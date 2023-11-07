@@ -90,14 +90,14 @@ def trace(func_or_cls_name: Union[Callable, str]) -> Callable:
 def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     # debugger.HandleCommand("type summary add -F ClangDataFormat.SourceLocation_summary clang::SourceLocation")
     # debugger.HandleCommand("type summary add -F ClangDataFormat.QualTypeProvider.get_summary clang::QualType")
-    # debugger.HandleCommand("type summary add clang::Type --python-function ClangDataFormat.Type_summary")
+    debugger.HandleCommand("type summary add --python-function ClangDataFormat.StringMapEntryProvider.get_summary -x '^llvm::StringMapEntry<.+>$'")
 
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerIntPairProvider -x '^llvm::PointerIntPair<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PunnedPointerProvider  -x '^llvm::detail::PunnedPointer<.+>$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.StringMapEntryProvider -x '^llvm::StringMapEntry<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerUnionProvider   -x '^llvm::PointerUnion<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.QualTypeProvider       -x '^clang::QualType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TypeProvider           -x '^clang::Type$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TypeBitfieldsProvider  -x '^clang::Type::TypeBitfields$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TagTypeProvider        -x '^clang::TagType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TemplateTypeParmTypeProvider -x '^clang::TemplateTypeParmType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclProvider           -x '^clang::Decl$'")
@@ -105,7 +105,68 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclarationNameProvider -x '^clang::DeclarationName$'")
 
 
-cached_types: Dict[str, SBType] = {}
+class StringMapEntryProvider(SBSyntheticValueProvider):
+    @trace
+    def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
+        self.value = value
+
+    @trace
+    def has_children(self) -> bool:
+        return True
+
+    @trace
+    def num_children(self, max_children: int) -> int:
+        return 2
+
+    @trace
+    def get_child_index(self, name: str) -> int:
+        print(f" name: {name}", end="")
+        if name == "Key":
+            return 0
+        if name == "Value":
+            return 1
+        return -1
+
+    @trace
+    def get_child_at_index(self, index: int) -> Optional[SBValue]:
+        print(f" index: {index}", end="")
+        if index == 0:
+            return self.key_value
+        if index == 1:
+            return self.value_value
+        return None
+
+    @trace
+    def update(self) -> bool:
+        value: SBValue = self.value
+        if value.type.is_pointer:
+            value = value.Dereference()
+        target: SBTarget = value.target
+
+        self.key_length_value: SBValue = value.GetChildMemberWithName("keyLength")
+        raw_key_length: int = self.key_length_value.unsigned
+
+        char_type: SBType = target.GetBasicType(lldb.eBasicTypeChar)
+        char_array_type: SBType = char_type.GetArrayType(raw_key_length + 1)
+
+        addr: SBAddress = value.addr
+        addr.OffsetAddress(value.type.size)
+
+        self.key_value: SBValue = target.CreateValueFromAddress("Key", addr, char_array_type)
+        self.key_value.SetSyntheticChildrenGenerated(True)
+
+        self.value_value: SBValue = value.GetChildMemberWithName("second").Clone("Value")
+        self.value_value.SetSyntheticChildrenGenerated(True)
+
+        return False
+
+    @classmethod
+    @trace("StringMapEntryProvider")
+    def get_summary(cls, value: SBValue, internal_dict: Dict[Any, Any], options: lldb.SBTypeSummaryOptions) -> str:
+        provider: StringMapEntryProvider = cls(value)
+        provider.update()
+        print(f"\nvalue: {provider.value_value.summary}", end="")
+        return f"{{{provider.key_value.summary} : {provider.value_value.summary}}}"
 
 
 class DeclProvider(SBSyntheticValueProvider):
@@ -248,7 +309,7 @@ class DeclarationNameProvider(SBSyntheticValueProvider):
         raw_pointer_mask: int = ~(ptr_mask_value.unsigned)
         raw_pointer_value: int = raw_ptr_value & raw_pointer_mask
         address: SBAddress = SBAddress(raw_pointer_value, self.value.target)
-        self.pointee_value: SBValue = self.value.target.CreateValueFromAddress("Pointee", address, pointee_type)
+        self.pointee_value: SBValue = self.value.target.CreateValueFromAddress("Pointer", address, pointee_type)
         self.pointee_value.SetSyntheticChildrenGenerated(True)
 
         return False
@@ -430,13 +491,11 @@ class TypeProvider(SBSyntheticValueProvider):
 
     @trace
     def update(self) -> bool:
-        self.ensure_type_class_type_is_cached(self.value.type)
-
         anon_union_value: SBValue = self.value.children[1]
         assert anon_union_value.type.name == "clang::Type::(anonymous union)"
         self.type_bits: SBValue = anon_union_value.GetChildMemberWithName("TypeBits")
 
-        raw_type_class_name = TypeBitfieldsProvider.get_raw_type_class_name(self.type_bits)
+        raw_type_class_name = self.type_bits.GetChildMemberWithName('TC').value
         if raw_type_class_name == "Enum":
             derived_type: SBType = self.value.target.FindFirstType("clang::TagType")
             assert derived_type.IsValid()
@@ -454,100 +513,6 @@ class TypeProvider(SBSyntheticValueProvider):
     @trace
     def has_children(self) -> bool:
         return True
-
-    @classmethod
-    @trace("TypeProvider")
-    def ensure_type_class_type_is_cached(cls, type: SBType) -> None:  # type: ignore
-        if "clang::Type::TypeClass" in cached_types:
-            return
-
-        if type.is_pointer:
-            type: SBType = type.GetPointeeType()
-        assert type.name == "clang::Type"
-        typeclass_enum: SBType = type.FindDirectNestedType("TypeClass")
-        assert typeclass_enum.IsValid()
-        cached_types["clang::Type::TypeClass"] = typeclass_enum
-
-
-class TypeBitfieldsProvider(SBSyntheticValueProvider):
-    @trace
-    def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
-        self.value: SBValue = value
-
-    @trace
-    def num_children(self, max_children: int) -> int:
-        return 6
-
-    @trace
-    def get_child_index(self, name: str) -> int:
-        print(f" name: {name}", end="")
-        if name == "TC":
-            return 0
-        if name == "Dependence":
-            return 1
-        if name == "CacheValid":
-            return 2
-        if name == "CachedLinkage":
-            return 3
-        if name == "CachedLocalOrUnnamed":
-            return 4
-        if name == "FromAST":
-            return 5
-        return -1
-
-    @trace
-    def get_child_at_index(self, index: int) -> Optional[SBValue]:
-        print(f" index: {index}", end="")
-        if index == 0:
-            return self.tc_value
-        if index == 1:
-            return self.dependence_value
-        if index == 2:
-            return self.value.GetChildMemberWithName("CacheValid")
-        if index == 3:
-            return self.cached_linkage_value
-        if index == 4:
-            return self.value.GetChildMemberWithName("CachedLocalOrUnnamed")
-        if index == 5:
-            return self.value.GetChildMemberWithName("FromAST")
-        return None
-
-    @trace
-    def update(self) -> bool:
-        self.tc_value: SBValue = self.value.GetChildMemberWithName("TC")
-        type_class_enum: Optional[SBType] = cached_types.get("clang::Type::TypeClass", None)
-        if type_class_enum is not None:
-            self.tc_value = cast_enum(type_class_enum, self.tc_value)
-
-        self.dependence_value: SBValue = self.value.GetChildMemberWithName("Dependence")
-        type_dependence_enum: SBType = self.value.target.FindFirstType("clang::TypeDependenceScope::TypeDependence")
-        if type_dependence_enum.IsValid():
-            self.dependence_value = cast_enum(type_dependence_enum, self.dependence_value)
-
-        self.cached_linkage_value: SBValue = self.value.GetChildMemberWithName("CachedLinkage")
-        linkage_enum: SBType = self.value.target.FindFirstType("clang::Linkage")
-        if linkage_enum.IsValid():
-            self.cached_linkage_value = cast_enum(linkage_enum, self.cached_linkage_value)
-
-        return False
-
-    @trace
-    def has_children(self):
-        return True
-
-    @classmethod
-    @trace
-    def get_raw_type_class_name(cls, value: SBValue) -> Union[str, int]:
-        assert value.type.name == "clang::Type::TypeBitfields"
-        tc_value: SBValue = value.GetChildMemberWithName("TC")
-        error = SBError()
-        raw_tc_value: int = tc_value.GetValueAsUnsigned(error)
-        assert error.success
-        type_class_enum: Optional[SBType] = cached_types.get("clang::Type::TypeClass", None)
-        if type_class_enum is not None:
-            tc_value: SBValue = create_value_from_raw_int("TC", raw_tc_value, type_class_enum, value.target)
-            return tc_value.value
-        return raw_tc_value
 
 
 class PointerIntPairProvider(SBSyntheticValueProvider):
