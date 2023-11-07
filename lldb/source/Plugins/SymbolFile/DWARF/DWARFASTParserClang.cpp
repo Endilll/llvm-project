@@ -31,6 +31,7 @@
 #include "lldb/Symbol/SymbolFile.h"
 #include "lldb/Symbol/TypeList.h"
 #include "lldb/Symbol/TypeMap.h"
+#include "lldb/Symbol/VariableList.h"
 #include "lldb/Target/Language.h"
 #include "lldb/Utility/LLDBAssert.h"
 #include "lldb/Utility/Log.h"
@@ -131,6 +132,54 @@ static lldb::ModuleSP GetContainingClangModule(const DWARFDIE &die) {
     }
   }
   return lldb::ModuleSP();
+}
+
+std::optional<DWARFFormValue>
+DWARFASTParserClang::FindConstantOnVariableDefinition(DWARFDIE die) {
+  assert(die.Tag() == llvm::dwarf::DW_TAG_member);
+
+  auto *dwarf = die.GetDWARF();
+  if (!dwarf)
+    return {};
+
+  ConstString name{die.GetName()};
+  if (!name)
+    return {};
+
+  auto *CU = die.GetCU();
+  if (!CU)
+    return {};
+
+  DWARFASTParser *dwarf_ast = dwarf->GetDWARFParser(*CU);
+  auto parent_decl_ctx = dwarf_ast->GetDeclContextContainingUIDFromDWARF(die);
+
+  // Make sure we populate the GetDieToVariable cache.
+  VariableList variables;
+  dwarf->FindGlobalVariables(name, parent_decl_ctx, UINT_MAX, variables);
+
+  // The cache contains the variable definition whose DW_AT_specification
+  // points to our declaration DIE. Look up that definition using our
+  // declaration.
+  auto const &die_to_var = dwarf->GetDIEToVariable();
+  auto it = die_to_var.find(die.GetDIE());
+  if (it == die_to_var.end())
+    return {};
+
+  auto var_sp = it->getSecond();
+  assert(var_sp != nullptr);
+
+  if (!var_sp->GetLocationIsConstantValueData())
+    return {};
+
+  auto def = dwarf->GetDIE(var_sp->GetID());
+  auto def_attrs = def.GetAttributes();
+  DWARFFormValue form_value;
+  if (!def_attrs.ExtractFormValueAtIndex(
+          def_attrs.FindAttributeIndex(llvm::dwarf::DW_AT_const_value),
+          form_value))
+    return {};
+
+  return form_value;
 }
 
 TypeSP DWARFASTParserClang::ParseTypeFromClangModule(const SymbolContext &sc,
@@ -1637,13 +1686,13 @@ DWARFASTParserClang::ParseStructureLikeDIE(const SymbolContext &sc,
   int tag_decl_kind = -1;
   AccessType default_accessibility = eAccessNone;
   if (tag == DW_TAG_structure_type) {
-    tag_decl_kind = clang::TTK_Struct;
+    tag_decl_kind = llvm::to_underlying(clang::TagTypeKind::Struct);
     default_accessibility = eAccessPublic;
   } else if (tag == DW_TAG_union_type) {
-    tag_decl_kind = clang::TTK_Union;
+    tag_decl_kind = llvm::to_underlying(clang::TagTypeKind::Union);
     default_accessibility = eAccessPublic;
   } else if (tag == DW_TAG_class_type) {
-    tag_decl_kind = clang::TTK_Class;
+    tag_decl_kind = llvm::to_underlying(clang::TagTypeKind::Class);
     default_accessibility = eAccessPrivate;
   }
 
@@ -1762,7 +1811,7 @@ DWARFASTParserClang::ParseStructureLikeDIE(const SymbolContext &sc,
     }
   }
   assert(tag_decl_kind != -1);
-  (void)tag_decl_kind;
+  UNUSED_IF_ASSERT_DISABLED(tag_decl_kind);
   bool clang_type_was_created = false;
   clang_type = CompilerType(
       m_ast.weak_from_this(),
@@ -1929,7 +1978,7 @@ DWARFASTParserClang::ParseStructureLikeDIE(const SymbolContext &sc,
         m_ast.GetAsCXXRecordDecl(clang_type.GetOpaqueQualType());
     if (record_decl)
       record_decl->setArgPassingRestrictions(
-          clang::RecordDecl::APK_CannotPassInRegs);
+          clang::RecordArgPassingKind::CannotPassInRegs);
   }
   return type_sp;
 }
@@ -2906,8 +2955,20 @@ void DWARFASTParserClang::ParseSingleMember(
 
       bool unused;
       // TODO: Support float/double static members as well.
-      if (!attrs.const_value_form || !ct.IsIntegerOrEnumerationType(unused))
+      if (!ct.IsIntegerOrEnumerationType(unused))
         return;
+
+      // Newer versions of Clang don't emit the DW_AT_const_value
+      // on the declaration of an inline static data member. Instead
+      // it's attached to the definition DIE. If that's the case,
+      // try and fetch it.
+      if (!attrs.const_value_form) {
+        auto maybe_form_value = FindConstantOnVariableDefinition(die);
+        if (!maybe_form_value)
+          return;
+
+        attrs.const_value_form = *maybe_form_value;
+      }
 
       llvm::Expected<llvm::APInt> const_value_or_err =
           ExtractIntFromFormValue(ct, *attrs.const_value_form);
@@ -3852,7 +3913,7 @@ void DWARFASTParserClang::ParseRustVariantPart(
       decl_context, OptionalClangModuleID(), lldb::eAccessPublic,
       std::string(
           llvm::formatv("{0}$Inner", class_clang_type.GetTypeName(false))),
-      clang::TTK_Union, lldb::eLanguageTypeRust);
+      llvm::to_underlying(clang::TagTypeKind::Union), lldb::eLanguageTypeRust);
   m_ast.StartTagDeclarationDefinition(inner_holder);
   m_ast.SetIsPacked(inner_holder);
 
@@ -3866,7 +3927,8 @@ void DWARFASTParserClang::ParseRustVariantPart(
         m_ast.GetDeclContextForType(inner_holder), OptionalClangModuleID(),
         lldb::eAccessPublic,
         std::string(llvm::formatv("{0}$Variant", member.GetName())),
-        clang::TTK_Struct, lldb::eLanguageTypeRust);
+        llvm::to_underlying(clang::TagTypeKind::Struct),
+        lldb::eLanguageTypeRust);
 
     m_ast.StartTagDeclarationDefinition(field_type);
     auto offset = member.byte_offset;
