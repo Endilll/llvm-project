@@ -25,7 +25,7 @@ from lldb import SBAddress, SBData, SBError, SBSyntheticValueProvider, SBTarget,
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 
-call_depth = 0
+trace_call_depth = 0
 
 
 def trace(func_or_cls_name: Union[Callable, str]) -> Callable:
@@ -46,7 +46,7 @@ def trace(func_or_cls_name: Union[Callable, str]) -> Callable:
         def decorator(*args, **kwargs) -> Callable:
 
             from time import perf_counter_ns
-            global call_depth
+            global trace_call_depth
 
             if isinstance(func_or_cls_name, str):
                 class_name = func_or_cls_name + "."
@@ -62,8 +62,8 @@ def trace(func_or_cls_name: Union[Callable, str]) -> Callable:
 
             func_name = func.__name__
 
-            print("\n" + " "*13 + "  "*call_depth + f" {class_name}{func_name}()", end="")
-            call_depth += 1
+            print("\n" + " "*13 + "  "*trace_call_depth + f" {class_name}{func_name}()", end="")
+            trace_call_depth += 1
             start = perf_counter_ns()
             try:
                 ret = func(*args, **kwargs)
@@ -74,8 +74,8 @@ def trace(func_or_cls_name: Union[Callable, str]) -> Callable:
                 raise e
             finally:
                 end = perf_counter_ns()
-                call_depth -= 1
-                print(f"\n{format_big_number(end - start).rjust(13)}" + "  "*call_depth + f" {class_name}{func_name}() exit", end="")
+                trace_call_depth -= 1
+                print(f"\n{format_big_number(end - start).rjust(13)}" + "  "*trace_call_depth + f" {class_name}{func_name}() exit", end="")
 
             return ret
 
@@ -263,10 +263,6 @@ class DeclarationNameProvider(SBSyntheticValueProvider):
             return 0
         if name == "NameKind":
             return 1
-        if name == "$$dereference$$":
-            return 1000
-        if name == "Ptr":
-            return 1001
         return -1
 
     @trace
@@ -276,8 +272,6 @@ class DeclarationNameProvider(SBSyntheticValueProvider):
             return self.pointee_value
         if index == 1:
             return self.name_kind_value
-        if index == 1001:
-            return self.value.GetChildMemberWithName("Ptr")
         return None
 
     @trace
@@ -769,141 +763,3 @@ def cast_enum(type: SBType, value: SBValue) -> SBValue:
     raw_value: int = value.GetValueAsUnsigned(error)
     assert error.success
     return create_value_from_raw_int(value.name, raw_value, type, value.target)
-
-
-# def QualType_summary(qualty, internal_dict):
-#     return QualType(qualty).summary()
-
-# def SourceLocation_summary(srcloc, internal_dict):
-#     return SourceLocation(srcloc).summary()
-
-# class SourceLocation(object):
-#     def __init__(self, srcloc):
-#         self.srcloc = srcloc
-#         self.ID = srcloc.GetChildAtIndex(0).GetValueAsUnsigned()
-#         self.frame = srcloc.GetFrame()
-
-#     def offset(self):
-#         return getValueFromExpression(self.srcloc, ".getOffset()").GetValueAsUnsigned()
-
-#     def isInvalid(self):
-#         return self.ID == 0
-
-#     def isMacro(self):
-#         return getValueFromExpression(self.srcloc, ".isMacroID()").GetValueAsUnsigned()
-
-#     def isLocal(self, srcmgr_path):
-#         return self.frame.EvaluateExpression(
-#             "(%s).isLocalSourceLocation(%s)"
-#             % (srcmgr_path, getExpressionPath(self.srcloc))
-#         ).GetValueAsUnsigned()
-
-#     def getPrint(self, srcmgr_path):
-#         print_str = getValueFromExpression(
-#             self.srcloc, ".printToString(%s)" % srcmgr_path
-#         )
-#         return print_str.GetSummary()
-
-#     def summary(self):
-#         if self.isInvalid():
-#             return "<invalid loc>"
-#         srcmgr_path = findObjectExpressionPath("clang::SourceManager", self.frame)
-#         if srcmgr_path:
-#             return "%s (offset: %d, %s, %s)" % (
-#                 self.getPrint(srcmgr_path),
-#                 self.offset(),
-#                 "macro" if self.isMacro() else "file",
-#                 "local" if self.isLocal(srcmgr_path) else "loaded",
-#             )
-#         return "(offset: %d, %s)" % (
-#             self.offset(),
-#             "macro" if self.isMacro() else "file",
-#         )
-
-
-# class QualType(object):
-#     def __init__(self, qualty):
-#         self.qualty = qualty
-
-#     def getAsString(self):
-#         sb_value_type = self.qualty.GetFrame().EvaluateExpression(f'{getExpressionPath(self.qualty)}.getTypePtr()->getTypeClass()')
-#         if not sb_value_type.value:
-#             return '<NULL TYPE>'
-#         sb_value_contents = self.qualty.GetFrame().EvaluateExpression(f'{getExpressionPath(self.qualty)}.getAsString()')
-#         return f'{sb_value_type.value}Type{{ {sb_value_contents.summary} }}'
-
-#     def summary(self):
-#         desc = self.getAsString()
-#         return desc
-
-
-# Key is a (function address, type name) tuple, value is the expression path for
-# an object with such a type name from inside that function.
-FramePathMapCache = {}
-
-
-# def findObjectExpressionPath(typename, frame):
-#     func_addr = frame.GetFunction().GetStartAddress().GetFileAddress()
-#     key = (func_addr, typename)
-#     try:
-#         return FramePathMapCache[key]
-#     except KeyError:
-#         # print "CACHE MISS"
-#         path = None
-#         obj = findObject(typename, frame)
-#         if obj:
-#             path = getExpressionPath(obj)
-#         FramePathMapCache[key] = path
-#         return path
-
-
-# def findObject(typename, frame):
-#     def getTypename(value):
-#         # FIXME: lldb should provide something like getBaseType
-#         ty = value.GetType()
-#         if ty.IsPointerType() or ty.IsReferenceType():
-#             return ty.GetPointeeType().GetName()
-#         return ty.GetName()
-
-#     def searchForType(value, searched):
-#         tyname = getTypename(value)
-#         # print "SEARCH:", getExpressionPath(value), value.GetType().GetName()
-#         if tyname == typename:
-#             return value
-#         ty = value.GetType()
-#         if not (
-#             ty.IsPointerType()
-#             or ty.IsReferenceType()
-#             or
-#             # FIXME: lldb should provide something like getCanonicalType
-#             tyname.startswith("llvm::IntrusiveRefCntPtr<")
-#             or tyname.startswith("llvm::OwningPtr<")
-#         ):
-#             return None
-#         # FIXME: Hashing for SBTypes does not seem to work correctly, uses the typename instead,
-#         # and not the canonical one unfortunately.
-#         if tyname in searched:
-#             return None
-#         searched.add(tyname)
-#         for i in range(value.GetNumChildren()):
-#             child = value.GetChildAtIndex(i, 0, False)
-#             found = searchForType(child, searched)
-#             if found:
-#                 return found
-
-#     searched = set()
-#     value_list = frame.GetVariables(True, True, True, True)
-#     for val in value_list:
-#         found = searchForType(val, searched)
-#         if found:
-#             return found if not found.TypeIsPointerType() else found.Dereference()
-
-
-def getValueFromExpression(val, expr):
-    return val.GetFrame().EvaluateExpression(getExpressionPath(val) + expr)
-
-
-def getExpressionPath(val):
-    stream = lldb.SBStream()
-    val.GetExpressionPath(stream)
-    return stream.GetData()
