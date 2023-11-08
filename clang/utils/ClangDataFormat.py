@@ -165,7 +165,6 @@ class StringMapEntryProvider(SBSyntheticValueProvider):
     def get_summary(cls, value: SBValue, internal_dict: Dict[Any, Any], options: lldb.SBTypeSummaryOptions) -> str:
         provider: StringMapEntryProvider = cls(value)
         provider.update()
-        print(f"\nvalue: {provider.value_value.summary}", end="")
         return f"{{{provider.key_value.summary} : {provider.value_value.summary}}}"
 
 
@@ -204,7 +203,7 @@ class DeclProvider(SBSyntheticValueProvider):
         self.decl_kind_value: SBValue = self.value.GetChildMemberWithName("DeclKind")
         decl_kind_type: SBType = type.FindDirectNestedType("Kind")  # type: ignore
         if decl_kind_type.IsValid():
-            self.decl_kind_value: SBValue = cast_enum(decl_kind_type, self.decl_kind_value)
+            self.decl_kind_value: SBValue = cast_value(decl_kind_type, self.decl_kind_value)
         self.decl_value: SBValue = self.value.GetChildMemberWithName("decl")
         return False
 
@@ -379,6 +378,19 @@ class QualTypeProvider(SBSyntheticValueProvider):
     def get_summary(cls, value: SBValue, internal_dict: Dict[Any, Any] = {}, options = None) -> str:
         return "Endill QualType placeholder"
 
+    @classmethod
+    @trace("QualTypeProvider")
+    def is_unqualified(cls, value: SBValue) -> bool:
+        assert value.type.name == "clang::QualType"
+        pointer_int_pair = PointerIntPairProvider(value.GetChildMemberWithName("Value"))
+        pointer_int_pair.update()
+        raw_int_value = pointer_int_pair.raw_int_value
+        qualifiers_enum = value.target.FindFirstType("clang::Qualifiers::TQ")
+        result = False
+        for enumerator in qualifiers_enum.enum_members:
+            result = result or raw_int_value & enumerator.unsigned
+        return result
+
 
 class TagTypeProvider(SBSyntheticValueProvider):
     @trace
@@ -445,11 +457,8 @@ class TemplateTypeParmTypeProvider(SBSyntheticValueProvider):
     @trace
     def update(self) -> bool:
         union_value: SBValue = self.value.GetChildAtIndex(2)
-        common_base_type: SBType = self.value.type.bases[0].type.bases[0].type
-        common_base_value: SBValue = cast_value(common_base_type, self.value)
-        canonical_type_value: SBValue = common_base_value.GetChildMemberWithName("CanonicalType")
-        _, canonical_type_qualifiers = PointerIntPairProvider.extract_raw_values(canonical_type_value.GetChildMemberWithName('Value'))
-        if canonical_type_qualifiers == 0:
+        canonical_type_value: SBValue = self.value.GetChildMemberWithName("CanonicalType")
+        if QualTypeProvider.is_unqualified(canonical_type_value):
             self.info_decl_union_value: SBValue = union_value.GetChildMemberWithName("CanTTPTInfo")
         else:
             self.info_decl_union_value: SBValue = union_value.GetChildMemberWithName("TTPDecl")
@@ -461,8 +470,7 @@ class TypeProvider(SBSyntheticValueProvider):
     @trace
     def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
         self.value = value
-        self.type_bits: SBValue = None  # type: ignore
-        self.derived_bits: SBValue = None  # type: ignore
+        self.bits: SBValue = None  # type: ignore
         self.derived_value: SBValue = None  # type: ignore
 
     @trace
@@ -472,20 +480,18 @@ class TypeProvider(SBSyntheticValueProvider):
     @trace
     def get_child_index(self, name: str) -> int:
         print(f" name: {name}", end="")
-        if name == "TypeBits":
+        if name == "Bits":
             return 0
-        if name == "TagType":
-            return 2
+        if name == "Derived":
+            return 1
         return -1
 
     @trace
     def get_child_at_index(self, index: int) -> Optional[SBValue]:
         print(f" index: {index}", end="")
         if index == 0:
-            return self.type_bits
+            return self.bits
         if index == 1:
-            return self.derived_bits
-        if index == 2:
             return self.derived_value
         return None
 
@@ -497,16 +503,16 @@ class TypeProvider(SBSyntheticValueProvider):
 
         raw_type_class_name = self.type_bits.GetChildMemberWithName('TC').value
         if raw_type_class_name == "Enum":
+            self.bits: SBValue = self.value.GetChildMemberWithName("TypeBits")
             derived_type: SBType = self.value.target.FindFirstType("clang::TagType")
-            assert derived_type.IsValid()
         elif raw_type_class_name == "TemplateTypeParm":
+            self.bits: SBValue = self.value.GetChildMemberWithName("TypeBits")
             derived_type: SBType = self.value.target.FindFirstType("clang::TemplateTypeParmType")
-            assert derived_type.IsValid()
         else:
             raise NotImplementedError(raw_type_class_name)
 
-        if derived_type.IsValid():
-            self.derived_value: SBValue = cast_value(derived_type, self.value, "Derived")
+        assert derived_type.IsValid()
+        self.derived_value: SBValue = cast_value(derived_type, self.value, "Derived")
 
         return False
 
