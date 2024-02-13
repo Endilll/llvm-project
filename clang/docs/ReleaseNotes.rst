@@ -165,6 +165,9 @@ Bug Fixes in This Version
   a member class template for an implicit instantiation of a class template.
 
 - Fixed missing warnings when doing bool-like conversions in C23 (`#79435 <https://github.com/llvm/llvm-project/issues/79435>`_).
+- Clang's ``-Wshadow`` no longer warns when an init-capture is named the same as
+  a class field unless the lambda can capture this.
+  Fixes (`#71976 <https://github.com/llvm/llvm-project/issues/71976>`_)
 
 - Clang now accepts qualified partial/explicit specializations of variable templates that
   are not nominable in the lookup context of the specialization.
@@ -225,6 +228,8 @@ Bug Fixes to C++ Support
   or non-constant more accurately. Previously, only a subset of the initializer
   elements were considered, misclassifying some initializers as constant. Fixes
   some of (`#80510 <https://github.com/llvm/llvm-project/issues/80510>`).
+- Clang now ignores top-level cv-qualifiers on function parameters in template partial orderings.
+  (`#75404 <https://github.com/llvm/llvm-project/issues/75404>`_)
 
 Bug Fixes to AST Handling
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -293,6 +298,8 @@ clang-format
 
 - ``AlwaysBreakTemplateDeclarations`` is deprecated and renamed to
   ``BreakTemplateDeclarations``.
+- ``AlwaysBreakAfterReturnType`` is deprecated and renamed to
+  ``BreakAfterReturnType``.
 
 libclang
 --------
