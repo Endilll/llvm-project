@@ -9271,7 +9271,7 @@ ConstString TypeSystemClang::DeclContextGetName(void *opaque_decl_ctx) {
       llvm::raw_string_ostream stream{name};
       auto policy = GetTypePrintingPolicy();
       policy.AlwaysIncludeTypeForTemplateArgument = true;
-      named_decl->getNameForDiagnostic(stream, policy, /*qualified=*/ false);
+      named_decl->getNameForDiagnostic(stream, policy, /*qualified=*/false);
       return ConstString(name);
     }
   }
