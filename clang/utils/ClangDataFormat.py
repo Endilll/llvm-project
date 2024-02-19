@@ -354,6 +354,7 @@ class QualTypeProvider(SBSyntheticValueProvider):
         self.type_value = pointer_int_pair.pointer_value.Dereference().Clone("Type")
         raw_int_value = pointer_int_pair.raw_int_value
         qualifiers_enum = self.value.target.FindFirstType("clang::Qualifiers::TQ")
+        assert qualifiers_enum.IsValid()
         for enumerator in qualifiers_enum.enum_members:
             if enumerator.name == "Const":
                 self.is_const_value: SBValue = create_bool_value("LocalConstQualified", raw_int_value & enumerator.unsigned, self.value.target)
@@ -380,6 +381,7 @@ class QualTypeProvider(SBSyntheticValueProvider):
         pointer_int_pair.update()
         raw_int_value = pointer_int_pair.raw_int_value
         qualifiers_enum = value.target.FindFirstType("clang::Qualifiers::TQ")
+        assert qualifiers_enum.IsValid()
         result = False
         for enumerator in qualifiers_enum.enum_members:
             result = result or raw_int_value & enumerator.unsigned
