@@ -1270,8 +1270,8 @@ def TestOpWithRegionFoldNoMemoryEffect : TEST_Op<
 
 // Op for testing folding of outer op with inner ops.
 def TestOpWithRegionFold : TEST_Op<"op_with_region_fold"> {
-  let arguments = (ins I32:$operand);
-  let results = (outs I32);
+  let arguments = (ins AnyType:$operand);
+  let results = (outs AnyType);
   let regions = (region SizedRegion<1>:$region);
   let hasFolder = 1;
 }
@@ -2045,6 +2045,17 @@ def CustomDimensionListAttrOp : TEST_Op<"custom_dimension_list_attr"> {
   let assemblyFormat = [{
     `dimension_list` `=` custom<DimensionList>($dimension_list)
     attr-dict
+  }];
+}
+
+def OptionalCustomAttrOp : TEST_Op<"optional_custom_attr"> {
+  let description = [{
+    Test using a custom directive as the optional group anchor and the first
+    element to parse. It is expected to return an `OptionalParseResult`.
+  }];
+  let arguments = (ins OptionalAttr<I1Attr>:$attr);
+  let assemblyFormat = [{
+    attr-dict (custom<OptionalCustomParser>($attr)^) : (`bar`)?
   }];
 }
 
@@ -2898,7 +2909,8 @@ def TestOpWithNiceProperties : TEST_Op<"with_nice_properties"> {
   );
   let extraClassDeclaration = [{
     void printProperties(::mlir::MLIRContext *ctx, ::mlir::OpAsmPrinter &p,
-                         const Properties &prop);
+                         const Properties &prop,
+                         ::mlir::ArrayRef<::llvm::StringRef> elidedProps);
     static ::mlir::ParseResult  parseProperties(::mlir::OpAsmParser &parser,
                                      ::mlir::OperationState &result);
     static ::mlir::LogicalResult readFromMlirBytecode(
@@ -2927,7 +2939,8 @@ def TestOpWithNiceProperties : TEST_Op<"with_nice_properties"> {
       writer.writeVarInt(prop.value);
     }
     void TestOpWithNiceProperties::printProperties(::mlir::MLIRContext *ctx,
-            ::mlir::OpAsmPrinter &p, const Properties &prop) {
+            ::mlir::OpAsmPrinter &p, const Properties &prop,
+            ::mlir::ArrayRef<::llvm::StringRef> elidedProps) {
       customPrintProperties(p, prop.prop);
     }
     ::mlir::ParseResult TestOpWithNiceProperties::parseProperties(
@@ -2960,7 +2973,8 @@ def TestOpWithVersionedProperties : TEST_Op<"with_versioned_properties"> {
   );
   let extraClassDeclaration = [{
     void printProperties(::mlir::MLIRContext *ctx, ::mlir::OpAsmPrinter &p,
-                         const Properties &prop);
+                         const Properties &prop,
+                         ::mlir::ArrayRef<::llvm::StringRef> elidedProps);
     static ::mlir::ParseResult  parseProperties(::mlir::OpAsmParser &parser,
                                      ::mlir::OperationState &result);
     static ::mlir::LogicalResult readFromMlirBytecode(
@@ -2972,7 +2986,8 @@ def TestOpWithVersionedProperties : TEST_Op<"with_versioned_properties"> {
   }];
   let extraClassDefinition = [{
     void TestOpWithVersionedProperties::printProperties(::mlir::MLIRContext *ctx,
-            ::mlir::OpAsmPrinter &p, const Properties &prop) {
+            ::mlir::OpAsmPrinter &p, const Properties &prop,
+            ::mlir::ArrayRef<::llvm::StringRef> elidedProps) {
       customPrintProperties(p, prop.prop);
     }
     ::mlir::ParseResult TestOpWithVersionedProperties::parseProperties(
@@ -2984,6 +2999,11 @@ def TestOpWithVersionedProperties : TEST_Op<"with_versioned_properties"> {
       return success();
     }
   }];
+}
+
+def TestOpWithDefaultValuedProperties : TEST_Op<"with_default_valued_properties"> {
+  let assemblyFormat = "prop-dict attr-dict";
+  let arguments = (ins DefaultValuedAttr<I32Attr, "0">:$a);
 }
 
 //===----------------------------------------------------------------------===//
