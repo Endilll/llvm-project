@@ -1348,6 +1348,14 @@ let Command = "type lookup" in {
     Desc<"Which language's types should the search scope be">;
 }
 
+let Command = "type recognizer add" in {
+  def type_recognizer_add_regex : Option<"regex", "x">,
+    Desc<"Type names are actually regular expressions.">;
+  def type_recognizer_add_python_function : Option<"python-function", "F">,
+    Arg<"PythonFunction">,
+    Desc<"Give the name of a Python function to use for this type.">;
+}
+
 let Command = "watchpoint list" in {
   def watchpoint_list_brief : Option<"brief", "b">, Group<1>, Desc<"Give a "
     "brief description of the watchpoint (no location info).">;

@@ -186,10 +186,11 @@ public:
     eClearUserVisibleDataItemsLocation = 1u << 3,
     eClearUserVisibleDataItemsDescription = 1u << 4,
     eClearUserVisibleDataItemsSyntheticChildren = 1u << 5,
+    eClearUserVisibleDataItemsType = 1u << 6,
     eClearUserVisibleDataItemsAllStrings =
         eClearUserVisibleDataItemsValue | eClearUserVisibleDataItemsSummary |
         eClearUserVisibleDataItemsLocation |
-        eClearUserVisibleDataItemsDescription,
+        eClearUserVisibleDataItemsDescription | eClearUserVisibleDataItemsType,
     eClearUserVisibleDataItemsAll = 0xFFFF
   };
 
@@ -741,6 +742,16 @@ public:
     return m_synthetic_children_sp;
   }
 
+  void SetTypeRecognizer(lldb::TypeRecognizerImplSP recognizer) {
+    m_type_recognizer_sp = std::move(recognizer);
+    ClearUserVisibleData(eClearUserVisibleDataItemsType);
+  }
+
+  lldb::TypeRecognizerImplSP GetTypeRecognizer() {
+    UpdateFormatsIfNeeded();
+    return m_type_recognizer_sp;
+  }
+
   // Use GetParent for display purposes, but if you want to tell the parent to
   // update itself then use m_parent.  The ValueObjectDynamicValue's parent is
   // not the correct parent for displaying, they are really siblings, so for
@@ -887,6 +898,7 @@ protected:
   lldb::TypeSummaryImplSP m_type_summary_sp;
   lldb::TypeFormatImplSP m_type_format_sp;
   lldb::SyntheticChildrenSP m_synthetic_children_sp;
+  lldb::TypeRecognizerImplSP m_type_recognizer_sp;
   ProcessModID m_user_id_of_forced_summary;
   AddressType m_address_type_of_ptr_or_ref_children = eAddressTypeInvalid;
 

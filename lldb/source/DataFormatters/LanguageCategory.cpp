@@ -26,6 +26,7 @@ LanguageCategory::LanguageCategory(lldb::LanguageType lang_type)
     m_hardcoded_formats = language_plugin->GetHardcodedFormats();
     m_hardcoded_summaries = language_plugin->GetHardcodedSummaries();
     m_hardcoded_synthetics = language_plugin->GetHardcodedSynthetics();
+    m_hardcoded_recognizers = language_plugin->GetHardcodedRecognizers();
   }
   Enable();
 }
@@ -67,6 +68,9 @@ LanguageCategory::Get<lldb::TypeSummaryImplSP>(FormattersMatchData &,
 template bool
 LanguageCategory::Get<lldb::SyntheticChildrenSP>(FormattersMatchData &,
                                                  lldb::SyntheticChildrenSP &);
+template bool
+LanguageCategory::Get<lldb::TypeRecognizerImplSP>(FormattersMatchData &,
+                                                 lldb::TypeRecognizerImplSP &);
 /// \}
 
 template <>
@@ -82,6 +86,11 @@ auto &LanguageCategory::GetHardcodedFinder<lldb::TypeSummaryImplSP>() {
 template <>
 auto &LanguageCategory::GetHardcodedFinder<lldb::SyntheticChildrenSP>() {
   return m_hardcoded_synthetics;
+}
+
+template <>
+auto &LanguageCategory::GetHardcodedFinder<lldb::TypeRecognizerImplSP>() {
+  return m_hardcoded_recognizers;
 }
 
 } // namespace lldb_private
@@ -113,6 +122,8 @@ template bool LanguageCategory::GetHardcoded<lldb::TypeSummaryImplSP>(
     FormatManager &, FormattersMatchData &, lldb::TypeSummaryImplSP &);
 template bool LanguageCategory::GetHardcoded<lldb::SyntheticChildrenSP>(
     FormatManager &, FormattersMatchData &, lldb::SyntheticChildrenSP &);
+template bool LanguageCategory::GetHardcoded<lldb::TypeRecognizerImplSP>(
+    FormatManager &, FormattersMatchData &, lldb::TypeRecognizerImplSP &);
 /// \}
 
 lldb::TypeCategoryImplSP LanguageCategory::GetCategory() const {

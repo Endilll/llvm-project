@@ -118,6 +118,9 @@ public:
   lldb::ScriptedSyntheticChildrenSP
   GetSyntheticForType(lldb::TypeNameSpecifierImplSP type_sp);
 
+  lldb::TypeRecognizerImplSP
+  GetTypeRecognizerForType(lldb::TypeNameSpecifierImplSP type_sp);
+
   lldb::TypeFormatImplSP GetFormat(ValueObject &valobj,
                                    lldb::DynamicValueType use_dynamic);
 
@@ -126,6 +129,9 @@ public:
 
   lldb::SyntheticChildrenSP
   GetSyntheticChildren(ValueObject &valobj, lldb::DynamicValueType use_dynamic);
+
+  lldb::TypeRecognizerImplSP
+  GetTypeRecognizer(ValueObject &valobj, lldb::DynamicValueType use_dynamic);
 
   bool
   AnyMatches(const FormattersMatchCandidate &candidate_type,

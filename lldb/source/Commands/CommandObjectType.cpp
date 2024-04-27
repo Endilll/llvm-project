@@ -109,6 +109,8 @@ const char *FormatCategoryToString(FormatCategoryItem item, bool long_name) {
     return "synthetic";
   case eFormatCategoryItemFormat:
     return "format";
+  case eFormatCategoryItemRecognizer:
+    return "recognizer";
   }
   llvm_unreachable("Fully covered switch above!");
 }
@@ -1656,6 +1658,137 @@ protected:
   }
 };
 
+// CommandObjectTypeRecognizerAdd
+#define LLDB_OPTIONS_type_recognizer_add
+#include "CommandOptions.inc"
+
+class CommandObjectTypeRecognizerAdd : public CommandObjectParsed {
+private:
+  class CommandOptions : public Options {
+  public:
+    CommandOptions(CommandInterpreter &interpreter) {}
+    ~CommandOptions() override = default;
+
+    Status SetOptionValue(uint32_t option_idx, llvm::StringRef option_arg,
+                          ExecutionContext *execution_context) override {
+      Status error;
+      const int short_option = m_getopt_table[option_idx].val;
+      // bool success;
+      switch (short_option) {
+      case 'F':
+        m_python_function = std::string(option_arg);
+        break;
+      case 'x':
+        m_match_type = eFormatterMatchRegex;
+        break;
+      default:
+        llvm_unreachable("Unimplemented option");
+      }
+
+      return error;
+    }
+
+    void OptionParsingStarting(ExecutionContext *execution_context) override {
+      m_match_type = eFormatterMatchRegex;
+      m_python_function = "";
+    }
+
+    llvm::ArrayRef<OptionDefinition> GetDefinitions() override {
+      return llvm::ArrayRef(g_type_recognizer_add_options);
+    }
+
+    TypeRecognizerImpl::Flags m_flags;
+    FormatterMatchType m_match_type;
+    std::string m_python_function;
+  };
+
+  CommandOptions m_options;
+
+  Options *GetOptions() override { return &m_options; }
+
+public:
+  CommandObjectTypeRecognizerAdd(CommandInterpreter &interpreter)
+  : CommandObjectParsed(interpreter, "type recognizer add", "Add new dynamic type recognizer for a type."),
+    m_options(interpreter) {
+      CommandArgumentEntry type_arg;
+      CommandArgumentData type_style_arg;
+
+      type_style_arg.arg_type = eArgTypeName;
+      type_style_arg.arg_repetition = eArgRepeatPlus;
+
+      type_arg.push_back(type_style_arg);
+
+      m_arguments.push_back(type_arg);
+    }
+
+  ~CommandObjectTypeRecognizerAdd() override = default;
+
+  void AddTypeRecognizer(ConstString type_name, TypeRecognizerImplSP entry, FormatterMatchType match_type, Status *error) {
+    lldb::TypeCategoryImplSP category;
+    DataVisualization::Categories::GetCategory(ConstString("default"), category);
+
+    if (match_type == eFormatterMatchRegex) {
+      RegularExpression typeRX(type_name.GetStringRef());
+      if (!typeRX.IsValid()) {
+        if (error)
+          error->SetErrorString("regex format error (maybe this is not really a regex?)");
+        return;
+      }
+    }
+
+    category->AddTypeRecognizer(type_name.GetStringRef(), match_type, entry);
+  } 
+
+protected:
+  void DoExecute(Args &command, CommandReturnObject &result) override {
+    WarnOnPotentialUnquotedUnsignedType(command, result);
+
+    const size_t argc = command.GetArgumentCount();
+
+    if (argc < 1) {
+      result.AppendErrorWithFormat("%s takes one or more args.\n", m_cmd_name.c_str());
+      return;
+    }
+
+    TypeRecognizerImplSP script_recognizer;
+
+    if (!m_options.m_python_function.empty()) { // we have a Python function ready to use
+      const char *funct_name = m_options.m_python_function.c_str();
+      if (!funct_name || !funct_name[0]) {
+        result.AppendError("function name empty.\n");
+        return;
+      }
+
+      std::string code =
+        ("    " + m_options.m_python_function + "(valobj,internal_dict)");
+      script_recognizer = std::make_shared<TypeRecognizerImpl>(m_options.m_flags, funct_name, code.c_str());
+
+      ScriptInterpreter *interpreter = GetDebugger().GetScriptInterpreter();
+
+      if (interpreter && !interpreter->CheckObjectExists(funct_name))
+      result.AppendWarningWithFormat(
+          "The provided function \"%s\" does not exist - "
+          "please define it before attempting to use this type recognizer.\n",
+          funct_name);
+    }
+
+    // if I am here, script_format must point to something good, so I can add
+    // that as a dynamic type recognizer to all interested parties
+
+    Status error;
+
+    for (auto &entry : command.entries()) {
+      AddTypeRecognizer(ConstString(entry.ref()), script_recognizer, FormatterMatchType::eFormatterMatchRegex, &error);
+      if (error.Fail()) {
+        result.AppendError(error.AsCString());
+        return;
+      }
+    }
+
+    return;
+  }
+};
+
 // CommandObjectTypeCategoryDefine
 #define LLDB_OPTIONS_type_category_define
 #include "CommandOptions.inc"
@@ -2892,6 +3025,32 @@ public:
   ~CommandObjectTypeSummary() override = default;
 };
 
+class CommandObjectTypeRecognizer : public CommandObjectMultiword {
+public:
+  CommandObjectTypeRecognizer(CommandInterpreter &interpreter)
+      : CommandObjectMultiword(
+            interpreter, "type recognizer",
+            "Commands for editing dynamic type recognizers.",
+            "type summary [<sub-command-options>] ") {
+    LoadSubCommand(
+        "add", CommandObjectSP(new CommandObjectTypeRecognizerAdd(interpreter)));
+  //   LoadSubCommand("clear", CommandObjectSP(new CommandObjectTypeSummaryClear(
+  //                               interpreter)));
+  //   LoadSubCommand("delete", CommandObjectSP(new CommandObjectTypeSummaryDelete(
+  //                                interpreter)));
+  //   LoadSubCommand(
+  //       "list", CommandObjectSP(new CommandObjectTypeSummaryList(interpreter)));
+  //   LoadSubCommand(
+  //       "info", CommandObjectSP(new CommandObjectFormatterInfo<TypeSummaryImpl>(
+  //                   interpreter, "summary",
+  //                   [](ValueObject &valobj) -> TypeSummaryImpl::SharedPointer {
+  //                     return valobj.GetSummaryFormat();
+  //                   })));
+  }
+
+  ~CommandObjectTypeRecognizer() override = default;
+};
+
 // CommandObjectType
 
 CommandObjectType::CommandObjectType(CommandInterpreter &interpreter)
@@ -2904,6 +3063,8 @@ CommandObjectType::CommandObjectType(CommandInterpreter &interpreter)
                  CommandObjectSP(new CommandObjectTypeFilter(interpreter)));
   LoadSubCommand("format",
                  CommandObjectSP(new CommandObjectTypeFormat(interpreter)));
+  LoadSubCommand("recognizer",
+                 CommandObjectSP(new CommandObjectTypeRecognizer(interpreter)));
   LoadSubCommand("summary",
                  CommandObjectSP(new CommandObjectTypeSummary(interpreter)));
   LoadSubCommand("synthetic",

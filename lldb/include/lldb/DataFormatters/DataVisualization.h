@@ -50,6 +50,12 @@ public:
   static lldb::SyntheticChildrenSP
   GetSyntheticChildren(ValueObject &valobj, lldb::DynamicValueType use_dynamic);
 
+  static lldb::TypeRecognizerImplSP
+  GetTypeRecognizer(ValueObject &valobj, lldb::DynamicValueType use_dynamic);
+
+  static lldb::TypeRecognizerImplSP
+  GetTypeRecognizerForType(lldb::TypeNameSpecifierImplSP type_sp);
+
   static bool
   AnyMatches(const FormattersMatchCandidate &candidate_type,
              TypeCategoryImpl::FormatCategoryItems items =

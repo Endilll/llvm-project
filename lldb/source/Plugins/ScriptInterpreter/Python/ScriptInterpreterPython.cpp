@@ -6,6 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "lldb/API/SBType.h"
 #include "lldb/Host/Config.h"
 #include "lldb/lldb-enumerations.h"
 
@@ -2003,6 +2004,39 @@ bool ScriptInterpreterPythonImpl::GetScriptedSummary(
   }
 
   return ret_val;
+}
+
+lldb::TypeImplSP
+ScriptInterpreterPythonImpl::RecognizeType(const char *p_function_name,
+                                           lldb::ValueObjectSP input_valobj) {
+  if (!p_function_name || p_function_name[0] == '\0' || !input_valobj.get())
+    return nullptr;
+
+  Locker py_lock(this,
+                 Locker::AcquireLock | Locker::InitSession | Locker::NoSTDIN);
+
+  PythonObject ret_val = SWIGBridge::LLDBSwigPythonCallRecognizerScript(
+      p_function_name, GetSessionDictionary().get(), input_valobj);
+
+  if (!ret_val.IsAllocated())
+    return nullptr;
+
+  PyObject *out_py_valtype = ret_val.get();
+
+  if (!out_py_valtype || out_py_valtype == Py_None) {
+    Py_XDECREF(out_py_valtype);
+    return nullptr;
+  }
+
+  lldb::SBType *sb_type_ptr =
+      (lldb::SBType *)LLDBSWIGPython_CastPyObjectToSBType(out_py_valtype);
+
+  if (sb_type_ptr == nullptr) {
+    Py_XDECREF(out_py_valtype);
+    return nullptr;
+  }
+
+  return SWIGBridge::LLDBSWIGPython_GetTypeImplSPFromSBType(sb_type_ptr);
 }
 
 bool ScriptInterpreterPythonImpl::FormatterCallbackFunction(

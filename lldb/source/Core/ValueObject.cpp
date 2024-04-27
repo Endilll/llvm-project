@@ -16,6 +16,7 @@
 #include "lldb/Core/ValueObjectConstResult.h"
 #include "lldb/Core/ValueObjectDynamicValue.h"
 #include "lldb/Core/ValueObjectMemory.h"
+#include "lldb/Core/ValueObjectRecognizedValue.h"
 #include "lldb/Core/ValueObjectSyntheticFilter.h"
 #include "lldb/Core/ValueObjectVTable.h"
 #include "lldb/DataFormatters/DataVisualization.h"
@@ -221,6 +222,8 @@ bool ValueObject::UpdateFormatsIfNeeded() {
         DataVisualization::GetSummaryFormat(*this, GetDynamicValueType()));
     SetSyntheticChildren(
         DataVisualization::GetSyntheticChildren(*this, GetDynamicValueType()));
+    // FIXME: I guess we're not interested in dynamic value for type recognizer
+    SetTypeRecognizer(DataVisualization::GetTypeRecognizer(*this, eNoDynamicValues));
   }
 
   return any_change;
@@ -1802,13 +1805,34 @@ void ValueObject::CalculateDynamicValue(DynamicValueType use_dynamic) {
   if (use_dynamic == eNoDynamicValues)
     return;
 
-  if (!m_dynamic_value && !IsDynamic()) {
-    ExecutionContext exe_ctx(GetExecutionContextRef());
-    Process *process = exe_ctx.GetProcessPtr();
-    if (process && process->IsPossibleDynamicValue(*this)) {
-      ClearDynamicTypeInformation();
-      m_dynamic_value = new ValueObjectDynamicValue(*this, use_dynamic);
-    }
+  if (m_dynamic_value || IsDynamic())
+    return;
+
+  // Returns boolean that indicates whether we should proceed with the default
+  // vtable-based method.
+  auto try_type_recognizer = [&]() -> bool {
+    lldb::TypeRecognizerImplSP current_type_recognizer_sp(m_type_recognizer_sp);
+
+    UpdateFormatsIfNeeded();
+    if (m_type_recognizer_sp.get() == nullptr)
+      return false;
+    if (current_type_recognizer_sp == m_type_recognizer_sp && m_dynamic_value)
+      return true;
+
+    ClearDynamicTypeInformation();
+    m_dynamic_value = new ValueObjectRecognizedValue(*this, use_dynamic);
+
+    return true;
+  };
+
+  if (try_type_recognizer())
+    return;
+
+  ExecutionContext exe_ctx(GetExecutionContextRef());
+  Process *process = exe_ctx.GetProcessPtr();
+  if (process && process->IsPossibleDynamicValue(*this)) {
+    ClearDynamicTypeInformation();
+    m_dynamic_value = new ValueObjectDynamicValue(*this, use_dynamic);
   }
 }
 

@@ -65,6 +65,16 @@ DataVisualization::GetSyntheticForType(lldb::TypeNameSpecifierImplSP type_sp) {
   return GetFormatManager().GetSyntheticForType(type_sp);
 }
 
+lldb::TypeRecognizerImplSP
+DataVisualization::GetTypeRecognizer(ValueObject &valobj, lldb::DynamicValueType use_dynamic) {
+  return GetFormatManager().GetTypeRecognizer(valobj, use_dynamic);
+}
+
+lldb::TypeRecognizerImplSP
+DataVisualization::GetTypeRecognizerForType(lldb::TypeNameSpecifierImplSP type_sp) {
+  return GetFormatManager().GetTypeRecognizerForType(type_sp);
+}
+
 bool DataVisualization::AnyMatches(
     const FormattersMatchCandidate &candidate_type,
     TypeCategoryImpl::FormatCategoryItems items, bool only_enabled,

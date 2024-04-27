@@ -24,10 +24,12 @@ private:
     bool m_format_cached : 1;
     bool m_summary_cached : 1;
     bool m_synthetic_cached : 1;
+    bool m_recognizer_cached : 1;
 
     lldb::TypeFormatImplSP m_format_sp;
     lldb::TypeSummaryImplSP m_summary_sp;
     lldb::SyntheticChildrenSP m_synthetic_sp;
+    lldb::TypeRecognizerImplSP m_recognizer_sp;
 
   public:
     Entry();
@@ -36,14 +38,17 @@ private:
     bool IsFormatCached();
     bool IsSummaryCached();
     bool IsSyntheticCached();
+    bool IsRecognizerCached();
 
     void Get(lldb::TypeFormatImplSP &);
     void Get(lldb::TypeSummaryImplSP &);
     void Get(lldb::SyntheticChildrenSP &);
+    void Get(lldb::TypeRecognizerImplSP &);
 
     void Set(lldb::TypeFormatImplSP);
     void Set(lldb::TypeSummaryImplSP);
     void Set(lldb::SyntheticChildrenSP);
+    void Set(lldb::TypeRecognizerImplSP);
   };
   std::map<ConstString, Entry> m_entries;
   std::recursive_mutex m_mutex;
@@ -58,6 +63,7 @@ public:
   void Set(ConstString type, lldb::TypeFormatImplSP &format_sp);
   void Set(ConstString type, lldb::TypeSummaryImplSP &summary_sp);
   void Set(ConstString type, lldb::SyntheticChildrenSP &synthetic_sp);
+  void Set(ConstString type, lldb::TypeRecognizerImplSP &recognizer_sp);
 
   void Clear();
 

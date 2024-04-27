@@ -170,6 +170,7 @@ private:
   typedef TieredFormatterContainer<TypeSummaryImpl> SummaryContainer;
   typedef TieredFormatterContainer<TypeFilterImpl> FilterContainer;
   typedef TieredFormatterContainer<SyntheticChildren> SynthContainer;
+  typedef TieredFormatterContainer<TypeRecognizerImpl> RecognizerContainer;
 
 public:
   typedef uint16_t FormatCategoryItems;
@@ -207,6 +208,10 @@ public:
     m_synth_cont.ForEach(callback.callback);
   }
 
+  void ForEach(ForEachCallback<TypeRecognizerImpl> callback) {
+    m_recognizer_cont.ForEach(callback.callback);
+  }
+
   FormatContainer::MapValueType
   GetFormatForType(lldb::TypeNameSpecifierImplSP type_sp);
 
@@ -218,6 +223,9 @@ public:
 
   SynthContainer::MapValueType
   GetSyntheticForType(lldb::TypeNameSpecifierImplSP type_sp);
+
+  RecognizerContainer::MapValueType
+  GetRecognizerForType(lldb::TypeNameSpecifierImplSP type_sp);
 
   void AddTypeFormat(lldb::TypeNameSpecifierImplSP type_sp,
                      lldb::TypeFormatImplSP format_sp) {
@@ -268,6 +276,17 @@ public:
         synth_sp);
   }
 
+  void AddTypeRecognizer(lldb::TypeNameSpecifierImplSP type_sp,
+                         lldb::TypeRecognizerImplSP recognizer_sp) {
+    m_recognizer_cont.Add(type_sp, recognizer_sp);
+  }
+
+  void AddTypeRecognizer(llvm::StringRef name,
+                         lldb::FormatterMatchType match_type,
+                         lldb::TypeRecognizerImplSP recognizer_sp) {
+    AddTypeRecognizer(std::make_shared<lldb_private::TypeNameSpecifierImpl>(name, match_type), recognizer_sp);
+  }
+
   bool DeleteTypeFormat(lldb::TypeNameSpecifierImplSP type_sp) {
     return m_format_cont.Delete(type_sp);
   }
@@ -284,6 +303,10 @@ public:
     return m_synth_cont.Delete(type_sp);
   }
 
+  bool DeleteTypeRecognizer(lldb::TypeNameSpecifierImplSP type_sp) {
+    return m_recognizer_cont.Delete(type_sp);
+  }
+
   uint32_t GetNumFormats() { return m_format_cont.GetCount(); }
 
   uint32_t GetNumSummaries() { return m_summary_cont.GetCount(); }
@@ -291,6 +314,8 @@ public:
   uint32_t GetNumFilters() { return m_filter_cont.GetCount(); }
 
   uint32_t GetNumSynthetics() { return m_synth_cont.GetCount(); }
+
+  uint32_t GetNumRecognizers() { return m_recognizer_cont.GetCount(); }
 
   lldb::TypeNameSpecifierImplSP
   GetTypeNameSpecifierForFormatAtIndex(size_t index);
@@ -304,6 +329,9 @@ public:
   lldb::TypeNameSpecifierImplSP
   GetTypeNameSpecifierForSyntheticAtIndex(size_t index);
 
+  lldb::TypeNameSpecifierImplSP
+  GetTypeNameSpecifierForRecognizerAtIndex(size_t index);
+
   FormatContainer::MapValueType GetFormatAtIndex(size_t index);
 
   SummaryContainer::MapValueType GetSummaryAtIndex(size_t index);
@@ -311,6 +339,8 @@ public:
   FilterContainer::MapValueType GetFilterAtIndex(size_t index);
 
   SynthContainer::MapValueType GetSyntheticAtIndex(size_t index);
+
+  RecognizerContainer::MapValueType GetRecognizerAtIndex(size_t index);
 
   bool IsEnabled() const { return m_enabled; }
 
@@ -329,6 +359,9 @@ public:
 
   bool Get(lldb::LanguageType lang, const FormattersMatchVector &candidates,
            lldb::SyntheticChildrenSP &entry);
+
+  bool Get(lldb::LanguageType lang, const FormattersMatchVector &candidates,
+           lldb::TypeRecognizerImplSP &entry);
 
   void Clear(FormatCategoryItems items = ALL_ITEM_TYPES);
 
@@ -361,6 +394,7 @@ private:
   SummaryContainer m_summary_cont;
   FilterContainer m_filter_cont;
   SynthContainer m_synth_cont;
+  RecognizerContainer m_recognizer_cont;
 
   bool m_enabled;
 
@@ -395,6 +429,8 @@ private:
   friend class FormattersContainer<TypeFilterImpl>;
 
   friend class FormattersContainer<ScriptedSyntheticChildren>;
+
+  friend class FormattersContainer<TypeRecognizerImpl>;
 };
 
 } // namespace lldb_private

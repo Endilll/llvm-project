@@ -407,6 +407,11 @@ public:
     return false;
   }
 
+  virtual lldb::TypeImplSP RecognizeType(const char *p_function_name,
+                                         lldb::ValueObjectSP input_valobj) {
+    return nullptr;
+  };
+
   // Calls the specified formatter matching Python function and returns its
   // result (true if it's a match, false if we should keep looking for a
   // matching formatter).

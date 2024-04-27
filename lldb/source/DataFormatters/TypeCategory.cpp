@@ -16,7 +16,7 @@ using namespace lldb_private;
 TypeCategoryImpl::TypeCategoryImpl(IFormatChangeListener *clist,
                                    ConstString name)
     : m_format_cont(clist), m_summary_cont(clist), m_filter_cont(clist),
-      m_synth_cont(clist), m_enabled(false), m_change_listener(clist),
+      m_synth_cont(clist), m_recognizer_cont(clist), m_enabled(false), m_change_listener(clist),
       m_mutex(), m_name(name), m_languages() {}
 
 static bool IsApplicable(lldb::LanguageType category_lang,
@@ -134,6 +134,14 @@ bool TypeCategoryImpl::Get(lldb::LanguageType lang,
   return false;
 }
 
+bool TypeCategoryImpl::Get(lldb::LanguageType lang,
+                           const FormattersMatchVector &candidates,
+                           lldb::TypeRecognizerImplSP &entry) {
+  if (!IsEnabled() || !IsApplicable(lang))
+    return false;
+  return m_recognizer_cont.Get(candidates, entry);
+}
+
 void TypeCategoryImpl::Clear(FormatCategoryItems items) {
   if (items & eFormatCategoryItemFormat)
     m_format_cont.Clear();
@@ -146,6 +154,9 @@ void TypeCategoryImpl::Clear(FormatCategoryItems items) {
 
   if (items & eFormatCategoryItemSynth)
     m_synth_cont.Clear();
+
+  if (items & eFormatCategoryItemRecognizer)
+    m_recognizer_cont.Clear();
 }
 
 bool TypeCategoryImpl::Delete(ConstString name, FormatCategoryItems items) {
@@ -162,6 +173,9 @@ bool TypeCategoryImpl::Delete(ConstString name, FormatCategoryItems items) {
 
   if (items & eFormatCategoryItemSynth)
     success = m_synth_cont.Delete(name) || success;
+
+  if (items & eFormatCategoryItemRecognizer)
+    success = m_recognizer_cont.Delete(name) || success;
 
   return success;
 }
@@ -180,6 +194,9 @@ uint32_t TypeCategoryImpl::GetCount(FormatCategoryItems items) {
 
   if (items & eFormatCategoryItemSynth)
     count += m_synth_cont.GetCount();
+
+  if (items & eFormatCategoryItemRecognizer)
+    count += m_recognizer_cont.GetCount();
 
   return count;
 }
@@ -231,6 +248,16 @@ bool TypeCategoryImpl::AnyMatches(
     }
   }
 
+  if (items & eFormatCategoryItemSynth) {
+    if (m_recognizer_cont.AnyMatches(candidate_type)) {
+      if (matching_category)
+        *matching_category = m_name.GetCString();
+      if (matching_type)
+        *matching_type = eFormatCategoryItemSynth;
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -244,6 +271,8 @@ void TypeCategoryImpl::AutoComplete(CompletionRequest &request,
     m_filter_cont.AutoComplete(request);
   if (items & eFormatCategoryItemSynth)
     m_synth_cont.AutoComplete(request);
+  if (items & eFormatCategoryItemRecognizer)
+    m_recognizer_cont.AutoComplete(request);
 }
 
 TypeCategoryImpl::FormatContainer::MapValueType
@@ -266,6 +295,11 @@ TypeCategoryImpl::GetSyntheticForType(lldb::TypeNameSpecifierImplSP type_sp) {
   return m_synth_cont.GetForTypeNameSpecifier(type_sp);
 }
 
+TypeCategoryImpl::RecognizerContainer::MapValueType
+TypeCategoryImpl::GetRecognizerForType(lldb::TypeNameSpecifierImplSP type_sp) {
+  return m_recognizer_cont.GetForTypeNameSpecifier(type_sp);
+}
+
 TypeCategoryImpl::FormatContainer::MapValueType
 TypeCategoryImpl::GetFormatAtIndex(size_t index) {
   return m_format_cont.GetAtIndex(index);
@@ -286,6 +320,11 @@ TypeCategoryImpl::GetSyntheticAtIndex(size_t index) {
   return m_synth_cont.GetAtIndex(index);
 }
 
+TypeCategoryImpl::RecognizerContainer::MapValueType
+TypeCategoryImpl::GetRecognizerAtIndex(size_t index) {
+  return m_recognizer_cont.GetAtIndex(index);
+}
+
 lldb::TypeNameSpecifierImplSP
 TypeCategoryImpl::GetTypeNameSpecifierForFormatAtIndex(size_t index) {
   return m_format_cont.GetTypeNameSpecifierAtIndex(index);
@@ -304,6 +343,11 @@ TypeCategoryImpl::GetTypeNameSpecifierForFilterAtIndex(size_t index) {
 lldb::TypeNameSpecifierImplSP
 TypeCategoryImpl::GetTypeNameSpecifierForSyntheticAtIndex(size_t index) {
   return m_synth_cont.GetTypeNameSpecifierAtIndex(index);
+}
+
+lldb::TypeNameSpecifierImplSP
+TypeCategoryImpl::GetTypeNameSpecifierForRecognizerAtIndex(size_t index) {
+  return m_recognizer_cont.GetTypeNameSpecifierAtIndex(index);
 }
 
 void TypeCategoryImpl::Enable(bool value, uint32_t position) {

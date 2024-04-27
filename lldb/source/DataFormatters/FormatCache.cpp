@@ -24,6 +24,8 @@ bool FormatCache::Entry::IsSummaryCached() { return m_summary_cached; }
 
 bool FormatCache::Entry::IsSyntheticCached() { return m_synthetic_cached; }
 
+bool FormatCache::Entry::IsRecognizerCached() { return m_recognizer_cached; }
+
 void FormatCache::Entry::Get(lldb::TypeFormatImplSP &retval) {
   retval = m_format_sp;
 }
@@ -34,6 +36,10 @@ void FormatCache::Entry::Get(lldb::TypeSummaryImplSP &retval) {
 
 void FormatCache::Entry::Get(lldb::SyntheticChildrenSP &retval) {
   retval = m_synthetic_sp;
+}
+
+void FormatCache::Entry::Get(lldb::TypeRecognizerImplSP &retval) {
+  retval = m_recognizer_sp;
 }
 
 void FormatCache::Entry::Set(lldb::TypeFormatImplSP format_sp) {
@@ -51,6 +57,11 @@ void FormatCache::Entry::Set(lldb::SyntheticChildrenSP synthetic_sp) {
   m_synthetic_sp = synthetic_sp;
 }
 
+void FormatCache::Entry::Set(lldb::TypeRecognizerImplSP recognizer_sp) {
+  m_recognizer_cached = true;
+  m_recognizer_sp = recognizer_sp;
+}
+
 namespace lldb_private {
 
 template<> bool FormatCache::Entry::IsCached<lldb::TypeFormatImplSP>() {
@@ -61,6 +72,9 @@ template<> bool FormatCache::Entry::IsCached<lldb::TypeSummaryImplSP> () {
 }
 template<> bool FormatCache::Entry::IsCached<lldb::SyntheticChildrenSP>() {
   return IsSyntheticCached();
+}
+template<> bool FormatCache::Entry::IsCached<lldb::TypeRecognizerImplSP>() {
+  return IsRecognizerCached();
 }
 
 } // namespace lldb_private
@@ -79,7 +93,7 @@ bool FormatCache::Get(ConstString type, ImplSP &format_impl_sp) {
   return false;
 }
 
-/// Explicit instantiations for the three types.
+/// Explicit instantiations for the four types.
 /// \{
 template bool
 FormatCache::Get<lldb::TypeFormatImplSP>(ConstString, lldb::TypeFormatImplSP &);
@@ -89,6 +103,9 @@ FormatCache::Get<lldb::TypeSummaryImplSP>(ConstString,
 template bool
 FormatCache::Get<lldb::SyntheticChildrenSP>(ConstString,
                                             lldb::SyntheticChildrenSP &);
+template bool
+FormatCache::Get<lldb::TypeRecognizerImplSP>(ConstString,
+                                            lldb::TypeRecognizerImplSP &);
 /// \}
 
 void FormatCache::Set(ConstString type, lldb::TypeFormatImplSP &format_sp) {
@@ -105,6 +122,11 @@ void FormatCache::Set(ConstString type,
                       lldb::SyntheticChildrenSP &synthetic_sp) {
   std::lock_guard<std::recursive_mutex> guard(m_mutex);
   m_entries[type].Set(synthetic_sp);
+}
+
+void FormatCache::Set(ConstString type, lldb::TypeRecognizerImplSP &recognizer_sp) {
+  std::lock_guard<std::recursive_mutex> guard(m_mutex);
+  m_entries[type].Set(recognizer_sp);
 }
 
 void FormatCache::Clear() {
