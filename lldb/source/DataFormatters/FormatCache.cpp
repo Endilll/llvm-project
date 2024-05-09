@@ -16,7 +16,7 @@ using namespace lldb_private;
 
 FormatCache::Entry::Entry()
     : m_format_cached(false), m_summary_cached(false),
-      m_synthetic_cached(false) {}
+      m_synthetic_cached(false), m_recognizer_cached(false) {}
 
 bool FormatCache::Entry::IsFormatCached() { return m_format_cached; }
 

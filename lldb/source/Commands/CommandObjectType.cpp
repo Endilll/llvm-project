@@ -1778,7 +1778,7 @@ protected:
     Status error;
 
     for (auto &entry : command.entries()) {
-      AddTypeRecognizer(ConstString(entry.ref()), script_recognizer, FormatterMatchType::eFormatterMatchRegex, &error);
+      AddTypeRecognizer(ConstString(entry.ref()), script_recognizer, m_options.m_match_type, &error);
       if (error.Fail()) {
         result.AppendError(error.AsCString());
         return;

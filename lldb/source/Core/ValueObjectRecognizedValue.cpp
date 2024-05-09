@@ -128,18 +128,36 @@ bool ValueObjectRecognizedValue::UpdateValue() {
     return true;
   }
 
+  ExecutionContext exe_ctx(GetExecutionContextRef());
+  Target *target = exe_ctx.GetTargetPtr();
+  if (target) {
+    m_data.SetByteOrder(target->GetArchitecture().GetByteOrder());
+    m_data.SetAddressByteSize(target->GetArchitecture().GetAddressByteSize());
+  }
+
   Value old_value(m_value);
 
   lldb::ValueObjectSP recognized_valobj =
       m_parent->GetTypeRecognizer()->RecognizeObject(m_parent);
 
-  if (!recognized_valobj) {
+  if (recognized_valobj) {
     m_value = recognized_valobj->GetValue();
 
     bool has_changed_type = m_value.GetValueType() != old_value.GetValueType();
 
     if (has_changed_type) {
       SetValueDidChange(true);
+      m_value.SetCompilerType(recognized_valobj->GetCompilerType());
+      m_dynamic_type_info.SetCompilerType(recognized_valobj->GetCompilerType());
+      // TODO: (NekoCdr) remove comments below after figuring out what has to be done
+      // m_type_impl = TypeImpl(m_parent->GetCompilerType(), recognized_valobj->GetCompilerType());
+      m_error = m_value.GetValueAsData(&exe_ctx, m_data, GetModule().get());
+
+      if (!m_error.Success()) {
+        llvm::dbgs() << "GetValueAsData failed\n";
+        SetValueIsValid(false);
+        return false;
+      }
 
       Log *log = GetLog(LLDBLog::Types);
       LLDB_LOGF(log, "[%s %p] has a new dynamic type %s",
@@ -147,7 +165,7 @@ bool ValueObjectRecognizedValue::UpdateValue() {
                 GetTypeName().GetCString());
 
       SetValueIsValid(true);
-      return false;
+      return true;
     }
   }
 

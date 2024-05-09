@@ -407,7 +407,7 @@ public:
     return false;
   }
 
-  virtual lldb::TypeImplSP RecognizeType(const char *p_function_name,
+  virtual lldb::ValueObjectSP RecognizeType(const char *p_function_name,
                                          lldb::ValueObjectSP input_valobj) {
     return nullptr;
   };

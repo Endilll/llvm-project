@@ -2006,7 +2006,7 @@ bool ScriptInterpreterPythonImpl::GetScriptedSummary(
   return ret_val;
 }
 
-lldb::TypeImplSP
+lldb::ValueObjectSP
 ScriptInterpreterPythonImpl::RecognizeType(const char *p_function_name,
                                            lldb::ValueObjectSP input_valobj) {
   if (!p_function_name || p_function_name[0] == '\0' || !input_valobj.get())
@@ -2028,15 +2028,15 @@ ScriptInterpreterPythonImpl::RecognizeType(const char *p_function_name,
     return nullptr;
   }
 
-  lldb::SBType *sb_type_ptr =
-      (lldb::SBType *)LLDBSWIGPython_CastPyObjectToSBType(out_py_valtype);
+  lldb::SBValue *sb_value_ptr =
+      (lldb::SBValue *)LLDBSWIGPython_CastPyObjectToSBValue(out_py_valtype);
 
-  if (sb_type_ptr == nullptr) {
+  if (sb_value_ptr == nullptr) {
     Py_XDECREF(out_py_valtype);
     return nullptr;
   }
 
-  return SWIGBridge::LLDBSWIGPython_GetTypeImplSPFromSBType(sb_type_ptr);
+  return SWIGBridge::LLDBSWIGPython_GetValueObjectSPFromSBValue(sb_value_ptr);
 }
 
 bool ScriptInterpreterPythonImpl::FormatterCallbackFunction(
