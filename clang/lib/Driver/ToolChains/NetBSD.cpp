@@ -47,7 +47,7 @@ void netbsd::Assembler::ConstructJob(Compilation &C, const JobAction &JA,
   case llvm::Triple::armeb:
   case llvm::Triple::thumb:
   case llvm::Triple::thumbeb: {
-    StringRef MArch, MCPU;
+    llvm::StringRef MArch, MCPU;
     arm::getARMArchCPUFromArgs(Args, MArch, MCPU, /*FromAs*/ true);
     std::string Arch = arm::getARMTargetCPU(MCPU, MArch, Triple);
     CmdArgs.push_back(Args.MakeArgString("-mcpu=" + Arch));
@@ -58,8 +58,8 @@ void netbsd::Assembler::ConstructJob(Compilation &C, const JobAction &JA,
   case llvm::Triple::mipsel:
   case llvm::Triple::mips64:
   case llvm::Triple::mips64el: {
-    StringRef CPUName;
-    StringRef ABIName;
+    llvm::StringRef CPUName;
+    llvm::StringRef ABIName;
     mips::getMipsCPUAndABI(Args, Triple, CPUName, ABIName);
 
     CmdArgs.push_back("-march");
@@ -469,7 +469,7 @@ void NetBSD::AddClangSystemIncludeArgs(
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> Dir(D.ResourceDir);
+    llvm::SmallString<128> Dir(D.ResourceDir);
     llvm::sys::path::append(Dir, "include");
     addSystemInclude(DriverArgs, CC1Args, Dir.str());
   }
@@ -478,13 +478,13 @@ void NetBSD::AddClangSystemIncludeArgs(
     return;
 
   // Check for configure-time C include directories.
-  StringRef CIncludeDirs(C_INCLUDE_DIRS);
+  llvm::StringRef CIncludeDirs(C_INCLUDE_DIRS);
   if (CIncludeDirs != "") {
-    SmallVector<StringRef, 5> dirs;
+    llvm::SmallVector<llvm::StringRef, 5> dirs;
     CIncludeDirs.split(dirs, ":");
-    for (StringRef dir : dirs) {
-      StringRef Prefix =
-          llvm::sys::path::is_absolute(dir) ? StringRef(D.SysRoot) : "";
+    for (llvm::StringRef dir : dirs) {
+      llvm::StringRef Prefix =
+          llvm::sys::path::is_absolute(dir) ? llvm::StringRef(D.SysRoot) : "";
       addExternCSystemInclude(DriverArgs, CC1Args, Prefix + dir);
     }
     return;
@@ -564,9 +564,9 @@ void NetBSD::addClangTargetOptions(const ArgList &DriverArgs,
   if (SanArgs.hasAnySanitizer())
     CC1Args.push_back("-D_REENTRANT");
 
-  VersionTuple OsVersion = getTriple().getOSVersion();
+  llvm::VersionTuple OsVersion = getTriple().getOSVersion();
   bool UseInitArrayDefault =
-      OsVersion >= VersionTuple(9) || OsVersion.getMajor() == 0 ||
+      OsVersion >= llvm::VersionTuple(9) || OsVersion.getMajor() == 0 ||
       getTriple().getArch() == llvm::Triple::aarch64 ||
       getTriple().getArch() == llvm::Triple::aarch64_be ||
       getTriple().getArch() == llvm::Triple::arm ||

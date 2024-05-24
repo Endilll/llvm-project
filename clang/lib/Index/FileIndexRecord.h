@@ -33,7 +33,7 @@ private:
 public:
   FileIndexRecord(FileID FID, bool IsSystem) : FID(FID), IsSystem(IsSystem) {}
 
-  ArrayRef<DeclOccurrence> getDeclOccurrencesSortedByOffset() const;
+  llvm::ArrayRef<DeclOccurrence> getDeclOccurrencesSortedByOffset() const;
 
   FileID getFileID() const { return FID; }
   bool isSystem() const { return IsSystem; }
@@ -46,7 +46,7 @@ public:
   /// \param D the canonical declaration this is an occurrence of.
   /// \param Relations the set of symbols related to this occurrence.
   void addDeclOccurence(SymbolRoleSet Roles, unsigned Offset, const Decl *D,
-                        ArrayRef<SymbolRelation> Relations);
+                        llvm::ArrayRef<SymbolRelation> Relations);
 
   /// Adds an occurrence of the given macro at the supplied \c Offset.
   ///

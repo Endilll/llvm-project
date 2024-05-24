@@ -44,7 +44,7 @@ struct BaseSubobjectInfo {
   bool IsVirtual;
 
   /// Bases - Information about the base subobjects.
-  SmallVector<BaseSubobjectInfo*, 4> Bases;
+  llvm::SmallVector<BaseSubobjectInfo*, 4> Bases;
 
   /// PrimaryVirtualBaseInfo - Holds the base info for the primary virtual base
   /// of this base info (if one exists).
@@ -598,7 +598,7 @@ protected:
   /// \brief The maximum of the alignments of top-level members.
   CharUnits UnadjustedAlignment;
 
-  SmallVector<uint64_t, 16> FieldOffsets;
+  llvm::SmallVector<uint64_t, 16> FieldOffsets;
 
   /// Whether the external AST source has provided a layout for this
   /// record.
@@ -2646,7 +2646,7 @@ public:
   /// The class we share our vb-pointer with.
   const CXXRecordDecl *SharedVBPtrBase;
   /// The collection of field offsets.
-  SmallVector<uint64_t, 16> FieldOffsets;
+  llvm::SmallVector<uint64_t, 16> FieldOffsets;
   /// Base classes and their offsets in the record.
   BaseOffsetsMapTy Bases;
   /// virtual base classes and their offsets in the record.
@@ -3576,13 +3576,13 @@ ASTContext::getObjCLayout(const ObjCInterfaceDecl *D,
   return *NewEntry;
 }
 
-static void PrintOffset(raw_ostream &OS,
+static void PrintOffset(llvm::raw_ostream &OS,
                         CharUnits Offset, unsigned IndentLevel) {
   OS << llvm::format("%10" PRId64 " | ", (int64_t)Offset.getQuantity());
   OS.indent(IndentLevel * 2);
 }
 
-static void PrintBitFieldOffset(raw_ostream &OS, CharUnits Offset,
+static void PrintBitFieldOffset(llvm::raw_ostream &OS, CharUnits Offset,
                                 unsigned Begin, unsigned Width,
                                 unsigned IndentLevel) {
   llvm::SmallString<10> Buffer;
@@ -3600,12 +3600,12 @@ static void PrintBitFieldOffset(raw_ostream &OS, CharUnits Offset,
   OS.indent(IndentLevel * 2);
 }
 
-static void PrintIndentNoOffset(raw_ostream &OS, unsigned IndentLevel) {
+static void PrintIndentNoOffset(llvm::raw_ostream &OS, unsigned IndentLevel) {
   OS << "           | ";
   OS.indent(IndentLevel * 2);
 }
 
-static void DumpRecordLayout(raw_ostream &OS, const RecordDecl *RD,
+static void DumpRecordLayout(llvm::raw_ostream &OS, const RecordDecl *RD,
                              const ASTContext &C,
                              CharUnits Offset,
                              unsigned IndentLevel,
@@ -3642,7 +3642,7 @@ static void DumpRecordLayout(raw_ostream &OS, const RecordDecl *RD,
     }
 
     // Collect nvbases.
-    SmallVector<const CXXRecordDecl *, 4> Bases;
+    llvm::SmallVector<const CXXRecordDecl *, 4> Bases;
     for (const CXXBaseSpecifier &Base : CXXRD->bases()) {
       assert(!Base.getType()->isDependentType() &&
              "Cannot layout class with dependent bases.");
@@ -3750,7 +3750,7 @@ static void DumpRecordLayout(raw_ostream &OS, const RecordDecl *RD,
   OS << "]\n";
 }
 
-void ASTContext::DumpRecordLayout(const RecordDecl *RD, raw_ostream &OS,
+void ASTContext::DumpRecordLayout(const RecordDecl *RD, llvm::raw_ostream &OS,
                                   bool Simple) const {
   if (!Simple) {
     ::DumpRecordLayout(OS, RD, *this, CharUnits(), 0, nullptr,

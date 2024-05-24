@@ -219,7 +219,7 @@ LLVM_DUMP_METHOD void TypeLoc::dump(llvm::raw_ostream &OS,
 
 LLVM_DUMP_METHOD void Decl::dump() const { dump(llvm::errs()); }
 
-LLVM_DUMP_METHOD void Decl::dump(raw_ostream &OS, bool Deserialize,
+LLVM_DUMP_METHOD void Decl::dump(llvm::raw_ostream &OS, bool Deserialize,
                                  ASTDumpOutputFormat Format) const {
   ASTContext &Ctx = getASTContext();
   const SourceManager &SM = Ctx.getSourceManager();
@@ -271,7 +271,7 @@ LLVM_DUMP_METHOD void DeclContext::dumpLookups() const {
   dumpLookups(llvm::errs());
 }
 
-LLVM_DUMP_METHOD void DeclContext::dumpLookups(raw_ostream &OS,
+LLVM_DUMP_METHOD void DeclContext::dumpLookups(llvm::raw_ostream &OS,
                                                bool DumpDecls,
                                                bool Deserialize) const {
   const DeclContext *DC = this;
@@ -292,7 +292,7 @@ LLVM_DUMP_METHOD void Stmt::dump() const {
   P.Visit(this);
 }
 
-LLVM_DUMP_METHOD void Stmt::dump(raw_ostream &OS,
+LLVM_DUMP_METHOD void Stmt::dump(llvm::raw_ostream &OS,
                                  const ASTContext &Context) const {
   ASTDumper P(OS, Context, Context.getDiagnostics().getShowColors());
   P.Visit(this);
@@ -315,7 +315,7 @@ LLVM_DUMP_METHOD void Comment::dump() const {
   Dumper.Visit(FC, FC);
 }
 
-LLVM_DUMP_METHOD void Comment::dump(raw_ostream &OS,
+LLVM_DUMP_METHOD void Comment::dump(llvm::raw_ostream &OS,
                                     const ASTContext &Context) const {
   const auto *FC = dyn_cast<FullComment>(this);
   if (!FC)
@@ -341,7 +341,7 @@ LLVM_DUMP_METHOD void APValue::dump() const {
   Dumper.Visit(*this, /*Ty=*/QualType());
 }
 
-LLVM_DUMP_METHOD void APValue::dump(raw_ostream &OS,
+LLVM_DUMP_METHOD void APValue::dump(llvm::raw_ostream &OS,
                                     const ASTContext &Context) const {
   ASTDumper Dumper(llvm::errs(), Context,
                    Context.getDiagnostics().getShowColors());
@@ -356,7 +356,7 @@ LLVM_DUMP_METHOD void ConceptReference::dump() const {
   dump(llvm::errs());
 }
 
-LLVM_DUMP_METHOD void ConceptReference::dump(raw_ostream &OS) const {
+LLVM_DUMP_METHOD void ConceptReference::dump(llvm::raw_ostream &OS) const {
   auto &Ctx = getNamedConcept()->getASTContext();
   ASTDumper P(OS, Ctx, Ctx.getDiagnostics().getShowColors());
   P.Visit(this);

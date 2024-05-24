@@ -299,7 +299,7 @@ static void createStoreInstBefore(llvm::Value *value, Address addr,
   store->setAlignment(addr.getAlignment().getAsAlign());
 }
 
-static llvm::LoadInst *createLoadInstBefore(Address addr, const Twine &name,
+static llvm::LoadInst *createLoadInstBefore(Address addr, const llvm::Twine &name,
                                             llvm::Instruction *beforeInst,
                                             CodeGenFunction &CGF) {
   return new llvm::LoadInst(addr.getElementType(), addr.emitRawPointer(CGF),
@@ -743,8 +743,8 @@ void CodeGenFunction::PopCleanupBlock(bool FallthroughIsBranchThrough,
 
   // Copy the cleanup emission data out.  This uses either a stack
   // array or malloc'd memory, depending on the size, which is
-  // behavior that SmallVector would provide, if we could use it
-  // here. Unfortunately, if you ask for a SmallVector<char>, the
+  // behavior that llvm::SmallVector would provide, if we could use it
+  // here. Unfortunately, if you ask for a llvm::SmallVector<char>, the
   // alignment isn't sufficient.
   auto *CleanupSource = reinterpret_cast<char *>(Scope.getCleanupBuffer());
   alignas(EHScopeStack::ScopeStackAlignment) char
@@ -865,7 +865,7 @@ void CodeGenFunction::PopCleanupBlock(bool FallthroughIsBranchThrough,
       }
 
       llvm::BasicBlock *FallthroughDest = nullptr;
-      SmallVector<llvm::Instruction*, 2> InstsToAppend;
+      llvm::SmallVector<llvm::Instruction*, 2> InstsToAppend;
 
       // If there's exactly one branch-after and no other threads,
       // we can route it without a switch.
@@ -1024,7 +1024,7 @@ void CodeGenFunction::PopCleanupBlock(bool FallthroughIsBranchThrough,
     // throwing cleanups. For funclet EH personalities, the cleanupendpad models
     // program termination when cleanups throw.
     bool PushedTerminate = false;
-    SaveAndRestore RestoreCurrentFuncletPad(CurrentFuncletPad);
+    llvm::SaveAndRestore RestoreCurrentFuncletPad(CurrentFuncletPad);
     llvm::CleanupPadInst *CPI = nullptr;
 
     const EHPersonality &Personality = EHPersonality::get(*this);
@@ -1315,7 +1315,7 @@ static void EmitSehScope(CodeGenFunction &CGF,
   llvm::BasicBlock *InvokeDest = CGF.getInvokeDest();
   assert(CGF.Builder.GetInsertBlock() && InvokeDest);
   llvm::BasicBlock *Cont = CGF.createBasicBlock("invoke.cont");
-  SmallVector<llvm::OperandBundleDef, 1> BundleList =
+  llvm::SmallVector<llvm::OperandBundleDef, 1> BundleList =
       CGF.getBundlesForFunclet(SehCppScope.getCallee());
   if (CGF.CurrentFuncletPad)
     BundleList.emplace_back("funclet", CGF.CurrentFuncletPad);

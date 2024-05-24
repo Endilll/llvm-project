@@ -105,9 +105,9 @@ public:
     assert(Storage);
     return Storage[0];
   }
-  ArrayRef<unsigned> getLines() const {
+  llvm::ArrayRef<unsigned> getLines() const {
     assert(Storage);
-    return ArrayRef<unsigned>(Storage + 1, Storage + 1 + size());
+    return llvm::ArrayRef<unsigned>(Storage + 1, Storage + 1 + size());
   }
   const unsigned *begin() const { return getLines().begin(); }
   const unsigned *end() const { return getLines().end(); }
@@ -117,7 +117,7 @@ public:
                                llvm::BumpPtrAllocator &Alloc);
 
   LineOffsetMapping() = default;
-  LineOffsetMapping(ArrayRef<unsigned> LineOffsets,
+  LineOffsetMapping(llvm::ArrayRef<unsigned> LineOffsets,
                     llvm::BumpPtrAllocator &Alloc);
 
 private:
@@ -154,7 +154,7 @@ public:
   /// The filename that is used to access OrigEntry.
   ///
   /// FIXME: Remove this once OrigEntry is a FileEntryRef with a stable name.
-  StringRef Filename;
+  llvm::StringRef Filename;
 
   /// A bump pointer allocated array of offsets for each source line.
   ///
@@ -246,9 +246,9 @@ public:
     return std::nullopt;
   }
 
-  /// Return a StringRef to the source buffer data, only if it has already
+  /// Return a llvm::StringRef to the source buffer data, only if it has already
   /// been loaded.
-  std::optional<StringRef> getBufferDataIfLoaded() const {
+  std::optional<llvm::StringRef> getBufferDataIfLoaded() const {
     if (Buffer)
       return Buffer->getBuffer();
     return std::nullopt;
@@ -271,7 +271,7 @@ public:
 
   // If BufStr has an invalid BOM, returns the BOM name; otherwise, returns
   // nullptr
-  static const char *getInvalidBOM(StringRef BufStr);
+  static const char *getInvalidBOM(llvm::StringRef BufStr);
 };
 
 // Assert that the \c ContentCache objects will always be 8-byte aligned so
@@ -319,7 +319,7 @@ class FileInfo {
 public:
   /// Return a FileInfo object.
   static FileInfo get(SourceLocation IL, ContentCache &Con,
-                      CharacteristicKind FileCharacter, StringRef Filename) {
+                      CharacteristicKind FileCharacter, llvm::StringRef Filename) {
     FileInfo X;
     X.IncludeLoc = IL;
     X.NumCreatedFIDs = 0;
@@ -352,7 +352,7 @@ public:
 
   /// Returns the name of the file that was used when the file was loaded from
   /// the underlying file system.
-  StringRef getName() const { return getContentCache().Filename; }
+  llvm::StringRef getName() const { return getContentCache().Filename; }
 };
 
 /// Each ExpansionInfo encodes the expansion location - where
@@ -561,7 +561,7 @@ public:
   /// Retrieve the module import location and name for the given ID, if
   /// in fact it was loaded from a module (rather than, say, a precompiled
   /// header).
-  virtual std::pair<SourceLocation, StringRef> getModuleImportLoc(int ID) = 0;
+  virtual std::pair<SourceLocation, llvm::StringRef> getModuleImportLoc(int ID) = 0;
 };
 
 /// Holds the cache used by isBeforeInTranslationUnit.
@@ -646,7 +646,7 @@ public:
 /// The stack used when building modules on demand, which is used
 /// to provide a link between the source managers of the different compiler
 /// instances.
-using ModuleBuildStack = ArrayRef<std::pair<std::string, FullSourceLoc>>;
+using ModuleBuildStack = llvm::ArrayRef<std::pair<std::string, FullSourceLoc>>;
 
 /// This class handles loading and caching of source files into memory.
 ///
@@ -660,7 +660,7 @@ using ModuleBuildStack = ArrayRef<std::pair<std::string, FullSourceLoc>>;
 /// the case of a macro expansion, for example, the spelling location indicates
 /// where the expanded token came from and the expansion location specifies
 /// where it was expanded.
-class SourceManager : public RefCountedBase<SourceManager> {
+class SourceManager : public llvm::RefCountedBase<SourceManager> {
   /// DiagnosticsEngine object.
   DiagnosticsEngine &Diag;
 
@@ -718,7 +718,7 @@ class SourceManager : public RefCountedBase<SourceManager> {
   ///
   /// Positive FileIDs are indexes into this table. Entry 0 indicates an invalid
   /// expansion.
-  SmallVector<SrcMgr::SLocEntry, 0> LocalSLocEntryTable;
+  llvm::SmallVector<SrcMgr::SLocEntry, 0> LocalSLocEntryTable;
 
   /// The table of SLocEntries that are loaded from other modules.
   ///
@@ -729,7 +729,7 @@ class SourceManager : public RefCountedBase<SourceManager> {
   /// For each allocation in LoadedSLocEntryTable, we keep the first FileID.
   /// We assume exactly one allocation per AST file, and use that to determine
   /// whether two FileIDs come from the same AST file.
-  SmallVector<FileID, 0> LoadedSLocEntryAllocBegin;
+  llvm::SmallVector<FileID, 0> LoadedSLocEntryAllocBegin;
 
   /// The starting offset of the next local SLocEntry.
   ///
@@ -834,7 +834,7 @@ class SourceManager : public RefCountedBase<SourceManager> {
   /// There is no way to set this value from the command line. If we ever need
   /// to do so (e.g., if on-demand module construction moves out-of-process),
   /// we can add a cc1-level option to do so.
-  SmallVector<std::pair<std::string, FullSourceLoc>, 2> StoredModuleBuildStack;
+  llvm::SmallVector<std::pair<std::string, FullSourceLoc>, 2> StoredModuleBuildStack;
 
 public:
   SourceManager(DiagnosticsEngine &Diag, FileManager &FileMgr,
@@ -876,7 +876,7 @@ public:
   }
 
   /// Push an entry to the module build stack.
-  void pushModuleBuildStack(StringRef moduleName, FullSourceLoc importLoc) {
+  void pushModuleBuildStack(llvm::StringRef moduleName, FullSourceLoc importLoc) {
     StoredModuleBuildStack.push_back(std::make_pair(moduleName.str(),importLoc));
   }
 
@@ -1084,7 +1084,7 @@ public:
   /// buffer that's not represented by a filename.
   ///
   /// Returns std::nullopt for non-files and built-in files.
-  std::optional<StringRef> getNonBuiltinFilenameForID(FileID FID) const;
+  std::optional<llvm::StringRef> getNonBuiltinFilenameForID(FileID FID) const;
 
   /// Returns the FileEntry record for the provided SLocEntry.
   const FileEntry *
@@ -1094,24 +1094,24 @@ public:
     return nullptr;
   }
 
-  /// Return a StringRef to the source buffer data for the
+  /// Return a llvm::StringRef to the source buffer data for the
   /// specified FileID.
   ///
   /// \param FID The file ID whose contents will be returned.
   /// \param Invalid If non-NULL, will be set true if an error occurred.
-  StringRef getBufferData(FileID FID, bool *Invalid = nullptr) const;
+  llvm::StringRef getBufferData(FileID FID, bool *Invalid = nullptr) const;
 
-  /// Return a StringRef to the source buffer data for the
+  /// Return a llvm::StringRef to the source buffer data for the
   /// specified FileID, returning std::nullopt if invalid.
   ///
   /// \param FID The file ID whose contents will be returned.
-  std::optional<StringRef> getBufferDataOrNone(FileID FID) const;
+  std::optional<llvm::StringRef> getBufferDataOrNone(FileID FID) const;
 
-  /// Return a StringRef to the source buffer data for the
+  /// Return a llvm::StringRef to the source buffer data for the
   /// specified FileID, returning std::nullopt if it's not yet loaded.
   ///
   /// \param FID The file ID whose contents will be returned.
-  std::optional<StringRef> getBufferDataIfLoaded(FileID FID) const;
+  std::optional<llvm::StringRef> getBufferDataIfLoaded(FileID FID) const;
 
   /// Get the number of FileIDs (files and macros) that were created
   /// during preprocessing of \p FID, including it.
@@ -1147,7 +1147,7 @@ public:
   }
 
   /// Return the filename of the file containing a SourceLocation.
-  StringRef getFilename(SourceLocation SpellingLoc) const;
+  llvm::StringRef getFilename(SourceLocation SpellingLoc) const;
 
   /// Return the source location corresponding to the first byte of
   /// the specified file.
@@ -1177,7 +1177,7 @@ public:
   // Returns the import location if the given source location is
   // located within a module, or an invalid location if the source location
   // is within the current translation unit.
-  std::pair<SourceLocation, StringRef>
+  std::pair<SourceLocation, llvm::StringRef>
   getModuleImportLoc(SourceLocation Loc) const {
     FileID FID = getFileID(Loc);
 
@@ -1447,7 +1447,7 @@ public:
   ///
   /// Note that this name does not respect \#line directives.  Use
   /// getPresumedLoc for normal clients.
-  StringRef getBufferName(SourceLocation Loc, bool *Invalid = nullptr) const;
+  llvm::StringRef getBufferName(SourceLocation Loc, bool *Invalid = nullptr) const;
 
   /// Return the file characteristic of the specified source
   /// location, indicating whether this is a normal file, a system
@@ -1507,7 +1507,7 @@ public:
     PresumedLoc Presumed = getPresumedLoc(Loc);
     if (Presumed.isInvalid())
       return false;
-    StringRef Filename(Presumed.getFilename());
+    llvm::StringRef Filename(Presumed.getFilename());
     return Filename == "<built-in>";
   }
 
@@ -1516,7 +1516,7 @@ public:
     PresumedLoc Presumed = getPresumedLoc(Loc);
     if (Presumed.isInvalid())
       return false;
-    StringRef Filename(Presumed.getFilename());
+    llvm::StringRef Filename(Presumed.getFilename());
     return Filename == "<command line>";
   }
 
@@ -1525,7 +1525,7 @@ public:
     PresumedLoc Presumed = getPresumedLoc(Loc);
     if (Presumed.isInvalid())
       return false;
-    StringRef Filename(Presumed.getFilename());
+    llvm::StringRef Filename(Presumed.getFilename());
     return Filename == "<scratch space>";
   }
 
@@ -1582,7 +1582,7 @@ public:
   //===--------------------------------------------------------------------===//
 
   /// Return the uniqued ID for the specified filename.
-  unsigned getLineTableFilenameID(StringRef Str);
+  unsigned getLineTableFilenameID(llvm::StringRef Str);
 
   /// Add a line note to the line table for the FileID and offset
   /// specified by Loc.
@@ -1945,7 +1945,7 @@ private:
   ///
   /// This works regardless of whether the ContentCache corresponds to a
   /// file or some other input source.
-  FileID createFileIDImpl(SrcMgr::ContentCache &File, StringRef Filename,
+  FileID createFileIDImpl(SrcMgr::ContentCache &File, llvm::StringRef Filename,
                           SourceLocation IncludePos,
                           SrcMgr::CharacteristicKind DirCharacter, int LoadedID,
                           SourceLocation::UIntTy LoadedOffset);
@@ -2014,7 +2014,7 @@ class SourceManagerForFile {
 public:
   /// Creates SourceManager and necessary dependencies (e.g. VFS, FileManager).
   /// The main file in the SourceManager will be \p FileName with \p Content.
-  SourceManagerForFile(StringRef FileName, StringRef Content);
+  SourceManagerForFile(llvm::StringRef FileName, llvm::StringRef Content);
 
   SourceManager &get() {
     assert(SourceMgr);

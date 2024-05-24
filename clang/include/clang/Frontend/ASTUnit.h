@@ -107,18 +107,18 @@ public:
 
 private:
   std::shared_ptr<LangOptions>            LangOpts;
-  IntrusiveRefCntPtr<DiagnosticsEngine>   Diagnostics;
-  IntrusiveRefCntPtr<FileManager>         FileMgr;
-  IntrusiveRefCntPtr<SourceManager>       SourceMgr;
-  IntrusiveRefCntPtr<InMemoryModuleCache> ModuleCache;
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine>   Diagnostics;
+  llvm::IntrusiveRefCntPtr<FileManager>         FileMgr;
+  llvm::IntrusiveRefCntPtr<SourceManager>       SourceMgr;
+  llvm::IntrusiveRefCntPtr<InMemoryModuleCache> ModuleCache;
   std::unique_ptr<HeaderSearch>           HeaderInfo;
-  IntrusiveRefCntPtr<TargetInfo>          Target;
+  llvm::IntrusiveRefCntPtr<TargetInfo>          Target;
   std::shared_ptr<Preprocessor>           PP;
-  IntrusiveRefCntPtr<ASTContext>          Ctx;
+  llvm::IntrusiveRefCntPtr<ASTContext>          Ctx;
   std::shared_ptr<TargetOptions>          TargetOpts;
   std::shared_ptr<HeaderSearchOptions>    HSOpts;
   std::shared_ptr<PreprocessorOptions>    PPOpts;
-  IntrusiveRefCntPtr<ASTReader> Reader;
+  llvm::IntrusiveRefCntPtr<ASTReader> Reader;
   bool HadModuleLoaderFatalFailure = false;
   bool StorePreamblesInMemory = false;
 
@@ -173,7 +173,7 @@ private:
   std::vector<Decl*> TopLevelDecls;
 
   /// Sorted (by file offset) vector of pairs of file offset/Decl.
-  using LocDeclsTy = SmallVector<std::pair<unsigned, Decl *>, 64>;
+  using LocDeclsTy = llvm::SmallVector<std::pair<unsigned, Decl *>, 64>;
   using FileDeclsTy = llvm::DenseMap<FileID, std::unique_ptr<LocDeclsTy>>;
 
   /// Map from FileID to the file-level declarations that it contains.
@@ -184,15 +184,15 @@ private:
   std::string OriginalSourceFile;
 
   /// The set of diagnostics produced when creating the preamble.
-  SmallVector<StandaloneDiagnostic, 4> PreambleDiagnostics;
+  llvm::SmallVector<StandaloneDiagnostic, 4> PreambleDiagnostics;
 
   /// The set of diagnostics produced when creating this
   /// translation unit.
-  SmallVector<StoredDiagnostic, 4> StoredDiagnostics;
+  llvm::SmallVector<StoredDiagnostic, 4> StoredDiagnostics;
 
   /// The set of diagnostics produced when failing to parse, e.g. due
   /// to failure to load the PCH.
-  SmallVector<StoredDiagnostic, 4> FailedParseDiagnostics;
+  llvm::SmallVector<StoredDiagnostic, 4> FailedParseDiagnostics;
 
   /// The number of stored diagnostics that come from the driver
   /// itself.
@@ -254,13 +254,13 @@ private:
   /// (likely to change while trying to use them).
   bool UserFilesAreVolatile : 1;
 
-  static void ConfigureDiags(IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
+  static void ConfigureDiags(llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
                              ASTUnit &AST, CaptureDiagsKind CaptureDiagnostics);
 
   void TranslateStoredDiagnostics(FileManager &FileMgr,
                                   SourceManager &SrcMan,
-                      const SmallVectorImpl<StandaloneDiagnostic> &Diags,
-                            SmallVectorImpl<StoredDiagnostic> &Out);
+                      const llvm::SmallVectorImpl<StandaloneDiagnostic> &Diags,
+                            llvm::SmallVectorImpl<StoredDiagnostic> &Out);
 
   void clearFileLevelDecls();
 
@@ -372,12 +372,12 @@ private:
 
   bool Parse(std::shared_ptr<PCHContainerOperations> PCHContainerOps,
              std::unique_ptr<llvm::MemoryBuffer> OverrideMainBuffer,
-             IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS);
+             llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS);
 
   std::unique_ptr<llvm::MemoryBuffer> getMainBufferWithPrecompiledPreamble(
       std::shared_ptr<PCHContainerOperations> PCHContainerOps,
       CompilerInvocation &PreambleInvocationIn,
-      IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS, bool AllowRebuild = true,
+      llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS, bool AllowRebuild = true,
       unsigned MaxLines = 0);
   void RealizeTopLevelDeclsFromPreamble();
 
@@ -481,9 +481,9 @@ public:
 
   const FileSystemOptions &getFileSystemOpts() const { return FileSystemOpts; }
 
-  IntrusiveRefCntPtr<ASTReader> getASTReader() const;
+  llvm::IntrusiveRefCntPtr<ASTReader> getASTReader() const;
 
-  StringRef getOriginalSourceFileName() const {
+  llvm::StringRef getOriginalSourceFileName() const {
     return OriginalSourceFile;
   }
 
@@ -495,10 +495,10 @@ public:
   bool getOwnsRemappedFileBuffers() const { return OwnsRemappedFileBuffers; }
   void setOwnsRemappedFileBuffers(bool val) { OwnsRemappedFileBuffers = val; }
 
-  StringRef getMainFileName() const;
+  llvm::StringRef getMainFileName() const;
 
   /// If this ASTUnit came from an AST file, returns the filename for it.
-  StringRef getASTFileName() const;
+  llvm::StringRef getASTFileName() const;
 
   using top_level_iterator = std::vector<Decl *>::iterator;
 
@@ -538,7 +538,7 @@ public:
   /// range. \p Length can be 0 to indicate a point at \p Offset instead of
   /// a range.
   void findFileRegionDecls(FileID File, unsigned Offset, unsigned Length,
-                           SmallVectorImpl<Decl *> &Decls);
+                           llvm::SmallVectorImpl<Decl *> &Decls);
 
   /// Retrieve a reference to the current top-level name hash value.
   ///
@@ -652,7 +652,7 @@ public:
   bool isModuleFile() const;
 
   std::unique_ptr<llvm::MemoryBuffer>
-  getBufferForFile(StringRef Filename, std::string *ErrorStr = nullptr);
+  getBufferForFile(llvm::StringRef Filename, std::string *ErrorStr = nullptr);
 
   /// Determine what kind of translation unit this AST represents.
   TranslationUnitKind getTranslationUnitKind() const { return TUKind; }
@@ -667,7 +667,7 @@ public:
   /// Create a ASTUnit. Gets ownership of the passed CompilerInvocation.
   static std::unique_ptr<ASTUnit>
   create(std::shared_ptr<CompilerInvocation> CI,
-         IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
+         llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
          CaptureDiagsKind CaptureDiagnostics, bool UserFilesAreVolatile);
 
   enum WhatToLoad {
@@ -694,7 +694,7 @@ public:
   static std::unique_ptr<ASTUnit>
   LoadFromASTFile(const std::string &Filename,
                   const PCHContainerReader &PCHContainerRdr, WhatToLoad ToLoad,
-                  IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
+                  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
                   const FileSystemOptions &FileSystemOpts,
                   std::shared_ptr<HeaderSearchOptions> HSOpts,
                   std::shared_ptr<LangOptions> LangOpts = nullptr,
@@ -702,7 +702,7 @@ public:
                   CaptureDiagsKind CaptureDiagnostics = CaptureDiagsKind::None,
                   bool AllowASTWithCompilerErrors = false,
                   bool UserFilesAreVolatile = false,
-                  IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS =
+                  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS =
                       llvm::vfs::getRealFileSystem());
 
 private:
@@ -723,7 +723,7 @@ private:
   bool LoadFromCompilerInvocation(
       std::shared_ptr<PCHContainerOperations> PCHContainerOps,
       unsigned PrecompilePreambleAfterNParses,
-      IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS);
+      llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS);
 
 public:
   /// Create an ASTUnit from a source file, via a CompilerInvocation
@@ -757,9 +757,9 @@ public:
   static ASTUnit *LoadFromCompilerInvocationAction(
       std::shared_ptr<CompilerInvocation> CI,
       std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-      IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
+      llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
       FrontendAction *Action = nullptr, ASTUnit *Unit = nullptr,
-      bool Persistent = true, StringRef ResourceFilesPath = StringRef(),
+      bool Persistent = true, llvm::StringRef ResourceFilesPath = llvm::StringRef(),
       bool OnlyLocalDecls = false,
       CaptureDiagsKind CaptureDiagnostics = CaptureDiagsKind::None,
       unsigned PrecompilePreambleAfterNParses = 0,
@@ -784,7 +784,7 @@ public:
   static std::unique_ptr<ASTUnit> LoadFromCompilerInvocation(
       std::shared_ptr<CompilerInvocation> CI,
       std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-      IntrusiveRefCntPtr<DiagnosticsEngine> Diags, FileManager *FileMgr,
+      llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags, FileManager *FileMgr,
       bool OnlyLocalDecls = false,
       CaptureDiagsKind CaptureDiagnostics = CaptureDiagsKind::None,
       unsigned PrecompilePreambleAfterNParses = 0,
@@ -832,11 +832,11 @@ public:
   static std::unique_ptr<ASTUnit> LoadFromCommandLine(
       const char **ArgBegin, const char **ArgEnd,
       std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-      IntrusiveRefCntPtr<DiagnosticsEngine> Diags, StringRef ResourceFilesPath,
+      llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags, llvm::StringRef ResourceFilesPath,
       bool StorePreamblesInMemory = false,
-      StringRef PreambleStoragePath = StringRef(), bool OnlyLocalDecls = false,
+      llvm::StringRef PreambleStoragePath = llvm::StringRef(), bool OnlyLocalDecls = false,
       CaptureDiagsKind CaptureDiagnostics = CaptureDiagsKind::None,
-      ArrayRef<RemappedFile> RemappedFiles = std::nullopt,
+      llvm::ArrayRef<RemappedFile> RemappedFiles = std::nullopt,
       bool RemappedFilesKeepOriginalName = true,
       unsigned PrecompilePreambleAfterNParses = 0,
       TranslationUnitKind TUKind = TU_Complete,
@@ -848,9 +848,9 @@ public:
       bool SingleFileParse = false, bool UserFilesAreVolatile = false,
       bool ForSerialization = false,
       bool RetainExcludedConditionalBlocks = false,
-      std::optional<StringRef> ModuleFormat = std::nullopt,
+      std::optional<llvm::StringRef> ModuleFormat = std::nullopt,
       std::unique_ptr<ASTUnit> *ErrAST = nullptr,
-      IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr);
+      llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr);
 
   /// Reparse the source files using the same command-line options that
   /// were originally used to produce this translation unit.
@@ -864,8 +864,8 @@ public:
   /// \returns True if a failure occurred that causes the ASTUnit not to
   /// contain any translation-unit information, false otherwise.
   bool Reparse(std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-               ArrayRef<RemappedFile> RemappedFiles = std::nullopt,
-               IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr);
+               llvm::ArrayRef<RemappedFile> RemappedFiles = std::nullopt,
+               llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr);
 
   /// Free data that will be re-generated on the next parse.
   ///
@@ -896,27 +896,27 @@ public:
   ///
   /// FIXME: The Diag, LangOpts, SourceMgr, FileMgr, StoredDiagnostics, and
   /// OwnedBuffers parameters are all disgusting hacks. They will go away.
-  void CodeComplete(StringRef File, unsigned Line, unsigned Column,
-                    ArrayRef<RemappedFile> RemappedFiles, bool IncludeMacros,
+  void CodeComplete(llvm::StringRef File, unsigned Line, unsigned Column,
+                    llvm::ArrayRef<RemappedFile> RemappedFiles, bool IncludeMacros,
                     bool IncludeCodePatterns, bool IncludeBriefComments,
                     CodeCompleteConsumer &Consumer,
                     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
                     DiagnosticsEngine &Diag, LangOptions &LangOpts,
                     SourceManager &SourceMgr, FileManager &FileMgr,
-                    SmallVectorImpl<StoredDiagnostic> &StoredDiagnostics,
-                    SmallVectorImpl<const llvm::MemoryBuffer *> &OwnedBuffers,
+                    llvm::SmallVectorImpl<StoredDiagnostic> &StoredDiagnostics,
+                    llvm::SmallVectorImpl<const llvm::MemoryBuffer *> &OwnedBuffers,
                     std::unique_ptr<SyntaxOnlyAction> Act);
 
   /// Save this translation unit to a file with the given name.
   ///
   /// \returns true if there was a file error or false if the save was
   /// successful.
-  bool Save(StringRef File);
+  bool Save(llvm::StringRef File);
 
   /// Serialize this translation unit with the given output stream.
   ///
   /// \returns True if an error occurred, false otherwise.
-  bool serialize(raw_ostream &OS);
+  bool serialize(llvm::raw_ostream &OS);
 };
 
 } // namespace clang

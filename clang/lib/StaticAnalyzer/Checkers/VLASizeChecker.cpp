@@ -215,7 +215,7 @@ void VLASizeChecker::reportTaintBug(const Expr *SizeE, ProgramStateRef State,
   if (!N)
     return;
 
-  SmallString<256> buf;
+  llvm::SmallString<256> buf;
   llvm::raw_svector_ostream os(buf);
   os << "Declared variable-length array (VLA) ";
   os << "has tainted (attacker controlled) size that can be 0 or negative";
@@ -237,7 +237,7 @@ void VLASizeChecker::reportBug(VLASize_Kind Kind, const Expr *SizeE,
   if (!N)
     return;
 
-  SmallString<256> buf;
+  llvm::SmallString<256> buf;
   llvm::raw_svector_ostream os(buf);
   os << "Declared variable-length array (VLA) ";
   switch (Kind) {

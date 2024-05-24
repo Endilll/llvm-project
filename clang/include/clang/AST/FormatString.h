@@ -213,8 +213,8 @@ public:
     return Position;
   }
 
-  StringRef getCharacters() const {
-    return StringRef(getStart(), getLength());
+  llvm::StringRef getCharacters() const {
+    return llvm::StringRef(getStart(), getLength());
   }
 
   bool consumesDataArgument() const {
@@ -397,7 +397,7 @@ public:
 
   ArgType getArgType(ASTContext &Ctx) const;
 
-  void toString(raw_ostream &os) const;
+  void toString(llvm::raw_ostream &os) const;
 
   bool usesPositionalArg() const { return (bool) UsesPositionalArg; }
   unsigned getPositionalArgIndex() const {
@@ -533,7 +533,7 @@ class PrintfSpecifier : public analyze_format_string::FormatSpecifier {
   OptionalFlag IsPublic;             // '{public}'
   OptionalFlag IsSensitive;          // '{sensitive}'
   OptionalAmount Precision;
-  StringRef MaskType;
+  llvm::StringRef MaskType;
 
   ArgType getScalarArgType(ASTContext &Ctx, bool IsObjCLiteral) const;
 
@@ -619,8 +619,8 @@ public:
   const OptionalFlag &isSensitive() const { return IsSensitive; }
   bool usesPositionalArg() const { return UsesPositionalArg; }
 
-  StringRef getMaskType() const { return MaskType; }
-  void setMaskType(StringRef S) { MaskType = S; }
+  llvm::StringRef getMaskType() const { return MaskType; }
+  void setMaskType(llvm::StringRef S) { MaskType = S; }
 
   /// Changes the specifier and length according to a QualType, retaining any
   /// flags or options. Returns true on success, or false when a conversion
@@ -628,7 +628,7 @@ public:
   bool fixType(QualType QT, const LangOptions &LangOpt, ASTContext &Ctx,
                bool IsObjCLiteral);
 
-  void toString(raw_ostream &os) const;
+  void toString(llvm::raw_ostream &os) const;
 
   // Validation methods - to check if any element results in undefined behavior
   bool hasValidPlusPrefix() const;
@@ -699,7 +699,7 @@ public:
   bool fixType(QualType QT, QualType RawQT, const LangOptions &LangOpt,
                ASTContext &Ctx);
 
-  void toString(raw_ostream &os) const;
+  void toString(llvm::raw_ostream &os) const;
 
   static ScanfSpecifier Parse(const char *beg, const char *end);
 };
@@ -756,7 +756,7 @@ public:
   }
 
   /// Handle mask types whose sizes are not between one and eight bytes.
-  virtual void handleInvalidMaskType(StringRef MaskType) {}
+  virtual void handleInvalidMaskType(llvm::StringRef MaskType) {}
 
     // Scanf-specific handlers.
 

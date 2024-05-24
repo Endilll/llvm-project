@@ -31,7 +31,7 @@ buildTestFS(llvm::StringMap<std::string> const &Files,
 // A VFS provider that returns TestFSes containing a provided set of files.
 class MockFS : public ThreadsafeFS {
 public:
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem> viewImpl() const override {
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> viewImpl() const override {
     auto MemFS = buildTestFS(Files, Timestamps);
     if (!OverlayRealFileSystemForModules)
       return MemFS;
@@ -57,8 +57,8 @@ public:
   ///
   /// If \p RelPathPrefix is not empty, use that as a prefix in front of the
   /// source file name, instead of using an absolute path.
-  MockCompilationDatabase(StringRef Directory = StringRef(),
-                          StringRef RelPathPrefix = StringRef());
+  MockCompilationDatabase(llvm::StringRef Directory = llvm::StringRef(),
+                          llvm::StringRef RelPathPrefix = llvm::StringRef());
 
   std::optional<tooling::CompileCommand>
   getCompileCommand(PathRef File) const override;
@@ -68,8 +68,8 @@ public:
   std::vector<std::string> ExtraClangFlags;
 
 private:
-  StringRef Directory;
-  StringRef RelPathPrefix;
+  llvm::StringRef Directory;
+  llvm::StringRef RelPathPrefix;
 };
 
 // Returns an absolute (fake) test directory for this OS.

@@ -52,7 +52,7 @@ static bool ParsePrecision(FormatStringHandler &H, PrintfSpecifier &FS,
 
 static bool ParseObjCFlags(FormatStringHandler &H, PrintfSpecifier &FS,
                            const char *FlagBeg, const char *E, bool Warn) {
-   StringRef Flag(FlagBeg, E - FlagBeg);
+   llvm::StringRef Flag(FlagBeg, E - FlagBeg);
    // Currently there is only one flag.
    if (Flag == "tt") {
      FS.setHasObjCTechnicalTerm(FlagBeg);
@@ -123,15 +123,15 @@ static PrintfSpecifierResult ParsePrintfSpecifier(FormatStringHandler &H,
   if (*I == '{') {
     ++I;
     unsigned char PrivacyFlags = 0;
-    StringRef MatchedStr;
+    llvm::StringRef MatchedStr;
 
     do {
-      StringRef Str(I, E - I);
+      llvm::StringRef Str(I, E - I);
       std::string Match = "^[[:space:]]*"
                           "(private|public|sensitive|mask\\.[^[:space:],}]*)"
                           "[[:space:]]*(,|})";
       llvm::Regex R(Match);
-      SmallVector<StringRef, 2> Matches;
+      llvm::SmallVector<llvm::StringRef, 2> Matches;
 
       if (R.match(Str, &Matches)) {
         MatchedStr = Matches[1];
@@ -141,7 +141,7 @@ static PrintfSpecifierResult ParsePrintfSpecifier(FormatStringHandler &H,
         // comma-delimited segment is at least as strict as the privacy
         // annotations in previous comma-delimited segments.
         if (MatchedStr.starts_with("mask")) {
-          StringRef MaskType = MatchedStr.substr(sizeof("mask.") - 1);
+          llvm::StringRef MaskType = MatchedStr.substr(sizeof("mask.") - 1);
           unsigned Size = MaskType.size();
           if (Warn && (Size == 0 || Size > 8))
             H.handleInvalidMaskType(MaskType);
@@ -158,7 +158,7 @@ static PrintfSpecifierResult ParsePrintfSpecifier(FormatStringHandler &H,
         size_t CommaOrBracePos =
             Str.find_if([](char c) { return c == ',' || c == '}'; });
 
-        if (CommaOrBracePos == StringRef::npos) {
+        if (CommaOrBracePos == llvm::StringRef::npos) {
           // Neither a comma nor the closing brace was found.
           if (Warn)
             H.HandleIncompleteSpecifier(Start, E - Start);
@@ -967,7 +967,7 @@ bool PrintfSpecifier::fixType(QualType QT, const LangOptions &LangOpt,
   return true;
 }
 
-void PrintfSpecifier::toString(raw_ostream &os) const {
+void PrintfSpecifier::toString(llvm::raw_ostream &os) const {
   // Whilst some features have no defined order, we are using the order
   // appearing in the C99 standard (ISO/IEC 9899:1999 (E) 7.19.6.1)
   os << "%";

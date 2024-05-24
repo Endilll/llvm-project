@@ -66,7 +66,7 @@ static bool isAtStartOfLineIncludingEmptyMacro(SourceLocation NextLoc,
 void MisleadingIndentationCheck::missingBracesCheck(
     const SourceManager &SM, const CompoundStmt *CStmt,
     const LangOptions &LangOpts) {
-  const static StringRef StmtNames[] = {"if", "for", "while"};
+  const static llvm::StringRef StmtNames[] = {"if", "for", "while"};
   for (unsigned int I = 0; I < CStmt->size() - 1; I++) {
     const Stmt *CurrentStmt = CStmt->body_begin()[I];
     const Stmt *Inner = nullptr;

@@ -48,7 +48,7 @@ const DeclaratorDecl *getConstructedVarOrField(const Expr *FoundConstructExpr,
 const char SmartPtrArrayMismatchCheck::PointerTypeN[] = "pointer_type";
 
 SmartPtrArrayMismatchCheck::SmartPtrArrayMismatchCheck(
-    StringRef Name, ClangTidyContext *Context, StringRef SmartPointerName)
+    llvm::StringRef Name, ClangTidyContext *Context, llvm::StringRef SmartPointerName)
     : ClangTidyCheck(Name, Context), SmartPointerName(SmartPointerName) {}
 
 void SmartPtrArrayMismatchCheck::storeOptions(

@@ -31,7 +31,7 @@ using namespace llvm;
 namespace clang {
 namespace refactor {
 
-void TestSelectionRangesInFile::dump(raw_ostream &OS) const {
+void TestSelectionRangesInFile::dump(llvm::raw_ostream &OS) const {
   for (const auto &Group : GroupedRanges) {
     OS << "Test selection group '" << Group.Name << "':\n";
     for (const auto &Range : Group.Ranges) {
@@ -67,7 +67,7 @@ bool TestSelectionRangesInFile::foreachRange(
 
 namespace {
 
-void dumpChanges(const tooling::AtomicChanges &Changes, raw_ostream &OS) {
+void dumpChanges(const tooling::AtomicChanges &Changes, llvm::raw_ostream &OS) {
   for (const auto &Change : Changes)
     OS << const_cast<tooling::AtomicChange &>(Change).toYAMLString() << "\n";
 }
@@ -84,7 +84,7 @@ bool areChangesSame(const tooling::AtomicChanges &LHS,
 }
 
 bool printRewrittenSources(const tooling::AtomicChanges &Changes,
-                           raw_ostream &OS) {
+                           llvm::raw_ostream &OS) {
   std::set<std::string> Files;
   for (const auto &Change : Changes)
     Files.insert(Change.getFilePath());
@@ -140,7 +140,7 @@ public:
 private:
   bool handleAllResults();
 
-  void handleResult(Expected<tooling::AtomicChanges> Result) {
+  void handleResult(llvm::Expected<tooling::AtomicChanges> Result) {
     Results.back().push_back(std::move(Result));
     size_t GroupIndex = Results.size() - 1;
     if (Results.back().size() >=
@@ -156,20 +156,20 @@ private:
   }
 
   const TestSelectionRangesInFile &TestRanges;
-  std::vector<std::vector<Expected<tooling::AtomicChanges>>> Results;
+  std::vector<std::vector<llvm::Expected<tooling::AtomicChanges>>> Results;
 };
 
-std::pair<unsigned, unsigned> getLineColumn(StringRef Filename,
+std::pair<unsigned, unsigned> getLineColumn(llvm::StringRef Filename,
                                             unsigned Offset) {
   ErrorOr<std::unique_ptr<MemoryBuffer>> ErrOrFile =
       MemoryBuffer::getFile(Filename);
   if (!ErrOrFile)
     return {0, 0};
-  StringRef Source = ErrOrFile.get()->getBuffer();
+  llvm::StringRef Source = ErrOrFile.get()->getBuffer();
   Source = Source.take_front(Offset);
   size_t LastLine = Source.find_last_of("\r\n");
   return {Source.count('\n') + 1,
-          (LastLine == StringRef::npos ? Offset : Offset - LastLine) + 1};
+          (LastLine == llvm::StringRef::npos ? Offset : Offset - LastLine) + 1};
 }
 
 } // end anonymous namespace
@@ -181,7 +181,7 @@ bool TestRefactoringResultConsumer::handleAllResults() {
     std::optional<tooling::AtomicChanges> CanonicalResult;
     std::optional<std::string> CanonicalErrorMessage;
     for (const auto &I : llvm::enumerate(Group.value())) {
-      Expected<tooling::AtomicChanges> &Result = I.value();
+      llvm::Expected<tooling::AtomicChanges> &Result = I.value();
       std::string ErrorMessage;
       bool HasResult = !!Result;
       if (!HasResult) {
@@ -263,25 +263,25 @@ TestSelectionRangesInFile::createConsumer() const {
 
 /// Adds the \p ColumnOffset to file offset \p Offset, without going past a
 /// newline.
-static unsigned addColumnOffset(StringRef Source, unsigned Offset,
+static unsigned addColumnOffset(llvm::StringRef Source, unsigned Offset,
                                 unsigned ColumnOffset) {
   if (!ColumnOffset)
     return Offset;
-  StringRef Substr = Source.drop_front(Offset).take_front(ColumnOffset);
+  llvm::StringRef Substr = Source.drop_front(Offset).take_front(ColumnOffset);
   size_t NewlinePos = Substr.find_first_of("\r\n");
   return Offset +
-         (NewlinePos == StringRef::npos ? ColumnOffset : (unsigned)NewlinePos);
+         (NewlinePos == llvm::StringRef::npos ? ColumnOffset : (unsigned)NewlinePos);
 }
 
-static unsigned addEndLineOffsetAndEndColumn(StringRef Source, unsigned Offset,
+static unsigned addEndLineOffsetAndEndColumn(llvm::StringRef Source, unsigned Offset,
                                              unsigned LineNumberOffset,
                                              unsigned Column) {
-  StringRef Line = Source.drop_front(Offset);
+  llvm::StringRef Line = Source.drop_front(Offset);
   unsigned LineOffset = 0;
   for (; LineNumberOffset != 0; --LineNumberOffset) {
     size_t NewlinePos = Line.find_first_of("\r\n");
     // Line offset goes out of bounds.
-    if (NewlinePos == StringRef::npos)
+    if (NewlinePos == llvm::StringRef::npos)
       break;
     LineOffset += NewlinePos + 1;
     Line = Line.drop_front(NewlinePos + 1);
@@ -289,11 +289,11 @@ static unsigned addEndLineOffsetAndEndColumn(StringRef Source, unsigned Offset,
   // Source now points to the line at +lineOffset;
   size_t LineStart = Source.find_last_of("\r\n", /*From=*/Offset + LineOffset);
   return addColumnOffset(
-      Source, LineStart == StringRef::npos ? 0 : LineStart + 1, Column - 1);
+      Source, LineStart == llvm::StringRef::npos ? 0 : LineStart + 1, Column - 1);
 }
 
 std::optional<TestSelectionRangesInFile>
-findTestSelectionRanges(StringRef Filename) {
+findTestSelectionRanges(llvm::StringRef Filename) {
   ErrorOr<std::unique_ptr<MemoryBuffer>> ErrOrFile =
       MemoryBuffer::getFile(Filename);
   if (!ErrOrFile) {
@@ -301,7 +301,7 @@ findTestSelectionRanges(StringRef Filename) {
                  << " : could not open the given file";
     return std::nullopt;
   }
-  StringRef Source = ErrOrFile.get()->getBuffer();
+  llvm::StringRef Source = ErrOrFile.get()->getBuffer();
 
   // See the doc comment for this function for the explanation of this
   // syntax.
@@ -310,7 +310,7 @@ findTestSelectionRanges(StringRef Filename) {
       "blank:]]*(\\+[[:digit:]]+)?[[:blank:]]*(->[[:blank:]"
       "]*[\\+\\:[:digit:]]+)?");
 
-  std::map<std::string, SmallVector<TestSelectionRange, 8>> GroupedRanges;
+  std::map<std::string, llvm::SmallVector<TestSelectionRange, 8>> GroupedRanges;
 
   LangOptions LangOpts;
   LangOpts.CPlusPlus = 1;
@@ -323,9 +323,9 @@ findTestSelectionRanges(StringRef Filename) {
        Lex.LexFromRawLexer(Tok)) {
     if (Tok.isNot(tok::comment))
       continue;
-    StringRef Comment =
+    llvm::StringRef Comment =
         Source.substr(Tok.getLocation().getRawEncoding(), Tok.getLength());
-    SmallVector<StringRef, 4> Matches;
+    llvm::SmallVector<llvm::StringRef, 4> Matches;
     // Try to detect mistyped 'range:' comments to ensure tests don't miss
     // anything.
     auto DetectMistypedCommand = [&]() -> bool {
@@ -357,7 +357,7 @@ findTestSelectionRanges(StringRef Filename) {
     if (!Matches[3].empty()) {
       static const Regex EndLocRegex(
           "->[[:blank:]]*(\\+[[:digit:]]+):([[:digit:]]+)");
-      SmallVector<StringRef, 4> EndLocMatches;
+      llvm::SmallVector<llvm::StringRef, 4> EndLocMatches;
       if (!EndLocRegex.match(Matches[3], &EndLocMatches)) {
         if (DetectMistypedCommand())
           return std::nullopt;
@@ -374,7 +374,7 @@ findTestSelectionRanges(StringRef Filename) {
     }
     TestSelectionRange Range = {Offset, EndOffset};
     auto It = GroupedRanges.insert(std::make_pair(
-        Matches[1].str(), SmallVector<TestSelectionRange, 8>{Range}));
+        Matches[1].str(), llvm::SmallVector<TestSelectionRange, 8>{Range}));
     if (!It.second)
       It.first->second.push_back(Range);
   }

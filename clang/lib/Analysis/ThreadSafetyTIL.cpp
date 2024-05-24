@@ -16,7 +16,7 @@ using namespace clang;
 using namespace threadSafety;
 using namespace til;
 
-StringRef til::getUnaryOpcodeString(TIL_UnaryOpcode Op) {
+llvm::StringRef til::getUnaryOpcodeString(TIL_UnaryOpcode Op) {
   switch (Op) {
     case UOP_Minus:    return "-";
     case UOP_BitNot:   return "~";
@@ -25,7 +25,7 @@ StringRef til::getUnaryOpcodeString(TIL_UnaryOpcode Op) {
   return {};
 }
 
-StringRef til::getBinaryOpcodeString(TIL_BinaryOpcode Op) {
+llvm::StringRef til::getBinaryOpcodeString(TIL_BinaryOpcode Op) {
   switch (Op) {
     case BOP_Mul:      return "*";
     case BOP_Div:      return "/";

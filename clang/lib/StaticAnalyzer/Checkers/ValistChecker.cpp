@@ -25,7 +25,7 @@ using namespace ento;
 REGISTER_SET_WITH_PROGRAMSTATE(InitializedVALists, const MemRegion *)
 
 namespace {
-typedef SmallVector<const MemRegion *, 2> RegionVector;
+typedef llvm::SmallVector<const MemRegion *, 2> RegionVector;
 
 class ValistChecker : public Checker<check::PreCall, check::PreStmt<VAArgExpr>,
                                      check::DeadSymbols> {
@@ -35,7 +35,7 @@ class ValistChecker : public Checker<check::PreCall, check::PreStmt<VAArgExpr>,
     CallDescription Func;
     int VAListPos;
   };
-  static const SmallVector<VAListAccepter, 15> VAListAccepters;
+  static const llvm::SmallVector<VAListAccepter, 15> VAListAccepters;
   static const CallDescription VaStart, VaEnd, VaCopy;
 
 public:
@@ -59,10 +59,10 @@ private:
   const ExplodedNode *getStartCallSite(const ExplodedNode *N,
                                        const MemRegion *Reg) const;
 
-  void reportUninitializedAccess(const MemRegion *VAList, StringRef Msg,
+  void reportUninitializedAccess(const MemRegion *VAList, llvm::StringRef Msg,
                                  CheckerContext &C) const;
-  void reportLeakedVALists(const RegionVector &LeakedVALists, StringRef Msg1,
-                           StringRef Msg2, CheckerContext &C, ExplodedNode *N,
+  void reportLeakedVALists(const RegionVector &LeakedVALists, llvm::StringRef Msg1,
+                           llvm::StringRef Msg2, CheckerContext &C, ExplodedNode *N,
                            bool ReportUninit = false) const;
 
   void checkVAListStartCall(const CallEvent &Call, CheckerContext &C,
@@ -99,7 +99,7 @@ private:
   };
 };
 
-const SmallVector<ValistChecker::VAListAccepter, 15>
+const llvm::SmallVector<ValistChecker::VAListAccepter, 15>
     ValistChecker::VAListAccepters = {{{CDM::CLibrary, {"vfprintf"}, 3}, 2},
                                       {{CDM::CLibrary, {"vfscanf"}, 3}, 2},
                                       {{CDM::CLibrary, {"vprintf"}, 2}, 1},
@@ -150,7 +150,7 @@ void ValistChecker::checkPreCall(const CallEvent &Call,
       if (Symbolic)
         return;
 
-      SmallString<80> Errmsg("Function '");
+      llvm::SmallString<80> Errmsg("Function '");
       Errmsg += FuncInfo.Func.getFunctionName();
       Errmsg += "' is called with an uninitialized va_list argument";
       reportUninitializedAccess(VAList, Errmsg.c_str(), C);
@@ -245,7 +245,7 @@ ValistChecker::getStartCallSite(const ExplodedNode *N,
 }
 
 void ValistChecker::reportUninitializedAccess(const MemRegion *VAList,
-                                              StringRef Msg,
+                                              llvm::StringRef Msg,
                                               CheckerContext &C) const {
   if (!ChecksEnabled[CK_Uninitialized])
     return;
@@ -262,7 +262,7 @@ void ValistChecker::reportUninitializedAccess(const MemRegion *VAList,
 }
 
 void ValistChecker::reportLeakedVALists(const RegionVector &LeakedVALists,
-                                        StringRef Msg1, StringRef Msg2,
+                                        llvm::StringRef Msg1, llvm::StringRef Msg2,
                                         CheckerContext &C, ExplodedNode *N,
                                         bool ReportUninit) const {
   if (!(ChecksEnabled[CK_Unterminated] ||
@@ -287,7 +287,7 @@ void ValistChecker::reportLeakedVALists(const RegionVector &LeakedVALists,
       LocUsedForUniqueing = PathDiagnosticLocation::createBegin(
           StartCallStmt, C.getSourceManager(), StartNode->getLocationContext());
 
-    SmallString<100> Buf;
+    llvm::SmallString<100> Buf;
     llvm::raw_svector_ostream OS(Buf);
     OS << Msg1;
     std::string VariableName = Reg->getDescriptiveName();
@@ -383,7 +383,7 @@ PathDiagnosticPieceRef ValistChecker::ValistBugVisitor::VisitNode(
   if (!S)
     return nullptr;
 
-  StringRef Msg;
+  llvm::StringRef Msg;
   if (State->contains<InitializedVALists>(Reg) &&
       !StatePrev->contains<InitializedVALists>(Reg))
     Msg = "Initialized va_list";

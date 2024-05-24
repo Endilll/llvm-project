@@ -849,7 +849,7 @@ clangd accepts flags on the commandline, and in the CLANGD_FLAGS environment var
   log("Features: {0}", featureString());
   log("PID: {0}", llvm::sys::Process::getProcessId());
   {
-    SmallString<128> CWD;
+    llvm::SmallString<128> CWD;
     if (auto Err = llvm::sys::fs::current_path(CWD))
       log("Working directory unknown: {0}", Err.message());
     else

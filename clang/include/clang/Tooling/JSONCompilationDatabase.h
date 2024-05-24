@@ -65,14 +65,14 @@ public:
   /// Returns NULL and sets ErrorMessage if the database could not be
   /// loaded from the given file.
   static std::unique_ptr<JSONCompilationDatabase>
-  loadFromFile(StringRef FilePath, std::string &ErrorMessage,
+  loadFromFile(llvm::StringRef FilePath, std::string &ErrorMessage,
                JSONCommandLineSyntax Syntax);
 
   /// Loads a JSON compilation database from a data buffer.
   ///
   /// Returns NULL and sets ErrorMessage if the database could not be loaded.
   static std::unique_ptr<JSONCompilationDatabase>
-  loadFromBuffer(StringRef DatabaseString, std::string &ErrorMessage,
+  loadFromBuffer(llvm::StringRef DatabaseString, std::string &ErrorMessage,
                  JSONCommandLineSyntax Syntax);
 
   /// Returns all compile commands in which the specified file was
@@ -81,7 +81,7 @@ public:
   /// FIXME: Currently FilePath must be an absolute path inside the
   /// source directory which does not have symlinks resolved.
   std::vector<CompileCommand>
-  getCompileCommands(StringRef FilePath) const override;
+  getCompileCommands(llvm::StringRef FilePath) const override;
 
   /// Returns the list of all files available in the compilation database.
   ///
@@ -118,7 +118,7 @@ private:
                  llvm::yaml::ScalarNode *>;
 
   /// Converts the given array of CompileCommandRefs to CompileCommands.
-  void getCommands(ArrayRef<CompileCommandRef> CommandsRef,
+  void getCommands(llvm::ArrayRef<CompileCommandRef> CommandsRef,
                    std::vector<CompileCommand> &Commands) const;
 
   // Maps file paths to the compile command lines for that file.

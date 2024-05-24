@@ -182,7 +182,7 @@ void Haiku::AddClangSystemIncludeArgs(const llvm::opt::ArgList &DriverArgs,
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> Dir(D.ResourceDir);
+    llvm::SmallString<128> Dir(D.ResourceDir);
     llvm::sys::path::append(Dir, "include");
     addSystemInclude(DriverArgs, CC1Args, Dir.str());
   }
@@ -191,13 +191,13 @@ void Haiku::AddClangSystemIncludeArgs(const llvm::opt::ArgList &DriverArgs,
     return;
 
   // Add dirs specified via 'configure --with-c-include-dirs'.
-  StringRef CIncludeDirs(C_INCLUDE_DIRS);
+  llvm::StringRef CIncludeDirs(C_INCLUDE_DIRS);
   if (!CIncludeDirs.empty()) {
-    SmallVector<StringRef, 5> dirs;
+    llvm::SmallVector<llvm::StringRef, 5> dirs;
     CIncludeDirs.split(dirs, ":");
-    for (StringRef dir : dirs) {
-      StringRef Prefix =
-        llvm::sys::path::is_absolute(dir) ? StringRef(D.SysRoot) : "";
+    for (llvm::StringRef dir : dirs) {
+      llvm::StringRef Prefix =
+        llvm::sys::path::is_absolute(dir) ? llvm::StringRef(D.SysRoot) : "";
       addExternCSystemInclude(DriverArgs, CC1Args, Prefix + dir);
     }
     return;

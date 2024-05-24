@@ -27,7 +27,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/make-shared.html
 class MakeSharedCheck : public MakeSmartPtrCheck {
 public:
-  MakeSharedCheck(StringRef Name, ClangTidyContext *Context);
+  MakeSharedCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
 protected:
   SmartPtrTypeMatcher getSmartPointerTypeMatcher() const override;

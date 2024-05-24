@@ -17,7 +17,7 @@ struct GetDeclsVisitor : TestVisitor<GetDeclsVisitor> {
   std::function<void(CallExpr *)> OnCall;
   std::function<void(RecordTypeLoc)> OnRecordTypeLoc;
   std::function<void(UsingTypeLoc)> OnUsingTypeLoc;
-  SmallVector<Decl *, 4> DeclStack;
+  llvm::SmallVector<Decl *, 4> DeclStack;
 
   bool VisitCallExpr(CallExpr *Expr) {
     if (OnCall)
@@ -49,7 +49,7 @@ TEST(LookupTest, replaceNestedFunctionName) {
   GetDeclsVisitor Visitor;
 
   auto replaceCallExpr = [&](const CallExpr *Expr,
-                             StringRef ReplacementString) {
+                             llvm::StringRef ReplacementString) {
     const auto *Callee = cast<DeclRefExpr>(Expr->getCallee()->IgnoreImplicit());
     const ValueDecl *FD = Callee->getDecl();
     return tooling::replaceNestedName(
@@ -191,7 +191,7 @@ TEST(LookupTest, replaceNestedClassName) {
   GetDeclsVisitor Visitor;
 
   auto replaceTypeLoc = [&](const NamedDecl *ND, SourceLocation Loc,
-                            StringRef ReplacementString) {
+                            llvm::StringRef ReplacementString) {
     return tooling::replaceNestedName(
         nullptr, Loc, Visitor.DeclStack.back()->getDeclContext(), ND,
         ReplacementString);

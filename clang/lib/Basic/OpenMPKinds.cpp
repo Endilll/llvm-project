@@ -20,7 +20,7 @@
 using namespace clang;
 using namespace llvm::omp;
 
-unsigned clang::getOpenMPSimpleClauseType(OpenMPClauseKind Kind, StringRef Str,
+unsigned clang::getOpenMPSimpleClauseType(OpenMPClauseKind Kind, llvm::StringRef Str,
                                           const LangOptions &LangOpts) {
   switch (Kind) {
   case OMPC_default:
@@ -619,7 +619,7 @@ bool clang::isOpenMPTargetDataManagementDirective(OpenMPDirectiveKind DKind) {
 bool clang::isOpenMPNestingTeamsDirective(OpenMPDirectiveKind DKind) {
   if (DKind == OMPD_teams)
     return true;
-  ArrayRef<Directive> Leaves = getLeafConstructs(DKind);
+  llvm::ArrayRef<Directive> Leaves = getLeafConstructs(DKind);
   return !Leaves.empty() && Leaves.front() == OMPD_teams;
 }
 
@@ -642,7 +642,7 @@ bool clang::isOpenMPSimdDirective(OpenMPDirectiveKind DKind) {
 bool clang::isOpenMPNestingDistributeDirective(OpenMPDirectiveKind Kind) {
   if (Kind == OMPD_distribute)
     return true;
-  ArrayRef<Directive> Leaves = getLeafConstructs(Kind);
+  llvm::ArrayRef<Directive> Leaves = getLeafConstructs(Kind);
   return !Leaves.empty() && Leaves.front() == OMPD_distribute;
 }
 
@@ -654,7 +654,7 @@ bool clang::isOpenMPDistributeDirective(OpenMPDirectiveKind Kind) {
 bool clang::isOpenMPGenericLoopDirective(OpenMPDirectiveKind Kind) {
   if (Kind == OMPD_loop)
     return true;
-  ArrayRef<Directive> Leaves = getLeafConstructs(Kind);
+  llvm::ArrayRef<Directive> Leaves = getLeafConstructs(Kind);
   return !Leaves.empty() && Leaves.back() == OMPD_loop;
 }
 
@@ -703,7 +703,7 @@ bool clang::needsTaskBasedThreadLimit(OpenMPDirectiveKind DKind) {
 }
 
 void clang::getOpenMPCaptureRegions(
-    SmallVectorImpl<OpenMPDirectiveKind> &CaptureRegions,
+    llvm::SmallVectorImpl<OpenMPDirectiveKind> &CaptureRegions,
     OpenMPDirectiveKind DKind) {
   assert(unsigned(DKind) < llvm::omp::Directive_enumSize);
   switch (DKind) {

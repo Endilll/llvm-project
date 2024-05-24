@@ -149,14 +149,14 @@ UnusedReturnValueCheck::UnusedReturnValueCheck(llvm::StringRef Name,
 
 UnusedReturnValueCheck::UnusedReturnValueCheck(
     llvm::StringRef Name, ClangTidyContext *Context,
-    std::vector<StringRef> CheckedFunctions)
+    std::vector<llvm::StringRef> CheckedFunctions)
     : UnusedReturnValueCheck(Name, Context, std::move(CheckedFunctions), {},
                              false) {}
 
 UnusedReturnValueCheck::UnusedReturnValueCheck(
     llvm::StringRef Name, ClangTidyContext *Context,
-    std::vector<StringRef> CheckedFunctions,
-    std::vector<StringRef> CheckedReturnTypes, bool AllowCastToVoid)
+    std::vector<llvm::StringRef> CheckedFunctions,
+    std::vector<llvm::StringRef> CheckedReturnTypes, bool AllowCastToVoid)
     : ClangTidyCheck(Name, Context),
       CheckedFunctions(std::move(CheckedFunctions)),
       CheckedReturnTypes(std::move(CheckedReturnTypes)),

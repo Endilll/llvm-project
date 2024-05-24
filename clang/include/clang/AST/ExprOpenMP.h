@@ -32,20 +32,20 @@ class OMPArrayShapingExpr final
 
   /// Construct full expression.
   OMPArrayShapingExpr(QualType ExprTy, Expr *Op, SourceLocation L,
-                      SourceLocation R, ArrayRef<Expr *> Dims);
+                      SourceLocation R, llvm::ArrayRef<Expr *> Dims);
 
   /// Construct an empty expression.
   explicit OMPArrayShapingExpr(EmptyShell Shell, unsigned NumDims)
       : Expr(OMPArrayShapingExprClass, Shell), NumDims(NumDims) {}
 
   /// Sets the dimensions for the array shaping.
-  void setDimensions(ArrayRef<Expr *> Dims);
+  void setDimensions(llvm::ArrayRef<Expr *> Dims);
 
   /// Sets the base expression for array shaping operation.
   void setBase(Expr *Op) { getTrailingObjects<Expr *>()[NumDims] = Op; }
 
   /// Sets source ranges for the brackets in the array shaping operation.
-  void setBracketsRanges(ArrayRef<SourceRange> BR);
+  void setBracketsRanges(llvm::ArrayRef<SourceRange> BR);
 
   unsigned numTrailingObjects(OverloadToken<Expr *>) const {
     // Add an extra one for the base expression.
@@ -59,8 +59,8 @@ class OMPArrayShapingExpr final
 public:
   static OMPArrayShapingExpr *Create(const ASTContext &Context, QualType T,
                                      Expr *Op, SourceLocation L,
-                                     SourceLocation R, ArrayRef<Expr *> Dims,
-                                     ArrayRef<SourceRange> BracketRanges);
+                                     SourceLocation R, llvm::ArrayRef<Expr *> Dims,
+                                     llvm::ArrayRef<SourceRange> BracketRanges);
 
   static OMPArrayShapingExpr *CreateEmpty(const ASTContext &Context,
                                           unsigned NumDims);
@@ -77,12 +77,12 @@ public:
   }
 
   /// Fetches the dimensions for array shaping expression.
-  ArrayRef<Expr *> getDimensions() const {
+  llvm::ArrayRef<Expr *> getDimensions() const {
     return llvm::ArrayRef(getTrailingObjects<Expr *>(), NumDims);
   }
 
   /// Fetches source ranges for the brackets os the array shaping expression.
-  ArrayRef<SourceRange> getBracketsRanges() const {
+  llvm::ArrayRef<SourceRange> getBracketsRanges() const {
     return llvm::ArrayRef(getTrailingObjects<SourceRange>(), NumDims);
   }
 
@@ -195,8 +195,8 @@ private:
 
   OMPIteratorExpr(QualType ExprTy, SourceLocation IteratorKwLoc,
                   SourceLocation L, SourceLocation R,
-                  ArrayRef<IteratorDefinition> Data,
-                  ArrayRef<OMPIteratorHelperData> Helpers);
+                  llvm::ArrayRef<IteratorDefinition> Data,
+                  llvm::ArrayRef<OMPIteratorHelperData> Helpers);
 
   /// Construct an empty expression.
   explicit OMPIteratorExpr(EmptyShell Shell, unsigned NumIterators)
@@ -233,8 +233,8 @@ public:
   static OMPIteratorExpr *Create(const ASTContext &Context, QualType T,
                                  SourceLocation IteratorKwLoc, SourceLocation L,
                                  SourceLocation R,
-                                 ArrayRef<IteratorDefinition> Data,
-                                 ArrayRef<OMPIteratorHelperData> Helpers);
+                                 llvm::ArrayRef<IteratorDefinition> Data,
+                                 llvm::ArrayRef<OMPIteratorHelperData> Helpers);
 
   static OMPIteratorExpr *CreateEmpty(const ASTContext &Context,
                                       unsigned NumIterators);

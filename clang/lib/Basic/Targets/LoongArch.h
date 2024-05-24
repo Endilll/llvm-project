@@ -53,14 +53,14 @@ public:
     return true;
   }
 
-  StringRef getCPU() const { return CPU; }
+  llvm::StringRef getCPU() const { return CPU; }
 
-  StringRef getABI() const override { return ABI; }
+  llvm::StringRef getABI() const override { return ABI; }
 
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
   BuiltinVaListKind getBuiltinVaListKind() const override {
     return TargetInfo::VoidPtrBuiltinVaList;
@@ -68,7 +68,7 @@ public:
 
   std::string_view getClobbers() const override { return ""; }
 
-  ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
 
   int getEHDataRegisterNumber(unsigned RegNo) const override {
     if (RegNo == 0)
@@ -78,7 +78,7 @@ public:
     return -1;
   }
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
 
   bool validateAsmConstraint(const char *&Name,
                              TargetInfo::ConstraintInfo &Info) const override;
@@ -91,13 +91,13 @@ public:
 
   bool
   initFeatureMap(llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags,
-                 StringRef CPU,
+                 llvm::StringRef CPU,
                  const std::vector<std::string> &FeaturesVec) const override;
 
-  bool hasFeature(StringRef Feature) const override;
+  bool hasFeature(llvm::StringRef Feature) const override;
 
-  bool isValidCPUName(StringRef Name) const override;
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  bool isValidCPUName(llvm::StringRef Name) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
 };
 
 class LLVM_LIBRARY_VISIBILITY LoongArch32TargetInfo

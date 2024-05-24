@@ -138,29 +138,29 @@ private:
   // message to be emitted.
   void diagnoseSubMismatchUnexpected(DiffResult &DR,
                                      const NamedDecl *FirstRecord,
-                                     StringRef FirstModule,
+                                     llvm::StringRef FirstModule,
                                      const NamedDecl *SecondRecord,
-                                     StringRef SecondModule) const;
+                                     llvm::StringRef SecondModule) const;
 
   void diagnoseSubMismatchDifferentDeclKinds(DiffResult &DR,
                                              const NamedDecl *FirstRecord,
-                                             StringRef FirstModule,
+                                             llvm::StringRef FirstModule,
                                              const NamedDecl *SecondRecord,
-                                             StringRef SecondModule) const;
+                                             llvm::StringRef SecondModule) const;
 
   bool diagnoseSubMismatchField(const NamedDecl *FirstRecord,
-                                StringRef FirstModule, StringRef SecondModule,
+                                llvm::StringRef FirstModule, llvm::StringRef SecondModule,
                                 const FieldDecl *FirstField,
                                 const FieldDecl *SecondField) const;
 
   bool diagnoseSubMismatchTypedef(const NamedDecl *FirstRecord,
-                                  StringRef FirstModule, StringRef SecondModule,
+                                  llvm::StringRef FirstModule, llvm::StringRef SecondModule,
                                   const TypedefNameDecl *FirstTD,
                                   const TypedefNameDecl *SecondTD,
                                   bool IsTypeAlias) const;
 
   bool diagnoseSubMismatchVar(const NamedDecl *FirstRecord,
-                              StringRef FirstModule, StringRef SecondModule,
+                              llvm::StringRef FirstModule, llvm::StringRef SecondModule,
                               const VarDecl *FirstVD,
                               const VarDecl *SecondVD) const;
 
@@ -169,17 +169,17 @@ private:
   /// Returns true if found a mismatch and diagnosed it.
   bool diagnoseSubMismatchProtocols(const ObjCProtocolList &FirstProtocols,
                                     const ObjCContainerDecl *FirstContainer,
-                                    StringRef FirstModule,
+                                    llvm::StringRef FirstModule,
                                     const ObjCProtocolList &SecondProtocols,
                                     const ObjCContainerDecl *SecondContainer,
-                                    StringRef SecondModule) const;
+                                    llvm::StringRef SecondModule) const;
 
   /// Check if Objective-C methods are the same and diagnose if different.
   ///
   /// Returns true if found a mismatch and diagnosed it.
   bool diagnoseSubMismatchObjCMethod(const NamedDecl *FirstObjCContainer,
-                                     StringRef FirstModule,
-                                     StringRef SecondModule,
+                                     llvm::StringRef FirstModule,
+                                     llvm::StringRef SecondModule,
                                      const ObjCMethodDecl *FirstMethod,
                                      const ObjCMethodDecl *SecondMethod) const;
 
@@ -188,7 +188,7 @@ private:
   /// Returns true if found a mismatch and diagnosed it.
   bool
   diagnoseSubMismatchObjCProperty(const NamedDecl *FirstObjCContainer,
-                                  StringRef FirstModule, StringRef SecondModule,
+                                  llvm::StringRef FirstModule, llvm::StringRef SecondModule,
                                   const ObjCPropertyDecl *FirstProp,
                                   const ObjCPropertyDecl *SecondProp) const;
 

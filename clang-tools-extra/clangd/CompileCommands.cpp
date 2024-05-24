@@ -67,7 +67,7 @@ std::optional<std::string> queryXcrun(llvm::ArrayRef<llvm::StringRef> Argv) {
     log("Can't read xcrun output: {0}", Buf.getError().message());
     return std::nullopt;
   }
-  StringRef Path = Buf->get()->getBuffer().trim();
+  llvm::StringRef Path = Buf->get()->getBuffer().trim();
   if (Path.empty()) {
     log("xcrun produced no output");
     return std::nullopt;
@@ -111,7 +111,7 @@ std::string detectClangPath() {
   static int StaticForMainAddr;
   std::string ClangdExecutable =
       llvm::sys::fs::getMainExecutable("clangd", (void *)&StaticForMainAddr);
-  SmallString<128> ClangPath;
+  llvm::SmallString<128> ClangPath;
   ClangPath = llvm::sys::path::parent_path(ClangdExecutable);
   llvm::sys::path::append(ClangPath, "clang");
   return std::string(ClangPath);
@@ -507,7 +507,7 @@ llvm::ArrayRef<ArgStripper::Rule> ArgStripper::rulesFor(llvm::StringRef Arg) {
         auto Modes = getModes(Opt);
         std::pair<unsigned, unsigned> ArgCount = getArgCount(Opt);
         // Iterate over each spelling of the alias, e.g. -foo vs --foo.
-        for (StringRef Prefix : Prefixes[A]) {
+        for (llvm::StringRef Prefix : Prefixes[A]) {
           llvm::SmallString<64> Buf(Prefix);
           Buf.append(Opt.getName());
           llvm::StringRef Spelling = Result->try_emplace(Buf).first->getKey();

@@ -33,7 +33,7 @@ using namespace tooling;
 
 namespace {
 
-void PrintDecl(raw_ostream &Out, const ASTContext *Context, const Decl *D,
+void PrintDecl(llvm::raw_ostream &Out, const ASTContext *Context, const Decl *D,
                PrintingPolicyAdjuster PolicyModifier) {
   PrintingPolicy Policy = Context->getPrintingPolicy();
   Policy.TerseOutput = true;
@@ -44,9 +44,9 @@ void PrintDecl(raw_ostream &Out, const ASTContext *Context, const Decl *D,
 }
 
 ::testing::AssertionResult
-PrintedDeclMatches(StringRef Code, const std::vector<std::string> &Args,
+PrintedDeclMatches(llvm::StringRef Code, const std::vector<std::string> &Args,
                    const DeclarationMatcher &NodeMatch,
-                   StringRef ExpectedPrinted, StringRef FileName,
+                   llvm::StringRef ExpectedPrinted, llvm::StringRef FileName,
                    PrintingPolicyAdjuster PolicyModifier = nullptr,
                    bool AllowError = false) {
   return PrintedNodeMatches<Decl>(
@@ -57,8 +57,8 @@ PrintedDeclMatches(StringRef Code, const std::vector<std::string> &Args,
 }
 
 ::testing::AssertionResult
-PrintedDeclCXX98Matches(StringRef Code, StringRef DeclName,
-                        StringRef ExpectedPrinted,
+PrintedDeclCXX98Matches(llvm::StringRef Code, llvm::StringRef DeclName,
+                        llvm::StringRef ExpectedPrinted,
                         PrintingPolicyAdjuster PolicyModifier = nullptr) {
   std::vector<std::string> Args(1, "-std=c++98");
   return PrintedDeclMatches(Code, Args, namedDecl(hasName(DeclName)).bind("id"),
@@ -66,8 +66,8 @@ PrintedDeclCXX98Matches(StringRef Code, StringRef DeclName,
 }
 
 ::testing::AssertionResult
-PrintedDeclCXX98Matches(StringRef Code, const DeclarationMatcher &NodeMatch,
-                        StringRef ExpectedPrinted,
+PrintedDeclCXX98Matches(llvm::StringRef Code, const DeclarationMatcher &NodeMatch,
+                        llvm::StringRef ExpectedPrinted,
                         PrintingPolicyAdjuster PolicyModifier = nullptr) {
   std::vector<std::string> Args(1, "-std=c++98");
   return PrintedDeclMatches(Code,
@@ -78,17 +78,17 @@ PrintedDeclCXX98Matches(StringRef Code, const DeclarationMatcher &NodeMatch,
                             PolicyModifier);
 }
 
-::testing::AssertionResult PrintedDeclCXX11Matches(StringRef Code,
-                                                   StringRef DeclName,
-                                                   StringRef ExpectedPrinted) {
+::testing::AssertionResult PrintedDeclCXX11Matches(llvm::StringRef Code,
+                                                   llvm::StringRef DeclName,
+                                                   llvm::StringRef ExpectedPrinted) {
   std::vector<std::string> Args(1, "-std=c++11");
   return PrintedDeclMatches(Code, Args, namedDecl(hasName(DeclName)).bind("id"),
                             ExpectedPrinted, "input.cc");
 }
 
 ::testing::AssertionResult
-PrintedDeclCXX11Matches(StringRef Code, const DeclarationMatcher &NodeMatch,
-                        StringRef ExpectedPrinted,
+PrintedDeclCXX11Matches(llvm::StringRef Code, const DeclarationMatcher &NodeMatch,
+                        llvm::StringRef ExpectedPrinted,
                         PrintingPolicyAdjuster PolicyModifier = nullptr) {
   std::vector<std::string> Args(1, "-std=c++11");
   return PrintedDeclMatches(Code, Args, NodeMatch, ExpectedPrinted, "input.cc",
@@ -96,9 +96,9 @@ PrintedDeclCXX11Matches(StringRef Code, const DeclarationMatcher &NodeMatch,
 }
 
 ::testing::AssertionResult PrintedDeclCXX11nonMSCMatches(
-                                  StringRef Code,
+                                  llvm::StringRef Code,
                                   const DeclarationMatcher &NodeMatch,
-                                  StringRef ExpectedPrinted) {
+                                  llvm::StringRef ExpectedPrinted) {
   std::vector<std::string> Args{"-std=c++11", "-fno-delayed-template-parsing"};
   return PrintedDeclMatches(Code,
                             Args,
@@ -108,8 +108,8 @@ PrintedDeclCXX11Matches(StringRef Code, const DeclarationMatcher &NodeMatch,
 }
 
 ::testing::AssertionResult
-PrintedDeclCXX17Matches(StringRef Code, const DeclarationMatcher &NodeMatch,
-                        StringRef ExpectedPrinted,
+PrintedDeclCXX17Matches(llvm::StringRef Code, const DeclarationMatcher &NodeMatch,
+                        llvm::StringRef ExpectedPrinted,
                         PrintingPolicyAdjuster PolicyModifier = nullptr) {
   std::vector<std::string> Args{"-std=c++17", "-fno-delayed-template-parsing"};
   return PrintedDeclMatches(Code, Args, NodeMatch, ExpectedPrinted, "input.cc",
@@ -117,8 +117,8 @@ PrintedDeclCXX17Matches(StringRef Code, const DeclarationMatcher &NodeMatch,
 }
 
 ::testing::AssertionResult
-PrintedDeclC11Matches(StringRef Code, const DeclarationMatcher &NodeMatch,
-                      StringRef ExpectedPrinted,
+PrintedDeclC11Matches(llvm::StringRef Code, const DeclarationMatcher &NodeMatch,
+                      llvm::StringRef ExpectedPrinted,
                       PrintingPolicyAdjuster PolicyModifier = nullptr) {
   std::vector<std::string> Args(1, "-std=c11");
   return PrintedDeclMatches(Code, Args, NodeMatch, ExpectedPrinted, "input.c",
@@ -126,8 +126,8 @@ PrintedDeclC11Matches(StringRef Code, const DeclarationMatcher &NodeMatch,
 }
 
 ::testing::AssertionResult
-PrintedDeclObjCMatches(StringRef Code, const DeclarationMatcher &NodeMatch,
-                       StringRef ExpectedPrinted, bool AllowError = false) {
+PrintedDeclObjCMatches(llvm::StringRef Code, const DeclarationMatcher &NodeMatch,
+                       llvm::StringRef ExpectedPrinted, bool AllowError = false) {
   std::vector<std::string> Args(1, "");
   return PrintedDeclMatches(Code, Args, NodeMatch, ExpectedPrinted, "input.m",
                             /*PolicyModifier=*/nullptr, AllowError);
@@ -782,12 +782,12 @@ TEST(DeclPrinter, TestCXXMethodDecl_Operator1) {
   };
 
   for (unsigned i = 0, e = std::size(OperatorNames); i != e; ++i) {
-    SmallString<128> Code;
+    llvm::SmallString<128> Code;
     Code.append("struct Z { void operator");
     Code.append(OperatorNames[i]);
     Code.append("(Z z); };");
 
-    SmallString<128> Expected;
+    llvm::SmallString<128> Expected;
     Expected.append("void operator");
     Expected.append(OperatorNames[i]);
     Expected.append("(Z z)");
@@ -805,12 +805,12 @@ TEST(DeclPrinter, TestCXXMethodDecl_Operator2) {
   };
 
   for (unsigned i = 0, e = std::size(OperatorNames); i != e; ++i) {
-    SmallString<128> Code;
+    llvm::SmallString<128> Code;
     Code.append("struct Z { void operator");
     Code.append(OperatorNames[i]);
     Code.append("(); };");
 
-    SmallString<128> Expected;
+    llvm::SmallString<128> Expected;
     Expected.append("void operator");
     Expected.append(OperatorNames[i]);
     Expected.append("()");

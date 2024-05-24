@@ -25,7 +25,7 @@ void getInclusions(bool IsLocal, unsigned n, CXTranslationUnit TU,
   ASTUnit *CXXUnit = cxtu::getASTUnit(TU);
   SourceManager &SM = CXXUnit->getSourceManager();
   ASTContext &Ctx = CXXUnit->getASTContext();
-  SmallVector<CXSourceLocation, 10> InclusionStack;
+  llvm::SmallVector<CXSourceLocation, 10> InclusionStack;
   const bool HasPreamble = SM.getPreambleFileID().isValid();
 
   for (unsigned i = 0 ; i < n ; ++i) {

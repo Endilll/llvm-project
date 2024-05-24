@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/standalone-empty.html
 class StandaloneEmptyCheck : public ClangTidyCheck {
 public:
-  StandaloneEmptyCheck(StringRef Name, ClangTidyContext *Context)
+  StandaloneEmptyCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

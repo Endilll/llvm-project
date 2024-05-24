@@ -56,7 +56,7 @@ void UndefinedNewArraySizeChecker::HandleUndefinedArrayElementCount(
 
   if (ExplodedNode *N = C.generateErrorNode()) {
 
-    SmallString<100> buf;
+    llvm::SmallString<100> buf;
     llvm::raw_svector_ostream os(buf);
 
     os << "Element count in new[] is a garbage value";

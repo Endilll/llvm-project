@@ -18,7 +18,7 @@
 
 namespace clang::tidy::cppcoreguidelines {
 
-static bool isCapsOnly(StringRef Name) {
+static bool isCapsOnly(llvm::StringRef Name) {
   return llvm::all_of(Name, [](const char C) {
     return std::isupper(C) || std::isdigit(C) || C == '_';
   });
@@ -29,7 +29,7 @@ namespace {
 class MacroUsageCallbacks : public PPCallbacks {
 public:
   MacroUsageCallbacks(MacroUsageCheck *Check, const SourceManager &SM,
-                      StringRef RegExpStr, bool CapsOnly,
+                      llvm::StringRef RegExpStr, bool CapsOnly,
                       bool IgnoreCommandLine)
       : Check(Check), SM(SM), RegExp(RegExpStr), CheckCapsOnly(CapsOnly),
         IgnoreCommandLineMacros(IgnoreCommandLine) {}
@@ -44,7 +44,7 @@ public:
         SM.isWrittenInCommandLineFile(MD->getLocation()))
       return;
 
-    StringRef MacroName = MacroNameTok.getIdentifierInfo()->getName();
+    llvm::StringRef MacroName = MacroNameTok.getIdentifierInfo()->getName();
     if (MacroName == "__GCC_HAVE_DWARF2_CFI_ASM")
       return;
     if (!CheckCapsOnly && !RegExp.match(MacroName))
@@ -76,9 +76,9 @@ void MacroUsageCheck::registerPPCallbacks(const SourceManager &SM,
       this, SM, AllowedRegexp, CheckCapsOnly, IgnoreCommandLineMacros));
 }
 
-void MacroUsageCheck::warnMacro(const MacroDirective *MD, StringRef MacroName) {
+void MacroUsageCheck::warnMacro(const MacroDirective *MD, llvm::StringRef MacroName) {
   const MacroInfo *Info = MD->getMacroInfo();
-  StringRef Message;
+  llvm::StringRef Message;
 
   if (llvm::all_of(Info->tokens(), std::mem_fn(&Token::isLiteral)))
     Message = "macro '%0' used to declare a constant; consider using a "
@@ -98,7 +98,7 @@ void MacroUsageCheck::warnMacro(const MacroDirective *MD, StringRef MacroName) {
 }
 
 void MacroUsageCheck::warnNaming(const MacroDirective *MD,
-                                 StringRef MacroName) {
+                                 llvm::StringRef MacroName) {
   diag(MD->getLocation(), "macro definition does not define the macro name "
                           "'%0' using all uppercase characters")
       << MacroName;

@@ -71,7 +71,7 @@ class MacroPPCallbacks : public PPCallbacks {
   /// \param [out] Value Place holder for returned macro value.
   static void writeMacroDefinition(const IdentifierInfo &II,
                                    const MacroInfo &MI, Preprocessor &PP,
-                                   raw_ostream &Name, raw_ostream &Value);
+                                   llvm::raw_ostream &Name, llvm::raw_ostream &Value);
 
   /// Update current file scope status to next file scope.
   void updateStatusToNextScope();
@@ -99,10 +99,10 @@ public:
 
   /// Callback invoked whenever a directive (#xxx) is processed.
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
 

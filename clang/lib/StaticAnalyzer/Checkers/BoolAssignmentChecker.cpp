@@ -36,7 +36,7 @@ public:
 void BoolAssignmentChecker::emitReport(ProgramStateRef State, CheckerContext &C,
                                        bool IsTainted) const {
   if (ExplodedNode *N = C.generateNonFatalErrorNode(State)) {
-    StringRef Msg = IsTainted ? "Might assign a tainted non-Boolean value"
+    llvm::StringRef Msg = IsTainted ? "Might assign a tainted non-Boolean value"
                               : "Assignment of a non-Boolean value";
     C.emitReport(std::make_unique<PathSensitiveBugReport>(BT, Msg, N));
   }

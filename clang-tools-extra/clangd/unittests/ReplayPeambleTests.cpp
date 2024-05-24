@@ -70,9 +70,9 @@ struct ReplayPreamblePPCallback : public PPCallbacks {
   explicit ReplayPreamblePPCallback(const SourceManager &SM) : SM(SM) {}
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange, OptionalFileEntryRef,
-                          StringRef, StringRef, const clang::Module *, bool,
+                          llvm::StringRef, llvm::StringRef, const clang::Module *, bool,
                           SrcMgr::CharacteristicKind) override {
     Includes.emplace_back(SM, HashLoc, IncludeTok, FileName, IsAngled,
                           FilenameRange);
@@ -84,7 +84,7 @@ struct ReplayPreamblePPCallback : public PPCallbacks {
   }
 };
 struct ReplayPreambleCheck : public tidy::ClangTidyCheck {
-  ReplayPreambleCheck(StringRef Name, tidy::ClangTidyContext *Context)
+  ReplayPreambleCheck(llvm::StringRef Name, tidy::ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override {

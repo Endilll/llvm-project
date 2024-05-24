@@ -35,7 +35,7 @@ SanitizerMask expandKernelSanitizerMasks(SanitizerMask Mask) {
 }
 
 void SanitizerMetadata::reportGlobal(llvm::GlobalVariable *GV,
-                                     SourceLocation Loc, StringRef Name,
+                                     SourceLocation Loc, llvm::StringRef Name,
                                      QualType Ty,
                                      SanitizerMask NoSanitizeAttrMask,
                                      bool IsDynInit) {

@@ -15,7 +15,7 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::cppcoreguidelines {
 
 ProTypeStaticCastDowncastCheck::ProTypeStaticCastDowncastCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StrictMode(Options.getLocalOrGlobal("StrictMode", true)) {}
 

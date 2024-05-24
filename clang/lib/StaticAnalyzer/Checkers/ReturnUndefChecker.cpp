@@ -77,7 +77,7 @@ void ReturnUndefChecker::checkPreStmt(const ReturnStmt *RS,
   }
 }
 
-static void emitBug(CheckerContext &C, const BugType &BT, StringRef Msg,
+static void emitBug(CheckerContext &C, const BugType &BT, llvm::StringRef Msg,
                     const Expr *RetE, const Expr *TrackingE = nullptr) {
   ExplodedNode *N = C.generateErrorNode();
   if (!N)

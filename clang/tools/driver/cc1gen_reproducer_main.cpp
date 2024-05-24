@@ -78,13 +78,13 @@ static std::string generateReproducerMetaInfo(const ClangInvocationInfo &Info) {
   llvm::raw_string_ostream OS(Result);
   OS << '{';
   bool NeedComma = false;
-  auto EmitKey = [&](StringRef Key) {
+  auto EmitKey = [&](llvm::StringRef Key) {
     if (NeedComma)
       OS << ", ";
     NeedComma = true;
     OS << '"' << Key << "\": ";
   };
-  auto EmitStringKey = [&](StringRef Key, StringRef Value) {
+  auto EmitStringKey = [&](llvm::StringRef Key, llvm::StringRef Value) {
     if (Value.empty())
       return;
     EmitKey(Key);
@@ -111,15 +111,15 @@ static std::string generateReproducerMetaInfo(const ClangInvocationInfo &Info) {
 
 /// Generates a reproducer for a set of arguments from a specific invocation.
 static std::optional<driver::Driver::CompilationDiagnosticReport>
-generateReproducerForInvocationArguments(ArrayRef<const char *> Argv,
+generateReproducerForInvocationArguments(llvm::ArrayRef<const char *> Argv,
                                          const ClangInvocationInfo &Info,
                                          const llvm::ToolContext &ToolContext) {
   using namespace driver;
   auto TargetAndMode = ToolChain::getTargetAndModeFromProgramName(Argv[0]);
 
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions;
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions;
 
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
   DiagnosticsEngine Diags(DiagID, &*DiagOpts, new IgnoringDiagConsumer());
   ProcessWarningOptions(Diags, *DiagOpts, /*ReportDiags=*/false);
   Driver TheDriver(ToolContext.Path, llvm::sys::getDefaultTargetTriple(),
@@ -159,7 +159,7 @@ static void printReproducerInformation(
   OS << "]\n}\n";
 }
 
-int cc1gen_reproducer_main(ArrayRef<const char *> Argv, const char *Argv0,
+int cc1gen_reproducer_main(llvm::ArrayRef<const char *> Argv, const char *Argv0,
                            void *MainAddr,
                            const llvm::ToolContext &ToolContext) {
   if (Argv.size() < 1) {
@@ -167,7 +167,7 @@ int cc1gen_reproducer_main(ArrayRef<const char *> Argv, const char *Argv0,
     return 1;
   }
   // Parse the invocation descriptor.
-  StringRef Input = Argv[0];
+  llvm::StringRef Input = Argv[0];
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> Buffer =
       llvm::MemoryBuffer::getFile(Input, /*IsText=*/true);
   if (!Buffer) {
@@ -178,7 +178,7 @@ int cc1gen_reproducer_main(ArrayRef<const char *> Argv, const char *Argv0,
   llvm::yaml::Input YAML(Buffer.get()->getBuffer());
   ClangInvocationInfo InvocationInfo;
   YAML >> InvocationInfo;
-  if (Argv.size() > 1 && Argv[1] == StringRef("-v"))
+  if (Argv.size() > 1 && Argv[1] == llvm::StringRef("-v"))
     InvocationInfo.Dump = true;
 
   // Create an invocation that will produce the reproducer.

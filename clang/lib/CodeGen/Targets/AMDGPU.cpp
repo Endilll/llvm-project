@@ -385,7 +385,7 @@ void AMDGPUTargetCodeGenInfo::setFunctionDeclAttributes(
 /// AMDGPU ROCm device libraries.
 void AMDGPUTargetCodeGenInfo::emitTargetGlobals(
     CodeGen::CodeGenModule &CGM) const {
-  StringRef Name = "__oclc_ABI_version";
+  llvm::StringRef Name = "__oclc_ABI_version";
   llvm::GlobalVariable *OriginalGV = CGM.getModule().getNamedGlobal(Name);
   if (OriginalGV && !llvm::GlobalVariable::isExternalLinkage(OriginalGV->getLinkage()))
     return;
@@ -521,9 +521,9 @@ AMDGPUTargetCodeGenInfo::getLLVMSyncScopeID(const LangOptions &LangOpts,
 
   if (Ordering != llvm::AtomicOrdering::SequentiallyConsistent) {
     if (!Name.empty())
-      Name = Twine(Twine(Name) + Twine("-")).str();
+      Name = llvm::Twine(llvm::Twine(Name) + llvm::Twine("-")).str();
 
-    Name = Twine(Twine(Name) + Twine("one-as")).str();
+    Name = llvm::Twine(llvm::Twine(Name) + llvm::Twine("one-as")).str();
   }
 
   return Ctx.getOrInsertSyncScopeID(Name);
@@ -580,7 +580,7 @@ llvm::Value *AMDGPUTargetCodeGenInfo::createEnqueuedBlockKernel(
     ArgBaseTypeNames.push_back(llvm::MDString::get(C, "void*"));
     ArgTypeQuals.push_back(llvm::MDString::get(C, ""));
     ArgNames.push_back(
-        llvm::MDString::get(C, (Twine("local_arg") + Twine(I)).str()));
+        llvm::MDString::get(C, (llvm::Twine("local_arg") + llvm::Twine(I)).str()));
   }
   std::string Name = Invoke->getName().str() + "_kernel";
   auto *FT = llvm::FunctionType::get(llvm::Type::getVoidTy(C), ArgTys, false);

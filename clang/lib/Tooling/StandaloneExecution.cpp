@@ -29,7 +29,7 @@ static ArgumentsAdjuster getDefaultArgumentsAdjusters() {
 StandaloneToolExecutor::StandaloneToolExecutor(
     const CompilationDatabase &Compilations,
     llvm::ArrayRef<std::string> SourcePaths,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS,
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps)
     : Tool(Compilations, SourcePaths, std::move(PCHContainerOps),
            std::move(BaseFS)),

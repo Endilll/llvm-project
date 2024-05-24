@@ -83,7 +83,7 @@ private:
 
   FriendDecl(DeclContext *DC, SourceLocation L, FriendUnion Friend,
              SourceLocation FriendL,
-             ArrayRef<TemplateParameterList *> FriendTypeTPLists)
+             llvm::ArrayRef<TemplateParameterList *> FriendTypeTPLists)
       : Decl(Decl::Friend, DC, L), Friend(Friend), FriendLoc(FriendL),
         UnsupportedFriend(false), NumTPLists(FriendTypeTPLists.size()) {
     for (unsigned i = 0; i < NumTPLists; ++i)
@@ -111,7 +111,7 @@ public:
   static FriendDecl *
   Create(ASTContext &C, DeclContext *DC, SourceLocation L, FriendUnion Friend_,
          SourceLocation FriendL,
-         ArrayRef<TemplateParameterList *> FriendTypeTPLists = std::nullopt);
+         llvm::ArrayRef<TemplateParameterList *> FriendTypeTPLists = std::nullopt);
   static FriendDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID,
                                         unsigned FriendTypeNumTPLists);
 

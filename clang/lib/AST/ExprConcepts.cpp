@@ -118,9 +118,9 @@ static bool RequirementContainsError(concepts::Requirement *R) {
 
 RequiresExpr::RequiresExpr(ASTContext &C, SourceLocation RequiresKWLoc,
                            RequiresExprBodyDecl *Body, SourceLocation LParenLoc,
-                           ArrayRef<ParmVarDecl *> LocalParameters,
+                           llvm::ArrayRef<ParmVarDecl *> LocalParameters,
                            SourceLocation RParenLoc,
-                           ArrayRef<concepts::Requirement *> Requirements,
+                           llvm::ArrayRef<concepts::Requirement *> Requirements,
                            SourceLocation RBraceLoc)
     : Expr(RequiresExprClass, C.BoolTy, VK_PRValue, OK_Ordinary),
       NumLocalParameters(LocalParameters.size()),
@@ -172,8 +172,8 @@ RequiresExpr::RequiresExpr(ASTContext &C, EmptyShell Empty,
 
 RequiresExpr *RequiresExpr::Create(
     ASTContext &C, SourceLocation RequiresKWLoc, RequiresExprBodyDecl *Body,
-    SourceLocation LParenLoc, ArrayRef<ParmVarDecl *> LocalParameters,
-    SourceLocation RParenLoc, ArrayRef<concepts::Requirement *> Requirements,
+    SourceLocation LParenLoc, llvm::ArrayRef<ParmVarDecl *> LocalParameters,
+    SourceLocation RParenLoc, llvm::ArrayRef<concepts::Requirement *> Requirements,
     SourceLocation RBraceLoc) {
   void *Mem =
       C.Allocate(totalSizeToAlloc<ParmVarDecl *, concepts::Requirement *>(

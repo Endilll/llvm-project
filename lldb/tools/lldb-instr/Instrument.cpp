@@ -144,7 +144,7 @@ public:
   void EndSourceFileAction() override { MyRewriter.overwriteChangedFiles(); }
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef File) override {
+                                                 llvm::StringRef File) override {
     MyRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
     return std::make_unique<SBConsumer>(MyRewriter, CI.getASTContext());
   }

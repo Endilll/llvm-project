@@ -37,7 +37,7 @@ extern llvm::cl::opt<bool> SystemHeadersCoverage;
 using namespace clang;
 using namespace CodeGen;
 
-void CodeGenPGO::setFuncName(StringRef Name,
+void CodeGenPGO::setFuncName(llvm::StringRef Name,
                              llvm::GlobalValue::LinkageTypes Linkage) {
   llvm::IndexedInstrProfReader *PGOReader = CGM.getPGOReader();
   FuncName = llvm::getPGOFuncName(
@@ -235,8 +235,8 @@ struct MapRegionCounters : public RecursiveASTVisitor<MapRegionCounters> {
   /// similar to this: "x = a && b && c && (d || f)"
   unsigned NumCond = 0;
   bool SplitNestedLogicalOp = false;
-  SmallVector<const Stmt *, 16> NonLogOpStack;
-  SmallVector<const BinaryOperator *, 16> LogOpStack;
+  llvm::SmallVector<const Stmt *, 16> NonLogOpStack;
+  llvm::SmallVector<const BinaryOperator *, 16> LogOpStack;
 
   // Hook: dataTraverseStmtPre() is invoked prior to visiting an AST Stmt node.
   bool dataTraverseStmtPre(Stmt *S) {
@@ -603,7 +603,7 @@ struct ComputeRegionCounts : public ConstStmtVisitor<ComputeRegionCounts> {
     uint64_t ContinueCount = 0;
     BreakContinue() = default;
   };
-  SmallVector<BreakContinue, 8> BreakContinueStack;
+  llvm::SmallVector<BreakContinue, 8> BreakContinueStack;
 
   ComputeRegionCounts(llvm::DenseMap<const Stmt *, uint64_t> &CountMap,
                       CodeGenPGO &PGO)
@@ -1146,7 +1146,7 @@ void CodeGenPGO::emitCounterRegionMapping(const Decl *D) {
 }
 
 void
-CodeGenPGO::emitEmptyCounterMapping(const Decl *D, StringRef Name,
+CodeGenPGO::emitEmptyCounterMapping(const Decl *D, llvm::StringRef Name,
                                     llvm::GlobalValue::LinkageTypes Linkage) {
   if (skipRegionMappingForDecl(D))
     return;
@@ -1204,15 +1204,15 @@ void CodeGenPGO::emitCounterSetOrIncrement(CGBuilderTy &Builder, const Stmt *S,
 
   if (llvm::EnableSingleByteCoverage)
     Builder.CreateCall(CGM.getIntrinsic(llvm::Intrinsic::instrprof_cover),
-                       ArrayRef(Args, 4));
+                       llvm::ArrayRef(Args, 4));
   else {
     if (!StepV)
       Builder.CreateCall(CGM.getIntrinsic(llvm::Intrinsic::instrprof_increment),
-                         ArrayRef(Args, 4));
+                         llvm::ArrayRef(Args, 4));
     else
       Builder.CreateCall(
           CGM.getIntrinsic(llvm::Intrinsic::instrprof_increment_step),
-          ArrayRef(Args));
+          llvm::ArrayRef(Args));
   }
 }
 
@@ -1329,7 +1329,7 @@ void CodeGenPGO::setValueProfilingFlag(llvm::Module &M) {
 void CodeGenPGO::setProfileVersion(llvm::Module &M) {
   if (CGM.getCodeGenOpts().hasProfileClangInstr() &&
       llvm::EnableSingleByteCoverage) {
-    const StringRef VarName(INSTR_PROF_QUOTE(INSTR_PROF_RAW_VERSION_VAR));
+    const llvm::StringRef VarName(INSTR_PROF_QUOTE(INSTR_PROF_RAW_VERSION_VAR));
     llvm::Type *IntTy64 = llvm::Type::getInt64Ty(M.getContext());
     uint64_t ProfileVersion =
         (INSTR_PROF_RAW_VERSION | VARIANT_MASK_BYTE_COVERAGE);
@@ -1461,7 +1461,7 @@ llvm::MDNode *CodeGenFunction::createProfileWeights(uint64_t TrueCount,
 }
 
 llvm::MDNode *
-CodeGenFunction::createProfileWeights(ArrayRef<uint64_t> Weights) const {
+CodeGenFunction::createProfileWeights(llvm::ArrayRef<uint64_t> Weights) const {
   // We need at least two elements to create meaningful weights.
   if (Weights.size() < 2)
     return nullptr;
@@ -1474,7 +1474,7 @@ CodeGenFunction::createProfileWeights(ArrayRef<uint64_t> Weights) const {
   // Calculate how to scale down to 32-bits.
   uint64_t Scale = calculateWeightScale(MaxWeight);
 
-  SmallVector<uint32_t, 16> ScaledWeights;
+  llvm::SmallVector<uint32_t, 16> ScaledWeights;
   ScaledWeights.reserve(Weights.size());
   for (uint64_t W : Weights)
     ScaledWeights.push_back(scaleBranchWeight(W, Scale));

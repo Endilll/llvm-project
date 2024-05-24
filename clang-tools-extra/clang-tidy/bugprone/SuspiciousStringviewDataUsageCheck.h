@@ -21,7 +21,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/suspicious-stringview-data-usage.html
 class SuspiciousStringviewDataUsageCheck : public ClangTidyCheck {
 public:
-  SuspiciousStringviewDataUsageCheck(StringRef Name, ClangTidyContext *Context);
+  SuspiciousStringviewDataUsageCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;

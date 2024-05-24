@@ -20,7 +20,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/pro-type-cstyle-cast.html
 class ProTypeCstyleCastCheck : public ClangTidyCheck {
 public:
-  ProTypeCstyleCastCheck(StringRef Name, ClangTidyContext *Context)
+  ProTypeCstyleCastCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

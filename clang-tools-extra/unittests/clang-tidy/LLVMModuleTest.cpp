@@ -14,10 +14,10 @@ namespace tidy {
 namespace test {
 
 template <typename T>
-static std::string runCheck(StringRef Code, const Twine &Filename,
-                            std::optional<StringRef> ExpectedWarning,
-                            std::map<StringRef, StringRef> PathsToContent =
-                                std::map<StringRef, StringRef>()) {
+static std::string runCheck(llvm::StringRef Code, const llvm::Twine &Filename,
+                            std::optional<llvm::StringRef> ExpectedWarning,
+                            std::map<llvm::StringRef, llvm::StringRef> PathsToContent =
+                                std::map<llvm::StringRef, llvm::StringRef>()) {
   std::vector<ClangTidyError> Errors;
   std::string Result = test::runCheckOnCode<T>(
       Code, &Errors, Filename, std::string("-xc++-header"), ClangTidyOptions{},
@@ -31,17 +31,17 @@ static std::string runCheck(StringRef Code, const Twine &Filename,
 }
 
 static std::string
-runHeaderGuardCheck(StringRef Code, const Twine &Filename,
-                    std::optional<StringRef> ExpectedWarning) {
+runHeaderGuardCheck(llvm::StringRef Code, const llvm::Twine &Filename,
+                    std::optional<llvm::StringRef> ExpectedWarning) {
   return runCheck<LLVMHeaderGuardCheck>(Code, Filename,
                                         std::move(ExpectedWarning));
 }
 
 static std::string
-runIncludeOrderCheck(StringRef Code, const Twine &Filename,
-                     std::optional<StringRef> ExpectedWarning,
+runIncludeOrderCheck(llvm::StringRef Code, const llvm::Twine &Filename,
+                     std::optional<llvm::StringRef> ExpectedWarning,
                      llvm::ArrayRef<llvm::StringLiteral> Includes) {
-  std::map<StringRef, StringRef> PathsToContent;
+  std::map<llvm::StringRef, llvm::StringRef> PathsToContent;
   for (auto Include : Includes)
     PathsToContent.emplace(Include, "");
   return runCheck<IncludeOrderCheck>(Code, Filename, std::move(ExpectedWarning),
@@ -50,14 +50,14 @@ runIncludeOrderCheck(StringRef Code, const Twine &Filename,
 
 namespace {
 struct WithEndifComment : public LLVMHeaderGuardCheck {
-  WithEndifComment(StringRef Name, ClangTidyContext *Context)
+  WithEndifComment(llvm::StringRef Name, ClangTidyContext *Context)
       : LLVMHeaderGuardCheck(Name, Context) {}
-  bool shouldSuggestEndifComment(StringRef Filename) override { return true; }
+  bool shouldSuggestEndifComment(llvm::StringRef Filename) override { return true; }
 };
 
 static std::string
-runHeaderGuardCheckWithEndif(StringRef Code, const Twine &Filename,
-                             std::optional<StringRef> ExpectedWarning) {
+runHeaderGuardCheckWithEndif(llvm::StringRef Code, const llvm::Twine &Filename,
+                             std::optional<llvm::StringRef> ExpectedWarning) {
   return runCheck<WithEndifComment>(Code, Filename, std::move(ExpectedWarning));
 }
 } // namespace
@@ -71,7 +71,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
                 "#define FOO\n"
                 "#endif\n",
                 "include/llvm/ADT/foo.h",
-                StringRef("header guard does not follow preferred style")));
+                llvm::StringRef("header guard does not follow preferred style")));
 
   // Allow trailing underscores.
   EXPECT_EQ("#ifndef LLVM_ADT_FOO_H_\n"
@@ -88,7 +88,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
             "\n"
             "#endif\n",
             runHeaderGuardCheck("", "./include/clang-c/bar.h",
-                                StringRef("header is missing header guard")));
+                                llvm::StringRef("header is missing header guard")));
 
   EXPECT_EQ("#ifndef LLVM_CLANG_LIB_CODEGEN_C_H\n"
             "#define LLVM_CLANG_LIB_CODEGEN_C_H\n"
@@ -96,7 +96,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
             "\n"
             "#endif\n",
             runHeaderGuardCheck("", "tools/clang/lib/CodeGen/c.h",
-                                StringRef("header is missing header guard")));
+                                llvm::StringRef("header is missing header guard")));
 
   EXPECT_EQ("#ifndef LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_X_H\n"
             "#define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_X_H\n"
@@ -104,7 +104,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
             "\n"
             "#endif\n",
             runHeaderGuardCheck("", "tools/clang/tools/extra/clang-tidy/x.h",
-                                StringRef("header is missing header guard")));
+                                llvm::StringRef("header is missing header guard")));
 
   EXPECT_EQ(
       "int foo;\n"
@@ -116,7 +116,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
                           "#define LLVM_CLANG_BAR_H\n"
                           "#endif\n",
                           "include/clang/bar.h",
-                          StringRef("code/includes outside of area guarded by "
+                          llvm::StringRef("code/includes outside of area guarded by "
                                     "header guard; consider moving it")));
 
   EXPECT_EQ(
@@ -129,7 +129,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
                           "#endif\n"
                           "int foo;\n",
                           "include/clang/bar.h",
-                          StringRef("code/includes outside of area guarded by "
+                          llvm::StringRef("code/includes outside of area guarded by "
                                     "header guard; consider moving it")));
 
   EXPECT_EQ("#ifndef LLVM_CLANG_BAR_H\n"
@@ -146,7 +146,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
                                 "#define FOOLOLO\n"
                                 "#endif\n",
                                 "include/clang/bar.h",
-                                StringRef("header is missing header guard")));
+                                llvm::StringRef("header is missing header guard")));
 
   // Fix incorrect #endif comments even if we shouldn't add new ones.
   EXPECT_EQ("#ifndef LLVM_ADT_FOO_H\n"
@@ -157,7 +157,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
                 "#define FOO\n"
                 "#endif // FOO\n",
                 "include/llvm/ADT/foo.h",
-                StringRef("header guard does not follow preferred style")));
+                llvm::StringRef("header guard does not follow preferred style")));
 
   EXPECT_EQ("#ifndef LLVM_ADT_FOO_H\n"
             "#define LLVM_ADT_FOO_H\n"
@@ -167,7 +167,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
                 "#define FOO\n"
                 "#endif\n",
                 "include/llvm/ADT/foo.h",
-                StringRef("header guard does not follow preferred style")));
+                llvm::StringRef("header guard does not follow preferred style")));
 
   EXPECT_EQ("#ifndef LLVM_ADT_FOO_H\n"
             "#define LLVM_ADT_FOO_H\n"
@@ -177,7 +177,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
                 "#define LLVM_ADT_FOO_H\n"
                 "#endif // LLVM_H\n",
                 "include/llvm/ADT/foo.h",
-                StringRef("#endif for a header guard should reference the "
+                llvm::StringRef("#endif for a header guard should reference the "
                           "guard macro in a comment")));
 
   EXPECT_EQ("#ifndef LLVM_ADT_FOO_H\n"
@@ -206,7 +206,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
                 "#define LLVM_ADT_FOO_H_\n"
                 "#endif // LLVM\n",
                 "include/llvm/ADT/foo.h",
-                StringRef("header guard does not follow preferred style")));
+                llvm::StringRef("header guard does not follow preferred style")));
 
   // An extra space inside the comment is OK.
   llvm::StringRef WithExtraSpace = "#ifndef LLVM_ADT_FOO_H\n"
@@ -226,7 +226,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
                 "#endif \\ \n"
                 "// LLVM_ADT_FOO_H\n",
                 "include/llvm/ADT/foo.h",
-                StringRef("backslash and newline separated by space")));
+                llvm::StringRef("backslash and newline separated by space")));
 
   EXPECT_EQ("#ifndef LLVM_ADT_FOO_H\n"
             "#define LLVM_ADT_FOO_H\n"
@@ -246,7 +246,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
             "#endif\n",
             runHeaderGuardCheck(
                 "", "/llvm-project/clang-tools-extra/clangd/foo.h",
-                StringRef("header is missing header guard")));
+                llvm::StringRef("header is missing header guard")));
 
   // Substitution of characters should not result in a header guard starting
   // with "_".
@@ -256,7 +256,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
             "\n"
             "#endif\n",
             runHeaderGuardCheck("", "include/--bar.h",
-                                StringRef("header is missing header guard")));
+                                llvm::StringRef("header is missing header guard")));
 
 #ifdef WIN32
   // Check interaction with Windows-style path separators (\).
@@ -267,7 +267,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
       "\n"
       "#endif\n",
       runHeaderGuardCheck("", "llvm-project\\clang-tools-extra\\clangd\\foo.h",
-                          StringRef("header is missing header guard")));
+                          llvm::StringRef("header is missing header guard")));
 
   EXPECT_EQ("#ifndef LLVM_CLANG_TOOLS_EXTRA_CLANGD_FOO_H\n"
             "#define LLVM_CLANG_TOOLS_EXTRA_CLANGD_FOO_H\n"
@@ -276,7 +276,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
             "#endif\n",
             runHeaderGuardCheck(
                 "", "C:\\llvm-project\\clang-tools-extra\\clangd\\foo.h",
-                StringRef("header is missing header guard")));
+                llvm::StringRef("header is missing header guard")));
 
   EXPECT_EQ("#ifndef LLVM_CLANG_TOOLS_EXTRA_CLANGD_FOO_H\n"
             "#define LLVM_CLANG_TOOLS_EXTRA_CLANGD_FOO_H\n"
@@ -286,7 +286,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
             runHeaderGuardCheck(
                 "",
                 "\\\\SMBShare\\llvm-project\\clang-tools-extra\\clangd\\foo.h",
-                StringRef("header is missing header guard")));
+                llvm::StringRef("header is missing header guard")));
 
   EXPECT_EQ("#ifndef LLVM_CLANG_TOOLS_EXTRA_CLANGD_FOO_H\n"
             "#define LLVM_CLANG_TOOLS_EXTRA_CLANGD_FOO_H\n"
@@ -295,7 +295,7 @@ TEST(LLVMHeaderGuardCheckTest, FixHeaderGuards) {
             "#endif\n",
             runHeaderGuardCheck(
                 "", "\\\\?\\C:\\llvm-project\\clang-tools-extra\\clangd\\foo.h",
-                StringRef("header is missing header guard")));
+                llvm::StringRef("header is missing header guard")));
 #endif
 }
 
@@ -312,7 +312,7 @@ TEST(IncludeOrderCheck, GTestHeaders) {
   #include "llvm/foo.h"
   #include <algorithm>
   #include "gtest/foo.h")cpp",
-          "foo.cc", StringRef("#includes are not sorted properly"),
+          "foo.cc", llvm::StringRef("#includes are not sorted properly"),
           {"foo.h", "algorithm", "gtest/foo.h", "llvm/foo.h"}));
 }
 

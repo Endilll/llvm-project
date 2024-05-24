@@ -141,7 +141,7 @@ const ParsedAttrInfo &ParsedAttrInfo::get(const AttributeCommonInfo &A) {
   return DefaultParsedAttrInfo;
 }
 
-ArrayRef<const ParsedAttrInfo *> ParsedAttrInfo::getAllBuiltin() {
+llvm::ArrayRef<const ParsedAttrInfo *> ParsedAttrInfo::getAllBuiltin() {
   return llvm::ArrayRef(AttrInfoMap);
 }
 
@@ -178,7 +178,7 @@ bool ParsedAttr::appliesToDecl(const Decl *D,
 
 void ParsedAttr::getMatchRules(
     const LangOptions &LangOpts,
-    SmallVectorImpl<std::pair<attr::SubjectMatchRule, bool>> &MatchRules)
+    llvm::SmallVectorImpl<std::pair<attr::SubjectMatchRule, bool>> &MatchRules)
     const {
   return getInfo().getPragmaAttributeMatchRules(MatchRules, LangOpts);
 }

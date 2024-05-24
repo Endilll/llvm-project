@@ -27,14 +27,14 @@ using namespace clang;
 using namespace llvm::opt;
 
 std::unique_ptr<CompilerInvocation>
-clang::createInvocation(ArrayRef<const char *> ArgList,
+clang::createInvocation(llvm::ArrayRef<const char *> ArgList,
                         CreateInvocationOptions Opts) {
   assert(!ArgList.empty());
   auto Diags = Opts.Diags
                    ? std::move(Opts.Diags)
                    : CompilerInstance::createDiagnostics(new DiagnosticOptions);
 
-  SmallVector<const char *, 16> Args(ArgList.begin(), ArgList.end());
+  llvm::SmallVector<const char *, 16> Args(ArgList.begin(), ArgList.end());
 
   // FIXME: Find a cleaner way to force the driver into restricted modes.
   Args.insert(
@@ -84,14 +84,14 @@ clang::createInvocation(ArrayRef<const char *> ArgList,
 
   bool PickFirstOfMany = OffloadCompilation || Opts.RecoverOnError;
   if (Jobs.size() == 0 || (Jobs.size() > 1 && !PickFirstOfMany)) {
-    SmallString<256> Msg;
+    llvm::SmallString<256> Msg;
     llvm::raw_svector_ostream OS(Msg);
     Jobs.Print(OS, "; ", true);
     Diags->Report(diag::err_fe_expected_compiler_job) << OS.str();
     return nullptr;
   }
   auto Cmd = llvm::find_if(Jobs, [](const driver::Command &Cmd) {
-    return StringRef(Cmd.getCreator().getName()) == "clang";
+    return llvm::StringRef(Cmd.getCreator().getName()) == "clang";
   });
   if (Cmd == Jobs.end()) {
     Diags->Report(diag::err_fe_expected_clang_command);

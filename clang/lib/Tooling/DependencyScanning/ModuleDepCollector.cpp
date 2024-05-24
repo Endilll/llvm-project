@@ -104,7 +104,7 @@ static void optimizeDiagnosticOpts(DiagnosticOptions &Opts,
   if (!IsSystemModule)
     return;
   bool Wsystem_headers = false;
-  for (StringRef Opt : Opts.Warnings) {
+  for (llvm::StringRef Opt : Opts.Warnings) {
     bool isPositive = !Opt.consume_front("no-");
     if (Opt == "system-headers")
       Wsystem_headers = isPositive;
@@ -120,11 +120,11 @@ static void optimizeDiagnosticOpts(DiagnosticOptions &Opts,
 }
 
 static std::vector<std::string> splitString(std::string S, char Separator) {
-  SmallVector<StringRef> Segments;
-  StringRef(S).split(Segments, Separator, /*MaxSplit=*/-1, /*KeepEmpty=*/false);
+  llvm::SmallVector<llvm::StringRef> Segments;
+  llvm::StringRef(S).split(Segments, Separator, /*MaxSplit=*/-1, /*KeepEmpty=*/false);
   std::vector<std::string> Result;
   Result.reserve(Segments.size());
-  for (StringRef Segment : Segments)
+  for (llvm::StringRef Segment : Segments)
     Result.push_back(Segment.str());
   return Result;
 }
@@ -147,7 +147,7 @@ void ModuleDepCollector::addOutputPaths(CowCompilerInvocation &CI,
     if (!CI.getDependencyOutputOpts().OutputFile.empty() &&
         CI.getDependencyOutputOpts().Targets.empty()) {
       // Fallback to -o as dependency target, as in the driver.
-      SmallString<128> Target;
+      llvm::SmallString<128> Target;
       quoteMakeTarget(CI.getFrontendOpts().OutputFile, Target);
       CI.getMutDependencyOutputOpts().Targets.push_back(std::string(Target));
     }
@@ -214,7 +214,7 @@ makeCommonInvocationForModuleBuild(CompilerInvocation CI) {
     llvm::erase_if(
         CI.getPreprocessorOpts().Macros,
         [&CI](const std::pair<std::string, bool> &Def) {
-          StringRef MacroDef = Def.first;
+          llvm::StringRef MacroDef = Def.first;
           return CI.getHeaderSearchOpts().ModulesIgnoreMacros.contains(
               llvm::CachedHashString(MacroDef.split('=').first));
         });
@@ -249,7 +249,7 @@ ModuleDepCollector::getInvocationAdjustedForModuleBuildWithoutOutputs(
   CI.getMutFrontendOpts().ModuleMapFiles.clear();
 
   auto DepModuleMapFiles = collectModuleMapFiles(Deps.ClangModuleDeps);
-  for (StringRef ModuleMapFile : Deps.ModuleMapFileDeps) {
+  for (llvm::StringRef ModuleMapFile : Deps.ModuleMapFileDeps) {
     // TODO: Track these as `FileEntryRef` to simplify the equality check below.
     auto ModuleMapEntry = ScanInstance.getFileManager().getFile(ModuleMapFile);
     assert(ModuleMapEntry && "module map file entry not found");
@@ -293,7 +293,7 @@ ModuleDepCollector::getInvocationAdjustedForModuleBuildWithoutOutputs(
 }
 
 llvm::DenseSet<const FileEntry *> ModuleDepCollector::collectModuleMapFiles(
-    ArrayRef<ModuleID> ClangModuleDeps) const {
+    llvm::ArrayRef<ModuleID> ClangModuleDeps) const {
   llvm::DenseSet<const FileEntry *> ModuleMapFiles;
   for (const ModuleID &MID : ClangModuleDeps) {
     ModuleDeps *MD = ModuleDepsByID.lookup(MID);
@@ -307,7 +307,7 @@ llvm::DenseSet<const FileEntry *> ModuleDepCollector::collectModuleMapFiles(
 }
 
 void ModuleDepCollector::addModuleMapFiles(
-    CompilerInvocation &CI, ArrayRef<ModuleID> ClangModuleDeps) const {
+    CompilerInvocation &CI, llvm::ArrayRef<ModuleID> ClangModuleDeps) const {
   if (EagerLoadModules)
     return; // Only pcm is needed for eager load.
 
@@ -319,7 +319,7 @@ void ModuleDepCollector::addModuleMapFiles(
 }
 
 void ModuleDepCollector::addModuleFiles(
-    CompilerInvocation &CI, ArrayRef<ModuleID> ClangModuleDeps) const {
+    CompilerInvocation &CI, llvm::ArrayRef<ModuleID> ClangModuleDeps) const {
   for (const ModuleID &MID : ClangModuleDeps) {
     std::string PCMPath =
         Controller.lookupModuleOutput(MID, ModuleOutputKind::ModuleFile);
@@ -332,7 +332,7 @@ void ModuleDepCollector::addModuleFiles(
 }
 
 void ModuleDepCollector::addModuleFiles(
-    CowCompilerInvocation &CI, ArrayRef<ModuleID> ClangModuleDeps) const {
+    CowCompilerInvocation &CI, llvm::ArrayRef<ModuleID> ClangModuleDeps) const {
   for (const ModuleID &MID : ClangModuleDeps) {
     std::string PCMPath =
         Controller.lookupModuleOutput(MID, ModuleOutputKind::ModuleFile);
@@ -370,7 +370,7 @@ void ModuleDepCollector::applyDiscoveredDependencies(CompilerInvocation &CI) {
         CI.getFrontendOpts().ModuleMapFiles.emplace_back(
             CurrentModuleMap->getNameAsRequested());
 
-    SmallVector<ModuleID> DirectDeps;
+    llvm::SmallVector<ModuleID> DirectDeps;
     for (const auto &KV : ModularDeps)
       if (DirectModularDeps.contains(KV.first))
         DirectDeps.push_back(KV.second->ID);
@@ -391,7 +391,7 @@ static std::string getModuleContextHash(const ModuleDeps &MD,
                                         llvm::vfs::FileSystem &VFS) {
   llvm::HashBuilder<llvm::TruncatedBLAKE3<16>, llvm::endianness::native>
       HashBuilder;
-  SmallString<32> Scratch;
+  llvm::SmallString<32> Scratch;
 
   // Hash the compiler version and serialization version to ensure the module
   // will be readable.
@@ -402,9 +402,9 @@ static std::string getModuleContextHash(const ModuleDeps &MD,
     HashBuilder.add(*CWD);
 
   // Hash the BuildInvocation without any input files.
-  SmallString<0> ArgVec;
+  llvm::SmallString<0> ArgVec;
   ArgVec.reserve(4096);
-  CI.generateCC1CommandLine([&](const Twine &Arg) {
+  CI.generateCC1CommandLine([&](const llvm::Twine &Arg) {
     Arg.toVector(ArgVec);
     ArgVec.push_back('\0');
   });
@@ -458,14 +458,14 @@ void ModuleDepCollectorPP::LexedFileChanged(FileID FID,
   // Dependency generation really does want to go all the way to the
   // file entry for a source location to find out what is depended on.
   // We do not want #line markers to affect dependency generation!
-  if (std::optional<StringRef> Filename = SM.getNonBuiltinFilenameForID(FID))
+  if (std::optional<llvm::StringRef> Filename = SM.getNonBuiltinFilenameForID(FID))
     MDC.addFileDep(llvm::sys::path::remove_leading_dotslash(*Filename));
 }
 
 void ModuleDepCollectorPP::InclusionDirective(
-    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    SourceLocation HashLoc, const Token &IncludeTok, llvm::StringRef FileName,
     bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
-    StringRef SearchPath, StringRef RelativePath, const Module *SuggestedModule,
+    llvm::StringRef SearchPath, llvm::StringRef RelativePath, const Module *SuggestedModule,
     bool ModuleImported, SrcMgr::CharacteristicKind FileType) {
   if (!File && !ModuleImported) {
     // This is a non-modular include that HeaderSearch failed to find. Add it
@@ -585,7 +585,7 @@ ModuleDepCollectorPP::handleTopLevelModule(const Module *M) {
   OptionalFileEntryRef ModuleMap = ModMapInfo.getModuleMapFileForUniquing(M);
 
   if (ModuleMap) {
-    SmallString<128> Path = ModuleMap->getNameAsRequested();
+    llvm::SmallString<128> Path = ModuleMap->getNameAsRequested();
     ModMapInfo.canonicalizeModuleMapPath(Path);
     MD.ClangModuleMapFile = std::string(Path);
   }
@@ -601,7 +601,7 @@ ModuleDepCollectorPP::handleTopLevelModule(const Module *M) {
         // this file in the proper directory and relies on the rest of Clang to
         // handle it like normal. With explicitly built modules we don't need
         // to play VFS tricks, so replace it with the correct module map.
-        if (StringRef(IFI.Filename).ends_with("__inferred_module.map")) {
+        if (llvm::StringRef(IFI.Filename).ends_with("__inferred_module.map")) {
           MDC.addFileDep(MD, ModuleMap->getName());
           return;
         }
@@ -618,7 +618,7 @@ ModuleDepCollectorPP::handleTopLevelModule(const Module *M) {
       [&](const serialization::InputFileInfo &IFI, bool IsSystem) {
         if (!(IFI.TopLevel && IFI.ModuleMap))
           return;
-        if (StringRef(IFI.FilenameAsRequested)
+        if (llvm::StringRef(IFI.FilenameAsRequested)
                 .ends_with("__inferred_module.map"))
           return;
         MD.ModuleMapFileDeps.emplace_back(IFI.FilenameAsRequested);
@@ -654,7 +654,7 @@ static void forEachSubmoduleSorted(const Module *M,
   // Submodule order depends on order of header includes for inferred submodules
   // we don't care about the exact order, so sort so that it's consistent across
   // TUs to improve sharing.
-  SmallVector<const Module *> Submodules(M->submodules());
+  llvm::SmallVector<const Module *> Submodules(M->submodules());
   llvm::stable_sort(Submodules, [](const Module *A, const Module *B) {
     return A->Name < B->Name;
   });
@@ -762,18 +762,18 @@ bool ModuleDepCollector::isPrebuiltModule(const Module *M) {
   return true;
 }
 
-static StringRef makeAbsoluteAndPreferred(CompilerInstance &CI, StringRef Path,
-                                          SmallVectorImpl<char> &Storage) {
+static llvm::StringRef makeAbsoluteAndPreferred(CompilerInstance &CI, llvm::StringRef Path,
+                                          llvm::SmallVectorImpl<char> &Storage) {
   if (llvm::sys::path::is_absolute(Path) &&
       !llvm::sys::path::is_style_windows(llvm::sys::path::Style::native))
     return Path;
   Storage.assign(Path.begin(), Path.end());
   CI.getFileManager().makeAbsolutePath(Storage);
   llvm::sys::path::make_preferred(Storage);
-  return StringRef(Storage.data(), Storage.size());
+  return llvm::StringRef(Storage.data(), Storage.size());
 }
 
-void ModuleDepCollector::addFileDep(StringRef Path) {
+void ModuleDepCollector::addFileDep(llvm::StringRef Path) {
   if (IsStdModuleP1689Format) {
     // Within P1689 format, we don't want all the paths to be absolute path
     // since it may violate the tranditional make style dependencies info.
@@ -786,7 +786,7 @@ void ModuleDepCollector::addFileDep(StringRef Path) {
   FileDeps.push_back(std::string(Path));
 }
 
-void ModuleDepCollector::addFileDep(ModuleDeps &MD, StringRef Path) {
+void ModuleDepCollector::addFileDep(ModuleDeps &MD, llvm::StringRef Path) {
   if (IsStdModuleP1689Format) {
     MD.FileDeps.insert(Path);
     return;

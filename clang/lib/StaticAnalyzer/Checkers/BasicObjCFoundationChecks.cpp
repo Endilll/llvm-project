@@ -52,10 +52,10 @@ public:
 // Utility functions.
 //===----------------------------------------------------------------------===//
 
-static StringRef GetReceiverInterfaceName(const ObjCMethodCall &msg) {
+static llvm::StringRef GetReceiverInterfaceName(const ObjCMethodCall &msg) {
   if (const ObjCInterfaceDecl *ID = msg.getReceiverInterface())
     return ID->getIdentifier()->getName();
-  return StringRef();
+  return llvm::StringRef();
 }
 
 enum FoundationClass {
@@ -119,7 +119,7 @@ class NilArgChecker : public Checker<check::PreObjCMessage,
   void warnIfNilArg(CheckerContext &C, const ObjCMethodCall &msg, unsigned Arg,
                     FoundationClass Class, bool CanBeSubscript = false) const;
 
-  void generateBugReport(ExplodedNode *N, StringRef Msg, SourceRange Range,
+  void generateBugReport(ExplodedNode *N, llvm::StringRef Msg, SourceRange Range,
                          const Expr *Expr, CheckerContext &C) const;
 
 public:
@@ -173,7 +173,7 @@ void NilArgChecker::warnIfNilArg(CheckerContext &C,
   // within the same checker callback. For now we don't want to, but
   // it'll need to be fixed if we ever want to.
   if (ExplodedNode *N = C.generateErrorNode()) {
-    SmallString<128> sbuf;
+    llvm::SmallString<128> sbuf;
     llvm::raw_svector_ostream os(sbuf);
 
     if (CanBeSubscript && msg.getMessageKind() == OCM_Subscript) {
@@ -215,7 +215,7 @@ void NilArgChecker::warnIfNilArg(CheckerContext &C,
 }
 
 void NilArgChecker::generateBugReport(ExplodedNode *N,
-                                      StringRef Msg,
+                                      llvm::StringRef Msg,
                                       SourceRange Range,
                                       const Expr *E,
                                       CheckerContext &C) const {
@@ -498,7 +498,7 @@ void CFNumberChecker::checkPreStmt(const CallExpr *CE,
   //  the bits initialized to the provided values.
   ExplodedNode *N = C.generateNonFatalErrorNode();
   if (N) {
-    SmallString<128> sbuf;
+    llvm::SmallString<128> sbuf;
     llvm::raw_svector_ostream os(sbuf);
     bool isCreate = (FD->getIdentifier() == ICreate);
 
@@ -575,7 +575,7 @@ void CFRetainReleaseChecker::checkPreCall(const CallEvent &Call,
     if (!N)
       return;
 
-    SmallString<64> Str;
+    llvm::SmallString<64> Str;
     raw_svector_ostream OS(Str);
     OS << "Null pointer argument in call to "
        << cast<FunctionDecl>(Call.getDecl())->getName();
@@ -631,7 +631,7 @@ void ClassReleaseChecker::checkPreObjCMessage(const ObjCMethodCall &msg,
     return;
 
   if (ExplodedNode *N = C.generateNonFatalErrorNode()) {
-    SmallString<200> buf;
+    llvm::SmallString<200> buf;
     llvm::raw_svector_ostream os(buf);
 
     os << "The '";
@@ -779,10 +779,10 @@ void VariadicMethodTypeChecker::checkPreObjCMessage(const ObjCMethodCall &msg,
     if (!*errorNode)
       continue;
 
-    SmallString<128> sbuf;
+    llvm::SmallString<128> sbuf;
     llvm::raw_svector_ostream os(sbuf);
 
-    StringRef TypeName = GetReceiverInterfaceName(msg);
+    llvm::StringRef TypeName = GetReceiverInterfaceName(msg);
     if (!TypeName.empty())
       os << "Argument to '" << TypeName << "' method '";
     else

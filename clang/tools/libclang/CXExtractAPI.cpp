@@ -60,7 +60,7 @@ struct LibClangExtractAPIVisitor
     if (!VisitObjCInterfaceDecl(Interface))
       return false;
 
-    SmallString<128> USR;
+    llvm::SmallString<128> USR;
     index::generateUSRForDecl(Interface, USR);
 
     if (auto *InterfaceRecord = dyn_cast_if_present<ObjCInterfaceRecord>(
@@ -159,7 +159,7 @@ CXString clang_getSymbolGraphForCursor(CXCursor cursor) {
   const Decl *CanonicalDecl = D->getCanonicalDecl();
   CanonicalDecl = CanonicalDecl ? CanonicalDecl : D;
 
-  SmallString<128> USR;
+  llvm::SmallString<128> USR;
   if (index::generateUSRForDecl(CanonicalDecl, USR))
     return cxstring::createNull();
 

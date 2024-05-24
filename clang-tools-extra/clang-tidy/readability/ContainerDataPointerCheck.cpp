@@ -29,7 +29,7 @@ void ContainerDataPointerCheck::storeOptions(
                 utils::options::serializeStringList(IgnoredContainers));
 }
 
-ContainerDataPointerCheck::ContainerDataPointerCheck(StringRef Name,
+ContainerDataPointerCheck::ContainerDataPointerCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoredContainers(utils::options::parseStringList(

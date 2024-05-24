@@ -23,11 +23,11 @@ namespace {
 TEST(CompilerInstance, DefaultVFSOverlayFromInvocation) {
   // Create a temporary VFS overlay yaml file.
   int FD;
-  SmallString<256> FileName;
+  llvm::SmallString<256> FileName;
   ASSERT_FALSE(sys::fs::createTemporaryFile("vfs", "yaml", FD, FileName));
   ToolOutputFile File(FileName, FD);
 
-  SmallString<256> CurrentPath;
+  llvm::SmallString<256> CurrentPath;
   sys::fs::current_path(CurrentPath);
   sys::fs::make_absolute(CurrentPath, FileName);
 
@@ -52,7 +52,7 @@ TEST(CompilerInstance, DefaultVFSOverlayFromInvocation) {
   const std::string VFSArg = "-ivfsoverlay" + FileNameStr;
   const char *Args[] = {"clang", VFSArg.c_str(), "-xc++", "-"};
 
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
       CompilerInstance::createDiagnostics(new DiagnosticOptions());
 
   CreateInvocationOptions CIOpts;
@@ -87,7 +87,7 @@ TEST(CompilerInstance, AllowDiagnosticLogWithUnownedDiagnosticConsumer) {
   auto DiagPrinter = std::make_unique<TextDiagnosticPrinter>(
       DiagnosticsOS, new DiagnosticOptions());
   CompilerInstance Instance;
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags = Instance.createDiagnostics(
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags = Instance.createDiagnostics(
       DiagOpts, DiagPrinter.get(), /*ShouldOwnClient=*/false);
 
   Diags->Report(diag::err_expected) << "no crash";

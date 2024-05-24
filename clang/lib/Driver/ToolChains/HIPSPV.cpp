@@ -25,8 +25,8 @@ using namespace llvm::opt;
 
 // Convenience function for creating temporary file for both modes of
 // isSaveTempsEnabled().
-static const char *getTempFile(Compilation &C, StringRef Prefix,
-                               StringRef Extension) {
+static const char *getTempFile(Compilation &C, llvm::StringRef Prefix,
+                               llvm::StringRef Extension) {
   if (C.getDriver().isSaveTempsEnabled()) {
     return C.getArgs().MakeArgString(Prefix + "." + Extension);
   }
@@ -37,16 +37,16 @@ static const char *getTempFile(Compilation &C, StringRef Prefix,
 // Locates HIP pass plugin.
 static std::string findPassPlugin(const Driver &D,
                                   const llvm::opt::ArgList &Args) {
-  StringRef Path = Args.getLastArgValue(options::OPT_hipspv_pass_plugin_EQ);
+  llvm::StringRef Path = Args.getLastArgValue(options::OPT_hipspv_pass_plugin_EQ);
   if (!Path.empty()) {
     if (llvm::sys::fs::exists(Path))
       return Path.str();
     D.Diag(diag::err_drv_no_such_file) << Path;
   }
 
-  StringRef hipPath = Args.getLastArgValue(options::OPT_hip_path_EQ);
+  llvm::StringRef hipPath = Args.getLastArgValue(options::OPT_hip_path_EQ);
   if (!hipPath.empty()) {
-    SmallString<128> PluginPath(hipPath);
+    llvm::SmallString<128> PluginPath(hipPath);
     llvm::sys::path::append(PluginPath, "lib", "libLLVMHipSpvPasses.so");
     if (llvm::sys::fs::exists(PluginPath))
       return PluginPath.str().str();
@@ -191,12 +191,12 @@ void HIPSPVToolChain::AddHIPIncludeArgs(const ArgList &DriverArgs,
   if (DriverArgs.hasArg(options::OPT_nogpuinc))
     return;
 
-  StringRef hipPath = DriverArgs.getLastArgValue(options::OPT_hip_path_EQ);
+  llvm::StringRef hipPath = DriverArgs.getLastArgValue(options::OPT_hip_path_EQ);
   if (hipPath.empty()) {
     getDriver().Diag(diag::err_drv_hipspv_no_hip_path) << 1 << "'-nogpuinc'";
     return;
   }
-  SmallString<128> P(hipPath);
+  llvm::SmallString<128> P(hipPath);
   llvm::sys::path::append(P, "include");
   CC1Args.append({"-isystem", DriverArgs.MakeArgString(P)});
 }
@@ -215,9 +215,9 @@ HIPSPVToolChain::getDeviceLibs(const llvm::opt::ArgList &DriverArgs) const {
   for (auto Path : HipDeviceLibPathArgs)
     LibraryPaths.push_back(DriverArgs.MakeArgString(Path));
 
-  StringRef HipPath = DriverArgs.getLastArgValue(options::OPT_hip_path_EQ);
+  llvm::StringRef HipPath = DriverArgs.getLastArgValue(options::OPT_hip_path_EQ);
   if (!HipPath.empty()) {
-    SmallString<128> Path(HipPath);
+    llvm::SmallString<128> Path(HipPath);
     llvm::sys::path::append(Path, "lib", "hip-device-lib");
     LibraryPaths.push_back(DriverArgs.MakeArgString(Path));
   }
@@ -227,10 +227,10 @@ HIPSPVToolChain::getDeviceLibs(const llvm::opt::ArgList &DriverArgs) const {
   // Maintain compatability with --hip-device-lib.
   auto BCLibArgs = DriverArgs.getAllArgValues(options::OPT_hip_device_lib_EQ);
   if (!BCLibArgs.empty()) {
-    llvm::for_each(BCLibArgs, [&](StringRef BCName) {
-      StringRef FullName;
+    llvm::for_each(BCLibArgs, [&](llvm::StringRef BCName) {
+      llvm::StringRef FullName;
       for (std::string LibraryPath : LibraryPaths) {
-        SmallString<128> Path(LibraryPath);
+        llvm::SmallString<128> Path(LibraryPath);
         llvm::sys::path::append(Path, BCName);
         FullName = Path;
         if (llvm::sys::fs::exists(FullName)) {
@@ -245,7 +245,7 @@ HIPSPVToolChain::getDeviceLibs(const llvm::opt::ArgList &DriverArgs) const {
     auto TT = getTriple().normalize();
     std::string BCName = "hipspv-" + TT + ".bc";
     for (auto *LibPath : LibraryPaths) {
-      SmallString<128> Path(LibPath);
+      llvm::SmallString<128> Path(LibPath);
       llvm::sys::path::append(Path, BCName);
       if (llvm::sys::fs::exists(Path)) {
         BCLibs.emplace_back(Path.str().str());
@@ -273,7 +273,7 @@ SanitizerMask HIPSPVToolChain::getSupportedSanitizers() const {
   return HostTC.getSupportedSanitizers();
 }
 
-VersionTuple HIPSPVToolChain::computeMSVCVersion(const Driver *D,
+llvm::VersionTuple HIPSPVToolChain::computeMSVCVersion(const Driver *D,
                                                  const ArgList &Args) const {
   return HostTC.computeMSVCVersion(D, Args);
 }

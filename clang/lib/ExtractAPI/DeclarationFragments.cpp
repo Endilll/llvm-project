@@ -101,7 +101,7 @@ DeclarationFragments &DeclarationFragments::removeTrailingSemicolon() {
   return *this;
 }
 
-StringRef DeclarationFragments::getFragmentKindString(
+llvm::StringRef DeclarationFragments::getFragmentKindString(
     DeclarationFragments::FragmentKind Kind) {
   switch (Kind) {
   case DeclarationFragments::FragmentKind::None:
@@ -132,7 +132,7 @@ StringRef DeclarationFragments::getFragmentKindString(
 }
 
 DeclarationFragments::FragmentKind
-DeclarationFragments::parseFragmentKindFromString(StringRef S) {
+DeclarationFragments::parseFragmentKindFromString(llvm::StringRef S) {
   return llvm::StringSwitch<FragmentKind>(S)
       .Case("keyword", DeclarationFragments::FragmentKind::Keyword)
       .Case("attribute", DeclarationFragments::FragmentKind::Attribute)
@@ -223,7 +223,7 @@ DeclarationFragmentsBuilder::getFragmentsForNNS(const NestedNameSpecifier *NNS,
     const NamespaceDecl *NS = NNS->getAsNamespace();
     if (NS->isAnonymousNamespace())
       return Fragments;
-    SmallString<128> USR;
+    llvm::SmallString<128> USR;
     index::generateUSRForDecl(NS, USR);
     Fragments.append(NS->getName(),
                      DeclarationFragments::FragmentKind::Identifier, USR, NS);
@@ -232,7 +232,7 @@ DeclarationFragmentsBuilder::getFragmentsForNNS(const NestedNameSpecifier *NNS,
 
   case NestedNameSpecifier::NamespaceAlias: {
     const NamespaceAliasDecl *Alias = NNS->getAsNamespaceAlias();
-    SmallString<128> USR;
+    llvm::SmallString<128> USR;
     index::generateUSRForDecl(Alias, USR);
     Fragments.append(Alias->getName(),
                      DeclarationFragments::FragmentKind::Identifier, USR,
@@ -381,7 +381,7 @@ DeclarationFragments DeclarationFragmentsBuilder::getFragmentsForType(
       // the original source to concrete values. For example
       // `int nums[MAX]` -> `int nums[100]`
       // `char *str[5 + 1]` -> `char *str[6]`
-      SmallString<128> Size;
+      llvm::SmallString<128> Size;
       CAT->getSize().toStringUnsigned(Size);
       After.append(Size, DeclarationFragments::FragmentKind::NumberLiteral);
     }
@@ -399,7 +399,7 @@ DeclarationFragments DeclarationFragmentsBuilder::getFragmentsForType(
     raw_string_ostream Stream(Str);
     TemplName.print(Stream, Context.getPrintingPolicy(),
                     TemplateName::Qualified::AsWritten);
-    SmallString<64> USR("");
+    llvm::SmallString<64> USR("");
     if (const auto *TemplDecl = TemplName.getAsTemplateDecl())
       index::generateUSRForDecl(TemplDecl, USR);
 
@@ -423,7 +423,7 @@ DeclarationFragments DeclarationFragmentsBuilder::getFragmentsForType(
     if (Decl->getName().empty())
       return Fragments.append("{ ... }",
                               DeclarationFragments::FragmentKind::Text);
-    SmallString<128> TagUSR;
+    llvm::SmallString<128> TagUSR;
     clang::index::generateUSRForDecl(Decl, TagUSR);
     return Fragments.append(Decl->getName(),
                             DeclarationFragments::FragmentKind::TypeIdentifier,
@@ -434,7 +434,7 @@ DeclarationFragments DeclarationFragmentsBuilder::getFragmentsForType(
   // ObjCInterfaceDecl for the true USR.
   if (const auto *ObjCIT = dyn_cast<ObjCInterfaceType>(Base)) {
     const auto *Decl = ObjCIT->getDecl();
-    SmallString<128> USR;
+    llvm::SmallString<128> USR;
     index::generateUSRForDecl(Decl, USR);
     return Fragments.append(Decl->getName(),
                             DeclarationFragments::FragmentKind::TypeIdentifier,
@@ -442,7 +442,7 @@ DeclarationFragments DeclarationFragmentsBuilder::getFragmentsForType(
   }
 
   // Default fragment builder for other kinds of types (BuiltinType etc.)
-  SmallString<128> USR;
+  llvm::SmallString<128> USR;
   clang::index::generateUSRForType(Base, Context, USR);
   Fragments.append(Base.getAsString(),
                    DeclarationFragments::FragmentKind::TypeIdentifier, USR);
@@ -577,7 +577,7 @@ DeclarationFragmentsBuilder::getFragmentsForVarTemplate(const VarDecl *Var) {
   DeclarationFragments After;
   DeclarationFragments ArgumentFragment =
       getFragmentsForType(T, Var->getASTContext(), After);
-  if (StringRef(ArgumentFragment.begin()->Spelling)
+  if (llvm::StringRef(ArgumentFragment.begin()->Spelling)
           .starts_with("type-parameter")) {
     std::string ProperArgName = T.getAsString();
     ArgumentFragment.begin()->Spelling.swap(ProperArgName);
@@ -610,7 +610,7 @@ DeclarationFragmentsBuilder::getFragmentsForParam(const ParmVarDecl *Param) {
   else
     TypeFragments.append(getFragmentsForType(T, Param->getASTContext(), After));
 
-  if (StringRef(TypeFragments.begin()->Spelling)
+  if (llvm::StringRef(TypeFragments.begin()->Spelling)
           .starts_with("type-parameter")) {
     std::string ProperArgName = Param->getOriginalType().getAsString();
     TypeFragments.begin()->Spelling.swap(ProperArgName);
@@ -702,7 +702,7 @@ DeclarationFragmentsBuilder::getFragmentsForFunction(const FunctionDecl *Func) {
   DeclarationFragments After;
   auto ReturnValueFragment =
       getFragmentsForType(Func->getReturnType(), Func->getASTContext(), After);
-  if (StringRef(ReturnValueFragment.begin()->Spelling)
+  if (llvm::StringRef(ReturnValueFragment.begin()->Spelling)
           .starts_with("type-parameter")) {
     std::string ProperArgName = Func->getReturnType().getAsString();
     ReturnValueFragment.begin()->Spelling.swap(ProperArgName);
@@ -866,7 +866,7 @@ DeclarationFragmentsBuilder::getFragmentsForSpecialCXXMethod(
 DeclarationFragments DeclarationFragmentsBuilder::getFragmentsForCXXMethod(
     const CXXMethodDecl *Method) {
   DeclarationFragments Fragments;
-  StringRef Name = Method->getName();
+  llvm::StringRef Name = Method->getName();
   if (Method->isStatic())
     Fragments.append("static", DeclarationFragments::FragmentKind::Keyword)
         .appendSpace();
@@ -969,7 +969,7 @@ DeclarationFragmentsBuilder::getFragmentsForOverloadedOperator(
 // Get fragments for template parameters, e.g. T in tempalte<typename T> ...
 DeclarationFragments
 DeclarationFragmentsBuilder::getFragmentsForTemplateParameters(
-    ArrayRef<NamedDecl *> ParameterArray) {
+    llvm::ArrayRef<NamedDecl *> ParameterArray) {
   DeclarationFragments Fragments;
   for (unsigned i = 0, end = ParameterArray.size(); i != end; ++i) {
     if (i)
@@ -1021,7 +1021,7 @@ DeclarationFragmentsBuilder::getFragmentsForTemplateParameters(
             DeclarationFragments::FragmentKind::GenericParameter);
 
       if (NTP->hasDefaultArgument()) {
-        SmallString<8> ExprStr;
+        llvm::SmallString<8> ExprStr;
         raw_svector_ostream Output(ExprStr);
         NTP->getDefaultArgument().getArgument().print(
             NTP->getASTContext().getPrintingPolicy(), Output,
@@ -1067,8 +1067,8 @@ DeclarationFragmentsBuilder::getFragmentsForTemplateParameters(
 // generic arguments.
 DeclarationFragments
 DeclarationFragmentsBuilder::getFragmentsForTemplateArguments(
-    const ArrayRef<TemplateArgument> TemplateArguments, ASTContext &Context,
-    const std::optional<ArrayRef<TemplateArgumentLoc>> TemplateArgumentLocs) {
+    const llvm::ArrayRef<TemplateArgument> TemplateArguments, ASTContext &Context,
+    const std::optional<llvm::ArrayRef<TemplateArgumentLoc>> TemplateArgumentLocs) {
   DeclarationFragments Fragments;
   for (unsigned i = 0, end = TemplateArguments.size(); i != end; ++i) {
     if (i)
@@ -1082,7 +1082,7 @@ DeclarationFragmentsBuilder::getFragmentsForTemplateArguments(
       DeclarationFragments ArgumentFragment =
           getFragmentsForType(CTA.getAsType(), Context, After);
 
-      if (StringRef(ArgumentFragment.begin()->Spelling)
+      if (llvm::StringRef(ArgumentFragment.begin()->Spelling)
               .starts_with("type-parameter")) {
         std::string ProperArgName = TemplateArgumentLocs.value()[i]
                                         .getTypeSourceInfo()
@@ -1095,7 +1095,7 @@ DeclarationFragmentsBuilder::getFragmentsForTemplateArguments(
     }
     case TemplateArgument::Declaration: {
       const auto *VD = CTA.getAsDecl();
-      SmallString<128> USR;
+      llvm::SmallString<128> USR;
       index::generateUSRForDecl(VD, USR);
       Fragments.append(VD->getNameAsString(),
                        DeclarationFragments::FragmentKind::Identifier, USR);
@@ -1106,7 +1106,7 @@ DeclarationFragmentsBuilder::getFragmentsForTemplateArguments(
       break;
 
     case TemplateArgument::Integral: {
-      SmallString<4> Str;
+      llvm::SmallString<4> Str;
       CTA.getAsIntegral().toString(Str);
       Fragments.append(Str, DeclarationFragments::FragmentKind::Text);
       break;
@@ -1124,7 +1124,7 @@ DeclarationFragmentsBuilder::getFragmentsForTemplateArguments(
       std::string Str;
       raw_string_ostream Stream(Str);
       CTA.getAsTemplate().print(Stream, Context.getPrintingPolicy());
-      SmallString<64> USR("");
+      llvm::SmallString<64> USR("");
       if (const auto *TemplDecl =
               CTA.getAsTemplateOrTemplatePattern().getAsTemplateDecl())
         index::generateUSRForDecl(TemplDecl, USR);
@@ -1143,7 +1143,7 @@ DeclarationFragmentsBuilder::getFragmentsForTemplateArguments(
       break;
 
     case TemplateArgument::Expression: {
-      SmallString<8> ExprStr;
+      llvm::SmallString<8> ExprStr;
       raw_svector_ostream Output(ExprStr);
       CTA.getAsExpr()->printPretty(Output, nullptr,
                                    Context.getPrintingPolicy());
@@ -1315,7 +1315,7 @@ DeclarationFragmentsBuilder::getFragmentsForFunctionTemplateSpecialization(
 }
 
 DeclarationFragments
-DeclarationFragmentsBuilder::getFragmentsForMacro(StringRef Name,
+DeclarationFragmentsBuilder::getFragmentsForMacro(llvm::StringRef Name,
                                                   const MacroDirective *MD) {
   DeclarationFragments Fragments;
   Fragments.append("#define", DeclarationFragments::FragmentKind::Keyword)
@@ -1350,7 +1350,7 @@ DeclarationFragments DeclarationFragmentsBuilder::getFragmentsForObjCCategory(
   DeclarationFragments Fragments;
 
   auto *Interface = Category->getClassInterface();
-  SmallString<128> InterfaceUSR;
+  llvm::SmallString<128> InterfaceUSR;
   index::generateUSRForDecl(Interface, InterfaceUSR);
 
   Fragments.append("@interface", DeclarationFragments::FragmentKind::Keyword)
@@ -1377,7 +1377,7 @@ DeclarationFragments DeclarationFragmentsBuilder::getFragmentsForObjCInterface(
 
   // Build the inheritance part of the declaration.
   if (const ObjCInterfaceDecl *SuperClass = Interface->getSuperClass()) {
-    SmallString<128> SuperUSR;
+    llvm::SmallString<128> SuperUSR;
     index::generateUSRForDecl(SuperClass, SuperUSR);
     Fragments.append(" : ", DeclarationFragments::FragmentKind::Text)
         .append(SuperClass->getName(),
@@ -1419,7 +1419,7 @@ DeclarationFragments DeclarationFragmentsBuilder::getFragmentsForObjCMethod(
     // of "external parameters" as in Swift. This is because Objective-C method
     // symbols are referenced with the entire selector, instead of just the
     // method name in Swift.
-    SmallString<32> ParamID(Selector.getNameForSlot(i));
+    llvm::SmallString<32> ParamID(Selector.getNameForSlot(i));
     ParamID.append(":");
     Fragments.appendSpace().append(
         ParamID, DeclarationFragments::FragmentKind::Identifier);
@@ -1447,8 +1447,8 @@ DeclarationFragments DeclarationFragmentsBuilder::getFragmentsForObjCProperty(
     Fragments.append(" (", DeclarationFragments::FragmentKind::Text);
     // Helper function to render the attribute.
     auto RenderAttribute =
-        [&](ObjCPropertyAttribute::Kind Kind, StringRef Spelling,
-            StringRef Arg = "",
+        [&](ObjCPropertyAttribute::Kind Kind, llvm::StringRef Spelling,
+            llvm::StringRef Arg = "",
             DeclarationFragments::FragmentKind ArgKind =
                 DeclarationFragments::FragmentKind::Identifier) {
           // Check if the `Kind` attribute is set for this property.
@@ -1551,7 +1551,7 @@ DeclarationFragments DeclarationFragmentsBuilder::getFragmentsForObjCProtocol(
       if (It != Protocol->protocol_begin())
         Fragments.append(", ", DeclarationFragments::FragmentKind::Text);
 
-      SmallString<128> USR;
+      llvm::SmallString<128> USR;
       index::generateUSRForDecl(*It, USR);
       Fragments.append((*It)->getName(),
                        DeclarationFragments::FragmentKind::TypeIdentifier, USR,
@@ -1622,7 +1622,7 @@ DeclarationFragmentsBuilder::getSubHeading(const ObjCMethodDecl *Method) {
 
 // Subheading of a symbol defaults to its name.
 DeclarationFragments
-DeclarationFragmentsBuilder::getSubHeadingForMacro(StringRef Name) {
+DeclarationFragmentsBuilder::getSubHeadingForMacro(llvm::StringRef Name) {
   DeclarationFragments Fragments;
   Fragments.append(Name, DeclarationFragments::FragmentKind::Identifier);
   return Fragments;

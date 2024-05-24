@@ -82,9 +82,9 @@ private:
 
   using ABIInfo::appendAttributeMangling;
   void appendAttributeMangling(TargetClonesAttr *Attr, unsigned Index,
-                               raw_ostream &Out) const override;
-  void appendAttributeMangling(StringRef AttrStr,
-                               raw_ostream &Out) const override;
+                               llvm::raw_ostream &Out) const override;
+  void appendAttributeMangling(llvm::StringRef AttrStr,
+                               llvm::raw_ostream &Out) const override;
 };
 
 class AArch64SwiftABIInfo : public SwiftABIInfo {
@@ -103,7 +103,7 @@ public:
     SwiftInfo = std::make_unique<AArch64SwiftABIInfo>(CGT);
   }
 
-  StringRef getARCRetainAutoreleasedReturnValueMarker() const override {
+  llvm::StringRef getARCRetainAutoreleasedReturnValueMarker() const override {
     return "mov\tfp, fp\t\t// marker for objc_retainAutoreleaseReturnValue";
   }
 
@@ -129,7 +129,7 @@ public:
       return;
 
     TargetInfo::BranchProtectionInfo BPI;
-    StringRef Error;
+    llvm::StringRef Error;
     (void)CGM.getTarget().validateBranchProtection(Attr.BranchProtection,
                                                    Attr.CPU, BPI, Error);
     assert(Error.empty());
@@ -852,7 +852,7 @@ static bool isStreamingCompatible(const FunctionDecl *F) {
 // Report an error if an argument or return value of type Ty would need to be
 // passed in a floating-point register.
 static void diagnoseIfNeedsFPReg(DiagnosticsEngine &Diags,
-                                 const StringRef ABIName,
+                                 const llvm::StringRef ABIName,
                                  const AArch64ABIInfo &ABIInfo,
                                  const QualType &Ty, const NamedDecl *D) {
   const Type *HABase = nullptr;
@@ -939,28 +939,28 @@ void AArch64TargetCodeGenInfo::checkFunctionCallABI(CodeGenModule &CGM,
 
 void AArch64ABIInfo::appendAttributeMangling(TargetClonesAttr *Attr,
                                              unsigned Index,
-                                             raw_ostream &Out) const {
+                                             llvm::raw_ostream &Out) const {
   appendAttributeMangling(Attr->getFeatureStr(Index), Out);
 }
 
-void AArch64ABIInfo::appendAttributeMangling(StringRef AttrStr,
-                                             raw_ostream &Out) const {
+void AArch64ABIInfo::appendAttributeMangling(llvm::StringRef AttrStr,
+                                             llvm::raw_ostream &Out) const {
   if (AttrStr == "default") {
     Out << ".default";
     return;
   }
 
   Out << "._";
-  SmallVector<StringRef, 8> Features;
+  llvm::SmallVector<llvm::StringRef, 8> Features;
   AttrStr.split(Features, "+");
   for (auto &Feat : Features)
     Feat = Feat.trim();
 
-  llvm::sort(Features, [](const StringRef LHS, const StringRef RHS) {
+  llvm::sort(Features, [](const llvm::StringRef LHS, const llvm::StringRef RHS) {
     return LHS.compare(RHS) < 0;
   });
 
-  llvm::SmallDenseSet<StringRef, 8> UniqueFeats;
+  llvm::SmallDenseSet<llvm::StringRef, 8> UniqueFeats;
   for (auto &Feat : Features)
     if (auto Ext = llvm::AArch64::parseArchExtension(Feat))
       if (UniqueFeats.insert(Ext->Name).second)

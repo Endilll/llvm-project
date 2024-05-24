@@ -39,7 +39,7 @@ MATCHER_P(refRange, Range, "") {
          std::make_tuple(Range.start.line, Range.start.character,
                          Range.end.line, Range.end.character);
 }
-MATCHER_P(fileURI, F, "") { return StringRef(arg.Location.FileURI) == F; }
+MATCHER_P(fileURI, F, "") { return llvm::StringRef(arg.Location.FileURI) == F; }
 
 TEST(SymbolLocation, Position) {
   using Position = SymbolLocation::Position;
@@ -398,7 +398,7 @@ TEST(MergeTest, Merge) {
 
   Symbol M = mergeSymbol(L, R);
   EXPECT_EQ(M.Name, "Foo");
-  EXPECT_EQ(StringRef(M.CanonicalDeclaration.FileURI), "file:///left.h");
+  EXPECT_EQ(llvm::StringRef(M.CanonicalDeclaration.FileURI), "file:///left.h");
   EXPECT_EQ(M.References, 3u);
   EXPECT_EQ(M.Signature, "()");
   EXPECT_EQ(M.CompletionSnippetSuffix, "{$1:0}");
@@ -418,14 +418,14 @@ TEST(MergeTest, PreferSymbolWithDefn) {
   R.Name = "right";
 
   Symbol M = mergeSymbol(L, R);
-  EXPECT_EQ(StringRef(M.CanonicalDeclaration.FileURI), "file:/left.h");
-  EXPECT_EQ(StringRef(M.Definition.FileURI), "");
+  EXPECT_EQ(llvm::StringRef(M.CanonicalDeclaration.FileURI), "file:/left.h");
+  EXPECT_EQ(llvm::StringRef(M.Definition.FileURI), "");
   EXPECT_EQ(M.Name, "left");
 
   R.Definition.FileURI = "file:/right.cpp"; // Now right will be favored.
   M = mergeSymbol(L, R);
-  EXPECT_EQ(StringRef(M.CanonicalDeclaration.FileURI), "file:/right.h");
-  EXPECT_EQ(StringRef(M.Definition.FileURI), "file:/right.cpp");
+  EXPECT_EQ(llvm::StringRef(M.CanonicalDeclaration.FileURI), "file:/right.h");
+  EXPECT_EQ(llvm::StringRef(M.Definition.FileURI), "file:/right.cpp");
   EXPECT_EQ(M.Name, "right");
 }
 
@@ -437,12 +437,12 @@ TEST(MergeTest, PreferSymbolLocationInCodegenFile) {
   R.CanonicalDeclaration.FileURI = "file:/x.proto";
 
   Symbol M = mergeSymbol(L, R);
-  EXPECT_EQ(StringRef(M.CanonicalDeclaration.FileURI), "file:/x.proto");
+  EXPECT_EQ(llvm::StringRef(M.CanonicalDeclaration.FileURI), "file:/x.proto");
 
   // Prefer L if both have codegen suffix.
   L.CanonicalDeclaration.FileURI = "file:/y.proto";
   M = mergeSymbol(L, R);
-  EXPECT_EQ(StringRef(M.CanonicalDeclaration.FileURI), "file:/y.proto");
+  EXPECT_EQ(llvm::StringRef(M.CanonicalDeclaration.FileURI), "file:/y.proto");
 }
 
 TEST(MergeIndexTest, Refs) {

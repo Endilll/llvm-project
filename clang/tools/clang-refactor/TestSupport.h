@@ -54,7 +54,7 @@ struct TestSelectionRangesInFile {
   std::string Filename;
   struct RangeGroup {
     std::string Name;
-    SmallVector<TestSelectionRange, 8> Ranges;
+    llvm::SmallVector<TestSelectionRange, 8> Ranges;
   };
   std::vector<RangeGroup> GroupedRanges;
 
@@ -96,7 +96,7 @@ struct TestSelectionRangesInFile {
 /// \returns std::nullopt on failure (errors are emitted to stderr), or a set of
 /// grouped source ranges in the given file otherwise.
 std::optional<TestSelectionRangesInFile>
-findTestSelectionRanges(StringRef Filename);
+findTestSelectionRanges(llvm::StringRef Filename);
 
 } // end namespace refactor
 } // end namespace clang

@@ -37,7 +37,7 @@ RewriteRuleWith<std::string> CleanupCtadCheckImpl() {
       warning_message);
 }
 
-CleanupCtadCheck::CleanupCtadCheck(StringRef Name, ClangTidyContext *Context)
+CleanupCtadCheck::CleanupCtadCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : utils::TransformerClangTidyCheck(CleanupCtadCheckImpl(), Name, Context) {}
 
 } // namespace clang::tidy::abseil

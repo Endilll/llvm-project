@@ -71,7 +71,7 @@ static void ErrorAndExit(std::string message) {
 
 // Helper function to add optimization passes to the TargetMachine at the 
 // specified optimization level, OptLevel
-static void RunOptimizationPasses(raw_ostream &OS, Module &M,
+static void RunOptimizationPasses(llvm::raw_ostream &OS, Module &M,
                                   CodeGenOptLevel OptLevel) {
   llvm::OptimizationLevel OL;
   switch (OptLevel) {

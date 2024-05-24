@@ -67,7 +67,7 @@ namespace types = clang::driver::types;
 namespace path = llvm::sys::path;
 
 // The length of the prefix these two strings have in common.
-size_t matchingPrefix(StringRef L, StringRef R) {
+size_t matchingPrefix(llvm::StringRef L, llvm::StringRef R) {
   size_t Limit = std::min(L.size(), R.size());
   for (size_t I = 0; I < Limit; ++I)
     if (L[I] != R[I])
@@ -78,19 +78,19 @@ size_t matchingPrefix(StringRef L, StringRef R) {
 // A comparator for searching SubstringWithIndexes with std::equal_range etc.
 // Optionaly prefix semantics: compares equal if the key is a prefix.
 template <bool Prefix> struct Less {
-  bool operator()(StringRef Key, std::pair<StringRef, size_t> Value) const {
-    StringRef V = Prefix ? Value.first.substr(0, Key.size()) : Value.first;
+  bool operator()(llvm::StringRef Key, std::pair<llvm::StringRef, size_t> Value) const {
+    llvm::StringRef V = Prefix ? Value.first.substr(0, Key.size()) : Value.first;
     return Key < V;
   }
-  bool operator()(std::pair<StringRef, size_t> Value, StringRef Key) const {
-    StringRef V = Prefix ? Value.first.substr(0, Key.size()) : Value.first;
+  bool operator()(std::pair<llvm::StringRef, size_t> Value, llvm::StringRef Key) const {
+    llvm::StringRef V = Prefix ? Value.first.substr(0, Key.size()) : Value.first;
     return V < Key;
   }
 };
 
 // Infer type from filename. If we might have gotten it wrong, set *Certain.
 // *.h will be inferred as a C header, but not certain.
-types::ID guessType(StringRef Filename, bool *Certain = nullptr) {
+types::ID guessType(llvm::StringRef Filename, bool *Certain = nullptr) {
   // path::extension is ".cpp", lookupTypeForExtension wants "cpp".
   auto Lang =
       types::lookupTypeForExtension(path::extension(Filename).substr(1));
@@ -142,7 +142,7 @@ struct TransferableCommand {
     // Wrap the old arguments in an InputArgList.
     llvm::opt::InputArgList ArgList;
     {
-      SmallVector<const char *, 16> TmpArgv;
+      llvm::SmallVector<const char *, 16> TmpArgv;
       for (const std::string &S : OldArgs)
         TmpArgv.push_back(S.c_str());
       ClangCLMode = !TmpArgv.empty() &&
@@ -211,7 +211,7 @@ struct TransferableCommand {
 
   // Produce a CompileCommand for \p filename, based on this one.
   // (This consumes the TransferableCommand just to avoid copying Cmd).
-  CompileCommand transferTo(StringRef Filename) && {
+  CompileCommand transferTo(llvm::StringRef Filename) && {
     CompileCommand Result = std::move(Cmd);
     Result.Heuristic = "inferred from " + Result.Filename;
     Result.Filename = std::string(Filename);
@@ -226,7 +226,7 @@ struct TransferableCommand {
               ? types::lookupHeaderTypeForSourceType(*Type)
               : *Type;
       if (ClangCLMode) {
-        const StringRef Flag = toCLFlag(TargetType);
+        const llvm::StringRef Flag = toCLFlag(TargetType);
         if (!Flag.empty())
           Result.CommandLine.push_back(std::string(Flag));
       } else {
@@ -264,7 +264,7 @@ private:
   }
 
   // Convert a file type to the matching CL-style type flag.
-  static StringRef toCLFlag(types::ID Type) {
+  static llvm::StringRef toCLFlag(types::ID Type) {
     switch (Type) {
     case types::TY_C:
     case types::TY_CHeader:
@@ -273,7 +273,7 @@ private:
     case types::TY_CXXHeader:
       return "/TP";
     default:
-      return StringRef();
+      return llvm::StringRef();
     }
   }
 
@@ -323,7 +323,7 @@ public:
     Types.reserve(OriginalPaths.size());
     Stems.reserve(OriginalPaths.size());
     for (size_t I = 0; I < OriginalPaths.size(); ++I) {
-      StringRef Path = Strings.save(StringRef(OriginalPaths[I]).lower());
+      llvm::StringRef Path = Strings.save(llvm::StringRef(OriginalPaths[I]).lower());
 
       Paths.emplace_back(Path, I);
       Types.push_back(foldType(guessType(OriginalPaths[I])));
@@ -343,7 +343,7 @@ public:
   // Returns the path for the file that best fits OriginalFilename.
   // Candidates with extensions matching PreferLanguage will be chosen over
   // others (unless it's TY_INVALID, or all candidates are bad).
-  StringRef chooseProxy(StringRef OriginalFilename,
+  llvm::StringRef chooseProxy(llvm::StringRef OriginalFilename,
                         types::ID PreferLanguage) const {
     assert(!empty() && "need at least one candidate!");
     std::string Filename = OriginalFilename.lower();
@@ -363,7 +363,7 @@ public:
   }
 
 private:
-  using SubstringAndIndex = std::pair<StringRef, size_t>;
+  using SubstringAndIndex = std::pair<llvm::StringRef, size_t>;
   // Directory matching parameters: we look at the last two segments of the
   // parent directory (usually the semantically significant ones in practice).
   // We search only the last four of each candidate (for efficiency).
@@ -373,12 +373,12 @@ private:
 
   // Award points to candidate entries that should be considered for the file.
   // Returned keys are indexes into paths, and the values are (nonzero) scores.
-  DenseMap<size_t, int> scoreCandidates(StringRef Filename) const {
+  DenseMap<size_t, int> scoreCandidates(llvm::StringRef Filename) const {
     // Decompose Filename into the parts we care about.
     // /some/path/complicated/project/Interesting.h
     // [-prefix--][---dir---] [-dir-] [--stem---]
-    StringRef Stem = sys::path::stem(Filename);
-    llvm::SmallVector<StringRef, DirectorySegmentsQueried> Dirs;
+    llvm::StringRef Stem = sys::path::stem(Filename);
+    llvm::SmallVector<llvm::StringRef, DirectorySegmentsQueried> Dirs;
     llvm::StringRef Prefix;
     auto Dir = ++sys::path::rbegin(Filename),
          DirEnd = sys::path::rend(Filename);
@@ -390,7 +390,7 @@ private:
 
     // Now award points based on lookups into our various indexes.
     DenseMap<size_t, int> Candidates; // Index -> score.
-    auto Award = [&](int Points, ArrayRef<SubstringAndIndex> Range) {
+    auto Award = [&](int Points, llvm::ArrayRef<SubstringAndIndex> Range) {
       for (const auto &Entry : Range)
         Candidates[Entry.second] += Points;
     };
@@ -400,7 +400,7 @@ private:
     Award(1, indexLookup</*Prefix=*/false>(Stem, Stems));
     // For each of the last few directories in the Filename, award a point
     // if it's present in the candidate.
-    for (StringRef Dir : Dirs)
+    for (llvm::StringRef Dir : Dirs)
       Award(1, indexLookup</*Prefix=*/false>(Dir, Components));
     // Award one more point if the whole rest of the path matches.
     if (sys::path::root_directory(Prefix) != Prefix)
@@ -411,7 +411,7 @@ private:
   // Pick a single winner from the set of scored candidates.
   // Returns (index, score).
   std::pair<size_t, int> pickWinner(const DenseMap<size_t, int> &Candidates,
-                                    StringRef Filename,
+                                    llvm::StringRef Filename,
                                     types::ID PreferredLanguage) const {
     struct ScoredCandidate {
       size_t Index;
@@ -457,17 +457,17 @@ private:
   // Returns the range within a sorted index that compares equal to Key.
   // If Prefix is true, it's instead the range starting with Key.
   template <bool Prefix>
-  ArrayRef<SubstringAndIndex>
-  indexLookup(StringRef Key, ArrayRef<SubstringAndIndex> Idx) const {
-    // Use pointers as iteratiors to ease conversion of result to ArrayRef.
+  llvm::ArrayRef<SubstringAndIndex>
+  indexLookup(llvm::StringRef Key, llvm::ArrayRef<SubstringAndIndex> Idx) const {
+    // Use pointers as iteratiors to ease conversion of result to llvm::ArrayRef.
     auto Range = std::equal_range(Idx.data(), Idx.data() + Idx.size(), Key,
                                   Less<Prefix>());
     return {Range.first, Range.second};
   }
 
   // Performs a point lookup into a nonempty index, returning a longest match.
-  SubstringAndIndex longestMatch(StringRef Key,
-                                 ArrayRef<SubstringAndIndex> Idx) const {
+  SubstringAndIndex longestMatch(llvm::StringRef Key,
+                                 llvm::ArrayRef<SubstringAndIndex> Idx) const {
     assert(!Idx.empty());
     // Longest substring match will be adjacent to a direct lookup.
     auto It = llvm::lower_bound(Idx, SubstringAndIndex{Key, 0});
@@ -504,7 +504,7 @@ public:
       : Inner(std::move(Inner)), Index(this->Inner->getAllFiles()) {}
 
   std::vector<CompileCommand>
-  getCompileCommands(StringRef Filename) const override {
+  getCompileCommands(llvm::StringRef Filename) const override {
     auto Known = Inner->getCompileCommands(Filename);
     if (Index.empty() || !Known.empty())
       return Known;
@@ -540,7 +540,7 @@ inferMissingCompileCommands(std::unique_ptr<CompilationDatabase> Inner) {
 }
 
 tooling::CompileCommand transferCompileCommand(CompileCommand Cmd,
-                                               StringRef Filename) {
+                                               llvm::StringRef Filename) {
   return TransferableCommand(std::move(Cmd)).transferTo(Filename);
 }
 

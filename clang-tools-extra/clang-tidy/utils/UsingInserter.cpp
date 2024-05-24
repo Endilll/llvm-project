@@ -18,9 +18,9 @@ namespace clang::tidy::utils {
 
 using namespace ast_matchers;
 
-static StringRef getUnqualifiedName(StringRef QualifiedName) {
+static llvm::StringRef getUnqualifiedName(llvm::StringRef QualifiedName) {
   size_t LastSeparatorPos = QualifiedName.rfind("::");
-  if (LastSeparatorPos == StringRef::npos)
+  if (LastSeparatorPos == llvm::StringRef::npos)
     return QualifiedName;
   return QualifiedName.drop_front(LastSeparatorPos + 2);
 }
@@ -29,8 +29,8 @@ UsingInserter::UsingInserter(const SourceManager &SourceMgr)
     : SourceMgr(SourceMgr) {}
 
 std::optional<FixItHint> UsingInserter::createUsingDeclaration(
-    ASTContext &Context, const Stmt &Statement, StringRef QualifiedName) {
-  StringRef UnqualifiedName = getUnqualifiedName(QualifiedName);
+    ASTContext &Context, const Stmt &Statement, llvm::StringRef QualifiedName) {
+  llvm::StringRef UnqualifiedName = getUnqualifiedName(QualifiedName);
   const FunctionDecl *Function = getSurroundingFunction(Context, Statement);
   if (!Function)
     return std::nullopt;
@@ -73,9 +73,9 @@ std::optional<FixItHint> UsingInserter::createUsingDeclaration(
   return FixItHint::CreateInsertion(InsertLoc, Declaration);
 }
 
-StringRef UsingInserter::getShortName(ASTContext &Context,
+llvm::StringRef UsingInserter::getShortName(ASTContext &Context,
                                       const Stmt &Statement,
-                                      StringRef QualifiedName) {
+                                      llvm::StringRef QualifiedName) {
   const FunctionDecl *Function = getSurroundingFunction(Context, Statement);
   if (AddedUsing.count(NameInFunction(Function, QualifiedName.str())) != 0)
     return getUnqualifiedName(QualifiedName);

@@ -20,7 +20,7 @@ namespace clang::tidy::performance {
 /// http://clang.llvm.org/extra/clang-tidy/checks/performance/move-constructor-init.html
 class MoveConstructorInitCheck : public ClangTidyCheck {
 public:
-  MoveConstructorInitCheck(StringRef Name, ClangTidyContext *Context);
+  MoveConstructorInitCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
   }

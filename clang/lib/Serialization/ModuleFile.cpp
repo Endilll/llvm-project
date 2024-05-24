@@ -30,7 +30,7 @@ ModuleFile::~ModuleFile() {
 
 template<typename Key, typename Offset, unsigned InitialCapacity>
 static void
-dumpLocalRemap(StringRef Name,
+dumpLocalRemap(llvm::StringRef Name,
                const ContinuousRangeMap<Key, Offset, InitialCapacity> &Map) {
   if (Map.begin() == Map.end())
     return;

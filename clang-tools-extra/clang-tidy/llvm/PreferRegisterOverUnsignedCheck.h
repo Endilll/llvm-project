@@ -21,7 +21,7 @@ namespace clang::tidy::llvm_check {
 /// http://clang.llvm.org/extra/clang-tidy/checks/llvm/prefer-register-over-unsigned.html
 class PreferRegisterOverUnsignedCheck : public ClangTidyCheck {
 public:
-  PreferRegisterOverUnsignedCheck(StringRef Name, ClangTidyContext *Context)
+  PreferRegisterOverUnsignedCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

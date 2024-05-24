@@ -346,7 +346,7 @@ class NodeBuilderWithSinks: public NodeBuilder {
   void anchor() override;
 
 protected:
-  SmallVector<ExplodedNode*, 2> sinksGenerated;
+  llvm::SmallVector<ExplodedNode*, 2> sinksGenerated;
   ProgramPoint &Location;
 
 public:
@@ -370,7 +370,7 @@ public:
     return N;
   }
 
-  const SmallVectorImpl<ExplodedNode*> &getSinks() const {
+  const llvm::SmallVectorImpl<ExplodedNode*> &getSinks() const {
     return sinksGenerated;
   }
 };

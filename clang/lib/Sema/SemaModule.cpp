@@ -186,7 +186,7 @@ void Sema::HandleStartOfHeaderUnit() {
   SourceLocation StartOfTU =
       SourceMgr.getLocForStartOfFile(SourceMgr.getMainFileID());
 
-  StringRef HUName = getLangOpts().CurrentModule;
+  llvm::StringRef HUName = getLangOpts().CurrentModule;
   if (HUName.empty()) {
     HUName =
         SourceMgr.getFileEntryRefForID(SourceMgr.getMainFileID())->getName();
@@ -350,7 +350,7 @@ Sema::ActOnModuleDecl(SourceLocation StartLoc, SourceLocation ModuleLoc,
 
   // Test the first part of the path to see if it's std[0-9]+ but allow the
   // name in a system header.
-  StringRef FirstComponentName = Path[0].first->getName();
+  llvm::StringRef FirstComponentName = Path[0].first->getName();
   if (!getSourceManager().isInSystemHeader(Path[0].second) &&
       (FirstComponentName == "std" ||
        (FirstComponentName.starts_with("std") &&
@@ -661,7 +661,7 @@ DeclResult Sema::ActOnModuleImport(SourceLocation StartLoc,
         << Mod->getFullModuleName() << getLangOpts().CurrentModule;
   }
 
-  SmallVector<SourceLocation, 2> IdentifierLocs;
+  llvm::SmallVector<SourceLocation, 2> IdentifierLocs;
 
   if (Path.empty()) {
     // If this was a header import, pad out with dummy locations.

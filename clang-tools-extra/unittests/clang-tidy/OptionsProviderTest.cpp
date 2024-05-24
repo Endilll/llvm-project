@@ -20,14 +20,14 @@ TEST(ClangTidyOptionsProvider, InMemoryFileSystems) {
   llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> FileSystem(
       new llvm::vfs::InMemoryFileSystem);
 
-  StringRef BaseClangTidy = R"(
+  llvm::StringRef BaseClangTidy = R"(
     Checks: -*,clang-diagnostic-*
   )";
-  StringRef Sub1ClangTidy = R"(
+  llvm::StringRef Sub1ClangTidy = R"(
     Checks: readability-*
     InheritParentConfig: true
   )";
-  StringRef Sub2ClangTidy = R"(
+  llvm::StringRef Sub2ClangTidy = R"(
     Checks: bugprone-*,misc-*,clang-diagnostic-*
     InheritParentConfig: false
     )";

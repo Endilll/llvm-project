@@ -22,7 +22,7 @@ namespace clang::tidy::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/objc/forbidden-subclassing.html
 class ForbiddenSubclassingCheck : public ClangTidyCheck {
 public:
-  ForbiddenSubclassingCheck(StringRef Name, ClangTidyContext *Context);
+  ForbiddenSubclassingCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC;
   }
@@ -31,7 +31,7 @@ public:
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
 
 private:
-  const std::vector<StringRef> ForbiddenSuperClassNames;
+  const std::vector<llvm::StringRef> ForbiddenSuperClassNames;
 };
 
 } // namespace clang::tidy::objc

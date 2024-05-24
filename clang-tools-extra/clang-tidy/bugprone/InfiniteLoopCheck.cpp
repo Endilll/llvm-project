@@ -197,7 +197,7 @@ static bool populateCallees(const Stmt *StmtNode,
 
 /// returns true iff `SCC` contains `Func` and its' function set overlaps with
 /// `Callees`
-static bool overlap(ArrayRef<CallGraphNode *> SCC,
+static bool overlap(llvm::ArrayRef<CallGraphNode *> SCC,
                     const llvm::SmallSet<const Decl *, 16> &Callees,
                     const Decl *Func) {
   bool ContainsFunc = false, Overlap = false;

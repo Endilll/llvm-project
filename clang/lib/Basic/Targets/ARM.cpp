@@ -112,7 +112,7 @@ void ARMTargetInfo::setABIAPCS(bool IsAAPCS16) {
 }
 
 void ARMTargetInfo::setArchInfo() {
-  StringRef ArchName = getTriple().getArchName();
+  llvm::StringRef ArchName = getTriple().getArchName();
 
   ArchISA = llvm::ARM::parseArchISA(ArchName);
   CPU = std::string(llvm::ARM::getDefaultCPU(ArchName));
@@ -123,7 +123,7 @@ void ARMTargetInfo::setArchInfo() {
 }
 
 void ARMTargetInfo::setArchInfo(llvm::ARM::ArchKind Kind) {
-  StringRef SubArch;
+  llvm::StringRef SubArch;
 
   // cache TargetParser info
   ArchKind = Kind;
@@ -176,7 +176,7 @@ bool ARMTargetInfo::supportsThumb2() const {
   return CPUAttr == "6T2" || (ArchVersion >= 7 && CPUAttr != "8M_BASE");
 }
 
-StringRef ARMTargetInfo::getCPUAttr() const {
+llvm::StringRef ARMTargetInfo::getCPUAttr() const {
   // For most sub-arches, the build attribute CPU name is enough.
   // For Cortex variants, it's slightly different.
   switch (ArchKind) {
@@ -239,7 +239,7 @@ StringRef ARMTargetInfo::getCPUAttr() const {
   }
 }
 
-StringRef ARMTargetInfo::getCPUProfile() const {
+llvm::StringRef ARMTargetInfo::getCPUProfile() const {
   switch (ArchProfile) {
   case llvm::ARM::ProfileKind::A:
     return "A";
@@ -361,7 +361,7 @@ ARMTargetInfo::ARMTargetInfo(const llvm::Triple &Triple,
   SoftFloatABI = llvm::is_contained(Opts.FeaturesAsWritten, "+soft-float-abi");
 }
 
-StringRef ARMTargetInfo::getABI() const { return ABI; }
+llvm::StringRef ARMTargetInfo::getABI() const { return ABI; }
 
 bool ARMTargetInfo::setABI(const std::string &Name) {
   ABI = Name;
@@ -381,7 +381,7 @@ bool ARMTargetInfo::setABI(const std::string &Name) {
   return false;
 }
 
-bool ARMTargetInfo::isBranchProtectionSupportedArch(StringRef Arch) const {
+bool ARMTargetInfo::isBranchProtectionSupportedArch(llvm::StringRef Arch) const {
   llvm::ARM::ArchKind CPUArch = llvm::ARM::parseCPUArch(Arch);
   if (CPUArch == llvm::ARM::ArchKind::INVALID)
     CPUArch = llvm::ARM::parseArch(getTriple().getArchName());
@@ -389,19 +389,19 @@ bool ARMTargetInfo::isBranchProtectionSupportedArch(StringRef Arch) const {
   if (CPUArch == llvm::ARM::ArchKind::INVALID)
     return false;
 
-  StringRef ArchFeature = llvm::ARM::getArchName(CPUArch);
+  llvm::StringRef ArchFeature = llvm::ARM::getArchName(CPUArch);
   auto a =
       llvm::Triple(ArchFeature, getTriple().getVendorName(),
                    getTriple().getOSName(), getTriple().getEnvironmentName());
 
-  StringRef SubArch = llvm::ARM::getSubArch(CPUArch);
+  llvm::StringRef SubArch = llvm::ARM::getSubArch(CPUArch);
   llvm::ARM::ProfileKind Profile = llvm::ARM::parseArchProfile(SubArch);
   return a.isArmT32() && (Profile == llvm::ARM::ProfileKind::M);
 }
 
-bool ARMTargetInfo::validateBranchProtection(StringRef Spec, StringRef Arch,
+bool ARMTargetInfo::validateBranchProtection(llvm::StringRef Spec, llvm::StringRef Arch,
                                              BranchProtectionInfo &BPI,
-                                             StringRef &Err) const {
+                                             llvm::StringRef &Err) const {
   llvm::ARM::ParsedBranchProtection PBP;
   if (!llvm::ARM::parseBranchProtection(Spec, PBP, Err))
     return false;
@@ -427,11 +427,11 @@ bool ARMTargetInfo::validateBranchProtection(StringRef Spec, StringRef Arch,
 
 // FIXME: This should be based on Arch attributes, not CPU names.
 bool ARMTargetInfo::initFeatureMap(
-    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, StringRef CPU,
+    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, llvm::StringRef CPU,
     const std::vector<std::string> &FeaturesVec) const {
 
   std::string ArchFeature;
-  std::vector<StringRef> TargetFeatures;
+  std::vector<llvm::StringRef> TargetFeatures;
   llvm::ARM::ArchKind Arch = llvm::ARM::parseArch(getTriple().getArchName());
 
   // Map the base architecture to an appropriate target feature, so we don't
@@ -485,7 +485,7 @@ bool ARMTargetInfo::initFeatureMap(
     if (Feature == "+soft-float-abi")
       continue;
 
-    StringRef FixedFeature;
+    llvm::StringRef FixedFeature;
     if (Feature == "+arm")
       FixedFeature = "-thumb-mode";
     else if (Feature == "+thumb")
@@ -642,7 +642,7 @@ bool ARMTargetInfo::handleTargetFeatures(std::vector<std::string> &Features,
   return true;
 }
 
-bool ARMTargetInfo::hasFeature(StringRef Feature) const {
+bool ARMTargetInfo::hasFeature(llvm::StringRef Feature) const {
   return llvm::StringSwitch<bool>(Feature)
       .Case("arm", true)
       .Case("aarch32", true)
@@ -661,12 +661,12 @@ bool ARMTargetInfo::hasBFloat16Type() const {
   return HasBFloat16 || (FPU && !SoftFloat);
 }
 
-bool ARMTargetInfo::isValidCPUName(StringRef Name) const {
+bool ARMTargetInfo::isValidCPUName(llvm::StringRef Name) const {
   return Name == "generic" ||
          llvm::ARM::parseCPUArch(Name) != llvm::ARM::ArchKind::INVALID;
 }
 
-void ARMTargetInfo::fillValidCPUList(SmallVectorImpl<StringRef> &Values) const {
+void ARMTargetInfo::fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   llvm::ARM::fillValidCPUArchList(Values);
 }
 
@@ -681,7 +681,7 @@ bool ARMTargetInfo::setCPU(const std::string &Name) {
   return true;
 }
 
-bool ARMTargetInfo::setFPMath(StringRef Name) {
+bool ARMTargetInfo::setFPMath(llvm::StringRef Name) {
   if (Name == "neon") {
     FPMath = FP_Neon;
     return true;
@@ -737,7 +737,7 @@ void ARMTargetInfo::getTargetDefines(const LangOptions &Opts,
 
   // ACLE 6.4.1 ARM/Thumb instruction set architecture
   // __ARM_ARCH is defined as an integer value indicating the current ARM ISA
-  Builder.defineMacro("__ARM_ARCH", Twine(ArchVersion));
+  Builder.defineMacro("__ARM_ARCH", llvm::Twine(ArchVersion));
 
   if (ArchVersion >= 8) {
     // ACLE 6.5.7 Crypto Extension
@@ -789,7 +789,7 @@ void ARMTargetInfo::getTargetDefines(const LangOptions &Opts,
 
   // ACLE 6.4.4 LDREX/STREX
   if (LDREX)
-    Builder.defineMacro("__ARM_FEATURE_LDREX", "0x" + Twine::utohexstr(LDREX));
+    Builder.defineMacro("__ARM_FEATURE_LDREX", "0x" + llvm::Twine::utohexstr(LDREX));
 
   // ACLE 6.4.5 CLZ
   if (ArchVersion == 5 || (ArchVersion == 6 && CPUProfile != "M") ||
@@ -798,7 +798,7 @@ void ARMTargetInfo::getTargetDefines(const LangOptions &Opts,
 
   // ACLE 6.5.1 Hardware Floating Point
   if (HW_FP)
-    Builder.defineMacro("__ARM_FP", "0x" + Twine::utohexstr(HW_FP));
+    Builder.defineMacro("__ARM_FP", "0x" + llvm::Twine::utohexstr(HW_FP));
 
   // ACLE predefines.
   Builder.defineMacro("__ARM_ACLE", "200");
@@ -901,7 +901,7 @@ void ARMTargetInfo::getTargetDefines(const LangOptions &Opts,
     break;
   }
   Builder.defineMacro("__ARM_FEATURE_COPROC",
-                      "0x" + Twine::utohexstr(FeatureCoprocBF));
+                      "0x" + llvm::Twine::utohexstr(FeatureCoprocBF));
 
   if (ArchKind == llvm::ARM::ArchKind::XSCALE)
     Builder.defineMacro("__XSCALE__");
@@ -953,7 +953,7 @@ void ARMTargetInfo::getTargetDefines(const LangOptions &Opts,
     // current AArch32 NEON implementations do not support double-precision
     // floating-point even when it is present in VFP.
     Builder.defineMacro("__ARM_NEON_FP",
-                        "0x" + Twine::utohexstr(HW_FP & ~HW_FP_DP));
+                        "0x" + llvm::Twine::utohexstr(HW_FP & ~HW_FP_DP));
   }
 
   if (hasMVE()) {
@@ -963,11 +963,11 @@ void ARMTargetInfo::getTargetDefines(const LangOptions &Opts,
   if (hasCDE()) {
     Builder.defineMacro("__ARM_FEATURE_CDE", "1");
     Builder.defineMacro("__ARM_FEATURE_CDE_COPROC",
-                        "0x" + Twine::utohexstr(getARMCDECoprocMask()));
+                        "0x" + llvm::Twine::utohexstr(getARMCDECoprocMask()));
   }
 
   Builder.defineMacro("__ARM_SIZEOF_WCHAR_T",
-                      Twine(Opts.WCharSize ? Opts.WCharSize : 4));
+                      llvm::Twine(Opts.WCharSize ? Opts.WCharSize : 4));
 
   Builder.defineMacro("__ARM_SIZEOF_MINIMAL_ENUM", Opts.ShortEnums ? "1" : "4");
 
@@ -1035,7 +1035,7 @@ void ARMTargetInfo::getTargetDefines(const LangOptions &Opts,
     unsigned Value = 1;
     if (Opts.isSignReturnAddressScopeAll())
       Value |= 1 << 2;
-    Builder.defineMacro("__ARM_FEATURE_PAC_DEFAULT", Twine(Value));
+    Builder.defineMacro("__ARM_FEATURE_PAC_DEFAULT", llvm::Twine(Value));
   }
 
   switch (ArchKind) {
@@ -1087,7 +1087,7 @@ static constexpr Builtin::Info BuiltinInfo[] = {
 #include "clang/Basic/BuiltinsARM.def"
 };
 
-ArrayRef<Builtin::Info> ARMTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> ARMTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo,
                         clang::ARM::LastTSBuiltin - Builtin::FirstTSBuiltin);
 }
@@ -1119,7 +1119,7 @@ const char *const ARMTargetInfo::GCCRegNames[] = {
     "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11",
     "q12", "q13", "q14", "q15"};
 
-ArrayRef<const char *> ARMTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> ARMTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
@@ -1132,7 +1132,7 @@ const TargetInfo::GCCRegAlias ARMTargetInfo::GCCRegAliases[] = {
     // don't want to substitute one of these for a different-sized one.
 };
 
-ArrayRef<TargetInfo::GCCRegAlias> ARMTargetInfo::getGCCRegAliases() const {
+llvm::ArrayRef<TargetInfo::GCCRegAlias> ARMTargetInfo::getGCCRegAliases() const {
   return llvm::ArrayRef(GCCRegAliases);
 }
 
@@ -1291,7 +1291,7 @@ std::string ARMTargetInfo::convertConstraint(const char *&Constraint) const {
 }
 
 bool ARMTargetInfo::validateConstraintModifier(
-    StringRef Constraint, char Modifier, unsigned Size,
+    llvm::StringRef Constraint, char Modifier, unsigned Size,
     std::string &SuggestedModifier) const {
   bool isOutput = (Constraint[0] == '=');
   bool isInOut = (Constraint[0] == '+');

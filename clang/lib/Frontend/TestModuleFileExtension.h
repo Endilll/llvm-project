@@ -46,9 +46,9 @@ class TestModuleFileExtension
 public:
   static char ID;
 
-  TestModuleFileExtension(StringRef BlockName, unsigned MajorVersion,
+  TestModuleFileExtension(llvm::StringRef BlockName, unsigned MajorVersion,
                           unsigned MinorVersion, bool Hashed,
-                          StringRef UserInfo)
+                          llvm::StringRef UserInfo)
       : BlockName(BlockName), MajorVersion(MajorVersion),
         MinorVersion(MinorVersion), Hashed(Hashed), UserInfo(UserInfo) {}
   ~TestModuleFileExtension() override;

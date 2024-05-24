@@ -58,7 +58,7 @@ using namespace llvm::opt;
 
 std::string GetExecutablePath(const char *Argv0, bool CanonicalPrefixes) {
   if (!CanonicalPrefixes) {
-    SmallString<128> ExecutablePath(Argv0);
+    llvm::SmallString<128> ExecutablePath(Argv0);
     // Do a PATH lookup if Argv0 isn't a valid path.
     if (!llvm::sys::fs::exists(ExecutablePath))
       if (llvm::ErrorOr<std::string> P =
@@ -73,20 +73,20 @@ std::string GetExecutablePath(const char *Argv0, bool CanonicalPrefixes) {
   return llvm::sys::fs::getMainExecutable(Argv0, P);
 }
 
-static const char *GetStableCStr(llvm::StringSet<> &SavedStrings, StringRef S) {
+static const char *GetStableCStr(llvm::StringSet<> &SavedStrings, llvm::StringRef S) {
   return SavedStrings.insert(S).first->getKeyData();
 }
 
-extern int cc1_main(ArrayRef<const char *> Argv, const char *Argv0,
+extern int cc1_main(llvm::ArrayRef<const char *> Argv, const char *Argv0,
                     void *MainAddr);
-extern int cc1as_main(ArrayRef<const char *> Argv, const char *Argv0,
+extern int cc1as_main(llvm::ArrayRef<const char *> Argv, const char *Argv0,
                       void *MainAddr);
-extern int cc1gen_reproducer_main(ArrayRef<const char *> Argv,
+extern int cc1gen_reproducer_main(llvm::ArrayRef<const char *> Argv,
                                   const char *Argv0, void *MainAddr,
                                   const llvm::ToolContext &);
 
 static void insertTargetAndModeArgs(const ParsedClangName &NameParts,
-                                    SmallVectorImpl<const char *> &ArgVector,
+                                    llvm::SmallVectorImpl<const char *> &ArgVector,
                                     llvm::StringSet<> &SavedStrings) {
   // Put target and mode arguments at the start of argument list so that
   // arguments specified in command line could override them. Avoid putting
@@ -110,7 +110,7 @@ static void insertTargetAndModeArgs(const ParsedClangName &NameParts,
 }
 
 static void getCLEnvVarOptions(std::string &EnvValue, llvm::StringSaver &Saver,
-                               SmallVectorImpl<const char *> &Opts) {
+                               llvm::SmallVectorImpl<const char *> &Opts) {
   llvm::cl::TokenizeWindowsCommandLine(EnvValue, Saver, Opts);
   // The first instance of '#' should be replaced with '=' in each option.
   for (const char *Opt : Opts)
@@ -189,13 +189,13 @@ static void FixupDiagPrefixExeName(TextDiagnosticPrinter *DiagClient,
                                    const std::string &Path) {
   // If the clang binary happens to be named cl.exe for compatibility reasons,
   // use clang-cl.exe as the prefix to avoid confusion between clang and MSVC.
-  StringRef ExeBasename(llvm::sys::path::stem(Path));
+  llvm::StringRef ExeBasename(llvm::sys::path::stem(Path));
   if (ExeBasename.equals_insensitive("cl"))
     ExeBasename = "clang-cl";
   DiagClient->setPrefix(std::string(ExeBasename));
 }
 
-static int ExecuteCC1Tool(SmallVectorImpl<const char *> &ArgV,
+static int ExecuteCC1Tool(llvm::SmallVectorImpl<const char *> &ArgV,
                           const llvm::ToolContext &ToolContext) {
   // If we call the cc1 tool from the clangDriver library (through
   // Driver::CC1Main), we need to clean up the options usage count. The options
@@ -209,14 +209,14 @@ static int ExecuteCC1Tool(SmallVectorImpl<const char *> &ArgV,
     llvm::errs() << toString(std::move(Err)) << '\n';
     return 1;
   }
-  StringRef Tool = ArgV[1];
+  llvm::StringRef Tool = ArgV[1];
   void *GetExecutablePathVP = (void *)(intptr_t)GetExecutablePath;
   if (Tool == "-cc1")
-    return cc1_main(ArrayRef(ArgV).slice(1), ArgV[0], GetExecutablePathVP);
+    return cc1_main(llvm::ArrayRef(ArgV).slice(1), ArgV[0], GetExecutablePathVP);
   if (Tool == "-cc1as")
-    return cc1as_main(ArrayRef(ArgV).slice(2), ArgV[0], GetExecutablePathVP);
+    return cc1as_main(llvm::ArrayRef(ArgV).slice(2), ArgV[0], GetExecutablePathVP);
   if (Tool == "-cc1gen-reproducer")
-    return cc1gen_reproducer_main(ArrayRef(ArgV).slice(2), ArgV[0],
+    return cc1gen_reproducer_main(llvm::ArrayRef(ArgV).slice(2), ArgV[0],
                                   GetExecutablePathVP, ToolContext);
   // Reject unknown tools.
   llvm::errs()
@@ -230,7 +230,7 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
   llvm::setBugReportMsg("PLEASE submit a bug report to " BUG_REPORT_URL
                         " and include the crash backtrace, preprocessed "
                         "source, and associated run script.\n");
-  SmallVector<const char *, 256> Args(Argv, Argv + Argc);
+  llvm::SmallVector<const char *, 256> Args(Argv, Argv + Argc);
 
   if (llvm::sys::Process::FixupStandardFileDescriptors())
     return 1;
@@ -252,7 +252,7 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
   }
 
   // Handle -cc1 integrated tools.
-  if (Args.size() >= 2 && StringRef(Args[1]).starts_with("-cc1"))
+  if (Args.size() >= 2 && llvm::StringRef(Args[1]).starts_with("-cc1"))
     return ExecuteCC1Tool(Args, ToolContext);
 
   // Handle options that need handling before the real command line parsing in
@@ -262,9 +262,9 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
     // Skip end-of-line response file markers
     if (Args[i] == nullptr)
       continue;
-    if (StringRef(Args[i]) == "-canonical-prefixes")
+    if (llvm::StringRef(Args[i]) == "-canonical-prefixes")
       CanonicalPrefixes = true;
-    else if (StringRef(Args[i]) == "-no-canonical-prefixes")
+    else if (llvm::StringRef(Args[i]) == "-no-canonical-prefixes")
       CanonicalPrefixes = false;
   }
 
@@ -274,7 +274,7 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
     // Arguments in "CL" are prepended.
     std::optional<std::string> OptCL = llvm::sys::Process::GetEnv("CL");
     if (OptCL) {
-      SmallVector<const char *, 8> PrependedOpts;
+      llvm::SmallVector<const char *, 8> PrependedOpts;
       getCLEnvVarOptions(*OptCL, Saver, PrependedOpts);
 
       // Insert right after the program name to prepend to the argument list.
@@ -283,7 +283,7 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
     // Arguments in "_CL_" are appended.
     std::optional<std::string> Opt_CL_ = llvm::sys::Process::GetEnv("_CL_");
     if (Opt_CL_) {
-      SmallVector<const char *, 8> AppendedOpts;
+      llvm::SmallVector<const char *, 8> AppendedOpts;
       getCLEnvVarOptions(*Opt_CL_, Saver, AppendedOpts);
 
       // Insert at the end of the argument list to append.
@@ -313,14 +313,14 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
                            .Case("-fintegrated-cc1", false)
                            .Default(UseNewCC1Process);
 
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts =
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts =
       CreateAndPopulateDiagOpts(Args);
 
   TextDiagnosticPrinter *DiagClient
     = new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts);
   FixupDiagPrefixExeName(DiagClient, ProgName);
 
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
 
   DiagnosticsEngine Diags(DiagID, &*DiagOpts, DiagClient);
 
@@ -351,7 +351,7 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
     return 1;
 
   if (!UseNewCC1Process) {
-    TheDriver.CC1Main = [ToolContext](SmallVectorImpl<const char *> &ArgV) {
+    TheDriver.CC1Main = [ToolContext](llvm::SmallVectorImpl<const char *> &ArgV) {
       return ExecuteCC1Tool(ArgV, ToolContext);
     };
     // Ensure the CC1Command actually catches cc1 crashes
@@ -387,7 +387,7 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
   if (!C->getJobs().empty())
     FailingCommand = &*C->getJobs().begin();
   if (C && !C->containsError()) {
-    SmallVector<std::pair<int, const Command *>, 4> FailingCommands;
+    llvm::SmallVector<std::pair<int, const Command *>, 4> FailingCommands;
     Res = TheDriver.ExecuteCompilation(*C, FailingCommands);
 
     for (const auto &P : FailingCommands) {

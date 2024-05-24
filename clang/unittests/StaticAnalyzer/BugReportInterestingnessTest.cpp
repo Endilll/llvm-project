@@ -111,7 +111,7 @@ public:
       : ExpectedDiags(std::move(ExpectedDiags)) {}
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &Compiler,
-                                                 StringRef File) override {
+                                                 llvm::StringRef File) override {
     std::unique_ptr<AnalysisASTConsumer> AnalysisConsumer =
         CreateAnalysisConsumer(Compiler);
     AnalysisConsumer->AddDiagnosticConsumer(new VerifyPathDiagnosticConsumer(

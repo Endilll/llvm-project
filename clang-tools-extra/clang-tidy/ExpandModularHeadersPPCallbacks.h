@@ -42,7 +42,7 @@ class ExpandModularHeadersPPCallbacks : public PPCallbacks {
 public:
   ExpandModularHeadersPPCallbacks(
       CompilerInstance *CI,
-      IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFS);
+      llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFS);
   ~ExpandModularHeadersPPCallbacks();
 
   /// Returns the preprocessor that provides callbacks for the whole
@@ -65,10 +65,10 @@ private:
                    FileID PrevFID) override;
 
   void InclusionDirective(SourceLocation DirectiveLoc,
-                          const Token &IncludeToken, StringRef IncludedFilename,
+                          const Token &IncludeToken, llvm::StringRef IncludedFilename,
                           bool IsAngled, CharSourceRange FilenameRange,
                           OptionalFileEntryRef IncludedFile,
-                          StringRef SearchPath, StringRef RelativePath,
+                          llvm::StringRef SearchPath, llvm::StringRef RelativePath,
                           const Module *SuggestedModule, bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
 
@@ -77,24 +77,24 @@ private:
   // Handle all other callbacks.
   // Just parse to the corresponding location to generate PPCallbacks for the
   // corresponding range
-  void Ident(SourceLocation Loc, StringRef) override;
+  void Ident(SourceLocation Loc, llvm::StringRef) override;
   void PragmaDirective(SourceLocation Loc, PragmaIntroducerKind) override;
   void PragmaComment(SourceLocation Loc, const IdentifierInfo *,
-                     StringRef) override;
-  void PragmaDetectMismatch(SourceLocation Loc, StringRef, StringRef) override;
-  void PragmaDebug(SourceLocation Loc, StringRef) override;
-  void PragmaMessage(SourceLocation Loc, StringRef, PragmaMessageKind,
-                     StringRef) override;
-  void PragmaDiagnosticPush(SourceLocation Loc, StringRef) override;
-  void PragmaDiagnosticPop(SourceLocation Loc, StringRef) override;
-  void PragmaDiagnostic(SourceLocation Loc, StringRef, diag::Severity,
-                        StringRef) override;
-  void HasInclude(SourceLocation Loc, StringRef, bool, OptionalFileEntryRef,
+                     llvm::StringRef) override;
+  void PragmaDetectMismatch(SourceLocation Loc, llvm::StringRef, llvm::StringRef) override;
+  void PragmaDebug(SourceLocation Loc, llvm::StringRef) override;
+  void PragmaMessage(SourceLocation Loc, llvm::StringRef, PragmaMessageKind,
+                     llvm::StringRef) override;
+  void PragmaDiagnosticPush(SourceLocation Loc, llvm::StringRef) override;
+  void PragmaDiagnosticPop(SourceLocation Loc, llvm::StringRef) override;
+  void PragmaDiagnostic(SourceLocation Loc, llvm::StringRef, diag::Severity,
+                        llvm::StringRef) override;
+  void HasInclude(SourceLocation Loc, llvm::StringRef, bool, OptionalFileEntryRef,
                   SrcMgr::CharacteristicKind) override;
   void PragmaOpenCLExtension(SourceLocation NameLoc, const IdentifierInfo *,
                              SourceLocation StateLoc, unsigned) override;
   void PragmaWarning(SourceLocation Loc, PragmaWarningSpecifier,
-                     ArrayRef<int>) override;
+                     llvm::ArrayRef<int>) override;
   void PragmaWarningPush(SourceLocation Loc, int) override;
   void PragmaWarningPop(SourceLocation Loc) override;
   void PragmaAssumeNonNullBegin(SourceLocation Loc) override;

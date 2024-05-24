@@ -91,7 +91,7 @@ std::vector<std::string> getCC1ArgsForTesting(TestLanguage Lang) {
   return Args;
 }
 
-StringRef getFilenameForTesting(TestLanguage Lang) {
+llvm::StringRef getFilenameForTesting(TestLanguage Lang) {
   switch (Lang) {
   case Lang_C89:
   case Lang_C99:
@@ -120,7 +120,7 @@ StringRef getFilenameForTesting(TestLanguage Lang) {
 std::string getAnyTargetForTesting() {
   for (const auto &Target : llvm::TargetRegistry::targets()) {
     std::string Error;
-    StringRef TargetName(Target.getName());
+    llvm::StringRef TargetName(Target.getName());
     if (TargetName == "x86-64")
       TargetName = "x86_64";
     if (llvm::TargetRegistry::lookupTarget(std::string(TargetName), Error) ==

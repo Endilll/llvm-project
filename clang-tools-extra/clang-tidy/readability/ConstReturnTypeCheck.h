@@ -20,7 +20,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/const-return-type.html
 class ConstReturnTypeCheck : public ClangTidyCheck {
  public:
-   ConstReturnTypeCheck(StringRef Name, ClangTidyContext *Context)
+   ConstReturnTypeCheck(llvm::StringRef Name, ClangTidyContext *Context)
        : ClangTidyCheck(Name, Context),
          IgnoreMacros(Options.getLocalOrGlobal("IgnoreMacros", true)) {}
    void storeOptions(ClangTidyOptions::OptionMap &Opts) override;

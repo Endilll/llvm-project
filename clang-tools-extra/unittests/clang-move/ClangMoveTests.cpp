@@ -241,7 +241,7 @@ runClangMoveOnCode(const move::MoveDefinitionSpec &Spec,
   std::map<std::string, std::string> Results;
   for (const auto &It : FileToReplacements) {
     // The path may come out as "./foo.h", normalize to "foo.h".
-    SmallString<32> FilePath (It.first);
+    llvm::SmallString<32> FilePath (It.first);
     llvm::sys::path::remove_dots(FilePath);
     Results[FilePath.str().str()] = Context.getRewrittenText(FileToFileID[FilePath]);
   }

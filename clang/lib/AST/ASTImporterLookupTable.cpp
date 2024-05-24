@@ -196,7 +196,7 @@ void ASTImporterLookupTable::dump(DeclContext *DC) const {
 void ASTImporterLookupTable::dump() const {
   for (const auto &Entry : LookupTable) {
     DeclContext *DC = Entry.first;
-    StringRef Primary = DC->getPrimaryContext() ? " primary" : "";
+    llvm::StringRef Primary = DC->getPrimaryContext() ? " primary" : "";
     llvm::errs() << "== DC:" << cast<Decl>(DC) << Primary << "\n";
     dump(DC);
   }

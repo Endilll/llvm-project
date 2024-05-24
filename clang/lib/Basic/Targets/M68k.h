@@ -44,10 +44,10 @@ public:
 
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
-  bool hasFeature(StringRef Feature) const override;
-  ArrayRef<const char *> getGCCRegNames() const override;
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  bool hasFeature(llvm::StringRef Feature) const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
   std::string convertConstraint(const char *&Constraint) const override;
   bool validateAsmConstraint(const char *&Name,
                              TargetInfo::ConstraintInfo &info) const override;

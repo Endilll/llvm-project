@@ -94,7 +94,7 @@ private:
   std::string Msg;
 
 public:
-  StackHintGeneratorForSymbol(SymbolRef S, StringRef M) : Sym(S), Msg(M) {}
+  StackHintGeneratorForSymbol(SymbolRef S, llvm::StringRef M) : Sym(S), Msg(M) {}
   ~StackHintGeneratorForSymbol() override = default;
 
   /// Search the call expression for the symbol Sym and dispatch the
@@ -129,15 +129,15 @@ protected:
   std::string ShortDescription;
   std::string Description;
 
-  SmallVector<SourceRange, 4> Ranges;
-  SmallVector<std::shared_ptr<PathDiagnosticNotePiece>, 4> Notes;
-  SmallVector<FixItHint, 4> Fixits;
+  llvm::SmallVector<SourceRange, 4> Ranges;
+  llvm::SmallVector<std::shared_ptr<PathDiagnosticNotePiece>, 4> Notes;
+  llvm::SmallVector<FixItHint, 4> Fixits;
 
-  BugReport(Kind kind, const BugType &bt, StringRef desc)
+  BugReport(Kind kind, const BugType &bt, llvm::StringRef desc)
       : BugReport(kind, bt, "", desc) {}
 
-  BugReport(Kind K, const BugType &BT, StringRef ShortDescription,
-            StringRef Description)
+  BugReport(Kind K, const BugType &BT, llvm::StringRef ShortDescription,
+            llvm::StringRef Description)
       : K(K), BT(BT), ShortDescription(ShortDescription),
         Description(Description) {}
 
@@ -154,13 +154,13 @@ public:
   /// the end of the warning is traditionally omitted. If the description
   /// consists of multiple sentences, periods between the sentences are
   /// encouraged, but the period at the end of the description is still omitted.
-  StringRef getDescription() const { return Description; }
+  llvm::StringRef getDescription() const { return Description; }
 
   /// A short general warning message that is appropriate for displaying in
   /// the list of all reported bugs. It should describe what kind of bug is found
   /// but does not need to try to go into details of that specific bug.
   /// Grammatical conventions of getDescription() apply here as well.
-  StringRef getShortDescription(bool UseFallback = true) const {
+  llvm::StringRef getShortDescription(bool UseFallback = true) const {
     if (ShortDescription.empty() && UseFallback)
       return Description;
     return ShortDescription;
@@ -198,8 +198,8 @@ public:
   /// this report. If the report is path-sensitive, these notes will not be
   /// displayed as part of the execution path explanation, but will be displayed
   /// separately. Use bug visitors if you need to add an extra path note.
-  void addNote(StringRef Msg, const PathDiagnosticLocation &Pos,
-               ArrayRef<SourceRange> Ranges = {}) {
+  void addNote(llvm::StringRef Msg, const PathDiagnosticLocation &Pos,
+               llvm::ArrayRef<SourceRange> Ranges = {}) {
     auto P = std::make_shared<PathDiagnosticNotePiece>(Pos, Msg);
 
     for (const auto &R : Ranges)
@@ -208,7 +208,7 @@ public:
     Notes.push_back(std::move(P));
   }
 
-  ArrayRef<std::shared_ptr<PathDiagnosticNotePiece>> getNotes() {
+  llvm::ArrayRef<std::shared_ptr<PathDiagnosticNotePiece>> getNotes() {
     return Notes;
   }
 
@@ -226,7 +226,7 @@ public:
   }
 
   /// Get the SourceRanges associated with the report.
-  virtual ArrayRef<SourceRange> getRanges() const {
+  virtual llvm::ArrayRef<SourceRange> getRanges() const {
     return Ranges;
   }
 
@@ -253,7 +253,7 @@ class BasicBugReport : public BugReport {
   const Decl *DeclWithIssue = nullptr;
 
 public:
-  BasicBugReport(const BugType &bt, StringRef desc, PathDiagnosticLocation l)
+  BasicBugReport(const BugType &bt, llvm::StringRef desc, PathDiagnosticLocation l)
       : BugReport(Kind::Basic, bt, desc), Location(l) {}
 
   static bool classof(const BugReport *R) {
@@ -288,7 +288,7 @@ public:
 
 class PathSensitiveBugReport : public BugReport {
 public:
-  using VisitorList = SmallVector<std::unique_ptr<BugReporterVisitor>, 8>;
+  using VisitorList = llvm::SmallVector<std::unique_ptr<BugReporterVisitor>, 8>;
   using visitor_iterator = VisitorList::iterator;
   using visitor_range = llvm::iterator_range<visitor_iterator>;
 
@@ -366,11 +366,11 @@ protected:
       StackHints;
 
 public:
-  PathSensitiveBugReport(const BugType &bt, StringRef desc,
+  PathSensitiveBugReport(const BugType &bt, llvm::StringRef desc,
                          const ExplodedNode *errorNode)
       : PathSensitiveBugReport(bt, desc, desc, errorNode) {}
 
-  PathSensitiveBugReport(const BugType &bt, StringRef shortDesc, StringRef desc,
+  PathSensitiveBugReport(const BugType &bt, llvm::StringRef shortDesc, llvm::StringRef desc,
                          const ExplodedNode *errorNode)
       : PathSensitiveBugReport(bt, shortDesc, desc, errorNode,
                                /*LocationToUnique*/ {},
@@ -383,14 +383,14 @@ public:
   /// to the user. This method allows to rest the location which should be used
   /// for uniquing reports. For example, memory leaks checker, could set this to
   /// the allocation site, rather then the location where the bug is reported.
-  PathSensitiveBugReport(const BugType &bt, StringRef desc,
+  PathSensitiveBugReport(const BugType &bt, llvm::StringRef desc,
                          const ExplodedNode *errorNode,
                          PathDiagnosticLocation LocationToUnique,
                          const Decl *DeclToUnique)
       : PathSensitiveBugReport(bt, desc, desc, errorNode, LocationToUnique,
                                DeclToUnique) {}
 
-  PathSensitiveBugReport(const BugType &bt, StringRef shortDesc, StringRef desc,
+  PathSensitiveBugReport(const BugType &bt, llvm::StringRef shortDesc, llvm::StringRef desc,
                          const ExplodedNode *errorNode,
                          PathDiagnosticLocation LocationToUnique,
                          const Decl *DeclToUnique);
@@ -420,7 +420,7 @@ public:
 
   const Decl *getDeclWithIssue() const override;
 
-  ArrayRef<SourceRange> getRanges() const override;
+  llvm::ArrayRef<SourceRange> getRanges() const override;
 
   PathDiagnosticLocation getLocation() const override;
 
@@ -554,7 +554,7 @@ class BugReportEquivClass : public llvm::FoldingSetNode {
 public:
   BugReportEquivClass(std::unique_ptr<BugReport> R) { AddReport(std::move(R)); }
 
-  ArrayRef<std::unique_ptr<BugReport>> getReports() const { return Reports; }
+  llvm::ArrayRef<std::unique_ptr<BugReport>> getReports() const { return Reports; }
 
   void Profile(llvm::FoldingSetNodeID& ID) const {
     assert(!Reports.empty());
@@ -570,7 +570,7 @@ class BugReporterData {
 public:
   virtual ~BugReporterData() = default;
 
-  virtual ArrayRef<PathDiagnosticConsumer*> getPathDiagnosticConsumers() = 0;
+  virtual llvm::ArrayRef<PathDiagnosticConsumer*> getPathDiagnosticConsumers() = 0;
   virtual ASTContext &getASTContext() = 0;
   virtual SourceManager &getSourceManager() = 0;
   virtual AnalyzerOptions &getAnalyzerOptions() = 0;
@@ -608,7 +608,7 @@ public:
   /// Generate and flush diagnostics for all bug reports.
   void FlushReports();
 
-  ArrayRef<PathDiagnosticConsumer*> getPathDiagnosticConsumers() {
+  llvm::ArrayRef<PathDiagnosticConsumer*> getPathDiagnosticConsumers() {
     return D.getPathDiagnosticConsumers();
   }
 
@@ -642,28 +642,28 @@ public:
   virtual void emitReport(std::unique_ptr<BugReport> R);
 
   void EmitBasicReport(const Decl *DeclWithIssue, const CheckerBase *Checker,
-                       StringRef BugName, StringRef BugCategory,
-                       StringRef BugStr, PathDiagnosticLocation Loc,
-                       ArrayRef<SourceRange> Ranges = std::nullopt,
-                       ArrayRef<FixItHint> Fixits = std::nullopt);
+                       llvm::StringRef BugName, llvm::StringRef BugCategory,
+                       llvm::StringRef BugStr, PathDiagnosticLocation Loc,
+                       llvm::ArrayRef<SourceRange> Ranges = std::nullopt,
+                       llvm::ArrayRef<FixItHint> Fixits = std::nullopt);
 
   void EmitBasicReport(const Decl *DeclWithIssue, CheckerNameRef CheckerName,
-                       StringRef BugName, StringRef BugCategory,
-                       StringRef BugStr, PathDiagnosticLocation Loc,
-                       ArrayRef<SourceRange> Ranges = std::nullopt,
-                       ArrayRef<FixItHint> Fixits = std::nullopt);
+                       llvm::StringRef BugName, llvm::StringRef BugCategory,
+                       llvm::StringRef BugStr, PathDiagnosticLocation Loc,
+                       llvm::ArrayRef<SourceRange> Ranges = std::nullopt,
+                       llvm::ArrayRef<FixItHint> Fixits = std::nullopt);
 
 private:
   llvm::StringMap<std::unique_ptr<BugType>> StrBugTypes;
 
   /// Returns a BugType that is associated with the given name and
   /// category.
-  BugType *getBugTypeForName(CheckerNameRef CheckerName, StringRef name,
-                             StringRef category);
+  BugType *getBugTypeForName(CheckerNameRef CheckerName, llvm::StringRef name,
+                             llvm::StringRef category);
 
   virtual BugReport *
   findReportInEquivalenceClass(BugReportEquivClass &eqClass,
-                               SmallVectorImpl<BugReport *> &bugReports) {
+                               llvm::SmallVectorImpl<BugReport *> &bugReports) {
     return eqClass.getReports()[0].get();
   }
 
@@ -671,8 +671,8 @@ protected:
   /// Generate the diagnostics for the given bug report.
   virtual std::unique_ptr<DiagnosticForConsumerMapTy>
   generateDiagnosticForConsumerMap(BugReport *exampleReport,
-                                   ArrayRef<PathDiagnosticConsumer *> consumers,
-                                   ArrayRef<BugReport *> bugReports);
+                                   llvm::ArrayRef<PathDiagnosticConsumer *> consumers,
+                                   llvm::ArrayRef<BugReport *> bugReports);
 };
 
 /// GRBugReporter is used for generating path-sensitive reports.
@@ -681,13 +681,13 @@ class PathSensitiveBugReporter final : public BugReporter {
 
   BugReport *findReportInEquivalenceClass(
       BugReportEquivClass &eqClass,
-      SmallVectorImpl<BugReport *> &bugReports) override;
+      llvm::SmallVectorImpl<BugReport *> &bugReports) override;
 
   /// Generate the diagnostics for the given bug report.
   std::unique_ptr<DiagnosticForConsumerMapTy>
   generateDiagnosticForConsumerMap(BugReport *exampleReport,
-                                   ArrayRef<PathDiagnosticConsumer *> consumers,
-                                   ArrayRef<BugReport *> bugReports) override;
+                                   llvm::ArrayRef<PathDiagnosticConsumer *> consumers,
+                                   llvm::ArrayRef<BugReport *> bugReports) override;
 public:
   PathSensitiveBugReporter(BugReporterData& d, ExprEngine& eng)
       : BugReporter(d), Eng(eng) {}
@@ -706,8 +706,8 @@ public:
   /// Iterates through the bug reports within a single equivalence class,
   /// stops at a first non-invalidated report.
   std::unique_ptr<DiagnosticForConsumerMapTy> generatePathDiagnostics(
-      ArrayRef<PathDiagnosticConsumer *> consumers,
-      ArrayRef<PathSensitiveBugReport *> &bugReports);
+      llvm::ArrayRef<PathDiagnosticConsumer *> consumers,
+      llvm::ArrayRef<PathSensitiveBugReport *> &bugReports);
 
   void emitReport(std::unique_ptr<BugReport> R) override;
 };
@@ -753,7 +753,7 @@ public:
 /// DataTag::Factory should be friend for every derived class.
 class DataTag : public ProgramPointTag {
 public:
-  StringRef getTagDescription() const override { return "Data Tag"; }
+  llvm::StringRef getTagDescription() const override { return "Data Tag"; }
 
   // Manage memory for DataTag objects.
   class Factory {
@@ -804,7 +804,7 @@ public:
     return std::move(Msg);
   }
 
-  StringRef getTagDescription() const override {
+  llvm::StringRef getTagDescription() const override {
     // TODO: Remember a few examples of generated messages
     // and display them in the ExplodedGraph dump by
     // returning them from this function.

@@ -44,7 +44,7 @@ static ProgramStateRef removeRefBinding(ProgramStateRef State, SymbolRef Sym) {
   return State->remove<RefBindings>(Sym);
 }
 
-void RefVal::print(raw_ostream &Out) const {
+void RefVal::print(llvm::raw_ostream &Out) const {
   if (!T.isNull())
     Out << "Tracked " << T << " | ";
 
@@ -162,7 +162,7 @@ void RetainCountChecker::checkPostStmt(const BlockExpr *BE,
   // FIXME: For now we invalidate the tracking of all symbols passed to blocks
   // via captured variables, even though captured variables result in a copy
   // and in implicit increment/decrement of a retain count.
-  SmallVector<const MemRegion*, 10> Regions;
+  llvm::SmallVector<const MemRegion*, 10> Regions;
   const LocationContext *LC = C.getLocationContext();
   MemRegionManager &MemMgr = C.getSValBuilder().getRegionManager();
 
@@ -516,7 +516,7 @@ static bool shouldEscapeRegion(const MemRegion *R) {
   return true;
 }
 
-static SmallVector<ProgramStateRef, 2>
+static llvm::SmallVector<ProgramStateRef, 2>
 updateOutParameters(ProgramStateRef State, const RetainSummary &Summ,
                     const CallEvent &CE) {
 
@@ -695,7 +695,7 @@ void RetainCountChecker::checkSummary(const RetainSummary &Summ,
       state = setRefBinding(state, Sym, *updatedRefVal);
   }
 
-  SmallVector<ProgramStateRef, 2> Out =
+  llvm::SmallVector<ProgramStateRef, 2> Out =
       updateOutParameters(state, Summ, CallOrMsg);
 
   for (ProgramStateRef St : Out) {
@@ -1182,8 +1182,8 @@ ProgramStateRef RetainCountChecker::evalAssume(ProgramStateRef state,
 
 ProgramStateRef RetainCountChecker::checkRegionChanges(
     ProgramStateRef state, const InvalidatedSymbols *invalidated,
-    ArrayRef<const MemRegion *> ExplicitRegions,
-    ArrayRef<const MemRegion *> Regions, const LocationContext *LCtx,
+    llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+    llvm::ArrayRef<const MemRegion *> Regions, const LocationContext *LCtx,
     const CallEvent *Call) const {
   if (!invalidated)
     return state;
@@ -1263,7 +1263,7 @@ RetainCountChecker::handleAutoreleaseCounts(ProgramStateRef state,
 
   ExplodedNode *N = Ctx.generateSink(state, Pred, Tag);
   if (N) {
-    SmallString<128> sbuf;
+    llvm::SmallString<128> sbuf;
     llvm::raw_svector_ostream os(sbuf);
     os << "Object was autoreleased ";
     if (V.getAutoreleaseCount() > 1)
@@ -1284,7 +1284,7 @@ RetainCountChecker::handleAutoreleaseCounts(ProgramStateRef state,
 ProgramStateRef
 RetainCountChecker::handleSymbolDeath(ProgramStateRef state,
                                       SymbolRef sid, RefVal V,
-                                    SmallVectorImpl<SymbolRef> &Leaked) const {
+                                    llvm::SmallVectorImpl<SymbolRef> &Leaked) const {
   bool hasLeak;
 
   // HACK: Ignore retain-count issues on values accessed through ivars,
@@ -1311,7 +1311,7 @@ RetainCountChecker::handleSymbolDeath(ProgramStateRef state,
 
 ExplodedNode *
 RetainCountChecker::processLeaks(ProgramStateRef state,
-                                 SmallVectorImpl<SymbolRef> &Leaked,
+                                 llvm::SmallVectorImpl<SymbolRef> &Leaked,
                                  CheckerContext &Ctx,
                                  ExplodedNode *Pred) const {
   // Generate an intermediate node representing the leak point.
@@ -1398,7 +1398,7 @@ void RetainCountChecker::checkEndFunction(const ReturnStmt *RS,
     return;
 
   B = state->get<RefBindings>();
-  SmallVector<SymbolRef, 10> Leaked;
+  llvm::SmallVector<SymbolRef, 10> Leaked;
 
   for (auto &I : B)
     state = handleSymbolDeath(state, I.first, I.second, Leaked);
@@ -1411,7 +1411,7 @@ void RetainCountChecker::checkDeadSymbols(SymbolReaper &SymReaper,
   ExplodedNode *Pred = C.getPredecessor();
 
   ProgramStateRef state = C.getState();
-  SmallVector<SymbolRef, 10> Leaked;
+  llvm::SmallVector<SymbolRef, 10> Leaked;
 
   // Update counts from autorelease pools
   for (const auto &I: state->get<RefBindings>()) {
@@ -1452,7 +1452,7 @@ void RetainCountChecker::checkDeadSymbols(SymbolReaper &SymReaper,
   C.addTransition(state, Pred);
 }
 
-void RetainCountChecker::printState(raw_ostream &Out, ProgramStateRef State,
+void RetainCountChecker::printState(llvm::raw_ostream &Out, ProgramStateRef State,
                                     const char *NL, const char *Sep) const {
 
   RefBindingsTy B = State->get<RefBindings>();

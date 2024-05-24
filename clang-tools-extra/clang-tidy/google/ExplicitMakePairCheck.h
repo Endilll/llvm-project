@@ -24,7 +24,7 @@ namespace clang::tidy::google::build {
 /// http://clang.llvm.org/extra/clang-tidy/checks/google/build-explicit-make-pair.html
 class ExplicitMakePairCheck : public ClangTidyCheck {
 public:
-  ExplicitMakePairCheck(StringRef Name, ClangTidyContext *Context)
+  ExplicitMakePairCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

@@ -22,7 +22,7 @@ namespace clang::tidy::llvm_libc {
 class RestrictSystemLibcHeadersCheck
     : public portability::RestrictSystemIncludesCheck {
 public:
-  RestrictSystemLibcHeadersCheck(StringRef Name, ClangTidyContext *Context)
+  RestrictSystemLibcHeadersCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : portability::RestrictSystemIncludesCheck(Name, Context, "-*") {}
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;

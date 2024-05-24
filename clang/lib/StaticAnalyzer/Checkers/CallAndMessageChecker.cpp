@@ -200,7 +200,7 @@ bool CallAndMessageChecker::uninitRefOrPointer(
   // If parameter is declared as pointer to const in function declaration,
   // then check if corresponding argument in function call is
   // pointing to undefined symbol value (uninitialized memory).
-  SmallString<200> Buf;
+  llvm::SmallString<200> Buf;
   llvm::raw_svector_ostream Os(Buf);
 
   if (ParamDecl->getType()->isPointerType()) {
@@ -237,7 +237,7 @@ bool CallAndMessageChecker::uninitRefOrPointer(
 namespace {
 class FindUninitializedField {
 public:
-  SmallVector<const FieldDecl *, 10> FieldChain;
+  llvm::SmallVector<const FieldDecl *, 10> FieldChain;
 
 private:
   StoreManager &StoreMgr;
@@ -299,7 +299,7 @@ bool CallAndMessageChecker::PreVisitProcessArg(CheckerContext &C,
     if (ExplodedNode *N = C.generateErrorNode()) {
       LazyInit_BT(BD, BT);
       // Generate a report for this bug.
-      SmallString<200> Buf;
+      llvm::SmallString<200> Buf;
       llvm::raw_svector_ostream Os(Buf);
       describeUninitializedArgumentInCall(Call, ArgumentNumber, Os);
       auto R = std::make_unique<PathSensitiveBugReport>(*BT, Os.str(), N);
@@ -328,7 +328,7 @@ bool CallAndMessageChecker::PreVisitProcessArg(CheckerContext &C,
       }
       if (ExplodedNode *N = C.generateErrorNode()) {
         LazyInit_BT(BD, BT);
-        SmallString<512> Str;
+        llvm::SmallString<512> Str;
         llvm::raw_svector_ostream os(Str);
         os << "Passed-by-value struct argument contains uninitialized data";
 
@@ -337,7 +337,7 @@ bool CallAndMessageChecker::PreVisitProcessArg(CheckerContext &C,
         else {
           os << " (e.g., via the field chain: '";
           bool first = true;
-          for (SmallVectorImpl<const FieldDecl *>::iterator
+          for (llvm::SmallVectorImpl<const FieldDecl *>::iterator
                DI = F.FieldChain.begin(), DE = F.FieldChain.end(); DI!=DE;++DI){
             if (first)
               first = false;
@@ -423,7 +423,7 @@ ProgramStateRef CallAndMessageChecker::checkParameterCount(
 
   LazyInit_BT("Function call with too few arguments", BT_call_few_args);
 
-  SmallString<512> Str;
+  llvm::SmallString<512> Str;
   llvm::raw_svector_ostream os(Str);
   if (isa<AnyFunctionCall>(Call)) {
     os << "Function ";
@@ -488,7 +488,7 @@ CallAndMessageChecker::checkCXXDeallocation(const CXXDeallocatorCall *DC,
     return nullptr;
   }
 
-  StringRef Desc;
+  llvm::StringRef Desc;
   ExplodedNode *N = C.generateErrorNode();
   if (!N)
     return nullptr;
@@ -640,7 +640,7 @@ void CallAndMessageChecker::emitNilReceiverBug(CheckerContext &C,
 
   QualType ResTy = msg.getResultType();
 
-  SmallString<200> buf;
+  llvm::SmallString<200> buf;
   llvm::raw_svector_ostream os(buf);
   os << "The receiver of message '";
   ME->getSelector().print(os);

@@ -20,7 +20,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/pro-type-vararg.html
 class ProTypeVarargCheck : public ClangTidyCheck {
 public:
-  ProTypeVarargCheck(StringRef Name, ClangTidyContext *Context)
+  ProTypeVarargCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

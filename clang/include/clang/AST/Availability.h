@@ -32,15 +32,15 @@ class AvailabilitySpec {
   /// Represents the version that this specifier requires. If the host OS
   /// version is greater than or equal to Version, the @available will evaluate
   /// to true.
-  VersionTuple Version;
+  llvm::VersionTuple Version;
 
   /// Name of the platform that Version corresponds to.
-  StringRef Platform;
+  llvm::StringRef Platform;
 
   SourceLocation BeginLoc, EndLoc;
 
 public:
-  AvailabilitySpec(VersionTuple Version, StringRef Platform,
+  AvailabilitySpec(llvm::VersionTuple Version, llvm::StringRef Platform,
                    SourceLocation BeginLoc, SourceLocation EndLoc)
       : Version(Version), Platform(Platform), BeginLoc(BeginLoc),
         EndLoc(EndLoc) {}
@@ -49,8 +49,8 @@ public:
   AvailabilitySpec(SourceLocation StarLoc)
       : BeginLoc(StarLoc), EndLoc(StarLoc) {}
 
-  VersionTuple getVersion() const { return Version; }
-  StringRef getPlatform() const { return Platform; }
+  llvm::VersionTuple getVersion() const { return Version; }
+  llvm::StringRef getPlatform() const { return Platform; }
   SourceLocation getBeginLoc() const { return BeginLoc; }
   SourceLocation getEndLoc() const { return EndLoc; }
 
@@ -64,9 +64,9 @@ class Decl;
 struct AvailabilityInfo {
   /// The domain is the platform for which this availability info applies to.
   llvm::SmallString<32> Domain;
-  VersionTuple Introduced;
-  VersionTuple Deprecated;
-  VersionTuple Obsoleted;
+  llvm::VersionTuple Introduced;
+  llvm::VersionTuple Deprecated;
+  llvm::VersionTuple Obsoleted;
   bool Unavailable = false;
   bool UnconditionallyDeprecated = false;
   bool UnconditionallyUnavailable = false;
@@ -97,8 +97,8 @@ struct AvailabilityInfo {
     return UnconditionallyUnavailable;
   }
 
-  AvailabilityInfo(StringRef Domain, VersionTuple I, VersionTuple D,
-                   VersionTuple O, bool U, bool UD, bool UU)
+  AvailabilityInfo(llvm::StringRef Domain, llvm::VersionTuple I, llvm::VersionTuple D,
+                   llvm::VersionTuple O, bool U, bool UD, bool UU)
       : Domain(Domain), Introduced(I), Deprecated(D), Obsoleted(O),
         Unavailable(U), UnconditionallyDeprecated(UD),
         UnconditionallyUnavailable(UU) {}

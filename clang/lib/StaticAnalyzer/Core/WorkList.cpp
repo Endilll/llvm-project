@@ -34,7 +34,7 @@ STATISTIC(MaxReachableSize, "Maximum size of auxiliary worklist set");
 namespace {
 
 class DFS : public WorkList {
-  SmallVector<WorkListUnit, 20> Stack;
+  llvm::SmallVector<WorkListUnit, 20> Stack;
 
 public:
   bool hasWork() const override {
@@ -90,7 +90,7 @@ namespace {
 
   class BFSBlockDFSContents : public WorkList {
     std::deque<WorkListUnit> Queue;
-    SmallVector<WorkListUnit, 20> Stack;
+    llvm::SmallVector<WorkListUnit, 20> Stack;
 
   public:
     bool hasWork() const override {
@@ -131,10 +131,10 @@ namespace {
 
 class UnexploredFirstStack : public WorkList {
   /// Stack of nodes known to have statements we have not traversed yet.
-  SmallVector<WorkListUnit, 20> StackUnexplored;
+  llvm::SmallVector<WorkListUnit, 20> StackUnexplored;
 
   /// Stack of all other nodes.
-  SmallVector<WorkListUnit, 20> StackOthers;
+  llvm::SmallVector<WorkListUnit, 20> StackOthers;
 
   using BlockID = unsigned;
   using LocIdentifier = std::pair<BlockID, const StackFrameContext *>;

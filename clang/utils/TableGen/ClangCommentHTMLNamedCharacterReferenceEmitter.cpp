@@ -27,13 +27,13 @@ using namespace llvm;
 ///
 /// \returns true on success.
 static bool translateCodePointToUTF8(unsigned CodePoint,
-                                     SmallVectorImpl<char> &CLiteral) {
+                                     llvm::SmallVectorImpl<char> &CLiteral) {
   char Translated[UNI_MAX_UTF8_BYTES_PER_CODE_POINT];
   char *TranslatedPtr = Translated;
   if (!ConvertCodePointToUTF8(CodePoint, TranslatedPtr))
     return false;
 
-  StringRef UTF8(Translated, TranslatedPtr - Translated);
+  llvm::StringRef UTF8(Translated, TranslatedPtr - Translated);
 
   raw_svector_ostream OS(CLiteral);
   OS << "\"";
@@ -47,10 +47,10 @@ static bool translateCodePointToUTF8(unsigned CodePoint,
 }
 
 void clang::EmitClangCommentHTMLNamedCharacterReferences(RecordKeeper &Records,
-                                                         raw_ostream &OS) {
+                                                         llvm::raw_ostream &OS) {
   std::vector<Record *> Tags = Records.getAllDerivedDefinitions("NCR");
   std::vector<StringMatcher::StringPair> NameToUTF8;
-  SmallString<32> CLiteral;
+  llvm::SmallString<32> CLiteral;
   for (std::vector<Record *>::iterator I = Tags.begin(), E = Tags.end();
        I != E; ++I) {
     Record &Tag = **I;
@@ -61,7 +61,7 @@ void clang::EmitClangCommentHTMLNamedCharacterReferences(RecordKeeper &Records,
     if (!translateCodePointToUTF8(CodePoint, CLiteral)) {
       SrcMgr.PrintMessage(Tag.getLoc().front(),
                           SourceMgr::DK_Error,
-                          Twine("invalid code point"));
+                          llvm::Twine("invalid code point"));
       continue;
     }
     CLiteral.append(";");
@@ -73,9 +73,9 @@ void clang::EmitClangCommentHTMLNamedCharacterReferences(RecordKeeper &Records,
   emitSourceFileHeader("HTML named character reference to UTF-8 translation",
                        OS, Records);
 
-  OS << "StringRef translateHTMLNamedCharacterReferenceToUTF8(\n"
-        "                                             StringRef Name) {\n";
+  OS << "llvm::StringRef translateHTMLNamedCharacterReferenceToUTF8(\n"
+        "                                             llvm::StringRef Name) {\n";
   StringMatcher("Name", NameToUTF8, OS).Emit();
-  OS << "  return StringRef();\n"
+  OS << "  return llvm::StringRef();\n"
      << "}\n\n";
 }

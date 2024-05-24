@@ -270,7 +270,7 @@ public:
                                  BugReporter &BR) const {
     const Table &Config = mgr.options.Config;
 
-    SmallVector<const Table::MapEntryTy *, 32> Keys;
+    llvm::SmallVector<const Table::MapEntryTy *, 32> Keys;
     for (const auto &Entry : Config)
       Keys.push_back(&Entry);
     llvm::array_pod_sort(Keys.begin(), Keys.end(), compareEntry);

@@ -19,7 +19,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/pro-type-const-cast.html
 class ProTypeConstCastCheck : public ClangTidyCheck {
 public:
-  ProTypeConstCastCheck(StringRef Name, ClangTidyContext *Context);
+  ProTypeConstCastCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

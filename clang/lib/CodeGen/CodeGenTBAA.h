@@ -152,12 +152,12 @@ class CodeGenTBAA {
   /// !tbaa.struct metadata formation. Return false for an unsupported type.
   bool CollectFields(uint64_t BaseOffset,
                      QualType Ty,
-                     SmallVectorImpl<llvm::MDBuilder::TBAAStructField> &Fields,
+                     llvm::SmallVectorImpl<llvm::MDBuilder::TBAAStructField> &Fields,
                      bool MayAlias);
 
   /// createScalarTypeNode - A wrapper function to create a metadata node
   /// describing a scalar type.
-  llvm::MDNode *createScalarTypeNode(StringRef Name, llvm::MDNode *Parent,
+  llvm::MDNode *createScalarTypeNode(llvm::StringRef Name, llvm::MDNode *Parent,
                                      uint64_t Size);
 
   /// getTypeInfoHelper - An internal helper function to generate metadata used

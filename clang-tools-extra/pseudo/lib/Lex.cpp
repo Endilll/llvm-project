@@ -51,7 +51,7 @@ TokenStream lex(const std::string &Code, const clang::LangOptions &LangOpts) {
     }
     if (NewLineStart || !LastOffset) {
       Indent = 0;
-      for (char C : StringRef(Code).slice(NewLineStart, Offset)) {
+      for (char C : llvm::StringRef(Code).slice(NewLineStart, Offset)) {
         if (C == ' ')
           ++Indent;
         else if (C == '\t')

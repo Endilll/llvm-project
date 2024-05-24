@@ -32,7 +32,7 @@ template <typename U> class OMPDeclarativeDirective : public U {
   friend class ASTDeclWriter;
 
   /// Get the clauses storage.
-  MutableArrayRef<OMPClause *> getClauses() {
+  llvm::MutableArrayRef<OMPClause *> getClauses() {
     if (!Data)
       return std::nullopt;
     return Data->getClauses();
@@ -48,7 +48,7 @@ protected:
 
   template <typename T, typename... Params>
   static T *createDirective(const ASTContext &C, DeclContext *DC,
-                            ArrayRef<OMPClause *> Clauses, unsigned NumChildren,
+                            llvm::ArrayRef<OMPClause *> Clauses, unsigned NumChildren,
                             Params &&... P) {
     auto *Inst = new (C, DC, size(Clauses.size(), NumChildren))
         T(DC, std::forward<Params>(P)...);
@@ -88,7 +88,7 @@ public:
   ///
   OMPClause *getClause(unsigned I) const { return clauses()[I]; }
 
-  ArrayRef<OMPClause *> clauses() const {
+  llvm::ArrayRef<OMPClause *> clauses() const {
     if (!Data)
       return std::nullopt;
     return Data->getClauses();
@@ -116,27 +116,27 @@ class OMPThreadPrivateDecl final : public OMPDeclarativeDirective<Decl> {
                        SourceLocation L = SourceLocation())
       : OMPDeclarativeDirective<Decl>(OMPThreadPrivate, DC, L) {}
 
-  ArrayRef<const Expr *> getVars() const {
+  llvm::ArrayRef<const Expr *> getVars() const {
     auto **Storage = reinterpret_cast<Expr **>(Data->getChildren().data());
     return llvm::ArrayRef(Storage, Data->getNumChildren());
   }
 
-  MutableArrayRef<Expr *> getVars() {
+  llvm::MutableArrayRef<Expr *> getVars() {
     auto **Storage = reinterpret_cast<Expr **>(Data->getChildren().data());
     return llvm::MutableArrayRef(Storage, Data->getNumChildren());
   }
 
-  void setVars(ArrayRef<Expr *> VL);
+  void setVars(llvm::ArrayRef<Expr *> VL);
 
 public:
   static OMPThreadPrivateDecl *Create(ASTContext &C, DeclContext *DC,
                                       SourceLocation L,
-                                      ArrayRef<Expr *> VL);
+                                      llvm::ArrayRef<Expr *> VL);
   static OMPThreadPrivateDecl *CreateDeserialized(ASTContext &C,
                                                   GlobalDeclID ID, unsigned N);
 
-  typedef MutableArrayRef<Expr *>::iterator varlist_iterator;
-  typedef ArrayRef<const Expr *>::iterator varlist_const_iterator;
+  typedef llvm::MutableArrayRef<Expr *>::iterator varlist_iterator;
+  typedef llvm::ArrayRef<const Expr *>::iterator varlist_const_iterator;
   typedef llvm::iterator_range<varlist_iterator> varlist_range;
   typedef llvm::iterator_range<varlist_const_iterator> varlist_const_range;
 
@@ -315,14 +315,14 @@ public:
   static OMPDeclareMapperDecl *Create(ASTContext &C, DeclContext *DC,
                                       SourceLocation L, DeclarationName Name,
                                       QualType T, DeclarationName VarName,
-                                      ArrayRef<OMPClause *> Clauses,
+                                      llvm::ArrayRef<OMPClause *> Clauses,
                                       OMPDeclareMapperDecl *PrevDeclInScope);
   /// Creates deserialized declare mapper node.
   static OMPDeclareMapperDecl *CreateDeserialized(ASTContext &C,
                                                   GlobalDeclID ID, unsigned N);
 
-  using clauselist_iterator = MutableArrayRef<OMPClause *>::iterator;
-  using clauselist_const_iterator = ArrayRef<const OMPClause *>::iterator;
+  using clauselist_iterator = llvm::MutableArrayRef<OMPClause *>::iterator;
+  using clauselist_const_iterator = llvm::ArrayRef<const OMPClause *>::iterator;
   using clauselist_range = llvm::iterator_range<clauselist_iterator>;
   using clauselist_const_range =
       llvm::iterator_range<clauselist_const_iterator>;
@@ -426,13 +426,13 @@ class OMPRequiresDecl final : public OMPDeclarativeDirective<Decl> {
 public:
   /// Create requires node.
   static OMPRequiresDecl *Create(ASTContext &C, DeclContext *DC,
-                                 SourceLocation L, ArrayRef<OMPClause *> CL);
+                                 SourceLocation L, llvm::ArrayRef<OMPClause *> CL);
   /// Create deserialized requires node.
   static OMPRequiresDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID,
                                              unsigned N);
 
-  using clauselist_iterator = MutableArrayRef<OMPClause *>::iterator;
-  using clauselist_const_iterator = ArrayRef<const OMPClause *>::iterator;
+  using clauselist_iterator = llvm::MutableArrayRef<OMPClause *>::iterator;
+  using clauselist_const_iterator = llvm::ArrayRef<const OMPClause *>::iterator;
   using clauselist_range = llvm::iterator_range<clauselist_iterator>;
   using clauselist_const_range = llvm::iterator_range<clauselist_const_iterator>;
 
@@ -480,31 +480,31 @@ class OMPAllocateDecl final : public OMPDeclarativeDirective<Decl> {
   OMPAllocateDecl(DeclContext *DC, SourceLocation L)
       : OMPDeclarativeDirective<Decl>(OMPAllocate, DC, L) {}
 
-  ArrayRef<const Expr *> getVars() const {
+  llvm::ArrayRef<const Expr *> getVars() const {
     auto **Storage = reinterpret_cast<Expr **>(Data->getChildren().data());
     return llvm::ArrayRef(Storage, Data->getNumChildren());
   }
 
-  MutableArrayRef<Expr *> getVars() {
+  llvm::MutableArrayRef<Expr *> getVars() {
     auto **Storage = reinterpret_cast<Expr **>(Data->getChildren().data());
     return llvm::MutableArrayRef(Storage, Data->getNumChildren());
   }
 
-  void setVars(ArrayRef<Expr *> VL);
+  void setVars(llvm::ArrayRef<Expr *> VL);
 
 public:
   static OMPAllocateDecl *Create(ASTContext &C, DeclContext *DC,
-                                 SourceLocation L, ArrayRef<Expr *> VL,
-                                 ArrayRef<OMPClause *> CL);
+                                 SourceLocation L, llvm::ArrayRef<Expr *> VL,
+                                 llvm::ArrayRef<OMPClause *> CL);
   static OMPAllocateDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID,
                                              unsigned NVars, unsigned NClauses);
 
-  typedef MutableArrayRef<Expr *>::iterator varlist_iterator;
-  typedef ArrayRef<const Expr *>::iterator varlist_const_iterator;
+  typedef llvm::MutableArrayRef<Expr *>::iterator varlist_iterator;
+  typedef llvm::ArrayRef<const Expr *>::iterator varlist_const_iterator;
   typedef llvm::iterator_range<varlist_iterator> varlist_range;
   typedef llvm::iterator_range<varlist_const_iterator> varlist_const_range;
-  using clauselist_iterator = MutableArrayRef<OMPClause *>::iterator;
-  using clauselist_const_iterator = ArrayRef<const OMPClause *>::iterator;
+  using clauselist_iterator = llvm::MutableArrayRef<OMPClause *>::iterator;
+  using clauselist_const_iterator = llvm::ArrayRef<const OMPClause *>::iterator;
   using clauselist_range = llvm::iterator_range<clauselist_iterator>;
   using clauselist_const_range = llvm::iterator_range<clauselist_const_iterator>;
 

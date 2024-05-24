@@ -348,8 +348,8 @@ TEST(SourceCodeTests, CollectWords) {
   // this is a comment
   std::string getSomeText() { return "magic word"; }
   )cpp");
-  std::set<StringRef> ActualWords(Words.keys().begin(), Words.keys().end());
-  std::set<StringRef> ExpectedWords = {"define",  "fizz",   "buzz", "this",
+  std::set<llvm::StringRef> ActualWords(Words.keys().begin(), Words.keys().end());
+  std::set<llvm::StringRef> ExpectedWords = {"define",  "fizz",   "buzz", "this",
                                        "comment", "string", "some", "text",
                                        "return",  "magic",  "word"};
   EXPECT_EQ(ActualWords, ExpectedWords);
@@ -1091,8 +1091,8 @@ TEST(ApplyEditsTest, EndLineOutOfRange) {
 }
 
 TEST(FormatStyleForFile, LanguageGuessingHeuristic) {
-  StringRef ObjCContent = "@interface Foo\n@end\n";
-  StringRef CppContent = "class Foo {};\n";
+  llvm::StringRef ObjCContent = "@interface Foo\n@end\n";
+  llvm::StringRef CppContent = "class Foo {};\n";
   using LK = format::FormatStyle::LanguageKind;
   struct TestCase {
     llvm::StringRef Filename;

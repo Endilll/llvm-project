@@ -131,18 +131,18 @@ public:
   /// signatures that were considered.
   ///
   /// FIXME: rename to GuessCallArgumentType to reduce confusion.
-  QualType ProduceCallSignatureHelp(Expr *Fn, ArrayRef<Expr *> Args,
+  QualType ProduceCallSignatureHelp(Expr *Fn, llvm::ArrayRef<Expr *> Args,
                                     SourceLocation OpenParLoc);
   QualType ProduceConstructorSignatureHelp(QualType Type, SourceLocation Loc,
-                                           ArrayRef<Expr *> Args,
+                                           llvm::ArrayRef<Expr *> Args,
                                            SourceLocation OpenParLoc,
                                            bool Braced);
   QualType ProduceCtorInitMemberSignatureHelp(
       Decl *ConstructorDecl, CXXScopeSpec SS, ParsedType TemplateTypeTy,
-      ArrayRef<Expr *> ArgExprs, IdentifierInfo *II, SourceLocation OpenParLoc,
+      llvm::ArrayRef<Expr *> ArgExprs, IdentifierInfo *II, SourceLocation OpenParLoc,
       bool Braced);
   QualType ProduceTemplateArgumentSignatureHelp(
-      TemplateTy, ArrayRef<ParsedTemplateArgument>, SourceLocation LAngleLoc);
+      TemplateTy, llvm::ArrayRef<ParsedTemplateArgument>, SourceLocation LAngleLoc);
   void CodeCompleteInitializer(Scope *S, Decl *D);
   /// Trigger code completion for a record of \p BaseType. \p InitExprs are
   /// expressions in the initializer list seen so far and \p D is the current
@@ -161,7 +161,7 @@ public:
   void CodeCompleteNamespaceAliasDecl(Scope *S);
   void CodeCompleteOperatorName(Scope *S);
   void CodeCompleteConstructorInitializer(
-      Decl *Constructor, ArrayRef<CXXCtorInitializer *> Initializers);
+      Decl *Constructor, llvm::ArrayRef<CXXCtorInitializer *> Initializers);
 
   void CodeCompleteLambdaIntroducer(Scope *S, LambdaIntroducer &Intro,
                                     bool AfterAmpersand);
@@ -178,20 +178,20 @@ public:
                                    bool IsParameter);
   void CodeCompleteObjCMessageReceiver(Scope *S);
   void CodeCompleteObjCSuperMessage(Scope *S, SourceLocation SuperLoc,
-                                    ArrayRef<const IdentifierInfo *> SelIdents,
+                                    llvm::ArrayRef<const IdentifierInfo *> SelIdents,
                                     bool AtArgumentExpression);
   void CodeCompleteObjCClassMessage(Scope *S, ParsedType Receiver,
-                                    ArrayRef<const IdentifierInfo *> SelIdents,
+                                    llvm::ArrayRef<const IdentifierInfo *> SelIdents,
                                     bool AtArgumentExpression,
                                     bool IsSuper = false);
   void CodeCompleteObjCInstanceMessage(
-      Scope *S, Expr *Receiver, ArrayRef<const IdentifierInfo *> SelIdents,
+      Scope *S, Expr *Receiver, llvm::ArrayRef<const IdentifierInfo *> SelIdents,
       bool AtArgumentExpression, ObjCInterfaceDecl *Super = nullptr);
   void CodeCompleteObjCForCollection(Scope *S, DeclGroupPtrTy IterationVar);
   void CodeCompleteObjCSelector(Scope *S,
-                                ArrayRef<const IdentifierInfo *> SelIdents);
+                                llvm::ArrayRef<const IdentifierInfo *> SelIdents);
   void
-  CodeCompleteObjCProtocolReferences(ArrayRef<IdentifierLocPair> Protocols);
+  CodeCompleteObjCProtocolReferences(llvm::ArrayRef<IdentifierLocPair> Protocols);
   void CodeCompleteObjCProtocolDecl(Scope *S);
   void CodeCompleteObjCInterfaceDecl(Scope *S);
   void CodeCompleteObjCClassForwardDecl(Scope *S);
@@ -211,7 +211,7 @@ public:
                                   ParsedType ReturnType);
   void CodeCompleteObjCMethodDeclSelector(
       Scope *S, bool IsInstanceMethod, bool AtParameterName,
-      ParsedType ReturnType, ArrayRef<const IdentifierInfo *> SelIdents);
+      ParsedType ReturnType, llvm::ArrayRef<const IdentifierInfo *> SelIdents);
   void CodeCompleteObjCClassPropertyRefExpr(Scope *S,
                                             const IdentifierInfo &ClassName,
                                             SourceLocation ClassNameLoc,
@@ -229,7 +229,7 @@ public:
   void
   GatherGlobalCodeCompletions(CodeCompletionAllocator &Allocator,
                               CodeCompletionTUInfo &CCTUInfo,
-                              SmallVectorImpl<CodeCompletionResult> &Results);
+                              llvm::SmallVectorImpl<CodeCompletionResult> &Results);
 };
 
 } // namespace clang

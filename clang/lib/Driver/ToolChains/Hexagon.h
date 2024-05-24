@@ -52,7 +52,7 @@ public:
 
 void getHexagonTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                               const llvm::opt::ArgList &Args,
-                              std::vector<StringRef> &Features);
+                              std::vector<llvm::StringRef> &Features);
 
 } // end namespace hexagon.
 } // end namespace tools
@@ -94,19 +94,19 @@ public:
   void AddCXXStdlibLibArgs(const llvm::opt::ArgList &Args,
                            llvm::opt::ArgStringList &CmdArgs) const override;
 
-  StringRef GetGCCLibAndIncVersion() const { return GCCLibAndIncVersion.Text; }
+  llvm::StringRef GetGCCLibAndIncVersion() const { return GCCLibAndIncVersion.Text; }
 
   std::string getHexagonTargetDir(
       const std::string &InstalledDir,
-      const SmallVectorImpl<std::string> &PrefixDirs) const;
+      const llvm::SmallVectorImpl<std::string> &PrefixDirs) const;
   void getHexagonLibraryPaths(const llvm::opt::ArgList &Args,
       ToolChain::path_list &LibPaths) const;
 
   std::string getCompilerRTPath() const override;
 
   static bool isAutoHVXEnabled(const llvm::opt::ArgList &Args);
-  static StringRef GetDefaultCPU();
-  static StringRef GetTargetCPUVersion(const llvm::opt::ArgList &Args);
+  static llvm::StringRef GetDefaultCPU();
+  static llvm::StringRef GetTargetCPUVersion(const llvm::opt::ArgList &Args);
 
   static std::optional<unsigned>
   getSmallDataThreshold(const llvm::opt::ArgList &Args);

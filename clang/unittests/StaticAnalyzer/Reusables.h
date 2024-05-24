@@ -33,7 +33,7 @@ const T *findNode(const Decl *Where, MatcherT What) {
 
 // Find a declaration in the current AST by name.
 template <typename T>
-const T *findDeclByName(const Decl *Where, StringRef Name) {
+const T *findDeclByName(const Decl *Where, llvm::StringRef Name) {
   using namespace ast_matchers;
   return findNode<T>(Where, namedDecl(hasName(Name)));
 }
@@ -138,7 +138,7 @@ public:
                                SourceManager &SM)
       : ExpectedDiags(ExpectedDiags), SM(SM) {}
 
-  StringRef getName() const override { return "verify test diagnostics"; }
+  llvm::StringRef getName() const override { return "verify test diagnostics"; }
 
   void FlushDiagnosticsImpl(std::vector<const PathDiagnostic *> &Diags,
                             FilesMade *filesMade) override {

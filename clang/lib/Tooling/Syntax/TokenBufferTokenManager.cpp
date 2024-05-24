@@ -12,7 +12,7 @@ namespace clang {
 namespace syntax {
 constexpr llvm::StringLiteral syntax::TokenBufferTokenManager::Kind;
 
-std::pair<FileID, ArrayRef<syntax::Token>>
+std::pair<FileID, llvm::ArrayRef<syntax::Token>>
 syntax::TokenBufferTokenManager::lexBuffer(
     std::unique_ptr<llvm::MemoryBuffer> Input) {
   auto FID = SM.createFileID(std::move(Input));

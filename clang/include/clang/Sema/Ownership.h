@@ -255,11 +255,11 @@ using DeclResult = ActionResult<Decl *>;
 using ParsedTemplateTy = OpaquePtr<TemplateName>;
 using UnionParsedTemplateTy = UnionOpaquePtr<TemplateName>;
 
-using MultiExprArg = MutableArrayRef<Expr *>;
-using MultiStmtArg = MutableArrayRef<Stmt *>;
-using ASTTemplateArgsPtr = MutableArrayRef<ParsedTemplateArgument>;
-using MultiTypeArg = MutableArrayRef<ParsedType>;
-using MultiTemplateParamsArg = MutableArrayRef<TemplateParameterList *>;
+using MultiExprArg = llvm::MutableArrayRef<Expr *>;
+using MultiStmtArg = llvm::MutableArrayRef<Stmt *>;
+using ASTTemplateArgsPtr = llvm::MutableArrayRef<ParsedTemplateArgument>;
+using MultiTypeArg = llvm::MutableArrayRef<ParsedType>;
+using MultiTemplateParamsArg = llvm::MutableArrayRef<TemplateParameterList *>;
 
 inline ExprResult ExprError() { return ExprResult(true); }
 inline StmtResult StmtError() { return StmtResult(true); }

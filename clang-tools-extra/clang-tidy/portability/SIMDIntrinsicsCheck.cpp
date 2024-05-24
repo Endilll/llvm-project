@@ -38,11 +38,11 @@ AST_MATCHER(FunctionDecl, isVectorFunction) {
 
 } // namespace
 
-static StringRef trySuggestPpc(StringRef Name) {
+static llvm::StringRef trySuggestPpc(llvm::StringRef Name) {
   if (!Name.consume_front("vec_"))
     return {};
 
-  return llvm::StringSwitch<StringRef>(Name)
+  return llvm::StringSwitch<llvm::StringRef>(Name)
       // [simd.alg]
       .Case("max", "$std::max")
       .Case("min", "$std::min")
@@ -53,7 +53,7 @@ static StringRef trySuggestPpc(StringRef Name) {
       .Default({});
 }
 
-static StringRef trySuggestX86(StringRef Name) {
+static llvm::StringRef trySuggestX86(llvm::StringRef Name) {
   if (!(Name.consume_front("_mm_") || Name.consume_front("_mm256_") ||
         Name.consume_front("_mm512_")))
     return {};
@@ -75,7 +75,7 @@ static StringRef trySuggestX86(StringRef Name) {
   return {};
 }
 
-SIMDIntrinsicsCheck::SIMDIntrinsicsCheck(StringRef Name,
+SIMDIntrinsicsCheck::SIMDIntrinsicsCheck(llvm::StringRef Name,
                                          ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context), Std(Options.get("Std", "")),
       Suggest(Options.get("Suggest", false)) {}
@@ -106,8 +106,8 @@ void SIMDIntrinsicsCheck::check(const MatchFinder::MatchResult &Result) {
   if (!Callee)
     return;
 
-  StringRef Old = Callee->getName();
-  StringRef New;
+  llvm::StringRef Old = Callee->getName();
+  llvm::StringRef New;
   llvm::Triple::ArchType Arch =
       Result.Context->getTargetInfo().getTriple().getArch();
 
@@ -135,7 +135,7 @@ void SIMDIntrinsicsCheck::check(const MatchFinder::MatchResult &Result) {
       static const llvm::Regex StdRegex("\\$std"), SimdRegex("\\$simd");
       diag(Call->getExprLoc(), "'%0' can be replaced by %1")
           << Old
-          << SimdRegex.sub(SmallString<32>({Std, "::simd"}),
+          << SimdRegex.sub(llvm::SmallString<32>({Std, "::simd"}),
                            StdRegex.sub(Std, New));
     } else {
       diag(Call->getExprLoc(), "'%0' is a non-portable %1 intrinsic function")

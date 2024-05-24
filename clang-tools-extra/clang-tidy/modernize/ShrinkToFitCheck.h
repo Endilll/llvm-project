@@ -21,7 +21,7 @@ namespace clang::tidy::modernize {
 /// Note that, the `shrink_to_fit()` method is only available in C++11 and up.
 class ShrinkToFitCheck : public ClangTidyCheck {
 public:
-  ShrinkToFitCheck(StringRef Name, ClangTidyContext *Context)
+  ShrinkToFitCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;

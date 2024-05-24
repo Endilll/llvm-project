@@ -170,9 +170,9 @@ void aix::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 
   if (Arg *A =
           Args.getLastArg(clang::driver::options::OPT_mxcoff_build_id_EQ)) {
-    StringRef BuildId = A->getValue();
+    llvm::StringRef BuildId = A->getValue();
     if (BuildId[0] != '0' || BuildId[1] != 'x' ||
-        BuildId.find_if_not(llvm::isHexDigit, 2) != StringRef::npos)
+        BuildId.find_if_not(llvm::isHexDigit, 2) != llvm::StringRef::npos)
       ToolChain.getDriver().Diag(diag::err_drv_unsupported_option_argument)
           << A->getSpelling() << BuildId;
     else {
@@ -367,7 +367,7 @@ void AIX::AddOpenMPIncludeArgs(const ArgList &DriverArgs,
   // Add OpenMP include paths if -fopenmp is specified.
   if (DriverArgs.hasFlag(options::OPT_fopenmp, options::OPT_fopenmp_EQ,
                          options::OPT_fno_openmp, false)) {
-    SmallString<128> PathOpenMP;
+    llvm::SmallString<128> PathOpenMP;
     switch (getDriver().getOpenMPRuntime(DriverArgs)) {
     case Driver::OMPRT_OMP:
       PathOpenMP = GetHeaderSysroot(DriverArgs);
@@ -394,7 +394,7 @@ void AIX::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
   const Driver &D = getDriver();
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> P(D.ResourceDir);
+    llvm::SmallString<128> P(D.ResourceDir);
     // Add the PowerPC intrinsic headers (<resource>/include/ppc_wrappers)
     path::append(P, "include", "ppc_wrappers");
     addSystemInclude(DriverArgs, CC1Args, P);
@@ -412,7 +412,7 @@ void AIX::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   // Add <sysroot>/usr/include.
-  SmallString<128> UP(Sysroot);
+  llvm::SmallString<128> UP(Sysroot);
   path::append(UP, "/usr/include");
   addSystemInclude(DriverArgs, CC1Args, UP.str());
 }
@@ -432,7 +432,7 @@ void AIX::AddClangCXXStdlibIncludeArgs(
         "picking up libstdc++ headers is unimplemented on AIX");
   case ToolChain::CST_Libcxx: {
     llvm::StringRef Sysroot = GetHeaderSysroot(DriverArgs);
-    SmallString<128> PathCPP(Sysroot);
+    llvm::SmallString<128> PathCPP(Sysroot);
     llvm::sys::path::append(PathCPP, "opt/IBM/openxlCSDK", "include", "c++",
                             "v1");
     addSystemInclude(DriverArgs, CC1Args, PathCPP.str());
@@ -559,11 +559,11 @@ void AIX::addProfileRTLibs(const llvm::opt::ArgList &Args,
     // Add linker option -u__llvm_profile_runtime to cause runtime
     // initialization to occur.
     CmdArgs.push_back(Args.MakeArgString(
-        Twine("-u", llvm::getInstrProfRuntimeHookVarName())));
+        llvm::Twine("-u", llvm::getInstrProfRuntimeHookVarName())));
 
     if (const auto *A =
             Args.getLastArgNoClaim(options::OPT_fprofile_update_EQ)) {
-      StringRef Val = A->getValue();
+      llvm::StringRef Val = A->getValue();
       if (Val == "atomic" || Val == "prefer-atomic")
         CmdArgs.push_back("-latomic");
     }

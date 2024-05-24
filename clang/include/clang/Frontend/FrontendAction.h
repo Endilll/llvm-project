@@ -42,7 +42,7 @@ class FrontendAction {
 
 private:
   std::unique_ptr<ASTConsumer> CreateWrappedASTConsumer(CompilerInstance &CI,
-                                                        StringRef InFile);
+                                                        llvm::StringRef InFile);
 
 protected:
   /// @name Implementation Action Interface
@@ -68,7 +68,7 @@ protected:
   ///
   /// \return The new AST consumer, or null on failure.
   virtual std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                         StringRef InFile) = 0;
+                                                         llvm::StringRef InFile) = 0;
 
   /// Callback before starting processing a single input, giving the
   /// opportunity to modify the CompilerInvocation or do some other action
@@ -136,12 +136,12 @@ public:
     return CurrentInput;
   }
 
-  StringRef getCurrentFile() const {
+  llvm::StringRef getCurrentFile() const {
     assert(!CurrentInput.isEmpty() && "No current file!");
     return CurrentInput.getFile();
   }
 
-  StringRef getCurrentFileOrBufferName() const {
+  llvm::StringRef getCurrentFileOrBufferName() const {
     assert(!CurrentInput.isEmpty() && "No current file!");
     return CurrentInput.isFile()
                ? CurrentInput.getFile()
@@ -258,7 +258,7 @@ class PluginASTAction : public ASTFrontendAction {
   virtual void anchor();
 public:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override = 0;
+                                                 llvm::StringRef InFile) override = 0;
 
   /// Parse the given plugin command line arguments.
   ///
@@ -290,7 +290,7 @@ protected:
   /// Provide a default implementation which returns aborts;
   /// this method should never be called by FrontendAction clients.
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
 public:
   bool usesPreprocessorOnly() const override { return true; }
@@ -308,7 +308,7 @@ protected:
 
   bool PrepareToExecuteAction(CompilerInstance &CI) override;
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
   bool BeginInvocation(CompilerInstance &CI) override;
   bool BeginSourceFileAction(CompilerInstance &CI) override;
   void ExecuteAction() override;

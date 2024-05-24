@@ -54,8 +54,8 @@ public:
 
 protected:
   void emitDiagnosticMessage(FullSourceLoc Loc, PresumedLoc PLoc,
-                             DiagnosticsEngine::Level Level, StringRef Message,
-                             ArrayRef<CharSourceRange> Ranges,
+                             DiagnosticsEngine::Level Level, llvm::StringRef Message,
+                             llvm::ArrayRef<CharSourceRange> Ranges,
                              DiagOrStoredDiag Info) override {
     // Remove check name from the message.
     // FIXME: Remove this once there's a better way to pass check names than
@@ -104,11 +104,11 @@ protected:
 
   void emitDiagnosticLoc(FullSourceLoc Loc, PresumedLoc PLoc,
                          DiagnosticsEngine::Level Level,
-                         ArrayRef<CharSourceRange> Ranges) override {}
+                         llvm::ArrayRef<CharSourceRange> Ranges) override {}
 
   void emitCodeContext(FullSourceLoc Loc, DiagnosticsEngine::Level Level,
-                       SmallVectorImpl<CharSourceRange> &Ranges,
-                       ArrayRef<FixItHint> Hints) override {
+                       llvm::SmallVectorImpl<CharSourceRange> &Ranges,
+                       llvm::ArrayRef<FixItHint> Hints) override {
     assert(Loc.isValid());
     tooling::DiagnosticMessage *DiagWithFix =
         Level == DiagnosticsEngine::Note ? &Error.Notes.back() : &Error.Message;
@@ -137,10 +137,10 @@ protected:
   void emitIncludeLocation(FullSourceLoc Loc, PresumedLoc PLoc) override {}
 
   void emitImportLocation(FullSourceLoc Loc, PresumedLoc PLoc,
-                          StringRef ModuleName) override {}
+                          llvm::StringRef ModuleName) override {}
 
   void emitBuildingModuleLocation(FullSourceLoc Loc, PresumedLoc PLoc,
-                                  StringRef ModuleName) override {}
+                                  llvm::StringRef ModuleName) override {}
 
   void endDiagnostic(DiagOrStoredDiag D,
                      DiagnosticsEngine::Level Level) override {
@@ -152,9 +152,9 @@ private:
 };
 } // end anonymous namespace
 
-ClangTidyError::ClangTidyError(StringRef CheckName,
+ClangTidyError::ClangTidyError(llvm::StringRef CheckName,
                                ClangTidyError::Level DiagLevel,
-                               StringRef BuildDirectory, bool IsWarningAsError)
+                               llvm::StringRef BuildDirectory, bool IsWarningAsError)
     : tooling::Diagnostic(CheckName, DiagLevel, BuildDirectory),
       IsWarningAsError(IsWarningAsError) {}
 
@@ -173,7 +173,7 @@ ClangTidyContext::ClangTidyContext(
 ClangTidyContext::~ClangTidyContext() = default;
 
 DiagnosticBuilder ClangTidyContext::diag(
-    StringRef CheckName, SourceLocation Loc, StringRef Description,
+    llvm::StringRef CheckName, SourceLocation Loc, llvm::StringRef Description,
     DiagnosticIDs::Level Level /* = DiagnosticIDs::Warning*/) {
   assert(Loc.isValid());
   unsigned ID = DiagEngine->getDiagnosticIDs()->getCustomDiagID(
@@ -183,7 +183,7 @@ DiagnosticBuilder ClangTidyContext::diag(
 }
 
 DiagnosticBuilder ClangTidyContext::diag(
-    StringRef CheckName, StringRef Description,
+    llvm::StringRef CheckName, llvm::StringRef Description,
     DiagnosticIDs::Level Level /* = DiagnosticIDs::Warning*/) {
   unsigned ID = DiagEngine->getDiagnosticIDs()->getCustomDiagID(
       Level, (Description + " [" + CheckName + "]").str());
@@ -204,14 +204,14 @@ DiagnosticBuilder ClangTidyContext::diag(const tooling::Diagnostic &Error) {
 }
 
 DiagnosticBuilder ClangTidyContext::configurationDiag(
-    StringRef Message,
+    llvm::StringRef Message,
     DiagnosticIDs::Level Level /* = DiagnosticIDs::Warning*/) {
   return diag("clang-tidy-config", Message, Level);
 }
 
 bool ClangTidyContext::shouldSuppressDiagnostic(
     DiagnosticsEngine::Level DiagLevel, const Diagnostic &Info,
-    SmallVectorImpl<tooling::Diagnostic> &NoLintErrors, bool AllowIO,
+    llvm::SmallVectorImpl<tooling::Diagnostic> &NoLintErrors, bool AllowIO,
     bool EnableNoLintBlocks) {
   std::string CheckName = getCheckName(Info.getID());
   return NoLintHandler.shouldSuppress(DiagLevel, Info, CheckName, NoLintErrors,
@@ -225,8 +225,8 @@ void ClangTidyContext::setSourceManager(SourceManager *SourceMgr) {
 static bool parseFileExtensions(llvm::ArrayRef<std::string> AllFileExtensions,
                                 FileExtensionsSet &FileExtensions) {
   FileExtensions.clear();
-  for (StringRef Suffix : AllFileExtensions) {
-    StringRef Extension = Suffix.trim();
+  for (llvm::StringRef Suffix : AllFileExtensions) {
+    llvm::StringRef Extension = Suffix.trim();
     if (!llvm::all_of(Extension, isAlphanumeric))
       return false;
     FileExtensions.insert(Extension);
@@ -234,7 +234,7 @@ static bool parseFileExtensions(llvm::ArrayRef<std::string> AllFileExtensions,
   return true;
 }
 
-void ClangTidyContext::setCurrentFile(StringRef File) {
+void ClangTidyContext::setCurrentFile(llvm::StringRef File) {
   CurrentFile = std::string(File);
   CurrentOptions = getOptionsForFile(CurrentFile);
   CheckFilter = std::make_unique<CachedGlobList>(*getOptions().Checks);
@@ -261,7 +261,7 @@ const ClangTidyOptions &ClangTidyContext::getOptions() const {
   return CurrentOptions;
 }
 
-ClangTidyOptions ClangTidyContext::getOptionsForFile(StringRef File) const {
+ClangTidyOptions ClangTidyContext::getOptionsForFile(llvm::StringRef File) const {
   // Merge options on top of getDefaults() as a safeguard against options with
   // unset values.
   return ClangTidyOptions::getDefaults().merge(
@@ -270,7 +270,7 @@ ClangTidyOptions ClangTidyContext::getOptionsForFile(StringRef File) const {
 
 void ClangTidyContext::setEnableProfiling(bool P) { Profile = P; }
 
-void ClangTidyContext::setProfileStoragePrefix(StringRef Prefix) {
+void ClangTidyContext::setProfileStoragePrefix(llvm::StringRef Prefix) {
   ProfilePrefix = std::string(Prefix);
 }
 
@@ -282,12 +282,12 @@ ClangTidyContext::getProfileStorageParams() const {
   return ClangTidyProfiling::StorageParams(ProfilePrefix, CurrentFile);
 }
 
-bool ClangTidyContext::isCheckEnabled(StringRef CheckName) const {
+bool ClangTidyContext::isCheckEnabled(llvm::StringRef CheckName) const {
   assert(CheckFilter != nullptr);
   return CheckFilter->contains(CheckName);
 }
 
-bool ClangTidyContext::treatAsError(StringRef CheckName) const {
+bool ClangTidyContext::treatAsError(llvm::StringRef CheckName) const {
   assert(WarningAsErrorFilter != nullptr);
   return WarningAsErrorFilter->contains(CheckName);
 }
@@ -374,7 +374,7 @@ void ClangTidyDiagnosticConsumer::HandleDiagnostic(
   if (LastErrorWasIgnored && DiagLevel == DiagnosticsEngine::Note)
     return;
 
-  SmallVector<tooling::Diagnostic, 1> SuppressionErrors;
+  llvm::SmallVector<tooling::Diagnostic, 1> SuppressionErrors;
   if (Context.shouldSuppressDiagnostic(DiagLevel, Info, SuppressionErrors,
                                        EnableNolintBlocks)) {
     ++Context.Stats.ErrorsIgnoredNOLINT;
@@ -442,7 +442,7 @@ void ClangTidyDiagnosticConsumer::HandleDiagnostic(
     ClangTidyDiagnosticRenderer Converter(
         Context.getLangOpts(), &Context.DiagEngine->getDiagnosticOptions(),
         Errors.back());
-    SmallString<100> Message;
+    llvm::SmallString<100> Message;
     Info.FormatDiagnostic(Message);
     FullSourceLoc Loc;
     if (Info.hasSourceManager())
@@ -462,7 +462,7 @@ void ClangTidyDiagnosticConsumer::HandleDiagnostic(
     Context.diag(Error);
 }
 
-bool ClangTidyDiagnosticConsumer::passesLineFilter(StringRef FileName,
+bool ClangTidyDiagnosticConsumer::passesLineFilter(llvm::StringRef FileName,
                                                    unsigned LineNumber) const {
   if (Context.getGlobalOptions().LineFilter.empty())
     return true;
@@ -572,7 +572,7 @@ void ClangTidyDiagnosticConsumer::checkFilters(SourceLocation Location,
     return;
   }
 
-  StringRef FileName(File->getName());
+  llvm::StringRef FileName(File->getName());
   LastErrorRelatesToUserCode =
       LastErrorRelatesToUserCode || Sources.isInMainFile(Location) ||
       (HeaderFilter &&

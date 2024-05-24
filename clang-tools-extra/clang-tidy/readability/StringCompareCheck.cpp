@@ -19,14 +19,14 @@ namespace optutils = clang::tidy::utils::options;
 
 namespace clang::tidy::readability {
 
-static const StringRef CompareMessage = "do not use 'compare' to test equality "
+static const llvm::StringRef CompareMessage = "do not use 'compare' to test equality "
                                         "of strings; use the string equality "
                                         "operator instead";
 
-static const StringRef DefaultStringLikeClasses = "::std::basic_string;"
+static const llvm::StringRef DefaultStringLikeClasses = "::std::basic_string;"
                                                   "::std::basic_string_view";
 
-StringCompareCheck::StringCompareCheck(StringRef Name,
+StringCompareCheck::StringCompareCheck(llvm::StringRef Name,
                                        ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StringLikeClasses(optutils::parseStringList(

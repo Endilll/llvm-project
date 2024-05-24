@@ -27,7 +27,7 @@ namespace clang::tidy::google::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/google/readability-casting.html
 class AvoidCStyleCastsCheck : public ClangTidyCheck {
 public:
-  AvoidCStyleCastsCheck(StringRef Name, ClangTidyContext *Context)
+  AvoidCStyleCastsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

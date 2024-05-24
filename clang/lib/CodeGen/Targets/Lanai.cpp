@@ -109,7 +109,7 @@ ABIArgInfo LanaiABIInfo::classifyArgumentType(QualType Ty,
     unsigned SizeInRegs = (getContext().getTypeSize(Ty) + 31) / 32;
     if (SizeInRegs <= State.FreeRegs) {
       llvm::IntegerType *Int32 = llvm::Type::getInt32Ty(LLVMContext);
-      SmallVector<llvm::Type *, 3> Elements(SizeInRegs, Int32);
+      llvm::SmallVector<llvm::Type *, 3> Elements(SizeInRegs, Int32);
       llvm::Type *Result = llvm::StructType::get(LLVMContext, Elements);
       State.FreeRegs -= SizeInRegs;
       return ABIArgInfo::getDirectInReg(Result);

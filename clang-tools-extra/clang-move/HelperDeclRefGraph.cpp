@@ -17,7 +17,7 @@
 namespace clang {
 namespace move {
 
-void HelperDeclRefGraph::print(raw_ostream &OS) const {
+void HelperDeclRefGraph::print(llvm::raw_ostream &OS) const {
   OS << " --- Call graph Dump --- \n";
   for (auto I = DeclMap.begin(); I != DeclMap.end(); ++I) {
     const CallGraphNode *N = (I->second).get();

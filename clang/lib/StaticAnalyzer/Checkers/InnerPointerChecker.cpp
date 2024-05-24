@@ -310,7 +310,7 @@ PathDiagnosticPieceRef InnerPointerChecker::InnerPointerBRVisitor::VisitNode(
   const auto *TypedRegion = cast<TypedValueRegion>(ObjRegion);
   QualType ObjTy = TypedRegion->getValueType();
 
-  SmallString<256> Buf;
+  llvm::SmallString<256> Buf;
   llvm::raw_svector_ostream OS(Buf);
   OS << "Pointer to inner buffer of '" << ObjTy << "' obtained here";
   PathDiagnosticLocation Pos(S, BRC.getSourceManager(),

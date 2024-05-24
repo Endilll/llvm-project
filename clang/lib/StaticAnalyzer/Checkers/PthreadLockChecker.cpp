@@ -203,7 +203,7 @@ private:
                                                 const SymbolRef *sym) const;
   void reportBug(CheckerContext &C, std::unique_ptr<BugType> BT[],
                  const Expr *MtxExpr, CheckerKind CheckKind,
-                 StringRef Desc) const;
+                 llvm::StringRef Desc) const;
 
   // Init.
   void InitAnyLock(const CallEvent &Call, CheckerContext &C,
@@ -250,10 +250,10 @@ public:
   void checkDeadSymbols(SymbolReaper &SymReaper, CheckerContext &C) const;
   ProgramStateRef
   checkRegionChanges(ProgramStateRef State, const InvalidatedSymbols *Symbols,
-                     ArrayRef<const MemRegion *> ExplicitRegions,
-                     ArrayRef<const MemRegion *> Regions,
+                     llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+                     llvm::ArrayRef<const MemRegion *> Regions,
                      const LocationContext *LCtx, const CallEvent *Call) const;
-  void printState(raw_ostream &Out, ProgramStateRef State, const char *NL,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State, const char *NL,
                   const char *Sep) const override;
 
 private:
@@ -340,7 +340,7 @@ ProgramStateRef PthreadLockChecker::resolvePossiblyDestroyedMutex(
   return state;
 }
 
-void PthreadLockChecker::printState(raw_ostream &Out, ProgramStateRef State,
+void PthreadLockChecker::printState(llvm::raw_ostream &Out, ProgramStateRef State,
                                     const char *NL, const char *Sep) const {
   LockMapTy LM = State->get<LockMap>();
   if (!LM.isEmpty()) {
@@ -608,7 +608,7 @@ void PthreadLockChecker::DestroyLockAux(const CallEvent &Call,
     }
   }
 
-  StringRef Message = LState->isLocked()
+  llvm::StringRef Message = LState->isLocked()
                           ? "This lock is still locked"
                           : "This lock has already been destroyed";
 
@@ -643,7 +643,7 @@ void PthreadLockChecker::InitLockAux(const CallEvent &Call, CheckerContext &C,
     return;
   }
 
-  StringRef Message = LState->isLocked()
+  llvm::StringRef Message = LState->isLocked()
                           ? "This lock is still being held"
                           : "This lock has already been initialized";
 
@@ -653,7 +653,7 @@ void PthreadLockChecker::InitLockAux(const CallEvent &Call, CheckerContext &C,
 void PthreadLockChecker::reportBug(CheckerContext &C,
                                    std::unique_ptr<BugType> BT[],
                                    const Expr *MtxExpr, CheckerKind CheckKind,
-                                   StringRef Desc) const {
+                                   llvm::StringRef Desc) const {
   ExplodedNode *N = C.generateErrorNode();
   if (!N)
     return;
@@ -693,8 +693,8 @@ void PthreadLockChecker::checkDeadSymbols(SymbolReaper &SymReaper,
 
 ProgramStateRef PthreadLockChecker::checkRegionChanges(
     ProgramStateRef State, const InvalidatedSymbols *Symbols,
-    ArrayRef<const MemRegion *> ExplicitRegions,
-    ArrayRef<const MemRegion *> Regions, const LocationContext *LCtx,
+    llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+    llvm::ArrayRef<const MemRegion *> Regions, const LocationContext *LCtx,
     const CallEvent *Call) const {
 
   bool IsLibraryFunction = false;

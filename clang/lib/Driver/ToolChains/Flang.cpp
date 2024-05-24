@@ -91,7 +91,7 @@ static bool shouldLoopVersion(const ArgList &Args) {
     return true;
 
   if (LoopVersioningArg->getOption().matches(options::OPT_O)) {
-    StringRef S(LoopVersioningArg->getValue());
+    llvm::StringRef S(LoopVersioningArg->getValue());
     unsigned OptLevel = 0;
     // Note -Os or Oz woould "fail" here, so return false. Which is the
     // desiered behavior.
@@ -169,7 +169,7 @@ void Flang::AddAArch64TargetArgs(const ArgList &Args,
                                  ArgStringList &CmdArgs) const {
   // Handle -msve_vector_bits=<bits>
   if (Arg *A = Args.getLastArg(options::OPT_msve_vector_bits_EQ)) {
-    StringRef Val = A->getValue();
+    llvm::StringRef Val = A->getValue();
     const Driver &D = getToolChain().getDriver();
     if (Val == "128" || Val == "256" || Val == "512" || Val == "1024" ||
         Val == "2048" || Val == "128+" || Val == "256+" || Val == "512+" ||
@@ -199,12 +199,12 @@ void Flang::AddRISCVTargetArgs(const ArgList &Args,
   const llvm::Triple &Triple = getToolChain().getTriple();
   // Handle -mrvv-vector-bits=<bits>
   if (Arg *A = Args.getLastArg(options::OPT_mrvv_vector_bits_EQ)) {
-    StringRef Val = A->getValue();
+    llvm::StringRef Val = A->getValue();
     const Driver &D = getToolChain().getDriver();
 
     // Get minimum VLen from march.
     unsigned MinVLen = 0;
-    StringRef Arch = riscv::getRISCVArch(Args, Triple);
+    llvm::StringRef Arch = riscv::getRISCVArch(Args, Triple);
     auto ISAInfo = llvm::RISCVISAInfo::parseArchString(
         Arch, /*EnableExperimentalExtensions*/ true);
     // Ignore parsing error.
@@ -242,7 +242,7 @@ void Flang::AddRISCVTargetArgs(const ArgList &Args,
 void Flang::AddX86_64TargetArgs(const ArgList &Args,
                                 ArgStringList &CmdArgs) const {
   if (Arg *A = Args.getLastArg(options::OPT_masm_EQ)) {
-    StringRef Value = A->getValue();
+    llvm::StringRef Value = A->getValue();
     if (Value == "intel" || Value == "att") {
       CmdArgs.push_back(Args.MakeArgString("-mllvm"));
       CmdArgs.push_back(Args.MakeArgString("-x86-asm-syntax=" + Value));
@@ -257,11 +257,11 @@ static void addVSDefines(const ToolChain &TC, const ArgList &Args,
                          ArgStringList &CmdArgs) {
 
   unsigned ver = 0;
-  const VersionTuple vt = TC.computeMSVCVersion(nullptr, Args);
+  const llvm::VersionTuple vt = TC.computeMSVCVersion(nullptr, Args);
   ver = vt.getMajor() * 10000000 + vt.getMinor().value_or(0) * 100000 +
         vt.getSubminor().value_or(0);
-  CmdArgs.push_back(Args.MakeArgString("-D_MSC_VER=" + Twine(ver / 100000)));
-  CmdArgs.push_back(Args.MakeArgString("-D_MSC_FULL_VER=" + Twine(ver)));
+  CmdArgs.push_back(Args.MakeArgString("-D_MSC_VER=" + llvm::Twine(ver / 100000)));
+  CmdArgs.push_back(Args.MakeArgString("-D_MSC_FULL_VER=" + llvm::Twine(ver)));
   CmdArgs.push_back(Args.MakeArgString("-D_WIN32"));
 
   const llvm::Triple &triple = TC.getTriple();
@@ -330,7 +330,7 @@ static void processVSRuntimeLibrary(const ToolChain &TC, const ArgList &Args,
 void Flang::AddAMDGPUTargetArgs(const ArgList &Args,
                                 ArgStringList &CmdArgs) const {
   if (Arg *A = Args.getLastArg(options::OPT_mcode_object_version_EQ)) {
-    StringRef Val = A->getValue();
+    llvm::StringRef Val = A->getValue();
     CmdArgs.push_back(Args.MakeArgString("-mcode-object-version=" + Val));
   }
 }
@@ -374,7 +374,7 @@ void Flang::addTargetOptions(const ArgList &Args,
   }
 
   if (Arg *A = Args.getLastArg(options::OPT_fveclib)) {
-    StringRef Name = A->getValue();
+    llvm::StringRef Name = A->getValue();
     if (Name == "SVML") {
       if (Triple.getArch() != llvm::Triple::x86 &&
           Triple.getArch() != llvm::Triple::x86_64)
@@ -396,7 +396,7 @@ void Flang::addTargetOptions(const ArgList &Args,
       // flang doesn't currently suport nostdlib, nodefaultlibs. Adding these
       // here incase they are added someday
       if (!Args.hasArg(options::OPT_nostdlib, options::OPT_nodefaultlibs)) {
-        if (A->getValue() == StringRef{"Accelerate"}) {
+        if (A->getValue() == llvm::StringRef{"Accelerate"}) {
           CmdArgs.push_back("-framework");
           CmdArgs.push_back("Accelerate");
         }
@@ -480,7 +480,7 @@ void Flang::addOffloadOptions(Compilation &C, const InputInfoList &Inputs,
 
 static void addFloatingPointOptions(const Driver &D, const ArgList &Args,
                                     ArgStringList &CmdArgs) {
-  StringRef FPContract;
+  llvm::StringRef FPContract;
   bool HonorINFs = true;
   bool HonorNaNs = true;
   bool ApproxFunc = false;
@@ -489,7 +489,7 @@ static void addFloatingPointOptions(const Driver &D, const ArgList &Args,
   bool ReciprocalMath = false;
 
   if (const Arg *A = Args.getLastArg(options::OPT_ffp_contract)) {
-    const StringRef Val = A->getValue();
+    const llvm::StringRef Val = A->getValue();
     if (Val == "fast" || Val == "off") {
       FPContract = Val;
     } else if (Val == "on") {
@@ -609,7 +609,7 @@ static void addFloatingPointOptions(const Driver &D, const ArgList &Args,
 
 static void renderRemarksOptions(const ArgList &Args, ArgStringList &CmdArgs,
                                  const InputInfo &Input) {
-  StringRef Format = "yaml";
+  llvm::StringRef Format = "yaml";
   if (const Arg *A = Args.getLastArg(options::OPT_fsave_optimization_record_EQ))
     Format = A->getValue();
 
@@ -619,7 +619,7 @@ static void renderRemarksOptions(const ArgList &Args, ArgStringList &CmdArgs,
   if (A) {
     CmdArgs.push_back(A->getValue());
   } else {
-    SmallString<128> F;
+    llvm::SmallString<128> F;
 
     if (Args.hasArg(options::OPT_c) || Args.hasArg(options::OPT_S)) {
       if (Arg *FinalOutput = Args.getLastArg(options::OPT_o))
@@ -631,7 +631,7 @@ static void renderRemarksOptions(const ArgList &Args, ArgStringList &CmdArgs,
       F = llvm::sys::path::stem(Input.getBaseInput());
     }
 
-    SmallString<32> Extension;
+    llvm::SmallString<32> Extension;
     Extension += "opt.";
     Extension += Format;
 

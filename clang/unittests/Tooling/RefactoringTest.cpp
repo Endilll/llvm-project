@@ -522,8 +522,8 @@ TEST_F(ReplacementTest, MultipleFilesReplaceAndFormat) {
   std::string Expected2 = "int x =\n"
                           "    1234567890123;\n"
                           "int y = 10;";
-  StringRef File1 = "format_1.cpp";
-  StringRef File2 = "format_2.cpp";
+  llvm::StringRef File1 = "format_1.cpp";
+  llvm::StringRef File2 = "format_2.cpp";
   FileID ID1 = Context.createInMemoryFile(File1, Code1);
   FileID ID2 = Context.createInMemoryFile(File2, Code2);
 
@@ -600,7 +600,7 @@ public:
   }
 
   FileID createFile(llvm::StringRef Name, llvm::StringRef Content) {
-    SmallString<1024> Path;
+    llvm::SmallString<1024> Path;
     int FD;
     std::error_code EC = llvm::sys::fs::createTemporaryFile(Name, "", FD, Path);
     assert(!EC);
@@ -612,7 +612,7 @@ public:
     auto File = Context.Files.getOptionalFileRef(Path);
     assert(File);
 
-    StringRef Found =
+    llvm::StringRef Found =
         TemporaryFiles.insert(std::make_pair(Name, std::string(Path.str())))
             .first->second;
     assert(Found == Path);
@@ -651,7 +651,7 @@ namespace {
 template <typename T>
 class TestVisitor : public clang::RecursiveASTVisitor<T> {
 public:
-  bool runOver(StringRef Code) {
+  bool runOver(llvm::StringRef Code) {
     return runToolOnCode(std::make_unique<TestAction>(this), Code);
   }
 
@@ -692,7 +692,7 @@ private:
 } // end namespace
 
 void expectReplacementAt(const Replacement &Replace,
-                         StringRef File, unsigned Offset, unsigned Length) {
+                         llvm::StringRef File, unsigned Offset, unsigned Length) {
   ASSERT_TRUE(Replace.isApplicable());
   EXPECT_EQ(File, Replace.getFilePath());
   EXPECT_EQ(Offset, Replace.getOffset());
@@ -916,8 +916,8 @@ TEST(Range, ConflictingRangesBeforeReplacements) {
 
 class MergeReplacementsTest : public ::testing::Test {
 protected:
-  void mergeAndTestRewrite(StringRef Code, StringRef Intermediate,
-                           StringRef Result, const Replacements &First,
+  void mergeAndTestRewrite(llvm::StringRef Code, llvm::StringRef Intermediate,
+                           llvm::StringRef Result, const Replacements &First,
                            const Replacements &Second) {
     // These are mainly to verify the test itself and make it easier to read.
     auto AfterFirst = applyAllReplacements(Code, First);
@@ -936,7 +936,7 @@ protected:
         llvm::errs() << M.getOffset() << " " << M.getLength() << " "
                      << M.getReplacementText() << "\n";
   }
-  void mergeAndTestRewrite(StringRef Code, const Replacements &First,
+  void mergeAndTestRewrite(llvm::StringRef Code, const Replacements &First,
                            const Replacements &Second) {
     auto AfterFirst = applyAllReplacements(Code, First);
     EXPECT_TRUE(static_cast<bool>(AfterFirst));
@@ -1041,8 +1041,8 @@ TEST(DeduplicateByFileTest, PathsWithDots) {
   llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> VFS(
       new llvm::vfs::InMemoryFileSystem());
   FileManager FileMgr(FileSystemOptions(), VFS);
-  StringRef Path1 = usesWindowsPaths() ? "a\\b\\..\\.\\c.h" : "a/b/.././c.h";
-  StringRef Path2 = usesWindowsPaths() ? "a\\c.h" : "a/c.h";
+  llvm::StringRef Path1 = usesWindowsPaths() ? "a\\b\\..\\.\\c.h" : "a/b/.././c.h";
+  llvm::StringRef Path2 = usesWindowsPaths() ? "a\\c.h" : "a/c.h";
   EXPECT_TRUE(VFS->addFile(Path1, 0, llvm::MemoryBuffer::getMemBuffer("")));
   EXPECT_TRUE(VFS->addFile(Path2, 0, llvm::MemoryBuffer::getMemBuffer("")));
   FileToReplaces[std::string(Path1)] = Replacements();
@@ -1057,8 +1057,8 @@ TEST(DeduplicateByFileTest, PathWithDotSlash) {
   llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> VFS(
       new llvm::vfs::InMemoryFileSystem());
   FileManager FileMgr(FileSystemOptions(), VFS);
-  StringRef Path1 = usesWindowsPaths() ? ".\\a\\b\\c.h" : "./a/b/c.h";
-  StringRef Path2 = usesWindowsPaths() ? "a\\b\\c.h" : "a/b/c.h";
+  llvm::StringRef Path1 = usesWindowsPaths() ? ".\\a\\b\\c.h" : "./a/b/c.h";
+  llvm::StringRef Path2 = usesWindowsPaths() ? "a\\b\\c.h" : "a/b/c.h";
   EXPECT_TRUE(VFS->addFile(Path1, 0, llvm::MemoryBuffer::getMemBuffer("")));
   EXPECT_TRUE(VFS->addFile(Path2, 0, llvm::MemoryBuffer::getMemBuffer("")));
   FileToReplaces[std::string(Path1)] = Replacements();
@@ -1073,8 +1073,8 @@ TEST(DeduplicateByFileTest, NonExistingFilePath) {
   llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> VFS(
       new llvm::vfs::InMemoryFileSystem());
   FileManager FileMgr(FileSystemOptions(), VFS);
-  StringRef Path1 = usesWindowsPaths() ? ".\\a\\b\\c.h" : "./a/b/c.h";
-  StringRef Path2 = usesWindowsPaths() ? "a\\b\\c.h" : "a/b/c.h";
+  llvm::StringRef Path1 = usesWindowsPaths() ? ".\\a\\b\\c.h" : "./a/b/c.h";
+  llvm::StringRef Path2 = usesWindowsPaths() ? "a\\b\\c.h" : "a/b/c.h";
   FileToReplaces[std::string(Path1)] = Replacements();
   FileToReplaces[std::string(Path2)] = Replacements();
   FileToReplaces = groupReplacementsByFile(FileMgr, FileToReplaces);

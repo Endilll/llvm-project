@@ -222,7 +222,7 @@ void DragonFly::AddClangSystemIncludeArgs(
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> Dir(D.ResourceDir);
+    llvm::SmallString<128> Dir(D.ResourceDir);
     llvm::sys::path::append(Dir, "include");
     addSystemInclude(DriverArgs, CC1Args, Dir.str());
   }

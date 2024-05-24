@@ -29,7 +29,7 @@ public:
   void Endif(SourceLocation Loc, SourceLocation IfLoc) override {
     if (!SM.isWrittenInSameFile(Loc, IfLoc))
       return;
-    SmallVectorImpl<SourceRange> &Collection = Collections[SM.getFileID(Loc)];
+    llvm::SmallVectorImpl<SourceRange> &Collection = Collections[SM.getFileID(Loc)];
     assert(Collection.empty() || Collection.back().getEnd() < Loc);
     Collection.emplace_back(IfLoc, Loc);
   }
@@ -147,7 +147,7 @@ static void removeElseAndBrackets(DiagnosticBuilder &Diag, ASTContext &Context,
   }
 }
 
-ElseAfterReturnCheck::ElseAfterReturnCheck(StringRef Name,
+ElseAfterReturnCheck::ElseAfterReturnCheck(llvm::StringRef Name,
                                            ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       WarnOnUnfixable(Options.get(WarnOnUnfixableStr, true)),
@@ -202,7 +202,7 @@ static bool hasPreprocessorBranchEndBetweenLocations(
   if (Iter == ConditionalBranchMap.end() || Iter->getSecond().empty())
     return false;
 
-  const SmallVectorImpl<SourceRange> &ConditionalBranches = Iter->getSecond();
+  const llvm::SmallVectorImpl<SourceRange> &ConditionalBranches = Iter->getSecond();
 
   assert(llvm::is_sorted(ConditionalBranches,
                          [](const SourceRange &LHS, const SourceRange &RHS) {
@@ -222,7 +222,7 @@ static bool hasPreprocessorBranchEndBetweenLocations(
   return false;
 }
 
-static StringRef getControlFlowString(const Stmt &Stmt) {
+static llvm::StringRef getControlFlowString(const Stmt &Stmt) {
   if (isa<ReturnStmt>(Stmt))
     return "return";
   if (isa<ContinueStmt>(Stmt))
@@ -247,7 +247,7 @@ void ElseAfterReturnCheck::check(const MatchFinder::MatchResult &Result) {
     return;
 
   bool IsLastInScope = OuterScope->body_back() == If;
-  StringRef ControlFlowInterruptor = getControlFlowString(*Interrupt);
+  llvm::StringRef ControlFlowInterruptor = getControlFlowString(*Interrupt);
 
   if (!IsLastInScope && containsDeclInScope(Else)) {
     if (WarnOnUnfixable) {

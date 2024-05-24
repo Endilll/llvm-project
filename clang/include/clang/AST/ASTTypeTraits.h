@@ -86,7 +86,7 @@ public:
   bool isBaseOf(ASTNodeKind Other, unsigned *Distance) const;
 
   /// String representation of the kind.
-  StringRef asStringRef() const;
+  llvm::StringRef asStringRef() const;
 
   /// Strict weak ordering for ASTNodeKind.
   constexpr bool operator<(const ASTNodeKind &Other) const {
@@ -237,7 +237,7 @@ KIND_TO_KIND_ID(ConceptReference)
 #include "clang/Basic/AttrList.inc"
 #undef KIND_TO_KIND_ID
 
-inline raw_ostream &operator<<(raw_ostream &OS, ASTNodeKind K) {
+inline llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, ASTNodeKind K) {
   OS << K.asStringRef();
   return OS;
 }

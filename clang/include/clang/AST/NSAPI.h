@@ -135,31 +135,31 @@ public:
 
   /// Returns selector for "objectForKeyedSubscript:".
   Selector getObjectForKeyedSubscriptSelector() const {
-    return getOrInitSelector(StringRef("objectForKeyedSubscript"),
+    return getOrInitSelector(llvm::StringRef("objectForKeyedSubscript"),
                              objectForKeyedSubscriptSel);
   }
 
   /// Returns selector for "objectAtIndexedSubscript:".
   Selector getObjectAtIndexedSubscriptSelector() const {
-    return getOrInitSelector(StringRef("objectAtIndexedSubscript"),
+    return getOrInitSelector(llvm::StringRef("objectAtIndexedSubscript"),
                              objectAtIndexedSubscriptSel);
   }
 
   /// Returns selector for "setObject:forKeyedSubscript".
   Selector getSetObjectForKeyedSubscriptSelector() const {
-    StringRef Ids[] = { "setObject", "forKeyedSubscript" };
+    llvm::StringRef Ids[] = { "setObject", "forKeyedSubscript" };
     return getOrInitSelector(Ids, setObjectForKeyedSubscriptSel);
   }
 
   /// Returns selector for "setObject:atIndexedSubscript".
   Selector getSetObjectAtIndexedSubscriptSelector() const {
-    StringRef Ids[] = { "setObject", "atIndexedSubscript" };
+    llvm::StringRef Ids[] = { "setObject", "atIndexedSubscript" };
     return getOrInitSelector(Ids, setObjectAtIndexedSubscriptSel);
   }
 
   /// Returns selector for "isEqual:".
   Selector getIsEqualSelector() const {
-    return getOrInitSelector(StringRef("isEqual"), isEqualSel);
+    return getOrInitSelector(llvm::StringRef("isEqual"), isEqualSel);
   }
 
   Selector getNewSelector() const {
@@ -219,21 +219,21 @@ public:
   bool isObjCNSUIntegerType(QualType T) const;
   /// Returns one of NSIntegral typedef names if \param T is a typedef
   /// of that name in objective-c.
-  StringRef GetNSIntegralKind(QualType T) const;
+  llvm::StringRef GetNSIntegralKind(QualType T) const;
 
   /// Returns \c true if \p Id is currently defined as a macro.
-  bool isMacroDefined(StringRef Id) const;
+  bool isMacroDefined(llvm::StringRef Id) const;
 
   /// Returns \c true if \p InterfaceDecl is subclass of \p NSClassKind
   bool isSubclassOfNSClass(ObjCInterfaceDecl *InterfaceDecl,
                            NSClassIdKindKind NSClassKind) const;
 
 private:
-  bool isObjCTypedef(QualType T, StringRef name, IdentifierInfo *&II) const;
+  bool isObjCTypedef(QualType T, llvm::StringRef name, IdentifierInfo *&II) const;
   bool isObjCEnumerator(const Expr *E,
-                        StringRef name, IdentifierInfo *&II) const;
-  Selector getOrInitSelector(ArrayRef<StringRef> Ids, Selector &Sel) const;
-  Selector getOrInitNullarySelector(StringRef Id, Selector &Sel) const;
+                        llvm::StringRef name, IdentifierInfo *&II) const;
+  Selector getOrInitSelector(llvm::ArrayRef<llvm::StringRef> Ids, Selector &Sel) const;
+  Selector getOrInitNullarySelector(llvm::StringRef Id, Selector &Sel) const;
 
   ASTContext &Ctx;
 

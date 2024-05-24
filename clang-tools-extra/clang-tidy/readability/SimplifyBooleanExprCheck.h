@@ -20,7 +20,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/simplify-boolean-expr.html
 class SimplifyBooleanExprCheck : public ClangTidyCheck {
 public:
-  SimplifyBooleanExprCheck(StringRef Name, ClangTidyContext *Context);
+  SimplifyBooleanExprCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
@@ -61,8 +61,8 @@ private:
                       const Stmt *Parent, const ParenExpr *Parens);
 
   void issueDiag(const ASTContext &Context, SourceLocation Loc,
-                 StringRef Description, SourceRange ReplacementRange,
-                 StringRef Replacement);
+                 llvm::StringRef Description, SourceRange ReplacementRange,
+                 llvm::StringRef Replacement);
 
   bool canBeBypassed(const Stmt *S) const;
 

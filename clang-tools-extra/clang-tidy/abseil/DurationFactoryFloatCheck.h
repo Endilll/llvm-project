@@ -22,7 +22,7 @@ namespace clang::tidy::abseil {
 /// http://clang.llvm.org/extra/clang-tidy/checks/abseil/duration-factory-float.html
 class DurationFactoryFloatCheck : public ClangTidyCheck {
 public:
-  DurationFactoryFloatCheck(StringRef Name, ClangTidyContext *Context)
+  DurationFactoryFloatCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

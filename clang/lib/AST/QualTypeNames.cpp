@@ -128,7 +128,7 @@ static const Type *getFullyQualifiedTemplateType(const ASTContext &Ctx,
   // and fully qualify them as well.
   if (const auto *TST = dyn_cast<const TemplateSpecializationType>(TypePtr)) {
     bool MightHaveChanged = false;
-    SmallVector<TemplateArgument, 4> FQArgs;
+    llvm::SmallVector<TemplateArgument, 4> FQArgs;
     // Cheap to copy and potentially modified by
     // getFullyQualifedTemplateArgument.
     for (TemplateArgument Arg : TST->template_arguments()) {
@@ -158,7 +158,7 @@ static const Type *getFullyQualifiedTemplateType(const ASTContext &Ctx,
       const TemplateArgumentList &TemplateArgs = TSTDecl->getTemplateArgs();
 
       bool MightHaveChanged = false;
-      SmallVector<TemplateArgument, 4> FQArgs;
+      llvm::SmallVector<TemplateArgument, 4> FQArgs;
       for (unsigned int I = 0, E = TemplateArgs.size(); I != E; ++I) {
         // cheap to copy and potentially modified by
         // getFullyQualifedTemplateArgument

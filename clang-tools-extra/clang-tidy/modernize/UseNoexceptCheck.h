@@ -29,7 +29,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-noexcept.html
 class UseNoexceptCheck : public ClangTidyCheck {
 public:
-  UseNoexceptCheck(StringRef Name, ClangTidyContext *Context);
+  UseNoexceptCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
   }
@@ -38,7 +38,7 @@ public:
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
-  const StringRef NoexceptMacro;
+  const llvm::StringRef NoexceptMacro;
   const bool UseNoexceptFalse;
 };
 

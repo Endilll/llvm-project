@@ -17,7 +17,7 @@ using namespace tooling;
 using namespace dependencies;
 
 llvm::ErrorOr<DependencyScanningWorkerFilesystem::TentativeEntry>
-DependencyScanningWorkerFilesystem::readFile(StringRef Filename) {
+DependencyScanningWorkerFilesystem::readFile(llvm::StringRef Filename) {
   // Load the file and its content from the file system.
   auto MaybeFile = getUnderlyingFS().openFileForRead(Filename);
   if (!MaybeFile)
@@ -61,7 +61,7 @@ bool DependencyScanningWorkerFilesystem::ensureDirectiveTokensArePopulated(
   if (Contents->DepDirectives.load())
     return true;
 
-  SmallVector<dependency_directives_scan::Directive, 64> Directives;
+  llvm::SmallVector<dependency_directives_scan::Directive, 64> Directives;
   // Scan the file for preprocessor directives that might affect the
   // dependencies.
   if (scanSourceForDependencyDirectives(Contents->Original->getBuffer(),
@@ -96,7 +96,7 @@ DependencyScanningFilesystemSharedCache::
 
 DependencyScanningFilesystemSharedCache::CacheShard &
 DependencyScanningFilesystemSharedCache::getShardForFilename(
-    StringRef Filename) const {
+    llvm::StringRef Filename) const {
   assert(llvm::sys::path::is_absolute_gnu(Filename));
   return CacheShards[llvm::hash_value(Filename) % NumShards];
 }
@@ -110,7 +110,7 @@ DependencyScanningFilesystemSharedCache::getShardForUID(
 
 const CachedFileSystemEntry *
 DependencyScanningFilesystemSharedCache::CacheShard::findEntryByFilename(
-    StringRef Filename) const {
+    llvm::StringRef Filename) const {
   assert(llvm::sys::path::is_absolute_gnu(Filename));
   std::lock_guard<std::mutex> LockGuard(CacheLock);
   auto It = CacheByFilename.find(Filename);
@@ -127,7 +127,7 @@ DependencyScanningFilesystemSharedCache::CacheShard::findEntryByUID(
 
 const CachedFileSystemEntry &
 DependencyScanningFilesystemSharedCache::CacheShard::
-    getOrEmplaceEntryForFilename(StringRef Filename,
+    getOrEmplaceEntryForFilename(llvm::StringRef Filename,
                                  llvm::ErrorOr<llvm::vfs::Status> Stat) {
   std::lock_guard<std::mutex> LockGuard(CacheLock);
   auto [It, Inserted] = CacheByFilename.insert({Filename, {nullptr, nullptr}});
@@ -162,7 +162,7 @@ DependencyScanningFilesystemSharedCache::CacheShard::getOrEmplaceEntryForUID(
 
 const CachedFileSystemEntry &
 DependencyScanningFilesystemSharedCache::CacheShard::
-    getOrInsertEntryForFilename(StringRef Filename,
+    getOrInsertEntryForFilename(llvm::StringRef Filename,
                                 const CachedFileSystemEntry &Entry) {
   std::lock_guard<std::mutex> LockGuard(CacheLock);
   auto [It, Inserted] = CacheByFilename.insert({Filename, {&Entry, nullptr}});
@@ -174,7 +174,7 @@ DependencyScanningFilesystemSharedCache::CacheShard::
 
 const CachedRealPath *
 DependencyScanningFilesystemSharedCache::CacheShard::findRealPathByFilename(
-    StringRef Filename) const {
+    llvm::StringRef Filename) const {
   assert(llvm::sys::path::is_absolute_gnu(Filename));
   std::lock_guard<std::mutex> LockGuard(CacheLock);
   auto It = CacheByFilename.find(Filename);
@@ -182,7 +182,7 @@ DependencyScanningFilesystemSharedCache::CacheShard::findRealPathByFilename(
 }
 
 const CachedRealPath &DependencyScanningFilesystemSharedCache::CacheShard::
-    getOrEmplaceRealPathForFilename(StringRef Filename,
+    getOrEmplaceRealPathForFilename(llvm::StringRef Filename,
                                     llvm::ErrorOr<llvm::StringRef> RealPath) {
   std::lock_guard<std::mutex> LockGuard(CacheLock);
 
@@ -201,8 +201,8 @@ const CachedRealPath &DependencyScanningFilesystemSharedCache::CacheShard::
   return *StoredRealPath;
 }
 
-static bool shouldCacheStatFailures(StringRef Filename) {
-  StringRef Ext = llvm::sys::path::extension(Filename);
+static bool shouldCacheStatFailures(llvm::StringRef Filename) {
+  llvm::StringRef Ext = llvm::sys::path::extension(Filename);
   if (Ext.empty())
     return false; // This may be the module cache directory.
   return true;
@@ -210,7 +210,7 @@ static bool shouldCacheStatFailures(StringRef Filename) {
 
 DependencyScanningWorkerFilesystem::DependencyScanningWorkerFilesystem(
     DependencyScanningFilesystemSharedCache &SharedCache,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS)
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS)
     : llvm::RTTIExtends<DependencyScanningWorkerFilesystem,
                         llvm::vfs::ProxyFileSystem>(std::move(FS)),
       SharedCache(SharedCache),
@@ -229,7 +229,7 @@ DependencyScanningWorkerFilesystem::getOrEmplaceSharedEntryForUID(
 
 const CachedFileSystemEntry *
 DependencyScanningWorkerFilesystem::findEntryByFilenameWithWriteThrough(
-    StringRef Filename) {
+    llvm::StringRef Filename) {
   if (const auto *Entry = LocalCache.findEntryByFilename(Filename))
     return Entry;
   auto &Shard = SharedCache.getShardForFilename(Filename);
@@ -240,7 +240,7 @@ DependencyScanningWorkerFilesystem::findEntryByFilenameWithWriteThrough(
 
 llvm::ErrorOr<const CachedFileSystemEntry &>
 DependencyScanningWorkerFilesystem::computeAndStoreResult(
-    StringRef OriginalFilename, StringRef FilenameForLookup) {
+    llvm::StringRef OriginalFilename, llvm::StringRef FilenameForLookup) {
   llvm::ErrorOr<llvm::vfs::Status> Stat =
       getUnderlyingFS().status(OriginalFilename);
   if (!Stat) {
@@ -271,8 +271,8 @@ DependencyScanningWorkerFilesystem::computeAndStoreResult(
 
 llvm::ErrorOr<EntryRef>
 DependencyScanningWorkerFilesystem::getOrCreateFileSystemEntry(
-    StringRef OriginalFilename) {
-  SmallString<256> PathBuf;
+    llvm::StringRef OriginalFilename) {
+  llvm::SmallString<256> PathBuf;
   auto FilenameForLookup = tryGetFilenameForLookup(OriginalFilename, PathBuf);
   if (!FilenameForLookup)
     return FilenameForLookup.getError();
@@ -287,9 +287,9 @@ DependencyScanningWorkerFilesystem::getOrCreateFileSystemEntry(
 }
 
 llvm::ErrorOr<llvm::vfs::Status>
-DependencyScanningWorkerFilesystem::status(const Twine &Path) {
-  SmallString<256> OwnedFilename;
-  StringRef Filename = Path.toStringRef(OwnedFilename);
+DependencyScanningWorkerFilesystem::status(const llvm::Twine &Path) {
+  llvm::SmallString<256> OwnedFilename;
+  llvm::StringRef Filename = Path.toStringRef(OwnedFilename);
 
   if (Filename.ends_with(".pcm"))
     return getUnderlyingFS().status(Path);
@@ -300,7 +300,7 @@ DependencyScanningWorkerFilesystem::status(const Twine &Path) {
   return Result->getStatus();
 }
 
-bool DependencyScanningWorkerFilesystem::exists(const Twine &Path) {
+bool DependencyScanningWorkerFilesystem::exists(const llvm::Twine &Path) {
   // While some VFS overlay filesystems may implement more-efficient
   // mechanisms for `exists` queries, `DependencyScanningWorkerFilesystem`
   // typically wraps `RealFileSystem` which does not specialize `exists`,
@@ -326,7 +326,7 @@ public:
   llvm::ErrorOr<llvm::vfs::Status> status() override { return Stat; }
 
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
-  getBuffer(const Twine &Name, int64_t FileSize, bool RequiresNullTerminator,
+  getBuffer(const llvm::Twine &Name, int64_t FileSize, bool RequiresNullTerminator,
             bool IsVolatile) override {
     return std::move(Buffer);
   }
@@ -358,9 +358,9 @@ DepScanFile::create(EntryRef Entry) {
 }
 
 llvm::ErrorOr<std::unique_ptr<llvm::vfs::File>>
-DependencyScanningWorkerFilesystem::openFileForRead(const Twine &Path) {
-  SmallString<256> OwnedFilename;
-  StringRef Filename = Path.toStringRef(OwnedFilename);
+DependencyScanningWorkerFilesystem::openFileForRead(const llvm::Twine &Path) {
+  llvm::SmallString<256> OwnedFilename;
+  llvm::StringRef Filename = Path.toStringRef(OwnedFilename);
 
   if (Filename.ends_with(".pcm"))
     return getUnderlyingFS().openFileForRead(Path);
@@ -372,12 +372,12 @@ DependencyScanningWorkerFilesystem::openFileForRead(const Twine &Path) {
 }
 
 std::error_code
-DependencyScanningWorkerFilesystem::getRealPath(const Twine &Path,
-                                                SmallVectorImpl<char> &Output) {
-  SmallString<256> OwnedFilename;
-  StringRef OriginalFilename = Path.toStringRef(OwnedFilename);
+DependencyScanningWorkerFilesystem::getRealPath(const llvm::Twine &Path,
+                                                llvm::SmallVectorImpl<char> &Output) {
+  llvm::SmallString<256> OwnedFilename;
+  llvm::StringRef OriginalFilename = Path.toStringRef(OwnedFilename);
 
-  SmallString<256> PathBuf;
+  llvm::SmallString<256> PathBuf;
   auto FilenameForLookup = tryGetFilenameForLookup(OriginalFilename, PathBuf);
   if (!FilenameForLookup)
     return FilenameForLookup.getError();
@@ -408,7 +408,7 @@ DependencyScanningWorkerFilesystem::getRealPath(const Twine &Path,
   std::error_code EC = getUnderlyingFS().getRealPath(OriginalFilename, Output);
   llvm::ErrorOr<llvm::StringRef> ComputedRealPath = EC;
   if (!EC)
-    ComputedRealPath = StringRef{Output.data(), Output.size()};
+    ComputedRealPath = llvm::StringRef{Output.data(), Output.size()};
 
   // ...and try to write it into the shared cache. In case some other thread won
   // this race and already wrote its own result there, just adopt it. Write
@@ -420,7 +420,7 @@ DependencyScanningWorkerFilesystem::getRealPath(const Twine &Path,
 }
 
 std::error_code DependencyScanningWorkerFilesystem::setCurrentWorkingDirectory(
-    const Twine &Path) {
+    const llvm::Twine &Path) {
   std::error_code EC = ProxyFileSystem::setCurrentWorkingDirectory(Path);
   updateWorkingDirForCacheLookup();
   return EC;
@@ -440,21 +440,21 @@ void DependencyScanningWorkerFilesystem::updateWorkingDirForCacheLookup() {
          llvm::sys::path::is_absolute_gnu(*WorkingDirForCacheLookup));
 }
 
-llvm::ErrorOr<StringRef>
+llvm::ErrorOr<llvm::StringRef>
 DependencyScanningWorkerFilesystem::tryGetFilenameForLookup(
-    StringRef OriginalFilename, llvm::SmallVectorImpl<char> &PathBuf) const {
-  StringRef FilenameForLookup;
+    llvm::StringRef OriginalFilename, llvm::SmallVectorImpl<char> &PathBuf) const {
+  llvm::StringRef FilenameForLookup;
   if (llvm::sys::path::is_absolute_gnu(OriginalFilename)) {
     FilenameForLookup = OriginalFilename;
   } else if (!WorkingDirForCacheLookup) {
     return WorkingDirForCacheLookup.getError();
   } else {
-    StringRef RelFilename = OriginalFilename;
+    llvm::StringRef RelFilename = OriginalFilename;
     RelFilename.consume_front("./");
     PathBuf.assign(WorkingDirForCacheLookup->begin(),
                    WorkingDirForCacheLookup->end());
     llvm::sys::path::append(PathBuf, RelFilename);
-    FilenameForLookup = StringRef{PathBuf.begin(), PathBuf.size()};
+    FilenameForLookup = llvm::StringRef{PathBuf.begin(), PathBuf.size()};
   }
   assert(llvm::sys::path::is_absolute_gnu(FilenameForLookup));
   return FilenameForLookup;

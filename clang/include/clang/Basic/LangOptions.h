@@ -632,7 +632,7 @@ public:
 
   /// Is this a libc/libm function that is no longer recognized as a
   /// builtin because a -fno-builtin-* option has been specified?
-  bool isNoBuiltinFunc(StringRef Name) const;
+  bool isNoBuiltinFunc(llvm::StringRef Name) const;
 
   /// True if any ObjC types may have non-trivial lifetime qualifiers.
   bool allowsNonTrivialObjCLifetimeQualifiers() const {
@@ -643,8 +643,8 @@ public:
     return ConvergentFunctions;
   }
 
-  /// Return the OpenCL C or C++ version as a VersionTuple.
-  VersionTuple getOpenCLVersionTuple() const;
+  /// Return the OpenCL C or C++ version as a llvm::VersionTuple.
+  llvm::VersionTuple getOpenCLVersionTuple() const;
 
   /// Return the OpenCL version that kernel language is compatible with
   unsigned getOpenCLCompatibleVersion() const;
@@ -743,7 +743,7 @@ public:
   }
 
   /// Remap path prefix according to -fmacro-prefix-path option.
-  void remapPathPrefix(SmallVectorImpl<char> &Path) const;
+  void remapPathPrefix(llvm::SmallVectorImpl<char> &Path) const;
 
   RoundingMode getDefaultRoundingMode() const {
     return RoundingMath ? RoundingMode::Dynamic

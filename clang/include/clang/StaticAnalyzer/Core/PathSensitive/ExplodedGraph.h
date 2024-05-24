@@ -432,7 +432,7 @@ public:
   ///                        nodes in this graph.
   /// \returns The trimmed graph
   std::unique_ptr<ExplodedGraph>
-  trim(ArrayRef<const NodeTy *> Nodes,
+  trim(llvm::ArrayRef<const NodeTy *> Nodes,
        InterExplodedGraphMap *ForwardMap = nullptr,
        InterExplodedGraphMap *InverseMap = nullptr) const;
 

@@ -55,10 +55,10 @@ public:
   ProgramStateRef
   checkRegionChanges(ProgramStateRef State,
                      const InvalidatedSymbols *Invalidated,
-                     ArrayRef<const MemRegion *> ExplicitRegions,
-                     ArrayRef<const MemRegion *> Regions,
+                     llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+                     llvm::ArrayRef<const MemRegion *> Regions,
                      const LocationContext *LCtx, const CallEvent *Call) const;
-  void printState(raw_ostream &Out, ProgramStateRef State, const char *NL,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State, const char *NL,
                   const char *Sep) const override;
   void checkLiveSymbols(ProgramStateRef State, SymbolReaper &SR) const;
 
@@ -101,7 +101,7 @@ REGISTER_MAP_WITH_PROGRAMSTATE(TrackedRegionMap, const MemRegion *, SVal)
 
 // Checks if RD has name in Names and is in std namespace
 static bool hasStdClassWithName(const CXXRecordDecl *RD,
-                                ArrayRef<llvm::StringLiteral> Names) {
+                                llvm::ArrayRef<llvm::StringLiteral> Names) {
   if (!RD || !RD->getDeclContext()->isStdNamespace())
     return false;
   if (RD->getDeclName().isIdentifier())
@@ -136,7 +136,7 @@ bool isStdSmartPtr(const CXXRecordDecl *RD) {
     return false;
 
   if (RD->getDeclName().isIdentifier()) {
-    StringRef Name = RD->getName();
+    llvm::StringRef Name = RD->getName();
     return Name == "shared_ptr" || Name == "unique_ptr" || Name == "weak_ptr";
   }
   return false;
@@ -553,7 +553,7 @@ void SmartPtrModeling::checkDeadSymbols(SymbolReaper &SymReaper,
   C.addTransition(State);
 }
 
-void SmartPtrModeling::printState(raw_ostream &Out, ProgramStateRef State,
+void SmartPtrModeling::printState(llvm::raw_ostream &Out, ProgramStateRef State,
                                   const char *NL, const char *Sep) const {
   TrackedRegionMapTy RS = State->get<TrackedRegionMap>();
 
@@ -572,8 +572,8 @@ void SmartPtrModeling::printState(raw_ostream &Out, ProgramStateRef State,
 
 ProgramStateRef SmartPtrModeling::checkRegionChanges(
     ProgramStateRef State, const InvalidatedSymbols *Invalidated,
-    ArrayRef<const MemRegion *> ExplicitRegions,
-    ArrayRef<const MemRegion *> Regions, const LocationContext *LCtx,
+    llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+    llvm::ArrayRef<const MemRegion *> Regions, const LocationContext *LCtx,
     const CallEvent *Call) const {
   TrackedRegionMapTy RegionMap = State->get<TrackedRegionMap>();
   TrackedRegionMapTy::Factory &RegionMapFactory =

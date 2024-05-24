@@ -17,7 +17,7 @@ namespace clang::tidy::modernize {
 
 class LoopConvertCheck : public ClangTidyCheck {
 public:
-  LoopConvertCheck(StringRef Name, ClangTidyContext *Context);
+  LoopConvertCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }
@@ -46,7 +46,7 @@ private:
                     bool AliasFromForInit, const ForStmt *Loop,
                     RangeDescriptor Descriptor);
 
-  StringRef getContainerString(ASTContext *Context, const ForStmt *Loop,
+  llvm::StringRef getContainerString(ASTContext *Context, const ForStmt *Loop,
                                const Expr *ContainerExpr);
 
   void getArrayLoopQualifiers(ASTContext *Context,
@@ -69,8 +69,8 @@ private:
   bool isConvertible(ASTContext *Context, const ast_matchers::BoundNodes &Nodes,
                      const ForStmt *Loop, LoopFixerKind FixerKind);
 
-  StringRef getReverseFunction() const;
-  StringRef getReverseHeader() const;
+  llvm::StringRef getReverseFunction() const;
+  llvm::StringRef getReverseHeader() const;
 
   std::unique_ptr<TUTrackingInfo> TUInfo;
   const unsigned long long MaxCopySize;

@@ -20,7 +20,7 @@ namespace clang::tidy::performance {
 /// can take advantage of the order of the elements.
 class InefficientAlgorithmCheck : public ClangTidyCheck {
 public:
-  InefficientAlgorithmCheck(StringRef Name, ClangTidyContext *Context)
+  InefficientAlgorithmCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

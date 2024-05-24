@@ -38,8 +38,8 @@ using namespace clang;
 //===----------------------------------------------------------------------===//
 
 std::unique_ptr<ASTConsumer>
-HTMLPrintAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
-  if (std::unique_ptr<raw_ostream> OS =
+HTMLPrintAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
+  if (std::unique_ptr<llvm::raw_ostream> OS =
           CI.createDefaultOutputFile(false, InFile))
     return CreateHTMLPrinter(std::move(OS), CI.getPreprocessor());
   return nullptr;
@@ -49,7 +49,7 @@ FixItAction::FixItAction() {}
 FixItAction::~FixItAction() {}
 
 std::unique_ptr<ASTConsumer>
-FixItAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+FixItAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   return std::make_unique<ASTConsumer>();
 }
 
@@ -74,7 +74,7 @@ public:
 
   std::string RewriteFilename(const std::string &Filename, int &fd) override {
     fd = -1;
-    SmallString<128> Path(Filename);
+    llvm::SmallString<128> Path(Filename);
     llvm::sys::path::replace_extension(Path,
       NewSuffix + llvm::sys::path::extension(Path));
     return std::string(Path);
@@ -84,7 +84,7 @@ public:
 class FixItRewriteToTemp : public FixItOptions {
 public:
   std::string RewriteFilename(const std::string &Filename, int &fd) override {
-    SmallString<128> Path;
+    llvm::SmallString<128> Path;
     llvm::sys::fs::createTemporaryFile(llvm::sys::path::filename(Filename),
                                        llvm::sys::path::extension(Filename).drop_front(), fd,
                                        Path);
@@ -161,8 +161,8 @@ bool FixItRecompile::BeginInvocation(CompilerInstance &CI) {
 #if CLANG_ENABLE_OBJC_REWRITER
 
 std::unique_ptr<ASTConsumer>
-RewriteObjCAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
-  if (std::unique_ptr<raw_ostream> OS =
+RewriteObjCAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
+  if (std::unique_ptr<llvm::raw_ostream> OS =
           CI.createDefaultOutputFile(false, InFile, "cpp")) {
     if (CI.getLangOpts().ObjCRuntime.isNonFragile())
       return CreateModernObjCRewriter(std::string(InFile), std::move(OS),
@@ -185,7 +185,7 @@ RewriteObjCAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
 
 void RewriteMacrosAction::ExecuteAction() {
   CompilerInstance &CI = getCompilerInstance();
-  std::unique_ptr<raw_ostream> OS =
+  std::unique_ptr<llvm::raw_ostream> OS =
       CI.createDefaultOutputFile(/*Binary=*/true, getCurrentFileOrBufferName());
   if (!OS) return;
 
@@ -194,7 +194,7 @@ void RewriteMacrosAction::ExecuteAction() {
 
 void RewriteTestAction::ExecuteAction() {
   CompilerInstance &CI = getCompilerInstance();
-  std::unique_ptr<raw_ostream> OS =
+  std::unique_ptr<llvm::raw_ostream> OS =
       CI.createDefaultOutputFile(/*Binary=*/false, getCurrentFileOrBufferName());
   if (!OS) return;
 
@@ -203,15 +203,15 @@ void RewriteTestAction::ExecuteAction() {
 
 class RewriteIncludesAction::RewriteImportsListener : public ASTReaderListener {
   CompilerInstance &CI;
-  std::weak_ptr<raw_ostream> Out;
+  std::weak_ptr<llvm::raw_ostream> Out;
 
   llvm::DenseSet<const FileEntry*> Rewritten;
 
 public:
-  RewriteImportsListener(CompilerInstance &CI, std::shared_ptr<raw_ostream> Out)
+  RewriteImportsListener(CompilerInstance &CI, std::shared_ptr<llvm::raw_ostream> Out)
       : CI(CI), Out(Out) {}
 
-  void visitModuleFile(StringRef Filename,
+  void visitModuleFile(llvm::StringRef Filename,
                        serialization::ModuleKind Kind) override {
     auto File = CI.getFileManager().getFile(Filename);
     assert(File && "missing file for loaded module?");

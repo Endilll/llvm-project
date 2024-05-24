@@ -31,13 +31,13 @@ namespace clang {
       uint64_t Align;
 
       /// The offsets of non-virtual base classes in the record.
-      SmallVector<CharUnits, 8> BaseOffsets;
+      llvm::SmallVector<CharUnits, 8> BaseOffsets;
 
       /// The offsets of virtual base classes in the record.
-      SmallVector<CharUnits, 8> VBaseOffsets;
+      llvm::SmallVector<CharUnits, 8> VBaseOffsets;
 
       /// The offsets of the fields, in source order.
-      SmallVector<uint64_t, 8> FieldOffsets;
+      llvm::SmallVector<uint64_t, 8> FieldOffsets;
     };
 
     /// The set of layouts that will be overridden.
@@ -48,7 +48,7 @@ namespace clang {
     /// set of record types.
     ///
     /// The file is the result of passing -fdump-record-layouts to a file.
-    explicit LayoutOverrideSource(StringRef Filename);
+    explicit LayoutOverrideSource(llvm::StringRef Filename);
 
     /// If this particular record type has an overridden layout,
     /// return that layout.

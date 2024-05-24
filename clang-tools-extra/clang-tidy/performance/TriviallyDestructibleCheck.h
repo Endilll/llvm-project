@@ -25,7 +25,7 @@ namespace clang::tidy::performance {
 /// http://clang.llvm.org/extra/clang-tidy/checks/performance/trivially-destructible.html
 class TriviallyDestructibleCheck : public ClangTidyCheck {
 public:
-  TriviallyDestructibleCheck(StringRef Name, ClangTidyContext *Context)
+  TriviallyDestructibleCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;

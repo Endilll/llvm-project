@@ -45,7 +45,7 @@ struct Query : llvm::RefCountedBase<Query> {
   /// \return false if an error occurs, otherwise return true.
   virtual bool run(llvm::raw_ostream &OS, QuerySession &QS) const = 0;
 
-  StringRef RemainingContent;
+  llvm::StringRef RemainingContent;
   const QueryKind Kind;
 };
 
@@ -53,7 +53,7 @@ typedef llvm::IntrusiveRefCntPtr<Query> QueryRef;
 
 /// Any query which resulted in a parse error.  The error message is in ErrStr.
 struct InvalidQuery : Query {
-  InvalidQuery(const Twine &ErrStr) : Query(QK_Invalid), ErrStr(ErrStr.str()) {}
+  InvalidQuery(const llvm::Twine &ErrStr) : Query(QK_Invalid), ErrStr(ErrStr.str()) {}
   bool run(llvm::raw_ostream &OS, QuerySession &QS) const override;
 
   std::string ErrStr;
@@ -87,20 +87,20 @@ struct QuitQuery : Query {
 
 /// Query for "match MATCHER".
 struct MatchQuery : Query {
-  MatchQuery(StringRef Source,
+  MatchQuery(llvm::StringRef Source,
              const ast_matchers::dynamic::DynTypedMatcher &Matcher)
       : Query(QK_Match), Matcher(Matcher), Source(Source) {}
   bool run(llvm::raw_ostream &OS, QuerySession &QS) const override;
 
   ast_matchers::dynamic::DynTypedMatcher Matcher;
 
-  StringRef Source;
+  llvm::StringRef Source;
 
   static bool classof(const Query *Q) { return Q->Kind == QK_Match; }
 };
 
 struct LetQuery : Query {
-  LetQuery(StringRef Name, const ast_matchers::dynamic::VariantValue &Value)
+  LetQuery(llvm::StringRef Name, const ast_matchers::dynamic::VariantValue &Value)
       : Query(QK_Let), Name(Name), Value(Value) {}
   bool run(llvm::raw_ostream &OS, QuerySession &QS) const override;
 
@@ -189,7 +189,7 @@ struct DisableOutputQuery : SetNonExclusiveOutputQuery {
 };
 
 struct FileQuery : Query {
-  FileQuery(StringRef File, StringRef Prefix = StringRef())
+  FileQuery(llvm::StringRef File, llvm::StringRef Prefix = llvm::StringRef())
       : Query(QK_File), File(File),
         Prefix(!Prefix.empty() ? std::optional<std::string>(Prefix)
                                : std::nullopt) {}

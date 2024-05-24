@@ -24,7 +24,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/unchecked-optional-access.html
 class UncheckedOptionalAccessCheck : public ClangTidyCheck {
 public:
-  UncheckedOptionalAccessCheck(StringRef Name, ClangTidyContext *Context)
+  UncheckedOptionalAccessCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         ModelOptions{
             Options.getLocalOrGlobal("IgnoreSmartPointerDereference", false)} {}

@@ -108,7 +108,7 @@ public:
 
   /// Get all possible synch scope values that might be
   /// encountered at runtime for the current language.
-  virtual ArrayRef<unsigned> getRuntimeValues() const = 0;
+  virtual llvm::ArrayRef<unsigned> getRuntimeValues() const = 0;
 
   /// If atomic builtin function is called with invalid
   /// synch scope value at runtime, it will fall back to a valid
@@ -155,7 +155,7 @@ public:
            S <= static_cast<unsigned>(Last);
   }
 
-  ArrayRef<unsigned> getRuntimeValues() const override {
+  llvm::ArrayRef<unsigned> getRuntimeValues() const override {
     static_assert(Last == SubGroup, "Does not include all synch scopes");
     static const unsigned Scopes[] = {
         static_cast<unsigned>(WorkGroup), static_cast<unsigned>(Device),
@@ -206,7 +206,7 @@ public:
            S <= static_cast<unsigned>(Last);
   }
 
-  ArrayRef<unsigned> getRuntimeValues() const override {
+  llvm::ArrayRef<unsigned> getRuntimeValues() const override {
     static_assert(Last == System, "Does not include all synch scopes");
     static const unsigned Scopes[] = {
         static_cast<unsigned>(SingleThread), static_cast<unsigned>(Wavefront),
@@ -255,7 +255,7 @@ public:
     return S <= static_cast<unsigned>(Last);
   }
 
-  ArrayRef<unsigned> getRuntimeValues() const override {
+  llvm::ArrayRef<unsigned> getRuntimeValues() const override {
     static_assert(Last == Single, "Does not include all sync scopes");
     static const unsigned Scopes[] = {
         static_cast<unsigned>(Device), static_cast<unsigned>(System),

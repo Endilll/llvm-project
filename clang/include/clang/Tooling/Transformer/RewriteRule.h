@@ -158,7 +158,7 @@ inline EditGenerator ifBound(std::string ID, ASTEdit TrueEdit) {
 
 /// Flattens a list of generators into a single generator whose elements are the
 /// concatenation of the results of the argument generators.
-EditGenerator flattenVector(SmallVector<EditGenerator, 2> Generators);
+EditGenerator flattenVector(llvm::SmallVector<EditGenerator, 2> Generators);
 
 namespace detail {
 /// Helper function to construct an \c EditGenerator. Overloaded for common
@@ -216,14 +216,14 @@ ASTEdit remove(RangeSelector S);
 
 /// Adds an include directive for the given header to the file of `Target`. The
 /// particular location specified by `Target` is ignored.
-ASTEdit addInclude(RangeSelector Target, StringRef Header,
+ASTEdit addInclude(RangeSelector Target, llvm::StringRef Header,
                    IncludeFormat Format = IncludeFormat::Quoted);
 
 /// Adds an include directive for the given header to the file associated with
 /// `RootID`. If `RootID` matches inside a macro expansion, will add the
 /// directive to the file in which the macro was expanded (as opposed to the
 /// file in which the macro is defined).
-inline ASTEdit addInclude(StringRef Header,
+inline ASTEdit addInclude(llvm::StringRef Header,
                           IncludeFormat Format = IncludeFormat::Quoted) {
   return addInclude(expansion(node(RootID)), Header, Format);
 }
@@ -285,7 +285,7 @@ struct RewriteRuleBase {
     EditGenerator Edits;
   };
   // We expect RewriteRules will most commonly include only one case.
-  SmallVector<Case, 1> Cases;
+  llvm::SmallVector<Case, 1> Cases;
 };
 
 /// A source-code transformation with accompanying metadata.
@@ -293,7 +293,7 @@ struct RewriteRuleBase {
 /// When a case of the rule matches, the \c Transformer invokes the
 /// corresponding metadata generator and provides it alongside the edits.
 template <typename MetadataT> struct RewriteRuleWith : RewriteRuleBase {
-  SmallVector<Generator<MetadataT>, 1> Metadata;
+  llvm::SmallVector<Generator<MetadataT>, 1> Metadata;
 };
 
 template <> struct RewriteRuleWith<void> : RewriteRuleBase {};
@@ -411,7 +411,7 @@ void addInclude(RewriteRuleBase &Rule, llvm::StringRef Header,
 /// @{
 template <typename MetadataT>
 RewriteRuleWith<MetadataT>
-applyFirst(ArrayRef<RewriteRuleWith<MetadataT>> Rules) {
+applyFirst(llvm::ArrayRef<RewriteRuleWith<MetadataT>> Rules) {
   RewriteRuleWith<MetadataT> R;
   for (auto &Rule : Rules) {
     assert(Rule.Cases.size() == Rule.Metadata.size() &&
@@ -423,7 +423,7 @@ applyFirst(ArrayRef<RewriteRuleWith<MetadataT>> Rules) {
 }
 
 template <>
-RewriteRuleWith<void> applyFirst(ArrayRef<RewriteRuleWith<void>> Rules);
+RewriteRuleWith<void> applyFirst(llvm::ArrayRef<RewriteRuleWith<void>> Rules);
 
 template <typename MetadataT>
 RewriteRuleWith<MetadataT>
@@ -489,19 +489,19 @@ namespace detail {
 /// auto Edits = rewriteDescendants(*Node, InlineX, Results);
 /// ```
 /// @{
-llvm::Expected<SmallVector<Edit, 1>>
+llvm::Expected<llvm::SmallVector<Edit, 1>>
 rewriteDescendants(const Decl &Node, RewriteRule Rule,
                    const ast_matchers::MatchFinder::MatchResult &Result);
 
-llvm::Expected<SmallVector<Edit, 1>>
+llvm::Expected<llvm::SmallVector<Edit, 1>>
 rewriteDescendants(const Stmt &Node, RewriteRule Rule,
                    const ast_matchers::MatchFinder::MatchResult &Result);
 
-llvm::Expected<SmallVector<Edit, 1>>
+llvm::Expected<llvm::SmallVector<Edit, 1>>
 rewriteDescendants(const TypeLoc &Node, RewriteRule Rule,
                    const ast_matchers::MatchFinder::MatchResult &Result);
 
-llvm::Expected<SmallVector<Edit, 1>>
+llvm::Expected<llvm::SmallVector<Edit, 1>>
 rewriteDescendants(const DynTypedNode &Node, RewriteRule Rule,
                    const ast_matchers::MatchFinder::MatchResult &Result);
 /// @}

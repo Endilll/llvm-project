@@ -87,7 +87,7 @@ void MultiplexASTDeserializationListener::ModuleImportRead(
 class MultiplexASTMutationListener : public ASTMutationListener {
 public:
   // Does NOT take ownership of the elements in L.
-  MultiplexASTMutationListener(ArrayRef<ASTMutationListener*> L);
+  MultiplexASTMutationListener(llvm::ArrayRef<ASTMutationListener*> L);
   void CompletedTagDefinition(const TagDecl *D) override;
   void AddedVisibleDecl(const DeclContext *DC, const Decl *D) override;
   void AddedCXXImplicitMember(const CXXRecordDecl *RD, const Decl *D) override;
@@ -129,7 +129,7 @@ private:
 };
 
 MultiplexASTMutationListener::MultiplexASTMutationListener(
-    ArrayRef<ASTMutationListener*> L)
+    llvm::ArrayRef<ASTMutationListener*> L)
     : Listeners(L.begin(), L.end()) {
 }
 

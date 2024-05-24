@@ -20,7 +20,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/misplaced-array-index.html
 class MisplacedArrayIndexCheck : public ClangTidyCheck {
 public:
-  MisplacedArrayIndexCheck(StringRef Name, ClangTidyContext *Context)
+  MisplacedArrayIndexCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

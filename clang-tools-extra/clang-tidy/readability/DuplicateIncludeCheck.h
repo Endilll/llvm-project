@@ -19,7 +19,7 @@ namespace clang::tidy::readability {
 /// directives between them are analyzed.
 class DuplicateIncludeCheck : public ClangTidyCheck {
 public:
-  DuplicateIncludeCheck(StringRef Name, ClangTidyContext *Context)
+  DuplicateIncludeCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,

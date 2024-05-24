@@ -36,7 +36,7 @@ public:
 
   void If(SourceLocation Loc, SourceRange ConditionRange,
           ConditionValueKind ConditionValue) override {
-    StringRef Condition =
+    llvm::StringRef Condition =
         Lexer::getSourceText(CharSourceRange::getTokenRange(ConditionRange),
                              PP.getSourceManager(), PP.getLangOpts());
     checkMacroRedundancy(Loc, Condition, IfStack, DK_If, DK_If, true);
@@ -69,8 +69,8 @@ public:
   }
 
 private:
-  void checkMacroRedundancy(SourceLocation Loc, StringRef MacroName,
-                            SmallVector<PreprocessorEntry, 4> &Stack,
+  void checkMacroRedundancy(SourceLocation Loc, llvm::StringRef MacroName,
+                            llvm::SmallVector<PreprocessorEntry, 4> &Stack,
                             DirectiveKind WarningKind, DirectiveKind NoteKind,
                             bool Store) {
     if (PP.getSourceManager().isInMainFile(Loc)) {
@@ -90,9 +90,9 @@ private:
 
   ClangTidyCheck &Check;
   Preprocessor &PP;
-  SmallVector<PreprocessorEntry, 4> IfStack;
-  SmallVector<PreprocessorEntry, 4> IfdefStack;
-  SmallVector<PreprocessorEntry, 4> IfndefStack;
+  llvm::SmallVector<PreprocessorEntry, 4> IfStack;
+  llvm::SmallVector<PreprocessorEntry, 4> IfdefStack;
+  llvm::SmallVector<PreprocessorEntry, 4> IfndefStack;
 };
 } // namespace
 

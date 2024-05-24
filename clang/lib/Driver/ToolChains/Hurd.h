@@ -42,7 +42,7 @@ protected:
 
   std::string getMultiarchTriple(const Driver &D,
                                  const llvm::Triple &TargetTriple,
-                                 StringRef SysRoot) const override;
+                                 llvm::StringRef SysRoot) const override;
 };
 
 } // end namespace toolchains

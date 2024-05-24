@@ -69,7 +69,7 @@ public:
   /// expect the majority of consumers to copy or move the individual values
   /// into a separate data structure.
   using ChangeSetConsumer = std::function<void(
-      Expected<llvm::MutableArrayRef<AtomicChange>> Changes)>;
+      llvm::Expected<llvm::MutableArrayRef<AtomicChange>> Changes)>;
 
   /// \param Consumer receives all rewrites for a single match, or an error.
   /// Will not necessarily be called for each match; for example, if the rule

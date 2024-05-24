@@ -20,7 +20,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/avoid-return-with-void-value.html
 class AvoidReturnWithVoidValueCheck : public ClangTidyCheck {
 public:
-  AvoidReturnWithVoidValueCheck(StringRef Name, ClangTidyContext *Context);
+  AvoidReturnWithVoidValueCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

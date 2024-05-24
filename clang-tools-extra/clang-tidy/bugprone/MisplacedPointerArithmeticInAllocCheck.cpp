@@ -84,7 +84,7 @@ void MisplacedPointerArithmeticInAllocCheck::check(
   }
 
   const SourceRange OldRParen = SourceRange(PtrArith->getLHS()->getEndLoc());
-  const StringRef RParen =
+  const llvm::StringRef RParen =
       Lexer::getSourceText(CharSourceRange::getTokenRange(OldRParen),
                            *Result.SourceManager, getLangOpts());
   const SourceLocation NewRParen = Lexer::getLocForEndOfToken(

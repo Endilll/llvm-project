@@ -32,11 +32,11 @@ struct NotExtendedByDeclBoundToPredicate {
     return Self->getExtendingDecl() != Other;
   }
 
-  StringRef ID;
+  llvm::StringRef ID;
   ::clang::DynTypedNode Node;
 };
 
-AST_MATCHER_P(MaterializeTemporaryExpr, isExtendedByDeclBoundTo, StringRef,
+AST_MATCHER_P(MaterializeTemporaryExpr, isExtendedByDeclBoundTo, llvm::StringRef,
               ID) {
   NotExtendedByDeclBoundToPredicate Predicate{
       ID, ::clang::DynTypedNode::create(Node)};

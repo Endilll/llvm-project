@@ -33,7 +33,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/stringview-nullptr.html
 class StringviewNullptrCheck : public utils::TransformerClangTidyCheck {
 public:
-  StringviewNullptrCheck(StringRef Name, ClangTidyContext *Context);
+  StringviewNullptrCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus17;

@@ -161,8 +161,8 @@ inline std::unique_ptr<FrontendActionFactory> newFrontendActionFactory(
 ///                         clang modules.
 ///
 /// \return - True if 'ToolAction' was successfully executed.
-bool runToolOnCode(std::unique_ptr<FrontendAction> ToolAction, const Twine &Code,
-                   const Twine &FileName = "input.cc",
+bool runToolOnCode(std::unique_ptr<FrontendAction> ToolAction, const llvm::Twine &Code,
+                   const llvm::Twine &FileName = "input.cc",
                    std::shared_ptr<PCHContainerOperations> PCHContainerOps =
                        std::make_shared<PCHContainerOperations>());
 
@@ -184,19 +184,19 @@ using FileContentMappings = std::vector<std::pair<std::string, std::string>>;
 ///
 /// \return - True if 'ToolAction' was successfully executed.
 bool runToolOnCodeWithArgs(
-    std::unique_ptr<FrontendAction> ToolAction, const Twine &Code,
-    const std::vector<std::string> &Args, const Twine &FileName = "input.cc",
-    const Twine &ToolName = "clang-tool",
+    std::unique_ptr<FrontendAction> ToolAction, const llvm::Twine &Code,
+    const std::vector<std::string> &Args, const llvm::Twine &FileName = "input.cc",
+    const llvm::Twine &ToolName = "clang-tool",
     std::shared_ptr<PCHContainerOperations> PCHContainerOps =
         std::make_shared<PCHContainerOperations>(),
     const FileContentMappings &VirtualMappedFiles = FileContentMappings());
 
 // Similar to the overload except this takes a VFS.
 bool runToolOnCodeWithArgs(
-    std::unique_ptr<FrontendAction> ToolAction, const Twine &Code,
+    std::unique_ptr<FrontendAction> ToolAction, const llvm::Twine &Code,
     llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
-    const std::vector<std::string> &Args, const Twine &FileName = "input.cc",
-    const Twine &ToolName = "clang-tool",
+    const std::vector<std::string> &Args, const llvm::Twine &FileName = "input.cc",
+    const llvm::Twine &ToolName = "clang-tool",
     std::shared_ptr<PCHContainerOperations> PCHContainerOps =
         std::make_shared<PCHContainerOperations>());
 
@@ -209,7 +209,7 @@ bool runToolOnCodeWithArgs(
 ///
 /// \return The resulting AST or null if an error occurred.
 std::unique_ptr<ASTUnit>
-buildASTFromCode(StringRef Code, StringRef FileName = "input.cc",
+buildASTFromCode(llvm::StringRef Code, llvm::StringRef FileName = "input.cc",
                  std::shared_ptr<PCHContainerOperations> PCHContainerOps =
                      std::make_shared<PCHContainerOperations>());
 
@@ -227,8 +227,8 @@ buildASTFromCode(StringRef Code, StringRef FileName = "input.cc",
 ///
 /// \return The resulting AST or null if an error occurred.
 std::unique_ptr<ASTUnit> buildASTFromCodeWithArgs(
-    StringRef Code, const std::vector<std::string> &Args,
-    StringRef FileName = "input.cc", StringRef ToolName = "clang-tool",
+    llvm::StringRef Code, const std::vector<std::string> &Args,
+    llvm::StringRef FileName = "input.cc", llvm::StringRef ToolName = "clang-tool",
     std::shared_ptr<PCHContainerOperations> PCHContainerOps =
         std::make_shared<PCHContainerOperations>(),
     ArgumentsAdjuster Adjuster = getClangStripDependencyFileAdjuster(),
@@ -323,12 +323,12 @@ public:
   /// \param Files The file manager to use for underlying file operations when
   /// running the tool.
   ClangTool(const CompilationDatabase &Compilations,
-            ArrayRef<std::string> SourcePaths,
+            llvm::ArrayRef<std::string> SourcePaths,
             std::shared_ptr<PCHContainerOperations> PCHContainerOps =
                 std::make_shared<PCHContainerOperations>(),
-            IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS =
+            llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS =
                 llvm::vfs::getRealFileSystem(),
-            IntrusiveRefCntPtr<FileManager> Files = nullptr);
+            llvm::IntrusiveRefCntPtr<FileManager> Files = nullptr);
 
   ~ClangTool();
 
@@ -341,7 +341,7 @@ public:
   ///
   /// \param FilePath The path at which the content will be mapped.
   /// \param Content A null terminated buffer of the file's content.
-  void mapVirtualFile(StringRef FilePath, StringRef Content);
+  void mapVirtualFile(llvm::StringRef FilePath, llvm::StringRef Content);
 
   /// Append a command line arguments adjuster to the adjuster chain.
   ///
@@ -385,7 +385,7 @@ private:
   llvm::IntrusiveRefCntPtr<FileManager> Files;
 
   // Contains a list of pairs (<file name>, <file content>).
-  std::vector<std::pair<StringRef, StringRef>> MappedFileContents;
+  std::vector<std::pair<llvm::StringRef, llvm::StringRef>> MappedFileContents;
 
   llvm::StringSet<> SeenWorkingDirectories;
 
@@ -431,7 +431,7 @@ inline std::unique_ptr<FrontendActionFactory> newFrontendActionFactory(
           : ConsumerFactory(ConsumerFactory), Callbacks(Callbacks) {}
 
       std::unique_ptr<ASTConsumer>
-      CreateASTConsumer(CompilerInstance &, StringRef) override {
+      CreateASTConsumer(CompilerInstance &, llvm::StringRef) override {
         return ConsumerFactory->newASTConsumer();
       }
 
@@ -474,11 +474,11 @@ inline std::unique_ptr<FrontendActionFactory> newFrontendActionFactory(
 /// does by removing "./" and computing native paths.
 ///
 /// \param File Either an absolute or relative path.
-std::string getAbsolutePath(StringRef File);
+std::string getAbsolutePath(llvm::StringRef File);
 
 /// An overload of getAbsolutePath that works over the provided \p FS.
 llvm::Expected<std::string> getAbsolutePath(llvm::vfs::FileSystem &FS,
-                                            StringRef File);
+                                            llvm::StringRef File);
 
 /// Changes CommandLine to contain implicit flags that would have been
 /// defined had the compiler driver been invoked through the path InvokedAs.
@@ -501,7 +501,7 @@ llvm::Expected<std::string> getAbsolutePath(llvm::vfs::FileSystem &FS,
 /// infrastructure expects that CommandLine[0] is a tool path relative to which
 /// the builtin headers can be found.
 void addTargetAndModeForProgramName(std::vector<std::string> &CommandLine,
-                                    StringRef InvokedAs);
+                                    llvm::StringRef InvokedAs);
 
 /// Helper function that expands response files in command line.
 void addExpandedResponseFiles(std::vector<std::string> &CommandLine,
@@ -511,7 +511,7 @@ void addExpandedResponseFiles(std::vector<std::string> &CommandLine,
 
 /// Creates a \c CompilerInvocation.
 CompilerInvocation *newInvocation(DiagnosticsEngine *Diagnostics,
-                                  ArrayRef<const char *> CC1Args,
+                                  llvm::ArrayRef<const char *> CC1Args,
                                   const char *const BinaryName);
 
 } // namespace tooling

@@ -40,7 +40,7 @@ namespace clang::tidy::modernize {
 /// \endcode
 class ReplaceAutoPtrCheck : public ClangTidyCheck {
 public:
-  ReplaceAutoPtrCheck(StringRef Name, ClangTidyContext *Context);
+  ReplaceAutoPtrCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

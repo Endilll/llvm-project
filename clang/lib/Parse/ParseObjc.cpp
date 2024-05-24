@@ -149,9 +149,9 @@ public:
 Parser::DeclGroupPtrTy
 Parser::ParseObjCAtClassDeclaration(SourceLocation atLoc) {
   ConsumeToken(); // the identifier "class"
-  SmallVector<IdentifierInfo *, 8> ClassNames;
-  SmallVector<SourceLocation, 8> ClassLocs;
-  SmallVector<ObjCTypeParamList *, 8> ClassTypeParams;
+  llvm::SmallVector<IdentifierInfo *, 8> ClassNames;
+  llvm::SmallVector<SourceLocation, 8> ClassLocs;
+  llvm::SmallVector<ObjCTypeParamList *, 8> ClassTypeParams;
 
   while (true) {
     MaybeSkipAttributes(tok::objc_class);
@@ -260,7 +260,7 @@ Decl *Parser::ParseObjCAtInterfaceDeclaration(SourceLocation AtLoc,
   // case, LAngleLoc will be valid and ProtocolIdents will capture the
   // protocol references (that have not yet been resolved).
   SourceLocation LAngleLoc, EndProtoLoc;
-  SmallVector<IdentifierLocPair, 8> ProtocolIdents;
+  llvm::SmallVector<IdentifierLocPair, 8> ProtocolIdents;
   ObjCTypeParamList *typeParameterList = nullptr;
   ObjCTypeParamListScope typeParamScope(Actions, getCurScope());
   if (Tok.is(tok::less))
@@ -299,8 +299,8 @@ Decl *Parser::ParseObjCAtInterfaceDeclaration(SourceLocation AtLoc,
 
     // Next, we need to check for any protocol references.
     assert(LAngleLoc.isInvalid() && "Cannot have already parsed protocols");
-    SmallVector<Decl *, 8> ProtocolRefs;
-    SmallVector<SourceLocation, 8> ProtocolLocs;
+    llvm::SmallVector<Decl *, 8> ProtocolRefs;
+    llvm::SmallVector<SourceLocation, 8> ProtocolLocs;
     if (Tok.is(tok::less) &&
         ParseObjCProtocolReferences(ProtocolRefs, ProtocolLocs, true, true,
                                     LAngleLoc, EndProtoLoc,
@@ -323,10 +323,10 @@ Decl *Parser::ParseObjCAtInterfaceDeclaration(SourceLocation AtLoc,
   IdentifierInfo *superClassId = nullptr;
   SourceLocation superClassLoc;
   SourceLocation typeArgsLAngleLoc;
-  SmallVector<ParsedType, 4> typeArgs;
+  llvm::SmallVector<ParsedType, 4> typeArgs;
   SourceLocation typeArgsRAngleLoc;
-  SmallVector<Decl *, 4> protocols;
-  SmallVector<SourceLocation, 4> protocolLocs;
+  llvm::SmallVector<Decl *, 4> protocols;
+  llvm::SmallVector<SourceLocation, 4> protocolLocs;
   if (Tok.is(tok::colon)) { // a super class is specified.
     ConsumeToken();
 
@@ -458,7 +458,7 @@ static void addContextSensitiveTypeNullability(Parser &P,
 /// \param rAngleLoc The location of the ending '>'.
 ObjCTypeParamList *Parser::parseObjCTypeParamListOrProtocolRefs(
     ObjCTypeParamListScope &Scope, SourceLocation &lAngleLoc,
-    SmallVectorImpl<IdentifierLocPair> &protocolIdents,
+    llvm::SmallVectorImpl<IdentifierLocPair> &protocolIdents,
     SourceLocation &rAngleLoc, bool mayBeProtocolList) {
   assert(Tok.is(tok::less) && "Not at the beginning of a type parameter list");
 
@@ -467,7 +467,7 @@ ObjCTypeParamList *Parser::parseObjCTypeParamListOrProtocolRefs(
 
   // Local function to "flush" the protocol identifiers, turning them into
   // type parameters.
-  SmallVector<Decl *, 4> typeParams;
+  llvm::SmallVector<Decl *, 4> typeParams;
   auto makeProtocolIdentsIntoTypeParameters = [&]() {
     unsigned index = 0;
     for (const auto &pair : protocolIdents) {
@@ -605,7 +605,7 @@ ObjCTypeParamList *Parser::parseObjCTypeParamListOrProtocolRefs(
 /// Parse an objc-type-parameter-list.
 ObjCTypeParamList *Parser::parseObjCTypeParamList() {
   SourceLocation lAngleLoc;
-  SmallVector<IdentifierLocPair, 1> protocolIdents;
+  llvm::SmallVector<IdentifierLocPair, 1> protocolIdents;
   SourceLocation rAngleLoc;
 
   ObjCTypeParamListScope Scope(Actions, getCurScope());
@@ -641,8 +641,8 @@ static bool isTopLevelObjCKeyword(tok::ObjCKeywordKind DirectiveKind) {
 ///
 void Parser::ParseObjCInterfaceDeclList(tok::ObjCKeywordKind contextKey,
                                         Decl *CDecl) {
-  SmallVector<Decl *, 32> allMethods;
-  SmallVector<DeclGroupPtrTy, 8> allTUVariables;
+  llvm::SmallVector<Decl *, 32> allMethods;
+  llvm::SmallVector<DeclGroupPtrTy, 8> allTUVariables;
   tok::ObjCKeywordKind MethodImplKind = tok::objc_not_keyword;
 
   SourceRange AtEnd;
@@ -1435,7 +1435,7 @@ Decl *Parser::ParseObjCMethodDecl(SourceLocation mLoc,
     return nullptr;
   }
 
-  SmallVector<DeclaratorChunk::ParamInfo, 8> CParamInfo;
+  llvm::SmallVector<DeclaratorChunk::ParamInfo, 8> CParamInfo;
   if (Tok.isNot(tok::colon)) {
     // If attributes exist after the method, parse them.
     MaybeParseAttributes(PAKM_CXX11 | (getLangOpts().ObjC ? PAKM_GNU : 0),
@@ -1450,9 +1450,9 @@ Decl *Parser::ParseObjCMethodDecl(SourceLocation mLoc,
     return Result;
   }
 
-  SmallVector<const IdentifierInfo *, 12> KeyIdents;
-  SmallVector<SourceLocation, 12> KeyLocs;
-  SmallVector<SemaObjC::ObjCArgInfo, 12> ArgInfos;
+  llvm::SmallVector<const IdentifierInfo *, 12> KeyIdents;
+  llvm::SmallVector<SourceLocation, 12> KeyLocs;
+  llvm::SmallVector<SemaObjC::ObjCArgInfo, 12> ArgInfos;
   ParseScope PrototypeScope(this, Scope::FunctionPrototypeScope |
                             Scope::FunctionDeclarationScope | Scope::DeclScope);
 
@@ -1576,8 +1576,8 @@ Decl *Parser::ParseObjCMethodDecl(SourceLocation mLoc,
 ///     '<' identifier-list '>'
 ///
 bool Parser::
-ParseObjCProtocolReferences(SmallVectorImpl<Decl *> &Protocols,
-                            SmallVectorImpl<SourceLocation> &ProtocolLocs,
+ParseObjCProtocolReferences(llvm::SmallVectorImpl<Decl *> &Protocols,
+                            llvm::SmallVectorImpl<SourceLocation> &ProtocolLocs,
                             bool WarnOnDeclarations, bool ForObjCContainer,
                             SourceLocation &LAngleLoc, SourceLocation &EndLoc,
                             bool consumeLastToken) {
@@ -1585,7 +1585,7 @@ ParseObjCProtocolReferences(SmallVectorImpl<Decl *> &Protocols,
 
   LAngleLoc = ConsumeToken(); // the "<"
 
-  SmallVector<IdentifierLocPair, 8> ProtocolIdents;
+  llvm::SmallVector<IdentifierLocPair, 8> ProtocolIdents;
 
   while (true) {
     if (Tok.is(tok::code_completion)) {
@@ -1624,8 +1624,8 @@ TypeResult Parser::parseObjCProtocolQualifierType(SourceLocation &rAngleLoc) {
   assert(getLangOpts().ObjC && "Protocol qualifiers only exist in Objective-C");
 
   SourceLocation lAngleLoc;
-  SmallVector<Decl *, 8> protocols;
-  SmallVector<SourceLocation, 8> protocolLocs;
+  llvm::SmallVector<Decl *, 8> protocols;
+  llvm::SmallVector<SourceLocation, 8> protocolLocs;
   (void)ParseObjCProtocolReferences(protocols, protocolLocs, false, false,
                                     lAngleLoc, rAngleLoc,
                                     /*consumeLastToken=*/true);
@@ -1648,11 +1648,11 @@ TypeResult Parser::parseObjCProtocolQualifierType(SourceLocation &rAngleLoc) {
 void Parser::parseObjCTypeArgsOrProtocolQualifiers(
        ParsedType baseType,
        SourceLocation &typeArgsLAngleLoc,
-       SmallVectorImpl<ParsedType> &typeArgs,
+       llvm::SmallVectorImpl<ParsedType> &typeArgs,
        SourceLocation &typeArgsRAngleLoc,
        SourceLocation &protocolLAngleLoc,
-       SmallVectorImpl<Decl *> &protocols,
-       SmallVectorImpl<SourceLocation> &protocolLocs,
+       llvm::SmallVectorImpl<Decl *> &protocols,
+       llvm::SmallVectorImpl<SourceLocation> &protocolLocs,
        SourceLocation &protocolRAngleLoc,
        bool consumeLastToken,
        bool warnOnIncompleteProtocols) {
@@ -1662,8 +1662,8 @@ void Parser::parseObjCTypeArgsOrProtocolQualifiers(
   // Whether all of the elements we've parsed thus far are single
   // identifiers, which might be types or might be protocols.
   bool allSingleIdentifiers = true;
-  SmallVector<IdentifierInfo *, 4> identifiers;
-  SmallVectorImpl<SourceLocation> &identifierLocs = protocolLocs;
+  llvm::SmallVector<IdentifierInfo *, 4> identifiers;
+  llvm::SmallVectorImpl<SourceLocation> &identifierLocs = protocolLocs;
 
   // Parse a list of comma-separated identifiers, bailing out if we
   // see something different.
@@ -1680,7 +1680,7 @@ void Parser::parseObjCTypeArgsOrProtocolQualifiers(
 
     if (Tok.is(tok::code_completion)) {
       // FIXME: Also include types here.
-      SmallVector<IdentifierLocPair, 4> identifierLocPairs;
+      llvm::SmallVector<IdentifierLocPair, 4> identifierLocPairs;
       for (unsigned i = 0, n = identifiers.size(); i != n; ++i) {
         identifierLocPairs.push_back(IdentifierLocPair(identifiers[i],
                                                        identifierLocs[i]));
@@ -1728,8 +1728,8 @@ void Parser::parseObjCTypeArgsOrProtocolQualifiers(
   bool invalid = false;
   IdentifierInfo *foundProtocolId = nullptr, *foundValidTypeId = nullptr;
   SourceLocation foundProtocolSrcLoc, foundValidTypeSrcLoc;
-  SmallVector<IdentifierInfo *, 2> unknownTypeArgs;
-  SmallVector<SourceLocation, 2> unknownTypeArgsLoc;
+  llvm::SmallVector<IdentifierInfo *, 2> unknownTypeArgs;
+  llvm::SmallVector<SourceLocation, 2> unknownTypeArgsLoc;
 
   for (unsigned i = 0, n = identifiers.size(); i != n; ++i) {
     ParsedType typeArg
@@ -1822,11 +1822,11 @@ void Parser::parseObjCTypeArgsOrProtocolQualifiers(
 void Parser::parseObjCTypeArgsAndProtocolQualifiers(
        ParsedType baseType,
        SourceLocation &typeArgsLAngleLoc,
-       SmallVectorImpl<ParsedType> &typeArgs,
+       llvm::SmallVectorImpl<ParsedType> &typeArgs,
        SourceLocation &typeArgsRAngleLoc,
        SourceLocation &protocolLAngleLoc,
-       SmallVectorImpl<Decl *> &protocols,
-       SmallVectorImpl<SourceLocation> &protocolLocs,
+       llvm::SmallVectorImpl<Decl *> &protocols,
+       llvm::SmallVectorImpl<SourceLocation> &protocolLocs,
        SourceLocation &protocolRAngleLoc,
        bool consumeLastToken) {
   assert(Tok.is(tok::less));
@@ -1879,11 +1879,11 @@ TypeResult Parser::parseObjCTypeArgsAndProtocolQualifiers(
              SourceLocation &endLoc) {
   assert(Tok.is(tok::less));
   SourceLocation typeArgsLAngleLoc;
-  SmallVector<ParsedType, 4> typeArgs;
+  llvm::SmallVector<ParsedType, 4> typeArgs;
   SourceLocation typeArgsRAngleLoc;
   SourceLocation protocolLAngleLoc;
-  SmallVector<Decl *, 4> protocols;
-  SmallVector<SourceLocation, 4> protocolLocs;
+  llvm::SmallVector<Decl *, 4> protocols;
+  llvm::SmallVector<SourceLocation, 4> protocolLocs;
   SourceLocation protocolRAngleLoc;
 
   // Parse type arguments and protocol qualifiers.
@@ -1908,7 +1908,7 @@ TypeResult Parser::parseObjCTypeArgsAndProtocolQualifiers(
 
 void Parser::HelperActionsForIvarDeclarations(
     ObjCContainerDecl *interfaceDecl, SourceLocation atLoc,
-    BalancedDelimiterTracker &T, SmallVectorImpl<Decl *> &AllIvarDecls,
+    BalancedDelimiterTracker &T, llvm::SmallVectorImpl<Decl *> &AllIvarDecls,
     bool RBraceMissing) {
   if (!RBraceMissing)
     T.consumeClose();
@@ -1948,7 +1948,7 @@ void Parser::ParseObjCClassInstanceVariables(ObjCContainerDecl *interfaceDecl,
                                              tok::ObjCKeywordKind visibility,
                                              SourceLocation atLoc) {
   assert(Tok.is(tok::l_brace) && "expected {");
-  SmallVector<Decl *, 32> AllIvarDecls;
+  llvm::SmallVector<Decl *, 32> AllIvarDecls;
 
   ParseScope ClassScope(this, Scope::DeclScope | Scope::ClassScope);
 
@@ -2088,7 +2088,7 @@ Parser::ParseObjCAtProtocolDeclaration(SourceLocation AtLoc,
   CheckNestedObjCContexts(AtLoc);
 
   if (Tok.is(tok::comma)) { // list of forward declarations.
-    SmallVector<IdentifierLocPair, 8> ProtocolRefs;
+    llvm::SmallVector<IdentifierLocPair, 8> ProtocolRefs;
     ProtocolRefs.push_back(std::make_pair(protocolName, nameLoc));
 
     // Parse the list of forward declarations.
@@ -2116,8 +2116,8 @@ Parser::ParseObjCAtProtocolDeclaration(SourceLocation AtLoc,
   // Last, and definitely not least, parse a protocol declaration.
   SourceLocation LAngleLoc, EndProtoLoc;
 
-  SmallVector<Decl *, 8> ProtocolRefs;
-  SmallVector<SourceLocation, 8> ProtocolLocs;
+  llvm::SmallVector<Decl *, 8> ProtocolRefs;
+  llvm::SmallVector<SourceLocation, 8> ProtocolLocs;
   if (Tok.is(tok::less) &&
       ParseObjCProtocolReferences(ProtocolRefs, ProtocolLocs, false, true,
                                   LAngleLoc, EndProtoLoc,
@@ -2182,7 +2182,7 @@ Parser::ParseObjCAtImplementationDeclaration(SourceLocation AtLoc,
   // permitted here. Parse and diagnose them.
   if (Tok.is(tok::less)) {
     SourceLocation lAngleLoc, rAngleLoc;
-    SmallVector<IdentifierLocPair, 8> protocolIdents;
+    llvm::SmallVector<IdentifierLocPair, 8> protocolIdents;
     SourceLocation diagLoc = Tok.getLocation();
     ObjCTypeParamListScope typeParamScope(Actions, getCurScope());
     if (parseObjCTypeParamListOrProtocolRefs(typeParamScope, lAngleLoc,
@@ -2225,8 +2225,8 @@ Parser::ParseObjCAtImplementationDeclaration(SourceLocation AtLoc,
     if (Tok.is(tok::less)) { // we have illegal '<' try to recover
       Diag(Tok, diag::err_unexpected_protocol_qualifier);
       SourceLocation protocolLAngleLoc, protocolRAngleLoc;
-      SmallVector<Decl *, 4> protocols;
-      SmallVector<SourceLocation, 4> protocolLocs;
+      llvm::SmallVector<Decl *, 4> protocols;
+      llvm::SmallVector<SourceLocation, 4> protocolLocs;
       (void)ParseObjCProtocolReferences(protocols, protocolLocs,
                                         /*warnOnIncompleteProtocols=*/false,
                                         /*ForObjCContainer=*/false,
@@ -2256,8 +2256,8 @@ Parser::ParseObjCAtImplementationDeclaration(SourceLocation AtLoc,
       Diag(Tok, diag::err_unexpected_protocol_qualifier);
 
       SourceLocation protocolLAngleLoc, protocolRAngleLoc;
-      SmallVector<Decl *, 4> protocols;
-      SmallVector<SourceLocation, 4> protocolLocs;
+      llvm::SmallVector<Decl *, 4> protocols;
+      llvm::SmallVector<SourceLocation, 4> protocolLocs;
       (void)ParseObjCProtocolReferences(protocols, protocolLocs,
                                         /*warnOnIncompleteProtocols=*/false,
                                         /*ForObjCContainer=*/false,
@@ -2267,7 +2267,7 @@ Parser::ParseObjCAtImplementationDeclaration(SourceLocation AtLoc,
   }
   assert(ObjCImpDecl);
 
-  SmallVector<Decl *, 8> DeclsInGroup;
+  llvm::SmallVector<Decl *, 8> DeclsInGroup;
 
   {
     ObjCImplParsingDataRAII ObjCImplParsing(*this, ObjCImpDecl);
@@ -3238,8 +3238,8 @@ Parser::ParseObjCMessageExpressionBody(SourceLocation LBracLoc,
   SourceLocation Loc;
   IdentifierInfo *selIdent = ParseObjCSelectorPiece(Loc);
 
-  SmallVector<const IdentifierInfo *, 12> KeyIdents;
-  SmallVector<SourceLocation, 12> KeyLocs;
+  llvm::SmallVector<const IdentifierInfo *, 12> KeyIdents;
+  llvm::SmallVector<SourceLocation, 12> KeyLocs;
   ExprVector KeyExprs;
 
   if (Tok.is(tok::colon)) {
@@ -3388,7 +3388,7 @@ ExprResult Parser::ParseObjCStringLiteral(SourceLocation AtLoc) {
   // @"foo" @"bar" is a valid concatenated string.  Eat any subsequent string
   // expressions.  At this point, we know that the only valid thing that starts
   // with '@' is an @"".
-  SmallVector<SourceLocation, 4> AtLocs;
+  llvm::SmallVector<SourceLocation, 4> AtLocs;
   ExprVector AtStrings;
   AtLocs.push_back(AtLoc);
   AtStrings.push_back(Res.get());
@@ -3516,7 +3516,7 @@ ExprResult Parser::ParseObjCArrayLiteral(SourceLocation AtLoc) {
 }
 
 ExprResult Parser::ParseObjCDictionaryLiteral(SourceLocation AtLoc) {
-  SmallVector<ObjCDictionaryElement, 4> Elements; // dictionary elements.
+  llvm::SmallVector<ObjCDictionaryElement, 4> Elements; // dictionary elements.
   ConsumeBrace(); // consume the l_square.
   bool HasInvalidEltExpr = false;
   while (Tok.isNot(tok::r_brace)) {
@@ -3639,7 +3639,7 @@ ExprResult Parser::ParseObjCSelectorExpression(SourceLocation AtLoc) {
   if (Tok.isNot(tok::l_paren))
     return ExprError(Diag(Tok, diag::err_expected_lparen_after) << "@selector");
 
-  SmallVector<const IdentifierInfo *, 12> KeyIdents;
+  llvm::SmallVector<const IdentifierInfo *, 12> KeyIdents;
   SourceLocation sLoc;
 
   BalancedDelimiterTracker T(*this, tok::l_paren);

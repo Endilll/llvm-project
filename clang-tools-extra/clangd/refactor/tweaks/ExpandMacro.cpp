@@ -36,7 +36,7 @@ public:
   }
 
   bool prepare(const Selection &Inputs) override;
-  Expected<Tweak::Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Tweak::Effect> apply(const Selection &Inputs) override;
   std::string title() const override;
 
 private:
@@ -105,7 +105,7 @@ bool ExpandMacro::prepare(const Selection &Inputs) {
   return true;
 }
 
-Expected<Tweak::Effect> ExpandMacro::apply(const Selection &Inputs) {
+llvm::Expected<Tweak::Effect> ExpandMacro::apply(const Selection &Inputs) {
   auto &SM = Inputs.AST->getSourceManager();
 
   std::string Replacement;

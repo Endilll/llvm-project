@@ -74,7 +74,7 @@ void UseUncaughtExceptionsCheck::check(const MatchFinder::MatchResult &Result) {
                              "'std::uncaught_exceptions' instead");
 
   if (!BeginLoc.isMacroID()) {
-    StringRef Text =
+    llvm::StringRef Text =
         Lexer::getSourceText(CharSourceRange::getTokenRange(BeginLoc, EndLoc),
                              *Result.SourceManager, getLangOpts());
 

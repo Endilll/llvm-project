@@ -434,7 +434,7 @@ public:
     return true;
   }
 
-  Expected<Effect> apply(const Selection &Sel) override {
+  llvm::Expected<Effect> apply(const Selection &Sel) override {
     const auto &AST = Sel.AST->getASTContext();
     const auto &SM = AST.getSourceManager();
 

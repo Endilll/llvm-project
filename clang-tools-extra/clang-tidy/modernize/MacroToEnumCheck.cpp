@@ -21,7 +21,7 @@
 namespace clang::tidy::modernize {
 
 static bool hasOnlyComments(SourceLocation Loc, const LangOptions &Options,
-                            StringRef Text) {
+                            llvm::StringRef Text) {
   // Use a lexer to look for tokens; if we find something other than a single
   // hash, then there were intervening tokens between macro definitions.
   std::string Buffer{Text};
@@ -73,7 +73,7 @@ static bool hasOnlyComments(SourceLocation Loc, const LangOptions &Options,
   return true;
 }
 
-static StringRef getTokenName(const Token &Tok) {
+static llvm::StringRef getTokenName(const Token &Tok) {
   return Tok.is(tok::raw_identifier) ? Tok.getRawIdentifier()
                                      : Tok.getIdentifierInfo()->getName();
 }
@@ -88,7 +88,7 @@ struct EnumMacro {
   const MacroDirective *Directive;
 };
 
-using MacroList = SmallVector<EnumMacro>;
+using MacroList = llvm::SmallVector<EnumMacro>;
 
 enum class IncludeGuard { None, FileChanged, IfGuard, DefineGuard };
 
@@ -114,10 +114,10 @@ public:
                    FileID PrevFID) override;
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override {
     clearCurrentEnum(HashLoc);
@@ -208,18 +208,18 @@ private:
   void checkCondition(SourceRange ConditionRange);
   void checkName(const Token &MacroNameTok);
   void rememberExpressionName(const Token &Tok);
-  void rememberExpressionTokens(ArrayRef<Token> MacroTokens);
+  void rememberExpressionTokens(llvm::ArrayRef<Token> MacroTokens);
   void invalidateExpressionNames();
   void issueDiagnostics();
   void warnMacroEnum(const EnumMacro &Macro) const;
   void fixEnumMacro(const MacroList &MacroList) const;
-  bool isInitializer(ArrayRef<Token> MacroTokens);
+  bool isInitializer(llvm::ArrayRef<Token> MacroTokens);
 
   MacroToEnumCheck *Check;
   const LangOptions &LangOpts;
   const SourceManager &SM;
-  SmallVector<MacroList> Enums;
-  SmallVector<FileState> Files;
+  llvm::SmallVector<MacroList> Enums;
+  llvm::SmallVector<FileState> Files;
   std::vector<std::string> ExpressionNames;
   FileState *CurrentFile = nullptr;
 };
@@ -238,7 +238,7 @@ bool MacroToEnumCallbacks::isConsecutiveMacro(const MacroDirective *MD) const {
       SourceRange{CurrentFile->LastMacroLocation, Define}, true};
   CharSourceRange CharRange =
       Lexer::makeFileCharRange(BetweenMacros, SM, LangOpts);
-  StringRef BetweenText = Lexer::getSourceText(CharRange, SM, LangOpts);
+  llvm::StringRef BetweenText = Lexer::getSourceText(CharRange, SM, LangOpts);
   return hasOnlyComments(Define, LangOpts, BetweenText);
 }
 
@@ -277,7 +277,7 @@ void MacroToEnumCallbacks::checkCondition(SourceRange Range) {
 void MacroToEnumCallbacks::checkName(const Token &MacroNameTok) {
   rememberExpressionName(MacroNameTok);
 
-  StringRef Id = getTokenName(MacroNameTok);
+  llvm::StringRef Id = getTokenName(MacroNameTok);
   llvm::erase_if(Enums, [&Id](const MacroList &MacroList) {
     return llvm::any_of(MacroList, [&Id](const EnumMacro &Macro) {
       return getTokenName(Macro.Name) == Id;
@@ -294,7 +294,7 @@ void MacroToEnumCallbacks::rememberExpressionName(const Token &Tok) {
 }
 
 void MacroToEnumCallbacks::rememberExpressionTokens(
-    ArrayRef<Token> MacroTokens) {
+    llvm::ArrayRef<Token> MacroTokens) {
   for (Token Tok : MacroTokens) {
     if (Tok.isAnyIdentifier())
       rememberExpressionName(Tok);
@@ -317,7 +317,7 @@ void MacroToEnumCallbacks::FileChanged(SourceLocation Loc,
   CurrentFile = &Files.back();
 }
 
-bool MacroToEnumCallbacks::isInitializer(ArrayRef<Token> MacroTokens)
+bool MacroToEnumCallbacks::isInitializer(llvm::ArrayRef<Token> MacroTokens)
 {
   IntegralLiteralExpressionMatcher Matcher(MacroTokens, LangOpts.C99 == 0);
   bool Matched = Matcher.match();
@@ -347,7 +347,7 @@ void MacroToEnumCallbacks::MacroDefined(const Token &MacroNameTok,
     return;
 
   const MacroInfo *Info = MD->getMacroInfo();
-  ArrayRef<Token> MacroTokens = Info->tokens();
+  llvm::ArrayRef<Token> MacroTokens = Info->tokens();
   if (Info->isBuiltinMacro() || MacroTokens.empty())
     return;
   if (Info->isFunctionLike()) {
@@ -402,7 +402,7 @@ namespace {
 
 template <size_t N>
 bool textEquals(const char (&Needle)[N], const char *HayStack) {
-  return StringRef{HayStack, N - 1} == Needle;
+  return llvm::StringRef{HayStack, N - 1} == Needle;
 }
 
 template <size_t N> size_t len(const char (&)[N]) { return N - 1; }

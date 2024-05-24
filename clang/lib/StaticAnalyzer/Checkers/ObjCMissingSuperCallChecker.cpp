@@ -70,10 +70,10 @@ public:
                     BugReporter &BR) const;
 private:
   bool isCheckableClass(const ObjCImplementationDecl *D,
-                        StringRef &SuperclassName) const;
+                        llvm::StringRef &SuperclassName) const;
   void initializeSelectors(ASTContext &Ctx) const;
-  void fillSelectors(ASTContext &Ctx, ArrayRef<SelectorDescriptor> Sel,
-                     StringRef ClassName) const;
+  void fillSelectors(ASTContext &Ctx, llvm::ArrayRef<SelectorDescriptor> Sel,
+                     llvm::StringRef ClassName) const;
   mutable llvm::StringMap<llvm::SmallPtrSet<Selector, 16>> SelectorsForClass;
   mutable bool IsInitialized = false;
 };
@@ -86,7 +86,7 @@ private:
 /// \param D The declaration to check for superclasses.
 /// \param[out] SuperclassName On return, the found superclass name.
 bool ObjCSuperCallChecker::isCheckableClass(const ObjCImplementationDecl *D,
-                                            StringRef &SuperclassName) const {
+                                            llvm::StringRef &SuperclassName) const {
   const ObjCInterfaceDecl *ID = D->getClassInterface()->getSuperClass();
   for ( ; ID ; ID = ID->getSuperClass())
   {
@@ -98,8 +98,8 @@ bool ObjCSuperCallChecker::isCheckableClass(const ObjCImplementationDecl *D,
 }
 
 void ObjCSuperCallChecker::fillSelectors(ASTContext &Ctx,
-                                         ArrayRef<SelectorDescriptor> Sel,
-                                         StringRef ClassName) const {
+                                         llvm::ArrayRef<SelectorDescriptor> Sel,
+                                         llvm::StringRef ClassName) const {
   llvm::SmallPtrSet<Selector, 16> &ClassSelectors =
       SelectorsForClass[ClassName];
   // Fill the Selectors SmallSet with all selectors we want to check.
@@ -171,7 +171,7 @@ void ObjCSuperCallChecker::checkASTDecl(const ObjCImplementationDecl *D,
     initializeSelectors(Ctx);
 
   // Find out whether this class has a superclass that we are supposed to check.
-  StringRef SuperclassName;
+  llvm::StringRef SuperclassName;
   if (!isCheckableClass(D, SuperclassName))
     return;
 
@@ -197,7 +197,7 @@ void ObjCSuperCallChecker::checkASTDecl(const ObjCImplementationDecl *D,
                                             Mgr.getAnalysisDeclContext(D));
 
         const char *Name = "Missing call to superclass";
-        SmallString<320> Buf;
+        llvm::SmallString<320> Buf;
         llvm::raw_svector_ostream os(Buf);
 
         os << "The '" << S.getAsString()

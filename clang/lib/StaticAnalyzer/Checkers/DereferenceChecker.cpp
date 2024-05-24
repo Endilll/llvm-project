@@ -49,8 +49,8 @@ public:
                      CheckerContext &C) const;
   void checkBind(SVal L, SVal V, const Stmt *S, CheckerContext &C) const;
 
-  static void AddDerefSource(raw_ostream &os,
-                             SmallVectorImpl<SourceRange> &Ranges,
+  static void AddDerefSource(llvm::raw_ostream &os,
+                             llvm::SmallVectorImpl<SourceRange> &Ranges,
                              const Expr *Ex, const ProgramState *state,
                              const LocationContext *LCtx,
                              bool loadedFrom = false);
@@ -60,8 +60,8 @@ public:
 } // end anonymous namespace
 
 void
-DereferenceChecker::AddDerefSource(raw_ostream &os,
-                                   SmallVectorImpl<SourceRange> &Ranges,
+DereferenceChecker::AddDerefSource(llvm::raw_ostream &os,
+                                   llvm::SmallVectorImpl<SourceRange> &Ranges,
                                    const Expr *Ex,
                                    const ProgramState *state,
                                    const LocationContext *LCtx,
@@ -181,10 +181,10 @@ void DereferenceChecker::reportBug(DerefKind K, ProgramStateRef State,
   if (!N)
     return;
 
-  SmallString<100> buf;
+  llvm::SmallString<100> buf;
   llvm::raw_svector_ostream os(buf);
 
-  SmallVector<SourceRange, 2> Ranges;
+  llvm::SmallVector<SourceRange, 2> Ranges;
 
   switch (S->getStmtClass()) {
   case Stmt::ArraySubscriptExprClass: {
@@ -235,7 +235,7 @@ void DereferenceChecker::reportBug(DerefKind K, ProgramStateRef State,
 
   bugreporter::trackExpressionValue(N, bugreporter::getDerefExpr(S), *report);
 
-  for (SmallVectorImpl<SourceRange>::iterator
+  for (llvm::SmallVectorImpl<SourceRange>::iterator
        I = Ranges.begin(), E = Ranges.end(); I!=E; ++I)
     report->addRange(*I);
 

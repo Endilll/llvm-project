@@ -18,10 +18,10 @@ namespace clang::tidy::llvm_check {
 /// http://clang.llvm.org/extra/clang-tidy/checks/llvm/header-guard.html
 class LLVMHeaderGuardCheck : public utils::HeaderGuardCheck {
 public:
-  LLVMHeaderGuardCheck(StringRef Name, ClangTidyContext *Context);
+  LLVMHeaderGuardCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
-  bool shouldSuggestEndifComment(StringRef Filename) override { return false; }
-  std::string getHeaderGuard(StringRef Filename, StringRef OldGuard) override;
+  bool shouldSuggestEndifComment(llvm::StringRef Filename) override { return false; }
+  std::string getHeaderGuard(llvm::StringRef Filename, llvm::StringRef OldGuard) override;
 };
 
 } // namespace clang::tidy::llvm_check

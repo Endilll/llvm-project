@@ -274,15 +274,15 @@ namespace PR12120 {
 }
 
 namespace PR12498 {
-  class ArrayRef; // expected-note{{forward declaration}}
+  class llvm::ArrayRef; // expected-note{{forward declaration}}
 
   struct C {
-    void foo(const ArrayRef&); // expected-note{{passing argument to parameter here}}
+    void foo(const llvm::ArrayRef&); // expected-note{{passing argument to parameter here}}
   };
 
   static void bar(C* c)
   {
-    c->foo({ nullptr, 1 }); // expected-error{{initialization of incomplete type 'const ArrayRef'}}
+    c->foo({ nullptr, 1 }); // expected-error{{initialization of incomplete type 'const llvm::ArrayRef'}}
   }
 }
 

@@ -13,13 +13,13 @@ namespace clang::tidy::utils::options {
 
 static const char StringsDelimiter[] = ";";
 
-std::vector<StringRef> parseStringList(StringRef Option) {
+std::vector<llvm::StringRef> parseStringList(llvm::StringRef Option) {
   Option = Option.trim().trim(StringsDelimiter);
   if (Option.empty())
     return {};
-  std::vector<StringRef> Result;
+  std::vector<llvm::StringRef> Result;
   Result.reserve(Option.count(StringsDelimiter) + 1);
-  StringRef Cur;
+  llvm::StringRef Cur;
   while (std::tie(Cur, Option) = Option.split(StringsDelimiter),
          !Option.empty()) {
     Cur = Cur.trim();
@@ -32,17 +32,17 @@ std::vector<StringRef> parseStringList(StringRef Option) {
   return Result;
 }
 
-std::vector<StringRef> parseListPair(StringRef L, StringRef R) {
+std::vector<llvm::StringRef> parseListPair(llvm::StringRef L, llvm::StringRef R) {
   L = L.trim().trim(StringsDelimiter);
   if (L.empty())
     return parseStringList(R);
   R = R.trim().trim(StringsDelimiter);
   if (R.empty())
     return parseStringList(L);
-  std::vector<StringRef> Result;
+  std::vector<llvm::StringRef> Result;
   Result.reserve(2 + L.count(StringsDelimiter) + R.count(StringsDelimiter));
-  for (StringRef Option : {L, R}) {
-    StringRef Cur;
+  for (llvm::StringRef Option : {L, R}) {
+    llvm::StringRef Cur;
     while (std::tie(Cur, Option) = Option.split(StringsDelimiter),
            !Option.empty()) {
       Cur = Cur.trim();
@@ -56,7 +56,7 @@ std::vector<StringRef> parseListPair(StringRef L, StringRef R) {
   return Result;
 }
 
-std::string serializeStringList(ArrayRef<StringRef> Strings) {
+std::string serializeStringList(llvm::ArrayRef<llvm::StringRef> Strings) {
   return llvm::join(Strings, StringsDelimiter);
 }
 

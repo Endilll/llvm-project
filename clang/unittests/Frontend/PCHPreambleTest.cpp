@@ -24,8 +24,8 @@ using namespace clang;
 
 namespace {
 
-std::string Canonicalize(const Twine &Path) {
-  SmallVector<char, 128> PathVec;
+std::string Canonicalize(const llvm::Twine &Path) {
+  llvm::SmallVector<char, 128> PathVec;
   Path.toVector(PathVec);
   llvm::sys::path::remove_dots(PathVec, true);
   return std::string(PathVec.begin(), PathVec.end());
@@ -36,13 +36,13 @@ class ReadCountingInMemoryFileSystem : public vfs::InMemoryFileSystem
   std::map<std::string, unsigned> ReadCounts;
 
 public:
-  ErrorOr<std::unique_ptr<vfs::File>> openFileForRead(const Twine &Path) override
+  ErrorOr<std::unique_ptr<vfs::File>> openFileForRead(const llvm::Twine &Path) override
   {
     ++ReadCounts[Canonicalize(Path)];
     return InMemoryFileSystem::openFileForRead(Path);
   }
 
-  unsigned GetReadCount(const Twine &Path) const
+  unsigned GetReadCount(const llvm::Twine &Path) const
   {
     auto it = ReadCounts.find(Canonicalize(Path));
     return it == ReadCounts.end() ? 0 : it->second;
@@ -50,7 +50,7 @@ public:
 };
 
 class PCHPreambleTest : public ::testing::Test {
-  IntrusiveRefCntPtr<ReadCountingInMemoryFileSystem> VFS;
+  llvm::IntrusiveRefCntPtr<ReadCountingInMemoryFileSystem> VFS;
   StringMap<std::string> RemappedFiles;
   std::shared_ptr<PCHContainerOperations> PCHContainerOpts;
   FileSystemOptions FSOpts;
@@ -94,7 +94,7 @@ public:
     PreprocessorOptions &PPOpts = CI->getPreprocessorOpts();
     PPOpts.RemappedFilesKeepOriginalName = true;
 
-    IntrusiveRefCntPtr<DiagnosticsEngine>
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine>
       Diags(CompilerInstance::createDiagnostics(new DiagnosticOptions, new DiagnosticConsumer));
 
     FileManager *FileMgr = new FileManager(FSOpts, VFS);

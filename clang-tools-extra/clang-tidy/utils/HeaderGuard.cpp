@@ -16,8 +16,8 @@
 namespace clang::tidy::utils {
 
 /// canonicalize a path by removing ./ and ../ components.
-static std::string cleanPath(StringRef Path) {
-  SmallString<256> Result = Path;
+static std::string cleanPath(llvm::StringRef Path) {
+  llvm::SmallString<256> Result = Path;
   llvm::sys::path::remove_dots(Result, true);
   return std::string(Result);
 }
@@ -96,7 +96,7 @@ public:
 
       // If the macro Name is not equal to what we can compute, correct it in
       // the #ifndef and #define.
-      StringRef CurHeaderGuard =
+      llvm::StringRef CurHeaderGuard =
           MacroEntry.first.getIdentifierInfo()->getName();
       std::vector<FixItHint> FixIts;
       std::string NewGuard = checkHeaderGuardDefinition(
@@ -125,8 +125,8 @@ public:
     clearAllState();
   }
 
-  bool wouldFixEndifComment(StringRef FileName, SourceLocation EndIf,
-                            StringRef HeaderGuard,
+  bool wouldFixEndifComment(llvm::StringRef FileName, SourceLocation EndIf,
+                            llvm::StringRef HeaderGuard,
                             size_t *EndIfLenPtr = nullptr) {
     if (!EndIf.isValid())
       return false;
@@ -135,12 +135,12 @@ public:
     if (EndIfLenPtr)
       *EndIfLenPtr = EndIfLen;
 
-    StringRef EndIfStr(EndIfData, EndIfLen);
+    llvm::StringRef EndIfStr(EndIfData, EndIfLen);
     EndIfStr = EndIfStr.substr(EndIfStr.find_first_not_of("#endif \t"));
 
     // Give up if there's an escaped newline.
     size_t FindEscapedNewline = EndIfStr.find_last_not_of(' ');
-    if (FindEscapedNewline != StringRef::npos &&
+    if (FindEscapedNewline != llvm::StringRef::npos &&
         EndIfStr[FindEscapedNewline] == '\\')
       return false;
 
@@ -159,8 +159,8 @@ public:
   std::string checkHeaderGuardDefinition(SourceLocation Ifndef,
                                          SourceLocation Define,
                                          SourceLocation EndIf,
-                                         StringRef FileName,
-                                         StringRef CurHeaderGuard,
+                                         llvm::StringRef FileName,
+                                         llvm::StringRef CurHeaderGuard,
                                          std::vector<FixItHint> &FixIts) {
     std::string CPPVar = Check->getHeaderGuard(FileName, CurHeaderGuard);
     CPPVar = Check->sanitizeHeaderGuard(CPPVar);
@@ -186,8 +186,8 @@ public:
 
   /// Checks the comment after the #endif of a header guard and fixes it
   /// if it doesn't match \c HeaderGuard.
-  void checkEndifComment(StringRef FileName, SourceLocation EndIf,
-                         StringRef HeaderGuard,
+  void checkEndifComment(llvm::StringRef FileName, SourceLocation EndIf,
+                         llvm::StringRef HeaderGuard,
                          std::vector<FixItHint> &FixIts) {
     size_t EndIfLen = 0;
     if (wouldFixEndifComment(FileName, EndIf, HeaderGuard, &EndIfLen)) {
@@ -205,7 +205,7 @@ public:
     // fix-its to add the guard.
     // TODO: Insert the guard after top comments.
     for (const auto &FE : Files) {
-      StringRef FileName = FE.getKey();
+      llvm::StringRef FileName = FE.getKey();
       if (!Check->shouldSuggestToAddHeaderGuard(FileName))
         continue;
 
@@ -225,7 +225,7 @@ public:
       // FIXME: Can we move it into the right spot?
       bool SeenMacro = false;
       for (const auto &MacroEntry : Macros) {
-        StringRef Name = MacroEntry.first.getIdentifierInfo()->getName();
+        llvm::StringRef Name = MacroEntry.first.getIdentifierInfo()->getName();
         SourceLocation DefineLoc = MacroEntry.first.getLocation();
         if ((Name == CPPVar || Name == CPPVarUnder) &&
             SM.isWrittenInSameFile(StartLoc, DefineLoc)) {
@@ -275,22 +275,22 @@ void HeaderGuardCheck::registerPPCallbacks(const SourceManager &SM,
   PP->addPPCallbacks(std::make_unique<HeaderGuardPPCallbacks>(PP, this));
 }
 
-std::string HeaderGuardCheck::sanitizeHeaderGuard(StringRef Guard) {
+std::string HeaderGuardCheck::sanitizeHeaderGuard(llvm::StringRef Guard) {
   // Only reserved identifiers are allowed to start with an '_'.
   return Guard.ltrim('_').str();
 }
 
-bool HeaderGuardCheck::shouldSuggestEndifComment(StringRef FileName) {
+bool HeaderGuardCheck::shouldSuggestEndifComment(llvm::StringRef FileName) {
   return utils::isFileExtension(FileName, HeaderFileExtensions);
 }
 
-bool HeaderGuardCheck::shouldFixHeaderGuard(StringRef FileName) { return true; }
+bool HeaderGuardCheck::shouldFixHeaderGuard(llvm::StringRef FileName) { return true; }
 
-bool HeaderGuardCheck::shouldSuggestToAddHeaderGuard(StringRef FileName) {
+bool HeaderGuardCheck::shouldSuggestToAddHeaderGuard(llvm::StringRef FileName) {
   return utils::isFileExtension(FileName, HeaderFileExtensions);
 }
 
-std::string HeaderGuardCheck::formatEndIf(StringRef HeaderGuard) {
+std::string HeaderGuardCheck::formatEndIf(llvm::StringRef HeaderGuard) {
   return "endif // " + HeaderGuard.str();
 }
 } // namespace clang::tidy::utils

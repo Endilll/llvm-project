@@ -30,17 +30,17 @@
 
 using namespace clang;
 
-static void dumpPreviousDeclImpl(raw_ostream &OS, ...) {}
+static void dumpPreviousDeclImpl(llvm::raw_ostream &OS, ...) {}
 
 template <typename T>
-static void dumpPreviousDeclImpl(raw_ostream &OS, const Mergeable<T> *D) {
+static void dumpPreviousDeclImpl(llvm::raw_ostream &OS, const Mergeable<T> *D) {
   const T *First = D->getFirstDecl();
   if (First != D)
     OS << " first " << First;
 }
 
 template <typename T>
-static void dumpPreviousDeclImpl(raw_ostream &OS, const Redeclarable<T> *D) {
+static void dumpPreviousDeclImpl(llvm::raw_ostream &OS, const Redeclarable<T> *D) {
   const T *Prev = D->getPreviousDecl();
   if (Prev)
     OS << " prev " << Prev;
@@ -48,7 +48,7 @@ static void dumpPreviousDeclImpl(raw_ostream &OS, const Redeclarable<T> *D) {
 
 /// Dump the previous declaration in the redeclaration chain for a declaration,
 /// if any.
-static void dumpPreviousDecl(raw_ostream &OS, const Decl *D) {
+static void dumpPreviousDecl(llvm::raw_ostream &OS, const Decl *D) {
   switch (D->getKind()) {
 #define DECL(DERIVED, BASE)                                                    \
   case Decl::DERIVED:                                                          \
@@ -59,14 +59,14 @@ static void dumpPreviousDecl(raw_ostream &OS, const Decl *D) {
   llvm_unreachable("Decl that isn't part of DeclNodes.inc!");
 }
 
-TextNodeDumper::TextNodeDumper(raw_ostream &OS, const ASTContext &Context,
+TextNodeDumper::TextNodeDumper(llvm::raw_ostream &OS, const ASTContext &Context,
                                bool ShowColors)
     : TextTreeStructure(OS, ShowColors), OS(OS), ShowColors(ShowColors),
       Context(&Context), SM(&Context.getSourceManager()),
       PrintPolicy(Context.getPrintingPolicy()),
       Traits(&Context.getCommentCommandTraits()) {}
 
-TextNodeDumper::TextNodeDumper(raw_ostream &OS, bool ShowColors)
+TextNodeDumper::TextNodeDumper(llvm::raw_ostream &OS, bool ShowColors)
     : TextTreeStructure(OS, ShowColors), OS(OS), ShowColors(ShowColors) {}
 
 void TextNodeDumper::Visit(const comments::Comment *C,
@@ -112,7 +112,7 @@ void TextNodeDumper::Visit(const Attr *A) {
 }
 
 void TextNodeDumper::Visit(const TemplateArgument &TA, SourceRange R,
-                           const Decl *From, StringRef Label) {
+                           const Decl *From, llvm::StringRef Label) {
   OS << "TemplateArgument";
   if (R.isValid())
     dumpSourceRange(R);
@@ -371,7 +371,7 @@ void TextNodeDumper::Visit(const OMPClause *C) {
   }
   {
     ColorScope Color(OS, ShowColors, AttrColor);
-    StringRef ClauseName(llvm::omp::getOpenMPClauseName(C->getClauseKind()));
+    llvm::StringRef ClauseName(llvm::omp::getOpenMPClauseName(C->getClauseKind()));
     OS << "OMP" << ClauseName.substr(/*Start=*/0, /*N=*/1).upper()
        << ClauseName.drop_front() << "Clause";
   }
@@ -585,7 +585,7 @@ static bool isSimpleAPValue(const APValue &Value) {
 void TextNodeDumper::dumpAPValueChildren(
     const APValue &Value, QualType Ty,
     const APValue &(*IdxToChildFun)(const APValue &, unsigned),
-    unsigned NumChildren, StringRef LabelSingular, StringRef LabelPlurial) {
+    unsigned NumChildren, llvm::StringRef LabelSingular, llvm::StringRef LabelPlurial) {
   // To save some vertical space we print up to MaxChildrenPerLine APValues
   // considered to be simple (by isSimpleAPValue) on a single line.
   constexpr unsigned MaxChildrenPerLine = 4;
@@ -936,7 +936,7 @@ void clang::TextNodeDumper::dumpNestedNameSpecifier(const NestedNameSpecifier *N
   });
 }
 
-void TextNodeDumper::dumpDeclRef(const Decl *D, StringRef Label) {
+void TextNodeDumper::dumpDeclRef(const Decl *D, llvm::StringRef Label) {
   if (!D)
     return;
 
@@ -1127,7 +1127,7 @@ void TextNodeDumper::VisitPackTemplateArgument(const TemplateArgument &) {
   OS << " pack";
 }
 
-static void dumpBasePath(raw_ostream &OS, const CastExpr *Node) {
+static void dumpBasePath(llvm::raw_ostream &OS, const CastExpr *Node) {
   if (Node->path_empty())
     return;
 
@@ -2211,7 +2211,7 @@ void TextNodeDumper::VisitPragmaCommentDecl(const PragmaCommentDecl *D) {
     OS << "user";
     break;
   }
-  StringRef Arg = D->getArg();
+  llvm::StringRef Arg = D->getArg();
   if (!Arg.empty())
     OS << " \"" << Arg << "\"";
 }
@@ -2259,7 +2259,7 @@ void TextNodeDumper::VisitOMPRequiresDecl(const OMPRequiresDecl *D) {
       }
       {
         ColorScope Color(OS, ShowColors, AttrColor);
-        StringRef ClauseName(
+        llvm::StringRef ClauseName(
             llvm::omp::getOpenMPClauseName(C->getClauseKind()));
         OS << "OMP" << ClauseName.substr(/*Start=*/0, /*N=*/1).upper()
            << ClauseName.drop_front() << "Clause";

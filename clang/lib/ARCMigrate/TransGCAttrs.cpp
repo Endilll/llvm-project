@@ -46,7 +46,7 @@ public:
     if (!D || D->isImplicit())
       return true;
 
-    SaveAndRestore Save(FullyMigratable, isMigratable(D));
+    llvm::SaveAndRestore Save(FullyMigratable, isMigratable(D));
 
     if (ObjCPropertyDecl *PropD = dyn_cast<ObjCPropertyDecl>(D)) {
       lookForAttribute(PropD, PropD->getTypeSourceInfo());
@@ -96,7 +96,7 @@ public:
     SourceManager &SM = Ctx.getSourceManager();
     if (Loc.isMacroID())
       Loc = SM.getImmediateExpansionRange(Loc).getBegin();
-    StringRef Spell = OwnershipAttr->getKind()->getName();
+    llvm::StringRef Spell = OwnershipAttr->getKind()->getName();
     MigrationContext::GCAttrOccurrence::AttrKind Kind;
     if (Spell == "strong")
       Kind = MigrationContext::GCAttrOccurrence::Strong;
@@ -229,7 +229,7 @@ static void checkAllAtProps(MigrationContext &MigrateCtx,
       return;
   }
 
-  SmallVector<std::pair<AttributedTypeLoc, ObjCPropertyDecl *>, 4> ATLs;
+  llvm::SmallVector<std::pair<AttributedTypeLoc, ObjCPropertyDecl *>, 4> ATLs;
   bool hasWeak = false, hasStrong = false;
   ObjCPropertyAttribute::Kind Attrs = ObjCPropertyAttribute::kind_noattr;
   for (IndivPropsTy::iterator
@@ -265,7 +265,7 @@ static void checkAllAtProps(MigrationContext &MigrateCtx,
       MigrateCtx.AtPropsWeak.insert(AtLoc);
 
   } else {
-    StringRef toAttr = "strong";
+    llvm::StringRef toAttr = "strong";
     if (hasWeak) {
       if (canApplyWeak(MigrateCtx.Pass.Ctx, IndProps.front()->getType(),
                        /*AllowOnUnknownClass=*/true))

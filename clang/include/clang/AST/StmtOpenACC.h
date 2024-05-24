@@ -32,10 +32,10 @@ class OpenACCConstructStmt : public Stmt {
   /// the directive.
   SourceRange Range;
 
-  /// The list of clauses.  This is stored here as an ArrayRef, as this is the
+  /// The list of clauses.  This is stored here as an llvm::ArrayRef, as this is the
   /// most convienient place to access the list, however the list itself should
   /// be stored in leaf nodes, likely in trailing-storage.
-  MutableArrayRef<const OpenACCClause *> Clauses;
+  llvm::MutableArrayRef<const OpenACCClause *> Clauses;
 
 protected:
   OpenACCConstructStmt(StmtClass SC, OpenACCDirectiveKind K,
@@ -44,7 +44,7 @@ protected:
 
   // Used only for initialization, the leaf class can initialize this to
   // trailing storage.
-  void setClauseList(MutableArrayRef<const OpenACCClause *> NewClauses) {
+  void setClauseList(llvm::MutableArrayRef<const OpenACCClause *> NewClauses) {
     assert(Clauses.empty() && "Cannot change clause list");
     Clauses = NewClauses;
   }
@@ -59,7 +59,7 @@ public:
 
   SourceLocation getBeginLoc() const { return Range.getBegin(); }
   SourceLocation getEndLoc() const { return Range.getEnd(); }
-  ArrayRef<const OpenACCClause *> clauses() const { return Clauses; }
+  llvm::ArrayRef<const OpenACCClause *> clauses() const { return Clauses; }
 
   child_range children() {
     return child_range(child_iterator(), child_iterator());
@@ -136,13 +136,13 @@ class OpenACCComputeConstruct final
     std::uninitialized_value_construct(
         getTrailingObjects<const OpenACCClause *>(),
         getTrailingObjects<const OpenACCClause *>() + NumClauses);
-    setClauseList(MutableArrayRef(getTrailingObjects<const OpenACCClause *>(),
+    setClauseList(llvm::MutableArrayRef(getTrailingObjects<const OpenACCClause *>(),
                                   NumClauses));
   }
 
   OpenACCComputeConstruct(OpenACCDirectiveKind K, SourceLocation Start,
                           SourceLocation End,
-                          ArrayRef<const OpenACCClause *> Clauses,
+                          llvm::ArrayRef<const OpenACCClause *> Clauses,
                           Stmt *StructuredBlock)
       : OpenACCAssociatedStmtConstruct(OpenACCComputeConstructClass, K, Start,
                                        End, StructuredBlock) {
@@ -154,7 +154,7 @@ class OpenACCComputeConstruct final
     std::uninitialized_copy(Clauses.begin(), Clauses.end(),
                             getTrailingObjects<const OpenACCClause *>());
 
-    setClauseList(MutableArrayRef(getTrailingObjects<const OpenACCClause *>(),
+    setClauseList(llvm::MutableArrayRef(getTrailingObjects<const OpenACCClause *>(),
                                   Clauses.size()));
   }
 
@@ -169,7 +169,7 @@ public:
                                               unsigned NumClauses);
   static OpenACCComputeConstruct *
   Create(const ASTContext &C, OpenACCDirectiveKind K, SourceLocation BeginLoc,
-         SourceLocation EndLoc, ArrayRef<const OpenACCClause *> Clauses,
+         SourceLocation EndLoc, llvm::ArrayRef<const OpenACCClause *> Clauses,
          Stmt *StructuredBlock);
 
   Stmt *getStructuredBlock() { return getAssociatedStmt(); }

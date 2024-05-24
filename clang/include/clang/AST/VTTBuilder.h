@@ -74,12 +74,12 @@ class VTTBuilder {
   /// The most derived class for which we're building this vtable.
   const CXXRecordDecl *MostDerivedClass;
 
-  using VTTVTablesVectorTy = SmallVector<VTTVTable, 64>;
+  using VTTVTablesVectorTy = llvm::SmallVector<VTTVTable, 64>;
 
   /// The VTT vtables.
   VTTVTablesVectorTy VTTVTables;
 
-  using VTTComponentsVectorTy = SmallVector<VTTComponent, 64>;
+  using VTTComponentsVectorTy = llvm::SmallVector<VTTComponent, 64>;
 
   /// The VTT components.
   VTTComponentsVectorTy VTTComponents;

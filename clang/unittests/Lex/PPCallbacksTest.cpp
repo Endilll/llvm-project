@@ -34,10 +34,10 @@ namespace {
 class InclusionDirectiveCallbacks : public PPCallbacks {
 public:
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override {
     this->HashLoc = HashLoc;
@@ -55,12 +55,12 @@ public:
 
   SourceLocation HashLoc;
   Token IncludeTok;
-  SmallString<16> FileName;
+  llvm::SmallString<16> FileName;
   bool IsAngled;
   CharSourceRange FilenameRange;
   OptionalFileEntryRef File;
-  SmallString<16> SearchPath;
-  SmallString<16> RelativePath;
+  llvm::SmallString<16> SearchPath;
+  llvm::SmallString<16> RelativePath;
   const Module *SuggestedModule;
   bool ModuleImported;
   SrcMgr::CharacteristicKind FileType;
@@ -93,7 +93,7 @@ public:
 class PragmaOpenCLExtensionCallbacks : public PPCallbacks {
 public:
   typedef struct {
-    SmallString<16> Name;
+    llvm::SmallString<16> Name;
     unsigned State;
   } CallbackParameters;
 
@@ -110,7 +110,7 @@ public:
   }
 
   SourceLocation NameLoc;
-  SmallString<16> Name;
+  llvm::SmallString<16> Name;
   SourceLocation StateLoc;
   unsigned State;
 };
@@ -124,7 +124,7 @@ public:
 
   std::vector<Mark> Marks;
 
-  void PragmaMark(SourceLocation Loc, StringRef Trivia) override {
+  void PragmaMark(SourceLocation Loc, llvm::StringRef Trivia) override {
     Marks.emplace_back(Mark{Loc, Trivia.str()});
   }
 };
@@ -142,15 +142,15 @@ protected:
     Target = TargetInfo::CreateTargetInfo(Diags, TargetOpts);
   }
 
-  IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem;
   FileManager FileMgr;
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
   DiagnosticsEngine Diags;
   SourceManager SourceMgr;
   LangOptions LangOpts;
   std::shared_ptr<TargetOptions> TargetOpts;
-  IntrusiveRefCntPtr<TargetInfo> Target;
+  llvm::IntrusiveRefCntPtr<TargetInfo> Target;
 
   // Register a header path as a known file and add its location
   // to search path.
@@ -161,25 +161,25 @@ protected:
                                 llvm::MemoryBuffer::getMemBuffer("\n"));
 
     // Add header's parent path to search path.
-    StringRef SearchPath = llvm::sys::path::parent_path(HeaderPath);
+    llvm::StringRef SearchPath = llvm::sys::path::parent_path(HeaderPath);
     auto DE = FileMgr.getOptionalDirectoryRef(SearchPath);
     DirectoryLookup DL(*DE, SrcMgr::C_User, false);
     HeaderInfo.AddSearchPath(DL, IsSystemHeader);
   }
 
   // Get the raw source string of the range.
-  StringRef GetSourceString(CharSourceRange Range) {
+  llvm::StringRef GetSourceString(CharSourceRange Range) {
     const char* B = SourceMgr.getCharacterData(Range.getBegin());
     const char* E = SourceMgr.getCharacterData(Range.getEnd());
 
-    return StringRef(B, E - B);
+    return llvm::StringRef(B, E - B);
   }
 
-  StringRef GetSourceStringToEnd(CharSourceRange Range) {
+  llvm::StringRef GetSourceStringToEnd(CharSourceRange Range) {
     const char *B = SourceMgr.getCharacterData(Range.getBegin());
     const char *E = SourceMgr.getCharacterData(Range.getEnd());
 
-    return StringRef(
+    return llvm::StringRef(
         B,
         E - B + Lexer::MeasureTokenLength(Range.getEnd(), SourceMgr, LangOpts));
   }
@@ -239,7 +239,7 @@ protected:
   }
 
   std::vector<CondDirectiveCallbacks::Result>
-  DirectiveExprRange(StringRef SourceText) {
+  DirectiveExprRange(llvm::StringRef SourceText) {
     TrivialModuleLoader ModLoader;
     std::unique_ptr<llvm::MemoryBuffer> Buf =
         llvm::MemoryBuffer::getMemBuffer(SourceText);
@@ -447,7 +447,7 @@ TEST_F(PPCallbacksTest, FileNotFoundSkipped) {
   class FileNotFoundCallbacks : public PPCallbacks {
   public:
     unsigned int NumCalls = 0;
-    bool FileNotFound(StringRef FileName) override {
+    bool FileNotFound(llvm::StringRef FileName) override {
       NumCalls++;
       return FileName == "skipped.h";
     }

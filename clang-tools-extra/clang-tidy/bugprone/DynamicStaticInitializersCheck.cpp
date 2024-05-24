@@ -26,7 +26,7 @@ AST_MATCHER(clang::VarDecl, hasConstantDeclaration) {
 }
 
 DynamicStaticInitializersCheck::DynamicStaticInitializersCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       HeaderFileExtensions(Context->getHeaderFileExtensions()) {}
 

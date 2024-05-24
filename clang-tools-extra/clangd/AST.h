@@ -129,8 +129,8 @@ const ObjCImplDecl *getCorrespondingObjCImpl(const ObjCContainerDecl *D);
 ///   fallback in the absence of compile flags.
 Symbol::IncludeDirective
 preferredIncludeDirective(llvm::StringRef FileName, const LangOptions &LangOpts,
-                          ArrayRef<Inclusion> MainFileIncludes,
-                          ArrayRef<const Decl *> TopLevelDecls);
+                          llvm::ArrayRef<Inclusion> MainFileIncludes,
+                          llvm::ArrayRef<const Decl *> TopLevelDecls);
 
 /// Returns a QualType as string. The result doesn't contain unwritten scopes
 /// like anonymous/inline namespace.

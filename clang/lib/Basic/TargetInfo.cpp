@@ -177,7 +177,7 @@ TargetInfo::TargetInfo(const llvm::Triple &T) : Triple(T) {
 
   // Default to an unknown platform name.
   PlatformName = "unknown";
-  PlatformMinVersion = VersionTuple();
+  PlatformMinVersion = llvm::VersionTuple();
 
   MaxOpenCLWorkGroupSize = 1024;
 
@@ -187,7 +187,7 @@ TargetInfo::TargetInfo(const llvm::Triple &T) : Triple(T) {
 // Out of line virtual dtor for TargetInfo.
 TargetInfo::~TargetInfo() {}
 
-void TargetInfo::resetDataLayout(StringRef DL, const char *ULP) {
+void TargetInfo::resetDataLayout(llvm::StringRef DL, const char *ULP) {
   DataLayoutString = DL.str();
   UserLabelPrefix = ULP;
 }
@@ -530,10 +530,10 @@ void TargetInfo::adjust(DiagnosticsEngine &Diags, LangOptions &Opts) {
 }
 
 bool TargetInfo::initFeatureMap(
-    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, StringRef CPU,
+    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, llvm::StringRef CPU,
     const std::vector<std::string> &FeatureVec) const {
   for (const auto &F : FeatureVec) {
-    StringRef Name = F;
+    llvm::StringRef Name = F;
     if (Name.empty())
       continue;
     // Apply the feature via the target.
@@ -545,11 +545,11 @@ bool TargetInfo::initFeatureMap(
   return true;
 }
 
-ParsedTargetAttr TargetInfo::parseTargetAttr(StringRef Features) const {
+ParsedTargetAttr TargetInfo::parseTargetAttr(llvm::StringRef Features) const {
   ParsedTargetAttr Ret;
   if (Features == "default")
     return Ret;
-  SmallVector<StringRef, 1> AttrFeatures;
+  llvm::SmallVector<llvm::StringRef, 1> AttrFeatures;
   Features.split(AttrFeatures, ",");
 
   // Grab the various features and prepend a "+" to turn on the feature to
@@ -618,7 +618,7 @@ LangAS TargetInfo::getOpenCLTypeAddrSpace(OpenCLTypeKind TK) const {
 //===----------------------------------------------------------------------===//
 
 
-static StringRef removeGCCRegisterPrefix(StringRef Name) {
+static llvm::StringRef removeGCCRegisterPrefix(llvm::StringRef Name) {
   if (Name[0] == '%' || Name[0] == '#')
     Name = Name.substr(1);
 
@@ -628,7 +628,7 @@ static StringRef removeGCCRegisterPrefix(StringRef Name) {
 /// isValidClobber - Returns whether the passed in string is
 /// a valid clobber in an inline asm statement. This is used by
 /// Sema.
-bool TargetInfo::isValidClobber(StringRef Name) const {
+bool TargetInfo::isValidClobber(llvm::StringRef Name) const {
   return (isValidGCCRegisterName(Name) || Name == "memory" || Name == "cc" ||
           Name == "unwind");
 }
@@ -636,7 +636,7 @@ bool TargetInfo::isValidClobber(StringRef Name) const {
 /// isValidGCCRegisterName - Returns whether the passed in string
 /// is a valid register name according to GCC. This is used by Sema for
 /// inline asm statements.
-bool TargetInfo::isValidGCCRegisterName(StringRef Name) const {
+bool TargetInfo::isValidGCCRegisterName(llvm::StringRef Name) const {
   if (Name.empty())
     return false;
 
@@ -645,7 +645,7 @@ bool TargetInfo::isValidGCCRegisterName(StringRef Name) const {
   if (Name.empty())
     return false;
 
-  ArrayRef<const char *> Names = getGCCRegNames();
+  llvm::ArrayRef<const char *> Names = getGCCRegNames();
 
   // If we have a number it maps to an entry in the register name array.
   if (isDigit(Name[0])) {
@@ -681,14 +681,14 @@ bool TargetInfo::isValidGCCRegisterName(StringRef Name) const {
   return false;
 }
 
-StringRef TargetInfo::getNormalizedGCCRegisterName(StringRef Name,
+llvm::StringRef TargetInfo::getNormalizedGCCRegisterName(llvm::StringRef Name,
                                                    bool ReturnCanonical) const {
   assert(isValidGCCRegisterName(Name) && "Invalid register passed in");
 
   // Get rid of any register prefix.
   Name = removeGCCRegisterPrefix(Name);
 
-  ArrayRef<const char *> Names = getGCCRegNames();
+  llvm::ArrayRef<const char *> Names = getGCCRegNames();
 
   // First, check if we have a number.
   if (isDigit(Name[0])) {
@@ -797,7 +797,7 @@ bool TargetInfo::validateOutputConstraint(ConstraintInfo &Info) const {
 }
 
 bool TargetInfo::resolveSymbolicName(const char *&Name,
-                                     ArrayRef<ConstraintInfo> OutputConstraints,
+                                     llvm::ArrayRef<ConstraintInfo> OutputConstraints,
                                      unsigned &Index) const {
   assert(*Name == '[' && "Symbolic name did not start with '['");
   Name++;
@@ -820,7 +820,7 @@ bool TargetInfo::resolveSymbolicName(const char *&Name,
 }
 
 bool TargetInfo::validateInputConstraint(
-                              MutableArrayRef<ConstraintInfo> OutputConstraints,
+                              llvm::MutableArrayRef<ConstraintInfo> OutputConstraints,
                               ConstraintInfo &Info) const {
   const char *Name = Info.ConstraintStr.c_str();
 
@@ -837,7 +837,7 @@ bool TargetInfo::validateInputConstraint(
           Name++;
         const char *DigitEnd = Name;
         unsigned i;
-        if (StringRef(DigitStart, DigitEnd - DigitStart + 1)
+        if (llvm::StringRef(DigitStart, DigitEnd - DigitStart + 1)
                 .getAsInteger(10, i))
           return false;
 

@@ -158,25 +158,25 @@ public:
 
   /// \returns a CommandInfo object for a given command name or
   /// NULL if no CommandInfo object exists for this command.
-  const CommandInfo *getCommandInfoOrNULL(StringRef Name) const;
+  const CommandInfo *getCommandInfoOrNULL(llvm::StringRef Name) const;
 
-  const CommandInfo *getCommandInfo(StringRef Name) const {
+  const CommandInfo *getCommandInfo(llvm::StringRef Name) const {
     if (const CommandInfo *Info = getCommandInfoOrNULL(Name))
       return Info;
     llvm_unreachable("the command should be known");
   }
 
-  const CommandInfo *getTypoCorrectCommandInfo(StringRef Typo) const;
+  const CommandInfo *getTypoCorrectCommandInfo(llvm::StringRef Typo) const;
 
   const CommandInfo *getCommandInfo(unsigned CommandID) const;
 
-  const CommandInfo *registerUnknownCommand(StringRef CommandName);
+  const CommandInfo *registerUnknownCommand(llvm::StringRef CommandName);
 
-  const CommandInfo *registerBlockCommand(StringRef CommandName);
+  const CommandInfo *registerBlockCommand(llvm::StringRef CommandName);
 
   /// \returns a CommandInfo object for a given command name or
   /// NULL if \c Name is not a builtin command.
-  static const CommandInfo *getBuiltinCommandInfo(StringRef Name);
+  static const CommandInfo *getBuiltinCommandInfo(llvm::StringRef Name);
 
   /// \returns a CommandInfo object for a given command ID or
   /// NULL if \c CommandID is not a builtin command.
@@ -186,17 +186,17 @@ private:
   CommandTraits(const CommandTraits &) = delete;
   void operator=(const CommandTraits &) = delete;
 
-  const CommandInfo *getRegisteredCommandInfo(StringRef Name) const;
+  const CommandInfo *getRegisteredCommandInfo(llvm::StringRef Name) const;
   const CommandInfo *getRegisteredCommandInfo(unsigned CommandID) const;
 
-  CommandInfo *createCommandInfoWithName(StringRef CommandName);
+  CommandInfo *createCommandInfoWithName(llvm::StringRef CommandName);
 
   unsigned NextID;
 
   /// Allocator for CommandInfo objects.
   llvm::BumpPtrAllocator &Allocator;
 
-  SmallVector<CommandInfo *, 4> RegisteredCommands;
+  llvm::SmallVector<CommandInfo *, 4> RegisteredCommands;
 };
 
 } // end namespace comments

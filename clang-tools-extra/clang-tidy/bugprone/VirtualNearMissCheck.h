@@ -23,7 +23,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/virtual-near-miss.html
 class VirtualNearMissCheck : public ClangTidyCheck {
 public:
-  VirtualNearMissCheck(StringRef Name, ClangTidyContext *Context)
+  VirtualNearMissCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

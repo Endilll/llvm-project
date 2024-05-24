@@ -38,7 +38,7 @@ void CopyConstructorInitCheck::check(const MatchFinder::MatchResult &Result) {
   bool HasRelevantBaseInit = false;
   bool ShouldNotDoFixit = false;
   bool HasWrittenInitializer = false;
-  SmallVector<FixItHint, 2> SafeFixIts;
+  llvm::SmallVector<FixItHint, 2> SafeFixIts;
   for (const auto *Init : Ctor->inits()) {
     bool CtorInitIsWritten = Init->isWritten();
     HasWrittenInitializer = HasWrittenInitializer || CtorInitIsWritten;

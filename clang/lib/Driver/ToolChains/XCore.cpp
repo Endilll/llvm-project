@@ -117,10 +117,10 @@ void XCoreToolChain::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
       DriverArgs.hasArg(options::OPT_nostdlibinc))
     return;
   if (const char *cl_include_dir = getenv("XCC_C_INCLUDE_PATH")) {
-    SmallVector<StringRef, 4> Dirs;
+    llvm::SmallVector<llvm::StringRef, 4> Dirs;
     const char EnvPathSeparatorStr[] = {llvm::sys::EnvPathSeparator, '\0'};
-    StringRef(cl_include_dir).split(Dirs, StringRef(EnvPathSeparatorStr));
-    ArrayRef<StringRef> DirVec(Dirs);
+    llvm::StringRef(cl_include_dir).split(Dirs, llvm::StringRef(EnvPathSeparatorStr));
+    llvm::ArrayRef<llvm::StringRef> DirVec(Dirs);
     addSystemIncludes(DriverArgs, CC1Args, DirVec);
   }
 }
@@ -142,10 +142,10 @@ void XCoreToolChain::AddClangCXXStdlibIncludeArgs(
       DriverArgs.hasArg(options::OPT_nostdincxx))
     return;
   if (const char *cl_include_dir = getenv("XCC_CPLUS_INCLUDE_PATH")) {
-    SmallVector<StringRef, 4> Dirs;
+    llvm::SmallVector<llvm::StringRef, 4> Dirs;
     const char EnvPathSeparatorStr[] = {llvm::sys::EnvPathSeparator, '\0'};
-    StringRef(cl_include_dir).split(Dirs, StringRef(EnvPathSeparatorStr));
-    ArrayRef<StringRef> DirVec(Dirs);
+    llvm::StringRef(cl_include_dir).split(Dirs, llvm::StringRef(EnvPathSeparatorStr));
+    llvm::ArrayRef<llvm::StringRef> DirVec(Dirs);
     addSystemIncludes(DriverArgs, CC1Args, DirVec);
   }
 }

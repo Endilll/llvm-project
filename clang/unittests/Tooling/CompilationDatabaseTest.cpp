@@ -24,7 +24,7 @@ using testing::EndsWith;
 using testing::IsEmpty;
 using testing::UnorderedElementsAreArray;
 
-static void expectFailure(StringRef JSONDatabase, StringRef Explanation) {
+static void expectFailure(llvm::StringRef JSONDatabase, llvm::StringRef Explanation) {
   std::string ErrorMessage;
   EXPECT_EQ(nullptr,
             JSONCompilationDatabase::loadFromBuffer(JSONDatabase, ErrorMessage,
@@ -52,7 +52,7 @@ TEST(JSONCompilationDatabase, ErrsOnInvalidFormat) {
   expectFailure("[{\"output\":[]}]", "Expected strings as value.");
 }
 
-static std::vector<std::string> getAllFiles(StringRef JSONDatabase,
+static std::vector<std::string> getAllFiles(llvm::StringRef JSONDatabase,
                                             std::string &ErrorMessage,
                                             JSONCommandLineSyntax Syntax) {
   std::unique_ptr<CompilationDatabase> Database(
@@ -68,7 +68,7 @@ static std::vector<std::string> getAllFiles(StringRef JSONDatabase,
 }
 
 static std::vector<CompileCommand>
-getAllCompileCommands(JSONCommandLineSyntax Syntax, StringRef JSONDatabase,
+getAllCompileCommands(JSONCommandLineSyntax Syntax, llvm::StringRef JSONDatabase,
                       std::string &ErrorMessage) {
   std::unique_ptr<CompilationDatabase> Database(
       JSONCompilationDatabase::loadFromBuffer(JSONDatabase, ErrorMessage,
@@ -87,7 +87,7 @@ TEST(JSONCompilationDatabase, GetAllFiles) {
       << ErrorMessage;
 
   std::vector<std::string> expected_files;
-  SmallString<16> PathStorage;
+  llvm::SmallString<16> PathStorage;
   llvm::sys::path::native("//net/dir/file1", PathStorage);
   expected_files.push_back(std::string(PathStorage.str()));
   llvm::sys::path::native("//net/dir/file2", PathStorage);
@@ -131,14 +131,14 @@ TEST(JSONCompilationDatabase, GetAllCompileCommands) {
               .size())
       << ErrorMessage;
 
-  StringRef Directory1("//net/dir1");
-  StringRef FileName1("file1");
-  StringRef Command1("command1");
-  StringRef Output1("file1.o");
-  StringRef Directory2("//net/dir2");
-  StringRef FileName2("file2");
-  StringRef Command2("command2");
-  StringRef Output2("");
+  llvm::StringRef Directory1("//net/dir1");
+  llvm::StringRef FileName1("file1");
+  llvm::StringRef Command1("command1");
+  llvm::StringRef Output1("file1.o");
+  llvm::StringRef Directory2("//net/dir2");
+  llvm::StringRef FileName2("file2");
+  llvm::StringRef Command2("command2");
+  llvm::StringRef Output2("");
 
   std::vector<CompileCommand> Commands = getAllCompileCommands(
       JSONCommandLineSyntax::Gnu,
@@ -189,7 +189,7 @@ TEST(JSONCompilationDatabase, GetAllCompileCommands) {
   EXPECT_EQ(Command1, Commands[1].CommandLine[0]) << ErrorMessage;
 }
 
-static CompileCommand findCompileArgsInJsonDatabase(StringRef FileName,
+static CompileCommand findCompileArgsInJsonDatabase(llvm::StringRef FileName,
                                                     std::string JSONDatabase,
                                                     std::string &ErrorMessage) {
   std::unique_ptr<CompilationDatabase> Database(
@@ -207,11 +207,11 @@ static CompileCommand findCompileArgsInJsonDatabase(StringRef FileName,
 }
 
 TEST(JSONCompilationDatabase, ArgumentsPreferredOverCommand) {
-   StringRef Directory("//net/dir");
-   StringRef FileName("//net/dir/filename");
-   StringRef Command("command");
-   StringRef Arguments = "arguments";
-   Twine ArgumentsAccumulate;
+   llvm::StringRef Directory("//net/dir");
+   llvm::StringRef FileName("//net/dir/filename");
+   llvm::StringRef Command("command");
+   llvm::StringRef Arguments = "arguments";
+   llvm::Twine ArgumentsAccumulate;
    std::string ErrorMessage;
    CompileCommand FoundCommand = findCompileArgsInJsonDatabase(
       FileName,
@@ -227,7 +227,7 @@ TEST(JSONCompilationDatabase, ArgumentsPreferredOverCommand) {
 
 struct FakeComparator : public PathComparator {
   ~FakeComparator() override {}
-  bool equivalent(StringRef FileA, StringRef FileB) const override {
+  bool equivalent(llvm::StringRef FileA, llvm::StringRef FileB) const override {
     return FileA.equals_insensitive(FileB);
   }
 };
@@ -236,7 +236,7 @@ class FileMatchTrieTest : public ::testing::Test {
 protected:
   FileMatchTrieTest() : Trie(new FakeComparator()) {}
 
-  StringRef find(StringRef Path) {
+  llvm::StringRef find(llvm::StringRef Path) {
     llvm::raw_string_ostream ES(Error);
     return Trie.findEquivalent(Path, ES);
   }
@@ -319,9 +319,9 @@ TEST(findCompileArgsInJsonDatabase, FindsNothingIfEmpty) {
 }
 
 TEST(findCompileArgsInJsonDatabase, ReadsSingleEntry) {
-  StringRef Directory("//net/some/directory");
-  StringRef FileName("//net/path/to/a-file.cpp");
-  StringRef Command("//net/path/to/compiler and some arguments");
+  llvm::StringRef Directory("//net/some/directory");
+  llvm::StringRef FileName("//net/path/to/a-file.cpp");
+  llvm::StringRef Command("//net/path/to/compiler and some arguments");
   std::string ErrorMessage;
   CompileCommand FoundCommand = findCompileArgsInJsonDatabase(
     FileName,
@@ -348,9 +348,9 @@ TEST(findCompileArgsInJsonDatabase, ReadsSingleEntry) {
 }
 
 TEST(findCompileArgsInJsonDatabase, ReadsCompileCommandLinesWithSpaces) {
-  StringRef Directory("//net/some/directory");
-  StringRef FileName("//net/path/to/a-file.cpp");
-  StringRef Command("\\\"//net/path to compiler\\\" \\\"and an argument\\\"");
+  llvm::StringRef Directory("//net/some/directory");
+  llvm::StringRef FileName("//net/path/to/a-file.cpp");
+  llvm::StringRef Command("\\\"//net/path to compiler\\\" \\\"and an argument\\\"");
   std::string ErrorMessage;
   CompileCommand FoundCommand = findCompileArgsInJsonDatabase(
     FileName,
@@ -365,9 +365,9 @@ TEST(findCompileArgsInJsonDatabase, ReadsCompileCommandLinesWithSpaces) {
 }
 
 TEST(findCompileArgsInJsonDatabase, ReadsDirectoryWithSpaces) {
-  StringRef Directory("//net/some directory / with spaces");
-  StringRef FileName("//net/path/to/a-file.cpp");
-  StringRef Command("a command");
+  llvm::StringRef Directory("//net/some directory / with spaces");
+  llvm::StringRef FileName("//net/path/to/a-file.cpp");
+  llvm::StringRef Command("a command");
   std::string ErrorMessage;
   CompileCommand FoundCommand = findCompileArgsInJsonDatabase(
     FileName,
@@ -379,16 +379,16 @@ TEST(findCompileArgsInJsonDatabase, ReadsDirectoryWithSpaces) {
 }
 
 TEST(findCompileArgsInJsonDatabase, FindsEntry) {
-  StringRef Directory("//net/directory");
-  StringRef FileName("file");
-  StringRef Command("command");
+  llvm::StringRef Directory("//net/directory");
+  llvm::StringRef FileName("file");
+  llvm::StringRef Command("command");
   std::string JsonDatabase = "[";
   for (int I = 0; I < 10; ++I) {
     if (I > 0) JsonDatabase += ",";
     JsonDatabase +=
-      ("{\"directory\":\"" + Directory + Twine(I) + "\"," +
-        "\"command\":\"" + Command + Twine(I) + "\","
-        "\"file\":\"" + FileName + Twine(I) + "\"}").str();
+      ("{\"directory\":\"" + Directory + llvm::Twine(I) + "\"," +
+        "\"command\":\"" + Command + llvm::Twine(I) + "\","
+        "\"file\":\"" + FileName + llvm::Twine(I) + "\"}").str();
   }
   JsonDatabase += "]";
   std::string ErrorMessage;
@@ -425,7 +425,7 @@ TEST(findCompileArgsInJsonDatabase, ParsesCompilerWrappers) {
   }
 }
 
-static std::vector<std::string> unescapeJsonCommandLine(StringRef Command) {
+static std::vector<std::string> unescapeJsonCommandLine(llvm::StringRef Command) {
   std::string JsonDatabase =
     ("[{\"directory\":\"//net/root\", \"file\":\"test\", \"command\": \"" +
      Command + "\"}]").str();
@@ -533,7 +533,7 @@ TEST(unescapeJsonCommandLine, ParsesSingleQuotedString) {
 
 TEST(FixedCompilationDatabase, ReturnsFixedCommandLine) {
   FixedCompilationDatabase Database(".", /*CommandLine*/ {"one", "two"});
-  StringRef FileName("source");
+  llvm::StringRef FileName("source");
   std::vector<CompileCommand> Result =
     Database.getCompileCommands(FileName);
   ASSERT_EQ(1ul, Result.size());
@@ -711,11 +711,11 @@ TEST(ParseFixedCompilationDatabase, HandlesArgv0) {
 }
 
 struct MemCDB : public CompilationDatabase {
-  using EntryMap = llvm::StringMap<SmallVector<CompileCommand, 1>>;
+  using EntryMap = llvm::StringMap<llvm::SmallVector<CompileCommand, 1>>;
   EntryMap Entries;
   MemCDB(const EntryMap &E) : Entries(E) {}
 
-  std::vector<CompileCommand> getCompileCommands(StringRef F) const override {
+  std::vector<CompileCommand> getCompileCommands(llvm::StringRef F) const override {
     auto Ret = Entries.lookup(F);
     return {Ret.begin(), Ret.end()};
   }
@@ -732,21 +732,21 @@ class MemDBTest : public ::testing::Test {
 protected:
   // Adds an entry to the underlying compilation database.
   // A flag is injected: -D <File>, so the command used can be identified.
-  void add(StringRef File, StringRef Clang, StringRef Flags) {
-    SmallVector<StringRef, 8> Argv = {Clang, File, "-D", File};
+  void add(llvm::StringRef File, llvm::StringRef Clang, llvm::StringRef Flags) {
+    llvm::SmallVector<llvm::StringRef, 8> Argv = {Clang, File, "-D", File};
     llvm::SplitString(Flags, Argv);
 
     // Trim double quotation from the argumnets if any.
     for (auto *It = Argv.begin(); It != Argv.end(); ++It)
       *It = It->trim("\"");
 
-    SmallString<32> Dir;
+    llvm::SmallString<32> Dir;
     llvm::sys::path::system_temp_directory(false, Dir);
 
     Entries[path(File)].push_back(
         {Dir, path(File), {Argv.begin(), Argv.end()}, "foo.o"});
   }
-  void add(StringRef File, StringRef Flags = "") { add(File, "clang", Flags); }
+  void add(llvm::StringRef File, llvm::StringRef Flags = "") { add(File, "clang", Flags); }
 
   // Turn a unix path fragment (foo/bar.h) into a native path (C:\tmp\foo\bar.h)
   std::string path(llvm::SmallString<32> File) {
@@ -788,7 +788,7 @@ protected:
             ->getCompileCommands(path(F));
     if (Results.empty())
       return "none";
-    StringRef Proxy = Results.front().Heuristic;
+    llvm::StringRef Proxy = Results.front().Heuristic;
     if (!Proxy.consume_front("inferred from "))
       return "";
     // We have a proxy file, convert back to a unix relative path.
@@ -841,7 +841,7 @@ TEST_F(InterpolateTest, Language) {
   EXPECT_EQ(getCommand("baz.h"), "clang -D dir/baz.cee -x c-header");
   // prefer a worse match with the right extension.
   EXPECT_EQ(getCommand("foo.c"), "clang -D dir/bar.c");
-  Entries.erase(path(StringRef("dir/bar.c")));
+  Entries.erase(path(llvm::StringRef("dir/bar.c")));
   // Now we transfer across languages, so drop -std too.
   EXPECT_EQ(getCommand("foo.c"), "clang -D dir/foo.cpp");
   // Prefer -x over -std when overriding language.
@@ -976,7 +976,7 @@ public:
   ExpandResponseFilesTest() : FS(new llvm::vfs::InMemoryFileSystem) {}
 
 protected:
-  void addFile(StringRef File, StringRef Content) {
+  void addFile(llvm::StringRef File, llvm::StringRef Content) {
     ASSERT_TRUE(
         FS->addFile(File, 0, llvm::MemoryBuffer::getMemBufferCopy(Content)));
   }
@@ -993,7 +993,7 @@ protected:
 };
 
 TEST_F(ExpandResponseFilesTest, ExpandResponseFiles) {
-  addFile(path(StringRef("rsp1.rsp")), "-Dflag");
+  addFile(path(llvm::StringRef("rsp1.rsp")), "-Dflag");
 
   add("foo.cpp", "clang", "@rsp1.rsp");
   add("bar.cpp", "clang", "-Dflag");
@@ -1002,7 +1002,7 @@ TEST_F(ExpandResponseFilesTest, ExpandResponseFiles) {
 }
 
 TEST_F(ExpandResponseFilesTest, ExpandResponseFilesEmptyArgument) {
-  addFile(path(StringRef("rsp1.rsp")), "-Dflag");
+  addFile(path(llvm::StringRef("rsp1.rsp")), "-Dflag");
 
   add("foo.cpp", "clang", "@rsp1.rsp \"\"");
   EXPECT_EQ(getCommand("foo.cpp"), "clang foo.cpp -D foo.cpp -Dflag ");

@@ -211,12 +211,12 @@ Argument Name    Argument Value Syntax                                Clang C++ 
 ==============   ==================================================   ============================== ============================================================================================================
 HashLoc          "(file):(line):(col)"                                SourceLocation                 The location of the '#' that starts the inclusion directive.
 IncludeTok       (token)                                              const Token                    The token that indicates the kind of inclusion directive, e.g., 'include' or 'import'.
-FileName         "(file)"                                             StringRef                      The name of the file being included, as written in the source code.
+FileName         "(file)"                                             llvm::StringRef                      The name of the file being included, as written in the source code.
 IsAngled         (true|false)                                         bool                           Whether the file name was enclosed in angle brackets; otherwise, it was enclosed in quotes.
 FilenameRange    "(file)"                                             CharSourceRange                The character range of the quotes or angle brackets for the written file name.
 File             "(file)"                                             const FileEntry                The actual file that may be included by this inclusion directive.
-SearchPath       "(path)"                                             StringRef                      Contains the search path which was used to find the file in the file system.
-RelativePath     "(path)"                                             StringRef                      The path relative to SearchPath, at which the include file was found.
+SearchPath       "(path)"                                             llvm::StringRef                      Contains the search path which was used to find the file in the file system.
+RelativePath     "(path)"                                             llvm::StringRef                      The path relative to SearchPath, at which the include file was found.
 Imported         ((module name)|(null))                               const Module                   The module, whenever an inclusion directive was automatically turned into a module import or null otherwise.
 ==============   ==================================================   ============================== ============================================================================================================
 
@@ -367,7 +367,7 @@ Argument descriptions:
 Argument Name    Argument Value Syntax                                Clang C++ Type                 Description
 ==============   ==================================================   ============================== ================================
 Loc              "(file):(line):(col)"                                SourceLocation                 The location of the directive.
-DebugType        (string)                                             StringRef                      Indicates type of debug message.
+DebugType        (string)                                             llvm::StringRef                      Indicates type of debug message.
 ==============   ==================================================   ============================== ================================
 
 Example:::
@@ -387,9 +387,9 @@ Argument descriptions:
 Argument Name    Argument Value Syntax                                Clang C++ Type                 Description
 ==============   ==================================================   ============================== =======================================
 Loc              "(file):(line):(col)"                                SourceLocation                 The location of the directive.
-Namespace        (name)                                               StringRef                      The namespace of the message directive.
+Namespace        (name)                                               llvm::StringRef                      The namespace of the message directive.
 Kind             (PMK_Message|PMK_Warning|PMK_Error)                  PPCallbacks::PragmaMessageKind The type of the message directive.
-Str              (string)                                             StringRef                      The text of the message directive.
+Str              (string)                                             llvm::StringRef                      The text of the message directive.
 ==============   ==================================================   ============================== =======================================
 
 Example:::
@@ -411,7 +411,7 @@ Argument descriptions:
 Argument Name    Argument Value Syntax                                Clang C++ Type                 Description
 ==============   ==================================================   ============================== ==============================
 Loc              "(file):(line):(col)"                                SourceLocation                 The location of the directive.
-Namespace        (name)                                               StringRef                      Namespace name.
+Namespace        (name)                                               llvm::StringRef                      Namespace name.
 ==============   ==================================================   ============================== ==============================
 
 Example:::
@@ -431,7 +431,7 @@ Argument descriptions:
 Argument Name    Argument Value Syntax                                Clang C++ Type                 Description
 ==============   ==================================================   ============================== ==============================
 Loc              "(file):(line):(col)"                                SourceLocation                 The location of the directive.
-Namespace        (name)                                               StringRef                      Namespace name.
+Namespace        (name)                                               llvm::StringRef                      Namespace name.
 ==============   ==================================================   ============================== ==============================
 
 Example:::
@@ -451,9 +451,9 @@ Argument descriptions:
 Argument Name    Argument Value Syntax                                Clang C++ Type                 Description
 ==============   ==================================================   ============================== ==============================
 Loc              "(file):(line):(col)"                                SourceLocation                 The location of the directive.
-Namespace        (name)                                               StringRef                      Namespace name.
+Namespace        (name)                                               llvm::StringRef                      Namespace name.
 mapping          (0|MAP_IGNORE|MAP_WARNING|MAP_ERROR|MAP_FATAL)       diag::Severity                 Mapping type.
-Str              (string)                                             StringRef                      Warning/error name.
+Str              (string)                                             llvm::StringRef                      Warning/error name.
 ==============   ==================================================   ============================== ==============================
 
 Example:::
@@ -499,8 +499,8 @@ Argument descriptions:
 Argument Name    Argument Value Syntax                                Clang C++ Type                 Description
 ==============   ==================================================   ============================== ==============================
 Loc              "(file):(line):(col)"                                SourceLocation                 The location of the directive.
-WarningSpec      (string)                                             StringRef                      The warning specifier.
-Ids              [(number)[, ...]]                                    ArrayRef<int>                  The warning numbers.
+WarningSpec      (string)                                             llvm::StringRef                      The warning specifier.
+Ids              [(number)[, ...]]                                    llvm::ArrayRef<int>                  The warning numbers.
 ==============   ==================================================   ============================== ==============================
 
 Example:::

@@ -24,7 +24,7 @@ namespace targets {
 struct LLVM_LIBRARY_VISIBILITY MCUInfo {
   const char *Name;
   const char *DefineName;
-  StringRef Arch; // The __AVR_ARCH__ value.
+  llvm::StringRef Arch; // The __AVR_ARCH__ value.
   const int NumFlashBanks; // Set to 0 for the devices do not support LPM/ELPM.
 };
 
@@ -349,46 +349,46 @@ static MCUInfo AVRMcus[] = {
 } // namespace targets
 } // namespace clang
 
-static bool ArchHasELPM(StringRef Arch) {
+static bool ArchHasELPM(llvm::StringRef Arch) {
   return llvm::StringSwitch<bool>(Arch)
     .Cases("31", "51", "6", true)
     .Cases("102", "104", "105", "106", "107", true)
     .Default(false);
 }
 
-static bool ArchHasELPMX(StringRef Arch) {
+static bool ArchHasELPMX(llvm::StringRef Arch) {
   return llvm::StringSwitch<bool>(Arch)
     .Cases("51", "6", true)
     .Cases("102", "104", "105", "106", "107", true)
     .Default(false);
 }
 
-static bool ArchHasMOVW(StringRef Arch) {
+static bool ArchHasMOVW(llvm::StringRef Arch) {
   return llvm::StringSwitch<bool>(Arch)
     .Cases("25", "35", "4", "5", "51", "6", true)
     .Cases("102", "103", "104", "105", "106", "107", true)
     .Default(false);
 }
 
-static bool ArchHasLPMX(StringRef Arch) {
+static bool ArchHasLPMX(llvm::StringRef Arch) {
   return ArchHasMOVW(Arch); // same architectures
 }
 
-static bool ArchHasMUL(StringRef Arch) {
+static bool ArchHasMUL(llvm::StringRef Arch) {
   return llvm::StringSwitch<bool>(Arch)
     .Cases("4", "5", "51", "6", true)
     .Cases("102", "103", "104", "105", "106", "107", true)
     .Default(false);
 }
 
-static bool ArchHasJMPCALL(StringRef Arch) {
+static bool ArchHasJMPCALL(llvm::StringRef Arch) {
   return llvm::StringSwitch<bool>(Arch)
     .Cases("3", "31", "35", "5", "51", "6", true)
     .Cases("102", "103", "104", "105", "106", "107", true)
     .Default(false);
 }
 
-static bool ArchHas3BytePC(StringRef Arch) {
+static bool ArchHas3BytePC(llvm::StringRef Arch) {
   // These devices have more than 128kB of program memory.
   // Note:
   //   - Not fully correct for arch 106: only about half the chips have more
@@ -401,12 +401,12 @@ static bool ArchHas3BytePC(StringRef Arch) {
     .Default(false);
 }
 
-bool AVRTargetInfo::isValidCPUName(StringRef Name) const {
+bool AVRTargetInfo::isValidCPUName(llvm::StringRef Name) const {
   return llvm::any_of(
       AVRMcus, [&](const MCUInfo &Info) { return Info.Name == Name; });
 }
 
-void AVRTargetInfo::fillValidCPUList(SmallVectorImpl<StringRef> &Values) const {
+void AVRTargetInfo::fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   for (const MCUInfo &Info : AVRMcus)
     Values.push_back(Info.Name);
 }

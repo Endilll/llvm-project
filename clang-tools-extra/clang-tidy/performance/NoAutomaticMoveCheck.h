@@ -18,7 +18,7 @@ namespace clang::tidy::performance {
 /// http://clang.llvm.org/extra/clang-tidy/checks/performance/no-automatic-move.html
 class NoAutomaticMoveCheck : public ClangTidyCheck {
 public:
-  NoAutomaticMoveCheck(StringRef Name, ClangTidyContext *Context);
+  NoAutomaticMoveCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
   }
@@ -27,7 +27,7 @@ public:
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
 
 private:
-  const std::vector<StringRef> AllowedTypes;
+  const std::vector<llvm::StringRef> AllowedTypes;
 };
 
 } // namespace clang::tidy::performance

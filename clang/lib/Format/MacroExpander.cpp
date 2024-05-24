@@ -32,9 +32,9 @@ namespace clang {
 namespace format {
 
 struct MacroExpander::Definition {
-  StringRef Name;
-  SmallVector<FormatToken *, 8> Params;
-  SmallVector<FormatToken *, 8> Body;
+  llvm::StringRef Name;
+  llvm::SmallVector<FormatToken *, 8> Params;
+  llvm::SmallVector<FormatToken *, 8> Body;
 
   // Map from each argument's name to its position in the argument list.
   // With "M(x, y) x + y":
@@ -47,7 +47,7 @@ struct MacroExpander::Definition {
 
 class MacroExpander::DefinitionParser {
 public:
-  DefinitionParser(ArrayRef<FormatToken *> Tokens) : Tokens(Tokens) {
+  DefinitionParser(llvm::ArrayRef<FormatToken *> Tokens) : Tokens(Tokens) {
     assert(!Tokens.empty());
     Current = Tokens[0];
   }
@@ -115,7 +115,7 @@ private:
   size_t Pos = 0;
   FormatToken *Current = nullptr;
   Definition Def;
-  ArrayRef<FormatToken *> Tokens;
+  llvm::ArrayRef<FormatToken *> Tokens;
 };
 
 MacroExpander::MacroExpander(
@@ -150,20 +150,20 @@ void MacroExpander::parseDefinition(const std::string &Macro) {
   }
 }
 
-bool MacroExpander::defined(StringRef Name) const {
+bool MacroExpander::defined(llvm::StringRef Name) const {
   return FunctionLike.contains(Name) || ObjectLike.contains(Name);
 }
 
-bool MacroExpander::objectLike(StringRef Name) const {
+bool MacroExpander::objectLike(llvm::StringRef Name) const {
   return ObjectLike.contains(Name);
 }
 
-bool MacroExpander::hasArity(StringRef Name, unsigned Arity) const {
+bool MacroExpander::hasArity(llvm::StringRef Name, unsigned Arity) const {
   auto it = FunctionLike.find(Name);
   return it != FunctionLike.end() && it->second.contains(Arity);
 }
 
-SmallVector<FormatToken *, 8>
+llvm::SmallVector<FormatToken *, 8>
 MacroExpander::expand(FormatToken *ID,
                       std::optional<ArgsList> OptionalArgs) const {
   if (OptionalArgs)
@@ -176,7 +176,7 @@ MacroExpander::expand(FormatToken *ID,
                                     ->second
                               : ObjectLike.find(ID->TokenText)->second;
   ArgsList Args = OptionalArgs ? OptionalArgs.value() : ArgsList();
-  SmallVector<FormatToken *, 8> Result;
+  llvm::SmallVector<FormatToken *, 8> Result;
   // Expand each argument at most once.
   llvm::StringSet<> ExpandedArgs;
 

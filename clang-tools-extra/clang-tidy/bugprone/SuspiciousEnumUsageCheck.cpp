@@ -103,7 +103,7 @@ static bool isPossiblyBitMask(const EnumDecl *EnumDec) {
          !(NonPowOfTwoCounter == 1 && isMaxValAllBitSetLiteral(EnumDec));
 }
 
-SuspiciousEnumUsageCheck::SuspiciousEnumUsageCheck(StringRef Name,
+SuspiciousEnumUsageCheck::SuspiciousEnumUsageCheck(llvm::StringRef Name,
                                                    ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StrictMode(Options.getLocalOrGlobal("StrictMode", false)) {}
@@ -113,7 +113,7 @@ void SuspiciousEnumUsageCheck::storeOptions(ClangTidyOptions::OptionMap &Opts) {
 }
 
 void SuspiciousEnumUsageCheck::registerMatchers(MatchFinder *Finder) {
-  const auto EnumExpr = [](StringRef RefName, StringRef DeclName) {
+  const auto EnumExpr = [](llvm::StringRef RefName, llvm::StringRef DeclName) {
     return expr(hasType(enumDecl().bind(DeclName))).bind(RefName);
   };
 

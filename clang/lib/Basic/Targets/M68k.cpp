@@ -61,7 +61,7 @@ M68kTargetInfo::M68kTargetInfo(const llvm::Triple &Triple,
 }
 
 bool M68kTargetInfo::setCPU(const std::string &Name) {
-  StringRef N = Name;
+  llvm::StringRef N = Name;
   CPU = llvm::StringSwitch<CPUKind>(N)
             .Case("generic", CK_68000)
             .Case("M68000", CK_68000)
@@ -115,12 +115,12 @@ void M68kTargetInfo::getTargetDefines(const LangOptions &Opts,
     Builder.defineMacro("__HAVE_68881__");
 }
 
-ArrayRef<Builtin::Info> M68kTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> M68kTargetInfo::getTargetBuiltins() const {
   // FIXME: Implement.
   return std::nullopt;
 }
 
-bool M68kTargetInfo::hasFeature(StringRef Feature) const {
+bool M68kTargetInfo::hasFeature(llvm::StringRef Feature) const {
   // FIXME elaborate moar
   return Feature == "M68000";
 }
@@ -130,7 +130,7 @@ const char *const M68kTargetInfo::GCCRegNames[] = {
     "a0", "a1", "a2", "a3", "a4", "a5", "a6", "sp",
     "pc"};
 
-ArrayRef<const char *> M68kTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> M68kTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
@@ -140,7 +140,7 @@ const TargetInfo::GCCRegAlias M68kTargetInfo::GCCRegAliases[] = {
     {{"usp", "ssp", "isp", "a7"}, "sp"},
 };
 
-ArrayRef<TargetInfo::GCCRegAlias> M68kTargetInfo::getGCCRegAliases() const {
+llvm::ArrayRef<TargetInfo::GCCRegAlias> M68kTargetInfo::getGCCRegAliases() const {
   return llvm::ArrayRef(GCCRegAliases);
 }
 

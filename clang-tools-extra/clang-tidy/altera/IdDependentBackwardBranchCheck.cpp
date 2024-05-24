@@ -115,7 +115,7 @@ void IdDependentBackwardBranchCheck::saveIdDepVar(const Stmt *Statement,
   // Record that this variable is thread-dependent.
   IdDepVarsMap[Variable] =
       IdDependencyRecord(Variable, Variable->getBeginLoc(),
-                         Twine("assignment of ID-dependent variable ") +
+                         llvm::Twine("assignment of ID-dependent variable ") +
                              Variable->getNameAsString());
 }
 
@@ -124,7 +124,7 @@ void IdDependentBackwardBranchCheck::saveIdDepField(const Stmt *Statement,
   // Record that this field is thread-dependent.
   IdDepFieldsMap[Field] = IdDependencyRecord(
       Field, Statement->getBeginLoc(),
-      Twine("assignment of ID-dependent field ") + Field->getNameAsString());
+      llvm::Twine("assignment of ID-dependent field ") + Field->getNameAsString());
 }
 
 void IdDependentBackwardBranchCheck::saveIdDepVarFromReference(

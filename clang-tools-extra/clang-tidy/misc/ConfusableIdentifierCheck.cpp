@@ -24,7 +24,7 @@ namespace {
 
 namespace clang::tidy::misc {
 
-ConfusableIdentifierCheck::ConfusableIdentifierCheck(StringRef Name,
+ConfusableIdentifierCheck::ConfusableIdentifierCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context) {}
 
@@ -46,9 +46,9 @@ ConfusableIdentifierCheck::~ConfusableIdentifierCheck() = default;
 // We're skipping 1. and 3. for the sake of simplicity, but this can lead to
 // false positive.
 
-static llvm::SmallString<64U> skeleton(StringRef Name) {
+static llvm::SmallString<64U> skeleton(llvm::StringRef Name) {
   using namespace llvm;
-  SmallString<64U> Skeleton;
+  llvm::SmallString<64U> Skeleton;
   Skeleton.reserve(1U + Name.size());
 
   const char *Curr = Name.data();
@@ -65,7 +65,7 @@ static llvm::SmallString<64U> skeleton(StringRef Name) {
       break;
     }
 
-    StringRef Key(Prev, Curr - Prev);
+    llvm::StringRef Key(Prev, Curr - Prev);
     auto Where = llvm::lower_bound(ConfusableEntries, CodePoint,
                                    [](decltype(ConfusableEntries[0]) x,
                                       UTF32 y) { return x.codepoint < y; });
@@ -185,7 +185,7 @@ void ConfusableIdentifierCheck::check(
   if (!NDII)
     return;
 
-  StringRef NDName = NDII->getName();
+  llvm::StringRef NDName = NDII->getName();
   if (NDName.empty())
     return;
 
@@ -197,7 +197,7 @@ void ConfusableIdentifierCheck::check(
       continue;
 
     const IdentifierInfo *ONDII = E.Declaration->getIdentifier();
-    StringRef ONDName = ONDII->getName();
+    llvm::StringRef ONDName = ONDII->getName();
     if (ONDName == NDName)
       continue;
 

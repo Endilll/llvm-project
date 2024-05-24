@@ -80,7 +80,7 @@ private:
   HeaderMap KnownFiles;
 
   // Collection of expected header includes and the access level for them.
-  llvm::DenseMap<StringRef, HeaderType> KnownIncludes;
+  llvm::DenseMap<llvm::StringRef, HeaderType> KnownIncludes;
 };
 
 /// Lookup the dylib or TextAPI file location for a system library or framework.
@@ -93,10 +93,10 @@ private:
 /// \param SearchPaths Fallback search paths if library was not found in earlier
 /// paths.
 /// \return The full path of the library.
-std::string findLibrary(StringRef InstallName, FileManager &FM,
-                        ArrayRef<std::string> FrameworkSearchPaths,
-                        ArrayRef<std::string> LibrarySearchPaths,
-                        ArrayRef<std::string> SearchPaths);
+std::string findLibrary(llvm::StringRef InstallName, FileManager &FM,
+                        llvm::ArrayRef<std::string> FrameworkSearchPaths,
+                        llvm::ArrayRef<std::string> LibrarySearchPaths,
+                        llvm::ArrayRef<std::string> SearchPaths);
 } // namespace installapi
 } // namespace clang
 

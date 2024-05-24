@@ -5,11 +5,11 @@ using namespace llvm;
 
 // These tests are to Check whether CodeGen::TargetFeatures works correctly.
 TEST(CheckTargetFeaturesTest, checkBuiltinFeatures) {
-  auto doCheck = [](StringRef BuiltinFeatures, StringRef FuncFeatures) {
-    SmallVector<StringRef, 1> Features;
+  auto doCheck = [](llvm::StringRef BuiltinFeatures, llvm::StringRef FuncFeatures) {
+    llvm::SmallVector<llvm::StringRef, 1> Features;
     FuncFeatures.split(Features, ',');
     StringMap<bool> SM;
-    for (StringRef F : Features)
+    for (llvm::StringRef F : Features)
       SM.insert(std::make_pair(F, true));
     return clang::Builtin::evaluateRequiredTargetFeatures(BuiltinFeatures, SM);
   };

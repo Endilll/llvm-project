@@ -27,7 +27,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/unused-local-non-trivial-variable.html
 class UnusedLocalNonTrivialVariableCheck : public ClangTidyCheck {
 public:
-  UnusedLocalNonTrivialVariableCheck(StringRef Name, ClangTidyContext *Context);
+  UnusedLocalNonTrivialVariableCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
@@ -35,8 +35,8 @@ public:
   std::optional<TraversalKind> getCheckTraversalKind() const override;
 
 private:
-  const std::vector<StringRef> IncludeTypes;
-  const std::vector<StringRef> ExcludeTypes;
+  const std::vector<llvm::StringRef> IncludeTypes;
+  const std::vector<llvm::StringRef> ExcludeTypes;
 };
 
 } // namespace clang::tidy::bugprone

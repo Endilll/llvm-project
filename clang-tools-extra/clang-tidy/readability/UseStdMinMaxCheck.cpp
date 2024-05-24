@@ -83,7 +83,7 @@ static std::string createReplacement(const Expr *CondLhs, const Expr *CondRhs,
                                      const Expr *AssignLhs,
                                      const SourceManager &Source,
                                      const LangOptions &LO,
-                                     StringRef FunctionName,
+                                     llvm::StringRef FunctionName,
                                      const BinaryOperator *BO) {
   const llvm::StringRef CondLhsStr = Lexer::getSourceText(
       Source.getExpansionRange(CondLhs->getSourceRange()), Source, LO);
@@ -113,7 +113,7 @@ static std::string createReplacement(const Expr *CondLhs, const Expr *CondRhs,
       .str();
 }
 
-UseStdMinMaxCheck::UseStdMinMaxCheck(StringRef Name, ClangTidyContext *Context)
+UseStdMinMaxCheck::UseStdMinMaxCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IncludeInserter(Options.getLocalOrGlobal("IncludeStyle",
                                                utils::IncludeSorter::IS_LLVM),

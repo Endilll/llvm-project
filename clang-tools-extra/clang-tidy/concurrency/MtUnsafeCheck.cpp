@@ -13,7 +13,7 @@
 using namespace clang::ast_matchers;
 
 // Initial list was extracted from gcc documentation
-static const clang::StringRef GlibcFunctions[] = {
+static const llvm::StringRef GlibcFunctions[] = {
     "::argp_error",
     "::argp_help",
     "::argp_parse",
@@ -173,7 +173,7 @@ static const clang::StringRef GlibcFunctions[] = {
     "::wordexp",
 };
 
-static const clang::StringRef PosixFunctions[] = {
+static const llvm::StringRef PosixFunctions[] = {
     "::asctime",
     "::basename",
     "::catgets",
@@ -262,10 +262,10 @@ namespace clang::tidy {
 
 template <> struct OptionEnumMapping<concurrency::MtUnsafeCheck::FunctionSet> {
   static llvm::ArrayRef<
-      std::pair<concurrency::MtUnsafeCheck::FunctionSet, StringRef>>
+      std::pair<concurrency::MtUnsafeCheck::FunctionSet, llvm::StringRef>>
   getEnumMapping() {
     static constexpr std::pair<concurrency::MtUnsafeCheck::FunctionSet,
-                               StringRef>
+                               llvm::StringRef>
         Mapping[] = {{concurrency::MtUnsafeCheck::FunctionSet::Posix, "posix"},
                      {concurrency::MtUnsafeCheck::FunctionSet::Glibc, "glibc"},
                      {concurrency::MtUnsafeCheck::FunctionSet::Any, "any"}};
@@ -288,7 +288,7 @@ hasAnyMtUnsafeNames(MtUnsafeCheck::FunctionSet Libc) {
   llvm_unreachable("invalid FunctionSet");
 }
 
-MtUnsafeCheck::MtUnsafeCheck(StringRef Name, ClangTidyContext *Context)
+MtUnsafeCheck::MtUnsafeCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       FuncSet(Options.get("FunctionSet", MtUnsafeCheck::FunctionSet::Any)) {}
 

@@ -19,8 +19,8 @@ namespace {
 
 class SortImportsTestJS : public testing::Test {
 protected:
-  std::string sort(StringRef Code, unsigned Offset = 0, unsigned Length = 0) {
-    StringRef FileName = "input.js";
+  std::string sort(llvm::StringRef Code, unsigned Offset = 0, unsigned Length = 0) {
+    llvm::StringRef FileName = "input.js";
     if (Length == 0U)
       Length = Code.size() - Offset;
     std::vector<tooling::Range> Ranges(1, tooling::Range(Offset, Length));
@@ -33,8 +33,8 @@ protected:
     return *Formatted;
   }
 
-  void _verifySort(const char *File, int Line, StringRef Expected,
-                   StringRef Code, unsigned Offset = 0, unsigned Length = 0) {
+  void _verifySort(const char *File, int Line, llvm::StringRef Expected,
+                   llvm::StringRef Code, unsigned Offset = 0, unsigned Length = 0) {
     testing::ScopedTrace t(File, Line, testing::Message() << Code.str());
     std::string Result = sort(Code, Offset, Length);
     EXPECT_EQ(Expected.str(), Result) << "Expected:\n"

@@ -188,7 +188,7 @@ enum class EscapeChar {
 /// Return C-style escaped string for special characters, or an empty string if
 /// there is no such mapping.
 template <EscapeChar Opt, class CharT>
-LLVM_READONLY inline auto escapeCStyle(CharT Ch) -> StringRef {
+LLVM_READONLY inline auto escapeCStyle(CharT Ch) -> llvm::StringRef {
   switch (Ch) {
   case '\\':
     return "\\\\";
@@ -241,12 +241,12 @@ LLVM_READONLY inline char toUppercase(char c) {
 ///
 /// Note that this is a very simple check; it does not accept UCNs as valid
 /// identifier characters.
-LLVM_READONLY inline bool isValidAsciiIdentifier(StringRef S,
+LLVM_READONLY inline bool isValidAsciiIdentifier(llvm::StringRef S,
                                                  bool AllowDollar = false) {
   if (S.empty() || !isAsciiIdentifierStart(S[0], AllowDollar))
     return false;
 
-  for (StringRef::iterator I = S.begin(), E = S.end(); I != E; ++I)
+  for (llvm::StringRef::iterator I = S.begin(), E = S.end(); I != E; ++I)
     if (!isAsciiIdentifierContinue(*I, AllowDollar))
       return false;
 

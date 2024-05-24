@@ -19,8 +19,8 @@ using namespace clang;
 namespace {
 class InterfaceStubFunctionsConsumer : public ASTConsumer {
   CompilerInstance &Instance;
-  StringRef InFile;
-  StringRef Format;
+  llvm::StringRef InFile;
+  llvm::StringRef Format;
   std::set<std::string> ParsedTemplates;
 
   enum RootDeclOrigin { TopLevel = 0, FromTU = 1, IsLate = 2 };
@@ -237,8 +237,8 @@ class InterfaceStubFunctionsConsumer : public ASTConsumer {
   }
 
 public:
-  InterfaceStubFunctionsConsumer(CompilerInstance &Instance, StringRef InFile,
-                                 StringRef Format)
+  InterfaceStubFunctionsConsumer(CompilerInstance &Instance, llvm::StringRef InFile,
+                                 llvm::StringRef Format)
       : Instance(Instance), InFile(InFile), Format(Format) {}
 
   void HandleTranslationUnit(ASTContext &context) override {
@@ -288,8 +288,8 @@ public:
 
     auto writeIfsV1 = [this](const llvm::Triple &T,
                              const MangledSymbols &Symbols,
-                             const ASTContext &context, StringRef Format,
-                             raw_ostream &OS) -> void {
+                             const ASTContext &context, llvm::StringRef Format,
+                             llvm::raw_ostream &OS) -> void {
       OS << "--- !" << Format << "\n";
       OS << "IfsVersion: 3.0\n";
       OS << "Target: " << T.str() << "\n";
@@ -336,6 +336,6 @@ public:
 
 std::unique_ptr<ASTConsumer>
 GenerateInterfaceStubsAction::CreateASTConsumer(CompilerInstance &CI,
-                                                StringRef InFile) {
+                                                llvm::StringRef InFile) {
   return std::make_unique<InterfaceStubFunctionsConsumer>(CI, InFile, "ifs-v1");
 }

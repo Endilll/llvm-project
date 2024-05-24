@@ -16,7 +16,7 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::bugprone {
 
 MisplacedWideningCastCheck::MisplacedWideningCastCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       CheckImplicitCasts(Options.get("CheckImplicitCasts", false)) {}
 

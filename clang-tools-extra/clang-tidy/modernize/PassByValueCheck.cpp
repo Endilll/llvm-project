@@ -175,10 +175,10 @@ static bool hasRValueOverload(const CXXConstructorDecl *Ctor,
 
 /// Find all references to \p ParamDecl across all of the
 /// redeclarations of \p Ctor.
-static SmallVector<const ParmVarDecl *, 2>
+static llvm::SmallVector<const ParmVarDecl *, 2>
 collectParamDecls(const CXXConstructorDecl *Ctor,
                   const ParmVarDecl *ParamDecl) {
-  SmallVector<const ParmVarDecl *, 2> Results;
+  llvm::SmallVector<const ParmVarDecl *, 2> Results;
   unsigned ParamIdx = ParamDecl->getFunctionScopeIndex();
 
   for (const FunctionDecl *Redecl : Ctor->redecls())
@@ -186,7 +186,7 @@ collectParamDecls(const CXXConstructorDecl *Ctor,
   return Results;
 }
 
-PassByValueCheck::PassByValueCheck(StringRef Name, ClangTidyContext *Context)
+PassByValueCheck::PassByValueCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       Inserter(Options.getLocalOrGlobal("IncludeStyle",
                                         utils::IncludeSorter::IS_LLVM),

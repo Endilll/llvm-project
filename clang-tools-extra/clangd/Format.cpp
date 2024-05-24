@@ -61,10 +61,10 @@ void closeBrackets(std::string &Code, const format::FormatStyle &Style) {
   Code.append(Brackets.rbegin(), Brackets.rend());
 }
 
-static StringRef commentMarker(llvm::StringRef Line) {
-  for (StringRef Marker : {"///", "//"}){
+static llvm::StringRef commentMarker(llvm::StringRef Line) {
+  for (llvm::StringRef Marker : {"///", "//"}){
     auto I = Line.rfind(Marker);
-    if (I != StringRef::npos)
+    if (I != llvm::StringRef::npos)
       return Line.substr(I, Marker.size());
   }
   return "";
@@ -85,7 +85,7 @@ llvm::StringRef lastLine(llvm::StringRef Code) {
 // Its value should not affect the outcome. We use the default from reformat().
 llvm::StringRef Filename = "<stdin>";
 
-// tooling::Replacement from overlapping StringRefs: From must be part of Code.
+// tooling::Replacement from overlapping llvm::StringRefs: From must be part of Code.
 tooling::Replacement replacement(llvm::StringRef Code, llvm::StringRef From,
                                  llvm::StringRef To) {
   assert(From.begin() >= Code.begin() && From.end() <= Code.end());
@@ -121,7 +121,7 @@ struct IncrementalChanges {
 // FIXME: Move those functions to clang/include/clang/Format.h and reuse them?
 
 // Helper function for columnWidthWithTabs().
-inline unsigned columnWidth(StringRef Text) {
+inline unsigned columnWidth(llvm::StringRef Text) {
   int ContentWidth = llvm::sys::unicode::columnWidthUTF8(Text);
   if (ContentWidth < 0)
     return Text.size(); // fallback for unprintable characters
@@ -130,12 +130,12 @@ inline unsigned columnWidth(StringRef Text) {
 
 // Returns the number of columns required to display the \p Text on a terminal
 // with the \p TabWidth.
-inline unsigned columnWidthWithTabs(StringRef Text, unsigned TabWidth) {
+inline unsigned columnWidthWithTabs(llvm::StringRef Text, unsigned TabWidth) {
   unsigned TotalWidth = 0;
-  StringRef Tail = Text;
+  llvm::StringRef Tail = Text;
   for (;;) {
-    StringRef::size_type TabPos = Tail.find('\t');
-    if (TabPos == StringRef::npos)
+    llvm::StringRef::size_type TabPos = Tail.find('\t');
+    if (TabPos == llvm::StringRef::npos)
       return TotalWidth + columnWidth(Tail);
     TotalWidth += columnWidth(Tail.substr(0, TabPos));
     if (TabWidth)
@@ -158,31 +158,31 @@ IncrementalChanges getIncrementalChangesAfterNewline(llvm::StringRef Code,
   //    leading
   //    indentation^trailing
   // Where indentation was added by the editor.
-  StringRef Trailing = firstLine(Code.substr(Cursor));
-  StringRef Indentation = lastLine(Code.take_front(Cursor));
+  llvm::StringRef Trailing = firstLine(Code.substr(Cursor));
+  llvm::StringRef Indentation = lastLine(Code.take_front(Cursor));
   if (Indentation.data() == Code.data()) {
     vlog("Typed a newline, but we're still on the first line!");
     return Result;
   }
-  StringRef Leading =
+  llvm::StringRef Leading =
       lastLine(Code.take_front(Indentation.data() - Code.data() - 1));
-  StringRef NextLine = firstLine(Code.substr(Cursor + Trailing.size() + 1));
+  llvm::StringRef NextLine = firstLine(Code.substr(Cursor + Trailing.size() + 1));
 
   // Strip leading whitespace on trailing line.
-  StringRef TrailingTrim = Trailing.ltrim();
+  llvm::StringRef TrailingTrim = Trailing.ltrim();
   if (unsigned TrailWS = Trailing.size() - TrailingTrim.size())
     cantFail(Result.Changes.add(
-        replacement(Code, StringRef(Trailing.begin(), TrailWS), "")));
+        replacement(Code, llvm::StringRef(Trailing.begin(), TrailWS), "")));
 
   // If we split a comment, replace indentation with a comment marker.
   // If the editor made the new line a comment, also respect that.
-  StringRef CommentMarker = commentMarker(Leading);
+  llvm::StringRef CommentMarker = commentMarker(Leading);
   bool NewLineIsComment = !commentMarker(Indentation).empty();
   if (!CommentMarker.empty() &&
       (NewLineIsComment || !commentMarker(NextLine).empty() ||
        (!TrailingTrim.empty() && !TrailingTrim.starts_with("//")))) {
     // We indent the new comment to match the previous one.
-    StringRef PreComment =
+    llvm::StringRef PreComment =
         Leading.take_front(CommentMarker.data() - Leading.data());
     std::string IndentAndComment =
         (std::string(columnWidthWithTabs(PreComment, TabWidth), ' ') +
@@ -372,8 +372,8 @@ formatIncremental(llvm::StringRef OriginalCode, unsigned OriginalCursor,
     FinalCode =
         cantFail(tooling::applyAllReplacements(FinalCode, *Pass.second));
     dlog("After {0}:\n{1}^{2}", Pass.first,
-         StringRef(FinalCode).take_front(FinalCursor),
-         StringRef(FinalCode).drop_front(FinalCursor));
+         llvm::StringRef(FinalCode).take_front(FinalCursor),
+         llvm::StringRef(FinalCode).drop_front(FinalCursor));
 #endif
   }
   return split(Final, OriginalCursor, FinalCursor);

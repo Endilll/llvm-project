@@ -60,7 +60,7 @@ namespace toolchains {
 class LLVM_LIBRARY_VISIBILITY PS4PS5Base : public Generic_ELF {
 public:
   PS4PS5Base(const Driver &D, const llvm::Triple &Triple,
-             const llvm::opt::ArgList &Args, StringRef Platform,
+             const llvm::opt::ArgList &Args, llvm::StringRef Platform,
              const char *EnvVar);
 
   void
@@ -103,7 +103,7 @@ public:
 
   // Helper methods for PS4/PS5.
   virtual const char *getLinkerBaseName() const = 0;
-  virtual std::string qualifyPSCmdName(StringRef CmdName) const = 0;
+  virtual std::string qualifyPSCmdName(llvm::StringRef CmdName) const = 0;
   virtual void addSanitizerArgs(const llvm::opt::ArgList &Args,
                                 llvm::opt::ArgStringList &CmdArgs,
                                 const char *Prefix,
@@ -131,8 +131,8 @@ public:
   bool canSplitThinLTOUnit() const override { return false; }
 
   const char *getLinkerBaseName() const override { return "ld"; }
-  std::string qualifyPSCmdName(StringRef CmdName) const override {
-    return Twine("orbis-", CmdName).str();
+  std::string qualifyPSCmdName(llvm::StringRef CmdName) const override {
+    return llvm::Twine("orbis-", CmdName).str();
   }
   void addSanitizerArgs(const llvm::opt::ArgList &Args,
                         llvm::opt::ArgStringList &CmdArgs, const char *Prefix,
@@ -156,8 +156,8 @@ public:
   SanitizerMask getSupportedSanitizers() const override;
 
   const char *getLinkerBaseName() const override { return "lld"; }
-  std::string qualifyPSCmdName(StringRef CmdName) const override {
-    return Twine("prospero-", CmdName).str();
+  std::string qualifyPSCmdName(llvm::StringRef CmdName) const override {
+    return llvm::Twine("prospero-", CmdName).str();
   }
   void addSanitizerArgs(const llvm::opt::ArgList &Args,
                         llvm::opt::ArgStringList &CmdArgs, const char *Prefix,

@@ -57,7 +57,7 @@ class TagDecl;
 /// sources can resolve types and declarations from abstract IDs into
 /// actual type and declaration nodes, and read parts of declaration
 /// contexts.
-class ExternalASTSource : public RefCountedBase<ExternalASTSource> {
+class ExternalASTSource : public llvm::RefCountedBase<ExternalASTSource> {
   friend class ExternalSemaSource;
 
   /// Generation number for this external AST source. Must be increased
@@ -176,12 +176,12 @@ public:
   virtual void
   FindExternalLexicalDecls(const DeclContext *DC,
                            llvm::function_ref<bool(Decl::Kind)> IsKindWeWant,
-                           SmallVectorImpl<Decl *> &Result);
+                           llvm::SmallVectorImpl<Decl *> &Result);
 
   /// Finds all declarations lexically contained within the given
   /// DeclContext.
   void FindExternalLexicalDecls(const DeclContext *DC,
-                                SmallVectorImpl<Decl *> &Result) {
+                                llvm::SmallVectorImpl<Decl *> &Result) {
     FindExternalLexicalDecls(DC, [](Decl::Kind) { return true; }, Result);
   }
 
@@ -190,7 +190,7 @@ public:
   /// a range.
   virtual void FindFileRegionDecls(FileID File, unsigned Offset,
                                    unsigned Length,
-                                   SmallVectorImpl<Decl *> &Decls);
+                                   llvm::SmallVectorImpl<Decl *> &Decls);
 
   /// Gives the external AST source an opportunity to complete
   /// the redeclaration chain for a declaration. Called each time we
@@ -303,7 +303,7 @@ protected:
   static DeclContextLookupResult
   SetExternalVisibleDeclsForName(const DeclContext *DC,
                                  DeclarationName Name,
-                                 ArrayRef<NamedDecl*> Decls);
+                                 llvm::ArrayRef<NamedDecl*> Decls);
 
   static DeclContextLookupResult
   SetNoExternalVisibleDeclsForName(const DeclContext *DC,
@@ -496,11 +496,11 @@ namespace clang {
 /// items loaded from the external source are loaded lazily, when needed for
 /// iteration over the complete vector.
 template<typename T, typename Source,
-         void (Source::*Loader)(SmallVectorImpl<T>&),
+         void (Source::*Loader)(llvm::SmallVectorImpl<T>&),
          unsigned LoadedStorage = 2, unsigned LocalStorage = 4>
 class LazyVector {
-  SmallVector<T, LoadedStorage> Loaded;
-  SmallVector<T, LocalStorage> Local;
+  llvm::SmallVector<T, LoadedStorage> Loaded;
+  llvm::SmallVector<T, LocalStorage> Local;
 
 public:
   /// Iteration over the elements in the vector.

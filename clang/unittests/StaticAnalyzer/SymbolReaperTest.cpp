@@ -54,7 +54,7 @@ class SuperRegionLivenessAction : public ASTFrontendAction {
 public:
   SuperRegionLivenessAction() {}
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &Compiler,
-                                                 StringRef File) override {
+                                                 llvm::StringRef File) override {
     return std::make_unique<SuperRegionLivenessConsumer>(Compiler);
   }
 };

@@ -69,13 +69,13 @@ public:
 
   bool handleDiagnostics(const DiagnosticInfo &DI) override;
 
-  bool isAnalysisRemarkEnabled(StringRef PassName) const override {
+  bool isAnalysisRemarkEnabled(llvm::StringRef PassName) const override {
     return CodeGenOpts.OptimizationRemarkAnalysis.patternMatches(PassName);
   }
-  bool isMissedOptRemarkEnabled(StringRef PassName) const override {
+  bool isMissedOptRemarkEnabled(llvm::StringRef PassName) const override {
     return CodeGenOpts.OptimizationRemarkMissed.patternMatches(PassName);
   }
-  bool isPassedOptRemarkEnabled(StringRef PassName) const override {
+  bool isPassedOptRemarkEnabled(llvm::StringRef PassName) const override {
     return CodeGenOpts.OptimizationRemark.patternMatches(PassName);
   }
 
@@ -110,12 +110,12 @@ static void reportOptRecordError(Error E, DiagnosticsEngine &Diags,
 
 BackendConsumer::BackendConsumer(
     BackendAction Action, DiagnosticsEngine &Diags,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
     const HeaderSearchOptions &HeaderSearchOpts,
     const PreprocessorOptions &PPOpts, const CodeGenOptions &CodeGenOpts,
     const TargetOptions &TargetOpts, const LangOptions &LangOpts,
-    const std::string &InFile, SmallVector<LinkModule, 4> LinkModules,
-    std::unique_ptr<raw_pwrite_stream> OS, LLVMContext &C,
+    const std::string &InFile, llvm::SmallVector<LinkModule, 4> LinkModules,
+    std::unique_ptr<llvm::raw_pwrite_stream> OS, LLVMContext &C,
     CoverageSourceInfo *CoverageInfo)
     : Diags(Diags), Action(Action), HeaderSearchOpts(HeaderSearchOpts),
       CodeGenOpts(CodeGenOpts), TargetOpts(TargetOpts), LangOpts(LangOpts),
@@ -135,11 +135,11 @@ BackendConsumer::BackendConsumer(
 // initializing the OS field.
 BackendConsumer::BackendConsumer(
     BackendAction Action, DiagnosticsEngine &Diags,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
     const HeaderSearchOptions &HeaderSearchOpts,
     const PreprocessorOptions &PPOpts, const CodeGenOptions &CodeGenOpts,
     const TargetOptions &TargetOpts, const LangOptions &LangOpts,
-    llvm::Module *Module, SmallVector<LinkModule, 4> LinkModules,
+    llvm::Module *Module, llvm::SmallVector<LinkModule, 4> LinkModules,
     LLVMContext &C, CoverageSourceInfo *CoverageInfo)
     : Diags(Diags), Action(Action), HeaderSearchOpts(HeaderSearchOpts),
       CodeGenOpts(CodeGenOpts), TargetOpts(TargetOpts), LangOpts(LangOpts),
@@ -299,7 +299,7 @@ void BackendConsumer::HandleTranslationUnit(ASTContext &C) {
   Ctx.setDiagnosticHandler(std::make_unique<ClangDiagnosticHandler>(
       CodeGenOpts, this));
 
-  Expected<std::unique_ptr<llvm::ToolOutputFile>> OptRecordFileOrErr =
+  llvm::Expected<std::unique_ptr<llvm::ToolOutputFile>> OptRecordFileOrErr =
     setupLLVMOptimizationRemarks(
       Ctx, CodeGenOpts.OptRecordFile, CodeGenOpts.OptRecordPasses,
       CodeGenOpts.OptRecordFormat, CodeGenOpts.DiagnosticsWithHotness,
@@ -485,7 +485,7 @@ void BackendConsumer::SrcMgrDiagHandler(const llvm::DiagnosticInfoSrcMgr &DI) {
   // First, we re-format the SMDiagnostic in terms of a clang diagnostic.
 
   // Strip "error: " off the start of the message string.
-  StringRef Message = D.getMessage();
+  llvm::StringRef Message = D.getMessage();
   (void)Message.consume_front("error: ");
 
   // If the SMDiagnostic has an inline asm source location, translate it.
@@ -580,7 +580,7 @@ bool BackendConsumer::ResourceLimitDiagHandler(
 
 const FullSourceLoc BackendConsumer::getBestLocationFromDebugLoc(
     const llvm::DiagnosticInfoWithLocationBase &D, bool &BadDebugInfo,
-    StringRef &Filename, unsigned &Line, unsigned &Column) const {
+    llvm::StringRef &Filename, unsigned &Line, unsigned &Column) const {
   SourceManager &SourceMgr = Context->getSourceManager();
   FileManager &FileMgr = SourceMgr.getFileManager();
   SourceLocation DILoc;
@@ -636,7 +636,7 @@ void BackendConsumer::UnsupportedDiagHandler(
   assert(D.getSeverity() == llvm::DS_Error ||
          D.getSeverity() == llvm::DS_Warning);
 
-  StringRef Filename;
+  llvm::StringRef Filename;
   unsigned Line, Column;
   bool BadDebugInfo = false;
   FullSourceLoc Loc;
@@ -673,7 +673,7 @@ void BackendConsumer::EmitOptimizationMessage(
   assert(D.getSeverity() == llvm::DS_Remark ||
          D.getSeverity() == llvm::DS_Warning);
 
-  StringRef Filename;
+  llvm::StringRef Filename;
   unsigned Line, Column;
   bool BadDebugInfo = false;
   FullSourceLoc Loc;
@@ -784,7 +784,7 @@ void BackendConsumer::DontCallDiagHandler(const DiagnosticInfoDontCall &D) {
 
 void BackendConsumer::MisExpectDiagHandler(
     const llvm::DiagnosticInfoMisExpect &D) {
-  StringRef Filename;
+  llvm::StringRef Filename;
   unsigned Line, Column;
   bool BadDebugInfo = false;
   FullSourceLoc Loc =
@@ -931,7 +931,7 @@ bool CodeGenAction::loadLinkModules(CompilerInstance &CI) {
       return true;
     }
 
-    Expected<std::unique_ptr<llvm::Module>> ModuleOrErr =
+    llvm::Expected<std::unique_ptr<llvm::Module>> ModuleOrErr =
         getOwningLazyBitcodeModule(std::move(*BCBuf), *VMContext);
     if (!ModuleOrErr) {
       handleAllErrors(ModuleOrErr.takeError(), [&](ErrorInfoBase &EIB) {
@@ -977,8 +977,8 @@ bool CodeGenAction::BeginSourceFileAction(CompilerInstance &CI) {
   return true;
 }
 
-static std::unique_ptr<raw_pwrite_stream>
-GetOutputStream(CompilerInstance &CI, StringRef InFile, BackendAction Action) {
+static std::unique_ptr<llvm::raw_pwrite_stream>
+GetOutputStream(CompilerInstance &CI, llvm::StringRef InFile, BackendAction Action) {
   switch (Action) {
   case Backend_EmitAssembly:
     return CI.createDefaultOutputFile(false, InFile, "s");
@@ -998,9 +998,9 @@ GetOutputStream(CompilerInstance &CI, StringRef InFile, BackendAction Action) {
 }
 
 std::unique_ptr<ASTConsumer>
-CodeGenAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+CodeGenAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   BackendAction BA = static_cast<BackendAction>(Act);
-  std::unique_ptr<raw_pwrite_stream> OS = CI.takeOutputStream();
+  std::unique_ptr<llvm::raw_pwrite_stream> OS = CI.takeOutputStream();
   if (!OS)
     OS = GetOutputStream(CI, InFile, BA);
 
@@ -1067,7 +1067,7 @@ CodeGenAction::loadModule(MemoryBufferRef MBRef) {
   if (!CI.getCodeGenOpts().ThinLTOIndexFile.empty()) {
     VMContext->enableDebugTypeODRUniquing();
 
-    Expected<std::vector<BitcodeModule>> BMsOrErr = getBitcodeModuleList(MBRef);
+    llvm::Expected<std::vector<BitcodeModule>> BMsOrErr = getBitcodeModuleList(MBRef);
     if (!BMsOrErr)
       return DiagErrors(BMsOrErr.takeError());
     BitcodeModule *Bm = llvm::lto::findThinLTOModule(*BMsOrErr);
@@ -1080,7 +1080,7 @@ CodeGenAction::loadModule(MemoryBufferRef MBRef) {
       M->setTargetTriple(CI.getTargetOpts().Triple);
       return M;
     }
-    Expected<std::unique_ptr<llvm::Module>> MOrErr =
+    llvm::Expected<std::unique_ptr<llvm::Module>> MOrErr =
         Bm->parseModule(*VMContext);
     if (!MOrErr)
       return DiagErrors(MOrErr.takeError());
@@ -1099,11 +1099,11 @@ CodeGenAction::loadModule(MemoryBufferRef MBRef) {
   // If MBRef is a bitcode with multiple modules (e.g., -fsplit-lto-unit
   // output), place the extra modules (actually only one, a regular LTO module)
   // into LinkModules as if we are using -mlink-bitcode-file.
-  Expected<std::vector<BitcodeModule>> BMsOrErr = getBitcodeModuleList(MBRef);
+  llvm::Expected<std::vector<BitcodeModule>> BMsOrErr = getBitcodeModuleList(MBRef);
   if (BMsOrErr && BMsOrErr->size()) {
     std::unique_ptr<llvm::Module> FirstM;
     for (auto &BM : *BMsOrErr) {
-      Expected<std::unique_ptr<llvm::Module>> MOrErr =
+      llvm::Expected<std::unique_ptr<llvm::Module>> MOrErr =
           BM.parseModule(*VMContext);
       if (!MOrErr)
         return DiagErrors(MOrErr.takeError());
@@ -1131,7 +1131,7 @@ CodeGenAction::loadModule(MemoryBufferRef MBRef) {
   }
 
   // Strip off a leading diagnostic code if there is one.
-  StringRef Msg = Err.getMessage();
+  llvm::StringRef Msg = Err.getMessage();
   Msg.consume_front("error: ");
 
   unsigned DiagID =
@@ -1152,7 +1152,7 @@ void CodeGenAction::ExecuteAction() {
   CompilerInstance &CI = getCompilerInstance();
   auto &CodeGenOpts = CI.getCodeGenOpts();
   auto &Diagnostics = CI.getDiagnostics();
-  std::unique_ptr<raw_pwrite_stream> OS =
+  std::unique_ptr<llvm::raw_pwrite_stream> OS =
       GetOutputStream(CI, getCurrentFileOrBufferName(), BA);
   if (BA != Backend_EmitNothing && !OS)
     return;
@@ -1205,7 +1205,7 @@ void CodeGenAction::ExecuteAction() {
   Ctx.setDiagnosticHandler(
       std::make_unique<ClangDiagnosticHandler>(CodeGenOpts, &Result));
 
-  Expected<std::unique_ptr<llvm::ToolOutputFile>> OptRecordFileOrErr =
+  llvm::Expected<std::unique_ptr<llvm::ToolOutputFile>> OptRecordFileOrErr =
       setupLLVMOptimizationRemarks(
           Ctx, CodeGenOpts.OptRecordFile, CodeGenOpts.OptRecordPasses,
           CodeGenOpts.OptRecordFormat, CodeGenOpts.DiagnosticsWithHotness,

@@ -58,7 +58,7 @@ public:
 
   virtual void dump() const;
 
-  virtual void dumpToStream(raw_ostream &os) const {}
+  virtual void dumpToStream(llvm::raw_ostream &os) const {}
 
   virtual QualType getType() const = 0;
   virtual void Profile(llvm::FoldingSetNodeID &profile) = 0;
@@ -69,7 +69,7 @@ public:
   /// expression symbol and all the operands in it. Note, SymbolDerived is
   /// treated as SymbolData - the iterator will NOT visit the parent region.
   class symbol_iterator {
-    SmallVector<const SymExpr *, 5> itr;
+    llvm::SmallVector<const SymExpr *, 5> itr;
 
     void expand();
 
@@ -104,14 +104,14 @@ public:
   virtual const MemRegion *getOriginRegion() const { return nullptr; }
 };
 
-inline raw_ostream &operator<<(raw_ostream &os,
+inline llvm::raw_ostream &operator<<(llvm::raw_ostream &os,
                                const clang::ento::SymExpr *SE) {
   SE->dumpToStream(os);
   return os;
 }
 
 using SymbolRef = const SymExpr *;
-using SymbolRefSmallVectorTy = SmallVector<SymbolRef, 2>;
+using SymbolRefSmallVectorTy = llvm::SmallVector<SymbolRef, 2>;
 using SymbolID = unsigned;
 
 /// A symbol representing data which can be stored in a memory location
@@ -130,7 +130,7 @@ public:
   ~SymbolData() override = default;
 
   /// Get a string representation of the kind of the region.
-  virtual StringRef getKindStr() const = 0;
+  virtual llvm::StringRef getKindStr() const = 0;
 
   SymbolID getSymbolID() const { return Sym; }
 

@@ -182,7 +182,7 @@ SourceLocation CXXScalarValueInitExpr::getBeginLoc() const {
 CXXNewExpr::CXXNewExpr(bool IsGlobalNew, FunctionDecl *OperatorNew,
                        FunctionDecl *OperatorDelete, bool ShouldPassAlignment,
                        bool UsualArrayDeleteWantsSize,
-                       ArrayRef<Expr *> PlacementArgs, SourceRange TypeIdParens,
+                       llvm::ArrayRef<Expr *> PlacementArgs, SourceRange TypeIdParens,
                        std::optional<Expr *> ArraySize,
                        CXXNewInitializationStyle InitializationStyle,
                        Expr *Initializer, QualType Ty,
@@ -245,7 +245,7 @@ CXXNewExpr::CXXNewExpr(EmptyShell Empty, bool IsArray,
 CXXNewExpr *CXXNewExpr::Create(
     const ASTContext &Ctx, bool IsGlobalNew, FunctionDecl *OperatorNew,
     FunctionDecl *OperatorDelete, bool ShouldPassAlignment,
-    bool UsualArrayDeleteWantsSize, ArrayRef<Expr *> PlacementArgs,
+    bool UsualArrayDeleteWantsSize, llvm::ArrayRef<Expr *> PlacementArgs,
     SourceRange TypeIdParens, std::optional<Expr *> ArraySize,
     CXXNewInitializationStyle InitializationStyle, Expr *Initializer,
     QualType Ty, TypeSourceInfo *AllocatedTypeInfo, SourceRange Range,
@@ -539,7 +539,7 @@ SourceLocation CXXConstructExpr::getEndLoc() const {
 }
 
 CXXOperatorCallExpr::CXXOperatorCallExpr(OverloadedOperatorKind OpKind,
-                                         Expr *Fn, ArrayRef<Expr *> Args,
+                                         Expr *Fn, llvm::ArrayRef<Expr *> Args,
                                          QualType Ty, ExprValueKind VK,
                                          SourceLocation OperatorLoc,
                                          FPOptionsOverride FPFeatures,
@@ -561,7 +561,7 @@ CXXOperatorCallExpr::CXXOperatorCallExpr(unsigned NumArgs, bool HasFPFeatures,
 CXXOperatorCallExpr *
 CXXOperatorCallExpr::Create(const ASTContext &Ctx,
                             OverloadedOperatorKind OpKind, Expr *Fn,
-                            ArrayRef<Expr *> Args, QualType Ty,
+                            llvm::ArrayRef<Expr *> Args, QualType Ty,
                             ExprValueKind VK, SourceLocation OperatorLoc,
                             FPOptionsOverride FPFeatures, ADLCallKind UsesADL) {
   // Allocate storage for the trailing objects of CallExpr.
@@ -610,7 +610,7 @@ SourceRange CXXOperatorCallExpr::getSourceRangeImpl() const {
   }
 }
 
-CXXMemberCallExpr::CXXMemberCallExpr(Expr *Fn, ArrayRef<Expr *> Args,
+CXXMemberCallExpr::CXXMemberCallExpr(Expr *Fn, llvm::ArrayRef<Expr *> Args,
                                      QualType Ty, ExprValueKind VK,
                                      SourceLocation RP,
                                      FPOptionsOverride FPOptions,
@@ -624,7 +624,7 @@ CXXMemberCallExpr::CXXMemberCallExpr(unsigned NumArgs, bool HasFPFeatures,
                Empty) {}
 
 CXXMemberCallExpr *CXXMemberCallExpr::Create(const ASTContext &Ctx, Expr *Fn,
-                                             ArrayRef<Expr *> Args, QualType Ty,
+                                             llvm::ArrayRef<Expr *> Args, QualType Ty,
                                              ExprValueKind VK,
                                              SourceLocation RP,
                                              FPOptionsOverride FPFeatures,
@@ -883,7 +883,7 @@ SourceLocation CXXFunctionalCastExpr::getEndLoc() const {
   return RParenLoc.isValid() ? RParenLoc : getSubExpr()->getEndLoc();
 }
 
-UserDefinedLiteral::UserDefinedLiteral(Expr *Fn, ArrayRef<Expr *> Args,
+UserDefinedLiteral::UserDefinedLiteral(Expr *Fn, llvm::ArrayRef<Expr *> Args,
                                        QualType Ty, ExprValueKind VK,
                                        SourceLocation LitEndLoc,
                                        SourceLocation SuffixLoc,
@@ -898,7 +898,7 @@ UserDefinedLiteral::UserDefinedLiteral(unsigned NumArgs, bool HasFPFeatures,
                HasFPFeatures, Empty) {}
 
 UserDefinedLiteral *UserDefinedLiteral::Create(const ASTContext &Ctx, Expr *Fn,
-                                               ArrayRef<Expr *> Args,
+                                               llvm::ArrayRef<Expr *> Args,
                                                QualType Ty, ExprValueKind VK,
                                                SourceLocation LitEndLoc,
                                                SourceLocation SuffixLoc,
@@ -1057,7 +1057,7 @@ CXXBindTemporaryExpr *CXXBindTemporaryExpr::Create(const ASTContext &C,
 
 CXXTemporaryObjectExpr::CXXTemporaryObjectExpr(
     CXXConstructorDecl *Cons, QualType Ty, TypeSourceInfo *TSI,
-    ArrayRef<Expr *> Args, SourceRange ParenOrBraceRange,
+    llvm::ArrayRef<Expr *> Args, SourceRange ParenOrBraceRange,
     bool HadMultipleCandidates, bool ListInitialization,
     bool StdInitListInitialization, bool ZeroInitialization)
     : CXXConstructExpr(
@@ -1075,7 +1075,7 @@ CXXTemporaryObjectExpr::CXXTemporaryObjectExpr(EmptyShell Empty,
 
 CXXTemporaryObjectExpr *CXXTemporaryObjectExpr::Create(
     const ASTContext &Ctx, CXXConstructorDecl *Cons, QualType Ty,
-    TypeSourceInfo *TSI, ArrayRef<Expr *> Args, SourceRange ParenOrBraceRange,
+    TypeSourceInfo *TSI, llvm::ArrayRef<Expr *> Args, SourceRange ParenOrBraceRange,
     bool HadMultipleCandidates, bool ListInitialization,
     bool StdInitListInitialization, bool ZeroInitialization) {
   unsigned SizeOfTrailingObjects = sizeOfTrailingObjects(Args.size());
@@ -1109,7 +1109,7 @@ SourceLocation CXXTemporaryObjectExpr::getEndLoc() const {
 
 CXXConstructExpr *CXXConstructExpr::Create(
     const ASTContext &Ctx, QualType Ty, SourceLocation Loc,
-    CXXConstructorDecl *Ctor, bool Elidable, ArrayRef<Expr *> Args,
+    CXXConstructorDecl *Ctor, bool Elidable, llvm::ArrayRef<Expr *> Args,
     bool HadMultipleCandidates, bool ListInitialization,
     bool StdInitListInitialization, bool ZeroInitialization,
     CXXConstructionKind ConstructKind, SourceRange ParenOrBraceRange) {
@@ -1133,7 +1133,7 @@ CXXConstructExpr *CXXConstructExpr::CreateEmpty(const ASTContext &Ctx,
 
 CXXConstructExpr::CXXConstructExpr(
     StmtClass SC, QualType Ty, SourceLocation Loc, CXXConstructorDecl *Ctor,
-    bool Elidable, ArrayRef<Expr *> Args, bool HadMultipleCandidates,
+    bool Elidable, llvm::ArrayRef<Expr *> Args, bool HadMultipleCandidates,
     bool ListInitialization, bool StdInitListInitialization,
     bool ZeroInitialization, CXXConstructionKind ConstructKind,
     SourceRange ParenOrBraceRange)
@@ -1205,7 +1205,7 @@ LambdaCaptureKind LambdaCapture::getCaptureKind() const {
 LambdaExpr::LambdaExpr(QualType T, SourceRange IntroducerRange,
                        LambdaCaptureDefault CaptureDefault,
                        SourceLocation CaptureDefaultLoc, bool ExplicitParams,
-                       bool ExplicitResultType, ArrayRef<Expr *> CaptureInits,
+                       bool ExplicitResultType, llvm::ArrayRef<Expr *> CaptureInits,
                        SourceLocation ClosingBrace,
                        bool ContainsUnexpandedParameterPack)
     : Expr(LambdaExprClass, T, VK_PRValue, OK_Ordinary),
@@ -1246,7 +1246,7 @@ LambdaExpr *LambdaExpr::Create(const ASTContext &Context, CXXRecordDecl *Class,
                                LambdaCaptureDefault CaptureDefault,
                                SourceLocation CaptureDefaultLoc,
                                bool ExplicitParams, bool ExplicitResultType,
-                               ArrayRef<Expr *> CaptureInits,
+                               llvm::ArrayRef<Expr *> CaptureInits,
                                SourceLocation ClosingBrace,
                                bool ContainsUnexpandedParameterPack) {
   // Determine the type of the expression (i.e., the type of the
@@ -1348,7 +1348,7 @@ TemplateParameterList *LambdaExpr::getTemplateParameterList() const {
   return Record->getGenericLambdaTemplateParameterList();
 }
 
-ArrayRef<NamedDecl *> LambdaExpr::getExplicitTemplateParameters() const {
+llvm::ArrayRef<NamedDecl *> LambdaExpr::getExplicitTemplateParameters() const {
   const CXXRecordDecl *Record = getLambdaClass();
   return Record->getLambdaExplicitTemplateParameters();
 }
@@ -1372,7 +1372,7 @@ LambdaExpr::const_child_range LambdaExpr::children() const {
 
 ExprWithCleanups::ExprWithCleanups(Expr *subexpr,
                                    bool CleanupsHaveSideEffects,
-                                   ArrayRef<CleanupObject> objects)
+                                   llvm::ArrayRef<CleanupObject> objects)
     : FullExpr(ExprWithCleanupsClass, subexpr) {
   ExprWithCleanupsBits.CleanupsHaveSideEffects = CleanupsHaveSideEffects;
   ExprWithCleanupsBits.NumObjects = objects.size();
@@ -1382,7 +1382,7 @@ ExprWithCleanups::ExprWithCleanups(Expr *subexpr,
 
 ExprWithCleanups *ExprWithCleanups::Create(const ASTContext &C, Expr *subexpr,
                                            bool CleanupsHaveSideEffects,
-                                           ArrayRef<CleanupObject> objects) {
+                                           llvm::ArrayRef<CleanupObject> objects) {
   void *buffer = C.Allocate(totalSizeToAlloc<CleanupObject>(objects.size()),
                             alignof(ExprWithCleanups));
   return new (buffer)
@@ -1404,7 +1404,7 @@ ExprWithCleanups *ExprWithCleanups::Create(const ASTContext &C,
 
 CXXUnresolvedConstructExpr::CXXUnresolvedConstructExpr(
     QualType T, TypeSourceInfo *TSI, SourceLocation LParenLoc,
-    ArrayRef<Expr *> Args, SourceLocation RParenLoc, bool IsListInit)
+    llvm::ArrayRef<Expr *> Args, SourceLocation RParenLoc, bool IsListInit)
     : Expr(CXXUnresolvedConstructExprClass, T,
            (TSI->getType()->isLValueReferenceType()   ? VK_LValue
             : TSI->getType()->isRValueReferenceType() ? VK_XValue
@@ -1421,7 +1421,7 @@ CXXUnresolvedConstructExpr::CXXUnresolvedConstructExpr(
 
 CXXUnresolvedConstructExpr *CXXUnresolvedConstructExpr::Create(
     const ASTContext &Context, QualType T, TypeSourceInfo *TSI,
-    SourceLocation LParenLoc, ArrayRef<Expr *> Args, SourceLocation RParenLoc,
+    SourceLocation LParenLoc, llvm::ArrayRef<Expr *> Args, SourceLocation RParenLoc,
     bool IsListInit) {
   void *Mem = Context.Allocate(totalSizeToAlloc<Expr *>(Args.size()));
   return new (Mem) CXXUnresolvedConstructExpr(T, TSI, LParenLoc, Args,
@@ -1646,7 +1646,7 @@ SizeOfPackExpr *SizeOfPackExpr::Create(ASTContext &Context,
                                        NamedDecl *Pack, SourceLocation PackLoc,
                                        SourceLocation RParenLoc,
                                        std::optional<unsigned> Length,
-                                       ArrayRef<TemplateArgument> PartialArgs) {
+                                       llvm::ArrayRef<TemplateArgument> PartialArgs) {
   void *Storage =
       Context.Allocate(totalSizeToAlloc<TemplateArgument>(PartialArgs.size()));
   return new (Storage) SizeOfPackExpr(Context.getSizeType(), OperatorLoc, Pack,
@@ -1668,7 +1668,7 @@ NonTypeTemplateParmDecl *SubstNonTypeTemplateParmExpr::getParameter() const {
 PackIndexingExpr *PackIndexingExpr::Create(
     ASTContext &Context, SourceLocation EllipsisLoc, SourceLocation RSquareLoc,
     Expr *PackIdExpr, Expr *IndexExpr, std::optional<int64_t> Index,
-    ArrayRef<Expr *> SubstitutedExprs, bool ExpandedToEmptyPack) {
+    llvm::ArrayRef<Expr *> SubstitutedExprs, bool ExpandedToEmptyPack) {
   QualType Type;
   if (Index && !SubstitutedExprs.empty())
     Type = SubstitutedExprs[*Index]->getType();
@@ -1746,7 +1746,7 @@ FunctionParmPackExpr::FunctionParmPackExpr(QualType T, VarDecl *ParamPack,
 FunctionParmPackExpr *
 FunctionParmPackExpr::Create(const ASTContext &Context, QualType T,
                              VarDecl *ParamPack, SourceLocation NameLoc,
-                             ArrayRef<VarDecl *> Params) {
+                             llvm::ArrayRef<VarDecl *> Params) {
   return new (Context.Allocate(totalSizeToAlloc<VarDecl *>(Params.size())))
       FunctionParmPackExpr(T, ParamPack, NameLoc, Params.size(), Params.data());
 }
@@ -1804,7 +1804,7 @@ bool MaterializeTemporaryExpr::isUsableInConstantExpressions(
 }
 
 TypeTraitExpr::TypeTraitExpr(QualType T, SourceLocation Loc, TypeTrait Kind,
-                             ArrayRef<TypeSourceInfo *> Args,
+                             llvm::ArrayRef<TypeSourceInfo *> Args,
                              SourceLocation RParenLoc, bool Value)
     : Expr(TypeTraitExprClass, T, VK_PRValue, OK_Ordinary), Loc(Loc),
       RParenLoc(RParenLoc) {
@@ -1827,7 +1827,7 @@ TypeTraitExpr::TypeTraitExpr(QualType T, SourceLocation Loc, TypeTrait Kind,
 TypeTraitExpr *TypeTraitExpr::Create(const ASTContext &C, QualType T,
                                      SourceLocation Loc,
                                      TypeTrait Kind,
-                                     ArrayRef<TypeSourceInfo *> Args,
+                                     llvm::ArrayRef<TypeSourceInfo *> Args,
                                      SourceLocation RParenLoc,
                                      bool Value) {
   void *Mem = C.Allocate(totalSizeToAlloc<TypeSourceInfo *>(Args.size()));
@@ -1841,7 +1841,7 @@ TypeTraitExpr *TypeTraitExpr::CreateDeserialized(const ASTContext &C,
 }
 
 CUDAKernelCallExpr::CUDAKernelCallExpr(Expr *Fn, CallExpr *Config,
-                                       ArrayRef<Expr *> Args, QualType Ty,
+                                       llvm::ArrayRef<Expr *> Args, QualType Ty,
                                        ExprValueKind VK, SourceLocation RP,
                                        FPOptionsOverride FPFeatures,
                                        unsigned MinNumArgs)
@@ -1855,7 +1855,7 @@ CUDAKernelCallExpr::CUDAKernelCallExpr(unsigned NumArgs, bool HasFPFeatures,
 
 CUDAKernelCallExpr *
 CUDAKernelCallExpr::Create(const ASTContext &Ctx, Expr *Fn, CallExpr *Config,
-                           ArrayRef<Expr *> Args, QualType Ty, ExprValueKind VK,
+                           llvm::ArrayRef<Expr *> Args, QualType Ty, ExprValueKind VK,
                            SourceLocation RP, FPOptionsOverride FPFeatures,
                            unsigned MinNumArgs) {
   // Allocate storage for the trailing objects of CallExpr.
@@ -1881,7 +1881,7 @@ CUDAKernelCallExpr *CUDAKernelCallExpr::CreateEmpty(const ASTContext &Ctx,
 }
 
 CXXParenListInitExpr *
-CXXParenListInitExpr::Create(ASTContext &C, ArrayRef<Expr *> Args, QualType T,
+CXXParenListInitExpr::Create(ASTContext &C, llvm::ArrayRef<Expr *> Args, QualType T,
                              unsigned NumUserSpecifiedExprs,
                              SourceLocation InitLoc, SourceLocation LParenLoc,
                              SourceLocation RParenLoc) {

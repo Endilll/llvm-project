@@ -79,8 +79,8 @@ public:
     return kind() == Literal && static_cast<bool>(Value) == b;
   }
 
-  ArrayRef<const Formula *> operands() const {
-    return ArrayRef(reinterpret_cast<Formula *const *>(this + 1),
+  llvm::ArrayRef<const Formula *> operands() const {
+    return llvm::ArrayRef(reinterpret_cast<Formula *const *>(this + 1),
                     numOperands(kind()));
   }
 
@@ -92,7 +92,7 @@ public:
 
   // Allocate Formulas using Arena rather than calling this function directly.
   static const Formula &create(llvm::BumpPtrAllocator &Alloc, Kind K,
-                               ArrayRef<const Formula *> Operands,
+                               llvm::ArrayRef<const Formula *> Operands,
                                unsigned Value = 0);
 
 private:

@@ -51,7 +51,7 @@ protected:
     Target = TargetInfo::CreateTargetInfo(Diags, TargetOpts);
   }
 
-  std::unique_ptr<Preprocessor> CreatePP(StringRef Source,
+  std::unique_ptr<Preprocessor> CreatePP(llvm::StringRef Source,
                                          TrivialModuleLoader &ModLoader) {
     std::unique_ptr<llvm::MemoryBuffer> Buf =
         llvm::MemoryBuffer::getMemBuffer(Source);
@@ -69,7 +69,7 @@ protected:
     return PP;
   }
 
-  std::vector<Token> Lex(StringRef Source) {
+  std::vector<Token> Lex(llvm::StringRef Source) {
     TrivialModuleLoader ModLoader;
     PP = CreatePP(Source, ModLoader);
 
@@ -79,8 +79,8 @@ protected:
     return toks;
   }
 
-  std::vector<Token> CheckLex(StringRef Source,
-                              ArrayRef<tok::TokenKind> ExpectedTokens) {
+  std::vector<Token> CheckLex(llvm::StringRef Source,
+                              llvm::ArrayRef<tok::TokenKind> ExpectedTokens) {
     auto toks = Lex(Source);
     EXPECT_EQ(ExpectedTokens.size(), toks.size());
     for (unsigned i = 0, e = ExpectedTokens.size(); i != e; ++i) {
@@ -92,7 +92,7 @@ protected:
 
   std::string getSourceText(Token Begin, Token End) {
     bool Invalid;
-    StringRef Str =
+    llvm::StringRef Str =
         Lexer::getSourceText(CharSourceRange::getTokenRange(SourceRange(
                                     Begin.getLocation(), End.getLocation())),
                              SourceMgr, LangOpts, &Invalid);
@@ -103,12 +103,12 @@ protected:
 
   FileSystemOptions FileMgrOpts;
   FileManager FileMgr;
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
   DiagnosticsEngine Diags;
   SourceManager SourceMgr;
   LangOptions LangOpts;
   std::shared_ptr<TargetOptions> TargetOpts;
-  IntrusiveRefCntPtr<TargetInfo> Target;
+  llvm::IntrusiveRefCntPtr<TargetInfo> Target;
   std::unique_ptr<Preprocessor> PP;
 };
 
@@ -314,7 +314,7 @@ TEST_F(LexerTest, LexAPI) {
             SourceRange(macroRange.getBegin(),
                         macroRange.getEnd().getLocWithOffset(1)));
 
-  StringRef text = Lexer::getSourceText(
+  llvm::StringRef text = Lexer::getSourceText(
                                CharSourceRange::getTokenRange(lsqrLoc, rsqrLoc),
                                SourceMgr, LangOpts);
   EXPECT_EQ(text, "M(foo)");
@@ -545,12 +545,12 @@ TEST_F(LexerTest, AvoidPastEndOfStringDereference) {
 }
 
 TEST_F(LexerTest, StringizingRasString) {
-  // For "std::string Lexer::Stringify(StringRef Str, bool Charify)".
+  // For "std::string Lexer::Stringify(llvm::StringRef Str, bool Charify)".
   std::string String1 = R"(foo
     {"bar":[]}
     baz)";
-  // For "void Lexer::Stringify(SmallVectorImpl<char> &Str)".
-  SmallString<128> String2;
+  // For "void Lexer::Stringify(llvm::SmallVectorImpl<char> &Str)".
+  llvm::SmallString<128> String2;
   String2 += String1.c_str();
 
   // Corner cases.
@@ -558,20 +558,20 @@ TEST_F(LexerTest, StringizingRasString) {
     \n
     \\n
     \\)";
-  SmallString<128> String4;
+  llvm::SmallString<128> String4;
   String4 += String3.c_str();
   std::string String5 = R"(a\
 
 
     \\b)";
-  SmallString<128> String6;
+  llvm::SmallString<128> String6;
   String6 += String5.c_str();
 
-  String1 = Lexer::Stringify(StringRef(String1));
+  String1 = Lexer::Stringify(llvm::StringRef(String1));
   Lexer::Stringify(String2);
-  String3 = Lexer::Stringify(StringRef(String3));
+  String3 = Lexer::Stringify(llvm::StringRef(String3));
   Lexer::Stringify(String4);
-  String5 = Lexer::Stringify(StringRef(String5));
+  String5 = Lexer::Stringify(llvm::StringRef(String5));
   Lexer::Stringify(String6);
 
   EXPECT_EQ(String1, R"(foo\n    {\"bar\":[]}\n    baz)");

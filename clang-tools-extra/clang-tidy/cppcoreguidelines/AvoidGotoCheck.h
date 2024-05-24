@@ -20,7 +20,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/avoid-goto.html
 class AvoidGotoCheck : public ClangTidyCheck {
 public:
-  AvoidGotoCheck(StringRef Name, ClangTidyContext *Context)
+  AvoidGotoCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

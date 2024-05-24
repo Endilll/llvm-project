@@ -46,7 +46,7 @@ void MipsLLVMToolChain::AddClangSystemIncludeArgs(
   const Driver &D = getDriver();
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> P(D.ResourceDir);
+    llvm::SmallString<128> P(D.ResourceDir);
     llvm::sys::path::append(P, "include");
     addSystemInclude(DriverArgs, CC1Args, P);
   }
@@ -82,7 +82,7 @@ ToolChain::CXXStdlibType
 MipsLLVMToolChain::GetCXXStdlibType(const ArgList &Args) const {
   Arg *A = Args.getLastArg(options::OPT_stdlib_EQ);
   if (A) {
-    StringRef Value = A->getValue();
+    llvm::StringRef Value = A->getValue();
     if (Value != "libc++")
       getDriver().Diag(clang::diag::err_drv_invalid_stdlib_name)
           << A->getAsString(Args);
@@ -118,9 +118,9 @@ void MipsLLVMToolChain::AddCXXStdlibLibArgs(const ArgList &Args,
 }
 
 std::string MipsLLVMToolChain::getCompilerRT(const ArgList &Args,
-                                             StringRef Component,
+                                             llvm::StringRef Component,
                                              FileType Type) const {
-  SmallString<128> Path(getDriver().ResourceDir);
+  llvm::SmallString<128> Path(getDriver().ResourceDir);
   llvm::sys::path::append(Path, SelectedMultilibs.back().osSuffix(), "lib" + LibSuffix,
                           getOS());
   const char *Suffix;
@@ -136,6 +136,6 @@ std::string MipsLLVMToolChain::getCompilerRT(const ArgList &Args,
     break;
   }
   llvm::sys::path::append(
-      Path, Twine("libclang_rt." + Component + "-" + "mips" + Suffix));
+      Path, llvm::Twine("libclang_rt." + Component + "-" + "mips" + Suffix));
   return std::string(Path);
 }

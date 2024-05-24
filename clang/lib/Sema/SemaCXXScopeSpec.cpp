@@ -108,7 +108,7 @@ DeclContext *Sema::computeDeclContext(const CXXScopeSpec &SS,
           // correctly. Currently removing this fallback would change the
           // diagnostic output for invalid code in a number of tests.
           ClassTemplatePartialSpecializationDecl *PartialSpec = nullptr;
-          ArrayRef<TemplateParameterList *> TemplateParamLists =
+          llvm::ArrayRef<TemplateParameterList *> TemplateParamLists =
               SS.getTemplateParamLists();
           if (!TemplateParamLists.empty()) {
             unsigned Depth = ClassTemplate->getTemplateParameters()->getDepth();

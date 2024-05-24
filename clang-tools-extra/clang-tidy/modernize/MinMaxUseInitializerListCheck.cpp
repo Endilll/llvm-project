@@ -21,7 +21,7 @@ struct FindArgsResult {
   const Expr *First;
   const Expr *Last;
   const Expr *Compare;
-  SmallVector<const clang::Expr *, 2> Args;
+  llvm::SmallVector<const clang::Expr *, 2> Args;
 };
 
 } // anonymous namespace
@@ -60,11 +60,11 @@ static FindArgsResult findArgs(const CallExpr *Call) {
 
       return Result;
     }
-    Result.Args = SmallVector<const Expr *>(Call->arguments());
+    Result.Args = llvm::SmallVector<const Expr *>(Call->arguments());
   } else {
     // if it has 3 arguments then the last will be the comparison
     Result.Compare = *(std::next(Call->arguments().begin(), 2));
-    Result.Args = SmallVector<const Expr *>(llvm::drop_end(Call->arguments()));
+    Result.Args = llvm::SmallVector<const Expr *>(llvm::drop_end(Call->arguments()));
   }
   Result.First = Result.Args.front();
   Result.Last = Result.Args.back();
@@ -72,12 +72,12 @@ static FindArgsResult findArgs(const CallExpr *Call) {
   return Result;
 }
 
-static SmallVector<FixItHint>
+static llvm::SmallVector<FixItHint>
 generateReplacements(const MatchFinder::MatchResult &Match,
                      const CallExpr *TopCall, const FindArgsResult &Result,
                      const bool IgnoreNonTrivialTypes,
                      const std::uint64_t IgnoreTrivialTypesOfSizeAbove) {
-  SmallVector<FixItHint> FixItHints;
+  llvm::SmallVector<FixItHint> FixItHints;
   const SourceManager &SourceMngr = *Match.SourceManager;
   const LangOptions &LanguageOpts = Match.Context->getLangOpts();
 
@@ -113,11 +113,11 @@ generateReplacements(const MatchFinder::MatchResult &Match,
       if (ArgType == ResultType)
         continue;
 
-      const StringRef ArgText = Lexer::getSourceText(
+      const llvm::StringRef ArgText = Lexer::getSourceText(
           CharSourceRange::getTokenRange(Arg->getSourceRange()), SourceMngr,
           LanguageOpts);
 
-      const auto Replacement = Twine("static_cast<")
+      const auto Replacement = llvm::Twine("static_cast<")
                                    .concat(ResultType.getAsString(LanguageOpts))
                                    .concat(">(")
                                    .concat(ArgText)
@@ -168,7 +168,7 @@ generateReplacements(const MatchFinder::MatchResult &Match,
           CharSourceRange::getTokenRange(InnerResult.First->getEndLoc())));
     }
 
-    const SmallVector<FixItHint> InnerReplacements = generateReplacements(
+    const llvm::SmallVector<FixItHint> InnerReplacements = generateReplacements(
         Match, InnerCall, InnerResult, IgnoreNonTrivialTypes,
         IgnoreTrivialTypesOfSizeAbove);
 
@@ -193,7 +193,7 @@ generateReplacements(const MatchFinder::MatchResult &Match,
 }
 
 MinMaxUseInitializerListCheck::MinMaxUseInitializerListCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreNonTrivialTypes(Options.get("IgnoreNonTrivialTypes", true)),
       IgnoreTrivialTypesOfSizeAbove(
@@ -211,7 +211,7 @@ void MinMaxUseInitializerListCheck::storeOptions(
 }
 
 void MinMaxUseInitializerListCheck::registerMatchers(MatchFinder *Finder) {
-  auto CreateMatcher = [](const StringRef FunctionName) {
+  auto CreateMatcher = [](const llvm::StringRef FunctionName) {
     auto FuncDecl = functionDecl(hasName(FunctionName));
     auto Expression = callExpr(callee(FuncDecl));
 
@@ -238,7 +238,7 @@ void MinMaxUseInitializerListCheck::check(
   const auto *TopCall = Match.Nodes.getNodeAs<CallExpr>("topCall");
 
   const FindArgsResult Result = findArgs(TopCall);
-  const SmallVector<FixItHint> Replacements =
+  const llvm::SmallVector<FixItHint> Replacements =
       generateReplacements(Match, TopCall, Result, IgnoreNonTrivialTypes,
                            IgnoreTrivialTypesOfSizeAbove);
 

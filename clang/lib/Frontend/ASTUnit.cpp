@@ -129,7 +129,7 @@ namespace {
       }
     }
 
-    void setOutput(const Twine &Output) {
+    void setOutput(const llvm::Twine &Output) {
       if (WantTiming)
         this->Output = Output.str();
     }
@@ -157,7 +157,7 @@ static bool moveOnNoError(llvm::ErrorOr<T> Val, T &Output) {
 static std::unique_ptr<llvm::MemoryBuffer>
 getBufferForFileHandlingRemapping(const CompilerInvocation &Invocation,
                                   llvm::vfs::FileSystem *VFS,
-                                  StringRef FilePath, bool isVolatile) {
+                                  llvm::StringRef FilePath, bool isVolatile) {
   const auto &PreprocessorOpts = Invocation.getPreprocessorOpts();
 
   // Try to determine if the main file has been remapped, either from the
@@ -215,7 +215,7 @@ getBufferForFileHandlingRemapping(const CompilerInvocation &Invocation,
 }
 
 struct ASTUnit::ASTWriterData {
-  SmallString<128> Buffer;
+  llvm::SmallString<128> Buffer;
   llvm::BitstreamWriter Stream;
   ASTWriter Writer;
 
@@ -373,7 +373,7 @@ void ASTUnit::CacheCodeCompletionResults() {
 
   // Gather the set of global code completions.
   using Result = CodeCompletionResult;
-  SmallVector<Result, 8> Results;
+  llvm::SmallVector<Result, 8> Results;
   CachedCompletionAllocator = std::make_shared<GlobalCodeCompletionAllocator>();
   CodeCompletionTUInfo CCTUInfo(CachedCompletionAllocator);
   TheSema->CodeCompletion().GatherGlobalCodeCompletions(
@@ -521,7 +521,7 @@ class ASTInfoCollector : public ASTReaderListener {
   PreprocessorOptions &PPOpts;
   LangOptions &LangOpt;
   std::shared_ptr<TargetOptions> &TargetOpts;
-  IntrusiveRefCntPtr<TargetInfo> &Target;
+  llvm::IntrusiveRefCntPtr<TargetInfo> &Target;
   unsigned &Counter;
   bool InitializedLanguage = false;
   bool InitializedHeaderSearchPaths = false;
@@ -531,7 +531,7 @@ public:
                    HeaderSearchOptions &HSOpts, PreprocessorOptions &PPOpts,
                    LangOptions &LangOpt,
                    std::shared_ptr<TargetOptions> &TargetOpts,
-                   IntrusiveRefCntPtr<TargetInfo> &Target, unsigned &Counter)
+                   llvm::IntrusiveRefCntPtr<TargetInfo> &Target, unsigned &Counter)
       : PP(PP), Context(Context), HSOpts(HSOpts), PPOpts(PPOpts),
         LangOpt(LangOpt), TargetOpts(TargetOpts), Target(Target),
         Counter(Counter) {}
@@ -559,7 +559,7 @@ public:
   }
 
   bool ReadHeaderSearchOptions(const HeaderSearchOptions &HSOpts,
-                               StringRef SpecificModuleCachePath,
+                               llvm::StringRef SpecificModuleCachePath,
                                bool Complain) override {
     // llvm::SaveAndRestore doesn't support bit field.
     auto ForceCheckCXX20ModulesInputFiles =
@@ -654,16 +654,16 @@ private:
 
 /// Diagnostic consumer that saves each diagnostic it is given.
 class FilterAndStoreDiagnosticConsumer : public DiagnosticConsumer {
-  SmallVectorImpl<StoredDiagnostic> *StoredDiags;
-  SmallVectorImpl<ASTUnit::StandaloneDiagnostic> *StandaloneDiags;
+  llvm::SmallVectorImpl<StoredDiagnostic> *StoredDiags;
+  llvm::SmallVectorImpl<ASTUnit::StandaloneDiagnostic> *StandaloneDiags;
   bool CaptureNonErrorsFromIncludes = true;
   const LangOptions *LangOpts = nullptr;
   SourceManager *SourceMgr = nullptr;
 
 public:
   FilterAndStoreDiagnosticConsumer(
-      SmallVectorImpl<StoredDiagnostic> *StoredDiags,
-      SmallVectorImpl<ASTUnit::StandaloneDiagnostic> *StandaloneDiags,
+      llvm::SmallVectorImpl<StoredDiagnostic> *StoredDiags,
+      llvm::SmallVectorImpl<ASTUnit::StandaloneDiagnostic> *StandaloneDiags,
       bool CaptureNonErrorsFromIncludes)
       : StoredDiags(StoredDiags), StandaloneDiags(StandaloneDiags),
         CaptureNonErrorsFromIncludes(CaptureNonErrorsFromIncludes) {
@@ -693,8 +693,8 @@ class CaptureDroppedDiagnostics {
 public:
   CaptureDroppedDiagnostics(
       CaptureDiagsKind CaptureDiagnostics, DiagnosticsEngine &Diags,
-      SmallVectorImpl<StoredDiagnostic> *StoredDiags,
-      SmallVectorImpl<ASTUnit::StandaloneDiagnostic> *StandaloneDiags)
+      llvm::SmallVectorImpl<StoredDiagnostic> *StoredDiags,
+      llvm::SmallVectorImpl<ASTUnit::StandaloneDiagnostic> *StandaloneDiags)
       : Diags(Diags),
         Client(StoredDiags, StandaloneDiags,
                CaptureDiagnostics !=
@@ -759,7 +759,7 @@ void FilterAndStoreDiagnosticConsumer::HandleDiagnostic(
   }
 }
 
-IntrusiveRefCntPtr<ASTReader> ASTUnit::getASTReader() const {
+llvm::IntrusiveRefCntPtr<ASTReader> ASTUnit::getASTReader() const {
   return Reader;
 }
 
@@ -776,7 +776,7 @@ ASTDeserializationListener *ASTUnit::getDeserializationListener() {
 }
 
 std::unique_ptr<llvm::MemoryBuffer>
-ASTUnit::getBufferForFile(StringRef Filename, std::string *ErrorStr) {
+ASTUnit::getBufferForFile(llvm::StringRef Filename, std::string *ErrorStr) {
   assert(FileMgr);
   auto Buffer = FileMgr->getBufferForFile(Filename, UserFilesAreVolatile);
   if (Buffer)
@@ -787,7 +787,7 @@ ASTUnit::getBufferForFile(StringRef Filename, std::string *ErrorStr) {
 }
 
 /// Configure the diagnostics object for use with ASTUnit.
-void ASTUnit::ConfigureDiags(IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
+void ASTUnit::ConfigureDiags(llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
                              ASTUnit &AST,
                              CaptureDiagsKind CaptureDiagnostics) {
   assert(Diags.get() && "no DiagnosticsEngine was provided");
@@ -799,12 +799,12 @@ void ASTUnit::ConfigureDiags(IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
 
 std::unique_ptr<ASTUnit> ASTUnit::LoadFromASTFile(
     const std::string &Filename, const PCHContainerReader &PCHContainerRdr,
-    WhatToLoad ToLoad, IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
+    WhatToLoad ToLoad, llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
     const FileSystemOptions &FileSystemOpts,
     std::shared_ptr<HeaderSearchOptions> HSOpts,
     std::shared_ptr<LangOptions> LangOpts, bool OnlyLocalDecls,
     CaptureDiagsKind CaptureDiagnostics, bool AllowASTWithCompilerErrors,
-    bool UserFilesAreVolatile, IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
+    bool UserFilesAreVolatile, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
   std::unique_ptr<ASTUnit> AST(new ASTUnit(true));
 
   // Recover resources if we crash before exiting this method.
@@ -1044,7 +1044,7 @@ public:
   ASTUnit &Unit;
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override {
+                                                 llvm::StringRef InFile) override {
     CI.getPreprocessor().addPPCallbacks(
         std::make_unique<MacroDefinitionTrackerPPCallbacks>(
                                            Unit.getCurrentTopLevelHashValue()));
@@ -1113,13 +1113,13 @@ static bool isNonDriverDiag(const StoredDiagnostic &StoredDiag) {
 }
 
 static void
-checkAndRemoveNonDriverDiags(SmallVectorImpl<StoredDiagnostic> &StoredDiags) {
+checkAndRemoveNonDriverDiags(llvm::SmallVectorImpl<StoredDiagnostic> &StoredDiags) {
   // Get rid of stored diagnostics except the ones from the driver which do not
   // have a source location.
   llvm::erase_if(StoredDiags, isNonDriverDiag);
 }
 
-static void checkAndSanitizeDiags(SmallVectorImpl<StoredDiagnostic> &
+static void checkAndSanitizeDiags(llvm::SmallVectorImpl<StoredDiagnostic> &
                                                               StoredDiagnostics,
                                   SourceManager &SM) {
   // The stored diagnostic has the old source manager in it; update
@@ -1142,7 +1142,7 @@ static void checkAndSanitizeDiags(SmallVectorImpl<StoredDiagnostic> &
 /// contain any translation-unit information, false otherwise.
 bool ASTUnit::Parse(std::shared_ptr<PCHContainerOperations> PCHContainerOps,
                     std::unique_ptr<llvm::MemoryBuffer> OverrideMainBuffer,
-                    IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
+                    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
   if (!Invocation)
     return true;
 
@@ -1339,7 +1339,7 @@ std::unique_ptr<llvm::MemoryBuffer>
 ASTUnit::getMainBufferWithPrecompiledPreamble(
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
     CompilerInvocation &PreambleInvocationIn,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS, bool AllowRebuild,
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS, bool AllowRebuild,
     unsigned MaxLines) {
   auto MainFilePath =
       PreambleInvocationIn.getFrontendOpts().Inputs[0].getFile();
@@ -1393,8 +1393,8 @@ ASTUnit::getMainBufferWithPrecompiledPreamble(
 
   ++PreambleCounter;
 
-  SmallVector<StandaloneDiagnostic, 4> NewPreambleDiagsStandalone;
-  SmallVector<StoredDiagnostic, 4> NewPreambleDiags;
+  llvm::SmallVector<StandaloneDiagnostic, 4> NewPreambleDiagsStandalone;
+  llvm::SmallVector<StoredDiagnostic, 4> NewPreambleDiags;
   ASTUnitPreambleCallbacks Callbacks;
   {
     std::optional<CaptureDroppedDiagnostics> Capture;
@@ -1499,7 +1499,7 @@ void ASTUnit::transferASTDataFromCompilerInstance(CompilerInstance &CI) {
   HadModuleLoaderFatalFailure = CI.hadModuleLoaderFatalFailure();
 }
 
-StringRef ASTUnit::getMainFileName() const {
+llvm::StringRef ASTUnit::getMainFileName() const {
   if (Invocation && !Invocation->getFrontendOpts().Inputs.empty()) {
     const FrontendInputFile &Input = Invocation->getFrontendOpts().Inputs[0];
     if (Input.isFile())
@@ -1517,7 +1517,7 @@ StringRef ASTUnit::getMainFileName() const {
   return {};
 }
 
-StringRef ASTUnit::getASTFileName() const {
+llvm::StringRef ASTUnit::getASTFileName() const {
   if (!isMainFileAST())
     return {};
 
@@ -1528,12 +1528,12 @@ StringRef ASTUnit::getASTFileName() const {
 
 std::unique_ptr<ASTUnit>
 ASTUnit::create(std::shared_ptr<CompilerInvocation> CI,
-                IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
+                llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags,
                 CaptureDiagsKind CaptureDiagnostics,
                 bool UserFilesAreVolatile) {
   std::unique_ptr<ASTUnit> AST(new ASTUnit(false));
   ConfigureDiags(Diags, *AST, CaptureDiagnostics);
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS =
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS =
       createVFSFromCompilerInvocation(*CI, *Diags);
   AST->Diagnostics = Diags;
   AST->FileSystemOpts = CI->getFileSystemOpts();
@@ -1550,8 +1550,8 @@ ASTUnit::create(std::shared_ptr<CompilerInvocation> CI,
 ASTUnit *ASTUnit::LoadFromCompilerInvocationAction(
     std::shared_ptr<CompilerInvocation> CI,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags, FrontendAction *Action,
-    ASTUnit *Unit, bool Persistent, StringRef ResourceFilesPath,
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags, FrontendAction *Action,
+    ASTUnit *Unit, bool Persistent, llvm::StringRef ResourceFilesPath,
     bool OnlyLocalDecls, CaptureDiagsKind CaptureDiagnostics,
     unsigned PrecompilePreambleAfterNParses, bool CacheCodeCompletionResults,
     bool UserFilesAreVolatile, std::unique_ptr<ASTUnit> *ErrAST) {
@@ -1687,7 +1687,7 @@ ASTUnit *ASTUnit::LoadFromCompilerInvocationAction(
 bool ASTUnit::LoadFromCompilerInvocation(
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
     unsigned PrecompilePreambleAfterNParses,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
   if (!Invocation)
     return true;
 
@@ -1721,7 +1721,7 @@ bool ASTUnit::LoadFromCompilerInvocation(
 std::unique_ptr<ASTUnit> ASTUnit::LoadFromCompilerInvocation(
     std::shared_ptr<CompilerInvocation> CI,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags, FileManager *FileMgr,
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags, FileManager *FileMgr,
     bool OnlyLocalDecls, CaptureDiagsKind CaptureDiagnostics,
     unsigned PrecompilePreambleAfterNParses, TranslationUnitKind TUKind,
     bool CacheCodeCompletionResults, bool IncludeBriefCommentsInCodeCompletion,
@@ -1758,17 +1758,17 @@ std::unique_ptr<ASTUnit> ASTUnit::LoadFromCompilerInvocation(
 std::unique_ptr<ASTUnit> ASTUnit::LoadFromCommandLine(
     const char **ArgBegin, const char **ArgEnd,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags, StringRef ResourceFilesPath,
-    bool StorePreamblesInMemory, StringRef PreambleStoragePath,
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags, llvm::StringRef ResourceFilesPath,
+    bool StorePreamblesInMemory, llvm::StringRef PreambleStoragePath,
     bool OnlyLocalDecls, CaptureDiagsKind CaptureDiagnostics,
-    ArrayRef<RemappedFile> RemappedFiles, bool RemappedFilesKeepOriginalName,
+    llvm::ArrayRef<RemappedFile> RemappedFiles, bool RemappedFilesKeepOriginalName,
     unsigned PrecompilePreambleAfterNParses, TranslationUnitKind TUKind,
     bool CacheCodeCompletionResults, bool IncludeBriefCommentsInCodeCompletion,
     bool AllowPCHWithCompilerErrors, SkipFunctionBodiesScope SkipFunctionBodies,
     bool SingleFileParse, bool UserFilesAreVolatile, bool ForSerialization,
-    bool RetainExcludedConditionalBlocks, std::optional<StringRef> ModuleFormat,
+    bool RetainExcludedConditionalBlocks, std::optional<llvm::StringRef> ModuleFormat,
     std::unique_ptr<ASTUnit> *ErrAST,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
   assert(Diags.get() && "no DiagnosticsEngine was provided");
 
   // If no VFS was provided, create one that tracks the physical file system.
@@ -1777,7 +1777,7 @@ std::unique_ptr<ASTUnit> ASTUnit::LoadFromCommandLine(
   if (!VFS)
     VFS = llvm::vfs::createPhysicalFileSystem();
 
-  SmallVector<StoredDiagnostic, 4> StoredDiagnostics;
+  llvm::SmallVector<StoredDiagnostic, 4> StoredDiagnostics;
 
   std::shared_ptr<CompilerInvocation> CI;
 
@@ -1862,8 +1862,8 @@ std::unique_ptr<ASTUnit> ASTUnit::LoadFromCommandLine(
 }
 
 bool ASTUnit::Reparse(std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-                      ArrayRef<RemappedFile> RemappedFiles,
-                      IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
+                      llvm::ArrayRef<RemappedFile> RemappedFiles,
+                      llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
   if (!Invocation)
     return true;
 
@@ -2098,7 +2098,7 @@ void AugmentedCodeCompleteConsumer::ProcessCodeCompleteResults(Sema &S,
   // Contains the set of names that are hidden by "local" completion results.
   llvm::StringSet<llvm::BumpPtrAllocator> HiddenNames;
   using Result = CodeCompletionResult;
-  SmallVector<Result, 8> AllResults;
+  llvm::SmallVector<Result, 8> AllResults;
   for (ASTUnit::cached_completion_iterator
             C = AST.cached_completion_begin(),
          CEnd = AST.cached_completion_end();
@@ -2177,21 +2177,21 @@ void AugmentedCodeCompleteConsumer::ProcessCodeCompleteResults(Sema &S,
 }
 
 void ASTUnit::CodeComplete(
-    StringRef File, unsigned Line, unsigned Column,
-    ArrayRef<RemappedFile> RemappedFiles, bool IncludeMacros,
+    llvm::StringRef File, unsigned Line, unsigned Column,
+    llvm::ArrayRef<RemappedFile> RemappedFiles, bool IncludeMacros,
     bool IncludeCodePatterns, bool IncludeBriefComments,
     CodeCompleteConsumer &Consumer,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
     DiagnosticsEngine &Diag, LangOptions &LangOpts, SourceManager &SourceMgr,
-    FileManager &FileMgr, SmallVectorImpl<StoredDiagnostic> &StoredDiagnostics,
-    SmallVectorImpl<const llvm::MemoryBuffer *> &OwnedBuffers,
+    FileManager &FileMgr, llvm::SmallVectorImpl<StoredDiagnostic> &StoredDiagnostics,
+    llvm::SmallVectorImpl<const llvm::MemoryBuffer *> &OwnedBuffers,
     std::unique_ptr<SyntaxOnlyAction> Act) {
   if (!Invocation)
     return;
 
   SimpleTimer CompletionTimer(WantTiming);
   CompletionTimer.setOutput("Code completion @ " + File + ":" +
-                            Twine(Line) + ":" + Twine(Column));
+                            llvm::Twine(Line) + ":" + llvm::Twine(Column));
 
   auto CCInvocation = std::make_shared<CompilerInvocation>(*Invocation);
 
@@ -2273,13 +2273,13 @@ void ASTUnit::CodeComplete(
   Clang->setCodeCompletionConsumer(AugmentedConsumer);
 
   auto getUniqueID =
-      [&FileMgr](StringRef Filename) -> std::optional<llvm::sys::fs::UniqueID> {
+      [&FileMgr](llvm::StringRef Filename) -> std::optional<llvm::sys::fs::UniqueID> {
     if (auto Status = FileMgr.getVirtualFileSystem().status(Filename))
       return Status->getUniqueID();
     return std::nullopt;
   };
 
-  auto hasSameUniqueID = [getUniqueID](StringRef LHS, StringRef RHS) {
+  auto hasSameUniqueID = [getUniqueID](llvm::StringRef LHS, llvm::StringRef RHS) {
     if (LHS == RHS)
       return true;
     if (auto LHSID = getUniqueID(LHS))
@@ -2304,7 +2304,7 @@ void ASTUnit::CodeComplete(
     assert(Preamble &&
            "No preamble was built, but OverrideMainBuffer is not null");
 
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS =
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS =
         &FileMgr.getVirtualFileSystem();
     Preamble->AddImplicitPreamble(Clang->getInvocation(), VFS,
                                   OverrideMainBuffer.get());
@@ -2333,7 +2333,7 @@ void ASTUnit::CodeComplete(
   }
 }
 
-bool ASTUnit::Save(StringRef File) {
+bool ASTUnit::Save(llvm::StringRef File) {
   if (HadModuleLoaderFatalFailure)
     return true;
 
@@ -2353,8 +2353,8 @@ bool ASTUnit::Save(StringRef File) {
   return false;
 }
 
-static bool serializeUnit(ASTWriter &Writer, SmallVectorImpl<char> &Buffer,
-                          Sema &S, raw_ostream &OS) {
+static bool serializeUnit(ASTWriter &Writer, llvm::SmallVectorImpl<char> &Buffer,
+                          Sema &S, llvm::raw_ostream &OS) {
   Writer.WriteAST(S, std::string(), nullptr, "");
 
   // Write the generated bitstream to "Out".
@@ -2364,11 +2364,11 @@ static bool serializeUnit(ASTWriter &Writer, SmallVectorImpl<char> &Buffer,
   return false;
 }
 
-bool ASTUnit::serialize(raw_ostream &OS) {
+bool ASTUnit::serialize(llvm::raw_ostream &OS) {
   if (WriterData)
     return serializeUnit(WriterData->Writer, WriterData->Buffer, getSema(), OS);
 
-  SmallString<128> Buffer;
+  llvm::SmallString<128> Buffer;
   llvm::BitstreamWriter Stream(Buffer);
   InMemoryModuleCache ModuleCache;
   ASTWriter Writer(Stream, Buffer, ModuleCache, {});
@@ -2378,13 +2378,13 @@ bool ASTUnit::serialize(raw_ostream &OS) {
 void ASTUnit::TranslateStoredDiagnostics(
                           FileManager &FileMgr,
                           SourceManager &SrcMgr,
-                          const SmallVectorImpl<StandaloneDiagnostic> &Diags,
-                          SmallVectorImpl<StoredDiagnostic> &Out) {
+                          const llvm::SmallVectorImpl<StandaloneDiagnostic> &Diags,
+                          llvm::SmallVectorImpl<StoredDiagnostic> &Out) {
   // Map the standalone diagnostic into the new source manager. We also need to
   // remap all the locations to the new view. This includes the diag location,
   // any associated source ranges, and the source ranges of associated fix-its.
   // FIXME: There should be a cleaner way to do this.
-  SmallVector<StoredDiagnostic, 4> Result;
+  llvm::SmallVector<StoredDiagnostic, 4> Result;
   Result.reserve(Diags.size());
 
   for (const auto &SD : Diags) {
@@ -2409,7 +2409,7 @@ void ASTUnit::TranslateStoredDiagnostics(
     SourceLocation L = FileLoc.getLocWithOffset(SD.LocOffset);
     FullSourceLoc Loc(L, SrcMgr);
 
-    SmallVector<CharSourceRange, 4> Ranges;
+    llvm::SmallVector<CharSourceRange, 4> Ranges;
     Ranges.reserve(SD.Ranges.size());
     for (const auto &Range : SD.Ranges) {
       SourceLocation BL = FileLoc.getLocWithOffset(Range.first);
@@ -2417,7 +2417,7 @@ void ASTUnit::TranslateStoredDiagnostics(
       Ranges.push_back(CharSourceRange::getCharRange(BL, EL));
     }
 
-    SmallVector<FixItHint, 2> FixIts;
+    llvm::SmallVector<FixItHint, 2> FixIts;
     FixIts.reserve(SD.FixIts.size());
     for (const auto &FixIt : SD.FixIts) {
       FixIts.push_back(FixItHint());
@@ -2476,7 +2476,7 @@ void ASTUnit::addFileLevelDecl(Decl *D) {
 }
 
 void ASTUnit::findFileRegionDecls(FileID File, unsigned Offset, unsigned Length,
-                                  SmallVectorImpl<Decl *> &Decls) {
+                                  llvm::SmallVectorImpl<Decl *> &Decls) {
   if (File.isInvalid())
     return;
 

@@ -129,7 +129,7 @@ public:
   void appendArgumentsAdjuster(ArgumentsAdjuster Adjuster);
 
   std::vector<CompileCommand>
-  getCompileCommands(StringRef FilePath) const override;
+  getCompileCommands(llvm::StringRef FilePath) const override;
 
   std::vector<std::string> getAllFiles() const override;
 

@@ -151,7 +151,7 @@ void NonConstParameterCheck::diagnoseNonConstParameters() {
     if (!ParamInfo.CanBeConst)
       continue;
 
-    SmallVector<FixItHint, 8> Fixes;
+    llvm::SmallVector<FixItHint, 8> Fixes;
     auto *Function =
         dyn_cast_or_null<const FunctionDecl>(Par->getParentFunctionOrMethod());
     if (!Function)

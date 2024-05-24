@@ -300,7 +300,7 @@ void PPCallbacksTracker::PragmaWarningPop(SourceLocation Loc) {
 // Callback invoked when a #pragma execution_character_set(push) directive
 // is read.
 void PPCallbacksTracker::PragmaExecCharsetPush(SourceLocation Loc,
-                                               StringRef Str) {
+                                               llvm::StringRef Str) {
   beginCallback("PragmaExecCharsetPush");
   appendArgument("Loc", Loc);
   appendArgument("Charset", Str);

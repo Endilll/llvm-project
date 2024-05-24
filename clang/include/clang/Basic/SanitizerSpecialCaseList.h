@@ -40,8 +40,8 @@ public:
               llvm::vfs::FileSystem &VFS);
 
   // Query ignorelisted entries if any bit in Mask matches the entry's section.
-  bool inSection(SanitizerMask Mask, StringRef Prefix, StringRef Query,
-                 StringRef Category = StringRef()) const;
+  bool inSection(SanitizerMask Mask, llvm::StringRef Prefix, llvm::StringRef Query,
+                 llvm::StringRef Category = llvm::StringRef()) const;
 
 protected:
   // Initialize SanitizerSections.

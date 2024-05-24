@@ -55,7 +55,7 @@ static bool isInitMethodAvailable(const ObjCInterfaceDecl *ClassDecl) {
 // used. While the generics arguments will not make any difference to the
 // returned code at this time, the style guide allows them and they should be
 // left in any fix-it hint.
-static StringRef getReceiverString(SourceRange ReceiverRange,
+static llvm::StringRef getReceiverString(SourceRange ReceiverRange,
                                    const SourceManager &SM,
                                    const LangOptions &LangOpts) {
   CharSourceRange CharRange = Lexer::makeFileCharRange(
@@ -68,15 +68,15 @@ static FixItHint getCallFixItHint(const ObjCMessageExpr *Expr,
                                   const LangOptions &LangOpts) {
   // Check whether the messaged class has a known factory method to use instead
   // of -init.
-  StringRef Receiver =
+  llvm::StringRef Receiver =
       getReceiverString(Expr->getReceiverRange(), SM, LangOpts);
   // Some classes should use standard factory methods instead of alloc/init.
-  std::map<StringRef, StringRef> ClassToFactoryMethodMap = {{"NSDate", "date"},
+  std::map<llvm::StringRef, llvm::StringRef> ClassToFactoryMethodMap = {{"NSDate", "date"},
                                                             {"NSNull", "null"}};
   auto FoundClassFactory = ClassToFactoryMethodMap.find(Receiver);
   if (FoundClassFactory != ClassToFactoryMethodMap.end()) {
-    StringRef ClassName = FoundClassFactory->first;
-    StringRef FactorySelector = FoundClassFactory->second;
+    llvm::StringRef ClassName = FoundClassFactory->first;
+    llvm::StringRef FactorySelector = FoundClassFactory->second;
     std::string NewCall =
         std::string(llvm::formatv("[{0} {1}]", ClassName, FactorySelector));
     return FixItHint::CreateReplacement(Expr->getSourceRange(), NewCall);

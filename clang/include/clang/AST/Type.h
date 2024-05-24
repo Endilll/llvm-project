@@ -802,7 +802,7 @@ public:
   static std::string getAddrSpaceAsString(LangAS AS);
 
   bool isEmptyWhenPrinted(const PrintingPolicy &Policy) const;
-  void print(raw_ostream &OS, const PrintingPolicy &Policy,
+  void print(llvm::raw_ostream &OS, const PrintingPolicy &Policy,
              bool appendSpaceIfNonEmpty = false) const;
 
   void Profile(llvm::FoldingSetNodeID &ID) const { ID.AddInteger(Mask); }
@@ -1334,19 +1334,19 @@ public:
   std::string getAsString() const;
   std::string getAsString(const PrintingPolicy &Policy) const;
 
-  void print(raw_ostream &OS, const PrintingPolicy &Policy,
-             const Twine &PlaceHolder = Twine(),
+  void print(llvm::raw_ostream &OS, const PrintingPolicy &Policy,
+             const llvm::Twine &PlaceHolder = llvm::Twine(),
              unsigned Indentation = 0) const;
 
-  static void print(SplitQualType split, raw_ostream &OS,
-                    const PrintingPolicy &policy, const Twine &PlaceHolder,
+  static void print(SplitQualType split, llvm::raw_ostream &OS,
+                    const PrintingPolicy &policy, const llvm::Twine &PlaceHolder,
                     unsigned Indentation = 0) {
     return print(split.Ty, split.Quals, OS, policy, PlaceHolder, Indentation);
   }
 
   static void print(const Type *ty, Qualifiers qs,
-                    raw_ostream &OS, const PrintingPolicy &policy,
-                    const Twine &PlaceHolder,
+                    llvm::raw_ostream &OS, const PrintingPolicy &policy,
+                    const llvm::Twine &PlaceHolder,
                     unsigned Indentation = 0);
 
   void getAsStringInternal(std::string &Str,
@@ -1364,16 +1364,16 @@ public:
   class StreamedQualTypeHelper {
     const QualType &T;
     const PrintingPolicy &Policy;
-    const Twine &PlaceHolder;
+    const llvm::Twine &PlaceHolder;
     unsigned Indentation;
 
   public:
     StreamedQualTypeHelper(const QualType &T, const PrintingPolicy &Policy,
-                           const Twine &PlaceHolder, unsigned Indentation)
+                           const llvm::Twine &PlaceHolder, unsigned Indentation)
         : T(T), Policy(Policy), PlaceHolder(PlaceHolder),
           Indentation(Indentation) {}
 
-    friend raw_ostream &operator<<(raw_ostream &OS,
+    friend llvm::raw_ostream &operator<<(llvm::raw_ostream &OS,
                                    const StreamedQualTypeHelper &SQT) {
       SQT.T.print(OS, SQT.Policy, SQT.PlaceHolder, SQT.Indentation);
       return OS;
@@ -1381,7 +1381,7 @@ public:
   };
 
   StreamedQualTypeHelper stream(const PrintingPolicy &Policy,
-                                const Twine &PlaceHolder = Twine(),
+                                const llvm::Twine &PlaceHolder = llvm::Twine(),
                                 unsigned Indentation = 0) const {
     return StreamedQualTypeHelper(*this, Policy, PlaceHolder, Indentation);
   }
@@ -1574,7 +1574,7 @@ public:
   ///
   /// \returns the resulting type.
   QualType substObjCTypeArgs(ASTContext &ctx,
-                             ArrayRef<QualType> typeArgs,
+                             llvm::ArrayRef<QualType> typeArgs,
                              ObjCSubstitutionContext context) const;
 
   /// Substitute type arguments from an object type for the Objective-C type
@@ -1626,7 +1626,7 @@ private:
   static bool hasNonTrivialToPrimitiveCopyCUnion(const RecordDecl *RD);
 };
 
-raw_ostream &operator<<(raw_ostream &OS, QualType QT);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, QualType QT);
 
 } // namespace clang
 
@@ -2925,7 +2925,7 @@ public:
   /// the type parameters of the given declaration context in any type described
   /// within that context, or an empty optional to indicate that no
   /// substitution is required.
-  std::optional<ArrayRef<QualType>>
+  std::optional<llvm::ArrayRef<QualType>>
   getObjCSubstitutions(const DeclContext *dc) const;
 
   /// Determines if this is an ObjC interface type that may accept type
@@ -3022,11 +3022,11 @@ private:
 
 public:
   Kind getKind() const { return static_cast<Kind>(BuiltinTypeBits.Kind); }
-  StringRef getName(const PrintingPolicy &Policy) const;
+  llvm::StringRef getName(const PrintingPolicy &Policy) const;
 
   const char *getNameAsCString(const PrintingPolicy &Policy) const {
-    // The StringRef is null-terminated.
-    StringRef str = getName(Policy);
+    // The llvm::StringRef is null-terminated.
+    llvm::StringRef str = getName(Policy);
     assert(!str.empty() && str.data()[str.size()] == '\0');
     return str.data();
   }
@@ -3201,7 +3201,7 @@ class BoundsAttributedType : public Type, public llvm::FoldingSetNode {
   QualType WrappedTy;
 
 protected:
-  ArrayRef<TypeCoupledDeclRefInfo> Decls; // stored in trailing objects
+  llvm::ArrayRef<TypeCoupledDeclRefInfo> Decls; // stored in trailing objects
 
   BoundsAttributedType(TypeClass TC, QualType Wrapped, QualType Canon);
 
@@ -3221,7 +3221,7 @@ public:
     return decl_range(dependent_decl_begin(), dependent_decl_end());
   }
 
-  ArrayRef<TypeCoupledDeclRefInfo> getCoupledDecls() const {
+  llvm::ArrayRef<TypeCoupledDeclRefInfo> getCoupledDecls() const {
     return {dependent_decl_begin(), dependent_decl_end()};
   }
 
@@ -3257,7 +3257,7 @@ class CountAttributedType final
   /// for the bounds information.
   CountAttributedType(QualType Wrapped, QualType Canon, Expr *CountExpr,
                       bool CountInBytes, bool OrNull,
-                      ArrayRef<TypeCoupledDeclRefInfo> CoupledDecls);
+                      llvm::ArrayRef<TypeCoupledDeclRefInfo> CoupledDecls);
 
   unsigned numTrailingObjects(OverloadToken<TypeCoupledDeclRefInfo>) const {
     return CountAttributedTypeBits.NumCoupledDecls;
@@ -4599,7 +4599,7 @@ public:
     return getReturnType().getNonLValueExprType(Context);
   }
 
-  static StringRef getNameForCallConv(CallingConv CC);
+  static llvm::StringRef getNameForCallConv(CallingConv CC);
 
   static bool classof(const Type *T) {
     return T->getTypeClass() == FunctionNoProto ||
@@ -4710,7 +4710,7 @@ public:
     ExceptionSpecificationType Type = EST_None;
 
     /// Explicitly-specified list of exception types.
-    ArrayRef<QualType> Exceptions;
+    llvm::ArrayRef<QualType> Exceptions;
 
     /// Noexcept expression, if this is a computed noexcept specification.
     Expr *NoexceptExpr = nullptr;
@@ -4819,7 +4819,7 @@ private:
     return false;
   }
 
-  FunctionProtoType(QualType result, ArrayRef<QualType> params,
+  FunctionProtoType(QualType result, llvm::ArrayRef<QualType> params,
                     QualType canonical, const ExtProtoInfo &epi);
 
   /// This struct is returned by getExceptionSpecSize and is used to
@@ -4894,7 +4894,7 @@ public:
     return param_type_begin()[i];
   }
 
-  ArrayRef<QualType> getParamTypes() const {
+  llvm::ArrayRef<QualType> getParamTypes() const {
     return llvm::ArrayRef(param_type_begin(), param_type_end());
   }
 
@@ -5042,7 +5042,7 @@ public:
 
   using param_type_iterator = const QualType *;
 
-  ArrayRef<QualType> param_types() const {
+  llvm::ArrayRef<QualType> param_types() const {
     return llvm::ArrayRef(param_type_begin(), param_type_end());
   }
 
@@ -5056,7 +5056,7 @@ public:
 
   using exception_iterator = const QualType *;
 
-  ArrayRef<QualType> exceptions() const {
+  llvm::ArrayRef<QualType> exceptions() const {
     return llvm::ArrayRef(exception_begin(), exception_end());
   }
 
@@ -5075,9 +5075,9 @@ public:
     return FunctionTypeBits.HasExtParameterInfos;
   }
 
-  ArrayRef<ExtParameterInfo> getExtParameterInfos() const {
+  llvm::ArrayRef<ExtParameterInfo> getExtParameterInfos() const {
     assert(hasExtParameterInfos());
-    return ArrayRef<ExtParameterInfo>(getTrailingObjects<ExtParameterInfo>(),
+    return llvm::ArrayRef<ExtParameterInfo>(getTrailingObjects<ExtParameterInfo>(),
                                       getNumParams());
   }
 
@@ -5123,7 +5123,7 @@ public:
   bool isSugared() const { return false; }
   QualType desugar() const { return QualType(this, 0); }
 
-  void printExceptionSpecification(raw_ostream &OS,
+  void printExceptionSpecification(llvm::raw_ostream &OS,
                                    const PrintingPolicy &Policy) const;
 
   static bool classof(const Type *T) {
@@ -5412,7 +5412,7 @@ protected:
   friend class ASTContext; // ASTContext creates these.
   PackIndexingType(const ASTContext &Context, QualType Canonical,
                    QualType Pattern, Expr *IndexExpr,
-                   ArrayRef<QualType> Expansions = {});
+                   llvm::ArrayRef<QualType> Expansions = {});
 
 public:
   Expr *getIndexExpr() const { return IndexExpr; }
@@ -5435,7 +5435,7 @@ public:
 
   bool hasSelectedType() const { return getSelectedIndex() != std::nullopt; }
 
-  ArrayRef<QualType> getExpansions() const {
+  llvm::ArrayRef<QualType> getExpansions() const {
     return {getExpansionsPtr(), Size};
   }
 
@@ -5458,7 +5458,7 @@ private:
   }
 
   static TypeDependence computeDependence(QualType Pattern, Expr *IndexExpr,
-                                          ArrayRef<QualType> Expansions = {});
+                                          llvm::ArrayRef<QualType> Expansions = {});
 
   unsigned numTrailingObjects(OverloadToken<QualType>) const { return Size; }
 };
@@ -5986,10 +5986,10 @@ class AutoType : public DeducedType, public llvm::FoldingSetNode {
 
   AutoType(QualType DeducedAsType, AutoTypeKeyword Keyword,
            TypeDependence ExtraDependence, QualType Canon, ConceptDecl *CD,
-           ArrayRef<TemplateArgument> TypeConstraintArgs);
+           llvm::ArrayRef<TemplateArgument> TypeConstraintArgs);
 
 public:
-  ArrayRef<TemplateArgument> getTypeConstraintArguments() const {
+  llvm::ArrayRef<TemplateArgument> getTypeConstraintArguments() const {
     return {reinterpret_cast<const TemplateArgument *>(this + 1),
             AutoTypeBits.NumArgs};
   }
@@ -6018,7 +6018,7 @@ public:
   static void Profile(llvm::FoldingSetNodeID &ID, const ASTContext &Context,
                       QualType Deduced, AutoTypeKeyword Keyword,
                       bool IsDependent, ConceptDecl *CD,
-                      ArrayRef<TemplateArgument> Arguments);
+                      llvm::ArrayRef<TemplateArgument> Arguments);
 
   static bool classof(const Type *T) {
     return T->getTypeClass() == Auto;
@@ -6100,7 +6100,7 @@ class TemplateSpecializationType : public Type, public llvm::FoldingSetNode {
   TemplateName Template;
 
   TemplateSpecializationType(TemplateName T,
-                             ArrayRef<TemplateArgument> Args,
+                             llvm::ArrayRef<TemplateArgument> Args,
                              QualType Canon,
                              QualType Aliased);
 
@@ -6117,13 +6117,13 @@ public:
   /// the caller that they need to pass in the converted arguments, not the
   /// specified arguments.
   static bool
-  anyDependentTemplateArguments(ArrayRef<TemplateArgumentLoc> Args,
-                                ArrayRef<TemplateArgument> Converted);
+  anyDependentTemplateArguments(llvm::ArrayRef<TemplateArgumentLoc> Args,
+                                llvm::ArrayRef<TemplateArgument> Converted);
   static bool
   anyDependentTemplateArguments(const TemplateArgumentListInfo &,
-                                ArrayRef<TemplateArgument> Converted);
+                                llvm::ArrayRef<TemplateArgument> Converted);
   static bool anyInstantiationDependentTemplateArguments(
-      ArrayRef<TemplateArgumentLoc> Args);
+      llvm::ArrayRef<TemplateArgumentLoc> Args);
 
   /// True if this template specialization type matches a current
   /// instantiation in the context in which it is found.
@@ -6155,7 +6155,7 @@ public:
   /// Retrieve the name of the template that we are specializing.
   TemplateName getTemplateName() const { return Template; }
 
-  ArrayRef<TemplateArgument> template_arguments() const {
+  llvm::ArrayRef<TemplateArgument> template_arguments() const {
     return {reinterpret_cast<const TemplateArgument *>(this + 1),
             TemplateSpecializationTypeBits.NumArgs};
   }
@@ -6170,7 +6170,7 @@ public:
 
   void Profile(llvm::FoldingSetNodeID &ID, const ASTContext &Ctx);
   static void Profile(llvm::FoldingSetNodeID &ID, TemplateName T,
-                      ArrayRef<TemplateArgument> Args,
+                      llvm::ArrayRef<TemplateArgument> Args,
                       const ASTContext &Context);
 
   static bool classof(const Type *T) {
@@ -6180,17 +6180,17 @@ public:
 
 /// Print a template argument list, including the '<' and '>'
 /// enclosing the template arguments.
-void printTemplateArgumentList(raw_ostream &OS,
-                               ArrayRef<TemplateArgument> Args,
+void printTemplateArgumentList(llvm::raw_ostream &OS,
+                               llvm::ArrayRef<TemplateArgument> Args,
                                const PrintingPolicy &Policy,
                                const TemplateParameterList *TPL = nullptr);
 
-void printTemplateArgumentList(raw_ostream &OS,
-                               ArrayRef<TemplateArgumentLoc> Args,
+void printTemplateArgumentList(llvm::raw_ostream &OS,
+                               llvm::ArrayRef<TemplateArgumentLoc> Args,
                                const PrintingPolicy &Policy,
                                const TemplateParameterList *TPL = nullptr);
 
-void printTemplateArgumentList(raw_ostream &OS,
+void printTemplateArgumentList(llvm::raw_ostream &OS,
                                const TemplateArgumentListInfo &Args,
                                const PrintingPolicy &Policy,
                                const TemplateParameterList *TPL = nullptr);
@@ -6199,7 +6199,7 @@ void printTemplateArgumentList(raw_ostream &OS,
 /// substituting Args into the default argument of Param.
 bool isSubstitutedDefaultArgument(ASTContext &Ctx, TemplateArgument Arg,
                                   const NamedDecl *Param,
-                                  ArrayRef<TemplateArgument> Args,
+                                  llvm::ArrayRef<TemplateArgument> Args,
                                   unsigned Depth);
 
 /// The injected class name of a C++ class template or class
@@ -6348,9 +6348,9 @@ public:
 
   static bool KeywordIsTagTypeKind(ElaboratedTypeKeyword Keyword);
 
-  static StringRef getKeywordName(ElaboratedTypeKeyword Keyword);
+  static llvm::StringRef getKeywordName(ElaboratedTypeKeyword Keyword);
 
-  static StringRef getTagTypeKindName(TagTypeKind Kind) {
+  static llvm::StringRef getTagTypeKindName(TagTypeKind Kind) {
     return getKeywordName(getKeywordForTagTypeKind(Kind));
   }
 
@@ -6514,14 +6514,14 @@ class DependentTemplateSpecializationType : public TypeWithKeyword,
   DependentTemplateSpecializationType(ElaboratedTypeKeyword Keyword,
                                       NestedNameSpecifier *NNS,
                                       const IdentifierInfo *Name,
-                                      ArrayRef<TemplateArgument> Args,
+                                      llvm::ArrayRef<TemplateArgument> Args,
                                       QualType Canon);
 
 public:
   NestedNameSpecifier *getQualifier() const { return NNS; }
   const IdentifierInfo *getIdentifier() const { return Name; }
 
-  ArrayRef<TemplateArgument> template_arguments() const {
+  llvm::ArrayRef<TemplateArgument> template_arguments() const {
     return {reinterpret_cast<const TemplateArgument *>(this + 1),
             DependentTemplateSpecializationTypeBits.NumArgs};
   }
@@ -6538,7 +6538,7 @@ public:
                       ElaboratedTypeKeyword Keyword,
                       NestedNameSpecifier *Qualifier,
                       const IdentifierInfo *Name,
-                      ArrayRef<TemplateArgument> Args);
+                      llvm::ArrayRef<TemplateArgument> Args);
 
   static bool classof(const Type *T) {
     return T->getTypeClass() == DependentTemplateSpecialization;
@@ -6637,7 +6637,7 @@ protected:
     static_cast<T*>(this)->setNumProtocolsImpl(N);
   }
 
-  void initialize(ArrayRef<ObjCProtocolDecl *> protocols) {
+  void initialize(llvm::ArrayRef<ObjCProtocolDecl *> protocols) {
     setNumProtocols(protocols.size());
     assert(getNumProtocols() == protocols.size() &&
            "bitfield overflow in protocol count");
@@ -6669,8 +6669,8 @@ public:
   }
 
   /// Retrieve all of the protocol qualifiers.
-  ArrayRef<ObjCProtocolDecl *> getProtocols() const {
-    return ArrayRef<ObjCProtocolDecl *>(qual_begin(), getNumProtocols());
+  llvm::ArrayRef<ObjCProtocolDecl *> getProtocols() const {
+    return llvm::ArrayRef<ObjCProtocolDecl *>(qual_begin(), getNumProtocols());
   }
 };
 
@@ -6704,7 +6704,7 @@ class ObjCTypeParamType : public Type,
 
   ObjCTypeParamType(const ObjCTypeParamDecl *D,
                     QualType can,
-                    ArrayRef<ObjCProtocolDecl *> protocols);
+                    llvm::ArrayRef<ObjCProtocolDecl *> protocols);
 
 public:
   bool isSugared() const { return true; }
@@ -6718,7 +6718,7 @@ public:
   static void Profile(llvm::FoldingSetNodeID &ID,
                       const ObjCTypeParamDecl *OTPDecl,
                       QualType CanonicalType,
-                      ArrayRef<ObjCProtocolDecl *> protocols);
+                      llvm::ArrayRef<ObjCProtocolDecl *> protocols);
 
   ObjCTypeParamDecl *getDecl() const { return OTPDecl; }
 };
@@ -6793,8 +6793,8 @@ protected:
   enum Nonce_ObjCInterface { Nonce_ObjCInterface };
 
   ObjCObjectType(QualType Canonical, QualType Base,
-                 ArrayRef<QualType> typeArgs,
-                 ArrayRef<ObjCProtocolDecl *> protocols,
+                 llvm::ArrayRef<QualType> typeArgs,
+                 llvm::ArrayRef<ObjCProtocolDecl *> protocols,
                  bool isKindOf);
 
   ObjCObjectType(enum Nonce_ObjCInterface)
@@ -6858,11 +6858,11 @@ public:
   bool isUnspecializedAsWritten() const { return !isSpecializedAsWritten(); }
 
   /// Retrieve the type arguments of this object type (semantically).
-  ArrayRef<QualType> getTypeArgs() const;
+  llvm::ArrayRef<QualType> getTypeArgs() const;
 
   /// Retrieve the type arguments of this object type as they were
   /// written.
-  ArrayRef<QualType> getTypeArgsAsWritten() const {
+  llvm::ArrayRef<QualType> getTypeArgsAsWritten() const {
     return llvm::ArrayRef(getTypeArgStorage(), ObjCObjectTypeBits.NumTypeArgs);
   }
 
@@ -6910,8 +6910,8 @@ class ObjCObjectTypeImpl : public ObjCObjectType, public llvm::FoldingSetNode {
   // will need to be modified.
 
   ObjCObjectTypeImpl(QualType Canonical, QualType Base,
-                     ArrayRef<QualType> typeArgs,
-                     ArrayRef<ObjCProtocolDecl *> protocols,
+                     llvm::ArrayRef<QualType> typeArgs,
+                     llvm::ArrayRef<ObjCProtocolDecl *> protocols,
                      bool isKindOf)
       : ObjCObjectType(Canonical, Base, typeArgs, protocols, isKindOf) {}
 
@@ -6919,8 +6919,8 @@ public:
   void Profile(llvm::FoldingSetNodeID &ID);
   static void Profile(llvm::FoldingSetNodeID &ID,
                       QualType Base,
-                      ArrayRef<QualType> typeArgs,
-                      ArrayRef<ObjCProtocolDecl *> protocols,
+                      llvm::ArrayRef<QualType> typeArgs,
+                      llvm::ArrayRef<ObjCProtocolDecl *> protocols,
                       bool isKindOf);
 };
 
@@ -7110,12 +7110,12 @@ public:
   bool isUnspecializedAsWritten() const { return !isSpecializedAsWritten(); }
 
   /// Retrieve the type arguments for this type.
-  ArrayRef<QualType> getTypeArgs() const {
+  llvm::ArrayRef<QualType> getTypeArgs() const {
     return getObjectType()->getTypeArgs();
   }
 
   /// Retrieve the type arguments for this type.
-  ArrayRef<QualType> getTypeArgsAsWritten() const {
+  llvm::ArrayRef<QualType> getTypeArgsAsWritten() const {
     return getObjectType()->getTypeArgsAsWritten();
   }
 
@@ -8230,7 +8230,7 @@ QualType DecayedType::getPointeeType() const {
 // as a scaled integer.
 // TODO: At some point, we should change the arguments to instead just accept an
 // APFixedPoint instead of APSInt and scale.
-void FixedPointValueToString(SmallVectorImpl<char> &Str, llvm::APSInt Val,
+void FixedPointValueToString(llvm::SmallVectorImpl<char> &Str, llvm::APSInt Val,
                              unsigned Scale);
 
 } // namespace clang

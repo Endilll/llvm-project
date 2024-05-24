@@ -37,31 +37,31 @@ namespace {
 class ClangAsmParserCallback : public llvm::MCAsmParserSemaCallback {
   Parser &TheParser;
   SourceLocation AsmLoc;
-  StringRef AsmString;
+  llvm::StringRef AsmString;
 
   /// The tokens we streamed into AsmString and handed off to MC.
-  ArrayRef<Token> AsmToks;
+  llvm::ArrayRef<Token> AsmToks;
 
   /// The offset of each token in AsmToks within AsmString.
-  ArrayRef<unsigned> AsmTokOffsets;
+  llvm::ArrayRef<unsigned> AsmTokOffsets;
 
 public:
-  ClangAsmParserCallback(Parser &P, SourceLocation Loc, StringRef AsmString,
-                         ArrayRef<Token> Toks, ArrayRef<unsigned> Offsets)
+  ClangAsmParserCallback(Parser &P, SourceLocation Loc, llvm::StringRef AsmString,
+                         llvm::ArrayRef<Token> Toks, llvm::ArrayRef<unsigned> Offsets)
       : TheParser(P), AsmLoc(Loc), AsmString(AsmString), AsmToks(Toks),
         AsmTokOffsets(Offsets) {
     assert(AsmToks.size() == AsmTokOffsets.size());
   }
 
-  void LookupInlineAsmIdentifier(StringRef &LineBuf,
+  void LookupInlineAsmIdentifier(llvm::StringRef &LineBuf,
                                  llvm::InlineAsmIdentifierInfo &Info,
                                  bool IsUnevaluatedContext) override;
 
-  StringRef LookupInlineAsmLabel(StringRef Identifier, llvm::SourceMgr &LSM,
+  llvm::StringRef LookupInlineAsmLabel(llvm::StringRef Identifier, llvm::SourceMgr &LSM,
                                  llvm::SMLoc Location,
                                  bool Create) override;
 
-  bool LookupInlineAsmField(StringRef Base, StringRef Member,
+  bool LookupInlineAsmField(llvm::StringRef Base, llvm::StringRef Member,
                             unsigned &Offset) override {
     return TheParser.getActions().LookupInlineAsmField(Base, Member, Offset,
                                                        AsmLoc);
@@ -73,7 +73,7 @@ public:
 
 private:
   /// Collect the appropriate tokens for the given string.
-  void findTokensForString(StringRef Str, SmallVectorImpl<Token> &TempToks,
+  void findTokensForString(llvm::StringRef Str, llvm::SmallVectorImpl<Token> &TempToks,
                            const Token *&FirstOrigToken) const;
 
   SourceLocation translateLocation(const llvm::SourceMgr &LSM,
@@ -84,10 +84,10 @@ private:
 }
 
 void ClangAsmParserCallback::LookupInlineAsmIdentifier(
-    StringRef &LineBuf, llvm::InlineAsmIdentifierInfo &Info,
+    llvm::StringRef &LineBuf, llvm::InlineAsmIdentifierInfo &Info,
     bool IsUnevaluatedContext) {
   // Collect the desired tokens.
-  SmallVector<Token, 16> LineToks;
+  llvm::SmallVector<Token, 16> LineToks;
   const Token *FirstOrigToken = nullptr;
   findTokensForString(LineBuf, LineToks, FirstOrigToken);
 
@@ -124,7 +124,7 @@ void ClangAsmParserCallback::LookupInlineAsmIdentifier(
   TheParser.getActions().FillInlineAsmIdentifierInfo(Result.get(), Info);
 }
 
-StringRef ClangAsmParserCallback::LookupInlineAsmLabel(StringRef Identifier,
+llvm::StringRef ClangAsmParserCallback::LookupInlineAsmLabel(llvm::StringRef Identifier,
                                                        llvm::SourceMgr &LSM,
                                                        llvm::SMLoc Location,
                                                        bool Create) {
@@ -135,7 +135,7 @@ StringRef ClangAsmParserCallback::LookupInlineAsmLabel(StringRef Identifier,
 }
 
 void ClangAsmParserCallback::findTokensForString(
-    StringRef Str, SmallVectorImpl<Token> &TempToks,
+    llvm::StringRef Str, llvm::SmallVectorImpl<Token> &TempToks,
     const Token *&FirstOrigToken) const {
   // For now, assert that the string we're working with is a substring
   // of what we gave to MC.  This lets us use the original tokens.
@@ -297,9 +297,9 @@ ExprResult Parser::ParseMSAsmIdentifier(llvm::SmallVectorImpl<Token> &LineToks,
 /// Turn a sequence of our tokens back into a string that we can hand
 /// to the MC asm parser.
 static bool buildMSAsmString(Preprocessor &PP, SourceLocation AsmLoc,
-                             ArrayRef<Token> AsmToks,
-                             SmallVectorImpl<unsigned> &TokOffsets,
-                             SmallString<512> &Asm) {
+                             llvm::ArrayRef<Token> AsmToks,
+                             llvm::SmallVectorImpl<unsigned> &TokOffsets,
+                             llvm::SmallString<512> &Asm) {
   assert(!AsmToks.empty() && "Didn't expect an empty AsmToks!");
 
   // Is this the start of a new assembly statement?
@@ -334,7 +334,7 @@ static bool buildMSAsmString(Preprocessor &PP, SourceLocation AsmLoc,
     }
 
     // Append the spelling of the token.
-    SmallString<32> SpellingBuffer;
+    llvm::SmallString<32> SpellingBuffer;
     bool SpellingInvalid = false;
     Asm += PP.getSpelling(Tok, SpellingBuffer, &SpellingInvalid);
     assert(!SpellingInvalid && "spelling was invalid after correct parse?");
@@ -378,7 +378,7 @@ bool Parser::isGNUAsmQualifier(const Token &TokAfterAsm) const {
 StmtResult Parser::ParseMicrosoftAsmStatement(SourceLocation AsmLoc) {
   SourceManager &SrcMgr = PP.getSourceManager();
   SourceLocation EndLoc = AsmLoc;
-  SmallVector<Token, 4> AsmToks;
+  llvm::SmallVector<Token, 4> AsmToks;
 
   bool SingleLineMode = true;
   unsigned BraceNesting = 0;
@@ -387,7 +387,7 @@ StmtResult Parser::ParseMicrosoftAsmStatement(SourceLocation AsmLoc) {
   FileID FID;
   unsigned LineNo = 0;
   unsigned NumTokensRead = 0;
-  SmallVector<SourceLocation, 4> LBraceLocs;
+  llvm::SmallVector<SourceLocation, 4> LBraceLocs;
   bool SkippedStartOfLine = false;
 
   if (Tok.is(tok::l_brace)) {
@@ -525,9 +525,9 @@ StmtResult Parser::ParseMicrosoftAsmStatement(SourceLocation AsmLoc) {
   }
 
   // Okay, prepare to use MC to parse the assembly.
-  SmallVector<StringRef, 4> ConstraintRefs;
-  SmallVector<Expr *, 4> Exprs;
-  SmallVector<StringRef, 4> ClobberRefs;
+  llvm::SmallVector<llvm::StringRef, 4> ConstraintRefs;
+  llvm::SmallVector<Expr *, 4> Exprs;
+  llvm::SmallVector<llvm::StringRef, 4> ClobberRefs;
 
   // We need an actual supported target.
   const llvm::Triple &TheTriple = Actions.Context.getTargetInfo().getTriple();
@@ -544,7 +544,7 @@ StmtResult Parser::ParseMicrosoftAsmStatement(SourceLocation AsmLoc) {
 
   assert(!LBraceLocs.empty() && "Should have at least one location here");
 
-  SmallString<512> AsmString;
+  llvm::SmallString<512> AsmString;
   auto EmptyStmt = [&] {
     return Actions.ActOnMSAsmStmt(AsmLoc, LBraceLocs[0], AsmToks, AsmString,
                                   /*NumOutputs*/ 0, /*NumInputs*/ 0,
@@ -557,7 +557,7 @@ StmtResult Parser::ParseMicrosoftAsmStatement(SourceLocation AsmLoc) {
   }
 
   // Expand the tokens into a string buffer.
-  SmallVector<unsigned, 8> TokOffsets;
+  llvm::SmallVector<unsigned, 8> TokOffsets;
   if (buildMSAsmString(PP, AsmLoc, AsmToks, TokOffsets, AsmString))
     return StmtError();
 
@@ -630,9 +630,9 @@ StmtResult Parser::ParseMicrosoftAsmStatement(SourceLocation AsmLoc) {
   unsigned NumOutputs;
   unsigned NumInputs;
   std::string AsmStringIR;
-  SmallVector<std::pair<void *, bool>, 4> OpExprs;
-  SmallVector<std::string, 4> Constraints;
-  SmallVector<std::string, 4> Clobbers;
+  llvm::SmallVector<std::pair<void *, bool>, 4> OpExprs;
+  llvm::SmallVector<std::string, 4> Constraints;
+  llvm::SmallVector<std::string, 4> Clobbers;
   if (Parser->parseMSInlineAsm(AsmStringIR, NumOutputs, NumInputs, OpExprs,
                                Constraints, Clobbers, MII.get(), IP.get(),
                                Callback))
@@ -644,10 +644,10 @@ StmtResult Parser::ParseMicrosoftAsmStatement(SourceLocation AsmLoc) {
     return C == "fpsr" || C == "mxcsr";
   });
 
-  // Build the vector of clobber StringRefs.
+  // Build the vector of clobber llvm::StringRefs.
   ClobberRefs.insert(ClobberRefs.end(), Clobbers.begin(), Clobbers.end());
 
-  // Recast the void pointers and build the vector of constraint StringRefs.
+  // Recast the void pointers and build the vector of constraint llvm::StringRefs.
   unsigned NumExprs = NumOutputs + NumInputs;
   ConstraintRefs.resize(NumExprs);
   Exprs.resize(NumExprs);
@@ -661,7 +661,7 @@ StmtResult Parser::ParseMicrosoftAsmStatement(SourceLocation AsmLoc) {
       OpExpr =
           Actions.BuildUnaryOp(getCurScope(), AsmLoc, UO_AddrOf, OpExpr).get();
 
-    ConstraintRefs[i] = StringRef(Constraints[i]);
+    ConstraintRefs[i] = llvm::StringRef(Constraints[i]);
     Exprs[i] = OpExpr;
   }
 
@@ -754,7 +754,7 @@ StmtResult Parser::ParseAsmStatement(bool &msAsm) {
     return StmtError();
   }
 
-  SmallVector<IdentifierInfo *, 4> Names;
+  llvm::SmallVector<IdentifierInfo *, 4> Names;
   ExprVector Constraints;
   ExprVector Exprs;
   ExprVector Clobbers;
@@ -881,9 +881,9 @@ StmtResult Parser::ParseAsmStatement(bool &msAsm) {
 ///
 //
 // FIXME: Avoid unnecessary std::string trashing.
-bool Parser::ParseAsmOperandsOpt(SmallVectorImpl<IdentifierInfo *> &Names,
-                                 SmallVectorImpl<Expr *> &Constraints,
-                                 SmallVectorImpl<Expr *> &Exprs) {
+bool Parser::ParseAsmOperandsOpt(llvm::SmallVectorImpl<IdentifierInfo *> &Names,
+                                 llvm::SmallVectorImpl<Expr *> &Constraints,
+                                 llvm::SmallVectorImpl<Expr *> &Exprs) {
   // 'asm-operands' isn't present?
   if (!isTokenStringLiteral() && Tok.isNot(tok::l_square))
     return false;

@@ -28,7 +28,7 @@ class UseUsingCheck : public ClangTidyCheck {
   std::string FirstTypedefName;
 
 public:
-  UseUsingCheck(StringRef Name, ClangTidyContext *Context);
+  UseUsingCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
   }

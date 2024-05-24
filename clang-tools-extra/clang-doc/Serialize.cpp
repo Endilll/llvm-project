@@ -83,7 +83,7 @@ public:
 
 private:
   std::string getCommandName(unsigned CommandID) const;
-  bool isWhitespaceOnly(StringRef S) const;
+  bool isWhitespaceOnly(llvm::StringRef S) const;
 
   CommentInfo &CurrentCI;
 };
@@ -190,7 +190,7 @@ std::string getSourceCode(const Decl *D, const SourceRange &R) {
 }
 
 template <typename T> static std::string serialize(T &I) {
-  SmallString<2048> Buffer;
+  llvm::SmallString<2048> Buffer;
   llvm::BitstreamWriter Stream(Buffer);
   ClangDocBitcodeWriter Writer(Stream);
   Writer.emitBlock(I);
@@ -395,7 +395,7 @@ static void parseEnumerators(EnumInfo &I, const EnumDecl *D) {
     if (const Expr *InitExpr = E->getInitExpr())
       ValueExpr = getSourceCode(D, InitExpr->getSourceRange());
 
-    SmallString<16> ValueStr;
+    llvm::SmallString<16> ValueStr;
     E->getInitVal().toString(ValueStr);
     I.Members.emplace_back(E->getNameAsString(), ValueStr, ValueExpr);
   }
@@ -515,7 +515,7 @@ static void populateInfo(Info &I, const T *D, const FullComment *C,
 
 template <typename T>
 static void populateSymbolInfo(SymbolInfo &I, const T *D, const FullComment *C,
-                               int LineNumber, StringRef Filename,
+                               int LineNumber, llvm::StringRef Filename,
                                bool IsFileInRootDir,
                                bool &IsInAnonymousNamespace) {
   populateInfo(I, D, C, IsInAnonymousNamespace);
@@ -527,7 +527,7 @@ static void populateSymbolInfo(SymbolInfo &I, const T *D, const FullComment *C,
 
 static void populateFunctionInfo(FunctionInfo &I, const FunctionDecl *D,
                                  const FullComment *FC, int LineNumber,
-                                 StringRef Filename, bool IsFileInRootDir,
+                                 llvm::StringRef Filename, bool IsFileInRootDir,
                                  bool &IsInAnonymousNamespace) {
   populateSymbolInfo(I, D, FC, LineNumber, Filename, IsFileInRootDir,
                      IsInAnonymousNamespace);
@@ -764,7 +764,7 @@ emitInfo(const CXXMethodDecl *D, const FullComment *FC, int LineNumber,
 
 std::pair<std::unique_ptr<Info>, std::unique_ptr<Info>>
 emitInfo(const TypedefDecl *D, const FullComment *FC, int LineNumber,
-         StringRef File, bool IsFileInRootDir, bool PublicOnly) {
+         llvm::StringRef File, bool IsFileInRootDir, bool PublicOnly) {
   TypedefInfo Info;
 
   bool IsInAnonymousNamespace = false;
@@ -790,7 +790,7 @@ emitInfo(const TypedefDecl *D, const FullComment *FC, int LineNumber,
 // TypedefInfo with the IsUsing flag set.
 std::pair<std::unique_ptr<Info>, std::unique_ptr<Info>>
 emitInfo(const TypeAliasDecl *D, const FullComment *FC, int LineNumber,
-         StringRef File, bool IsFileInRootDir, bool PublicOnly) {
+         llvm::StringRef File, bool IsFileInRootDir, bool PublicOnly) {
   TypedefInfo Info;
 
   bool IsInAnonymousNamespace = false;

@@ -90,7 +90,7 @@ class CXXOperatorCallExpr final : public CallExpr {
   SourceRange getSourceRangeImpl() const LLVM_READONLY;
 
   CXXOperatorCallExpr(OverloadedOperatorKind OpKind, Expr *Fn,
-                      ArrayRef<Expr *> Args, QualType Ty, ExprValueKind VK,
+                      llvm::ArrayRef<Expr *> Args, QualType Ty, ExprValueKind VK,
                       SourceLocation OperatorLoc, FPOptionsOverride FPFeatures,
                       ADLCallKind UsesADL);
 
@@ -99,7 +99,7 @@ class CXXOperatorCallExpr final : public CallExpr {
 public:
   static CXXOperatorCallExpr *
   Create(const ASTContext &Ctx, OverloadedOperatorKind OpKind, Expr *Fn,
-         ArrayRef<Expr *> Args, QualType Ty, ExprValueKind VK,
+         llvm::ArrayRef<Expr *> Args, QualType Ty, ExprValueKind VK,
          SourceLocation OperatorLoc, FPOptionsOverride FPFeatures,
          ADLCallKind UsesADL = NotADL);
 
@@ -177,7 +177,7 @@ class CXXMemberCallExpr final : public CallExpr {
   // CXXMemberCallExpr has some trailing objects belonging
   // to CallExpr. See CallExpr for the details.
 
-  CXXMemberCallExpr(Expr *Fn, ArrayRef<Expr *> Args, QualType Ty,
+  CXXMemberCallExpr(Expr *Fn, llvm::ArrayRef<Expr *> Args, QualType Ty,
                     ExprValueKind VK, SourceLocation RP,
                     FPOptionsOverride FPOptions, unsigned MinNumArgs);
 
@@ -185,7 +185,7 @@ class CXXMemberCallExpr final : public CallExpr {
 
 public:
   static CXXMemberCallExpr *Create(const ASTContext &Ctx, Expr *Fn,
-                                   ArrayRef<Expr *> Args, QualType Ty,
+                                   llvm::ArrayRef<Expr *> Args, QualType Ty,
                                    ExprValueKind VK, SourceLocation RP,
                                    FPOptionsOverride FPFeatures,
                                    unsigned MinNumArgs = 0);
@@ -236,7 +236,7 @@ class CUDAKernelCallExpr final : public CallExpr {
   // CUDAKernelCallExpr has some trailing objects belonging
   // to CallExpr. See CallExpr for the details.
 
-  CUDAKernelCallExpr(Expr *Fn, CallExpr *Config, ArrayRef<Expr *> Args,
+  CUDAKernelCallExpr(Expr *Fn, CallExpr *Config, llvm::ArrayRef<Expr *> Args,
                      QualType Ty, ExprValueKind VK, SourceLocation RP,
                      FPOptionsOverride FPFeatures, unsigned MinNumArgs);
 
@@ -244,7 +244,7 @@ class CUDAKernelCallExpr final : public CallExpr {
 
 public:
   static CUDAKernelCallExpr *Create(const ASTContext &Ctx, Expr *Fn,
-                                    CallExpr *Config, ArrayRef<Expr *> Args,
+                                    CallExpr *Config, llvm::ArrayRef<Expr *> Args,
                                     QualType Ty, ExprValueKind VK,
                                     SourceLocation RP,
                                     FPOptionsOverride FPFeatures,
@@ -320,10 +320,10 @@ public:
 
   BinaryOperatorKind getOperator() const { return getDecomposedForm().Opcode; }
   BinaryOperatorKind getOpcode() const { return getOperator(); }
-  static StringRef getOpcodeStr(BinaryOperatorKind Op) {
+  static llvm::StringRef getOpcodeStr(BinaryOperatorKind Op) {
     return BinaryOperator::getOpcodeStr(Op);
   }
-  StringRef getOpcodeStr() const {
+  llvm::StringRef getOpcodeStr() const {
     return BinaryOperator::getOpcodeStr(getOpcode());
   }
   bool isComparisonOp() const { return true; }
@@ -644,7 +644,7 @@ class UserDefinedLiteral final : public CallExpr {
   // UserDefinedLiteral has some trailing objects belonging
   // to CallExpr. See CallExpr for the details.
 
-  UserDefinedLiteral(Expr *Fn, ArrayRef<Expr *> Args, QualType Ty,
+  UserDefinedLiteral(Expr *Fn, llvm::ArrayRef<Expr *> Args, QualType Ty,
                      ExprValueKind VK, SourceLocation LitEndLoc,
                      SourceLocation SuffixLoc, FPOptionsOverride FPFeatures);
 
@@ -652,7 +652,7 @@ class UserDefinedLiteral final : public CallExpr {
 
 public:
   static UserDefinedLiteral *Create(const ASTContext &Ctx, Expr *Fn,
-                                    ArrayRef<Expr *> Args, QualType Ty,
+                                    llvm::ArrayRef<Expr *> Args, QualType Ty,
                                     ExprValueKind VK, SourceLocation LitEndLoc,
                                     SourceLocation SuffixLoc,
                                     FPOptionsOverride FPFeatures);
@@ -1575,7 +1575,7 @@ protected:
   /// Build a C++ construction expression.
   CXXConstructExpr(StmtClass SC, QualType Ty, SourceLocation Loc,
                    CXXConstructorDecl *Ctor, bool Elidable,
-                   ArrayRef<Expr *> Args, bool HadMultipleCandidates,
+                   llvm::ArrayRef<Expr *> Args, bool HadMultipleCandidates,
                    bool ListInitialization, bool StdInitListInitialization,
                    bool ZeroInitialization, CXXConstructionKind ConstructKind,
                    SourceRange ParenOrBraceRange);
@@ -1593,7 +1593,7 @@ public:
   /// Create a C++ construction expression.
   static CXXConstructExpr *
   Create(const ASTContext &Ctx, QualType Ty, SourceLocation Loc,
-         CXXConstructorDecl *Ctor, bool Elidable, ArrayRef<Expr *> Args,
+         CXXConstructorDecl *Ctor, bool Elidable, llvm::ArrayRef<Expr *> Args,
          bool HadMultipleCandidates, bool ListInitialization,
          bool StdInitListInitialization, bool ZeroInitialization,
          CXXConstructionKind ConstructKind, SourceRange ParenOrBraceRange);
@@ -1888,7 +1888,7 @@ class CXXTemporaryObjectExpr final : public CXXConstructExpr {
   TypeSourceInfo *TSI;
 
   CXXTemporaryObjectExpr(CXXConstructorDecl *Cons, QualType Ty,
-                         TypeSourceInfo *TSI, ArrayRef<Expr *> Args,
+                         TypeSourceInfo *TSI, llvm::ArrayRef<Expr *> Args,
                          SourceRange ParenOrBraceRange,
                          bool HadMultipleCandidates, bool ListInitialization,
                          bool StdInitListInitialization,
@@ -1899,7 +1899,7 @@ class CXXTemporaryObjectExpr final : public CXXConstructExpr {
 public:
   static CXXTemporaryObjectExpr *
   Create(const ASTContext &Ctx, CXXConstructorDecl *Cons, QualType Ty,
-         TypeSourceInfo *TSI, ArrayRef<Expr *> Args,
+         TypeSourceInfo *TSI, llvm::ArrayRef<Expr *> Args,
          SourceRange ParenOrBraceRange, bool HadMultipleCandidates,
          bool ListInitialization, bool StdInitListInitialization,
          bool ZeroInitialization);
@@ -1970,7 +1970,7 @@ class LambdaExpr final : public Expr,
   LambdaExpr(QualType T, SourceRange IntroducerRange,
              LambdaCaptureDefault CaptureDefault,
              SourceLocation CaptureDefaultLoc, bool ExplicitParams,
-             bool ExplicitResultType, ArrayRef<Expr *> CaptureInits,
+             bool ExplicitResultType, llvm::ArrayRef<Expr *> CaptureInits,
              SourceLocation ClosingBrace, bool ContainsUnexpandedParameterPack);
 
   /// Construct an empty lambda expression.
@@ -1991,7 +1991,7 @@ public:
   Create(const ASTContext &C, CXXRecordDecl *Class, SourceRange IntroducerRange,
          LambdaCaptureDefault CaptureDefault, SourceLocation CaptureDefaultLoc,
          bool ExplicitParams, bool ExplicitResultType,
-         ArrayRef<Expr *> CaptureInits, SourceLocation ClosingBrace,
+         llvm::ArrayRef<Expr *> CaptureInits, SourceLocation ClosingBrace,
          bool ContainsUnexpandedParameterPack);
 
   /// Construct a new lambda expression that will be deserialized from
@@ -2121,7 +2121,7 @@ public:
 
   /// Get the template parameters were explicitly specified (as opposed to being
   /// invented by use of an auto parameter).
-  ArrayRef<NamedDecl *> getExplicitTemplateParameters() const;
+  llvm::ArrayRef<NamedDecl *> getExplicitTemplateParameters() const;
 
   /// Get the trailing requires clause, if any.
   Expr *getTrailingRequiresClause() const;
@@ -2285,7 +2285,7 @@ class CXXNewExpr final
   /// Build a c++ new expression.
   CXXNewExpr(bool IsGlobalNew, FunctionDecl *OperatorNew,
              FunctionDecl *OperatorDelete, bool ShouldPassAlignment,
-             bool UsualArrayDeleteWantsSize, ArrayRef<Expr *> PlacementArgs,
+             bool UsualArrayDeleteWantsSize, llvm::ArrayRef<Expr *> PlacementArgs,
              SourceRange TypeIdParens, std::optional<Expr *> ArraySize,
              CXXNewInitializationStyle InitializationStyle, Expr *Initializer,
              QualType Ty, TypeSourceInfo *AllocatedTypeInfo, SourceRange Range,
@@ -2300,7 +2300,7 @@ public:
   static CXXNewExpr *
   Create(const ASTContext &Ctx, bool IsGlobalNew, FunctionDecl *OperatorNew,
          FunctionDecl *OperatorDelete, bool ShouldPassAlignment,
-         bool UsualArrayDeleteWantsSize, ArrayRef<Expr *> PlacementArgs,
+         bool UsualArrayDeleteWantsSize, llvm::ArrayRef<Expr *> PlacementArgs,
          SourceRange TypeIdParens, std::optional<Expr *> ArraySize,
          CXXNewInitializationStyle InitializationStyle, Expr *Initializer,
          QualType Ty, TypeSourceInfo *AllocatedTypeInfo, SourceRange Range,
@@ -2771,7 +2771,7 @@ class TypeTraitExpr final
   // TypeTraitExpr.
 
   TypeTraitExpr(QualType T, SourceLocation Loc, TypeTrait Kind,
-                ArrayRef<TypeSourceInfo *> Args,
+                llvm::ArrayRef<TypeSourceInfo *> Args,
                 SourceLocation RParenLoc,
                 bool Value);
 
@@ -2789,7 +2789,7 @@ public:
   /// Create a new type trait expression.
   static TypeTraitExpr *Create(const ASTContext &C, QualType T,
                                SourceLocation Loc, TypeTrait Kind,
-                               ArrayRef<TypeSourceInfo *> Args,
+                               llvm::ArrayRef<TypeSourceInfo *> Args,
                                SourceLocation RParenLoc,
                                bool Value);
 
@@ -2816,7 +2816,7 @@ public:
   }
 
   /// Retrieve the argument types.
-  ArrayRef<TypeSourceInfo *> getArgs() const {
+  llvm::ArrayRef<TypeSourceInfo *> getArgs() const {
     return llvm::ArrayRef(getTrailingObjects<TypeSourceInfo *>(), getNumArgs());
   }
 
@@ -3141,7 +3141,7 @@ public:
     return getTrailingASTTemplateKWAndArgsInfo()->NumTemplateArgs;
   }
 
-  ArrayRef<TemplateArgumentLoc> template_arguments() const {
+  llvm::ArrayRef<TemplateArgumentLoc> template_arguments() const {
     return {getTemplateArgs(), getNumTemplateArgs()};
   }
 
@@ -3421,7 +3421,7 @@ public:
     return getTrailingObjects<ASTTemplateKWAndArgsInfo>()->NumTemplateArgs;
   }
 
-  ArrayRef<TemplateArgumentLoc> template_arguments() const {
+  llvm::ArrayRef<TemplateArgumentLoc> template_arguments() const {
     return {getTemplateArgs(), getNumTemplateArgs()};
   }
 
@@ -3478,7 +3478,7 @@ private:
 
   ExprWithCleanups(EmptyShell, unsigned NumObjects);
   ExprWithCleanups(Expr *SubExpr, bool CleanupsHaveSideEffects,
-                   ArrayRef<CleanupObject> Objects);
+                   llvm::ArrayRef<CleanupObject> Objects);
 
 public:
   static ExprWithCleanups *Create(const ASTContext &C, EmptyShell empty,
@@ -3486,9 +3486,9 @@ public:
 
   static ExprWithCleanups *Create(const ASTContext &C, Expr *subexpr,
                                   bool CleanupsHaveSideEffects,
-                                  ArrayRef<CleanupObject> objects);
+                                  llvm::ArrayRef<CleanupObject> objects);
 
-  ArrayRef<CleanupObject> getObjects() const {
+  llvm::ArrayRef<CleanupObject> getObjects() const {
     return llvm::ArrayRef(getTrailingObjects<CleanupObject>(), getNumObjects());
   }
 
@@ -3562,7 +3562,7 @@ class CXXUnresolvedConstructExpr final
   SourceLocation RParenLoc;
 
   CXXUnresolvedConstructExpr(QualType T, TypeSourceInfo *TSI,
-                             SourceLocation LParenLoc, ArrayRef<Expr *> Args,
+                             SourceLocation LParenLoc, llvm::ArrayRef<Expr *> Args,
                              SourceLocation RParenLoc, bool IsListInit);
 
   CXXUnresolvedConstructExpr(EmptyShell Empty, unsigned NumArgs)
@@ -3573,7 +3573,7 @@ class CXXUnresolvedConstructExpr final
 public:
   static CXXUnresolvedConstructExpr *
   Create(const ASTContext &Context, QualType T, TypeSourceInfo *TSI,
-         SourceLocation LParenLoc, ArrayRef<Expr *> Args,
+         SourceLocation LParenLoc, llvm::ArrayRef<Expr *> Args,
          SourceLocation RParenLoc, bool IsListInit);
 
   static CXXUnresolvedConstructExpr *CreateEmpty(const ASTContext &Context,
@@ -3878,7 +3878,7 @@ public:
     return getTrailingObjects<ASTTemplateKWAndArgsInfo>()->NumTemplateArgs;
   }
 
-  ArrayRef<TemplateArgumentLoc> template_arguments() const {
+  llvm::ArrayRef<TemplateArgumentLoc> template_arguments() const {
     return {getTemplateArgs(), getNumTemplateArgs()};
   }
 
@@ -4282,7 +4282,7 @@ class SizeOfPackExpr final
   SizeOfPackExpr(QualType SizeType, SourceLocation OperatorLoc, NamedDecl *Pack,
                  SourceLocation PackLoc, SourceLocation RParenLoc,
                  std::optional<unsigned> Length,
-                 ArrayRef<TemplateArgument> PartialArgs)
+                 llvm::ArrayRef<TemplateArgument> PartialArgs)
       : Expr(SizeOfPackExprClass, SizeType, VK_PRValue, OK_Ordinary),
         OperatorLoc(OperatorLoc), PackLoc(PackLoc), RParenLoc(RParenLoc),
         Length(Length ? *Length : PartialArgs.size()), Pack(Pack) {
@@ -4303,7 +4303,7 @@ public:
   Create(ASTContext &Context, SourceLocation OperatorLoc, NamedDecl *Pack,
          SourceLocation PackLoc, SourceLocation RParenLoc,
          std::optional<unsigned> Length = std::nullopt,
-         ArrayRef<TemplateArgument> PartialArgs = std::nullopt);
+         llvm::ArrayRef<TemplateArgument> PartialArgs = std::nullopt);
   static SizeOfPackExpr *CreateDeserialized(ASTContext &Context,
                                             unsigned NumPartialArgs);
 
@@ -4339,7 +4339,7 @@ public:
   }
 
   /// Get
-  ArrayRef<TemplateArgument> getPartialArguments() const {
+  llvm::ArrayRef<TemplateArgument> getPartialArguments() const {
     assert(isPartiallySubstituted());
     const auto *Args = getTrailingObjects<TemplateArgument>();
     return llvm::ArrayRef(Args, Args + Length);
@@ -4385,7 +4385,7 @@ class PackIndexingExpr final
 
   PackIndexingExpr(QualType Type, SourceLocation EllipsisLoc,
                    SourceLocation RSquareLoc, Expr *PackIdExpr, Expr *IndexExpr,
-                   ArrayRef<Expr *> SubstitutedExprs = {},
+                   llvm::ArrayRef<Expr *> SubstitutedExprs = {},
                    bool ExpandedToEmptyPack = false)
       : Expr(PackIndexingExprClass, Type, VK_LValue, OK_Ordinary),
         EllipsisLoc(EllipsisLoc), RSquareLoc(RSquareLoc),
@@ -4414,7 +4414,7 @@ public:
                                   SourceLocation EllipsisLoc,
                                   SourceLocation RSquareLoc, Expr *PackIdExpr,
                                   Expr *IndexExpr, std::optional<int64_t> Index,
-                                  ArrayRef<Expr *> SubstitutedExprs = {},
+                                  llvm::ArrayRef<Expr *> SubstitutedExprs = {},
                                   bool ExpandedToEmptyPack = false);
   static PackIndexingExpr *CreateDeserialized(ASTContext &Context,
                                               unsigned NumTransformedExprs);
@@ -4456,7 +4456,7 @@ public:
   }
 
   /// Return the trailing expressions, regardless of the expansion.
-  ArrayRef<Expr *> getExpressions() const {
+  llvm::ArrayRef<Expr *> getExpressions() const {
     return {getTrailingObjects<Expr *>(), TransformedExpressions};
   }
 
@@ -4660,7 +4660,7 @@ public:
   static FunctionParmPackExpr *Create(const ASTContext &Context, QualType T,
                                       VarDecl *ParamPack,
                                       SourceLocation NameLoc,
-                                      ArrayRef<VarDecl *> Params);
+                                      llvm::ArrayRef<VarDecl *> Params);
   static FunctionParmPackExpr *CreateEmpty(const ASTContext &Context,
                                            unsigned NumParams);
 
@@ -4962,7 +4962,7 @@ class CXXParenListInitExpr final
   SourceLocation InitLoc, LParenLoc, RParenLoc;
   llvm::PointerUnion<Expr *, FieldDecl *> ArrayFillerOrUnionFieldInit;
 
-  CXXParenListInitExpr(ArrayRef<Expr *> Args, QualType T,
+  CXXParenListInitExpr(llvm::ArrayRef<Expr *> Args, QualType T,
                        unsigned NumUserSpecifiedExprs, SourceLocation InitLoc,
                        SourceLocation LParenLoc, SourceLocation RParenLoc)
       : Expr(CXXParenListInitExprClass, T, getValueKindForType(T), OK_Ordinary),
@@ -4979,7 +4979,7 @@ class CXXParenListInitExpr final
 
 public:
   static CXXParenListInitExpr *
-  Create(ASTContext &C, ArrayRef<Expr *> Args, QualType T,
+  Create(ASTContext &C, llvm::ArrayRef<Expr *> Args, QualType T,
          unsigned NumUserSpecifiedExprs, SourceLocation InitLoc,
          SourceLocation LParenLoc, SourceLocation RParenLoc);
 
@@ -4992,20 +4992,20 @@ public:
 
   void updateDependence() { setDependence(computeDependence(this)); }
 
-  ArrayRef<Expr *> getInitExprs() {
-    return ArrayRef(getTrailingObjects<Expr *>(), NumExprs);
+  llvm::ArrayRef<Expr *> getInitExprs() {
+    return llvm::ArrayRef(getTrailingObjects<Expr *>(), NumExprs);
   }
 
-  const ArrayRef<Expr *> getInitExprs() const {
-    return ArrayRef(getTrailingObjects<Expr *>(), NumExprs);
+  const llvm::ArrayRef<Expr *> getInitExprs() const {
+    return llvm::ArrayRef(getTrailingObjects<Expr *>(), NumExprs);
   }
 
-  ArrayRef<Expr *> getUserSpecifiedInitExprs() {
-    return ArrayRef(getTrailingObjects<Expr *>(), NumUserSpecifiedExprs);
+  llvm::ArrayRef<Expr *> getUserSpecifiedInitExprs() {
+    return llvm::ArrayRef(getTrailingObjects<Expr *>(), NumUserSpecifiedExprs);
   }
 
-  const ArrayRef<Expr *> getUserSpecifiedInitExprs() const {
-    return ArrayRef(getTrailingObjects<Expr *>(), NumUserSpecifiedExprs);
+  const llvm::ArrayRef<Expr *> getUserSpecifiedInitExprs() const {
+    return llvm::ArrayRef(getTrailingObjects<Expr *>(), NumUserSpecifiedExprs);
   }
 
   SourceLocation getBeginLoc() const LLVM_READONLY { return LParenLoc; }

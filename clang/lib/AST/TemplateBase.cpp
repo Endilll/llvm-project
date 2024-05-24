@@ -48,13 +48,13 @@ using namespace clang;
 ///
 /// \param TemplArg the TemplateArgument instance to print.
 ///
-/// \param Out the raw_ostream instance to use for printing.
+/// \param Out the llvm::raw_ostream instance to use for printing.
 ///
 /// \param Policy the printing policy for EnumConstantDecl printing.
 ///
 /// \param IncludeType If set, ensure that the type of the expression printed
 /// matches the type of the template argument.
-static void printIntegral(const TemplateArgument &TemplArg, raw_ostream &Out,
+static void printIntegral(const TemplateArgument &TemplArg, llvm::raw_ostream &Out,
                           const PrintingPolicy &Policy, bool IncludeType) {
   const Type *T = TemplArg.getIntegralType().getTypePtr();
   const llvm::APSInt &Val = TemplArg.getAsIntegral();
@@ -250,7 +250,7 @@ TemplateArgument::TemplateArgument(const ASTContext &Ctx, QualType Type,
 
 TemplateArgument
 TemplateArgument::CreatePackCopy(ASTContext &Context,
-                                 ArrayRef<TemplateArgument> Args) {
+                                 llvm::ArrayRef<TemplateArgument> Args) {
   if (Args.empty())
     return getEmptyPack();
 
@@ -497,7 +497,7 @@ TemplateArgument TemplateArgument::getPackExpansionPattern() const {
   llvm_unreachable("Invalid TemplateArgument Kind!");
 }
 
-void TemplateArgument::print(const PrintingPolicy &Policy, raw_ostream &Out,
+void TemplateArgument::print(const PrintingPolicy &Policy, llvm::raw_ostream &Out,
                              bool IncludeType) const {
 
   switch (getKind()) {
@@ -581,7 +581,7 @@ void TemplateArgument::print(const PrintingPolicy &Policy, raw_ostream &Out,
   }
 }
 
-void TemplateArgument::dump(raw_ostream &Out) const {
+void TemplateArgument::dump(llvm::raw_ostream &Out) const {
   LangOptions LO; // FIXME! see also TemplateName::dump().
   LO.CPlusPlus = true;
   LO.Bool = true;
@@ -659,7 +659,7 @@ static const T &DiagTemplateArg(const T &DB, const TemplateArgument &Arg) {
 
   case TemplateArgument::StructuralValue: {
     // FIXME: We're guessing at LangOptions!
-    SmallString<32> Str;
+    llvm::SmallString<32> Str;
     llvm::raw_svector_ostream OS(Str);
     LangOptions LangOpts;
     LangOpts.CPlusPlus = true;
@@ -679,7 +679,7 @@ static const T &DiagTemplateArg(const T &DB, const TemplateArgument &Arg) {
     // This shouldn't actually ever happen, so it's okay that we're
     // regurgitating an expression here.
     // FIXME: We're guessing at LangOptions!
-    SmallString<32> Str;
+    llvm::SmallString<32> Str;
     llvm::raw_svector_ostream OS(Str);
     LangOptions LangOpts;
     LangOpts.CPlusPlus = true;
@@ -690,7 +690,7 @@ static const T &DiagTemplateArg(const T &DB, const TemplateArgument &Arg) {
 
   case TemplateArgument::Pack: {
     // FIXME: We're guessing at LangOptions!
-    SmallString<32> Str;
+    llvm::SmallString<32> Str;
     llvm::raw_svector_ostream OS(Str);
     LangOptions LangOpts;
     LangOpts.CPlusPlus = true;

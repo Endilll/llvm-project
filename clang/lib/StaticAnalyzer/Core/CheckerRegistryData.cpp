@@ -31,7 +31,7 @@ CmdLineOption::dumpToStream(llvm::raw_ostream &Out) const {
       << DefaultValStr;
 }
 
-static StringRef toString(StateFromCmdLine Kind) {
+static llvm::StringRef toString(StateFromCmdLine Kind) {
   switch (Kind) {
   case StateFromCmdLine::State_Disabled:
     return "Disabled";
@@ -80,7 +80,7 @@ LLVM_DUMP_METHOD void PackageInfo::dumpToStream(llvm::raw_ostream &Out) const {
 
 static constexpr char PackageSeparator = '.';
 
-static bool isInPackage(const CheckerInfo &Checker, StringRef PackageName) {
+static bool isInPackage(const CheckerInfo &Checker, llvm::StringRef PackageName) {
   // Does the checker's full name have the package as a prefix?
   if (!Checker.FullName.starts_with(PackageName))
     return false;
@@ -97,7 +97,7 @@ static bool isInPackage(const CheckerInfo &Checker, StringRef PackageName) {
 }
 
 CheckerInfoListRange
-CheckerRegistryData::getMutableCheckersForCmdLineArg(StringRef CmdLineArg) {
+CheckerRegistryData::getMutableCheckersForCmdLineArg(llvm::StringRef CmdLineArg) {
   auto It = checker_registry::binaryFind(Checkers, CmdLineArg);
 
   if (!isInPackage(*It, CmdLineArg))
@@ -120,7 +120,7 @@ CheckerRegistryData::getMutableCheckersForCmdLineArg(StringRef CmdLineArg) {
 //===----------------------------------------------------------------------===//
 
 void CheckerRegistryData::printCheckerWithDescList(
-    const AnalyzerOptions &AnOpts, raw_ostream &Out,
+    const AnalyzerOptions &AnOpts, llvm::raw_ostream &Out,
     size_t MaxNameChars) const {
   // FIXME: Print available packages.
 
@@ -139,7 +139,7 @@ void CheckerRegistryData::printCheckerWithDescList(
   const size_t InitialPad = 2;
 
   auto Print = [=](llvm::raw_ostream &Out, const CheckerInfo &Checker,
-                   StringRef Description) {
+                   llvm::StringRef Description) {
     AnalyzerOptions::printFormattedEntry(Out, {Checker.FullName, Description},
                                          InitialPad, OptionFieldWidth);
     Out << '\n';
@@ -170,13 +170,13 @@ void CheckerRegistryData::printCheckerWithDescList(
   }
 }
 
-void CheckerRegistryData::printEnabledCheckerList(raw_ostream &Out) const {
+void CheckerRegistryData::printEnabledCheckerList(llvm::raw_ostream &Out) const {
   for (const auto *i : EnabledCheckers)
     Out << i->FullName << '\n';
 }
 
 void CheckerRegistryData::printCheckerOptionList(const AnalyzerOptions &AnOpts,
-                                                 raw_ostream &Out) const {
+                                                 llvm::raw_ostream &Out) const {
   Out << "OVERVIEW: Clang Static Analyzer Checker and Package Option List\n\n";
   Out << "USAGE: -analyzer-config <OPTION1=VALUE,OPTION2=VALUE,...>\n\n";
   Out << "       -analyzer-config OPTION1=VALUE, -analyzer-config "
@@ -185,7 +185,7 @@ void CheckerRegistryData::printCheckerOptionList(const AnalyzerOptions &AnOpts,
 
   // It's usually ill-advised to use multimap, but clang will terminate after
   // this function.
-  std::multimap<StringRef, const CmdLineOption &> OptionMap;
+  std::multimap<llvm::StringRef, const CmdLineOption &> OptionMap;
 
   for (const CheckerInfo &Checker : Checkers) {
     for (const CmdLineOption &Option : Checker.CmdLineOptions) {
@@ -199,15 +199,15 @@ void CheckerRegistryData::printCheckerOptionList(const AnalyzerOptions &AnOpts,
     }
   }
 
-  auto Print = [](llvm::raw_ostream &Out, StringRef FullOption,
-                  StringRef Desc) {
+  auto Print = [](llvm::raw_ostream &Out, llvm::StringRef FullOption,
+                  llvm::StringRef Desc) {
     AnalyzerOptions::printFormattedEntry(Out, {FullOption, Desc},
                                          /*InitialPad*/ 2,
                                          /*EntryWidth*/ 50,
                                          /*MinLineWidth*/ 90);
     Out << "\n\n";
   };
-  for (const std::pair<const StringRef, const CmdLineOption &> &Entry :
+  for (const std::pair<const llvm::StringRef, const CmdLineOption &> &Entry :
        OptionMap) {
     const CmdLineOption &Option = Entry.second;
     std::string FullOption = (Entry.first + ":" + Option.OptionName).str();

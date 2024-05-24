@@ -54,14 +54,14 @@ public:
   ///   2) we use the file name in the Status as the cache key.
   ///
   /// Note that the returned VFS should not outlive the cache.
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem>
-  getProducingFS(IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS);
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>
+  getProducingFS(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS);
 
   /// Returns a VFS that uses the cache collected.
   ///
   /// Note that the returned VFS should not outlive the cache.
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem>
-  getConsumingFS(IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS) const;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>
+  getConsumingFS(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS) const;
 
 private:
   std::string MainFilePath;

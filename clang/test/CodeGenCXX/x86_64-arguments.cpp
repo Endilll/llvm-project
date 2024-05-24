@@ -49,16 +49,16 @@ struct struct_with_mfp_1 { void *a; s4_mfp b; };
 void f_struct_with_mfp_1(struct_with_mfp_1 a) { (void)a; }
 
 namespace PR7523 {
-struct StringRef {
+struct llvm::StringRef {
   char *a;
 };
 
-void AddKeyword(StringRef, int x);
+void AddKeyword(llvm::StringRef, int x);
 
 void foo() {
   // CHECK-LABEL: define{{.*}} void @_ZN6PR75233fooEv()
   // CHECK: call void @_ZN6PR752310AddKeywordENS_9StringRefEi(ptr {{.*}}, i32 4)
-  AddKeyword(StringRef(), 4);
+  AddKeyword(llvm::StringRef(), 4);
 }
 }
 
@@ -131,15 +131,15 @@ namespace test6 {
 }
 
 namespace test7 {
-  struct StringRef {char* ptr; long len; };
+  struct llvm::StringRef {char* ptr; long len; };
   class A { public: ~A(); };
-  A x(A, A, long, long, StringRef) { return A(); }
-  // Check that the StringRef is passed byval instead of expanded
+  A x(A, A, long, long, llvm::StringRef) { return A(); }
+  // Check that the llvm::StringRef is passed byval instead of expanded
   // (which would split it between registers and memory).
   // CHECK: define{{.*}} void @_ZN5test71xENS_1AES0_llNS_9StringRefE({{.*}} byval({{.*}}) align 8 {{%.*}})
 
   // And a couple extra related tests:
-  A y(A, long double, long, long, StringRef) { return A(); }
+  A y(A, long double, long, long, llvm::StringRef) { return A(); }
   // CHECK: define{{.*}} void @_ZN5test71yENS_1AEellNS_9StringRefE({{.*}} ptr
   struct StringDouble {char * ptr; double d;};
   A z(A, A, A, A, A, StringDouble) { return A(); }

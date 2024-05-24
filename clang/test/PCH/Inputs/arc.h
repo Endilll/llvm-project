@@ -4,9 +4,9 @@ typedef const void *CFTypeRef;
 typedef const struct __CFString *CFStringRef;
 
 CFTypeRef CFCreateSomething(void);
-CFStringRef CFCreateString(void);
+CFllvm::StringRef CFCreateString(void);
 CFTypeRef CFGetSomething(void);
-CFStringRef CFGetString(void);
+CFllvm::StringRef CFGetString(void);
 
 @interface NSString
 @end

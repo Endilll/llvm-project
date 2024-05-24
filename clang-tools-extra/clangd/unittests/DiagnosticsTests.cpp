@@ -421,7 +421,7 @@ TEST(DiagnosticTest, MakeUnique) {
 }
 
 TEST(DiagnosticTest, CoroutineInHeader) {
-  StringRef CoroutineH = R"cpp(
+  llvm::StringRef CoroutineH = R"cpp(
 namespace std {
 template <class Ret, typename... T>
 struct coroutine_traits { using promise_type = typename Ret::promise_type; };
@@ -448,7 +448,7 @@ struct awaitable {
 } // namespace std
   )cpp";
 
-  StringRef Header = R"cpp(
+  llvm::StringRef Header = R"cpp(
 #include "coroutine.h"
 template <typename T> struct [[clang::coro_return_type]] Gen {
   struct promise_type {
@@ -1178,7 +1178,7 @@ main.cpp:2:3: error: something terrible happened)";
   // Transform diagnostics and check the results.
   std::vector<std::pair<clangd::Diagnostic, std::vector<clangd::Fix>>> LSPDiags;
   toLSPDiags(D, MainFile, Opts,
-             [&](clangd::Diagnostic LSPDiag, ArrayRef<clangd::Fix> Fixes) {
+             [&](clangd::Diagnostic LSPDiag, llvm::ArrayRef<clangd::Fix> Fixes) {
                LSPDiags.push_back(
                    {std::move(LSPDiag),
                     std::vector<clangd::Fix>(Fixes.begin(), Fixes.end())});
@@ -1197,7 +1197,7 @@ main.cpp:2:3: error: something terrible happened)";
   LSPDiags.clear();
   Opts.EmitRelatedLocations = true;
   toLSPDiags(D, MainFile, Opts,
-             [&](clangd::Diagnostic LSPDiag, ArrayRef<clangd::Fix> Fixes) {
+             [&](clangd::Diagnostic LSPDiag, llvm::ArrayRef<clangd::Fix> Fixes) {
                LSPDiags.push_back(
                    {std::move(LSPDiag),
                     std::vector<clangd::Fix>(Fixes.begin(), Fixes.end())});
@@ -1893,14 +1893,14 @@ TEST(ToLSPDiag, RangeIsInMain) {
   D.InsideMainFile = true;
   N.InsideMainFile = false;
   toLSPDiags(D, {}, Opts,
-             [&](clangd::Diagnostic LSPDiag, ArrayRef<clangd::Fix>) {
+             [&](clangd::Diagnostic LSPDiag, llvm::ArrayRef<clangd::Fix>) {
                EXPECT_EQ(LSPDiag.range, D.Range);
              });
 
   D.InsideMainFile = false;
   N.InsideMainFile = true;
   toLSPDiags(D, {}, Opts,
-             [&](clangd::Diagnostic LSPDiag, ArrayRef<clangd::Fix>) {
+             [&](clangd::Diagnostic LSPDiag, llvm::ArrayRef<clangd::Fix>) {
                EXPECT_EQ(LSPDiag.range, N.Range);
              });
 }
@@ -1974,7 +1974,7 @@ TEST(Diagnostics, DeprecatedDiagsAreHints) {
   D.Tags = {Deprecated};
   D.Severity = DiagnosticsEngine::Warning;
   toLSPDiags(D, {}, Opts,
-             [&](clangd::Diagnostic LSPDiag, ArrayRef<clangd::Fix>) {
+             [&](clangd::Diagnostic LSPDiag, llvm::ArrayRef<clangd::Fix>) {
                Diag = std::move(LSPDiag);
              });
   EXPECT_EQ(Diag->severity, getSeverity(DiagnosticsEngine::Remark));
@@ -1983,7 +1983,7 @@ TEST(Diagnostics, DeprecatedDiagsAreHints) {
   // Preserve errors.
   D.Severity = DiagnosticsEngine::Error;
   toLSPDiags(D, {}, Opts,
-             [&](clangd::Diagnostic LSPDiag, ArrayRef<clangd::Fix>) {
+             [&](clangd::Diagnostic LSPDiag, llvm::ArrayRef<clangd::Fix>) {
                Diag = std::move(LSPDiag);
              });
   EXPECT_EQ(Diag->severity, getSeverity(DiagnosticsEngine::Error));
@@ -1993,7 +1993,7 @@ TEST(Diagnostics, DeprecatedDiagsAreHints) {
   D.Tags = {};
   D.Severity = DiagnosticsEngine::Warning;
   toLSPDiags(D, {}, Opts,
-             [&](clangd::Diagnostic LSPDiag, ArrayRef<clangd::Fix>) {
+             [&](clangd::Diagnostic LSPDiag, llvm::ArrayRef<clangd::Fix>) {
                Diag = std::move(LSPDiag);
              });
   EXPECT_EQ(Diag->severity, getSeverity(DiagnosticsEngine::Warning));

@@ -82,7 +82,7 @@ private:
   class RecordPragma;
 
   /// The public header mapping by the IWYU private pragma. For private pragmas
-  //  without public mapping an empty StringRef is stored.
+  //  without public mapping an empty llvm::StringRef is stored.
   //
   // !!NOTE: instead of using a FileEntry* to identify the physical file, we
   // deliberately use the UniqueID to ensure the result is stable across

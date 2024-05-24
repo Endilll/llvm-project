@@ -19,7 +19,7 @@ namespace clang::tidy::llvm_libc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/llvmlibc/implementation-in-namespace.html
 class ImplementationInNamespaceCheck : public ClangTidyCheck {
 public:
-  ImplementationInNamespaceCheck(StringRef Name, ClangTidyContext *Context)
+  ImplementationInNamespaceCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {

@@ -36,10 +36,10 @@ struct SymbolHeaderMapping {
     const char *Data;  // std::vector
     unsigned ScopeLen; // ~~~~~
     unsigned NameLen;  //      ~~~~~~
-    StringRef scope() const { return StringRef(Data, ScopeLen); }
-    StringRef name() const { return StringRef(Data + ScopeLen, NameLen); }
-    StringRef qualifiedName() const {
-      return StringRef(Data, ScopeLen + NameLen);
+    llvm::StringRef scope() const { return llvm::StringRef(Data, ScopeLen); }
+    llvm::StringRef name() const { return llvm::StringRef(Data + ScopeLen, NameLen); }
+    llvm::StringRef qualifiedName() const {
+      return llvm::StringRef(Data, ScopeLen + NameLen);
     }
   } *SymbolNames = nullptr;
   // Symbol name -> Symbol::ID, within a namespace.
@@ -55,7 +55,7 @@ static const SymbolHeaderMapping *getMappingPerLang(Lang L) {
 }
 
 static int countSymbols(Lang Language) {
-  ArrayRef<const char *> Symbols;
+  llvm::ArrayRef<const char *> Symbols;
 #define SYMBOL(Name, NS, Header) #NS #Name,
   switch (Language) {
   case Lang::C: {
@@ -77,7 +77,7 @@ static int countSymbols(Lang Language) {
   }
   }
 #undef SYMBOL
-  return llvm::DenseSet<StringRef>(Symbols.begin(), Symbols.end()).size();
+  return llvm::DenseSet<llvm::StringRef>(Symbols.begin(), Symbols.end()).size();
 }
 
 static int initialize(Lang Language) {
@@ -143,7 +143,7 @@ static int initialize(Lang Language) {
     const char *HeaderName;
   };
 #define SYMBOL(Name, NS, Header)                                               \
-  {#NS #Name, static_cast<decltype(Symbol::NSLen)>(StringRef(#NS).size()),     \
+  {#NS #Name, static_cast<decltype(Symbol::NSLen)>(llvm::StringRef(#NS).size()),     \
    #Header},
   switch (Language) {
   case Lang::C: {

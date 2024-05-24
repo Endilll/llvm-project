@@ -102,11 +102,11 @@ Decl *Parser::ParseHLSLBuffer(SourceLocation &DeclEnd) {
   return D;
 }
 
-static void fixSeparateAttrArgAndNumber(StringRef ArgStr, SourceLocation ArgLoc,
+static void fixSeparateAttrArgAndNumber(llvm::StringRef ArgStr, SourceLocation ArgLoc,
                                         Token Tok, ArgsVector &ArgExprs,
                                         Parser &P, ASTContext &Ctx,
                                         Preprocessor &PP) {
-  StringRef Num = StringRef(Tok.getLiteralData(), Tok.getLength());
+  llvm::StringRef Num = llvm::StringRef(Tok.getLiteralData(), Tok.getLength());
   SourceLocation EndNumLoc = Tok.getEndLoc();
 
   P.ConsumeToken(); // consume constant.
@@ -153,7 +153,7 @@ void Parser::ParseHLSLAnnotations(ParsedAttributes &Attrs,
       SkipUntil(tok::r_paren, StopAtSemi); // skip through )
       return;
     }
-    StringRef SlotStr = Tok.getIdentifierInfo()->getName();
+    llvm::StringRef SlotStr = Tok.getIdentifierInfo()->getName();
     SourceLocation SlotLoc = Tok.getLocation();
     ArgExprs.push_back(ParseIdentifierLoc());
 
@@ -169,7 +169,7 @@ void Parser::ParseHLSLAnnotations(ParsedAttributes &Attrs,
         SkipUntil(tok::r_paren, StopAtSemi); // skip through )
         return;
       }
-      StringRef SpaceStr = Tok.getIdentifierInfo()->getName();
+      llvm::StringRef SpaceStr = Tok.getIdentifierInfo()->getName();
       SourceLocation SpaceLoc = Tok.getLocation();
       ArgExprs.push_back(ParseIdentifierLoc());
 
@@ -196,7 +196,7 @@ void Parser::ParseHLSLAnnotations(ParsedAttributes &Attrs,
       SkipUntil(tok::r_paren, StopAtSemi); // skip through )
       return;
     }
-    StringRef OffsetStr = Tok.getIdentifierInfo()->getName();
+    llvm::StringRef OffsetStr = Tok.getIdentifierInfo()->getName();
     SourceLocation SubComponentLoc = Tok.getLocation();
     if (OffsetStr[0] != 'c') {
       Diag(Tok.getLocation(), diag::err_hlsl_packoffset_invalid_reg)
@@ -225,7 +225,7 @@ void Parser::ParseHLSLAnnotations(ParsedAttributes &Attrs,
         SkipUntil(tok::r_paren, StopAtSemi); // skip through )
         return;
       }
-      StringRef ComponentStr = Tok.getIdentifierInfo()->getName();
+      llvm::StringRef ComponentStr = Tok.getIdentifierInfo()->getName();
       ComponentLoc = Tok.getLocation();
       ConsumeToken(); // consume identifier.
       // Make sure Component is a single character.

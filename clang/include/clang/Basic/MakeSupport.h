@@ -11,12 +11,13 @@
 
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace clang {
 
 /// Quote target names for inclusion in GNU Make dependency files.
 /// Only the characters '$', '#', ' ', '\t' are quoted.
-void quoteMakeTarget(StringRef Target, SmallVectorImpl<char> &Res);
+void quoteMakeTarget(llvm::StringRef Target, llvm::SmallVectorImpl<char> &Res);
 
 } // namespace clang
 

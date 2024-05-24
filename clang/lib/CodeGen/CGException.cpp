@@ -66,7 +66,7 @@ llvm::FunctionCallee CodeGenModule::getTerminateFn() {
   llvm::FunctionType *FTy =
     llvm::FunctionType::get(VoidTy, /*isVarArg=*/false);
 
-  StringRef name;
+  llvm::StringRef name;
 
   // In C++, use std::terminate().
   if (getLangOpts().CPlusPlus &&
@@ -87,7 +87,7 @@ llvm::FunctionCallee CodeGenModule::getTerminateFn() {
 }
 
 static llvm::FunctionCallee getCatchallRethrowFn(CodeGenModule &CGM,
-                                                 StringRef Name) {
+                                                 llvm::StringRef Name) {
   llvm::FunctionType *FTy =
     llvm::FunctionType::get(CGM.VoidTy, CGM.Int8PtrTy, /*isVarArg=*/false);
 
@@ -160,7 +160,7 @@ static const EHPersonality &getObjCPersonality(const TargetInfo &Target,
   case ObjCRuntime::GNUstep:
     if (T.isOSCygMing())
       return EHPersonality::GNU_CPlusPlus_SEH;
-    else if (L.ObjCRuntime.getVersion() >= VersionTuple(1, 7))
+    else if (L.ObjCRuntime.getVersion() >= llvm::VersionTuple(1, 7))
       return EHPersonality::GNUstep_ObjC;
     [[fallthrough]];
   case ObjCRuntime::GCC:
@@ -864,7 +864,7 @@ llvm::BasicBlock *CodeGenFunction::EmitLandingPad() {
   bool hasCatchAll = false;
   bool hasCleanup = false;
   bool hasFilter = false;
-  SmallVector<llvm::Value*, 4> filterTypes;
+  llvm::SmallVector<llvm::Value*, 4> filterTypes;
   llvm::SmallPtrSet<llvm::Value*, 4> catchTypes;
   for (EHScopeStack::iterator I = EHStack.begin(), E = EHStack.end(); I != E;
        ++I) {
@@ -931,7 +931,7 @@ llvm::BasicBlock *CodeGenFunction::EmitLandingPad() {
     // Create a filter expression: a constant array indicating which filter
     // types there are. The personality routine only lands here if the filter
     // doesn't match.
-    SmallVector<llvm::Constant*, 8> Filters;
+    llvm::SmallVector<llvm::Constant*, 8> Filters;
     llvm::ArrayType *AType =
       llvm::ArrayType::get(!filterTypes.empty() ?
                              filterTypes[0]->getType() : Int8PtrTy,
@@ -1031,7 +1031,7 @@ static void emitWasmCatchPadBlock(CodeGenFunction &CGF,
   CGF.EmitBlockAfterUses(WasmCatchStartBlock);
 
   // Create a catchpad instruction.
-  SmallVector<llvm::Value *, 4> CatchTypes;
+  llvm::SmallVector<llvm::Value *, 4> CatchTypes;
   for (unsigned I = 0, E = NumHandlers; I < E; ++I) {
     const EHCatchScope::Handler &Handler = CatchScope.getHandler(I);
     CatchTypeInfo TypeInfo = Handler.Type;
@@ -1226,7 +1226,7 @@ void CodeGenFunction::ExitCXXTryStmt(const CXXTryStmt &S, bool IsFnTryBlock) {
 
   // Copy the handler blocks off before we pop the EH stack.  Emitting
   // the handlers might scribble on this memory.
-  SmallVector<EHCatchScope::Handler, 8> Handlers(
+  llvm::SmallVector<EHCatchScope::Handler, 8> Handlers(
       CatchScope.begin(), CatchScope.begin() + NumHandlers);
 
   EHStack.popCatch();
@@ -1248,7 +1248,7 @@ void CodeGenFunction::ExitCXXTryStmt(const CXXTryStmt &S, bool IsFnTryBlock) {
   // Wasm uses Windows-style EH instructions, but merges all catch clauses into
   // one big catchpad. So we save the old funclet pad here before we traverse
   // each catch handler.
-  SaveAndRestore RestoreCurrentFuncletPad(CurrentFuncletPad);
+  llvm::SaveAndRestore RestoreCurrentFuncletPad(CurrentFuncletPad);
   llvm::BasicBlock *WasmCatchStartBlock = nullptr;
   if (EHPersonality::get(*this).isWasmPersonality()) {
     auto *CatchSwitch =
@@ -1281,7 +1281,7 @@ void CodeGenFunction::ExitCXXTryStmt(const CXXTryStmt &S, bool IsFnTryBlock) {
     RunCleanupsScope CatchScope(*this);
 
     // Initialize the catch variable and set up the cleanups.
-    SaveAndRestore RestoreCurrentFuncletPad(CurrentFuncletPad);
+    llvm::SaveAndRestore RestoreCurrentFuncletPad(CurrentFuncletPad);
     CGM.getCXXABI().emitBeginCatch(*this, C);
 
     // Emit the PGO counter increment.
@@ -1605,7 +1605,7 @@ llvm::BasicBlock *CodeGenFunction::getTerminateFunclet() {
 
   // Create the cleanuppad using the current parent pad as its token. Use 'none'
   // if this is a top-level terminate scope, which is the common case.
-  SaveAndRestore RestoreCurrentFuncletPad(CurrentFuncletPad);
+  llvm::SaveAndRestore RestoreCurrentFuncletPad(CurrentFuncletPad);
   llvm::Value *ParentPad = CurrentFuncletPad;
   if (!ParentPad)
     ParentPad = llvm::ConstantTokenNone::get(CGM.getLLVMContext());
@@ -2018,7 +2018,7 @@ void CodeGenFunction::startOutlinedSEHHelper(CodeGenFunction &ParentCGF,
   SourceLocation StartLoc = OutlinedStmt->getBeginLoc();
 
   // Get the mangled function name.
-  SmallString<128> Name;
+  llvm::SmallString<128> Name;
   {
     llvm::raw_svector_ostream OS(Name);
     GlobalDecl ParentSEHFn = ParentCGF.CurSEHParent;

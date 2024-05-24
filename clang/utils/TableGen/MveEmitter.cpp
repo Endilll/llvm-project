@@ -415,7 +415,7 @@ struct CodeGenParamAllocator {
   // Internally track how many things we've allocated
   unsigned nparams = 0;
 
-  std::string allocParam(StringRef Type, StringRef Value) {
+  std::string allocParam(llvm::StringRef Type, llvm::StringRef Value) {
     unsigned ParamNumber;
 
     if (!ParamNumberMap) {
@@ -472,7 +472,7 @@ private:
 public:
   virtual ~Result() = default;
   using Scope = std::map<std::string, Ptr>;
-  virtual void genCode(raw_ostream &OS, CodeGenParamAllocator &) const = 0;
+  virtual void genCode(llvm::raw_ostream &OS, CodeGenParamAllocator &) const = 0;
   virtual bool hasIntegerConstantValue() const { return false; }
   virtual uint32_t integerConstantValue() const { return 0; }
   virtual bool hasIntegerValue() const { return false; }
@@ -528,7 +528,7 @@ public:
     VarNameUsed = true;
     return VarName;
   }
-  void setVarname(const StringRef s) { VarName = std::string(s); }
+  void setVarname(const llvm::StringRef s) { VarName = std::string(s); }
   bool varnameUsed() const { return VarNameUsed; }
 
   // Emit code to generate this result as a Value *.
@@ -565,7 +565,7 @@ public:
   bool Immediate;
   BuiltinArgResult(unsigned ArgNum, bool AddressType, bool Immediate)
       : ArgNum(ArgNum), AddressType(AddressType), Immediate(Immediate) {}
-  void genCode(raw_ostream &OS, CodeGenParamAllocator &) const override {
+  void genCode(llvm::raw_ostream &OS, CodeGenParamAllocator &) const override {
     OS << (AddressType ? "EmitPointerWithAlignment" : "EmitScalarExpr")
        << "(E->getArg(" << ArgNum << "))";
   }
@@ -595,7 +595,7 @@ public:
   uint32_t IntegerValue;
   IntLiteralResult(const ScalarType *IntegerType, uint32_t IntegerValue)
       : IntegerType(IntegerType), IntegerValue(IntegerValue) {}
-  void genCode(raw_ostream &OS,
+  void genCode(llvm::raw_ostream &OS,
                CodeGenParamAllocator &ParamAlloc) const override {
     OS << "llvm::ConstantInt::get("
        << ParamAlloc.allocParam("llvm::Type *", IntegerType->llvmName())
@@ -616,7 +616,7 @@ public:
   Ptr V;
   IntCastResult(const ScalarType *IntegerType, Ptr V)
       : IntegerType(IntegerType), V(V) {}
-  void genCode(raw_ostream &OS,
+  void genCode(llvm::raw_ostream &OS,
                CodeGenParamAllocator &ParamAlloc) const override {
     OS << "Builder.CreateIntCast(" << V->varname() << ", "
        << ParamAlloc.allocParam("llvm::Type *", IntegerType->llvmName()) << ", "
@@ -638,7 +638,7 @@ public:
   Ptr V;
   PointerCastResult(const PointerType *PtrType, Ptr V)
       : PtrType(PtrType), V(V) {}
-  void genCode(raw_ostream &OS,
+  void genCode(llvm::raw_ostream &OS,
                CodeGenParamAllocator &ParamAlloc) const override {
     OS << "Builder.CreatePointerCast(" << V->asValue() << ", "
        << ParamAlloc.allocParam("llvm::Type *", PtrType->llvmName()) << ")";
@@ -654,16 +654,16 @@ public:
 // particular argument should be an integer constant instead of an llvm::Value.
 class IRBuilderResult : public Result {
 public:
-  StringRef CallPrefix;
+  llvm::StringRef CallPrefix;
   std::vector<Ptr> Args;
   std::set<unsigned> AddressArgs;
   std::map<unsigned, std::string> IntegerArgs;
-  IRBuilderResult(StringRef CallPrefix, const std::vector<Ptr> &Args,
+  IRBuilderResult(llvm::StringRef CallPrefix, const std::vector<Ptr> &Args,
                   const std::set<unsigned> &AddressArgs,
                   const std::map<unsigned, std::string> &IntegerArgs)
       : CallPrefix(CallPrefix), Args(Args), AddressArgs(AddressArgs),
         IntegerArgs(IntegerArgs) {}
-  void genCode(raw_ostream &OS,
+  void genCode(llvm::raw_ostream &OS,
                CodeGenParamAllocator &ParamAlloc) const override {
     OS << CallPrefix;
     const char *Sep = "";
@@ -707,7 +707,7 @@ public:
   unsigned Align;
   AddressResult(Ptr Arg, const Type *Ty, unsigned Align)
       : Arg(Arg), Ty(Ty), Align(Align) {}
-  void genCode(raw_ostream &OS,
+  void genCode(llvm::raw_ostream &OS,
                CodeGenParamAllocator &ParamAlloc) const override {
     OS << "Address(" << Arg->varname() << ", " << Ty->llvmName()
        << ", CharUnits::fromQuantity(" << Align << "))";
@@ -727,12 +727,12 @@ public:
   std::string IntrinsicID;
   std::vector<const Type *> ParamTypes;
   std::vector<Ptr> Args;
-  IRIntrinsicResult(StringRef IntrinsicID,
+  IRIntrinsicResult(llvm::StringRef IntrinsicID,
                     const std::vector<const Type *> &ParamTypes,
                     const std::vector<Ptr> &Args)
       : IntrinsicID(std::string(IntrinsicID)), ParamTypes(ParamTypes),
         Args(Args) {}
-  void genCode(raw_ostream &OS,
+  void genCode(llvm::raw_ostream &OS,
                CodeGenParamAllocator &ParamAlloc) const override {
     std::string IntNo = ParamAlloc.allocParam(
         "Intrinsic::ID", "Intrinsic::" + IntrinsicID);
@@ -765,7 +765,7 @@ class TypeResult : public Result {
 public:
   const Type *T;
   TypeResult(const Type *T) : T(T) {}
-  void genCode(raw_ostream &OS, CodeGenParamAllocator &) const override {
+  void genCode(llvm::raw_ostream &OS, CodeGenParamAllocator &) const override {
     OS << T->llvmName();
   }
   std::string typeName() const override {
@@ -791,7 +791,7 @@ class ACLEIntrinsic {
     enum class BoundsType { ExplicitRange, UInt };
     BoundsType boundsType;
     int64_t i1, i2;
-    StringRef ExtraCheckType, ExtraCheckArgs;
+    llvm::StringRef ExtraCheckType, ExtraCheckArgs;
     const Type *ArgType;
   };
 
@@ -801,7 +801,7 @@ class ACLEIntrinsic {
   std::string ShortName, FullName;
 
   // Name of the architecture extension, used in the Clang builtin name
-  StringRef BuiltinExtension;
+  llvm::StringRef BuiltinExtension;
 
   // A very small number of intrinsics _only_ have a polymorphic
   // variant (vuninitializedq taking an unevaluated argument).
@@ -837,7 +837,7 @@ class ACLEIntrinsic {
 public:
   const std::string &shortName() const { return ShortName; }
   const std::string &fullName() const { return FullName; }
-  StringRef builtinExtension() const { return BuiltinExtension; }
+  llvm::StringRef builtinExtension() const { return BuiltinExtension; }
   const Type *returnType() const { return ReturnType; }
   const std::vector<const Type *> &argTypes() const { return ArgTypes; }
   bool requiresFloat() const {
@@ -858,7 +858,7 @@ public:
   bool headerOnly() const { return HeaderOnly; }
 
   // External entry point for code generation, called from EmitterBase.
-  void genCode(raw_ostream &OS, CodeGenParamAllocator &ParamAlloc,
+  void genCode(llvm::raw_ostream &OS, CodeGenParamAllocator &ParamAlloc,
                unsigned Pass) const {
     assert(!headerOnly() && "Called genCode for header-only intrinsic");
     if (!hasCode()) {
@@ -883,7 +883,7 @@ public:
       } else if (V->varnameUsed()) {
         std::string Type = V->typeName();
         OS << V->typeName();
-        if (!StringRef(Type).ends_with("*"))
+        if (!llvm::StringRef(Type).ends_with("*"))
           OS << " ";
         OS << V->varname() << " = ";
       }
@@ -895,7 +895,7 @@ public:
 
   static std::string signedHexLiteral(const llvm::APInt &iOrig) {
     llvm::APInt i = iOrig.trunc(64);
-    SmallString<40> s;
+    llvm::SmallString<40> s;
     i.toString(s, 16, true, true);
     return std::string(s);
   }
@@ -936,14 +936,14 @@ public:
         std::string Suffix;
         if (!IA.ExtraCheckArgs.empty()) {
           std::string tmp;
-          StringRef Arg = IA.ExtraCheckArgs;
+          llvm::StringRef Arg = IA.ExtraCheckArgs;
           if (Arg == "!lanesize") {
             tmp = utostr(IA.ArgType->sizeInBits());
             Arg = tmp;
           }
-          Suffix = (Twine(", ") + Arg).str();
+          Suffix = (llvm::Twine(", ") + Arg).str();
         }
-        SemaChecks.push_back((Twine("BuiltinConstantArg") + IA.ExtraCheckType +
+        SemaChecks.push_back((llvm::Twine("BuiltinConstantArg") + IA.ExtraCheckType +
                               "(TheCall, " + Index + Suffix + ")")
                                  .str());
       }
@@ -984,7 +984,7 @@ public:
   // Methods to create a Type object, or return the right existing one from the
   // maps stored in this object.
   const VoidType *getVoidType() { return &Void; }
-  const ScalarType *getScalarType(StringRef Name) {
+  const ScalarType *getScalarType(llvm::StringRef Name) {
     return ScalarTypes[std::string(Name)].get();
   }
   const ScalarType *getScalarType(Record *R) {
@@ -1048,11 +1048,11 @@ public:
   EmitterBase(RecordKeeper &Records);
   virtual ~EmitterBase() = default;
 
-  virtual void EmitHeader(raw_ostream &OS) = 0;
-  virtual void EmitBuiltinDef(raw_ostream &OS) = 0;
-  virtual void EmitBuiltinSema(raw_ostream &OS) = 0;
-  void EmitBuiltinCG(raw_ostream &OS);
-  void EmitBuiltinAliases(raw_ostream &OS);
+  virtual void EmitHeader(llvm::raw_ostream &OS) = 0;
+  virtual void EmitBuiltinDef(llvm::raw_ostream &OS) = 0;
+  virtual void EmitBuiltinSema(llvm::raw_ostream &OS) = 0;
+  void EmitBuiltinCG(llvm::raw_ostream &OS);
+  void EmitBuiltinAliases(llvm::raw_ostream &OS);
 };
 
 const Type *EmitterBase::getType(Init *I, const Type *Param) {
@@ -1163,7 +1163,7 @@ Result::Ptr EmitterBase::getCodeForDag(DagInit *D, const Result::Scope &Scope,
       // has different semantics in a seq
       Result::Ptr V =
           getCodeForDag(cast<DagInit>(D->getArg(i)), SubScope, Param);
-      StringRef ArgName = D->getArgNameStr(i);
+      llvm::StringRef ArgName = D->getArgNameStr(i);
       if (!ArgName.empty())
         SubScope[std::string(ArgName)] = V;
       if (PrevV)
@@ -1266,7 +1266,7 @@ Result::Ptr EmitterBase::getCodeForDagArg(DagInit *D, unsigned ArgNum,
                                           const Result::Scope &Scope,
                                           const Type *Param) {
   Init *Arg = D->getArg(ArgNum);
-  StringRef Name = D->getArgNameStr(ArgNum);
+  llvm::StringRef Name = D->getArgNameStr(ArgNum);
 
   if (!Name.empty()) {
     if (!isa<UnsetInit>(Arg))
@@ -1304,7 +1304,7 @@ Result::Ptr EmitterBase::getCodeForDagArg(DagInit *D, unsigned ArgNum,
   PrintNote("DAG: " + D->getAsString());
   if (TypedInit *Typed = dyn_cast<TypedInit>(Arg))
     PrintNote("argument type: " + Typed->getType()->getAsString());
-  PrintFatalNote("argument number " + Twine(ArgNum) + ": " + Arg->getAsString());
+  PrintFatalNote("argument number " + llvm::Twine(ArgNum) + ": " + Arg->getAsString());
 }
 
 Result::Ptr EmitterBase::getCodeForArg(unsigned ArgNum, const Type *ArgType,
@@ -1334,26 +1334,26 @@ ACLEIntrinsic::ACLEIntrinsic(EmitterBase &ME, Record *R, const Type *Param)
   // parameter type. (If the intrinsic is unparametrised, its
   // parameter type will be given as Void, which returns the empty
   // string for acleSuffix.)
-  StringRef BaseName =
+  llvm::StringRef BaseName =
       (R->isSubClassOf("NameOverride") ? R->getValueAsString("basename")
                                        : R->getName());
-  StringRef overrideLetter = R->getValueAsString("overrideKindLetter");
+  llvm::StringRef overrideLetter = R->getValueAsString("overrideKindLetter");
   FullName =
-      (Twine(BaseName) + Param->acleSuffix(std::string(overrideLetter))).str();
+      (llvm::Twine(BaseName) + Param->acleSuffix(std::string(overrideLetter))).str();
 
   // Derive the intrinsic's polymorphic name, by removing components from the
   // full name as specified by its 'pnt' member ('polymorphic name type'),
   // which indicates how many type suffixes to remove, and any other piece of
   // the name that should be removed.
   Record *PolymorphicNameType = R->getValueAsDef("pnt");
-  SmallVector<StringRef, 8> NameParts;
-  StringRef(FullName).split(NameParts, '_');
+  llvm::SmallVector<llvm::StringRef, 8> NameParts;
+  llvm::StringRef(FullName).split(NameParts, '_');
   for (unsigned i = 0, e = PolymorphicNameType->getValueAsInt(
                            "NumTypeSuffixesToDiscard");
        i < e; ++i)
     NameParts.pop_back();
   if (!PolymorphicNameType->isValueUnset("ExtraSuffixToDiscard")) {
-    StringRef ExtraSuffix =
+    llvm::StringRef ExtraSuffix =
         PolymorphicNameType->getValueAsString("ExtraSuffixToDiscard");
     auto it = NameParts.end();
     while (it != NameParts.begin()) {
@@ -1430,7 +1430,7 @@ ACLEIntrinsic::ACLEIntrinsic(EmitterBase &ME, Record *R, const Type *Param)
 
     // The argument will usually have a name in the arguments dag, which goes
     // into the variable-name scope that the code gen will refer to.
-    StringRef ArgName = ArgsDag->getArgNameStr(i);
+    llvm::StringRef ArgName = ArgsDag->getArgNameStr(i);
     if (!ArgName.empty())
       Scope[std::string(ArgName)] =
           ME.getCodeForArg(i, ArgType, Promote, Immediate);
@@ -1445,9 +1445,9 @@ ACLEIntrinsic::ACLEIntrinsic(EmitterBase &ME, Record *R, const Type *Param)
     // a list of parameters we're going to assign to variables before
     // breaking from the loop.
     CustomCodeGenArgs["CustomCodeGenType"] =
-        (Twine("CustomCodeGen::") + MainOp->getValueAsString("type")).str();
+        (llvm::Twine("CustomCodeGen::") + MainOp->getValueAsString("type")).str();
     for (unsigned i = 0, e = CodeDag->getNumArgs(); i < e; ++i) {
-      StringRef Name = CodeDag->getArgNameStr(i);
+      llvm::StringRef Name = CodeDag->getArgNameStr(i);
       if (Name.empty()) {
         PrintFatalError("Operands to CustomCodegen should have names");
       } else if (auto *II = dyn_cast<IntInit>(CodeDag->getArg(i))) {
@@ -1560,7 +1560,7 @@ struct MergeableGroup {
   }
 };
 
-void EmitterBase::EmitBuiltinCG(raw_ostream &OS) {
+void EmitterBase::EmitBuiltinCG(llvm::raw_ostream &OS) {
   // Pass 1: generate code for all the intrinsics as if every type or constant
   // that can possibly be abstracted out into a parameter variable will be.
   // This identifies the sets of intrinsics we'll group together into a single
@@ -1678,7 +1678,7 @@ void EmitterBase::EmitBuiltinCG(raw_ostream &OS) {
     if (!MG.ParamTypes.empty()) {
       // If we've got some parameter variables, then emit their declarations...
       for (size_t i = 0, e = MG.ParamTypes.size(); i < e; ++i) {
-        StringRef Type = MG.ParamTypes[i];
+        llvm::StringRef Type = MG.ParamTypes[i];
         OS << "  " << Type;
         if (!Type.ends_with("*"))
           OS << " ";
@@ -1705,7 +1705,7 @@ void EmitterBase::EmitBuiltinCG(raw_ostream &OS) {
   }
 }
 
-void EmitterBase::EmitBuiltinAliases(raw_ostream &OS) {
+void EmitterBase::EmitBuiltinAliases(llvm::raw_ostream &OS) {
   // Build a sorted table of:
   // - intrinsic id number
   // - full name
@@ -1726,7 +1726,7 @@ void EmitterBase::EmitBuiltinAliases(raw_ostream &OS) {
   }
   OS << "};\n\n";
 
-  OS << "ArrayRef<IntrinToName> Map(MapData);\n\n";
+  OS << "llvm::ArrayRef<IntrinToName> Map(MapData);\n\n";
 
   OS << "static const char IntrinNames[] = {\n";
   StringTable.EmitString(OS);
@@ -1752,12 +1752,12 @@ void EmitterBase::GroupSemaChecks(
 class MveEmitter : public EmitterBase {
 public:
   MveEmitter(RecordKeeper &Records) : EmitterBase(Records){};
-  void EmitHeader(raw_ostream &OS) override;
-  void EmitBuiltinDef(raw_ostream &OS) override;
-  void EmitBuiltinSema(raw_ostream &OS) override;
+  void EmitHeader(llvm::raw_ostream &OS) override;
+  void EmitBuiltinDef(llvm::raw_ostream &OS) override;
+  void EmitBuiltinSema(llvm::raw_ostream &OS) override;
 };
 
-void MveEmitter::EmitHeader(raw_ostream &OS) {
+void MveEmitter::EmitHeader(llvm::raw_ostream &OS) {
   // Accumulate pieces of the header file that will be enabled under various
   // different combinations of #ifdef. The index into parts[] is made up of
   // the following bit flags.
@@ -1777,7 +1777,7 @@ void MveEmitter::EmitHeader(raw_ostream &OS) {
     const ScalarType *ST = kv.second.get();
     if (ST->hasNonstandardName())
       continue;
-    raw_ostream &OS = parts[ST->requiresFloat() ? Float : 0];
+    llvm::raw_ostream &OS = parts[ST->requiresFloat() ? Float : 0];
     const VectorType *VT = getVectorType(ST);
 
     OS << "typedef __attribute__((__neon_vector_type__(" << VT->lanes()
@@ -1819,7 +1819,7 @@ void MveEmitter::EmitHeader(raw_ostream &OS) {
       // have to write __arm_vfooq everywhere, of course.
 
       for (bool UserNamespace : {false, true}) {
-        raw_ostream &OS = parts[(Int.requiresFloat() ? Float : 0) |
+        llvm::raw_ostream &OS = parts[(Int.requiresFloat() ? Float : 0) |
                                 (UserNamespace ? UseUserNamespace : 0)];
 
         // Make the name of the function in this declaration.
@@ -1833,7 +1833,7 @@ void MveEmitter::EmitHeader(raw_ostream &OS) {
         // prototype.
 
         std::string RetTypeName = Int.returnType()->cName();
-        if (!StringRef(RetTypeName).ends_with("*"))
+        if (!llvm::StringRef(RetTypeName).ends_with("*"))
           RetTypeName += " ";
 
         std::vector<std::string> ArgTypeNames;
@@ -1943,7 +1943,7 @@ void MveEmitter::EmitHeader(raw_ostream &OS) {
         "#endif /* __ARM_MVE_H */\n";
 }
 
-void MveEmitter::EmitBuiltinDef(raw_ostream &OS) {
+void MveEmitter::EmitBuiltinDef(llvm::raw_ostream &OS) {
   for (const auto &kv : ACLEIntrinsics) {
     const ACLEIntrinsic &Int = *kv.second;
     OS << "BUILTIN(__builtin_arm_mve_" << Int.fullName()
@@ -1955,7 +1955,7 @@ void MveEmitter::EmitBuiltinDef(raw_ostream &OS) {
   for (const auto &kv : ACLEIntrinsics) {
     const ACLEIntrinsic &Int = *kv.second;
     if (Int.polymorphic()) {
-      StringRef Name = Int.shortName();
+      llvm::StringRef Name = Int.shortName();
       if (ShortNamesSeen.find(std::string(Name)) == ShortNamesSeen.end()) {
         OS << "BUILTIN(__builtin_arm_mve_" << Name << ", \"vi.\", \"nt";
         if (Int.nonEvaluating())
@@ -1967,12 +1967,12 @@ void MveEmitter::EmitBuiltinDef(raw_ostream &OS) {
   }
 }
 
-void MveEmitter::EmitBuiltinSema(raw_ostream &OS) {
+void MveEmitter::EmitBuiltinSema(llvm::raw_ostream &OS) {
   std::map<std::string, std::set<std::string>> Checks;
   GroupSemaChecks(Checks);
 
   for (const auto &kv : Checks) {
-    for (StringRef Name : kv.second)
+    for (llvm::StringRef Name : kv.second)
       OS << "case ARM::BI__builtin_arm_mve_" << Name << ":\n";
     OS << "  return " << kv.first;
   }
@@ -1986,14 +1986,14 @@ void MveEmitter::EmitBuiltinSema(raw_ostream &OS) {
 // fixed types.
 
 class FunctionMacro {
-  std::vector<StringRef> Params;
-  StringRef Definition;
+  std::vector<llvm::StringRef> Params;
+  llvm::StringRef Definition;
 
 public:
   FunctionMacro(const Record &R);
 
-  const std::vector<StringRef> &getParams() const { return Params; }
-  StringRef getDefinition() const { return Definition; }
+  const std::vector<llvm::StringRef> &getParams() const { return Params; }
+  llvm::StringRef getDefinition() const { return Definition; }
 };
 
 FunctionMacro::FunctionMacro(const Record &R) {
@@ -2006,13 +2006,13 @@ FunctionMacro::FunctionMacro(const Record &R) {
 //
 
 class CdeEmitter : public EmitterBase {
-  std::map<StringRef, FunctionMacro> FunctionMacros;
+  std::map<llvm::StringRef, FunctionMacro> FunctionMacros;
 
 public:
   CdeEmitter(RecordKeeper &Records);
-  void EmitHeader(raw_ostream &OS) override;
-  void EmitBuiltinDef(raw_ostream &OS) override;
-  void EmitBuiltinSema(raw_ostream &OS) override;
+  void EmitHeader(llvm::raw_ostream &OS) override;
+  void EmitBuiltinDef(llvm::raw_ostream &OS) override;
+  void EmitBuiltinSema(llvm::raw_ostream &OS) override;
 };
 
 CdeEmitter::CdeEmitter(RecordKeeper &Records) : EmitterBase(Records) {
@@ -2020,7 +2020,7 @@ CdeEmitter::CdeEmitter(RecordKeeper &Records) : EmitterBase(Records) {
     FunctionMacros.emplace(R->getName(), FunctionMacro(*R));
 }
 
-void CdeEmitter::EmitHeader(raw_ostream &OS) {
+void CdeEmitter::EmitHeader(llvm::raw_ostream &OS) {
   // Accumulate pieces of the header file that will be enabled under various
   // different combinations of #ifdef. The index into parts[] is one of the
   // following:
@@ -2044,7 +2044,7 @@ void CdeEmitter::EmitHeader(raw_ostream &OS) {
     // We don't have float64x2_t
     if (ST->kind() == ScalarTypeKind::Float && ST->sizeInBits() == 64)
       continue;
-    raw_ostream &OS = parts[ST->requiresFloat() ? MVEFloat : MVE];
+    llvm::raw_ostream &OS = parts[ST->requiresFloat() ? MVEFloat : MVE];
     const VectorType *VT = getVectorType(ST);
 
     OS << "typedef __attribute__((__neon_vector_type__(" << VT->lanes()
@@ -2067,7 +2067,7 @@ void CdeEmitter::EmitHeader(raw_ostream &OS) {
       if (!Polymorphic && Int.polymorphicOnly())
         continue;
 
-      raw_ostream &OS =
+      llvm::raw_ostream &OS =
           parts[Int.requiresFloat() ? MVEFloat
                                     : Int.requiresMVE() ? MVE : None];
 
@@ -2078,7 +2078,7 @@ void CdeEmitter::EmitHeader(raw_ostream &OS) {
       // Make strings for the types involved in the function's
       // prototype.
       std::string RetTypeName = Int.returnType()->cName();
-      if (!StringRef(RetTypeName).ends_with("*"))
+      if (!llvm::StringRef(RetTypeName).ends_with("*"))
         RetTypeName += " ";
 
       std::vector<std::string> ArgTypeNames;
@@ -2098,10 +2098,10 @@ void CdeEmitter::EmitHeader(raw_ostream &OS) {
   }
 
   for (const auto &kv : FunctionMacros) {
-    StringRef Name = kv.first;
+    llvm::StringRef Name = kv.first;
     const FunctionMacro &FM = kv.second;
 
-    raw_ostream &OS = parts[MVE];
+    llvm::raw_ostream &OS = parts[MVE];
     OS << "#define "
        << "__arm_" << Name << "(" << join(FM.getParams(), ", ") << ") "
        << FM.getDefinition() << "\n";
@@ -2151,7 +2151,7 @@ void CdeEmitter::EmitHeader(raw_ostream &OS) {
         "#endif /* __ARM_CDE_H */\n";
 }
 
-void CdeEmitter::EmitBuiltinDef(raw_ostream &OS) {
+void CdeEmitter::EmitBuiltinDef(llvm::raw_ostream &OS) {
   for (const auto &kv : ACLEIntrinsics) {
     if (kv.second->headerOnly())
       continue;
@@ -2161,12 +2161,12 @@ void CdeEmitter::EmitBuiltinDef(raw_ostream &OS) {
   }
 }
 
-void CdeEmitter::EmitBuiltinSema(raw_ostream &OS) {
+void CdeEmitter::EmitBuiltinSema(llvm::raw_ostream &OS) {
   std::map<std::string, std::set<std::string>> Checks;
   GroupSemaChecks(Checks);
 
   for (const auto &kv : Checks) {
-    for (StringRef Name : kv.second)
+    for (llvm::StringRef Name : kv.second)
       OS << "case ARM::BI__builtin_arm_cde_" << Name << ":\n";
     OS << "  Err = " << kv.first << "  break;\n";
   }
@@ -2178,45 +2178,45 @@ namespace clang {
 
 // MVE
 
-void EmitMveHeader(RecordKeeper &Records, raw_ostream &OS) {
+void EmitMveHeader(RecordKeeper &Records, llvm::raw_ostream &OS) {
   MveEmitter(Records).EmitHeader(OS);
 }
 
-void EmitMveBuiltinDef(RecordKeeper &Records, raw_ostream &OS) {
+void EmitMveBuiltinDef(RecordKeeper &Records, llvm::raw_ostream &OS) {
   MveEmitter(Records).EmitBuiltinDef(OS);
 }
 
-void EmitMveBuiltinSema(RecordKeeper &Records, raw_ostream &OS) {
+void EmitMveBuiltinSema(RecordKeeper &Records, llvm::raw_ostream &OS) {
   MveEmitter(Records).EmitBuiltinSema(OS);
 }
 
-void EmitMveBuiltinCG(RecordKeeper &Records, raw_ostream &OS) {
+void EmitMveBuiltinCG(RecordKeeper &Records, llvm::raw_ostream &OS) {
   MveEmitter(Records).EmitBuiltinCG(OS);
 }
 
-void EmitMveBuiltinAliases(RecordKeeper &Records, raw_ostream &OS) {
+void EmitMveBuiltinAliases(RecordKeeper &Records, llvm::raw_ostream &OS) {
   MveEmitter(Records).EmitBuiltinAliases(OS);
 }
 
 // CDE
 
-void EmitCdeHeader(RecordKeeper &Records, raw_ostream &OS) {
+void EmitCdeHeader(RecordKeeper &Records, llvm::raw_ostream &OS) {
   CdeEmitter(Records).EmitHeader(OS);
 }
 
-void EmitCdeBuiltinDef(RecordKeeper &Records, raw_ostream &OS) {
+void EmitCdeBuiltinDef(RecordKeeper &Records, llvm::raw_ostream &OS) {
   CdeEmitter(Records).EmitBuiltinDef(OS);
 }
 
-void EmitCdeBuiltinSema(RecordKeeper &Records, raw_ostream &OS) {
+void EmitCdeBuiltinSema(RecordKeeper &Records, llvm::raw_ostream &OS) {
   CdeEmitter(Records).EmitBuiltinSema(OS);
 }
 
-void EmitCdeBuiltinCG(RecordKeeper &Records, raw_ostream &OS) {
+void EmitCdeBuiltinCG(RecordKeeper &Records, llvm::raw_ostream &OS) {
   CdeEmitter(Records).EmitBuiltinCG(OS);
 }
 
-void EmitCdeBuiltinAliases(RecordKeeper &Records, raw_ostream &OS) {
+void EmitCdeBuiltinAliases(RecordKeeper &Records, llvm::raw_ostream &OS) {
   CdeEmitter(Records).EmitBuiltinAliases(OS);
 }
 

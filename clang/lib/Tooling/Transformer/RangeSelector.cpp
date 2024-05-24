@@ -29,30 +29,30 @@ using llvm::StringError;
 
 using MatchResult = MatchFinder::MatchResult;
 
-static Error invalidArgumentError(Twine Message) {
+static Error invalidArgumentError(llvm::Twine Message) {
   return llvm::make_error<StringError>(llvm::errc::invalid_argument, Message);
 }
 
-static Error typeError(StringRef ID, const ASTNodeKind &Kind) {
+static Error typeError(llvm::StringRef ID, const ASTNodeKind &Kind) {
   return invalidArgumentError("mismatched type (node id=" + ID +
                               " kind=" + Kind.asStringRef() + ")");
 }
 
-static Error typeError(StringRef ID, const ASTNodeKind &Kind,
-                       Twine ExpectedType) {
+static Error typeError(llvm::StringRef ID, const ASTNodeKind &Kind,
+                       llvm::Twine ExpectedType) {
   return invalidArgumentError("mismatched type: expected one of " +
                               ExpectedType + " (node id=" + ID +
                               " kind=" + Kind.asStringRef() + ")");
 }
 
-static Error missingPropertyError(StringRef ID, Twine Description,
-                                  StringRef Property) {
+static Error missingPropertyError(llvm::StringRef ID, llvm::Twine Description,
+                                  llvm::StringRef Property) {
   return invalidArgumentError(Description + " requires property '" + Property +
                               "' (node id=" + ID + ")");
 }
 
-static Expected<DynTypedNode> getNode(const ast_matchers::BoundNodes &Nodes,
-                                      StringRef ID) {
+static llvm::Expected<DynTypedNode> getNode(const ast_matchers::BoundNodes &Nodes,
+                                      llvm::StringRef ID) {
   auto &NodesMap = Nodes.getMap();
   auto It = NodesMap.find(ID);
   if (It == NodesMap.end())
@@ -104,8 +104,8 @@ static SourceLocation findOpenParen(const CallExpr &E, const SourceManager &SM,
 }
 
 RangeSelector transformer::before(RangeSelector Selector) {
-  return [Selector](const MatchResult &Result) -> Expected<CharSourceRange> {
-    Expected<CharSourceRange> SelectedRange = Selector(Result);
+  return [Selector](const MatchResult &Result) -> llvm::Expected<CharSourceRange> {
+    llvm::Expected<CharSourceRange> SelectedRange = Selector(Result);
     if (!SelectedRange)
       return SelectedRange.takeError();
     return CharSourceRange::getCharRange(SelectedRange->getBegin());
@@ -113,8 +113,8 @@ RangeSelector transformer::before(RangeSelector Selector) {
 }
 
 RangeSelector transformer::after(RangeSelector Selector) {
-  return [Selector](const MatchResult &Result) -> Expected<CharSourceRange> {
-    Expected<CharSourceRange> SelectedRange = Selector(Result);
+  return [Selector](const MatchResult &Result) -> llvm::Expected<CharSourceRange> {
+    llvm::Expected<CharSourceRange> SelectedRange = Selector(Result);
     if (!SelectedRange)
       return SelectedRange.takeError();
     SourceLocation End = SelectedRange->getEnd();
@@ -139,8 +139,8 @@ RangeSelector transformer::after(RangeSelector Selector) {
 }
 
 RangeSelector transformer::node(std::string ID) {
-  return [ID](const MatchResult &Result) -> Expected<CharSourceRange> {
-    Expected<DynTypedNode> Node = getNode(Result.Nodes, ID);
+  return [ID](const MatchResult &Result) -> llvm::Expected<CharSourceRange> {
+    llvm::Expected<DynTypedNode> Node = getNode(Result.Nodes, ID);
     if (!Node)
       return Node.takeError();
     return (Node->get<Decl>() != nullptr ||
@@ -152,8 +152,8 @@ RangeSelector transformer::node(std::string ID) {
 }
 
 RangeSelector transformer::statement(std::string ID) {
-  return [ID](const MatchResult &Result) -> Expected<CharSourceRange> {
-    Expected<DynTypedNode> Node = getNode(Result.Nodes, ID);
+  return [ID](const MatchResult &Result) -> llvm::Expected<CharSourceRange> {
+    llvm::Expected<DynTypedNode> Node = getNode(Result.Nodes, ID);
     if (!Node)
       return Node.takeError();
     return tooling::getExtendedRange(*Node, tok::TokenKind::semi,
@@ -162,11 +162,11 @@ RangeSelector transformer::statement(std::string ID) {
 }
 
 RangeSelector transformer::enclose(RangeSelector Begin, RangeSelector End) {
-  return [Begin, End](const MatchResult &Result) -> Expected<CharSourceRange> {
-    Expected<CharSourceRange> BeginRange = Begin(Result);
+  return [Begin, End](const MatchResult &Result) -> llvm::Expected<CharSourceRange> {
+    llvm::Expected<CharSourceRange> BeginRange = Begin(Result);
     if (!BeginRange)
       return BeginRange.takeError();
-    Expected<CharSourceRange> EndRange = End(Result);
+    llvm::Expected<CharSourceRange> EndRange = End(Result);
     if (!EndRange)
       return EndRange.takeError();
     SourceLocation B = BeginRange->getBegin();
@@ -186,8 +186,8 @@ RangeSelector transformer::encloseNodes(std::string BeginID,
 }
 
 RangeSelector transformer::member(std::string ID) {
-  return [ID](const MatchResult &Result) -> Expected<CharSourceRange> {
-    Expected<DynTypedNode> Node = getNode(Result.Nodes, ID);
+  return [ID](const MatchResult &Result) -> llvm::Expected<CharSourceRange> {
+    llvm::Expected<DynTypedNode> Node = getNode(Result.Nodes, ID);
     if (!Node)
       return Node.takeError();
     if (auto *M = Node->get<clang::MemberExpr>())
@@ -198,8 +198,8 @@ RangeSelector transformer::member(std::string ID) {
 }
 
 RangeSelector transformer::name(std::string ID) {
-  return [ID](const MatchResult &Result) -> Expected<CharSourceRange> {
-    Expected<DynTypedNode> N = getNode(Result.Nodes, ID);
+  return [ID](const MatchResult &Result) -> llvm::Expected<CharSourceRange> {
+    llvm::Expected<DynTypedNode> N = getNode(Result.Nodes, ID);
     if (!N)
       return N.takeError();
     auto &Node = *N;
@@ -258,8 +258,8 @@ class RelativeSelector {
 public:
   RelativeSelector(std::string ID) : ID(std::move(ID)) {}
 
-  Expected<CharSourceRange> operator()(const MatchResult &Result) {
-    Expected<DynTypedNode> N = getNode(Result.Nodes, ID);
+  llvm::Expected<CharSourceRange> operator()(const MatchResult &Result) {
+    llvm::Expected<DynTypedNode> N = getNode(Result.Nodes, ID);
     if (!N)
       return N.takeError();
     if (const auto *Arg = N->get<T>())
@@ -329,8 +329,8 @@ RangeSelector transformer::elseBranch(std::string ID) {
 }
 
 RangeSelector transformer::expansion(RangeSelector S) {
-  return [S](const MatchResult &Result) -> Expected<CharSourceRange> {
-    Expected<CharSourceRange> SRange = S(Result);
+  return [S](const MatchResult &Result) -> llvm::Expected<CharSourceRange> {
+    llvm::Expected<CharSourceRange> SRange = S(Result);
     if (!SRange)
       return SRange.takeError();
     return Result.SourceManager->getExpansionRange(*SRange);

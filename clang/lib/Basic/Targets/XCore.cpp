@@ -32,7 +32,7 @@ void XCoreTargetInfo::getTargetDefines(const LangOptions &Opts,
   Builder.defineMacro("__XS1B__");
 }
 
-ArrayRef<Builtin::Info> XCoreTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> XCoreTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo,
                         clang::XCore::LastTSBuiltin - Builtin::FirstTSBuiltin);
 }

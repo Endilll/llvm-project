@@ -25,7 +25,7 @@ namespace clang {
 class Attr;
 
 /// AttrVec - A vector of Attr, which is how they are stored on the AST.
-using AttrVec = SmallVector<Attr *, 4>;
+using AttrVec = llvm::SmallVector<Attr *, 4>;
 
 /// specific_attr_iterator - Iterates over a subrange of an AttrVec, only
 /// providing attributes that are of a specific type.

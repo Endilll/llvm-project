@@ -19,7 +19,7 @@
 #include "clang/AST/DeclTemplate.h"
 
 namespace clang {
-inline StringRef getLambdaStaticInvokerName() {
+inline llvm::StringRef getLambdaStaticInvokerName() {
   return "__invoke";
 }
 // This function returns true if M is a specialization, a template,

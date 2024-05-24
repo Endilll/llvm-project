@@ -40,7 +40,7 @@ AST_MATCHER(clang::ParmVarDecl, isArgvOfMain) {
 
 } // namespace
 
-AvoidCArraysCheck::AvoidCArraysCheck(StringRef Name, ClangTidyContext *Context)
+AvoidCArraysCheck::AvoidCArraysCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       AllowStringArrays(Options.get("AllowStringArrays", false)) {}
 

@@ -36,7 +36,7 @@ using namespace sema;
 using llvm::ArrayRef;
 
 ExprResult SemaObjC::ParseObjCStringLiteral(SourceLocation *AtLocs,
-                                            ArrayRef<Expr *> Strings) {
+                                            llvm::ArrayRef<Expr *> Strings) {
   ASTContext &Context = getASTContext();
   // Most ObjC strings are formed out of a single piece.  However, we *can*
   // have strings formed out of multiple @ strings with multiple pptokens in
@@ -47,8 +47,8 @@ ExprResult SemaObjC::ParseObjCStringLiteral(SourceLocation *AtLocs,
   // If we have a multi-part string, merge it all together.
   if (Strings.size() != 1) {
     // Concatenate objc strings.
-    SmallString<128> StrBuf;
-    SmallVector<SourceLocation, 8> StrLocs;
+    llvm::SmallString<128> StrBuf;
+    llvm::SmallVector<SourceLocation, 8> StrLocs;
 
     for (Expr *E : Strings) {
       S = cast<StringLiteral>(E);
@@ -545,7 +545,7 @@ ExprResult SemaObjC::BuildObjCBoxedExpr(SourceRange SR, Expr *ValueExpr) {
                   dyn_cast<StringLiteral>(CE->getSubExpr()->IgnoreParens())) {
             assert((SL->isOrdinary() || SL->isUTF8()) &&
                    "unexpected character encoding");
-            StringRef Str = SL->getString();
+            llvm::StringRef Str = SL->getString();
             const llvm::UTF8 *StrBegin = Str.bytes_begin();
             const llvm::UTF8 *StrEnd = Str.bytes_end();
             // Check that this is a valid UTF-8 string.
@@ -691,7 +691,7 @@ ExprResult SemaObjC::BuildObjCBoxedExpr(SourceRange SR, Expr *ValueExpr) {
             /*isDefined=*/false, ObjCImplementationControl::Required,
             /*HasRelatedResultType=*/false);
 
-        SmallVector<ParmVarDecl *, 2> Params;
+        llvm::SmallVector<ParmVarDecl *, 2> Params;
 
         ParmVarDecl *bytes =
         ParmVarDecl::Create(Context, M,
@@ -825,7 +825,7 @@ ExprResult SemaObjC::BuildObjCArrayLiteral(SourceRange SR,
           /*isPropertyAccessor=*/false, /*isSynthesizedAccessorStub=*/false,
           /*isImplicitlyDeclared=*/true, /*isDefined=*/false,
           ObjCImplementationControl::Required, false);
-      SmallVector<ParmVarDecl *, 2> Params;
+      llvm::SmallVector<ParmVarDecl *, 2> Params;
       ParmVarDecl *objects = ParmVarDecl::Create(Context, Method,
                                                  SourceLocation(),
                                                  SourceLocation(),
@@ -918,7 +918,7 @@ CheckObjCDictionaryLiteralDuplicateKeys(Sema &S,
     }
   };
 
-  llvm::DenseMap<StringRef, SourceLocation> StringKeys;
+  llvm::DenseMap<llvm::StringRef, SourceLocation> StringKeys;
   std::map<llvm::APSInt, SourceLocation, APSIntCompare> IntegralKeys;
 
   auto checkOneKey = [&](auto &Map, const auto &Key, SourceLocation Loc) {
@@ -933,7 +933,7 @@ CheckObjCDictionaryLiteralDuplicateKeys(Sema &S,
     Expr *Key = Literal->getKeyValueElement(Idx).Key->IgnoreParenImpCasts();
 
     if (auto *StrLit = dyn_cast<ObjCStringLiteral>(Key)) {
-      StringRef Bytes = StrLit->getString()->getBytes();
+      llvm::StringRef Bytes = StrLit->getString()->getBytes();
       SourceLocation Loc = StrLit->getExprLoc();
       checkOneKey(StringKeys, Bytes, Loc);
     }
@@ -958,7 +958,7 @@ CheckObjCDictionaryLiteralDuplicateKeys(Sema &S,
 }
 
 ExprResult SemaObjC::BuildObjCDictionaryLiteral(
-    SourceRange SR, MutableArrayRef<ObjCDictionaryElement> Elements) {
+    SourceRange SR, llvm::MutableArrayRef<ObjCDictionaryElement> Elements) {
   ASTContext &Context = getASTContext();
   SourceLocation Loc = SR.getBegin();
 
@@ -986,7 +986,7 @@ ExprResult SemaObjC::BuildObjCDictionaryLiteral(
           /*isSynthesizedAccessorStub=*/false,
           /*isImplicitlyDeclared=*/true, /*isDefined=*/false,
           ObjCImplementationControl::Required, false);
-      SmallVector<ParmVarDecl *, 3> Params;
+      llvm::SmallVector<ParmVarDecl *, 3> Params;
       ParmVarDecl *objects = ParmVarDecl::Create(Context, Method,
                                                  SourceLocation(),
                                                  SourceLocation(),
@@ -1654,7 +1654,7 @@ findExplicitInstancetypeDeclarer(const ObjCMethodDecl *MD,
     if (ifaceMD) return findExplicitInstancetypeDeclarer(ifaceMD, instancetype);
   }
 
-  SmallVector<const ObjCMethodDecl *, 4> overrides;
+  llvm::SmallVector<const ObjCMethodDecl *, 4> overrides;
   MD->getOverriddenMethods(overrides);
   for (unsigned i = 0, e = overrides.size(); i != e; ++i) {
     if (const ObjCMethodDecl *result =
@@ -1724,7 +1724,7 @@ void SemaObjC::EmitRelatedResultTypeNote(const Expr *E) {
 
 bool SemaObjC::CheckMessageArgumentTypes(
     const Expr *Receiver, QualType ReceiverType, MultiExprArg Args,
-    Selector Sel, ArrayRef<SourceLocation> SelectorLocs, ObjCMethodDecl *Method,
+    Selector Sel, llvm::ArrayRef<SourceLocation> SelectorLocs, ObjCMethodDecl *Method,
     bool isClassMessage, bool isSuperMessage, SourceLocation lbrac,
     SourceLocation rbrac, SourceRange RecRange, QualType &ReturnType,
     ExprValueKind &VK) {
@@ -1823,7 +1823,7 @@ bool SemaObjC::CheckMessageArgumentTypes(
 
   // Compute the set of type arguments to be substituted into each parameter
   // type.
-  std::optional<ArrayRef<QualType>> typeArgs =
+  std::optional<llvm::ArrayRef<QualType>> typeArgs =
       ReceiverType->getObjCSubstitutions(Method->getDeclContext());
   bool IsError = false;
   for (unsigned i = 0; i < NumNamedArgs; i++) {
@@ -1926,7 +1926,7 @@ bool SemaObjC::CheckMessageArgumentTypes(
 
   // Do additional checkings on method.
   IsError |=
-      CheckObjCMethodCall(Method, SelLoc, ArrayRef(Args.data(), Args.size()));
+      CheckObjCMethodCall(Method, SelLoc, llvm::ArrayRef(Args.data(), Args.size()));
 
   return IsError;
 }
@@ -2391,7 +2391,7 @@ SemaObjC::getObjCMessageKind(Scope *S, IdentifierInfo *Name,
 
 ExprResult SemaObjC::ActOnSuperMessage(Scope *S, SourceLocation SuperLoc,
                                        Selector Sel, SourceLocation LBracLoc,
-                                       ArrayRef<SourceLocation> SelectorLocs,
+                                       llvm::ArrayRef<SourceLocation> SelectorLocs,
                                        SourceLocation RBracLoc,
                                        MultiExprArg Args) {
   ASTContext &Context = getASTContext();
@@ -2504,7 +2504,7 @@ static void checkCocoaAPI(Sema &S, const ObjCMessageExpr *Msg) {
 
 static void checkFoundationAPI(Sema &S, SourceLocation Loc,
                                const ObjCMethodDecl *Method,
-                               ArrayRef<Expr *> Args, QualType ReceiverType,
+                               llvm::ArrayRef<Expr *> Args, QualType ReceiverType,
                                bool IsClassObjectCall) {
   // Check if this is a performSelector method that uses a selector that returns
   // a record or a vector type.
@@ -2618,7 +2618,7 @@ DiagnoseCStringFormatDirectiveInObjCAPI(Sema &S,
 ExprResult SemaObjC::BuildClassMessage(
     TypeSourceInfo *ReceiverTypeInfo, QualType ReceiverType,
     SourceLocation SuperLoc, Selector Sel, ObjCMethodDecl *Method,
-    SourceLocation LBracLoc, ArrayRef<SourceLocation> SelectorLocs,
+    SourceLocation LBracLoc, llvm::ArrayRef<SourceLocation> SelectorLocs,
     SourceLocation RBracLoc, MultiExprArg ArgsIn, bool isImplicit) {
   ASTContext &Context = getASTContext();
   SourceLocation Loc = SuperLoc.isValid()? SuperLoc
@@ -2628,7 +2628,7 @@ ExprResult SemaObjC::BuildClassMessage(
       << FixItHint::CreateInsertion(Loc, "[");
     LBracLoc = Loc;
   }
-  ArrayRef<SourceLocation> SelectorSlotLocs;
+  llvm::ArrayRef<SourceLocation> SelectorSlotLocs;
   if (!SelectorLocs.empty() && SelectorLocs.front().isValid())
     SelectorSlotLocs = SelectorLocs;
   else
@@ -2643,7 +2643,7 @@ ExprResult SemaObjC::BuildClassMessage(
     assert(SuperLoc.isInvalid() && "Message to super with dependent type");
     return ObjCMessageExpr::Create(Context, ReceiverType, VK_PRValue, LBracLoc,
                                    ReceiverTypeInfo, Sel, SelectorLocs,
-                                   /*Method=*/nullptr, ArrayRef(Args, NumArgs),
+                                   /*Method=*/nullptr, llvm::ArrayRef(Args, NumArgs),
                                    RBracLoc, isImplicit);
   }
 
@@ -2745,17 +2745,17 @@ ExprResult SemaObjC::BuildClassMessage(
   if (SuperLoc.isValid())
     Result = ObjCMessageExpr::Create(
         Context, ReturnType, VK, LBracLoc, SuperLoc, /*IsInstanceSuper=*/false,
-        ReceiverType, Sel, SelectorLocs, Method, ArrayRef(Args, NumArgs),
+        ReceiverType, Sel, SelectorLocs, Method, llvm::ArrayRef(Args, NumArgs),
         RBracLoc, isImplicit);
   else {
     Result = ObjCMessageExpr::Create(
         Context, ReturnType, VK, LBracLoc, ReceiverTypeInfo, Sel, SelectorLocs,
-        Method, ArrayRef(Args, NumArgs), RBracLoc, isImplicit);
+        Method, llvm::ArrayRef(Args, NumArgs), RBracLoc, isImplicit);
     if (!isImplicit)
       checkCocoaAPI(SemaRef, Result);
   }
   if (Method)
-    checkFoundationAPI(SemaRef, SelLoc, Method, ArrayRef(Args, NumArgs),
+    checkFoundationAPI(SemaRef, SelLoc, Method, llvm::ArrayRef(Args, NumArgs),
                        ReceiverType, /*IsClassObjectCall=*/true);
   return SemaRef.MaybeBindToTemporary(Result);
 }
@@ -2765,7 +2765,7 @@ ExprResult SemaObjC::BuildClassMessage(
 // is obtained from Sel.getNumArgs().
 ExprResult SemaObjC::ActOnClassMessage(Scope *S, ParsedType Receiver,
                                        Selector Sel, SourceLocation LBracLoc,
-                                       ArrayRef<SourceLocation> SelectorLocs,
+                                       llvm::ArrayRef<SourceLocation> SelectorLocs,
                                        SourceLocation RBracLoc,
                                        MultiExprArg Args) {
   ASTContext &Context = getASTContext();
@@ -2843,7 +2843,7 @@ static bool isMethodDeclaredInRootProtocol(Sema &S, const ObjCMethodDecl *M) {
 ExprResult SemaObjC::BuildInstanceMessage(
     Expr *Receiver, QualType ReceiverType, SourceLocation SuperLoc,
     Selector Sel, ObjCMethodDecl *Method, SourceLocation LBracLoc,
-    ArrayRef<SourceLocation> SelectorLocs, SourceLocation RBracLoc,
+    llvm::ArrayRef<SourceLocation> SelectorLocs, SourceLocation RBracLoc,
     MultiExprArg ArgsIn, bool isImplicit) {
   assert((Receiver || SuperLoc.isValid()) && "If the Receiver is null, the "
                                              "SuperLoc must be valid so we can "
@@ -2854,7 +2854,7 @@ ExprResult SemaObjC::BuildInstanceMessage(
   SourceLocation Loc = SuperLoc.isValid() ? SuperLoc : Receiver->getBeginLoc();
   SourceRange RecRange =
       SuperLoc.isValid()? SuperLoc : Receiver->getSourceRange();
-  ArrayRef<SourceLocation> SelectorSlotLocs;
+  llvm::ArrayRef<SourceLocation> SelectorSlotLocs;
   if (!SelectorLocs.empty() && SelectorLocs.front().isValid())
     SelectorSlotLocs = SelectorLocs;
   else
@@ -2889,7 +2889,7 @@ ExprResult SemaObjC::BuildInstanceMessage(
       assert(SuperLoc.isInvalid() && "Message to super with dependent type");
       return ObjCMessageExpr::Create(
           Context, Context.DependentTy, VK_PRValue, LBracLoc, Receiver, Sel,
-          SelectorLocs, /*Method=*/nullptr, ArrayRef(Args, NumArgs), RBracLoc,
+          SelectorLocs, /*Method=*/nullptr, llvm::ArrayRef(Args, NumArgs), RBracLoc,
           isImplicit);
     }
 
@@ -2955,7 +2955,7 @@ ExprResult SemaObjC::BuildInstanceMessage(
                                                                      typeBound);
     if (receiverIsIdLike || ReceiverType->isBlockPointerType() ||
         (Receiver && Context.isObjCNSObjectType(Receiver->getType()))) {
-      SmallVector<ObjCMethodDecl*, 4> Methods;
+      llvm::SmallVector<ObjCMethodDecl*, 4> Methods;
       // If we have a type bound, further filter the methods.
       CollectMultipleMethodsInGlobalPool(Sel, Methods, true/*InstanceFirst*/,
                                          true/*CheckTheOther*/, typeBound);
@@ -3015,7 +3015,7 @@ ExprResult SemaObjC::BuildInstanceMessage(
           if (!Receiver || !isSelfExpr(Receiver)) {
             // If no class (factory) method was found, check if an _instance_
             // method of the same name exists in the root class only.
-            SmallVector<ObjCMethodDecl*, 4> Methods;
+            llvm::SmallVector<ObjCMethodDecl*, 4> Methods;
             CollectMultipleMethodsInGlobalPool(Sel, Methods,
                                                false/*InstanceFirst*/,
                                                true/*CheckTheOther*/);
@@ -3102,7 +3102,7 @@ ExprResult SemaObjC::BuildInstanceMessage(
             // behavior isn't very desirable, however we need it for GCC
             // compatibility. FIXME: should we deviate??
             if (OCIType->qual_empty()) {
-              SmallVector<ObjCMethodDecl*, 4> Methods;
+              llvm::SmallVector<ObjCMethodDecl*, 4> Methods;
               CollectMultipleMethodsInGlobalPool(Sel, Methods,
                                                  true/*InstanceFirst*/,
                                                  false/*CheckTheOther*/);
@@ -3336,12 +3336,12 @@ ExprResult SemaObjC::BuildInstanceMessage(
   if (SuperLoc.isValid())
     Result = ObjCMessageExpr::Create(
         Context, ReturnType, VK, LBracLoc, SuperLoc, /*IsInstanceSuper=*/true,
-        ReceiverType, Sel, SelectorLocs, Method, ArrayRef(Args, NumArgs),
+        ReceiverType, Sel, SelectorLocs, Method, llvm::ArrayRef(Args, NumArgs),
         RBracLoc, isImplicit);
   else {
     Result = ObjCMessageExpr::Create(
         Context, ReturnType, VK, LBracLoc, Receiver, Sel, SelectorLocs, Method,
-        ArrayRef(Args, NumArgs), RBracLoc, isImplicit);
+        llvm::ArrayRef(Args, NumArgs), RBracLoc, isImplicit);
     if (!isImplicit)
       checkCocoaAPI(SemaRef, Result);
   }
@@ -3362,7 +3362,7 @@ ExprResult SemaObjC::BuildInstanceMessage(
         }
       }
     }
-    checkFoundationAPI(SemaRef, SelLoc, Method, ArrayRef(Args, NumArgs),
+    checkFoundationAPI(SemaRef, SelLoc, Method, llvm::ArrayRef(Args, NumArgs),
                        ReceiverType, IsClassObjectCall);
   }
 
@@ -3422,7 +3422,7 @@ static void RemoveSelectorFromWarningCache(SemaObjC &S, Expr *Arg) {
 // is obtained from Sel.getNumArgs().
 ExprResult SemaObjC::ActOnInstanceMessage(Scope *S, Expr *Receiver,
                                           Selector Sel, SourceLocation LBracLoc,
-                                          ArrayRef<SourceLocation> SelectorLocs,
+                                          llvm::ArrayRef<SourceLocation> SelectorLocs,
                                           SourceLocation RBracLoc,
                                           MultiExprArg Args) {
   ASTContext &Context = getASTContext();
@@ -3746,7 +3746,7 @@ namespace {
   };
 } // end anonymous namespace
 
-bool SemaObjC::isKnownName(StringRef name) {
+bool SemaObjC::isKnownName(llvm::StringRef name) {
   ASTContext &Context = getASTContext();
   if (name.empty())
     return false;
@@ -3776,7 +3776,7 @@ static void addFixitForObjCARCConversion(
       if (const CXXNamedCastExpr *NCE = dyn_cast<CXXNamedCastExpr>(realCast)) {
         SourceRange range(NCE->getOperatorLoc(),
                           NCE->getAngleBrackets().getEnd());
-        SmallString<32> BridgeCall;
+        llvm::SmallString<32> BridgeCall;
 
         SourceManager &SM = S.getSourceManager();
         char PrevChar = *SM.getCharacterData(range.getBegin().getLocWithOffset(-1));
@@ -3794,7 +3794,7 @@ static void addFixitForObjCARCConversion(
     castedE = castedE->IgnoreImpCasts();
     SourceRange range = castedE->getSourceRange();
 
-    SmallString<32> BridgeCall;
+    llvm::SmallString<32> BridgeCall;
 
     SourceManager &SM = S.getSourceManager();
     char PrevChar = *SM.getCharacterData(range.getBegin().getLocWithOffset(-1));
@@ -4571,8 +4571,8 @@ Expr *SemaObjC::stripARCUnbridgedCast(Expr *e) {
     assert(!gse->isTypePredicate());
 
     unsigned n = gse->getNumAssocs();
-    SmallVector<Expr *, 4> subExprs;
-    SmallVector<TypeSourceInfo *, 4> subTypes;
+    llvm::SmallVector<Expr *, 4> subExprs;
+    llvm::SmallVector<TypeSourceInfo *, 4> subTypes;
     subExprs.reserve(n);
     subTypes.reserve(n);
     for (const GenericSelectionExpr::Association assoc : gse->associations()) {
@@ -5160,7 +5160,7 @@ ExprResult SemaObjC::ActOnObjCAvailabilityCheckExpr(
     SourceLocation RParen) {
   ASTContext &Context = getASTContext();
   auto FindSpecVersion =
-      [&](StringRef Platform) -> std::optional<VersionTuple> {
+      [&](llvm::StringRef Platform) -> std::optional<llvm::VersionTuple> {
     auto Spec = llvm::find_if(AvailSpecs, [&](const AvailabilitySpec &Spec) {
       return Spec.getPlatform() == Platform;
     });
@@ -5176,7 +5176,7 @@ ExprResult SemaObjC::ActOnObjCAvailabilityCheckExpr(
     return Spec->getVersion();
   };
 
-  VersionTuple Version;
+  llvm::VersionTuple Version;
   if (auto MaybeVersion =
           FindSpecVersion(Context.getTargetInfo().getPlatformName()))
     Version = *MaybeVersion;

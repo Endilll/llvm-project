@@ -2520,7 +2520,7 @@ TypeSystemClang::GetCompilerDeclContextForType(const CompilerType &type) {
 /// The \p mask argument allows one to skip certain kinds of simplifications,
 /// when one wishes to handle a certain kind of type directly.
 static QualType
-RemoveWrappingTypes(QualType type, ArrayRef<clang::Type::TypeClass> mask = {}) {
+RemoveWrappingTypes(QualType type, llvm::ArrayRef<clang::Type::TypeClass> mask = {}) {
   while (true) {
     if (find(mask, type->getTypeClass()) != mask.end())
       return type;

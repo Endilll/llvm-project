@@ -234,20 +234,20 @@ public:
   /// Dump graph to the specified filename.
   /// If filename is empty, generate a temporary one.
   /// \return The filename the graph is written into.
-  std::string DumpGraph(bool trim = false, StringRef Filename="");
+  std::string DumpGraph(bool trim = false, llvm::StringRef Filename="");
 
   /// Dump the graph consisting of the given nodes to a specified filename.
   /// Generate a temporary filename if it's not provided.
   /// \return The filename the graph is written into.
-  std::string DumpGraph(ArrayRef<const ExplodedNode *> Nodes,
-                        StringRef Filename = "");
+  std::string DumpGraph(llvm::ArrayRef<const ExplodedNode *> Nodes,
+                        llvm::StringRef Filename = "");
 
   /// Visualize the ExplodedGraph created by executing the simulation.
   void ViewGraph(bool trim = false);
 
   /// Visualize a trimmed ExplodedGraph that only contains paths to the given
   /// nodes.
-  void ViewGraph(ArrayRef<const ExplodedNode *> Nodes);
+  void ViewGraph(llvm::ArrayRef<const ExplodedNode *> Nodes);
 
   /// getInitialState - Return the initial state used for the root vertex
   ///  in the ExplodedGraph.
@@ -390,8 +390,8 @@ public:
   ProgramStateRef
   processRegionChanges(ProgramStateRef state,
                        const InvalidatedSymbols *invalidated,
-                       ArrayRef<const MemRegion *> ExplicitRegions,
-                       ArrayRef<const MemRegion *> Regions,
+                       llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+                       llvm::ArrayRef<const MemRegion *> Regions,
                        const LocationContext *LCtx,
                        const CallEvent *Call);
 
@@ -403,7 +403,7 @@ public:
   }
 
   /// printJson - Called by ProgramStateManager to print checker-specific data.
-  void printJson(raw_ostream &Out, ProgramStateRef State,
+  void printJson(llvm::raw_ostream &Out, ProgramStateRef State,
                  const LocationContext *LCtx, const char *NL,
                  unsigned int Space, bool IsDot) const;
 
@@ -628,7 +628,7 @@ public:
 
   /// Call PointerEscape callback when a value escapes as a result of bind.
   ProgramStateRef processPointerEscapedOnBind(
-      ProgramStateRef State, ArrayRef<std::pair<SVal, SVal>> LocAndVals,
+      ProgramStateRef State, llvm::ArrayRef<std::pair<SVal, SVal>> LocAndVals,
       const LocationContext *LCtx, PointerEscapeKind Kind,
       const CallEvent *Call);
 
@@ -638,7 +638,7 @@ public:
   ProgramStateRef notifyCheckersOfPointerEscape(
                            ProgramStateRef State,
                            const InvalidatedSymbols *Invalidated,
-                           ArrayRef<const MemRegion *> ExplicitRegions,
+                           llvm::ArrayRef<const MemRegion *> ExplicitRegions,
                            const CallEvent *Call,
                            RegionAndSymbolInvalidationTraits &ITraits);
 
@@ -656,7 +656,7 @@ private:
 
   /// A simple wrapper when you only need to notify checkers of pointer-escape
   /// of some values.
-  ProgramStateRef escapeValues(ProgramStateRef State, ArrayRef<SVal> Vs,
+  ProgramStateRef escapeValues(ProgramStateRef State, llvm::ArrayRef<SVal> Vs,
                                PointerEscapeKind K,
                                const CallEvent *Call = nullptr) const;
 

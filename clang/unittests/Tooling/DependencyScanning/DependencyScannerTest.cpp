@@ -80,7 +80,7 @@ private:
 
 TEST(DependencyScanner, ScanDepsReuseFilemanager) {
   std::vector<std::string> Compilation = {"-c", "-E", "-MT", "test.cpp.o"};
-  StringRef CWD = "/root";
+  llvm::StringRef CWD = "/root";
   FixedCompilationDatabase CDB(CWD, Compilation);
 
   auto VFS = new llvm::vfs::InMemoryFileSystem();
@@ -129,7 +129,7 @@ TEST(DependencyScanner, ScanDepsReuseFilemanager) {
 
 TEST(DependencyScanner, ScanDepsReuseFilemanagerSkippedFile) {
   std::vector<std::string> Compilation = {"-c", "-E", "-MT", "test.cpp.o"};
-  StringRef CWD = "/root";
+  llvm::StringRef CWD = "/root";
   FixedCompilationDatabase CDB(CWD, Compilation);
 
   auto VFS = new llvm::vfs::InMemoryFileSystem();
@@ -171,7 +171,7 @@ TEST(DependencyScanner, ScanDepsReuseFilemanagerSkippedFile) {
 
 TEST(DependencyScanner, ScanDepsReuseFilemanagerHasInclude) {
   std::vector<std::string> Compilation = {"-c", "-E", "-MT", "test.cpp.o"};
-  StringRef CWD = "/root";
+  llvm::StringRef CWD = "/root";
   FixedCompilationDatabase CDB(CWD, Compilation);
 
   auto VFS = new llvm::vfs::InMemoryFileSystem();
@@ -214,7 +214,7 @@ TEST(DependencyScanner, ScanDepsWithFS) {
                                           "test.cpp",
                                           "-o"
                                           "test.cpp.o"};
-  StringRef CWD = "/root";
+  llvm::StringRef CWD = "/root";
 
   auto VFS = new llvm::vfs::InMemoryFileSystem();
   VFS->setCurrentWorkingDirectory(CWD);
@@ -252,7 +252,7 @@ TEST(DependencyScanner, ScanDepsWithModuleLookup) {
       "-fmodules",
       "-I/root/SomeSources",
   };
-  StringRef CWD = "/root";
+  llvm::StringRef CWD = "/root";
 
   auto VFS = new llvm::vfs::InMemoryFileSystem();
   VFS->setCurrentWorkingDirectory(CWD);
@@ -268,16 +268,16 @@ TEST(DependencyScanner, ScanDepsWithModuleLookup) {
     std::vector<std::string> StatPaths;
     std::vector<std::string> ReadFiles;
 
-    InterceptorFS(IntrusiveRefCntPtr<FileSystem> UnderlyingFS)
+    InterceptorFS(llvm::IntrusiveRefCntPtr<FileSystem> UnderlyingFS)
         : ProxyFileSystem(UnderlyingFS) {}
 
-    llvm::ErrorOr<llvm::vfs::Status> status(const Twine &Path) override {
+    llvm::ErrorOr<llvm::vfs::Status> status(const llvm::Twine &Path) override {
       StatPaths.push_back(Path.str());
       return ProxyFileSystem::status(Path);
     }
 
     llvm::ErrorOr<std::unique_ptr<llvm::vfs::File>>
-    openFileForRead(const Twine &Path) override {
+    openFileForRead(const llvm::Twine &Path) override {
       ReadFiles.push_back(Path.str());
       return ProxyFileSystem::openFileForRead(Path);
     }

@@ -20,7 +20,7 @@ namespace clang::tidy::cert {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cert/err58-cpp.html
 class StaticObjectExceptionCheck : public ClangTidyCheck {
 public:
-  StaticObjectExceptionCheck(StringRef Name, ClangTidyContext *Context)
+  StaticObjectExceptionCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return getLangOpts().CPlusPlus && getLangOpts().CXXExceptions;

@@ -161,11 +161,11 @@ static int PrintSupportedExtensions(std::string TargetStr) {
   return 0;
 }
 
-int cc1_main(ArrayRef<const char *> Argv, const char *Argv0, void *MainAddr) {
+int cc1_main(llvm::ArrayRef<const char *> Argv, const char *Argv0, void *MainAddr) {
   ensureSufficientStack();
 
   std::unique_ptr<CompilerInstance> Clang(new CompilerInstance());
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
 
   // Register the support for object-file-wrapped Clang modules.
   auto PCHOps = Clang->getPCHContainerOperations();
@@ -180,12 +180,12 @@ int cc1_main(ArrayRef<const char *> Argv, const char *Argv0, void *MainAddr) {
 
   // Buffer diagnostics from argument parsing so that we can output them using a
   // well formed diagnostic object.
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
   TextDiagnosticBuffer *DiagsBuffer = new TextDiagnosticBuffer;
   DiagnosticsEngine Diags(DiagID, &*DiagOpts, DiagsBuffer);
 
   // Setup round-trip remarks for the DiagnosticsEngine used in CreateFromArgs.
-  if (find(Argv, StringRef("-Rround-trip-cc1-args")) != Argv.end())
+  if (find(Argv, llvm::StringRef("-Rround-trip-cc1-args")) != Argv.end())
     Diags.setSeverity(diag::remark_cc1_round_trip_generated,
                       diag::Severity::Remark, {});
 

@@ -44,7 +44,7 @@ enum class NoLintType { NoLint, NoLintNextLine, NoLintBegin, NoLintEnd };
 
 // Convert a string like "NOLINTNEXTLINE" to its enum `Type::NoLintNextLine`.
 // Return `std::nullopt` if the string is unrecognized.
-static std::optional<NoLintType> strToNoLintType(StringRef Str) {
+static std::optional<NoLintType> strToNoLintType(llvm::StringRef Str) {
   auto Type = llvm::StringSwitch<std::optional<NoLintType>>(Str)
                   .Case("NOLINT", NoLintType::NoLint)
                   .Case("NOLINTNEXTLINE", NoLintType::NoLintNextLine)
@@ -61,10 +61,10 @@ static std::optional<NoLintType> strToNoLintType(StringRef Str) {
 // Whitespace within a NOLINT's check list shall be ignored.
 // "NOLINT( check1, check2 )" is equivalent to "NOLINT(check1,check2)".
 // Return the check list with all extraneous whitespace removed.
-static std::string trimWhitespace(StringRef Checks) {
-  SmallVector<StringRef> Split;
+static std::string trimWhitespace(llvm::StringRef Checks) {
+  llvm::SmallVector<llvm::StringRef> Split;
   Checks.split(Split, ',');
-  for (StringRef &Check : Split)
+  for (llvm::StringRef &Check : Split)
     Check = Check.trim();
   return llvm::join(Split, ",");
 }
@@ -99,7 +99,7 @@ public:
   std::optional<std::string> checks() const { return Checks; }
 
   // Whether this NOLINT applies to the provided check.
-  bool suppresses(StringRef Check) const { return ChecksGlob->contains(Check); }
+  bool suppresses(llvm::StringRef Check) const { return ChecksGlob->contains(Check); }
 
 private:
   std::optional<std::string> Checks;
@@ -109,15 +109,15 @@ private:
 } // namespace
 
 // Consume the entire buffer and return all `NoLintToken`s that were found.
-static SmallVector<NoLintToken> getNoLints(StringRef Buffer) {
+static llvm::SmallVector<NoLintToken> getNoLints(llvm::StringRef Buffer) {
   static constexpr llvm::StringLiteral NOLINT = "NOLINT";
-  SmallVector<NoLintToken> NoLints;
+  llvm::SmallVector<NoLintToken> NoLints;
 
   size_t Pos = 0;
   while (Pos < Buffer.size()) {
     // Find NOLINT:
     const size_t NoLintPos = Buffer.find(NOLINT, Pos);
-    if (NoLintPos == StringRef::npos)
+    if (NoLintPos == llvm::StringRef::npos)
       break; // Buffer exhausted
 
     // Read [A-Z] characters immediately after "NOLINT", e.g. the "NEXTLINE" in
@@ -136,7 +136,7 @@ static SmallVector<NoLintToken> getNoLints(StringRef Buffer) {
     std::optional<std::string> Checks;
     if (Pos < Buffer.size() && Buffer[Pos] == '(') {
       size_t ClosingBracket = Buffer.find_first_of("\n)", ++Pos);
-      if (ClosingBracket != StringRef::npos && Buffer[ClosingBracket] == ')') {
+      if (ClosingBracket != llvm::StringRef::npos && Buffer[ClosingBracket] == ')') {
         Checks = Buffer.slice(Pos, ClosingBracket).str();
         Pos = ClosingBracket + 1;
       }
@@ -167,7 +167,7 @@ public:
 
   // Whether the provided diagnostic is within and is suppressible by this block
   // of NOLINT(BEGIN/END) comments.
-  bool suppresses(size_t DiagPos, StringRef DiagName) const {
+  bool suppresses(size_t DiagPos, llvm::StringRef DiagName) const {
     return (Begin.Pos < DiagPos) && (DiagPos < EndPos) &&
            Begin.suppresses(DiagName);
   }
@@ -182,11 +182,11 @@ private:
 // Match NOLINTBEGINs with their corresponding NOLINTENDs and move them into
 // `NoLintBlockToken`s. If any BEGINs or ENDs are left over, they are moved to
 // `UnmatchedTokens`.
-static SmallVector<NoLintBlockToken>
-formNoLintBlocks(SmallVector<NoLintToken> NoLints,
-                 SmallVectorImpl<NoLintToken> &UnmatchedTokens) {
-  SmallVector<NoLintBlockToken> CompletedBlocks;
-  SmallVector<NoLintToken> Stack;
+static llvm::SmallVector<NoLintBlockToken>
+formNoLintBlocks(llvm::SmallVector<NoLintToken> NoLints,
+                 llvm::SmallVectorImpl<NoLintToken> &UnmatchedTokens) {
+  llvm::SmallVector<NoLintBlockToken> CompletedBlocks;
+  llvm::SmallVector<NoLintToken> Stack;
 
   // Nested blocks must be fully contained within their parent block. What this
   // means is that when you have a series of nested BEGIN tokens, the END tokens
@@ -218,30 +218,30 @@ formNoLintBlocks(SmallVector<NoLintToken> NoLints,
 class NoLintDirectiveHandler::Impl {
 public:
   bool shouldSuppress(DiagnosticsEngine::Level DiagLevel,
-                      const Diagnostic &Diag, StringRef DiagName,
-                      SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
+                      const Diagnostic &Diag, llvm::StringRef DiagName,
+                      llvm::SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
                       bool AllowIO, bool EnableNoLintBlocks);
 
 private:
-  bool diagHasNoLintInMacro(const Diagnostic &Diag, StringRef DiagName,
-                            SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
+  bool diagHasNoLintInMacro(const Diagnostic &Diag, llvm::StringRef DiagName,
+                            llvm::SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
                             bool AllowIO, bool EnableNoLintBlocks);
 
-  bool diagHasNoLint(StringRef DiagName, SourceLocation DiagLoc,
+  bool diagHasNoLint(llvm::StringRef DiagName, SourceLocation DiagLoc,
                      const SourceManager &SrcMgr,
-                     SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
+                     llvm::SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
                      bool AllowIO, bool EnableNoLintBlocks);
 
-  void generateCache(const SourceManager &SrcMgr, StringRef FileName,
-                     FileID File, StringRef Buffer,
-                     SmallVectorImpl<tooling::Diagnostic> &NoLintErrors);
+  void generateCache(const SourceManager &SrcMgr, llvm::StringRef FileName,
+                     FileID File, llvm::StringRef Buffer,
+                     llvm::SmallVectorImpl<tooling::Diagnostic> &NoLintErrors);
 
-  llvm::StringMap<SmallVector<NoLintBlockToken>> Cache;
+  llvm::StringMap<llvm::SmallVector<NoLintBlockToken>> Cache;
 };
 
 bool NoLintDirectiveHandler::Impl::shouldSuppress(
     DiagnosticsEngine::Level DiagLevel, const Diagnostic &Diag,
-    StringRef DiagName, SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
+    llvm::StringRef DiagName, llvm::SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
     bool AllowIO, bool EnableNoLintBlocks) {
   if (DiagLevel >= DiagnosticsEngine::Error)
     return false;
@@ -252,8 +252,8 @@ bool NoLintDirectiveHandler::Impl::shouldSuppress(
 // Look at the macro's spelling location for a NOLINT. If none is found, keep
 // looking up the call stack.
 bool NoLintDirectiveHandler::Impl::diagHasNoLintInMacro(
-    const Diagnostic &Diag, StringRef DiagName,
-    SmallVectorImpl<tooling::Diagnostic> &NoLintErrors, bool AllowIO,
+    const Diagnostic &Diag, llvm::StringRef DiagName,
+    llvm::SmallVectorImpl<tooling::Diagnostic> &NoLintErrors, bool AllowIO,
     bool EnableNoLintBlocks) {
   SourceLocation DiagLoc = Diag.getLocation();
   if (DiagLoc.isInvalid())
@@ -272,7 +272,7 @@ bool NoLintDirectiveHandler::Impl::diagHasNoLintInMacro(
 
 // Look behind and ahead for '\n' characters. These mark the start and end of
 // this line.
-static std::pair<size_t, size_t> getLineStartAndEnd(StringRef Buffer,
+static std::pair<size_t, size_t> getLineStartAndEnd(llvm::StringRef Buffer,
                                                     size_t From) {
   size_t StartPos = Buffer.find_last_of('\n', From) + 1;
   size_t EndPos = std::min(Buffer.find('\n', From), Buffer.size());
@@ -281,12 +281,12 @@ static std::pair<size_t, size_t> getLineStartAndEnd(StringRef Buffer,
 
 // Whether the line has a NOLINT of type = `Type` that can suppress the
 // diagnostic `DiagName`.
-static bool lineHasNoLint(StringRef Buffer,
+static bool lineHasNoLint(llvm::StringRef Buffer,
                           std::pair<size_t, size_t> LineStartAndEnd,
-                          NoLintType Type, StringRef DiagName) {
+                          NoLintType Type, llvm::StringRef DiagName) {
   // Get all NOLINTs on the line.
   Buffer = Buffer.slice(LineStartAndEnd.first, LineStartAndEnd.second);
-  SmallVector<NoLintToken> NoLints = getNoLints(Buffer);
+  llvm::SmallVector<NoLintToken> NoLints = getNoLints(Buffer);
 
   // Do any of these NOLINTs match the desired type and diag name?
   return llvm::any_of(NoLints, [&](const NoLintToken &NoLint) {
@@ -296,15 +296,15 @@ static bool lineHasNoLint(StringRef Buffer,
 
 // Whether the provided diagnostic is located within and is suppressible by a
 // block of NOLINT(BEGIN/END) comments.
-static bool withinNoLintBlock(ArrayRef<NoLintBlockToken> NoLintBlocks,
-                              size_t DiagPos, StringRef DiagName) {
+static bool withinNoLintBlock(llvm::ArrayRef<NoLintBlockToken> NoLintBlocks,
+                              size_t DiagPos, llvm::StringRef DiagName) {
   return llvm::any_of(NoLintBlocks, [&](const NoLintBlockToken &NoLintBlock) {
     return NoLintBlock.suppresses(DiagPos, DiagName);
   });
 }
 
 // Get the file contents as a string.
-static std::optional<StringRef> getBuffer(const SourceManager &SrcMgr,
+static std::optional<llvm::StringRef> getBuffer(const SourceManager &SrcMgr,
                                           FileID File, bool AllowIO) {
   return AllowIO ? SrcMgr.getBufferDataOrNone(File)
                  : SrcMgr.getBufferDataIfLoaded(File);
@@ -315,8 +315,8 @@ static std::optional<StringRef> getBuffer(const SourceManager &SrcMgr,
 // that fails do we look for NOLINT(BEGIN/END) blocks (which requires reading
 // the entire file).
 bool NoLintDirectiveHandler::Impl::diagHasNoLint(
-    StringRef DiagName, SourceLocation DiagLoc, const SourceManager &SrcMgr,
-    SmallVectorImpl<tooling::Diagnostic> &NoLintErrors, bool AllowIO,
+    llvm::StringRef DiagName, SourceLocation DiagLoc, const SourceManager &SrcMgr,
+    llvm::SmallVectorImpl<tooling::Diagnostic> &NoLintErrors, bool AllowIO,
     bool EnableNoLintBlocks) {
   // Translate the diagnostic's SourceLocation to a raw file + offset pair.
   FileID File;
@@ -325,12 +325,12 @@ bool NoLintDirectiveHandler::Impl::diagHasNoLint(
 
   // We will only see NOLINTs in user-authored sources. No point reading the
   // file if it is a <built-in>.
-  std::optional<StringRef> FileName = SrcMgr.getNonBuiltinFilenameForID(File);
+  std::optional<llvm::StringRef> FileName = SrcMgr.getNonBuiltinFilenameForID(File);
   if (!FileName)
     return false;
 
   // Get file contents.
-  std::optional<StringRef> Buffer = getBuffer(SrcMgr, File, AllowIO);
+  std::optional<llvm::StringRef> Buffer = getBuffer(SrcMgr, File, AllowIO);
   if (!Buffer)
     return false;
 
@@ -366,7 +366,7 @@ static tooling::Diagnostic makeNoLintError(const SourceManager &SrcMgr,
   tooling::Diagnostic Error;
   Error.DiagLevel = tooling::Diagnostic::Error;
   Error.DiagnosticName = "clang-tidy-nolint";
-  StringRef Message =
+  llvm::StringRef Message =
       (NoLint.Type == NoLintType::NoLintBegin)
           ? ("unmatched 'NOLINTBEGIN' comment without a subsequent 'NOLINT"
              "END' comment")
@@ -379,13 +379,13 @@ static tooling::Diagnostic makeNoLintError(const SourceManager &SrcMgr,
 
 // Find all NOLINT(BEGIN/END) blocks in a file and store in the cache.
 void NoLintDirectiveHandler::Impl::generateCache(
-    const SourceManager &SrcMgr, StringRef FileName, FileID File,
-    StringRef Buffer, SmallVectorImpl<tooling::Diagnostic> &NoLintErrors) {
+    const SourceManager &SrcMgr, llvm::StringRef FileName, FileID File,
+    llvm::StringRef Buffer, llvm::SmallVectorImpl<tooling::Diagnostic> &NoLintErrors) {
   // Read entire file to get all NOLINTs.
-  SmallVector<NoLintToken> NoLints = getNoLints(Buffer);
+  llvm::SmallVector<NoLintToken> NoLints = getNoLints(Buffer);
 
   // Match each BEGIN with its corresponding END.
-  SmallVector<NoLintToken> UnmatchedTokens;
+  llvm::SmallVector<NoLintToken> UnmatchedTokens;
   Cache[FileName] = formNoLintBlocks(std::move(NoLints), UnmatchedTokens);
 
   // Raise error for any BEGIN/END left over.
@@ -404,7 +404,7 @@ NoLintDirectiveHandler::~NoLintDirectiveHandler() = default;
 
 bool NoLintDirectiveHandler::shouldSuppress(
     DiagnosticsEngine::Level DiagLevel, const Diagnostic &Diag,
-    StringRef DiagName, SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
+    llvm::StringRef DiagName, llvm::SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
     bool AllowIO, bool EnableNoLintBlocks) {
   return PImpl->shouldSuppress(DiagLevel, Diag, DiagName, NoLintErrors, AllowIO,
                                EnableNoLintBlocks);

@@ -19,7 +19,7 @@
 using namespace clang;
 using namespace clang::targets;
 
-ArrayRef<Builtin::Info> Le64TargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> Le64TargetInfo::getTargetBuiltins() const {
   return {};
 }
 

@@ -21,7 +21,7 @@ void getLoongArchTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                                 const llvm::opt::ArgList &Args,
                                 std::vector<llvm::StringRef> &Features);
 
-StringRef getLoongArchABI(const Driver &D, const llvm::opt::ArgList &Args,
+llvm::StringRef getLoongArchABI(const Driver &D, const llvm::opt::ArgList &Args,
                           const llvm::Triple &Triple);
 
 std::string postProcessTargetCPUString(const std::string &CPU,

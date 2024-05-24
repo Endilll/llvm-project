@@ -22,7 +22,7 @@ namespace clang::tidy::cppcoreguidelines {
 
 const internal::VariadicDynCastAllOfMatcher<Stmt, VAArgExpr> VAArgExpr;
 
-static constexpr StringRef AllowedVariadics[] = {
+static constexpr llvm::StringRef AllowedVariadics[] = {
     // clang-format off
     "__builtin_isgreater",
     "__builtin_isgreaterequal",
@@ -59,7 +59,7 @@ static constexpr StringRef AllowedVariadics[] = {
     // clang-format on
 };
 
-static constexpr StringRef VaArgWarningMessage =
+static constexpr llvm::StringRef VaArgWarningMessage =
     "do not use va_arg to define c-style vararg functions; "
     "use variadic templates instead";
 

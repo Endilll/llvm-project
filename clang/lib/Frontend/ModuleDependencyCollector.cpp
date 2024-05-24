@@ -33,7 +33,7 @@ public:
       : Collector(Collector), FileMgr(FileMgr) {}
   bool needsInputFileVisitation() override { return true; }
   bool needsSystemInputFileVisitation() override { return true; }
-  bool visitInputFile(StringRef Filename, bool IsSystem, bool IsOverridden,
+  bool visitInputFile(llvm::StringRef Filename, bool IsSystem, bool IsOverridden,
                       bool IsExplicitModule) override {
     // Run this through the FileManager in order to respect 'use-external-name'
     // in case we have a VFS overlay.
@@ -52,10 +52,10 @@ struct ModuleDependencyPPCallbacks : public PPCallbacks {
       : Collector(Collector), SM(SM) {}
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override {
     if (!File)
@@ -69,7 +69,7 @@ struct ModuleDependencyMMCallbacks : public ModuleMapCallbacks {
   ModuleDependencyMMCallbacks(ModuleDependencyCollector &Collector)
       : Collector(Collector) {}
 
-  void moduleMapAddHeader(StringRef HeaderPath) override {
+  void moduleMapAddHeader(llvm::StringRef HeaderPath) override {
     if (llvm::sys::path::is_absolute(HeaderPath))
       Collector.addFile(HeaderPath);
   }
@@ -92,8 +92,8 @@ void ModuleDependencyCollector::attachToPreprocessor(Preprocessor &PP) {
       std::make_unique<ModuleDependencyMMCallbacks>(*this));
 }
 
-static bool isCaseSensitivePath(StringRef Path) {
-  SmallString<256> TmpDest = Path, UpperDest, RealDest;
+static bool isCaseSensitivePath(llvm::StringRef Path) {
+  llvm::SmallString<256> TmpDest = Path, UpperDest, RealDest;
   // Remove component traversals, links, etc.
   if (llvm::sys::fs::real_path(Path, TmpDest))
     return true; // Current default value in vfs.yaml
@@ -114,7 +114,7 @@ void ModuleDependencyCollector::writeFileMap() {
   if (Seen.empty())
     return;
 
-  StringRef VFSDir = getDest();
+  llvm::StringRef VFSDir = getDest();
 
   // Default to use relative overlay directories in the VFS yaml file. This
   // allows crash reproducer scripts to work across machines.
@@ -129,7 +129,7 @@ void ModuleDependencyCollector::writeFileMap() {
   VFSWriter.setUseExternalNames(false);
 
   std::error_code EC;
-  SmallString<256> YAMLPath = VFSDir;
+  llvm::SmallString<256> YAMLPath = VFSDir;
   llvm::sys::path::append(YAMLPath, "vfs.yaml");
   llvm::raw_fd_ostream OS(YAMLPath, EC, llvm::sys::fs::OF_TextWithCRLF);
   if (EC) {
@@ -139,13 +139,13 @@ void ModuleDependencyCollector::writeFileMap() {
   VFSWriter.write(OS);
 }
 
-std::error_code ModuleDependencyCollector::copyToRoot(StringRef Src,
-                                                      StringRef Dst) {
+std::error_code ModuleDependencyCollector::copyToRoot(llvm::StringRef Src,
+                                                      llvm::StringRef Dst) {
   using namespace llvm::sys;
   llvm::FileCollector::PathCanonicalizer::PathStorage Paths =
       Canonicalizer.canonicalize(Src);
 
-  SmallString<256> CacheDst = getDest();
+  llvm::SmallString<256> CacheDst = getDest();
 
   if (Dst.empty()) {
     // The common case is to map the virtual path to the same path inside the
@@ -176,7 +176,7 @@ std::error_code ModuleDependencyCollector::copyToRoot(StringRef Src,
   return std::error_code();
 }
 
-void ModuleDependencyCollector::addFile(StringRef Filename, StringRef FileDst) {
+void ModuleDependencyCollector::addFile(llvm::StringRef Filename, llvm::StringRef FileDst) {
   if (insertSeen(Filename))
     if (copyToRoot(Filename, FileDst))
       HasErrors = true;

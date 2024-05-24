@@ -18,7 +18,7 @@ namespace clang::tidy::performance {
 // isn't any implicit conversion).
 class ImplicitConversionInLoopCheck : public ClangTidyCheck {
 public:
-  ImplicitConversionInLoopCheck(StringRef Name, ClangTidyContext *Context)
+  ImplicitConversionInLoopCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
       bool isLanguageVersionSupported(const LangOptions &LangOpts) const override{
         return LangOpts.CPlusPlus11;

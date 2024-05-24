@@ -106,9 +106,9 @@ private:
         std::string ID = IA->getId().str();
         if (!ID.empty()) {
           ID = llvm::utohexstr(llvm::MD5Hash(ID), /*LowerCase=*/true);
-          FatBinSymbols.insert(Twine(FatBinPrefix + "_" + ID).str());
+          FatBinSymbols.insert(llvm::Twine(FatBinPrefix + "_" + ID).str());
           GPUBinHandleSymbols.insert(
-              Twine(GPUBinHandlePrefix + "_" + ID).str());
+              llvm::Twine(GPUBinHandlePrefix + "_" + ID).str());
           continue;
         }
         if (IA->getInputArg().getNumValues() == 0)
@@ -223,7 +223,7 @@ void HIP::constructHIPFatbinCommand(Compilation &C, const JobAction &JA,
   ArgStringList BundlerArgs;
   BundlerArgs.push_back(Args.MakeArgString("-type=o"));
   BundlerArgs.push_back(
-      Args.MakeArgString("-bundle-align=" + Twine(HIPCodeObjectAlign)));
+      Args.MakeArgString("-bundle-align=" + llvm::Twine(HIPCodeObjectAlign)));
 
   // ToDo: Remove the dummy host binary entry which is required by
   // clang-offload-bundler.

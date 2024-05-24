@@ -223,7 +223,7 @@ TEST(MultilibTest, ParseInvalid) {
 Variants: []
 )"));
   EXPECT_TRUE(
-      StringRef(Diagnostic).contains("missing required key 'MultilibVersion'"))
+      llvm::StringRef(Diagnostic).contains("missing required key 'MultilibVersion'"))
       << Diagnostic;
 
   // Reject files with a different major version
@@ -233,7 +233,7 @@ MultilibVersion: 2.0
 Variants: []
 )"));
   EXPECT_TRUE(
-      StringRef(Diagnostic).contains("multilib version 2.0 is unsupported"))
+      llvm::StringRef(Diagnostic).contains("multilib version 2.0 is unsupported"))
       << Diagnostic;
   EXPECT_FALSE(parseYaml(MS, Diagnostic,
                          R"(
@@ -241,7 +241,7 @@ MultilibVersion: 0.1
 Variants: []
 )"));
   EXPECT_TRUE(
-      StringRef(Diagnostic).contains("multilib version 0.1 is unsupported"))
+      llvm::StringRef(Diagnostic).contains("multilib version 0.1 is unsupported"))
       << Diagnostic;
 
   // Reject files with a later minor version
@@ -251,7 +251,7 @@ MultilibVersion: 1.9
 Variants: []
 )"));
   EXPECT_TRUE(
-      StringRef(Diagnostic).contains("multilib version 1.9 is unsupported"))
+      llvm::StringRef(Diagnostic).contains("multilib version 1.9 is unsupported"))
       << Diagnostic;
 
   // Accept files with the same major version and the same or earlier minor
@@ -262,7 +262,7 @@ Variants: []
 )")) << Diagnostic;
 
   EXPECT_FALSE(parseYaml(MS, Diagnostic, YAML_PREAMBLE));
-  EXPECT_TRUE(StringRef(Diagnostic).contains("missing required key 'Variants'"))
+  EXPECT_TRUE(llvm::StringRef(Diagnostic).contains("missing required key 'Variants'"))
       << Diagnostic;
 
   EXPECT_FALSE(parseYaml(MS, Diagnostic, YAML_PREAMBLE R"(
@@ -270,21 +270,21 @@ Variants:
 - Dir: /abc
   Flags: []
 )"));
-  EXPECT_TRUE(StringRef(Diagnostic).contains("paths must be relative"))
+  EXPECT_TRUE(llvm::StringRef(Diagnostic).contains("paths must be relative"))
       << Diagnostic;
 
   EXPECT_FALSE(parseYaml(MS, Diagnostic, YAML_PREAMBLE R"(
 Variants:
 - Flags: []
 )"));
-  EXPECT_TRUE(StringRef(Diagnostic).contains("missing required key 'Dir'"))
+  EXPECT_TRUE(llvm::StringRef(Diagnostic).contains("missing required key 'Dir'"))
       << Diagnostic;
 
   EXPECT_FALSE(parseYaml(MS, Diagnostic, YAML_PREAMBLE R"(
 Variants:
 - Dir: .
 )"));
-  EXPECT_TRUE(StringRef(Diagnostic).contains("missing required key 'Flags'"))
+  EXPECT_TRUE(llvm::StringRef(Diagnostic).contains("missing required key 'Flags'"))
       << Diagnostic;
 
   EXPECT_FALSE(parseYaml(MS, Diagnostic, YAML_PREAMBLE R"(
@@ -292,7 +292,7 @@ Variants: []
 Mappings:
 - Match: abc
 )"));
-  EXPECT_TRUE(StringRef(Diagnostic).contains("value required for 'Flags'"))
+  EXPECT_TRUE(llvm::StringRef(Diagnostic).contains("value required for 'Flags'"))
       << Diagnostic;
 
   EXPECT_FALSE(parseYaml(MS, Diagnostic, YAML_PREAMBLE R"(
@@ -302,7 +302,7 @@ Mappings:
   Match: '('
   Flags: []
 )"));
-  EXPECT_TRUE(StringRef(Diagnostic).contains("parentheses not balanced"))
+  EXPECT_TRUE(llvm::StringRef(Diagnostic).contains("parentheses not balanced"))
       << Diagnostic;
 }
 

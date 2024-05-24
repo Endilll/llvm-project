@@ -123,7 +123,7 @@ public:
     // situation.
     if (!CCC.getBaseType().isNull() || !CCC.getPreferredType().isNull())
       return;
-    if (StringRef(Result.Keyword).starts_with(Prefix))
+    if (llvm::StringRef(Result.Keyword).starts_with(Prefix))
       Results.push_back(Result.Keyword);
   }
 

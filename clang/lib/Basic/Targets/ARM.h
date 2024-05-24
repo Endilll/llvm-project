@@ -51,8 +51,8 @@ class LLVM_LIBRARY_VISIBILITY ARMTargetInfo : public TargetInfo {
 
   std::string ABI, CPU;
 
-  StringRef CPUProfile;
-  StringRef CPUAttr;
+  llvm::StringRef CPUProfile;
+  llvm::StringRef CPUAttr;
 
   enum { FP_Default, FP_VFP, FP_Neon } FPMath;
 
@@ -143,27 +143,27 @@ class LLVM_LIBRARY_VISIBILITY ARMTargetInfo : public TargetInfo {
   bool hasMVEFloat() const;
   bool hasCDE() const;
 
-  StringRef getCPUAttr() const;
-  StringRef getCPUProfile() const;
+  llvm::StringRef getCPUAttr() const;
+  llvm::StringRef getCPUProfile() const;
 
 public:
   ARMTargetInfo(const llvm::Triple &Triple, const TargetOptions &Opts);
 
-  StringRef getABI() const override;
+  llvm::StringRef getABI() const override;
   bool setABI(const std::string &Name) override;
 
-  bool isBranchProtectionSupportedArch(StringRef Arch) const override;
-  bool validateBranchProtection(StringRef Spec, StringRef Arch,
+  bool isBranchProtectionSupportedArch(llvm::StringRef Arch) const override;
+  bool validateBranchProtection(llvm::StringRef Spec, llvm::StringRef Arch,
                                 BranchProtectionInfo &BPI,
-                                StringRef &Err) const override;
+                                llvm::StringRef &Err) const override;
 
   // FIXME: This should be based on Arch attributes, not CPU names.
   bool
   initFeatureMap(llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags,
-                 StringRef CPU,
+                 llvm::StringRef CPU,
                  const std::vector<std::string> &FeaturesVec) const override;
 
-  bool isValidFeatureName(StringRef Feature) const override {
+  bool isValidFeatureName(llvm::StringRef Feature) const override {
     // We pass soft-float-abi in as a -target-feature, but the backend figures
     // this out through other means.
     return Feature != "soft-float-abi";
@@ -172,16 +172,16 @@ public:
   bool handleTargetFeatures(std::vector<std::string> &Features,
                             DiagnosticsEngine &Diags) override;
 
-  bool hasFeature(StringRef Feature) const override;
+  bool hasFeature(llvm::StringRef Feature) const override;
 
   bool hasBFloat16Type() const override;
 
-  bool isValidCPUName(StringRef Name) const override;
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  bool isValidCPUName(llvm::StringRef Name) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
 
   bool setCPU(const std::string &Name) override;
 
-  bool setFPMath(StringRef Name) override;
+  bool setFPMath(llvm::StringRef Name) override;
 
   bool useFP16ConversionIntrinsics() const override {
     return false;
@@ -196,23 +196,23 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
   bool isCLZForZeroUndef() const override;
   BuiltinVaListKind getBuiltinVaListKind() const override;
 
-  ArrayRef<const char *> getGCCRegNames() const override;
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
   bool validateAsmConstraint(const char *&Name,
                              TargetInfo::ConstraintInfo &Info) const override;
   std::string convertConstraint(const char *&Constraint) const override;
   bool
-  validateConstraintModifier(StringRef Constraint, char Modifier, unsigned Size,
+  validateConstraintModifier(llvm::StringRef Constraint, char Modifier, unsigned Size,
                              std::string &SuggestedModifier) const override;
   std::string_view getClobbers() const override;
 
-  StringRef getConstraintRegister(StringRef Constraint,
-                                  StringRef Expression) const override {
+  llvm::StringRef getConstraintRegister(llvm::StringRef Constraint,
+                                  llvm::StringRef Expression) const override {
     return Expression;
   }
 

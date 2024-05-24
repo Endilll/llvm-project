@@ -24,7 +24,7 @@ class SignalHandlerCheck : public ClangTidyCheck {
 public:
   enum class AsyncSafeFunctionSetKind { Minimal, POSIX };
 
-  SignalHandlerCheck(StringRef Name, ClangTidyContext *Context);
+  SignalHandlerCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

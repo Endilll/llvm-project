@@ -32,7 +32,7 @@ namespace transformer {
 /// This is a central abstraction of the Transformer framework.
 template <typename T>
 using MatchConsumer =
-    std::function<Expected<T>(const ast_matchers::MatchFinder::MatchResult &)>;
+    std::function<llvm::Expected<T>(const ast_matchers::MatchFinder::MatchResult &)>;
 
 /// Creates an error that signals that a `MatchConsumer` expected a certain node
 /// to be bound by AST matchers, but it was not actually bound.

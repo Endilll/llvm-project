@@ -34,11 +34,11 @@ public:
   ///
   /// \p KeepNegativeGlobs a bool flag indicating whether to keep negative
   /// globs from \p Globs or not. When false, negative globs are simply ignored.
-  GlobList(StringRef Globs, bool KeepNegativeGlobs = true);
+  GlobList(llvm::StringRef Globs, bool KeepNegativeGlobs = true);
 
   /// Returns \c true if the pattern matches \p S. The result is the last
   /// matching glob's Positive flag.
-  virtual bool contains(StringRef S) const;
+  virtual bool contains(llvm::StringRef S) const;
 
 private:
   struct GlobListItem {
@@ -46,10 +46,10 @@ private:
     llvm::Regex Regex;
     llvm::StringRef Text;
   };
-  SmallVector<GlobListItem, 0> Items;
+  llvm::SmallVector<GlobListItem, 0> Items;
 
 public:
-  const SmallVectorImpl<GlobListItem> &getItems() const { return Items; };
+  const llvm::SmallVectorImpl<GlobListItem> &getItems() const { return Items; };
 };
 
 /// A \p GlobList that caches search results, so that search is performed only
@@ -59,7 +59,7 @@ public:
   using GlobList::GlobList;
 
   /// \see GlobList::contains
-  bool contains(StringRef S) const override;
+  bool contains(llvm::StringRef S) const override;
 
 private:
   mutable llvm::StringMap<bool> Cache;

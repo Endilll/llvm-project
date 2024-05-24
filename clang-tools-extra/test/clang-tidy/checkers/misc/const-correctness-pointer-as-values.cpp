@@ -56,10 +56,10 @@ void EmitProtocolMethodList(T &&Methods) {
   // Note: If the template is uninstantiated the analysis does not figure out,
   // that p_local0 could be const. Not sure why, but probably bails because
   // some expressions are type-dependent.
-  SmallVector<const int *> p_local0;
-  // CHECK-MESSAGES: [[@LINE-1]]:3: warning: variable 'p_local0' of type 'SmallVector<const int *>' can be declared 'const'
-  // CHECK-FIXES: SmallVector<const int *> const p_local0
-  SmallVector<const int *> np_local0;
+  llvm::SmallVector<const int *> p_local0;
+  // CHECK-MESSAGES: [[@LINE-1]]:3: warning: variable 'p_local0' of type 'llvm::SmallVector<const int *>' can be declared 'const'
+  // CHECK-FIXES: llvm::SmallVector<const int *> const p_local0
+  llvm::SmallVector<const int *> np_local0;
   for (const auto *I : Methods) {
     if (I == nullptr)
       np_local0.push_back(I);

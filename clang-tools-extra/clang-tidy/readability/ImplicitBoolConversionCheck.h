@@ -19,7 +19,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/implicit-bool-conversion.html
 class ImplicitBoolConversionCheck : public ClangTidyCheck {
 public:
-  ImplicitBoolConversionCheck(StringRef Name, ClangTidyContext *Context);
+  ImplicitBoolConversionCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.Bool;
   }

@@ -52,27 +52,27 @@ namespace internal {
 static bool notUnaryOperator(const DynTypedNode &DynNode,
                              ASTMatchFinder *Finder,
                              BoundNodesTreeBuilder *Builder,
-                             ArrayRef<DynTypedMatcher> InnerMatchers);
+                             llvm::ArrayRef<DynTypedMatcher> InnerMatchers);
 
 static bool allOfVariadicOperator(const DynTypedNode &DynNode,
                                   ASTMatchFinder *Finder,
                                   BoundNodesTreeBuilder *Builder,
-                                  ArrayRef<DynTypedMatcher> InnerMatchers);
+                                  llvm::ArrayRef<DynTypedMatcher> InnerMatchers);
 
 static bool eachOfVariadicOperator(const DynTypedNode &DynNode,
                                    ASTMatchFinder *Finder,
                                    BoundNodesTreeBuilder *Builder,
-                                   ArrayRef<DynTypedMatcher> InnerMatchers);
+                                   llvm::ArrayRef<DynTypedMatcher> InnerMatchers);
 
 static bool anyOfVariadicOperator(const DynTypedNode &DynNode,
                                   ASTMatchFinder *Finder,
                                   BoundNodesTreeBuilder *Builder,
-                                  ArrayRef<DynTypedMatcher> InnerMatchers);
+                                  llvm::ArrayRef<DynTypedMatcher> InnerMatchers);
 
 static bool optionallyVariadicOperator(const DynTypedNode &DynNode,
                                        ASTMatchFinder *Finder,
                                        BoundNodesTreeBuilder *Builder,
-                                       ArrayRef<DynTypedMatcher> InnerMatchers);
+                                       llvm::ArrayRef<DynTypedMatcher> InnerMatchers);
 
 bool matchesAnyBase(const CXXRecordDecl &Node,
                     const Matcher<CXXBaseSpecifier> &BaseSpecMatcher,
@@ -110,7 +110,7 @@ namespace {
 
 using VariadicOperatorFunction = bool (*)(
     const DynTypedNode &DynNode, ASTMatchFinder *Finder,
-    BoundNodesTreeBuilder *Builder, ArrayRef<DynTypedMatcher> InnerMatchers);
+    BoundNodesTreeBuilder *Builder, llvm::ArrayRef<DynTypedMatcher> InnerMatchers);
 
 template <VariadicOperatorFunction Func>
 class VariadicMatcher : public DynMatcherInterface {
@@ -129,8 +129,8 @@ private:
 
 class IdDynMatcher : public DynMatcherInterface {
 public:
-  IdDynMatcher(StringRef ID,
-               IntrusiveRefCntPtr<DynMatcherInterface> InnerMatcher)
+  IdDynMatcher(llvm::StringRef ID,
+               llvm::IntrusiveRefCntPtr<DynMatcherInterface> InnerMatcher)
       : ID(ID), InnerMatcher(std::move(InnerMatcher)) {}
 
   bool dynMatches(const DynTypedNode &DynNode, ASTMatchFinder *Finder,
@@ -146,7 +146,7 @@ public:
 
 private:
   const std::string ID;
-  const IntrusiveRefCntPtr<DynMatcherInterface> InnerMatcher;
+  const llvm::IntrusiveRefCntPtr<DynMatcherInterface> InnerMatcher;
 };
 
 /// A matcher that always returns true.
@@ -168,7 +168,7 @@ class DynTraversalMatcherImpl : public DynMatcherInterface {
 public:
   explicit DynTraversalMatcherImpl(
       clang::TraversalKind TK,
-      IntrusiveRefCntPtr<DynMatcherInterface> InnerMatcher)
+      llvm::IntrusiveRefCntPtr<DynMatcherInterface> InnerMatcher)
       : TK(TK), InnerMatcher(std::move(InnerMatcher)) {}
 
   bool dynMatches(const DynTypedNode &DynNode, ASTMatchFinder *Finder,
@@ -182,7 +182,7 @@ public:
 
 private:
   clang::TraversalKind TK;
-  IntrusiveRefCntPtr<DynMatcherInterface> InnerMatcher;
+  llvm::IntrusiveRefCntPtr<DynMatcherInterface> InnerMatcher;
 };
 
 } // namespace
@@ -339,7 +339,7 @@ bool DynTypedMatcher::matchesNoKindCheck(const DynTypedNode &DynNode,
   return false;
 }
 
-std::optional<DynTypedMatcher> DynTypedMatcher::tryBind(StringRef ID) const {
+std::optional<DynTypedMatcher> DynTypedMatcher::tryBind(llvm::StringRef ID) const {
   if (!AllowBind)
     return std::nullopt;
   auto Result = *this;
@@ -366,7 +366,7 @@ void BoundNodesTreeBuilder::addMatch(const BoundNodesTreeBuilder &Other) {
 static bool notUnaryOperator(const DynTypedNode &DynNode,
                              ASTMatchFinder *Finder,
                              BoundNodesTreeBuilder *Builder,
-                             ArrayRef<DynTypedMatcher> InnerMatchers) {
+                             llvm::ArrayRef<DynTypedMatcher> InnerMatchers) {
   if (InnerMatchers.size() != 1)
     return false;
 
@@ -387,7 +387,7 @@ static bool notUnaryOperator(const DynTypedNode &DynNode,
 static bool allOfVariadicOperator(const DynTypedNode &DynNode,
                                   ASTMatchFinder *Finder,
                                   BoundNodesTreeBuilder *Builder,
-                                  ArrayRef<DynTypedMatcher> InnerMatchers) {
+                                  llvm::ArrayRef<DynTypedMatcher> InnerMatchers) {
   // allOf leads to one matcher for each alternative in the first
   // matcher combined with each alternative in the second matcher.
   // Thus, we can reuse the same Builder.
@@ -399,7 +399,7 @@ static bool allOfVariadicOperator(const DynTypedNode &DynNode,
 static bool eachOfVariadicOperator(const DynTypedNode &DynNode,
                                    ASTMatchFinder *Finder,
                                    BoundNodesTreeBuilder *Builder,
-                                   ArrayRef<DynTypedMatcher> InnerMatchers) {
+                                   llvm::ArrayRef<DynTypedMatcher> InnerMatchers) {
   BoundNodesTreeBuilder Result;
   bool Matched = false;
   for (const DynTypedMatcher &InnerMatcher : InnerMatchers) {
@@ -416,7 +416,7 @@ static bool eachOfVariadicOperator(const DynTypedNode &DynNode,
 static bool anyOfVariadicOperator(const DynTypedNode &DynNode,
                                   ASTMatchFinder *Finder,
                                   BoundNodesTreeBuilder *Builder,
-                                  ArrayRef<DynTypedMatcher> InnerMatchers) {
+                                  llvm::ArrayRef<DynTypedMatcher> InnerMatchers) {
   for (const DynTypedMatcher &InnerMatcher : InnerMatchers) {
     BoundNodesTreeBuilder Result = *Builder;
     if (InnerMatcher.matches(DynNode, Finder, &Result)) {
@@ -430,7 +430,7 @@ static bool anyOfVariadicOperator(const DynTypedNode &DynNode,
 static bool
 optionallyVariadicOperator(const DynTypedNode &DynNode, ASTMatchFinder *Finder,
                            BoundNodesTreeBuilder *Builder,
-                           ArrayRef<DynTypedMatcher> InnerMatchers) {
+                           llvm::ArrayRef<DynTypedMatcher> InnerMatchers) {
   if (InnerMatchers.size() != 1)
     return false;
 
@@ -441,7 +441,7 @@ optionallyVariadicOperator(const DynTypedNode &DynNode, ASTMatchFinder *Finder,
 }
 
 inline static
-std::vector<std::string> vectorFromRefs(ArrayRef<const StringRef *> NameRefs) {
+std::vector<std::string> vectorFromRefs(llvm::ArrayRef<const llvm::StringRef *> NameRefs) {
   std::vector<std::string> Names;
   Names.reserve(NameRefs.size());
   for (auto *Name : NameRefs)
@@ -449,37 +449,37 @@ std::vector<std::string> vectorFromRefs(ArrayRef<const StringRef *> NameRefs) {
   return Names;
 }
 
-Matcher<NamedDecl> hasAnyNameFunc(ArrayRef<const StringRef *> NameRefs) {
+Matcher<NamedDecl> hasAnyNameFunc(llvm::ArrayRef<const llvm::StringRef *> NameRefs) {
   return internal::Matcher<NamedDecl>(
       new internal::HasNameMatcher(vectorFromRefs(NameRefs)));
 }
 
 Matcher<ObjCMessageExpr> hasAnySelectorFunc(
-    ArrayRef<const StringRef *> NameRefs) {
+    llvm::ArrayRef<const llvm::StringRef *> NameRefs) {
   return hasAnySelectorMatcher(vectorFromRefs(NameRefs));
 }
 
-HasOpNameMatcher hasAnyOperatorNameFunc(ArrayRef<const StringRef *> NameRefs) {
+HasOpNameMatcher hasAnyOperatorNameFunc(llvm::ArrayRef<const llvm::StringRef *> NameRefs) {
   return HasOpNameMatcher(vectorFromRefs(NameRefs));
 }
 
 HasOverloadOpNameMatcher
-hasAnyOverloadedOperatorNameFunc(ArrayRef<const StringRef *> NameRefs) {
+hasAnyOverloadedOperatorNameFunc(llvm::ArrayRef<const llvm::StringRef *> NameRefs) {
   return HasOverloadOpNameMatcher(vectorFromRefs(NameRefs));
 }
 
 HasNameMatcher::HasNameMatcher(std::vector<std::string> N)
     : UseUnqualifiedMatch(
-          llvm::all_of(N, [](StringRef Name) { return !Name.contains("::"); })),
+          llvm::all_of(N, [](llvm::StringRef Name) { return !Name.contains("::"); })),
       Names(std::move(N)) {
 #ifndef NDEBUG
-  for (StringRef Name : Names)
+  for (llvm::StringRef Name : Names)
     assert(!Name.empty());
 #endif
 }
 
-static bool consumeNameSuffix(StringRef &FullName, StringRef Suffix) {
-  StringRef Name = FullName;
+static bool consumeNameSuffix(llvm::StringRef &FullName, llvm::StringRef Suffix) {
+  llvm::StringRef Name = FullName;
   if (!Name.ends_with(Suffix))
     return false;
   Name = Name.drop_back(Suffix.size());
@@ -492,7 +492,7 @@ static bool consumeNameSuffix(StringRef &FullName, StringRef Suffix) {
   return true;
 }
 
-static StringRef getNodeName(const NamedDecl &Node,
+static llvm::StringRef getNodeName(const NamedDecl &Node,
                              llvm::SmallString<128> &Scratch) {
   // Simple name.
   if (Node.getIdentifier())
@@ -509,7 +509,7 @@ static StringRef getNodeName(const NamedDecl &Node,
   return "(anonymous)";
 }
 
-static StringRef getNodeName(const RecordDecl &Node,
+static llvm::StringRef getNodeName(const RecordDecl &Node,
                              llvm::SmallString<128> &Scratch) {
   if (Node.getIdentifier()) {
     return Node.getName();
@@ -518,7 +518,7 @@ static StringRef getNodeName(const RecordDecl &Node,
   return ("(anonymous " + Node.getKindName() + ")").toStringRef(Scratch);
 }
 
-static StringRef getNodeName(const NamespaceDecl &Node,
+static llvm::StringRef getNodeName(const NamespaceDecl &Node,
                              llvm::SmallString<128> &Scratch) {
   return Node.isAnonymousNamespace() ? "(anonymous namespace)" : Node.getName();
 }
@@ -527,16 +527,16 @@ namespace {
 
 class PatternSet {
 public:
-  PatternSet(ArrayRef<std::string> Names) {
+  PatternSet(llvm::ArrayRef<std::string> Names) {
     Patterns.reserve(Names.size());
-    for (StringRef Name : Names)
+    for (llvm::StringRef Name : Names)
       Patterns.push_back({Name, Name.starts_with("::")});
   }
 
   /// Consumes the name suffix from each pattern in the set and removes the ones
   /// that didn't match.
   /// Return true if there are still any patterns left.
-  bool consumeNameSuffix(StringRef NodeName, bool CanSkip) {
+  bool consumeNameSuffix(llvm::StringRef NodeName, bool CanSkip) {
     for (size_t I = 0; I < Patterns.size();) {
       if (::clang::ast_matchers::internal::consumeNameSuffix(Patterns[I].P,
                                                              NodeName) ||
@@ -561,7 +561,7 @@ public:
 
 private:
   struct Pattern {
-    StringRef P;
+    llvm::StringRef P;
     bool IsFullyQualified;
   };
 
@@ -573,8 +573,8 @@ private:
 bool HasNameMatcher::matchesNodeUnqualified(const NamedDecl &Node) const {
   assert(UseUnqualifiedMatch);
   llvm::SmallString<128> Scratch;
-  StringRef NodeName = getNodeName(Node, Scratch);
-  return llvm::any_of(Names, [&](StringRef Name) {
+  llvm::StringRef NodeName = getNodeName(Node, Scratch);
+  return llvm::any_of(Names, [&](llvm::StringRef Name) {
     return consumeNameSuffix(Name, NodeName) && Name.empty();
   });
 }
@@ -588,7 +588,7 @@ bool HasNameMatcher::matchesNodeFullFast(const NamedDecl &Node) const {
   //  - We can exit early on the first failure.
   //  - We can skip inline/anonymous namespaces without another pass.
   //  - We print one name at a time, reducing the chance of overflowing the
-  //    inlined space of the SmallString.
+  //    inlined space of the llvm::SmallString.
 
   // First, match the name.
   if (!Patterns.consumeNameSuffix(getNodeName(Node, Scratch),
@@ -641,7 +641,7 @@ bool HasNameMatcher::matchesNodeFullFast(const NamedDecl &Node) const {
 bool HasNameMatcher::matchesNodeFullSlow(const NamedDecl &Node) const {
   const bool SkipUnwrittenCases[] = {false, true};
   for (bool SkipUnwritten : SkipUnwrittenCases) {
-    llvm::SmallString<128> NodeName = StringRef("::");
+    llvm::SmallString<128> NodeName = llvm::StringRef("::");
     llvm::raw_svector_ostream OS(NodeName);
 
     PrintingPolicy Policy = Node.getASTContext().getPrintingPolicy();
@@ -649,9 +649,9 @@ bool HasNameMatcher::matchesNodeFullSlow(const NamedDecl &Node) const {
     Policy.SuppressInlineNamespace = SkipUnwritten;
     Node.printQualifiedName(OS, Policy);
 
-    const StringRef FullName = OS.str();
+    const llvm::StringRef FullName = OS.str();
 
-    for (const StringRef Pattern : Names) {
+    for (const llvm::StringRef Pattern : Names) {
       if (Pattern.starts_with("::")) {
         if (FullName == Pattern)
           return true;
@@ -676,18 +676,18 @@ bool HasNameMatcher::matchesNode(const NamedDecl &Node) const {
 
 // Checks whether \p Loc points to a token with source text of \p TokenText.
 static bool isTokenAtLoc(const SourceManager &SM, const LangOptions &LangOpts,
-                         StringRef Text, SourceLocation Loc) {
+                         llvm::StringRef Text, SourceLocation Loc) {
   llvm::SmallString<16> Buffer;
   bool Invalid = false;
   // Since `Loc` may point into an expansion buffer, which has no corresponding
   // source, we need to look at the spelling location to read the actual source.
-  StringRef TokenText = Lexer::getSpelling(SM.getSpellingLoc(Loc), Buffer, SM,
+  llvm::StringRef TokenText = Lexer::getSpelling(SM.getSpellingLoc(Loc), Buffer, SM,
                                            LangOpts, &Invalid);
   return !Invalid && Text == TokenText;
 }
 
 std::optional<SourceLocation>
-getExpansionLocOfMacro(StringRef MacroName, SourceLocation Loc,
+getExpansionLocOfMacro(llvm::StringRef MacroName, SourceLocation Loc,
                        const ASTContext &Context) {
   auto &SM = Context.getSourceManager();
   const LangOptions &LangOpts = Context.getLangOpts();
@@ -707,9 +707,9 @@ getExpansionLocOfMacro(StringRef MacroName, SourceLocation Loc,
   return std::nullopt;
 }
 
-std::shared_ptr<llvm::Regex> createAndVerifyRegex(StringRef Regex,
+std::shared_ptr<llvm::Regex> createAndVerifyRegex(llvm::StringRef Regex,
                                                   llvm::Regex::RegexFlags Flags,
-                                                  StringRef MatcherID) {
+                                                  llvm::StringRef MatcherID) {
   assert(!Regex.empty() && "Empty regex string");
   auto SharedRegex = std::make_shared<llvm::Regex>(Regex, Flags);
   std::string Error;
@@ -1004,17 +1004,17 @@ const internal::VariadicOperatorMatcherFunc<
     allOf = {internal::DynTypedMatcher::VO_AllOf};
 const internal::VariadicOperatorMatcherFunc<1, 1> optionally = {
     internal::DynTypedMatcher::VO_Optionally};
-const internal::VariadicFunction<internal::Matcher<NamedDecl>, StringRef,
+const internal::VariadicFunction<internal::Matcher<NamedDecl>, llvm::StringRef,
                                  internal::hasAnyNameFunc>
     hasAnyName = {};
 
-const internal::VariadicFunction<internal::HasOpNameMatcher, StringRef,
+const internal::VariadicFunction<internal::HasOpNameMatcher, llvm::StringRef,
                                  internal::hasAnyOperatorNameFunc>
     hasAnyOperatorName = {};
-const internal::VariadicFunction<internal::HasOverloadOpNameMatcher, StringRef,
+const internal::VariadicFunction<internal::HasOverloadOpNameMatcher, llvm::StringRef,
                                  internal::hasAnyOverloadedOperatorNameFunc>
     hasAnyOverloadedOperatorName = {};
-const internal::VariadicFunction<internal::Matcher<ObjCMessageExpr>, StringRef,
+const internal::VariadicFunction<internal::Matcher<ObjCMessageExpr>, llvm::StringRef,
                                  internal::hasAnySelectorFunc>
     hasAnySelector = {};
 const internal::ArgumentAdaptingMatcherFunc<internal::HasMatcher> has = {};

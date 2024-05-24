@@ -19,7 +19,7 @@ namespace clang::tidy::fuchsia {
 /// http://clang.llvm.org/extra/clang-tidy/checks/fuchsia/multiple-inheritance.html
 class MultipleInheritanceCheck : public ClangTidyCheck {
 public:
-  MultipleInheritanceCheck(StringRef Name, ClangTidyContext *Context)
+  MultipleInheritanceCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

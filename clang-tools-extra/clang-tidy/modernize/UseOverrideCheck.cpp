@@ -16,7 +16,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::modernize {
 
-UseOverrideCheck::UseOverrideCheck(StringRef Name, ClangTidyContext *Context)
+UseOverrideCheck::UseOverrideCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreDestructors(Options.get("IgnoreDestructors", false)),
       IgnoreTemplateInstantiations(
@@ -52,17 +52,17 @@ void UseOverrideCheck::registerMatchers(MatchFinder *Finder) {
 
 // Re-lex the tokens to get precise locations to insert 'override' and remove
 // 'virtual'.
-static SmallVector<Token, 16>
+static llvm::SmallVector<Token, 16>
 parseTokens(CharSourceRange Range, const MatchFinder::MatchResult &Result) {
   const SourceManager &Sources = *Result.SourceManager;
   std::pair<FileID, unsigned> LocInfo =
       Sources.getDecomposedLoc(Range.getBegin());
-  StringRef File = Sources.getBufferData(LocInfo.first);
+  llvm::StringRef File = Sources.getBufferData(LocInfo.first);
   const char *TokenBegin = File.data() + LocInfo.second;
   Lexer RawLexer(Sources.getLocForStartOfFile(LocInfo.first),
                  Result.Context->getLangOpts(), File.begin(), TokenBegin,
                  File.end());
-  SmallVector<Token, 16> Tokens;
+  llvm::SmallVector<Token, 16> Tokens;
   Token Tok;
   int NestedParens = 0;
   while (!RawLexer.LexFromRawLexer(Tok)) {
@@ -75,7 +75,7 @@ parseTokens(CharSourceRange Range, const MatchFinder::MatchResult &Result) {
     else if (Tok.is(tok::r_paren))
       --NestedParens;
     if (Tok.is(tok::raw_identifier)) {
-      IdentifierInfo &Info = Result.Context->Idents.get(StringRef(
+      IdentifierInfo &Info = Result.Context->Idents.get(llvm::StringRef(
           Sources.getCharacterData(Tok.getLocation()), Tok.getLength()));
       Tok.setIdentifierInfo(&Info);
       Tok.setKind(Info.getTokenID());
@@ -85,7 +85,7 @@ parseTokens(CharSourceRange Range, const MatchFinder::MatchResult &Result) {
   return Tokens;
 }
 
-static StringRef getText(const Token &Tok, const SourceManager &Sources) {
+static llvm::StringRef getText(const Token &Tok, const SourceManager &Sources) {
   return {Sources.getCharacterData(Tok.getLocation()), Tok.getLength()};
 }
 
@@ -120,12 +120,12 @@ void UseOverrideCheck::check(const MatchFinder::MatchResult &Result) {
   } else if (KeywordCount == 0) {
     Message = "annotate this function with '%0' or (rarely) '%1'";
   } else {
-    StringRef Redundant =
+    llvm::StringRef Redundant =
         HasVirtual ? (HasOverride && HasFinal && !AllowOverrideAndFinal
                           ? "'virtual' and '%0' are"
                           : "'virtual' is")
                    : "'%0' is";
-    StringRef Correct = HasFinal ? "'%1'" : "'%0'";
+    llvm::StringRef Correct = HasFinal ? "'%1'" : "'%0'";
 
     Message = (llvm::Twine(Redundant) +
                " redundant since the function is already declared " + Correct)
@@ -145,7 +145,7 @@ void UseOverrideCheck::check(const MatchFinder::MatchResult &Result) {
   // FIXME: Instead of re-lexing and looking for specific macros such as
   // 'ABSTRACT', properly store the location of 'virtual' and '= 0' in each
   // FunctionDecl.
-  SmallVector<Token, 16> Tokens = parseTokens(FileRange, Result);
+  llvm::SmallVector<Token, 16> Tokens = parseTokens(FileRange, Result);
 
   // Add 'override' on inline declarations that don't already have it.
   if (!HasFinal && !HasOverride) {

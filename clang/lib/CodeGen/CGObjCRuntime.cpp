@@ -157,7 +157,7 @@ void CGObjCRuntime::EmitTryCatchStmt(CodeGenFunction &CGF,
       FinallyInfo.enter(CGF, Finally->getFinallyBody(),
                         beginCatchFn, endCatchFn, exceptionRethrowFn);
 
-  SmallVector<CatchHandler, 8> Handlers;
+  llvm::SmallVector<CatchHandler, 8> Handlers;
 
 
   // Enter the catch, if there is one.
@@ -228,7 +228,7 @@ void CGObjCRuntime::EmitTryCatchStmt(CodeGenFunction &CGF,
     CGF.EmitBlock(Handler.Block);
 
     CodeGenFunction::LexicalScope Cleanups(CGF, Handler.Body->getSourceRange());
-    SaveAndRestore RevertAfterScope(CGF.CurrentFuncletPad);
+    llvm::SaveAndRestore RevertAfterScope(CGF.CurrentFuncletPad);
     if (useFunclets) {
       llvm::Instruction *CPICandidate = Handler.Block->getFirstNonPHI();
       if (auto *CPI = dyn_cast_or_null<llvm::CatchPadInst>(CPICandidate)) {

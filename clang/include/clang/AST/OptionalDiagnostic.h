@@ -39,9 +39,9 @@ public:
 
   OptionalDiagnostic &operator<<(const llvm::APSInt &I) {
     if (Diag) {
-      SmallVector<char, 32> Buffer;
+      llvm::SmallVector<char, 32> Buffer;
       I.toString(Buffer);
-      *Diag << StringRef(Buffer.data(), Buffer.size());
+      *Diag << llvm::StringRef(Buffer.data(), Buffer.size());
     }
     return *this;
   }
@@ -56,18 +56,18 @@ public:
       // tricky to implement. Could use std::to_chars.
       unsigned precision = llvm::APFloat::semanticsPrecision(F.getSemantics());
       precision = (precision * 59 + 195) / 196;
-      SmallVector<char, 32> Buffer;
+      llvm::SmallVector<char, 32> Buffer;
       F.toString(Buffer, precision);
-      *Diag << StringRef(Buffer.data(), Buffer.size());
+      *Diag << llvm::StringRef(Buffer.data(), Buffer.size());
     }
     return *this;
   }
 
   OptionalDiagnostic &operator<<(const llvm::APFixedPoint &FX) {
     if (Diag) {
-      SmallVector<char, 32> Buffer;
+      llvm::SmallVector<char, 32> Buffer;
       FX.toString(Buffer);
-      *Diag << StringRef(Buffer.data(), Buffer.size());
+      *Diag << llvm::StringRef(Buffer.data(), Buffer.size());
     }
     return *this;
   }

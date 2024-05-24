@@ -30,7 +30,7 @@ namespace test {
 template <typename Check, typename... Checks> struct CheckFactory {
   static void
   createChecks(ClangTidyContext *Context,
-               SmallVectorImpl<std::unique_ptr<ClangTidyCheck>> &Result) {
+               llvm::SmallVectorImpl<std::unique_ptr<ClangTidyCheck>> &Result) {
     CheckFactory<Check>::createChecks(Context, Result);
     CheckFactory<Checks...>::createChecks(Context, Result);
   }
@@ -39,7 +39,7 @@ template <typename Check, typename... Checks> struct CheckFactory {
 template <typename Check> struct CheckFactory<Check> {
   static void
   createChecks(ClangTidyContext *Context,
-               SmallVectorImpl<std::unique_ptr<ClangTidyCheck>> &Result) {
+               llvm::SmallVectorImpl<std::unique_ptr<ClangTidyCheck>> &Result) {
     Result.emplace_back(std::make_unique<Check>(
         "test-check-" + std::to_string(Result.size()), Context));
   }
@@ -48,14 +48,14 @@ template <typename Check> struct CheckFactory<Check> {
 template <typename... CheckTypes>
 class TestClangTidyAction : public ASTFrontendAction {
 public:
-  TestClangTidyAction(SmallVectorImpl<std::unique_ptr<ClangTidyCheck>> &Checks,
+  TestClangTidyAction(llvm::SmallVectorImpl<std::unique_ptr<ClangTidyCheck>> &Checks,
                       ast_matchers::MatchFinder &Finder,
                       ClangTidyContext &Context)
       : Checks(Checks), Finder(Finder), Context(Context) {}
 
 private:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &Compiler,
-                                                 StringRef File) override {
+                                                 llvm::StringRef File) override {
     Context.setSourceManager(&Compiler.getSourceManager());
     Context.setCurrentFile(File);
     Context.setASTContext(&Compiler.getASTContext());
@@ -77,19 +77,19 @@ private:
     return Finder.newASTConsumer();
   }
 
-  SmallVectorImpl<std::unique_ptr<ClangTidyCheck>> &Checks;
+  llvm::SmallVectorImpl<std::unique_ptr<ClangTidyCheck>> &Checks;
   ast_matchers::MatchFinder &Finder;
   ClangTidyContext &Context;
 };
 
 template <typename... CheckTypes>
 std::string
-runCheckOnCode(StringRef Code, std::vector<ClangTidyError> *Errors = nullptr,
-               const Twine &Filename = "input.cc",
-               ArrayRef<std::string> ExtraArgs = std::nullopt,
+runCheckOnCode(llvm::StringRef Code, std::vector<ClangTidyError> *Errors = nullptr,
+               const llvm::Twine &Filename = "input.cc",
+               llvm::ArrayRef<std::string> ExtraArgs = std::nullopt,
                const ClangTidyOptions &ExtraOptions = ClangTidyOptions(),
-               std::map<StringRef, StringRef> PathsToContent =
-                   std::map<StringRef, StringRef>()) {
+               std::map<llvm::StringRef, llvm::StringRef> PathsToContent =
+                   std::map<llvm::StringRef, llvm::StringRef>()) {
   static_assert(sizeof...(CheckTypes) > 0, "No checks specified");
   ClangTidyOptions Options = ExtraOptions;
   Options.Checks = "*";
@@ -122,7 +122,7 @@ runCheckOnCode(StringRef Code, std::vector<ClangTidyError> *Errors = nullptr,
   llvm::IntrusiveRefCntPtr<FileManager> Files(
       new FileManager(FileSystemOptions(), InMemoryFileSystem));
 
-  SmallVector<std::unique_ptr<ClangTidyCheck>, sizeof...(CheckTypes)> Checks;
+  llvm::SmallVector<std::unique_ptr<ClangTidyCheck>, sizeof...(CheckTypes)> Checks;
   tooling::ToolInvocation Invocation(
       Args,
       std::make_unique<TestClangTidyAction<CheckTypes...>>(Checks, Finder,
@@ -132,7 +132,7 @@ runCheckOnCode(StringRef Code, std::vector<ClangTidyError> *Errors = nullptr,
                               llvm::MemoryBuffer::getMemBuffer(Code));
   for (const auto &FileContent : PathsToContent) {
     InMemoryFileSystem->addFile(
-        Twine("include/") + FileContent.first, 0,
+        llvm::Twine("include/") + FileContent.first, 0,
         llvm::MemoryBuffer::getMemBuffer(FileContent.second));
   }
   Invocation.setDiagnosticConsumer(&DiagConsumer);

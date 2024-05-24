@@ -24,8 +24,8 @@ namespace clang {
 namespace clangd {
 
 // Calls addDocument and then blockUntilIdleForTest.
-void runAddDocument(ClangdServer &Server, PathRef File, StringRef Contents,
-                    StringRef Version = "null",
+void runAddDocument(ClangdServer &Server, PathRef File, llvm::StringRef Contents,
+                    llvm::StringRef Version = "null",
                     WantDiagnostics WantDiags = WantDiagnostics::Auto,
                     bool ForceRebuild = false);
 
@@ -44,7 +44,7 @@ llvm::Expected<std::vector<DocumentHighlight>>
 runFindDocumentHighlights(ClangdServer &Server, PathRef File, Position Pos);
 
 llvm::Expected<RenameResult> runRename(ClangdServer &Server, PathRef File,
-                                       Position Pos, StringRef NewName,
+                                       Position Pos, llvm::StringRef NewName,
                                        const clangd::RenameOptions &RenameOpts);
 
 llvm::Expected<RenameResult>
@@ -55,7 +55,7 @@ runPrepareRename(ClangdServer &Server, PathRef File, Position Pos,
 llvm::Expected<tooling::Replacements>
 runFormatFile(ClangdServer &Server, PathRef File, std::optional<Range>);
 
-SymbolSlab runFuzzyFind(const SymbolIndex &Index, StringRef Query);
+SymbolSlab runFuzzyFind(const SymbolIndex &Index, llvm::StringRef Query);
 SymbolSlab runFuzzyFind(const SymbolIndex &Index, const FuzzyFindRequest &Req);
 RefSlab getRefs(const SymbolIndex &Index, SymbolID ID);
 

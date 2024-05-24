@@ -35,7 +35,7 @@ public:
   const char *id() const override;
 
   bool prepare(const Selection &Inputs) override;
-  Expected<Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Effect> apply(const Selection &Inputs) override;
   std::string title() const override {
     return "Remove using namespace, re-qualify names instead";
   }
@@ -126,7 +126,7 @@ bool RemoveUsingNamespace::prepare(const Selection &Inputs) {
   return isTopLevelDecl(CA);
 }
 
-Expected<Tweak::Effect> RemoveUsingNamespace::apply(const Selection &Inputs) {
+llvm::Expected<Tweak::Effect> RemoveUsingNamespace::apply(const Selection &Inputs) {
   auto &Ctx = Inputs.AST->getASTContext();
   auto &SM = Ctx.getSourceManager();
   // First, collect *all* using namespace directives that redeclare the same

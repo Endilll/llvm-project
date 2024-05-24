@@ -77,20 +77,20 @@ static cl::opt<std::string>
 }
 } // anonymous namespace
 
-static void printSymbolInfo(SymbolInfo SymInfo, raw_ostream &OS);
+static void printSymbolInfo(SymbolInfo SymInfo, llvm::raw_ostream &OS);
 static void printSymbolNameAndUSR(const Decl *D, ASTContext &Ctx,
-                                  raw_ostream &OS);
-static void printSymbolNameAndUSR(const clang::Module *Mod, raw_ostream &OS);
+                                  llvm::raw_ostream &OS);
+static void printSymbolNameAndUSR(const clang::Module *Mod, llvm::raw_ostream &OS);
 
 namespace {
 
 class PrintIndexDataConsumer : public IndexDataConsumer {
-  raw_ostream &OS;
+  llvm::raw_ostream &OS;
   std::unique_ptr<ASTNameGenerator> ASTNameGen;
   std::shared_ptr<Preprocessor> PP;
 
 public:
-  PrintIndexDataConsumer(raw_ostream &OS) : OS(OS) {
+  PrintIndexDataConsumer(llvm::raw_ostream &OS) : OS(OS) {
   }
 
   void initialize(ASTContext &Ctx) override {
@@ -102,7 +102,7 @@ public:
   }
 
   bool handleDeclOccurrence(const Decl *D, SymbolRoleSet Roles,
-                            ArrayRef<SymbolRelation> Relations,
+                            llvm::ArrayRef<SymbolRelation> Relations,
                             SourceLocation Loc, ASTNodeInfo ASTNode) override {
     ASTContext &Ctx = D->getASTContext();
     SourceManager &SM = Ctx.getSourceManager();
@@ -180,7 +180,7 @@ public:
     OS << Name->getName();
     OS << " | ";
 
-    SmallString<256> USRBuf;
+    llvm::SmallString<256> USRBuf;
     if (generateUSRForMacro(Name->getName(), MI->getDefinitionLoc(), SM,
                             USRBuf)) {
       OS << "<no-usr>";
@@ -203,7 +203,7 @@ public:
 
 static void dumpModuleFileInputs(serialization::ModuleFile &Mod,
                                  ASTReader &Reader,
-                                 raw_ostream &OS) {
+                                 llvm::raw_ostream &OS) {
   OS << "---- Module Inputs ----\n";
   Reader.visitInputFiles(Mod, /*IncludeSystem=*/true, /*Complain=*/false,
                         [&](const serialization::InputFile &IF, bool isSystem) {
@@ -213,13 +213,13 @@ static void dumpModuleFileInputs(serialization::ModuleFile &Mod,
 }
 
 static bool printSourceSymbols(const char *Executable,
-                               ArrayRef<const char *> Args,
+                               llvm::ArrayRef<const char *> Args,
                                bool dumpModuleImports, bool indexLocals,
                                bool ignoreMacros) {
-  SmallVector<const char *, 4> ArgsWithProgName;
+  llvm::SmallVector<const char *, 4> ArgsWithProgName;
   ArgsWithProgName.push_back(Executable);
   ArgsWithProgName.append(Args.begin(), Args.end());
-  IntrusiveRefCntPtr<DiagnosticsEngine>
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine>
     Diags(CompilerInstance::createDiagnostics(new DiagnosticOptions));
   CreateInvocationOptions CIOpts;
   CIOpts.Diags = Diags;
@@ -228,7 +228,7 @@ static bool printSourceSymbols(const char *Executable,
   if (!CInvok)
     return true;
 
-  raw_ostream &OS = outs();
+  llvm::raw_ostream &OS = outs();
   auto DataConsumer = std::make_shared<PrintIndexDataConsumer>(OS);
   IndexingOptions IndexOpts;
   IndexOpts.IndexFunctionLocals = indexLocals;
@@ -258,8 +258,8 @@ static bool printSourceSymbols(const char *Executable,
   return false;
 }
 
-static bool printSourceSymbolsFromModule(StringRef modulePath,
-                                         StringRef format) {
+static bool printSourceSymbolsFromModule(llvm::StringRef modulePath,
+                                         llvm::StringRef format) {
   FileSystemOptions FileSystemOpts;
   auto pchContOps = std::make_shared<PCHContainerOperations>();
   // Register the support for object-file-wrapped Clang modules.
@@ -272,7 +272,7 @@ static bool printSourceSymbolsFromModule(StringRef modulePath,
 
   auto HSOpts = std::make_shared<HeaderSearchOptions>();
 
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
       CompilerInstance::createDiagnostics(new DiagnosticOptions());
   std::unique_ptr<ASTUnit> AU = ASTUnit::LoadFromASTFile(
       std::string(modulePath), *pchRdr, ASTUnit::LoadASTOnly, Diags,
@@ -296,7 +296,7 @@ static bool printSourceSymbolsFromModule(StringRef modulePath,
 // Helper Utils
 //===----------------------------------------------------------------------===//
 
-static void printSymbolInfo(SymbolInfo SymInfo, raw_ostream &OS) {
+static void printSymbolInfo(SymbolInfo SymInfo, llvm::raw_ostream &OS) {
   OS << getSymbolKindString(SymInfo.Kind);
   if (SymInfo.SubKind != SymbolSubKind::None)
     OS << '/' << getSymbolSubKindString(SymInfo.SubKind);
@@ -309,13 +309,13 @@ static void printSymbolInfo(SymbolInfo SymInfo, raw_ostream &OS) {
 }
 
 static void printSymbolNameAndUSR(const Decl *D, ASTContext &Ctx,
-                                  raw_ostream &OS) {
+                                  llvm::raw_ostream &OS) {
   if (printSymbolName(D, Ctx.getLangOpts(), OS)) {
     OS << "<no-name>";
   }
   OS << " | ";
 
-  SmallString<256> USRBuf;
+  llvm::SmallString<256> USRBuf;
   if (generateUSRForDecl(D, USRBuf)) {
     OS << "<no-usr>";
   } else {
@@ -323,7 +323,7 @@ static void printSymbolNameAndUSR(const Decl *D, ASTContext &Ctx,
   }
 }
 
-static void printSymbolNameAndUSR(const clang::Module *Mod, raw_ostream &OS) {
+static void printSymbolNameAndUSR(const clang::Module *Mod, llvm::raw_ostream &OS) {
   assert(Mod);
   OS << Mod->getFullModuleName() << " | ";
   generateFullUSRForModule(Mod, OS);
@@ -339,12 +339,12 @@ int indextest_core_main(int argc, const char **argv) {
   void *MainAddr = (void*) (intptr_t) indextest_core_main;
   std::string Executable = llvm::sys::fs::getMainExecutable(argv[0], MainAddr);
 
-  assert(argv[1] == StringRef("core"));
+  assert(argv[1] == llvm::StringRef("core"));
   ++argv;
   --argc;
 
   std::vector<const char *> CompArgs;
-  const char **DoubleDash = std::find(argv, argv + argc, StringRef("--"));
+  const char **DoubleDash = std::find(argv, argv + argc, llvm::StringRef("--"));
   if (DoubleDash != argv + argc) {
     CompArgs = std::vector<const char *>(DoubleDash + 1, argv + argc);
     argc = DoubleDash - argv;
@@ -382,13 +382,13 @@ int indextest_core_main(int argc, const char **argv) {
 int indextest_perform_shell_execution(const char *command_line) {
   BumpPtrAllocator Alloc;
   llvm::StringSaver Saver(Alloc);
-  SmallVector<const char *, 4> Args;
+  llvm::SmallVector<const char *, 4> Args;
   llvm::cl::TokenizeGNUCommandLine(command_line, Saver, Args);
   auto Program = llvm::sys::findProgramByName(Args[0]);
   if (std::error_code ec = Program.getError()) {
     llvm::errs() << "command not found: " << Args[0] << "\n";
     return ec.value();
   }
-  SmallVector<StringRef, 8> execArgs(Args.begin(), Args.end());
+  llvm::SmallVector<llvm::StringRef, 8> execArgs(Args.begin(), Args.end());
   return llvm::sys::ExecuteAndWait(*Program, execArgs);
 }

@@ -226,7 +226,7 @@ void Sema::MaybeSuggestAddingStaticToDecl(const FunctionDecl *Cur) {
 /// \returns true if there was an error (this declaration cannot be
 /// referenced), false otherwise.
 ///
-bool Sema::DiagnoseUseOfDecl(NamedDecl *D, ArrayRef<SourceLocation> Locs,
+bool Sema::DiagnoseUseOfDecl(NamedDecl *D, llvm::ArrayRef<SourceLocation> Locs,
                              const ObjCInterfaceDecl *UnknownObjCClass,
                              bool ObjCPropertyAccess,
                              bool AvoidPartialAvailabilityChecks,
@@ -279,7 +279,7 @@ bool Sema::DiagnoseUseOfDecl(NamedDecl *D, ArrayRef<SourceLocation> Locs,
       else {
         StringLiteral *Msg = FD->getDeletedMessage();
         Diag(Loc, diag::err_deleted_function_use)
-            << (Msg != nullptr) << (Msg ? Msg->getString() : StringRef());
+            << (Msg != nullptr) << (Msg ? Msg->getString() : llvm::StringRef());
       }
       NoteDeletedFunction(FD);
       return true;
@@ -423,7 +423,7 @@ bool Sema::DiagnoseUseOfDecl(NamedDecl *D, ArrayRef<SourceLocation> Locs,
 /// if so, it checks that the requirements of the sentinel are
 /// satisfied.
 void Sema::DiagnoseSentinelCalls(const NamedDecl *D, SourceLocation Loc,
-                                 ArrayRef<Expr *> Args) {
+                                 llvm::ArrayRef<Expr *> Args) {
   const SentinelAttr *Attr = D->getAttr<SentinelAttr>();
   if (!Attr)
     return;
@@ -1646,7 +1646,7 @@ QualType Sema::UsualArithmeticConversions(ExprResult &LHS, ExprResult &RHS,
 ExprResult Sema::ActOnGenericSelectionExpr(
     SourceLocation KeyLoc, SourceLocation DefaultLoc, SourceLocation RParenLoc,
     bool PredicateIsExpr, void *ControllingExprOrType,
-    ArrayRef<ParsedType> ArgTypes, ArrayRef<Expr *> ArgExprs) {
+    llvm::ArrayRef<ParsedType> ArgTypes, llvm::ArrayRef<Expr *> ArgExprs) {
   unsigned NumAssocs = ArgTypes.size();
   assert(NumAssocs == ArgExprs.size());
 
@@ -1678,7 +1678,7 @@ ExprResult Sema::ActOnGenericSelectionExpr(
 ExprResult Sema::CreateGenericSelectionExpr(
     SourceLocation KeyLoc, SourceLocation DefaultLoc, SourceLocation RParenLoc,
     bool PredicateIsExpr, void *ControllingExprOrType,
-    ArrayRef<TypeSourceInfo *> Types, ArrayRef<Expr *> Exprs) {
+    llvm::ArrayRef<TypeSourceInfo *> Types, llvm::ArrayRef<Expr *> Exprs) {
   unsigned NumAssocs = Types.size();
   assert(NumAssocs == Exprs.size());
   assert(ControllingExprOrType &&
@@ -1823,7 +1823,7 @@ ExprResult Sema::CreateGenericSelectionExpr(
                                         ContainsUnexpandedParameterPack);
   }
 
-  SmallVector<unsigned, 1> CompatIndices;
+  llvm::SmallVector<unsigned, 1> CompatIndices;
   unsigned DefaultIndex = -1U;
   // Look at the canonical type of the controlling expression in case it was a
   // deduced type like __auto_type. However, when issuing diagnostics, use the
@@ -1947,7 +1947,7 @@ static SourceLocation getUDSuffixLoc(Sema &S, SourceLocation TokLoc,
 static ExprResult BuildCookedLiteralOperatorCall(Sema &S, Scope *Scope,
                                                  IdentifierInfo *UDSuffix,
                                                  SourceLocation UDSuffixLoc,
-                                                 ArrayRef<Expr*> Args,
+                                                 llvm::ArrayRef<Expr*> Args,
                                                  SourceLocation LitEndLoc) {
   assert(Args.size() <= 2 && "too many arguments for literal operator");
 
@@ -1973,7 +1973,7 @@ static ExprResult BuildCookedLiteralOperatorCall(Sema &S, Scope *Scope,
   return S.BuildLiteralOperatorCall(R, OpNameInfo, Args, LitEndLoc);
 }
 
-ExprResult Sema::ActOnUnevaluatedStringLiteral(ArrayRef<Token> StringToks) {
+ExprResult Sema::ActOnUnevaluatedStringLiteral(llvm::ArrayRef<Token> StringToks) {
   // StringToks needs backing storage as it doesn't hold array elements itself
   std::vector<Token> ExpandedToks;
   if (getLangOpts().MicrosoftExt)
@@ -1984,7 +1984,7 @@ ExprResult Sema::ActOnUnevaluatedStringLiteral(ArrayRef<Token> StringToks) {
   if (Literal.hadError)
     return ExprError();
 
-  SmallVector<SourceLocation, 4> StringTokLocs;
+  llvm::SmallVector<SourceLocation, 4> StringTokLocs;
   for (const Token &Tok : StringToks)
     StringTokLocs.push_back(Tok.getLocation());
 
@@ -2003,7 +2003,7 @@ ExprResult Sema::ActOnUnevaluatedStringLiteral(ArrayRef<Token> StringToks) {
 }
 
 std::vector<Token>
-Sema::ExpandFunctionLocalPredefinedMacros(ArrayRef<Token> Toks) {
+Sema::ExpandFunctionLocalPredefinedMacros(llvm::ArrayRef<Token> Toks) {
   // MSVC treats some predefined identifiers (e.g. __FUNCTION__) as function
   // local macros that expand to string literals that may be concatenated.
   // These macros are expanded here (in Sema), because StringLiteralParser
@@ -2031,7 +2031,7 @@ Sema::ExpandFunctionLocalPredefinedMacros(ArrayRef<Token> Toks) {
     // Stringify predefined expression
     Diag(Tok.getLocation(), diag::ext_string_literal_from_predefined)
         << Tok.getKind();
-    SmallString<64> Str;
+    llvm::SmallString<64> Str;
     llvm::raw_svector_ostream OS(Str);
     Token &Exp = ExpandedToks.emplace_back();
     Exp.startToken();
@@ -2058,7 +2058,7 @@ Sema::ExpandFunctionLocalPredefinedMacros(ArrayRef<Token> Toks) {
 /// string.
 ///
 ExprResult
-Sema::ActOnStringLiteral(ArrayRef<Token> StringToks, Scope *UDLScope) {
+Sema::ActOnStringLiteral(llvm::ArrayRef<Token> StringToks, Scope *UDLScope) {
   assert(!StringToks.empty() && "Must have at least one string!");
 
   // StringToks needs backing storage as it doesn't hold array elements itself
@@ -2070,7 +2070,7 @@ Sema::ActOnStringLiteral(ArrayRef<Token> StringToks, Scope *UDLScope) {
   if (Literal.hadError)
     return ExprError();
 
-  SmallVector<SourceLocation, 4> StringTokLocs;
+  llvm::SmallVector<SourceLocation, 4> StringTokLocs;
   for (const Token &Tok : StringToks)
     StringTokLocs.push_back(Tok.getLocation());
 
@@ -2375,7 +2375,7 @@ Sema::DecomposeUnqualifiedId(const UnqualifiedId &Id,
 
 static void emitEmptyLookupTypoDiagnostic(
     const TypoCorrection &TC, Sema &SemaRef, const CXXScopeSpec &SS,
-    DeclarationName Typo, SourceLocation TypoLoc, ArrayRef<Expr *> Args,
+    DeclarationName Typo, SourceLocation TypoLoc, llvm::ArrayRef<Expr *> Args,
     unsigned DiagnosticID, unsigned DiagnosticSuggestID) {
   DeclContext *Ctx =
       SS.isEmpty() ? nullptr : SemaRef.computeDeclContext(SS, false);
@@ -2479,7 +2479,7 @@ bool Sema::DiagnoseDependentMemberLookup(const LookupResult &R) {
 bool Sema::DiagnoseEmptyLookup(Scope *S, CXXScopeSpec &SS, LookupResult &R,
                                CorrectionCandidateCallback &CCC,
                                TemplateArgumentListInfo *ExplicitTemplateArgs,
-                               ArrayRef<Expr *> Args, DeclContext *LookupCtx,
+                               llvm::ArrayRef<Expr *> Args, DeclContext *LookupCtx,
                                TypoExpr **Out) {
   DeclarationName Name = R.getLookupName();
 
@@ -3522,8 +3522,8 @@ ExprResult Sema::BuildDeclarationNameExpr(
   return E;
 }
 
-static void ConvertUTF8ToWideString(unsigned CharByteWidth, StringRef Source,
-                                    SmallString<32> &Target) {
+static void ConvertUTF8ToWideString(unsigned CharByteWidth, llvm::StringRef Source,
+                                    llvm::SmallString<32> &Target) {
   Target.resize(CharByteWidth * (Source.size() + 1));
   char *ResultPtr = &Target[0];
   const llvm::UTF8 *ErrorPtr;
@@ -3560,7 +3560,7 @@ ExprResult Sema::BuildPredefinedExpr(SourceLocation Loc,
         IK == PredefinedIdentKind::LFuncSig) {
       ResTy =
           Context.adjustStringLiteralBaseType(Context.WideCharTy.withConst());
-      SmallString<32> RawChars;
+      llvm::SmallString<32> RawChars;
       ConvertUTF8ToWideString(Context.getTypeSizeInChars(ResTy).getQuantity(),
                               Str, RawChars);
       ResTy = Context.getConstantArrayType(ResTy, LengthI, nullptr,
@@ -3587,9 +3587,9 @@ ExprResult Sema::ActOnPredefinedExpr(SourceLocation Loc, tok::TokenKind Kind) {
 }
 
 ExprResult Sema::ActOnCharacterConstant(const Token &Tok, Scope *UDLScope) {
-  SmallString<16> CharBuffer;
+  llvm::SmallString<16> CharBuffer;
   bool Invalid = false;
-  StringRef ThisTok = PP.getSpelling(Tok, CharBuffer, &Invalid);
+  llvm::StringRef ThisTok = PP.getSpelling(Tok, CharBuffer, &Invalid);
   if (Invalid)
     return ExprError();
 
@@ -3669,7 +3669,7 @@ static Expr *BuildFloatingLiteral(Sema &S, NumericLiteralParser &Literal,
   if ((result & APFloat::opOverflow) ||
       ((result & APFloat::opUnderflow) && Val.isZero())) {
     unsigned diagnostic;
-    SmallString<20> buffer;
+    llvm::SmallString<20> buffer;
     if (result & APFloat::opOverflow) {
       diagnostic = diag::warn_float_overflow;
       APFloat::getLargest(Format).toString(buffer);
@@ -3727,16 +3727,16 @@ ExprResult Sema::ActOnNumericConstant(const Token &Tok, Scope *UDLScope) {
     return ActOnIntegerConstant(Tok.getLocation(), Val-'0');
   }
 
-  SmallString<128> SpellingBuffer;
+  llvm::SmallString<128> SpellingBuffer;
   // NumericLiteralParser wants to overread by one character.  Add padding to
   // the buffer in case the token is copied to the buffer.  If getSpelling()
-  // returns a StringRef to the memory buffer, it should have a null char at
+  // returns a llvm::StringRef to the memory buffer, it should have a null char at
   // the EOF, so it is also safe.
   SpellingBuffer.resize(Tok.getLength() + 1);
 
   // Get the spelling of the token, which eliminates trigraphs, etc.
   bool Invalid = false;
-  StringRef TokSpelling = PP.getSpelling(Tok, SpellingBuffer, &Invalid);
+  llvm::StringRef TokSpelling = PP.getSpelling(Tok, SpellingBuffer, &Invalid);
   if (Invalid)
     return ExprError();
 
@@ -3813,7 +3813,7 @@ ExprResult Sema::ActOnNumericConstant(const Token &Tok, Scope *UDLScope) {
           Context.adjustStringLiteralBaseType(Context.CharTy.withConst()),
           llvm::APInt(32, Length + 1), nullptr, ArraySizeModifier::Normal, 0);
       Expr *Lit =
-          StringLiteral::Create(Context, StringRef(TokSpelling.data(), Length),
+          StringLiteral::Create(Context, llvm::StringRef(TokSpelling.data(), Length),
                                 StringLiteralKind::Ordinary,
                                 /*Pascal*/ false, StrTy, &TokLoc, 1);
       return BuildLiteralOperatorCall(R, OpNameInfo, Lit, TokLoc);
@@ -4569,7 +4569,7 @@ bool Sema::CheckUnaryExprOrTypeTraitOperand(QualType ExprType,
                                             SourceLocation OpLoc,
                                             SourceRange ExprRange,
                                             UnaryExprOrTypeTrait ExprKind,
-                                            StringRef KWName) {
+                                            llvm::StringRef KWName) {
   if (ExprType->isDependentType())
     return false;
 
@@ -4743,7 +4743,7 @@ Sema::ActOnUnaryExprOrTypeTraitExpr(SourceLocation OpLoc,
   return Result;
 }
 
-bool Sema::CheckAlignasTypeArgument(StringRef KWName, TypeSourceInfo *TInfo,
+bool Sema::CheckAlignasTypeArgument(llvm::StringRef KWName, TypeSourceInfo *TInfo,
                                     SourceLocation OpLoc, SourceRange R) {
   if (!TInfo)
     return true;
@@ -4758,7 +4758,7 @@ bool Sema::CheckAlignasTypeArgument(StringRef KWName, TypeSourceInfo *TInfo,
 ///
 /// [N1570 6.7.5] _Alignas(type-name) is equivalent to
 /// _Alignas(_Alignof(type-name)).
-bool Sema::ActOnAlignasTypeArgument(StringRef KWName, ParsedType Ty,
+bool Sema::ActOnAlignasTypeArgument(llvm::StringRef KWName, ParsedType Ty,
                                     SourceLocation OpLoc, SourceRange R) {
   TypeSourceInfo *TInfo;
   (void)GetTypeFromParser(ParsedType::getFromOpaquePtr(Ty.getAsOpaquePtr()),
@@ -5766,7 +5766,7 @@ private:
 
 static TypoCorrection TryTypoCorrectionForCall(Sema &S, Expr *Fn,
                                                FunctionDecl *FDecl,
-                                               ArrayRef<Expr *> Args) {
+                                               llvm::ArrayRef<Expr *> Args) {
   MemberExpr *ME = dyn_cast<MemberExpr>(Fn);
   DeclarationName FuncName = FDecl->getDeclName();
   SourceLocation NameLoc = ME ? ME->getMemberLoc() : Fn->getBeginLoc();
@@ -5812,7 +5812,7 @@ bool
 Sema::ConvertArgumentsForCall(CallExpr *Call, Expr *Fn,
                               FunctionDecl *FDecl,
                               const FunctionProtoType *Proto,
-                              ArrayRef<Expr *> Args,
+                              llvm::ArrayRef<Expr *> Args,
                               SourceLocation RParenLoc,
                               bool IsExecConfig) {
   // Bail out early if calling a builtin with custom typechecking.
@@ -5932,7 +5932,7 @@ Sema::ConvertArgumentsForCall(CallExpr *Call, Expr *Fn,
       return true;
     }
   }
-  SmallVector<Expr *, 8> AllArgs;
+  llvm::SmallVector<Expr *, 8> AllArgs;
   VariadicCallType CallType = getVariadicCallType(FDecl, Proto, Fn);
 
   Invalid = GatherArgumentsForCall(Call->getBeginLoc(), FDecl, Proto, 0, Args,
@@ -5949,8 +5949,8 @@ Sema::ConvertArgumentsForCall(CallExpr *Call, Expr *Fn,
 
 bool Sema::GatherArgumentsForCall(SourceLocation CallLoc, FunctionDecl *FDecl,
                                   const FunctionProtoType *Proto,
-                                  unsigned FirstParam, ArrayRef<Expr *> Args,
-                                  SmallVectorImpl<Expr *> &AllArgs,
+                                  unsigned FirstParam, llvm::ArrayRef<Expr *> Args,
+                                  llvm::SmallVectorImpl<Expr *> &AllArgs,
                                   VariadicCallType CallType, bool AllowExplicit,
                                   bool IsListInitialization) {
   unsigned NumParams = Proto->getNumParams();
@@ -6228,7 +6228,7 @@ static FunctionDecl *rewriteBuiltinFunctionDecl(Sema *Sema, ASTContext &Context,
 
   bool NeedsNewDecl = false;
   unsigned i = 0;
-  SmallVector<QualType, 8> OverloadParams;
+  llvm::SmallVector<QualType, 8> OverloadParams;
 
   for (QualType ParamType : FT->param_types()) {
 
@@ -6272,7 +6272,7 @@ static FunctionDecl *rewriteBuiltinFunctionDecl(Sema *Sema, ASTContext &Context,
       /*TInfo=*/nullptr, SC_Extern, Sema->getCurFPFeatures().isFPConstrained(),
       false,
       /*hasPrototype=*/true);
-  SmallVector<ParmVarDecl*, 16> Params;
+  llvm::SmallVector<ParmVarDecl*, 16> Params;
   FT = cast<FunctionProtoType>(OverloadTy);
   for (unsigned i = 0, e = FT->getNumParams(); i != e; ++i) {
     QualType ParamType = FT->getParamType(i);
@@ -6665,7 +6665,7 @@ ExprResult Sema::BuildCallExpr(Scope *Scope, Expr *Fn, SourceLocation LParenLoc,
 //  with the specified CallArgs
 Expr *Sema::BuildBuiltinCallExpr(SourceLocation Loc, Builtin::ID Id,
                                  MultiExprArg CallArgs) {
-  StringRef Name = Context.BuiltinInfo.getName(Id);
+  llvm::StringRef Name = Context.BuiltinInfo.getName(Id);
   LookupResult R(*this, &Context.Idents.get(Name), Loc,
                  Sema::LookupOrdinaryName);
   LookupName(R, TUScope, /*AllowBuiltinCreation=*/true);
@@ -6731,7 +6731,7 @@ ExprResult Sema::ActOnConvertVectorExpr(Expr *E, ParsedType ParsedDestTy,
 /// \param NDecl the declaration being called, if available
 ExprResult Sema::BuildResolvedCallExpr(Expr *Fn, NamedDecl *NDecl,
                                        SourceLocation LParenLoc,
-                                       ArrayRef<Expr *> Args,
+                                       llvm::ArrayRef<Expr *> Args,
                                        SourceLocation RParenLoc, Expr *Config,
                                        bool IsExecConfig, ADLCallKind UsesADL) {
   FunctionDecl *FDecl = dyn_cast_or_null<FunctionDecl>(NDecl);
@@ -7857,7 +7857,7 @@ ExprResult Sema::BuildVectorLiteral(SourceLocation LParenLoc,
   QualType Ty = TInfo->getType();
   assert(Ty->isVectorType() && "Expected vector type");
 
-  SmallVector<Expr *, 8> initExprs;
+  llvm::SmallVector<Expr *, 8> initExprs;
   const VectorType *VTy = Ty->castAs<VectorType>();
   unsigned numElems = VTy->getNumElements();
 
@@ -8313,7 +8313,7 @@ OpenCLConvertScalarsToVectors(Sema &S, ExprResult &LHS, ExprResult &RHS,
     // Since VectorTy is created internally, it does not pretty print
     // with an OpenCL name. Instead, we just print a description.
     std::string EleTyName = ResTy.getUnqualifiedType().getAsString();
-    SmallString<64> Str;
+    llvm::SmallString<64> Str;
     llvm::raw_svector_ostream OS(Str);
     OS << "(vector of " << NumElements << " '" << EleTyName << "' values)";
     S.Diag(QuestionLoc, diag::err_conditional_vector_element_size)
@@ -11290,7 +11290,7 @@ static void DiagnoseBadShiftValues(Sema& S, ExprResult &LHS, ExprResult &RHS,
 
   // Print the bit representation of the signed integer as an unsigned
   // hexadecimal number.
-  SmallString<40> HexResult;
+  llvm::SmallString<40> HexResult;
   Result.toString(HexResult, 16, /*Signed =*/false, /*Literal =*/true);
 
   // If we are only missing a sign bit, this is less likely to result in actual
@@ -12852,8 +12852,8 @@ static void diagnoseXorMisusedAsPow(Sema &S, const ExprResult &XorLHS,
     RHSStr = "+" + RHSStr;
   }
 
-  StringRef LHSStrRef = LHSStr;
-  StringRef RHSStrRef = RHSStr;
+  llvm::StringRef LHSStrRef = LHSStr;
+  llvm::StringRef RHSStrRef = RHSStr;
   // Do not diagnose literals with digit separators, binary, hexadecimal, octal
   // literals.
   if (LHSStrRef.starts_with("0b") || LHSStrRef.starts_with("0B") ||
@@ -14070,8 +14070,8 @@ bool Sema::CheckUseOfCXXMethodAsAddressOfOperand(SourceLocation OpLoc,
     return Diag(OpLoc, diag::err_unqualified_pointer_member_function)
            << DRE->getSourceRange();
 
-  SmallString<32> Str;
-  StringRef Qual = (MD->getParent()->getName() + "::").toStringRef(Str);
+  llvm::SmallString<32> Str;
+  llvm::StringRef Qual = (MD->getParent()->getName() + "::").toStringRef(Str);
   return Diag(OpLoc, diag::err_unqualified_pointer_member_function)
          << DRE->getSourceRange()
          << FixItHint::CreateInsertion(DRE->getSourceRange().getBegin(), Qual);
@@ -14564,7 +14564,7 @@ static void checkObjCPointerIntrospection(Sema &S, ExprResult &L, ExprResult &R,
     // Some clients may wish to silence warnings in this subcase.
     if (const ObjCMessageExpr *ME = dyn_cast<ObjCMessageExpr>(Ex)) {
       Selector S = ME->getSelector();
-      StringRef SelArg0 = S.getNameForSlot(0);
+      llvm::StringRef SelArg0 = S.getNameForSlot(0);
       if (SelArg0.starts_with("performSelector"))
         Diag = diag::warn_objc_pointer_masking_performSelector;
     }
@@ -14984,7 +14984,7 @@ static void DiagnoseBitwisePrecedence(Sema &Self, BinaryOperatorKind Opc,
   SourceRange DiagRange = isLeftComp
                               ? SourceRange(LHSExpr->getBeginLoc(), OpLoc)
                               : SourceRange(OpLoc, RHSExpr->getEndLoc());
-  StringRef OpStr = isLeftComp ? LHSBO->getOpcodeStr() : RHSBO->getOpcodeStr();
+  llvm::StringRef OpStr = isLeftComp ? LHSBO->getOpcodeStr() : RHSBO->getOpcodeStr();
   SourceRange ParensRange =
       isLeftComp
           ? SourceRange(LHSBO->getRHS()->getBeginLoc(), RHSExpr->getEndLoc())
@@ -15069,10 +15069,10 @@ static void DiagnoseBitwiseOpInBitwiseOp(Sema &S, BinaryOperatorKind Opc,
 }
 
 static void DiagnoseAdditionInShift(Sema &S, SourceLocation OpLoc,
-                                    Expr *SubExpr, StringRef Shift) {
+                                    Expr *SubExpr, llvm::StringRef Shift) {
   if (BinaryOperator *Bop = dyn_cast<BinaryOperator>(SubExpr)) {
     if (Bop->getOpcode() == BO_Add || Bop->getOpcode() == BO_Sub) {
-      StringRef Op = Bop->getOpcodeStr();
+      llvm::StringRef Op = Bop->getOpcodeStr();
       S.Diag(Bop->getOperatorLoc(), diag::warn_addition_in_bitshift)
           << Bop->getSourceRange() << OpLoc << Shift << Op;
       SuggestParentheses(S, Bop->getOperatorLoc(),
@@ -15133,7 +15133,7 @@ static void DiagnoseBinOpPrecedence(Sema &Self, BinaryOperatorKind Opc,
 
   if ((Opc == BO_Shl && LHSExpr->getType()->isIntegralType(Self.getASTContext()))
       || Opc == BO_Shr) {
-    StringRef Shift = BinaryOperator::getOpcodeStr(Opc);
+    llvm::StringRef Shift = BinaryOperator::getOpcodeStr(Opc);
     DiagnoseAdditionInShift(Self, OpLoc, LHSExpr, Shift);
     DiagnoseAdditionInShift(Self, OpLoc, RHSExpr, Shift);
   }
@@ -15799,7 +15799,7 @@ ExprResult Sema::ActOnStmtExprResult(ExprResult ER) {
 
 ExprResult Sema::BuildBuiltinOffsetOf(SourceLocation BuiltinLoc,
                                       TypeSourceInfo *TInfo,
-                                      ArrayRef<OffsetOfComponent> Components,
+                                      llvm::ArrayRef<OffsetOfComponent> Components,
                                       SourceLocation RParenLoc) {
   QualType ArgTy = TInfo->getType();
   bool Dependent = ArgTy->isDependentType();
@@ -15821,8 +15821,8 @@ ExprResult Sema::BuildBuiltinOffsetOf(SourceLocation BuiltinLoc,
 
   bool DidWarnAboutNonPOD = false;
   QualType CurrentType = ArgTy;
-  SmallVector<OffsetOfNode, 4> Comps;
-  SmallVector<Expr*, 4> Exprs;
+  llvm::SmallVector<OffsetOfNode, 4> Comps;
+  llvm::SmallVector<Expr*, 4> Exprs;
   for (const OffsetOfComponent &OC : Components) {
     if (OC.isBrackets) {
       // Offset of an array sub-field.  TODO: Should we allow vector elements?
@@ -15968,7 +15968,7 @@ ExprResult Sema::ActOnBuiltinOffsetOf(Scope *S,
                                       SourceLocation BuiltinLoc,
                                       SourceLocation TypeLoc,
                                       ParsedType ParsedArgTy,
-                                      ArrayRef<OffsetOfComponent> Components,
+                                      llvm::ArrayRef<OffsetOfComponent> Components,
                                       SourceLocation RParenLoc) {
 
   TypeSourceInfo *ArgTInfo;
@@ -16121,7 +16121,7 @@ void Sema::ActOnBlockArguments(SourceLocation CaretLoc, Declarator &ParamInfo,
   }
 
   // Push block parameters from the declarator if we had them.
-  SmallVector<ParmVarDecl*, 8> Params;
+  llvm::SmallVector<ParmVarDecl*, 8> Params;
   if (ExplicitSignature) {
     for (unsigned I = 0, E = ExplicitSignature.getNumParams(); I != E; ++I) {
       ParmVarDecl *Param = ExplicitSignature.getParam(I);
@@ -16273,7 +16273,7 @@ ExprResult Sema::ActOnBlockStmtExpr(SourceLocation CaretLoc,
   PopDeclContext();
 
   // Set the captured variables on the block.
-  SmallVector<BlockDecl::Capture, 4> Captures;
+  llvm::SmallVector<BlockDecl::Capture, 4> Captures;
   for (Capture &Cap : BSI->Captures) {
     if (Cap.isInvalid() || Cap.isThisCapture())
       continue;
@@ -16588,7 +16588,7 @@ static CXXRecordDecl *LookupStdSourceLocationImpl(Sema &S, SourceLocation Loc) {
 
   unsigned Count = 0;
   for (FieldDecl *F : ImplDecl->fields()) {
-    StringRef Name = F->getName();
+    llvm::StringRef Name = F->getName();
 
     if (Name == "_M_file_name") {
       if (F->getType() !=
@@ -17111,7 +17111,7 @@ Sema::VerifyIntegerConstantExpression(Expr *E, llvm::APSInt *Result,
   }
 
   Expr::EvalResult EvalResult;
-  SmallVector<PartialDiagnosticAt, 8> Notes;
+  llvm::SmallVector<PartialDiagnosticAt, 8> Notes;
   EvalResult.Diag = &Notes;
 
   // Try to evaluate the expression, and produce diagnostics explaining why it's
@@ -17471,16 +17471,16 @@ static void EvaluateAndDiagnoseImmediateInvocation(
 
 static void RemoveNestedImmediateInvocation(
     Sema &SemaRef, Sema::ExpressionEvaluationContextRecord &Rec,
-    SmallVector<Sema::ImmediateInvocationCandidate, 4>::reverse_iterator It) {
+    llvm::SmallVector<Sema::ImmediateInvocationCandidate, 4>::reverse_iterator It) {
   struct ComplexRemove : TreeTransform<ComplexRemove> {
     using Base = TreeTransform<ComplexRemove>;
     llvm::SmallPtrSetImpl<DeclRefExpr *> &DRSet;
-    SmallVector<Sema::ImmediateInvocationCandidate, 4> &IISet;
-    SmallVector<Sema::ImmediateInvocationCandidate, 4>::reverse_iterator
+    llvm::SmallVector<Sema::ImmediateInvocationCandidate, 4> &IISet;
+    llvm::SmallVector<Sema::ImmediateInvocationCandidate, 4>::reverse_iterator
         CurrentII;
     ComplexRemove(Sema &SemaRef, llvm::SmallPtrSetImpl<DeclRefExpr *> &DR,
-                  SmallVector<Sema::ImmediateInvocationCandidate, 4> &II,
-                  SmallVector<Sema::ImmediateInvocationCandidate,
+                  llvm::SmallVector<Sema::ImmediateInvocationCandidate, 4> &II,
+                  llvm::SmallVector<Sema::ImmediateInvocationCandidate,
                               4>::reverse_iterator Current)
         : Base(SemaRef), DRSet(DR), IISet(II), CurrentII(Current) {}
     void RemoveImmediateInvocation(ConstantExpr* E) {
@@ -17830,7 +17830,7 @@ static void CheckCompleteParameterTypesForMangler(Sema &S, FunctionDecl *FD,
 
     void diagnose(Sema &S, SourceLocation Loc, QualType T) override {
       CallingConv CC = FD->getType()->castAs<FunctionType>()->getCallConv();
-      StringRef CCName;
+      llvm::StringRef CCName;
       switch (CC) {
       case CC_X86StdCall:
         CCName = "stdcall";
@@ -18681,8 +18681,8 @@ static void buildLambdaCaptureFixit(Sema &Sema, LambdaScopeInfo *LSI,
   // known not to be copy constructible.
   bool ShouldOfferCopyFix = canCaptureVariableByCopy(Var, Sema.getASTContext());
 
-  SmallString<32> FixBuffer;
-  StringRef Separator = LSI->NumExplicitCaptures > 0 ? ", " : "";
+  llvm::SmallString<32> FixBuffer;
+  llvm::StringRef Separator = LSI->NumExplicitCaptures > 0 ? ", " : "";
   if (Var->getDeclName().isIdentifier() && !Var->getName().empty()) {
     SourceLocation VarInsertLoc = LSI->IntroducerRange.getEnd();
     if (ShouldOfferCopyFix) {
@@ -19327,7 +19327,7 @@ static ExprResult rebuildPotentialResultsAsNonOdrUsed(Sema &S, Expr *E,
   case Expr::GenericSelectionExprClass: {
     auto *GSE = cast<GenericSelectionExpr>(E);
 
-    SmallVector<Expr *, 4> AssocExprs;
+    llvm::SmallVector<Expr *, 4> AssocExprs;
     bool AnyChanged = false;
     for (Expr *OrigAssocExpr : GSE->getAssocExprs()) {
       ExprResult AssocExpr = Rebuild(OrigAssocExpr);
@@ -19931,10 +19931,10 @@ class EvaluatedExprMarker : public UsedDeclVisitor<EvaluatedExprMarker> {
 public:
   typedef UsedDeclVisitor<EvaluatedExprMarker> Inherited;
   bool SkipLocalVariables;
-  ArrayRef<const Expr *> StopAt;
+  llvm::ArrayRef<const Expr *> StopAt;
 
   EvaluatedExprMarker(Sema &S, bool SkipLocalVariables,
-                      ArrayRef<const Expr *> StopAt)
+                      llvm::ArrayRef<const Expr *> StopAt)
       : Inherited(S), SkipLocalVariables(SkipLocalVariables), StopAt(StopAt) {}
 
   void visitUsedDecl(SourceLocation Loc, Decl *D) {
@@ -19981,7 +19981,7 @@ public:
 /// \param StopAt Subexpressions that we shouldn't recurse into.
 void Sema::MarkDeclarationsReferencedInExpr(Expr *E,
                                             bool SkipLocalVariables,
-                                            ArrayRef<const Expr*> StopAt) {
+                                            llvm::ArrayRef<const Expr*> StopAt) {
   EvaluatedExprMarker(*this, SkipLocalVariables, StopAt).Visit(E);
 }
 
@@ -19990,7 +19990,7 @@ void Sema::MarkDeclarationsReferencedInExpr(Expr *E,
 ///        CFG (eg, in the initializer of a global or in a constant expression).
 ///        For example,
 ///        namespace { auto *p = new double[3][false ? (1, 2) : 3]; }
-bool Sema::DiagIfReachable(SourceLocation Loc, ArrayRef<const Stmt *> Stmts,
+bool Sema::DiagIfReachable(SourceLocation Loc, llvm::ArrayRef<const Stmt *> Stmts,
                            const PartialDiagnostic &PD) {
   if (!Stmts.empty() && getCurFunctionOrMethodDecl()) {
     if (!FunctionScopes.empty())
@@ -20033,7 +20033,7 @@ bool Sema::DiagIfReachable(SourceLocation Loc, ArrayRef<const Stmt *> Stmts,
 /// behavior of a program, such as passing a non-POD value through an ellipsis.
 /// Failure to do so will likely result in spurious diagnostics or failures
 /// during overload resolution or within sizeof/alignof/typeof/typeid.
-bool Sema::DiagRuntimeBehavior(SourceLocation Loc, ArrayRef<const Stmt*> Stmts,
+bool Sema::DiagRuntimeBehavior(SourceLocation Loc, llvm::ArrayRef<const Stmt*> Stmts,
                                const PartialDiagnostic &PD) {
 
   if (ExprEvalContexts.back().isDiscardedStatementContext())
@@ -20501,8 +20501,8 @@ ExprResult RebuildUnknownAnyExpr::VisitCallExpr(CallExpr *E) {
     // This is a hack, but it is far superior to moving the
     // corresponding target-specific code from IR-gen to Sema/AST.
 
-    ArrayRef<QualType> ParamTypes = Proto->getParamTypes();
-    SmallVector<QualType, 8> ArgTypes;
+    llvm::ArrayRef<QualType> ParamTypes = Proto->getParamTypes();
+    llvm::SmallVector<QualType, 8> ArgTypes;
     if (ParamTypes.empty() && Proto->isVariadic()) { // the special case
       ArgTypes.reserve(E->getNumArgs());
       for (unsigned i = 0, e = E->getNumArgs(); i != e; ++i) {
@@ -20640,7 +20640,7 @@ ExprResult RebuildUnknownAnyExpr::resolveDecl(Expr *E, ValueDecl *VD) {
         if (FD->getQualifier())
           NewFD->setQualifierInfo(FD->getQualifierLoc());
 
-        SmallVector<ParmVarDecl*, 16> Params;
+        llvm::SmallVector<ParmVarDecl*, 16> Params;
         for (const auto &AI : FT->param_types()) {
           ParmVarDecl *Param =
             S.BuildParmVarDeclForTypedef(FD, Loc, AI);
@@ -20976,7 +20976,7 @@ bool Sema::CheckCaseExpression(Expr *E) {
 }
 
 ExprResult Sema::CreateRecoveryExpr(SourceLocation Begin, SourceLocation End,
-                                    ArrayRef<Expr *> SubExprs, QualType T) {
+                                    llvm::ArrayRef<Expr *> SubExprs, QualType T) {
   if (!Context.getLangOpts().RecoveryAST)
     return ExprError();
 

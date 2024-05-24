@@ -59,16 +59,16 @@ static cl::opt<bool>
 /// Path of the current binary.
 static const char *PackagerExecutable;
 
-static void PrintVersion(raw_ostream &OS) {
+static void PrintVersion(llvm::raw_ostream &OS) {
   OS << clang::getClangToolFullVersion("clang-offload-packager") << '\n';
 }
 
 // Get a map containing all the arguments for the image. Repeated arguments will
 // be placed in a comma separated list.
-static DenseMap<StringRef, StringRef> getImageArguments(StringRef Image,
+static DenseMap<llvm::StringRef, llvm::StringRef> getImageArguments(llvm::StringRef Image,
                                                         StringSaver &Saver) {
-  DenseMap<StringRef, StringRef> Args;
-  for (StringRef Arg : llvm::split(Image, ",")) {
+  DenseMap<llvm::StringRef, llvm::StringRef> Args;
+  for (llvm::StringRef Arg : llvm::split(Image, ",")) {
     auto [Key, Value] = Arg.split("=");
     if (Args.count(Key))
       Args[Key] = Saver.save(Args[Key] + "," + Value);
@@ -79,8 +79,8 @@ static DenseMap<StringRef, StringRef> getImageArguments(StringRef Image,
   return Args;
 }
 
-static Error writeFile(StringRef Filename, StringRef Data) {
-  Expected<std::unique_ptr<FileOutputBuffer>> OutputOrErr =
+static Error writeFile(llvm::StringRef Filename, llvm::StringRef Data) {
+  llvm::Expected<std::unique_ptr<FileOutputBuffer>> OutputOrErr =
       FileOutputBuffer::create(Filename, Data.size());
   if (!OutputOrErr)
     return OutputOrErr.takeError();
@@ -92,12 +92,12 @@ static Error writeFile(StringRef Filename, StringRef Data) {
 }
 
 static Error bundleImages() {
-  SmallVector<char, 1024> BinaryData;
+  llvm::SmallVector<char, 1024> BinaryData;
   raw_svector_ostream OS(BinaryData);
-  for (StringRef Image : DeviceImages) {
+  for (llvm::StringRef Image : DeviceImages) {
     BumpPtrAllocator Alloc;
     StringSaver Saver(Alloc);
-    DenseMap<StringRef, StringRef> Args = getImageArguments(Image, Saver);
+    DenseMap<llvm::StringRef, llvm::StringRef> Args = getImageArguments(Image, Saver);
 
     if (!Args.count("triple") || !Args.count("file"))
       return createStringError(
@@ -137,7 +137,7 @@ static Error bundleImages() {
   }
 
   if (Error E = writeFile(OutputFile,
-                          StringRef(BinaryData.begin(), BinaryData.size())))
+                          llvm::StringRef(BinaryData.begin(), BinaryData.size())))
     return E;
   return Error::success();
 }
@@ -155,17 +155,17 @@ static Error unbundleImages() {
     Buffer = MemoryBuffer::getMemBufferCopy(Buffer->getBuffer(),
                                             Buffer->getBufferIdentifier());
 
-  SmallVector<OffloadFile> Binaries;
+  llvm::SmallVector<OffloadFile> Binaries;
   if (Error Err = extractOffloadBinaries(*Buffer, Binaries))
     return Err;
 
   // Try to extract each device image specified by the user from the input file.
-  for (StringRef Image : DeviceImages) {
+  for (llvm::StringRef Image : DeviceImages) {
     BumpPtrAllocator Alloc;
     StringSaver Saver(Alloc);
     auto Args = getImageArguments(Image, Saver);
 
-    SmallVector<const OffloadBinary *> Extracted;
+    llvm::SmallVector<const OffloadBinary *> Extracted;
     for (const OffloadFile &File : Binaries) {
       const auto *Binary = File.getBinary();
       // We handle the 'file' and 'kind' identifiers differently.
@@ -189,7 +189,7 @@ static Error unbundleImages() {
         return createStringError(inconvertibleErrorCode(),
                                  "Image must have a 'file' argument.");
 
-      SmallVector<NewArchiveMember> Members;
+      llvm::SmallVector<NewArchiveMember> Members;
       for (const OffloadBinary *Binary : Extracted)
         Members.emplace_back(MemoryBufferRef(
             Binary->getImage(),
@@ -209,7 +209,7 @@ static Error unbundleImages() {
     } else {
       uint64_t Idx = 0;
       for (const OffloadBinary *Binary : Extracted) {
-        StringRef Filename =
+        llvm::StringRef Filename =
             Saver.save(sys::path::stem(InputFile) + "-" + Binary->getTriple() +
                        "-" + Binary->getArch() + "." + std::to_string(Idx++) +
                        "." + getImageKindName(Binary->getImageKind()));

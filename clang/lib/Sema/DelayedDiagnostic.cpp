@@ -22,12 +22,12 @@ using namespace sema;
 
 DelayedDiagnostic
 DelayedDiagnostic::makeAvailability(AvailabilityResult AR,
-                                    ArrayRef<SourceLocation> Locs,
+                                    llvm::ArrayRef<SourceLocation> Locs,
                                     const NamedDecl *ReferringDecl,
                                     const NamedDecl *OffendingDecl,
                                     const ObjCInterfaceDecl *UnknownObjCClass,
                                     const ObjCPropertyDecl  *ObjCProperty,
-                                    StringRef Msg,
+                                    llvm::StringRef Msg,
                                     bool ObjCPropertyAccess) {
   assert(!Locs.empty());
   DelayedDiagnostic DD;

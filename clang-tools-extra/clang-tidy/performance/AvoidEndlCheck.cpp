@@ -46,7 +46,7 @@ void AvoidEndlCheck::check(const MatchFinder::MatchResult &Result) {
     // Handle the more common streaming '... << std::endl' case
     const CharSourceRange TokenRange =
         CharSourceRange::getTokenRange(Expression->getSourceRange());
-    const StringRef SourceText = Lexer::getSourceText(
+    const llvm::StringRef SourceText = Lexer::getSourceText(
         TokenRange, *Result.SourceManager, Result.Context->getLangOpts());
 
     auto Diag = diag(Expression->getBeginLoc(),
@@ -59,14 +59,14 @@ void AvoidEndlCheck::check(const MatchFinder::MatchResult &Result) {
     const auto *CallExpression = llvm::cast<CallExpr>(Expression);
     assert(CallExpression->getNumArgs() == 1);
 
-    const StringRef SourceText = Lexer::getSourceText(
+    const llvm::StringRef SourceText = Lexer::getSourceText(
         CharSourceRange::getTokenRange(
             CallExpression->getCallee()->getSourceRange()),
         *Result.SourceManager, Result.Context->getLangOpts());
 
     const CharSourceRange ArgTokenRange = CharSourceRange::getTokenRange(
         CallExpression->getArg(0)->getSourceRange());
-    const StringRef ArgSourceText = Lexer::getSourceText(
+    const llvm::StringRef ArgSourceText = Lexer::getSourceText(
         ArgTokenRange, *Result.SourceManager, Result.Context->getLangOpts());
 
     const std::string ReplacementString =

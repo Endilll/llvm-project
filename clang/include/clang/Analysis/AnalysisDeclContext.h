@@ -269,7 +269,7 @@ public:
   /// Prints out the call stack.
   ///
   /// \param Out The out stream.
-  LLVM_DUMP_METHOD void dumpStack(raw_ostream &Out) const;
+  LLVM_DUMP_METHOD void dumpStack(llvm::raw_ostream &Out) const;
 
   /// Prints out the call stack in \c json format.
   ///
@@ -283,7 +283,7 @@ public:
   ///   [&](const LocationContext *LC) { LC->dump(); }
   /// \endcode
   void printJson(
-      raw_ostream &Out, const char *NL = "\n", unsigned int Space = 0,
+      llvm::raw_ostream &Out, const char *NL = "\n", unsigned int Space = 0,
       bool IsDot = false,
       std::function<void(const LocationContext *)> printMoreInfoPerContext =
           [](const LocationContext *) {}) const;

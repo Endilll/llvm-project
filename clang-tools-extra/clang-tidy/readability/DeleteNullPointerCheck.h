@@ -20,7 +20,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/delete-null-pointer.html
 class DeleteNullPointerCheck : public ClangTidyCheck {
 public:
-  DeleteNullPointerCheck(StringRef Name, ClangTidyContext *Context)
+  DeleteNullPointerCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

@@ -32,9 +32,9 @@ using namespace llvm;
 namespace clang::tidy {
 
 template <> struct OptionEnumMapping<modernize::Confidence::Level> {
-  static llvm::ArrayRef<std::pair<modernize::Confidence::Level, StringRef>>
+  static llvm::ArrayRef<std::pair<modernize::Confidence::Level, llvm::StringRef>>
   getEnumMapping() {
-    static constexpr std::pair<modernize::Confidence::Level, StringRef>
+    static constexpr std::pair<modernize::Confidence::Level, llvm::StringRef>
         Mapping[] = {{modernize::Confidence::CL_Reasonable, "reasonable"},
                      {modernize::Confidence::CL_Safe, "safe"},
                      {modernize::Confidence::CL_Risky, "risky"}};
@@ -44,9 +44,9 @@ template <> struct OptionEnumMapping<modernize::Confidence::Level> {
 
 template <> struct OptionEnumMapping<modernize::VariableNamer::NamingStyle> {
   static llvm::ArrayRef<
-      std::pair<modernize::VariableNamer::NamingStyle, StringRef>>
+      std::pair<modernize::VariableNamer::NamingStyle, llvm::StringRef>>
   getEnumMapping() {
-    static constexpr std::pair<modernize::VariableNamer::NamingStyle, StringRef>
+    static constexpr std::pair<modernize::VariableNamer::NamingStyle, llvm::StringRef>
         Mapping[] = {{modernize::VariableNamer::NS_CamelCase, "CamelCase"},
                      {modernize::VariableNamer::NS_CamelBack, "camelBack"},
                      {modernize::VariableNamer::NS_LowerCase, "lower_case"},
@@ -341,7 +341,7 @@ enum class IteratorCallKind {
 
 struct ContainerCall {
   const Expr *Container;
-  StringRef Name;
+  llvm::StringRef Name;
   bool IsArrow;
   IteratorCallKind CallKind;
 };
@@ -353,7 +353,7 @@ struct ContainerCall {
 // Returns at a 3-tuple with the container expr, function name (begin/end/etc),
 // and whether the call is made through an arrow (->) for CXXMemberCallExprs.
 // The returned Expr* is nullptr if any of the assumptions are not met.
-// static std::tuple<const Expr *, StringRef, bool, IteratorCallKind>
+// static std::tuple<const Expr *, llvm::StringRef, bool, IteratorCallKind>
 static std::optional<ContainerCall> getContainerExpr(const Expr *Call) {
   const Expr *Dug = digThroughConstructorsConversions(Call);
 
@@ -460,7 +460,7 @@ static const Expr *findContainer(ASTContext *Context, const Expr *BeginExpr,
 }
 
 /// Obtain the original source code text from a SourceRange.
-static StringRef getStringFromRange(SourceManager &SourceMgr,
+static llvm::StringRef getStringFromRange(SourceManager &SourceMgr,
                                     const LangOptions &LangOpts,
                                     SourceRange Range) {
   if (SourceMgr.getFileID(Range.getBegin()) !=
@@ -554,7 +554,7 @@ static bool containerIsConst(const Expr *ContainerExpr, bool Dereference) {
   return false;
 }
 
-LoopConvertCheck::LoopConvertCheck(StringRef Name, ClangTidyContext *Context)
+LoopConvertCheck::LoopConvertCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context), TUInfo(new TUTrackingInfo),
       MaxCopySize(Options.get("MaxCopySize", 16ULL)),
       MinConfidence(Options.get("MinConfidence", Confidence::CL_Reasonable)),
@@ -774,7 +774,7 @@ void LoopConvertCheck::doConversion(
     }
   }
 
-  SmallString<128> Range;
+  llvm::SmallString<128> Range;
   llvm::raw_svector_ostream Output(Range);
   Output << '(';
   Type.print(Output, getLangOpts());
@@ -803,10 +803,10 @@ void LoopConvertCheck::doConversion(
 }
 
 /// Returns a string which refers to the container iterated over.
-StringRef LoopConvertCheck::getContainerString(ASTContext *Context,
+llvm::StringRef LoopConvertCheck::getContainerString(ASTContext *Context,
                                                const ForStmt *Loop,
                                                const Expr *ContainerExpr) {
-  StringRef ContainerString;
+  llvm::StringRef ContainerString;
   ContainerExpr = ContainerExpr->IgnoreParenImpCasts();
   if (isa<CXXThisExpr>(ContainerExpr)) {
     ContainerString = "this";

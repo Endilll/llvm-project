@@ -20,7 +20,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/pro-type-static-cast-downcast.html
 class ProTypeStaticCastDowncastCheck : public ClangTidyCheck {
 public:
-  ProTypeStaticCastDowncastCheck(StringRef Name, ClangTidyContext *Context);
+  ProTypeStaticCastDowncastCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

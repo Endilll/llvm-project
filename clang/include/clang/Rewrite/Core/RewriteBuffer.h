@@ -43,7 +43,7 @@ public:
   void Initialize(const char *BufStart, const char *BufEnd) {
     Buffer.assign(BufStart, BufEnd);
   }
-  void Initialize(StringRef Input) {
+  void Initialize(llvm::StringRef Input) {
     Initialize(Input.begin(), Input.end());
   }
 
@@ -54,7 +54,7 @@ public:
   /// Rewriter::overwriteChangedFiles() instead.
   ///
   /// The original buffer is not actually changed.
-  raw_ostream &write(raw_ostream &Stream) const;
+  llvm::raw_ostream &write(llvm::raw_ostream &Stream) const;
 
   /// RemoveText - Remove the specified text.
   void RemoveText(unsigned OrigOffset, unsigned Size,
@@ -63,7 +63,7 @@ public:
   /// InsertText - Insert some text at the specified point, where the offset in
   /// the buffer is specified relative to the original SourceBuffer.  The
   /// text is inserted after the specified location.
-  void InsertText(unsigned OrigOffset, StringRef Str,
+  void InsertText(unsigned OrigOffset, llvm::StringRef Str,
                   bool InsertAfter = true);
 
 
@@ -71,14 +71,14 @@ public:
   /// offset in the buffer is specified relative to the original
   /// SourceBuffer. The text is inserted before the specified location.  This is
   /// method is the same as InsertText with "InsertAfter == false".
-  void InsertTextBefore(unsigned OrigOffset, StringRef Str) {
+  void InsertTextBefore(unsigned OrigOffset, llvm::StringRef Str) {
     InsertText(OrigOffset, Str, false);
   }
 
   /// InsertTextAfter - Insert some text at the specified point, where the
   /// offset in the buffer is specified relative to the original SourceBuffer.
   /// The text is inserted after the specified location.
-  void InsertTextAfter(unsigned OrigOffset, StringRef Str) {
+  void InsertTextAfter(unsigned OrigOffset, llvm::StringRef Str) {
     InsertText(OrigOffset, Str);
   }
 
@@ -86,7 +86,7 @@ public:
   /// buffer with a new string.  This is effectively a combined "remove/insert"
   /// operation.
   void ReplaceText(unsigned OrigOffset, unsigned OrigLength,
-                   StringRef NewStr);
+                   llvm::StringRef NewStr);
 
 private:
   /// getMappedOffset - Given an offset into the original SourceBuffer that this

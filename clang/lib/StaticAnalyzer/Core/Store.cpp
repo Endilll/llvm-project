@@ -48,7 +48,7 @@ StoreRef StoreManager::enterStackFrame(Store OldStore,
                                        const StackFrameContext *LCtx) {
   StoreRef Store = StoreRef(OldStore, *this);
 
-  SmallVector<CallEvent::FrameBindingTy, 16> InitialBindings;
+  llvm::SmallVector<CallEvent::FrameBindingTy, 16> InitialBindings;
   Call.getInitialStackFrameContents(LCtx, InitialBindings);
 
   for (const auto &I : InitialBindings)

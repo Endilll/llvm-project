@@ -61,7 +61,7 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override {
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override {
     return std::nullopt;
   }
 
@@ -71,7 +71,7 @@ public:
 
   std::string_view getClobbers() const override { return ""; }
 
-  ArrayRef<const char *> getGCCRegNames() const override {
+  llvm::ArrayRef<const char *> getGCCRegNames() const override {
     static const char *const GCCRegNames[] = {
         "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",  "r8",  "r9",
         "r10", "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19",
@@ -79,11 +79,11 @@ public:
     return llvm::ArrayRef(GCCRegNames);
   }
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     return std::nullopt;
   }
 
-  ArrayRef<TargetInfo::AddlRegName> getGCCAddlRegNames() const override {
+  llvm::ArrayRef<TargetInfo::AddlRegName> getGCCAddlRegNames() const override {
     static const TargetInfo::AddlRegName AddlRegNames[] = {
         {{"r26", "r27"}, 26},
         {{"r28", "r29"}, 27},
@@ -96,7 +96,7 @@ public:
   bool validateAsmConstraint(const char *&Name,
                              TargetInfo::ConstraintInfo &Info) const override {
     // There aren't any multi-character AVR specific constraints.
-    if (StringRef(Name).size() > 1)
+    if (llvm::StringRef(Name).size() > 1)
       return false;
 
     switch (*Name) {
@@ -169,11 +169,11 @@ public:
                : TargetInfo::getLeastIntTypeByWidth(BitWidth, IsSigned);
   }
 
-  bool isValidCPUName(StringRef Name) const override;
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  bool isValidCPUName(llvm::StringRef Name) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
   bool setCPU(const std::string &Name) override;
   std::optional<std::string> handleAsmEscapedChar(char EscChar) const override;
-  StringRef getABI() const override { return ABI; }
+  llvm::StringRef getABI() const override { return ABI; }
 
   std::pair<unsigned, unsigned> hardwareInterferenceSizes() const override {
     return std::make_pair(32, 32);
@@ -181,9 +181,9 @@ public:
 
 protected:
   std::string CPU;
-  StringRef ABI;
-  StringRef DefineName;
-  StringRef Arch;
+  llvm::StringRef ABI;
+  llvm::StringRef DefineName;
+  llvm::StringRef Arch;
   int NumFlashBanks = 0;
 };
 

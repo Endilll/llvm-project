@@ -265,7 +265,7 @@ bool SVal::isZeroConstant() const {
 
 LLVM_DUMP_METHOD void SVal::dump() const { dumpToStream(llvm::errs()); }
 
-void SVal::printJson(raw_ostream &Out, bool AddQuotes) const {
+void SVal::printJson(llvm::raw_ostream &Out, bool AddQuotes) const {
   std::string Buf;
   llvm::raw_string_ostream TempOut(Buf);
 
@@ -274,7 +274,7 @@ void SVal::printJson(raw_ostream &Out, bool AddQuotes) const {
   Out << JsonFormat(TempOut.str(), AddQuotes);
 }
 
-void SVal::dumpToStream(raw_ostream &os) const {
+void SVal::dumpToStream(llvm::raw_ostream &os) const {
   if (isUndef()) {
     os << "Undefined";
     return;
@@ -294,7 +294,7 @@ void SVal::dumpToStream(raw_ostream &os) const {
   llvm_unreachable("Unhandled SVal kind!");
 }
 
-void NonLoc::dumpToStream(raw_ostream &os) const {
+void NonLoc::dumpToStream(llvm::raw_ostream &os) const {
   switch (getKind()) {
   case nonloc::ConcreteIntKind: {
     const auto &Value = castAs<nonloc::ConcreteInt>().getValue();
@@ -360,7 +360,7 @@ void NonLoc::dumpToStream(raw_ostream &os) const {
     }
 }
 
-void Loc::dumpToStream(raw_ostream &os) const {
+void Loc::dumpToStream(llvm::raw_ostream &os) const {
   switch (getKind()) {
   case loc::ConcreteIntKind:
     os << castAs<loc::ConcreteInt>().getValue().getZExtValue() << " (Loc)";

@@ -79,7 +79,7 @@ struct UnwrappedLineNode;
 ///
 class MacroExpander {
 public:
-  using ArgsList = ArrayRef<SmallVector<FormatToken *, 8>>;
+  using ArgsList = llvm::ArrayRef<llvm::SmallVector<FormatToken *, 8>>;
 
   /// Construct a macro expander from a set of macro definitions.
   /// Macro definitions must be encoded as UTF-8.
@@ -101,21 +101,21 @@ public:
   ~MacroExpander();
 
   /// Returns whether any macro \p Name is defined, regardless of overloads.
-  bool defined(StringRef Name) const;
+  bool defined(llvm::StringRef Name) const;
 
   /// Returns whetherh there is an object-like overload, i.e. where the macro
   /// has no arguments and should not consume subsequent parentheses.
-  bool objectLike(StringRef Name) const;
+  bool objectLike(llvm::StringRef Name) const;
 
   /// Returns whether macro \p Name provides an overload with the given arity.
-  bool hasArity(StringRef Name, unsigned Arity) const;
+  bool hasArity(llvm::StringRef Name, unsigned Arity) const;
 
   /// Returns the expanded stream of format tokens for \p ID, where
   /// each element in \p Args is a positional argument to the macro call.
   /// If \p Args is not set, the object-like overload is used.
   /// If \p Args is set, the overload with the arity equal to \c Args.size() is
   /// used.
-  SmallVector<FormatToken *, 8>
+  llvm::SmallVector<FormatToken *, 8>
   expand(FormatToken *ID, std::optional<ArgsList> OptionalArgs) const;
 
 private:
@@ -128,7 +128,7 @@ private:
   const FormatStyle &Style;
   llvm::SpecificBumpPtrAllocator<FormatToken> &Allocator;
   IdentifierTable &IdentTable;
-  SmallVector<std::unique_ptr<llvm::MemoryBuffer>> Buffers;
+  llvm::SmallVector<std::unique_ptr<llvm::MemoryBuffer>> Buffers;
   llvm::StringMap<llvm::DenseMap<int, Definition>> FunctionLike;
   llvm::StringMap<Definition> ObjectLike;
 };
@@ -260,7 +260,7 @@ private:
     LineNode() = default;
     LineNode(FormatToken *Tok) : Tok(Tok) {}
     FormatToken *Tok = nullptr;
-    SmallVector<std::unique_ptr<ReconstructedLine>> Children;
+    llvm::SmallVector<std::unique_ptr<ReconstructedLine>> Children;
   };
 
   // Line in which we build up the resulting unwrapped line.
@@ -269,7 +269,7 @@ private:
   struct ReconstructedLine {
     explicit ReconstructedLine(unsigned Level) : Level(Level) {}
     unsigned Level;
-    SmallVector<std::unique_ptr<LineNode>> Tokens;
+    llvm::SmallVector<std::unique_ptr<LineNode>> Tokens;
   };
 
   // The line in which we collect the resulting reconstructed output.
@@ -285,7 +285,7 @@ private:
 
   // Stack of currently "open" lines, where each line's predecessor's last
   // token is the parent token for that line.
-  SmallVector<ReconstructedLine *> ActiveReconstructedLines;
+  llvm::SmallVector<ReconstructedLine *> ActiveReconstructedLines;
 
   // Maps from the expanded token to the token that takes its place in the
   // reconstructed token stream in terms of parent-child relationships.
@@ -325,7 +325,7 @@ private:
   };
 
   // Stack of macro calls for which we're in the middle of an expansion.
-  SmallVector<Expansion> ActiveExpansions;
+  llvm::SmallVector<Expansion> ActiveExpansions;
 
   struct MacroCallState {
     MacroCallState(ReconstructedLine *Line, FormatToken *ParentLastToken,
@@ -368,7 +368,7 @@ private:
   // |- ,
   // |  \- <argument>
   // \- )
-  SmallVector<MacroCallState> MacroCallStructure;
+  llvm::SmallVector<MacroCallState> MacroCallStructure;
 
   // Maps from identifier of the macro call to an unwrapped line containing
   // all tokens of the macro call.

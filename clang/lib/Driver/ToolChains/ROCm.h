@@ -38,7 +38,7 @@ struct DeviceLibABIVersion {
   bool requiresLibrary() { return ABIVersion >= 500; }
   std::string toString() {
     assert(ABIVersion % 100 == 0 && "Not supported");
-    return Twine(ABIVersion / 100).str();
+    return llvm::Twine(ABIVersion / 100).str();
   }
 };
 
@@ -47,12 +47,12 @@ struct DeviceLibABIVersion {
 class RocmInstallationDetector {
 private:
   struct ConditionalLibrary {
-    SmallString<0> On;
-    SmallString<0> Off;
+    llvm::SmallString<0> On;
+    llvm::SmallString<0> Off;
 
     bool isValid() const { return !On.empty() && !Off.empty(); }
 
-    StringRef get(bool Enabled) const {
+    llvm::StringRef get(bool Enabled) const {
       assert(isValid());
       return Enabled ? On : Off;
     }
@@ -69,7 +69,7 @@ private:
 
     bool isSPACK() const { return !SPACKReleaseStr.empty(); }
     Candidate(std::string Path, bool StrictChecking = false,
-              StringRef SPACKReleaseStr = {})
+              llvm::StringRef SPACKReleaseStr = {})
         : Path(Path), StrictChecking(StrictChecking),
           SPACKReleaseStr(SPACKReleaseStr.str()) {}
   };
@@ -94,42 +94,42 @@ private:
   std::string VersionPatch;
 
   // ROCm path specified by --rocm-path.
-  StringRef RocmPathArg;
+  llvm::StringRef RocmPathArg;
   // ROCm device library paths specified by --rocm-device-lib-path.
   std::vector<std::string> RocmDeviceLibPathArg;
   // HIP runtime path specified by --hip-path.
-  StringRef HIPPathArg;
+  llvm::StringRef HIPPathArg;
   // HIP Standard Parallel Algorithm acceleration library specified by
   // --hipstdpar-path
-  StringRef HIPStdParPathArg;
+  llvm::StringRef HIPStdParPathArg;
   // rocThrust algorithm library specified by --hipstdpar-thrust-path
-  StringRef HIPRocThrustPathArg;
+  llvm::StringRef HIPRocThrustPathArg;
   // rocPrim algorithm library specified by --hipstdpar-prim-path
-  StringRef HIPRocPrimPathArg;
+  llvm::StringRef HIPRocPrimPathArg;
   // HIP version specified by --hip-version.
-  StringRef HIPVersionArg;
+  llvm::StringRef HIPVersionArg;
   // Wheter -nogpulib is specified.
   bool NoBuiltinLibs = false;
 
   // Paths
-  SmallString<0> InstallPath;
-  SmallString<0> BinPath;
-  SmallString<0> LibPath;
-  SmallString<0> LibDevicePath;
-  SmallString<0> IncludePath;
-  SmallString<0> SharePath;
+  llvm::SmallString<0> InstallPath;
+  llvm::SmallString<0> BinPath;
+  llvm::SmallString<0> LibPath;
+  llvm::SmallString<0> LibDevicePath;
+  llvm::SmallString<0> IncludePath;
+  llvm::SmallString<0> SharePath;
   llvm::StringMap<std::string> LibDeviceMap;
 
   // Libraries that are always linked.
-  SmallString<0> OCML;
-  SmallString<0> OCKL;
+  llvm::SmallString<0> OCML;
+  llvm::SmallString<0> OCKL;
 
   // Libraries that are always linked depending on the language
-  SmallString<0> OpenCL;
-  SmallString<0> HIP;
+  llvm::SmallString<0> OpenCL;
+  llvm::SmallString<0> HIP;
 
   // Asan runtime library
-  SmallString<0> AsanRTL;
+  llvm::SmallString<0> AsanRTL;
 
   // Libraries swapped based on compile flags.
   ConditionalLibrary WavefrontSize64;
@@ -143,7 +143,7 @@ private:
   std::map<unsigned, std::string> ABIVersionMap;
 
   // Cache ROCm installation search paths.
-  SmallVector<Candidate, 4> ROCmSearchDirs;
+  llvm::SmallVector<Candidate, 4> ROCmSearchDirs;
   bool PrintROCmSearchDirs;
   bool Verbose;
 
@@ -156,14 +156,14 @@ private:
 
   void scanLibDevicePath(llvm::StringRef Path);
   bool parseHIPVersionFile(llvm::StringRef V);
-  const SmallVectorImpl<Candidate> &getInstallationPathCandidates();
+  const llvm::SmallVectorImpl<Candidate> &getInstallationPathCandidates();
 
   /// Find the path to a SPACK package under the ROCm candidate installation
   /// directory if the candidate is a SPACK ROCm candidate. \returns empty
   /// string if the candidate is not SPACK ROCm candidate or the requested
   /// package is not found.
   llvm::SmallString<0> findSPACKPackage(const Candidate &Cand,
-                                        StringRef PackageName);
+                                        llvm::StringRef PackageName);
 
 public:
   RocmInstallationDetector(const Driver &D, const llvm::Triple &HostTriple,
@@ -175,13 +175,13 @@ public:
   /// toolchains.
   llvm::SmallVector<std::string, 12>
   getCommonBitcodeLibs(const llvm::opt::ArgList &DriverArgs,
-                       StringRef LibDeviceFile, bool Wave64, bool DAZ,
+                       llvm::StringRef LibDeviceFile, bool Wave64, bool DAZ,
                        bool FiniteOnly, bool UnsafeMathOpt,
                        bool FastRelaxedMath, bool CorrectSqrt,
                        DeviceLibABIVersion ABIVer, bool isOpenMP) const;
   /// Check file paths of default bitcode libraries common to AMDGPU based
   /// toolchains. \returns false if there are invalid or missing files.
-  bool checkCommonBitcodeLibs(StringRef GPUArch, StringRef LibDeviceFile,
+  bool checkCommonBitcodeLibs(llvm::StringRef GPUArch, llvm::StringRef LibDeviceFile,
                               DeviceLibABIVersion ABIVer) const;
 
   /// Check whether we detected a valid HIP runtime.
@@ -194,78 +194,78 @@ public:
   bool hasHIPStdParLibrary() const { return HasHIPStdParLibrary; }
 
   /// Print information about the detected ROCm installation.
-  void print(raw_ostream &OS) const;
+  void print(llvm::raw_ostream &OS) const;
 
   /// Get the detected Rocm install's version.
   // RocmVersion version() const { return Version; }
 
   /// Get the detected Rocm installation path.
-  StringRef getInstallPath() const { return InstallPath; }
+  llvm::StringRef getInstallPath() const { return InstallPath; }
 
   /// Get the detected path to Rocm's bin directory.
-  // StringRef getBinPath() const { return BinPath; }
+  // llvm::StringRef getBinPath() const { return BinPath; }
 
   /// Get the detected Rocm Include path.
-  StringRef getIncludePath() const { return IncludePath; }
+  llvm::StringRef getIncludePath() const { return IncludePath; }
 
   /// Get the detected Rocm library path.
-  StringRef getLibPath() const { return LibPath; }
+  llvm::StringRef getLibPath() const { return LibPath; }
 
   /// Get the detected Rocm device library path.
-  StringRef getLibDevicePath() const { return LibDevicePath; }
+  llvm::StringRef getLibDevicePath() const { return LibDevicePath; }
 
-  StringRef getOCMLPath() const {
+  llvm::StringRef getOCMLPath() const {
     assert(!OCML.empty());
     return OCML;
   }
 
-  StringRef getOCKLPath() const {
+  llvm::StringRef getOCKLPath() const {
     assert(!OCKL.empty());
     return OCKL;
   }
 
-  StringRef getOpenCLPath() const {
+  llvm::StringRef getOpenCLPath() const {
     assert(!OpenCL.empty());
     return OpenCL;
   }
 
-  StringRef getHIPPath() const {
+  llvm::StringRef getHIPPath() const {
     assert(!HIP.empty());
     return HIP;
   }
 
   /// Returns empty string of Asan runtime library is not available.
-  StringRef getAsanRTLPath() const { return AsanRTL; }
+  llvm::StringRef getAsanRTLPath() const { return AsanRTL; }
 
-  StringRef getWavefrontSize64Path(bool Enabled) const {
+  llvm::StringRef getWavefrontSize64Path(bool Enabled) const {
     return WavefrontSize64.get(Enabled);
   }
 
-  StringRef getFiniteOnlyPath(bool Enabled) const {
+  llvm::StringRef getFiniteOnlyPath(bool Enabled) const {
     return FiniteOnly.get(Enabled);
   }
 
-  StringRef getUnsafeMathPath(bool Enabled) const {
+  llvm::StringRef getUnsafeMathPath(bool Enabled) const {
     return UnsafeMath.get(Enabled);
   }
 
-  StringRef getDenormalsAreZeroPath(bool Enabled) const {
+  llvm::StringRef getDenormalsAreZeroPath(bool Enabled) const {
     return DenormalsAreZero.get(Enabled);
   }
 
-  StringRef getCorrectlyRoundedSqrtPath(bool Enabled) const {
+  llvm::StringRef getCorrectlyRoundedSqrtPath(bool Enabled) const {
     return CorrectlyRoundedSqrt.get(Enabled);
   }
 
-  StringRef getABIVersionPath(DeviceLibABIVersion ABIVer) const {
+  llvm::StringRef getABIVersionPath(DeviceLibABIVersion ABIVer) const {
     auto Loc = ABIVersionMap.find(ABIVer.ABIVersion);
     if (Loc == ABIVersionMap.end())
-      return StringRef();
+      return llvm::StringRef();
     return Loc->second;
   }
 
   /// Get libdevice file for given architecture
-  StringRef getLibDeviceFile(StringRef Gpu) const {
+  llvm::StringRef getLibDeviceFile(llvm::StringRef Gpu) const {
     auto Loc = LibDeviceMap.find(Gpu);
     if (Loc == LibDeviceMap.end())
       return "";
@@ -279,17 +279,17 @@ public:
   void detectHIPRuntime();
 
   /// Get the values for --rocm-device-lib-path arguments
-  ArrayRef<std::string> getRocmDeviceLibPathArg() const {
+  llvm::ArrayRef<std::string> getRocmDeviceLibPathArg() const {
     return RocmDeviceLibPathArg;
   }
 
   /// Get the value for --rocm-path argument
-  StringRef getRocmPathArg() const { return RocmPathArg; }
+  llvm::StringRef getRocmPathArg() const { return RocmPathArg; }
 
   /// Get the value for --hip-version argument
-  StringRef getHIPVersionArg() const { return HIPVersionArg; }
+  llvm::StringRef getHIPVersionArg() const { return HIPVersionArg; }
 
-  StringRef getHIPVersion() const { return DetectedVersion; }
+  llvm::StringRef getHIPVersion() const { return DetectedVersion; }
 };
 
 } // end namespace driver

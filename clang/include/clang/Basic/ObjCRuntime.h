@@ -61,21 +61,21 @@ public:
 
 private:
   Kind TheKind = MacOSX;
-  VersionTuple Version;
+  llvm::VersionTuple Version;
 
 public:
   /// A bogus initialization of the runtime.
   ObjCRuntime() = default;
-  ObjCRuntime(Kind kind, const VersionTuple &version)
+  ObjCRuntime(Kind kind, const llvm::VersionTuple &version)
       : TheKind(kind), Version(version) {}
 
-  void set(Kind kind, VersionTuple version) {
+  void set(Kind kind, llvm::VersionTuple version) {
     TheKind = kind;
     Version = version;
   }
 
   Kind getKind() const { return TheKind; }
-  const VersionTuple &getVersion() const { return Version; }
+  const llvm::VersionTuple &getVersion() const { return Version; }
 
   /// Does this runtime follow the set of implied behaviors for a
   /// "non-fragile" ABI?
@@ -105,18 +105,18 @@ public:
       case llvm::Triple::arm:
       case llvm::Triple::x86:
       case llvm::Triple::x86_64:
-        return !(getVersion() >= VersionTuple(1, 6));
+        return !(getVersion() >= llvm::VersionTuple(1, 6));
       case llvm::Triple::aarch64:
       case llvm::Triple::mips64:
-        return !(getVersion() >= VersionTuple(1, 9));
+        return !(getVersion() >= llvm::VersionTuple(1, 9));
       case llvm::Triple::riscv64:
-        return !(getVersion() >= VersionTuple(2, 2));
+        return !(getVersion() >= llvm::VersionTuple(2, 2));
       default:
         return true;
       }
     } else if ((getKind() == MacOSX) && isNonFragile() &&
-               (getVersion() >= VersionTuple(10, 0)) &&
-               (getVersion() < VersionTuple(10, 6)))
+               (getVersion() >= llvm::VersionTuple(10, 0)) &&
+               (getVersion() < llvm::VersionTuple(10, 6)))
       return Arch != llvm::Triple::x86_64;
     // Except for deployment target of 10.5 or less,
     // Mac runtimes use legacy dispatch everywhere now.
@@ -151,7 +151,7 @@ public:
     switch (getKind()) {
     case FragileMacOSX:
       // No stub library for the fragile runtime.
-      return getVersion() >= VersionTuple(10, 7);
+      return getVersion() >= llvm::VersionTuple(10, 7);
     case MacOSX: return true;
     case iOS: return true;
     case WatchOS: return true;
@@ -169,13 +169,13 @@ public:
   /// library.
   bool hasNativeARC() const {
     switch (getKind()) {
-    case FragileMacOSX: return getVersion() >= VersionTuple(10, 7);
-    case MacOSX: return getVersion() >= VersionTuple(10, 7);
-    case iOS: return getVersion() >= VersionTuple(5);
+    case FragileMacOSX: return getVersion() >= llvm::VersionTuple(10, 7);
+    case MacOSX: return getVersion() >= llvm::VersionTuple(10, 7);
+    case iOS: return getVersion() >= llvm::VersionTuple(5);
     case WatchOS: return true;
 
     case GCC: return false;
-    case GNUstep: return getVersion() >= VersionTuple(1, 6);
+    case GNUstep: return getVersion() >= llvm::VersionTuple(1, 6);
     case ObjFW: return true;
     }
     llvm_unreachable("bad kind");
@@ -203,9 +203,9 @@ public:
     case FragileMacOSX:
       return false;
     case MacOSX:
-      return getVersion() >= VersionTuple(10, 10);
+      return getVersion() >= llvm::VersionTuple(10, 10);
     case iOS:
-      return getVersion() >= VersionTuple(8);
+      return getVersion() >= llvm::VersionTuple(8);
     case WatchOS:
       return true;
     case GCC:
@@ -217,7 +217,7 @@ public:
       // the runtime is built with this enabled.  Since distributions typically
       // build all Objective-C things with the same compiler version and flags,
       // it's better to be conservative here.
-      return (getVersion() >= VersionTuple(2, 2));
+      return (getVersion() >= llvm::VersionTuple(2, 2));
     case ObjFW:
       return false;
     }
@@ -245,16 +245,16 @@ public:
     case FragileMacOSX:
       return false;
     case MacOSX:
-      return getVersion() >= VersionTuple(10, 10);
+      return getVersion() >= llvm::VersionTuple(10, 10);
     case iOS:
-      return getVersion() >= VersionTuple(8);
+      return getVersion() >= llvm::VersionTuple(8);
     case WatchOS:
       return true;
 
     case GCC:
       return false;
     case GNUstep:
-      return getVersion() >= VersionTuple(2, 2);
+      return getVersion() >= llvm::VersionTuple(2, 2);
     case ObjFW:
       return false;
     }
@@ -267,13 +267,13 @@ public:
   bool shouldUseRuntimeFunctionForCombinedAllocInit() const {
     switch (getKind()) {
     case MacOSX:
-      return getVersion() >= VersionTuple(10, 14, 4);
+      return getVersion() >= llvm::VersionTuple(10, 14, 4);
     case iOS:
-      return getVersion() >= VersionTuple(12, 2);
+      return getVersion() >= llvm::VersionTuple(12, 2);
     case WatchOS:
-      return getVersion() >= VersionTuple(5, 2);
+      return getVersion() >= llvm::VersionTuple(5, 2);
     case GNUstep:
-      return getVersion() >= VersionTuple(2, 2);
+      return getVersion() >= llvm::VersionTuple(2, 2);
     default:
       return false;
     }
@@ -283,13 +283,13 @@ public:
   bool hasOptimizedSetter() const {
     switch (getKind()) {
       case MacOSX:
-        return getVersion() >= VersionTuple(10, 8);
+        return getVersion() >= llvm::VersionTuple(10, 8);
       case iOS:
-        return (getVersion() >= VersionTuple(6));
+        return (getVersion() >= llvm::VersionTuple(6));
       case WatchOS:
         return true;
       case GNUstep:
-        return getVersion() >= VersionTuple(1, 7);
+        return getVersion() >= llvm::VersionTuple(1, 7);
       default:
         return false;
     }
@@ -314,8 +314,8 @@ public:
   bool hasSubscripting() const {
     switch (getKind()) {
     case FragileMacOSX: return false;
-    case MacOSX: return getVersion() >= VersionTuple(10, 11);
-    case iOS: return getVersion() >= VersionTuple(9);
+    case MacOSX: return getVersion() >= llvm::VersionTuple(10, 11);
+    case iOS: return getVersion() >= llvm::VersionTuple(9);
     case WatchOS: return true;
 
     // This is really a lie, because some implementations and versions
@@ -363,9 +363,9 @@ public:
   /// without it, abort() must be used in pure ObjC files.
   bool hasTerminate() const {
     switch (getKind()) {
-    case FragileMacOSX: return getVersion() >= VersionTuple(10, 8);
-    case MacOSX: return getVersion() >= VersionTuple(10, 8);
-    case iOS: return getVersion() >= VersionTuple(5);
+    case FragileMacOSX: return getVersion() >= llvm::VersionTuple(10, 8);
+    case MacOSX: return getVersion() >= llvm::VersionTuple(10, 8);
+    case iOS: return getVersion() >= llvm::VersionTuple(5);
     case WatchOS: return true;
     case GCC: return false;
     case GNUstep: return false;
@@ -410,7 +410,7 @@ public:
     case WatchOS:
       return true;
     case GNUstep:
-      return getVersion() >= VersionTuple(1, 7);
+      return getVersion() >= llvm::VersionTuple(1, 7);
     default: return false;
     }
   }
@@ -420,11 +420,11 @@ public:
     switch (getKind()) {
     case MacOSX:
     case FragileMacOSX:
-      return getVersion() >= VersionTuple(10, 11);
+      return getVersion() >= llvm::VersionTuple(10, 11);
     case iOS:
-      return getVersion() >= VersionTuple(9);
+      return getVersion() >= llvm::VersionTuple(9);
     case WatchOS:
-      return getVersion() >= VersionTuple(2);
+      return getVersion() >= llvm::VersionTuple(2);
     case GNUstep:
       return false;
     default:
@@ -438,11 +438,11 @@ public:
     default:
       return false;
     case MacOSX:
-      return getVersion() >= VersionTuple(10, 11);
+      return getVersion() >= llvm::VersionTuple(10, 11);
     case iOS:
-      return getVersion() >= VersionTuple(9);
+      return getVersion() >= llvm::VersionTuple(9);
     case WatchOS:
-      return getVersion() >= VersionTuple(2);
+      return getVersion() >= llvm::VersionTuple(2);
     }
   }
 
@@ -472,7 +472,7 @@ public:
     case WatchOS: return true;
     case GCC: return false;
     case GNUstep:
-      return (getVersion() >= VersionTuple(2, 2));
+      return (getVersion() >= llvm::VersionTuple(2, 2));
     case ObjFW: return false;
     }
     llvm_unreachable("bad kind");
@@ -482,7 +482,7 @@ public:
   /// string.
   ///
   /// \return true on error.
-  bool tryParse(StringRef input);
+  bool tryParse(llvm::StringRef input);
 
   std::string getAsString() const;
 
@@ -506,7 +506,7 @@ public:
   }
 };
 
-raw_ostream &operator<<(raw_ostream &out, const ObjCRuntime &value);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &out, const ObjCRuntime &value);
 
 } // namespace clang
 

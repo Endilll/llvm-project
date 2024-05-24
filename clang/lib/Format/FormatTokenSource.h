@@ -71,7 +71,7 @@ public:
   // getNextToken() -> b2
   // getNextToken() -> a1
   // getNextToken() -> a2
-  virtual FormatToken *insertTokens(ArrayRef<FormatToken *> Tokens) = 0;
+  virtual FormatToken *insertTokens(llvm::ArrayRef<FormatToken *> Tokens) = 0;
 
   [[nodiscard]] FormatToken *getNextNonComment() {
     FormatToken *Tok;
@@ -85,7 +85,7 @@ public:
 
 class IndexedTokenSource : public FormatTokenSource {
 public:
-  IndexedTokenSource(ArrayRef<FormatToken *> Tokens)
+  IndexedTokenSource(llvm::ArrayRef<FormatToken *> Tokens)
       : Tokens(Tokens), Position(-1) {}
 
   FormatToken *getNextToken() override {
@@ -139,7 +139,7 @@ public:
     return Tokens[Position];
   }
 
-  FormatToken *insertTokens(ArrayRef<FormatToken *> New) override {
+  FormatToken *insertTokens(llvm::ArrayRef<FormatToken *> New) override {
     assert(Position != -1);
     assert((*New.rbegin())->Tok.is(tok::eof));
     int Next = Tokens.size();
@@ -173,14 +173,14 @@ private:
     return Next;
   }
 
-  void dbgToken(int Position, StringRef Indent = "") {
+  void dbgToken(int Position, llvm::StringRef Indent = "") {
     FormatToken *Tok = Tokens[Position];
     llvm::dbgs() << Indent << "[" << Position
                  << "] Token: " << Tok->Tok.getName() << " / " << Tok->TokenText
                  << ", Macro: " << !!Tok->MacroCtx << "\n";
   }
 
-  SmallVector<FormatToken *> Tokens;
+  llvm::SmallVector<FormatToken *> Tokens;
   int Position;
 
   // Maps from position a to position b, so that when we reach a, the token
@@ -242,7 +242,7 @@ public:
     return Token;
   }
 
-  FormatToken *insertTokens(ArrayRef<FormatToken *> Tokens) override {
+  FormatToken *insertTokens(llvm::ArrayRef<FormatToken *> Tokens) override {
     llvm_unreachable("Cannot insert tokens while parsing a macro.");
     return nullptr;
   }

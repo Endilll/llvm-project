@@ -17,8 +17,8 @@ namespace utils {
 
 namespace {
 
-StringRef removeFirstSuffix(StringRef Str, ArrayRef<const char *> Suffixes) {
-  for (StringRef Suffix : Suffixes) {
+llvm::StringRef removeFirstSuffix(llvm::StringRef Str, llvm::ArrayRef<const char *> Suffixes) {
+  for (llvm::StringRef Suffix : Suffixes) {
     if (Str.ends_with(Suffix)) {
       return Str.substr(0, Str.size() - Suffix.size());
     }
@@ -26,7 +26,7 @@ StringRef removeFirstSuffix(StringRef Str, ArrayRef<const char *> Suffixes) {
   return Str;
 }
 
-StringRef makeCanonicalName(StringRef Str, IncludeSorter::IncludeStyle Style) {
+llvm::StringRef makeCanonicalName(llvm::StringRef Str, IncludeSorter::IncludeStyle Style) {
   // The list of suffixes to remove from source file names to get the
   // "canonical" file names.
   // E.g. tools/sort_includes.cc and tools/sort_includes_test.cc
@@ -38,7 +38,7 @@ StringRef makeCanonicalName(StringRef Str, IncludeSorter::IncludeStyle Style) {
         removeFirstSuffix(Str, {".cc", ".cpp", ".c", ".h", ".hpp"}), {"Test"});
   }
   if (Style == IncludeSorter::IS_Google_ObjC) {
-    StringRef Canonical =
+    llvm::StringRef Canonical =
         removeFirstSuffix(removeFirstSuffix(Str, {".cc", ".cpp", ".c", ".h",
                                                   ".hpp", ".mm", ".m"}),
                           {"_unittest", "_regtest", "_test", "Test"});
@@ -46,7 +46,7 @@ StringRef makeCanonicalName(StringRef Str, IncludeSorter::IncludeStyle Style) {
     // Objective-C categories have a `+suffix` format, but should be grouped
     // with the file they are a category of.
     size_t StartIndex = Canonical.find_last_of('/');
-    if (StartIndex == StringRef::npos) {
+    if (StartIndex == llvm::StringRef::npos) {
       StartIndex = 0;
     }
     return Canonical.substr(
@@ -64,7 +64,7 @@ size_t findNextLine(const char *Text) {
 }
 
 IncludeSorter::IncludeKinds
-determineIncludeKind(StringRef CanonicalFile, StringRef IncludeFile,
+determineIncludeKind(llvm::StringRef CanonicalFile, llvm::StringRef IncludeFile,
                      bool IsAngled, IncludeSorter::IncludeStyle Style) {
   // Compute the two "canonical" forms of the include's filename sans extension.
   // The first form is the include's filename without ".h" or "-inl.h" at the
@@ -76,15 +76,15 @@ determineIncludeKind(StringRef CanonicalFile, StringRef IncludeFile,
     return IncludeFile.ends_with(".h") ? IncludeSorter::IK_CSystemInclude
                                        : IncludeSorter::IK_CXXSystemInclude;
   }
-  StringRef CanonicalInclude = makeCanonicalName(IncludeFile, Style);
+  llvm::StringRef CanonicalInclude = makeCanonicalName(IncludeFile, Style);
   if (CanonicalFile.ends_with(CanonicalInclude) ||
       CanonicalInclude.ends_with(CanonicalFile)) {
     return IncludeSorter::IK_MainTUInclude;
   }
   if ((Style == IncludeSorter::IS_Google) ||
       (Style == IncludeSorter::IS_Google_ObjC)) {
-    std::pair<StringRef, StringRef> Parts = CanonicalInclude.split("/public/");
-    StringRef FileCopy = CanonicalFile;
+    std::pair<llvm::StringRef, llvm::StringRef> Parts = CanonicalInclude.split("/public/");
+    llvm::StringRef FileCopy = CanonicalFile;
     if (FileCopy.consume_front(Parts.first) &&
         FileCopy.consume_back(Parts.second)) {
       // Determine the kind of this inclusion.
@@ -103,7 +103,7 @@ determineIncludeKind(StringRef CanonicalFile, StringRef IncludeFile,
   return IncludeSorter::IK_NonSystemInclude;
 }
 
-int compareHeaders(StringRef LHS, StringRef RHS,
+int compareHeaders(llvm::StringRef LHS, llvm::StringRef RHS,
                    IncludeSorter::IncludeStyle Style) {
   if (Style == IncludeSorter::IncludeStyle::IS_Google_ObjC) {
     const std::pair<const char *, const char *> &Mismatch =
@@ -123,12 +123,12 @@ int compareHeaders(StringRef LHS, StringRef RHS,
 } // namespace
 
 IncludeSorter::IncludeSorter(const SourceManager *SourceMgr,
-                             const FileID FileID, StringRef FileName,
+                             const FileID FileID, llvm::StringRef FileName,
                              IncludeStyle Style)
     : SourceMgr(SourceMgr), Style(Style), CurrentFileID(FileID),
       CanonicalFile(makeCanonicalName(FileName, Style)) {}
 
-void IncludeSorter::addInclude(StringRef FileName, bool IsAngled,
+void IncludeSorter::addInclude(llvm::StringRef FileName, bool IsAngled,
                                SourceLocation HashLocation,
                                SourceLocation EndLocation) {
   int Offset = findNextLine(SourceMgr->getCharacterData(EndLocation));
@@ -151,7 +151,7 @@ void IncludeSorter::addInclude(StringRef FileName, bool IsAngled,
 }
 
 std::optional<FixItHint>
-IncludeSorter::createIncludeInsertion(StringRef FileName, bool IsAngled) {
+IncludeSorter::createIncludeInsertion(llvm::StringRef FileName, bool IsAngled) {
   std::string IncludeStmt;
   if (Style == IncludeStyle::IS_Google_ObjC) {
     IncludeStmt = IsAngled
@@ -225,9 +225,9 @@ IncludeSorter::createIncludeInsertion(StringRef FileName, bool IsAngled) {
 
 } // namespace utils
 
-llvm::ArrayRef<std::pair<utils::IncludeSorter::IncludeStyle, StringRef>>
+llvm::ArrayRef<std::pair<utils::IncludeSorter::IncludeStyle, llvm::StringRef>>
 OptionEnumMapping<utils::IncludeSorter::IncludeStyle>::getEnumMapping() {
-  static constexpr std::pair<utils::IncludeSorter::IncludeStyle, StringRef>
+  static constexpr std::pair<utils::IncludeSorter::IncludeStyle, llvm::StringRef>
       Mapping[] = {{utils::IncludeSorter::IS_LLVM, "llvm"},
                    {utils::IncludeSorter::IS_Google, "google"},
                    {utils::IncludeSorter::IS_Google_ObjC, "google-objc"}};

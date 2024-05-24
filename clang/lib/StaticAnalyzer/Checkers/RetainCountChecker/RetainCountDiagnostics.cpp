@@ -21,7 +21,7 @@ using namespace clang;
 using namespace ento;
 using namespace retaincountchecker;
 
-StringRef RefCountBug::bugTypeToName(RefCountBug::RefCountBugKind BT) {
+llvm::StringRef RefCountBug::bugTypeToName(RefCountBug::RefCountBugKind BT) {
   switch (BT) {
   case UseAfterRelease:
     return "Use-after-release";
@@ -43,7 +43,7 @@ StringRef RefCountBug::bugTypeToName(RefCountBug::RefCountBugKind BT) {
   llvm_unreachable("Unknown RefCountBugKind");
 }
 
-StringRef RefCountBug::getDescription() const {
+llvm::StringRef RefCountBug::getDescription() const {
   switch (BT) {
   case UseAfterRelease:
     return "Reference-counted object is used after it is released";
@@ -383,7 +383,7 @@ annotateConsumedSummaryMismatch(const ExplodedNode *N,
 
   std::string sbuf;
   llvm::raw_string_ostream os(sbuf);
-  ArrayRef<const ParmVarDecl *> Parameters = Call->parameters();
+  llvm::ArrayRef<const ParmVarDecl *> Parameters = Call->parameters();
   for (unsigned I=0; I < Call->getNumArgs() && I < Parameters.size(); ++I) {
     const ParmVarDecl *PVD = Parameters[I];
 
@@ -821,7 +821,7 @@ RefLeakReportVisitor::getEndPath(BugReporterContext &BRC,
         } else if (RV->getObjKind() == ObjKind::OS) {
           std::string FuncName = FD->getNameAsString();
           os << "whose name ('" << FuncName << "') starts with '"
-             << StringRef(FuncName).substr(0, 3) << "'";
+             << llvm::StringRef(FuncName).substr(0, 3) << "'";
         }
       }
     }
@@ -844,7 +844,7 @@ RefCountReport::RefCountReport(const RefCountBug &D, const LangOptions &LOpts,
 
 RefCountReport::RefCountReport(const RefCountBug &D, const LangOptions &LOpts,
                                ExplodedNode *n, SymbolRef sym,
-                               StringRef endText)
+                               llvm::StringRef endText)
     : PathSensitiveBugReport(D, D.getDescription(), endText, n) {
 
   addVisitor<RefCountReportVisitor>(sym);

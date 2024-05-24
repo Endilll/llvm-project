@@ -64,7 +64,7 @@ public:
     IndexFile.os().flush();
     EXPECT_TRUE(llvm::sys::fs::exists(IndexFileName));
 
-    StringRef SourceText = "int f(int) { return 0; }\n";
+    llvm::StringRef SourceText = "int f(int) { return 0; }\n";
     // This file must exist since the saved ASTFile will reference it.
     int SourceFD;
     llvm::SmallString<256> SourceFileName;
@@ -124,7 +124,7 @@ public:
 
 protected:
   std::unique_ptr<clang::ASTConsumer>
-  CreateASTConsumer(clang::CompilerInstance &CI, StringRef) override {
+  CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef) override {
     CI.getAnalyzerOpts().CTUImportThreshold = OverrideLimit;
     CI.getAnalyzerOpts().CTUImportCppThreshold = OverrideLimit;
     return std::make_unique<CTUASTConsumer>(CI, Success);

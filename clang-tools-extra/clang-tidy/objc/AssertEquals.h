@@ -21,7 +21,7 @@ namespace clang::tidy::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/objc/assert-equals.html
 class AssertEquals final : public ClangTidyCheck {
 public:
-  AssertEquals(StringRef Name, ClangTidyContext *Context)
+  AssertEquals(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC;

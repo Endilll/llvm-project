@@ -46,11 +46,11 @@ extern llvm::cl::opt<std::string> ExecutorName;
 class ToolResults {
 public:
   virtual ~ToolResults() = default;
-  virtual void addResult(StringRef Key, StringRef Value) = 0;
+  virtual void addResult(llvm::StringRef Key, llvm::StringRef Value) = 0;
   virtual std::vector<std::pair<llvm::StringRef, llvm::StringRef>>
   AllKVResults() = 0;
   virtual void forEachResult(
-      llvm::function_ref<void(StringRef Key, StringRef Value)> Callback) = 0;
+      llvm::function_ref<void(llvm::StringRef Key, llvm::StringRef Value)> Callback) = 0;
 };
 
 /// Stores the key-value results in memory. It maintains the lifetime of
@@ -59,10 +59,10 @@ public:
 class InMemoryToolResults : public ToolResults {
 public:
   InMemoryToolResults() : Strings(Arena) {}
-  void addResult(StringRef Key, StringRef Value) override;
+  void addResult(llvm::StringRef Key, llvm::StringRef Value) override;
   std::vector<std::pair<llvm::StringRef, llvm::StringRef>>
   AllKVResults() override;
-  void forEachResult(llvm::function_ref<void(StringRef Key, StringRef Value)>
+  void forEachResult(llvm::function_ref<void(llvm::StringRef Key, llvm::StringRef Value)>
                          Callback) override;
 
 private:
@@ -82,7 +82,7 @@ public:
   explicit ExecutionContext(ToolResults *Results) : Results(Results) {}
 
   /// Adds a KV pair to the result container of this execution.
-  void reportResult(StringRef Key, StringRef Value);
+  void reportResult(llvm::StringRef Key, llvm::StringRef Value);
 
   // Returns the source control system's revision number if applicable.
   // Otherwise returns an empty string.
@@ -113,7 +113,7 @@ public:
   virtual ~ToolExecutor() {}
 
   /// Returns the name of a specific executor.
-  virtual StringRef getExecutorName() const = 0;
+  virtual llvm::StringRef getExecutorName() const = 0;
 
   /// Executes each action with a corresponding arguments adjuster.
   virtual llvm::Error
@@ -143,7 +143,7 @@ public:
   ///
   /// \param FilePath The path at which the content will be mapped.
   /// \param Content A buffer of the file's content.
-  virtual void mapVirtualFile(StringRef FilePath, StringRef Content) = 0;
+  virtual void mapVirtualFile(llvm::StringRef FilePath, llvm::StringRef Content) = 0;
 };
 
 /// Interface for factories that create specific executors. This is also

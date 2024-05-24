@@ -42,7 +42,7 @@ ExternalASTSource::hasExternalDefinitions(const Decl *D) {
 
 void ExternalASTSource::FindFileRegionDecls(FileID File, unsigned Offset,
                                             unsigned Length,
-                                            SmallVectorImpl<Decl *> &Decls) {}
+                                            llvm::SmallVectorImpl<Decl *> &Decls) {}
 
 void ExternalASTSource::CompleteRedeclChain(const Decl *D) {}
 
@@ -102,7 +102,7 @@ void ExternalASTSource::completeVisibleDeclsMap(const DeclContext *DC) {}
 
 void ExternalASTSource::FindExternalLexicalDecls(
     const DeclContext *DC, llvm::function_ref<bool(Decl::Kind)> IsKindWeWant,
-    SmallVectorImpl<Decl *> &Result) {}
+    llvm::SmallVectorImpl<Decl *> &Result) {}
 
 void ExternalASTSource::getMemoryBufferSizes(MemoryBufferSizes &sizes) const {}
 

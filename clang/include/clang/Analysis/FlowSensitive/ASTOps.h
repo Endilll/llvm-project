@@ -59,21 +59,21 @@ public:
   RecordInitListHelper(const CXXParenListInitExpr *ParenInitList);
 
   // Base classes with their associated initializer expressions.
-  ArrayRef<std::pair<const CXXBaseSpecifier *, Expr *>> base_inits() const {
+  llvm::ArrayRef<std::pair<const CXXBaseSpecifier *, Expr *>> base_inits() const {
     return BaseInits;
   }
 
   // Fields with their associated initializer expressions.
-  ArrayRef<std::pair<const FieldDecl *, Expr *>> field_inits() const {
+  llvm::ArrayRef<std::pair<const FieldDecl *, Expr *>> field_inits() const {
     return FieldInits;
   }
 
 private:
   RecordInitListHelper(QualType Ty, std::vector<const FieldDecl *> Fields,
-                       ArrayRef<Expr *> Inits);
+                       llvm::ArrayRef<Expr *> Inits);
 
-  SmallVector<std::pair<const CXXBaseSpecifier *, Expr *>> BaseInits;
-  SmallVector<std::pair<const FieldDecl *, Expr *>> FieldInits;
+  llvm::SmallVector<std::pair<const CXXBaseSpecifier *, Expr *>> BaseInits;
+  llvm::SmallVector<std::pair<const FieldDecl *, Expr *>> FieldInits;
 
   // We potentially synthesize an `ImplicitValueInitExpr` for unions. It's a
   // member variable because we store a pointer to it in `FieldInits`.

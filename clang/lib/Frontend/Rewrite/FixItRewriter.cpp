@@ -48,7 +48,7 @@ FixItRewriter::~FixItRewriter() {
   Diags.setClient(Client, Owner.release() != nullptr);
 }
 
-bool FixItRewriter::WriteFixedFile(FileID ID, raw_ostream &OS) {
+bool FixItRewriter::WriteFixedFile(FileID ID, llvm::raw_ostream &OS) {
   const RewriteBuffer *RewriteBuf = Rewrite.getRewriteBufferFor(ID);
   if (!RewriteBuf) return true;
   RewriteBuf->write(OS);
@@ -64,11 +64,11 @@ class RewritesReceiver : public edit::EditsReceiver {
 public:
   RewritesReceiver(Rewriter &Rewrite) : Rewrite(Rewrite) {}
 
-  void insert(SourceLocation loc, StringRef text) override {
+  void insert(SourceLocation loc, llvm::StringRef text) override {
     Rewrite.InsertText(loc, text);
   }
 
-  void replace(CharSourceRange range, StringRef text) override {
+  void replace(CharSourceRange range, llvm::StringRef text) override {
     Rewrite.ReplaceText(range.getBegin(), Rewrite.getRangeSize(range), text);
   }
 };

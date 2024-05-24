@@ -249,12 +249,12 @@ private:
   // the virtual table group. To save a little memory in the common case where
   // the vtable group contains a single vtable, an empty vector here represents
   // the vector {0}.
-  OwningArrayRef<size_t> VTableIndices;
+  llvm::OwningArrayRef<size_t> VTableIndices;
 
-  OwningArrayRef<VTableComponent> VTableComponents;
+  llvm::OwningArrayRef<VTableComponent> VTableComponents;
 
   /// Contains thunks needed by vtables, sorted by indices.
-  OwningArrayRef<VTableThunkTy> VTableThunks;
+  llvm::OwningArrayRef<VTableThunkTy> VTableThunks;
 
   /// Address points for all vtables.
   AddressPointsMapTy AddressPoints;
@@ -263,17 +263,17 @@ private:
   AddressPointsIndexMapTy AddressPointIndices;
 
 public:
-  VTableLayout(ArrayRef<size_t> VTableIndices,
-               ArrayRef<VTableComponent> VTableComponents,
-               ArrayRef<VTableThunkTy> VTableThunks,
+  VTableLayout(llvm::ArrayRef<size_t> VTableIndices,
+               llvm::ArrayRef<VTableComponent> VTableComponents,
+               llvm::ArrayRef<VTableThunkTy> VTableThunks,
                const AddressPointsMapTy &AddressPoints);
   ~VTableLayout();
 
-  ArrayRef<VTableComponent> vtable_components() const {
+  llvm::ArrayRef<VTableComponent> vtable_components() const {
     return VTableComponents;
   }
 
-  ArrayRef<VTableThunkTy> vtable_thunks() const {
+  llvm::ArrayRef<VTableThunkTy> vtable_thunks() const {
     return VTableThunks;
   }
 
@@ -320,7 +320,7 @@ public:
 
 class VTableContextBase {
 public:
-  typedef SmallVector<ThunkInfo, 1> ThunkInfoVectorTy;
+  typedef llvm::SmallVector<ThunkInfo, 1> ThunkInfoVectorTy;
 
   bool isMicrosoft() const { return IsMicrosoftABI; }
 
@@ -444,7 +444,7 @@ private:
 /// table pointer.  A record may contain as many vfptrs or vbptrs as there are
 /// base subobjects.
 struct VPtrInfo {
-  typedef SmallVector<const CXXRecordDecl *, 1> BasePath;
+  typedef llvm::SmallVector<const CXXRecordDecl *, 1> BasePath;
 
   VPtrInfo(const CXXRecordDecl *RD)
       : ObjectWithVPtr(RD), IntroducingObject(RD), NextBaseToMangle(RD) {}
@@ -492,7 +492,7 @@ struct VPtrInfo {
   }
 };
 
-typedef SmallVector<std::unique_ptr<VPtrInfo>, 2> VPtrInfoVector;
+typedef llvm::SmallVector<std::unique_ptr<VPtrInfo>, 2> VPtrInfoVector;
 
 /// All virtual base related information about a given record decl.  Includes
 /// information on all virtual base tables and the path components that are used
@@ -567,7 +567,7 @@ private:
 
   void dumpMethodLocations(const CXXRecordDecl *RD,
                            const MethodVFTableLocationsTy &NewMethods,
-                           raw_ostream &);
+                           llvm::raw_ostream &);
 
   const VirtualBaseInfo &
   computeVBTableRelatedInformation(const CXXRecordDecl *RD);

@@ -1,5 +1,5 @@
 // RUN: %clang_cc1 -verify -fsyntax-only %s
-// The diagnostics we produce for this code tickled a bug in raw_ostream.
+// The diagnostics we produce for this code tickled a bug in llvm::raw_ostream.
 template <typename _Alloc> class allocator;
 template <class _CharT> struct char_traits;
 template <typename _CharT, typename _Traits = char_traits<_CharT>,

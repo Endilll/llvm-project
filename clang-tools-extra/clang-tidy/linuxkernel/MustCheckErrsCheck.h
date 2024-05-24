@@ -21,7 +21,7 @@ namespace clang::tidy::linuxkernel {
 /// http://clang.llvm.org/extra/clang-tidy/checks/linuxkernel/must-check-errs.html
 class MustCheckErrsCheck : public ClangTidyCheck {
 public:
-  MustCheckErrsCheck(StringRef Name, ClangTidyContext *Context)
+  MustCheckErrsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

@@ -34,7 +34,7 @@ public:
       : SM(SM), LangOpts(LangOpts) {}
 
   bool visitSymbolOccurrence(const NamedDecl *ND,
-                             ArrayRef<SourceRange> NameRanges) {
+                             llvm::ArrayRef<SourceRange> NameRanges) {
     return true;
   }
 

@@ -29,7 +29,7 @@ public:
 
   bool shouldWalkTypesOfTypeLocs() const { return false; }
 
-  bool visitUnqualName(StringRef UnqualName) {
+  bool visitUnqualName(llvm::StringRef UnqualName) {
     // Check for collisions with function arguments.
     for (ParmVarDecl *Param : F.parameters())
       if (const IdentifierInfo *Ident = Param->getIdentifier())
@@ -145,7 +145,7 @@ SourceLocation UseTrailingReturnTypeCheck::findTrailingReturnTypeSourceLocation(
 
   // Skip subsequent CV and ref qualifiers.
   std::pair<FileID, unsigned> Loc = SM.getDecomposedLoc(Result);
-  StringRef File = SM.getBufferData(Loc.first);
+  llvm::StringRef File = SM.getBufferData(Loc.first);
   const char *TokenBegin = File.data() + Loc.second;
   Lexer Lexer(SM.getLocForStartOfFile(Loc.first), LangOpts, File.begin(),
               TokenBegin, File.end());
@@ -153,7 +153,7 @@ SourceLocation UseTrailingReturnTypeCheck::findTrailingReturnTypeSourceLocation(
   while (!Lexer.LexFromRawLexer(T)) {
     if (T.is(tok::raw_identifier)) {
       IdentifierInfo &Info = Ctx.Idents.get(
-          StringRef(SM.getCharacterData(T.getLocation()), T.getLength()));
+          llvm::StringRef(SM.getCharacterData(T.getLocation()), T.getLength()));
       T.setIdentifierInfo(&Info);
       T.setKind(Info.getTokenID());
     }
@@ -190,7 +190,7 @@ classifyToken(const FunctionDecl &F, Preprocessor &PP, Token Tok) {
   Token End;
   End.startToken();
   End.setKind(tok::eof);
-  SmallVector<Token, 2> Stream{Tok, End};
+  llvm::SmallVector<Token, 2> Stream{Tok, End};
 
   // FIXME: do not report these token to Preprocessor.TokenWatcher.
   PP.EnterTokenStream(Stream, false, /*IsReinject=*/false);
@@ -217,7 +217,7 @@ classifyToken(const FunctionDecl &F, Preprocessor &PP, Token Tok) {
   return CT;
 }
 
-std::optional<SmallVector<ClassifiedToken, 8>>
+std::optional<llvm::SmallVector<ClassifiedToken, 8>>
 UseTrailingReturnTypeCheck::classifyTokensBeforeFunctionName(
     const FunctionDecl &F, const ASTContext &Ctx, const SourceManager &SM,
     const LangOptions &LangOpts) {
@@ -226,17 +226,17 @@ UseTrailingReturnTypeCheck::classifyTokensBeforeFunctionName(
 
   // Create tokens for everything before the name of the function.
   std::pair<FileID, unsigned> Loc = SM.getDecomposedLoc(BeginF);
-  StringRef File = SM.getBufferData(Loc.first);
+  llvm::StringRef File = SM.getBufferData(Loc.first);
   const char *TokenBegin = File.data() + Loc.second;
   Lexer Lexer(SM.getLocForStartOfFile(Loc.first), LangOpts, File.begin(),
               TokenBegin, File.end());
   Token T;
-  SmallVector<ClassifiedToken, 8> ClassifiedTokens;
+  llvm::SmallVector<ClassifiedToken, 8> ClassifiedTokens;
   while (!Lexer.LexFromRawLexer(T) &&
          SM.isBeforeInTranslationUnit(T.getLocation(), BeginNameF)) {
     if (T.is(tok::raw_identifier)) {
       IdentifierInfo &Info = Ctx.Idents.get(
-          StringRef(SM.getCharacterData(T.getLocation()), T.getLength()));
+          llvm::StringRef(SM.getCharacterData(T.getLocation()), T.getLength()));
 
       if (Info.hasMacroDefinition()) {
         const MacroInfo *MI = PP->getMacroInfo(&Info);
@@ -293,11 +293,11 @@ SourceRange UseTrailingReturnTypeCheck::findReturnTypeAndCVSourceRange(
     return ReturnTypeRange;
 
   // Include qualifiers to the left and right of the return type.
-  std::optional<SmallVector<ClassifiedToken, 8>> MaybeTokens =
+  std::optional<llvm::SmallVector<ClassifiedToken, 8>> MaybeTokens =
       classifyTokensBeforeFunctionName(F, Ctx, SM, LangOpts);
   if (!MaybeTokens)
     return {};
-  const SmallVector<ClassifiedToken, 8> &Tokens = *MaybeTokens;
+  const llvm::SmallVector<ClassifiedToken, 8> &Tokens = *MaybeTokens;
 
   ReturnTypeRange.setBegin(expandIfMacroId(ReturnTypeRange.getBegin(), SM));
   ReturnTypeRange.setEnd(expandIfMacroId(ReturnTypeRange.getEnd(), SM));
@@ -345,7 +345,7 @@ void UseTrailingReturnTypeCheck::keepSpecifiers(
 
   // Tokenize return type. If it contains macros which contain a mix of
   // qualifiers, specifiers and types, give up.
-  std::optional<SmallVector<ClassifiedToken, 8>> MaybeTokens =
+  std::optional<llvm::SmallVector<ClassifiedToken, 8>> MaybeTokens =
       classifyTokensBeforeFunctionName(F, Ctx, SM, LangOpts);
   if (!MaybeTokens)
     return;
@@ -476,7 +476,7 @@ void UseTrailingReturnTypeCheck::check(const MatchFinder::MatchResult &Result) {
 
   SourceLocation ReturnTypeEnd =
       Lexer::getLocForEndOfToken(ReturnTypeCVRange.getEnd(), 0, SM, LangOpts);
-  StringRef CharAfterReturnType = Lexer::getSourceText(
+  llvm::StringRef CharAfterReturnType = Lexer::getSourceText(
       CharSourceRange::getCharRange(ReturnTypeEnd,
                                     ReturnTypeEnd.getLocWithOffset(1)),
       SM, LangOpts);

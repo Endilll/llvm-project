@@ -24,14 +24,14 @@ using namespace clang;
 
 namespace {
 class ReparseWorkingDirTest : public ::testing::Test {
-  IntrusiveRefCntPtr<vfs::InMemoryFileSystem> VFS;
+  llvm::IntrusiveRefCntPtr<vfs::InMemoryFileSystem> VFS;
   std::shared_ptr<PCHContainerOperations> PCHContainerOpts;
 
 public:
   void SetUp() override { VFS = new vfs::InMemoryFileSystem(); }
   void TearDown() override {}
 
-  void setWorkingDirectory(StringRef Path) {
+  void setWorkingDirectory(llvm::StringRef Path) {
     VFS->setCurrentWorkingDirectory(Path);
   }
 
@@ -42,7 +42,7 @@ public:
                  MemoryBuffer::getMemBufferCopy(Contents, Filename));
   }
 
-  std::unique_ptr<ASTUnit> ParseAST(StringRef EntryFile) {
+  std::unique_ptr<ASTUnit> ParseAST(llvm::StringRef EntryFile) {
     PCHContainerOpts = std::make_shared<PCHContainerOperations>();
     auto CI = std::make_shared<CompilerInvocation>();
     CI->getFrontendOpts().Inputs.push_back(FrontendInputFile(
@@ -57,7 +57,7 @@ public:
     CI->getFileSystemOpts().WorkingDir = *VFS->getCurrentWorkingDirectory();
     CI->getTargetOpts().Triple = "i386-unknown-linux-gnu";
 
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
         CompilerInstance::createDiagnostics(new DiagnosticOptions,
                                             new DiagnosticConsumer));
 
@@ -78,7 +78,7 @@ public:
 
 TEST_F(ReparseWorkingDirTest, ReparseWorkingDir) {
   // Setup the working directory path.
-  SmallString<16> WorkingDir;
+  llvm::SmallString<16> WorkingDir;
 #ifdef _WIN32
   WorkingDir = "C:\\";
 #else
@@ -87,10 +87,10 @@ TEST_F(ReparseWorkingDirTest, ReparseWorkingDir) {
   llvm::sys::path::append(WorkingDir, "root");
   setWorkingDirectory(WorkingDir);
 
-  SmallString<32> Header;
+  llvm::SmallString<32> Header;
   llvm::sys::path::append(Header, WorkingDir, "headers", "header.h");
 
-  SmallString<32> MainName;
+  llvm::SmallString<32> MainName;
   llvm::sys::path::append(MainName, WorkingDir, "main.cpp");
 
   AddFile(MainName.str().str(), R"cpp(

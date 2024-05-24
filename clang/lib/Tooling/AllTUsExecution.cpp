@@ -33,7 +33,7 @@ ArgumentsAdjuster getDefaultArgumentsAdjusters() {
 
 class ThreadSafeToolResults : public ToolResults {
 public:
-  void addResult(StringRef Key, StringRef Value) override {
+  void addResult(llvm::StringRef Key, llvm::StringRef Value) override {
     std::unique_lock<std::mutex> LockGuard(Mutex);
     Results.addResult(Key, Value);
   }
@@ -43,7 +43,7 @@ public:
     return Results.AllKVResults();
   }
 
-  void forEachResult(llvm::function_ref<void(StringRef Key, StringRef Value)>
+  void forEachResult(llvm::function_ref<void(llvm::StringRef Key, llvm::StringRef Value)>
                          Callback) override {
     Results.forEachResult(Callback);
   }
@@ -123,7 +123,7 @@ llvm::Error AllTUsToolExecutor::execute(
                 "] Processing file " + Path);
             // Each thread gets an independent copy of a VFS to allow different
             // concurrent working directories.
-            IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS =
+            llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS =
                 llvm::vfs::createPhysicalFileSystem();
             ClangTool Tool(Compilations, {Path},
                            std::make_shared<PCHContainerOperations>(), FS);

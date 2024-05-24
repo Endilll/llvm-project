@@ -101,7 +101,7 @@ static const NamespaceDecl *lookupStdNamespace(const ASTContext &Ctx,
 static const CXXRecordDecl *lookupCXXRecordDecl(const ASTContext &Ctx,
                                                 const NamespaceDecl *StdNS,
                                                 ComparisonCategoryType Kind) {
-  StringRef Name = ComparisonCategories::getCategoryString(Kind);
+  llvm::StringRef Name = ComparisonCategories::getCategoryString(Kind);
   DeclContextLookupResult Lookup = StdNS->lookup(&Ctx.Idents.get(Name));
   if (!Lookup.empty())
     if (const CXXRecordDecl *RD = dyn_cast<CXXRecordDecl>(Lookup.front()))
@@ -169,7 +169,7 @@ QualType ComparisonCategoryInfo::getType() const {
   return QualType(Record->getTypeForDecl(), 0);
 }
 
-StringRef ComparisonCategories::getCategoryString(ComparisonCategoryType Kind) {
+llvm::StringRef ComparisonCategories::getCategoryString(ComparisonCategoryType Kind) {
   using CCKT = ComparisonCategoryType;
   switch (Kind) {
   case CCKT::PartialOrdering:
@@ -182,7 +182,7 @@ StringRef ComparisonCategories::getCategoryString(ComparisonCategoryType Kind) {
   llvm_unreachable("unhandled cases in switch");
 }
 
-StringRef ComparisonCategories::getResultString(ComparisonCategoryResult Kind) {
+llvm::StringRef ComparisonCategories::getResultString(ComparisonCategoryResult Kind) {
   using CCVT = ComparisonCategoryResult;
   switch (Kind) {
   case CCVT::Equal:

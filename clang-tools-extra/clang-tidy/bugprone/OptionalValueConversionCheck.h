@@ -22,15 +22,15 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/optional-value-conversion.html
 class OptionalValueConversionCheck : public ClangTidyCheck {
 public:
-  OptionalValueConversionCheck(StringRef Name, ClangTidyContext *Context);
+  OptionalValueConversionCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   std::optional<TraversalKind> getCheckTraversalKind() const override;
 
 private:
-  std::vector<StringRef> OptionalTypes;
-  std::vector<StringRef> ValueMethods;
+  std::vector<llvm::StringRef> OptionalTypes;
+  std::vector<llvm::StringRef> ValueMethods;
 };
 
 } // namespace clang::tidy::bugprone

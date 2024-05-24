@@ -66,7 +66,7 @@ using namespace clang;
 namespace {
 
   class StmtPrinter : public StmtVisitor<StmtPrinter> {
-    raw_ostream &OS;
+    llvm::raw_ostream &OS;
     unsigned IndentLevel;
     PrinterHelper* Helper;
     PrintingPolicy Policy;
@@ -74,9 +74,9 @@ namespace {
     const ASTContext *Context;
 
   public:
-    StmtPrinter(raw_ostream &os, PrinterHelper *helper,
+    StmtPrinter(llvm::raw_ostream &os, PrinterHelper *helper,
                 const PrintingPolicy &Policy, unsigned Indentation = 0,
-                StringRef NL = "\n", const ASTContext *Context = nullptr)
+                llvm::StringRef NL = "\n", const ASTContext *Context = nullptr)
         : OS(os), IndentLevel(Indentation), Helper(helper), Policy(Policy),
           NL(NL), Context(Context) {}
 
@@ -138,7 +138,7 @@ namespace {
         OS << "<null expr>";
     }
 
-    raw_ostream &Indent(int Delta = 0) {
+    llvm::raw_ostream &Indent(int Delta = 0) {
       for (int i = 0, e = IndentLevel+Delta; i < e; ++i)
         OS << "  ";
       return OS;
@@ -249,7 +249,7 @@ void StmtPrinter::PrintRawDecl(Decl *D) {
 }
 
 void StmtPrinter::PrintRawDeclStmt(const DeclStmt *S) {
-  SmallVector<Decl *, 2> Decls(S->decls());
+  llvm::SmallVector<Decl *, 2> Decls(S->decls());
   Decl::printGroup(Decls.data(), Decls.size(), OS, Policy, IndentLevel);
 }
 
@@ -727,7 +727,7 @@ void StmtPrinter::VisitOMPCanonicalLoop(OMPCanonicalLoop *Node) {
 void StmtPrinter::PrintOMPExecutableDirective(OMPExecutableDirective *S,
                                               bool ForceNoStmt) {
   OMPClausePrinter Printer(OS, Policy);
-  ArrayRef<OMPClause *> Clauses = S->clauses();
+  llvm::ArrayRef<OMPClause *> Clauses = S->clauses();
   for (auto *Clause : Clauses)
     if (Clause && !Clause->isImplicit()) {
       OS << ' ';
@@ -1283,12 +1283,12 @@ void StmtPrinter::VisitCharacterLiteral(CharacterLiteral *Node) {
 
 /// Prints the given expression using the original source text. Returns true on
 /// success, false otherwise.
-static bool printExprAsWritten(raw_ostream &OS, Expr *E,
+static bool printExprAsWritten(llvm::raw_ostream &OS, Expr *E,
                                const ASTContext *Context) {
   if (!Context)
     return false;
   bool Invalid = false;
-  StringRef Source = Lexer::getSourceText(
+  llvm::StringRef Source = Lexer::getSourceText(
       CharSourceRange::getTokenRange(E->getSourceRange()),
       Context->getSourceManager(), Context->getLangOpts(), &Invalid);
   if (!Invalid) {
@@ -1356,12 +1356,12 @@ void StmtPrinter::VisitFixedPointLiteral(FixedPointLiteral *Node) {
   }
 }
 
-static void PrintFloatingLiteral(raw_ostream &OS, FloatingLiteral *Node,
+static void PrintFloatingLiteral(llvm::raw_ostream &OS, FloatingLiteral *Node,
                                  bool PrintSuffix) {
-  SmallString<16> Str;
+  llvm::SmallString<16> Str;
   Node->getValue().toString(Str);
   OS << Str;
-  if (Str.find_first_not_of("-0123456789") == StringRef::npos)
+  if (Str.find_first_not_of("-0123456789") == llvm::StringRef::npos)
     OS << '.'; // Trailing dot in order to separate from ints.
 
   if (!PrintSuffix)
@@ -2780,22 +2780,22 @@ void Stmt::dumpPretty(const ASTContext &Context) const {
   printPretty(llvm::errs(), nullptr, PrintingPolicy(Context.getLangOpts()));
 }
 
-void Stmt::printPretty(raw_ostream &Out, PrinterHelper *Helper,
+void Stmt::printPretty(llvm::raw_ostream &Out, PrinterHelper *Helper,
                        const PrintingPolicy &Policy, unsigned Indentation,
-                       StringRef NL, const ASTContext *Context) const {
+                       llvm::StringRef NL, const ASTContext *Context) const {
   StmtPrinter P(Out, Helper, Policy, Indentation, NL, Context);
   P.Visit(const_cast<Stmt *>(this));
 }
 
-void Stmt::printPrettyControlled(raw_ostream &Out, PrinterHelper *Helper,
+void Stmt::printPrettyControlled(llvm::raw_ostream &Out, PrinterHelper *Helper,
                                  const PrintingPolicy &Policy,
-                                 unsigned Indentation, StringRef NL,
+                                 unsigned Indentation, llvm::StringRef NL,
                                  const ASTContext *Context) const {
   StmtPrinter P(Out, Helper, Policy, Indentation, NL, Context);
   P.PrintControlledStmt(const_cast<Stmt *>(this));
 }
 
-void Stmt::printJson(raw_ostream &Out, PrinterHelper *Helper,
+void Stmt::printJson(llvm::raw_ostream &Out, PrinterHelper *Helper,
                      const PrintingPolicy &Policy, bool AddQuotes) const {
   std::string Buf;
   llvm::raw_string_ostream TempOut(Buf);

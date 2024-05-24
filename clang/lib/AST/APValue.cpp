@@ -91,8 +91,8 @@ QualType APValue::LValueBase::getType() const {
   // may not be the type of the expression.
   if (const MaterializeTemporaryExpr *MTE =
           clang::dyn_cast<MaterializeTemporaryExpr>(Base)) {
-    SmallVector<const Expr *, 2> CommaLHSs;
-    SmallVector<SubobjectAdjustment, 2> Adjustments;
+    llvm::SmallVector<const Expr *, 2> CommaLHSs;
+    llvm::SmallVector<SubobjectAdjustment, 2> Adjustments;
     const Expr *Temp = MTE->getSubExpr();
     const Expr *Inner = Temp->skipRValueSubobjectAdjustments(CommaLHSs,
                                                              Adjustments);
@@ -155,7 +155,7 @@ void APValue::LValuePathEntry::Profile(llvm::FoldingSetNodeID &ID) const {
 }
 
 APValue::LValuePathSerializationHelper::LValuePathSerializationHelper(
-    ArrayRef<LValuePathEntry> Path, QualType ElemTy)
+    llvm::ArrayRef<LValuePathEntry> Path, QualType ElemTy)
     : Ty((const void *)ElemTy.getTypePtrOrNull()), Path(Path) {}
 
 QualType APValue::LValuePathSerializationHelper::getType() {
@@ -627,10 +627,10 @@ static double GetApproxValue(const llvm::APFloat &F) {
   return V.convertToDouble();
 }
 
-static bool TryPrintAsStringLiteral(raw_ostream &Out,
+static bool TryPrintAsStringLiteral(llvm::raw_ostream &Out,
                                     const PrintingPolicy &Policy,
                                     const ArrayType *ATy,
-                                    ArrayRef<APValue> Inits) {
+                                    llvm::ArrayRef<APValue> Inits) {
   if (Inits.empty())
     return false;
 
@@ -649,7 +649,7 @@ static bool TryPrintAsStringLiteral(raw_ostream &Out,
 
   // Better than printing a two-digit sequence of 10 integers.
   constexpr size_t MaxN = 36;
-  StringRef Ellipsis;
+  llvm::StringRef Ellipsis;
   if (Inits.size() > MaxN && !Policy.EntireContentsOfLargeArray) {
     Ellipsis = "[...]";
     Inits =
@@ -664,7 +664,7 @@ static bool TryPrintAsStringLiteral(raw_ostream &Out,
       return false; // Bye bye, see you in integers.
     auto Ch = static_cast<unsigned char>(Char64);
     // The diagnostic message is 'quoted'
-    StringRef Escaped = escapeCStyle<EscapeChar::SingleAndDouble>(Ch);
+    llvm::StringRef Escaped = escapeCStyle<EscapeChar::SingleAndDouble>(Ch);
     if (Escaped.empty()) {
       if (!isPrintable(Ch))
         return false;
@@ -690,12 +690,12 @@ static bool TryPrintAsStringLiteral(raw_ostream &Out,
   return true;
 }
 
-void APValue::printPretty(raw_ostream &Out, const ASTContext &Ctx,
+void APValue::printPretty(llvm::raw_ostream &Out, const ASTContext &Ctx,
                           QualType Ty) const {
   printPretty(Out, Ctx.getPrintingPolicy(), Ty, &Ctx);
 }
 
-void APValue::printPretty(raw_ostream &Out, const PrintingPolicy &Policy,
+void APValue::printPretty(llvm::raw_ostream &Out, const PrintingPolicy &Policy,
                           QualType Ty, const ASTContext *Ctx) const {
   // There are no objects of type 'void', but values of this type can be
   // returned from functions.
@@ -825,7 +825,7 @@ void APValue::printPretty(raw_ostream &Out, const PrintingPolicy &Policy,
       E->printPretty(Out, nullptr, Policy);
     }
 
-    ArrayRef<LValuePathEntry> Path = getLValuePath();
+    llvm::ArrayRef<LValuePathEntry> Path = getLValuePath();
     const CXXRecordDecl *CastToBase = nullptr;
     for (unsigned I = 0, N = Path.size(); I != N; ++I) {
       if (ElemTy->isRecordType()) {
@@ -991,7 +991,7 @@ bool APValue::hasLValuePath() const {
   return ((const LV *)(const char *)&Data)->hasPath();
 }
 
-ArrayRef<APValue::LValuePathEntry> APValue::getLValuePath() const {
+llvm::ArrayRef<APValue::LValuePathEntry> APValue::getLValuePath() const {
   assert(isLValue() && hasLValuePath() && "Invalid accessor");
   const LV &LVal = *((const LV *)(const char *)&Data);
   return llvm::ArrayRef(LVal.getPath(), LVal.PathLength);
@@ -1023,7 +1023,7 @@ void APValue::setLValue(LValueBase B, const CharUnits &O, NoLValuePath,
   LVal.IsNullPtr = IsNullPtr;
 }
 
-MutableArrayRef<APValue::LValuePathEntry>
+llvm::MutableArrayRef<APValue::LValuePathEntry>
 APValue::setLValueUninit(LValueBase B, const CharUnits &O, unsigned Size,
                          bool IsOnePastTheEnd, bool IsNullPtr) {
   assert(isLValue() && "Invalid accessor");
@@ -1037,9 +1037,9 @@ APValue::setLValueUninit(LValueBase B, const CharUnits &O, unsigned Size,
 }
 
 void APValue::setLValue(LValueBase B, const CharUnits &O,
-                        ArrayRef<LValuePathEntry> Path, bool IsOnePastTheEnd,
+                        llvm::ArrayRef<LValuePathEntry> Path, bool IsOnePastTheEnd,
                         bool IsNullPtr) {
-  MutableArrayRef<APValue::LValuePathEntry> InternalPath =
+  llvm::MutableArrayRef<APValue::LValuePathEntry> InternalPath =
       setLValueUninit(B, O, Path.size(), IsOnePastTheEnd, IsNullPtr);
   if (Path.size()) {
     memcpy(InternalPath.data(), Path.data(),
@@ -1068,7 +1068,7 @@ bool APValue::isMemberPointerToDerivedMember() const {
   return MPD.MemberAndIsDerivedMember.getInt();
 }
 
-ArrayRef<const CXXRecordDecl*> APValue::getMemberPointerPath() const {
+llvm::ArrayRef<const CXXRecordDecl*> APValue::getMemberPointerPath() const {
   assert(isMemberPointer() && "Invalid accessor");
   const MemberPointerData &MPD =
       *((const MemberPointerData *)(const char *)&Data);
@@ -1088,11 +1088,11 @@ void APValue::MakeArray(unsigned InitElts, unsigned Size) {
   Kind = Array;
 }
 
-MutableArrayRef<APValue::LValuePathEntry>
+llvm::MutableArrayRef<APValue::LValuePathEntry>
 setLValueUninit(APValue::LValueBase B, const CharUnits &O, unsigned Size,
                 bool OnePastTheEnd, bool IsNullPtr);
 
-MutableArrayRef<const CXXRecordDecl *>
+llvm::MutableArrayRef<const CXXRecordDecl *>
 APValue::setMemberPointerUninit(const ValueDecl *Member, bool IsDerivedMember,
                                 unsigned Size) {
   assert(isAbsent() && "Bad state change");
@@ -1106,8 +1106,8 @@ APValue::setMemberPointerUninit(const ValueDecl *Member, bool IsDerivedMember,
 }
 
 void APValue::MakeMemberPointer(const ValueDecl *Member, bool IsDerivedMember,
-                                ArrayRef<const CXXRecordDecl *> Path) {
-  MutableArrayRef<const CXXRecordDecl *> InternalPath =
+                                llvm::ArrayRef<const CXXRecordDecl *> Path) {
+  llvm::MutableArrayRef<const CXXRecordDecl *> InternalPath =
       setMemberPointerUninit(Member, IsDerivedMember, Path.size());
   for (unsigned I = 0; I != Path.size(); ++I)
     InternalPath[I] = Path[I]->getCanonicalDecl();

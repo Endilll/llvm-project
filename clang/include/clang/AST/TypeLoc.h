@@ -825,7 +825,7 @@ public:
     return *(this->getTypePtr()->qual_begin() + i);
   }
 
-  ArrayRef<SourceLocation> getProtocolLocs() const {
+  llvm::ArrayRef<SourceLocation> getProtocolLocs() const {
     return llvm::ArrayRef(getProtocolLocArray(), getNumProtocols());
   }
 
@@ -1035,7 +1035,7 @@ public:
   }
 
 
-  ArrayRef<SourceLocation> getProtocolLocs() const {
+  llvm::ArrayRef<SourceLocation> getProtocolLocs() const {
     return llvm::ArrayRef(getProtocolLocArray(), getNumProtocols());
   }
 
@@ -1488,7 +1488,7 @@ public:
       *getExceptionSpecRangePtr() = R;
   }
 
-  ArrayRef<ParmVarDecl *> getParams() const {
+  llvm::ArrayRef<ParmVarDecl *> getParams() const {
     return llvm::ArrayRef(getParmArray(), getNumParams());
   }
 
@@ -1734,7 +1734,7 @@ public:
   }
 
   static void initializeArgLocs(ASTContext &Context,
-                                ArrayRef<TemplateArgument> Args,
+                                llvm::ArrayRef<TemplateArgument> Args,
                                 TemplateArgumentLocInfo *ArgInfos,
                                 SourceLocation Loc);
 

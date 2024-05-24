@@ -35,8 +35,8 @@ public:
     StringOffsetSize(size_t Offset, size_t Size) : Offset(Offset), Size(Size) {}
   };
 
-  StringOffsetSize add(StringRef Str);
-  StringRef getBuffer() const { return Buffer; }
+  StringOffsetSize add(llvm::StringRef Str);
+  llvm::StringRef getBuffer() const { return Buffer; }
 };
 
 /// Pool of filesystem paths backed by a StringPool
@@ -67,14 +67,14 @@ public:
 
   /// \returns index of the newly added file in FilePaths.
   size_t addFilePath(RootDirKind Root, const StringPool::StringOffsetSize &Dir,
-                     StringRef Filename);
+                     llvm::StringRef Filename);
 
   /// \returns offset in Paths and size of newly added directory.
-  StringPool::StringOffsetSize addDirPath(StringRef Dir);
+  StringPool::StringOffsetSize addDirPath(llvm::StringRef Dir);
 
   llvm::ArrayRef<FilePath> getFilePaths() const;
 
-  StringRef getPaths() const;
+  llvm::StringRef getPaths() const;
 
 private:
   StringPool Paths;
@@ -104,7 +104,7 @@ public:
 
   /// \returns file paths (no directories) backed by buffer exposed in
   /// getPathsBuffer.
-  ArrayRef<PathPool::FilePath> getFilePaths() const {
+  llvm::ArrayRef<PathPool::FilePath> getFilePaths() const {
     return Paths.getFilePaths();
   }
 

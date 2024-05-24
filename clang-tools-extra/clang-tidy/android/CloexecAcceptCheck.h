@@ -19,7 +19,7 @@ namespace clang::tidy::android {
 /// http://clang.llvm.org/extra/clang-tidy/checks/android/cloexec-accept.html
 class CloexecAcceptCheck : public CloexecCheck {
 public:
-  CloexecAcceptCheck(StringRef Name, ClangTidyContext *Context)
+  CloexecAcceptCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : CloexecCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

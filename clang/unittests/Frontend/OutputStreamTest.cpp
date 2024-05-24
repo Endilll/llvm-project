@@ -31,8 +31,8 @@ TEST(FrontendOutputTests, TestOutputStream) {
   Invocation->getTargetOpts().Triple = "i386-unknown-linux-gnu";
   CompilerInstance Compiler;
 
-  SmallVector<char, 256> IRBuffer;
-  std::unique_ptr<raw_pwrite_stream> IRStream(
+  llvm::SmallVector<char, 256> IRBuffer;
+  std::unique_ptr<llvm::raw_pwrite_stream> IRStream(
       new raw_svector_ostream(IRBuffer));
 
   Compiler.setOutputStream(std::move(IRStream));
@@ -42,7 +42,7 @@ TEST(FrontendOutputTests, TestOutputStream) {
   bool Success = ExecuteCompilerInvocation(&Compiler);
   EXPECT_TRUE(Success);
   EXPECT_TRUE(!IRBuffer.empty());
-  EXPECT_TRUE(StringRef(IRBuffer.data()).starts_with("BC"));
+  EXPECT_TRUE(llvm::StringRef(IRBuffer.data()).starts_with("BC"));
 }
 
 TEST(FrontendOutputTests, TestVerboseOutputStreamShared) {
@@ -60,7 +60,7 @@ TEST(FrontendOutputTests, TestVerboseOutputStreamShared) {
 
   Compiler.setOutputStream(std::make_unique<raw_null_ostream>());
   Compiler.setInvocation(std::move(Invocation));
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
   Compiler.createDiagnostics(
       new TextDiagnosticPrinter(llvm::nulls(), &*DiagOpts), true);
   Compiler.setVerboseOutputStream(VerboseStream);
@@ -68,7 +68,7 @@ TEST(FrontendOutputTests, TestVerboseOutputStreamShared) {
   bool Success = ExecuteCompilerInvocation(&Compiler);
   EXPECT_FALSE(Success);
   EXPECT_TRUE(!VerboseStream.str().empty());
-  EXPECT_TRUE(StringRef(VerboseBuffer.data()).contains("errors generated"));
+  EXPECT_TRUE(llvm::StringRef(VerboseBuffer.data()).contains("errors generated"));
 }
 
 TEST(FrontendOutputTests, TestVerboseOutputStreamOwned) {
@@ -84,12 +84,12 @@ TEST(FrontendOutputTests, TestVerboseOutputStreamOwned) {
     Invocation->getTargetOpts().Triple = "i386-unknown-linux-gnu";
     CompilerInstance Compiler;
 
-    std::unique_ptr<raw_ostream> VerboseStream =
+    std::unique_ptr<llvm::raw_ostream> VerboseStream =
         std::make_unique<raw_string_ostream>(VerboseBuffer);
 
     Compiler.setOutputStream(std::make_unique<raw_null_ostream>());
     Compiler.setInvocation(std::move(Invocation));
-    IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+    llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
     Compiler.createDiagnostics(
         new TextDiagnosticPrinter(llvm::nulls(), &*DiagOpts), true);
     Compiler.setVerboseOutputStream(std::move(VerboseStream));
@@ -98,7 +98,7 @@ TEST(FrontendOutputTests, TestVerboseOutputStreamOwned) {
   }
   EXPECT_FALSE(Success);
   EXPECT_TRUE(!VerboseBuffer.empty());
-  EXPECT_TRUE(StringRef(VerboseBuffer.data()).contains("errors generated"));
+  EXPECT_TRUE(llvm::StringRef(VerboseBuffer.data()).contains("errors generated"));
 }
 
 TEST(FrontendOutputTests, TestVerboseOutputStreamOwnedNotLeaked) {

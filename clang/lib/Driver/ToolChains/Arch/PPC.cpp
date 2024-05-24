@@ -34,7 +34,7 @@ static std::string getPPCGenericTargetCPU(const llvm::Triple &T) {
     return "ppc";
 }
 
-static std::string normalizeCPUName(StringRef CPUName, const llvm::Triple &T) {
+static std::string normalizeCPUName(llvm::StringRef CPUName, const llvm::Triple &T) {
   // Clang/LLVM does not actually support code generation
   // for the 405 CPU. However, there are uses of this CPU ID
   // in projects that previously used GCC and rely on Clang
@@ -92,7 +92,7 @@ std::string ppc::getPPCTargetCPU(const Driver &D, const ArgList &Args,
   return getPPCGenericTargetCPU(T);
 }
 
-const char *ppc::getPPCAsmModeForCPU(StringRef Name) {
+const char *ppc::getPPCAsmModeForCPU(llvm::StringRef Name) {
   return llvm::StringSwitch<const char *>(Name)
       .Case("pwr7", "-mpower7")
       .Case("power7", "-mpower7")
@@ -108,7 +108,7 @@ const char *ppc::getPPCAsmModeForCPU(StringRef Name) {
 
 void ppc::getPPCTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                                const ArgList &Args,
-                               std::vector<StringRef> &Features) {
+                               std::vector<llvm::StringRef> &Features) {
   if (Triple.getSubArch() == llvm::Triple::PPCSubArch_spe)
     Features.push_back("+spe");
 
@@ -168,7 +168,7 @@ ppc::FloatABI ppc::getPPCFloatABI(const Driver &D, const ArgList &Args) {
                 .Case("soft", ppc::FloatABI::Soft)
                 .Case("hard", ppc::FloatABI::Hard)
                 .Default(ppc::FloatABI::Invalid);
-      if (ABI == ppc::FloatABI::Invalid && !StringRef(A->getValue()).empty()) {
+      if (ABI == ppc::FloatABI::Invalid && !llvm::StringRef(A->getValue()).empty()) {
         D.Diag(clang::diag::err_drv_invalid_mfloat_abi) << A->getAsString(Args);
         ABI = ppc::FloatABI::Hard;
       }
@@ -185,5 +185,5 @@ ppc::FloatABI ppc::getPPCFloatABI(const Driver &D, const ArgList &Args) {
 
 bool ppc::hasPPCAbiArg(const ArgList &Args, const char *Value) {
   Arg *A = Args.getLastArg(options::OPT_mabi_EQ);
-  return A && (A->getValue() == StringRef(Value));
+  return A && (A->getValue() == llvm::StringRef(Value));
 }

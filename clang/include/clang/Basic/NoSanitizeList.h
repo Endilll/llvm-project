@@ -34,17 +34,17 @@ public:
   NoSanitizeList(const std::vector<std::string> &NoSanitizeListPaths,
                  SourceManager &SM);
   ~NoSanitizeList();
-  bool containsGlobal(SanitizerMask Mask, StringRef GlobalName,
-                      StringRef Category = StringRef()) const;
-  bool containsType(SanitizerMask Mask, StringRef MangledTypeName,
-                    StringRef Category = StringRef()) const;
-  bool containsFunction(SanitizerMask Mask, StringRef FunctionName) const;
-  bool containsFile(SanitizerMask Mask, StringRef FileName,
-                    StringRef Category = StringRef()) const;
-  bool containsMainFile(SanitizerMask Mask, StringRef FileName,
-                        StringRef Category = StringRef()) const;
+  bool containsGlobal(SanitizerMask Mask, llvm::StringRef GlobalName,
+                      llvm::StringRef Category = llvm::StringRef()) const;
+  bool containsType(SanitizerMask Mask, llvm::StringRef MangledTypeName,
+                    llvm::StringRef Category = llvm::StringRef()) const;
+  bool containsFunction(SanitizerMask Mask, llvm::StringRef FunctionName) const;
+  bool containsFile(SanitizerMask Mask, llvm::StringRef FileName,
+                    llvm::StringRef Category = llvm::StringRef()) const;
+  bool containsMainFile(SanitizerMask Mask, llvm::StringRef FileName,
+                        llvm::StringRef Category = llvm::StringRef()) const;
   bool containsLocation(SanitizerMask Mask, SourceLocation Loc,
-                        StringRef Category = StringRef()) const;
+                        llvm::StringRef Category = llvm::StringRef()) const;
 };
 
 } // end namespace clang

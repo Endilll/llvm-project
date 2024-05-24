@@ -23,7 +23,7 @@ using clang::tooling::Diagnostic;
 static DiagnosticMessage
 makeMessage(const std::string &Message, int FileOffset,
             const std::string &FilePath, const StringMap<Replacements> &Fix,
-            const SmallVector<FileByteRange, 1> &Ranges) {
+            const llvm::SmallVector<FileByteRange, 1> &Ranges) {
   DiagnosticMessage DiagMessage;
   DiagMessage.Message = Message;
   DiagMessage.FileOffset = FileOffset;
@@ -43,11 +43,11 @@ static FileByteRange makeByteRange(int FileOffset,
   return Range;
 }
 
-static Diagnostic makeDiagnostic(StringRef DiagnosticName,
+static Diagnostic makeDiagnostic(llvm::StringRef DiagnosticName,
                                  const std::string &Message, int FileOffset,
                                  const std::string &FilePath,
                                  const StringMap<Replacements> &Fix,
-                                 const SmallVector<FileByteRange, 1> &Ranges,
+                                 const llvm::SmallVector<FileByteRange, 1> &Ranges,
                                  Diagnostic::Level DiagnosticLevel) {
   return Diagnostic(DiagnosticName,
                     makeMessage(Message, FileOffset, FilePath, Fix, Ranges), {},
@@ -127,7 +127,7 @@ TEST(DiagnosticsYamlTest, serializesDiagnostics) {
   StringMap<Replacements> Fix2 = {
       {"path/to/header.h",
        Replacements({"path/to/header.h", 62, 2, "replacement #2"})}};
-  SmallVector<FileByteRange, 1> Ranges2 =
+  llvm::SmallVector<FileByteRange, 1> Ranges2 =
       {makeByteRange(10, 10, "path/to/source.cpp")};
   TUD.Diagnostics.push_back(makeDiagnostic("diagnostic#2", "message #2", 60,
                                            "path/to/header.h", Fix2, Ranges2,

@@ -18,7 +18,7 @@ namespace clang::tidy::bugprone {
 
 static constexpr int UnsignedASCIIUpperBound = 127;
 
-SignedCharMisuseCheck::SignedCharMisuseCheck(StringRef Name,
+SignedCharMisuseCheck::SignedCharMisuseCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       CharTypdefsToIgnoreList(Options.get("CharTypdefsToIgnore", "")),

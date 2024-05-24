@@ -92,7 +92,7 @@ TEST(CollectMainFileMacros, SelectedMacros) {
         #define $2(def)[[FOO]] $3[[BAR]]
         int A = $2[[FOO]];
       )cpp"};
-  auto ExpectedResults = [](const llvm::Annotations &T, StringRef Name) {
+  auto ExpectedResults = [](const llvm::Annotations &T, llvm::StringRef Name) {
     std::vector<Matcher<MacroOccurrence>> ExpectedLocations;
     for (const auto &[R, Bits] : T.rangesWithPayload(Name)) {
       if (Bits == "def")

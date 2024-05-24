@@ -25,7 +25,7 @@
 using namespace clang;
 using namespace serialized_diags;
 
-std::error_code SerializedDiagnosticReader::readDiagnostics(StringRef File) {
+std::error_code SerializedDiagnosticReader::readDiagnostics(llvm::StringRef File) {
   // Open the diagnostics file.
   FileSystemOptions FO;
   FileManager FileMgr(FO);
@@ -42,7 +42,7 @@ std::error_code SerializedDiagnosticReader::readDiagnostics(StringRef File) {
 
   // Sniff for the signature.
   for (unsigned char C : {'D', 'I', 'A', 'G'}) {
-    if (Expected<llvm::SimpleBitstreamCursor::word_t> Res = Stream.Read(8)) {
+    if (llvm::Expected<llvm::SimpleBitstreamCursor::word_t> Res = Stream.Read(8)) {
       if (Res.get() == C)
         continue;
     } else {
@@ -54,7 +54,7 @@ std::error_code SerializedDiagnosticReader::readDiagnostics(StringRef File) {
 
   // Read the top level blocks.
   while (!Stream.AtEndOfStream()) {
-    if (Expected<unsigned> Res = Stream.ReadCode()) {
+    if (llvm::Expected<unsigned> Res = Stream.ReadCode()) {
       if (Res.get() != llvm::bitc::ENTER_SUBBLOCK)
         return SDError::InvalidDiagnostics;
     } else {
@@ -64,7 +64,7 @@ std::error_code SerializedDiagnosticReader::readDiagnostics(StringRef File) {
     }
 
     std::error_code EC;
-    Expected<unsigned> MaybeSubBlockID = Stream.ReadSubBlockID();
+    llvm::Expected<unsigned> MaybeSubBlockID = Stream.ReadSubBlockID();
     if (!MaybeSubBlockID) {
       // FIXME this drops the error on the floor.
       consumeError(MaybeSubBlockID.takeError());
@@ -73,7 +73,7 @@ std::error_code SerializedDiagnosticReader::readDiagnostics(StringRef File) {
 
     switch (MaybeSubBlockID.get()) {
     case llvm::bitc::BLOCKINFO_BLOCK_ID: {
-      Expected<std::optional<llvm::BitstreamBlockInfo>> MaybeBlockInfo =
+      llvm::Expected<std::optional<llvm::BitstreamBlockInfo>> MaybeBlockInfo =
           Stream.ReadBlockInfoBlock();
       if (!MaybeBlockInfo) {
         // FIXME this drops the error on the floor.
@@ -119,7 +119,7 @@ SerializedDiagnosticReader::skipUntilRecordOrBlock(
 
   while (!Stream.AtEndOfStream()) {
     unsigned Code;
-    if (Expected<unsigned> Res = Stream.ReadCode())
+    if (llvm::Expected<unsigned> Res = Stream.ReadCode())
       Code = Res.get();
     else
       return llvm::errorToErrorCode(Res.takeError());
@@ -131,7 +131,7 @@ SerializedDiagnosticReader::skipUntilRecordOrBlock(
     }
     switch (static_cast<llvm::bitc::FixedAbbrevIDs>(Code)) {
     case llvm::bitc::ENTER_SUBBLOCK:
-      if (Expected<unsigned> Res = Stream.ReadSubBlockID())
+      if (llvm::Expected<unsigned> Res = Stream.ReadSubBlockID())
         BlockOrRecordID = Res.get();
       else
         return llvm::errorToErrorCode(Res.takeError());
@@ -191,8 +191,8 @@ SerializedDiagnosticReader::readMetaBlock(llvm::BitstreamCursor &Stream) {
       return {};
     }
 
-    SmallVector<uint64_t, 1> Record;
-    Expected<unsigned> MaybeRecordID = Stream.readRecord(BlockOrCode, Record);
+    llvm::SmallVector<uint64_t, 1> Record;
+    llvm::Expected<unsigned> MaybeRecordID = Stream.readRecord(BlockOrCode, Record);
     if (!MaybeRecordID)
       return errorToErrorCode(MaybeRecordID.takeError());
     unsigned RecordID = MaybeRecordID.get();
@@ -220,7 +220,7 @@ SerializedDiagnosticReader::readDiagnosticBlock(llvm::BitstreamCursor &Stream) {
   if ((EC = visitStartOfDiagnostic()))
     return EC;
 
-  SmallVector<uint64_t, 16> Record;
+  llvm::SmallVector<uint64_t, 16> Record;
   while (true) {
     unsigned BlockOrCode = 0;
     llvm::ErrorOr<Cursor> Res = skipUntilRecordOrBlock(Stream, BlockOrCode);
@@ -249,8 +249,8 @@ SerializedDiagnosticReader::readDiagnosticBlock(llvm::BitstreamCursor &Stream) {
 
     // Read the record.
     Record.clear();
-    StringRef Blob;
-    Expected<unsigned> MaybeRecID =
+    llvm::StringRef Blob;
+    llvm::Expected<unsigned> MaybeRecID =
         Stream.readRecord(BlockOrCode, Record, &Blob);
     if (!MaybeRecID)
       return errorToErrorCode(MaybeRecID.takeError());

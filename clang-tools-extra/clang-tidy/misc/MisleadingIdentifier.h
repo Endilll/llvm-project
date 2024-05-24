@@ -15,7 +15,7 @@ namespace clang::tidy::misc {
 
 class MisleadingIdentifierCheck : public ClangTidyCheck {
 public:
-  MisleadingIdentifierCheck(StringRef Name, ClangTidyContext *Context);
+  MisleadingIdentifierCheck(llvm::StringRef Name, ClangTidyContext *Context);
   ~MisleadingIdentifierCheck();
 
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

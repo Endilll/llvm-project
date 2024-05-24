@@ -19,13 +19,13 @@ const char IWYUPragma[] = "// IWYU pragma: private, include ";
 } // namespace
 
 bool PragmaCommentHandler::HandleComment(Preprocessor &PP, SourceRange Range) {
-  StringRef Text =
+  llvm::StringRef Text =
       Lexer::getSourceText(CharSourceRange::getCharRange(Range),
                            PP.getSourceManager(), PP.getLangOpts());
   size_t Pos = Text.find(IWYUPragma);
-  if (Pos == StringRef::npos)
+  if (Pos == llvm::StringRef::npos)
     return false;
-  StringRef RemappingFilePath = Text.substr(Pos + std::strlen(IWYUPragma));
+  llvm::StringRef RemappingFilePath = Text.substr(Pos + std::strlen(IWYUPragma));
   Collector->addHeaderMapping(
       PP.getSourceManager().getFilename(Range.getBegin()),
       RemappingFilePath.trim("\"<>"));

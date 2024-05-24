@@ -32,7 +32,7 @@ public:
   const char *id() const final;
 
   bool prepare(const Selection &Inputs) override;
-  Expected<Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Effect> apply(const Selection &Inputs) override;
   std::string title() const override { return "Convert to raw string"; }
   llvm::StringLiteral kind() const override {
     return CodeAction::REFACTOR_KIND;
@@ -68,7 +68,7 @@ static bool isNormalString(const StringLiteral &Str, SourceLocation Cursor,
 }
 
 static bool needsRaw(llvm::StringRef Content) {
-  return Content.find_first_of("\"\n\t") != StringRef::npos;
+  return Content.find_first_of("\"\n\t") != llvm::StringRef::npos;
 }
 
 static bool canBeRaw(llvm::StringRef Content) {
@@ -91,7 +91,7 @@ bool RawStringLiteral::prepare(const Selection &Inputs) {
          needsRaw(Str->getBytes()) && canBeRaw(Str->getBytes());
 }
 
-Expected<Tweak::Effect> RawStringLiteral::apply(const Selection &Inputs) {
+llvm::Expected<Tweak::Effect> RawStringLiteral::apply(const Selection &Inputs) {
   auto &SM = Inputs.AST->getSourceManager();
   auto Reps = tooling::Replacements(
       tooling::Replacement(SM, Str, ("R\"(" + Str->getBytes() + ")\"").str(),

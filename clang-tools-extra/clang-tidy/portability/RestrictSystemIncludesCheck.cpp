@@ -19,12 +19,12 @@
 namespace clang::tidy::portability {
 
 void RestrictedIncludesPPCallbacks::InclusionDirective(
-    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    SourceLocation HashLoc, const Token &IncludeTok, llvm::StringRef FileName,
     bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
-    StringRef SearchPath, StringRef RelativePath, const Module *SuggestedModule,
+    llvm::StringRef SearchPath, llvm::StringRef RelativePath, const Module *SuggestedModule,
     bool ModuleImported, SrcMgr::CharacteristicKind FileType) {
   if (!Check.contains(FileName) && SrcMgr::isSystem(FileType)) {
-    SmallString<256> FullPath;
+    llvm::SmallString<256> FullPath;
     llvm::sys::path::append(FullPath, SearchPath);
     llvm::sys::path::append(FullPath, RelativePath);
     // Bucket the allowed include directives by the id of the file they were

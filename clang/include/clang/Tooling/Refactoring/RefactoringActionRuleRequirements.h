@@ -25,16 +25,16 @@ namespace tooling {
 /// requirements are satisfied.
 ///
 /// Subclasses must implement the
-/// 'Expected<T> evaluate(RefactoringRuleContext &) const' member function.
+/// 'llvm::Expected<T> evaluate(RefactoringRuleContext &) const' member function.
 /// \c T is used to determine the return type that is passed to the
 /// refactoring rule's constructor.
 /// For example, the \c SourceRangeSelectionRequirement subclass defines
-/// 'Expected<SourceRange> evaluate(RefactoringRuleContext &Context) const'
+/// 'llvm::Expected<SourceRange> evaluate(RefactoringRuleContext &Context) const'
 /// function. When this function returns a non-error value, the resulting
 /// source range is passed to the specific refactoring action rule
 /// constructor (provided all other requirements are satisfied).
 class RefactoringActionRuleRequirement {
-  // Expected<T> evaluate(RefactoringRuleContext &Context) const;
+  // llvm::Expected<T> evaluate(RefactoringRuleContext &Context) const;
 };
 
 /// A base class for any requirement that expects some part of the source to be
@@ -45,7 +45,7 @@ class SourceSelectionRequirement : public RefactoringActionRuleRequirement {};
 /// text is selected.
 class SourceRangeSelectionRequirement : public SourceSelectionRequirement {
 public:
-  Expected<SourceRange> evaluate(RefactoringRuleContext &Context) const {
+  llvm::Expected<SourceRange> evaluate(RefactoringRuleContext &Context) const {
     if (Context.getSelectionRange().isValid())
       return Context.getSelectionRange();
     return Context.createDiagnosticError(diag::err_refactor_no_selection);
@@ -59,7 +59,7 @@ public:
 /// search of matching refactoring action rules.
 class ASTSelectionRequirement : public SourceRangeSelectionRequirement {
 public:
-  Expected<SelectedASTNode> evaluate(RefactoringRuleContext &Context) const;
+  llvm::Expected<SelectedASTNode> evaluate(RefactoringRuleContext &Context) const;
 };
 
 /// A selection requirement that is satisfied when the selection range overlaps
@@ -73,7 +73,7 @@ public:
 /// \see CodeRangeASTSelection
 class CodeRangeASTSelectionRequirement : public ASTSelectionRequirement {
 public:
-  Expected<CodeRangeASTSelection>
+  llvm::Expected<CodeRangeASTSelection>
   evaluate(RefactoringRuleContext &Context) const;
 };
 
@@ -84,7 +84,7 @@ public:
 
   /// Returns the set of refactoring options that are used when evaluating this
   /// requirement.
-  virtual ArrayRef<std::shared_ptr<RefactoringOption>>
+  virtual llvm::ArrayRef<std::shared_ptr<RefactoringOption>>
   getRefactoringOptions() const = 0;
 };
 
@@ -97,12 +97,12 @@ class OptionRequirement : public RefactoringOptionsRequirement {
 public:
   OptionRequirement() : Opt(createRefactoringOption<OptionType>()) {}
 
-  ArrayRef<std::shared_ptr<RefactoringOption>>
+  llvm::ArrayRef<std::shared_ptr<RefactoringOption>>
   getRefactoringOptions() const final {
     return Opt;
   }
 
-  Expected<typename OptionType::ValueType>
+  llvm::Expected<typename OptionType::ValueType>
   evaluate(RefactoringRuleContext &) const {
     return static_cast<OptionType *>(Opt.get())->getValue();
   }

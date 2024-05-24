@@ -25,7 +25,7 @@ using MatchResult = MatchFinder::MatchResult;
 using llvm::ValueIs;
 
 // Create a valid translation unit from a statement.
-static std::string wrapSnippet(StringRef StatementCode) {
+static std::string wrapSnippet(llvm::StringRef StatementCode) {
   return ("namespace std {\n"
           "template <typename T> struct unique_ptr {\n"
           "  T* operator->() const;\n"
@@ -66,7 +66,7 @@ struct TestMatch {
 // matcher correspondingly. `Matcher` should match one of the statements in
 // `StatementCode` exactly -- that is, produce exactly one match. However,
 // `StatementCode` may contain other statements not described by `Matcher`.
-static std::optional<TestMatch> matchStmt(StringRef StatementCode,
+static std::optional<TestMatch> matchStmt(llvm::StringRef StatementCode,
                                           StatementMatcher Matcher) {
   auto AstUnit = buildASTFromCodeWithArgs(wrapSnippet(StatementCode),
                                           {"-Wno-unused-value"});
@@ -84,7 +84,7 @@ static std::optional<TestMatch> matchStmt(StringRef StatementCode,
   return TestMatch{std::move(AstUnit), MatchResult(Matches[0], &Context)};
 }
 
-static void testPredicate(bool (*Pred)(const Expr &), StringRef Snippet,
+static void testPredicate(bool (*Pred)(const Expr &), llvm::StringRef Snippet,
                           bool Expected) {
   auto StmtMatch = matchStmt(Snippet, expr().bind("expr"));
   ASSERT_TRUE(StmtMatch) << "Snippet: " << Snippet;
@@ -94,7 +94,7 @@ static void testPredicate(bool (*Pred)(const Expr &), StringRef Snippet,
 
 // Tests the predicate on the call argument, assuming `Snippet` is a function
 // call.
-static void testPredicateOnArg(bool (*Pred)(const Expr &), StringRef Snippet,
+static void testPredicateOnArg(bool (*Pred)(const Expr &), llvm::StringRef Snippet,
                                bool Expected) {
   auto StmtMatch = matchStmt(
       Snippet, expr(ignoringImplicit(callExpr(hasArgument(
@@ -190,7 +190,7 @@ TEST(SourceCodeBuildersTest, isKnownPointerLikeTypeNormalTypeFalse) {
 
 static void testBuilder(
     std::optional<std::string> (*Builder)(const Expr &, const ASTContext &),
-    StringRef Snippet, StringRef Expected) {
+    llvm::StringRef Snippet, llvm::StringRef Expected) {
   auto StmtMatch = matchStmt(Snippet, expr().bind("expr"));
   ASSERT_TRUE(StmtMatch);
   EXPECT_THAT(Builder(*StmtMatch->Result.Nodes.getNodeAs<Expr>("expr"),
@@ -198,7 +198,7 @@ static void testBuilder(
               ValueIs(std::string(Expected)));
 }
 
-static void testBuildAccess(StringRef Snippet, StringRef Expected,
+static void testBuildAccess(llvm::StringRef Snippet, llvm::StringRef Expected,
                             PLTClass C = PLTClass::Pointer) {
   auto StmtMatch = matchStmt(Snippet, expr().bind("expr"));
   ASSERT_TRUE(StmtMatch);
@@ -244,7 +244,7 @@ TEST(SourceCodeBuildersTest, BuildAddressOfBinaryOperation) {
 }
 
 TEST(SourceCodeBuildersTest, BuildAddressOfImplicitThis) {
-  StringRef Snippet = R"cc(
+  llvm::StringRef Snippet = R"cc(
     struct Struct {
       void foo() {}
       void bar() {
@@ -374,7 +374,7 @@ TEST(SourceCodeBuildersTest, BuildAccessSmartPointerDerefAsValue) {
 }
 
 TEST(SourceCodeBuildersTest, BuildAccessSmartPointerMemberCall) {
-  StringRef Snippet = R"cc(
+  llvm::StringRef Snippet = R"cc(
     Smart x;
     x->Field;
   )cc";
@@ -387,7 +387,7 @@ TEST(SourceCodeBuildersTest, BuildAccessSmartPointerMemberCall) {
 }
 
 TEST(SourceCodeBuildersTest, BuildAccessIgnoreImplicit) {
-  StringRef Snippet = R"cc(
+  llvm::StringRef Snippet = R"cc(
     S x;
     A *a;
     a = &x;
@@ -402,7 +402,7 @@ TEST(SourceCodeBuildersTest, BuildAccessIgnoreImplicit) {
 }
 
 TEST(SourceCodeBuildersTest, BuildAccessImplicitThis) {
-  StringRef Snippet = R"cc(
+  llvm::StringRef Snippet = R"cc(
     struct Struct {
       void foo() {}
       void bar() {
@@ -420,7 +420,7 @@ TEST(SourceCodeBuildersTest, BuildAccessImplicitThis) {
 }
 
 TEST(SourceCodeBuildersTest, BuildAccessImplicitThisIgnoreImplicitCasts) {
-  StringRef Snippet = "struct B : public A { void f() { super(); } };";
+  llvm::StringRef Snippet = "struct B : public A { void f() { super(); } };";
   auto StmtMatch = matchStmt(
       Snippet,
       cxxMemberCallExpr(onImplicitObjectArgument(expr().bind("expr"))));

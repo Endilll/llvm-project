@@ -30,7 +30,7 @@ using namespace clang;
 // PrettyStackTraceLoc
 //===----------------------------------------------------------------------===//
 
-void PrettyStackTraceLoc::print(raw_ostream &OS) const {
+void PrettyStackTraceLoc::print(llvm::raw_ostream &OS) const {
   if (Loc.isValid()) {
     Loc.print(OS, SM);
     OS << ": ";
@@ -59,7 +59,7 @@ void llvm::FoldingSetTrait<SourceLocation>::Profile(
   ID.AddInteger(X.ID);
 }
 
-void SourceLocation::print(raw_ostream &OS, const SourceManager &SM)const{
+void SourceLocation::print(llvm::raw_ostream &OS, const SourceManager &SM)const{
   if (!isValid()) {
     OS << "<invalid loc>";
     return;
@@ -103,7 +103,7 @@ LLVM_DUMP_METHOD void SourceRange::dump(const SourceManager &SM) const {
   llvm::errs() << '\n';
 }
 
-static PresumedLoc PrintDifference(raw_ostream &OS, const SourceManager &SM,
+static PresumedLoc PrintDifference(llvm::raw_ostream &OS, const SourceManager &SM,
                                    SourceLocation Loc, PresumedLoc Previous) {
   if (Loc.isFileID()) {
 
@@ -133,7 +133,7 @@ static PresumedLoc PrintDifference(raw_ostream &OS, const SourceManager &SM,
   return PrintedLoc;
 }
 
-void SourceRange::print(raw_ostream &OS, const SourceManager &SM) const {
+void SourceRange::print(llvm::raw_ostream &OS, const SourceManager &SM) const {
 
   OS << '<';
   auto PrintedLoc = PrintDifference(OS, SM, B, {});
@@ -197,11 +197,11 @@ FullSourceLoc FullSourceLoc::getImmediateMacroCallerLoc() const {
   return FullSourceLoc(SrcMgr->getImmediateMacroCallerLoc(*this), *SrcMgr);
 }
 
-std::pair<FullSourceLoc, StringRef> FullSourceLoc::getModuleImportLoc() const {
+std::pair<FullSourceLoc, llvm::StringRef> FullSourceLoc::getModuleImportLoc() const {
   if (!isValid())
-    return std::make_pair(FullSourceLoc(), StringRef());
+    return std::make_pair(FullSourceLoc(), llvm::StringRef());
 
-  std::pair<SourceLocation, StringRef> ImportLoc =
+  std::pair<SourceLocation, llvm::StringRef> ImportLoc =
       SrcMgr->getModuleImportLoc(*this);
   return std::make_pair(FullSourceLoc(ImportLoc.first, *SrcMgr),
                         ImportLoc.second);
@@ -271,7 +271,7 @@ const char *FullSourceLoc::getCharacterData(bool *Invalid) const {
   return SrcMgr->getCharacterData(*this, Invalid);
 }
 
-StringRef FullSourceLoc::getBufferData(bool *Invalid) const {
+llvm::StringRef FullSourceLoc::getBufferData(bool *Invalid) const {
   assert(isValid());
   return SrcMgr->getBufferData(SrcMgr->getFileID(*this), Invalid);
 }

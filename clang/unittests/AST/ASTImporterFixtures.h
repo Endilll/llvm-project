@@ -36,16 +36,16 @@ class ASTUnit;
 
 namespace ast_matchers {
 
-const StringRef DeclToImportID = "declToImport";
-const StringRef DeclToVerifyID = "declToVerify";
+const llvm::StringRef DeclToImportID = "declToImport";
+const llvm::StringRef DeclToVerifyID = "declToVerify";
 
 // Creates a virtual file and assigns that to the context of given AST. If the
 // file already exists then the file will not be created again as a duplicate.
-void createVirtualFileIfNeeded(ASTUnit *ToAST, StringRef FileName,
+void createVirtualFileIfNeeded(ASTUnit *ToAST, llvm::StringRef FileName,
                                std::unique_ptr<llvm::MemoryBuffer> &&Buffer);
 
-void createVirtualFileIfNeeded(ASTUnit *ToAST, StringRef FileName,
-                               StringRef Code);
+void createVirtualFileIfNeeded(ASTUnit *ToAST, llvm::StringRef FileName,
+                               llvm::StringRef Code);
 
 // Common base for the different families of ASTImporter tests that are
 // parameterized on the compiler options which may result a different AST. E.g.
@@ -116,7 +116,7 @@ private:
     ImporterConstructor Creator;
     ASTImporter::ODRHandlingType ODRHandling;
 
-    TU(StringRef Code, StringRef FileName, std::vector<std::string> Args,
+    TU(llvm::StringRef Code, llvm::StringRef FileName, std::vector<std::string> Args,
        ImporterConstructor C = ImporterConstructor(),
        ASTImporter::ODRHandlingType ODRHandling =
            ASTImporter::ODRHandlingType::Conservative);
@@ -146,8 +146,8 @@ private:
   // Initialize the shared state if not initialized already.
   void lazyInitSharedState(TranslationUnitDecl *ToTU);
 
-  void lazyInitToAST(TestLanguage ToLang, StringRef ToSrcCode,
-                     StringRef FileName);
+  void lazyInitToAST(TestLanguage ToLang, llvm::StringRef ToSrcCode,
+                     llvm::StringRef FileName);
 
 protected:
   std::shared_ptr<ASTImporterSharedState> SharedStatePtr;
@@ -163,18 +163,18 @@ public:
   // of the identifier into the To context.
   // Must not be called more than once within the same test.
   std::tuple<Decl *, Decl *>
-  getImportedDecl(StringRef FromSrcCode, TestLanguage FromLang,
-                  StringRef ToSrcCode, TestLanguage ToLang,
-                  StringRef Identifier = DeclToImportID);
+  getImportedDecl(llvm::StringRef FromSrcCode, TestLanguage FromLang,
+                  llvm::StringRef ToSrcCode, TestLanguage ToLang,
+                  llvm::StringRef Identifier = DeclToImportID);
 
   // Creates a TU decl for the given source code which can be used as a From
   // context.  May be called several times in a given test (with different file
   // name).
-  TranslationUnitDecl *getTuDecl(StringRef SrcCode, TestLanguage Lang,
-                                 StringRef FileName = "input.cc");
+  TranslationUnitDecl *getTuDecl(llvm::StringRef SrcCode, TestLanguage Lang,
+                                 llvm::StringRef FileName = "input.cc");
 
   // Creates the To context with the given source code and returns the TU decl.
-  TranslationUnitDecl *getToTuDecl(StringRef ToSrcCode, TestLanguage ToLang);
+  TranslationUnitDecl *getToTuDecl(llvm::StringRef ToSrcCode, TestLanguage ToLang);
 
   // Import the given Decl into the ToCtx.
   // May be called several times in a given test.
@@ -216,7 +216,7 @@ class TestImportBase
     // Add 'From' file to virtual file system so importer can 'find' it
     // while importing SourceLocations. It is safe to add same file multiple
     // times - it just isn't replaced.
-    StringRef FromFileName = From->getMainFileName();
+    llvm::StringRef FromFileName = From->getMainFileName();
     createVirtualFileIfNeeded(To, FromFileName,
                               From->getBufferForFile(FromFileName));
 
@@ -225,7 +225,7 @@ class TestImportBase
     if (Imported) {
       // This should dump source locations and assert if some source locations
       // were not imported.
-      SmallString<1024> ImportChecker;
+      llvm::SmallString<1024> ImportChecker;
       llvm::raw_svector_ostream ToNothing(ImportChecker);
       ToCtx.getTranslationUnitDecl()->print(ToNothing);
 
@@ -322,17 +322,17 @@ public:
   }
 
   struct ImportAction {
-    StringRef FromFilename;
-    StringRef ToFilename;
+    llvm::StringRef FromFilename;
+    llvm::StringRef ToFilename;
     // FIXME: Generalize this to support other node kinds.
     internal::BindableMatcher<Decl> ImportPredicate;
 
-    ImportAction(StringRef FromFilename, StringRef ToFilename,
+    ImportAction(llvm::StringRef FromFilename, llvm::StringRef ToFilename,
                  DeclarationMatcher ImportPredicate)
         : FromFilename(FromFilename), ToFilename(ToFilename),
           ImportPredicate(ImportPredicate) {}
 
-    ImportAction(StringRef FromFilename, StringRef ToFilename,
+    ImportAction(llvm::StringRef FromFilename, llvm::StringRef ToFilename,
                  const std::string &DeclName)
         : FromFilename(FromFilename), ToFilename(ToFilename),
           ImportPredicate(namedDecl(hasName(DeclName))) {}
@@ -349,7 +349,7 @@ public:
   using CodeFiles = llvm::StringMap<CodeEntry>;
 
   /// Builds an ASTUnit for one potential compile options set.
-  SingleASTUnit createASTUnit(StringRef FileName, const CodeEntry &CE) const {
+  SingleASTUnit createASTUnit(llvm::StringRef FileName, const CodeEntry &CE) const {
     std::vector<std::string> Args = getCommandLineArgsForLanguage(CE.Lang);
     auto AST = tooling::buildASTFromCodeWithArgs(CE.CodeSample, Args, FileName);
     EXPECT_TRUE(AST.get());
@@ -372,14 +372,14 @@ public:
   /// after all imports in sequence are done.
   void testImportSequence(const CodeFiles &CodeSamples,
                           const std::vector<ImportAction> &ImportActions,
-                          StringRef FileForFinalCheck,
+                          llvm::StringRef FileForFinalCheck,
                           internal::BindableMatcher<Decl> FinalSelectPredicate,
                           internal::BindableMatcher<Decl> VerificationMatcher) {
     AllASTUnits AllASTs;
     using ImporterKey = std::pair<const ASTUnit *, const ASTUnit *>;
     llvm::DenseMap<ImporterKey, std::unique_ptr<ASTImporter>> Importers;
 
-    auto GenASTsIfNeeded = [this, &AllASTs, &CodeSamples](StringRef Filename) {
+    auto GenASTsIfNeeded = [this, &AllASTs, &CodeSamples](llvm::StringRef Filename) {
       if (!AllASTs.count(Filename)) {
         auto Found = CodeSamples.find(Filename);
         assert(Found != CodeSamples.end() && "Wrong file for import!");
@@ -388,7 +388,7 @@ public:
     };
 
     for (const ImportAction &Action : ImportActions) {
-      StringRef FromFile = Action.FromFilename, ToFile = Action.ToFilename;
+      llvm::StringRef FromFile = Action.FromFilename, ToFile = Action.ToFilename;
       GenASTsIfNeeded(FromFile);
       GenASTsIfNeeded(ToFile);
 
@@ -432,17 +432,17 @@ template <typename T> RecordDecl *getRecordDecl(T *D) {
 template <class T>
 ::testing::AssertionResult isSuccess(llvm::Expected<T> &ValOrErr) {
   if (ValOrErr)
-    return ::testing::AssertionSuccess() << "Expected<> contains no error.";
+    return ::testing::AssertionSuccess() << "llvm::Expected<> contains no error.";
   else
     return ::testing::AssertionFailure()
-           << "Expected<> contains error: " << toString(ValOrErr.takeError());
+           << "llvm::Expected<> contains error: " << toString(ValOrErr.takeError());
 }
 
 template <class T>
 ::testing::AssertionResult isImportError(llvm::Expected<T> &ValOrErr,
                                          ASTImportError::ErrorKind Kind) {
   if (ValOrErr) {
-    return ::testing::AssertionFailure() << "Expected<> is expected to contain "
+    return ::testing::AssertionFailure() << "llvm::Expected<> is expected to contain "
                                             "error but does contain value \""
                                          << (*ValOrErr) << "\"";
   } else {
@@ -452,14 +452,14 @@ template <class T>
         ValOrErr.takeError(), [&OS, &Result, Kind](clang::ASTImportError &IE) {
           if (IE.Error == Kind) {
             Result = true;
-            OS << "Expected<> contains an ImportError " << IE.toString();
+            OS << "llvm::Expected<> contains an ImportError " << IE.toString();
           } else {
-            OS << "Expected<> contains an ImportError " << IE.toString()
+            OS << "llvm::Expected<> contains an ImportError " << IE.toString()
                << " instead of kind " << Kind;
           }
         });
     if (Err) {
-      OS << "Expected<> contains unexpected error: "
+      OS << "llvm::Expected<> contains unexpected error: "
          << toString(std::move(Err));
     }
     if (Result)

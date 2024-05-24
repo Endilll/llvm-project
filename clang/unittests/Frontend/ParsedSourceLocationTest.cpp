@@ -16,7 +16,7 @@ using namespace clang;
 namespace {
 
 TEST(ParsedSourceRange, ParseTest) {
-  auto Check = [](StringRef Value, StringRef Filename, unsigned BeginLine,
+  auto Check = [](llvm::StringRef Value, llvm::StringRef Filename, unsigned BeginLine,
                   unsigned BeginColumn, unsigned EndLine, unsigned EndColumn) {
     std::optional<ParsedSourceRange> PSR = ParsedSourceRange::fromString(Value);
     ASSERT_TRUE(PSR);

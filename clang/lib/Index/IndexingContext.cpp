@@ -51,13 +51,13 @@ bool IndexingContext::shouldIndexTemplateParameters() const {
 
 bool IndexingContext::handleDecl(const Decl *D,
                                  SymbolRoleSet Roles,
-                                 ArrayRef<SymbolRelation> Relations) {
+                                 llvm::ArrayRef<SymbolRelation> Relations) {
   return handleDecl(D, D->getLocation(), Roles, Relations);
 }
 
 bool IndexingContext::handleDecl(const Decl *D, SourceLocation Loc,
                                  SymbolRoleSet Roles,
-                                 ArrayRef<SymbolRelation> Relations,
+                                 llvm::ArrayRef<SymbolRelation> Relations,
                                  const DeclContext *DC) {
   if (!DC)
     DC = D->getDeclContext();
@@ -75,7 +75,7 @@ bool IndexingContext::handleReference(const NamedDecl *D, SourceLocation Loc,
                                       const NamedDecl *Parent,
                                       const DeclContext *DC,
                                       SymbolRoleSet Roles,
-                                      ArrayRef<SymbolRelation> Relations,
+                                      llvm::ArrayRef<SymbolRelation> Relations,
                                       const Expr *RefE) {
   if (!shouldIndexFunctionLocalSymbols() && isFunctionLocalSymbol(D))
     return true;
@@ -90,7 +90,7 @@ bool IndexingContext::handleReference(const NamedDecl *D, SourceLocation Loc,
 }
 
 static void reportModuleReferences(const Module *Mod,
-                                   ArrayRef<SourceLocation> IdLocs,
+                                   llvm::ArrayRef<SourceLocation> IdLocs,
                                    const ImportDecl *ImportD,
                                    IndexDataConsumer &DataConsumer) {
   if (!Mod)
@@ -306,7 +306,7 @@ static const Decl *getCanonicalDecl(const Decl *D) {
 }
 
 static bool shouldReportOccurrenceForSystemDeclOnlyMode(
-    bool IsRef, SymbolRoleSet Roles, ArrayRef<SymbolRelation> Relations) {
+    bool IsRef, SymbolRoleSet Roles, llvm::ArrayRef<SymbolRelation> Relations) {
   if (!IsRef)
     return true;
 
@@ -355,7 +355,7 @@ static bool shouldReportOccurrenceForSystemDeclOnlyMode(
 bool IndexingContext::handleDeclOccurrence(const Decl *D, SourceLocation Loc,
                                            bool IsRef, const Decl *Parent,
                                            SymbolRoleSet Roles,
-                                           ArrayRef<SymbolRelation> Relations,
+                                           llvm::ArrayRef<SymbolRelation> Relations,
                                            const Expr *OrigE,
                                            const Decl *OrigD,
                                            const DeclContext *ContainerDC) {
@@ -411,7 +411,7 @@ bool IndexingContext::handleDeclOccurrence(const Decl *D, SourceLocation Loc,
   if (Parent)
     Parent = getCanonicalDecl(Parent);
 
-  SmallVector<SymbolRelation, 6> FinalRelations;
+  llvm::SmallVector<SymbolRelation, 6> FinalRelations;
   FinalRelations.reserve(Relations.size()+1);
 
   auto addRelation = [&](SymbolRelation Rel) {

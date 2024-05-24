@@ -21,7 +21,7 @@ TEST(SanitizersTest, serializeSanitizers) {
   Set.set(parseSanitizerValue("memory", false), true);
   Set.set(parseSanitizerValue("nullability-arg", false), true);
 
-  SmallVector<StringRef, 4> Serialized;
+  llvm::SmallVector<llvm::StringRef, 4> Serialized;
   serializeSanitizerSet(Set, Serialized);
 
   ASSERT_EQ(Serialized.size(), 2u);
@@ -36,7 +36,7 @@ TEST(SanitizersTest, serializeSanitizersIndividual) {
   Set.set(parseSanitizerValue("nullability-assign", false), true);
   Set.set(parseSanitizerValue("nullability-return", false), true);
 
-  SmallVector<StringRef, 4> Serialized;
+  llvm::SmallVector<llvm::StringRef, 4> Serialized;
   serializeSanitizerSet(Set, Serialized);
 
   ASSERT_EQ(Serialized.size(), 4u);

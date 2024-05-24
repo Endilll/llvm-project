@@ -34,9 +34,9 @@ using namespace clang;
 // much to be desired. Come up with a better mangling scheme.
 
 static void mangleFunctionBlock(MangleContext &Context,
-                                StringRef Outer,
+                                llvm::StringRef Outer,
                                 const BlockDecl *BD,
-                                raw_ostream &Out) {
+                                llvm::raw_ostream &Out) {
   unsigned discriminator = Context.getBlockId(BD, true);
   if (discriminator == 0)
     Out << "__" << Outer << "_block_invoke";
@@ -136,7 +136,7 @@ bool MangleContext::shouldMangleDeclName(const NamedDecl *D) {
   return shouldMangleCXXName(D);
 }
 
-void MangleContext::mangleName(GlobalDecl GD, raw_ostream &Out) {
+void MangleContext::mangleName(GlobalDecl GD, llvm::raw_ostream &Out) {
   const ASTContext &ASTContext = getASTContext();
   const NamedDecl *D = cast<NamedDecl>(GD.getDecl());
 
@@ -157,7 +157,7 @@ void MangleContext::mangleName(GlobalDecl GD, raw_ostream &Out) {
     // tricks normally used for producing aliases (PR9177). Fortunately the
     // llvm mangler on ELF is a nop, so we can just avoid adding the \01
     // marker.
-    StringRef UserLabelPrefix =
+    llvm::StringRef UserLabelPrefix =
         getASTContext().getTargetInfo().getUserLabelPrefix();
 #ifndef NDEBUG
     char GlobalPrefix =
@@ -241,7 +241,7 @@ void MangleContext::mangleName(GlobalDecl GD, raw_ostream &Out) {
   Out << ((DefaultPtrWidth / 8) * ArgWords);
 }
 
-void MangleContext::mangleMSGuidDecl(const MSGuidDecl *GD, raw_ostream &Out) {
+void MangleContext::mangleMSGuidDecl(const MSGuidDecl *GD, llvm::raw_ostream &Out) {
   // For now, follow the MSVC naming convention for GUID objects on all
   // targets.
   MSGuidDecl::Parts P = GD->getParts();
@@ -257,7 +257,7 @@ void MangleContext::mangleMSGuidDecl(const MSGuidDecl *GD, raw_ostream &Out) {
 
 void MangleContext::mangleGlobalBlock(const BlockDecl *BD,
                                       const NamedDecl *ID,
-                                      raw_ostream &Out) {
+                                      llvm::raw_ostream &Out) {
   unsigned discriminator = getBlockId(BD, false);
   if (ID) {
     if (shouldMangleDeclName(ID))
@@ -274,8 +274,8 @@ void MangleContext::mangleGlobalBlock(const BlockDecl *BD,
 
 void MangleContext::mangleCtorBlock(const CXXConstructorDecl *CD,
                                     CXXCtorType CT, const BlockDecl *BD,
-                                    raw_ostream &ResStream) {
-  SmallString<64> Buffer;
+                                    llvm::raw_ostream &ResStream) {
+  llvm::SmallString<64> Buffer;
   llvm::raw_svector_ostream Out(Buffer);
   mangleName(GlobalDecl(CD, CT), Out);
   mangleFunctionBlock(*this, Buffer, BD, ResStream);
@@ -283,18 +283,18 @@ void MangleContext::mangleCtorBlock(const CXXConstructorDecl *CD,
 
 void MangleContext::mangleDtorBlock(const CXXDestructorDecl *DD,
                                     CXXDtorType DT, const BlockDecl *BD,
-                                    raw_ostream &ResStream) {
-  SmallString<64> Buffer;
+                                    llvm::raw_ostream &ResStream) {
+  llvm::SmallString<64> Buffer;
   llvm::raw_svector_ostream Out(Buffer);
   mangleName(GlobalDecl(DD, DT), Out);
   mangleFunctionBlock(*this, Buffer, BD, ResStream);
 }
 
 void MangleContext::mangleBlock(const DeclContext *DC, const BlockDecl *BD,
-                                raw_ostream &Out) {
+                                llvm::raw_ostream &Out) {
   assert(!isa<CXXConstructorDecl>(DC) && !isa<CXXDestructorDecl>(DC));
 
-  SmallString<64> Buffer;
+  llvm::SmallString<64> Buffer;
   llvm::raw_svector_ostream Stream(Buffer);
   if (const ObjCMethodDecl *Method = dyn_cast<ObjCMethodDecl>(DC)) {
     mangleObjCMethodNameAsSourceName(Method, Stream);
@@ -327,7 +327,7 @@ void MangleContext::mangleBlock(const DeclContext *DC, const BlockDecl *BD,
 }
 
 void MangleContext::mangleObjCMethodName(const ObjCMethodDecl *MD,
-                                         raw_ostream &OS,
+                                         llvm::raw_ostream &OS,
                                          bool includePrefixByte,
                                          bool includeCategoryNamespace) {
   if (getASTContext().getLangOpts().ObjCRuntime.isGNUFamily()) {
@@ -384,8 +384,8 @@ void MangleContext::mangleObjCMethodName(const ObjCMethodDecl *MD,
 }
 
 void MangleContext::mangleObjCMethodNameAsSourceName(const ObjCMethodDecl *MD,
-                                                     raw_ostream &Out) {
-  SmallString<64> Name;
+                                                     llvm::raw_ostream &Out) {
+  llvm::SmallString<64> Name;
   llvm::raw_svector_ostream OS(Name);
 
   mangleObjCMethodName(MD, OS, /*includePrefixByte=*/false,
@@ -402,9 +402,9 @@ public:
       : MC(Ctx.createMangleContext()),
         DL(Ctx.getTargetInfo().getDataLayoutString()) {}
 
-  bool writeName(const Decl *D, raw_ostream &OS) {
+  bool writeName(const Decl *D, llvm::raw_ostream &OS) {
     // First apply frontend mangling.
-    SmallString<128> FrontendBuf;
+    llvm::SmallString<128> FrontendBuf;
     llvm::raw_svector_ostream FrontendBufOS(FrontendBuf);
     if (auto *FD = dyn_cast<FunctionDecl>(D)) {
       if (FD->isDependentContext())
@@ -443,7 +443,7 @@ public:
     ObjCMetaclass,
   };
 
-  static StringRef getClassSymbolPrefix(ObjCKind Kind,
+  static llvm::StringRef getClassSymbolPrefix(ObjCKind Kind,
                                         const ASTContext &Context) {
     if (Context.getLangOpts().ObjCRuntime.isGNUFamily())
       return Kind == ObjCMetaclass ? "_OBJC_METACLASS_" : "_OBJC_CLASS_";
@@ -451,7 +451,7 @@ public:
   }
 
   std::vector<std::string> getAllManglings(const ObjCContainerDecl *OCD) {
-    StringRef ClassName;
+    llvm::StringRef ClassName;
     if (const auto *OID = dyn_cast<ObjCInterfaceDecl>(OCD))
       ClassName = OID->getObjCRuntimeNameAsString();
     else if (const auto *OID = dyn_cast<ObjCImplementationDecl>(OCD))
@@ -460,8 +460,8 @@ public:
     if (ClassName.empty())
       return {};
 
-    auto Mangle = [&](ObjCKind Kind, StringRef ClassName) -> std::string {
-      SmallString<40> Mangled;
+    auto Mangle = [&](ObjCKind Kind, llvm::StringRef ClassName) -> std::string {
+      llvm::SmallString<40> Mangled;
       auto Prefix = getClassSymbolPrefix(Kind, OCD->getASTContext());
       llvm::Mangler::getNameWithPrefix(Mangled, Prefix + ClassName, DL);
       return std::string(Mangled);
@@ -524,7 +524,7 @@ public:
   }
 
 private:
-  bool writeFuncOrVarName(const NamedDecl *D, raw_ostream &OS) {
+  bool writeFuncOrVarName(const NamedDecl *D, llvm::raw_ostream &OS) {
     if (MC->shouldMangleDeclName(D)) {
       GlobalDecl GD;
       if (const auto *CtorD = dyn_cast<CXXConstructorDecl>(D))
@@ -546,7 +546,7 @@ private:
     }
   }
 
-  void writeObjCClassName(const ObjCInterfaceDecl *D, raw_ostream &OS) {
+  void writeObjCClassName(const ObjCInterfaceDecl *D, llvm::raw_ostream &OS) {
     OS << getClassSymbolPrefix(ObjCClass, D->getASTContext());
     OS << D->getObjCRuntimeNameAsString();
   }
@@ -590,7 +590,7 @@ ASTNameGenerator::ASTNameGenerator(ASTContext &Ctx)
 
 ASTNameGenerator::~ASTNameGenerator() {}
 
-bool ASTNameGenerator::writeName(const Decl *D, raw_ostream &OS) {
+bool ASTNameGenerator::writeName(const Decl *D, llvm::raw_ostream &OS) {
   return Impl->writeName(D, OS);
 }
 

@@ -10,7 +10,7 @@
 
 using namespace clang;
 
-raw_ostream &syntax::operator<<(raw_ostream &OS, NodeKind K) {
+llvm::raw_ostream &syntax::operator<<(llvm::raw_ostream &OS, NodeKind K) {
   switch (K) {
 #define CONCRETE_NODE(Kind, Parent)                                            \
   case NodeKind::Kind:                                                         \
@@ -20,7 +20,7 @@ raw_ostream &syntax::operator<<(raw_ostream &OS, NodeKind K) {
   llvm_unreachable("unknown node kind");
 }
 
-raw_ostream &syntax::operator<<(raw_ostream &OS, NodeRole R) {
+llvm::raw_ostream &syntax::operator<<(llvm::raw_ostream &OS, NodeRole R) {
   switch (R) {
   case syntax::NodeRole::Detached:
     return OS << "Detached";

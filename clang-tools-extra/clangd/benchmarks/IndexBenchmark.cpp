@@ -42,7 +42,7 @@ std::vector<FuzzyFindRequest> extractQueriesFromLogs() {
     exit(1);
   }
 
-  StringRef Log = Buffer.get()->getBuffer();
+  llvm::StringRef Log = Buffer.get()->getBuffer();
 
   std::vector<FuzzyFindRequest> Requests;
   auto JSONArray = llvm::json::parse(Log);

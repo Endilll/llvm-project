@@ -32,7 +32,7 @@ AST_MATCHER(EnumDecl, isCompleteAndHasNoZeroValue) {
 } // namespace
 
 NonZeroEnumToBoolConversionCheck::NonZeroEnumToBoolConversionCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       EnumIgnoreList(
           utils::options::parseStringList(Options.get("EnumIgnoreList", ""))) {}

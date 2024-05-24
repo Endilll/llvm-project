@@ -26,11 +26,11 @@ enum class IsSubstitution_t : bool { Original, Replacement };
 
 struct VersionedInfoMetadata {
   /// An empty version refers to unversioned metadata.
-  VersionTuple Version;
+  llvm::VersionTuple Version;
   unsigned IsActive : 1;
   unsigned IsReplacement : 1;
 
-  VersionedInfoMetadata(VersionTuple Version, IsActive_t Active,
+  VersionedInfoMetadata(llvm::VersionTuple Version, IsActive_t Active,
                         IsSubstitution_t Replacement)
       : Version(Version), IsActive(Active == IsActive_t::Active),
         IsReplacement(Replacement == IsSubstitution_t::Replacement) {}
@@ -108,10 +108,10 @@ static void applyNullability(Sema &S, Decl *D, NullabilityKind Nullability,
 }
 
 /// Copy a string into ASTContext-allocated memory.
-static StringRef ASTAllocateString(ASTContext &Ctx, StringRef String) {
+static llvm::StringRef ASTAllocateString(ASTContext &Ctx, llvm::StringRef String) {
   void *mem = Ctx.Allocate(String.size(), alignof(char *));
   memcpy(mem, String.data(), String.size());
-  return StringRef(static_cast<char *>(mem), String.size());
+  return llvm::StringRef(static_cast<char *>(mem), String.size());
 }
 
 static AttributeCommonInfo getPlaceholderAttrInfo() {
@@ -263,12 +263,12 @@ static void ProcessAPINotes(Sema &S, Decl *D,
         [&] {
           return new (S.Context) AvailabilityAttr(
               S.Context, getPlaceholderAttrInfo(),
-              &S.Context.Idents.get("swift"), VersionTuple(), VersionTuple(),
-              VersionTuple(),
+              &S.Context.Idents.get("swift"), llvm::VersionTuple(), llvm::VersionTuple(),
+              llvm::VersionTuple(),
               /*Unavailable=*/true,
               ASTAllocateString(S.Context, Info.UnavailableMsg),
               /*Strict=*/false,
-              /*Replacement=*/StringRef(),
+              /*Replacement=*/llvm::StringRef(),
               /*Priority=*/Sema::AP_Explicit,
               /*Environment=*/nullptr);
         },
@@ -522,7 +522,7 @@ static void ProcessAPINotes(Sema &S, FunctionOrMethod AnyFunc,
       if (OverriddenResultType.isNull())
         OverriddenResultType = fnProtoType->getReturnType();
 
-      SmallVector<QualType, 4> ParamTypes;
+      llvm::SmallVector<QualType, 4> ParamTypes;
       for (auto Param : FD->parameters())
         ParamTypes.push_back(Param->getType());
 
@@ -722,7 +722,7 @@ static void maybeAttachUnversionedSwiftName(
     return;
 
   // Is the active slice versioned, and does it set a Swift name?
-  VersionTuple SelectedVersion;
+  llvm::VersionTuple SelectedVersion;
   SpecificInfo SelectedInfoSlice;
   std::tie(SelectedVersion, SelectedInfoSlice) = Info[*Info.getSelected()];
   if (SelectedVersion.empty())
@@ -759,7 +759,7 @@ static void ProcessVersionedAPINotes(
 
   unsigned Selected = Info.getSelected().value_or(Info.size());
 
-  VersionTuple Version;
+  llvm::VersionTuple Version;
   SpecificInfo InfoSlice;
   for (unsigned i = 0, e = Info.size(); i != e; ++i) {
     std::tie(Version, InfoSlice) = Info[i];
@@ -964,7 +964,7 @@ void Sema::ProcessAPINotes(Decl *D) {
         if (auto Context = GetContext(Reader)) {
           // Map the selector.
           Selector Sel = Method->getSelector();
-          SmallVector<StringRef, 2> SelPieces;
+          llvm::SmallVector<llvm::StringRef, 2> SelPieces;
           if (Sel.isUnarySelector()) {
             SelPieces.push_back(Sel.getNameForSlot(0));
           } else {

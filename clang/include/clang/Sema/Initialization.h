@@ -548,7 +548,7 @@ public:
   }
 
   /// For a lambda capture, return the capture's name.
-  StringRef getCapturedVarName() const {
+  llvm::StringRef getCapturedVarName() const {
     assert(getKind() == EK_LambdaCapture && "Not a lambda capture!");
     return Capture.VarID ? Capture.VarID->getName() : "this";
   }
@@ -571,7 +571,7 @@ public:
   void dump() const;
 
 private:
-  unsigned dumpImpl(raw_ostream &OS) const;
+  unsigned dumpImpl(llvm::raw_ostream &OS) const;
 };
 
 /// Describes the kind of initialization being performed, along with
@@ -989,7 +989,7 @@ private:
   enum SequenceKind SequenceKind;
 
   /// Steps taken by this initialization.
-  SmallVector<Step, 4> Steps;
+  llvm::SmallVector<Step, 4> Steps;
 
 public:
   /// Describes why initialization failed.
@@ -1223,7 +1223,7 @@ public:
   bool Diagnose(Sema &S,
                 const InitializedEntity &Entity,
                 const InitializationKind &Kind,
-                ArrayRef<Expr *> Args);
+                llvm::ArrayRef<Expr *> Args);
 
   /// Determine the kind of initialization sequence computed.
   enum SequenceKind getKind() const { return SequenceKind; }
@@ -1237,7 +1237,7 @@ public:
   /// Determine whether the initialization sequence is invalid.
   bool Failed() const { return SequenceKind == FailedSequence; }
 
-  using step_iterator = SmallVectorImpl<Step>::const_iterator;
+  using step_iterator = llvm::SmallVectorImpl<Step>::const_iterator;
 
   step_iterator step_begin() const { return Steps.begin(); }
   step_iterator step_end()   const { return Steps.end(); }
@@ -1427,7 +1427,7 @@ public:
 
   /// Dump a representation of this initialization sequence to
   /// the given stream, for debugging purposes.
-  void dump(raw_ostream &OS) const;
+  void dump(llvm::raw_ostream &OS) const;
 
   /// Dump a representation of this initialization sequence to
   /// standard error, for debugging purposes.

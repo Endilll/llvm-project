@@ -312,7 +312,7 @@ class InitListChecker {
   bool InOverloadResolution;
   InitListExpr *FullyStructuredList = nullptr;
   NoInitExpr *DummyExpr = nullptr;
-  SmallVectorImpl<QualType> *AggrDeductionCandidateParamTypes = nullptr;
+  llvm::SmallVectorImpl<QualType> *AggrDeductionCandidateParamTypes = nullptr;
 
   NoInitExpr *getDummyInit() {
     if (!DummyExpr)
@@ -506,10 +506,10 @@ public:
       Sema &S, const InitializedEntity &Entity, InitListExpr *IL, QualType &T,
       bool VerifyOnly, bool TreatUnavailableAsInvalid,
       bool InOverloadResolution = false,
-      SmallVectorImpl<QualType> *AggrDeductionCandidateParamTypes = nullptr);
+      llvm::SmallVectorImpl<QualType> *AggrDeductionCandidateParamTypes = nullptr);
   InitListChecker(Sema &S, const InitializedEntity &Entity, InitListExpr *IL,
                   QualType &T,
-                  SmallVectorImpl<QualType> &AggrDeductionCandidateParamTypes)
+                  llvm::SmallVectorImpl<QualType> &AggrDeductionCandidateParamTypes)
       : InitListChecker(S, Entity, IL, T, /*VerifyOnly=*/true,
                         /*TreatUnavailableAsInvalid=*/false,
                         /*InOverloadResolution=*/false,
@@ -982,7 +982,7 @@ static bool hasAnyDesignatedInits(const InitListExpr *IL) {
 InitListChecker::InitListChecker(
     Sema &S, const InitializedEntity &Entity, InitListExpr *IL, QualType &T,
     bool VerifyOnly, bool TreatUnavailableAsInvalid, bool InOverloadResolution,
-    SmallVectorImpl<QualType> *AggrDeductionCandidateParamTypes)
+    llvm::SmallVectorImpl<QualType> *AggrDeductionCandidateParamTypes)
     : SemaRef(S), VerifyOnly(VerifyOnly),
       TreatUnavailableAsInvalid(TreatUnavailableAsInvalid),
       InOverloadResolution(InOverloadResolution),
@@ -2476,7 +2476,7 @@ static void ExpandAnonymousFieldDesignator(Sema &SemaRef,
   typedef DesignatedInitExpr::Designator Designator;
 
   // Build the replacement designators.
-  SmallVector<Designator, 4> Replacements;
+  llvm::SmallVector<Designator, 4> Replacements;
   for (IndirectFieldDecl::chain_iterator PI = IndirectField->chain_begin(),
        PE = IndirectField->chain_end(); PI != PE; ++PI) {
     if (PI + 1 == PE)
@@ -2500,7 +2500,7 @@ static void ExpandAnonymousFieldDesignator(Sema &SemaRef,
 static DesignatedInitExpr *CloneDesignatedInitExpr(Sema &SemaRef,
                                                    DesignatedInitExpr *DIE) {
   unsigned NumIndexExprs = DIE->getNumSubExprs() - 1;
-  SmallVector<Expr*, 4> IndexExprs(NumIndexExprs);
+  llvm::SmallVector<Expr*, 4> IndexExprs(NumIndexExprs);
   for (unsigned I = 0; I < NumIndexExprs; ++I)
     IndexExprs[I] = DIE->getSubExpr(I + 1);
   return DesignatedInitExpr::Create(SemaRef.Context, DIE->designators(),
@@ -3373,8 +3373,8 @@ ExprResult Sema::ActOnDesignatedInitializer(Designation &Desig,
   typedef DesignatedInitExpr::Designator ASTDesignator;
 
   bool Invalid = false;
-  SmallVector<ASTDesignator, 32> Designators;
-  SmallVector<Expr *, 32> InitExpressions;
+  llvm::SmallVector<ASTDesignator, 32> Designators;
+  llvm::SmallVector<Expr *, 32> InitExpressions;
 
   // Build designators and check array designator expressions.
   for (unsigned Idx = 0; Idx < Desig.getNumDesignators(); ++Idx) {
@@ -3584,7 +3584,7 @@ bool InitializedEntity::allowsNRVO() const {
   return false;
 }
 
-unsigned InitializedEntity::dumpImpl(raw_ostream &OS) const {
+unsigned InitializedEntity::dumpImpl(llvm::raw_ostream &OS) const {
   assert(getParent() != this);
   unsigned Depth = getParent() ? getParent()->dumpImpl(OS) : 0;
   for (unsigned I = 0; I != Depth; ++I)
@@ -5451,10 +5451,10 @@ static void TryDefaultInitialization(Sema &S,
 
 static void TryOrBuildParenListInitialization(
     Sema &S, const InitializedEntity &Entity, const InitializationKind &Kind,
-    ArrayRef<Expr *> Args, InitializationSequence &Sequence, bool VerifyOnly,
+    llvm::ArrayRef<Expr *> Args, InitializationSequence &Sequence, bool VerifyOnly,
     ExprResult *Result = nullptr) {
   unsigned EntityIndexToProcess = 0;
-  SmallVector<Expr *, 4> InitExprs;
+  llvm::SmallVector<Expr *, 4> InitExprs;
   QualType ResultType;
   Expr *ArrayFiller = nullptr;
   FieldDecl *InitializedFieldInUnion = nullptr;
@@ -5467,7 +5467,7 @@ static void TryOrBuildParenListInitialization(
 
     if (IS.Failed()) {
       if (!VerifyOnly) {
-        IS.Diagnose(S, SubEntity, SubKind, Arg ? ArrayRef(Arg) : std::nullopt);
+        IS.Diagnose(S, SubEntity, SubKind, Arg ? llvm::ArrayRef(Arg) : std::nullopt);
       } else {
         Sequence.SetFailed(
             InitializationSequence::FK_ParenthesizedListInitFailed);
@@ -5489,7 +5489,7 @@ static void TryOrBuildParenListInitialization(
 
   if (const ArrayType *AT =
           S.getASTContext().getAsArrayType(Entity.getType())) {
-    SmallVector<InitializedEntity, 4> ElementEntities;
+    llvm::SmallVector<InitializedEntity, 4> ElementEntities;
     uint64_t ArrayLength;
     // C++ [dcl.init]p16.5
     //   if the destination type is an array, the object is initialized as
@@ -6855,7 +6855,7 @@ static ExprResult CopyObject(Sema &S,
   bool HadMultipleCandidates = CandidateSet.size() > 1;
 
   CXXConstructorDecl *Constructor = cast<CXXConstructorDecl>(Best->Function);
-  SmallVector<Expr*, 8> ConstructorArgs;
+  llvm::SmallVector<Expr*, 8> ConstructorArgs;
   CurInit.get(); // Ownership transferred into MultiExprArg, below.
 
   S.CheckConstructorAccess(Loc, Constructor, Best->FoundDecl, Entity,
@@ -7053,7 +7053,7 @@ PerformConstructorInitialization(Sema &S,
   bool HadMultipleCandidates = Step.Function.HadMultipleCandidates;
 
   // Build a call to the selected constructor.
-  SmallVector<Expr*, 8> ConstructorArgs;
+  llvm::SmallVector<Expr*, 8> ConstructorArgs;
   SourceLocation Loc = (Kind.isCopyInit() && Kind.getEqualLoc().isValid())
                          ? Kind.getEqualLoc()
                          : Kind.getLocation();
@@ -7424,7 +7424,7 @@ static bool isInStlNamespace(const Decl *D) {
     return false;
   if (const auto *ND = dyn_cast<NamespaceDecl>(DC))
     if (const IdentifierInfo *II = ND->getIdentifier()) {
-      StringRef Name = II->getName();
+      llvm::StringRef Name = II->getName();
       if (Name.size() >= 2 && Name.front() == '_' &&
           (Name[1] == '_' || isUppercase(Name[1])))
         return true;
@@ -7590,7 +7590,7 @@ static bool implicitObjectParamIsLifetimeBound(const FunctionDecl *FD) {
 static void visitLifetimeBoundArguments(IndirectLocalPath &Path, Expr *Call,
                                         LocalVisitor Visit) {
   const FunctionDecl *Callee;
-  ArrayRef<Expr*> Args;
+  llvm::ArrayRef<Expr*> Args;
 
   if (auto *CE = dyn_cast<CallExpr>(Call)) {
     Callee = CE->getDirectCallee();
@@ -8715,7 +8715,7 @@ ExprResult InitializationSequence::Perform(Sema &S,
                                      Entity.getType();
 
   ExprResult CurInit((Expr *)nullptr);
-  SmallVector<Expr*, 4> ArrayLoopCommonExprs;
+  llvm::SmallVector<Expr*, 4> ArrayLoopCommonExprs;
 
   // HLSL allows vector initialization to function like list initialization, but
   // use the syntax of a C++-like constructor.
@@ -8930,7 +8930,7 @@ ExprResult InitializationSequence::Perform(Sema &S,
       bool CreatedObject = false;
       if (CXXConstructorDecl *Constructor = dyn_cast<CXXConstructorDecl>(Fn)) {
         // Build a call to the selected constructor.
-        SmallVector<Expr*, 8> ConstructorArgs;
+        llvm::SmallVector<Expr*, 8> ConstructorArgs;
         SourceLocation Loc = CurInit.get()->getBeginLoc();
 
         // Determine the arguments required to actually perform the constructor
@@ -9621,7 +9621,7 @@ static void diagnoseListInit(Sema &S, const InitializedEntity &Entity,
 bool InitializationSequence::Diagnose(Sema &S,
                                       const InitializedEntity &Entity,
                                       const InitializationKind &Kind,
-                                      ArrayRef<Expr *> Args) {
+                                      llvm::ArrayRef<Expr *> Args) {
   if (!Failed())
     return false;
 
@@ -9775,7 +9775,7 @@ bool InitializationSequence::Diagnose(Sema &S,
       StringLiteral *Msg = Best->Function->getDeletedMessage();
       S.Diag(Kind.getLocation(), diag::err_typecheck_deleted_function)
           << OnlyArg->getType() << DestType.getNonReferenceType()
-          << (Msg != nullptr) << (Msg ? Msg->getString() : StringRef())
+          << (Msg != nullptr) << (Msg ? Msg->getString() : llvm::StringRef())
           << Args[0]->getSourceRange();
       if (Ovl == OR_Deleted) {
         S.NoteDeletedFunction(Best->Function);
@@ -10039,7 +10039,7 @@ bool InitializationSequence::Diagnose(Sema &S,
           StringLiteral *Msg = Best->Function->getDeletedMessage();
           S.Diag(Kind.getLocation(), diag::err_ovl_deleted_init)
               << DestType << (Msg != nullptr)
-              << (Msg ? Msg->getString() : StringRef()) << ArgsRange;
+              << (Msg ? Msg->getString() : llvm::StringRef()) << ArgsRange;
         }
 
         S.NoteDeletedFunction(Best->Function);
@@ -10124,7 +10124,7 @@ bool InitializationSequence::Diagnose(Sema &S,
   return true;
 }
 
-void InitializationSequence::dump(raw_ostream &OS) const {
+void InitializationSequence::dump(llvm::raw_ostream &OS) const {
   switch (SequenceKind) {
   case FailedSequence: {
     OS << "Failed sequence: ";
@@ -10557,7 +10557,7 @@ static void DiagnoseNarrowingInInitList(Sema &S,
   }
   }
 
-  SmallString<128> StaticCast;
+  llvm::SmallString<128> StaticCast;
   llvm::raw_svector_ostream OS(StaticCast);
   OS << "static_cast<";
   if (const TypedefType *TT = EntityType->getAs<TypedefType>()) {
@@ -10881,7 +10881,7 @@ QualType Sema::DeduceTemplateSpecializationFromInitializer(
     bool SuppressUserConversions = Kind.isCopyInit();
 
     if (TD) {
-      SmallVector<Expr *, 8> TmpInits;
+      llvm::SmallVector<Expr *, 8> TmpInits;
       for (Expr *E : Inits)
         if (auto *DI = dyn_cast<DesignatedInitExpr>(E))
           TmpInits.push_back(DI->getInit());
@@ -10918,7 +10918,7 @@ QualType Sema::DeduceTemplateSpecializationFromInitializer(
       if (!(RD->getDefinition() && RD->isAggregate()))
         return;
       QualType Ty = Context.getRecordType(RD);
-      SmallVector<QualType, 8> ElementTypes;
+      llvm::SmallVector<QualType, 8> ElementTypes;
 
       InitListChecker CheckInitList(*this, Entity, ListInit, Ty, ElementTypes);
       if (!CheckInitList.HadError()) {

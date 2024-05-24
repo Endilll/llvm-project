@@ -14,9 +14,9 @@ using namespace clang;
 using namespace tooling;
 
 SymbolOccurrence::SymbolOccurrence(const SymbolName &Name, OccurrenceKind Kind,
-                                   ArrayRef<SourceLocation> Locations)
+                                   llvm::ArrayRef<SourceLocation> Locations)
     : Kind(Kind) {
-  ArrayRef<std::string> NamePieces = Name.getNamePieces();
+  llvm::ArrayRef<std::string> NamePieces = Name.getNamePieces();
   assert(Locations.size() == NamePieces.size() &&
          "mismatching number of locations and lengths");
   assert(!Locations.empty() && "no locations");

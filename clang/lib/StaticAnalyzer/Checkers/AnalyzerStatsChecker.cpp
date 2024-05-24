@@ -88,7 +88,7 @@ void AnalyzerStatsChecker::checkEndAnalysis(ExplodedGraph &G,
   unreachable--;
 
   // Generate the warning string
-  SmallString<128> buf;
+  llvm::SmallString<128> buf;
   llvm::raw_svector_ostream output(buf);
   PresumedLoc Loc = SM.getPresumedLoc(D->getLocation());
   if (!Loc.isValid())
@@ -122,7 +122,7 @@ void AnalyzerStatsChecker::checkEndAnalysis(ExplodedGraph &G,
       continue;
     const CFGElement &CE = Exit->front();
     if (std::optional<CFGStmt> CS = CE.getAs<CFGStmt>()) {
-      SmallString<128> bufI;
+      llvm::SmallString<128> bufI;
       llvm::raw_svector_ostream outputI(bufI);
       outputI << "(" << NameOfRootFunction << ")" <<
                  ": The analyzer generated a sink at this point";

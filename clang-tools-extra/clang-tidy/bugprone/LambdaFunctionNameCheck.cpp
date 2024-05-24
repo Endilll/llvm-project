@@ -41,7 +41,7 @@ public:
     bool HasLine = false;
     for (const auto& T : MD.getMacroInfo()->tokens()) {
       if (T.is(tok::identifier)) {
-        StringRef IdentName = T.getIdentifierInfo()->getName();
+        llvm::StringRef IdentName = T.getIdentifierInfo()->getName();
         if (IdentName == "__FILE__") {
           HasFile = true;
         } else if (IdentName == "__LINE__") {
@@ -62,7 +62,7 @@ AST_MATCHER(CXXMethodDecl, isInLambda) { return Node.getParent()->isLambda(); }
 
 } // namespace
 
-LambdaFunctionNameCheck::LambdaFunctionNameCheck(StringRef Name,
+LambdaFunctionNameCheck::LambdaFunctionNameCheck(llvm::StringRef Name,
                                                  ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreMacros(

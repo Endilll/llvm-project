@@ -73,7 +73,7 @@ public:
 
   SanitizerMask getSupportedSanitizers() const override;
 
-  VersionTuple
+  llvm::VersionTuple
   computeMSVCVersion(const Driver *D,
                      const llvm::opt::ArgList &Args) const override;
 

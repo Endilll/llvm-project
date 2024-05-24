@@ -207,7 +207,7 @@ public:
 /// designators.  This class is mostly a helper for InitListDesignations.
 class Designation {
   /// Designators - The actual designators for this initializer.
-  SmallVector<Designator, 2> Designators;
+  llvm::SmallVector<Designator, 2> Designators;
 
 public:
   /// AddDesignator - Add a designator to the end of this list.

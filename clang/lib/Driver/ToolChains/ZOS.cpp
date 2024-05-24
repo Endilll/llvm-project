@@ -78,7 +78,7 @@ void zos::Assembler::ConstructJob(Compilation &C, const JobAction &JA,
 static std::string getLEHLQ(const ArgList &Args) {
   if (Args.hasArg(options::OPT_mzos_hlq_le_EQ)) {
     Arg *LEHLQArg = Args.getLastArg(options::OPT_mzos_hlq_le_EQ);
-    StringRef HLQ = LEHLQArg->getValue();
+    llvm::StringRef HLQ = LEHLQArg->getValue();
     if (!HLQ.empty())
       return HLQ.str();
   }
@@ -88,7 +88,7 @@ static std::string getLEHLQ(const ArgList &Args) {
 static std::string getClangHLQ(const ArgList &Args) {
   if (Args.hasArg(options::OPT_mzos_hlq_clang_EQ)) {
     Arg *ClangHLQArg = Args.getLastArg(options::OPT_mzos_hlq_clang_EQ);
-    StringRef HLQ = ClangHLQArg->getValue();
+    llvm::StringRef HLQ = ClangHLQArg->getValue();
     if (!HLQ.empty())
       return HLQ.str();
   }
@@ -98,7 +98,7 @@ static std::string getClangHLQ(const ArgList &Args) {
 static std::string getCSSHLQ(const ArgList &Args) {
   if (Args.hasArg(options::OPT_mzos_hlq_csslib_EQ)) {
     Arg *CsslibHLQArg = Args.getLastArg(options::OPT_mzos_hlq_csslib_EQ);
-    StringRef HLQ = CsslibHLQArg->getValue();
+    llvm::StringRef HLQ = CsslibHLQArg->getValue();
     if (!HLQ.empty())
       return HLQ.str();
   }
@@ -121,7 +121,7 @@ void zos::Linker::ConstructJob(Compilation &C, const JobAction &JA,
     CmdArgs.push_back(Output.getFilename());
   }
 
-  SmallString<128> LinkerOptions;
+  llvm::SmallString<128> LinkerOptions;
   LinkerOptions = "AMODE=";
   LinkerOptions += "64";
   LinkerOptions += ",LIST";
@@ -146,7 +146,7 @@ void zos::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 
   // Generate side file if -shared option is present.
   if (IsSharedLib) {
-    StringRef OutputName = Output.getFilename();
+    llvm::StringRef OutputName = Output.getFilename();
     // Strip away the last file suffix in presence from output name and add
     // a new .x suffix.
     size_t Suffix = OutputName.find_last_of('.');
@@ -177,7 +177,7 @@ void zos::Linker::ConstructJob(Compilation &C, const JobAction &JA,
   std::string LEHLQ = getLEHLQ(Args);
   std::string CsslibHLQ = getCSSHLQ(Args);
 
-  StringRef ld_env_var = StringRef(getenv("_LD_SYSLIB")).trim();
+  llvm::StringRef ld_env_var = llvm::StringRef(getenv("_LD_SYSLIB")).trim();
   if (ld_env_var.empty()) {
     CmdArgs.push_back("-S");
     CmdArgs.push_back(Args.MakeArgString("//'" + LEHLQ + ".SCEEBND2'"));
@@ -186,16 +186,16 @@ void zos::Linker::ConstructJob(Compilation &C, const JobAction &JA,
   }
 
   if (!Args.hasArg(options::OPT_nostdlib, options::OPT_nodefaultlibs)) {
-    ld_env_var = StringRef(getenv("_LD_SIDE_DECKS")).trim();
+    ld_env_var = llvm::StringRef(getenv("_LD_SIDE_DECKS")).trim();
     if (ld_env_var.empty()) {
       CmdArgs.push_back(
           Args.MakeArgString("//'" + LEHLQ + ".SCEELIB(CELQS001)'"));
       CmdArgs.push_back(
           Args.MakeArgString("//'" + LEHLQ + ".SCEELIB(CELQS003)'"));
     } else {
-      SmallVector<StringRef> ld_side_deck;
+      llvm::SmallVector<llvm::StringRef> ld_side_deck;
       ld_env_var.split(ld_side_deck, ":");
-      for (StringRef ld_loc : ld_side_deck) {
+      for (llvm::StringRef ld_loc : ld_side_deck) {
         CmdArgs.push_back((ld_loc.str()).c_str());
       }
     }
@@ -264,12 +264,12 @@ void ZOS::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
 
   // - <clang>/lib/clang/<ver>/include/zos_wrappers
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> P(ResourceDir);
+    llvm::SmallString<128> P(ResourceDir);
     path::append(P, "include", "zos_wrappers");
     addSystemInclude(DriverArgs, CC1Args, P.str());
 
     // - <clang>/lib/clang/<ver>/include
-    SmallString<128> P2(ResourceDir);
+    llvm::SmallString<128> P2(ResourceDir);
     path::append(P2, "include");
     addSystemInclude(DriverArgs, CC1Args, P2.str());
   }
@@ -277,22 +277,22 @@ void ZOS::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
   // - /usr/include
   if (Arg *SysIncludeArg =
           DriverArgs.getLastArg(options::OPT_mzos_sys_include_EQ)) {
-    StringRef SysInclude = SysIncludeArg->getValue();
+    llvm::StringRef SysInclude = SysIncludeArg->getValue();
 
     // fall back to the default include path
     if (!SysInclude.empty()) {
 
       // -mzos-sys-include opton can have colon separated
       // list of paths, so we need to parse the value.
-      StringRef PathLE(SysInclude);
+      llvm::StringRef PathLE(SysInclude);
       size_t Colon = PathLE.find(':');
-      if (Colon == StringRef::npos) {
+      if (Colon == llvm::StringRef::npos) {
         addSystemInclude(DriverArgs, CC1Args, PathLE.str());
         return;
       }
 
-      while (Colon != StringRef::npos) {
-        SmallString<128> P = PathLE.substr(0, Colon);
+      while (Colon != llvm::StringRef::npos) {
+        llvm::SmallString<128> P = PathLE.substr(0, Colon);
         addSystemInclude(DriverArgs, CC1Args, P.str());
         PathLE = PathLE.substr(Colon + 1);
         Colon = PathLE.find(':');

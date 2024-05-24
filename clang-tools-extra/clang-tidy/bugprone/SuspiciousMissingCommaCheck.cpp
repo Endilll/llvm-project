@@ -68,7 +68,7 @@ AST_MATCHER_P(StringLiteral, isConcatenatedLiteral, unsigned,
 } // namespace
 
 SuspiciousMissingCommaCheck::SuspiciousMissingCommaCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       SizeThreshold(Options.get("SizeThreshold", 5U)),
       RatioThreshold(std::stod(Options.get("RatioThreshold", ".2").str())),

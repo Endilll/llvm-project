@@ -88,7 +88,7 @@ public:
   Preprocessor &PP;
   const std::string OutDir;
   AnalyzerOptions &Opts;
-  ArrayRef<std::string> Plugins;
+  llvm::ArrayRef<std::string> Plugins;
   CodeInjector *Injector;
   cross_tu::CrossTranslationUnitContext CTU;
 
@@ -121,7 +121,7 @@ public:
   FunctionSummariesTy FunctionSummaries;
 
   AnalysisConsumer(CompilerInstance &CI, const std::string &outdir,
-                   AnalyzerOptions &opts, ArrayRef<std::string> plugins,
+                   AnalyzerOptions &opts, llvm::ArrayRef<std::string> plugins,
                    CodeInjector *injector)
       : RecVisitorMode(0), RecVisitorBR(nullptr), Ctx(nullptr),
         PP(CI.getPreprocessor()), OutDir(outdir), Opts(opts),
@@ -357,7 +357,7 @@ private:
   void runAnalysisOnTranslationUnit(ASTContext &C);
 
   /// Print \p S to stderr if \c Opts.AnalyzerDisplayProgress is set.
-  void reportAnalyzerProgress(StringRef S);
+  void reportAnalyzerProgress(llvm::StringRef S);
 }; // namespace
 } // end anonymous namespace
 
@@ -496,10 +496,10 @@ void AnalysisConsumer::HandleDeclsCallGraph(const unsigned LocalTUDeclsSize) {
   }
 }
 
-static bool fileContainsString(StringRef Substring, ASTContext &C) {
+static bool fileContainsString(llvm::StringRef Substring, ASTContext &C) {
   const SourceManager &SM = C.getSourceManager();
   FileID FID = SM.getMainFileID();
-  StringRef Buffer = SM.getBufferOrFake(FID).getBuffer();
+  llvm::StringRef Buffer = SM.getBufferOrFake(FID).getBuffer();
   return Buffer.contains(Substring);
 }
 
@@ -572,7 +572,7 @@ void AnalysisConsumer::runAnalysisOnTranslationUnit(ASTContext &C) {
     reportAnalyzerFunctionMisuse(Opts, *Ctx);
 }
 
-void AnalysisConsumer::reportAnalyzerProgress(StringRef S) {
+void AnalysisConsumer::reportAnalyzerProgress(llvm::StringRef S) {
   if (Opts.AnalyzerDisplayProgress)
     llvm::errs() << S;
 }

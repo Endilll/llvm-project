@@ -24,7 +24,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/exception-escape.html
 class ExceptionEscapeCheck : public ClangTidyCheck {
 public:
-  ExceptionEscapeCheck(StringRef Name, ClangTidyContext *Context);
+  ExceptionEscapeCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus && LangOpts.CXXExceptions;
   }

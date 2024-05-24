@@ -314,7 +314,7 @@ public:
   /// @param IsPrunable Whether the note is prunable. It allows BugReporter
   ///        to omit the note from the report if it would make the displayed
   ///        bug path significantly shorter.
-  const NoteTag *getNoteTag(StringRef Note, bool IsPrunable = false) {
+  const NoteTag *getNoteTag(llvm::StringRef Note, bool IsPrunable = false) {
     return getNoteTag(
         [Note = std::string(Note)](BugReporterContext &,
                PathSensitiveBugReport &) { return Note; },
@@ -343,13 +343,13 @@ public:
 
   /// Returns the word that should be used to refer to the declaration
   /// in the report.
-  StringRef getDeclDescription(const Decl *D);
+  llvm::StringRef getDeclDescription(const Decl *D);
 
   /// Get the declaration of the called function (path-sensitive).
   const FunctionDecl *getCalleeDecl(const CallExpr *CE) const;
 
   /// Get the name of the called function (path-sensitive).
-  StringRef getCalleeName(const FunctionDecl *FunDecl) const;
+  llvm::StringRef getCalleeName(const FunctionDecl *FunDecl) const;
 
   /// Get the identifier of the called function (path-sensitive).
   const IdentifierInfo *getCalleeIdentifier(const CallExpr *CE) const {
@@ -361,7 +361,7 @@ public:
   }
 
   /// Get the name of the called function (path-sensitive).
-  StringRef getCalleeName(const CallExpr *CE) const {
+  llvm::StringRef getCalleeName(const CallExpr *CE) const {
     const FunctionDecl *FunDecl = getCalleeDecl(CE);
     return getCalleeName(FunDecl);
   }
@@ -376,7 +376,7 @@ public:
   /// headers like <cstdlib> declare them there) and does not check if the
   /// function is declared as 'extern "C"' or if it uses C++ name mangling.
   static bool isCLibraryFunction(const FunctionDecl *FD,
-                                 StringRef Name = StringRef());
+                                 llvm::StringRef Name = llvm::StringRef());
 
   /// In builds that use source hardening (-D_FORTIFY_SOURCE), many standard
   /// functions are implemented as macros that expand to calls of hardened
@@ -389,7 +389,7 @@ public:
   ///
   /// NOTE: This method relies on heuristics; extend it if you need to handle a
   /// hardened variant that's not yet covered by it.
-  static bool isHardenedVariantOf(const FunctionDecl *FD, StringRef Name);
+  static bool isHardenedVariantOf(const FunctionDecl *FD, llvm::StringRef Name);
 
   /// Depending on wither the location corresponds to a macro, return
   /// either the macro name or the token spelling.
@@ -400,7 +400,7 @@ public:
   /// If AF_INET is a macro, the result should be treated as a source of taint.
   ///
   /// \sa clang::Lexer::getSpelling(), clang::Lexer::getImmediateMacroName().
-  StringRef getMacroNameOrSpelling(SourceLocation &Loc);
+  llvm::StringRef getMacroNameOrSpelling(SourceLocation &Loc);
 
 private:
   ExplodedNode *addTransitionImpl(ProgramStateRef State,

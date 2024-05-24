@@ -128,7 +128,7 @@ private:
   void handleClassTemplateDecl(const ClassTemplateDecl *TemplateDecl) {
     for (const auto *Specialization : TemplateDecl->specializations())
       addUSRsOfCtorDtors(Specialization);
-    SmallVector<ClassTemplatePartialSpecializationDecl *, 4> PartialSpecs;
+    llvm::SmallVector<ClassTemplatePartialSpecializationDecl *, 4> PartialSpecs;
     TemplateDecl->getPartialSpecializations(PartialSpecs);
     for (const auto *Spec : PartialSpecs)
       addUSRsOfCtorDtors(Spec);
@@ -147,7 +147,7 @@ private:
     USRSet.insert(getUSRForDecl(VTD->getTemplatedDecl()));
     for (const auto *Spec : VTD->specializations())
       USRSet.insert(getUSRForDecl(Spec));
-    SmallVector<VarTemplatePartialSpecializationDecl *, 4> PartialSpecs;
+    llvm::SmallVector<VarTemplatePartialSpecializationDecl *, 4> PartialSpecs;
     VTD->getPartialSpecializations(PartialSpecs);
     for (const auto *Spec : PartialSpecs)
       USRSet.insert(getUSRForDecl(Spec));
@@ -222,8 +222,8 @@ std::vector<std::string> getUSRsForDeclaration(const NamedDecl *ND,
 
 class NamedDeclFindingConsumer : public ASTConsumer {
 public:
-  NamedDeclFindingConsumer(ArrayRef<unsigned> SymbolOffsets,
-                           ArrayRef<std::string> QualifiedNames,
+  NamedDeclFindingConsumer(llvm::ArrayRef<unsigned> SymbolOffsets,
+                           llvm::ArrayRef<std::string> QualifiedNames,
                            std::vector<std::string> &SpellingNames,
                            std::vector<std::vector<std::string>> &USRList,
                            bool Force, bool &ErrorOccurred)
@@ -297,8 +297,8 @@ private:
     }
   }
 
-  ArrayRef<unsigned> SymbolOffsets;
-  ArrayRef<std::string> QualifiedNames;
+  llvm::ArrayRef<unsigned> SymbolOffsets;
+  llvm::ArrayRef<std::string> QualifiedNames;
   std::vector<std::string> &SpellingNames;
   std::vector<std::vector<std::string>> &USRList;
   bool Force;

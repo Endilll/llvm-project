@@ -14,7 +14,7 @@
 
 static void aborting_fatal_error_handler(void *, const char *reason,
                                          bool) {
-  // Write the result out to stderr avoiding errs() because raw_ostreams can
+  // Write the result out to stderr avoiding errs() because llvm::raw_ostreams can
   // call report_fatal_error.
   fprintf(stderr, "LIBCLANG FATAL ERROR: %s\n", reason);
   ::abort();

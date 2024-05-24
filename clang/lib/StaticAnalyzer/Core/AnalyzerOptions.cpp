@@ -33,7 +33,7 @@ using namespace llvm;
 
 void AnalyzerOptions::printFormattedEntry(
     llvm::raw_ostream &Out,
-    std::pair<StringRef, StringRef> EntryDescPair,
+    std::pair<llvm::StringRef, llvm::StringRef> EntryDescPair,
     size_t InitialPad, size_t EntryWidth, size_t MinLineWidth) {
 
   llvm::formatted_raw_ostream FOut(Out);
@@ -124,8 +124,8 @@ AnalyzerOptions::mayInlineCXXMemberFunction(
   return *K >= Param;
 }
 
-StringRef AnalyzerOptions::getCheckerStringOption(StringRef CheckerName,
-                                                  StringRef OptionName,
+llvm::StringRef AnalyzerOptions::getCheckerStringOption(llvm::StringRef CheckerName,
+                                                  llvm::StringRef OptionName,
                                                   bool SearchInParents) const {
   assert(!CheckerName.empty() &&
          "Empty checker name! Make sure the checker object (including it's "
@@ -134,11 +134,11 @@ StringRef AnalyzerOptions::getCheckerStringOption(StringRef CheckerName,
   ConfigTable::const_iterator E = Config.end();
   do {
     ConfigTable::const_iterator I =
-        Config.find((Twine(CheckerName) + ":" + OptionName).str());
+        Config.find((llvm::Twine(CheckerName) + ":" + OptionName).str());
     if (I != E)
-      return StringRef(I->getValue());
+      return llvm::StringRef(I->getValue());
     size_t Pos = CheckerName.rfind('.');
-    if (Pos == StringRef::npos)
+    if (Pos == llvm::StringRef::npos)
       break;
 
     CheckerName = CheckerName.substr(0, Pos);
@@ -151,15 +151,15 @@ StringRef AnalyzerOptions::getCheckerStringOption(StringRef CheckerName,
   return "";
 }
 
-StringRef AnalyzerOptions::getCheckerStringOption(const ento::CheckerBase *C,
-                                                  StringRef OptionName,
+llvm::StringRef AnalyzerOptions::getCheckerStringOption(const ento::CheckerBase *C,
+                                                  llvm::StringRef OptionName,
                                                   bool SearchInParents) const {
   return getCheckerStringOption(
                            C->getTagDescription(), OptionName, SearchInParents);
 }
 
-bool AnalyzerOptions::getCheckerBooleanOption(StringRef CheckerName,
-                                              StringRef OptionName,
+bool AnalyzerOptions::getCheckerBooleanOption(llvm::StringRef CheckerName,
+                                              llvm::StringRef OptionName,
                                               bool SearchInParents) const {
   auto Ret =
       llvm::StringSwitch<std::optional<bool>>(
@@ -176,14 +176,14 @@ bool AnalyzerOptions::getCheckerBooleanOption(StringRef CheckerName,
 }
 
 bool AnalyzerOptions::getCheckerBooleanOption(const ento::CheckerBase *C,
-                                              StringRef OptionName,
+                                              llvm::StringRef OptionName,
                                               bool SearchInParents) const {
   return getCheckerBooleanOption(
              C->getTagDescription(), OptionName, SearchInParents);
 }
 
-int AnalyzerOptions::getCheckerIntegerOption(StringRef CheckerName,
-                                             StringRef OptionName,
+int AnalyzerOptions::getCheckerIntegerOption(llvm::StringRef CheckerName,
+                                             llvm::StringRef OptionName,
                                              bool SearchInParents) const {
   int Ret = 0;
   bool HasFailed = getCheckerStringOption(CheckerName, OptionName,
@@ -197,7 +197,7 @@ int AnalyzerOptions::getCheckerIntegerOption(StringRef CheckerName,
 }
 
 int AnalyzerOptions::getCheckerIntegerOption(const ento::CheckerBase *C,
-                                             StringRef OptionName,
+                                             llvm::StringRef OptionName,
                                              bool SearchInParents) const {
   return getCheckerIntegerOption(
                            C->getTagDescription(), OptionName, SearchInParents);

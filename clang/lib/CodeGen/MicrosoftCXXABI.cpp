@@ -39,7 +39,7 @@ namespace {
 /// Holds all the vbtable globals for a given class.
 struct VBTableGlobals {
   const VPtrInfoVector *VBTables;
-  SmallVector<llvm::GlobalVariable *, 2> Globals;
+  llvm::SmallVector<llvm::GlobalVariable *, 2> Globals;
 };
 
 class MicrosoftCXXABI : public CGCXXABI {
@@ -115,8 +115,8 @@ public:
     return VBPtrOffsets;
   }
 
-  StringRef GetPureVirtualCallName() override { return "_purecall"; }
-  StringRef GetDeletedVirtualCallName() override { return "_purecall"; }
+  llvm::StringRef GetPureVirtualCallName() override { return "_purecall"; }
+  llvm::StringRef GetDeletedVirtualCallName() override { return "_purecall"; }
 
   void emitVirtualObjectDelete(CodeGenFunction &CGF, const CXXDeleteExpr *DE,
                                Address Ptr, QualType ElementType,
@@ -229,7 +229,7 @@ public:
 
   AddedStructorArgCounts
   buildStructorSignature(GlobalDecl GD,
-                         SmallVectorImpl<CanQualType> &ArgTys) override;
+                         llvm::SmallVectorImpl<CanQualType> &ArgTys) override;
 
   /// Non-base dtors should be emitted as delegating thunks in this ABI.
   bool useThunkForDtorVariant(const CXXDestructorDecl *Dtor,
@@ -356,17 +356,17 @@ public:
   llvm::GlobalVariable *
   getAddrOfVirtualDisplacementMap(const CXXRecordDecl *SrcRD,
                                   const CXXRecordDecl *DstRD) {
-    SmallString<256> OutName;
+    llvm::SmallString<256> OutName;
     llvm::raw_svector_ostream Out(OutName);
     getMangleContext().mangleCXXVirtualDisplacementMap(SrcRD, DstRD, Out);
-    StringRef MangledName = OutName.str();
+    llvm::StringRef MangledName = OutName.str();
 
     if (auto *VDispMap = CGM.getModule().getNamedGlobal(MangledName))
       return VDispMap;
 
     MicrosoftVTableContext &VTContext = CGM.getMicrosoftVTableContext();
     unsigned NumEntries = 1 + SrcRD->getNumVBases();
-    SmallVector<llvm::Constant *, 4> Map(NumEntries,
+    llvm::SmallVector<llvm::Constant *, 4> Map(NumEntries,
                                          llvm::UndefValue::get(CGM.IntTy));
     Map[0] = llvm::ConstantInt::get(CGM.IntTy, 0);
     bool AnyDifferent = false;
@@ -421,9 +421,9 @@ public:
                                        const ReturnAdjustment &RA) override;
 
   void EmitThreadLocalInitFuncs(
-      CodeGenModule &CGM, ArrayRef<const VarDecl *> CXXThreadLocals,
-      ArrayRef<llvm::Function *> CXXThreadLocalInits,
-      ArrayRef<const VarDecl *> CXXThreadLocalInitVars) override;
+      CodeGenModule &CGM, llvm::ArrayRef<const VarDecl *> CXXThreadLocals,
+      llvm::ArrayRef<llvm::Function *> CXXThreadLocalInits,
+      llvm::ArrayRef<const VarDecl *> CXXThreadLocalInitVars) override;
 
   bool usesThreadWrapperFunction(const VarDecl *VD) const override {
     return getContext().getLangOpts().isCompatibleWithMSVC(
@@ -483,7 +483,7 @@ public:
   }
 
   // 5 routines for constructing the llvm types for MS RTTI structs.
-  llvm::StructType *getTypeDescriptorType(StringRef TypeInfoString) {
+  llvm::StructType *getTypeDescriptorType(llvm::StringRef TypeInfoString) {
     llvm::SmallString<32> TDTypeName("rtti.TypeDescriptor");
     TDTypeName += llvm::utostr(TypeInfoString.size());
     llvm::StructType *&TypeDescriptorType =
@@ -560,7 +560,7 @@ public:
   }
 
   llvm::GlobalVariable *getImageBase() {
-    StringRef Name = "__ImageBase";
+    llvm::StringRef Name = "__ImageBase";
     if (llvm::GlobalVariable *GV = CGM.getModule().getNamedGlobal(Name))
       return GV;
 
@@ -1343,7 +1343,7 @@ void MicrosoftCXXABI::EmitVBPtrStores(CodeGenFunction &CGF,
 
 CGCXXABI::AddedStructorArgCounts
 MicrosoftCXXABI::buildStructorSignature(GlobalDecl GD,
-                                        SmallVectorImpl<CanQualType> &ArgTys) {
+                                        llvm::SmallVectorImpl<CanQualType> &ArgTys) {
   AddedStructorArgCounts Added;
   // TODO: 'for base' flag
   if (isa<CXXDestructorDecl>(GD.getDecl()) &&
@@ -1801,7 +1801,7 @@ llvm::Value *MicrosoftCXXABI::getVTableAddressPointInStructor(
 
 static void mangleVFTableName(MicrosoftMangleContext &MangleContext,
                               const CXXRecordDecl *RD, const VPtrInfo &VFPtr,
-                              SmallString<256> &Name) {
+                              llvm::SmallString<256> &Name) {
   llvm::raw_svector_ostream Out(Name);
   MangleContext.mangleCXXVFTable(RD, VFPtr.MangledPath, Out);
 }
@@ -1842,7 +1842,7 @@ llvm::GlobalVariable *MicrosoftCXXABI::getAddrOfVTable(const CXXRecordDecl *RD,
     // a unique mangled name.
     llvm::StringSet<> ObservedMangledNames;
     for (size_t J = 0, F = VFPtrs.size(); J != F; ++J) {
-      SmallString<256> Name;
+      llvm::SmallString<256> Name;
       mangleVFTableName(getMangleContext(), RD, *VFPtrs[J], Name);
       if (!ObservedMangledNames.insert(Name.str()).second)
         llvm_unreachable("Already saw this mangling before?");
@@ -1860,7 +1860,7 @@ llvm::GlobalVariable *MicrosoftCXXABI::getAddrOfVTable(const CXXRecordDecl *RD,
   }
   const std::unique_ptr<VPtrInfo> &VFPtr = *VFPtrI;
 
-  SmallString<256> VFTableName;
+  llvm::SmallString<256> VFTableName;
   mangleVFTableName(getMangleContext(), RD, *VFPtr, VFTableName);
 
   // Classes marked __declspec(dllimport) need vftables generated on the
@@ -1894,7 +1894,7 @@ llvm::GlobalVariable *MicrosoftCXXABI::getAddrOfVTable(const CXXRecordDecl *RD,
   llvm::GlobalValue::LinkageTypes VTableLinkage =
       VTableAliasIsRequred ? llvm::GlobalValue::PrivateLinkage : VFTableLinkage;
 
-  StringRef VTableName = VTableAliasIsRequred ? StringRef() : VFTableName.str();
+  llvm::StringRef VTableName = VTableAliasIsRequred ? llvm::StringRef() : VFTableName.str();
 
   llvm::Type *VTableType = CGM.getVTables().getVTableType(VTLayout);
 
@@ -2069,7 +2069,7 @@ MicrosoftCXXABI::EmitVirtualMemPtrThunk(const CXXMethodDecl *MD,
          "can't form pointers to ctors or virtual dtors");
 
   // Calculate the mangled name.
-  SmallString<256> ThunkName;
+  llvm::SmallString<256> ThunkName;
   llvm::raw_svector_ostream Out(ThunkName);
   getMangleContext().mangleVirtualMemPtrThunk(MD, ML, Out);
 
@@ -2150,10 +2150,10 @@ void MicrosoftCXXABI::emitVirtualInheritanceTables(const CXXRecordDecl *RD) {
 llvm::GlobalVariable *
 MicrosoftCXXABI::getAddrOfVBTable(const VPtrInfo &VBT, const CXXRecordDecl *RD,
                                   llvm::GlobalVariable::LinkageTypes Linkage) {
-  SmallString<256> OutName;
+  llvm::SmallString<256> OutName;
   llvm::raw_svector_ostream Out(OutName);
   getMangleContext().mangleCXXVBTable(RD, VBT.MangledPath, Out);
-  StringRef Name = OutName.str();
+  llvm::StringRef Name = OutName.str();
 
   llvm::ArrayType *VBTableType =
       llvm::ArrayType::get(CGM.IntTy, 1 + VBT.ObjectWithVPtr->getNumVBases());
@@ -2189,7 +2189,7 @@ void MicrosoftCXXABI::emitVBTableDefinition(const VPtrInfo &VBT,
       getContext().getASTRecordLayout(VBT.IntroducingObject);
   const ASTRecordLayout &DerivedLayout = getContext().getASTRecordLayout(RD);
 
-  SmallVector<llvm::Constant *, 4> Offsets(1 + ObjectWithVPtr->getNumVBases(),
+  llvm::SmallVector<llvm::Constant *, 4> Offsets(1 + ObjectWithVPtr->getNumVBases(),
                                            nullptr);
 
   // The offset from ObjectWithVPtr's vbptr to itself always leads.
@@ -2389,9 +2389,9 @@ void MicrosoftCXXABI::registerGlobalDtor(CodeGenFunction &CGF, const VarDecl &D,
 }
 
 void MicrosoftCXXABI::EmitThreadLocalInitFuncs(
-    CodeGenModule &CGM, ArrayRef<const VarDecl *> CXXThreadLocals,
-    ArrayRef<llvm::Function *> CXXThreadLocalInits,
-    ArrayRef<const VarDecl *> CXXThreadLocalInitVars) {
+    CodeGenModule &CGM, llvm::ArrayRef<const VarDecl *> CXXThreadLocals,
+    llvm::ArrayRef<llvm::Function *> CXXThreadLocalInits,
+    llvm::ArrayRef<const VarDecl *> CXXThreadLocalInitVars) {
   if (CXXThreadLocalInits.empty())
     return;
 
@@ -2407,7 +2407,7 @@ void MicrosoftCXXABI::EmitThreadLocalInitFuncs(
     llvm::GlobalVariable *InitFuncPtr = new llvm::GlobalVariable(
         CGM.getModule(), InitFunc->getType(), /*isConstant=*/true,
         llvm::GlobalVariable::InternalLinkage, InitFunc,
-        Twine(InitFunc->getName(), "$initializer$"));
+        llvm::Twine(InitFunc->getName(), "$initializer$"));
     InitFuncPtr->setSection(".CRT$XDU");
     // This variable has discardable linkage, we have to add it to @llvm.used to
     // ensure it won't get discarded.
@@ -2531,7 +2531,7 @@ LValue MicrosoftCXXABI::EmitThreadLocalVarDeclLValue(CodeGenFunction &CGF,
 }
 
 static ConstantAddress getInitThreadEpochPtr(CodeGenModule &CGM) {
-  StringRef VarName("_Init_thread_epoch");
+  llvm::StringRef VarName("_Init_thread_epoch");
   CharUnits Align = CGM.getIntAlign();
   if (auto *GV = CGM.getModule().getNamedGlobal(VarName))
     return ConstantAddress(GV, GV->getValueType(), Align);
@@ -2666,7 +2666,7 @@ void MicrosoftCXXABI::EmitGuardedInit(CodeGenFunction &CGF, const VarDecl &D,
 
   if (!GuardVar) {
     // Mangle the name for the guard.
-    SmallString<256> GuardName;
+    llvm::SmallString<256> GuardName;
     {
       llvm::raw_svector_ostream Out(GuardName);
       if (HasPerVariableGuard)
@@ -2909,7 +2909,7 @@ llvm::Constant *MicrosoftCXXABI::EmitMemberPointer(const APValue &MP,
     return EmitNullMemberPointer(DstTy);
 
   ASTContext &Ctx = getContext();
-  ArrayRef<const CXXRecordDecl *> MemberPointerPath = MP.getMemberPointerPath();
+  llvm::ArrayRef<const CXXRecordDecl *> MemberPointerPath = MP.getMemberPointerPath();
 
   llvm::Constant *C;
   if (const CXXMethodDecl *MD = dyn_cast<CXXMethodDecl>(MPD)) {
@@ -2936,7 +2936,7 @@ llvm::Constant *MicrosoftCXXABI::EmitMemberPointer(const APValue &MP,
             ->castAs<MemberPointerType>();
 
     bool DerivedMember = MP.isMemberPointerToDerivedMember();
-    SmallVector<const CXXBaseSpecifier *, 4> DerivedToBasePath;
+    llvm::SmallVector<const CXXBaseSpecifier *, 4> DerivedToBasePath;
     const CXXRecordDecl *PrevRD = SrcRD;
     for (const CXXRecordDecl *PathElem : MemberPointerPath) {
       const CXXRecordDecl *Base = nullptr;
@@ -3589,7 +3589,7 @@ CGCXXABI *clang::CodeGen::CreateMicrosoftCXXABI(CodeGenModule &CGM) {
 //   mangled into them so they can be aggressively deduplicated by the linker.
 
 static llvm::GlobalVariable *getTypeInfoVTable(CodeGenModule &CGM) {
-  StringRef MangledName("??_7type_info@@6B@");
+  llvm::StringRef MangledName("??_7type_info@@6B@");
   if (auto VTable = CGM.getModule().getNamedGlobal(MangledName))
     return VTable;
   return new llvm::GlobalVariable(CGM.getModule(), CGM.Int8PtrTy,
@@ -3694,7 +3694,7 @@ struct MSRTTIBuilder {
 
   llvm::GlobalVariable *getBaseClassDescriptor(const MSRTTIClass &Classes);
   llvm::GlobalVariable *
-  getBaseClassArray(SmallVectorImpl<MSRTTIClass> &Classes);
+  getBaseClassArray(llvm::SmallVectorImpl<MSRTTIClass> &Classes);
   llvm::GlobalVariable *getClassHierarchyDescriptor();
   llvm::GlobalVariable *getCompleteObjectLocator(const VPtrInfo &Info);
 
@@ -3711,7 +3711,7 @@ struct MSRTTIBuilder {
 
 /// Recursively serializes a class hierarchy in pre-order depth first
 /// order.
-static void serializeClassHierarchy(SmallVectorImpl<MSRTTIClass> &Classes,
+static void serializeClassHierarchy(llvm::SmallVectorImpl<MSRTTIClass> &Classes,
                                     const CXXRecordDecl *RD) {
   Classes.push_back(MSRTTIClass(RD));
   for (const CXXBaseSpecifier &Base : RD->bases())
@@ -3720,7 +3720,7 @@ static void serializeClassHierarchy(SmallVectorImpl<MSRTTIClass> &Classes,
 
 /// Find ambiguity among base classes.
 static void
-detectAmbiguousBases(SmallVectorImpl<MSRTTIClass> &Classes) {
+detectAmbiguousBases(llvm::SmallVectorImpl<MSRTTIClass> &Classes) {
   llvm::SmallPtrSet<const CXXRecordDecl *, 8> VirtualBases;
   llvm::SmallPtrSet<const CXXRecordDecl *, 8> UniqueBases;
   llvm::SmallPtrSet<const CXXRecordDecl *, 8> AmbiguousBases;
@@ -3742,7 +3742,7 @@ detectAmbiguousBases(SmallVectorImpl<MSRTTIClass> &Classes) {
 }
 
 llvm::GlobalVariable *MSRTTIBuilder::getClassHierarchyDescriptor() {
-  SmallString<256> MangledName;
+  llvm::SmallString<256> MangledName;
   {
     llvm::raw_svector_ostream Out(MangledName);
     ABI.getMangleContext().mangleCXXRTTIClassHierarchyDescriptor(RD, Out);
@@ -3753,7 +3753,7 @@ llvm::GlobalVariable *MSRTTIBuilder::getClassHierarchyDescriptor() {
     return CHD;
 
   // Serialize the class hierarchy and initialize the CHD Fields.
-  SmallVector<MSRTTIClass, 8> Classes;
+  llvm::SmallVector<MSRTTIClass, 8> Classes;
   serializeClassHierarchy(Classes, RD);
   Classes.front().initialize(/*Parent=*/nullptr, /*Specifier=*/nullptr);
   detectAmbiguousBases(Classes);
@@ -3797,8 +3797,8 @@ llvm::GlobalVariable *MSRTTIBuilder::getClassHierarchyDescriptor() {
 }
 
 llvm::GlobalVariable *
-MSRTTIBuilder::getBaseClassArray(SmallVectorImpl<MSRTTIClass> &Classes) {
-  SmallString<256> MangledName;
+MSRTTIBuilder::getBaseClassArray(llvm::SmallVectorImpl<MSRTTIClass> &Classes) {
+  llvm::SmallString<256> MangledName;
   {
     llvm::raw_svector_ostream Out(MangledName);
     ABI.getMangleContext().mangleCXXRTTIBaseClassArray(RD, Out);
@@ -3820,7 +3820,7 @@ MSRTTIBuilder::getBaseClassArray(SmallVectorImpl<MSRTTIClass> &Classes) {
     BCA->setComdat(CGM.getModule().getOrInsertComdat(BCA->getName()));
 
   // Initialize the BaseClassArray.
-  SmallVector<llvm::Constant *, 8> BaseClassArrayData;
+  llvm::SmallVector<llvm::Constant *, 8> BaseClassArrayData;
   for (MSRTTIClass &Class : Classes)
     BaseClassArrayData.push_back(
         ABI.getImageRelativeConstant(getBaseClassDescriptor(Class)));
@@ -3841,7 +3841,7 @@ MSRTTIBuilder::getBaseClassDescriptor(const MSRTTIClass &Class) {
     VBPtrOffset = Context.getASTRecordLayout(RD).getVBPtrOffset().getQuantity();
   }
 
-  SmallString<256> MangledName;
+  llvm::SmallString<256> MangledName;
   {
     llvm::raw_svector_ostream Out(MangledName);
     ABI.getMangleContext().mangleCXXRTTIBaseClassDescriptor(
@@ -3879,7 +3879,7 @@ MSRTTIBuilder::getBaseClassDescriptor(const MSRTTIClass &Class) {
 
 llvm::GlobalVariable *
 MSRTTIBuilder::getCompleteObjectLocator(const VPtrInfo &Info) {
-  SmallString<256> MangledName;
+  llvm::SmallString<256> MangledName;
   {
     llvm::raw_svector_ostream Out(MangledName);
     ABI.getMangleContext().mangleCXXRTTICompleteObjectLocator(RD, Info.MangledPath, Out);
@@ -3989,7 +3989,7 @@ MicrosoftCXXABI::getAddrOfCXXCatchHandlerType(QualType Type,
 /// types, and need to be abstracted.  They are abstracting by casting the
 /// address to an Int8PtrTy.
 llvm::Constant *MicrosoftCXXABI::getAddrOfRTTIDescriptor(QualType Type) {
-  SmallString<256> MangledName;
+  llvm::SmallString<256> MangledName;
   {
     llvm::raw_svector_ostream Out(MangledName);
     getMangleContext().mangleCXXRTTI(Type, Out);
@@ -4003,7 +4003,7 @@ llvm::Constant *MicrosoftCXXABI::getAddrOfRTTIDescriptor(QualType Type) {
   // RTTI, check if emitting vtables opportunistically need any adjustment.
 
   // Compute the fields for the TypeDescriptor.
-  SmallString<256> TypeInfoString;
+  llvm::SmallString<256> TypeInfoString;
   {
     llvm::raw_svector_ostream Out(TypeInfoString);
     getMangleContext().mangleCXXRTTIName(Type, Out);
@@ -4069,7 +4069,7 @@ MicrosoftCXXABI::getAddrOfCXXCtorClosure(const CXXConstructorDecl *CD,
   assert(CT == Ctor_CopyingClosure || CT == Ctor_DefaultClosure);
 
   // Calculate the mangled name.
-  SmallString<256> ThunkName;
+  llvm::SmallString<256> ThunkName;
   llvm::raw_svector_ostream Out(ThunkName);
   getMangleContext().mangleName(GlobalDecl(CD, CT), Out);
 
@@ -4145,8 +4145,8 @@ MicrosoftCXXABI::getAddrOfCXXCtorClosure(const CXXConstructorDecl *CD,
     Args.add(RValue::get(SrcVal), SrcParam.getType());
 
   // Add the rest of the default arguments.
-  SmallVector<const Stmt *, 4> ArgVec;
-  ArrayRef<ParmVarDecl *> params = CD->parameters().drop_front(IsCopy ? 1 : 0);
+  llvm::SmallVector<const Stmt *, 4> ArgVec;
+  llvm::ArrayRef<ParmVarDecl *> params = CD->parameters().drop_front(IsCopy ? 1 : 0);
   for (const ParmVarDecl *PD : params) {
     assert(PD->hasDefaultArg() && "ctor closure lacks default args");
     ArgVec.push_back(PD->getDefaultArg());
@@ -4195,7 +4195,7 @@ llvm::Constant *MicrosoftCXXABI::getCatchableType(QualType T,
       CT = Ctor_CopyingClosure;
 
   uint32_t Size = getContext().getTypeSizeInChars(T).getQuantity();
-  SmallString<256> MangledName;
+  llvm::SmallString<256> MangledName;
   {
     llvm::raw_svector_ostream Out(MangledName);
     getMangleContext().mangleCXXCatchableType(T, CD, CT, Size, NVOffset,
@@ -4297,7 +4297,7 @@ llvm::GlobalVariable *MicrosoftCXXABI::getCatchableTypeArray(QualType T) {
     const ASTRecordLayout &MostDerivedLayout =
         Context.getASTRecordLayout(MostDerivedClass);
     MicrosoftVTableContext &VTableContext = CGM.getMicrosoftVTableContext();
-    SmallVector<MSRTTIClass, 8> Classes;
+    llvm::SmallVector<MSRTTIClass, 8> Classes;
     serializeClassHierarchy(Classes, MostDerivedClass);
     Classes.front().initialize(/*Parent=*/nullptr, /*Specifier=*/nullptr);
     detectAmbiguousBases(Classes);
@@ -4366,7 +4366,7 @@ llvm::GlobalVariable *MicrosoftCXXABI::getCatchableTypeArray(QualType T) {
           AT, llvm::ArrayRef(CatchableTypes.begin(),
                              CatchableTypes.end())) // CatchableTypes
   };
-  SmallString<256> MangledName;
+  llvm::SmallString<256> MangledName;
   {
     llvm::raw_svector_ostream Out(MangledName);
     getMangleContext().mangleCXXCatchableTypeArray(T, NumEntries, Out);
@@ -4396,7 +4396,7 @@ llvm::GlobalVariable *MicrosoftCXXABI::getThrowInfo(QualType T) {
       cast<llvm::ConstantInt>(CTA->getInitializer()->getAggregateElement(0U))
           ->getLimitedValue();
 
-  SmallString<256> MangledName;
+  llvm::SmallString<256> MangledName;
   {
     llvm::raw_svector_ostream Out(MangledName);
     getMangleContext().mangleCXXThrowInfo(T, IsConst, IsVolatile, IsUnaligned,

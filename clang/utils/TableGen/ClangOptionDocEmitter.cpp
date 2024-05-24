@@ -40,8 +40,8 @@ struct DocumentedGroup : Documentation {
   Record *Group;
 };
 
-static bool hasFlag(const Record *Option, StringRef OptionFlag,
-                    StringRef FlagsField) {
+static bool hasFlag(const Record *Option, llvm::StringRef OptionFlag,
+                    llvm::StringRef FlagsField) {
   for (const Record *Flag : Option->getValueAsListOfDefs(FlagsField))
     if (Flag->getName() == OptionFlag)
       return true;
@@ -53,10 +53,10 @@ static bool hasFlag(const Record *Option, StringRef OptionFlag,
 }
 
 static bool isOptionVisible(const Record *Option, const Record *DocInfo) {
-  for (StringRef IgnoredFlag : DocInfo->getValueAsListOfStrings("IgnoreFlags"))
+  for (llvm::StringRef IgnoredFlag : DocInfo->getValueAsListOfStrings("IgnoreFlags"))
     if (hasFlag(Option, IgnoredFlag, "Flags"))
       return false;
-  for (StringRef Mask : DocInfo->getValueAsListOfStrings("VisibilityMask"))
+  for (llvm::StringRef Mask : DocInfo->getValueAsListOfStrings("VisibilityMask"))
     if (hasFlag(Option, Mask, "Visibility"))
       return true;
   return false;
@@ -168,8 +168,8 @@ Documentation extractDocumentation(RecordKeeper &Records,
 }
 
 // Get the first and successive separators to use for an OptionKind.
-std::pair<StringRef,StringRef> getSeparatorsForKind(const Record *OptionKind) {
-  return StringSwitch<std::pair<StringRef, StringRef>>(OptionKind->getName())
+std::pair<llvm::StringRef,llvm::StringRef> getSeparatorsForKind(const Record *OptionKind) {
+  return StringSwitch<std::pair<llvm::StringRef, llvm::StringRef>>(OptionKind->getName())
     .Cases("KIND_JOINED", "KIND_JOINED_OR_SEPARATE",
            "KIND_JOINED_AND_SEPARATE",
            "KIND_REMAINING_ARGS_JOINED", {"", " "})
@@ -191,17 +191,17 @@ unsigned getNumArgsForKind(Record *OptionKind, const Record *Option) {
     .Default(0);
 }
 
-std::string escapeRST(StringRef Str) {
+std::string escapeRST(llvm::StringRef Str) {
   std::string Out;
   for (auto K : Str) {
-    if (StringRef("`*|[]\\").count(K))
+    if (llvm::StringRef("`*|[]\\").count(K))
       Out.push_back('\\');
     Out.push_back(K);
   }
   return Out;
 }
 
-StringRef getSphinxOptionID(StringRef OptionName) {
+llvm::StringRef getSphinxOptionID(llvm::StringRef OptionName) {
   for (auto I = OptionName.begin(), E = OptionName.end(); I != E; ++I)
     if (!isalnum(*I) && *I != '-')
       return OptionName.substr(0, I - OptionName.begin());
@@ -217,7 +217,7 @@ bool canSphinxCopeWithOption(const Record *Option) {
   return false;
 }
 
-void emitHeading(int Depth, std::string Heading, raw_ostream &OS) {
+void emitHeading(int Depth, std::string Heading, llvm::raw_ostream &OS) {
   assert(Depth < 8 && "groups nested too deeply");
   OS << Heading << '\n'
      << std::string(Heading.size(), "=~-_'+<>"[Depth]) << "\n";
@@ -225,28 +225,28 @@ void emitHeading(int Depth, std::string Heading, raw_ostream &OS) {
 
 /// Get the value of field \p Primary, if possible. If \p Primary does not
 /// exist, get the value of \p Fallback and escape it for rST emission.
-std::string getRSTStringWithTextFallback(const Record *R, StringRef Primary,
-                                         StringRef Fallback) {
+std::string getRSTStringWithTextFallback(const Record *R, llvm::StringRef Primary,
+                                         llvm::StringRef Fallback) {
   for (auto Field : {Primary, Fallback}) {
     if (auto *V = R->getValue(Field)) {
-      StringRef Value;
+      llvm::StringRef Value;
       if (auto *SV = dyn_cast_or_null<StringInit>(V->getValue()))
         Value = SV->getValue();
       if (!Value.empty())
         return Field == Primary ? Value.str() : escapeRST(Value);
     }
   }
-  return std::string(StringRef());
+  return std::string(llvm::StringRef());
 }
 
-void emitOptionWithArgs(StringRef Prefix, const Record *Option,
-                        ArrayRef<StringRef> Args, raw_ostream &OS) {
+void emitOptionWithArgs(llvm::StringRef Prefix, const Record *Option,
+                        llvm::ArrayRef<llvm::StringRef> Args, llvm::raw_ostream &OS) {
   OS << Prefix << escapeRST(Option->getValueAsString("Name"));
 
-  std::pair<StringRef, StringRef> Separators =
+  std::pair<llvm::StringRef, llvm::StringRef> Separators =
       getSeparatorsForKind(Option->getValueAsDef("Kind"));
 
-  StringRef Separator = Separators.first;
+  llvm::StringRef Separator = Separators.first;
   for (auto Arg : Args) {
     OS << Separator << escapeRST(Arg);
     Separator = Separators.second;
@@ -255,7 +255,7 @@ void emitOptionWithArgs(StringRef Prefix, const Record *Option,
 
 constexpr StringLiteral DefaultMetaVarName = "<arg>";
 
-void emitOptionName(StringRef Prefix, const Record *Option, raw_ostream &OS) {
+void emitOptionName(llvm::StringRef Prefix, const Record *Option, llvm::raw_ostream &OS) {
   // Find the arguments to list after the option.
   unsigned NumArgs = getNumArgsForKind(Option->getValueAsDef("Kind"), Option);
   bool HasMetaVarName = !Option->isValueUnset("MetaVarName");
@@ -273,7 +273,7 @@ void emitOptionName(StringRef Prefix, const Record *Option, raw_ostream &OS) {
   // arguments.
   if (!HasMetaVarName || NumArgs == UnlimitedArgs) {
     while (Args.size() < NumArgs) {
-      Args.push_back(("<arg" + Twine(Args.size() + 1) + ">").str());
+      Args.push_back(("<arg" + llvm::Twine(Args.size() + 1) + ">").str());
       // Use '--args <arg1> <arg2>...' if any number of args are allowed.
       if (Args.size() == 2 && NumArgs == UnlimitedArgs) {
         Args.back() += "...";
@@ -282,7 +282,7 @@ void emitOptionName(StringRef Prefix, const Record *Option, raw_ostream &OS) {
     }
   }
 
-  emitOptionWithArgs(Prefix, Option, std::vector<StringRef>(Args.begin(), Args.end()), OS);
+  emitOptionWithArgs(Prefix, Option, std::vector<llvm::StringRef>(Args.begin(), Args.end()), OS);
 
   auto AliasArgs = Option->getValueAsListOfStrings("AliasArgs");
   if (!AliasArgs.empty()) {
@@ -295,7 +295,7 @@ void emitOptionName(StringRef Prefix, const Record *Option, raw_ostream &OS) {
   }
 }
 
-bool emitOptionNames(const Record *Option, raw_ostream &OS, bool EmittedAny) {
+bool emitOptionNames(const Record *Option, llvm::raw_ostream &OS, bool EmittedAny) {
   for (auto &Prefix : Option->getValueAsListOfStrings("Prefixes")) {
     if (EmittedAny)
       OS << ", ";
@@ -317,7 +317,7 @@ void forEachOptionName(const DocumentedOption &Option, const Record *DocInfo,
 }
 
 void emitOption(const DocumentedOption &Option, const Record *DocInfo,
-                raw_ostream &OS) {
+                llvm::raw_ostream &OS) {
   if (Option.Option->getValueAsDef("Kind")->getName() == "KIND_UNKNOWN" ||
       Option.Option->getValueAsDef("Kind")->getName() == "KIND_INPUT")
     return;
@@ -367,11 +367,11 @@ void emitOption(const DocumentedOption &Option, const Record *DocInfo,
       R->getValueAsListOfDefs("HelpTextsForVariants");
   for (Record *VisibilityHelp : VisibilitiesHelp) {
     // This is a list of visibilities.
-    ArrayRef<Init *> Visibilities =
+    llvm::ArrayRef<Init *> Visibilities =
         VisibilityHelp->getValueAsListInit("Visibilities")->getValues();
 
     // See if any of the program's visibilities are in the list.
-    for (StringRef DocInfoMask :
+    for (llvm::StringRef DocInfoMask :
          DocInfo->getValueAsListOfStrings("VisibilityMask")) {
       for (Init *Visibility : Visibilities) {
         if (Visibility->getAsUnquotedString() == DocInfoMask) {
@@ -396,13 +396,13 @@ void emitOption(const DocumentedOption &Option, const Record *DocInfo,
     if (!Description.empty() && Description.back() != '.')
       Description.push_back('.');
 
-    StringRef MetaVarName;
+    llvm::StringRef MetaVarName;
     if (!isa<UnsetInit>(R->getValueInit("MetaVarName")))
       MetaVarName = R->getValueAsString("MetaVarName");
     else
       MetaVarName = DefaultMetaVarName;
 
-    SmallVector<StringRef> Values;
+    llvm::SmallVector<llvm::StringRef> Values;
     SplitString(R->getValueAsString("Values"), Values, ",");
     Description += (" " + MetaVarName + " must be '").str();
     if (Values.size() > 1) {
@@ -417,10 +417,10 @@ void emitOption(const DocumentedOption &Option, const Record *DocInfo,
 }
 
 void emitDocumentation(int Depth, const Documentation &Doc,
-                       const Record *DocInfo, raw_ostream &OS);
+                       const Record *DocInfo, llvm::raw_ostream &OS);
 
 void emitGroup(int Depth, const DocumentedGroup &Group, const Record *DocInfo,
-               raw_ostream &OS) {
+               llvm::raw_ostream &OS) {
   emitHeading(Depth,
               getRSTStringWithTextFallback(Group.Group, "DocName", "Name"), OS);
 
@@ -435,7 +435,7 @@ void emitGroup(int Depth, const DocumentedGroup &Group, const Record *DocInfo,
 }
 
 void emitDocumentation(int Depth, const Documentation &Doc,
-                       const Record *DocInfo, raw_ostream &OS) {
+                       const Record *DocInfo, llvm::raw_ostream &OS) {
   for (auto &O : Doc.Options)
     emitOption(O, DocInfo, OS);
   for (auto &G : Doc.Groups)
@@ -444,7 +444,7 @@ void emitDocumentation(int Depth, const Documentation &Doc,
 
 }  // namespace
 
-void clang::EmitClangOptDocs(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitClangOptDocs(RecordKeeper &Records, llvm::raw_ostream &OS) {
   const Record *DocInfo = Records.getDef("GlobalDocumentation");
   if (!DocInfo) {
     PrintFatalError("The GlobalDocumentation top-level definition is missing, "

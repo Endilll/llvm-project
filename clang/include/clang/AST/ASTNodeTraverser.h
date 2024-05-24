@@ -41,12 +41,12 @@ following interface:
 
 struct {
   template <typename Fn> void AddChild(Fn DoAddChild);
-  template <typename Fn> void AddChild(StringRef Label, Fn DoAddChild);
+  template <typename Fn> void AddChild(llvm::StringRef Label, Fn DoAddChild);
 
   void Visit(const comments::Comment *C, const comments::FullComment *FC);
   void Visit(const Attr *A);
   void Visit(const TemplateArgument &TA, SourceRange R = {},
-             const Decl *From = nullptr, StringRef Label = {});
+             const Decl *From = nullptr, llvm::StringRef Label = {});
   void Visit(const Stmt *Node);
   void Visit(const Type *T);
   void Visit(QualType T);
@@ -135,7 +135,7 @@ public:
     });
   }
 
-  void Visit(const Stmt *Node, StringRef Label = {}) {
+  void Visit(const Stmt *Node, llvm::StringRef Label = {}) {
     getNodeDelegate().AddChild(Label, [=] {
       const Stmt *S = Node;
 

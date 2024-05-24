@@ -31,7 +31,7 @@ ObjCNoReturn::ObjCNoReturn(ASTContext &C)
     NSExceptionII(&C.Idents.get("NSException"))
 {
   // Generate selectors.
-  SmallVector<const IdentifierInfo *, 3> II;
+  llvm::SmallVector<const IdentifierInfo *, 3> II;
 
   // raise:format:
   II.push_back(&C.Idents.get("raise"));

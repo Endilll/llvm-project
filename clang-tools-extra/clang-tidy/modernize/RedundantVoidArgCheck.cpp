@@ -125,7 +125,7 @@ bool isMacroIdentifier(const IdentifierTable &Idents, const Token &ProtoToken) {
 
 void RedundantVoidArgCheck::removeVoidArgumentTokens(
     const ast_matchers::MatchFinder::MatchResult &Result, SourceRange Range,
-    StringRef GrammarLocation) {
+    llvm::StringRef GrammarLocation) {
   CharSourceRange CharRange =
       Lexer::makeFileCharRange(CharSourceRange::getTokenRange(Range),
                                *Result.SourceManager, getLangOpts());
@@ -218,7 +218,7 @@ void RedundantVoidArgCheck::removeVoidArgumentTokens(
 }
 
 void RedundantVoidArgCheck::removeVoidToken(Token VoidToken,
-                                            StringRef Diagnostic) {
+                                            llvm::StringRef Diagnostic) {
   SourceLocation VoidLoc = VoidToken.getLocation();
   diag(VoidLoc, Diagnostic) << FixItHint::CreateRemoval(VoidLoc);
 }

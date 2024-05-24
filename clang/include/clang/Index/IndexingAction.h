@@ -56,7 +56,7 @@ void indexASTUnit(ASTUnit &Unit, IndexDataConsumer &DataConsumer,
 
 /// Recursively indexes \p Decls.
 void indexTopLevelDecls(ASTContext &Ctx, Preprocessor &PP,
-                        ArrayRef<const Decl *> Decls,
+                        llvm::ArrayRef<const Decl *> Decls,
                         IndexDataConsumer &DataConsumer, IndexingOptions Opts);
 
 /// Creates a PPCallbacks that indexes macros and feeds macros to \p Consumer.

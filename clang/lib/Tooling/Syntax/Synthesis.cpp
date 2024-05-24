@@ -28,7 +28,7 @@ public:
     T->appendChildLowLevel(Child, R);
   }
 
-  static std::pair<FileID, ArrayRef<Token>>
+  static std::pair<FileID, llvm::ArrayRef<Token>>
   lexBuffer(TokenBufferTokenManager &TBTM,
             std::unique_ptr<llvm::MemoryBuffer> Buffer) {
     return TBTM.lexBuffer(std::move(Buffer));
@@ -39,7 +39,7 @@ public:
 // doesn't support digraphs or line continuations.
 syntax::Leaf *clang::syntax::createLeaf(syntax::Arena &A,
                                         TokenBufferTokenManager &TBTM,
-                                        tok::TokenKind K, StringRef Spelling) {
+                                        tok::TokenKind K, llvm::StringRef Spelling) {
   auto Tokens =
       FactoryImpl::lexBuffer(TBTM, llvm::MemoryBuffer::getMemBufferCopy(Spelling))
           .second;
@@ -203,7 +203,7 @@ syntax::Tree *allocateTree(syntax::Arena &A, syntax::NodeKind Kind) {
 
 syntax::Tree *clang::syntax::createTree(
     syntax::Arena &A,
-    ArrayRef<std::pair<syntax::Node *, syntax::NodeRole>> Children,
+    llvm::ArrayRef<std::pair<syntax::Node *, syntax::NodeRole>> Children,
     syntax::NodeKind K) {
   auto *T = allocateTree(A, K);
   FactoryImpl::setCanModify(T);

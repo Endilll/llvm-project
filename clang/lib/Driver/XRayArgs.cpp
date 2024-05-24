@@ -79,7 +79,7 @@ XRayArgs::XRayArgs(const ToolChain &TC, const ArgList &Args) {
     InstrumentationBundle.Mask = XRayInstrKind::All;
   else
     for (const auto &B : Bundles) {
-      llvm::SmallVector<StringRef, 2> BundleParts;
+      llvm::SmallVector<llvm::StringRef, 2> BundleParts;
       llvm::SplitString(B, BundleParts, ",");
       for (const auto &P : BundleParts) {
         // TODO: Automate the generation of the string case table.
@@ -140,7 +140,7 @@ XRayArgs::XRayArgs(const ToolChain &TC, const ArgList &Args) {
   else
     for (const auto &Arg : SpecifiedModes) {
       // Parse CSV values for -fxray-modes=...
-      llvm::SmallVector<StringRef, 2> ModeParts;
+      llvm::SmallVector<llvm::StringRef, 2> ModeParts;
       llvm::SplitString(Arg, ModeParts, ",");
       for (const auto &M : ModeParts)
         if (M == "none")
@@ -180,7 +180,7 @@ void XRayArgs::addArgs(const ToolChain &TC, const ArgList &Args,
   if (const Arg *A =
           Args.getLastArg(options::OPT_fxray_instruction_threshold_EQ)) {
     int Value;
-    StringRef S = A->getValue();
+    llvm::StringRef S = A->getValue();
     if (S.getAsInteger(0, Value) || Value < 0)
       D.Diag(clang::diag::err_drv_invalid_value) << A->getAsString(Args) << S;
     else
@@ -190,7 +190,7 @@ void XRayArgs::addArgs(const ToolChain &TC, const ArgList &Args,
   int XRayFunctionGroups = 1;
   int XRaySelectedFunctionGroup = 0;
   if (const Arg *A = Args.getLastArg(options::OPT_fxray_function_groups)) {
-    StringRef S = A->getValue();
+    llvm::StringRef S = A->getValue();
     if (S.getAsInteger(0, XRayFunctionGroups) || XRayFunctionGroups < 1)
       D.Diag(clang::diag::err_drv_invalid_value) << A->getAsString(Args) << S;
     if (XRayFunctionGroups > 1)
@@ -198,7 +198,7 @@ void XRayArgs::addArgs(const ToolChain &TC, const ArgList &Args,
   }
   if (const Arg *A =
           Args.getLastArg(options::OPT_fxray_selected_function_group)) {
-    StringRef S = A->getValue();
+    llvm::StringRef S = A->getValue();
     if (S.getAsInteger(0, XRaySelectedFunctionGroup) ||
         XRaySelectedFunctionGroup < 0 ||
         XRaySelectedFunctionGroup >= XRayFunctionGroups)
@@ -208,36 +208,36 @@ void XRayArgs::addArgs(const ToolChain &TC, const ArgList &Args,
   }
 
   for (const auto &Always : AlwaysInstrumentFiles) {
-    SmallString<64> AlwaysInstrumentOpt("-fxray-always-instrument=");
+    llvm::SmallString<64> AlwaysInstrumentOpt("-fxray-always-instrument=");
     AlwaysInstrumentOpt += Always;
     CmdArgs.push_back(Args.MakeArgString(AlwaysInstrumentOpt));
   }
 
   for (const auto &Never : NeverInstrumentFiles) {
-    SmallString<64> NeverInstrumentOpt("-fxray-never-instrument=");
+    llvm::SmallString<64> NeverInstrumentOpt("-fxray-never-instrument=");
     NeverInstrumentOpt += Never;
     CmdArgs.push_back(Args.MakeArgString(NeverInstrumentOpt));
   }
 
   for (const auto &AttrFile : AttrListFiles) {
-    SmallString<64> AttrListFileOpt("-fxray-attr-list=");
+    llvm::SmallString<64> AttrListFileOpt("-fxray-attr-list=");
     AttrListFileOpt += AttrFile;
     CmdArgs.push_back(Args.MakeArgString(AttrListFileOpt));
   }
 
   for (const auto &Dep : ExtraDeps) {
-    SmallString<64> ExtraDepOpt("-fdepfile-entry=");
+    llvm::SmallString<64> ExtraDepOpt("-fdepfile-entry=");
     ExtraDepOpt += Dep;
     CmdArgs.push_back(Args.MakeArgString(ExtraDepOpt));
   }
 
   for (const auto &Mode : Modes) {
-    SmallString<64> ModeOpt("-fxray-modes=");
+    llvm::SmallString<64> ModeOpt("-fxray-modes=");
     ModeOpt += Mode;
     CmdArgs.push_back(Args.MakeArgString(ModeOpt));
   }
 
-  SmallString<64> Bundle("-fxray-instrumentation-bundle=");
+  llvm::SmallString<64> Bundle("-fxray-instrumentation-bundle=");
   if (InstrumentationBundle.full()) {
     Bundle += "all";
   } else if (InstrumentationBundle.empty()) {

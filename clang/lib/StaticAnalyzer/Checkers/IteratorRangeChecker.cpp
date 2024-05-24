@@ -43,7 +43,7 @@ class IteratorRangeChecker
   void verifyAdvance(CheckerContext &C, SVal LHS, SVal RHS) const;
   void verifyPrev(CheckerContext &C, SVal LHS, SVal RHS) const;
   void verifyNext(CheckerContext &C, SVal LHS, SVal RHS) const;
-  void reportBug(StringRef Message, SVal Val, CheckerContext &C,
+  void reportBug(llvm::StringRef Message, SVal Val, CheckerContext &C,
                  ExplodedNode *ErrNode) const;
 
 public:
@@ -274,7 +274,7 @@ void IteratorRangeChecker::verifyNext(CheckerContext &C, SVal LHS,
   verifyRandomIncrOrDecr(C, OO_Plus, LHS, RHS);
 }
 
-void IteratorRangeChecker::reportBug(StringRef Message, SVal Val,
+void IteratorRangeChecker::reportBug(llvm::StringRef Message, SVal Val,
                                      CheckerContext &C,
                                      ExplodedNode *ErrNode) const {
   auto R = std::make_unique<PathSensitiveBugReport>(OutOfRangeBugType, Message,

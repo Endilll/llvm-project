@@ -48,7 +48,7 @@ PPCLinuxToolChain::PPCLinuxToolChain(const Driver &D,
                                      const llvm::opt::ArgList &Args)
     : Linux(D, Triple, Args) {
   if (Arg *A = Args.getLastArg(options::OPT_mabi_EQ)) {
-    StringRef ABIName = A->getValue();
+    llvm::StringRef ABIName = A->getValue();
 
     if ((ABIName == "ieeelongdouble" &&
          !SupportIEEEFloat128(D, Triple, Args)) ||
@@ -62,7 +62,7 @@ void PPCLinuxToolChain::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
   if (!DriverArgs.hasArg(clang::driver::options::OPT_nostdinc) &&
       !DriverArgs.hasArg(options::OPT_nobuiltininc)) {
     const Driver &D = getDriver();
-    SmallString<128> P(D.ResourceDir);
+    llvm::SmallString<128> P(D.ResourceDir);
     llvm::sys::path::append(P, "include", "ppc_wrappers");
     addSystemInclude(DriverArgs, CC1Args, P);
   }
@@ -98,6 +98,6 @@ bool PPCLinuxToolChain::SupportIEEEFloat128(
        GCCInstallation.getVersion().isOlderThan(12, 1, 0));
 
   std::string Linker = Linux::getDynamicLinker(Args);
-  return GlibcSupportsFloat128((Twine(D.DyldPrefix) + Linker).str()) &&
+  return GlibcSupportsFloat128((llvm::Twine(D.DyldPrefix) + Linker).str()) &&
          !(D.CCCIsCXX() && HasUnsupportedCXXLib);
 }

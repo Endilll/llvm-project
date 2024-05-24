@@ -246,7 +246,7 @@ static bool interp__builtin_nan(InterpState &S, CodePtr OpPC,
 
   assert(Arg.getFieldDesc()->isPrimitiveArray());
 
-  // Convert the given string to an integer using StringRef's API.
+  // Convert the given string to an integer using llvm::StringRef's API.
   llvm::APInt Fill;
   std::string Str;
   assert(Arg.getNumElems() >= 1);
@@ -265,7 +265,7 @@ static bool interp__builtin_nan(InterpState &S, CodePtr OpPC,
   // Treat empty strings as if they were zero.
   if (Str.empty())
     Fill = llvm::APInt(32, 0);
-  else if (StringRef(Str).getAsInteger(0, Fill))
+  else if (llvm::StringRef(Str).getAsInteger(0, Fill))
     return false;
 
   const llvm::fltSemantics &TargetSemantics =

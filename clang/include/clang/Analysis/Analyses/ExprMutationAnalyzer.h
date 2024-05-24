@@ -60,12 +60,12 @@ public:
 
     bool isUnevaluated(const Expr *Exp);
 
-    const Stmt *findExprMutation(ArrayRef<ast_matchers::BoundNodes> Matches);
-    const Stmt *findDeclMutation(ArrayRef<ast_matchers::BoundNodes> Matches);
+    const Stmt *findExprMutation(llvm::ArrayRef<ast_matchers::BoundNodes> Matches);
+    const Stmt *findDeclMutation(llvm::ArrayRef<ast_matchers::BoundNodes> Matches);
     const Stmt *
-    findExprPointeeMutation(ArrayRef<ast_matchers::BoundNodes> Matches);
+    findExprPointeeMutation(llvm::ArrayRef<ast_matchers::BoundNodes> Matches);
     const Stmt *
-    findDeclPointeeMutation(ArrayRef<ast_matchers::BoundNodes> Matches);
+    findDeclPointeeMutation(llvm::ArrayRef<ast_matchers::BoundNodes> Matches);
 
     const Stmt *findDirectMutation(const Expr *Exp);
     const Stmt *findMemberMutation(const Expr *Exp);

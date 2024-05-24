@@ -31,10 +31,10 @@ class InputInfo;
 class Tool;
 
 struct CrashReportInfo {
-  StringRef Filename;
-  StringRef VFSPath;
+  llvm::StringRef Filename;
+  llvm::StringRef VFSPath;
 
-  CrashReportInfo(StringRef Filename, StringRef VFSPath)
+  CrashReportInfo(llvm::StringRef Filename, llvm::StringRef VFSPath)
       : Filename(Filename), VFSPath(VFSPath) {}
 };
 
@@ -159,8 +159,8 @@ class Command {
   /// Encodes an array of C strings into a single string separated by whitespace.
   /// This function will also put in quotes arguments that have whitespaces and
   /// will escape the regular backslashes (used in Windows paths) and quotes.
-  /// The results are the contents of a response file, written into a raw_ostream.
-  void writeResponseFile(raw_ostream &OS) const;
+  /// The results are the contents of a response file, written into a llvm::raw_ostream.
+  void writeResponseFile(llvm::raw_ostream &OS) const;
 
 public:
   /// Whether to print the input filenames when executing.
@@ -171,8 +171,8 @@ public:
 
   Command(const Action &Source, const Tool &Creator,
           ResponseFileSupport ResponseSupport, const char *Executable,
-          const llvm::opt::ArgStringList &Arguments, ArrayRef<InputInfo> Inputs,
-          ArrayRef<InputInfo> Outputs = std::nullopt,
+          const llvm::opt::ArgStringList &Arguments, llvm::ArrayRef<InputInfo> Inputs,
+          llvm::ArrayRef<InputInfo> Outputs = std::nullopt,
           const char *PrependArg = nullptr);
   // FIXME: This really shouldn't be copyable, but is currently copied in some
   // error handling in Driver::generateCompilationDiagnostics.
@@ -182,7 +182,7 @@ public:
   virtual void Print(llvm::raw_ostream &OS, const char *Terminator, bool Quote,
                      CrashReportInfo *CrashInfo = nullptr) const;
 
-  virtual int Execute(ArrayRef<std::optional<StringRef>> Redirects,
+  virtual int Execute(llvm::ArrayRef<std::optional<llvm::StringRef>> Redirects,
                       std::string *ErrMsg, bool *ExecutionFailed) const;
 
   /// getSource - Return the Action which caused the creation of this job.
@@ -245,14 +245,14 @@ public:
   CC1Command(const Action &Source, const Tool &Creator,
              ResponseFileSupport ResponseSupport, const char *Executable,
              const llvm::opt::ArgStringList &Arguments,
-             ArrayRef<InputInfo> Inputs,
-             ArrayRef<InputInfo> Outputs = std::nullopt,
+             llvm::ArrayRef<InputInfo> Inputs,
+             llvm::ArrayRef<InputInfo> Outputs = std::nullopt,
              const char *PrependArg = nullptr);
 
   void Print(llvm::raw_ostream &OS, const char *Terminator, bool Quote,
              CrashReportInfo *CrashInfo = nullptr) const override;
 
-  int Execute(ArrayRef<std::optional<StringRef>> Redirects, std::string *ErrMsg,
+  int Execute(llvm::ArrayRef<std::optional<llvm::StringRef>> Redirects, std::string *ErrMsg,
               bool *ExecutionFailed) const override;
 
   void setEnvironment(llvm::ArrayRef<const char *> NewEnvironment) override;
@@ -261,7 +261,7 @@ public:
 /// JobList - A sequence of jobs to perform.
 class JobList {
 public:
-  using list_type = SmallVector<std::unique_ptr<Command>, 4>;
+  using list_type = llvm::SmallVector<std::unique_ptr<Command>, 4>;
   using size_type = list_type::size_type;
   using iterator = llvm::pointee_iterator<list_type::iterator>;
   using const_iterator = llvm::pointee_iterator<list_type::const_iterator>;

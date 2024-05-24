@@ -19,7 +19,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/string-literal-with-embedded-nul.html
 class StringLiteralWithEmbeddedNulCheck : public ClangTidyCheck {
 public:
-  StringLiteralWithEmbeddedNulCheck(StringRef Name, ClangTidyContext *Context)
+  StringLiteralWithEmbeddedNulCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

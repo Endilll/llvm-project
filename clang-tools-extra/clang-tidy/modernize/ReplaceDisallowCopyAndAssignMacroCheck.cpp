@@ -70,7 +70,7 @@ private:
 } // namespace
 
 ReplaceDisallowCopyAndAssignMacroCheck::ReplaceDisallowCopyAndAssignMacroCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       MacroName(Options.get("MacroName", "DISALLOW_COPY_AND_ASSIGN")) {}
 

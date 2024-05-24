@@ -27,10 +27,10 @@ private:
     std::optional<const Expr *> Precision;
     std::optional<const Expr *> FieldWidth;
     unsigned char Flags = 0;
-    StringRef MaskType;
+    llvm::StringRef MaskType;
   };
-  SmallVector<ArgData, 4> ArgsData;
-  ArrayRef<const Expr *> Args;
+  llvm::SmallVector<ArgData, 4> ArgsData;
+  llvm::ArrayRef<const Expr *> Args;
 
   OSLogBufferItem::Kind
   getKind(analyze_format_string::ConversionSpecifier::Kind K) {
@@ -52,7 +52,7 @@ private:
   }
 
 public:
-  OSLogFormatStringHandler(ArrayRef<const Expr *> Args) : Args(Args) {
+  OSLogFormatStringHandler(llvm::ArrayRef<const Expr *> Args) : Args(Args) {
     ArgsData.reserve(Args.size());
   }
 
@@ -180,10 +180,10 @@ public:
 
 bool clang::analyze_os_log::computeOSLogBufferLayout(
     ASTContext &Ctx, const CallExpr *E, OSLogBufferLayout &Layout) {
-  ArrayRef<const Expr *> Args(E->getArgs(), E->getArgs() + E->getNumArgs());
+  llvm::ArrayRef<const Expr *> Args(E->getArgs(), E->getArgs() + E->getNumArgs());
 
   const Expr *StringArg;
-  ArrayRef<const Expr *> VarArgs;
+  llvm::ArrayRef<const Expr *> VarArgs;
   switch (E->getBuiltinCallee()) {
   case Builtin::BI__builtin_os_log_format_buffer_size:
     assert(E->getNumArgs() >= 1 &&
@@ -203,7 +203,7 @@ bool clang::analyze_os_log::computeOSLogBufferLayout(
 
   const StringLiteral *Lit = cast<StringLiteral>(StringArg->IgnoreParenCasts());
   assert(Lit && (Lit->isOrdinary() || Lit->isUTF8()));
-  StringRef Data = Lit->getString();
+  llvm::StringRef Data = Lit->getString();
   OSLogFormatStringHandler H(VarArgs);
   ParsePrintfString(H, Data.begin(), Data.end(), Ctx.getLangOpts(),
                     Ctx.getTargetInfo(), /*isFreeBSDKPrintf*/ false);

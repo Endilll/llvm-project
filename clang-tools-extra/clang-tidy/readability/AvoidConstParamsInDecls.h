@@ -17,7 +17,7 @@ namespace clang::tidy::readability {
 // them.
 class AvoidConstParamsInDecls : public ClangTidyCheck {
 public:
-  AvoidConstParamsInDecls(StringRef Name, ClangTidyContext *Context)
+  AvoidConstParamsInDecls(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         IgnoreMacros(Options.getLocalOrGlobal("IgnoreMacros", true)) {}
 

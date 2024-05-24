@@ -470,7 +470,7 @@ struct FragmentCompiler {
       std::vector<std::string> FullyQualifiedNamespaces;
       for (auto &N : F.FullyQualifiedNamespaces) {
         // Normalize the data by dropping both leading and trailing ::
-        StringRef Namespace(*N);
+        llvm::StringRef Namespace(*N);
         Namespace.consume_front("::");
         Namespace.consume_back("::");
         FullyQualifiedNamespaces.push_back(Namespace.str());
@@ -487,7 +487,7 @@ struct FragmentCompiler {
 
   void appendTidyCheckSpec(std::string &CurSpec,
                            const Located<std::string> &Arg, bool IsPositive) {
-    StringRef Str = StringRef(*Arg).trim();
+    llvm::StringRef Str = llvm::StringRef(*Arg).trim();
     // Don't support negating here, its handled if the item is in the Add or
     // Remove list.
     if (Str.starts_with("-") || Str.contains(',')) {

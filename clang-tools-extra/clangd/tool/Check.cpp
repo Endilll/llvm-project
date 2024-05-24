@@ -456,7 +456,7 @@ bool check(llvm::StringRef File, const ThreadsafeFS &TFS,
   std::optional<Range> LineRange;
   if (!CheckFileLines.empty()) {
     uint32_t Begin = 0, End = std::numeric_limits<uint32_t>::max();
-    StringRef RangeStr(CheckFileLines);
+    llvm::StringRef RangeStr(CheckFileLines);
     bool ParseError = RangeStr.consumeInteger(0, Begin);
     if (RangeStr.empty()) {
       End = Begin;

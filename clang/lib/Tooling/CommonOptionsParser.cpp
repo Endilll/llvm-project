@@ -58,7 +58,7 @@ void ArgumentsAdjustingCompilations::appendArgumentsAdjuster(
 }
 
 std::vector<CompileCommand> ArgumentsAdjustingCompilations::getCompileCommands(
-    StringRef FilePath) const {
+    llvm::StringRef FilePath) const {
   return adjustCommands(Compilations->getCompileCommands(FilePath));
 }
 
@@ -170,7 +170,7 @@ CommonOptionsParser::CommonOptionsParser(
   llvm::Error Err = init(argc, argv, Category, OccurrencesFlag, Overview);
   if (Err) {
     llvm::report_fatal_error(
-        Twine("CommonOptionsParser: failed to parse command-line arguments. ") +
+        llvm::Twine("CommonOptionsParser: failed to parse command-line arguments. ") +
         llvm::toString(std::move(Err)));
   }
 }

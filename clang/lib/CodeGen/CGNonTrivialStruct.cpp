@@ -202,7 +202,7 @@ template <class Derived> struct GenFuncNameBase {
     appendStr("_AE");
   }
 
-  void appendStr(StringRef Str) { Name += Str; }
+  void appendStr(llvm::StringRef Str) { Name += Str; }
 
   std::string getName(QualType QT, bool IsVolatile) {
     QT = IsVolatile ? QT.withVolatile() : QT;
@@ -217,7 +217,7 @@ template <class Derived> struct GenFuncNameBase {
 
 template <class Derived>
 struct GenUnaryFuncName : StructVisitor<Derived>, GenFuncNameBase<Derived> {
-  GenUnaryFuncName(StringRef Prefix, CharUnits DstAlignment, ASTContext &Ctx)
+  GenUnaryFuncName(llvm::StringRef Prefix, CharUnits DstAlignment, ASTContext &Ctx)
       : StructVisitor<Derived>(Ctx) {
     this->appendStr(Prefix);
     this->appendStr(llvm::to_string(DstAlignment.getQuantity()));
@@ -234,7 +234,7 @@ template <bool IsMove>
 struct GenBinaryFuncName : CopyStructVisitor<GenBinaryFuncName<IsMove>, IsMove>,
                            GenFuncNameBase<GenBinaryFuncName<IsMove>> {
 
-  GenBinaryFuncName(StringRef Prefix, CharUnits DstAlignment,
+  GenBinaryFuncName(llvm::StringRef Prefix, CharUnits DstAlignment,
                     CharUnits SrcAlignment, ASTContext &Ctx)
       : CopyStructVisitor<GenBinaryFuncName<IsMove>, IsMove>(Ctx) {
     this->appendStr(Prefix);
@@ -435,7 +435,7 @@ template <class Derived> struct GenFuncBase {
   }
 
   template <size_t N>
-  llvm::Function *getFunction(StringRef FuncName, QualType QT,
+  llvm::Function *getFunction(llvm::StringRef FuncName, QualType QT,
                               std::array<CharUnits, N> Alignments,
                               CodeGenModule &CGM) {
     // If the special function already exists in the module, return it.
@@ -481,7 +481,7 @@ template <class Derived> struct GenFuncBase {
   }
 
   template <size_t N>
-  void callFunc(StringRef FuncName, QualType QT, std::array<Address, N> Addrs,
+  void callFunc(llvm::StringRef FuncName, QualType QT, std::array<Address, N> Addrs,
                 CodeGenFunction &CallerCGF) {
     std::array<CharUnits, N> Alignments;
     llvm::Value *Ptrs[N];
@@ -818,7 +818,7 @@ void CodeGenFunction::defaultInitNonTrivialCStructVar(LValue Dst) {
 }
 
 template <class G, size_t N>
-static void callSpecialFunction(G &&Gen, StringRef FuncName, QualType QT,
+static void callSpecialFunction(G &&Gen, llvm::StringRef FuncName, QualType QT,
                                 bool IsVolatile, CodeGenFunction &CGF,
                                 std::array<Address, N> Addrs) {
   auto SetArtificialLoc = ApplyDebugLocation::CreateArtificial(CGF);
@@ -830,7 +830,7 @@ static void callSpecialFunction(G &&Gen, StringRef FuncName, QualType QT,
 
 template <class G, size_t N>
 static llvm::Function *
-getSpecialFunction(G &&Gen, StringRef FuncName, QualType QT, bool IsVolatile,
+getSpecialFunction(G &&Gen, llvm::StringRef FuncName, QualType QT, bool IsVolatile,
                    std::array<CharUnits, N> Alignments, CodeGenModule &CGM) {
   QT = IsVolatile ? QT.withVolatile() : QT;
   // The following call requires an array of addresses as arguments, but doesn't

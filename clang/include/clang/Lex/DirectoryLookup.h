@@ -87,7 +87,7 @@ public:
 
   /// getName - Return the directory or filename corresponding to this lookup
   /// object.
-  StringRef getName() const;
+  llvm::StringRef getName() const;
 
   /// getDir - Return the directory that this entry refers to.
   ///
@@ -185,18 +185,18 @@ public:
   /// a framework include ("Foo.h" -> "Foo/Foo.h"), set the new name to this
   /// vector and point Filename to it.
   OptionalFileEntryRef
-  LookupFile(StringRef &Filename, HeaderSearch &HS, SourceLocation IncludeLoc,
-             SmallVectorImpl<char> *SearchPath,
-             SmallVectorImpl<char> *RelativePath, Module *RequestingModule,
+  LookupFile(llvm::StringRef &Filename, HeaderSearch &HS, SourceLocation IncludeLoc,
+             llvm::SmallVectorImpl<char> *SearchPath,
+             llvm::SmallVectorImpl<char> *RelativePath, Module *RequestingModule,
              ModuleMap::KnownHeader *SuggestedModule,
              bool &InUserSpecifiedSystemFramework, bool &IsFrameworkFound,
-             bool &IsInHeaderMap, SmallVectorImpl<char> &MappedName,
+             bool &IsInHeaderMap, llvm::SmallVectorImpl<char> &MappedName,
              bool OpenFile = true) const;
 
 private:
   OptionalFileEntryRef DoFrameworkLookup(
-      StringRef Filename, HeaderSearch &HS, SmallVectorImpl<char> *SearchPath,
-      SmallVectorImpl<char> *RelativePath, Module *RequestingModule,
+      llvm::StringRef Filename, HeaderSearch &HS, llvm::SmallVectorImpl<char> *SearchPath,
+      llvm::SmallVectorImpl<char> *RelativePath, Module *RequestingModule,
       ModuleMap::KnownHeader *SuggestedModule,
       bool &InUserSpecifiedSystemFramework, bool &IsFrameworkFound) const;
 };

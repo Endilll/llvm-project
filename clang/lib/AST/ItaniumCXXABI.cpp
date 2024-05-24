@@ -55,7 +55,7 @@ static const IdentifierInfo *findAnonymousUnionVarDeclName(const VarDecl& VD) {
 
 /// The name of a decomposition declaration.
 struct DecompositionDeclName {
-  using BindingArray = ArrayRef<const BindingDecl*>;
+  using BindingArray = llvm::ArrayRef<const BindingDecl*>;
 
   /// Representative example of a set of bindings with these names.
   BindingArray Bindings;
@@ -102,7 +102,7 @@ std::optional<bool> areDenseMapKeysEqualSpecialValues(T LHS, T RHS) {
 
 template<>
 struct DenseMapInfo<DecompositionDeclName> {
-  using ArrayInfo = llvm::DenseMapInfo<ArrayRef<const BindingDecl*>>;
+  using ArrayInfo = llvm::DenseMapInfo<llvm::ArrayRef<const BindingDecl*>>;
   static DecompositionDeclName getEmptyKey() {
     return {ArrayInfo::getEmptyKey()};
   }

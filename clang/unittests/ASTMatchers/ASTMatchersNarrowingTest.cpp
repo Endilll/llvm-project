@@ -19,7 +19,7 @@ namespace clang {
 namespace ast_matchers {
 
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesInFile) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define MY_MACRO(a) (4 + (a))
     void Test() { MY_MACRO(4); }
   )cc";
@@ -27,7 +27,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesInFile) {
 }
 
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesNested) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define MY_MACRO(a) (4 + (a))
 #define WRAPPER(a) MY_MACRO(a)
     void Test() { WRAPPER(4); }
@@ -36,7 +36,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesNested) {
 }
 
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesIntermediate) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define IMPL(a) (4 + (a))
 #define MY_MACRO(a) IMPL(a)
 #define WRAPPER(a) MY_MACRO(a)
@@ -46,7 +46,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesIntermediate) {
 }
 
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesTransitive) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define MY_MACRO(a) (4 + (a))
 #define WRAPPER(a) MY_MACRO(a)
     void Test() { WRAPPER(4); }
@@ -55,7 +55,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesTransitive) {
 }
 
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesArgument) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define MY_MACRO(a) (4 + (a))
     void Test() {
       int x = 5;
@@ -68,7 +68,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesArgument) {
 // Like IsExpandedFromMacro_MatchesArgument, but the argument is itself a
 // macro.
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesArgumentMacroExpansion) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define MY_MACRO(a) (4 + (a))
 #define IDENTITY(a) (a)
     void Test() {
@@ -79,7 +79,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesArgumentMacroExpansion) {
 }
 
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesWhenInArgument) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define MY_MACRO(a) (4 + (a))
 #define IDENTITY(a) (a)
     void Test() {
@@ -90,7 +90,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesWhenInArgument) {
 }
 
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesObjectMacro) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define PLUS (2 + 2)
     void Test() {
       PLUS;
@@ -100,7 +100,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_MatchesObjectMacro) {
 }
 
 TEST(IsExpandedFromMacro, MatchesFromCommandLine) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
     void Test() { FOUR_PLUS_FOUR; }
   )cc";
   EXPECT_TRUE(matchesConditionally(
@@ -109,7 +109,7 @@ TEST(IsExpandedFromMacro, MatchesFromCommandLine) {
 }
 
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_NotMatchesBeginOnly) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define ONE_PLUS 1+
   void Test() { ONE_PLUS 4; }
   )cc";
@@ -118,7 +118,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_NotMatchesBeginOnly) {
 }
 
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_NotMatchesEndOnly) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define PLUS_ONE +1
   void Test() { 4 PLUS_ONE; }
   )cc";
@@ -127,7 +127,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_NotMatchesEndOnly) {
 }
 
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_NotMatchesDifferentMacro) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define MY_MACRO(a) (4 + (a))
     void Test() { MY_MACRO(4); }
   )cc";
@@ -135,7 +135,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_NotMatchesDifferentMacro) {
 }
 
 TEST_P(ASTMatchersTest, IsExpandedFromMacro_NotMatchesDifferentInstances) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define FOUR 4
     void Test() { FOUR + FOUR; }
   )cc";
@@ -143,7 +143,7 @@ TEST_P(ASTMatchersTest, IsExpandedFromMacro_NotMatchesDifferentInstances) {
 }
 
 TEST(IsExpandedFromMacro, IsExpandedFromMacro_MatchesDecls) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define MY_MACRO(a) int i = a;
     void Test() { MY_MACRO(4); }
   )cc";
@@ -151,7 +151,7 @@ TEST(IsExpandedFromMacro, IsExpandedFromMacro_MatchesDecls) {
 }
 
 TEST(IsExpandedFromMacro, IsExpandedFromMacro_MatchesTypelocs) {
-  StringRef input = R"cc(
+  llvm::StringRef input = R"cc(
 #define MY_TYPE int
     void Test() { MY_TYPE i = 4; }
   )cc";
@@ -474,7 +474,7 @@ TEST_P(ASTMatchersTest, MapAnyOf) {
     return;
   }
 
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void F() {
   if (true) {}
   for ( ; false; ) {}
@@ -1455,7 +1455,7 @@ TEST_P(ASTMatchersTest, IsInitCapture) {
 }
 
 TEST_P(ASTMatchersTest, StorageDuration) {
-  StringRef T =
+  llvm::StringRef T =
       "void f() { int x; static int y; } int a;static int b;extern int c;";
 
   EXPECT_TRUE(matches(T, varDecl(hasName("x"), hasAutomaticStorageDuration())));
@@ -2588,7 +2588,7 @@ TEST_P(ASTMatchersTest, HasName_MatchesInlinedNamespaces) {
     return;
   }
 
-  StringRef code = "namespace a { inline namespace b { class C; } }";
+  llvm::StringRef code = "namespace a { inline namespace b { class C; } }";
   EXPECT_TRUE(matches(code, recordDecl(hasName("a::b::C"))));
   EXPECT_TRUE(matches(code, recordDecl(hasName("a::C"))));
   EXPECT_TRUE(matches(code, recordDecl(hasName("::a::b::C"))));
@@ -2600,7 +2600,7 @@ TEST_P(ASTMatchersTest, HasName_MatchesAnonymousNamespaces) {
     return;
   }
 
-  StringRef code = "namespace a { namespace { class C; } }";
+  llvm::StringRef code = "namespace a { namespace { class C; } }";
   EXPECT_TRUE(
       matches(code, recordDecl(hasName("a::(anonymous namespace)::C"))));
   EXPECT_TRUE(matches(code, recordDecl(hasName("a::C"))));
@@ -2633,7 +2633,7 @@ TEST_P(ASTMatchersTest, HasName_MatchesFunctionScope) {
     return;
   }
 
-  StringRef code =
+  llvm::StringRef code =
       "namespace a { void F(int a) { struct S { int m; }; int i; } }";
   EXPECT_TRUE(matches(code, varDecl(hasName("i"))));
   EXPECT_FALSE(matches(code, varDecl(hasName("F()::i"))));
@@ -2651,7 +2651,7 @@ TEST_P(ASTMatchersTest, HasName_QualifiedStringMatchesThroughLinkage) {
   }
 
   // https://bugs.llvm.org/show_bug.cgi?id=42193
-  StringRef code = R"cpp(namespace foo { extern "C" void test(); })cpp";
+  llvm::StringRef code = R"cpp(namespace foo { extern "C" void test(); })cpp";
   EXPECT_TRUE(matches(code, functionDecl(hasName("test"))));
   EXPECT_TRUE(matches(code, functionDecl(hasName("foo::test"))));
   EXPECT_TRUE(matches(code, functionDecl(hasName("::foo::test"))));
@@ -2670,7 +2670,7 @@ TEST_P(ASTMatchersTest, HasAnyName) {
     return;
   }
 
-  StringRef Code = "namespace a { namespace b { class C; } }";
+  llvm::StringRef Code = "namespace a { namespace b { class C; } }";
 
   EXPECT_TRUE(matches(Code, recordDecl(hasAnyName("XX", "a::b::C"))));
   EXPECT_TRUE(matches(Code, recordDecl(hasAnyName("a::b::C", "XX"))));
@@ -2681,7 +2681,7 @@ TEST_P(ASTMatchersTest, HasAnyName) {
   EXPECT_TRUE(
       matches(Code, recordDecl(hasAnyName("::C", "::b::C", "::a::b::C"))));
 
-  std::vector<StringRef> Names = {"::C", "::b::C", "::a::b::C"};
+  std::vector<llvm::StringRef> Names = {"::C", "::b::C", "::a::b::C"};
   EXPECT_TRUE(matches(Code, recordDecl(hasAnyName(Names))));
 }
 
@@ -2744,7 +2744,7 @@ TEST_P(ASTMatchersTest, HandlesNullQualTypes) {
 }
 
 TEST_P(ASTMatchersTest, ObjCIvarRefExpr) {
-  StringRef ObjCString =
+  llvm::StringRef ObjCString =
       "@interface A @end "
       "@implementation A { A *x; } - (void) func { x = 0; } @end";
   EXPECT_TRUE(matchesObjC(ObjCString, objcIvarRefExpr()));
@@ -3090,7 +3090,7 @@ TEST_P(ASTMatchersTest, Optionally_SubmatchersDoNotMatch) {
 
 // Regression test.
 TEST_P(ASTMatchersTest, Optionally_SubmatchersDoNotMatchButPreserveBindings) {
-  StringRef Code = "class A { int a; int b; };";
+  llvm::StringRef Code = "class A { int a; int b; };";
   auto Matcher = recordDecl(decl().bind("decl"),
                             optionally(has(fieldDecl(hasName("c")).bind("v"))));
   // "decl" is still bound.
@@ -3837,14 +3837,14 @@ TEST_P(ASTMatchersTest, EqualsBoundNodeMatcher_FiltersMatchedCombinations) {
 TEST_P(ASTMatchersTest,
        EqualsBoundNodeMatcher_UnlessDescendantsOfAncestorsMatch) {
   EXPECT_TRUE(matchAndVerifyResultTrue(
-      "struct StringRef { int size() const; const char* data() const; };"
-      "void f(StringRef v) {"
+      "struct llvm::StringRef { int size() const; const char* data() const; };"
+      "void f(llvm::StringRef v) {"
       "  v.data();"
       "}",
       cxxMemberCallExpr(
           callee(cxxMethodDecl(hasName("data"))),
           on(declRefExpr(to(
-              varDecl(hasType(recordDecl(hasName("StringRef")))).bind("var")))),
+              varDecl(hasType(recordDecl(hasName("llvm::StringRef")))).bind("var")))),
           unless(hasAncestor(stmt(hasDescendant(cxxMemberCallExpr(
               callee(cxxMethodDecl(anyOf(hasName("size"), hasName("length")))),
               on(declRefExpr(to(varDecl(equalsBoundNode("var")))))))))))
@@ -3852,15 +3852,15 @@ TEST_P(ASTMatchersTest,
       std::make_unique<VerifyIdIsBoundTo<Expr>>("data", 1)));
 
   EXPECT_FALSE(matches(
-      "struct StringRef { int size() const; const char* data() const; };"
-      "void f(StringRef v) {"
+      "struct llvm::StringRef { int size() const; const char* data() const; };"
+      "void f(llvm::StringRef v) {"
       "  v.data();"
       "  v.size();"
       "}",
       cxxMemberCallExpr(
           callee(cxxMethodDecl(hasName("data"))),
           on(declRefExpr(to(
-              varDecl(hasType(recordDecl(hasName("StringRef")))).bind("var")))),
+              varDecl(hasType(recordDecl(hasName("llvm::StringRef")))).bind("var")))),
           unless(hasAncestor(stmt(hasDescendant(cxxMemberCallExpr(
               callee(cxxMethodDecl(anyOf(hasName("size"), hasName("length")))),
               on(declRefExpr(to(varDecl(equalsBoundNode("var")))))))))))
@@ -4230,14 +4230,14 @@ TEST_P(ASTMatchersTest, IsMain) {
 TEST_P(ASTMatchersTest, OMPExecutableDirective_IsStandaloneDirective) {
   auto Matcher = ompExecutableDirective(isStandaloneDirective());
 
-  StringRef Source0 = R"(
+  llvm::StringRef Source0 = R"(
 void x() {
 #pragma omp parallel
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source0, Matcher));
 
-  StringRef Source1 = R"(
+  llvm::StringRef Source1 = R"(
 void x() {
 #pragma omp taskyield
 })";
@@ -4245,7 +4245,7 @@ void x() {
 }
 
 TEST_P(ASTMatchersTest, OMPExecutableDirective_HasStructuredBlock) {
-  StringRef Source0 = R"(
+  llvm::StringRef Source0 = R"(
 void x() {
 #pragma omp parallel
 ;
@@ -4253,7 +4253,7 @@ void x() {
   EXPECT_TRUE(matchesWithOpenMP(
       Source0, ompExecutableDirective(hasStructuredBlock(nullStmt()))));
 
-  StringRef Source1 = R"(
+  llvm::StringRef Source1 = R"(
 void x() {
 #pragma omp parallel
 {;}
@@ -4263,7 +4263,7 @@ void x() {
   EXPECT_TRUE(matchesWithOpenMP(
       Source1, ompExecutableDirective(hasStructuredBlock(compoundStmt()))));
 
-  StringRef Source2 = R"(
+  llvm::StringRef Source2 = R"(
 void x() {
 #pragma omp taskyield
 {;}
@@ -4275,41 +4275,41 @@ void x() {
 TEST_P(ASTMatchersTest, OMPExecutableDirective_HasClause) {
   auto Matcher = ompExecutableDirective(hasAnyClause(anything()));
 
-  StringRef Source0 = R"(
+  llvm::StringRef Source0 = R"(
 void x() {
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source0, Matcher));
 
-  StringRef Source1 = R"(
+  llvm::StringRef Source1 = R"(
 void x() {
 #pragma omp parallel
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source1, Matcher));
 
-  StringRef Source2 = R"(
+  llvm::StringRef Source2 = R"(
 void x() {
 #pragma omp parallel default(none)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source2, Matcher));
 
-  StringRef Source3 = R"(
+  llvm::StringRef Source3 = R"(
 void x() {
 #pragma omp parallel default(shared)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source3, Matcher));
 
-  StringRef Source4 = R"(
+  llvm::StringRef Source4 = R"(
 void x() {
 #pragma omp parallel default(firstprivate)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP51(Source4, Matcher));
 
-  StringRef Source5 = R"(
+  llvm::StringRef Source5 = R"(
 void x(int x) {
 #pragma omp parallel num_threads(x)
 ;
@@ -4321,41 +4321,41 @@ TEST_P(ASTMatchersTest, OMPDefaultClause_IsNoneKind) {
   auto Matcher =
       ompExecutableDirective(hasAnyClause(ompDefaultClause(isNoneKind())));
 
-  StringRef Source0 = R"(
+  llvm::StringRef Source0 = R"(
 void x() {
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source0, Matcher));
 
-  StringRef Source1 = R"(
+  llvm::StringRef Source1 = R"(
 void x() {
 #pragma omp parallel
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source1, Matcher));
 
-  StringRef Source2 = R"(
+  llvm::StringRef Source2 = R"(
 void x() {
 #pragma omp parallel default(none)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source2, Matcher));
 
-  StringRef Source3 = R"(
+  llvm::StringRef Source3 = R"(
 void x() {
 #pragma omp parallel default(shared)
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source3, Matcher));
 
-  StringRef Source4 = R"(
+  llvm::StringRef Source4 = R"(
 void x(int x) {
 #pragma omp parallel default(firstprivate)
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP51(Source4, Matcher));
 
-  StringRef Source5 = R"(
+  llvm::StringRef Source5 = R"(
 void x(int x) {
 #pragma omp parallel default(private)
 ;
@@ -4374,41 +4374,41 @@ TEST_P(ASTMatchersTest, OMPDefaultClause_IsSharedKind) {
   auto Matcher =
       ompExecutableDirective(hasAnyClause(ompDefaultClause(isSharedKind())));
 
-  StringRef Source0 = R"(
+  llvm::StringRef Source0 = R"(
 void x() {
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source0, Matcher));
 
-  StringRef Source1 = R"(
+  llvm::StringRef Source1 = R"(
 void x() {
 #pragma omp parallel
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source1, Matcher));
 
-  StringRef Source2 = R"(
+  llvm::StringRef Source2 = R"(
 void x() {
 #pragma omp parallel default(shared)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source2, Matcher));
 
-  StringRef Source3 = R"(
+  llvm::StringRef Source3 = R"(
 void x() {
 #pragma omp parallel default(none)
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source3, Matcher));
 
-  StringRef Source4 = R"(
+  llvm::StringRef Source4 = R"(
 void x(int x) {
 #pragma omp parallel default(firstprivate)
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP51(Source4, Matcher));
 
-  StringRef Source5 = R"(
+  llvm::StringRef Source5 = R"(
 void x(int x) {
 #pragma omp parallel default(private)
 ;
@@ -4533,61 +4533,61 @@ TEST_P(ASTMatchersTest, OMPExecutableDirective_IsAllowedToContainClauseKind) {
   auto Matcher = ompExecutableDirective(
       isAllowedToContainClauseKind(llvm::omp::OMPC_default));
 
-  StringRef Source0 = R"(
+  llvm::StringRef Source0 = R"(
 void x() {
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source0, Matcher));
 
-  StringRef Source1 = R"(
+  llvm::StringRef Source1 = R"(
 void x() {
 #pragma omp parallel
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source1, Matcher));
 
-  StringRef Source2 = R"(
+  llvm::StringRef Source2 = R"(
 void x() {
 #pragma omp parallel default(none)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source2, Matcher));
 
-  StringRef Source3 = R"(
+  llvm::StringRef Source3 = R"(
 void x() {
 #pragma omp parallel default(shared)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source3, Matcher));
 
-  StringRef Source4 = R"(
+  llvm::StringRef Source4 = R"(
 void x() {
 #pragma omp parallel default(firstprivate)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP51(Source4, Matcher));
 
-  StringRef Source5 = R"(
+  llvm::StringRef Source5 = R"(
 void x() {
 #pragma omp parallel default(private)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP51(Source5, Matcher));
 
-  StringRef Source6 = R"(
+  llvm::StringRef Source6 = R"(
 void x(int x) {
 #pragma omp parallel num_threads(x)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source6, Matcher));
 
-  StringRef Source7 = R"(
+  llvm::StringRef Source7 = R"(
 void x() {
 #pragma omp taskyield
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source7, Matcher));
 
-  StringRef Source8 = R"(
+  llvm::StringRef Source8 = R"(
 void x() {
 #pragma omp task
 ;
@@ -4793,7 +4793,7 @@ TEST_P(ASTMatchersTest, HasDirectBase) {
       cxxRecordDecl(hasName("Derived"),
                     hasDirectBase(hasType(cxxRecordDecl(hasName("Base")))))));
 
-  StringRef MultiDerived = R"cc(
+  llvm::StringRef MultiDerived = R"cc(
     class Base {};
     class Base2 {};
     class Derived : Base, Base2{};
@@ -4808,7 +4808,7 @@ TEST_P(ASTMatchersTest, HasDirectBase) {
       cxxRecordDecl(hasName("Derived"),
                     hasDirectBase(hasType(cxxRecordDecl(hasName("Base2")))))));
 
-  StringRef Indirect = R"cc(
+  llvm::StringRef Indirect = R"cc(
     class Base {};
     class Intermediate : Base {};
     class Derived : Intermediate{};

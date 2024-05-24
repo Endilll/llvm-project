@@ -23,7 +23,7 @@ void UniqueptrDeleteReleaseCheck::storeOptions(
 }
 
 UniqueptrDeleteReleaseCheck::UniqueptrDeleteReleaseCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       PreferResetCall(Options.get("PreferResetCall", false)) {}
 

@@ -111,9 +111,9 @@ void test_builtin_launder(char *p, const volatile int *ip, const float *&fp,
   const float* fd = __builtin_launder(fp);
 }
 
-void test_launder_return_type(const int (&ArrayRef)[101], int (&MArrRef)[42][13],
+void test_launder_return_type(const int (&llvm::ArrayRef)[101], int (&MArrRef)[42][13],
                               void (**&FuncPtrRef)()) {
-  TEST_TYPE(ArrayRef, const int *);
+  TEST_TYPE(llvm::ArrayRef, const int *);
   TEST_TYPE(MArrRef, int(*)[13]);
   TEST_TYPE(FuncPtrRef, void (**)());
 }

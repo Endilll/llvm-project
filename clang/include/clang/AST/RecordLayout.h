@@ -151,7 +151,7 @@ private:
   ASTRecordLayout(const ASTContext &Ctx, CharUnits size, CharUnits alignment,
                   CharUnits preferredAlignment, CharUnits unadjustedAlignment,
                   CharUnits requiredAlignment, CharUnits datasize,
-                  ArrayRef<uint64_t> fieldoffsets);
+                  llvm::ArrayRef<uint64_t> fieldoffsets);
 
   using BaseOffsetsMapTy = CXXRecordLayoutInfo::BaseOffsetsMapTy;
 
@@ -160,7 +160,7 @@ private:
                   CharUnits preferredAlignment, CharUnits unadjustedAlignment,
                   CharUnits requiredAlignment, bool hasOwnVFPtr,
                   bool hasExtendableVFPtr, CharUnits vbptroffset,
-                  CharUnits datasize, ArrayRef<uint64_t> fieldoffsets,
+                  CharUnits datasize, llvm::ArrayRef<uint64_t> fieldoffsets,
                   CharUnits nonvirtualsize, CharUnits nonvirtualalignment,
                   CharUnits preferrednvalignment,
                   CharUnits SizeOfLargestEmptySubobject,

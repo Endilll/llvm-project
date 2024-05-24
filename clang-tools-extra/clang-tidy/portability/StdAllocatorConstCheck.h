@@ -21,7 +21,7 @@ namespace clang::tidy::portability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/portability/std-allocator-const.html
 class StdAllocatorConstCheck : public ClangTidyCheck {
 public:
-  StdAllocatorConstCheck(StringRef Name, ClangTidyContext *Context)
+  StdAllocatorConstCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

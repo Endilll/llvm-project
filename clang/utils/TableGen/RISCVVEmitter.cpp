@@ -49,13 +49,13 @@ struct SemaRecord {
   uint32_t RequiredExtensions;
 
   // Prototype for this intrinsic.
-  SmallVector<PrototypeDescriptor> Prototype;
+  llvm::SmallVector<PrototypeDescriptor> Prototype;
 
   // Suffix of intrinsic name.
-  SmallVector<PrototypeDescriptor> Suffix;
+  llvm::SmallVector<PrototypeDescriptor> Suffix;
 
   // Suffix of overloaded intrinsic name.
-  SmallVector<PrototypeDescriptor> OverloadedSuffix;
+  llvm::SmallVector<PrototypeDescriptor> OverloadedSuffix;
 
   // Number of field, large than 1 if it's segment load/store.
   unsigned NF;
@@ -78,19 +78,19 @@ class SemaSignatureTable {
 private:
   std::vector<PrototypeDescriptor> SignatureTable;
 
-  void insert(ArrayRef<PrototypeDescriptor> Signature);
+  void insert(llvm::ArrayRef<PrototypeDescriptor> Signature);
 
 public:
   static constexpr unsigned INVALID_INDEX = ~0U;
 
   // Create compressed signature table from SemaRecords.
-  void init(ArrayRef<SemaRecord> SemaRecords);
+  void init(llvm::ArrayRef<SemaRecord> SemaRecords);
 
   // Query the Signature, return INVALID_INDEX if not found.
-  unsigned getIndex(ArrayRef<PrototypeDescriptor> Signature);
+  unsigned getIndex(llvm::ArrayRef<PrototypeDescriptor> Signature);
 
   /// Print signature table in RVVHeader Record to \p OS
-  void print(raw_ostream &OS);
+  void print(llvm::raw_ostream &OS);
 };
 
 class RVVEmitter {
@@ -102,18 +102,18 @@ public:
   RVVEmitter(RecordKeeper &R) : Records(R) {}
 
   /// Emit riscv_vector.h
-  void createHeader(raw_ostream &o);
+  void createHeader(llvm::raw_ostream &o);
 
   /// Emit all the __builtin prototypes and code needed by Sema.
-  void createBuiltins(raw_ostream &o);
+  void createBuiltins(llvm::raw_ostream &o);
 
   /// Emit all the information needed to map builtin -> LLVM IR intrinsic.
-  void createCodeGen(raw_ostream &o);
+  void createCodeGen(llvm::raw_ostream &o);
 
   /// Emit all the information needed by SemaRISCVVectorLookup.cpp.
   /// We've large number of intrinsic function for RVV, creating a customized
   /// could speed up the compilation time.
-  void createSema(raw_ostream &o);
+  void createSema(llvm::raw_ostream &o);
 
 private:
   /// Create all intrinsics and add them to \p Out and SemaRecords.
@@ -122,10 +122,10 @@ private:
   /// Create all intrinsic records and SemaSignatureTable from SemaRecords.
   void createRVVIntrinsicRecords(std::vector<RVVIntrinsicRecord> &Out,
                                  SemaSignatureTable &SST,
-                                 ArrayRef<SemaRecord> SemaRecords);
+                                 llvm::ArrayRef<SemaRecord> SemaRecords);
 
   /// Print HeaderCode in RVVHeader Record to \p Out
-  void printHeaderCode(raw_ostream &OS);
+  void printHeaderCode(llvm::raw_ostream &OS);
 };
 
 } // namespace
@@ -167,7 +167,7 @@ static VectorTypeModifier getTupleVTM(unsigned NF) {
       static_cast<uint8_t>(VectorTypeModifier::Tuple2) + (NF - 2));
 }
 
-void emitCodeGenSwitchBody(const RVVIntrinsic *RVVI, raw_ostream &OS) {
+void emitCodeGenSwitchBody(const RVVIntrinsic *RVVI, llvm::raw_ostream &OS) {
   if (!RVVI->getIRName().empty())
     OS << "  ID = Intrinsic::riscv_" + RVVI->getIRName() + ";\n";
   if (RVVI->getNF() >= 2)
@@ -234,13 +234,13 @@ void emitCodeGenSwitchBody(const RVVIntrinsic *RVVI, raw_ostream &OS) {
 //===----------------------------------------------------------------------===//
 // SemaSignatureTable implementation
 //===----------------------------------------------------------------------===//
-void SemaSignatureTable::init(ArrayRef<SemaRecord> SemaRecords) {
+void SemaSignatureTable::init(llvm::ArrayRef<SemaRecord> SemaRecords) {
   // Sort signature entries by length, let longer signature insert first, to
   // make it more possible to reuse table entries, that can reduce ~10% table
   // size.
   struct Compare {
-    bool operator()(const SmallVector<PrototypeDescriptor> &A,
-                    const SmallVector<PrototypeDescriptor> &B) const {
+    bool operator()(const llvm::SmallVector<PrototypeDescriptor> &A,
+                    const llvm::SmallVector<PrototypeDescriptor> &B) const {
       if (A.size() != B.size())
         return A.size() > B.size();
 
@@ -254,9 +254,9 @@ void SemaSignatureTable::init(ArrayRef<SemaRecord> SemaRecords) {
     }
   };
 
-  std::set<SmallVector<PrototypeDescriptor>, Compare> Signatures;
+  std::set<llvm::SmallVector<PrototypeDescriptor>, Compare> Signatures;
   auto InsertToSignatureSet =
-      [&](const SmallVector<PrototypeDescriptor> &Signature) {
+      [&](const llvm::SmallVector<PrototypeDescriptor> &Signature) {
         if (Signature.empty())
           return;
 
@@ -275,7 +275,7 @@ void SemaSignatureTable::init(ArrayRef<SemaRecord> SemaRecords) {
     insert(Sig);
 }
 
-void SemaSignatureTable::insert(ArrayRef<PrototypeDescriptor> Signature) {
+void SemaSignatureTable::insert(llvm::ArrayRef<PrototypeDescriptor> Signature) {
   if (getIndex(Signature) != INVALID_INDEX)
     return;
 
@@ -284,7 +284,7 @@ void SemaSignatureTable::insert(ArrayRef<PrototypeDescriptor> Signature) {
                         Signature.end());
 }
 
-unsigned SemaSignatureTable::getIndex(ArrayRef<PrototypeDescriptor> Signature) {
+unsigned SemaSignatureTable::getIndex(llvm::ArrayRef<PrototypeDescriptor> Signature) {
   // Empty signature could be point into any index since there is length
   // field when we use, so just always point it to 0.
   if (Signature.empty())
@@ -303,7 +303,7 @@ unsigned SemaSignatureTable::getIndex(ArrayRef<PrototypeDescriptor> Signature) {
   return INVALID_INDEX;
 }
 
-void SemaSignatureTable::print(raw_ostream &OS) {
+void SemaSignatureTable::print(llvm::raw_ostream &OS) {
   for (const auto &Sig : SignatureTable)
     OS << "PrototypeDescriptor(" << static_cast<int>(Sig.PT) << ", "
        << static_cast<int>(Sig.VTM) << ", " << static_cast<int>(Sig.TM)
@@ -313,7 +313,7 @@ void SemaSignatureTable::print(raw_ostream &OS) {
 //===----------------------------------------------------------------------===//
 // RVVEmitter implementation
 //===----------------------------------------------------------------------===//
-void RVVEmitter::createHeader(raw_ostream &OS) {
+void RVVEmitter::createHeader(llvm::raw_ostream &OS) {
 
   OS << "/*===---- riscv_vector.h - RISC-V V-extension RVVIntrinsics "
         "-------------------===\n"
@@ -356,7 +356,7 @@ void RVVEmitter::createHeader(raw_ostream &OS) {
       printType(*T);
   }
   // Print RVV int/float types.
-  for (char I : StringRef("csil")) {
+  for (char I : llvm::StringRef("csil")) {
     BasicType BT = ParseBasicType(I);
     for (int Log2LMUL : Log2LMULs) {
       auto T = TypeCache.computeType(BT, Log2LMUL, PrototypeDescriptor::Vector);
@@ -413,7 +413,7 @@ void RVVEmitter::createHeader(raw_ostream &OS) {
   OS << "#endif // __RISCV_VECTOR_H\n";
 }
 
-void RVVEmitter::createBuiltins(raw_ostream &OS) {
+void RVVEmitter::createBuiltins(llvm::raw_ostream &OS) {
   std::vector<std::unique_ptr<RVVIntrinsic>> Defs;
   createRVVIntrinsics(Defs);
 
@@ -444,7 +444,7 @@ void RVVEmitter::createBuiltins(raw_ostream &OS) {
   OS << "#undef RISCVV_BUILTIN\n";
 }
 
-void RVVEmitter::createCodeGen(raw_ostream &OS) {
+void RVVEmitter::createCodeGen(llvm::raw_ostream &OS) {
   std::vector<std::unique_ptr<RVVIntrinsic>> Defs;
   createRVVIntrinsics(Defs);
   // IR name could be empty, use the stable sort preserves the relative order.
@@ -462,7 +462,7 @@ void RVVEmitter::createCodeGen(raw_ostream &OS) {
   // previous iteration.
   RVVIntrinsic *PrevDef = Defs.begin()->get();
   for (auto &Def : Defs) {
-    StringRef CurIRName = Def->getIRName();
+    llvm::StringRef CurIRName = Def->getIRName();
     if (CurIRName != PrevDef->getIRName() ||
         (Def->getManualCodegen() != PrevDef->getManualCodegen()) ||
         (Def->getPolicyAttrs() != PrevDef->getPolicyAttrs())) {
@@ -500,12 +500,12 @@ void RVVEmitter::createRVVIntrinsics(
     std::vector<SemaRecord> *SemaRecords) {
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("RVVBuiltin");
   for (auto *R : RV) {
-    StringRef Name = R->getValueAsString("Name");
-    StringRef SuffixProto = R->getValueAsString("Suffix");
-    StringRef OverloadedName = R->getValueAsString("OverloadedName");
-    StringRef OverloadedSuffixProto = R->getValueAsString("OverloadedSuffix");
-    StringRef Prototypes = R->getValueAsString("Prototype");
-    StringRef TypeRange = R->getValueAsString("TypeRange");
+    llvm::StringRef Name = R->getValueAsString("Name");
+    llvm::StringRef SuffixProto = R->getValueAsString("Suffix");
+    llvm::StringRef OverloadedName = R->getValueAsString("OverloadedName");
+    llvm::StringRef OverloadedSuffixProto = R->getValueAsString("OverloadedSuffix");
+    llvm::StringRef Prototypes = R->getValueAsString("Prototype");
+    llvm::StringRef TypeRange = R->getValueAsString("TypeRange");
     bool HasMasked = R->getValueAsBit("HasMasked");
     bool HasMaskedOffOperand = R->getValueAsBit("HasMaskedOffOperand");
     bool HasVL = R->getValueAsBit("HasVL");
@@ -520,30 +520,30 @@ void RVVEmitter::createRVVIntrinsics(
     bool HasMaskPolicy = R->getValueAsBit("HasMaskPolicy");
     bool SupportOverloading = R->getValueAsBit("SupportOverloading");
     bool HasBuiltinAlias = R->getValueAsBit("HasBuiltinAlias");
-    StringRef ManualCodegen = R->getValueAsString("ManualCodegen");
+    llvm::StringRef ManualCodegen = R->getValueAsString("ManualCodegen");
     std::vector<int64_t> IntrinsicTypes =
         R->getValueAsListOfInts("IntrinsicTypes");
-    std::vector<StringRef> RequiredFeatures =
+    std::vector<llvm::StringRef> RequiredFeatures =
         R->getValueAsListOfStrings("RequiredFeatures");
-    StringRef IRName = R->getValueAsString("IRName");
-    StringRef MaskedIRName = R->getValueAsString("MaskedIRName");
+    llvm::StringRef IRName = R->getValueAsString("IRName");
+    llvm::StringRef MaskedIRName = R->getValueAsString("MaskedIRName");
     unsigned NF = R->getValueAsInt("NF");
     bool IsTuple = R->getValueAsBit("IsTuple");
     bool HasFRMRoundModeOp = R->getValueAsBit("HasFRMRoundModeOp");
 
     const Policy DefaultPolicy;
-    SmallVector<Policy> SupportedUnMaskedPolicies =
+    llvm::SmallVector<Policy> SupportedUnMaskedPolicies =
         RVVIntrinsic::getSupportedUnMaskedPolicies();
-    SmallVector<Policy> SupportedMaskedPolicies =
+    llvm::SmallVector<Policy> SupportedMaskedPolicies =
         RVVIntrinsic::getSupportedMaskedPolicies(HasTailPolicy, HasMaskPolicy);
 
     // Parse prototype and create a list of primitive type with transformers
     // (operand) in Prototype. Prototype[0] is output operand.
-    SmallVector<PrototypeDescriptor> BasicPrototype =
+    llvm::SmallVector<PrototypeDescriptor> BasicPrototype =
         parsePrototypes(Prototypes);
 
-    SmallVector<PrototypeDescriptor> SuffixDesc = parsePrototypes(SuffixProto);
-    SmallVector<PrototypeDescriptor> OverloadedSuffixDesc =
+    llvm::SmallVector<PrototypeDescriptor> SuffixDesc = parsePrototypes(SuffixProto);
+    llvm::SmallVector<PrototypeDescriptor> OverloadedSuffixDesc =
         parsePrototypes(OverloadedSuffixProto);
 
     // Compute Builtin types
@@ -580,7 +580,7 @@ void RVVEmitter::createRVVIntrinsics(
             DefaultPolicy, HasFRMRoundModeOp));
         if (UnMaskedPolicyScheme != PolicyScheme::SchemeNone)
           for (auto P : SupportedUnMaskedPolicies) {
-            SmallVector<PrototypeDescriptor> PolicyPrototype =
+            llvm::SmallVector<PrototypeDescriptor> PolicyPrototype =
                 RVVIntrinsic::computeBuiltinTypes(
                     BasicPrototype, /*IsMasked=*/false,
                     /*HasMaskedOffOperand=*/false, HasVL, NF,
@@ -608,7 +608,7 @@ void RVVEmitter::createRVVIntrinsics(
         if (MaskedPolicyScheme == PolicyScheme::SchemeNone)
           continue;
         for (auto P : SupportedMaskedPolicies) {
-          SmallVector<PrototypeDescriptor> PolicyPrototype =
+          llvm::SmallVector<PrototypeDescriptor> PolicyPrototype =
               RVVIntrinsic::computeBuiltinTypes(
                   BasicPrototype, /*IsMasked=*/true, HasMaskedOffOperand, HasVL,
                   NF, MaskedPolicyScheme, P, IsTuple);
@@ -695,18 +695,18 @@ void RVVEmitter::createRVVIntrinsics(
   }
 }
 
-void RVVEmitter::printHeaderCode(raw_ostream &OS) {
+void RVVEmitter::printHeaderCode(llvm::raw_ostream &OS) {
   std::vector<Record *> RVVHeaders =
       Records.getAllDerivedDefinitions("RVVHeader");
   for (auto *R : RVVHeaders) {
-    StringRef HeaderCodeStr = R->getValueAsString("HeaderCode");
+    llvm::StringRef HeaderCodeStr = R->getValueAsString("HeaderCode");
     OS << HeaderCodeStr.str();
   }
 }
 
 void RVVEmitter::createRVVIntrinsicRecords(std::vector<RVVIntrinsicRecord> &Out,
                                            SemaSignatureTable &SST,
-                                           ArrayRef<SemaRecord> SemaRecords) {
+                                           llvm::ArrayRef<SemaRecord> SemaRecords) {
   SST.init(SemaRecords);
 
   for (const auto &SR : SemaRecords) {
@@ -743,7 +743,7 @@ void RVVEmitter::createRVVIntrinsicRecords(std::vector<RVVIntrinsicRecord> &Out,
   }
 }
 
-void RVVEmitter::createSema(raw_ostream &OS) {
+void RVVEmitter::createSema(llvm::raw_ostream &OS) {
   std::vector<std::unique_ptr<RVVIntrinsic>> Defs;
   std::vector<RVVIntrinsicRecord> RVVIntrinsicRecords;
   SemaSignatureTable SST;
@@ -766,19 +766,19 @@ void RVVEmitter::createSema(raw_ostream &OS) {
 }
 
 namespace clang {
-void EmitRVVHeader(RecordKeeper &Records, raw_ostream &OS) {
+void EmitRVVHeader(RecordKeeper &Records, llvm::raw_ostream &OS) {
   RVVEmitter(Records).createHeader(OS);
 }
 
-void EmitRVVBuiltins(RecordKeeper &Records, raw_ostream &OS) {
+void EmitRVVBuiltins(RecordKeeper &Records, llvm::raw_ostream &OS) {
   RVVEmitter(Records).createBuiltins(OS);
 }
 
-void EmitRVVBuiltinCG(RecordKeeper &Records, raw_ostream &OS) {
+void EmitRVVBuiltinCG(RecordKeeper &Records, llvm::raw_ostream &OS) {
   RVVEmitter(Records).createCodeGen(OS);
 }
 
-void EmitRVVBuiltinSema(RecordKeeper &Records, raw_ostream &OS) {
+void EmitRVVBuiltinSema(RecordKeeper &Records, llvm::raw_ostream &OS) {
   RVVEmitter(Records).createSema(OS);
 }
 

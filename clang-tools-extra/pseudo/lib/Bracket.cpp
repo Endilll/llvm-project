@@ -116,7 +116,7 @@ std::vector<Bracket> findBrackets(const TokenStream &Stream) {
 }
 
 // Write the bracket pairings from Brackets back to Tokens.
-void applyPairings(ArrayRef<Bracket> Brackets, TokenStream &Tokens) {
+void applyPairings(llvm::ArrayRef<Bracket> Brackets, TokenStream &Tokens) {
   for (const auto &B : Brackets)
     Tokens.tokens()[B.Tok].Pair =
         (B.Pair == Bracket::None) ? 0 : (int32_t)Brackets[B.Pair].Tok - B.Tok;
@@ -125,7 +125,7 @@ void applyPairings(ArrayRef<Bracket> Brackets, TokenStream &Tokens) {
 // Find perfect pairings (ignoring whitespace) via greedy algorithm.
 // This means two brackets are paired if they match and the brackets between
 // them nest perfectly, with no skipped or crossed brackets.
-void simplePairBrackets(MutableArrayRef<Bracket> Brackets) {
+void simplePairBrackets(llvm::MutableArrayRef<Bracket> Brackets) {
   std::vector<unsigned> Stack;
   for (unsigned I = 0; I < Brackets.size(); ++I) {
     if (Brackets[I].Dir == Bracket::Open) {

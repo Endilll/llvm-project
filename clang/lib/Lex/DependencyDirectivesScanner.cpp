@@ -60,8 +60,8 @@ struct DirectiveWithTokens {
 /// 'tok::colon'. The \p Lexer will adjust if it sees consecutive 'tok::colon'
 /// while in C++ mode.
 struct Scanner {
-  Scanner(StringRef Input,
-          SmallVectorImpl<dependency_directives_scan::Token> &Tokens,
+  Scanner(llvm::StringRef Input,
+          llvm::SmallVectorImpl<dependency_directives_scan::Token> &Tokens,
           DiagnosticsEngine *Diags, SourceLocation InputSourceLoc)
       : Input(Input), Tokens(Tokens), Diags(Diags),
         InputSourceLoc(InputSourceLoc), LangOpts(getLangOptsForDepScanning()),
@@ -81,7 +81,7 @@ struct Scanner {
   /// Lex the provided source and emit the directive tokens.
   ///
   /// \returns True on error.
-  bool scan(SmallVectorImpl<Directive> &Directives);
+  bool scan(llvm::SmallVectorImpl<Directive> &Directives);
 
 private:
   /// Lexes next token and advances \p First and the \p Lexer.
@@ -92,22 +92,22 @@ private:
                                                         const char *const End);
 
   void skipLine(const char *&First, const char *const End);
-  void skipDirective(StringRef Name, const char *&First, const char *const End);
+  void skipDirective(llvm::StringRef Name, const char *&First, const char *const End);
 
   /// Returns the spelling of a string literal or identifier after performing
   /// any processing needed to handle \c clang::Token::NeedsCleaning.
-  StringRef cleanStringIfNeeded(const dependency_directives_scan::Token &Tok);
+  llvm::StringRef cleanStringIfNeeded(const dependency_directives_scan::Token &Tok);
 
   /// Lexes next token and if it is identifier returns its string, otherwise
   /// it skips the current line and returns \p std::nullopt.
   ///
   /// In any case (whatever the token kind) \p First and the \p Lexer will
   /// advance beyond the token.
-  [[nodiscard]] std::optional<StringRef>
+  [[nodiscard]] std::optional<llvm::StringRef>
   tryLexIdentifierOrSkipLine(const char *&First, const char *const End);
 
   /// Used when it is certain that next token is an identifier.
-  [[nodiscard]] StringRef lexIdentifier(const char *&First,
+  [[nodiscard]] llvm::StringRef lexIdentifier(const char *&First,
                                         const char *const End);
 
   /// Lexes next token and returns true iff it is an identifier that matches \p
@@ -115,7 +115,7 @@ private:
   ///
   /// In any case (whatever the token kind) \p First and the \p Lexer will
   /// advance beyond the token.
-  [[nodiscard]] bool isNextIdentifierOrSkipLine(StringRef Id,
+  [[nodiscard]] bool isNextIdentifierOrSkipLine(llvm::StringRef Id,
                                                 const char *&First,
                                                 const char *const End);
 
@@ -132,7 +132,7 @@ private:
   ///
   /// In any case (whatever the token kind) \p First and the \p Lexer will
   /// advance beyond the token.
-  [[nodiscard]] std::optional<StringRef>
+  [[nodiscard]] std::optional<llvm::StringRef>
   tryLexStringLiteralOrSkipLine(const char *&First, const char *const End);
 
   [[nodiscard]] bool scanImpl(const char *First, const char *const End);
@@ -173,8 +173,8 @@ private:
   bool reportError(const char *CurPtr, unsigned Err);
 
   StringMap<char> SplitIds;
-  StringRef Input;
-  SmallVectorImpl<dependency_directives_scan::Token> &Tokens;
+  llvm::StringRef Input;
+  llvm::SmallVectorImpl<dependency_directives_scan::Token> &Tokens;
   DiagnosticsEngine *Diags;
   SourceLocation InputSourceLoc;
 
@@ -182,11 +182,11 @@ private:
   /// Keeps track of the tokens for the currently lexed directive. Once a
   /// directive is fully lexed and "committed" then the tokens get appended to
   /// \p Tokens and \p CurDirToks is cleared for the next directive.
-  SmallVector<dependency_directives_scan::Token, 32> CurDirToks;
+  llvm::SmallVector<dependency_directives_scan::Token, 32> CurDirToks;
   /// The directives that were lexed along with the number of tokens that each
   /// directive contains. The tokens of all the directives are kept in \p Tokens
   /// vector, in the same order as the directives order in \p DirsWithToks.
-  SmallVector<DirectiveWithTokens, 64> DirsWithToks;
+  llvm::SmallVector<DirectiveWithTokens, 64> DirsWithToks;
   LangOptions LangOpts;
   Lexer TheLexer;
 };
@@ -243,7 +243,7 @@ static void skipRawString(const char *&First, const char *const End) {
     return;
   }
 
-  StringRef Terminator(First, Last - First);
+  llvm::StringRef Terminator(First, Last - First);
   for (;;) {
     // Move First to just past the next ")".
     First = Last;
@@ -448,7 +448,7 @@ void Scanner::skipLine(const char *&First, const char *const End) {
   }
 }
 
-void Scanner::skipDirective(StringRef Name, const char *&First,
+void Scanner::skipDirective(llvm::StringRef Name, const char *&First,
                             const char *const End) {
   if (llvm::StringSwitch<bool>(Name)
           .Case("warning", true)
@@ -549,13 +549,13 @@ void Scanner::lexPPDirectiveBody(const char *&First, const char *const End) {
   }
 }
 
-StringRef
+llvm::StringRef
 Scanner::cleanStringIfNeeded(const dependency_directives_scan::Token &Tok) {
   bool NeedsCleaning = Tok.Flags & clang::Token::NeedsCleaning;
   if (LLVM_LIKELY(!NeedsCleaning))
     return Input.slice(Tok.Offset, Tok.getEnd());
 
-  SmallString<64> Spelling;
+  llvm::SmallString<64> Spelling;
   Spelling.resize(Tok.Length);
 
   // FIXME: C++11 raw string literals need special handling (see getSpellingSlow
@@ -570,11 +570,11 @@ Scanner::cleanStringIfNeeded(const dependency_directives_scan::Token &Tok) {
     BufPtr += Size;
   }
 
-  return SplitIds.try_emplace(StringRef(Spelling.begin(), SpellingLength), 0)
+  return SplitIds.try_emplace(llvm::StringRef(Spelling.begin(), SpellingLength), 0)
       .first->first();
 }
 
-std::optional<StringRef>
+std::optional<llvm::StringRef>
 Scanner::tryLexIdentifierOrSkipLine(const char *&First, const char *const End) {
   const dependency_directives_scan::Token &Tok = lexToken(First, End);
   if (Tok.isNot(tok::raw_identifier)) {
@@ -586,15 +586,15 @@ Scanner::tryLexIdentifierOrSkipLine(const char *&First, const char *const End) {
   return cleanStringIfNeeded(Tok);
 }
 
-StringRef Scanner::lexIdentifier(const char *&First, const char *const End) {
-  std::optional<StringRef> Id = tryLexIdentifierOrSkipLine(First, End);
+llvm::StringRef Scanner::lexIdentifier(const char *&First, const char *const End) {
+  std::optional<llvm::StringRef> Id = tryLexIdentifierOrSkipLine(First, End);
   assert(Id && "expected identifier token");
   return *Id;
 }
 
-bool Scanner::isNextIdentifierOrSkipLine(StringRef Id, const char *&First,
+bool Scanner::isNextIdentifierOrSkipLine(llvm::StringRef Id, const char *&First,
                                          const char *const End) {
-  if (std::optional<StringRef> FoundId =
+  if (std::optional<llvm::StringRef> FoundId =
           tryLexIdentifierOrSkipLine(First, End)) {
     if (*FoundId == Id)
       return true;
@@ -612,7 +612,7 @@ bool Scanner::isNextTokenOrSkipLine(tok::TokenKind K, const char *&First,
   return false;
 }
 
-std::optional<StringRef>
+std::optional<llvm::StringRef>
 Scanner::tryLexStringLiteralOrSkipLine(const char *&First,
                                        const char *const End) {
   const dependency_directives_scan::Token &Tok = lexToken(First, End);
@@ -639,11 +639,11 @@ bool Scanner::lexAt(const char *&First, const char *const End) {
 }
 
 bool Scanner::lexModule(const char *&First, const char *const End) {
-  StringRef Id = lexIdentifier(First, End);
+  llvm::StringRef Id = lexIdentifier(First, End);
   bool Export = false;
   if (Id == "export") {
     Export = true;
-    std::optional<StringRef> NextId = tryLexIdentifierOrSkipLine(First, End);
+    std::optional<llvm::StringRef> NextId = tryLexIdentifierOrSkipLine(First, End);
     if (!NextId)
       return false;
     Id = *NextId;
@@ -686,20 +686,20 @@ bool Scanner::lex_Pragma(const char *&First, const char *const End) {
   if (!isNextTokenOrSkipLine(tok::l_paren, First, End))
     return false;
 
-  std::optional<StringRef> Str = tryLexStringLiteralOrSkipLine(First, End);
+  std::optional<llvm::StringRef> Str = tryLexStringLiteralOrSkipLine(First, End);
 
   if (!Str || !isNextTokenOrSkipLine(tok::r_paren, First, End))
     return false;
 
-  SmallString<64> Buffer(*Str);
+  llvm::SmallString<64> Buffer(*Str);
   prepare_PragmaString(Buffer);
 
   // Use a new scanner instance since the tokens will be inside the allocated
   // string. We should already have captured all the relevant tokens in the
   // current scanner.
-  SmallVector<dependency_directives_scan::Token> DiscardTokens;
+  llvm::SmallVector<dependency_directives_scan::Token> DiscardTokens;
   const char *Begin = Buffer.c_str();
-  Scanner PragmaScanner{StringRef(Begin, Buffer.size()), DiscardTokens, Diags,
+  Scanner PragmaScanner{llvm::StringRef(Begin, Buffer.size()), DiscardTokens, Diags,
                         InputSourceLoc};
 
   PragmaScanner.TheLexer.setParsingPreprocessorDirective(true);
@@ -718,11 +718,11 @@ bool Scanner::lex_Pragma(const char *&First, const char *const End) {
 }
 
 bool Scanner::lexPragma(const char *&First, const char *const End) {
-  std::optional<StringRef> FoundId = tryLexIdentifierOrSkipLine(First, End);
+  std::optional<llvm::StringRef> FoundId = tryLexIdentifierOrSkipLine(First, End);
   if (!FoundId)
     return false;
 
-  StringRef Id = *FoundId;
+  llvm::StringRef Id = *FoundId;
   auto Kind = llvm::StringSwitch<DirectiveKind>(Id)
                   .Case("once", pp_pragma_once)
                   .Case("push_macro", pp_pragma_push_macro)
@@ -863,11 +863,11 @@ bool Scanner::lexPPLine(const char *&First, const char *const End) {
   assert(HashTok.is(tok::hash));
   (void)HashTok;
 
-  std::optional<StringRef> FoundId = tryLexIdentifierOrSkipLine(First, End);
+  std::optional<llvm::StringRef> FoundId = tryLexIdentifierOrSkipLine(First, End);
   if (!FoundId)
     return false;
 
-  StringRef Id = *FoundId;
+  llvm::StringRef Id = *FoundId;
 
   if (Id == "pragma")
     return lexPragma(First, End);
@@ -925,7 +925,7 @@ bool Scanner::scanImpl(const char *First, const char *const End) {
   return false;
 }
 
-bool Scanner::scan(SmallVectorImpl<Directive> &Directives) {
+bool Scanner::scan(llvm::SmallVectorImpl<Directive> &Directives) {
   bool Error = scanImpl(Input.begin(), Input.end());
 
   if (!Error) {
@@ -936,7 +936,7 @@ bool Scanner::scan(SmallVectorImpl<Directive> &Directives) {
     pushDirective(pp_eof);
   }
 
-  ArrayRef<dependency_directives_scan::Token> RemainingTokens = Tokens;
+  llvm::ArrayRef<dependency_directives_scan::Token> RemainingTokens = Tokens;
   for (const DirectiveWithTokens &DirWithToks : DirsWithToks) {
     assert(RemainingTokens.size() >= DirWithToks.NumTokens);
     Directives.emplace_back(DirWithToks.Kind,
@@ -949,15 +949,15 @@ bool Scanner::scan(SmallVectorImpl<Directive> &Directives) {
 }
 
 bool clang::scanSourceForDependencyDirectives(
-    StringRef Input, SmallVectorImpl<dependency_directives_scan::Token> &Tokens,
-    SmallVectorImpl<Directive> &Directives, DiagnosticsEngine *Diags,
+    llvm::StringRef Input, llvm::SmallVectorImpl<dependency_directives_scan::Token> &Tokens,
+    llvm::SmallVectorImpl<Directive> &Directives, DiagnosticsEngine *Diags,
     SourceLocation InputSourceLoc) {
   return Scanner(Input, Tokens, Diags, InputSourceLoc).scan(Directives);
 }
 
 void clang::printDependencyDirectivesAsSource(
-    StringRef Source,
-    ArrayRef<dependency_directives_scan::Directive> Directives,
+    llvm::StringRef Source,
+    llvm::ArrayRef<dependency_directives_scan::Directive> Directives,
     llvm::raw_ostream &OS) {
   // Add a space separator where it is convenient for testing purposes.
   auto needsSpaceSeparator =

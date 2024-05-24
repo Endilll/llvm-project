@@ -122,7 +122,7 @@ static std::string GetEnclosingDeclContextSignature(const Decl *D) {
   return "";
 }
 
-static StringRef GetNthLineOfFile(std::optional<llvm::MemoryBufferRef> Buffer,
+static llvm::StringRef GetNthLineOfFile(std::optional<llvm::MemoryBufferRef> Buffer,
                                   int Line) {
   if (!Buffer)
     return "";
@@ -136,12 +136,12 @@ static StringRef GetNthLineOfFile(std::optional<llvm::MemoryBufferRef> Buffer,
 
 static std::string NormalizeLine(const SourceManager &SM, const FullSourceLoc &L,
                                  const LangOptions &LangOpts) {
-  static StringRef Whitespaces = " \t\n";
+  static llvm::StringRef Whitespaces = " \t\n";
 
-  StringRef Str = GetNthLineOfFile(SM.getBufferOrNone(L.getFileID(), L),
+  llvm::StringRef Str = GetNthLineOfFile(SM.getBufferOrNone(L.getFileID(), L),
                                    L.getExpansionLineNumber());
-  StringRef::size_type col = Str.find_first_not_of(Whitespaces);
-  if (col == StringRef::npos)
+  llvm::StringRef::size_type col = Str.find_first_not_of(Whitespaces);
+  if (col == llvm::StringRef::npos)
     col = 1; // The line only contains whitespace.
   else
     col++;
@@ -170,10 +170,10 @@ static std::string NormalizeLine(const SourceManager &SM, const FullSourceLoc &L
   return LineBuff.str();
 }
 
-static llvm::SmallString<32> GetMD5HashOfContent(StringRef Content) {
+static llvm::SmallString<32> GetMD5HashOfContent(llvm::StringRef Content) {
   llvm::MD5 Hash;
   llvm::MD5::MD5Result MD5Res;
-  SmallString<32> Res;
+  llvm::SmallString<32> Res;
 
   Hash.update(Content);
   Hash.final(MD5Res);
@@ -183,23 +183,23 @@ static llvm::SmallString<32> GetMD5HashOfContent(StringRef Content) {
 }
 
 std::string clang::getIssueString(const FullSourceLoc &IssueLoc,
-                                  StringRef CheckerName,
-                                  StringRef WarningMessage,
+                                  llvm::StringRef CheckerName,
+                                  llvm::StringRef WarningMessage,
                                   const Decl *IssueDecl,
                                   const LangOptions &LangOpts) {
-  static StringRef Delimiter = "$";
+  static llvm::StringRef Delimiter = "$";
 
   return (llvm::Twine(CheckerName) + Delimiter +
           GetEnclosingDeclContextSignature(IssueDecl) + Delimiter +
-          Twine(IssueLoc.getExpansionColumnNumber()) + Delimiter +
+          llvm::Twine(IssueLoc.getExpansionColumnNumber()) + Delimiter +
           NormalizeLine(IssueLoc.getManager(), IssueLoc, LangOpts) +
           Delimiter + WarningMessage)
       .str();
 }
 
-SmallString<32> clang::getIssueHash(const FullSourceLoc &IssueLoc,
-                                    StringRef CheckerName,
-                                    StringRef WarningMessage,
+llvm::SmallString<32> clang::getIssueHash(const FullSourceLoc &IssueLoc,
+                                    llvm::StringRef CheckerName,
+                                    llvm::StringRef WarningMessage,
                                     const Decl *IssueDecl,
                                     const LangOptions &LangOpts) {
 

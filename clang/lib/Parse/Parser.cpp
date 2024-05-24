@@ -73,7 +73,7 @@ Parser::Parser(Preprocessor &pp, Sema &actions, bool skipFunctionBodies)
   PP.setCodeCompletionHandler(*this);
 
   Actions.ParseTypeFromStringCallback =
-      [this](StringRef TypeStr, StringRef Context, SourceLocation IncludeLoc) {
+      [this](llvm::StringRef TypeStr, llvm::StringRef Context, SourceLocation IncludeLoc) {
         return this->ParseTypeFromString(TypeStr, Context, IncludeLoc);
       };
 }
@@ -116,7 +116,7 @@ static bool IsCommonTypo(tok::TokenKind ExpectedTok, const Token &Tok) {
 }
 
 bool Parser::ExpectAndConsume(tok::TokenKind ExpectedTok, unsigned DiagID,
-                              StringRef Msg) {
+                              llvm::StringRef Msg) {
   if (Tok.is(ExpectedTok) || Tok.is(tok::code_completion)) {
     ConsumeAnyToken();
     return false;
@@ -161,7 +161,7 @@ bool Parser::ExpectAndConsume(tok::TokenKind ExpectedTok, unsigned DiagID,
   return true;
 }
 
-bool Parser::ExpectAndConsumeSemi(unsigned DiagID, StringRef TokenUsed) {
+bool Parser::ExpectAndConsumeSemi(unsigned DiagID, llvm::StringRef TokenUsed) {
   if (TryConsumeToken(tok::semi))
     return false;
 
@@ -283,7 +283,7 @@ static bool HasFlagsSet(Parser::SkipUntilFlags L, Parser::SkipUntilFlags R) {
 ///
 /// If SkipUntil finds the specified token, it returns true, otherwise it
 /// returns false.
-bool Parser::SkipUntil(ArrayRef<tok::TokenKind> Toks, SkipUntilFlags Flags) {
+bool Parser::SkipUntil(llvm::ArrayRef<tok::TokenKind> Toks, SkipUntilFlags Flags) {
   // We always want this function to skip at least one token if the first token
   // isn't T and if not at EOF.
   bool isFirstTokenSkipped = true;
@@ -2500,12 +2500,12 @@ Parser::ParseModuleDecl(Sema::ModuleImportState &ImportState) {
     return Actions.ActOnPrivateModuleFragmentDecl(ModuleLoc, PrivateLoc);
   }
 
-  SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> Path;
+  llvm::SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> Path;
   if (ParseModuleName(ModuleLoc, Path, /*IsImport*/ false))
     return nullptr;
 
   // Parse the optional module-partition.
-  SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> Partition;
+  llvm::SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> Partition;
   if (Tok.is(tok::colon)) {
     SourceLocation ColonLoc = ConsumeToken();
     if (!getLangOpts().CPlusPlusModules)
@@ -2559,7 +2559,7 @@ Decl *Parser::ParseModuleImport(SourceLocation AtLoc,
   SourceLocation ImportLoc = ConsumeToken();
 
   // For C++20 modules, we can have "name" or ":Partition name" as valid input.
-  SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> Path;
+  llvm::SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> Path;
   bool IsPartition = false;
   Module *HeaderUnit = nullptr;
   if (Tok.is(tok::header_name)) {
@@ -2680,7 +2680,7 @@ Decl *Parser::ParseModuleImport(SourceLocation AtLoc,
 ///           module-name-qualifier[opt] identifier '.'
 bool Parser::ParseModuleName(
     SourceLocation UseLoc,
-    SmallVectorImpl<std::pair<IdentifierInfo *, SourceLocation>> &Path,
+    llvm::SmallVectorImpl<std::pair<IdentifierInfo *, SourceLocation>> &Path,
     bool IsImport) {
   // Parse the module path.
   while (true) {

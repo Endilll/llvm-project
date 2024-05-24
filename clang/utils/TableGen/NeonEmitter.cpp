@@ -116,7 +116,7 @@ class NeonEmitter;
 /// A TypeSpec can be used to create a type.
 class TypeSpec : public std::string {
 public:
-  static std::vector<TypeSpec> fromTypeSpecs(StringRef Str) {
+  static std::vector<TypeSpec> fromTypeSpecs(llvm::StringRef Str) {
     std::vector<TypeSpec> Ret;
     TypeSpec Acc;
     for (char I : Str.str()) {
@@ -163,7 +163,7 @@ public:
         Pointer(false), ScalarForMangling(false), NoManglingQ(false),
         Bitwidth(0), ElementBitwidth(0), NumVectors(0) {}
 
-  Type(TypeSpec TS, StringRef CharMods)
+  Type(TypeSpec TS, llvm::StringRef CharMods)
       : TS(std::move(TS)), Kind(Void), Immediate(false),
         Constant(false), Pointer(false), ScalarForMangling(false),
         NoManglingQ(false), Bitwidth(0), ElementBitwidth(0), NumVectors(0) {
@@ -269,7 +269,7 @@ public:
 
   /// Parse a type from a stdint.h or arm_neon.h typedef name,
   /// for example uint32x2_t or int64_t.
-  static Type fromTypedefName(StringRef Name);
+  static Type fromTypedefName(llvm::StringRef Name);
 
 private:
   /// Creates the type based on the typespec string in TS.
@@ -278,7 +278,7 @@ private:
   /// only take effect if the type size was changed by "Q" or "H".
   void applyTypespec(bool &Quad);
   /// Applies prototype modifiers to the type.
-  void applyModifiers(StringRef Mods);
+  void applyModifiers(llvm::StringRef Mods);
 };
 
 //===----------------------------------------------------------------------===//
@@ -367,9 +367,9 @@ class Intrinsic {
   }
 
 public:
-  Intrinsic(Record *R, StringRef Name, StringRef Proto, TypeSpec OutTS,
+  Intrinsic(Record *R, llvm::StringRef Name, llvm::StringRef Proto, TypeSpec OutTS,
             TypeSpec InTS, ClassKind CK, ListInit *Body, NeonEmitter &Emitter,
-            StringRef ArchGuard, StringRef TargetGuard, bool IsUnavailable, bool BigEndianSafe)
+            llvm::StringRef ArchGuard, llvm::StringRef TargetGuard, bool IsUnavailable, bool BigEndianSafe)
       : R(R), Name(Name.str()), OutTS(OutTS), InTS(InTS), CK(CK), Body(Body),
         ArchGuard(ArchGuard.str()), TargetGuard(TargetGuard.str()), IsUnavailable(IsUnavailable),
         BigEndianSafe(BigEndianSafe), PolymorphicKeyType(0), NeededEarly(false),
@@ -380,7 +380,7 @@ public:
     // Types[0] is the return value.
     unsigned Pos = 0;
     Types.emplace_back(OutTS, getNextModifiers(Proto, Pos));
-    StringRef Mods = getNextModifiers(Proto, Pos);
+    llvm::StringRef Mods = getNextModifiers(Proto, Pos);
     while (!Mods.empty()) {
       Types.emplace_back(InTS, Mods);
       if (Mods.contains('!'))
@@ -491,7 +491,7 @@ public:
   void indexBody();
 
 private:
-  StringRef getNextModifiers(StringRef Proto, unsigned &Pos) const;
+  llvm::StringRef getNextModifiers(llvm::StringRef Proto, unsigned &Pos) const;
 
   std::string mangleName(std::string Name, ClassKind CK) const;
 
@@ -501,9 +501,9 @@ private:
   void emitBodyAsBuiltinCall();
 
   void generateImpl(bool ReverseArguments,
-                    StringRef NamePrefix, StringRef CallPrefix);
+                    llvm::StringRef NamePrefix, llvm::StringRef CallPrefix);
   void emitReturn();
-  void emitBody(StringRef CallPrefix);
+  void emitBody(llvm::StringRef CallPrefix);
   void emitShadowedArgs();
   void emitArgumentReversal();
   void emitReturnVarDecl();
@@ -512,14 +512,14 @@ private:
   void emitNewLine();
   void emitClosingBrace();
   void emitOpeningBrace();
-  void emitPrototype(StringRef NamePrefix);
+  void emitPrototype(llvm::StringRef NamePrefix);
 
   class DagEmitter {
     Intrinsic &Intr;
-    StringRef CallPrefix;
+    llvm::StringRef CallPrefix;
 
   public:
-    DagEmitter(Intrinsic &Intr, StringRef CallPrefix) :
+    DagEmitter(Intrinsic &Intr, llvm::StringRef CallPrefix) :
       Intr(Intr), CallPrefix(CallPrefix) {
     }
     std::pair<Type, std::string> emitDagArg(Init *Arg, std::string ArgName);
@@ -548,19 +548,19 @@ class NeonEmitter {
   std::map<std::string, std::deque<Intrinsic>> IntrinsicMap;
   unsigned UniqueNumber;
 
-  void createIntrinsic(Record *R, SmallVectorImpl<Intrinsic *> &Out);
-  void genBuiltinsDef(raw_ostream &OS, SmallVectorImpl<Intrinsic *> &Defs);
-  void genStreamingSVECompatibleList(raw_ostream &OS,
-                                     SmallVectorImpl<Intrinsic *> &Defs);
-  void genOverloadTypeCheckCode(raw_ostream &OS,
-                                SmallVectorImpl<Intrinsic *> &Defs);
-  void genIntrinsicRangeCheckCode(raw_ostream &OS,
-                                  SmallVectorImpl<Intrinsic *> &Defs);
+  void createIntrinsic(Record *R, llvm::SmallVectorImpl<Intrinsic *> &Out);
+  void genBuiltinsDef(llvm::raw_ostream &OS, llvm::SmallVectorImpl<Intrinsic *> &Defs);
+  void genStreamingSVECompatibleList(llvm::raw_ostream &OS,
+                                     llvm::SmallVectorImpl<Intrinsic *> &Defs);
+  void genOverloadTypeCheckCode(llvm::raw_ostream &OS,
+                                llvm::SmallVectorImpl<Intrinsic *> &Defs);
+  void genIntrinsicRangeCheckCode(llvm::raw_ostream &OS,
+                                  llvm::SmallVectorImpl<Intrinsic *> &Defs);
 
 public:
   /// Called by Intrinsic - this attempts to get an intrinsic that takes
   /// the given types as arguments.
-  Intrinsic &getIntrinsic(StringRef Name, ArrayRef<Type> Types,
+  Intrinsic &getIntrinsic(llvm::StringRef Name, llvm::ArrayRef<Type> Types,
                           std::optional<std::string> MangledName);
 
   /// Called by Intrinsic - returns a globally-unique number.
@@ -587,19 +587,19 @@ public:
   }
 
   // Emit arm_neon.h.inc
-  void run(raw_ostream &o);
+  void run(llvm::raw_ostream &o);
 
   // Emit arm_fp16.h.inc
-  void runFP16(raw_ostream &o);
+  void runFP16(llvm::raw_ostream &o);
 
   // Emit arm_bf16.h.inc
-  void runBF16(raw_ostream &o);
+  void runBF16(llvm::raw_ostream &o);
 
-  void runVectorTypes(raw_ostream &o);
+  void runVectorTypes(llvm::raw_ostream &o);
 
   // Emit all the __builtin prototypes used in arm_neon.h, arm_fp16.h and
   // arm_bf16.h
-  void runHeader(raw_ostream &o);
+  void runHeader(llvm::raw_ostream &o);
 };
 
 } // end anonymous namespace
@@ -731,7 +731,7 @@ unsigned Type::getNeonEnum() const {
   return Base;
 }
 
-Type Type::fromTypedefName(StringRef Name) {
+Type Type::fromTypedefName(llvm::StringRef Name) {
   Type T;
   T.Kind = SInt;
 
@@ -853,7 +853,7 @@ void Type::applyTypespec(bool &Quad) {
   Bitwidth = Quad ? 128 : 64;
 }
 
-void Type::applyModifiers(StringRef Mods) {
+void Type::applyModifiers(llvm::StringRef Mods) {
   bool AppliedQuad = false;
   applyTypespec(AppliedQuad);
 
@@ -935,15 +935,15 @@ void Type::applyModifiers(StringRef Mods) {
 // Intrinsic implementation
 //===----------------------------------------------------------------------===//
 
-StringRef Intrinsic::getNextModifiers(StringRef Proto, unsigned &Pos) const {
+llvm::StringRef Intrinsic::getNextModifiers(llvm::StringRef Proto, unsigned &Pos) const {
   if (Proto.size() == Pos)
-    return StringRef();
+    return llvm::StringRef();
   else if (Proto[Pos] != '(')
     return Proto.substr(Pos++, 1);
 
   size_t Start = Pos + 1;
   size_t End = Proto.find(')', Start);
-  assert_with_loc(End != StringRef::npos, "unmatched modifier group paren");
+  assert_with_loc(End != llvm::StringRef::npos, "unmatched modifier group paren");
   Pos = End + 1;
   return Proto.slice(Start, End);
 }
@@ -1137,7 +1137,7 @@ void Intrinsic::initVariables() {
   RetVar = Variable(Types[0], "ret" + VariablePostfix);
 }
 
-void Intrinsic::emitPrototype(StringRef NamePrefix) {
+void Intrinsic::emitPrototype(llvm::StringRef NamePrefix) {
   if (UseMacro) {
     OS << "#define ";
   } else {
@@ -1296,7 +1296,7 @@ void Intrinsic::emitBodyAsBuiltinCall() {
   // sret-like argument.
   bool SRet = getReturnType().getNumVectors() >= 2;
 
-  StringRef N = Name;
+  llvm::StringRef N = Name;
   ClassKind LocalCK = CK;
   if (!protoHasScalar())
     LocalCK = ClassB;
@@ -1365,7 +1365,7 @@ void Intrinsic::emitBodyAsBuiltinCall() {
   emitNewLine();
 }
 
-void Intrinsic::emitBody(StringRef CallPrefix) {
+void Intrinsic::emitBody(llvm::StringRef CallPrefix) {
   std::vector<std::string> Lines;
 
   if (!Body || Body->getValues().empty()) {
@@ -1570,7 +1570,7 @@ std::pair<Type, std::string> Intrinsic::DagEmitter::emitDagShuffle(DagInit *DI){
   class LowHalf : public SetTheory::Operator {
   public:
     void apply(SetTheory &ST, DagInit *Expr, SetTheory::RecSet &Elts,
-               ArrayRef<SMLoc> Loc) override {
+               llvm::ArrayRef<SMLoc> Loc) override {
       SetTheory::RecSet Elts2;
       ST.evaluate(Expr->arg_begin(), Expr->arg_end(), Elts2, Loc);
       Elts.insert(Elts2.begin(), Elts2.begin() + (Elts2.size() / 2));
@@ -1580,7 +1580,7 @@ std::pair<Type, std::string> Intrinsic::DagEmitter::emitDagShuffle(DagInit *DI){
   class HighHalf : public SetTheory::Operator {
   public:
     void apply(SetTheory &ST, DagInit *Expr, SetTheory::RecSet &Elts,
-               ArrayRef<SMLoc> Loc) override {
+               llvm::ArrayRef<SMLoc> Loc) override {
       SetTheory::RecSet Elts2;
       ST.evaluate(Expr->arg_begin(), Expr->arg_end(), Elts2, Loc);
       Elts.insert(Elts2.begin() + (Elts2.size() / 2), Elts2.end());
@@ -1594,7 +1594,7 @@ std::pair<Type, std::string> Intrinsic::DagEmitter::emitDagShuffle(DagInit *DI){
     Rev(unsigned ElementSize) : ElementSize(ElementSize) {}
 
     void apply(SetTheory &ST, DagInit *Expr, SetTheory::RecSet &Elts,
-               ArrayRef<SMLoc> Loc) override {
+               llvm::ArrayRef<SMLoc> Loc) override {
       SetTheory::RecSet Elts2;
       ST.evaluate(Expr->arg_begin() + 1, Expr->arg_end(), Elts2, Loc);
 
@@ -1651,7 +1651,7 @@ std::pair<Type, std::string> Intrinsic::DagEmitter::emitDagShuffle(DagInit *DI){
 
   std::string S = "__builtin_shufflevector(" + Arg1.second + ", " + Arg2.second;
   for (auto &E : Elts) {
-    StringRef Name = E->getName();
+    llvm::StringRef Name = E->getName();
     assert_with_loc(Name.starts_with("sv"),
                     "Incorrect element kind in shuffle mask!");
     S += ", " + Name.drop_front(2).str();
@@ -1835,7 +1835,7 @@ std::string Intrinsic::generate() {
 }
 
 void Intrinsic::generateImpl(bool ReverseArguments,
-                             StringRef NamePrefix, StringRef CallPrefix) {
+                             llvm::StringRef NamePrefix, llvm::StringRef CallPrefix) {
   CurrentRecord = R;
 
   // If we call a macro, our local variables may be corrupted due to
@@ -1891,7 +1891,7 @@ void Intrinsic::indexBody() {
 // NeonEmitter implementation
 //===----------------------------------------------------------------------===//
 
-Intrinsic &NeonEmitter::getIntrinsic(StringRef Name, ArrayRef<Type> Types,
+Intrinsic &NeonEmitter::getIntrinsic(llvm::StringRef Name, llvm::ArrayRef<Type> Types,
                                      std::optional<std::string> MangledName) {
   // First, look up the name in the intrinsic map.
   assert_with_loc(IntrinsicMap.find(Name.str()) != IntrinsicMap.end(),
@@ -1944,7 +1944,7 @@ Intrinsic &NeonEmitter::getIntrinsic(StringRef Name, ArrayRef<Type> Types,
 }
 
 void NeonEmitter::createIntrinsic(Record *R,
-                                  SmallVectorImpl<Intrinsic *> &Out) {
+                                  llvm::SmallVectorImpl<Intrinsic *> &Out) {
   std::string Name = std::string(R->getValueAsString("Name"));
   std::string Proto = std::string(R->getValueAsString("Prototype"));
   std::string Types = std::string(R->getValueAsString("Types"));
@@ -2002,8 +2002,8 @@ void NeonEmitter::createIntrinsic(Record *R,
 
 /// genBuiltinsDef: Generate the BuiltinsARM.def and  BuiltinsAArch64.def
 /// declaration of builtins, checking for unique builtin declarations.
-void NeonEmitter::genBuiltinsDef(raw_ostream &OS,
-                                 SmallVectorImpl<Intrinsic *> &Defs) {
+void NeonEmitter::genBuiltinsDef(llvm::raw_ostream &OS,
+                                 llvm::SmallVectorImpl<Intrinsic *> &Defs) {
   OS << "#ifdef GET_NEON_BUILTINS\n";
 
   // We only want to emit a builtin once, and we want to emit them in
@@ -2037,7 +2037,7 @@ void NeonEmitter::genBuiltinsDef(raw_ostream &OS,
 }
 
 void NeonEmitter::genStreamingSVECompatibleList(
-    raw_ostream &OS, SmallVectorImpl<Intrinsic *> &Defs) {
+    llvm::raw_ostream &OS, llvm::SmallVectorImpl<Intrinsic *> &Defs) {
   OS << "#ifdef GET_NEON_STREAMING_COMPAT_FLAG\n";
 
   std::set<std::string> Emitted;
@@ -2062,8 +2062,8 @@ void NeonEmitter::genStreamingSVECompatibleList(
 
 /// Generate the ARM and AArch64 overloaded type checking code for
 /// SemaChecking.cpp, checking for unique builtin declarations.
-void NeonEmitter::genOverloadTypeCheckCode(raw_ostream &OS,
-                                           SmallVectorImpl<Intrinsic *> &Defs) {
+void NeonEmitter::genOverloadTypeCheckCode(llvm::raw_ostream &OS,
+                                           llvm::SmallVectorImpl<Intrinsic *> &Defs) {
   OS << "#ifdef GET_NEON_OVERLOAD_CHECK\n";
 
   // We record each overload check line before emitting because subsequent Inst
@@ -2132,7 +2132,7 @@ void NeonEmitter::genOverloadTypeCheckCode(raw_ostream &OS,
     OverloadInfo &OI = I.second;
 
     OS << "case NEON::BI__builtin_neon_" << I.first << ": ";
-    OS << "mask = 0x" << Twine::utohexstr(OI.Mask) << "ULL";
+    OS << "mask = 0x" << llvm::Twine::utohexstr(OI.Mask) << "ULL";
     if (OI.PtrArgNum >= 0)
       OS << "; PtrArgNum = " << OI.PtrArgNum;
     if (OI.HasConstPtr)
@@ -2142,8 +2142,8 @@ void NeonEmitter::genOverloadTypeCheckCode(raw_ostream &OS,
   OS << "#endif\n\n";
 }
 
-void NeonEmitter::genIntrinsicRangeCheckCode(raw_ostream &OS,
-                                        SmallVectorImpl<Intrinsic *> &Defs) {
+void NeonEmitter::genIntrinsicRangeCheckCode(llvm::raw_ostream &OS,
+                                        llvm::SmallVectorImpl<Intrinsic *> &Defs) {
   OS << "#ifdef GET_NEON_IMMEDIATE_CHECK\n";
 
   std::set<std::string> Emitted;
@@ -2230,10 +2230,10 @@ void NeonEmitter::genIntrinsicRangeCheckCode(raw_ostream &OS,
 /// 1. the NEON section of BuiltinsARM.def and BuiltinsAArch64.def.
 /// 2. the SemaChecking code for the type overload checking.
 /// 3. the SemaChecking code for validation of intrinsic immediate arguments.
-void NeonEmitter::runHeader(raw_ostream &OS) {
+void NeonEmitter::runHeader(llvm::raw_ostream &OS) {
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
 
-  SmallVector<Intrinsic *, 128> Defs;
+  llvm::SmallVector<Intrinsic *, 128> Defs;
   for (auto *R : RV)
     createIntrinsic(R, Defs);
 
@@ -2249,7 +2249,7 @@ void NeonEmitter::runHeader(raw_ostream &OS) {
   genIntrinsicRangeCheckCode(OS, Defs);
 }
 
-static void emitNeonTypeDefs(const std::string& types, raw_ostream &OS) {
+static void emitNeonTypeDefs(const std::string& types, llvm::raw_ostream &OS) {
   std::string TypedefTypes(types);
   std::vector<TypeSpec> TDTypeVec = TypeSpec::fromTypeSpecs(TypedefTypes);
 
@@ -2319,7 +2319,7 @@ static void emitNeonTypeDefs(const std::string& types, raw_ostream &OS) {
 
 /// run - Read the records in arm_neon.td and output arm_neon.h.  arm_neon.h
 /// is comprised of type definitions and function declarations.
-void NeonEmitter::run(raw_ostream &OS) {
+void NeonEmitter::run(llvm::raw_ostream &OS) {
   OS << "/*===---- arm_neon.h - ARM Neon intrinsics "
         "------------------------------"
         "---===\n"
@@ -2396,7 +2396,7 @@ void NeonEmitter::run(raw_ostream &OS) {
   OS << "#define __ai static __inline__ __attribute__((__always_inline__, "
         "__nodebug__))\n\n";
 
-  SmallVector<Intrinsic *, 128> Defs;
+  llvm::SmallVector<Intrinsic *, 128> Defs;
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
   for (auto *R : RV)
     createIntrinsic(R, Defs);
@@ -2413,7 +2413,7 @@ void NeonEmitter::run(raw_ostream &OS) {
   while (!Defs.empty() && MadeProgress) {
     MadeProgress = false;
 
-    for (SmallVector<Intrinsic *, 128>::iterator I = Defs.begin();
+    for (llvm::SmallVector<Intrinsic *, 128>::iterator I = Defs.begin();
          I != Defs.end(); /*No step*/) {
       bool DependenciesSatisfied = true;
       for (auto *II : (*I)->getDependencies()) {
@@ -2455,7 +2455,7 @@ void NeonEmitter::run(raw_ostream &OS) {
 
 /// run - Read the records in arm_fp16.td and output arm_fp16.h.  arm_fp16.h
 /// is comprised of type definitions and function declarations.
-void NeonEmitter::runFP16(raw_ostream &OS) {
+void NeonEmitter::runFP16(llvm::raw_ostream &OS) {
   OS << "/*===---- arm_fp16.h - ARM FP16 intrinsics "
         "------------------------------"
         "---===\n"
@@ -2505,7 +2505,7 @@ void NeonEmitter::runFP16(raw_ostream &OS) {
   OS << "#define __ai static __inline__ __attribute__((__always_inline__, "
         "__nodebug__))\n\n";
 
-  SmallVector<Intrinsic *, 128> Defs;
+  llvm::SmallVector<Intrinsic *, 128> Defs;
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
   for (auto *R : RV)
     createIntrinsic(R, Defs);
@@ -2522,7 +2522,7 @@ void NeonEmitter::runFP16(raw_ostream &OS) {
   while (!Defs.empty() && MadeProgress) {
     MadeProgress = false;
 
-    for (SmallVector<Intrinsic *, 128>::iterator I = Defs.begin();
+    for (llvm::SmallVector<Intrinsic *, 128>::iterator I = Defs.begin();
          I != Defs.end(); /*No step*/) {
       bool DependenciesSatisfied = true;
       for (auto *II : (*I)->getDependencies()) {
@@ -2560,7 +2560,7 @@ void NeonEmitter::runFP16(raw_ostream &OS) {
   OS << "#endif /* __ARM_FP16_H */\n";
 }
 
-void NeonEmitter::runVectorTypes(raw_ostream &OS) {
+void NeonEmitter::runVectorTypes(llvm::raw_ostream &OS) {
   OS << "/*===---- arm_vector_types - ARM vector type "
         "------===\n"
         " *\n"
@@ -2592,7 +2592,7 @@ void NeonEmitter::runVectorTypes(raw_ostream &OS) {
   OS << "#endif // __ARM_NEON_TYPES_H\n";
 }
 
-void NeonEmitter::runBF16(raw_ostream &OS) {
+void NeonEmitter::runBF16(llvm::raw_ostream &OS) {
   OS << "/*===---- arm_bf16.h - ARM BF16 intrinsics "
         "-----------------------------------===\n"
         " *\n"
@@ -2614,7 +2614,7 @@ void NeonEmitter::runBF16(raw_ostream &OS) {
   OS << "#define __ai static __inline__ __attribute__((__always_inline__, "
         "__nodebug__))\n\n";
 
-  SmallVector<Intrinsic *, 128> Defs;
+  llvm::SmallVector<Intrinsic *, 128> Defs;
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
   for (auto *R : RV)
     createIntrinsic(R, Defs);
@@ -2631,7 +2631,7 @@ void NeonEmitter::runBF16(raw_ostream &OS) {
   while (!Defs.empty() && MadeProgress) {
     MadeProgress = false;
 
-    for (SmallVector<Intrinsic *, 128>::iterator I = Defs.begin();
+    for (llvm::SmallVector<Intrinsic *, 128>::iterator I = Defs.begin();
          I != Defs.end(); /*No step*/) {
       bool DependenciesSatisfied = true;
       for (auto *II : (*I)->getDependencies()) {
@@ -2670,26 +2670,26 @@ void NeonEmitter::runBF16(raw_ostream &OS) {
   OS << "#endif\n";
 }
 
-void clang::EmitNeon(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitNeon(RecordKeeper &Records, llvm::raw_ostream &OS) {
   NeonEmitter(Records).run(OS);
 }
 
-void clang::EmitFP16(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitFP16(RecordKeeper &Records, llvm::raw_ostream &OS) {
   NeonEmitter(Records).runFP16(OS);
 }
 
-void clang::EmitBF16(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitBF16(RecordKeeper &Records, llvm::raw_ostream &OS) {
   NeonEmitter(Records).runBF16(OS);
 }
 
-void clang::EmitNeonSema(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitNeonSema(RecordKeeper &Records, llvm::raw_ostream &OS) {
   NeonEmitter(Records).runHeader(OS);
 }
 
-void clang::EmitVectorTypes(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitVectorTypes(RecordKeeper &Records, llvm::raw_ostream &OS) {
   NeonEmitter(Records).runVectorTypes(OS);
 }
 
-void clang::EmitNeonTest(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitNeonTest(RecordKeeper &Records, llvm::raw_ostream &OS) {
   llvm_unreachable("Neon test generation no longer implemented!");
 }

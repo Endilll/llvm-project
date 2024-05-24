@@ -10,19 +10,21 @@
 #define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_OPTIONUTILS_H
 
 #include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/ArrayRef.h"
 #include <string>
 #include <vector>
 
 namespace clang::tidy::utils::options {
 
 /// Parse a semicolon separated list of strings.
-std::vector<StringRef> parseStringList(StringRef Option);
+std::vector<llvm::StringRef> parseStringList(llvm::StringRef Option);
 
-std::vector<StringRef> parseListPair(StringRef L, StringRef R);
+std::vector<llvm::StringRef> parseListPair(llvm::StringRef L, llvm::StringRef R);
 
 /// Serialize a sequence of names that can be parsed by
 /// ``parseStringList``.
-std::string serializeStringList(ArrayRef<StringRef> Strings);
+std::string serializeStringList(llvm::ArrayRef<llvm::StringRef> Strings);
 
 } // namespace clang::tidy::utils::options
 

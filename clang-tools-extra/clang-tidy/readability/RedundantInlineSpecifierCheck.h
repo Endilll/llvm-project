@@ -20,7 +20,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/redundant-inline-specifier.html
 class RedundantInlineSpecifierCheck : public ClangTidyCheck {
 public:
-  RedundantInlineSpecifierCheck(StringRef Name, ClangTidyContext *Context)
+  RedundantInlineSpecifierCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         StrictMode(Options.getLocalOrGlobal("StrictMode", false)) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
@@ -33,7 +33,7 @@ private:
   template <typename T>
   void handleMatchedDecl(const T *MatchedDecl, const SourceManager &Sources,
                          const ast_matchers::MatchFinder::MatchResult &Result,
-                         StringRef Message);
+                         llvm::StringRef Message);
   const bool StrictMode;
 };
 

@@ -5196,7 +5196,7 @@ FormatStyle getNoStyle();
 /// compared case-insensitively.
 ///
 /// Returns ``true`` if the Style has been set.
-bool getPredefinedStyle(StringRef Name, FormatStyle::LanguageKind Language,
+bool getPredefinedStyle(llvm::StringRef Name, FormatStyle::LanguageKind Language,
                         FormatStyle *Style);
 
 /// Parse configuration from YAML-formatted text.
@@ -5220,7 +5220,7 @@ parseConfiguration(llvm::MemoryBufferRef Config, FormatStyle *Style,
                    void *DiagHandlerCtx = nullptr);
 
 /// Like above but accepts an unnamed buffer.
-inline std::error_code parseConfiguration(StringRef Config, FormatStyle *Style,
+inline std::error_code parseConfiguration(llvm::StringRef Config, FormatStyle *Style,
                                           bool AllowUnknownOptions = false) {
   return parseConfiguration(llvm::MemoryBufferRef(Config, "YAML"), Style,
                             AllowUnknownOptions);
@@ -5231,16 +5231,16 @@ std::string configurationAsText(const FormatStyle &Style);
 
 /// Returns the replacements necessary to sort all ``#include`` blocks
 /// that are affected by ``Ranges``.
-tooling::Replacements sortIncludes(const FormatStyle &Style, StringRef Code,
-                                   ArrayRef<tooling::Range> Ranges,
-                                   StringRef FileName,
+tooling::Replacements sortIncludes(const FormatStyle &Style, llvm::StringRef Code,
+                                   llvm::ArrayRef<tooling::Range> Ranges,
+                                   llvm::StringRef FileName,
                                    unsigned *Cursor = nullptr);
 
 /// Returns the replacements corresponding to applying and formatting
 /// \p Replaces on success; otheriwse, return an llvm::Error carrying
 /// llvm::StringError.
-Expected<tooling::Replacements>
-formatReplacements(StringRef Code, const tooling::Replacements &Replaces,
+llvm::Expected<tooling::Replacements>
+formatReplacements(llvm::StringRef Code, const tooling::Replacements &Replaces,
                    const FormatStyle &Style);
 
 /// Returns the replacements corresponding to applying \p Replaces and
@@ -5256,8 +5256,8 @@ formatReplacements(StringRef Code, const tooling::Replacements &Replaces,
 /// The include manipulation is done via ``tooling::HeaderInclude``, see its
 /// documentation for more details on how include insertion points are found and
 /// what edits are produced.
-Expected<tooling::Replacements>
-cleanupAroundReplacements(StringRef Code, const tooling::Replacements &Replaces,
+llvm::Expected<tooling::Replacements>
+cleanupAroundReplacements(llvm::StringRef Code, const tooling::Replacements &Replaces,
                           const FormatStyle &Style);
 
 /// Represents the status of a formatting attempt.
@@ -5283,34 +5283,34 @@ struct FormattingAttemptStatus {
 ///
 /// If ``Status`` is non-null, its value will be populated with the status of
 /// this formatting attempt. See \c FormattingAttemptStatus.
-tooling::Replacements reformat(const FormatStyle &Style, StringRef Code,
-                               ArrayRef<tooling::Range> Ranges,
-                               StringRef FileName = "<stdin>",
+tooling::Replacements reformat(const FormatStyle &Style, llvm::StringRef Code,
+                               llvm::ArrayRef<tooling::Range> Ranges,
+                               llvm::StringRef FileName = "<stdin>",
                                FormattingAttemptStatus *Status = nullptr);
 
 /// Same as above, except if ``IncompleteFormat`` is non-null, its value
 /// will be set to true if any of the affected ranges were not formatted due to
 /// a non-recoverable syntax error.
-tooling::Replacements reformat(const FormatStyle &Style, StringRef Code,
-                               ArrayRef<tooling::Range> Ranges,
-                               StringRef FileName, bool *IncompleteFormat);
+tooling::Replacements reformat(const FormatStyle &Style, llvm::StringRef Code,
+                               llvm::ArrayRef<tooling::Range> Ranges,
+                               llvm::StringRef FileName, bool *IncompleteFormat);
 
 /// Clean up any erroneous/redundant code in the given \p Ranges in \p
 /// Code.
 ///
 /// Returns the ``Replacements`` that clean up all \p Ranges in \p Code.
-tooling::Replacements cleanup(const FormatStyle &Style, StringRef Code,
-                              ArrayRef<tooling::Range> Ranges,
-                              StringRef FileName = "<stdin>");
+tooling::Replacements cleanup(const FormatStyle &Style, llvm::StringRef Code,
+                              llvm::ArrayRef<tooling::Range> Ranges,
+                              llvm::StringRef FileName = "<stdin>");
 
 /// Fix namespace end comments in the given \p Ranges in \p Code.
 ///
 /// Returns the ``Replacements`` that fix the namespace comments in all
 /// \p Ranges in \p Code.
 tooling::Replacements fixNamespaceEndComments(const FormatStyle &Style,
-                                              StringRef Code,
-                                              ArrayRef<tooling::Range> Ranges,
-                                              StringRef FileName = "<stdin>");
+                                              llvm::StringRef Code,
+                                              llvm::ArrayRef<tooling::Range> Ranges,
+                                              llvm::StringRef FileName = "<stdin>");
 
 /// Inserts or removes empty lines separating definition blocks including
 /// classes, structs, functions, namespaces, and enums in the given \p Ranges in
@@ -5319,9 +5319,9 @@ tooling::Replacements fixNamespaceEndComments(const FormatStyle &Style,
 /// Returns the ``Replacements`` that inserts or removes empty lines separating
 /// definition blocks in all \p Ranges in \p Code.
 tooling::Replacements separateDefinitionBlocks(const FormatStyle &Style,
-                                               StringRef Code,
-                                               ArrayRef<tooling::Range> Ranges,
-                                               StringRef FileName = "<stdin>");
+                                               llvm::StringRef Code,
+                                               llvm::ArrayRef<tooling::Range> Ranges,
+                                               llvm::StringRef FileName = "<stdin>");
 
 /// Sort consecutive using declarations in the given \p Ranges in
 /// \p Code.
@@ -5329,9 +5329,9 @@ tooling::Replacements separateDefinitionBlocks(const FormatStyle &Style,
 /// Returns the ``Replacements`` that sort the using declarations in all
 /// \p Ranges in \p Code.
 tooling::Replacements sortUsingDeclarations(const FormatStyle &Style,
-                                            StringRef Code,
-                                            ArrayRef<tooling::Range> Ranges,
-                                            StringRef FileName = "<stdin>");
+                                            llvm::StringRef Code,
+                                            llvm::ArrayRef<tooling::Range> Ranges,
+                                            llvm::StringRef FileName = "<stdin>");
 
 /// Returns the ``LangOpts`` that the formatter expects you to set.
 ///
@@ -5381,17 +5381,17 @@ extern const char *DefaultFallbackStyle;
 /// \returns FormatStyle as specified by ``StyleName``. If ``StyleName`` is
 /// "file" and no file is found, returns ``FallbackStyle``. If no style could be
 /// determined, returns an Error.
-Expected<FormatStyle> getStyle(StringRef StyleName, StringRef FileName,
-                               StringRef FallbackStyle, StringRef Code = "",
+llvm::Expected<FormatStyle> getStyle(llvm::StringRef StyleName, llvm::StringRef FileName,
+                               llvm::StringRef FallbackStyle, llvm::StringRef Code = "",
                                llvm::vfs::FileSystem *FS = nullptr,
                                bool AllowUnknownOptions = false);
 
 // Guesses the language from the ``FileName`` and ``Code`` to be formatted.
 // Defaults to FormatStyle::LK_Cpp.
-FormatStyle::LanguageKind guessLanguage(StringRef FileName, StringRef Code);
+FormatStyle::LanguageKind guessLanguage(llvm::StringRef FileName, llvm::StringRef Code);
 
 // Returns a string representation of ``Language``.
-inline StringRef getLanguageName(FormatStyle::LanguageKind Language) {
+inline llvm::StringRef getLanguageName(FormatStyle::LanguageKind Language) {
   switch (Language) {
   case FormatStyle::LK_Cpp:
     return "C++";
@@ -5418,8 +5418,8 @@ inline StringRef getLanguageName(FormatStyle::LanguageKind Language) {
   }
 }
 
-bool isClangFormatOn(StringRef Comment);
-bool isClangFormatOff(StringRef Comment);
+bool isClangFormatOn(llvm::StringRef Comment);
+bool isClangFormatOff(llvm::StringRef Comment);
 
 } // end namespace format
 } // end namespace clang

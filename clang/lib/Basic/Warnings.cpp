@@ -32,9 +32,9 @@ using namespace clang;
 // EmitUnknownDiagWarning - Emit a warning and typo hint for unknown warning
 // opts
 static void EmitUnknownDiagWarning(DiagnosticsEngine &Diags,
-                                   diag::Flavor Flavor, StringRef Prefix,
-                                   StringRef Opt) {
-  StringRef Suggestion = DiagnosticIDs::getNearestOption(Flavor, Opt);
+                                   diag::Flavor Flavor, llvm::StringRef Prefix,
+                                   llvm::StringRef Opt) {
+  llvm::StringRef Suggestion = DiagnosticIDs::getNearestOption(Flavor, Opt);
   Diags.Report(diag::warn_unknown_diag_option)
       << (Flavor == diag::Flavor::WarningOrError ? 0 : 1)
       << (Prefix.str() += std::string(Opt)) << !Suggestion.empty()
@@ -70,8 +70,8 @@ void clang::ProcessWarningOptions(DiagnosticsEngine &Diags,
   else
     Diags.setExtensionHandlingBehavior(diag::Severity::Ignored);
 
-  SmallVector<diag::kind, 10> _Diags;
-  const IntrusiveRefCntPtr< DiagnosticIDs > DiagIDs =
+  llvm::SmallVector<diag::kind, 10> _Diags;
+  const llvm::IntrusiveRefCntPtr< DiagnosticIDs > DiagIDs =
     Diags.getDiagnosticIDs();
   // We parse the warning options twice.  The first pass sets diagnostic state,
   // while the second pass reports warnings/errors.  This has the effect that
@@ -87,8 +87,8 @@ void clang::ProcessWarningOptions(DiagnosticsEngine &Diags,
 
     for (unsigned i = 0, e = Opts.Warnings.size(); i != e; ++i) {
       const auto Flavor = diag::Flavor::WarningOrError;
-      StringRef Opt = Opts.Warnings[i];
-      StringRef OrigOpt = Opts.Warnings[i];
+      llvm::StringRef Opt = Opts.Warnings[i];
+      llvm::StringRef OrigOpt = Opts.Warnings[i];
 
       // Treat -Wformat=0 as an alias for -Wno-format.
       if (Opt == "format=0")
@@ -130,7 +130,7 @@ void clang::ProcessWarningOptions(DiagnosticsEngine &Diags,
       // the deprecated -Werror-implicit-function-declaration which is used by
       // a few projects.
       if (Opt.starts_with("error")) {
-        StringRef Specifier;
+        llvm::StringRef Specifier;
         if (Opt.size() > 5) {  // Specifier must be present.
           if (Opt[5] != '=' &&
               Opt.substr(5) != "-implicit-function-declaration") {
@@ -159,7 +159,7 @@ void clang::ProcessWarningOptions(DiagnosticsEngine &Diags,
 
       // -Wfatal-errors is yet another special case.
       if (Opt.starts_with("fatal-errors")) {
-        StringRef Specifier;
+        llvm::StringRef Specifier;
         if (Opt.size() != 12) {
           if ((Opt[12] != '=' && Opt[12] != '-') || Opt.size() == 13) {
             if (Report)
@@ -194,7 +194,7 @@ void clang::ProcessWarningOptions(DiagnosticsEngine &Diags,
       }
     }
 
-    for (StringRef Opt : Opts.Remarks) {
+    for (llvm::StringRef Opt : Opts.Remarks) {
       const auto Flavor = diag::Flavor::Remark;
 
       // Check to see if this warning starts with "no-", if so, this is a

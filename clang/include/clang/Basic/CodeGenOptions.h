@@ -132,7 +132,7 @@ public:
     All,         // Keep all frame pointers.
   };
 
-  static StringRef getFramePointerKindName(FramePointerKind Kind) {
+  static llvm::StringRef getFramePointerKindName(FramePointerKind Kind) {
     switch (Kind) {
     case FramePointerKind::None:
       return "none";
@@ -349,7 +349,7 @@ public:
     bool hasValidPattern() const { return Regex != nullptr; }
 
     /// Matches the given string against the regex, if there is some.
-    bool patternMatches(StringRef String) const {
+    bool patternMatches(llvm::StringRef String) const {
       return hasValidPattern() && Regex->match(String);
     }
   };
@@ -542,7 +542,7 @@ public:
 
   /// Reset all of the options that are not considered when building a
   /// module.
-  void resetNonModularOptions(StringRef ModuleFormat);
+  void resetNonModularOptions(llvm::StringRef ModuleFormat);
 };
 
 }  // end namespace clang

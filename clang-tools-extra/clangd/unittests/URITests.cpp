@@ -172,7 +172,7 @@ std::string resolvePathOrDie(llvm::StringRef AbsPath,
 }
 
 TEST(URITest, ResolvePath) {
-  StringRef FilePath =
+  llvm::StringRef FilePath =
 #ifdef _WIN32
       "c:\\x\\y\\z";
 #else
@@ -194,7 +194,7 @@ TEST(URITest, Platform) {
 }
 
 TEST(URITest, ResolveFailed) {
-  auto FailedResolve = [](StringRef Uri) {
+  auto FailedResolve = [](llvm::StringRef Uri) {
     auto Path = URI::resolve(parseOrDie(Uri));
     if (!Path) {
       consumeError(Path.takeError());

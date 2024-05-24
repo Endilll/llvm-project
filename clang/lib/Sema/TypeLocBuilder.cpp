@@ -19,7 +19,7 @@ void TypeLocBuilder::pushFullCopy(TypeLoc L) {
   size_t Size = L.getFullDataSize();
   reserve(Size);
 
-  SmallVector<TypeLoc, 4> TypeLocs;
+  llvm::SmallVector<TypeLoc, 4> TypeLocs;
   TypeLoc CurTL = L;
   while (CurTL) {
     TypeLocs.push_back(CurTL);
@@ -46,7 +46,7 @@ void TypeLocBuilder::pushTrivial(ASTContext &Context, QualType T,
   auto L = TypeLoc(T, nullptr);
   reserve(L.getFullDataSize());
 
-  SmallVector<TypeLoc, 4> TypeLocs;
+  llvm::SmallVector<TypeLoc, 4> TypeLocs;
   for (auto CurTL = L; CurTL; CurTL = CurTL.getNextTypeLoc())
     TypeLocs.push_back(CurTL);
 

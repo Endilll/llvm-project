@@ -49,7 +49,7 @@ public:
 
   /// Reads a record with id AbbrevID from Cursor, resetting the
   /// internal state.
-  Expected<unsigned> readRecord(llvm::BitstreamCursor &Cursor,
+  llvm::Expected<unsigned> readRecord(llvm::BitstreamCursor &Cursor,
                                 unsigned AbbrevID);
 
   /// Is this a module file for a module (rather than a PCH or similar).
@@ -74,7 +74,7 @@ public:
   /// next value.
   uint64_t readInt() { return Record[Idx++]; }
 
-  ArrayRef<uint64_t> readIntArray(unsigned Len) {
+  llvm::ArrayRef<uint64_t> readIntArray(unsigned Len) {
     auto Array = llvm::ArrayRef(Record).slice(Idx, Len);
     Idx += Len;
     return Array;
@@ -113,7 +113,7 @@ public:
 
   /// Read information about an exception specification (inherited).
   //FunctionProtoType::ExceptionSpecInfo
-  //readExceptionSpecInfo(SmallVectorImpl<QualType> &ExceptionStorage);
+  //readExceptionSpecInfo(llvm::SmallVectorImpl<QualType> &ExceptionStorage);
 
   /// Get the global offset corresponding to a local offset.
   uint64_t getGlobalBitOffset(uint64_t LocalOffset) {
@@ -244,7 +244,7 @@ public:
   TemplateParameterList *readTemplateParameterList();
 
   /// Read a template argument array, advancing Idx.
-  void readTemplateArgumentList(SmallVectorImpl<TemplateArgument> &TemplArgs,
+  void readTemplateArgumentList(llvm::SmallVectorImpl<TemplateArgument> &TemplArgs,
                                 bool Canonicalize = false);
 
   /// Read a UnresolvedSet structure, advancing Idx.
@@ -278,8 +278,8 @@ public:
   /// Read an OpenACC clause, advancing Idx.
   OpenACCClause *readOpenACCClause();
 
-  /// Read a list of OpenACC clauses into the passed SmallVector.
-  void readOpenACCClauseList(MutableArrayRef<const OpenACCClause *> Clauses);
+  /// Read a list of OpenACC clauses into the passed llvm::SmallVector.
+  void readOpenACCClauseList(llvm::MutableArrayRef<const OpenACCClause *> Clauses);
 
   /// Read a source location, advancing Idx.
   SourceLocation readSourceLocation(LocSeq *Seq = nullptr) {
@@ -327,7 +327,7 @@ public:
   }
 
   /// Read a version tuple, advancing Idx.
-  VersionTuple readVersionTuple() {
+  llvm::VersionTuple readVersionTuple() {
     return ASTReader::ReadVersionTuple(Record, Idx);
   }
 

@@ -34,12 +34,12 @@ class VarDeclConstantInitTest : public ::testing::Test {
   void TearDown() override { sys::fs::remove_directories(TestDir); }
 
 public:
-  SmallString<256> TestDir;
+  llvm::SmallString<256> TestDir;
 
-  void addFile(StringRef Path, StringRef Contents) {
+  void addFile(llvm::StringRef Path, llvm::StringRef Contents) {
     ASSERT_FALSE(sys::path::is_absolute(Path));
 
-    SmallString<256> AbsPath(TestDir);
+    llvm::SmallString<256> AbsPath(TestDir);
     sys::path::append(AbsPath, Path);
 
     ASSERT_FALSE(
@@ -90,7 +90,7 @@ export namespace Fibonacci
 }
   )cpp");
 
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
       CompilerInstance::createDiagnostics(new DiagnosticOptions());
   CreateInvocationOptions CIOpts;
   CIOpts.Diags = Diags;

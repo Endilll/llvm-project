@@ -36,15 +36,15 @@ private:
   }
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override {
+                                                 llvm::StringRef InFile) override {
     return std::make_unique<ASTConsumer>();
   }
 
-  IntrusiveRefCntPtr<ExternalASTSource> Source;
+  llvm::IntrusiveRefCntPtr<ExternalASTSource> Source;
 };
 
 bool testExternalASTSource(ExternalASTSource *Source,
-                           StringRef FileContents) {
+                           llvm::StringRef FileContents) {
   CompilerInstance Compiler;
   Compiler.createDiagnostics();
 

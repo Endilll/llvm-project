@@ -41,14 +41,14 @@ std::vector<std::string> getUSRsForDeclaration(const NamedDecl *ND,
                                                ASTContext &Context);
 
 struct USRFindingAction {
-  USRFindingAction(ArrayRef<unsigned> SymbolOffsets,
-                   ArrayRef<std::string> QualifiedNames, bool Force)
+  USRFindingAction(llvm::ArrayRef<unsigned> SymbolOffsets,
+                   llvm::ArrayRef<std::string> QualifiedNames, bool Force)
       : SymbolOffsets(SymbolOffsets), QualifiedNames(QualifiedNames),
         ErrorOccurred(false), Force(Force) {}
   std::unique_ptr<ASTConsumer> newASTConsumer();
 
-  ArrayRef<std::string> getUSRSpellings() { return SpellingNames; }
-  ArrayRef<std::vector<std::string>> getUSRList() { return USRList; }
+  llvm::ArrayRef<std::string> getUSRSpellings() { return SpellingNames; }
+  llvm::ArrayRef<std::vector<std::string>> getUSRList() { return USRList; }
   bool errorOccurred() { return ErrorOccurred; }
 
 private:

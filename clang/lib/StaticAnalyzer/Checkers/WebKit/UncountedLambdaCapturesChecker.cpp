@@ -73,7 +73,7 @@ public:
                  const Type *T) const {
     assert(CapturedVar);
 
-    SmallString<100> Buf;
+    llvm::SmallString<100> Buf;
     llvm::raw_svector_ostream Os(Buf);
 
     if (Capture.isExplicit()) {

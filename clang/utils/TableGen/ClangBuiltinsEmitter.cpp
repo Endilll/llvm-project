@@ -29,18 +29,18 @@ enum class BuiltinType {
 
 class PrototypeParser {
 public:
-  PrototypeParser(StringRef Substitution, const Record *Builtin)
+  PrototypeParser(llvm::StringRef Substitution, const Record *Builtin)
       : Loc(Builtin->getFieldLoc("Prototype")), Substitution(Substitution) {
     ParsePrototype(Builtin->getValueAsString("Prototype"));
   }
 
 private:
-  void ParsePrototype(StringRef Prototype) {
+  void ParsePrototype(llvm::StringRef Prototype) {
     Prototype = Prototype.trim();
     ParseTypes(Prototype);
   }
 
-  void ParseTypes(StringRef &Prototype) {
+  void ParseTypes(llvm::StringRef &Prototype) {
     auto ReturnType = Prototype.take_until([](char c) { return c == '('; });
     ParseType(ReturnType);
     Prototype = Prototype.drop_front(ReturnType.size() + 1);
@@ -51,7 +51,7 @@ private:
     // Look through the input parameters.
     const size_t end = Prototype.size();
     for (size_t I = 0; I != end;) {
-      const StringRef Current = Prototype.substr(I, end);
+      const llvm::StringRef Current = Prototype.substr(I, end);
       // Skip any leading space or commas
       if (Current.starts_with(" ") || Current.starts_with(",")) {
         ++I;
@@ -75,8 +75,8 @@ private:
       // We know that we are past _ExtVector, therefore the first seen
       // comma is the boundary of a parameter in the prototype.
       if (size_t CommaPos = Current.find(',', 0)) {
-        if (CommaPos != StringRef::npos) {
-          StringRef T = Current.substr(0, CommaPos);
+        if (CommaPos != llvm::StringRef::npos) {
+          llvm::StringRef T = Current.substr(0, CommaPos);
           ParseType(T);
           // Move the prototype beyond the comma.
           I += CommaPos + 1;
@@ -90,7 +90,7 @@ private:
     }
   }
 
-  void ParseType(StringRef T) {
+  void ParseType(llvm::StringRef T) {
     T = T.trim();
     if (T.consume_back("*")) {
       ParseType(T);
@@ -191,7 +191,7 @@ public:
 
 private:
   SMLoc Loc;
-  StringRef Substitution;
+  llvm::StringRef Substitution;
   std::string Type;
 };
 
@@ -241,8 +241,8 @@ void PrintAttributes(const Record *Builtin, BuiltinType BT,
   OS << '\"';
 }
 
-void EmitBuiltinDef(llvm::raw_ostream &OS, StringRef Substitution,
-                    const Record *Builtin, Twine Spelling, BuiltinType BT) {
+void EmitBuiltinDef(llvm::raw_ostream &OS, llvm::StringRef Substitution,
+                    const Record *Builtin, llvm::Twine Spelling, BuiltinType BT) {
   if (Builtin->getValueAsBit("RequiresUndef"))
     OS << "#undef " << Spelling << '\n';
   switch (BT) {
@@ -322,7 +322,7 @@ void EmitBuiltin(llvm::raw_ostream &OS, const Record *Builtin) {
 
   for (auto [Substitution, Affix] :
        llvm::zip(Templates.Substitution, Templates.Affix)) {
-    for (StringRef Spelling : Builtin->getValueAsListOfStrings("Spellings")) {
+    for (llvm::StringRef Spelling : Builtin->getValueAsListOfStrings("Spellings")) {
       auto FullSpelling =
           (Templates.IsPrefix ? Affix + Spelling : Spelling + Affix).str();
       BuiltinType BT = BuiltinType::Builtin;

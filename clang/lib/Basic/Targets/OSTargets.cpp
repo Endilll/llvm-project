@@ -20,8 +20,8 @@ namespace clang {
 namespace targets {
 
 void getDarwinDefines(MacroBuilder &Builder, const LangOptions &Opts,
-                      const llvm::Triple &Triple, StringRef &PlatformName,
-                      VersionTuple &PlatformMinVersion) {
+                      const llvm::Triple &Triple, llvm::StringRef &PlatformName,
+                      llvm::VersionTuple &PlatformMinVersion) {
   Builder.defineMacro("__APPLE_CC__", "6000");
   Builder.defineMacro("__APPLE__");
   Builder.defineMacro("__STDC_NO_THREADS__");
@@ -48,7 +48,7 @@ void getDarwinDefines(MacroBuilder &Builder, const LangOptions &Opts,
     Builder.defineMacro("_REENTRANT");
 
   // Get the platform type and version number from the triple.
-  VersionTuple OsVersion;
+  llvm::VersionTuple OsVersion;
   if (Triple.isMacOSX()) {
     Triple.getMacOSXVersion(OsVersion);
     PlatformName = "macos";
@@ -67,9 +67,9 @@ void getDarwinDefines(MacroBuilder &Builder, const LangOptions &Opts,
     return;
   }
 
-  assert(OsVersion < VersionTuple(100) && "Invalid version!");
+  assert(OsVersion < llvm::VersionTuple(100) && "Invalid version!");
   char Str[7];
-  if (Triple.isMacOSX() && OsVersion < VersionTuple(10, 10)) {
+  if (Triple.isMacOSX() && OsVersion < llvm::VersionTuple(10, 10)) {
     Str[0] = '0' + (OsVersion.getMajor() / 10);
     Str[1] = '0' + (OsVersion.getMajor() % 10);
     Str[2] = '0' + std::min(OsVersion.getMinor().value_or(0), 9U);
@@ -205,13 +205,13 @@ static void addVisualCDefines(const LangOptions &Opts, MacroBuilder &Builder) {
 
   if (Opts.MSCompatibilityVersion) {
     Builder.defineMacro("_MSC_VER",
-                        Twine(Opts.MSCompatibilityVersion / 100000));
-    Builder.defineMacro("_MSC_FULL_VER", Twine(Opts.MSCompatibilityVersion));
+                        llvm::Twine(Opts.MSCompatibilityVersion / 100000));
+    Builder.defineMacro("_MSC_FULL_VER", llvm::Twine(Opts.MSCompatibilityVersion));
     // FIXME We cannot encode the revision information into 32-bits
-    Builder.defineMacro("_MSC_BUILD", Twine(1));
+    Builder.defineMacro("_MSC_BUILD", llvm::Twine(1));
 
     if (Opts.CPlusPlus11 && Opts.isCompatibleWithMSVC(LangOptions::MSVC2015))
-      Builder.defineMacro("_HAS_CHAR16_T_LANGUAGE_SUPPORT", Twine(1));
+      Builder.defineMacro("_HAS_CHAR16_T_LANGUAGE_SUPPORT", llvm::Twine(1));
 
     if (Opts.isCompatibleWithMSVC(LangOptions::MSVC2015)) {
       if (Opts.CPlusPlus23)

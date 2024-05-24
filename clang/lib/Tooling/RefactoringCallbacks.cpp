@@ -70,7 +70,7 @@ std::unique_ptr<ASTConsumer> ASTMatchRefactorer::newASTConsumer() {
 }
 
 static Replacement replaceStmtWithText(SourceManager &Sources, const Stmt &From,
-                                       StringRef Text) {
+                                       llvm::StringRef Text) {
   return tooling::Replacement(
       Sources, CharSourceRange::getTokenRange(From.getSourceRange()), Text);
 }
@@ -82,7 +82,7 @@ static Replacement replaceStmtWithStmt(SourceManager &Sources, const Stmt &From,
                            Sources, LangOptions()));
 }
 
-ReplaceStmtWithText::ReplaceStmtWithText(StringRef FromId, StringRef ToText)
+ReplaceStmtWithText::ReplaceStmtWithText(llvm::StringRef FromId, llvm::StringRef ToText)
     : FromId(std::string(FromId)), ToText(std::string(ToText)) {}
 
 void ReplaceStmtWithText::run(
@@ -100,7 +100,7 @@ void ReplaceStmtWithText::run(
   }
 }
 
-ReplaceStmtWithStmt::ReplaceStmtWithStmt(StringRef FromId, StringRef ToId)
+ReplaceStmtWithStmt::ReplaceStmtWithStmt(llvm::StringRef FromId, llvm::StringRef ToId)
     : FromId(std::string(FromId)), ToId(std::string(ToId)) {}
 
 void ReplaceStmtWithStmt::run(
@@ -119,7 +119,7 @@ void ReplaceStmtWithStmt::run(
   }
 }
 
-ReplaceIfStmtWithItsBody::ReplaceIfStmtWithItsBody(StringRef Id,
+ReplaceIfStmtWithItsBody::ReplaceIfStmtWithItsBody(llvm::StringRef Id,
                                                    bool PickTrueBranch)
     : Id(std::string(Id)), PickTrueBranch(PickTrueBranch) {}
 
@@ -156,7 +156,7 @@ ReplaceNodeWithTemplate::ReplaceNodeWithTemplate(
     : FromId(std::string(FromId)), Template(std::move(Template)) {}
 
 llvm::Expected<std::unique_ptr<ReplaceNodeWithTemplate>>
-ReplaceNodeWithTemplate::create(StringRef FromId, StringRef ToTemplate) {
+ReplaceNodeWithTemplate::create(llvm::StringRef FromId, llvm::StringRef ToTemplate) {
   std::vector<TemplateElement> ParsedTemplate;
   for (size_t Index = 0; Index < ToTemplate.size();) {
     if (ToTemplate[Index] == '$') {

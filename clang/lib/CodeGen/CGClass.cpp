@@ -790,7 +790,7 @@ void CodeGenFunction::EmitAsanPrologueOrEpilogue(bool Prologue) {
   const ASTRecordLayout &Info = Context.getASTRecordLayout(ClassDecl);
 
   // Populate sizes and offsets of fields.
-  SmallVector<SizeAndOffset, 16> SSV(Info.getFieldCount());
+  llvm::SmallVector<SizeAndOffset, 16> SSV(Info.getFieldCount());
   for (unsigned i = 0, e = Info.getFieldCount(); i != e; ++i)
     SSV[i].Offset =
         Context.toCharUnitsFromBits(Info.getFieldOffset(i)).getQuantity();
@@ -1143,7 +1143,7 @@ namespace {
     const CXXConstructorDecl *ConstructorDecl;
     bool MemcpyableCtor;
     FunctionArgList &Args;
-    SmallVector<CXXCtorInitializer*, 16> AggregatedInits;
+    llvm::SmallVector<CXXCtorInitializer*, 16> AggregatedInits;
   };
 
   class AssignmentMemcpyizer : public FieldMemcpyizer {
@@ -1219,7 +1219,7 @@ namespace {
     }
 
     bool AssignmentsMemcpyable;
-    SmallVector<Stmt*, 16> AggregatedStmts;
+    llvm::SmallVector<Stmt*, 16> AggregatedStmts;
 
   public:
     AssignmentMemcpyizer(CodeGenFunction &CGF, const CXXMethodDecl *AD,
@@ -1304,7 +1304,7 @@ void CodeGenFunction::EmitCtorPrologue(const CXXConstructorDecl *CD,
   for (; B != E && (*B)->isBaseInitializer() && (*B)->isBaseVirtual(); B++) {
     if (!ConstructVBases)
       continue;
-    SaveAndRestore ThisRAII(CXXThisValue);
+    llvm::SaveAndRestore ThisRAII(CXXThisValue);
     if (CGM.getCodeGenOpts().StrictVTablePointers &&
         CGM.getCodeGenOpts().OptimizationLevel > 0 &&
         isInitializerOfDynamicClass(*B))
@@ -1321,7 +1321,7 @@ void CodeGenFunction::EmitCtorPrologue(const CXXConstructorDecl *CD,
   // Then, non-virtual base initializers.
   for (; B != E && (*B)->isBaseInitializer(); B++) {
     assert(!(*B)->isBaseVirtual());
-    SaveAndRestore ThisRAII(CXXThisValue);
+    llvm::SaveAndRestore ThisRAII(CXXThisValue);
     if (CGM.getCodeGenOpts().StrictVTablePointers &&
         CGM.getCodeGenOpts().OptimizationLevel > 0 &&
         isInitializerOfDynamicClass(*B))
@@ -1676,13 +1676,13 @@ namespace {
   };
 
   static void EmitSanitizerDtorCallback(
-      CodeGenFunction &CGF, StringRef Name, llvm::Value *Ptr,
+      CodeGenFunction &CGF, llvm::StringRef Name, llvm::Value *Ptr,
       std::optional<CharUnits::QuantityType> PoisonSize = {}) {
     CodeGenFunction::SanitizerScope SanScope(&CGF);
     // Pass in void pointer and size of region as arguments to runtime
     // function
-    SmallVector<llvm::Value *, 2> Args = {Ptr};
-    SmallVector<llvm::Type *, 2> ArgTypes = {CGF.VoidPtrTy};
+    llvm::SmallVector<llvm::Value *, 2> Args = {Ptr};
+    llvm::SmallVector<llvm::Type *, 2> ArgTypes = {CGF.VoidPtrTy};
 
     if (PoisonSize.has_value()) {
       Args.emplace_back(llvm::ConstantInt::get(CGF.SizeTy, *PoisonSize));
@@ -3085,7 +3085,7 @@ void CodeGenFunction::EmitLambdaInAllocaImplFn(
 
   // Emit function containing the original call op body. __invoke will delegate
   // to this function.
-  SmallVector<CanQualType, 4> ArgTypes;
+  llvm::SmallVector<CanQualType, 4> ArgTypes;
   for (auto I = FnInfo.arg_begin(); I != FnInfo.arg_end(); ++I)
     ArgTypes.push_back(I->type);
   *ImplFnInfo = &CGM.getTypes().arrangeLLVMFunctionInfo(
@@ -3097,7 +3097,7 @@ void CodeGenFunction::EmitLambdaInAllocaImplFn(
   // front.
   // TODO: Use the name mangler to produce the right name instead of using
   // string replacement.
-  StringRef CallOpName = CallOpFn->getName();
+  llvm::StringRef CallOpName = CallOpFn->getName();
   std::string ImplName;
   if (size_t Pos = CallOpName.find_first_of("<lambda"))
     ImplName = ("?__impl@" + CallOpName.drop_front(Pos)).str();

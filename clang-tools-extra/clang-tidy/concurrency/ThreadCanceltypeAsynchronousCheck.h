@@ -19,7 +19,7 @@ namespace clang::tidy::concurrency {
 /// http://clang.llvm.org/extra/clang-tidy/checks/concurrency/thread-canceltype-asynchronous.html
 class ThreadCanceltypeAsynchronousCheck : public ClangTidyCheck {
 public:
-  ThreadCanceltypeAsynchronousCheck(StringRef Name, ClangTidyContext *Context)
+  ThreadCanceltypeAsynchronousCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

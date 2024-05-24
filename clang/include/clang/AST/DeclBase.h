@@ -726,8 +726,8 @@ public:
   /// the available attribute.
   AvailabilityResult
   getAvailability(std::string *Message = nullptr,
-                  VersionTuple EnclosingVersion = VersionTuple(),
-                  StringRef *RealizedPlatform = nullptr) const;
+                  llvm::VersionTuple EnclosingVersion = llvm::VersionTuple(),
+                  llvm::StringRef *RealizedPlatform = nullptr) const;
 
   /// Retrieve the version of the target platform in which this
   /// declaration was introduced.
@@ -735,7 +735,7 @@ public:
   /// \returns An empty version tuple if this declaration has no 'introduced'
   /// availability attributes, or the version tuple that's specified in the
   /// attribute otherwise.
-  VersionTuple getVersionIntroduced() const;
+  llvm::VersionTuple getVersionIntroduced() const;
 
   /// Determine whether this declaration is marked 'deprecated'.
   ///
@@ -1233,12 +1233,12 @@ public:
   static DeclContext *castToDeclContext(const Decl *);
   static Decl *castFromDeclContext(const DeclContext *);
 
-  void print(raw_ostream &Out, unsigned Indentation = 0,
+  void print(llvm::raw_ostream &Out, unsigned Indentation = 0,
              bool PrintInstantiation = false) const;
-  void print(raw_ostream &Out, const PrintingPolicy &Policy,
+  void print(llvm::raw_ostream &Out, const PrintingPolicy &Policy,
              unsigned Indentation = 0, bool PrintInstantiation = false) const;
   static void printGroup(Decl** Begin, unsigned NumDecls,
-                         raw_ostream &Out, const PrintingPolicy &Policy,
+                         llvm::raw_ostream &Out, const PrintingPolicy &Policy,
                          unsigned Indentation = 0);
 
   // Debuggers don't usually respect default arguments.
@@ -1247,7 +1247,7 @@ public:
   // Same as dump(), but forces color printing.
   void dumpColor() const;
 
-  void dump(raw_ostream &Out, bool Deserialize = false,
+  void dump(llvm::raw_ostream &Out, bool Deserialize = false,
             ASTDumpOutputFormat OutputFormat = ADOF_Default) const;
 
   /// \return Unique reproducible object identifier
@@ -1295,7 +1295,7 @@ public:
                        SourceManager &sm, const char *Msg)
       : TheDecl(theDecl), Loc(L), SM(sm), Message(Msg) {}
 
-  void print(raw_ostream &OS) const override;
+  void print(llvm::raw_ostream &OS) const override;
 };
 } // namespace clang
 
@@ -2045,7 +2045,7 @@ protected:
   ///
   /// \returns the first/last pair of declarations.
   static std::pair<Decl *, Decl *>
-  BuildDeclChain(ArrayRef<Decl*> Decls, bool FieldsAlreadyLoaded);
+  BuildDeclChain(llvm::ArrayRef<Decl*> Decls, bool FieldsAlreadyLoaded);
 
   DeclContext(Decl::Kind K);
 
@@ -2272,7 +2272,7 @@ public:
   /// contexts that are semanticaly connected to this declaration context,
   /// in source order, including this context (which may be the only result,
   /// for non-namespace contexts).
-  void collectAllContexts(SmallVectorImpl<DeclContext *> &Contexts);
+  void collectAllContexts(llvm::SmallVectorImpl<DeclContext *> &Contexts);
 
   /// decl_iterator - Iterates through the declarations stored
   /// within this context.
@@ -2548,7 +2548,7 @@ public:
   /// FIXME: This is very inefficient; replace uses of it with uses of
   /// noload_lookup.
   void localUncachedLookup(DeclarationName Name,
-                           SmallVectorImpl<NamedDecl *> &Results);
+                           llvm::SmallVectorImpl<NamedDecl *> &Results);
 
   /// Makes a declaration visible within this context.
   ///

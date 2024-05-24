@@ -29,7 +29,7 @@ using tools::addPathIfExists;
 /// so we provide a rough mapping here.
 std::string Hurd::getMultiarchTriple(const Driver &D,
                                      const llvm::Triple &TargetTriple,
-                                     StringRef SysRoot) const {
+                                     llvm::StringRef SysRoot) const {
   switch (TargetTriple.getArch()) {
   default:
     break;
@@ -52,7 +52,7 @@ std::string Hurd::getMultiarchTriple(const Driver &D,
   return TargetTriple.str();
 }
 
-static StringRef getOSLibDir(const llvm::Triple &Triple, const ArgList &Args) {
+static llvm::StringRef getOSLibDir(const llvm::Triple &Triple, const ArgList &Args) {
   // It happens that only x86 and PPC use the 'lib32' variant of oslibdir, and
   // using that variant while targeting other architectures causes problems
   // because the libraries are laid out in shared system roots that can't cope
@@ -100,7 +100,7 @@ Hurd::Hurd(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
   // those searched.
   // FIXME: It's not clear whether we should use the driver's installed
   // directory ('Dir' below) or the ResourceDir.
-  if (StringRef(D.Dir).starts_with(SysRoot)) {
+  if (llvm::StringRef(D.Dir).starts_with(SysRoot)) {
     addPathIfExists(D, D.Dir + "/../lib/" + MultiarchTriple, Paths);
     addPathIfExists(D, D.Dir + "/../" + OSLibDir, Paths);
   }
@@ -118,7 +118,7 @@ Hurd::Hurd(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
   // searched.
   // FIXME: It's not clear whether we should use the driver's installed
   // directory ('Dir' below) or the ResourceDir.
-  if (StringRef(D.Dir).starts_with(SysRoot))
+  if (llvm::StringRef(D.Dir).starts_with(SysRoot))
     addPathIfExists(D, D.Dir + "/../lib", Paths);
 
   addPathIfExists(D, SysRoot + "/lib", Paths);
@@ -158,7 +158,7 @@ void Hurd::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     addSystemInclude(DriverArgs, CC1Args, SysRoot + "/usr/local/include");
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> P(D.ResourceDir);
+    llvm::SmallString<128> P(D.ResourceDir);
     llvm::sys::path::append(P, "include");
     addSystemInclude(DriverArgs, CC1Args, P);
   }
@@ -167,13 +167,13 @@ void Hurd::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   // Check for configure-time C include directories.
-  StringRef CIncludeDirs(C_INCLUDE_DIRS);
+  llvm::StringRef CIncludeDirs(C_INCLUDE_DIRS);
   if (CIncludeDirs != "") {
-    SmallVector<StringRef, 5> Dirs;
+    llvm::SmallVector<llvm::StringRef, 5> Dirs;
     CIncludeDirs.split(Dirs, ":");
-    for (StringRef Dir : Dirs) {
-      StringRef Prefix =
-          llvm::sys::path::is_absolute(Dir) ? "" : StringRef(SysRoot);
+    for (llvm::StringRef Dir : Dirs) {
+      llvm::StringRef Prefix =
+          llvm::sys::path::is_absolute(Dir) ? "" : llvm::StringRef(SysRoot);
       addExternCSystemInclude(DriverArgs, CC1Args, Prefix + Dir);
     }
     return;
@@ -207,8 +207,8 @@ void Hurd::addLibStdCxxIncludePaths(const llvm::opt::ArgList &DriverArgs,
   if (!GCCInstallation.isValid())
     return;
 
-  StringRef TripleStr = GCCInstallation.getTriple().str();
-  StringRef DebianMultiarch =
+  llvm::StringRef TripleStr = GCCInstallation.getTriple().str();
+  llvm::StringRef DebianMultiarch =
       GCCInstallation.getTriple().getArch() == llvm::Triple::x86 ? "i386-gnu"
                                                                  : TripleStr;
 

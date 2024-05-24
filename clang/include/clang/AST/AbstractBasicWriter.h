@@ -54,7 +54,7 @@ template <class T> inline std::optional<T *> makeOptionalFromPointer(T *value) {
 //     Writes an optional value as the current property.
 //
 //   template <class ValueType>
-//   void writeArray(ArrayRef<ValueType> value);
+//   void writeArray(llvm::ArrayRef<ValueType> value);
 //
 //     Writes an array of values as the current property.
 //
@@ -171,7 +171,7 @@ public:
 
   void writeLValuePathSerializationHelper(
       APValue::LValuePathSerializationHelper lvaluePath) {
-    ArrayRef<APValue::LValuePathEntry> path = lvaluePath.Path;
+    llvm::ArrayRef<APValue::LValuePathEntry> path = lvaluePath.Path;
     QualType elemTy = lvaluePath.getType();
     asImpl().writeQualType(elemTy);
     asImpl().writeUInt32(path.size());
@@ -225,7 +225,7 @@ public:
   void writeNestedNameSpecifier(NestedNameSpecifier *NNS) {
     // Nested name specifiers usually aren't too long. I think that 8 would
     // typically accommodate the vast majority.
-    SmallVector<NestedNameSpecifier *, 8> nestedNames;
+    llvm::SmallVector<NestedNameSpecifier *, 8> nestedNames;
 
     // Push each of the NNS's onto a stack for serialization in reverse order.
     while (NNS) {

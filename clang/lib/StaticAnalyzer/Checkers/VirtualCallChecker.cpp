@@ -120,7 +120,7 @@ void VirtualCallChecker::checkPreCall(const CallEvent &Call,
 
   // At this point we're sure that we're calling a virtual method
   // during construction or destruction, so we'll emit a report.
-  SmallString<128> Msg;
+  llvm::SmallString<128> Msg;
   llvm::raw_svector_ostream OS(Msg);
   OS << "Call to ";
   if (IsPure)

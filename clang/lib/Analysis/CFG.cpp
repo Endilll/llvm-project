@@ -430,12 +430,12 @@ namespace {
 
 class reverse_children {
   llvm::SmallVector<Stmt *, 12> childrenBuf;
-  ArrayRef<Stmt *> children;
+  llvm::ArrayRef<Stmt *> children;
 
 public:
   reverse_children(Stmt *S);
 
-  using iterator = ArrayRef<Stmt *>::reverse_iterator;
+  using iterator = llvm::ArrayRef<Stmt *>::reverse_iterator;
 
   iterator begin() const { return children.rbegin(); }
   iterator end() const { return children.rend(); }
@@ -1831,7 +1831,7 @@ void CFGBuilder::addAutomaticObjHandling(LocalScope::const_iterator B,
   }
 
   // Extract information about all local scopes that are left
-  SmallVector<LocalScope::const_iterator, 10> LocalScopeEndMarkers;
+  llvm::SmallVector<LocalScope::const_iterator, 10> LocalScopeEndMarkers;
   LocalScopeEndMarkers.push_back(B);
   for (LocalScope::const_iterator I = B; I != E; ++I) {
     if (!I.inSameLocalScope(LocalScopeEndMarkers.back()))
@@ -1863,7 +1863,7 @@ void CFGBuilder::addAutomaticObjDestruction(LocalScope::const_iterator B,
   if (B == E)
     return;
 
-  SmallVector<VarDecl *, 10> DeclsNeedDestruction;
+  llvm::SmallVector<VarDecl *, 10> DeclsNeedDestruction;
   DeclsNeedDestruction.reserve(B.distance(E));
 
   for (VarDecl* D : llvm::make_range(B, E))
@@ -1920,7 +1920,7 @@ void CFGBuilder::addScopeExitHandling(LocalScope::const_iterator B,
     return;
 
   // We need to perform the scope leaving in reverse order
-  SmallVector<VarDecl *, 10> DeclsTrivial;
+  llvm::SmallVector<VarDecl *, 10> DeclsTrivial;
   DeclsTrivial.reserve(B.distance(E));
 
   // Objects with trivial destructor ends their lifetime when their storage
@@ -1988,7 +1988,7 @@ CFGBlock *CFGBuilder::createScopeChangesHandlingBlock(
 
   // We will update CFBBuilder when creating new block, restore the
   // previous state at exit.
-  SaveAndRestore save_Block(Block), save_Succ(Succ);
+  llvm::SaveAndRestore save_Block(Block), save_Succ(Succ);
 
   // Create a new block, and transfer terminator
   Block = createBlock(false);
@@ -3078,7 +3078,7 @@ CFGBlock *CFGBuilder::VisitIfStmt(IfStmt *I) {
 
   // Save local scope position because in case of condition variable ScopePos
   // won't be restored when traversing AST.
-  SaveAndRestore save_scope_pos(ScopePos);
+  llvm::SaveAndRestore save_scope_pos(ScopePos);
 
   // Create local scope for C++17 if init-stmt if one exists.
   if (Stmt *Init = I->getInit())
@@ -3103,7 +3103,7 @@ CFGBlock *CFGBuilder::VisitIfStmt(IfStmt *I) {
   CFGBlock *ElseBlock = Succ;
 
   if (Stmt *Else = I->getElse()) {
-    SaveAndRestore sv(Succ);
+    llvm::SaveAndRestore sv(Succ);
 
     // NULL out Block so that the recursive call to Visit will
     // create a new basic block.
@@ -3129,7 +3129,7 @@ CFGBlock *CFGBuilder::VisitIfStmt(IfStmt *I) {
   {
     Stmt *Then = I->getThen();
     assert(Then);
-    SaveAndRestore sv(Succ);
+    llvm::SaveAndRestore sv(Succ);
     Block = nullptr;
 
     // If branch is not a compound statement create implicit scope
@@ -3279,7 +3279,7 @@ CFGBlock *CFGBuilder::VisitSEHExceptStmt(SEHExceptStmt *ES) {
 
   // Save local scope position because in case of exception variable ScopePos
   // won't be restored when traversing AST.
-  SaveAndRestore save_scope_pos(ScopePos);
+  llvm::SaveAndRestore save_scope_pos(ScopePos);
 
   addStmt(ES->getBlock());
   CFGBlock *SEHExceptBlock = Block;
@@ -3369,13 +3369,13 @@ CFGBlock *CFGBuilder::VisitSEHTryStmt(SEHTryStmt *Terminator) {
   Succ = SEHTrySuccessor;
 
   // Save the current "__try" context.
-  SaveAndRestore SaveTry(TryTerminatedBlock, NewTryTerminatedBlock);
+  llvm::SaveAndRestore SaveTry(TryTerminatedBlock, NewTryTerminatedBlock);
   cfg->addTryDispatchBlock(TryTerminatedBlock);
 
   // Save the current value for the __leave target.
   // All __leaves should go to the code following the __try
   // (FIXME: or if the __try has a __finally, to the __finally.)
-  SaveAndRestore save_break(SEHLeaveJumpTarget);
+  llvm::SaveAndRestore save_break(SEHLeaveJumpTarget);
   SEHLeaveJumpTarget = JumpTarget(SEHTrySuccessor, ScopePos);
 
   assert(Terminator->getTryBlock() && "__try must contain a non-NULL body");
@@ -3497,7 +3497,7 @@ CFGBlock *CFGBuilder::VisitForStmt(ForStmt *F) {
 
   // Save local scope position because in case of condition variable ScopePos
   // won't be restored when traversing AST.
-  SaveAndRestore save_scope_pos(ScopePos);
+  llvm::SaveAndRestore save_scope_pos(ScopePos);
 
   // Create local scope for init statement and possible condition variable.
   // Add destructor for init statement and condition variable.
@@ -3525,7 +3525,7 @@ CFGBlock *CFGBuilder::VisitForStmt(ForStmt *F) {
 
   // Save the current value for the break targets.
   // All breaks should go to the code following the loop.
-  SaveAndRestore save_break(BreakJumpTarget);
+  llvm::SaveAndRestore save_break(BreakJumpTarget);
   BreakJumpTarget = JumpTarget(LoopSuccessor, ScopePos);
 
   CFGBlock *BodyBlock = nullptr, *TransitionBlock = nullptr;
@@ -3535,8 +3535,8 @@ CFGBlock *CFGBuilder::VisitForStmt(ForStmt *F) {
     assert(F->getBody());
 
     // Save the current values for Block, Succ, continue and break targets.
-    SaveAndRestore save_Block(Block), save_Succ(Succ);
-    SaveAndRestore save_continue(ContinueJumpTarget);
+    llvm::SaveAndRestore save_Block(Block), save_Succ(Succ);
+    llvm::SaveAndRestore save_continue(ContinueJumpTarget);
 
     // Create an empty block to represent the transition block for looping back
     // to the head of the loop.  If we have increment code, it will
@@ -3594,7 +3594,7 @@ CFGBlock *CFGBuilder::VisitForStmt(ForStmt *F) {
 
   do {
     Expr *C = F->getCond();
-    SaveAndRestore save_scope_pos(ScopePos);
+    llvm::SaveAndRestore save_scope_pos(ScopePos);
 
     // Specially handle logical operators, which have a slightly
     // more optimal CFG representation.
@@ -3660,7 +3660,7 @@ CFGBlock *CFGBuilder::VisitForStmt(ForStmt *F) {
   // If the loop contains initialization, create a new block for those
   // statements.  This block can also contain statements that precede the loop.
   if (Stmt *I = F->getInit()) {
-    SaveAndRestore save_scope_pos(ScopePos);
+    llvm::SaveAndRestore save_scope_pos(ScopePos);
     ScopePos = LoopBeginScopePos;
     Block = createBlock();
     return addStmt(I);
@@ -3763,8 +3763,8 @@ CFGBlock *CFGBuilder::VisitObjCForCollectionStmt(ObjCForCollectionStmt *S) {
   // Now create the true branch.
   {
     // Save the current values for Succ, continue and break targets.
-    SaveAndRestore save_Block(Block), save_Succ(Succ);
-    SaveAndRestore save_continue(ContinueJumpTarget),
+    llvm::SaveAndRestore save_Block(Block), save_Succ(Succ);
+    llvm::SaveAndRestore save_continue(ContinueJumpTarget),
         save_break(BreakJumpTarget);
 
     // Add an intermediate block between the BodyBlock and the
@@ -3859,7 +3859,7 @@ CFGBlock *CFGBuilder::VisitWhileStmt(WhileStmt *W) {
 
   // Save local scope position because in case of condition variable ScopePos
   // won't be restored when traversing AST.
-  SaveAndRestore save_scope_pos(ScopePos);
+  llvm::SaveAndRestore save_scope_pos(ScopePos);
 
   // Create local scope for possible condition variable.
   // Store scope position for continue statement.
@@ -3888,8 +3888,8 @@ CFGBlock *CFGBuilder::VisitWhileStmt(WhileStmt *W) {
     assert(W->getBody());
 
     // Save the current values for Block, Succ, continue and break targets.
-    SaveAndRestore save_Block(Block), save_Succ(Succ);
-    SaveAndRestore save_continue(ContinueJumpTarget),
+    llvm::SaveAndRestore save_Block(Block), save_Succ(Succ);
+    llvm::SaveAndRestore save_continue(ContinueJumpTarget),
         save_break(BreakJumpTarget);
 
     // Create an empty block to represent the transition block for looping back
@@ -4016,7 +4016,7 @@ CFGBlock *CFGBuilder::VisitObjCAtCatchStmt(ObjCAtCatchStmt *CS) {
 
   // Save local scope position because in case of exception variable ScopePos
   // won't be restored when traversing AST.
-  SaveAndRestore save_scope_pos(ScopePos);
+  llvm::SaveAndRestore save_scope_pos(ScopePos);
 
   if (CS->getCatchBody())
     addStmt(CS->getCatchBody());
@@ -4111,7 +4111,7 @@ CFGBlock *CFGBuilder::VisitObjCAtTryStmt(ObjCAtTryStmt *Terminator) {
   Succ = TrySuccessor;
 
   // Save the current "try" context.
-  SaveAndRestore SaveTry(TryTerminatedBlock, NewTryTerminatedBlock);
+  llvm::SaveAndRestore SaveTry(TryTerminatedBlock, NewTryTerminatedBlock);
   cfg->addTryDispatchBlock(TryTerminatedBlock);
 
   assert(Terminator->getTryBody() && "try must contain a non-NULL body");
@@ -4214,8 +4214,8 @@ CFGBlock *CFGBuilder::VisitDoStmt(DoStmt *D) {
     assert(D->getBody());
 
     // Save the current values for Block, Succ, and continue and break targets
-    SaveAndRestore save_Block(Block), save_Succ(Succ);
-    SaveAndRestore save_continue(ContinueJumpTarget),
+    llvm::SaveAndRestore save_Block(Block), save_Succ(Succ);
+    llvm::SaveAndRestore save_continue(ContinueJumpTarget),
         save_break(BreakJumpTarget);
 
     // All continues within this loop should go to the condition block
@@ -4333,7 +4333,7 @@ CFGBlock *CFGBuilder::VisitSwitchStmt(SwitchStmt *Terminator) {
 
   // Save local scope position because in case of condition variable ScopePos
   // won't be restored when traversing AST.
-  SaveAndRestore save_scope_pos(ScopePos);
+  llvm::SaveAndRestore save_scope_pos(ScopePos);
 
   // Create local scope for C++17 switch init-stmt if one exists.
   if (Stmt *Init = Terminator->getInit())
@@ -4353,9 +4353,9 @@ CFGBlock *CFGBuilder::VisitSwitchStmt(SwitchStmt *Terminator) {
   } else SwitchSuccessor = Succ;
 
   // Save the current "switch" context.
-  SaveAndRestore save_switch(SwitchTerminatedBlock),
+  llvm::SaveAndRestore save_switch(SwitchTerminatedBlock),
       save_default(DefaultCaseBlock);
-  SaveAndRestore save_break(BreakJumpTarget);
+  llvm::SaveAndRestore save_break(BreakJumpTarget);
 
   // Set the "default" case to be the block after the switch statement.  If the
   // switch statement contains a "default:", this value will be overwritten with
@@ -4378,13 +4378,13 @@ CFGBlock *CFGBuilder::VisitSwitchStmt(SwitchStmt *Terminator) {
 
   // For pruning unreachable case statements, save the current state
   // for tracking the condition value.
-  SaveAndRestore save_switchExclusivelyCovered(switchExclusivelyCovered, false);
+  llvm::SaveAndRestore save_switchExclusivelyCovered(switchExclusivelyCovered, false);
 
   // Determine if the switch condition can be explicitly evaluated.
   assert(Terminator->getCond() && "switch condition must be non-NULL");
   Expr::EvalResult result;
   bool b = tryEvaluate(Terminator->getCond(), result);
-  SaveAndRestore save_switchCond(switchCond, b ? &result : nullptr);
+  llvm::SaveAndRestore save_switchCond(switchCond, b ? &result : nullptr);
 
   // If body is not a compound statement create implicit scope
   // and add destructors.
@@ -4611,7 +4611,7 @@ CFGBlock *CFGBuilder::VisitCXXTryStmt(CXXTryStmt *Terminator) {
   Succ = TrySuccessor;
 
   // Save the current "try" context.
-  SaveAndRestore SaveTry(TryTerminatedBlock, NewTryTerminatedBlock);
+  llvm::SaveAndRestore SaveTry(TryTerminatedBlock, NewTryTerminatedBlock);
   cfg->addTryDispatchBlock(TryTerminatedBlock);
 
   assert(Terminator->getTryBlock() && "try must contain a non-NULL body");
@@ -4625,7 +4625,7 @@ CFGBlock *CFGBuilder::VisitCXXCatchStmt(CXXCatchStmt *CS) {
 
   // Save local scope position because in case of exception variable ScopePos
   // won't be restored when traversing AST.
-  SaveAndRestore save_scope_pos(ScopePos);
+  llvm::SaveAndRestore save_scope_pos(ScopePos);
 
   // Create local scope for possible exception variable.
   // Store scope position. Add implicit destructor.
@@ -4677,7 +4677,7 @@ CFGBlock *CFGBuilder::VisitCXXForRangeStmt(CXXForRangeStmt *S) {
   // }
 
   // Save local scope position before the addition of the implicit variables.
-  SaveAndRestore save_scope_pos(ScopePos);
+  llvm::SaveAndRestore save_scope_pos(ScopePos);
 
   // Create local scopes and destructors for range, begin and end variables.
   if (Stmt *Range = S->getRangeStmt())
@@ -4702,7 +4702,7 @@ CFGBlock *CFGBuilder::VisitCXXForRangeStmt(CXXForRangeStmt *S) {
 
   // Save the current value for the break targets.
   // All breaks should go to the code following the loop.
-  SaveAndRestore save_break(BreakJumpTarget);
+  llvm::SaveAndRestore save_break(BreakJumpTarget);
   BreakJumpTarget = JumpTarget(LoopSuccessor, ScopePos);
 
   // The block for the __begin != __end expression.
@@ -4735,8 +4735,8 @@ CFGBlock *CFGBuilder::VisitCXXForRangeStmt(CXXForRangeStmt *S) {
     assert(S->getBody());
 
     // Save the current values for Block, Succ, and continue targets.
-    SaveAndRestore save_Block(Block), save_Succ(Succ);
-    SaveAndRestore save_continue(ContinueJumpTarget);
+    llvm::SaveAndRestore save_Block(Block), save_Succ(Succ);
+    llvm::SaveAndRestore save_continue(ContinueJumpTarget);
 
     // Generate increment code in its own basic block.  This is the target of
     // continue statements.
@@ -4989,8 +4989,8 @@ tryAgain:
     case Stmt::MaterializeTemporaryExprClass: {
       const MaterializeTemporaryExpr* MTE = cast<MaterializeTemporaryExpr>(E);
       ExternallyDestructed = (MTE->getStorageDuration() != SD_FullExpression);
-      SmallVector<const Expr *, 2> CommaLHSs;
-      SmallVector<SubobjectAdjustment, 2> Adjustments;
+      llvm::SmallVector<const Expr *, 2> CommaLHSs;
+      llvm::SmallVector<SubobjectAdjustment, 2> Adjustments;
       // Find the expression whose lifetime needs to be extended.
       E = const_cast<Expr *>(
           cast<MaterializeTemporaryExpr>(E)
@@ -5195,7 +5195,7 @@ CFGBlock *CFGBuilder::VisitOMPExecutableDirective(OMPExecutableDirective *D,
 
   // Reverse the elements to process them in natural order. Iterators are not
   // bidirectional, so we need to create temp vector.
-  SmallVector<Stmt *, 8> Used(
+  llvm::SmallVector<Stmt *, 8> Used(
       OMPExecutableDirective::used_clauses_children(D->clauses()));
   for (Stmt *S : llvm::reverse(Used)) {
     assert(S && "Expected non-null used-in-clause child.");
@@ -5485,7 +5485,7 @@ public:
   void setBlockID(signed i) { currentBlock = i; }
   void setStmtID(unsigned i) { currStmt = i; }
 
-  bool handledStmt(Stmt *S, raw_ostream &OS) override {
+  bool handledStmt(Stmt *S, llvm::raw_ostream &OS) override {
     StmtMapTy::iterator I = StmtMap.find(S);
 
     if (I == StmtMap.end())
@@ -5500,7 +5500,7 @@ public:
     return true;
   }
 
-  bool handleDecl(const Decl *D, raw_ostream &OS) {
+  bool handleDecl(const Decl *D, llvm::raw_ostream &OS) {
     DeclMapTy::iterator I = DeclMap.find(D);
 
     if (I == DeclMap.end())
@@ -5518,12 +5518,12 @@ public:
 
 class CFGBlockTerminatorPrint
     : public StmtVisitor<CFGBlockTerminatorPrint,void> {
-  raw_ostream &OS;
+  llvm::raw_ostream &OS;
   StmtPrinterHelper* Helper;
   PrintingPolicy Policy;
 
 public:
-  CFGBlockTerminatorPrint(raw_ostream &os, StmtPrinterHelper* helper,
+  CFGBlockTerminatorPrint(llvm::raw_ostream &os, StmtPrinterHelper* helper,
                           const PrintingPolicy &Policy)
       : OS(os), Helper(helper), Policy(Policy) {
     this->Policy.IncludeNewlines = false;
@@ -5644,7 +5644,7 @@ public:
 
 } // namespace
 
-static void print_initializer(raw_ostream &OS, StmtPrinterHelper &Helper,
+static void print_initializer(llvm::raw_ostream &OS, StmtPrinterHelper &Helper,
                               const CXXCtorInitializer *I) {
   if (I->isBaseInitializer())
     OS << I->getBaseClass()->getAsCXXRecordDecl()->getName();
@@ -5665,10 +5665,10 @@ static void print_initializer(raw_ostream &OS, StmtPrinterHelper &Helper,
     OS << " (Member initializer)";
 }
 
-static void print_construction_context(raw_ostream &OS,
+static void print_construction_context(llvm::raw_ostream &OS,
                                        StmtPrinterHelper &Helper,
                                        const ConstructionContext *CC) {
-  SmallVector<const Stmt *, 3> Stmts;
+  llvm::SmallVector<const Stmt *, 3> Stmts;
   switch (CC->getKind()) {
   case ConstructionContext::SimpleConstructorInitializerKind: {
     OS << ", ";
@@ -5750,7 +5750,7 @@ static void print_construction_context(raw_ostream &OS,
     }
 }
 
-static void print_elem(raw_ostream &OS, StmtPrinterHelper &Helper,
+static void print_elem(llvm::raw_ostream &OS, StmtPrinterHelper &Helper,
                        const CFGElement &E);
 
 void CFGElement::dumpToStream(llvm::raw_ostream &OS) const {
@@ -5759,7 +5759,7 @@ void CFGElement::dumpToStream(llvm::raw_ostream &OS) const {
   print_elem(OS, Helper, *this);
 }
 
-static void print_elem(raw_ostream &OS, StmtPrinterHelper &Helper,
+static void print_elem(llvm::raw_ostream &OS, StmtPrinterHelper &Helper,
                        const CFGElement &E) {
   switch (E.getKind()) {
   case CFGElement::Kind::Statement:
@@ -5915,7 +5915,7 @@ static void print_elem(raw_ostream &OS, StmtPrinterHelper &Helper,
   }
 }
 
-static void print_block(raw_ostream &OS, const CFG* cfg,
+static void print_block(llvm::raw_ostream &OS, const CFG* cfg,
                         const CFGBlock &B,
                         StmtPrinterHelper &Helper, bool print_edges,
                         bool ShowColors) {
@@ -5923,7 +5923,7 @@ static void print_block(raw_ostream &OS, const CFG* cfg,
 
   // Print the header.
   if (ShowColors)
-    OS.changeColor(raw_ostream::YELLOW, true);
+    OS.changeColor(llvm::raw_ostream::YELLOW, true);
 
   OS << "\n [B" << B.getBlockID();
 
@@ -6002,7 +6002,7 @@ static void print_block(raw_ostream &OS, const CFG* cfg,
   // Print the terminator of this block.
   if (B.getTerminator().isValid()) {
     if (ShowColors)
-      OS.changeColor(raw_ostream::GREEN);
+      OS.changeColor(llvm::raw_ostream::GREEN);
 
     OS << "   T: ";
 
@@ -6020,7 +6020,7 @@ static void print_block(raw_ostream &OS, const CFG* cfg,
   if (print_edges) {
     // Print the predecessors of this block.
     if (!B.pred_empty()) {
-      const raw_ostream::Colors Color = raw_ostream::BLUE;
+      const llvm::raw_ostream::Colors Color = llvm::raw_ostream::BLUE;
       if (ShowColors)
         OS.changeColor(Color);
       OS << "   Preds " ;
@@ -6057,7 +6057,7 @@ static void print_block(raw_ostream &OS, const CFG* cfg,
 
     // Print the successors of this block.
     if (!B.succ_empty()) {
-      const raw_ostream::Colors Color = raw_ostream::MAGENTA;
+      const llvm::raw_ostream::Colors Color = llvm::raw_ostream::MAGENTA;
       if (ShowColors)
         OS.changeColor(Color);
       OS << "   Succs ";
@@ -6105,7 +6105,7 @@ void CFG::dump(const LangOptions &LO, bool ShowColors) const {
 }
 
 /// print - A simple pretty printer of a CFG that outputs to an ostream.
-void CFG::print(raw_ostream &OS, const LangOptions &LO, bool ShowColors) const {
+void CFG::print(llvm::raw_ostream &OS, const LangOptions &LO, bool ShowColors) const {
   StmtPrinterHelper Helper(this, LO);
 
   // Print the entry block.
@@ -6142,7 +6142,7 @@ LLVM_DUMP_METHOD void CFGBlock::dump() const {
 
 /// print - A simple pretty printer of a CFGBlock that outputs to an ostream.
 ///   Generally this will only be called from CFG::print.
-void CFGBlock::print(raw_ostream &OS, const CFG* cfg,
+void CFGBlock::print(llvm::raw_ostream &OS, const CFG* cfg,
                      const LangOptions &LO, bool ShowColors) const {
   StmtPrinterHelper Helper(cfg, LO);
   print_block(OS, cfg, *this, Helper, true, ShowColors);
@@ -6150,14 +6150,14 @@ void CFGBlock::print(raw_ostream &OS, const CFG* cfg,
 }
 
 /// printTerminator - A simple pretty printer of the terminator of a CFGBlock.
-void CFGBlock::printTerminator(raw_ostream &OS,
+void CFGBlock::printTerminator(llvm::raw_ostream &OS,
                                const LangOptions &LO) const {
   CFGBlockTerminatorPrint TPrinter(OS, nullptr, PrintingPolicy(LO));
   TPrinter.print(getTerminator());
 }
 
 /// printTerminatorJson - Pretty-prints the terminator in JSON format.
-void CFGBlock::printTerminatorJson(raw_ostream &Out, const LangOptions &LO,
+void CFGBlock::printTerminatorJson(llvm::raw_ostream &Out, const LangOptions &LO,
                                    bool AddQuotes) const {
   std::string Buf;
   llvm::raw_string_ostream TempOut(Buf);

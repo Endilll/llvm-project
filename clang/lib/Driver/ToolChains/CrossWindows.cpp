@@ -69,7 +69,7 @@ void tools::CrossWindows::Linker::ConstructJob(
       static_cast<const toolchains::CrossWindowsToolChain &>(getToolChain());
   const llvm::Triple &T = TC.getTriple();
   const Driver &D = TC.getDriver();
-  SmallString<128> EntryPoint;
+  llvm::SmallString<128> EntryPoint;
   ArgStringList CmdArgs;
   const char *Exec;
 
@@ -157,7 +157,7 @@ void tools::CrossWindows::Linker::ConstructJob(
   CmdArgs.push_back(Output.getFilename());
 
   if (Args.hasArg(options::OPT_shared) || Args.hasArg(options::OPT_rdynamic)) {
-    SmallString<261> ImpLib(Output.getFilename());
+    llvm::SmallString<261> ImpLib(Output.getFilename());
     llvm::sys::path::replace_extension(ImpLib, ".lib");
 
     CmdArgs.push_back("--out-implib");
@@ -251,7 +251,7 @@ AddClangSystemIncludeArgs(const llvm::opt::ArgList &DriverArgs,
 
   addSystemInclude(DriverArgs, CC1Args, SysRoot + "/usr/local/include");
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> ResourceDir(D.ResourceDir);
+    llvm::SmallString<128> ResourceDir(D.ResourceDir);
     llvm::sys::path::append(ResourceDir, "include");
     addSystemInclude(DriverArgs, CC1Args, ResourceDir);
   }

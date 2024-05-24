@@ -65,7 +65,7 @@ static const char KnownStringCompareFunctions[] = "__builtin_memcmp;"
                                                   "wmemcmp;";
 
 SuspiciousStringCompareCheck::SuspiciousStringCompareCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       WarnOnImplicitComparison(Options.get("WarnOnImplicitComparison", true)),
       WarnOnLogicalNotComparison(
@@ -89,7 +89,7 @@ void SuspiciousStringCompareCheck::registerMatchers(MatchFinder *Finder) {
 
   // Add the list of known string compare-like functions and add user-defined
   // functions.
-  std::vector<StringRef> FunctionNames = utils::options::parseListPair(
+  std::vector<llvm::StringRef> FunctionNames = utils::options::parseListPair(
       KnownStringCompareFunctions, StringCompareLikeFunctions);
 
   // Match a call to a string compare functions.

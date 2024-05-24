@@ -170,7 +170,7 @@ public:
   virtual void releaseMemory() { DT.reset(); }
 
   /// Converts the dominator tree to human readable form.
-  virtual void print(raw_ostream &OS, const llvm::Module* M= nullptr) const {
+  virtual void print(llvm::raw_ostream &OS, const llvm::Module* M= nullptr) const {
     DT.print(OS);
   }
 
@@ -194,7 +194,7 @@ namespace IDFCalculatorDetail {
 template <bool IsPostDom>
 struct ChildrenGetterTy<clang::CFGBlock, IsPostDom> {
   using NodeRef = typename GraphTraits<clang::CFGBlock *>::NodeRef;
-  using ChildrenTy = SmallVector<NodeRef, 8>;
+  using ChildrenTy = llvm::SmallVector<NodeRef, 8>;
 
   ChildrenTy get(const NodeRef &N) {
     using OrderedNodeTy =

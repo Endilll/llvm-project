@@ -88,7 +88,7 @@ prepareTweaks(const Tweak::Selection &S,
 }
 
 llvm::Expected<std::unique_ptr<Tweak>>
-prepareTweak(StringRef ID, const Tweak::Selection &S,
+prepareTweak(llvm::StringRef ID, const Tweak::Selection &S,
              const FeatureModuleSet *Modules) {
   for (auto &T : getAllTweaks(Modules)) {
     if (T->id() != ID)

@@ -29,7 +29,7 @@ class IdentifierInfo;
 
 /// A sequence of identifier/location pairs used to describe a particular
 /// module or submodule, e.g., std.vector.
-using ModuleIdPath = ArrayRef<std::pair<IdentifierInfo *, SourceLocation>>;
+using ModuleIdPath = llvm::ArrayRef<std::pair<IdentifierInfo *, SourceLocation>>;
 
 /// Describes the result of attempting to load a module.
 class ModuleLoadResult {
@@ -131,8 +131,8 @@ public:
   /// \param Loc The location at which to create the module.
   /// \param ModuleName The name of the module to create.
   /// \param Source The source of the module: a (preprocessed) module map.
-  virtual void createModuleFromSource(SourceLocation Loc, StringRef ModuleName,
-                                      StringRef Source) = 0;
+  virtual void createModuleFromSource(SourceLocation Loc, llvm::StringRef ModuleName,
+                                      llvm::StringRef Source) = 0;
 
   /// Make the given module visible.
   virtual void makeModuleVisible(Module *Mod,
@@ -156,7 +156,7 @@ public:
   /// \param Name The symbol name to look for.
   /// \param TriggerLoc The location for what triggered the load.
   /// \returns Returns true if any modules with that symbol found.
-  virtual bool lookupMissingImports(StringRef Name,
+  virtual bool lookupMissingImports(llvm::StringRef Name,
                                     SourceLocation TriggerLoc) = 0;
 
   bool HadFatalFailure = false;
@@ -171,8 +171,8 @@ public:
     return {};
   }
 
-  void createModuleFromSource(SourceLocation ImportLoc, StringRef ModuleName,
-                              StringRef Source) override {}
+  void createModuleFromSource(SourceLocation ImportLoc, llvm::StringRef ModuleName,
+                              llvm::StringRef Source) override {}
 
   void makeModuleVisible(Module *Mod, Module::NameVisibilityKind Visibility,
                          SourceLocation ImportLoc) override {}
@@ -181,7 +181,7 @@ public:
     return nullptr;
   }
 
-  bool lookupMissingImports(StringRef Name,
+  bool lookupMissingImports(llvm::StringRef Name,
                             SourceLocation TriggerLoc) override {
     return false;
   }

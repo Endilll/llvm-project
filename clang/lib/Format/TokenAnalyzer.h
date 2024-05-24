@@ -30,14 +30,14 @@ public:
   // that the next lines of \p Code should start at \p NextStartColumn, and
   // that \p Code should end at \p LastStartColumn if it ends in newline.
   // See also the documentation of clang::format::internal::reformat.
-  Environment(StringRef Code, StringRef FileName, unsigned FirstStartColumn = 0,
+  Environment(llvm::StringRef Code, llvm::StringRef FileName, unsigned FirstStartColumn = 0,
               unsigned NextStartColumn = 0, unsigned LastStartColumn = 0);
 
   FileID getFileID() const { return ID; }
 
   SourceManager &getSourceManager() const { return SM; }
 
-  ArrayRef<CharSourceRange> getCharRanges() const { return CharRanges; }
+  llvm::ArrayRef<CharSourceRange> getCharRanges() const { return CharRanges; }
 
   // Returns the column at which the fragment of code managed by this
   // environment starts.
@@ -53,8 +53,8 @@ public:
 
   // Returns nullptr and prints a diagnostic to stderr if the environment
   // can't be created.
-  static std::unique_ptr<Environment> make(StringRef Code, StringRef FileName,
-                                           ArrayRef<tooling::Range> Ranges,
+  static std::unique_ptr<Environment> make(llvm::StringRef Code, llvm::StringRef FileName,
+                                           llvm::ArrayRef<tooling::Range> Ranges,
                                            unsigned FirstStartColumn = 0,
                                            unsigned NextStartColumn = 0,
                                            unsigned LastStartColumn = 0);
@@ -68,7 +68,7 @@ private:
   SourceManager &SM;
   FileID ID;
 
-  SmallVector<CharSourceRange, 8> CharRanges;
+  llvm::SmallVector<CharSourceRange, 8> CharRanges;
   unsigned FirstStartColumn;
   unsigned NextStartColumn;
   unsigned LastStartColumn;
@@ -84,7 +84,7 @@ public:
 protected:
   virtual std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) = 0;
 
   void consumeUnwrappedLine(const UnwrappedLine &TheLine) override;
@@ -97,7 +97,7 @@ protected:
   const Environment &Env;
   // AffectedRangeMgr stores ranges to be fixed.
   AffectedRangeManager AffectedRangeMgr;
-  SmallVector<SmallVector<UnwrappedLine, 16>, 2> UnwrappedLines;
+  llvm::SmallVector<llvm::SmallVector<UnwrappedLine, 16>, 2> UnwrappedLines;
   encoding::Encoding Encoding;
 };
 

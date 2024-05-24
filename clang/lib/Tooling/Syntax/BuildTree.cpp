@@ -381,14 +381,14 @@ public:
 
   /// Populate children for \p New node, assuming it covers tokens from \p
   /// Range.
-  void foldNode(ArrayRef<syntax::Token> Range, syntax::Tree *New, ASTPtr From) {
+  void foldNode(llvm::ArrayRef<syntax::Token> Range, syntax::Tree *New, ASTPtr From) {
     assert(New);
     Pending.foldChildren(TBTM.tokenBuffer(), Range, New);
     if (From)
       Mapping.add(From, New);
   }
 
-  void foldNode(ArrayRef<syntax::Token> Range, syntax::Tree *New, TypeLoc L) {
+  void foldNode(llvm::ArrayRef<syntax::Token> Range, syntax::Tree *New, TypeLoc L) {
     // FIXME: add mapping for TypeLocs
     foldNode(Range, New, nullptr);
   }
@@ -403,7 +403,7 @@ public:
 
   /// Populate children for \p New list, assuming it covers tokens from a
   /// subrange of \p SuperRange.
-  void foldList(ArrayRef<syntax::Token> SuperRange, syntax::List *New,
+  void foldList(llvm::ArrayRef<syntax::Token> SuperRange, syntax::List *New,
                 ASTPtr From) {
     assert(New);
     auto ListRange = Pending.shrinkToFitList(SuperRange);
@@ -455,7 +455,7 @@ public:
   const syntax::Token *findToken(SourceLocation L) const;
 
   /// Finds the syntax tokens corresponding to the \p SourceRange.
-  ArrayRef<syntax::Token> getRange(SourceRange Range) const {
+  llvm::ArrayRef<syntax::Token> getRange(SourceRange Range) const {
     assert(Range.isValid());
     return getRange(Range.getBegin(), Range.getEnd());
   }
@@ -463,7 +463,7 @@ public:
   /// Finds the syntax tokens corresponding to the passed source locations.
   /// \p First is the start position of the first token and \p Last is the start
   /// position of the last token.
-  ArrayRef<syntax::Token> getRange(SourceLocation First,
+  llvm::ArrayRef<syntax::Token> getRange(SourceLocation First,
                                    SourceLocation Last) const {
     assert(First.isValid());
     assert(Last.isValid());
@@ -472,7 +472,7 @@ public:
     return llvm::ArrayRef(findToken(First), std::next(findToken(Last)));
   }
 
-  ArrayRef<syntax::Token>
+  llvm::ArrayRef<syntax::Token>
   getTemplateRange(const ClassTemplateSpecializationDecl *D) const {
     auto Tokens = getRange(D->getSourceRange());
     return maybeAppendSemicolon(Tokens, D);
@@ -506,8 +506,8 @@ public:
     return false;
   }
 
-  ArrayRef<syntax::Token> getDeclarationRange(Decl *D) {
-    ArrayRef<syntax::Token> Tokens;
+  llvm::ArrayRef<syntax::Token> getDeclarationRange(Decl *D) {
+    llvm::ArrayRef<syntax::Token> Tokens;
     // We want to drop the template parameters for specializations.
     if (const auto *S = dyn_cast<TagDecl>(D))
       Tokens = getRange(S->TypeDecl::getBeginLoc(), S->getEndLoc());
@@ -516,13 +516,13 @@ public:
     return maybeAppendSemicolon(Tokens, D);
   }
 
-  ArrayRef<syntax::Token> getExprRange(const Expr *E) const {
+  llvm::ArrayRef<syntax::Token> getExprRange(const Expr *E) const {
     return getRange(E->getSourceRange());
   }
 
   /// Find the adjusted range for the statement, consuming the trailing
   /// semicolon when needed.
-  ArrayRef<syntax::Token> getStmtRange(const Stmt *S) const {
+  llvm::ArrayRef<syntax::Token> getStmtRange(const Stmt *S) const {
     auto Tokens = getRange(S->getSourceRange());
     if (isa<CompoundStmt>(S))
       return Tokens;
@@ -535,7 +535,7 @@ public:
   }
 
 private:
-  ArrayRef<syntax::Token> maybeAppendSemicolon(ArrayRef<syntax::Token> Tokens,
+  llvm::ArrayRef<syntax::Token> maybeAppendSemicolon(llvm::ArrayRef<syntax::Token> Tokens,
                                                const Decl *D) const {
     if (isa<NamespaceDecl>(D))
       return Tokens;
@@ -546,8 +546,8 @@ private:
     return withTrailingSemicolon(Tokens);
   }
 
-  ArrayRef<syntax::Token>
-  withTrailingSemicolon(ArrayRef<syntax::Token> Tokens) const {
+  llvm::ArrayRef<syntax::Token>
+  withTrailingSemicolon(llvm::ArrayRef<syntax::Token> Tokens) const {
     assert(!Tokens.empty());
     assert(Tokens.back().kind() != tok::eof);
     // We never consume 'eof', so looking at the next token is ok.
@@ -582,7 +582,7 @@ private:
       }
     }
 
-    void assignRole(ArrayRef<syntax::Token> Range, syntax::NodeRole Role) {
+    void assignRole(llvm::ArrayRef<syntax::Token> Range, syntax::NodeRole Role) {
       assert(!Range.empty());
       auto It = Trees.lower_bound(Range.begin());
       assert(It != Trees.end() && "no node found");
@@ -597,7 +597,7 @@ private:
 
     /// Shrink \p Range to a subrange that only contains tokens of a list.
     /// List elements and delimiters should already have correct roles.
-    ArrayRef<syntax::Token> shrinkToFitList(ArrayRef<syntax::Token> Range) {
+    llvm::ArrayRef<syntax::Token> shrinkToFitList(llvm::ArrayRef<syntax::Token> Range) {
       auto BeginChildren = Trees.lower_bound(Range.begin());
       assert((BeginChildren == Trees.end() ||
               BeginChildren->first == Range.begin()) &&
@@ -620,13 +620,13 @@ private:
       auto EndListChildren =
           std::find_if_not(BeginListChildren, EndChildren, BelongsToList);
 
-      return ArrayRef<syntax::Token>(BeginListChildren->first,
+      return llvm::ArrayRef<syntax::Token>(BeginListChildren->first,
                                      EndListChildren->first);
     }
 
     /// Add \p Node to the forest and attach child nodes based on \p Tokens.
     void foldChildren(const syntax::TokenBuffer &TB,
-                      ArrayRef<syntax::Token> Tokens, syntax::Tree *Node) {
+                      llvm::ArrayRef<syntax::Token> Tokens, syntax::Tree *Node) {
       // Attach children to `Node`.
       assert(Node->getFirstChild() == nullptr && "node already has children");
 
@@ -1363,7 +1363,7 @@ public:
   }
 
   syntax::ParameterDeclarationList *
-  buildParameterDeclarationList(ArrayRef<ParmVarDecl *> Params) {
+  buildParameterDeclarationList(llvm::ArrayRef<ParmVarDecl *> Params) {
     for (auto *P : Params) {
       Builder.markChild(P, syntax::NodeRole::ListElement);
       const auto *DelimiterToken = std::next(Builder.findToken(P->getEndLoc()));
@@ -1650,7 +1650,7 @@ private:
   }
 
   void foldExplicitTemplateInstantiation(
-      ArrayRef<syntax::Token> Range, const syntax::Token *ExternKW,
+      llvm::ArrayRef<syntax::Token> Range, const syntax::Token *ExternKW,
       const syntax::Token *TemplateKW,
       syntax::SimpleDeclaration *InnerDeclaration, Decl *From) {
     assert(!ExternKW || ExternKW->kind() == tok::kw_extern);
@@ -1663,8 +1663,8 @@ private:
   }
 
   syntax::TemplateDeclaration *foldTemplateDeclaration(
-      ArrayRef<syntax::Token> Range, const syntax::Token *TemplateKW,
-      ArrayRef<syntax::Token> TemplatedDeclaration, Decl *From) {
+      llvm::ArrayRef<syntax::Token> Range, const syntax::Token *TemplateKW,
+      llvm::ArrayRef<syntax::Token> TemplatedDeclaration, Decl *From) {
     assert(TemplateKW && TemplateKW->kind() == tok::kw_template);
     Builder.markChildToken(TemplateKW, syntax::NodeRole::IntroducerKeyword);
 

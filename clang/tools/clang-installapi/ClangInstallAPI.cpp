@@ -39,10 +39,10 @@ using namespace clang::driver::options;
 using namespace llvm::opt;
 using namespace llvm::MachO;
 
-static bool runFrontend(StringRef ProgName, Twine Label, bool Verbose,
+static bool runFrontend(llvm::StringRef ProgName, llvm::Twine Label, bool Verbose,
                         InstallAPIContext &Ctx,
                         llvm::vfs::InMemoryFileSystem *FS,
-                        const ArrayRef<std::string> InitialArgs) {
+                        const llvm::ArrayRef<std::string> InitialArgs) {
 
   std::unique_ptr<llvm::MemoryBuffer> ProcessedInput = createInputBuffer(Ctx);
   // Skip invoking cc1 when there are no header inputs.
@@ -68,16 +68,16 @@ static bool runFrontend(StringRef ProgName, Twine Label, bool Verbose,
   return Invocation.run();
 }
 
-static bool run(ArrayRef<const char *> Args, const char *ProgName) {
+static bool run(llvm::ArrayRef<const char *> Args, const char *ProgName) {
   // Setup Diagnostics engine.
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
   const llvm::opt::OptTable &ClangOpts = clang::driver::getDriverOptTable();
   unsigned MissingArgIndex, MissingArgCount;
   llvm::opt::InputArgList ParsedArgs = ClangOpts.ParseArgs(
-      ArrayRef(Args).slice(1), MissingArgIndex, MissingArgCount);
+      llvm::ArrayRef(Args).slice(1), MissingArgIndex, MissingArgCount);
   ParseDiagnosticArgs(*DiagOpts, ParsedArgs);
 
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diag = new clang::DiagnosticsEngine(
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diag = new clang::DiagnosticsEngine(
       new clang::DiagnosticIDs(), DiagOpts.get(),
       new clang::TextDiagnosticPrinter(llvm::errs(), DiagOpts.get()));
 
@@ -88,7 +88,7 @@ static bool run(ArrayRef<const char *> Args, const char *ProgName) {
   llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
       new llvm::vfs::InMemoryFileSystem);
   OverlayFileSystem->pushOverlay(InMemoryFileSystem);
-  IntrusiveRefCntPtr<clang::FileManager> FM(
+  llvm::IntrusiveRefCntPtr<clang::FileManager> FM(
       new FileManager(clang::FileSystemOptions(), OverlayFileSystem));
 
   // Capture all options and diagnose any errors.
@@ -129,7 +129,7 @@ static bool run(ArrayRef<const char *> Args, const char *ProgName) {
       std::vector<std::string> ArgStrings = Opts.getClangFrontendArgs();
       Opts.addConditionalCC1Args(ArgStrings, Trip, Type);
       Ctx.Type = Type;
-      StringRef HeaderLabel = getName(Ctx.Type);
+      llvm::StringRef HeaderLabel = getName(Ctx.Type);
       if (!runFrontend(ProgName, HeaderLabel, Opts.DriverOpts.Verbose, Ctx,
                        InMemoryFileSystem.get(), ArgStrings))
         return EXIT_FAILURE;
@@ -169,7 +169,7 @@ static bool run(ArrayRef<const char *> Args, const char *ProgName) {
   auto assignLibAttrs =
       [&IF](
           const auto &Attrs,
-          std::function<void(InterfaceFile *, StringRef, const Target &)> Add) {
+          std::function<void(InterfaceFile *, llvm::StringRef, const Target &)> Add) {
         for (const auto &Lib : Attrs)
           for (const auto &T : IF.targets(Lib.getValue()))
             Add(&IF, Lib.getKey(), T);

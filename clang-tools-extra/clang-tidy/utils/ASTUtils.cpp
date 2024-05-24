@@ -37,7 +37,7 @@ bool isBinaryOrTernary(const Expr *E) {
 
 bool exprHasBitFlagWithSpelling(const Expr *Flags, const SourceManager &SM,
                                 const LangOptions &LangOpts,
-                                StringRef FlagName) {
+                                llvm::StringRef FlagName) {
   // If the Flag is an integer constant, check it.
   if (isa<IntegerLiteral>(Flags)) {
     if (!SM.isMacroBodyExpansion(Flags->getBeginLoc()) &&

@@ -35,11 +35,11 @@ class ClangTidyASTConsumerFactory {
 public:
   ClangTidyASTConsumerFactory(
       ClangTidyContext &Context,
-      IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFS = nullptr);
+      llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFS = nullptr);
 
   /// Returns an ASTConsumer that runs the specified clang-tidy checks.
   std::unique_ptr<clang::ASTConsumer>
-  createASTConsumer(clang::CompilerInstance &Compiler, StringRef File);
+  createASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef File);
 
   /// Get the list of enabled checks.
   std::vector<std::string> getCheckNames();
@@ -49,7 +49,7 @@ public:
 
 private:
   ClangTidyContext &Context;
-  IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFS;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFS;
   std::unique_ptr<ClangTidyCheckFactories> CheckFactories;
 };
 
@@ -86,10 +86,10 @@ getCheckOptions(const ClangTidyOptions &Options,
 std::vector<ClangTidyError>
 runClangTidy(clang::tidy::ClangTidyContext &Context,
              const tooling::CompilationDatabase &Compilations,
-             ArrayRef<std::string> InputFiles,
+             llvm::ArrayRef<std::string> InputFiles,
              llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> BaseFS,
              bool ApplyAnyFix, bool EnableCheckProfile = false,
-             llvm::StringRef StoreCheckProfile = StringRef());
+             llvm::StringRef StoreCheckProfile = llvm::StringRef());
 
 /// Controls what kind of fixes clang-tidy is allowed to apply.
 enum FixBehaviour {
@@ -115,9 +115,9 @@ void handleErrors(llvm::ArrayRef<ClangTidyError> Errors,
 
 /// Serializes replacements into YAML and writes them to the specified
 /// output stream.
-void exportReplacements(StringRef MainFilePath,
+void exportReplacements(llvm::StringRef MainFilePath,
                         const std::vector<ClangTidyError> &Errors,
-                        raw_ostream &OS);
+                        llvm::raw_ostream &OS);
 
 } // end namespace tidy
 } // end namespace clang

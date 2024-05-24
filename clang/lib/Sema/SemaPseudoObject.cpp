@@ -140,8 +140,8 @@ namespace {
         unsigned resultIndex = gse->getResultIndex();
         unsigned numAssocs = gse->getNumAssocs();
 
-        SmallVector<Expr *, 8> assocExprs;
-        SmallVector<TypeSourceInfo *, 8> assocTypes;
+        llvm::SmallVector<Expr *, 8> assocExprs;
+        llvm::SmallVector<TypeSourceInfo *, 8> assocTypes;
         assocExprs.reserve(numAssocs);
         assocTypes.reserve(numAssocs);
 
@@ -189,7 +189,7 @@ namespace {
     unsigned ResultIndex;
     SourceLocation GenericLoc;
     bool IsUnique;
-    SmallVector<Expr *, 4> Semantics;
+    llvm::SmallVector<Expr *, 4> Semantics;
 
     PseudoOpBuilder(Sema &S, SourceLocation genericLoc, bool IsUnique)
       : S(S), ResultIndex(PseudoObjectExpr::NoResult),
@@ -341,7 +341,7 @@ namespace {
  class MSPropertyOpBuilder : public PseudoOpBuilder {
    MSPropertyRefExpr *RefExpr;
    OpaqueValueExpr *InstanceBase;
-   SmallVector<Expr *, 4> CallArgs;
+   llvm::SmallVector<Expr *, 4> CallArgs;
 
    MSPropertyRefExpr *getBaseMSProperty(MSPropertySubscriptExpr *E);
 
@@ -664,11 +664,11 @@ bool ObjCPropertyOpBuilder::findSetter(bool warn) {
     if (setter->isPropertyAccessor() && warn)
       if (const ObjCInterfaceDecl *IFace =
           dyn_cast<ObjCInterfaceDecl>(setter->getDeclContext())) {
-        StringRef thisPropertyName = prop->getName();
+        llvm::StringRef thisPropertyName = prop->getName();
         // Try flipping the case of the first character.
         char front = thisPropertyName.front();
         front = isLowercase(front) ? toUppercase(front) : toLowercase(front);
-        SmallString<100> PropertyName = thisPropertyName;
+        llvm::SmallString<100> PropertyName = thisPropertyName;
         PropertyName[0] = front;
         const IdentifierInfo *AltMember =
             &S.PP.getIdentifierTable().get(PropertyName);
@@ -1224,7 +1224,7 @@ bool ObjCSubscriptOpBuilder::findAtIndexSetter() {
         /*isSynthesizedAccessorStub=*/false,
         /*isImplicitlyDeclared=*/true, /*isDefined=*/false,
         ObjCImplementationControl::Required, false);
-    SmallVector<ParmVarDecl *, 2> Params;
+    llvm::SmallVector<ParmVarDecl *, 2> Params;
     ParmVarDecl *object = ParmVarDecl::Create(S.Context, AtIndexSetter,
                                                 SourceLocation(), SourceLocation(),
                                                 &S.Context.Idents.get("object"),
@@ -1435,7 +1435,7 @@ ExprResult MSPropertyOpBuilder::buildSet(Expr *op, SourceLocation sl,
     return ExprError();
   }
 
-  SmallVector<Expr*, 4> ArgExprs;
+  llvm::SmallVector<Expr*, 4> ArgExprs;
   ArgExprs.append(CallArgs.begin(), CallArgs.end());
   ArgExprs.push_back(op);
   return S.BuildCallExpr(S.getCurScope(), SetterExpr.get(),

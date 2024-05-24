@@ -30,12 +30,12 @@ using namespace clang;
 namespace {
   class HTMLPrinter : public ASTConsumer {
     Rewriter R;
-    std::unique_ptr<raw_ostream> Out;
+    std::unique_ptr<llvm::raw_ostream> Out;
     Preprocessor &PP;
     bool SyntaxHighlight, HighlightMacros;
 
   public:
-    HTMLPrinter(std::unique_ptr<raw_ostream> OS, Preprocessor &pp,
+    HTMLPrinter(std::unique_ptr<llvm::raw_ostream> OS, Preprocessor &pp,
                 bool _SyntaxHighlight, bool _HighlightMacros)
       : Out(std::move(OS)), PP(pp), SyntaxHighlight(_SyntaxHighlight),
         HighlightMacros(_HighlightMacros) {}
@@ -46,7 +46,7 @@ namespace {
 }
 
 std::unique_ptr<ASTConsumer>
-clang::CreateHTMLPrinter(std::unique_ptr<raw_ostream> OS, Preprocessor &PP,
+clang::CreateHTMLPrinter(std::unique_ptr<llvm::raw_ostream> OS, Preprocessor &PP,
                          bool SyntaxHighlight, bool HighlightMacros) {
   return std::make_unique<HTMLPrinter>(std::move(OS), PP, SyntaxHighlight,
                                         HighlightMacros);
@@ -63,7 +63,7 @@ void HTMLPrinter::HandleTranslationUnit(ASTContext &Ctx) {
   // Format the file.
   FileID FID = R.getSourceMgr().getMainFileID();
   OptionalFileEntryRef Entry = R.getSourceMgr().getFileEntryRefForID(FID);
-  StringRef Name;
+  llvm::StringRef Name;
   // In some cases, in particular the case where the input is from stdin,
   // there is no entry.  Fall back to the memory buffer for a name in those
   // cases.

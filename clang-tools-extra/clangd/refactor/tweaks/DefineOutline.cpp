@@ -451,7 +451,7 @@ public:
     return true;
   }
 
-  Expected<Effect> apply(const Selection &Sel) override {
+  llvm::Expected<Effect> apply(const Selection &Sel) override {
     const SourceManager &SM = Sel.AST->getSourceManager();
     auto CCFile = getSourceFile(Sel.AST->tuPath(), Sel);
 

@@ -27,7 +27,7 @@ AST_MATCHER_P(NamespaceAliasDecl, hasTargetNamespace,
 
 std::optional<FixItHint>
 NamespaceAliaser::createAlias(ASTContext &Context, const Stmt &Statement,
-                              StringRef Namespace,
+                              llvm::StringRef Namespace,
                               const std::vector<std::string> &Abbreviations) {
   const FunctionDecl *Function = getSurroundingFunction(Context, Statement);
   if (!Function || !Function->hasBody())
@@ -79,7 +79,7 @@ NamespaceAliaser::createAlias(ASTContext &Context, const Stmt &Statement,
 
 std::string NamespaceAliaser::getNamespaceName(ASTContext &Context,
                                                const Stmt &Statement,
-                                               StringRef Namespace) const {
+                                               llvm::StringRef Namespace) const {
   const auto *Function = getSurroundingFunction(Context, Statement);
   auto FunctionAliases = AddedAliases.find(Function);
   if (FunctionAliases != AddedAliases.end()) {

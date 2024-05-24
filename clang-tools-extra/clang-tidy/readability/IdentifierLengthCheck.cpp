@@ -29,7 +29,7 @@ const char ErrorMessage[] =
     "%select{variable|exception variable|loop variable|"
     "parameter}0 name %1 is too short, expected at least %2 characters";
 
-IdentifierLengthCheck::IdentifierLengthCheck(StringRef Name,
+IdentifierLengthCheck::IdentifierLengthCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       MinimumVariableNameLength(Options.get("MinimumVariableNameLength",
@@ -94,7 +94,7 @@ void IdentifierLengthCheck::check(const MatchFinder::MatchResult &Result) {
     if (!StandaloneVar->getIdentifier())
       return;
 
-    StringRef VarName = StandaloneVar->getName();
+    llvm::StringRef VarName = StandaloneVar->getName();
 
     if (VarName.size() >= MinimumVariableNameLength ||
         IgnoredVariableNames.match(VarName))
@@ -109,7 +109,7 @@ void IdentifierLengthCheck::check(const MatchFinder::MatchResult &Result) {
     if (!ExceptionVarName->getIdentifier())
       return;
 
-    StringRef VarName = ExceptionVarName->getName();
+    llvm::StringRef VarName = ExceptionVarName->getName();
     if (VarName.size() >= MinimumExceptionNameLength ||
         IgnoredExceptionVariableNames.match(VarName))
       return;
@@ -123,7 +123,7 @@ void IdentifierLengthCheck::check(const MatchFinder::MatchResult &Result) {
     if (!LoopVar->getIdentifier())
       return;
 
-    StringRef VarName = LoopVar->getName();
+    llvm::StringRef VarName = LoopVar->getName();
 
     if (VarName.size() >= MinimumLoopCounterNameLength ||
         IgnoredLoopCounterNames.match(VarName))
@@ -138,7 +138,7 @@ void IdentifierLengthCheck::check(const MatchFinder::MatchResult &Result) {
     if (!ParamVar->getIdentifier())
       return;
 
-    StringRef VarName = ParamVar->getName();
+    llvm::StringRef VarName = ParamVar->getName();
 
     if (VarName.size() >= MinimumParameterNameLength ||
         IgnoredParameterNames.match(VarName))

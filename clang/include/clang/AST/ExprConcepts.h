@@ -78,7 +78,7 @@ public:
          const ConstraintSatisfaction *Satisfaction, bool Dependent,
          bool ContainsUnexpandedParameterPack);
 
-  ArrayRef<TemplateArgument> getTemplateArguments() const {
+  llvm::ArrayRef<TemplateArgument> getTemplateArguments() const {
     return SpecDecl->getTemplateArguments();
   }
 
@@ -181,12 +181,12 @@ private:
   bool Satisfied : 1;
 public:
   struct SubstitutionDiagnostic {
-    StringRef SubstitutedEntity;
+    llvm::StringRef SubstitutedEntity;
     // FIXME: Store diagnostics semantically and not as prerendered strings.
     //  Fixing this probably requires serialization of PartialDiagnostic
     //  objects.
     SourceLocation DiagLoc;
-    StringRef DiagMessage;
+    llvm::StringRef DiagMessage;
   };
 
   Requirement(RequirementKind Kind, bool IsDependent,
@@ -430,7 +430,7 @@ class NestedRequirement : public Requirement {
   Expr *Constraint = nullptr;
   const ASTConstraintSatisfaction *Satisfaction = nullptr;
   bool HasInvalidConstraint = false;
-  StringRef InvalidConstraintEntity;
+  llvm::StringRef InvalidConstraintEntity;
 
 public:
   friend ASTStmtReader;
@@ -453,7 +453,7 @@ public:
         Constraint(Constraint),
         Satisfaction(ASTConstraintSatisfaction::Create(C, Satisfaction)) {}
 
-  NestedRequirement(StringRef InvalidConstraintEntity,
+  NestedRequirement(llvm::StringRef InvalidConstraintEntity,
                     const ASTConstraintSatisfaction *Satisfaction)
       : Requirement(RK_Nested,
                     /*IsDependent=*/false,
@@ -462,14 +462,14 @@ public:
         Satisfaction(Satisfaction), HasInvalidConstraint(true),
         InvalidConstraintEntity(InvalidConstraintEntity) {}
 
-  NestedRequirement(ASTContext &C, StringRef InvalidConstraintEntity,
+  NestedRequirement(ASTContext &C, llvm::StringRef InvalidConstraintEntity,
                     const ConstraintSatisfaction &Satisfaction)
       : NestedRequirement(InvalidConstraintEntity,
                           ASTConstraintSatisfaction::Create(C, Satisfaction)) {}
 
   bool hasInvalidConstraint() const { return HasInvalidConstraint; }
 
-  StringRef getInvalidConstraintEntity() {
+  llvm::StringRef getInvalidConstraintEntity() {
     assert(hasInvalidConstraint());
     return InvalidConstraintEntity;
   }
@@ -528,9 +528,9 @@ class RequiresExpr final : public Expr,
 
   RequiresExpr(ASTContext &C, SourceLocation RequiresKWLoc,
                RequiresExprBodyDecl *Body, SourceLocation LParenLoc,
-               ArrayRef<ParmVarDecl *> LocalParameters,
+               llvm::ArrayRef<ParmVarDecl *> LocalParameters,
                SourceLocation RParenLoc,
-               ArrayRef<concepts::Requirement *> Requirements,
+               llvm::ArrayRef<concepts::Requirement *> Requirements,
                SourceLocation RBraceLoc);
   RequiresExpr(ASTContext &C, EmptyShell Empty, unsigned NumLocalParameters,
                unsigned NumRequirements);
@@ -539,21 +539,21 @@ public:
   static RequiresExpr *Create(ASTContext &C, SourceLocation RequiresKWLoc,
                               RequiresExprBodyDecl *Body,
                               SourceLocation LParenLoc,
-                              ArrayRef<ParmVarDecl *> LocalParameters,
+                              llvm::ArrayRef<ParmVarDecl *> LocalParameters,
                               SourceLocation RParenLoc,
-                              ArrayRef<concepts::Requirement *> Requirements,
+                              llvm::ArrayRef<concepts::Requirement *> Requirements,
                               SourceLocation RBraceLoc);
   static RequiresExpr *
   Create(ASTContext &C, EmptyShell Empty, unsigned NumLocalParameters,
          unsigned NumRequirements);
 
-  ArrayRef<ParmVarDecl *> getLocalParameters() const {
+  llvm::ArrayRef<ParmVarDecl *> getLocalParameters() const {
     return {getTrailingObjects<ParmVarDecl *>(), NumLocalParameters};
   }
 
   RequiresExprBodyDecl *getBody() const { return Body; }
 
-  ArrayRef<concepts::Requirement *> getRequirements() const {
+  llvm::ArrayRef<concepts::Requirement *> getRequirements() const {
     return {getTrailingObjects<concepts::Requirement *>(), NumRequirements};
   }
 

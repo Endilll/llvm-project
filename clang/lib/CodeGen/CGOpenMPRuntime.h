@@ -91,27 +91,27 @@ public:
 };
 
 struct OMPTaskDataTy final {
-  SmallVector<const Expr *, 4> PrivateVars;
-  SmallVector<const Expr *, 4> PrivateCopies;
-  SmallVector<const Expr *, 4> FirstprivateVars;
-  SmallVector<const Expr *, 4> FirstprivateCopies;
-  SmallVector<const Expr *, 4> FirstprivateInits;
-  SmallVector<const Expr *, 4> LastprivateVars;
-  SmallVector<const Expr *, 4> LastprivateCopies;
-  SmallVector<const Expr *, 4> ReductionVars;
-  SmallVector<const Expr *, 4> ReductionOrigs;
-  SmallVector<const Expr *, 4> ReductionCopies;
-  SmallVector<const Expr *, 4> ReductionOps;
-  SmallVector<CanonicalDeclPtr<const VarDecl>, 4> PrivateLocals;
+  llvm::SmallVector<const Expr *, 4> PrivateVars;
+  llvm::SmallVector<const Expr *, 4> PrivateCopies;
+  llvm::SmallVector<const Expr *, 4> FirstprivateVars;
+  llvm::SmallVector<const Expr *, 4> FirstprivateCopies;
+  llvm::SmallVector<const Expr *, 4> FirstprivateInits;
+  llvm::SmallVector<const Expr *, 4> LastprivateVars;
+  llvm::SmallVector<const Expr *, 4> LastprivateCopies;
+  llvm::SmallVector<const Expr *, 4> ReductionVars;
+  llvm::SmallVector<const Expr *, 4> ReductionOrigs;
+  llvm::SmallVector<const Expr *, 4> ReductionCopies;
+  llvm::SmallVector<const Expr *, 4> ReductionOps;
+  llvm::SmallVector<CanonicalDeclPtr<const VarDecl>, 4> PrivateLocals;
   struct DependData {
     OpenMPDependClauseKind DepKind = OMPC_DEPEND_unknown;
     const Expr *IteratorExpr = nullptr;
-    SmallVector<const Expr *, 4> DepExprs;
+    llvm::SmallVector<const Expr *, 4> DepExprs;
     explicit DependData() = default;
     DependData(OpenMPDependClauseKind DepKind, const Expr *IteratorExpr)
         : DepKind(DepKind), IteratorExpr(IteratorExpr) {}
   };
-  SmallVector<DependData, 4> Dependences;
+  llvm::SmallVector<DependData, 4> Dependences;
   llvm::PointerIntPair<llvm::Value *, 1, bool> Final;
   llvm::PointerIntPair<llvm::Value *, 1, bool> Schedule;
   llvm::PointerIntPair<llvm::Value *, 1, bool> Priority;
@@ -143,16 +143,16 @@ private:
     }
   };
   /// List of reduction-based clauses.
-  SmallVector<ReductionData, 4> ClausesData;
+  llvm::SmallVector<ReductionData, 4> ClausesData;
 
   /// List of addresses of shared variables/expressions.
-  SmallVector<std::pair<LValue, LValue>, 4> SharedAddresses;
+  llvm::SmallVector<std::pair<LValue, LValue>, 4> SharedAddresses;
   /// List of addresses of original variables/expressions.
-  SmallVector<std::pair<LValue, LValue>, 4> OrigAddresses;
+  llvm::SmallVector<std::pair<LValue, LValue>, 4> OrigAddresses;
   /// Sizes of the reduction items in chars.
-  SmallVector<std::pair<llvm::Value *, llvm::Value *>, 4> Sizes;
+  llvm::SmallVector<std::pair<llvm::Value *, llvm::Value *>, 4> Sizes;
   /// Base declarations for the reduction items.
-  SmallVector<const VarDecl *, 4> BaseDecls;
+  llvm::SmallVector<const VarDecl *, 4> BaseDecls;
 
   /// Emits lvalue for shared expression.
   LValue emitSharedLValue(CodeGenFunction &CGF, const Expr *E);
@@ -168,9 +168,9 @@ private:
                                    const OMPDeclareReductionDecl *DRD);
 
 public:
-  ReductionCodeGen(ArrayRef<const Expr *> Shareds, ArrayRef<const Expr *> Origs,
-                   ArrayRef<const Expr *> Privates,
-                   ArrayRef<const Expr *> ReductionOps);
+  ReductionCodeGen(llvm::ArrayRef<const Expr *> Shareds, llvm::ArrayRef<const Expr *> Origs,
+                   llvm::ArrayRef<const Expr *> Privates,
+                   llvm::ArrayRef<const Expr *> ReductionOps);
   /// Emits lvalue for the shared and original reduction item.
   /// \param N Number of the reduction item.
   void emitSharedOrigLValue(CodeGenFunction &CGF, unsigned N);
@@ -269,7 +269,7 @@ public:
   /// Also, stores the expression for the private loop counter and it
   /// threaprivate name.
   struct LastprivateConditionalData {
-    llvm::MapVector<CanonicalDeclPtr<const Decl>, SmallString<16>>
+    llvm::MapVector<CanonicalDeclPtr<const Decl>, llvm::SmallString<16>>
         DeclToUniqueName;
     LValue IVLVal;
     llvm::Function *Fn = nullptr;
@@ -329,7 +329,7 @@ protected:
   /// An outlined function may not be an entry if, e.g. the if clause always
   /// evaluates to false.
   virtual void emitTargetOutlinedFunctionHelper(const OMPExecutableDirective &D,
-                                                StringRef ParentName,
+                                                llvm::StringRef ParentName,
                                                 llvm::Function *&OutlinedFn,
                                                 llvm::Constant *&OutlinedFnID,
                                                 bool IsOffloadEntry,
@@ -343,16 +343,16 @@ protected:
   llvm::Value *getThreadID(CodeGenFunction &CGF, SourceLocation Loc);
 
   /// Get the function name of an outlined region.
-  std::string getOutlinedHelperName(StringRef Name) const;
+  std::string getOutlinedHelperName(llvm::StringRef Name) const;
   std::string getOutlinedHelperName(CodeGenFunction &CGF) const;
 
   /// Get the function name of a reduction function.
-  std::string getReductionFuncName(StringRef Name) const;
+  std::string getReductionFuncName(llvm::StringRef Name) const;
 
   /// Emits \p Callee function call with arguments \p Args with location \p Loc.
   void emitCall(CodeGenFunction &CGF, SourceLocation Loc,
                 llvm::FunctionCallee Callee,
-                ArrayRef<llvm::Value *> Args = std::nullopt) const;
+                llvm::ArrayRef<llvm::Value *> Args = std::nullopt) const;
 
   /// Emits address of the word in a memory where current thread id is
   /// stored.
@@ -382,7 +382,7 @@ protected:
   /// reference to the existing copy is returned.
   /// \param CriticalName Name of the critical region.
   ///
-  llvm::Value *getCriticalRegionLock(StringRef CriticalName);
+  llvm::Value *getCriticalRegionLock(llvm::StringRef CriticalName);
 
 protected:
   /// Map for SourceLocation and OpenMP runtime library debug locations.
@@ -410,7 +410,7 @@ protected:
   UDRMapTy UDRMap;
   /// Map of functions and locally defined UDRs.
   typedef llvm::DenseMap<llvm::Function *,
-                         SmallVector<const OMPDeclareReductionDecl *, 4>>
+                         llvm::SmallVector<const OMPDeclareReductionDecl *, 4>>
       FunctionUDRMapTy;
   FunctionUDRMapTy FunctionUDRMap;
   /// Map from the user-defined mapper declaration to its corresponding
@@ -419,7 +419,7 @@ protected:
   /// Map of functions and their local user-defined mappers.
   using FunctionUDMMapTy =
       llvm::DenseMap<llvm::Function *,
-                     SmallVector<const OMPDeclareMapperDecl *, 4>>;
+                     llvm::SmallVector<const OMPDeclareMapperDecl *, 4>>;
   FunctionUDMMapTy FunctionUDMMap;
   /// Maps local variables marked as lastprivate conditional to their internal
   /// types.
@@ -527,7 +527,7 @@ protected:
   /// found along the way.
   /// \param S Starting statement.
   /// \param ParentName Name of the function declaration that is being scanned.
-  void scanForTargetRegionsFunctions(const Stmt *S, StringRef ParentName);
+  void scanForTargetRegionsFunctions(const Stmt *S, llvm::StringRef ParentName);
 
   /// Build type kmp_routine_entry_t (if not built yet).
   void emitKmpRoutineEntryT(QualType KmpInt32Ty);
@@ -604,7 +604,7 @@ protected:
 
   /// Emit update for lastprivate conditional data.
   void emitLastprivateConditionalUpdate(CodeGenFunction &CGF, LValue IVLVal,
-                                        StringRef UniqueDeclName, LValue LVal,
+                                        llvm::StringRef UniqueDeclName, LValue LVal,
                                         SourceLocation Loc);
 
   /// Returns the number of the elements and the address of the depobj
@@ -615,7 +615,7 @@ protected:
                                                      LValue DepobjLVal,
                                                      SourceLocation Loc);
 
-  SmallVector<llvm::Value *, 4>
+  llvm::SmallVector<llvm::Value *, 4>
   emitDepobjElementsSizes(CodeGenFunction &CGF, QualType &KmpDependInfoTy,
                           const OMPTaskDataTy::DependData &Data);
 
@@ -714,7 +714,7 @@ public:
   static const Stmt *getSingleCompoundChild(ASTContext &Ctx, const Stmt *Body);
 
   /// Get the platform-specific name separator.
-  std::string getName(ArrayRef<StringRef> Parts) const;
+  std::string getName(llvm::ArrayRef<llvm::StringRef> Parts) const;
 
   /// Emit code for the specified user defined reduction construct.
   virtual void emitUserDefinedReduction(CodeGenFunction *CGF,
@@ -798,7 +798,7 @@ public:
   ///
   virtual void emitParallelCall(CodeGenFunction &CGF, SourceLocation Loc,
                                 llvm::Function *OutlinedFn,
-                                ArrayRef<llvm::Value *> CapturedVars,
+                                llvm::ArrayRef<llvm::Value *> CapturedVars,
                                 const Expr *IfCond, llvm::Value *NumThreads);
 
   /// Emits a critical region.
@@ -806,7 +806,7 @@ public:
   /// \param CriticalOpGen Generator for the statement associated with the given
   /// critical region.
   /// \param Hint Value of the 'hint' clause (optional).
-  virtual void emitCriticalRegion(CodeGenFunction &CGF, StringRef CriticalName,
+  virtual void emitCriticalRegion(CodeGenFunction &CGF, llvm::StringRef CriticalName,
                                   const RegionCodeGenTy &CriticalOpGen,
                                   SourceLocation Loc,
                                   const Expr *Hint = nullptr);
@@ -847,10 +847,10 @@ public:
   virtual void emitSingleRegion(CodeGenFunction &CGF,
                                 const RegionCodeGenTy &SingleOpGen,
                                 SourceLocation Loc,
-                                ArrayRef<const Expr *> CopyprivateVars,
-                                ArrayRef<const Expr *> DestExprs,
-                                ArrayRef<const Expr *> SrcExprs,
-                                ArrayRef<const Expr *> AssignmentOps);
+                                llvm::ArrayRef<const Expr *> CopyprivateVars,
+                                llvm::ArrayRef<const Expr *> DestExprs,
+                                llvm::ArrayRef<const Expr *> SrcExprs,
+                                llvm::ArrayRef<const Expr *> AssignmentOps);
 
   /// Emit an ordered region.
   /// \param OrderedOpGen Generator for the statement associated with the given
@@ -1101,11 +1101,11 @@ public:
   /// \param Name Name of the artificial threadprivate variable.
   virtual Address getAddrOfArtificialThreadPrivate(CodeGenFunction &CGF,
                                                    QualType VarType,
-                                                   StringRef Name);
+                                                   llvm::StringRef Name);
 
   /// Emit flush of the variables specified in 'omp flush' directive.
   /// \param Vars List of variables to flush.
-  virtual void emitFlush(CodeGenFunction &CGF, ArrayRef<const Expr *> Vars,
+  virtual void emitFlush(CodeGenFunction &CGF, llvm::ArrayRef<const Expr *> Vars,
                          SourceLocation Loc, llvm::AtomicOrdering AO);
 
   /// Emit task region for the task directive. The task region is
@@ -1197,9 +1197,9 @@ public:
   /// \param ReductionOps List of reduction operations in form 'LHS binop RHS'
   /// or 'operator binop(LHS, RHS)'.
   llvm::Function *emitReductionFunction(
-      StringRef ReducerName, SourceLocation Loc, llvm::Type *ArgsElemType,
-      ArrayRef<const Expr *> Privates, ArrayRef<const Expr *> LHSExprs,
-      ArrayRef<const Expr *> RHSExprs, ArrayRef<const Expr *> ReductionOps);
+      llvm::StringRef ReducerName, SourceLocation Loc, llvm::Type *ArgsElemType,
+      llvm::ArrayRef<const Expr *> Privates, llvm::ArrayRef<const Expr *> LHSExprs,
+      llvm::ArrayRef<const Expr *> RHSExprs, llvm::ArrayRef<const Expr *> ReductionOps);
 
   /// Emits single reduction combiner
   void emitSingleReductionCombiner(CodeGenFunction &CGF,
@@ -1256,10 +1256,10 @@ public:
   ///     directive on the host.
   ///     ReductionKind The kind of reduction to perform.
   virtual void emitReduction(CodeGenFunction &CGF, SourceLocation Loc,
-                             ArrayRef<const Expr *> Privates,
-                             ArrayRef<const Expr *> LHSExprs,
-                             ArrayRef<const Expr *> RHSExprs,
-                             ArrayRef<const Expr *> ReductionOps,
+                             llvm::ArrayRef<const Expr *> Privates,
+                             llvm::ArrayRef<const Expr *> LHSExprs,
+                             llvm::ArrayRef<const Expr *> RHSExprs,
+                             llvm::ArrayRef<const Expr *> ReductionOps,
                              ReductionOptionsTy Options);
 
   /// Emit a code for initialization of task reduction clause. Next code
@@ -1300,8 +1300,8 @@ public:
   /// state, list of privates, reductions etc.
   virtual llvm::Value *emitTaskReductionInit(CodeGenFunction &CGF,
                                              SourceLocation Loc,
-                                             ArrayRef<const Expr *> LHSExprs,
-                                             ArrayRef<const Expr *> RHSExprs,
+                                             llvm::ArrayRef<const Expr *> LHSExprs,
+                                             llvm::ArrayRef<const Expr *> RHSExprs,
                                              const OMPTaskDataTy &Data);
 
   /// Emits the following code for reduction clause with task modifier:
@@ -1359,7 +1359,7 @@ public:
   /// An outlined function may not be an entry if, e.g. the if clause always
   /// evaluates to false.
   virtual void emitTargetOutlinedFunction(const OMPExecutableDirective &D,
-                                          StringRef ParentName,
+                                          llvm::StringRef ParentName,
                                           llvm::Function *&OutlinedFn,
                                           llvm::Constant *&OutlinedFnID,
                                           bool IsOffloadEntry,
@@ -1421,7 +1421,7 @@ public:
   virtual void emitTeamsCall(CodeGenFunction &CGF,
                              const OMPExecutableDirective &D,
                              SourceLocation Loc, llvm::Function *OutlinedFn,
-                             ArrayRef<llvm::Value *> CapturedVars);
+                             llvm::ArrayRef<llvm::Value *> CapturedVars);
 
   /// Emits call to void __kmpc_push_num_teams(ident_t *loc, kmp_int32
   /// global_tid, kmp_int32 num_teams, kmp_int32 thread_limit) to generate code
@@ -1489,7 +1489,7 @@ public:
   /// Emit initialization for doacross loop nesting support.
   /// \param D Loop-based construct used in doacross nesting construct.
   virtual void emitDoacrossInit(CodeGenFunction &CGF, const OMPLoopDirective &D,
-                                ArrayRef<Expr *> NumIterations);
+                                llvm::ArrayRef<Expr *> NumIterations);
 
   /// Emit code for doacross ordered directive with 'depend' clause.
   /// \param C 'depend' clause with 'sink|source' dependency kind.
@@ -1535,7 +1535,7 @@ public:
   virtual void
   emitOutlinedFunctionCall(CodeGenFunction &CGF, SourceLocation Loc,
                            llvm::FunctionCallee OutlinedFn,
-                           ArrayRef<llvm::Value *> Args = std::nullopt) const;
+                           llvm::ArrayRef<llvm::Value *> Args = std::nullopt) const;
 
   /// Emits OpenMP-specific function prolog.
   /// Required for device constructs.
@@ -1635,7 +1635,7 @@ public:
   /// \returns Pointer to the first element of the array casted to VoidPtr type.
   std::pair<llvm::Value *, Address>
   emitDependClause(CodeGenFunction &CGF,
-                   ArrayRef<OMPTaskDataTy::DependData> Dependencies,
+                   llvm::ArrayRef<OMPTaskDataTy::DependData> Dependencies,
                    SourceLocation Loc);
 
   /// Emits list of dependecies based on the provided data (array of
@@ -1738,7 +1738,7 @@ public:
   ///
   void emitParallelCall(CodeGenFunction &CGF, SourceLocation Loc,
                         llvm::Function *OutlinedFn,
-                        ArrayRef<llvm::Value *> CapturedVars,
+                        llvm::ArrayRef<llvm::Value *> CapturedVars,
                         const Expr *IfCond, llvm::Value *NumThreads) override;
 
   /// Emits a critical region.
@@ -1746,7 +1746,7 @@ public:
   /// \param CriticalOpGen Generator for the statement associated with the given
   /// critical region.
   /// \param Hint Value of the 'hint' clause (optional).
-  void emitCriticalRegion(CodeGenFunction &CGF, StringRef CriticalName,
+  void emitCriticalRegion(CodeGenFunction &CGF, llvm::StringRef CriticalName,
                           const RegionCodeGenTy &CriticalOpGen,
                           SourceLocation Loc,
                           const Expr *Hint = nullptr) override;
@@ -1784,10 +1784,10 @@ public:
   /// single region.
   void emitSingleRegion(CodeGenFunction &CGF,
                         const RegionCodeGenTy &SingleOpGen, SourceLocation Loc,
-                        ArrayRef<const Expr *> CopyprivateVars,
-                        ArrayRef<const Expr *> DestExprs,
-                        ArrayRef<const Expr *> SrcExprs,
-                        ArrayRef<const Expr *> AssignmentOps) override;
+                        llvm::ArrayRef<const Expr *> CopyprivateVars,
+                        llvm::ArrayRef<const Expr *> DestExprs,
+                        llvm::ArrayRef<const Expr *> SrcExprs,
+                        llvm::ArrayRef<const Expr *> AssignmentOps) override;
 
   /// Emit an ordered region.
   /// \param OrderedOpGen Generator for the statement associated with the given
@@ -1939,11 +1939,11 @@ public:
   /// \param Name Name of the artificial threadprivate variable.
   Address getAddrOfArtificialThreadPrivate(CodeGenFunction &CGF,
                                            QualType VarType,
-                                           StringRef Name) override;
+                                           llvm::StringRef Name) override;
 
   /// Emit flush of the variables specified in 'omp flush' directive.
   /// \param Vars List of variables to flush.
-  void emitFlush(CodeGenFunction &CGF, ArrayRef<const Expr *> Vars,
+  void emitFlush(CodeGenFunction &CGF, llvm::ArrayRef<const Expr *> Vars,
                  SourceLocation Loc, llvm::AtomicOrdering AO) override;
 
   /// Emit task region for the task directive. The task region is
@@ -2056,10 +2056,10 @@ public:
   ///     directive on the host.
   ///     ReductionKind The kind of reduction to perform.
   void emitReduction(CodeGenFunction &CGF, SourceLocation Loc,
-                     ArrayRef<const Expr *> Privates,
-                     ArrayRef<const Expr *> LHSExprs,
-                     ArrayRef<const Expr *> RHSExprs,
-                     ArrayRef<const Expr *> ReductionOps,
+                     llvm::ArrayRef<const Expr *> Privates,
+                     llvm::ArrayRef<const Expr *> LHSExprs,
+                     llvm::ArrayRef<const Expr *> RHSExprs,
+                     llvm::ArrayRef<const Expr *> ReductionOps,
                      ReductionOptionsTy Options) override;
 
   /// Emit a code for initialization of task reduction clause. Next code
@@ -2099,8 +2099,8 @@ public:
   /// \param Data Additional data for task generation like tiedness, final
   /// state, list of privates, reductions etc.
   llvm::Value *emitTaskReductionInit(CodeGenFunction &CGF, SourceLocation Loc,
-                                     ArrayRef<const Expr *> LHSExprs,
-                                     ArrayRef<const Expr *> RHSExprs,
+                                     llvm::ArrayRef<const Expr *> LHSExprs,
+                                     llvm::ArrayRef<const Expr *> RHSExprs,
                                      const OMPTaskDataTy &Data) override;
 
   /// Emits the following code for reduction clause with task modifier:
@@ -2159,7 +2159,7 @@ public:
   /// An outlined function may not be an entry if, e.g. the if clause always
   /// evaluates to false.
   void emitTargetOutlinedFunction(const OMPExecutableDirective &D,
-                                  StringRef ParentName,
+                                  llvm::StringRef ParentName,
                                   llvm::Function *&OutlinedFn,
                                   llvm::Constant *&OutlinedFnID,
                                   bool IsOffloadEntry,
@@ -2209,7 +2209,7 @@ public:
   ///
   void emitTeamsCall(CodeGenFunction &CGF, const OMPExecutableDirective &D,
                      SourceLocation Loc, llvm::Function *OutlinedFn,
-                     ArrayRef<llvm::Value *> CapturedVars) override;
+                     llvm::ArrayRef<llvm::Value *> CapturedVars) override;
 
   /// Emits call to void __kmpc_push_num_teams(ident_t *loc, kmp_int32
   /// global_tid, kmp_int32 num_teams, kmp_int32 thread_limit) to generate code
@@ -2247,7 +2247,7 @@ public:
   /// Emit initialization for doacross loop nesting support.
   /// \param D Loop-based construct used in doacross nesting construct.
   void emitDoacrossInit(CodeGenFunction &CGF, const OMPLoopDirective &D,
-                        ArrayRef<Expr *> NumIterations) override;
+                        llvm::ArrayRef<Expr *> NumIterations) override;
 
   /// Emit code for doacross ordered directive with 'depend' clause.
   /// \param C 'depend' clause with 'sink|source' dependency kind.

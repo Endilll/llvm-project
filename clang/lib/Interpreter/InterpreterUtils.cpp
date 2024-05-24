@@ -37,7 +37,7 @@ Expr *CStyleCastPtrExpr(Sema &S, QualType Ty, uintptr_t Ptr) {
 }
 
 Sema::DeclGroupPtrTy CreateDGPtrFrom(Sema &S, Decl *D) {
-  SmallVector<Decl *, 1> DeclsInGroup;
+  llvm::SmallVector<Decl *, 1> DeclsInGroup;
   DeclsInGroup.push_back(D);
   Sema::DeclGroupPtrTy DeclGroupPtr = S.BuildDeclaratorGroup(DeclsInGroup);
   return DeclGroupPtr;

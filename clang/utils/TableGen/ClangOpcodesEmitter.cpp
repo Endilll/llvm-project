@@ -27,41 +27,41 @@ public:
   ClangOpcodesEmitter(RecordKeeper &R)
       : Records(R), NumTypes(Records.getAllDerivedDefinitions("Type").size()) {}
 
-  void run(raw_ostream &OS);
+  void run(llvm::raw_ostream &OS);
 
 private:
   /// Emits the opcode name for the opcode enum.
   /// The name is obtained by concatenating the name with the list of types.
-  void EmitEnum(raw_ostream &OS, StringRef N, const Record *R);
+  void EmitEnum(llvm::raw_ostream &OS, llvm::StringRef N, const Record *R);
 
   /// Emits the switch case and the invocation in the interpreter.
-  void EmitInterp(raw_ostream &OS, StringRef N, const Record *R);
+  void EmitInterp(llvm::raw_ostream &OS, llvm::StringRef N, const Record *R);
 
   /// Emits the disassembler.
-  void EmitDisasm(raw_ostream &OS, StringRef N, const Record *R);
+  void EmitDisasm(llvm::raw_ostream &OS, llvm::StringRef N, const Record *R);
 
   /// Emits the byte code emitter method.
-  void EmitEmitter(raw_ostream &OS, StringRef N, const Record *R);
+  void EmitEmitter(llvm::raw_ostream &OS, llvm::StringRef N, const Record *R);
 
   /// Emits the prototype.
-  void EmitProto(raw_ostream &OS, StringRef N, const Record *R);
+  void EmitProto(llvm::raw_ostream &OS, llvm::StringRef N, const Record *R);
 
   /// Emits the prototype to dispatch from a type.
-  void EmitGroup(raw_ostream &OS, StringRef N, const Record *R);
+  void EmitGroup(llvm::raw_ostream &OS, llvm::StringRef N, const Record *R);
 
   /// Emits the evaluator method.
-  void EmitEval(raw_ostream &OS, StringRef N, const Record *R);
+  void EmitEval(llvm::raw_ostream &OS, llvm::StringRef N, const Record *R);
 
-  void PrintTypes(raw_ostream &OS, ArrayRef<const Record *> Types);
+  void PrintTypes(llvm::raw_ostream &OS, llvm::ArrayRef<const Record *> Types);
 };
 
-void Enumerate(const Record *R, StringRef N,
-               std::function<void(ArrayRef<const Record *>, Twine)> &&F) {
+void Enumerate(const Record *R, llvm::StringRef N,
+               std::function<void(llvm::ArrayRef<const Record *>, llvm::Twine)> &&F) {
   llvm::SmallVector<const Record *, 2> TypePath;
   const auto *Types = R->getValueAsListInit("Types");
 
-  std::function<void(size_t, const Twine &)> Rec;
-  Rec = [&TypePath, Types, &Rec, &F](size_t I, const Twine &ID) {
+  std::function<void(size_t, const llvm::Twine &)> Rec;
+  Rec = [&TypePath, Types, &Rec, &F](size_t I, const llvm::Twine &ID) {
     if (I >= Types->size()) {
       F(TypePath, ID);
       return;
@@ -83,10 +83,10 @@ void Enumerate(const Record *R, StringRef N,
 
 } // namespace
 
-void ClangOpcodesEmitter::run(raw_ostream &OS) {
+void ClangOpcodesEmitter::run(llvm::raw_ostream &OS) {
   for (const auto *Opcode : Records.getAllDerivedDefinitions("Opcode")) {
     // The name is the record name, unless overriden.
-    StringRef N = Opcode->getValueAsString("Name");
+    llvm::StringRef N = Opcode->getValueAsString("Name");
     if (N.empty())
       N = Opcode->getName();
 
@@ -100,21 +100,21 @@ void ClangOpcodesEmitter::run(raw_ostream &OS) {
   }
 }
 
-void ClangOpcodesEmitter::EmitEnum(raw_ostream &OS, StringRef N,
+void ClangOpcodesEmitter::EmitEnum(llvm::raw_ostream &OS, llvm::StringRef N,
                                    const Record *R) {
   OS << "#ifdef GET_OPCODE_NAMES\n";
-  Enumerate(R, N, [&OS](ArrayRef<const Record *>, const Twine &ID) {
+  Enumerate(R, N, [&OS](llvm::ArrayRef<const Record *>, const llvm::Twine &ID) {
     OS << "OP_" << ID << ",\n";
   });
   OS << "#endif\n";
 }
 
-void ClangOpcodesEmitter::EmitInterp(raw_ostream &OS, StringRef N,
+void ClangOpcodesEmitter::EmitInterp(llvm::raw_ostream &OS, llvm::StringRef N,
                                      const Record *R) {
   OS << "#ifdef GET_INTERP\n";
 
   Enumerate(R, N,
-            [this, R, &OS, &N](ArrayRef<const Record *> TS, const Twine &ID) {
+            [this, R, &OS, &N](llvm::ArrayRef<const Record *> TS, const llvm::Twine &ID) {
               bool CanReturn = R->getValueAsBit("CanReturn");
               bool ChangesPC = R->getValueAsBit("ChangesPC");
               const auto &Args = R->getValueAsListOfDefs("Args");
@@ -168,10 +168,10 @@ void ClangOpcodesEmitter::EmitInterp(raw_ostream &OS, StringRef N,
   OS << "#endif\n";
 }
 
-void ClangOpcodesEmitter::EmitDisasm(raw_ostream &OS, StringRef N,
+void ClangOpcodesEmitter::EmitDisasm(llvm::raw_ostream &OS, llvm::StringRef N,
                                      const Record *R) {
   OS << "#ifdef GET_DISASM\n";
-  Enumerate(R, N, [R, &OS](ArrayRef<const Record *>, const Twine &ID) {
+  Enumerate(R, N, [R, &OS](llvm::ArrayRef<const Record *>, const llvm::Twine &ID) {
     OS << "case OP_" << ID << ":\n";
     OS << "  PrintName(\"" << ID << "\");\n";
     OS << "  OS << \"\\t\"";
@@ -187,13 +187,13 @@ void ClangOpcodesEmitter::EmitDisasm(raw_ostream &OS, StringRef N,
   OS << "#endif\n";
 }
 
-void ClangOpcodesEmitter::EmitEmitter(raw_ostream &OS, StringRef N,
+void ClangOpcodesEmitter::EmitEmitter(llvm::raw_ostream &OS, llvm::StringRef N,
                                       const Record *R) {
   if (R->getValueAsBit("HasCustomLink"))
     return;
 
   OS << "#ifdef GET_LINK_IMPL\n";
-  Enumerate(R, N, [R, &OS](ArrayRef<const Record *>, const Twine &ID) {
+  Enumerate(R, N, [R, &OS](llvm::ArrayRef<const Record *>, const llvm::Twine &ID) {
     const auto &Args = R->getValueAsListOfDefs("Args");
 
     // Emit the list of arguments.
@@ -224,11 +224,11 @@ void ClangOpcodesEmitter::EmitEmitter(raw_ostream &OS, StringRef N,
   OS << "#endif\n";
 }
 
-void ClangOpcodesEmitter::EmitProto(raw_ostream &OS, StringRef N,
+void ClangOpcodesEmitter::EmitProto(llvm::raw_ostream &OS, llvm::StringRef N,
                                     const Record *R) {
   OS << "#if defined(GET_EVAL_PROTO) || defined(GET_LINK_PROTO)\n";
   auto Args = R->getValueAsListOfDefs("Args");
-  Enumerate(R, N, [&OS, &Args](ArrayRef<const Record *> TS, const Twine &ID) {
+  Enumerate(R, N, [&OS, &Args](llvm::ArrayRef<const Record *> TS, const llvm::Twine &ID) {
     OS << "bool emit" << ID << "(";
     for (size_t I = 0, N = Args.size(); I < N; ++I) {
       const auto *Arg = Args[I];
@@ -262,7 +262,7 @@ void ClangOpcodesEmitter::EmitProto(raw_ostream &OS, StringRef N,
   OS << "#endif\n";
 }
 
-void ClangOpcodesEmitter::EmitGroup(raw_ostream &OS, StringRef N,
+void ClangOpcodesEmitter::EmitGroup(llvm::raw_ostream &OS, llvm::StringRef N,
                                     const Record *R) {
   if (!R->getValueAsBit("HasGroup"))
     return;
@@ -270,7 +270,7 @@ void ClangOpcodesEmitter::EmitGroup(raw_ostream &OS, StringRef N,
   const auto *Types = R->getValueAsListInit("Types");
   const auto &Args = R->getValueAsListOfDefs("Args");
 
-  Twine EmitFuncName = "emit" + N;
+  llvm::Twine EmitFuncName = "emit" + N;
 
   // Emit the prototype of the group emitter in the header.
   OS << "#if defined(GET_EVAL_PROTO) || defined(GET_LINK_PROTO)\n";
@@ -303,10 +303,10 @@ void ClangOpcodesEmitter::EmitGroup(raw_ostream &OS, StringRef N,
   }
   OS << "const SourceInfo &I) {\n";
 
-  std::function<void(size_t, const Twine &)> Rec;
+  std::function<void(size_t, const llvm::Twine &)> Rec;
   llvm::SmallVector<const Record *, 2> TS;
   Rec = [this, &Rec, &OS, Types, &Args, R, &TS, N,
-         EmitFuncName](size_t I, const Twine &ID) {
+         EmitFuncName](size_t I, const llvm::Twine &ID) {
     if (I >= Types->size()) {
       // Print a call to the emitter method.
       // Custom evaluator methods dispatch to template methods.
@@ -356,14 +356,14 @@ void ClangOpcodesEmitter::EmitGroup(raw_ostream &OS, StringRef N,
   OS << "#endif\n";
 }
 
-void ClangOpcodesEmitter::EmitEval(raw_ostream &OS, StringRef N,
+void ClangOpcodesEmitter::EmitEval(llvm::raw_ostream &OS, llvm::StringRef N,
                                    const Record *R) {
   if (R->getValueAsBit("HasCustomEval"))
     return;
 
   OS << "#ifdef GET_EVAL_IMPL\n";
   Enumerate(R, N,
-            [this, R, &N, &OS](ArrayRef<const Record *> TS, const Twine &ID) {
+            [this, R, &N, &OS](llvm::ArrayRef<const Record *> TS, const llvm::Twine &ID) {
               auto Args = R->getValueAsListOfDefs("Args");
 
               OS << "bool EvalEmitter::emit" << ID << "(";
@@ -391,8 +391,8 @@ void ClangOpcodesEmitter::EmitEval(raw_ostream &OS, StringRef N,
   OS << "#endif\n";
 }
 
-void ClangOpcodesEmitter::PrintTypes(raw_ostream &OS,
-                                     ArrayRef<const Record *> Types) {
+void ClangOpcodesEmitter::PrintTypes(llvm::raw_ostream &OS,
+                                     llvm::ArrayRef<const Record *> Types) {
   if (Types.empty())
     return;
   OS << "<";
@@ -404,6 +404,6 @@ void ClangOpcodesEmitter::PrintTypes(raw_ostream &OS,
   OS << ">";
 }
 
-void clang::EmitClangOpcodes(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitClangOpcodes(RecordKeeper &Records, llvm::raw_ostream &OS) {
   ClangOpcodesEmitter(Records).run(OS);
 }

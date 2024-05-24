@@ -54,7 +54,7 @@ ConversionKind classifyConversionFunc(const FunctionDecl *FD) {
       .Default(ConversionKind::None);
 }
 
-ConversionKind classifyFormatString(StringRef Fmt, const LangOptions &LO,
+ConversionKind classifyFormatString(llvm::StringRef Fmt, const LangOptions &LO,
                                     const TargetInfo &TI) {
   // Scan the format string for the first problematic format specifier, then
   // report that as the conversion type. This will miss additional conversion
@@ -128,7 +128,7 @@ ConversionKind classifyFormatString(StringRef Fmt, const LangOptions &LO,
   return H.get();
 }
 
-StringRef classifyConversionType(ConversionKind K) {
+llvm::StringRef classifyConversionType(ConversionKind K) {
   switch (K) {
   case ConversionKind::None:
     llvm_unreachable("Unexpected conversion kind");
@@ -148,7 +148,7 @@ StringRef classifyConversionType(ConversionKind K) {
   llvm_unreachable("Unknown conversion kind");
 }
 
-StringRef classifyReplacement(ConversionKind K) {
+llvm::StringRef classifyReplacement(ConversionKind K) {
   switch (K) {
   case ConversionKind::None:
     llvm_unreachable("Unexpected conversion kind");
@@ -187,7 +187,7 @@ void StrToNumCheck::check(const MatchFinder::MatchResult &Result) {
     Conversion = classifyConversionFunc(ConverterFunc);
   } else if (const auto *FFD =
                  Result.Nodes.getNodeAs<FunctionDecl>("formatted")) {
-    StringRef FmtStr;
+    llvm::StringRef FmtStr;
     // The format string comes from the call expression and depends on which
     // flavor of scanf is called.
     // Index 0: scanf, vscanf, Index 1: fscanf, sscanf, vfscanf, vsscanf.

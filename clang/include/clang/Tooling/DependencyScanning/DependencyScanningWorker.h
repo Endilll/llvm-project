@@ -50,7 +50,7 @@ public:
   virtual void
   handleDependencyOutputOpts(const DependencyOutputOptions &Opts) = 0;
 
-  virtual void handleFileDependency(StringRef Filename) = 0;
+  virtual void handleFileDependency(llvm::StringRef Filename) = 0;
 
   virtual void handlePrebuiltModuleDependency(PrebuiltModuleDep PMD) = 0;
 
@@ -89,18 +89,18 @@ public:
   ///
   /// \returns false if clang errors occurred (with diagnostics reported to
   /// \c DiagConsumer), true otherwise.
-  bool computeDependencies(StringRef WorkingDirectory,
+  bool computeDependencies(llvm::StringRef WorkingDirectory,
                            const std::vector<std::string> &CommandLine,
                            DependencyConsumer &DepConsumer,
                            DependencyActionController &Controller,
                            DiagnosticConsumer &DiagConsumer,
-                           std::optional<StringRef> ModuleName = std::nullopt);
+                           std::optional<llvm::StringRef> ModuleName = std::nullopt);
   /// \returns A \c StringError with the diagnostic output if clang errors
   /// occurred, success otherwise.
   llvm::Error computeDependencies(
-      StringRef WorkingDirectory, const std::vector<std::string> &CommandLine,
+      llvm::StringRef WorkingDirectory, const std::vector<std::string> &CommandLine,
       DependencyConsumer &Consumer, DependencyActionController &Controller,
-      std::optional<StringRef> ModuleName = std::nullopt);
+      std::optional<llvm::StringRef> ModuleName = std::nullopt);
 
   bool shouldEagerLoadModules() const { return EagerLoadModules; }
 

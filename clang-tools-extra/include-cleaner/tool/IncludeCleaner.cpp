@@ -146,7 +146,7 @@ private:
   }
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef File) override {
+                                                 llvm::StringRef File) override {
     return AST.record();
   }
 

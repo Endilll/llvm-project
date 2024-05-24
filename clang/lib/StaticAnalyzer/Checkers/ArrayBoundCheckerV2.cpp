@@ -343,7 +343,7 @@ static std::string getRegionName(const SubRegion *Region) {
   // Field regions only have descriptive names when their parent has a
   // descriptive name; so we provide a fallback representation for them:
   if (const auto *FR = Region->getAs<FieldRegion>()) {
-    if (StringRef Name = FR->getDecl()->getName(); !Name.empty())
+    if (llvm::StringRef Name = FR->getDecl()->getName(); !Name.empty())
       return formatv("the field '{0}'", Name);
     return "the unnamed field";
   }
@@ -374,7 +374,7 @@ static std::optional<int64_t> getConcreteValue(std::optional<NonLoc> SV) {
 
 static Messages getPrecedesMsgs(const SubRegion *Region, NonLoc Offset) {
   std::string RegName = getRegionName(Region);
-  SmallString<128> Buf;
+  llvm::SmallString<128> Buf;
   llvm::raw_svector_ostream Out(Buf);
   Out << "Access of " << RegName << " at negative byte offset";
   if (auto ConcreteIdx = Offset.getAs<nonloc::ConcreteInt>())
@@ -419,7 +419,7 @@ static Messages getExceedsMsgs(ASTContext &ACtx, const SubRegion *Region,
   bool UseByteOffsets = !tryDividePair(OffsetN, ExtentN, ElemSize);
   const char *OffsetOrIndex = UseByteOffsets ? "byte offset" : "index";
 
-  SmallString<256> Buf;
+  llvm::SmallString<256> Buf;
   llvm::raw_svector_ostream Out(Buf);
   Out << "Access of ";
   if (!ExtentN && !UseByteOffsets)
@@ -494,7 +494,7 @@ std::string StateUpdateReporter::getMessage(PathSensitiveBugReport &BR) const {
   const bool UseIndex =
       ElementSize && tryDividePair(OffsetN, ExtentN, *ElementSize);
 
-  SmallString<256> Buf;
+  llvm::SmallString<256> Buf;
   llvm::raw_svector_ostream Out(Buf);
   Out << "Assuming ";
   if (UseIndex) {
@@ -730,7 +730,7 @@ bool ArrayBoundCheckerV2::isFromCtypeMacro(const Stmt *S, ASTContext &ACtx) {
   if (!Loc.isMacroID())
     return false;
 
-  StringRef MacroName = Lexer::getImmediateMacroName(
+  llvm::StringRef MacroName = Lexer::getImmediateMacroName(
       Loc, ACtx.getSourceManager(), ACtx.getLangOpts());
 
   if (MacroName.size() < 7 || MacroName[0] != 'i' || MacroName[1] != 's')

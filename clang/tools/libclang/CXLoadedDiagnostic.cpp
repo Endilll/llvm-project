@@ -48,7 +48,7 @@ public:
   llvm::DenseMap<unsigned, FileEntryRef> Files;
 
   /// Copy the string into our own allocator.
-  const char *copyString(StringRef Blob) {
+  const char *copyString(llvm::StringRef Blob) {
     char *mem = Alloc.Allocate<char>(Blob.size() + 1);
     memcpy(mem, Blob.data(), Blob.size());
     mem[Blob.size()] = '\0';
@@ -113,8 +113,8 @@ CXString CXLoadedDiagnostic::getDiagnosticOption(CXString *Disable) const {
 
   // FIXME: possibly refactor with logic in CXStoredDiagnostic.
   if (Disable)
-    *Disable = cxstring::createDup((Twine("-Wno-") + DiagOption).str());
-  return cxstring::createDup((Twine("-W") + DiagOption).str());
+    *Disable = cxstring::createDup((llvm::Twine("-Wno-") + DiagOption).str());
+  return cxstring::createDup((llvm::Twine("-W") + DiagOption).str());
 }
 
 unsigned CXLoadedDiagnostic::getCategory() const {
@@ -189,7 +189,7 @@ class DiagLoader : serialized_diags::SerializedDiagnosticReader {
   enum CXLoadDiag_Error *error;
   CXString *errorString;
   std::unique_ptr<CXLoadedDiagnosticSetImpl> TopDiags;
-  SmallVector<std::unique_ptr<CXLoadedDiagnostic>, 8> CurrentDiags;
+  llvm::SmallVector<std::unique_ptr<CXLoadedDiagnostic>, 8> CurrentDiags;
 
   std::error_code reportBad(enum CXLoadDiag_Error code, llvm::StringRef err) {
     if (error)
@@ -214,21 +214,21 @@ protected:
   std::error_code visitStartOfDiagnostic() override;
   std::error_code visitEndOfDiagnostic() override;
 
-  std::error_code visitCategoryRecord(unsigned ID, StringRef Name) override;
+  std::error_code visitCategoryRecord(unsigned ID, llvm::StringRef Name) override;
 
-  std::error_code visitDiagFlagRecord(unsigned ID, StringRef Name) override;
+  std::error_code visitDiagFlagRecord(unsigned ID, llvm::StringRef Name) override;
 
   std::error_code visitDiagnosticRecord(
       unsigned Severity, const serialized_diags::Location &Location,
-      unsigned Category, unsigned Flag, StringRef Message) override;
+      unsigned Category, unsigned Flag, llvm::StringRef Message) override;
 
   std::error_code visitFilenameRecord(unsigned ID, unsigned Size,
                                       unsigned Timestamp,
-                                      StringRef Name) override;
+                                      llvm::StringRef Name) override;
 
   std::error_code visitFixitRecord(const serialized_diags::Location &Start,
                                    const serialized_diags::Location &End,
-                                   StringRef CodeToInsert) override;
+                                   llvm::StringRef CodeToInsert) override;
 
   std::error_code
   visitSourceRangeRecord(const serialized_diags::Location &Start,
@@ -321,7 +321,7 @@ std::error_code DiagLoader::visitEndOfDiagnostic() {
   return std::error_code();
 }
 
-std::error_code DiagLoader::visitCategoryRecord(unsigned ID, StringRef Name) {
+std::error_code DiagLoader::visitCategoryRecord(unsigned ID, llvm::StringRef Name) {
   // FIXME: Why do we care about long strings?
   if (Name.size() > 65536)
     return reportInvalidFile("Out-of-bounds string in category");
@@ -329,7 +329,7 @@ std::error_code DiagLoader::visitCategoryRecord(unsigned ID, StringRef Name) {
   return std::error_code();
 }
 
-std::error_code DiagLoader::visitDiagFlagRecord(unsigned ID, StringRef Name) {
+std::error_code DiagLoader::visitDiagFlagRecord(unsigned ID, llvm::StringRef Name) {
   // FIXME: Why do we care about long strings?
   if (Name.size() > 65536)
     return reportInvalidFile("Out-of-bounds string in warning flag");
@@ -339,7 +339,7 @@ std::error_code DiagLoader::visitDiagFlagRecord(unsigned ID, StringRef Name) {
 
 std::error_code DiagLoader::visitFilenameRecord(unsigned ID, unsigned Size,
                                                 unsigned Timestamp,
-                                                StringRef Name) {
+                                                llvm::StringRef Name) {
   // FIXME: Why do we care about long strings?
   if (Name.size() > 65536)
     return reportInvalidFile("Out-of-bounds string in filename");
@@ -362,7 +362,7 @@ DiagLoader::visitSourceRangeRecord(const serialized_diags::Location &Start,
 std::error_code
 DiagLoader::visitFixitRecord(const serialized_diags::Location &Start,
                              const serialized_diags::Location &End,
-                             StringRef CodeToInsert) {
+                             llvm::StringRef CodeToInsert) {
   CXSourceRange SR;
   if (std::error_code EC = readRange(Start, End, SR))
     return EC;
@@ -376,7 +376,7 @@ DiagLoader::visitFixitRecord(const serialized_diags::Location &Start,
 
 std::error_code DiagLoader::visitDiagnosticRecord(
     unsigned Severity, const serialized_diags::Location &Location,
-    unsigned Category, unsigned Flag, StringRef Message) {
+    unsigned Category, unsigned Flag, llvm::StringRef Message) {
   CXLoadedDiagnostic &D = *CurrentDiags.back();
   D.severity = Severity;
   if (std::error_code EC = readLocation(Location, D.DiagLoc))

@@ -61,7 +61,7 @@ public:
 
   int used(const SymbolInfo &Symbol) { return Reporter.used(Symbol); }
 
-  bool runFindAllSymbols(StringRef HeaderCode, StringRef MainCode) {
+  bool runFindAllSymbols(llvm::StringRef HeaderCode, llvm::StringRef MainCode) {
     llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
         new llvm::vfs::InMemoryFileSystem);
     llvm::IntrusiveRefCntPtr<FileManager> Files(

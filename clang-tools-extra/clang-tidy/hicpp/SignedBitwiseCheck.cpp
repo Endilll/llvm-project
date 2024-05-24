@@ -16,7 +16,7 @@ using namespace clang::ast_matchers::internal;
 
 namespace clang::tidy::hicpp {
 
-SignedBitwiseCheck::SignedBitwiseCheck(StringRef Name,
+SignedBitwiseCheck::SignedBitwiseCheck(llvm::StringRef Name,
                                        ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnorePositiveIntegerLiterals(

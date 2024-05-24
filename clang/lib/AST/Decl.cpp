@@ -78,7 +78,7 @@ Decl *clang::getPrimaryMergedDecl(Decl *D) {
   return D->getASTContext().getPrimaryMergedDecl(D);
 }
 
-void PrettyDeclStackTraceEntry::print(raw_ostream &OS) const {
+void PrettyDeclStackTraceEntry::print(llvm::raw_ostream &OS) const {
   SourceLocation Loc = this->Loc;
   if (!Loc.isValid() && TheDecl) Loc = TheDecl->getLocation();
   if (Loc.isValid()) {
@@ -317,7 +317,7 @@ static const Decl *getOutermostFuncOrBlockContext(const Decl *D) {
 /// Note that we don't take an LVComputationKind because we always
 /// want to honor the visibility of template arguments in the same way.
 LinkageInfo
-LinkageComputer::getLVForTemplateArgumentList(ArrayRef<TemplateArgument> Args,
+LinkageComputer::getLVForTemplateArgumentList(llvm::ArrayRef<TemplateArgument> Args,
                                               LVComputationKind computation) {
   LinkageInfo LV;
 
@@ -1154,7 +1154,7 @@ NamedDecl::isReserved(const LangOptions &LangOpts) const {
 }
 
 ObjCStringFormatFamily NamedDecl::getObjCFStringFormattingFamily() const {
-  StringRef name = getName();
+  llvm::StringRef name = getName();
   if (name.empty()) return SFF_None;
 
   if (name.front() == 'C')
@@ -1672,11 +1672,11 @@ Module *Decl::getOwningModuleForLinkage(bool IgnoreLinkage) const {
   llvm_unreachable("unknown module kind");
 }
 
-void NamedDecl::printName(raw_ostream &OS, const PrintingPolicy &Policy) const {
+void NamedDecl::printName(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const {
   Name.print(OS, Policy);
 }
 
-void NamedDecl::printName(raw_ostream &OS) const {
+void NamedDecl::printName(llvm::raw_ostream &OS) const {
   printName(OS, getASTContext().getPrintingPolicy());
 }
 
@@ -1687,11 +1687,11 @@ std::string NamedDecl::getQualifiedNameAsString() const {
   return QualName;
 }
 
-void NamedDecl::printQualifiedName(raw_ostream &OS) const {
+void NamedDecl::printQualifiedName(llvm::raw_ostream &OS) const {
   printQualifiedName(OS, getASTContext().getPrintingPolicy());
 }
 
-void NamedDecl::printQualifiedName(raw_ostream &OS,
+void NamedDecl::printQualifiedName(llvm::raw_ostream &OS,
                                    const PrintingPolicy &P) const {
   if (getDeclContext()->isFunctionOrMethod()) {
     // We do not print '(anonymous)' for function parameters without name.
@@ -1704,7 +1704,7 @@ void NamedDecl::printQualifiedName(raw_ostream &OS,
   else {
     // Give the printName override a chance to pick a different name before we
     // fall back to "(anonymous)".
-    SmallString<64> NameBuffer;
+    llvm::SmallString<64> NameBuffer;
     llvm::raw_svector_ostream NameOS(NameBuffer);
     printName(NameOS, P);
     if (NameBuffer.empty())
@@ -1714,11 +1714,11 @@ void NamedDecl::printQualifiedName(raw_ostream &OS,
   }
 }
 
-void NamedDecl::printNestedNameSpecifier(raw_ostream &OS) const {
+void NamedDecl::printNestedNameSpecifier(llvm::raw_ostream &OS) const {
   printNestedNameSpecifier(OS, getASTContext().getPrintingPolicy());
 }
 
-void NamedDecl::printNestedNameSpecifier(raw_ostream &OS,
+void NamedDecl::printNestedNameSpecifier(llvm::raw_ostream &OS,
                                          const PrintingPolicy &P) const {
   const DeclContext *Ctx = getDeclContext();
 
@@ -1739,7 +1739,7 @@ void NamedDecl::printNestedNameSpecifier(raw_ostream &OS,
   if (Ctx->isFunctionOrMethod())
     return;
 
-  using ContextsTy = SmallVector<const DeclContext *, 8>;
+  using ContextsTy = llvm::SmallVector<const DeclContext *, 8>;
   ContextsTy Contexts;
 
   // Collect named contexts.
@@ -1823,7 +1823,7 @@ void NamedDecl::printNestedNameSpecifier(raw_ostream &OS,
   }
 }
 
-void NamedDecl::getNameForDiagnostic(raw_ostream &OS,
+void NamedDecl::getNameForDiagnostic(llvm::raw_ostream &OS,
                                      const PrintingPolicy &Policy,
                                      bool Qualified) const {
   if (Qualified)
@@ -2029,7 +2029,7 @@ void DeclaratorDecl::setTrailingRequiresClause(Expr *TrailingRequiresClause) {
 }
 
 void DeclaratorDecl::setTemplateParameterListsInfo(
-    ASTContext &Context, ArrayRef<TemplateParameterList *> TPLists) {
+    ASTContext &Context, llvm::ArrayRef<TemplateParameterList *> TPLists) {
   assert(!TPLists.empty());
   // Make sure the extended decl info is allocated.
   if (!hasExtInfo()) {
@@ -2096,7 +2096,7 @@ SourceRange DeclaratorDecl::getSourceRange() const {
 }
 
 void QualifierInfo::setTemplateParameterListsInfo(
-    ASTContext &Context, ArrayRef<TemplateParameterList *> TPLists) {
+    ASTContext &Context, llvm::ArrayRef<TemplateParameterList *> TPLists) {
   // Free previous template parameters (if any).
   if (NumTemplParamLists > 0) {
     Context.Deallocate(TemplParamLists);
@@ -2549,11 +2549,11 @@ EvaluatedStmt *VarDecl::getEvaluatedStmt() const {
 }
 
 APValue *VarDecl::evaluateValue() const {
-  SmallVector<PartialDiagnosticAt, 8> Notes;
+  llvm::SmallVector<PartialDiagnosticAt, 8> Notes;
   return evaluateValueImpl(Notes, hasConstantInitialization());
 }
 
-APValue *VarDecl::evaluateValueImpl(SmallVectorImpl<PartialDiagnosticAt> &Notes,
+APValue *VarDecl::evaluateValueImpl(llvm::SmallVectorImpl<PartialDiagnosticAt> &Notes,
                                     bool IsConstantInitialization) const {
   EvaluatedStmt *Eval = ensureEvaluatedStmt();
 
@@ -2635,7 +2635,7 @@ bool VarDecl::hasConstantInitialization() const {
 }
 
 bool VarDecl::checkForConstantInitialization(
-    SmallVectorImpl<PartialDiagnosticAt> &Notes) const {
+    llvm::SmallVectorImpl<PartialDiagnosticAt> &Notes) const {
   EvaluatedStmt *Eval = ensureEvaluatedStmt();
   // If we ask for the value before we know whether we have a constant
   // initializer, we can compute the wrong value (for example, due to
@@ -3079,7 +3079,7 @@ FunctionDecl::FunctionDecl(Kind DK, ASTContext &C, DeclContext *DC,
 }
 
 void FunctionDecl::getNameForDiagnostic(
-    raw_ostream &OS, const PrintingPolicy &Policy, bool Qualified) const {
+    llvm::raw_ostream &OS, const PrintingPolicy &Policy, bool Qualified) const {
   NamedDecl::getNameForDiagnostic(OS, Policy, Qualified);
   const TemplateArgumentList *TemplateArgs = getTemplateSpecializationArgs();
   if (TemplateArgs)
@@ -3094,7 +3094,7 @@ bool FunctionDecl::isVariadic() const {
 
 FunctionDecl::DefaultedOrDeletedFunctionInfo *
 FunctionDecl::DefaultedOrDeletedFunctionInfo::Create(
-    ASTContext &Context, ArrayRef<DeclAccessPair> Lookups,
+    ASTContext &Context, llvm::ArrayRef<DeclAccessPair> Lookups,
     StringLiteral *DeletedMessage) {
   static constexpr size_t Alignment =
       std::max({alignof(DefaultedOrDeletedFunctionInfo),
@@ -3695,7 +3695,7 @@ unsigned FunctionDecl::getNumParams() const {
 }
 
 void FunctionDecl::setParams(ASTContext &C,
-                             ArrayRef<ParmVarDecl *> NewParamInfo) {
+                             llvm::ArrayRef<ParmVarDecl *> NewParamInfo) {
   assert(!ParamInfo && "Already has param info!");
   assert(NewParamInfo.size() == getNumParams() && "Parameter count mismatch!");
 
@@ -4682,7 +4682,7 @@ void FieldDecl::setCapturedVLAType(const VariableArrayType *VLAType) {
   CapturedVLAType = VLAType;
 }
 
-void FieldDecl::printName(raw_ostream &OS, const PrintingPolicy &Policy) const {
+void FieldDecl::printName(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const {
   // Print unnamed members using name of their type.
   if (isAnonymousStructOrUnion()) {
     this->getType().print(OS, Policy);
@@ -4800,7 +4800,7 @@ void TagDecl::setQualifierInfo(NestedNameSpecifierLoc QualifierLoc) {
   }
 }
 
-void TagDecl::printName(raw_ostream &OS, const PrintingPolicy &Policy) const {
+void TagDecl::printName(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const {
   DeclarationName Name = getDeclName();
   // If the name is supposed to have an identifier but does not have one, then
   // the tag is anonymous and we should print it differently.
@@ -4818,7 +4818,7 @@ void TagDecl::printName(raw_ostream &OS, const PrintingPolicy &Policy) const {
 }
 
 void TagDecl::setTemplateParameterListsInfo(
-    ASTContext &Context, ArrayRef<TemplateParameterList *> TPLists) {
+    ASTContext &Context, llvm::ArrayRef<TemplateParameterList *> TPLists) {
   assert(!TPLists.empty());
   // Make sure the extended decl info is allocated.
   if (!hasExtInfo())
@@ -5103,7 +5103,7 @@ bool RecordDecl::isMsStruct(const ASTContext &C) const {
   return hasAttr<MSStructAttr>() || C.getLangOpts().MSBitfields == 1;
 }
 
-void RecordDecl::reorderDecls(const SmallVectorImpl<Decl *> &Decls) {
+void RecordDecl::reorderDecls(const llvm::SmallVectorImpl<Decl *> &Decls) {
   std::tie(FirstDecl, LastDecl) = DeclContext::BuildDeclChain(Decls, false);
   LastDecl->NextInContextAndBits.setPointer(nullptr);
   setIsRandomized(true);
@@ -5116,7 +5116,7 @@ void RecordDecl::LoadFieldsFromExternalStorage() const {
   // Notify that we have a RecordDecl doing some initialization.
   ExternalASTSource::Deserializing TheFields(Source);
 
-  SmallVector<Decl*, 64> Decls;
+  llvm::SmallVector<Decl*, 64> Decls;
   setHasLoadedFieldsFromExternalStorage(true);
   Source->FindExternalLexicalDecls(this, [](Decl::Kind K) {
     return FieldDecl::classofKind(K) || IndirectFieldDecl::classofKind(K);
@@ -5226,7 +5226,7 @@ BlockDecl::BlockDecl(DeclContext *DC, SourceLocation CaretLoc)
   setCanAvoidCopyToHeap(false);
 }
 
-void BlockDecl::setParams(ArrayRef<ParmVarDecl *> NewParamInfo) {
+void BlockDecl::setParams(llvm::ArrayRef<ParmVarDecl *> NewParamInfo) {
   assert(!ParamInfo && "Already has param info!");
 
   // Zero params -> null pointer.
@@ -5237,7 +5237,7 @@ void BlockDecl::setParams(ArrayRef<ParmVarDecl *> NewParamInfo) {
   }
 }
 
-void BlockDecl::setCaptures(ASTContext &Context, ArrayRef<Capture> Captures,
+void BlockDecl::setCaptures(ASTContext &Context, llvm::ArrayRef<Capture> Captures,
                             bool CapturesCXXThis) {
   this->setCapturesCXXThis(CapturesCXXThis);
   this->NumCaptures = Captures.size();
@@ -5286,7 +5286,7 @@ PragmaCommentDecl *PragmaCommentDecl::Create(const ASTContext &C,
                                              TranslationUnitDecl *DC,
                                              SourceLocation CommentLoc,
                                              PragmaMSCommentKind CommentKind,
-                                             StringRef Arg) {
+                                             llvm::StringRef Arg) {
   PragmaCommentDecl *PCD =
       new (C, DC, additionalSizeToAlloc<char>(Arg.size() + 1))
           PragmaCommentDecl(DC, CommentLoc, CommentKind);
@@ -5306,8 +5306,8 @@ void PragmaDetectMismatchDecl::anchor() {}
 
 PragmaDetectMismatchDecl *
 PragmaDetectMismatchDecl::Create(const ASTContext &C, TranslationUnitDecl *DC,
-                                 SourceLocation Loc, StringRef Name,
-                                 StringRef Value) {
+                                 SourceLocation Loc, llvm::StringRef Name,
+                                 llvm::StringRef Value) {
   size_t ValueStart = Name.size() + 1;
   PragmaDetectMismatchDecl *PDMD =
       new (C, DC, additionalSizeToAlloc<char>(ValueStart + Value.size() + 1))
@@ -5353,7 +5353,7 @@ LabelDecl *LabelDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID) {
                                SourceLocation());
 }
 
-void LabelDecl::setMSAsmLabel(StringRef Name) {
+void LabelDecl::setMSAsmLabel(llvm::StringRef Name) {
 char *Buffer = new (getASTContext(), 1) char[Name.size() + 1];
   memcpy(Buffer, Name.data(), Name.size());
   Buffer[Name.size()] = '\0';
@@ -5468,7 +5468,7 @@ void IndirectFieldDecl::anchor() {}
 IndirectFieldDecl::IndirectFieldDecl(ASTContext &C, DeclContext *DC,
                                      SourceLocation L, DeclarationName N,
                                      QualType T,
-                                     MutableArrayRef<NamedDecl *> CH)
+                                     llvm::MutableArrayRef<NamedDecl *> CH)
     : ValueDecl(IndirectField, DC, L, N, T), Chaining(CH.data()),
       ChainingSize(CH.size()) {
   // In C++, indirect field declarations conflict with tag declarations in the
@@ -5686,7 +5686,7 @@ static unsigned getNumModuleIdentifiers(Module *Mod) {
 
 ImportDecl::ImportDecl(DeclContext *DC, SourceLocation StartLoc,
                        Module *Imported,
-                       ArrayRef<SourceLocation> IdentifierLocs)
+                       llvm::ArrayRef<SourceLocation> IdentifierLocs)
     : Decl(Import, DC, StartLoc), ImportedModule(Imported),
       NextLocalImportAndComplete(nullptr, true) {
   assert(getNumModuleIdentifiers(Imported) == IdentifierLocs.size());
@@ -5704,7 +5704,7 @@ ImportDecl::ImportDecl(DeclContext *DC, SourceLocation StartLoc,
 
 ImportDecl *ImportDecl::Create(ASTContext &C, DeclContext *DC,
                                SourceLocation StartLoc, Module *Imported,
-                               ArrayRef<SourceLocation> IdentifierLocs) {
+                               llvm::ArrayRef<SourceLocation> IdentifierLocs) {
   return new (C, DC,
               additionalSizeToAlloc<SourceLocation>(IdentifierLocs.size()))
       ImportDecl(DC, StartLoc, Imported, IdentifierLocs);
@@ -5726,7 +5726,7 @@ ImportDecl *ImportDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID,
       ImportDecl(EmptyShell());
 }
 
-ArrayRef<SourceLocation> ImportDecl::getIdentifierLocs() const {
+llvm::ArrayRef<SourceLocation> ImportDecl::getIdentifierLocs() const {
   if (!isImportComplete())
     return std::nullopt;
 

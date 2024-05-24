@@ -19,7 +19,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/pro-type-reinterpret-cast.html
 class ProTypeReinterpretCastCheck : public ClangTidyCheck {
 public:
-  ProTypeReinterpretCastCheck(StringRef Name, ClangTidyContext *Context)
+  ProTypeReinterpretCastCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

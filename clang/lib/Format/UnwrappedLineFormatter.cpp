@@ -172,7 +172,7 @@ private:
   /// previous lines (that are not PP directives) of equal or lower levels. This
   /// is used to align formatted lines to the indent of previous non-formatted
   /// lines. Think about the --lines parameter of clang-format.
-  SmallVector<int> IndentForLevel;
+  llvm::SmallVector<int> IndentForLevel;
 
   /// Offset of the current line relative to the indent level.
   ///
@@ -186,7 +186,7 @@ private:
 
 const FormatToken *getMatchingNamespaceToken(
     const AnnotatedLine *Line,
-    const SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
+    const llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
   if (!Line->startsWith(tok::r_brace))
     return nullptr;
   size_t StartLineIndex = Line->MatchingOpeningBlockLineIndex;
@@ -196,23 +196,23 @@ const FormatToken *getMatchingNamespaceToken(
   return AnnotatedLines[StartLineIndex]->First->getNamespaceToken();
 }
 
-StringRef getNamespaceTokenText(const AnnotatedLine *Line) {
+llvm::StringRef getNamespaceTokenText(const AnnotatedLine *Line) {
   const FormatToken *NamespaceToken = Line->First->getNamespaceToken();
-  return NamespaceToken ? NamespaceToken->TokenText : StringRef();
+  return NamespaceToken ? NamespaceToken->TokenText : llvm::StringRef();
 }
 
-StringRef getMatchingNamespaceTokenText(
+llvm::StringRef getMatchingNamespaceTokenText(
     const AnnotatedLine *Line,
-    const SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
+    const llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
   const FormatToken *NamespaceToken =
       getMatchingNamespaceToken(Line, AnnotatedLines);
-  return NamespaceToken ? NamespaceToken->TokenText : StringRef();
+  return NamespaceToken ? NamespaceToken->TokenText : llvm::StringRef();
 }
 
 class LineJoiner {
 public:
   LineJoiner(const FormatStyle &Style, const AdditionalKeywords &Keywords,
-             const SmallVectorImpl<AnnotatedLine *> &Lines)
+             const llvm::SmallVectorImpl<AnnotatedLine *> &Lines)
       : Style(Style), Keywords(Keywords), End(Lines.end()), Next(Lines.begin()),
         AnnotatedLines(Lines) {}
 
@@ -242,8 +242,8 @@ private:
   /// Calculates how many lines can be merged into 1 starting at \p I.
   unsigned
   tryFitMultipleLinesInOne(LevelIndentTracker &IndentTracker,
-                           SmallVectorImpl<AnnotatedLine *>::const_iterator I,
-                           SmallVectorImpl<AnnotatedLine *>::const_iterator E) {
+                           llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator I,
+                           llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator E) {
     const unsigned Indent = IndentTracker.getIndent();
 
     // Can't join the last line with anything.
@@ -605,8 +605,8 @@ private:
   }
 
   unsigned
-  tryMergeSimplePPDirective(SmallVectorImpl<AnnotatedLine *>::const_iterator I,
-                            SmallVectorImpl<AnnotatedLine *>::const_iterator E,
+  tryMergeSimplePPDirective(llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator I,
+                            llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator E,
                             unsigned Limit) {
     if (Limit == 0)
       return 0;
@@ -618,8 +618,8 @@ private:
   }
 
   unsigned tryMergeSimpleControlStatement(
-      SmallVectorImpl<AnnotatedLine *>::const_iterator I,
-      SmallVectorImpl<AnnotatedLine *>::const_iterator E, unsigned Limit) {
+      llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator I,
+      llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator E, unsigned Limit) {
     if (Limit == 0)
       return 0;
     if (Style.BraceWrapping.AfterControlStatement ==
@@ -660,8 +660,8 @@ private:
   }
 
   unsigned
-  tryMergeShortCaseLabels(SmallVectorImpl<AnnotatedLine *>::const_iterator I,
-                          SmallVectorImpl<AnnotatedLine *>::const_iterator E,
+  tryMergeShortCaseLabels(llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator I,
+                          llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator E,
                           unsigned Limit) {
     if (Limit == 0 || I + 1 == E ||
         I[1]->First->isOneOf(tok::kw_case, tok::kw_default)) {
@@ -693,7 +693,7 @@ private:
       if (Line->First->is(tok::comment)) {
         if (Level != Line->Level)
           return 0;
-        SmallVectorImpl<AnnotatedLine *>::const_iterator J = I + 2 + NumStmts;
+        llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator J = I + 2 + NumStmts;
         for (; J != E; ++J) {
           Line = *J;
           if (Line->InPPDirective != InPPDirective)
@@ -715,8 +715,8 @@ private:
   }
 
   unsigned
-  tryMergeSimpleBlock(SmallVectorImpl<AnnotatedLine *>::const_iterator I,
-                      SmallVectorImpl<AnnotatedLine *>::const_iterator E,
+  tryMergeSimpleBlock(llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator I,
+                      llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator E,
                       unsigned Limit) {
     // Don't merge with a preprocessor directive.
     if (I[1]->Type == LT_PreprocessorDirective)
@@ -900,8 +900,8 @@ private:
   /// Returns the modified column limit for \p I if it is inside a macro and
   /// needs a trailing '\'.
   unsigned
-  limitConsideringMacros(SmallVectorImpl<AnnotatedLine *>::const_iterator I,
-                         SmallVectorImpl<AnnotatedLine *>::const_iterator E,
+  limitConsideringMacros(llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator I,
+                         llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator E,
                          unsigned Limit) {
     if (I[0]->InPPDirective && I + 1 != E &&
         !I[1]->First->HasUnescapedNewline && I[1]->First->isNot(tok::eof)) {
@@ -910,7 +910,7 @@ private:
     return Limit;
   }
 
-  bool nextTwoLinesFitInto(SmallVectorImpl<AnnotatedLine *>::const_iterator I,
+  bool nextTwoLinesFitInto(llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator I,
                            unsigned Limit) {
     if (I[1]->First->MustBreakBefore || I[2]->First->MustBreakBefore)
       return false;
@@ -944,10 +944,10 @@ private:
 
   const FormatStyle &Style;
   const AdditionalKeywords &Keywords;
-  const SmallVectorImpl<AnnotatedLine *>::const_iterator End;
+  const llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator End;
 
-  SmallVectorImpl<AnnotatedLine *>::const_iterator Next;
-  const SmallVectorImpl<AnnotatedLine *> &AnnotatedLines;
+  llvm::SmallVectorImpl<AnnotatedLine *>::const_iterator Next;
+  const llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines;
 };
 
 static void markFinalized(FormatToken *Tok) {
@@ -1200,7 +1200,7 @@ private:
   typedef std::pair<OrderedPenalty, StateNode *> QueueItem;
 
   /// The BFS queue type.
-  typedef std::priority_queue<QueueItem, SmallVector<QueueItem>,
+  typedef std::priority_queue<QueueItem, llvm::SmallVector<QueueItem>,
                               std::greater<QueueItem>>
       QueueType;
 
@@ -1331,13 +1331,13 @@ private:
 } // anonymous namespace
 
 unsigned UnwrappedLineFormatter::format(
-    const SmallVectorImpl<AnnotatedLine *> &Lines, bool DryRun,
+    const llvm::SmallVectorImpl<AnnotatedLine *> &Lines, bool DryRun,
     int AdditionalIndent, bool FixBadIndentation, unsigned FirstStartColumn,
     unsigned NextStartColumn, unsigned LastStartColumn) {
   LineJoiner Joiner(Style, Keywords, Lines);
 
   // Try to look up already computed penalty in DryRun-mode.
-  std::pair<const SmallVectorImpl<AnnotatedLine *> *, unsigned> CacheKey(
+  std::pair<const llvm::SmallVectorImpl<AnnotatedLine *> *, unsigned> CacheKey(
       &Lines, AdditionalIndent);
   auto CacheIt = PenaltyCache.find(CacheKey);
   if (DryRun && CacheIt != PenaltyCache.end())
@@ -1461,7 +1461,7 @@ unsigned UnwrappedLineFormatter::format(
 static auto computeNewlines(const AnnotatedLine &Line,
                             const AnnotatedLine *PreviousLine,
                             const AnnotatedLine *PrevPrevLine,
-                            const SmallVectorImpl<AnnotatedLine *> &Lines,
+                            const llvm::SmallVectorImpl<AnnotatedLine *> &Lines,
                             const FormatStyle &Style) {
   const auto &RootToken = *Line.First;
   auto Newlines =
@@ -1551,7 +1551,7 @@ static auto computeNewlines(const AnnotatedLine &Line,
 void UnwrappedLineFormatter::formatFirstToken(
     const AnnotatedLine &Line, const AnnotatedLine *PreviousLine,
     const AnnotatedLine *PrevPrevLine,
-    const SmallVectorImpl<AnnotatedLine *> &Lines, unsigned Indent,
+    const llvm::SmallVectorImpl<AnnotatedLine *> &Lines, unsigned Indent,
     unsigned NewlineIndent) {
   FormatToken &RootToken = *Line.First;
   if (RootToken.is(tok::eof)) {

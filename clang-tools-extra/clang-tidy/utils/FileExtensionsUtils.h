@@ -32,30 +32,30 @@ bool isSpellingLocInHeaderFile(SourceLocation Loc, SourceManager &SM,
 
 /// Returns recommended default value for the list of header file
 /// extensions.
-inline StringRef defaultHeaderFileExtensions() { return ";h;hh;hpp;hxx"; }
+inline llvm::StringRef defaultHeaderFileExtensions() { return ";h;hh;hpp;hxx"; }
 
 /// Returns recommended default value for the list of implementation file
 /// extensions.
-inline StringRef defaultImplementationFileExtensions() {
+inline llvm::StringRef defaultImplementationFileExtensions() {
   return "c;cc;cpp;cxx";
 }
 
 /// Returns recommended default value for the list of file extension
 /// delimiters.
-inline StringRef defaultFileExtensionDelimiters() { return ",;"; }
+inline llvm::StringRef defaultFileExtensionDelimiters() { return ",;"; }
 
 /// Parses header file extensions from a semicolon-separated list.
-bool parseFileExtensions(StringRef AllFileExtensions,
+bool parseFileExtensions(llvm::StringRef AllFileExtensions,
                          FileExtensionsSet &FileExtensions,
-                         StringRef Delimiters);
+                         llvm::StringRef Delimiters);
 
 /// Decides whether a file has a header file extension.
 /// Returns the file extension, if included in the provided set.
-std::optional<StringRef>
-getFileExtension(StringRef FileName, const FileExtensionsSet &FileExtensions);
+std::optional<llvm::StringRef>
+getFileExtension(llvm::StringRef FileName, const FileExtensionsSet &FileExtensions);
 
 /// Decides whether a file has one of the specified file extensions.
-bool isFileExtension(StringRef FileName,
+bool isFileExtension(llvm::StringRef FileName,
                      const FileExtensionsSet &FileExtensions);
 
 } // namespace clang::tidy::utils

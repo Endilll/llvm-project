@@ -52,7 +52,7 @@ public:
   static constexpr std::size_t HeuristicCount =
       static_cast<std::size_t>(Heuristic::Dice) + 1;
 
-  SuspiciousCallArgumentCheck(StringRef Name, ClangTidyContext *Context);
+  SuspiciousCallArgumentCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
@@ -61,10 +61,10 @@ private:
   const std::size_t MinimumIdentifierNameLength;
 
   /// The configuration for which heuristics were enabled.
-  SmallVector<Heuristic, HeuristicCount> AppliedHeuristics;
+  llvm::SmallVector<Heuristic, HeuristicCount> AppliedHeuristics;
 
   /// The lower and upper bounds for each heuristic, as configured by the user.
-  SmallVector<std::pair<int8_t, int8_t>, HeuristicCount> ConfiguredBounds;
+  llvm::SmallVector<std::pair<int8_t, int8_t>, HeuristicCount> ConfiguredBounds;
 
   /// The abbreviation-to-abbreviated map for the Abbreviation heuristic.
   llvm::StringMap<std::string> AbbreviationDictionary;
@@ -73,10 +73,10 @@ private:
   std::optional<int8_t> getBound(Heuristic H, BoundKind BK) const;
 
   // Runtime information of the currently analyzed function call.
-  SmallVector<QualType, SmallVectorSize> ArgTypes;
-  SmallVector<StringRef, SmallVectorSize> ArgNames;
-  SmallVector<QualType, SmallVectorSize> ParamTypes;
-  SmallVector<StringRef, SmallVectorSize> ParamNames;
+  llvm::SmallVector<QualType, SmallVectorSize> ArgTypes;
+  llvm::SmallVector<llvm::StringRef, SmallVectorSize> ArgNames;
+  llvm::SmallVector<QualType, SmallVectorSize> ParamTypes;
+  llvm::SmallVector<llvm::StringRef, SmallVectorSize> ParamNames;
 
   void setParamNamesAndTypes(const FunctionDecl *CalleeFuncDecl);
 
@@ -88,7 +88,7 @@ private:
 
   bool areArgsSwapped(std::size_t Position1, std::size_t Position2) const;
 
-  bool areNamesSimilar(StringRef Arg, StringRef Param, Heuristic H,
+  bool areNamesSimilar(llvm::StringRef Arg, llvm::StringRef Param, Heuristic H,
                        BoundKind BK) const;
 };
 

@@ -60,39 +60,39 @@ private:
   const std::unique_ptr<BoundNodesCallback> FindResultReviewer;
 };
 
-inline ArrayRef<TestLanguage> langCxx11OrLater() {
+inline llvm::ArrayRef<TestLanguage> langCxx11OrLater() {
   static const TestLanguage Result[] = {Lang_CXX11, Lang_CXX14, Lang_CXX17,
                                         Lang_CXX20, Lang_CXX23};
-  return ArrayRef<TestLanguage>(Result);
+  return llvm::ArrayRef<TestLanguage>(Result);
 }
 
-inline ArrayRef<TestLanguage> langCxx14OrLater() {
+inline llvm::ArrayRef<TestLanguage> langCxx14OrLater() {
   static const TestLanguage Result[] = {Lang_CXX14, Lang_CXX17, Lang_CXX20,
                                         Lang_CXX23};
-  return ArrayRef<TestLanguage>(Result);
+  return llvm::ArrayRef<TestLanguage>(Result);
 }
 
-inline ArrayRef<TestLanguage> langCxx17OrLater() {
+inline llvm::ArrayRef<TestLanguage> langCxx17OrLater() {
   static const TestLanguage Result[] = {Lang_CXX17, Lang_CXX20, Lang_CXX23};
-  return ArrayRef<TestLanguage>(Result);
+  return llvm::ArrayRef<TestLanguage>(Result);
 }
 
-inline ArrayRef<TestLanguage> langCxx20OrLater() {
+inline llvm::ArrayRef<TestLanguage> langCxx20OrLater() {
   static const TestLanguage Result[] = {Lang_CXX20, Lang_CXX23};
-  return ArrayRef<TestLanguage>(Result);
+  return llvm::ArrayRef<TestLanguage>(Result);
 }
 
-inline ArrayRef<TestLanguage> langCxx23OrLater() {
+inline llvm::ArrayRef<TestLanguage> langCxx23OrLater() {
   static const TestLanguage Result[] = {Lang_CXX23};
-  return ArrayRef<TestLanguage>(Result);
+  return llvm::ArrayRef<TestLanguage>(Result);
 }
 
 template <typename T>
 testing::AssertionResult matchesConditionally(
-    const Twine &Code, const T &AMatcher, bool ExpectMatch,
-    ArrayRef<std::string> CompileArgs,
+    const llvm::Twine &Code, const T &AMatcher, bool ExpectMatch,
+    llvm::ArrayRef<std::string> CompileArgs,
     const FileContentMappings &VirtualMappedFiles = FileContentMappings(),
-    StringRef Filename = "input.cc") {
+    llvm::StringRef Filename = "input.cc") {
   bool Found = false, DynamicFound = false;
   MatchFinder Finder;
   VerifyMatch VerifyFound(nullptr, &Found);
@@ -147,8 +147,8 @@ testing::AssertionResult matchesConditionally(
 
 template <typename T>
 testing::AssertionResult
-matchesConditionally(const Twine &Code, const T &AMatcher, bool ExpectMatch,
-                     ArrayRef<TestLanguage> TestLanguages) {
+matchesConditionally(const llvm::Twine &Code, const T &AMatcher, bool ExpectMatch,
+                     llvm::ArrayRef<TestLanguage> TestLanguages) {
   for (auto Lang : TestLanguages) {
     auto Result = matchesConditionally(
         Code, AMatcher, ExpectMatch, getCommandLineArgsForTesting(Lang),
@@ -162,20 +162,20 @@ matchesConditionally(const Twine &Code, const T &AMatcher, bool ExpectMatch,
 
 template <typename T>
 testing::AssertionResult
-matches(const Twine &Code, const T &AMatcher,
-        ArrayRef<TestLanguage> TestLanguages = {Lang_CXX11}) {
+matches(const llvm::Twine &Code, const T &AMatcher,
+        llvm::ArrayRef<TestLanguage> TestLanguages = {Lang_CXX11}) {
   return matchesConditionally(Code, AMatcher, true, TestLanguages);
 }
 
 template <typename T>
 testing::AssertionResult
-notMatches(const Twine &Code, const T &AMatcher,
-           ArrayRef<TestLanguage> TestLanguages = {Lang_CXX11}) {
+notMatches(const llvm::Twine &Code, const T &AMatcher,
+           llvm::ArrayRef<TestLanguage> TestLanguages = {Lang_CXX11}) {
   return matchesConditionally(Code, AMatcher, false, TestLanguages);
 }
 
 template <typename T>
-testing::AssertionResult matchesObjC(const Twine &Code, const T &AMatcher,
+testing::AssertionResult matchesObjC(const llvm::Twine &Code, const T &AMatcher,
                                      bool ExpectMatch = true) {
   return matchesConditionally(Code, AMatcher, ExpectMatch,
                               {"-fobjc-nonfragile-abi", "-Wno-objc-root-class",
@@ -184,13 +184,13 @@ testing::AssertionResult matchesObjC(const Twine &Code, const T &AMatcher,
 }
 
 template <typename T>
-testing::AssertionResult matchesC(const Twine &Code, const T &AMatcher) {
+testing::AssertionResult matchesC(const llvm::Twine &Code, const T &AMatcher) {
   return matchesConditionally(Code, AMatcher, true, {}, FileContentMappings(),
                               "input.c");
 }
 
 template <typename T>
-testing::AssertionResult notMatchesObjC(const Twine &Code, const T &AMatcher) {
+testing::AssertionResult notMatchesObjC(const llvm::Twine &Code, const T &AMatcher) {
   return matchesObjC(Code, AMatcher, false);
 }
 
@@ -198,7 +198,7 @@ testing::AssertionResult notMatchesObjC(const Twine &Code, const T &AMatcher) {
 // small CUDA header prepended to the code string.
 template <typename T>
 testing::AssertionResult
-matchesConditionallyWithCuda(const Twine &Code, const T &AMatcher,
+matchesConditionallyWithCuda(const llvm::Twine &Code, const T &AMatcher,
                              bool ExpectMatch, llvm::StringRef CompileArg) {
   const std::string CudaHeader =
       "typedef unsigned int size_t;\n"
@@ -254,37 +254,37 @@ matchesConditionallyWithCuda(const Twine &Code, const T &AMatcher,
 }
 
 template <typename T>
-testing::AssertionResult matchesWithCuda(const Twine &Code, const T &AMatcher) {
+testing::AssertionResult matchesWithCuda(const llvm::Twine &Code, const T &AMatcher) {
   return matchesConditionallyWithCuda(Code, AMatcher, true, "-std=c++11");
 }
 
 template <typename T>
-testing::AssertionResult notMatchesWithCuda(const Twine &Code,
+testing::AssertionResult notMatchesWithCuda(const llvm::Twine &Code,
                                             const T &AMatcher) {
   return matchesConditionallyWithCuda(Code, AMatcher, false, "-std=c++11");
 }
 
 template <typename T>
-testing::AssertionResult matchesWithOpenMP(const Twine &Code,
+testing::AssertionResult matchesWithOpenMP(const llvm::Twine &Code,
                                            const T &AMatcher) {
   return matchesConditionally(Code, AMatcher, true, {"-fopenmp=libomp"});
 }
 
 template <typename T>
-testing::AssertionResult notMatchesWithOpenMP(const Twine &Code,
+testing::AssertionResult notMatchesWithOpenMP(const llvm::Twine &Code,
                                               const T &AMatcher) {
   return matchesConditionally(Code, AMatcher, false, {"-fopenmp=libomp"});
 }
 
 template <typename T>
-testing::AssertionResult matchesWithOpenMP51(const Twine &Code,
+testing::AssertionResult matchesWithOpenMP51(const llvm::Twine &Code,
                                              const T &AMatcher) {
   return matchesConditionally(Code, AMatcher, true,
                               {"-fopenmp=libomp", "-fopenmp-version=51"});
 }
 
 template <typename T>
-testing::AssertionResult notMatchesWithOpenMP51(const Twine &Code,
+testing::AssertionResult notMatchesWithOpenMP51(const llvm::Twine &Code,
                                                 const T &AMatcher) {
   return matchesConditionally(Code, AMatcher, false,
                               {"-fopenmp=libomp", "-fopenmp-version=51"});
@@ -292,9 +292,9 @@ testing::AssertionResult notMatchesWithOpenMP51(const Twine &Code,
 
 template <typename T>
 testing::AssertionResult matchAndVerifyResultConditionally(
-    const Twine &Code, const T &AMatcher,
+    const llvm::Twine &Code, const T &AMatcher,
     std::unique_ptr<BoundNodesCallback> FindResultVerifier, bool ExpectResult,
-    ArrayRef<std::string> Args = {}, StringRef Filename = "input.cc") {
+    llvm::ArrayRef<std::string> Args = {}, llvm::StringRef Filename = "input.cc") {
   bool VerifiedResult = false;
   MatchFinder Finder;
   VerifyMatch VerifyVerifiedResult(std::move(FindResultVerifier),
@@ -323,7 +323,7 @@ testing::AssertionResult matchAndVerifyResultConditionally(
   }
 
   VerifiedResult = false;
-  SmallString<256> Buffer;
+  llvm::SmallString<256> Buffer;
   std::unique_ptr<ASTUnit> AST(buildASTFromCodeWithArgs(
       Code.toStringRef(Buffer), CompileArgs, Filename));
   if (!AST.get())
@@ -345,10 +345,10 @@ testing::AssertionResult matchAndVerifyResultConditionally(
 // do more precisely).
 template <typename T>
 testing::AssertionResult
-matchAndVerifyResultTrue(const Twine &Code, const T &AMatcher,
+matchAndVerifyResultTrue(const llvm::Twine &Code, const T &AMatcher,
                          std::unique_ptr<BoundNodesCallback> FindResultVerifier,
-                         ArrayRef<std::string> Args = {},
-                         StringRef Filename = "input.cc") {
+                         llvm::ArrayRef<std::string> Args = {},
+                         llvm::StringRef Filename = "input.cc") {
   return matchAndVerifyResultConditionally(
       Code, AMatcher, std::move(FindResultVerifier),
       /*ExpectResult=*/true, Args, Filename);
@@ -356,9 +356,9 @@ matchAndVerifyResultTrue(const Twine &Code, const T &AMatcher,
 
 template <typename T>
 testing::AssertionResult matchAndVerifyResultFalse(
-    const Twine &Code, const T &AMatcher,
+    const llvm::Twine &Code, const T &AMatcher,
     std::unique_ptr<BoundNodesCallback> FindResultVerifier,
-    ArrayRef<std::string> Args = {}, StringRef Filename = "input.cc") {
+    llvm::ArrayRef<std::string> Args = {}, llvm::StringRef Filename = "input.cc") {
   return matchAndVerifyResultConditionally(
       Code, AMatcher, std::move(FindResultVerifier),
       /*ExpectResult=*/false, Args, Filename);
@@ -442,7 +442,7 @@ class ASTMatchersTest : public ::testing::Test,
                         public ::testing::WithParamInterface<TestClangConfig> {
 protected:
   template <typename T>
-  testing::AssertionResult matches(const Twine &Code, const T &AMatcher) {
+  testing::AssertionResult matches(const llvm::Twine &Code, const T &AMatcher) {
     const TestClangConfig &TestConfig = GetParam();
     return clang::ast_matchers::matchesConditionally(
         Code, AMatcher, /*ExpectMatch=*/true, TestConfig.getCommandLineArgs(),
@@ -450,7 +450,7 @@ protected:
   }
 
   template <typename T>
-  testing::AssertionResult notMatches(const Twine &Code, const T &AMatcher) {
+  testing::AssertionResult notMatches(const llvm::Twine &Code, const T &AMatcher) {
     const TestClangConfig &TestConfig = GetParam();
     return clang::ast_matchers::matchesConditionally(
         Code, AMatcher, /*ExpectMatch=*/false, TestConfig.getCommandLineArgs(),

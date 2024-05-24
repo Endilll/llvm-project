@@ -65,7 +65,7 @@ namespace clang {
   /// traversal of the tokens of a variadic macro definition.
   class VAOptDefinitionContext {
     /// Contains all the locations of so far unmatched lparens.
-    SmallVector<SourceLocation, 8> UnmatchedOpeningParens;
+    llvm::SmallVector<SourceLocation, 8> UnmatchedOpeningParens;
 
     const IdentifierInfo *const Ident__VA_OPT__;
 

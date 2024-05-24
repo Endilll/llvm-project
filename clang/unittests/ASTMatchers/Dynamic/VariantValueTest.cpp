@@ -28,7 +28,7 @@ TEST(VariantValueTest, Unsigned) {
 }
 
 TEST(VariantValueTest, String) {
-  const StringRef kString = "string";
+  const llvm::StringRef kString = "string";
   VariantValue Value = kString;
 
   EXPECT_TRUE(Value.isString());
@@ -70,7 +70,7 @@ TEST(VariantValueTest, DynTypedMatcher) {
 }
 
 TEST(VariantValueTest, Assignment) {
-  VariantValue Value = StringRef("A");
+  VariantValue Value = llvm::StringRef("A");
   EXPECT_TRUE(Value.isString());
   EXPECT_EQ("A", Value.getString());
   EXPECT_TRUE(Value.hasValue());
@@ -136,7 +136,7 @@ TEST(VariantValueTest, ImplicitBool) {
   EXPECT_FALSE(IfTrue);
   EXPECT_TRUE(!Value);
 
-  Value = StringRef();
+  Value = llvm::StringRef();
   IfTrue = false;
   if (Value) {
     IfTrue = true;

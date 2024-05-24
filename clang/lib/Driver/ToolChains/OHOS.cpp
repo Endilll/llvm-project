@@ -60,17 +60,17 @@ static bool findOHOSMuslMultilibs(const Multilib::flags_list &Flags,
 static bool findOHOSMultilibs(const Driver &D,
                                       const ToolChain &TC,
                                       const llvm::Triple &TargetTriple,
-                                      StringRef Path, const ArgList &Args,
+                                      llvm::StringRef Path, const ArgList &Args,
                                       DetectedMultilibs &Result) {
   Multilib::flags_list Flags;
   bool IsA7 = false;
   if (const Arg *A = Args.getLastArg(options::OPT_mcpu_EQ))
-    IsA7 = A->getValue() == StringRef("cortex-a7");
+    IsA7 = A->getValue() == llvm::StringRef("cortex-a7");
   addMultilibFlag(IsA7, "-mcpu=cortex-a7", Flags);
 
   bool IsMFPU = false;
   if (const Arg *A = Args.getLastArg(options::OPT_mfpu_EQ))
-    IsMFPU = A->getValue() == StringRef("neon-vfpv4");
+    IsMFPU = A->getValue() == llvm::StringRef("neon-vfpv4");
   addMultilibFlag(IsMFPU, "-mfpu=neon-vfpv4", Flags);
 
   tools::arm::FloatABI ARMFloatABI = getARMFloatABI(D, TargetTriple, Args);
@@ -116,12 +116,12 @@ std::string OHOS::getMultiarchTriple(const llvm::Triple &T) const {
 
 std::string OHOS::getMultiarchTriple(const Driver &D,
                                      const llvm::Triple &TargetTriple,
-                                     StringRef SysRoot) const {
+                                     llvm::StringRef SysRoot) const {
   return getMultiarchTriple(TargetTriple);
 }
 
 static std::string makePath(const std::initializer_list<std::string> &IL) {
-  SmallString<128> P;
+  llvm::SmallString<128> P;
   for (const auto &S : IL)
     llvm::sys::path::append(P, S);
   return static_cast<std::string>(P.str());
@@ -174,7 +174,7 @@ OHOS::OHOS(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
 ToolChain::RuntimeLibType OHOS::GetRuntimeLibType(
     const ArgList &Args) const {
   if (Arg *A = Args.getLastArg(clang::driver::options::OPT_rtlib_EQ)) {
-    StringRef Value = A->getValue();
+    llvm::StringRef Value = A->getValue();
     if (Value != "compiler-rt")
       getDriver().Diag(clang::diag::err_drv_invalid_rtlib_name)
           << A->getAsString(Args);
@@ -186,7 +186,7 @@ ToolChain::RuntimeLibType OHOS::GetRuntimeLibType(
 ToolChain::CXXStdlibType
 OHOS::GetCXXStdlibType(const ArgList &Args) const {
   if (Arg *A = Args.getLastArg(options::OPT_stdlib_EQ)) {
-    StringRef Value = A->getValue();
+    llvm::StringRef Value = A->getValue();
     if (Value != "libc++")
       getDriver().Diag(diag::err_drv_invalid_stdlib_name)
         << A->getAsString(Args);
@@ -205,7 +205,7 @@ void OHOS::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> P(D.ResourceDir);
+    llvm::SmallString<128> P(D.ResourceDir);
     llvm::sys::path::append(P, "include");
     addSystemInclude(DriverArgs, CC1Args, P);
   }
@@ -214,13 +214,13 @@ void OHOS::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   // Check for configure-time C include directories.
-  StringRef CIncludeDirs(C_INCLUDE_DIRS);
+  llvm::StringRef CIncludeDirs(C_INCLUDE_DIRS);
   if (CIncludeDirs != "") {
-    SmallVector<StringRef, 5> dirs;
+    llvm::SmallVector<llvm::StringRef, 5> dirs;
     CIncludeDirs.split(dirs, ":");
-    for (StringRef dir : dirs) {
-      StringRef Prefix =
-          llvm::sys::path::is_absolute(dir) ? StringRef(SysRoot) : "";
+    for (llvm::StringRef dir : dirs) {
+      llvm::StringRef Prefix =
+          llvm::sys::path::is_absolute(dir) ? llvm::StringRef(SysRoot) : "";
       addExternCSystemInclude(DriverArgs, CC1Args, Prefix + dir);
     }
     return;
@@ -283,7 +283,7 @@ std::string OHOS::computeSysRoot() const {
 }
 
 ToolChain::path_list OHOS::getRuntimePaths() const {
-  SmallString<128> P;
+  llvm::SmallString<128> P;
   path_list Paths;
   const Driver &D = getDriver();
   const llvm::Triple &Triple = getTriple();
@@ -337,9 +337,9 @@ std::string OHOS::getDynamicLinker(const ArgList &Args) const {
   return "/lib/ld-musl-" + ArchName + ".so.1";
 }
 
-std::string OHOS::getCompilerRT(const ArgList &Args, StringRef Component,
+std::string OHOS::getCompilerRT(const ArgList &Args, llvm::StringRef Component,
                                 FileType Type) const {
-  SmallString<128> Path(getDriver().ResourceDir);
+  llvm::SmallString<128> Path(getDriver().ResourceDir);
   llvm::sys::path::append(Path, "lib", getMultiarchTriple(getTriple()),
                           SelectedMultilib.gccSuffix());
   const char *Prefix =
@@ -357,7 +357,7 @@ std::string OHOS::getCompilerRT(const ArgList &Args, StringRef Component,
     break;
   }
   llvm::sys::path::append(
-      Path, Prefix + Twine("clang_rt.") + Component + Suffix);
+      Path, Prefix + llvm::Twine("clang_rt.") + Component + Suffix);
   return static_cast<std::string>(Path.str());
 }
 
@@ -400,7 +400,7 @@ void OHOS::addProfileRTLibs(const llvm::opt::ArgList &Args,
   // initialization module to be linked in.
   if (needsProfileRT(Args))
     CmdArgs.push_back(Args.MakeArgString(
-        Twine("-u", llvm::getInstrProfRuntimeHookVarName())));
+        llvm::Twine("-u", llvm::getInstrProfRuntimeHookVarName())));
   ToolChain::addProfileRTLibs(Args, CmdArgs);
 }
 

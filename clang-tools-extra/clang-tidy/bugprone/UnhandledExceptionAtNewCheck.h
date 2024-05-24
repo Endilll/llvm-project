@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/unhandled-exception-at-new.html
 class UnhandledExceptionAtNewCheck : public ClangTidyCheck {
 public:
-  UnhandledExceptionAtNewCheck(StringRef Name, ClangTidyContext *Context);
+  UnhandledExceptionAtNewCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus && LangOpts.CXXExceptions;

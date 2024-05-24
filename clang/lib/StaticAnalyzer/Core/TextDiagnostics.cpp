@@ -48,7 +48,7 @@ public:
         ShouldDisplayPathNotes(ShouldDisplayPathNotes) {}
   ~TextDiagnostics() override {}
 
-  StringRef getName() const override { return "TextDiagnostics"; }
+  llvm::StringRef getName() const override { return "TextDiagnostics"; }
 
   bool supportsLogicalOpControlFlow() const override { return true; }
   bool supportsCrossFileDiagnostics() const override { return true; }
@@ -67,9 +67,9 @@ public:
     SourceManager &SM = DiagEng.getSourceManager();
 
     Replacements Repls;
-    auto reportPiece = [&](unsigned ID, FullSourceLoc Loc, StringRef String,
-                           ArrayRef<SourceRange> Ranges,
-                           ArrayRef<FixItHint> Fixits) {
+    auto reportPiece = [&](unsigned ID, FullSourceLoc Loc, llvm::StringRef String,
+                           llvm::ArrayRef<SourceRange> Ranges,
+                           llvm::ArrayRef<FixItHint> Fixits) {
       if (!DiagOpts.ShouldApplyFixIts) {
         DiagEng.Report(Loc, ID) << String << Ranges << Fixits;
         return;

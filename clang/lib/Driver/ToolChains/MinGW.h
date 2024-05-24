@@ -93,7 +93,7 @@ public:
   void AddHIPIncludeArgs(const llvm::opt::ArgList &DriverArgs,
                          llvm::opt::ArgStringList &CC1Args) const override;
 
-  void printVerboseInfo(raw_ostream &OS) const override;
+  void printVerboseInfo(llvm::raw_ostream &OS) const override;
 
   unsigned GetDefaultDwarfVersion() const override { return 4; }
 

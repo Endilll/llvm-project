@@ -21,7 +21,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/qualified-auto.html
 class QualifiedAutoCheck : public ClangTidyCheck {
 public:
-  QualifiedAutoCheck(StringRef Name, ClangTidyContext *Context)
+  QualifiedAutoCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         AddConstToQualified(Options.get("AddConstToQualified", true)) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {

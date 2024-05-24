@@ -23,13 +23,13 @@ namespace driver {
 namespace tools {
 namespace arm {
 
-std::string getARMTargetCPU(StringRef CPU, llvm::StringRef Arch,
+std::string getARMTargetCPU(llvm::StringRef CPU, llvm::StringRef Arch,
                             const llvm::Triple &Triple);
 std::string getARMArch(llvm::StringRef Arch, const llvm::Triple &Triple);
-StringRef getARMCPUForMArch(llvm::StringRef Arch, const llvm::Triple &Triple);
-llvm::ARM::ArchKind getLLVMArchKindForARM(StringRef CPU, StringRef Arch,
+llvm::StringRef getARMCPUForMArch(llvm::StringRef Arch, const llvm::Triple &Triple);
+llvm::ARM::ArchKind getLLVMArchKindForARM(llvm::StringRef CPU, llvm::StringRef Arch,
                                           const llvm::Triple &Triple);
-StringRef getLLVMArchSuffixForARM(llvm::StringRef CPU, llvm::StringRef Arch,
+llvm::StringRef getLLVMArchSuffixForARM(llvm::StringRef CPU, llvm::StringRef Arch,
                                   const llvm::Triple &Triple);
 
 void appendBE8LinkFlag(const llvm::opt::ArgList &Args,

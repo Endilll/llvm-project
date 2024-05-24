@@ -764,7 +764,7 @@ multiclass RVVUnitStridedSegLoadTuple<string op> {
     {
       llvm::Type *ElementVectorType = cast<StructType>(ResultType)->elements()[0];
       IntrinsicTypes = {ElementVectorType, Ops.back()->getType()};
-      SmallVector<llvm::Value*, 12> Operands;
+      llvm::SmallVector<llvm::Value*, 12> Operands;
 
       bool NoPassthru =
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) |
@@ -835,7 +835,7 @@ multiclass RVVUnitStridedSegStoreTuple<string op> {
       unsigned Offset = IsMasked ? 1 : 0;
       llvm::Value *VTupleOperand = Ops[Offset + 1];
 
-      SmallVector<llvm::Value*, 12> Operands;
+      llvm::SmallVector<llvm::Value*, 12> Operands;
       for (unsigned I = 0; I < NF; ++I) {
         llvm::Value *V = Builder.CreateExtractValue(VTupleOperand, {I});
         Operands.push_back(V);
@@ -882,7 +882,7 @@ multiclass RVVUnitStridedSegLoadFFTuple<string op> {
     {
       llvm::Type *ElementVectorType = cast<StructType>(ResultType)->elements()[0];
       IntrinsicTypes = {ElementVectorType, Ops.back()->getType()};
-      SmallVector<llvm::Value*, 12> Operands;
+      llvm::SmallVector<llvm::Value*, 12> Operands;
 
       bool NoPassthru =
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) |
@@ -959,7 +959,7 @@ multiclass RVVStridedSegLoadTuple<string op> {
     {
       llvm::Type *ElementVectorType = cast<StructType>(ResultType)->elements()[0];
       IntrinsicTypes = {ElementVectorType, Ops.back()->getType()};
-      SmallVector<llvm::Value*, 12> Operands;
+      llvm::SmallVector<llvm::Value*, 12> Operands;
 
       bool NoPassthru =
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) |
@@ -1032,7 +1032,7 @@ multiclass RVVStridedSegStoreTuple<string op> {
       unsigned Offset = IsMasked ? 1 : 0;
       llvm::Value *VTupleOperand = Ops[Offset + 2];
 
-      SmallVector<llvm::Value*, 12> Operands;
+      llvm::SmallVector<llvm::Value*, 12> Operands;
       for (unsigned I = 0; I < NF; ++I) {
         llvm::Value *V = Builder.CreateExtractValue(VTupleOperand, {I});
         Operands.push_back(V);
@@ -1075,7 +1075,7 @@ multiclass RVVIndexedSegLoadTuple<string op> {
     {
       llvm::Type *ElementVectorType = cast<StructType>(ResultType)->elements()[0];
       IntrinsicTypes = {ElementVectorType, Ops.back()->getType()};
-      SmallVector<llvm::Value*, 12> Operands;
+      llvm::SmallVector<llvm::Value*, 12> Operands;
 
       bool NoPassthru =
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) |
@@ -1146,7 +1146,7 @@ multiclass RVVIndexedSegStoreTuple<string op> {
       unsigned Offset = IsMasked ? 1 : 0;
       llvm::Value *VTupleOperand = Ops[Offset + 2];
 
-      SmallVector<llvm::Value*, 12> Operands;
+      llvm::SmallVector<llvm::Value*, 12> Operands;
       for (unsigned I = 0; I < NF; ++I) {
         llvm::Value *V = Builder.CreateExtractValue(VTupleOperand, {I});
         Operands.push_back(V);
@@ -1409,7 +1409,7 @@ let ManualCodegen = [{
     // Unmasked: (passthru, op0, op1, round_mode, vl)
     // Masked:   (passthru, vector_in, vector_in/scalar_in, mask, vxrm, vl, policy)
 
-    SmallVector<llvm::Value*, 7> Operands;
+    llvm::SmallVector<llvm::Value*, 7> Operands;
     bool HasMaskedOff = !(
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) ||
         (!IsMasked && PolicyAttrs & RVV_VTA));
@@ -1458,7 +1458,7 @@ let ManualCodegen = [{
     // Unmasked: (passthru, op0, op1, round_mode, vl)
     // Masked:   (passthru, vector_in, vector_in/scalar_in, mask, vxrm, vl, policy)
 
-    SmallVector<llvm::Value*, 7> Operands;
+    llvm::SmallVector<llvm::Value*, 7> Operands;
     bool HasMaskedOff = !(
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) ||
         (!IsMasked && PolicyAttrs & RVV_VTA));
@@ -1513,7 +1513,7 @@ let ManualCodegen = [{
     // Unmasked: (passthru, op0, op1, round_mode, vl)
     // Masked:   (passthru, vector_in, vector_in/scalar_in, mask, frm, vl, policy)
 
-    SmallVector<llvm::Value*, 7> Operands;
+    llvm::SmallVector<llvm::Value*, 7> Operands;
     bool HasMaskedOff = !(
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) ||
         (!IsMasked && PolicyAttrs & RVV_VTA));
@@ -1590,7 +1590,7 @@ let ManualCodegen = [{
     // Unmasked: (passthru, op0, op1, round_mode, vl)
     // Masked:   (passthru, vector_in, vector_in/scalar_in, mask, frm, vl, policy)
 
-    SmallVector<llvm::Value*, 7> Operands;
+    llvm::SmallVector<llvm::Value*, 7> Operands;
     bool HasMaskedOff = !(
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) ||
         (!IsMasked && PolicyAttrs & RVV_VTA));
@@ -1664,7 +1664,7 @@ let ManualCodegen = [{
     // Unmasked: (passthru, op0, op1, round_mode, vl)
     // Masked:   (passthru, vector_in, vector_in/scalar_in, mask, frm, vl, policy)
 
-    SmallVector<llvm::Value*, 7> Operands;
+    llvm::SmallVector<llvm::Value*, 7> Operands;
     bool HasRoundModeOp = IsMasked ? Ops.size() == 6 : Ops.size() == 5;
 
     unsigned Offset = IsMasked ? 2 : 1;
@@ -1723,7 +1723,7 @@ let ManualCodegen = [{
     // Unmasked: (passthru, op0, op1, round_mode, vl)
     // Masked:   (passthru, vector_in, vector_in/scalar_in, mask, frm, vl, policy)
 
-    SmallVector<llvm::Value*, 7> Operands;
+    llvm::SmallVector<llvm::Value*, 7> Operands;
     bool HasRoundModeOp = IsMasked ? Ops.size() == 6 : Ops.size() == 5;
 
     unsigned Offset = IsMasked ? 2 : 1;
@@ -1793,7 +1793,7 @@ let ManualCodegen = [{
     // Unmasked: (passthru, op0, round_mode, vl)
     // Masked:   (passthru, op0, mask, frm, vl, policy)
 
-    SmallVector<llvm::Value*, 7> Operands;
+    llvm::SmallVector<llvm::Value*, 7> Operands;
     bool HasMaskedOff = !(
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) ||
         (!IsMasked && PolicyAttrs & RVV_VTA));
@@ -1939,7 +1939,7 @@ let ManualCodegen = [{
     // LLVM intrinsic
     // Unmasked: (passthru, op0, frm, vl)
     // Masked:   (passthru, op0, mask, frm, vl, policy)
-    SmallVector<llvm::Value*, 7> Operands;
+    llvm::SmallVector<llvm::Value*, 7> Operands;
     bool HasMaskedOff = !(
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) ||
         (!IsMasked && PolicyAttrs & RVV_VTA));
@@ -2111,7 +2111,7 @@ let ManualCodegen = [{
     // Unmasked: (passthru, op0, op1, round_mode, vl)
     // Masked:   (passthru, vector_in, vector_in/scalar_in, mask, frm, vl, policy)
 
-    SmallVector<llvm::Value*, 7> Operands;
+    llvm::SmallVector<llvm::Value*, 7> Operands;
     bool HasMaskedOff = !(
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) ||
         (!IsMasked && PolicyAttrs & RVV_VTA));

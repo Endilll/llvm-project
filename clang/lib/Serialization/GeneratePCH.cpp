@@ -23,9 +23,9 @@
 using namespace clang;
 
 PCHGenerator::PCHGenerator(
-    Preprocessor &PP, InMemoryModuleCache &ModuleCache, StringRef OutputFile,
-    StringRef isysroot, std::shared_ptr<PCHBuffer> Buffer,
-    ArrayRef<std::shared_ptr<ModuleFileExtension>> Extensions,
+    Preprocessor &PP, InMemoryModuleCache &ModuleCache, llvm::StringRef OutputFile,
+    llvm::StringRef isysroot, std::shared_ptr<PCHBuffer> Buffer,
+    llvm::ArrayRef<std::shared_ptr<ModuleFileExtension>> Extensions,
     bool AllowASTWithErrors, bool IncludeTimestamps,
     bool BuildingImplicitModule, bool ShouldCacheASTInMemory,
     bool GeneratingReducedBMI)
@@ -92,12 +92,12 @@ void PCHGenerator::anchor() {}
 
 CXX20ModulesGenerator::CXX20ModulesGenerator(Preprocessor &PP,
                                              InMemoryModuleCache &ModuleCache,
-                                             StringRef OutputFile,
+                                             llvm::StringRef OutputFile,
                                              bool GeneratingReducedBMI)
     : PCHGenerator(
           PP, ModuleCache, OutputFile, llvm::StringRef(),
           std::make_shared<PCHBuffer>(),
-          /*Extensions=*/ArrayRef<std::shared_ptr<ModuleFileExtension>>(),
+          /*Extensions=*/llvm::ArrayRef<std::shared_ptr<ModuleFileExtension>>(),
           /*AllowASTWithErrors*/ false, /*IncludeTimestamps=*/false,
           /*BuildingImplicitModule=*/false, /*ShouldCacheASTInMemory=*/false,
           GeneratingReducedBMI) {}

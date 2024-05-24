@@ -43,7 +43,7 @@ void TwineLocalCheck::check(const MatchFinder::MatchResult &Result) {
     SourceRange TypeRange =
         VD->getTypeSourceInfo()->getTypeLoc().getSourceRange();
 
-    // A real Twine, turn it into a std::string.
+    // A real llvm::Twine, turn it into a std::string.
     if (VD->getType()->getCanonicalTypeUnqualified() ==
         C->getType()->getCanonicalTypeUnqualified()) {
       SourceLocation EndLoc = Lexer::getLocForEndOfToken(

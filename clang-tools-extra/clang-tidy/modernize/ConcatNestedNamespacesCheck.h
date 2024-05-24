@@ -32,7 +32,7 @@ public:
 
 class ConcatNestedNamespacesCheck : public ClangTidyCheck {
 public:
-  ConcatNestedNamespacesCheck(StringRef Name, ClangTidyContext *Context)
+  ConcatNestedNamespacesCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool unsupportedNamespace(const NamespaceDecl &ND, bool IsChild) const;
   bool singleNamedNamespaceChild(const NamespaceDecl &ND) const;

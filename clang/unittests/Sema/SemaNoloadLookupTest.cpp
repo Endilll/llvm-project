@@ -35,12 +35,12 @@ class NoloadLookupTest : public ::testing::Test {
   void TearDown() override { sys::fs::remove_directories(TestDir); }
 
 public:
-  SmallString<256> TestDir;
+  llvm::SmallString<256> TestDir;
 
-  void addFile(StringRef Path, StringRef Contents) {
+  void addFile(llvm::StringRef Path, llvm::StringRef Contents) {
     ASSERT_FALSE(sys::path::is_absolute(Path));
 
-    SmallString<256> AbsPath(TestDir);
+    llvm::SmallString<256> AbsPath(TestDir);
     sys::path::append(AbsPath, Path);
 
     ASSERT_FALSE(
@@ -52,12 +52,12 @@ public:
     OS << Contents;
   }
 
-  std::string GenerateModuleInterface(StringRef ModuleName,
-                                      StringRef Contents) {
+  std::string GenerateModuleInterface(llvm::StringRef ModuleName,
+                                      llvm::StringRef Contents) {
     std::string FileName = llvm::Twine(ModuleName + ".cppm").str();
     addFile(FileName, Contents);
 
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
         CompilerInstance::createDiagnostics(new DiagnosticOptions());
     CreateInvocationOptions CIOpts;
     CIOpts.Diags = Diags;
@@ -140,7 +140,7 @@ private:
 
 class NoloadLookupAction : public ASTFrontendAction {
   std::unique_ptr<ASTConsumer>
-  CreateASTConsumer(CompilerInstance &CI, StringRef /*Unused*/) override {
+  CreateASTConsumer(CompilerInstance &CI, llvm::StringRef /*Unused*/) override {
     return std::make_unique<NoloadLookupConsumer>();
   }
 };

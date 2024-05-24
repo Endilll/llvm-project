@@ -25,7 +25,7 @@ public:
   /// \param Code     The selected set of statements.
   /// \param DeclName The name of the extract function. If None,
   ///                 "extracted" is used.
-  static Expected<ExtractFunction>
+  static llvm::Expected<ExtractFunction>
   initiate(RefactoringRuleContext &Context, CodeRangeASTSelection Code,
            std::optional<std::string> DeclName);
 
@@ -37,7 +37,7 @@ private:
       : Code(std::move(Code)),
         DeclName(DeclName ? std::move(*DeclName) : "extracted") {}
 
-  Expected<AtomicChanges>
+  llvm::Expected<AtomicChanges>
   createSourceReplacements(RefactoringRuleContext &Context) override;
 
   CodeRangeASTSelection Code;

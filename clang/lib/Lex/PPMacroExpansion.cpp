@@ -131,7 +131,7 @@ void Preprocessor::setLoadedMacroDirective(IdentifierInfo *II,
 
 ModuleMacro *Preprocessor::addModuleMacro(Module *Mod, IdentifierInfo *II,
                                           MacroInfo *Macro,
-                                          ArrayRef<ModuleMacro *> Overrides,
+                                          llvm::ArrayRef<ModuleMacro *> Overrides,
                                           bool &New) {
   llvm::FoldingSetNodeID ID;
   ModuleMacro::Profile(ID, Mod, II);
@@ -256,7 +256,7 @@ void Preprocessor::updateModuleMacroInfo(const IdentifierInfo *II,
 }
 
 void Preprocessor::dumpMacroInfo(const IdentifierInfo *II) {
-  ArrayRef<ModuleMacro*> Leaf;
+  llvm::ArrayRef<ModuleMacro*> Leaf;
   auto LeafIt = LeafModuleMacros.find(II);
   if (LeafIt != LeafModuleMacros.end())
     Leaf = LeafIt->second;
@@ -640,9 +640,9 @@ enum Bracket {
 
 /// CheckMatchedBrackets - Returns true if the braces and parentheses in the
 /// token vector are properly nested.
-static bool CheckMatchedBrackets(const SmallVectorImpl<Token> &Tokens) {
-  SmallVector<Bracket, 8> Brackets;
-  for (SmallVectorImpl<Token>::const_iterator I = Tokens.begin(),
+static bool CheckMatchedBrackets(const llvm::SmallVectorImpl<Token> &Tokens) {
+  llvm::SmallVector<Bracket, 8> Brackets;
+  for (llvm::SmallVectorImpl<Token>::const_iterator I = Tokens.begin(),
                                               E = Tokens.end();
        I != E; ++I) {
     if (I->is(tok::l_paren)) {
@@ -670,11 +670,11 @@ static bool CheckMatchedBrackets(const SmallVectorImpl<Token> &Tokens) {
 /// of an initializer list starting a macro argument, the range of those
 /// initializer lists will be place in InitLists.
 static bool GenerateNewArgTokens(Preprocessor &PP,
-                                 SmallVectorImpl<Token> &OldTokens,
-                                 SmallVectorImpl<Token> &NewTokens,
+                                 llvm::SmallVectorImpl<Token> &OldTokens,
+                                 llvm::SmallVectorImpl<Token> &NewTokens,
                                  unsigned &NumArgs,
-                                 SmallVectorImpl<SourceRange> &ParenHints,
-                                 SmallVectorImpl<SourceRange> &InitLists) {
+                                 llvm::SmallVectorImpl<SourceRange> &ParenHints,
+                                 llvm::SmallVectorImpl<SourceRange> &InitLists) {
   if (!CheckMatchedBrackets(OldTokens))
     return false;
 
@@ -683,18 +683,18 @@ static bool GenerateNewArgTokens(Preprocessor &PP,
   unsigned Braces = 0;
 
   // First token of a new macro argument.
-  SmallVectorImpl<Token>::iterator ArgStartIterator = OldTokens.begin();
+  llvm::SmallVectorImpl<Token>::iterator ArgStartIterator = OldTokens.begin();
 
   // First closing brace in a new macro argument.  Used to generate
   // SourceRanges for InitLists.
-  SmallVectorImpl<Token>::iterator ClosingBrace = OldTokens.end();
+  llvm::SmallVectorImpl<Token>::iterator ClosingBrace = OldTokens.end();
   NumArgs = 0;
   Token TempToken;
   // Set to true when a macro separator token is found inside a braced list.
   // If true, the fixed argument spans multiple old arguments and ParenHints
   // will be updated.
   bool FoundSeparatorToken = false;
-  for (SmallVectorImpl<Token>::iterator I = OldTokens.begin(),
+  for (llvm::SmallVectorImpl<Token>::iterator I = OldTokens.begin(),
                                         E = OldTokens.end();
        I != E; ++I) {
     if (I->is(tok::l_brace)) {
@@ -781,9 +781,9 @@ MacroArgs *Preprocessor::ReadMacroCallArgumentList(Token &MacroName,
   assert(Tok.is(tok::l_paren) && "Error computing l-paren-ness?");
 
   // ArgTokens - Build up a list of tokens that make up each argument.  Each
-  // argument is separated by an EOF token.  Use a SmallVector so we can avoid
+  // argument is separated by an EOF token.  Use a llvm::SmallVector so we can avoid
   // heap allocations in the common case.
-  SmallVector<Token, 64> ArgTokens;
+  llvm::SmallVector<Token, 64> ArgTokens;
   bool ContainsCodeCompletionTok = false;
   bool FoundElidedComma = false;
 
@@ -934,9 +934,9 @@ MacroArgs *Preprocessor::ReadMacroCallArgumentList(Token &MacroName,
     // TODO: See if this can be generalized to angle brackets for templates
     // inside macro arguments.
 
-    SmallVector<Token, 4> FixedArgTokens;
+    llvm::SmallVector<Token, 4> FixedArgTokens;
     unsigned FixedNumArgs = 0;
-    SmallVector<SourceRange, 4> ParenHints, InitLists;
+    llvm::SmallVector<SourceRange, 4> ParenHints, InitLists;
     if (!GenerateNewArgTokens(*this, ArgTokens, FixedArgTokens, FixedNumArgs,
                               ParenHints, InitLists)) {
       if (!InitLists.empty()) {
@@ -1057,7 +1057,7 @@ MacroArgs *Preprocessor::ReadMacroCallArgumentList(Token &MacroName,
 /// going to lex in the cache and when it finishes the tokens are removed
 /// from the end of the cache.
 Token *Preprocessor::cacheMacroExpandedTokens(TokenLexer *tokLexer,
-                                              ArrayRef<Token> tokens) {
+                                              llvm::ArrayRef<Token> tokens) {
   assert(tokLexer);
   if (tokens.empty())
     return nullptr;
@@ -1111,7 +1111,7 @@ static void ComputeDATE_TIME(SourceLocation &DATELoc, SourceLocation &TIMELoc,
   };
 
   {
-    SmallString<32> TmpBuffer;
+    llvm::SmallString<32> TmpBuffer;
     llvm::raw_svector_ostream TmpStream(TmpBuffer);
     if (TM)
       TmpStream << llvm::format("\"%s %2d %4d\"", Months[TM->tm_mon],
@@ -1125,7 +1125,7 @@ static void ComputeDATE_TIME(SourceLocation &DATELoc, SourceLocation &TIMELoc,
   }
 
   {
-    SmallString<32> TmpBuffer;
+    llvm::SmallString<32> TmpBuffer;
     llvm::raw_svector_ostream TmpStream(TmpBuffer);
     if (TM)
       TmpStream << llvm::format("\"%02d:%02d:%02d\"", TM->tm_hour, TM->tm_min,
@@ -1141,7 +1141,7 @@ static void ComputeDATE_TIME(SourceLocation &DATELoc, SourceLocation &TIMELoc,
 
 /// HasFeature - Return true if we recognize and implement the feature
 /// specified by the identifier as a standard language feature.
-static bool HasFeature(const Preprocessor &PP, StringRef Feature) {
+static bool HasFeature(const Preprocessor &PP, llvm::StringRef Feature) {
   const LangOptions &LangOpts = PP.getLangOpts();
 
   // Normalize the feature name, __foo__ becomes foo.
@@ -1159,7 +1159,7 @@ static bool HasFeature(const Preprocessor &PP, StringRef Feature) {
 /// HasExtension - Return true if we recognize and implement the feature
 /// specified by the identifier, either as an extension or a standard language
 /// feature.
-static bool HasExtension(const Preprocessor &PP, StringRef Extension) {
+static bool HasExtension(const Preprocessor &PP, llvm::StringRef Extension) {
   if (HasFeature(PP, Extension))
     return true;
 
@@ -1233,9 +1233,9 @@ static bool EvaluateHasIncludeCommon(Token &Tok, IdentifierInfo *II,
   }
 
   // Reserve a buffer to get the spelling.
-  SmallString<128> FilenameBuffer;
+  llvm::SmallString<128> FilenameBuffer;
   bool Invalid = false;
-  StringRef Filename = PP.getSpelling(Tok, FilenameBuffer, &Invalid);
+  llvm::StringRef Filename = PP.getSpelling(Tok, FilenameBuffer, &Invalid);
   if (Invalid)
     return false;
 
@@ -1438,7 +1438,7 @@ static bool isTargetArch(const TargetInfo &TI, const IdentifierInfo *II) {
 
 /// Implements the __is_target_vendor builtin macro.
 static bool isTargetVendor(const TargetInfo &TI, const IdentifierInfo *II) {
-  StringRef VendorName = TI.getTriple().getVendorName();
+  llvm::StringRef VendorName = TI.getTriple().getVendorName();
   if (VendorName.empty())
     VendorName = "unknown";
   return VendorName.equals_insensitive(II->getName());
@@ -1518,7 +1518,7 @@ void Preprocessor::ExpandBuiltinMacro(Token &Tok) {
 
   ++NumBuiltinMacroExpanded;
 
-  SmallString<128> TmpBuffer;
+  llvm::SmallString<128> TmpBuffer;
   llvm::raw_svector_ostream OS(TmpBuffer);
 
   // Set up the return result.
@@ -1568,7 +1568,7 @@ void Preprocessor::ExpandBuiltinMacro(Token &Tok) {
     }
 
     // Escape this filename.  Turn '\' -> '\\' '"' -> '\"'
-    SmallString<256> FN;
+    llvm::SmallString<256> FN;
     if (PLoc.isValid()) {
       // __FILE_NAME__ is a Clang-specific extension that expands to the
       // the last part of __FILE__.
@@ -1641,7 +1641,7 @@ void Preprocessor::ExpandBuiltinMacro(Token &Tok) {
       }
     }
     // Surround the string with " and strip the trailing newline.
-    OS << '"' << StringRef(Result).drop_back() << '"';
+    OS << '"' << llvm::StringRef(Result).drop_back() << '"';
     Tok.setKind(tok::string_literal);
   } else if (II == Ident__FLT_EVAL_METHOD__) {
     // __FLT_EVAL_METHOD__ is set to the default value.
@@ -1841,10 +1841,10 @@ void Preprocessor::ExpandBuiltinMacro(Token &Tok) {
         }
 
         // Finally, check if the warning flags maps to a diagnostic group.
-        // We construct a SmallVector here to talk to getDiagnosticIDs().
+        // We construct a llvm::SmallVector here to talk to getDiagnosticIDs().
         // Although we don't use the result, this isn't a hot path, and not
         // worth special casing.
-        SmallVector<diag::kind, 10> Diags;
+        llvm::SmallVector<diag::kind, 10> Diags;
         return !getDiagnostics().getDiagnosticIDs()->
                 getDiagnosticsInGroup(diag::Flavor::WarningOrError,
                                       WarningName.substr(2), Diags);
@@ -1976,7 +1976,7 @@ void Preprocessor::markMacroAsUsed(MacroInfo *MI) {
   MI->setIsUsed(true);
 }
 
-void Preprocessor::processPathForFileMacro(SmallVectorImpl<char> &Path,
+void Preprocessor::processPathForFileMacro(llvm::SmallVectorImpl<char> &Path,
                                            const LangOptions &LangOpts,
                                            const TargetInfo &TI) {
   LangOpts.remapPathPrefix(Path);
@@ -1989,13 +1989,13 @@ void Preprocessor::processPathForFileMacro(SmallVectorImpl<char> &Path,
   }
 }
 
-void Preprocessor::processPathToFileName(SmallVectorImpl<char> &FileName,
+void Preprocessor::processPathToFileName(llvm::SmallVectorImpl<char> &FileName,
                                          const PresumedLoc &PLoc,
                                          const LangOptions &LangOpts,
                                          const TargetInfo &TI) {
   // Try to get the last path component, failing that return the original
   // presumed location.
-  StringRef PLFileName = llvm::sys::path::filename(PLoc.getFilename());
+  llvm::StringRef PLFileName = llvm::sys::path::filename(PLoc.getFilename());
   if (PLFileName.empty())
     PLFileName = PLoc.getFilename();
   FileName.append(PLFileName.begin(), PLFileName.end());

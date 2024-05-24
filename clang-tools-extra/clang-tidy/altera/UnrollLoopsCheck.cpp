@@ -19,7 +19,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::altera {
 
-UnrollLoopsCheck::UnrollLoopsCheck(StringRef Name, ClangTidyContext *Context)
+UnrollLoopsCheck::UnrollLoopsCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       MaxLoopIterations(Options.get("MaxLoopIterations", 100U)) {}
 

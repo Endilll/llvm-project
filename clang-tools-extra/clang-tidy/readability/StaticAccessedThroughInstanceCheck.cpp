@@ -81,7 +81,7 @@ void StaticAccessedThroughInstanceCheck::check(
     return;
 
   // Do not warn for CUDA built-in variables.
-  if (StringRef(BaseTypeName).starts_with("__cuda_builtin_"))
+  if (llvm::StringRef(BaseTypeName).starts_with("__cuda_builtin_"))
     return;
 
   SourceLocation MemberExprStartLoc = MemberExpression->getBeginLoc();

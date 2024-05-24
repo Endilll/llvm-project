@@ -48,7 +48,7 @@ forwardSkipWhitespaceAndComments(SourceLocation Loc, const SourceManager &SM,
 }
 
 BracesAroundStatementsCheck::BracesAroundStatementsCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       // Always add braces by default.
       ShortStatementLines(Options.get("ShortStatementLines", 0U)) {}

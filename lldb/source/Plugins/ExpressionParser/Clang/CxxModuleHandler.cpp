@@ -158,7 +158,7 @@ getEqualLocalDeclContext(Sema &sema, DeclContext *foreign_ctxt) {
 
 /// Returns true iff tryInstantiateStdTemplate supports instantiating a template
 /// with the given template arguments.
-static bool templateArgsAreSupported(ArrayRef<TemplateArgument> a) {
+static bool templateArgsAreSupported(llvm::ArrayRef<TemplateArgument> a) {
   for (const TemplateArgument &arg : a) {
     switch (arg.getKind()) {
     case TemplateArgument::Type:

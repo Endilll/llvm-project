@@ -581,7 +581,7 @@ DependentTemplateSpecializationTypeLoc::initializeLocal(ASTContext &Context,
 }
 
 void TemplateSpecializationTypeLoc::initializeArgLocs(
-    ASTContext &Context, ArrayRef<TemplateArgument> Args,
+    ASTContext &Context, llvm::ArrayRef<TemplateArgument> Args,
     TemplateArgumentLocInfo *ArgInfos, SourceLocation Loc) {
   for (unsigned i = 0, e = Args.size(); i != e; ++i) {
     switch (Args[i].getKind()) {

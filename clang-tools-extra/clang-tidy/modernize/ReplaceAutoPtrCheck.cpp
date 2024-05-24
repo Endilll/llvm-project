@@ -35,7 +35,7 @@ AST_MATCHER(Expr, isLValue) { return Node.getValueKind() == VK_LValue; }
 
 } // namespace
 
-ReplaceAutoPtrCheck::ReplaceAutoPtrCheck(StringRef Name,
+ReplaceAutoPtrCheck::ReplaceAutoPtrCheck(llvm::StringRef Name,
                                          ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       Inserter(Options.getLocalOrGlobal("IncludeStyle",
@@ -137,7 +137,7 @@ void ReplaceAutoPtrCheck::check(const MatchFinder::MatchResult &Result) {
 
   // Ensure that only the 'auto_ptr' token is replaced and not the template
   // aliases.
-  if (StringRef(SM.getCharacterData(AutoPtrLoc), strlen("auto_ptr")) !=
+  if (llvm::StringRef(SM.getCharacterData(AutoPtrLoc), strlen("auto_ptr")) !=
       "auto_ptr")
     return;
 

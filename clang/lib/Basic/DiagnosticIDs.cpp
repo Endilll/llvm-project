@@ -137,11 +137,11 @@ struct StaticDiagInfoRec {
     return OptionGroupIndex;
   }
 
-  StringRef getDescription() const {
+  llvm::StringRef getDescription() const {
     size_t MyIndex = this - &StaticDiagInfo[0];
     uint32_t StringOffset = StaticDiagInfoDescriptionOffsets[MyIndex];
     const char* Table = reinterpret_cast<const char*>(&StaticDiagInfoDescriptions);
-    return StringRef(&Table[StringOffset], DescriptionLen);
+    return llvm::StringRef(&Table[StringOffset], DescriptionLen);
   }
 
   diag::Flavor getFlavor() const {
@@ -300,8 +300,8 @@ namespace {
     const char *NameStr;
     uint8_t NameLen;
 
-    StringRef getName() const {
-      return StringRef(NameStr, NameLen);
+    llvm::StringRef getName() const {
+      return llvm::StringRef(NameStr, NameLen);
     }
   };
 }
@@ -322,9 +322,9 @@ unsigned DiagnosticIDs::getNumberOfCategories() {
 /// getCategoryNameFromID - Given a category ID, return the name of the
 /// category, an empty string if CategoryID is zero, or null if CategoryID is
 /// invalid.
-StringRef DiagnosticIDs::getCategoryNameFromID(unsigned CategoryID) {
+llvm::StringRef DiagnosticIDs::getCategoryNameFromID(unsigned CategoryID) {
   if (CategoryID >= getNumberOfCategories())
-   return StringRef();
+   return llvm::StringRef();
   return CategoryNameTable[CategoryID].getName();
 }
 
@@ -365,7 +365,7 @@ namespace clang {
 
       /// getDescription - Return the description of the specified custom
       /// diagnostic.
-      StringRef getDescription(unsigned DiagID) const {
+      llvm::StringRef getDescription(unsigned DiagID) const {
         assert(DiagID - DIAG_UPPER_LIMIT < DiagInfo.size() &&
                "Invalid diagnostic ID");
         return DiagInfo[DiagID-DIAG_UPPER_LIMIT].second;
@@ -378,7 +378,7 @@ namespace clang {
         return DiagInfo[DiagID-DIAG_UPPER_LIMIT].first;
       }
 
-      unsigned getOrCreateDiagID(DiagnosticIDs::Level L, StringRef Message,
+      unsigned getOrCreateDiagID(DiagnosticIDs::Level L, llvm::StringRef Message,
                                  DiagnosticIDs &Diags) {
         DiagDesc D(L, std::string(Message));
         // Check to see if it already exists.
@@ -412,7 +412,7 @@ DiagnosticIDs::~DiagnosticIDs() {}
 ///
 /// \param FormatString A fixed diagnostic format string that will be hashed and
 /// mapped to a unique DiagID.
-unsigned DiagnosticIDs::getCustomDiagID(Level L, StringRef FormatString) {
+unsigned DiagnosticIDs::getCustomDiagID(Level L, llvm::StringRef FormatString) {
   if (!CustomDiagInfo)
     CustomDiagInfo.reset(new diag::CustomDiagInfo());
   return CustomDiagInfo->getOrCreateDiagID(L, FormatString, *this);
@@ -460,7 +460,7 @@ bool DiagnosticIDs::isDefaultMappingAsError(unsigned DiagID) {
 
 /// getDescription - Given a diagnostic ID, return a description of the
 /// issue.
-StringRef DiagnosticIDs::getDescription(unsigned DiagID) const {
+llvm::StringRef DiagnosticIDs::getDescription(unsigned DiagID) const {
   if (const StaticDiagInfoRec *Info = GetDiagInfo(DiagID))
     return Info->getDescription();
   assert(CustomDiagInfo && "Invalid CustomDiagInfo");
@@ -606,11 +606,11 @@ namespace {
     uint16_t NameOffset;
     uint16_t Members;
     uint16_t SubGroups;
-    StringRef Documentation;
+    llvm::StringRef Documentation;
 
     // String is stored with a pascal-style length byte.
-    StringRef getName() const {
-      return StringRef(DiagGroupNames + NameOffset + 1,
+    llvm::StringRef getName() const {
+      return llvm::StringRef(DiagGroupNames + NameOffset + 1,
                        DiagGroupNames[NameOffset]);
     }
   };
@@ -625,16 +625,16 @@ static const WarningOption OptionTable[] = {
 };
 
 /// Given a diagnostic group ID, return its documentation.
-StringRef DiagnosticIDs::getWarningOptionDocumentation(diag::Group Group) {
+llvm::StringRef DiagnosticIDs::getWarningOptionDocumentation(diag::Group Group) {
   return OptionTable[static_cast<int>(Group)].Documentation;
 }
 
-StringRef DiagnosticIDs::getWarningOptionForGroup(diag::Group Group) {
+llvm::StringRef DiagnosticIDs::getWarningOptionForGroup(diag::Group Group) {
   return OptionTable[static_cast<int>(Group)].getName();
 }
 
 std::optional<diag::Group>
-DiagnosticIDs::getGroupForWarningOption(StringRef Name) {
+DiagnosticIDs::getGroupForWarningOption(llvm::StringRef Name) {
   const auto *Found = llvm::partition_point(
       OptionTable, [=](const WarningOption &O) { return O.getName() < Name; });
   if (Found == std::end(OptionTable) || Found->getName() != Name)
@@ -651,10 +651,10 @@ std::optional<diag::Group> DiagnosticIDs::getGroupForDiag(unsigned DiagID) {
 /// getWarningOptionForDiag - Return the lowest-level warning option that
 /// enables the specified diagnostic.  If there is no -Wfoo flag that controls
 /// the diagnostic, this returns null.
-StringRef DiagnosticIDs::getWarningOptionForDiag(unsigned DiagID) {
+llvm::StringRef DiagnosticIDs::getWarningOptionForDiag(unsigned DiagID) {
   if (auto G = getGroupForDiag(DiagID))
     return getWarningOptionForGroup(*G);
-  return StringRef();
+  return llvm::StringRef();
 }
 
 std::vector<std::string> DiagnosticIDs::getDiagnosticFlags() {
@@ -673,7 +673,7 @@ std::vector<std::string> DiagnosticIDs::getDiagnosticFlags() {
 /// were filtered out due to having the wrong flavor.
 static bool getDiagnosticsInGroup(diag::Flavor Flavor,
                                   const WarningOption *Group,
-                                  SmallVectorImpl<diag::kind> &Diags) {
+                                  llvm::SmallVectorImpl<diag::kind> &Diags) {
   // An empty group is considered to be a warning group: we have empty groups
   // for GCC compatibility, and GCC does not have remarks.
   if (!Group->Members && !Group->SubGroups)
@@ -700,8 +700,8 @@ static bool getDiagnosticsInGroup(diag::Flavor Flavor,
 }
 
 bool
-DiagnosticIDs::getDiagnosticsInGroup(diag::Flavor Flavor, StringRef Group,
-                                     SmallVectorImpl<diag::kind> &Diags) const {
+DiagnosticIDs::getDiagnosticsInGroup(diag::Flavor Flavor, llvm::StringRef Group,
+                                     llvm::SmallVectorImpl<diag::kind> &Diags) const {
   if (std::optional<diag::Group> G = getGroupForWarningOption(Group))
     return ::getDiagnosticsInGroup(
         Flavor, &OptionTable[static_cast<unsigned>(*G)], Diags);
@@ -715,9 +715,9 @@ void DiagnosticIDs::getAllDiagnostics(diag::Flavor Flavor,
       Diags.push_back(StaticDiagInfo[i].DiagID);
 }
 
-StringRef DiagnosticIDs::getNearestOption(diag::Flavor Flavor,
-                                          StringRef Group) {
-  StringRef Best;
+llvm::StringRef DiagnosticIDs::getNearestOption(diag::Flavor Flavor,
+                                          llvm::StringRef Group) {
+  llvm::StringRef Best;
   unsigned BestDistance = Group.size() + 1; // Maximum threshold.
   for (const WarningOption &O : OptionTable) {
     // Don't suggest ignored warning flags.

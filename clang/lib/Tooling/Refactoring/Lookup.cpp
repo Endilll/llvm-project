@@ -82,8 +82,8 @@ usingFromDifferentCanonicalNamespace(const DeclContext *FromContext,
   return false;
 }
 
-static StringRef getBestNamespaceSubstr(const DeclContext *DeclA,
-                                        StringRef NewName,
+static llvm::StringRef getBestNamespaceSubstr(const DeclContext *DeclA,
+                                        llvm::StringRef NewName,
                                         bool HadLeadingColonColon) {
   while (true) {
     while (DeclA && !isa<NamespaceDecl>(DeclA))
@@ -124,8 +124,8 @@ static bool isFullyQualified(const NestedNameSpecifier *NNS) {
 // context contains a nested namespace "a::y", then "y::bar" can be resolved to
 // ::a::y::bar in the context, which can cause compile error.
 // FIXME: consider using namespaces.
-static std::string disambiguateSpellingInScope(StringRef Spelling,
-                                               StringRef QName,
+static std::string disambiguateSpellingInScope(llvm::StringRef Spelling,
+                                               llvm::StringRef QName,
                                                const DeclContext &UseContext,
                                                SourceLocation UseLoc) {
   assert(QName.starts_with("::"));
@@ -141,7 +141,7 @@ static std::string disambiguateSpellingInScope(StringRef Spelling,
   llvm::SmallVector<const NamespaceDecl *, 4> EnclosingNamespaces =
       getAllNamedNamespaces(&UseContext);
   auto &AST = UseContext.getParentASTContext();
-  StringRef TrimmedQName = QName.substr(2);
+  llvm::StringRef TrimmedQName = QName.substr(2);
   const auto &SM = UseContext.getParentASTContext().getSourceManager();
   UseLoc = SM.getSpellingLoc(UseLoc);
 
@@ -151,7 +151,7 @@ static std::string disambiguateSpellingInScope(StringRef Spelling,
     // Lookup the first component of Spelling in all enclosing namespaces
     // and check if there is any existing symbols with the same name but in
     // different scope.
-    StringRef Head = CurSpelling.split("::").first;
+    llvm::StringRef Head = CurSpelling.split("::").first;
     for (const auto *NS : EnclosingNamespaces) {
       auto LookupRes = NS->lookup(DeclarationName(&AST.Idents.get(Head)));
       if (!LookupRes.empty()) {
@@ -186,7 +186,7 @@ std::string tooling::replaceNestedName(const NestedNameSpecifier *Use,
                                        SourceLocation UseLoc,
                                        const DeclContext *UseContext,
                                        const NamedDecl *FromDecl,
-                                       StringRef ReplacementString) {
+                                       llvm::StringRef ReplacementString) {
   assert(ReplacementString.starts_with("::") &&
          "Expected fully-qualified name!");
 
@@ -208,7 +208,7 @@ std::string tooling::replaceNestedName(const NestedNameSpecifier *Use,
       !usingFromDifferentCanonicalNamespace(FromDecl->getDeclContext(),
                                             UseContext)) {
     auto Pos = ReplacementString.rfind("::");
-    return std::string(Pos != StringRef::npos
+    return std::string(Pos != llvm::StringRef::npos
                            ? ReplacementString.substr(Pos + 2)
                            : ReplacementString);
   }
@@ -216,7 +216,7 @@ std::string tooling::replaceNestedName(const NestedNameSpecifier *Use,
   // figure out how good a namespace match we have with our destination type.
   // We work backwards (from most specific possible namespace to least
   // specific).
-  StringRef Suggested = getBestNamespaceSubstr(UseContext, ReplacementString,
+  llvm::StringRef Suggested = getBestNamespaceSubstr(UseContext, ReplacementString,
                                                isFullyQualified(Use));
 
   return disambiguateSpellingInScope(Suggested, ReplacementString, *UseContext,

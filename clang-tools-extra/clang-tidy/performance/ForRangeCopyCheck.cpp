@@ -20,7 +20,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::performance {
 
-ForRangeCopyCheck::ForRangeCopyCheck(StringRef Name, ClangTidyContext *Context)
+ForRangeCopyCheck::ForRangeCopyCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       WarnOnAllAutoCopies(Options.get("WarnOnAllAutoCopies", false)),
       AllowedTypes(

@@ -221,7 +221,7 @@ class DumpVisitor : public RecursiveASTVisitor<DumpVisitor> {
     if (!ND || llvm::isa_and_nonnull<CXXConstructorDecl>(ND->getAsFunction()) ||
         isa<CXXDestructorDecl>(ND))
       return "";
-    std::string Name = toString([&](raw_ostream &OS) { ND->printName(OS); });
+    std::string Name = toString([&](llvm::raw_ostream &OS) { ND->printName(OS); });
     if (Name.empty())
       return "(anonymous)";
     return Name;
@@ -251,7 +251,7 @@ class DumpVisitor : public RecursiveASTVisitor<DumpVisitor> {
     }
     if (isa<IntegerLiteral, FloatingLiteral, FixedPointLiteral,
             CharacterLiteral, ImaginaryLiteral, CXXBoolLiteralExpr>(S))
-      return toString([&](raw_ostream &OS) {
+      return toString([&](llvm::raw_ostream &OS) {
         S->printPretty(OS, nullptr, Ctx.getPrintingPolicy());
       });
     if (const auto *MTE = dyn_cast<MaterializeTemporaryExpr>(S))
@@ -301,7 +301,7 @@ class DumpVisitor : public RecursiveASTVisitor<DumpVisitor> {
     return "";
   }
   std::string getDetail(const TemplateName &TN) {
-    return toString([&](raw_ostream &OS) {
+    return toString([&](llvm::raw_ostream &OS) {
       TN.print(OS, Ctx.getPrintingPolicy(), TemplateName::Qualified::None);
     });
   }
@@ -318,7 +318,7 @@ class DumpVisitor : public RecursiveASTVisitor<DumpVisitor> {
   /// Arcana is produced by TextNodeDumper, for the types it supports.
 
   template <typename Dump> std::string dump(const Dump &D) {
-    return toString([&](raw_ostream &OS) {
+    return toString([&](llvm::raw_ostream &OS) {
       TextNodeDumper Dumper(OS, Ctx, /*ShowColors=*/false);
       D(Dumper);
     });

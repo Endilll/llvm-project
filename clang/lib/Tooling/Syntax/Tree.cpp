@@ -171,7 +171,7 @@ void syntax::Tree::replaceChildRangeLowLevel(Node *Begin, Node *End,
 }
 
 namespace {
-static void dumpNode(raw_ostream &OS, const syntax::Node *N,
+static void dumpNode(llvm::raw_ostream &OS, const syntax::Node *N,
                      const syntax::TokenManager &TM, llvm::BitVector IndentMask) {
   auto DumpExtraInfo = [&OS](const syntax::Node *N) {
     if (N->getRole() != syntax::NodeRole::Unknown)

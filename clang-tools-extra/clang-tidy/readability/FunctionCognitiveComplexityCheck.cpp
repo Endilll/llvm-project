@@ -131,11 +131,11 @@ struct CognitiveComplexity final {
   // value ~20 would result in no allocs for 98% of functions, ~12 for 96%, ~10
   // for 91%, ~8 for 88%, ~6 for 84%, ~4 for 77%, ~2 for 64%, and ~1 for 37%.
   static_assert(sizeof(Detail) <= 8,
-                "Since we use SmallVector to minimize the amount of "
+                "Since we use llvm::SmallVector to minimize the amount of "
                 "allocations, we also need to consider the price we pay for "
                 "that in terms of stack usage. "
                 "Thus, it is good to minimize the size of the Detail struct.");
-  SmallVector<Detail, DefaultLimit> Details; // 25 elements is 200 bytes.
+  llvm::SmallVector<Detail, DefaultLimit> Details; // 25 elements is 200 bytes.
   // Yes, 25 is a magic number. This is the seemingly-sane default for the
   // upper limit for function cognitive complexity. Thus it would make sense
   // to avoid allocations for any function that does not violate the limit.
@@ -151,7 +151,7 @@ struct CognitiveComplexity final {
 // to use is based of the combination of the CognitiveComplexity::Criteria.
 // It would be nice to have it in CognitiveComplexity struct, but then it is
 // not static.
-static const std::array<const StringRef, 4> Msgs = {{
+static const std::array<const llvm::StringRef, 4> Msgs = {{
     // B1 + B2 + B3
     "+%0, including nesting penalty of %1, nesting level increased to %2",
 
@@ -216,7 +216,7 @@ class FunctionASTVisitor final
   // that was encountered. It would make sense for the function call to start
   // the new sequence, thus it is a stack.
   using OBO = std::optional<BinaryOperator::Opcode>;
-  std::stack<OBO, SmallVector<OBO, 4>> BinaryOperatorsStack;
+  std::stack<OBO, llvm::SmallVector<OBO, 4>> BinaryOperatorsStack;
 
 public:
   explicit FunctionASTVisitor(const bool IgnoreMacros)
@@ -490,7 +490,7 @@ public:
 } // namespace
 
 FunctionCognitiveComplexityCheck::FunctionCognitiveComplexityCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       Threshold(Options.get("Threshold", CognitiveComplexity::DefaultLimit)),
       DescribeBasicIncrements(Options.get("DescribeBasicIncrements", true)),

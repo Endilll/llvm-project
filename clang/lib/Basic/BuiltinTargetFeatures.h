@@ -32,12 +32,12 @@ namespace Builtin {
 class TargetFeatures {
   struct FeatureListStatus {
     bool HasFeatures;
-    StringRef CurFeaturesList;
+    llvm::StringRef CurFeaturesList;
   };
 
   const llvm::StringMap<bool> &CallerFeatureMap;
 
-  FeatureListStatus getAndFeatures(StringRef FeatureList) {
+  FeatureListStatus getAndFeatures(llvm::StringRef FeatureList) {
     int InParentheses = 0;
     bool HasFeatures = true;
     size_t SubexpressionStart = 0;
@@ -59,7 +59,7 @@ class TargetFeatures {
       case ',':
         if (InParentheses == 0) {
           if (HasFeatures && i != SubexpressionStart) {
-            StringRef F = FeatureList.slice(SubexpressionStart, i);
+            llvm::StringRef F = FeatureList.slice(SubexpressionStart, i);
             HasFeatures = CurrentToken == ')' ? hasRequiredFeatures(F)
                                               : CallerFeatureMap.lookup(F);
           }
@@ -75,11 +75,11 @@ class TargetFeatures {
     if (HasFeatures && SubexpressionStart != FeatureList.size())
       HasFeatures =
           CallerFeatureMap.lookup(FeatureList.substr(SubexpressionStart));
-    return {HasFeatures, StringRef()};
+    return {HasFeatures, llvm::StringRef()};
   }
 
 public:
-  bool hasRequiredFeatures(StringRef FeatureList) {
+  bool hasRequiredFeatures(llvm::StringRef FeatureList) {
     FeatureListStatus FS = {false, FeatureList};
     while (!FS.HasFeatures && !FS.CurFeaturesList.empty())
       FS = getAndFeatures(FS.CurFeaturesList);

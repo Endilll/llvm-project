@@ -22,13 +22,13 @@ using namespace cxindex;
 
 static void getTopOverriddenMethods(CXTranslationUnit TU,
                                     const Decl *D,
-                                    SmallVectorImpl<const Decl *> &Methods) {
+                                    llvm::SmallVectorImpl<const Decl *> &Methods) {
   if (!D)
     return;
   if (!isa<ObjCMethodDecl>(D) && !isa<CXXMethodDecl>(D))
     return;
 
-  SmallVector<CXCursor, 8> Overridden;
+  llvm::SmallVector<CXCursor, 8> Overridden;
   cxcursor::getOverriddenCursors(cxcursor::MakeCXCursor(D, TU), Overridden);
   
   if (Overridden.empty()) {
@@ -36,7 +36,7 @@ static void getTopOverriddenMethods(CXTranslationUnit TU,
     return;
   }
 
-  for (SmallVectorImpl<CXCursor>::iterator
+  for (llvm::SmallVectorImpl<CXCursor>::iterator
          I = Overridden.begin(), E = Overridden.end(); I != E; ++I)
     getTopOverriddenMethods(TU, cxcursor::getCursorDecl(*I), Methods);
 }
@@ -50,7 +50,7 @@ struct FindFileIdRefVisitData {
   int SelectorIdIdx;
   CXCursorAndRangeVisitor visitor;
 
-  typedef SmallVector<const Decl *, 8> TopMethodsTy;
+  typedef llvm::SmallVector<const Decl *, 8> TopMethodsTy;
   TopMethodsTy TopMethods;
 
   FindFileIdRefVisitData(CXTranslationUnit TU, FileID FID,

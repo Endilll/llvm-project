@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/incorrect-enable-if.html
 class IncorrectEnableIfCheck : public ClangTidyCheck {
 public:
-  IncorrectEnableIfCheck(StringRef Name, ClangTidyContext *Context)
+  IncorrectEnableIfCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

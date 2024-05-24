@@ -112,7 +112,7 @@ Nullability getNullabilityAnnotation(QualType Type) {
   return Nullability::Unspecified;
 }
 
-std::optional<int> tryExpandAsInteger(StringRef Macro, const Preprocessor &PP) {
+std::optional<int> tryExpandAsInteger(llvm::StringRef Macro, const Preprocessor &PP) {
   const auto *MacroII = PP.getIdentifierInfo(Macro);
   if (!MacroII)
     return std::nullopt;
@@ -133,7 +133,7 @@ std::optional<int> tryExpandAsInteger(StringRef Macro, const Preprocessor &PP) {
   //        literal, doesn't contain any literal data
   if (!T.isLiteral() || !T.getLiteralData())
     return std::nullopt;
-  StringRef ValueStr = StringRef(T.getLiteralData(), T.getLength());
+  llvm::StringRef ValueStr = llvm::StringRef(T.getLiteralData(), T.getLength());
   llvm::APInt IntValue;
   constexpr unsigned AutoSenseRadix = 0;
   if (ValueStr.getAsInteger(AutoSenseRadix, IntValue))

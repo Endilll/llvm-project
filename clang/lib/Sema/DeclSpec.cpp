@@ -176,7 +176,7 @@ DeclaratorChunk DeclaratorChunk::getFunction(bool hasProto,
                                              unsigned NumExceptions,
                                              Expr *NoexceptExpr,
                                              CachedTokens *ExceptionSpecTokens,
-                                             ArrayRef<NamedDecl*>
+                                             llvm::ArrayRef<NamedDecl*>
                                                  DeclsInPrototype,
                                              SourceLocation LocalRangeBegin,
                                              SourceLocation LocalRangeEnd,
@@ -223,7 +223,7 @@ DeclaratorChunk DeclaratorChunk::getFunction(bool hasProto,
     auto &attrs = MethodQualifiers->getAttributes();
     I.Fun.MethodQualifiers = new DeclSpec(attrs.getPool().getFactory());
     MethodQualifiers->forEachCVRUQualifier(
-        [&](DeclSpec::TQ TypeQual, StringRef PrintName, SourceLocation SL) {
+        [&](DeclSpec::TQ TypeQual, llvm::StringRef PrintName, SourceLocation SL) {
           I.Fun.MethodQualifiers->SetTypeQual(TypeQual, SL);
         });
     I.Fun.MethodQualifiers->getAttributes().takeAllFrom(attrs);
@@ -293,7 +293,7 @@ DeclaratorChunk DeclaratorChunk::getFunction(bool hasProto,
 
 void Declarator::setDecompositionBindings(
     SourceLocation LSquareLoc,
-    MutableArrayRef<DecompositionDeclarator::Binding> Bindings,
+    llvm::MutableArrayRef<DecompositionDeclarator::Binding> Bindings,
     SourceLocation RSquareLoc) {
   assert(!hasName() && "declarator given multiple names!");
 
@@ -439,7 +439,7 @@ bool Declarator::isCtorOrDtor() {
 }
 
 void DeclSpec::forEachCVRUQualifier(
-    llvm::function_ref<void(TQ, StringRef, SourceLocation)> Handle) {
+    llvm::function_ref<void(TQ, llvm::StringRef, SourceLocation)> Handle) {
   if (TypeQualifiers & TQ_const)
     Handle(TQ_const, "const", TQ_constLoc);
   if (TypeQualifiers & TQ_volatile)
@@ -451,7 +451,7 @@ void DeclSpec::forEachCVRUQualifier(
 }
 
 void DeclSpec::forEachQualifier(
-    llvm::function_ref<void(TQ, StringRef, SourceLocation)> Handle) {
+    llvm::function_ref<void(TQ, llvm::StringRef, SourceLocation)> Handle) {
   forEachCVRUQualifier(Handle);
   // FIXME: Add code below to iterate through the attributes and call Handle.
 }
@@ -1432,7 +1432,7 @@ void DeclSpec::Finish(Sema &S, const PrintingPolicy &Policy) {
   //   of a friend declaration.
   if (isFriendSpecified() &&
       (getStorageClassSpec() || getThreadStorageClassSpec())) {
-    SmallString<32> SpecName;
+    llvm::SmallString<32> SpecName;
     SourceLocation SCLoc;
     FixItHint StorageHint, ThreadHint;
 
@@ -1463,7 +1463,7 @@ void DeclSpec::Finish(Sema &S, const PrintingPolicy &Policy) {
   //   a constructor or conversion function within its class
   //   definition;
   if (isFriendSpecified() && (isVirtualSpecified() || hasExplicitSpecifier())) {
-    StringRef Keyword;
+    llvm::StringRef Keyword;
     FixItHint Hint;
     SourceLocation SCLoc;
 

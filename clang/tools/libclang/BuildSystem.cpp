@@ -49,7 +49,7 @@ clang_VirtualFileOverlay_addFileMapping(CXVirtualFileOverlay VFO,
   for (path::const_iterator
          PI = path::begin(virtualPath),
          PE = path::end(virtualPath); PI != PE; ++PI) {
-    StringRef Comp = *PI;
+    llvm::StringRef Comp = *PI;
     if (Comp == "." || Comp == "..")
       return CXError_InvalidArguments;
   }
@@ -78,7 +78,7 @@ clang_VirtualFileOverlay_writeToBuffer(CXVirtualFileOverlay VFO, unsigned,
   llvm::raw_svector_ostream OS(Buf);
   unwrap(VFO)->write(OS);
 
-  StringRef Data = OS.str();
+  llvm::StringRef Data = OS.str();
   *out_buffer_ptr = static_cast<char*>(llvm::safe_malloc(Data.size()));
   *out_buffer_size = Data.size();
   memcpy(*out_buffer_ptr, Data.data(), Data.size());
@@ -140,7 +140,7 @@ clang_ModuleMapDescriptor_writeToBuffer(CXModuleMapDescriptor MMD, unsigned,
   OS << "  module * { export * }\n";
   OS << "}\n";
 
-  StringRef Data = OS.str();
+  llvm::StringRef Data = OS.str();
   *out_buffer_ptr = static_cast<char*>(llvm::safe_malloc(Data.size()));
   *out_buffer_size = Data.size();
   memcpy(*out_buffer_ptr, Data.data(), Data.size());

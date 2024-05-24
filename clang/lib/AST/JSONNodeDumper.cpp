@@ -162,7 +162,7 @@ void JSONNodeDumper::Visit(const comments::Comment *C,
 }
 
 void JSONNodeDumper::Visit(const TemplateArgument &TA, SourceRange R,
-                           const Decl *From, StringRef Label) {
+                           const Decl *From, llvm::StringRef Label) {
   JOS.attribute("kind", "TemplateArgument");
   if (R.isValid())
     JOS.attributeObject("range", [R, this] { writeSourceRange(R); });
@@ -278,7 +278,7 @@ void JSONNodeDumper::writeBareSourceLocation(SourceLocation Loc,
   PresumedLoc Presumed = SM.getPresumedLoc(Loc);
   unsigned ActualLine = IsSpelling ? SM.getSpellingLineNumber(Loc)
                                    : SM.getExpansionLineNumber(Loc);
-  StringRef ActualFile = SM.getBufferName(Loc);
+  llvm::StringRef ActualFile = SM.getBufferName(Loc);
 
   if (Presumed.isValid()) {
     JOS.attribute("offset", SM.getDecomposedLoc(Loc).second);
@@ -288,7 +288,7 @@ void JSONNodeDumper::writeBareSourceLocation(SourceLocation Loc,
     } else if (LastLocLine != ActualLine)
       JOS.attribute("line", ActualLine);
 
-    StringRef PresumedFile = Presumed.getFilename();
+    llvm::StringRef PresumedFile = Presumed.getFilename();
     if (PresumedFile != ActualFile && LastLocPresumedFilename != PresumedFile)
       JOS.attribute("presumedFile", PresumedFile);
 
@@ -1068,7 +1068,7 @@ void JSONNodeDumper::VisitTemplateTemplateParmDecl(
 }
 
 void JSONNodeDumper::VisitLinkageSpecDecl(const LinkageSpecDecl *LSD) {
-  StringRef Lang;
+  llvm::StringRef Lang;
   switch (LSD->getLanguage()) {
   case LinkageSpecLanguageIDs::C:
     Lang = "C";
@@ -1711,7 +1711,7 @@ void JSONNodeDumper::VisitPackTemplateArgument(const TemplateArgument &TA) {
   JOS.attribute("isPack", true);
 }
 
-StringRef JSONNodeDumper::getCommentCommandName(unsigned CommandID) const {
+llvm::StringRef JSONNodeDumper::getCommentCommandName(unsigned CommandID) const {
   if (Traits)
     return Traits->getCommandInfo(CommandID)->Name;
   if (const comments::CommandInfo *Info =

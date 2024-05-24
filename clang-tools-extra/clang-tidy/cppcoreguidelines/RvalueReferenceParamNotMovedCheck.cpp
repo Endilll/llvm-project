@@ -117,7 +117,7 @@ void RvalueReferenceParamNotMovedCheck::check(
 }
 
 RvalueReferenceParamNotMovedCheck::RvalueReferenceParamNotMovedCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       AllowPartialMove(Options.getLocalOrGlobal("AllowPartialMove", false)),
       IgnoreUnnamedParams(

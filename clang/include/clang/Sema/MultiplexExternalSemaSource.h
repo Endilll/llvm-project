@@ -40,7 +40,7 @@ class MultiplexExternalSemaSource : public ExternalSemaSource {
   static char ID;
 
 private:
-  SmallVector<ExternalSemaSource *, 2> Sources;
+  llvm::SmallVector<ExternalSemaSource *, 2> Sources;
 
 public:
   /// Constructs a new multiplexing external sema source and appends the
@@ -109,13 +109,13 @@ public:
   void
   FindExternalLexicalDecls(const DeclContext *DC,
                            llvm::function_ref<bool(Decl::Kind)> IsKindWeWant,
-                           SmallVectorImpl<Decl *> &Result) override;
+                           llvm::SmallVectorImpl<Decl *> &Result) override;
 
   /// Get the decls that are contained in a file in the Offset/Length
   /// range. \p Length can be 0 to indicate a point at \p Offset instead of
   /// a range.
   void FindFileRegionDecls(FileID File, unsigned Offset,unsigned Length,
-                           SmallVectorImpl<Decl *> &Decls) override;
+                           llvm::SmallVectorImpl<Decl *> &Decls) override;
 
   /// Gives the external AST source an opportunity to complete
   /// an incomplete type.
@@ -214,7 +214,7 @@ public:
   /// Load the set of namespaces that are known to the external source,
   /// which will be used during typo correction.
   void
-  ReadKnownNamespaces(SmallVectorImpl<NamespaceDecl*> &Namespaces) override;
+  ReadKnownNamespaces(llvm::SmallVectorImpl<NamespaceDecl*> &Namespaces) override;
 
   /// Load the set of used but not defined functions or variables with
   /// internal linkage, or used but not defined inline functions.
@@ -242,7 +242,7 @@ public:
   /// given vector of tentative definitions. Note that this routine may be
   /// invoked multiple times; the external source should take care not to
   /// introduce the same declarations repeatedly.
-  void ReadTentativeDefinitions(SmallVectorImpl<VarDecl*> &Defs) override;
+  void ReadTentativeDefinitions(llvm::SmallVectorImpl<VarDecl*> &Defs) override;
 
   /// Read the set of unused file-scope declarations known to the
   /// external Sema source.
@@ -252,7 +252,7 @@ public:
   /// invoked multiple times; the external source should take care not to
   /// introduce the same declarations repeatedly.
   void ReadUnusedFileScopedDecls(
-                        SmallVectorImpl<const DeclaratorDecl*> &Decls) override;
+                        llvm::SmallVectorImpl<const DeclaratorDecl*> &Decls) override;
 
   /// Read the set of delegating constructors known to the
   /// external Sema source.
@@ -262,7 +262,7 @@ public:
   /// invoked multiple times; the external source should take care not to
   /// introduce the same declarations repeatedly.
   void ReadDelegatingConstructors(
-                          SmallVectorImpl<CXXConstructorDecl*> &Decls) override;
+                          llvm::SmallVectorImpl<CXXConstructorDecl*> &Decls) override;
 
   /// Read the set of ext_vector type declarations known to the
   /// external Sema source.
@@ -271,7 +271,7 @@ public:
   /// the given vector of declarations. Note that this routine may be
   /// invoked multiple times; the external source should take care not to
   /// introduce the same declarations repeatedly.
-  void ReadExtVectorDecls(SmallVectorImpl<TypedefNameDecl*> &Decls) override;
+  void ReadExtVectorDecls(llvm::SmallVectorImpl<TypedefNameDecl*> &Decls) override;
 
   /// Read the set of potentially unused typedefs known to the source.
   ///
@@ -289,7 +289,7 @@ public:
   /// given vector of selectors. Note that this routine
   /// may be invoked multiple times; the external source should take care not
   /// to introduce the same selectors repeatedly.
-  void ReadReferencedSelectors(SmallVectorImpl<std::pair<Selector,
+  void ReadReferencedSelectors(llvm::SmallVectorImpl<std::pair<Selector,
                                               SourceLocation> > &Sels) override;
 
   /// Read the set of weak, undeclared identifiers known to the
@@ -300,14 +300,14 @@ public:
   /// the external source should take care not to introduce the same identifiers
   /// repeatedly.
   void ReadWeakUndeclaredIdentifiers(
-           SmallVectorImpl<std::pair<IdentifierInfo*, WeakInfo> > &WI) override;
+           llvm::SmallVectorImpl<std::pair<IdentifierInfo*, WeakInfo> > &WI) override;
 
   /// Read the set of used vtables known to the external Sema source.
   ///
   /// The external source should append its own used vtables to the given
   /// vector. Note that this routine may be invoked multiple times; the external
   /// source should take care not to introduce the same vtables repeatedly.
-  void ReadUsedVTables(SmallVectorImpl<ExternalVTableUse> &VTables) override;
+  void ReadUsedVTables(llvm::SmallVectorImpl<ExternalVTableUse> &VTables) override;
 
   /// Read the set of pending instantiations known to the external
   /// Sema source.
@@ -317,7 +317,7 @@ public:
   /// external source should take care not to introduce the same instantiations
   /// repeatedly.
   void ReadPendingInstantiations(
-     SmallVectorImpl<std::pair<ValueDecl*, SourceLocation> >& Pending) override;
+     llvm::SmallVectorImpl<std::pair<ValueDecl*, SourceLocation> >& Pending) override;
 
   /// Read the set of late parsed template functions for this source.
   ///

@@ -20,7 +20,7 @@ namespace clang::tidy::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/objc/nsdate-formatter.html
 class NSDateFormatterCheck : public ClangTidyCheck {
 public:
-  NSDateFormatterCheck(StringRef Name, ClangTidyContext *Context)
+  NSDateFormatterCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC;

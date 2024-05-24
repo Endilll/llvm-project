@@ -53,10 +53,10 @@ class CodeGenModule;
 struct ImplicitCXXConstructorArgs {
   /// Implicit arguments to add before the explicit arguments, but after the
   /// `*this` argument (which always comes first).
-  SmallVector<llvm::Value *, 1> Prefix;
+  llvm::SmallVector<llvm::Value *, 1> Prefix;
 
   /// Implicit arguments to add after the explicit arguments.
-  SmallVector<llvm::Value *, 1> Suffix;
+  llvm::SmallVector<llvm::Value *, 1> Suffix;
 };
 
 const CGFunctionInfo &arrangeObjCMessageSendSignature(CodeGenModule &CGM,
@@ -76,7 +76,7 @@ const CGFunctionInfo &arrangeCXXMethodType(CodeGenModule &CGM,
 
 const CGFunctionInfo &arrangeFreeFunctionCall(CodeGenModule &CGM,
                                               CanQualType returnType,
-                                              ArrayRef<CanQualType> argTypes,
+                                              llvm::ArrayRef<CanQualType> argTypes,
                                               FunctionType::ExtInfo info,
                                               RequiredArgs args);
 

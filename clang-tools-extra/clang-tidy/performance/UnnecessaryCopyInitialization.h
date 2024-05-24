@@ -24,7 +24,7 @@ namespace clang::tidy::performance {
 // const references, and const pointers to const.
 class UnnecessaryCopyInitialization : public ClangTidyCheck {
 public:
-  UnnecessaryCopyInitialization(StringRef Name, ClangTidyContext *Context);
+  UnnecessaryCopyInitialization(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override{
     return LangOpts.CPlusPlus;
   }
@@ -58,8 +58,8 @@ private:
 
   void maybeIssueFixes(const CheckContext &Ctx, DiagnosticBuilder &Diagnostic);
 
-  const std::vector<StringRef> AllowedTypes;
-  const std::vector<StringRef> ExcludedContainerTypes;
+  const std::vector<llvm::StringRef> AllowedTypes;
+  const std::vector<llvm::StringRef> ExcludedContainerTypes;
 };
 
 } // namespace clang::tidy::performance

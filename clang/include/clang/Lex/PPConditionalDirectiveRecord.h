@@ -25,7 +25,7 @@ namespace clang {
 class PPConditionalDirectiveRecord : public PPCallbacks {
   SourceManager &SourceMgr;
 
-  SmallVector<SourceLocation, 6> CondDirectiveStack;
+  llvm::SmallVector<SourceLocation, 6> CondDirectiveStack;
 
   class CondDirectiveLoc {
     SourceLocation Loc;

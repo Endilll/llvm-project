@@ -220,7 +220,7 @@ protected:
 public:
   struct Argument {
     SourceRange Range;
-    StringRef Text;
+    llvm::StringRef Text;
   };
 
   Comment(CommentKind K,
@@ -238,7 +238,7 @@ public:
 
   void dump() const;
   void dumpColor() const;
-  void dump(raw_ostream &OS, const ASTContext &Context) const;
+  void dump(llvm::raw_ostream &OS, const ASTContext &Context) const;
 
   SourceRange getSourceRange() const LLVM_READONLY { return Range; }
 
@@ -289,10 +289,10 @@ public:
 
 /// Plain text.
 class TextComment : public InlineContentComment {
-  StringRef Text;
+  llvm::StringRef Text;
 
 public:
-  TextComment(SourceLocation LocBegin, SourceLocation LocEnd, StringRef Text)
+  TextComment(SourceLocation LocBegin, SourceLocation LocEnd, llvm::StringRef Text)
       : InlineContentComment(CommentKind::TextComment, LocBegin, LocEnd),
         Text(Text) {
     TextCommentBits.IsWhitespaceValid = false;
@@ -306,7 +306,7 @@ public:
 
   child_iterator child_end() const { return nullptr; }
 
-  StringRef getText() const LLVM_READONLY { return Text; }
+  llvm::StringRef getText() const LLVM_READONLY { return Text; }
 
   bool isWhitespace() const {
     if (TextCommentBits.IsWhitespaceValid)
@@ -335,12 +335,12 @@ enum class InlineCommandRenderKind {
 class InlineCommandComment : public InlineContentComment {
 protected:
   /// Command arguments.
-  ArrayRef<Argument> Args;
+  llvm::ArrayRef<Argument> Args;
 
 public:
   InlineCommandComment(SourceLocation LocBegin, SourceLocation LocEnd,
                        unsigned CommandID, InlineCommandRenderKind RK,
-                       ArrayRef<Argument> Args)
+                       llvm::ArrayRef<Argument> Args)
       : InlineContentComment(CommentKind::InlineCommandComment, LocBegin,
                              LocEnd),
         Args(Args) {
@@ -360,7 +360,7 @@ public:
     return InlineCommandCommentBits.CommandID;
   }
 
-  StringRef getCommandName(const CommandTraits &Traits) const {
+  llvm::StringRef getCommandName(const CommandTraits &Traits) const {
     return Traits.getCommandInfo(getCommandID())->Name;
   }
 
@@ -377,7 +377,7 @@ public:
     return Args.size();
   }
 
-  StringRef getArgText(unsigned Idx) const {
+  llvm::StringRef getArgText(unsigned Idx) const {
     return Args[Idx].Text;
   }
 
@@ -390,13 +390,13 @@ public:
 /// treated as inline content (regardless HTML semantics).
 class HTMLTagComment : public InlineContentComment {
 protected:
-  StringRef TagName;
+  llvm::StringRef TagName;
   SourceRange TagNameRange;
 
   HTMLTagComment(CommentKind K,
                  SourceLocation LocBegin,
                  SourceLocation LocEnd,
-                 StringRef TagName,
+                 llvm::StringRef TagName,
                  SourceLocation TagNameBegin,
                  SourceLocation TagNameEnd) :
       InlineContentComment(K, LocBegin, LocEnd),
@@ -412,7 +412,7 @@ public:
            C->getCommentKind() <= CommentKind::LastHTMLTagCommentConstant;
   }
 
-  StringRef getTagName() const LLVM_READONLY { return TagName; }
+  llvm::StringRef getTagName() const LLVM_READONLY { return TagName; }
 
   SourceRange getTagNameSourceRange() const LLVM_READONLY {
     SourceLocation L = getLocation();
@@ -435,20 +435,20 @@ public:
   class Attribute {
   public:
     SourceLocation NameLocBegin;
-    StringRef Name;
+    llvm::StringRef Name;
 
     SourceLocation EqualsLoc;
 
     SourceRange ValueRange;
-    StringRef Value;
+    llvm::StringRef Value;
 
     Attribute() { }
 
-    Attribute(SourceLocation NameLocBegin, StringRef Name)
+    Attribute(SourceLocation NameLocBegin, llvm::StringRef Name)
         : NameLocBegin(NameLocBegin), Name(Name), EqualsLoc(SourceLocation()) {}
 
-    Attribute(SourceLocation NameLocBegin, StringRef Name,
-              SourceLocation EqualsLoc, SourceRange ValueRange, StringRef Value)
+    Attribute(SourceLocation NameLocBegin, llvm::StringRef Name,
+              SourceLocation EqualsLoc, SourceRange ValueRange, llvm::StringRef Value)
         : NameLocBegin(NameLocBegin), Name(Name), EqualsLoc(EqualsLoc),
           ValueRange(ValueRange), Value(Value) {}
 
@@ -462,10 +462,10 @@ public:
   };
 
 private:
-  ArrayRef<Attribute> Attributes;
+  llvm::ArrayRef<Attribute> Attributes;
 
 public:
-  HTMLStartTagComment(SourceLocation LocBegin, StringRef TagName)
+  HTMLStartTagComment(SourceLocation LocBegin, llvm::StringRef TagName)
       : HTMLTagComment(CommentKind::HTMLStartTagComment, LocBegin,
                        LocBegin.getLocWithOffset(1 + TagName.size()), TagName,
                        LocBegin.getLocWithOffset(1),
@@ -489,7 +489,7 @@ public:
     return Attributes[Idx];
   }
 
-  void setAttrs(ArrayRef<Attribute> Attrs) {
+  void setAttrs(llvm::ArrayRef<Attribute> Attrs) {
     Attributes = Attrs;
     if (!Attrs.empty()) {
       const Attribute &Attr = Attrs.back();
@@ -519,7 +519,7 @@ public:
 class HTMLEndTagComment : public HTMLTagComment {
 public:
   HTMLEndTagComment(SourceLocation LocBegin, SourceLocation LocEnd,
-                    StringRef TagName)
+                    llvm::StringRef TagName)
       : HTMLTagComment(CommentKind::HTMLEndTagComment, LocBegin, LocEnd,
                        TagName, LocBegin.getLocWithOffset(2),
                        LocBegin.getLocWithOffset(2 + TagName.size())) {}
@@ -553,10 +553,10 @@ public:
 
 /// A single paragraph that contains inline content.
 class ParagraphComment : public BlockContentComment {
-  ArrayRef<InlineContentComment *> Content;
+  llvm::ArrayRef<InlineContentComment *> Content;
 
 public:
-  ParagraphComment(ArrayRef<InlineContentComment *> Content)
+  ParagraphComment(llvm::ArrayRef<InlineContentComment *> Content)
       : BlockContentComment(CommentKind::ParagraphComment, SourceLocation(),
                             SourceLocation()),
         Content(Content) {
@@ -604,7 +604,7 @@ private:
 class BlockCommandComment : public BlockContentComment {
 protected:
   /// Word-like arguments.
-  ArrayRef<Argument> Args;
+  llvm::ArrayRef<Argument> Args;
 
   /// Paragraph argument.
   ParagraphComment *Paragraph;
@@ -649,7 +649,7 @@ public:
     return BlockCommandCommentBits.CommandID;
   }
 
-  StringRef getCommandName(const CommandTraits &Traits) const {
+  llvm::StringRef getCommandName(const CommandTraits &Traits) const {
     return Traits.getCommandInfo(getCommandID())->Name;
   }
 
@@ -658,7 +658,7 @@ public:
   }
 
   SourceRange getCommandNameRange(const CommandTraits &Traits) const {
-    StringRef Name = getCommandName(Traits);
+    llvm::StringRef Name = getCommandName(Traits);
     return SourceRange(getCommandNameBeginLoc(),
                        getBeginLoc().getLocWithOffset(1 + Name.size()));
   }
@@ -667,7 +667,7 @@ public:
     return Args.size();
   }
 
-  StringRef getArgText(unsigned Idx) const {
+  llvm::StringRef getArgText(unsigned Idx) const {
     return Args[Idx].Text;
   }
 
@@ -675,7 +675,7 @@ public:
     return Args[Idx].Range;
   }
 
-  void setArgs(ArrayRef<Argument> A) {
+  void setArgs(llvm::ArrayRef<Argument> A) {
     Args = A;
     if (Args.size() > 0) {
       SourceLocation NewLocEnd = Args.back().Range.getEnd();
@@ -753,9 +753,9 @@ public:
     return getNumArgs() > 0;
   }
 
-  StringRef getParamName(const FullComment *FC) const;
+  llvm::StringRef getParamName(const FullComment *FC) const;
 
-  StringRef getParamNameAsWritten() const {
+  llvm::StringRef getParamNameAsWritten() const {
     return Args[0].Text;
   }
 
@@ -804,7 +804,7 @@ private:
   /// For C:  Position = { 0 }
   /// For TT: Position = { 1 }
   /// For T:  Position = { 1, 0 }
-  ArrayRef<unsigned> Position;
+  llvm::ArrayRef<unsigned> Position;
 
 public:
   TParamCommandComment(SourceLocation LocBegin, SourceLocation LocEnd,
@@ -820,9 +820,9 @@ public:
     return getNumArgs() > 0;
   }
 
-  StringRef getParamName(const FullComment *FC) const;
+  llvm::StringRef getParamName(const FullComment *FC) const;
 
-  StringRef getParamNameAsWritten() const {
+  llvm::StringRef getParamNameAsWritten() const {
     return Args[0].Text;
   }
 
@@ -844,7 +844,7 @@ public:
     return Position[Depth];
   }
 
-  void setPosition(ArrayRef<unsigned> NewPosition) {
+  void setPosition(llvm::ArrayRef<unsigned> NewPosition) {
     Position = NewPosition;
     assert(isPositionValid());
   }
@@ -852,10 +852,10 @@ public:
 
 /// A line of text contained in a verbatim block.
 class VerbatimBlockLineComment : public Comment {
-  StringRef Text;
+  llvm::StringRef Text;
 
 public:
-  VerbatimBlockLineComment(SourceLocation LocBegin, StringRef Text)
+  VerbatimBlockLineComment(SourceLocation LocBegin, llvm::StringRef Text)
       : Comment(CommentKind::VerbatimBlockLineComment, LocBegin,
                 LocBegin.getLocWithOffset(Text.size())),
         Text(Text) {}
@@ -868,7 +868,7 @@ public:
 
   child_iterator child_end() const { return nullptr; }
 
-  StringRef getText() const LLVM_READONLY {
+  llvm::StringRef getText() const LLVM_READONLY {
     return Text;
   }
 };
@@ -878,9 +878,9 @@ public:
 /// (VerbatimBlockLineComment nodes).
 class VerbatimBlockComment : public BlockCommandComment {
 protected:
-  StringRef CloseName;
+  llvm::StringRef CloseName;
   SourceLocation CloseNameLocBegin;
-  ArrayRef<VerbatimBlockLineComment *> Lines;
+  llvm::ArrayRef<VerbatimBlockLineComment *> Lines;
 
 public:
   VerbatimBlockComment(SourceLocation LocBegin, SourceLocation LocEnd,
@@ -902,16 +902,16 @@ public:
     return reinterpret_cast<child_iterator>(Lines.end());
   }
 
-  void setCloseName(StringRef Name, SourceLocation LocBegin) {
+  void setCloseName(llvm::StringRef Name, SourceLocation LocBegin) {
     CloseName = Name;
     CloseNameLocBegin = LocBegin;
   }
 
-  void setLines(ArrayRef<VerbatimBlockLineComment *> L) {
+  void setLines(llvm::ArrayRef<VerbatimBlockLineComment *> L) {
     Lines = L;
   }
 
-  StringRef getCloseName() const {
+  llvm::StringRef getCloseName() const {
     return CloseName;
   }
 
@@ -919,7 +919,7 @@ public:
     return Lines.size();
   }
 
-  StringRef getText(unsigned LineIdx) const {
+  llvm::StringRef getText(unsigned LineIdx) const {
     return Lines[LineIdx]->getText();
   }
 };
@@ -929,13 +929,13 @@ public:
 /// closing command.
 class VerbatimLineComment : public BlockCommandComment {
 protected:
-  StringRef Text;
+  llvm::StringRef Text;
   SourceLocation TextBegin;
 
 public:
   VerbatimLineComment(SourceLocation LocBegin, SourceLocation LocEnd,
                       unsigned CommandID, SourceLocation TextBegin,
-                      StringRef Text)
+                      llvm::StringRef Text)
       : BlockCommandComment(CommentKind::VerbatimLineComment, LocBegin, LocEnd,
                             CommandID,
                             CMK_At), // FIXME: improve source fidelity.
@@ -949,7 +949,7 @@ public:
 
   child_iterator child_end() const { return nullptr; }
 
-  StringRef getText() const {
+  llvm::StringRef getText() const {
     return Text;
   }
 
@@ -976,7 +976,7 @@ struct DeclInfo {
 
   /// Parameters that can be referenced by \\param if \c CommentDecl is something
   /// that we consider a "function".
-  ArrayRef<const ParmVarDecl *> ParamVars;
+  llvm::ArrayRef<const ParmVarDecl *> ParamVars;
 
   /// Function return type if \c CommentDecl is something that we consider
   /// a "function".
@@ -1081,11 +1081,11 @@ struct DeclInfo {
 
 /// A full comment attached to a declaration, contains block content.
 class FullComment : public Comment {
-  ArrayRef<BlockContentComment *> Blocks;
+  llvm::ArrayRef<BlockContentComment *> Blocks;
   DeclInfo *ThisDeclInfo;
 
 public:
-  FullComment(ArrayRef<BlockContentComment *> Blocks, DeclInfo *D)
+  FullComment(llvm::ArrayRef<BlockContentComment *> Blocks, DeclInfo *D)
       : Comment(CommentKind::FullComment, SourceLocation(), SourceLocation()),
         Blocks(Blocks), ThisDeclInfo(D) {
     if (Blocks.empty())
@@ -1118,7 +1118,7 @@ public:
     return ThisDeclInfo;
   }
 
-  ArrayRef<BlockContentComment *> getBlocks() const { return Blocks; }
+  llvm::ArrayRef<BlockContentComment *> getBlocks() const { return Blocks; }
 
 };
 } // end namespace comments

@@ -40,20 +40,20 @@ protected:
 
   FileSystemOptions FileMgrOpts;
   FileManager FileMgr;
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
   DiagnosticsEngine Diags;
   SourceManager SourceMgr;
   LangOptions LangOpts;
   std::shared_ptr<TargetOptions> TargetOpts;
-  IntrusiveRefCntPtr<TargetInfo> Target;
+  llvm::IntrusiveRefCntPtr<TargetInfo> Target;
 };
 
 class IncludeCollector : public PPCallbacks {
 public:
   Preprocessor &PP;
-  SmallVectorImpl<StringRef> &IncludedFiles;
+  llvm::SmallVectorImpl<llvm::StringRef> &IncludedFiles;
 
-  IncludeCollector(Preprocessor &PP, SmallVectorImpl<StringRef> &IncludedFiles)
+  IncludeCollector(Preprocessor &PP, llvm::SmallVectorImpl<llvm::StringRef> &IncludedFiles)
       : PP(PP), IncludedFiles(IncludedFiles) {}
 
   void LexedFileChanged(FileID FID, LexedFileChangeReason Reason,
@@ -63,7 +63,7 @@ public:
       return;
     if (FID == PP.getPredefinesFileID())
       return;
-    StringRef Filename =
+    llvm::StringRef Filename =
         PP.getSourceManager().getSLocEntry(FID).getFile().getName();
     IncludedFiles.push_back(Filename);
   }
@@ -100,15 +100,15 @@ TEST_F(PPDependencyDirectivesTest, MacroGuard) {
       SourceMgr.createFileID(*FE, SourceLocation(), SrcMgr::C_User));
 
   struct DepDirectives {
-    SmallVector<dependency_directives_scan::Token> Tokens;
-    SmallVector<dependency_directives_scan::Directive> Directives;
+    llvm::SmallVector<dependency_directives_scan::Token> Tokens;
+    llvm::SmallVector<dependency_directives_scan::Directive> Directives;
   };
-  SmallVector<std::unique_ptr<DepDirectives>> DepDirectivesObjects;
+  llvm::SmallVector<std::unique_ptr<DepDirectives>> DepDirectivesObjects;
 
   auto getDependencyDirectives = [&](FileEntryRef File)
-      -> std::optional<ArrayRef<dependency_directives_scan::Directive>> {
+      -> std::optional<llvm::ArrayRef<dependency_directives_scan::Directive>> {
     DepDirectivesObjects.push_back(std::make_unique<DepDirectives>());
-    StringRef Input = (*FileMgr.getBufferForFile(File))->getBuffer();
+    llvm::StringRef Input = (*FileMgr.getBufferForFile(File))->getBuffer();
     bool Err = scanSourceForDependencyDirectives(
         Input, DepDirectivesObjects.back()->Tokens,
         DepDirectivesObjects.back()->Directives);
@@ -118,7 +118,7 @@ TEST_F(PPDependencyDirectivesTest, MacroGuard) {
 
   auto PPOpts = std::make_shared<PreprocessorOptions>();
   PPOpts->DependencyDirectivesForFile = [&](FileEntryRef File)
-      -> std::optional<ArrayRef<dependency_directives_scan::Directive>> {
+      -> std::optional<llvm::ArrayRef<dependency_directives_scan::Directive>> {
     return getDependencyDirectives(File);
   };
 
@@ -130,16 +130,16 @@ TEST_F(PPDependencyDirectivesTest, MacroGuard) {
                   /*OwnsHeaderSearch =*/false);
   PP.Initialize(*Target);
 
-  SmallVector<StringRef> IncludedFiles;
+  llvm::SmallVector<llvm::StringRef> IncludedFiles;
   PP.addPPCallbacks(std::make_unique<IncludeCollector>(PP, IncludedFiles));
   PP.EnterMainSourceFile();
   PP.LexTokensUntilEOF();
 
-  SmallVector<std::string> IncludedFilesSlash;
-  for (StringRef IncludedFile : IncludedFiles)
+  llvm::SmallVector<std::string> IncludedFilesSlash;
+  for (llvm::StringRef IncludedFile : IncludedFiles)
     IncludedFilesSlash.push_back(
         llvm::sys::path::convert_to_slash(IncludedFile));
-  SmallVector<std::string> ExpectedIncludes{
+  llvm::SmallVector<std::string> ExpectedIncludes{
       "main.c", "./head1.h", "./head2.h", "./head2.h", "./head3.h", "./head3.h",
   };
   EXPECT_EQ(IncludedFilesSlash, ExpectedIncludes);

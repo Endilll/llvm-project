@@ -208,7 +208,7 @@ static bool DiagnoseNoDiscard(Sema &S, const WarnUnusedResultAttr *A,
                               SourceRange R2, bool IsCtor) {
   if (!A)
     return false;
-  StringRef Msg = A->getMessage();
+  llvm::StringRef Msg = A->getMessage();
 
   if (Msg.empty()) {
     if (IsCtor)
@@ -413,7 +413,7 @@ sema::CompoundScopeInfo &Sema::getCurCompoundScope() const {
 }
 
 StmtResult Sema::ActOnCompoundStmt(SourceLocation L, SourceLocation R,
-                                   ArrayRef<Stmt *> Elts, bool isStmtExpr) {
+                                   llvm::ArrayRef<Stmt *> Elts, bool isStmtExpr) {
   const unsigned NumElts = Elts.size();
 
   // If we're in C mode, check that we don't have any decls after stmts.  If
@@ -605,7 +605,7 @@ Sema::ActOnLabelStmt(SourceLocation IdentLoc, LabelDecl *TheDecl,
 }
 
 StmtResult Sema::BuildAttributedStmt(SourceLocation AttrsLoc,
-                                     ArrayRef<const Attr *> Attrs,
+                                     llvm::ArrayRef<const Attr *> Attrs,
                                      Stmt *SubStmt) {
   // FIXME: this code should move when a planned refactoring around statement
   // attributes lands.
@@ -623,7 +623,7 @@ StmtResult Sema::BuildAttributedStmt(SourceLocation AttrsLoc,
 
 StmtResult Sema::ActOnAttributedStmt(const ParsedAttributes &Attrs,
                                      Stmt *SubStmt) {
-  SmallVector<const Attr *, 1> SemanticAttrs;
+  llvm::SmallVector<const Attr *, 1> SemanticAttrs;
   ProcessStmtAttributes(SubStmt, Attrs, SemanticAttrs);
   if (!SemanticAttrs.empty())
     return BuildAttributedStmt(Attrs.Range.getBegin(), SemanticAttrs, SubStmt);
@@ -863,8 +863,8 @@ bool Sema::checkMustTailAttr(const Stmt *St, const Attr &MTA) {
       return false;
     }
 
-    ArrayRef<QualType> CalleeParams = CalleeType.Func->getParamTypes();
-    ArrayRef<QualType> CallerParams = CallerType.Func->getParamTypes();
+    llvm::ArrayRef<QualType> CalleeParams = CalleeType.Func->getParamTypes();
+    llvm::ArrayRef<QualType> CallerParams = CallerType.Func->getParamTypes();
     size_t N = CallerType.Func->getNumParams();
     for (size_t I = 0; I < N; I++) {
       if (!DoTypesMatch(CalleeParams[I], CallerParams[I],
@@ -1180,7 +1180,7 @@ static void checkCaseValue(Sema &S, SourceLocation Loc, const llvm::APSInt &Val,
   }
 }
 
-typedef SmallVector<std::pair<llvm::APSInt, EnumConstantDecl*>, 64> EnumValsTy;
+typedef llvm::SmallVector<std::pair<llvm::APSInt, EnumConstantDecl*>, 64> EnumValsTy;
 
 /// Returns true if we should emit a diagnostic about this case expression not
 /// being a part of the enum used in the switch controlling expression.
@@ -1290,7 +1290,7 @@ Sema::ActOnFinishSwitchStmt(SourceLocation SwitchLoc, Stmt *Switch,
   // Accumulate all of the case values in a vector so that we can sort them
   // and detect duplicates.  This vector contains the APInt for the case after
   // it has been converted to the condition type.
-  typedef SmallVector<std::pair<llvm::APSInt, CaseStmt*>, 64> CaseValsTy;
+  typedef llvm::SmallVector<std::pair<llvm::APSInt, CaseStmt*>, 64> CaseValsTy;
   CaseValsTy CaseVals;
 
   // Keep track of any GNU case ranges we see.  The APSInt is the low value.
@@ -1390,7 +1390,7 @@ Sema::ActOnFinishSwitchStmt(SourceLocation SwitchLoc, Stmt *Switch,
         if (i != 0 && CaseVals[i].first == CaseVals[i-1].first) {
           // If we have a duplicate, report it.
           // First, determine if either case value has a name
-          StringRef PrevString, CurrString;
+          llvm::StringRef PrevString, CurrString;
           Expr *PrevCase = CaseVals[i-1].second->getLHS()->IgnoreParenCasts();
           Expr *CurrCase = CaseVals[i].second->getLHS()->IgnoreParenCasts();
           if (DeclRefExpr *DeclRef = dyn_cast<DeclRefExpr>(PrevCase)) {
@@ -1399,7 +1399,7 @@ Sema::ActOnFinishSwitchStmt(SourceLocation SwitchLoc, Stmt *Switch,
           if (DeclRefExpr *DeclRef = dyn_cast<DeclRefExpr>(CurrCase)) {
             CurrString = DeclRef->getDecl()->getName();
           }
-          SmallString<16> CaseValStr;
+          llvm::SmallString<16> CaseValStr;
           CaseVals[i-1].first.toString(CaseValStr);
 
           if (PrevString == CurrString)
@@ -1586,7 +1586,7 @@ Sema::ActOnFinishSwitchStmt(SourceLocation SwitchLoc, Stmt *Switch,
       auto RI = CaseRanges.begin();
       bool hasCasesNotInSwitch = false;
 
-      SmallVector<DeclarationName,8> UnhandledNames;
+      llvm::SmallVector<DeclarationName,8> UnhandledNames;
 
       for (EI = EnumVals.begin(); EI != EIEnd; EI++) {
         // Don't warn about omitted unavailable EnumConstantDecls.
@@ -1687,7 +1687,7 @@ Sema::DiagnoseAssignmentEnum(QualType DstType, QualType SrcType,
             Diag(SrcExpr->getExprLoc(), diag::warn_not_in_enum_assignment)
               << DstType.getUnqualifiedType();
         } else {
-          typedef SmallVector<std::pair<llvm::APSInt, EnumConstantDecl *>, 64>
+          typedef llvm::SmallVector<std::pair<llvm::APSInt, EnumConstantDecl *>, 64>
               EnumValsTy;
           EnumValsTy EnumVals;
 
@@ -1771,13 +1771,13 @@ namespace {
   // of the excluded constructs are used.
   class DeclExtractor : public EvaluatedExprVisitor<DeclExtractor> {
     DeclSetVector &Decls;
-    SmallVectorImpl<SourceRange> &Ranges;
+    llvm::SmallVectorImpl<SourceRange> &Ranges;
     bool Simple;
   public:
     typedef EvaluatedExprVisitor<DeclExtractor> Inherited;
 
     DeclExtractor(Sema &S, DeclSetVector &Decls,
-                  SmallVectorImpl<SourceRange> &Ranges) :
+                  llvm::SmallVectorImpl<SourceRange> &Ranges) :
         Inherited(S.Context),
         Decls(Decls),
         Ranges(Ranges),
@@ -1940,7 +1940,7 @@ namespace {
 
     PartialDiagnostic PDiag = S.PDiag(diag::warn_variables_not_in_loop_body);
     DeclSetVector Decls;
-    SmallVector<SourceRange, 10> Ranges;
+    llvm::SmallVector<SourceRange, 10> Ranges;
     DeclExtractor DE(S, Decls, Ranges);
     DE.Visit(Second);
 
@@ -2319,7 +2319,7 @@ void NoteForRangeBeginEndFunction(Sema &SemaRef, Expr *E,
 
 /// Build a variable declaration for a for-range statement.
 VarDecl *BuildForRangeVarDecl(Sema &SemaRef, SourceLocation Loc,
-                              QualType Type, StringRef Name) {
+                              QualType Type, llvm::StringRef Name) {
   DeclContext *DC = SemaRef.CurContext;
   IdentifierInfo *II = &SemaRef.PP.getIdentifierTable().get(Name);
   TypeSourceInfo *TInfo = SemaRef.Context.getTrivialTypeSourceInfo(Type, Loc);
@@ -2358,7 +2358,7 @@ StmtResult Sema::ActOnCXXForRangeStmt(
     Scope *S, SourceLocation ForLoc, SourceLocation CoawaitLoc, Stmt *InitStmt,
     Stmt *First, SourceLocation ColonLoc, Expr *Range, SourceLocation RParenLoc,
     BuildForRangeKind Kind,
-    ArrayRef<MaterializeTemporaryExpr *> LifetimeExtendTemps) {
+    llvm::ArrayRef<MaterializeTemporaryExpr *> LifetimeExtendTemps) {
   // FIXME: recover in order to allow the body to be parsed.
   if (!First)
     return StmtError();
@@ -2412,7 +2412,7 @@ StmtResult Sema::ActOnCXXForRangeStmt(
 
   // Claim the type doesn't contain auto: we've already done the checking.
   DeclGroupPtrTy RangeGroup =
-      BuildDeclaratorGroup(MutableArrayRef<Decl *>((Decl **)&RangeVar, 1));
+      BuildDeclaratorGroup(llvm::MutableArrayRef<Decl *>((Decl **)&RangeVar, 1));
   StmtResult RangeDecl = ActOnDeclStmt(RangeGroup, RangeLoc, RangeLoc);
   if (RangeDecl.isInvalid()) {
     ActOnInitializerError(LoopVar);
@@ -2618,7 +2618,7 @@ StmtResult Sema::BuildCXXForRangeStmt(
     SourceLocation ColonLoc, Stmt *RangeDecl, Stmt *Begin, Stmt *End,
     Expr *Cond, Expr *Inc, Stmt *LoopVarDecl, SourceLocation RParenLoc,
     BuildForRangeKind Kind,
-    ArrayRef<MaterializeTemporaryExpr *> LifetimeExtendTemps) {
+    llvm::ArrayRef<MaterializeTemporaryExpr *> LifetimeExtendTemps) {
   // FIXME: This should not be used during template instantiation. We should
   // pick up the set of unqualified lookup results for the != and + operators
   // in the initial parse.
@@ -4258,7 +4258,7 @@ public:
 /// ActOnCXXTryBlock - Takes a try compound-statement and a number of
 /// handlers and creates a try statement from them.
 StmtResult Sema::ActOnCXXTryBlock(SourceLocation TryLoc, Stmt *TryBlock,
-                                  ArrayRef<Stmt *> Handlers) {
+                                  llvm::ArrayRef<Stmt *> Handlers) {
   const llvm::Triple &T = Context.getTargetInfo().getTriple();
   const bool IsOpenMPGPUTarget =
       getLangOpts().OpenMPIsTargetDevice && (T.isNVPTX() || T.isAMDGCN());
@@ -4497,8 +4497,8 @@ Sema::CreateCapturedStmtRecordDecl(CapturedDecl *&CD, SourceLocation Loc,
 
 static bool
 buildCapturedStmtCaptureList(Sema &S, CapturedRegionScopeInfo *RSI,
-                             SmallVectorImpl<CapturedStmt::Capture> &Captures,
-                             SmallVectorImpl<Expr *> &CaptureInits) {
+                             llvm::SmallVectorImpl<CapturedStmt::Capture> &Captures,
+                             llvm::SmallVectorImpl<Expr *> &CaptureInits) {
   for (const sema::Capture &Cap : RSI->Captures) {
     if (Cap.isInvalid())
       continue;
@@ -4570,7 +4570,7 @@ void Sema::ActOnCapturedRegionStart(SourceLocation Loc, Scope *CurScope,
 
 void Sema::ActOnCapturedRegionStart(SourceLocation Loc, Scope *CurScope,
                                     CapturedRegionKind Kind,
-                                    ArrayRef<CapturedParamNameType> Params,
+                                    llvm::ArrayRef<CapturedParamNameType> Params,
                                     unsigned OpenMPCaptureLevel) {
   CapturedDecl *CD = nullptr;
   RecordDecl *RD = CreateCapturedStmtRecordDecl(CD, Loc, Params.size());
@@ -4579,7 +4579,7 @@ void Sema::ActOnCapturedRegionStart(SourceLocation Loc, Scope *CurScope,
   DeclContext *DC = CapturedDecl::castToDeclContext(CD);
   bool ContextIsFound = false;
   unsigned ParamNum = 0;
-  for (ArrayRef<CapturedParamNameType>::iterator I = Params.begin(),
+  for (llvm::ArrayRef<CapturedParamNameType>::iterator I = Params.begin(),
                                                  E = Params.end();
        I != E; ++I, ++ParamNum) {
     if (I->second.isNull()) {
@@ -4637,7 +4637,7 @@ void Sema::ActOnCapturedRegionError() {
   RecordDecl *Record = RSI->TheRecordDecl;
   Record->setInvalidDecl();
 
-  SmallVector<Decl*, 4> Fields(Record->fields());
+  llvm::SmallVector<Decl*, 4> Fields(Record->fields());
   ActOnFields(/*Scope=*/nullptr, Record->getLocation(), Record, Fields,
               SourceLocation(), SourceLocation(), ParsedAttributesView());
 }
@@ -4651,8 +4651,8 @@ StmtResult Sema::ActOnCapturedRegionEnd(Stmt *S) {
   PoppedFunctionScopePtr ScopeRAII = PopFunctionScopeInfo();
   CapturedRegionScopeInfo *RSI = cast<CapturedRegionScopeInfo>(ScopeRAII.get());
 
-  SmallVector<CapturedStmt::Capture, 4> Captures;
-  SmallVector<Expr *, 4> CaptureInits;
+  llvm::SmallVector<CapturedStmt::Capture, 4> Captures;
+  llvm::SmallVector<Expr *, 4> CaptureInits;
   if (buildCapturedStmtCaptureList(*this, RSI, Captures, CaptureInits))
     return StmtError();
 

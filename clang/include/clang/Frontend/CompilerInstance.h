@@ -81,31 +81,31 @@ class CompilerInstance : public ModuleLoader {
   std::shared_ptr<CompilerInvocation> Invocation;
 
   /// The diagnostics engine instance.
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diagnostics;
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diagnostics;
 
   /// The target being compiled for.
-  IntrusiveRefCntPtr<TargetInfo> Target;
+  llvm::IntrusiveRefCntPtr<TargetInfo> Target;
 
   /// Auxiliary Target info.
-  IntrusiveRefCntPtr<TargetInfo> AuxTarget;
+  llvm::IntrusiveRefCntPtr<TargetInfo> AuxTarget;
 
   /// The file manager.
-  IntrusiveRefCntPtr<FileManager> FileMgr;
+  llvm::IntrusiveRefCntPtr<FileManager> FileMgr;
 
   /// The source manager.
-  IntrusiveRefCntPtr<SourceManager> SourceMgr;
+  llvm::IntrusiveRefCntPtr<SourceManager> SourceMgr;
 
   /// The cache of PCM files.
-  IntrusiveRefCntPtr<InMemoryModuleCache> ModuleCache;
+  llvm::IntrusiveRefCntPtr<InMemoryModuleCache> ModuleCache;
 
   /// The preprocessor.
   std::shared_ptr<Preprocessor> PP;
 
   /// The AST context.
-  IntrusiveRefCntPtr<ASTContext> Context;
+  llvm::IntrusiveRefCntPtr<ASTContext> Context;
 
   /// An optional sema source that will be attached to sema.
-  IntrusiveRefCntPtr<ExternalSemaSource> ExternalSemaSrc;
+  llvm::IntrusiveRefCntPtr<ExternalSemaSource> ExternalSemaSrc;
 
   /// The AST consumer.
   std::unique_ptr<ASTConsumer> Consumer;
@@ -123,7 +123,7 @@ class CompilerInstance : public ModuleLoader {
   std::unique_ptr<llvm::Timer> FrontendTimer;
 
   /// The ASTReader, if one exists.
-  IntrusiveRefCntPtr<ASTReader> TheASTReader;
+  llvm::IntrusiveRefCntPtr<ASTReader> TheASTReader;
 
   /// The module dependency collector for crashdumps
   std::shared_ptr<ModuleDependencyCollector> ModuleDepCollector;
@@ -138,9 +138,9 @@ class CompilerInstance : public ModuleLoader {
     llvm::StringSet<> Failed;
 
   public:
-    bool hasAlreadyFailed(StringRef module) { return Failed.count(module) > 0; }
+    bool hasAlreadyFailed(llvm::StringRef module) { return Failed.count(module) > 0; }
 
-    void addFailed(StringRef module) { Failed.insert(module); }
+    void addFailed(llvm::StringRef module) { Failed.insert(module); }
   };
 
   /// The set of modules that failed to build.
@@ -177,10 +177,10 @@ class CompilerInstance : public ModuleLoader {
   bool DisableGeneratingGlobalModuleIndex = false;
 
   /// The stream for verbose output if owned, otherwise nullptr.
-  std::unique_ptr<raw_ostream> OwnedVerboseOutputStream;
+  std::unique_ptr<llvm::raw_ostream> OwnedVerboseOutputStream;
 
   /// The stream for verbose output.
-  raw_ostream *VerboseOutputStream = &llvm::errs();
+  llvm::raw_ostream *VerboseOutputStream = &llvm::errs();
 
   /// Holds information about the output file.
   ///
@@ -369,7 +369,7 @@ public:
     return *Diagnostics;
   }
 
-  IntrusiveRefCntPtr<DiagnosticsEngine> getDiagnosticsPtr() const {
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> getDiagnosticsPtr() const {
     assert(Diagnostics && "Compiler instance has no diagnostics!");
     return Diagnostics;
   }
@@ -388,13 +388,13 @@ public:
   /// @{
 
   /// Replace the current stream for verbose output.
-  void setVerboseOutputStream(raw_ostream &Value);
+  void setVerboseOutputStream(llvm::raw_ostream &Value);
 
   /// Replace the current stream for verbose output.
-  void setVerboseOutputStream(std::unique_ptr<raw_ostream> Value);
+  void setVerboseOutputStream(std::unique_ptr<llvm::raw_ostream> Value);
 
   /// Get the current stream for verbose output.
-  raw_ostream &getVerboseOutputStream() {
+  llvm::raw_ostream &getVerboseOutputStream() {
     return *VerboseOutputStream;
   }
 
@@ -409,7 +409,7 @@ public:
     return *Target;
   }
 
-  IntrusiveRefCntPtr<TargetInfo> getTargetPtr() const {
+  llvm::IntrusiveRefCntPtr<TargetInfo> getTargetPtr() const {
     assert(Target && "Compiler instance has no target!");
     return Target;
   }
@@ -447,7 +447,7 @@ public:
     return *FileMgr;
   }
 
-  IntrusiveRefCntPtr<FileManager> getFileManagerPtr() const {
+  llvm::IntrusiveRefCntPtr<FileManager> getFileManagerPtr() const {
     assert(FileMgr && "Compiler instance has no file manager!");
     return FileMgr;
   }
@@ -472,7 +472,7 @@ public:
     return *SourceMgr;
   }
 
-  IntrusiveRefCntPtr<SourceManager> getSourceManagerPtr() const {
+  llvm::IntrusiveRefCntPtr<SourceManager> getSourceManagerPtr() const {
     assert(SourceMgr && "Compiler instance has no source manager!");
     return SourceMgr;
   }
@@ -517,7 +517,7 @@ public:
     return *Context;
   }
 
-  IntrusiveRefCntPtr<ASTContext> getASTContextPtr() const {
+  llvm::IntrusiveRefCntPtr<ASTContext> getASTContextPtr() const {
     assert(Context && "Compiler instance has no AST context!");
     return Context;
   }
@@ -570,8 +570,8 @@ public:
   /// @name Module Management
   /// @{
 
-  IntrusiveRefCntPtr<ASTReader> getASTReader() const;
-  void setASTReader(IntrusiveRefCntPtr<ASTReader> Reader);
+  llvm::IntrusiveRefCntPtr<ASTReader> getASTReader() const;
+  void setASTReader(llvm::IntrusiveRefCntPtr<ASTReader> Reader);
 
   std::shared_ptr<ModuleDependencyCollector> getModuleDepCollector() const;
   void setModuleDepCollector(
@@ -585,7 +585,7 @@ public:
   /// current CodeGenOptions.
   const PCHContainerWriter &getPCHContainerWriter() const {
     assert(Invocation && "cannot determine module format without invocation");
-    StringRef Format = getHeaderSearchOpts().ModuleFormat;
+    llvm::StringRef Format = getHeaderSearchOpts().ModuleFormat;
     auto *Writer = ThePCHContainerOperations->getWriterOrNull(Format);
     if (!Writer) {
       if (Diagnostics)
@@ -599,7 +599,7 @@ public:
   /// current CodeGenOptions.
   const PCHContainerReader &getPCHContainerReader() const {
     assert(Invocation && "cannot determine module format without invocation");
-    StringRef Format = getHeaderSearchOpts().ModuleFormat;
+    llvm::StringRef Format = getHeaderSearchOpts().ModuleFormat;
     auto *Reader = ThePCHContainerOperations->getReaderOrNull(Format);
     if (!Reader) {
       if (Diagnostics)
@@ -701,7 +701,7 @@ public:
   /// used by some diagnostics printers (for logging purposes only).
   ///
   /// \return The new object on success, or null on failure.
-  static IntrusiveRefCntPtr<DiagnosticsEngine>
+  static llvm::IntrusiveRefCntPtr<DiagnosticsEngine>
   createDiagnostics(DiagnosticOptions *Opts,
                     DiagnosticConsumer *Client = nullptr,
                     bool ShouldOwnClient = true,
@@ -711,7 +711,7 @@ public:
   ///
   /// \return The new file manager on success, or null on failure.
   FileManager *
-  createFileManager(IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr);
+  createFileManager(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr);
 
   /// Create the source manager and replace any existing one with it.
   void createSourceManager(FileManager &FileMgr);
@@ -720,7 +720,7 @@ public:
   /// and replace any existing one with it.
   void createPreprocessor(TranslationUnitKind TUKind);
 
-  std::string getSpecificModuleCachePath(StringRef ModuleHash);
+  std::string getSpecificModuleCachePath(llvm::StringRef ModuleHash);
   std::string getSpecificModuleCachePath() {
     return getSpecificModuleCachePath(getInvocation().getModuleHash());
   }
@@ -731,21 +731,21 @@ public:
   /// Create an external AST source to read a PCH file and attach it to the AST
   /// context.
   void createPCHExternalASTSource(
-      StringRef Path, DisableValidationForModuleKind DisableValidation,
+      llvm::StringRef Path, DisableValidationForModuleKind DisableValidation,
       bool AllowPCHWithCompilerErrors, void *DeserializationListener,
       bool OwnDeserializationListener);
 
   /// Create an external AST source to read a PCH file.
   ///
   /// \return - The new object on success, or null on failure.
-  static IntrusiveRefCntPtr<ASTReader> createPCHExternalASTSource(
-      StringRef Path, StringRef Sysroot,
+  static llvm::IntrusiveRefCntPtr<ASTReader> createPCHExternalASTSource(
+      llvm::StringRef Path, llvm::StringRef Sysroot,
       DisableValidationForModuleKind DisableValidation,
       bool AllowPCHWithCompilerErrors, Preprocessor &PP,
       InMemoryModuleCache &ModuleCache, ASTContext &Context,
       const PCHContainerReader &PCHContainerRdr,
-      ArrayRef<std::shared_ptr<ModuleFileExtension>> Extensions,
-      ArrayRef<std::shared_ptr<DependencyCollector>> DependencyCollectors,
+      llvm::ArrayRef<std::shared_ptr<ModuleFileExtension>> Extensions,
+      llvm::ArrayRef<std::shared_ptr<DependencyCollector>> DependencyCollectors,
       void *DeserializationListener, bool OwnDeserializationListener,
       bool Preamble, bool UseGlobalModuleIndex);
 
@@ -757,8 +757,8 @@ public:
   /// Create a code completion consumer to print code completion results, at
   /// \p Filename, \p Line, and \p Column, to the given output stream \p OS.
   static CodeCompleteConsumer *createCodeCompletionConsumer(
-      Preprocessor &PP, StringRef Filename, unsigned Line, unsigned Column,
-      const CodeCompleteOptions &Opts, raw_ostream &OS);
+      Preprocessor &PP, llvm::StringRef Filename, unsigned Line, unsigned Column,
+      const CodeCompleteOptions &Opts, llvm::raw_ostream &OS);
 
   /// Create the Sema object to be used for parsing.
   void createSema(TranslationUnitKind TUKind,
@@ -776,8 +776,8 @@ public:
   /// output on success).
   ///
   /// \return - Null on error.
-  std::unique_ptr<raw_pwrite_stream> createDefaultOutputFile(
-      bool Binary = true, StringRef BaseInput = "", StringRef Extension = "",
+  std::unique_ptr<llvm::raw_pwrite_stream> createDefaultOutputFile(
+      bool Binary = true, llvm::StringRef BaseInput = "", llvm::StringRef Extension = "",
       bool RemoveFileOnSignal = true, bool CreateMissingDirectories = false,
       bool ForceUseTemporary = false);
 
@@ -785,8 +785,8 @@ public:
   /// add it to the list of tracked output files.
   ///
   /// \return - Null on error.
-  std::unique_ptr<raw_pwrite_stream>
-  createOutputFile(StringRef OutputPath, bool Binary, bool RemoveFileOnSignal,
+  std::unique_ptr<llvm::raw_pwrite_stream>
+  createOutputFile(llvm::StringRef OutputPath, bool Binary, bool RemoveFileOnSignal,
                    bool UseTemporary, bool CreateMissingDirectories = false);
 
 private:
@@ -807,13 +807,13 @@ private:
   /// OutputPath in the end.
   /// \param CreateMissingDirectories - When \p UseTemporary is true, create
   /// missing directories in the output path.
-  Expected<std::unique_ptr<raw_pwrite_stream>>
-  createOutputFileImpl(StringRef OutputPath, bool Binary,
+  llvm::Expected<std::unique_ptr<llvm::raw_pwrite_stream>>
+  createOutputFileImpl(llvm::StringRef OutputPath, bool Binary,
                        bool RemoveFileOnSignal, bool UseTemporary,
                        bool CreateMissingDirectories);
 
 public:
-  std::unique_ptr<raw_pwrite_stream> createNullOutputFile();
+  std::unique_ptr<llvm::raw_pwrite_stream> createNullOutputFile();
 
   /// @}
   /// @name Initialization Utility Methods
@@ -846,7 +846,7 @@ public:
 
   void createASTReader();
 
-  bool loadModuleFile(StringRef FileName,
+  bool loadModuleFile(llvm::StringRef FileName,
                       serialization::ModuleFile *&LoadedModuleFile);
 
 private:
@@ -861,7 +861,7 @@ private:
   /// ModuleMap.  First attempt to load it from the given path on disk.  If that
   /// fails, defer to compileModuleAndReadAST, which will first build and then
   /// load it.
-  ModuleLoadResult findOrCompileModuleAndReadAST(StringRef ModuleName,
+  ModuleLoadResult findOrCompileModuleAndReadAST(llvm::StringRef ModuleName,
                                                  SourceLocation ImportLoc,
                                                  SourceLocation ModuleNameLoc,
                                                  bool IsInclusionDirective);
@@ -871,8 +871,8 @@ public:
                               Module::NameVisibilityKind Visibility,
                               bool IsInclusionDirective) override;
 
-  void createModuleFromSource(SourceLocation ImportLoc, StringRef ModuleName,
-                              StringRef Source) override;
+  void createModuleFromSource(SourceLocation ImportLoc, llvm::StringRef ModuleName,
+                              llvm::StringRef Source) override;
 
   void makeModuleVisible(Module *Mod, Module::NameVisibilityKind Visibility,
                          SourceLocation ImportLoc) override;
@@ -883,13 +883,13 @@ public:
 
   GlobalModuleIndex *loadGlobalModuleIndex(SourceLocation TriggerLoc) override;
 
-  bool lookupMissingImports(StringRef Name, SourceLocation TriggerLoc) override;
+  bool lookupMissingImports(llvm::StringRef Name, SourceLocation TriggerLoc) override;
 
   void addDependencyCollector(std::shared_ptr<DependencyCollector> Listener) {
     DependencyCollectors.push_back(std::move(Listener));
   }
 
-  void setExternalSemaSource(IntrusiveRefCntPtr<ExternalSemaSource> ESS);
+  void setExternalSemaSource(llvm::IntrusiveRefCntPtr<ExternalSemaSource> ESS);
 
   InMemoryModuleCache &getModuleCache() const { return *ModuleCache; }
 };

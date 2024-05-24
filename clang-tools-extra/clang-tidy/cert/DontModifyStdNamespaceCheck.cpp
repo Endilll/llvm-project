@@ -21,12 +21,12 @@ AST_POLYMORPHIC_MATCHER_P(
     AST_POLYMORPHIC_SUPPORTED_TYPES(ClassTemplateSpecializationDecl,
                                     TemplateSpecializationType, FunctionDecl),
     clang::ast_matchers::internal::Matcher<TemplateArgument>, InnerMatcher) {
-  ArrayRef<TemplateArgument> Args =
+  llvm::ArrayRef<TemplateArgument> Args =
       clang::ast_matchers::internal::getTemplateSpecializationArgs(Node);
   for (const auto &Arg : Args) {
     if (Arg.getKind() != TemplateArgument::Pack)
       continue;
-    ArrayRef<TemplateArgument> PackArgs = Arg.getPackAsArray();
+    llvm::ArrayRef<TemplateArgument> PackArgs = Arg.getPackAsArray();
     if (matchesFirstInRange(InnerMatcher, PackArgs.begin(), PackArgs.end(),
                             Finder, Builder) != PackArgs.end())
       return true;

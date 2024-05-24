@@ -19,7 +19,7 @@ namespace clang::tidy::cert {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cert/err60-cpp.html
 class ThrownExceptionTypeCheck : public ClangTidyCheck {
 public:
-  ThrownExceptionTypeCheck(StringRef Name, ClangTidyContext *Context)
+  ThrownExceptionTypeCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

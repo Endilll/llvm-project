@@ -25,7 +25,7 @@ AST_MATCHER_P(NamedDecl, usesHeaderFileExtension, FileExtensionsSet,
 
 } // namespace
 
-DefinitionsInHeadersCheck::DefinitionsInHeadersCheck(StringRef Name,
+DefinitionsInHeadersCheck::DefinitionsInHeadersCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       HeaderFileExtensions(Context->getHeaderFileExtensions()) {}

@@ -38,7 +38,7 @@ namespace {
 // This represents 0x1a | 0x2f<<7 = 6042.
 // A 32-bit integer takes 1-5 bytes to encode; small numbers are more compact.
 
-// Reads binary data from a StringRef, and keeps track of position.
+// Reads binary data from a llvm::StringRef, and keeps track of position.
 class Reader {
   const char *Begin, *End;
   bool Err = false;
@@ -259,7 +259,7 @@ llvm::Expected<StringTableIn> readStringTable(llvm::StringRef Data) {
 
 // SYMBOL ENCODING
 // Each field of clangd::Symbol is encoded in turn (see implementation).
-//  - StringRef fields encode as varint (index into the string table)
+//  - llvm::StringRef fields encode as varint (index into the string table)
 //  - enums encode as the underlying type
 //  - most numbers encode as varint
 

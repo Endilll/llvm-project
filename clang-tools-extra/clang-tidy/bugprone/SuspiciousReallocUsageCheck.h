@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/suspicious-realloc-usage.html
 class SuspiciousReallocUsageCheck : public ClangTidyCheck {
 public:
-  SuspiciousReallocUsageCheck(StringRef Name, ClangTidyContext *Context)
+  SuspiciousReallocUsageCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

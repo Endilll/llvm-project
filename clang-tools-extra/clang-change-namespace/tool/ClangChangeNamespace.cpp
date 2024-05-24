@@ -83,7 +83,7 @@ llvm::ErrorOr<std::vector<std::string>> GetAllowedSymbolPatterns() {
   if (AllowedFile.empty())
     return Patterns;
 
-  llvm::SmallVector<StringRef, 8> Lines;
+  llvm::SmallVector<llvm::StringRef, 8> Lines;
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> File =
       llvm::MemoryBuffer::getFile(AllowedFile);
   if (!File)
@@ -126,10 +126,10 @@ int main(int argc, const char **argv) {
   if (int Result = Tool.run(Factory.get()))
     return Result;
   LangOptions DefaultLangOptions;
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
   clang::TextDiagnosticPrinter DiagnosticPrinter(errs(), &*DiagOpts);
   DiagnosticsEngine Diagnostics(
-      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
+      llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
       &DiagnosticPrinter, false);
   auto &FileMgr = Tool.getFiles();
   SourceManager Sources(Diagnostics, FileMgr);

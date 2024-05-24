@@ -329,7 +329,7 @@ TEST_F(FormatTestComments, UnderstandsSingleLineComments) {
   verifyNoCrash("/\\\n/");
   verifyNoCrash("/\\\n* */");
   // The 0-character somehow makes the lexer return a proper comment.
-  verifyNoCrash(StringRef("/*\\\0\n/", 6));
+  verifyNoCrash(llvm::StringRef("/*\\\0\n/", 6));
 }
 
 TEST_F(FormatTestComments, KeepsParameterWithTrailingCommentsOnTheirOwnLine) {
@@ -1068,7 +1068,7 @@ TEST_F(FormatTestComments, KeepsLevelOfCommentBeforePPDirective) {
                    "  }\n"
                    "}"));
 
-  const StringRef Code("void func() {\n"
+  const llvm::StringRef Code("void func() {\n"
                        "  // clang-format off\n"
                        "  #define KV(value) #value, value\n"
                        "  // clang-format on\n"
@@ -3123,7 +3123,7 @@ TEST_F(FormatTestComments, DontAlignNamespaceComments) {
   Style.NamespaceMacros.push_back("TESTSUITE");
   Style.ShortNamespaceLines = 0;
 
-  StringRef Input = "namespace A {\n"
+  llvm::StringRef Input = "namespace A {\n"
                     "  TESTSUITE(B) {\n"
                     "    namespace C {\n"
                     "      namespace D { //\n"
@@ -3788,7 +3788,7 @@ TEST_F(FormatTestComments, IndentsLongJavadocAnnotatedLines) {
 
 TEST_F(FormatTestComments, SpaceAtLineCommentBegin) {
   FormatStyle Style = getLLVMStyle();
-  StringRef NoTextInComment = " //       \n"
+  llvm::StringRef NoTextInComment = " //       \n"
                               "\n"
                               "void foo() {// \n"
                               "// \n"
@@ -3820,7 +3820,7 @@ TEST_F(FormatTestComments, SpaceAtLineCommentBegin) {
             format(NoTextInComment, Style));
 
   Style = getLLVMStyle();
-  StringRef Code =
+  llvm::StringRef Code =
       "//Free comment without space\n"
       "\n"
       "//   Free comment with 3 spaces\n"
@@ -4112,7 +4112,7 @@ TEST_F(FormatTestComments, SpaceAtLineCommentBegin) {
             format(Code, Style));
 
   Style = getLLVMStyleWithColumns(20);
-  StringRef WrapCode = "//Lorem ipsum dolor sit amet\n"
+  llvm::StringRef WrapCode = "//Lorem ipsum dolor sit amet\n"
                        "\n"
                        "//  Lorem   ipsum   dolor   sit   amet\n"
                        "\n"
@@ -4180,7 +4180,7 @@ TEST_F(FormatTestComments, SpaceAtLineCommentBegin) {
             format(WrapCode, Style));
 
   Style = getLLVMStyleWithColumns(20);
-  StringRef LotsOfSpaces = "//                      This are more spaces "
+  llvm::StringRef LotsOfSpaces = "//                      This are more spaces "
                            "than the ColumnLimit, what now?\n"
                            "\n"
                            "//   Comment\n"

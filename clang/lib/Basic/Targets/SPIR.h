@@ -159,13 +159,13 @@ public:
   // memcpy as per section 3 of the SPIR spec.
   bool useFP16ConversionIntrinsics() const override { return false; }
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override {
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override {
     return std::nullopt;
   }
 
   std::string_view getClobbers() const override { return ""; }
 
-  ArrayRef<const char *> getGCCRegNames() const override {
+  llvm::ArrayRef<const char *> getGCCRegNames() const override {
     return std::nullopt;
   }
 
@@ -174,7 +174,7 @@ public:
     return true;
   }
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     return std::nullopt;
   }
 
@@ -242,7 +242,7 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  bool hasFeature(StringRef Feature) const override {
+  bool hasFeature(llvm::StringRef Feature) const override {
     return Feature == "spir";
   }
 
@@ -290,7 +290,7 @@ public:
     assert(Triple.isSPIRV() && "Invalid architecture for SPIR-V.");
   }
 
-  bool hasFeature(StringRef Feature) const override {
+  bool hasFeature(llvm::StringRef Feature) const override {
     return Feature == "spirv";
   }
 

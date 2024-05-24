@@ -91,7 +91,7 @@ namespace clang::tidy::%(namespace)s {
 /// http://clang.llvm.org/extra/clang-tidy/checks/%(module)s/%(check_name)s.html
 class %(check_name_camel)s : public ClangTidyCheck {
 public:
-  %(check_name_camel)s(StringRef Name, ClangTidyContext *Context)
+  %(check_name_camel)s(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

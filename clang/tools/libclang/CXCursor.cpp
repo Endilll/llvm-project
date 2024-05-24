@@ -149,9 +149,9 @@ CXCursor cxcursor::MakeCXCursor(const Decl *D, CXTranslationUnit TU,
     // Check if cursor points to a selector id.
     if (RegionOfInterest.isValid() &&
         RegionOfInterest.getBegin() == RegionOfInterest.getEnd()) {
-      SmallVector<SourceLocation, 16> SelLocs;
+      llvm::SmallVector<SourceLocation, 16> SelLocs;
       cast<ObjCMethodDecl>(D)->getSelectorLocs(SelLocs);
-      SmallVectorImpl<SourceLocation>::iterator I =
+      llvm::SmallVectorImpl<SourceLocation>::iterator I =
           llvm::find(SelLocs, RegionOfInterest.getBegin());
       if (I != SelLocs.end())
         SelectorIdIndex = I - SelLocs.begin();
@@ -628,9 +628,9 @@ CXCursor cxcursor::MakeCXCursor(const Stmt *S, const Decl *Parent,
     // Check if cursor points to a selector id.
     if (RegionOfInterest.isValid() &&
         RegionOfInterest.getBegin() == RegionOfInterest.getEnd()) {
-      SmallVector<SourceLocation, 16> SelLocs;
+      llvm::SmallVector<SourceLocation, 16> SelLocs;
       cast<ObjCMessageExpr>(S)->getSelectorLocs(SelLocs);
-      SmallVectorImpl<SourceLocation>::iterator I =
+      llvm::SmallVectorImpl<SourceLocation>::iterator I =
           llvm::find(SelLocs, RegionOfInterest.getBegin());
       if (I != SelLocs.end())
         SelectorIdIndex = I - SelLocs.begin();
@@ -1191,17 +1191,17 @@ CXTranslationUnit cxcursor::getCursorTU(CXCursor Cursor) {
 }
 
 void cxcursor::getOverriddenCursors(CXCursor cursor,
-                                    SmallVectorImpl<CXCursor> &overridden) {
+                                    llvm::SmallVectorImpl<CXCursor> &overridden) {
   assert(clang_isDeclaration(cursor.kind));
   const NamedDecl *D = dyn_cast_or_null<NamedDecl>(getCursorDecl(cursor));
   if (!D)
     return;
 
   CXTranslationUnit TU = getCursorTU(cursor);
-  SmallVector<const NamedDecl *, 8> OverDecls;
+  llvm::SmallVector<const NamedDecl *, 8> OverDecls;
   D->getASTContext().getOverriddenMethods(D, OverDecls);
 
-  for (SmallVectorImpl<const NamedDecl *>::iterator I = OverDecls.begin(),
+  for (llvm::SmallVectorImpl<const NamedDecl *>::iterator I = OverDecls.begin(),
                                                     E = OverDecls.end();
        I != E; ++I) {
     overridden.push_back(MakeCXCursor(*I, TU));
@@ -1630,7 +1630,7 @@ CXCompletionString clang_getCursorCompletionString(CXCursor cursor) {
 
 namespace {
 struct OverridenCursorsPool {
-  typedef SmallVector<CXCursor, 2> CursorVec;
+  typedef llvm::SmallVector<CXCursor, 2> CursorVec;
   std::vector<CursorVec *> AllCursors;
   std::vector<CursorVec *> AvailableCursors;
 

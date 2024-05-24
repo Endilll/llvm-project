@@ -86,9 +86,9 @@ void tools::MinGW::Linker::AddLibGCC(const ArgList &Args,
   CmdArgs.push_back("-lmoldname");
   CmdArgs.push_back("-lmingwex");
   for (auto Lib : Args.getAllArgValues(options::OPT_l))
-    if (StringRef(Lib).starts_with("msvcr") ||
-        StringRef(Lib).starts_with("ucrt") ||
-        StringRef(Lib).starts_with("crtdll"))
+    if (llvm::StringRef(Lib).starts_with("msvcr") ||
+        llvm::StringRef(Lib).starts_with("ucrt") ||
+        llvm::StringRef(Lib).starts_with("crtdll"))
       return;
   CmdArgs.push_back("-lmsvcrt");
 }
@@ -177,7 +177,7 @@ void tools::MinGW::Linker::ConstructJob(Compilation &C, const JobAction &JA,
     CmdArgs.push_back("--disable-auto-import");
 
   if (Arg *A = Args.getLastArg(options::OPT_mguard_EQ)) {
-    StringRef GuardArgs = A->getValue();
+    llvm::StringRef GuardArgs = A->getValue();
     if (GuardArgs == "none")
       CmdArgs.push_back("--no-guard-cf");
     else if (GuardArgs == "cf" || GuardArgs == "cf-nochecks")
@@ -194,7 +194,7 @@ void tools::MinGW::Linker::ConstructJob(Compilation &C, const JobAction &JA,
   // GCC used to do this only when the compiler itself runs on windows, but
   // since GCC 8 it does the same when cross compiling as well.
   if (!llvm::sys::path::has_extension(OutputFile)) {
-    CmdArgs.push_back(Args.MakeArgString(Twine(OutputFile) + ".exe"));
+    CmdArgs.push_back(Args.MakeArgString(llvm::Twine(OutputFile) + ".exe"));
     OutputFile = CmdArgs.back();
   } else
     CmdArgs.push_back(OutputFile);
@@ -379,14 +379,14 @@ static bool isCrossCompiling(const llvm::Triple &T, bool RequireArchMatch) {
 }
 
 // Simplified from Generic_GCC::GCCInstallationDetector::ScanLibDirForGCCTriple.
-static bool findGccVersion(StringRef LibDir, std::string &GccLibDir,
+static bool findGccVersion(llvm::StringRef LibDir, std::string &GccLibDir,
                            std::string &Ver,
                            toolchains::Generic_GCC::GCCVersion &Version) {
   Version = toolchains::Generic_GCC::GCCVersion::Parse("0.0.0");
   std::error_code EC;
   for (llvm::sys::fs::directory_iterator LI(LibDir, EC), LE; !EC && LI != LE;
        LI = LI.increment(EC)) {
-    StringRef VersionText = llvm::sys::path::filename(LI->path());
+    llvm::StringRef VersionText = llvm::sys::path::filename(LI->path());
     auto CandidateVersion =
         toolchains::Generic_GCC::GCCVersion::Parse(VersionText);
     if (CandidateVersion.Major == -1)
@@ -422,8 +422,8 @@ void toolchains::MinGW::findGccLibDir(const llvm::Triple &LiteralTriple) {
   }
   // lib: Arch Linux, Ubuntu, Windows
   // lib64: openSUSE Linux
-  for (StringRef CandidateLib : {"lib", "lib64"}) {
-    for (StringRef CandidateSysroot : SubdirNames) {
+  for (llvm::StringRef CandidateLib : {"lib", "lib64"}) {
+    for (llvm::StringRef CandidateSysroot : SubdirNames) {
       llvm::SmallString<1024> LibDir(Base);
       llvm::sys::path::append(LibDir, CandidateLib, "gcc", CandidateSysroot);
       if (findGccVersion(LibDir, GccLibDir, Ver, GccVer)) {
@@ -447,7 +447,7 @@ static llvm::ErrorOr<std::string> findGcc(const llvm::Triple &LiteralTriple,
   Gccs.back() += "-w64-mingw32ucrt-gcc";
   Gccs.emplace_back("mingw32-gcc");
   // Please do not add "gcc" here
-  for (StringRef CandidateGcc : Gccs)
+  for (llvm::StringRef CandidateGcc : Gccs)
     if (llvm::ErrorOr<std::string> GPPName = llvm::sys::findProgramByName(CandidateGcc))
       return GPPName;
   return make_error_code(std::errc::no_such_file_or_directory);
@@ -463,9 +463,9 @@ findClangRelativeSysroot(const Driver &D, const llvm::Triple &LiteralTriple,
   Subdirs.back() += "-w64-mingw32";
   Subdirs.emplace_back(T.getArchName());
   Subdirs.back() += "-w64-mingw32ucrt";
-  StringRef ClangRoot = llvm::sys::path::parent_path(D.Dir);
-  StringRef Sep = llvm::sys::path::get_separator();
-  for (StringRef CandidateSubdir : Subdirs) {
+  llvm::StringRef ClangRoot = llvm::sys::path::parent_path(D.Dir);
+  llvm::StringRef Sep = llvm::sys::path::get_separator();
+  for (llvm::StringRef CandidateSubdir : Subdirs) {
     if (llvm::sys::fs::is_directory(ClangRoot + Sep + CandidateSubdir)) {
       SubdirName = std::string(CandidateSubdir);
       return (ClangRoot + Sep + CandidateSubdir).str();
@@ -475,7 +475,7 @@ findClangRelativeSysroot(const Driver &D, const llvm::Triple &LiteralTriple,
 }
 
 static bool looksLikeMinGWSysroot(const std::string &Directory) {
-  StringRef Sep = llvm::sys::path::get_separator();
+  llvm::StringRef Sep = llvm::sys::path::get_separator();
   if (!llvm::sys::fs::exists(Directory + Sep + "include" + Sep + "_mingw.h"))
     return false;
   if (!llvm::sys::fs::exists(Directory + Sep + "lib" + Sep + "libkernel32.a"))
@@ -625,7 +625,7 @@ void toolchains::MinGW::AddHIPIncludeArgs(const ArgList &DriverArgs,
   RocmInstallation->AddHIPIncludeArgs(DriverArgs, CC1Args);
 }
 
-void toolchains::MinGW::printVerboseInfo(raw_ostream &OS) const {
+void toolchains::MinGW::printVerboseInfo(llvm::raw_ostream &OS) const {
   CudaInstallation->print(OS);
   RocmInstallation->print(OS);
 }
@@ -682,7 +682,7 @@ void toolchains::MinGW::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<1024> P(getDriver().ResourceDir);
+    llvm::SmallString<1024> P(getDriver().ResourceDir);
     llvm::sys::path::append(P, "include");
     addSystemInclude(DriverArgs, CC1Args, P.str());
   }
@@ -711,7 +711,7 @@ void toolchains::MinGW::addClangTargetOptions(
     const llvm::opt::ArgList &DriverArgs, llvm::opt::ArgStringList &CC1Args,
     Action::OffloadKind DeviceOffloadKind) const {
   if (Arg *A = DriverArgs.getLastArg(options::OPT_mguard_EQ)) {
-    StringRef GuardArgs = A->getValue();
+    llvm::StringRef GuardArgs = A->getValue();
     if (GuardArgs == "none") {
       // Do nothing.
     } else if (GuardArgs == "cf") {
@@ -741,7 +741,7 @@ void toolchains::MinGW::AddClangCXXStdlibIncludeArgs(
                         options::OPT_nostdincxx))
     return;
 
-  StringRef Slash = llvm::sys::path::get_separator();
+  llvm::StringRef Slash = llvm::sys::path::get_separator();
 
   switch (GetCXXStdlibType(DriverArgs)) {
   case ToolChain::CST_Libcxx: {

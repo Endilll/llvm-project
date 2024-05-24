@@ -58,7 +58,7 @@ public:
     setABI("abiv2");
   }
 
-  StringRef getABI() const override { return ABI; }
+  llvm::StringRef getABI() const override { return ABI; }
   bool setABI(const std::string &Name) override {
     if (Name == "abiv2" || Name == "abiv1") {
       ABI = Name;
@@ -69,11 +69,11 @@ public:
 
   bool setCPU(const std::string &Name) override;
 
-  bool isValidCPUName(StringRef Name) const override;
+  bool isValidCPUName(llvm::StringRef Name) const override;
 
   unsigned getMinGlobalAlign(uint64_t, bool HasNonWeakDef) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
   BuiltinVaListKind getBuiltinVaListKind() const override {
     return VoidPtrBuiltinVaList;
@@ -86,7 +86,7 @@ public:
 
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
-  bool hasFeature(StringRef Feature) const override;
+  bool hasFeature(llvm::StringRef Feature) const override;
   bool handleTargetFeatures(std::vector<std::string> &Features,
                             DiagnosticsEngine &Diags) override;
 
@@ -96,9 +96,9 @@ public:
   bool hasBitIntType() const override { return true; }
 
 protected:
-  ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
 
-  ArrayRef<GCCRegAlias> getGCCRegAliases() const override;
+  llvm::ArrayRef<GCCRegAlias> getGCCRegAliases() const override;
 };
 
 } // namespace targets

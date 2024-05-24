@@ -41,7 +41,7 @@ template <unsigned NumBuckets, unsigned NumBytes> struct HMapFileMock {
 
   std::unique_ptr<llvm::MemoryBuffer> getBuffer() {
     return llvm::MemoryBuffer::getMemBuffer(
-        StringRef(reinterpret_cast<char *>(this), sizeof(HMapFileMock)),
+        llvm::StringRef(reinterpret_cast<char *>(this), sizeof(HMapFileMock)),
         "header",
         /* RequresNullTerminator */ false);
   }
@@ -53,7 +53,7 @@ template <class FileTy> struct HMapFileMockMaker {
   unsigned BI = 0;
   HMapFileMockMaker(FileTy &File) : File(File) {}
 
-  unsigned addString(StringRef S) {
+  unsigned addString(llvm::StringRef S) {
     assert(SI + S.size() + 1 <= sizeof(File.Bytes));
     std::copy(S.begin(), S.end(), File.Bytes + SI);
     auto OldSI = SI;
@@ -61,7 +61,7 @@ template <class FileTy> struct HMapFileMockMaker {
     return OldSI;
   }
 
-  void addBucket(StringRef Str, unsigned Key, unsigned Prefix,
+  void addBucket(llvm::StringRef Str, unsigned Key, unsigned Prefix,
                  unsigned Suffix) {
     addBucket(getHash(Str), Key, Prefix, Suffix);
   }
@@ -85,7 +85,7 @@ template <class FileTy> struct HMapFileMockMaker {
   }
 
   // The header map hash function.
-  static unsigned getHash(StringRef Str) {
+  static unsigned getHash(llvm::StringRef Str) {
     unsigned Result = 0;
     for (char C : Str)
       Result += toLowercase(C) * 13;

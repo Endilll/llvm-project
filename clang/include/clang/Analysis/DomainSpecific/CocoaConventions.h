@@ -23,8 +23,8 @@ class QualType;
 namespace ento {
 namespace cocoa {
 
-  bool isRefType(QualType RetTy, StringRef Prefix,
-                 StringRef Name = StringRef());
+  bool isRefType(QualType RetTy, llvm::StringRef Prefix,
+                 llvm::StringRef Name = llvm::StringRef());
 
   bool isCocoaObjectRef(QualType T);
 

@@ -225,7 +225,7 @@ ObjCPropertyDecl::findPropertyDecl(const DeclContext *DC,
 
 IdentifierInfo *
 ObjCPropertyDecl::getDefaultSynthIvarName(ASTContext &Ctx) const {
-  SmallString<128> ivarName;
+  llvm::SmallString<128> ivarName;
   {
     llvm::raw_svector_ostream os(ivarName);
     os << '_' << getIdentifier()->getName();
@@ -454,7 +454,7 @@ void ObjCInterfaceDecl::mergeClassExtensionProtocolList(
   // Check for duplicate protocol in class's protocol list.
   // This is O(n*m). But it is extremely rare and number of protocols in
   // class or its extension are very few.
-  SmallVector<ObjCProtocolDecl *, 8> ProtocolRefs;
+  llvm::SmallVector<ObjCProtocolDecl *, 8> ProtocolRefs;
   for (unsigned i = 0; i < ExtNum; i++) {
     bool protocolExists = false;
     ObjCProtocolDecl *ProtoInExtension = ExtList[i];
@@ -918,8 +918,8 @@ void ObjCMethodDecl::setAsRedeclaration(const ObjCMethodDecl *PrevMethod) {
 }
 
 void ObjCMethodDecl::setParamsAndSelLocs(ASTContext &C,
-                                         ArrayRef<ParmVarDecl*> Params,
-                                         ArrayRef<SourceLocation> SelLocs) {
+                                         llvm::ArrayRef<ParmVarDecl*> Params,
+                                         llvm::ArrayRef<SourceLocation> SelLocs) {
   ParamsAndSelLocs = nullptr;
   NumParams = Params.size();
   if (Params.empty() && SelLocs.empty())
@@ -936,14 +936,14 @@ void ObjCMethodDecl::setParamsAndSelLocs(ASTContext &C,
 }
 
 void ObjCMethodDecl::getSelectorLocs(
-                               SmallVectorImpl<SourceLocation> &SelLocs) const {
+                               llvm::SmallVectorImpl<SourceLocation> &SelLocs) const {
   for (unsigned i = 0, e = getNumSelectorLocs(); i != e; ++i)
     SelLocs.push_back(getSelectorLoc(i));
 }
 
 void ObjCMethodDecl::setMethodParams(ASTContext &C,
-                                     ArrayRef<ParmVarDecl*> Params,
-                                     ArrayRef<SourceLocation> SelLocs) {
+                                     llvm::ArrayRef<ParmVarDecl*> Params,
+                                     llvm::ArrayRef<SourceLocation> SelLocs) {
   assert((!SelLocs.empty() || isImplicit()) &&
          "No selector locs for non-implicit method");
   if (isImplicit())
@@ -1251,7 +1251,7 @@ QualType ObjCMethodDecl::getSendResultType(QualType receiverType) const {
 
 static void CollectOverriddenMethodsRecurse(const ObjCContainerDecl *Container,
                                             const ObjCMethodDecl *Method,
-                               SmallVectorImpl<const ObjCMethodDecl *> &Methods,
+                               llvm::SmallVectorImpl<const ObjCMethodDecl *> &Methods,
                                             bool MovedToSuper) {
   if (!Container)
     return;
@@ -1311,13 +1311,13 @@ static void CollectOverriddenMethodsRecurse(const ObjCContainerDecl *Container,
 
 static inline void CollectOverriddenMethods(const ObjCContainerDecl *Container,
                                             const ObjCMethodDecl *Method,
-                             SmallVectorImpl<const ObjCMethodDecl *> &Methods) {
+                             llvm::SmallVectorImpl<const ObjCMethodDecl *> &Methods) {
   CollectOverriddenMethodsRecurse(Container, Method, Methods,
                                   /*MovedToSuper=*/false);
 }
 
 static void collectOverriddenMethodsSlow(const ObjCMethodDecl *Method,
-                          SmallVectorImpl<const ObjCMethodDecl *> &overridden) {
+                          llvm::SmallVectorImpl<const ObjCMethodDecl *> &overridden) {
   assert(Method->isOverriding());
 
   if (const auto *ProtD =
@@ -1358,7 +1358,7 @@ static void collectOverriddenMethodsSlow(const ObjCMethodDecl *Method,
 }
 
 void ObjCMethodDecl::getOverriddenMethods(
-                    SmallVectorImpl<const ObjCMethodDecl *> &Overridden) const {
+                    llvm::SmallVectorImpl<const ObjCMethodDecl *> &Overridden) const {
   const ObjCMethodDecl *Method = this;
 
   if (Method->isRedeclaration()) {
@@ -1453,7 +1453,7 @@ ObjCMethodDecl::findPropertyDecl(bool CheckOverrides) const {
   if (!CheckOverrides)
     return nullptr;
 
-  using OverridesTy = SmallVector<const ObjCMethodDecl *, 8>;
+  using OverridesTy = llvm::SmallVector<const ObjCMethodDecl *, 8>;
 
   OverridesTy Overrides;
   getOverriddenMethods(Overrides);
@@ -1511,7 +1511,7 @@ SourceRange ObjCTypeParamDecl::getSourceRange() const {
 // ObjCTypeParamList
 //===----------------------------------------------------------------------===//
 ObjCTypeParamList::ObjCTypeParamList(SourceLocation lAngleLoc,
-                                     ArrayRef<ObjCTypeParamDecl *> typeParams,
+                                     llvm::ArrayRef<ObjCTypeParamDecl *> typeParams,
                                      SourceLocation rAngleLoc)
     : Brackets(lAngleLoc, rAngleLoc), NumParams(typeParams.size()) {
   std::copy(typeParams.begin(), typeParams.end(), begin());
@@ -1520,7 +1520,7 @@ ObjCTypeParamList::ObjCTypeParamList(SourceLocation lAngleLoc,
 ObjCTypeParamList *ObjCTypeParamList::create(
                      ASTContext &ctx,
                      SourceLocation lAngleLoc,
-                     ArrayRef<ObjCTypeParamDecl *> typeParams,
+                     llvm::ArrayRef<ObjCTypeParamDecl *> typeParams,
                      SourceLocation rAngleLoc) {
   void *mem =
       ctx.Allocate(totalSizeToAlloc<ObjCTypeParamDecl *>(typeParams.size()),
@@ -1529,7 +1529,7 @@ ObjCTypeParamList *ObjCTypeParamList::create(
 }
 
 void ObjCTypeParamList::gatherDefaultTypeArgs(
-       SmallVectorImpl<QualType> &typeArgs) const {
+       llvm::SmallVectorImpl<QualType> &typeArgs) const {
   typeArgs.reserve(size());
   for (auto *typeParam : *this)
     typeArgs.push_back(typeParam->getUnderlyingType());
@@ -1609,7 +1609,7 @@ bool ObjCInterfaceDecl::hasDesignatedInitializers() const {
   return data().HasDesignatedInitializers;
 }
 
-StringRef
+llvm::StringRef
 ObjCInterfaceDecl::getObjCRuntimeNameAsString() const {
   if (const auto *ObjCRTName = getAttr<ObjCRuntimeNameAttr>())
     return ObjCRTName->getMetadataName();
@@ -1617,7 +1617,7 @@ ObjCInterfaceDecl::getObjCRuntimeNameAsString() const {
   return getName();
 }
 
-StringRef
+llvm::StringRef
 ObjCImplementationDecl::getObjCRuntimeNameAsString() const {
   if (ObjCInterfaceDecl *ID =
       const_cast<ObjCImplementationDecl*>(this)->getClassInterface())
@@ -1711,7 +1711,7 @@ ObjCIvarDecl *ObjCInterfaceDecl::all_declared_ivar_begin() {
   if (ObjCImplementationDecl *ImplDecl = getImplementation()) {
     data().IvarListMissingImplementation = false;
     if (!ImplDecl->ivar_empty()) {
-      SmallVector<SynthesizeIvarChunk, 16> layout;
+      llvm::SmallVector<SynthesizeIvarChunk, 16> layout;
       for (auto *IV : ImplDecl->ivars()) {
         if (IV->getSynthesize() && !IV->isInvalidDecl()) {
           layout.push_back(SynthesizeIvarChunk(
@@ -2073,7 +2073,7 @@ void ObjCProtocolDecl::collectInheritedProtocolProperties(
   }
 }
 
-StringRef
+llvm::StringRef
 ObjCProtocolDecl::getObjCRuntimeNameAsString() const {
   if (const auto *ObjCRTName = getAttr<ObjCRuntimeNameAttr>())
     return ObjCRTName->getMetadataName();
@@ -2268,7 +2268,7 @@ FindPropertyImplDecl(IdentifierInfo *Id,
   return nullptr;
 }
 
-raw_ostream &clang::operator<<(raw_ostream &OS,
+llvm::raw_ostream &clang::operator<<(llvm::raw_ostream &OS,
                                const ObjCCategoryImplDecl &CID) {
   OS << CID.getName();
   return OS;
@@ -2319,7 +2319,7 @@ ObjCImplementationDecl::init_begin() const {
   return IvarInitializers.get(getASTContext().getExternalSource());
 }
 
-raw_ostream &clang::operator<<(raw_ostream &OS,
+llvm::raw_ostream &clang::operator<<(llvm::raw_ostream &OS,
                                const ObjCImplementationDecl &ID) {
   OS << ID.getName();
   return OS;

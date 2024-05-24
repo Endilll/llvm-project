@@ -24,7 +24,7 @@ namespace tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/macro-usage.html
 class MacroUsageCheck : public ClangTidyCheck {
 public:
-  MacroUsageCheck(StringRef Name, ClangTidyContext *Context)
+  MacroUsageCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         AllowedRegexp(Options.get("AllowedRegexp", "^DEBUG_*")),
         CheckCapsOnly(Options.get("CheckCapsOnly", false)),
@@ -35,8 +35,8 @@ public:
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;
-  void warnMacro(const MacroDirective *MD, StringRef MacroName);
-  void warnNaming(const MacroDirective *MD, StringRef MacroName);
+  void warnMacro(const MacroDirective *MD, llvm::StringRef MacroName);
+  void warnNaming(const MacroDirective *MD, llvm::StringRef MacroName);
 
 private:
   /// A regular expression that defines how allowed macros must look like.

@@ -112,8 +112,8 @@ public:
 
   Stmt::child_range getStmtChildren(Stmt *S) { return S->children(); }
 
-  SmallVector<Stmt *, 8> getStmtChildren(CXXOperatorCallExpr *CE) {
-    SmallVector<Stmt *, 8> Children(CE->children());
+  llvm::SmallVector<Stmt *, 8> getStmtChildren(CXXOperatorCallExpr *CE) {
+    llvm::SmallVector<Stmt *, 8> Children(CE->children());
     bool Swap;
     // Switch the operator and the first operand for all infix and postfix
     // operations.

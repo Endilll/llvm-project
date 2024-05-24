@@ -770,7 +770,7 @@ findMethodDecl(const ObjCMessageExpr *MessageExpr,
 /// information, or null pointer when the returned type is not an
 /// ObjCObjectPointerType.
 static QualType getReturnTypeForMethod(
-    const ObjCMethodDecl *Method, ArrayRef<QualType> TypeArgs,
+    const ObjCMethodDecl *Method, llvm::ArrayRef<QualType> TypeArgs,
     const ObjCObjectPointerType *SelfType, ASTContext &C) {
   QualType StaticResultType = Method->getReturnType();
 
@@ -845,7 +845,7 @@ void DynamicTypePropagation::checkPreObjCMessage(const ObjCMethodCall &M,
       return;
   }
 
-  std::optional<ArrayRef<QualType>> TypeArgs =
+  std::optional<llvm::ArrayRef<QualType>> TypeArgs =
       (*TrackedType)->getObjCSubstitutions(Method->getDeclContext());
   // This case might happen when there is an unspecialized override of a
   // specialized method.
@@ -978,7 +978,7 @@ void DynamicTypePropagation::checkPostObjCMessage(const ObjCMethodCall &M,
   if (!Method)
     return;
 
-  std::optional<ArrayRef<QualType>> TypeArgs =
+  std::optional<llvm::ArrayRef<QualType>> TypeArgs =
       (*TrackedType)->getObjCSubstitutions(Method->getDeclContext());
   if (!TypeArgs)
     return;
@@ -1024,7 +1024,7 @@ void DynamicTypePropagation::reportGenericsBug(
     return;
 
   initBugType();
-  SmallString<192> Buf;
+  llvm::SmallString<192> Buf;
   llvm::raw_svector_ostream OS(Buf);
   OS << "Conversion from value of type '";
   QualType::print(From, Qualifiers(), OS, C.getLangOpts(), llvm::Twine());
@@ -1063,7 +1063,7 @@ PathDiagnosticPieceRef DynamicTypePropagation::GenericsBugVisitor::VisitNode(
 
   const LangOptions &LangOpts = BRC.getASTContext().getLangOpts();
 
-  SmallString<256> Buf;
+  llvm::SmallString<256> Buf;
   llvm::raw_svector_ostream OS(Buf);
   OS << "Type '";
   QualType::print(*TrackedType, Qualifiers(), OS, LangOpts, llvm::Twine());

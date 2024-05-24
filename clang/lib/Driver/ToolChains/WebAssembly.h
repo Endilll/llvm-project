@@ -77,7 +77,7 @@ private:
 
   std::string getMultiarchTriple(const Driver &D,
                                  const llvm::Triple &TargetTriple,
-                                 StringRef SysRoot) const override;
+                                 llvm::StringRef SysRoot) const override;
 
   void addLibCxxIncludePaths(const llvm::opt::ArgList &DriverArgs,
                              llvm::opt::ArgStringList &CC1Args) const;

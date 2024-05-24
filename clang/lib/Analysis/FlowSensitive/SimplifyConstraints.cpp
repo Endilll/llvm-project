@@ -94,7 +94,7 @@ void simplifyConstraints(llvm::SetVector<const Formula *> &Constraints,
           FalseAtoms.insert(Constraint->operands()[0]->getAtom());
         break;
       case Formula::Equal: {
-        ArrayRef<const Formula *> operands = Constraint->operands();
+        llvm::ArrayRef<const Formula *> operands = Constraint->operands();
         if (operands[0]->kind() == Formula::AtomRef &&
             operands[1]->kind() == Formula::AtomRef) {
           EquivalentAtoms.unionSets(operands[0]->getAtom(),

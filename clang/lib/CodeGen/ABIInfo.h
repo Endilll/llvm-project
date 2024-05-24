@@ -114,13 +114,13 @@ public:
                                                    bool Realign = false) const;
 
   virtual void appendAttributeMangling(TargetAttr *Attr,
-                                       raw_ostream &Out) const;
+                                       llvm::raw_ostream &Out) const;
   virtual void appendAttributeMangling(TargetVersionAttr *Attr,
-                                       raw_ostream &Out) const;
+                                       llvm::raw_ostream &Out) const;
   virtual void appendAttributeMangling(TargetClonesAttr *Attr, unsigned Index,
-                                       raw_ostream &Out) const;
-  virtual void appendAttributeMangling(StringRef AttrStr,
-                                       raw_ostream &Out) const;
+                                       llvm::raw_ostream &Out) const;
+  virtual void appendAttributeMangling(llvm::StringRef AttrStr,
+                                       llvm::raw_ostream &Out) const;
 };
 
 /// Target specific hooks for defining how a type should be passed or returned
@@ -130,7 +130,7 @@ protected:
   CodeGenTypes &CGT;
   bool SwiftErrorInRegister;
 
-  bool occupiesMoreThan(ArrayRef<llvm::Type *> scalarTypes,
+  bool occupiesMoreThan(llvm::ArrayRef<llvm::Type *> scalarTypes,
                         unsigned maxAllRegisters) const;
 
 public:
@@ -141,7 +141,7 @@ public:
 
   /// Returns true if an aggregate which expands to the given type sequence
   /// should be passed / returned indirectly.
-  virtual bool shouldPassIndirectly(ArrayRef<llvm::Type *> ComponentTys,
+  virtual bool shouldPassIndirectly(llvm::ArrayRef<llvm::Type *> ComponentTys,
                                     bool AsReturnValue) const;
 
   /// Returns true if the given vector type is legal from Swift's calling

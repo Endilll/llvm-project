@@ -236,7 +236,7 @@ llvm::Function *CodeGenFunction::createAtExitStub(const VarDecl &VD,
                                                   llvm::Constant *addr) {
   // Get the destructor function type, void(*)(void).
   llvm::FunctionType *ty = llvm::FunctionType::get(CGM.VoidTy, false);
-  SmallString<256> FnName;
+  llvm::SmallString<256> FnName;
   {
     llvm::raw_svector_ostream Out(FnName);
     CGM.getCXXABI().getMangleContext().mangleDynamicAtExitDestructor(&VD, Out);
@@ -271,7 +271,7 @@ llvm::Function *CodeGenFunction::createAtExitStub(const VarDecl &VD,
 llvm::Function *CodeGenFunction::createTLSAtExitStub(
     const VarDecl &D, llvm::FunctionCallee Dtor, llvm::Constant *Addr,
     llvm::FunctionCallee &AtExit) {
-  SmallString<256> FnName;
+  llvm::SmallString<256> FnName;
   {
     llvm::raw_svector_ostream Out(FnName);
     CGM.getCXXABI().getMangleContext().mangleDynamicAtExitDestructor(&D, Out);
@@ -434,7 +434,7 @@ void CodeGenFunction::EmitCXXGuardedInitBranch(llvm::Value *NeedsInit,
 }
 
 llvm::Function *CodeGenModule::CreateGlobalInitOrCleanUpFunction(
-    llvm::FunctionType *FTy, const Twine &Name, const CGFunctionInfo &FI,
+    llvm::FunctionType *FTy, const llvm::Twine &Name, const CGFunctionInfo &FI,
     SourceLocation Loc, bool TLS, llvm::GlobalVariable::LinkageTypes Linkage) {
   llvm::Function *Fn = llvm::Function::Create(FTy, Linkage, Name, &getModule());
 
@@ -534,7 +534,7 @@ CodeGenModule::EmitCXXGlobalVarDeclInitFunc(const VarDecl *D,
     return;
 
   llvm::FunctionType *FTy = llvm::FunctionType::get(VoidTy, false);
-  SmallString<256> FnName;
+  llvm::SmallString<256> FnName;
   {
     llvm::raw_svector_ostream Out(FnName);
     getCXXABI().getMangleContext().mangleDynamicInitializer(D, Out);
@@ -690,7 +690,7 @@ void CodeGenModule::EmitCXXModuleInitFunc(Module *Primary) {
       AllImports.insert(M);
   }
 
-  SmallVector<llvm::Function *, 8> ModuleInits;
+  llvm::SmallVector<llvm::Function *, 8> ModuleInits;
   for (Module *M : AllImports) {
     // No Itanium initializer in header like modules.
     if (M->isHeaderLikeModule())
@@ -700,7 +700,7 @@ void CodeGenModule::EmitCXXModuleInitFunc(Module *Primary) {
     if (!M->isNamedModuleInterfaceHasInit())
       continue;
     llvm::FunctionType *FTy = llvm::FunctionType::get(VoidTy, false);
-    SmallString<256> FnName;
+    llvm::SmallString<256> FnName;
     {
       llvm::raw_svector_ostream Out(FnName);
       cast<ItaniumMangleContext>(getCXXABI().getMangleContext())
@@ -716,14 +716,14 @@ void CodeGenModule::EmitCXXModuleInitFunc(Module *Primary) {
   // Add any initializers with specified priority; this uses the same  approach
   // as EmitCXXGlobalInitFunc().
   if (!PrioritizedCXXGlobalInits.empty()) {
-    SmallVector<llvm::Function *, 8> LocalCXXGlobalInits;
+    llvm::SmallVector<llvm::Function *, 8> LocalCXXGlobalInits;
     llvm::array_pod_sort(PrioritizedCXXGlobalInits.begin(),
                          PrioritizedCXXGlobalInits.end());
-    for (SmallVectorImpl<GlobalInitData>::iterator
+    for (llvm::SmallVectorImpl<GlobalInitData>::iterator
              I = PrioritizedCXXGlobalInits.begin(),
              E = PrioritizedCXXGlobalInits.end();
          I != E;) {
-      SmallVectorImpl<GlobalInitData>::iterator PrioE =
+      llvm::SmallVectorImpl<GlobalInitData>::iterator PrioE =
           std::upper_bound(I + 1, E, *I, GlobalInitPriorityCmp());
 
       for (; I < PrioE; ++I)
@@ -744,7 +744,7 @@ void CodeGenModule::EmitCXXModuleInitFunc(Module *Primary) {
   // multiple times via nested use).
   llvm::Function *Fn;
   {
-    SmallString<256> InitFnName;
+    llvm::SmallString<256> InitFnName;
     llvm::raw_svector_ostream Out(InitFnName);
     cast<ItaniumMangleContext>(getCXXABI().getMangleContext())
         .mangleModuleInitializer(Primary, Out);
@@ -796,8 +796,8 @@ void CodeGenModule::EmitCXXModuleInitFunc(Module *Primary) {
   ModuleInits.clear();
 }
 
-static SmallString<128> getTransformedFileName(llvm::Module &M) {
-  SmallString<128> FileName = llvm::sys::path::filename(M.getName());
+static llvm::SmallString<128> getTransformedFileName(llvm::Module &M) {
+  llvm::SmallString<128> FileName = llvm::sys::path::filename(M.getName());
 
   if (FileName.empty())
     FileName = "<null>";
@@ -829,14 +829,14 @@ CodeGenModule::EmitCXXGlobalInitFunc() {
     CXXGlobalInits.pop_back();
 
   // When we import C++20 modules, we must run their initializers first.
-  SmallVector<llvm::Function *, 8> ModuleInits;
+  llvm::SmallVector<llvm::Function *, 8> ModuleInits;
   if (CXX20ModuleInits)
     for (Module *M : ImportedModules) {
       // No Itanium initializer in header like modules.
       if (M->isHeaderLikeModule())
         continue;
       llvm::FunctionType *FTy = llvm::FunctionType::get(VoidTy, false);
-      SmallString<256> FnName;
+      llvm::SmallString<256> FnName;
       {
         llvm::raw_svector_ostream Out(FnName);
         cast<ItaniumMangleContext>(getCXXABI().getMangleContext())
@@ -858,16 +858,16 @@ CodeGenModule::EmitCXXGlobalInitFunc() {
 
   // Create our global prioritized initialization function.
   if (!PrioritizedCXXGlobalInits.empty()) {
-    SmallVector<llvm::Function *, 8> LocalCXXGlobalInits;
+    llvm::SmallVector<llvm::Function *, 8> LocalCXXGlobalInits;
     llvm::array_pod_sort(PrioritizedCXXGlobalInits.begin(),
                          PrioritizedCXXGlobalInits.end());
     // Iterate over "chunks" of ctors with same priority and emit each chunk
     // into separate function. Note - everything is sorted first by priority,
     // second - by lex order, so we emit ctor functions in proper order.
-    for (SmallVectorImpl<GlobalInitData >::iterator
+    for (llvm::SmallVectorImpl<GlobalInitData >::iterator
            I = PrioritizedCXXGlobalInits.begin(),
            E = PrioritizedCXXGlobalInits.end(); I != E; ) {
-      SmallVectorImpl<GlobalInitData >::iterator
+      llvm::SmallVectorImpl<GlobalInitData >::iterator
         PrioE = std::upper_bound(I + 1, E, *I, GlobalInitPriorityCmp());
 
       LocalCXXGlobalInits.clear();
@@ -907,7 +907,7 @@ CodeGenModule::EmitCXXGlobalInitFunc() {
   llvm::Function *Fn;
   if (CXX20ModuleInits && getContext().getCurrentNamedModule() &&
       !getContext().getCurrentNamedModule()->isModuleImplementation()) {
-    SmallString<256> InitFnName;
+    llvm::SmallString<256> InitFnName;
     llvm::raw_svector_ostream Out(InitFnName);
     cast<ItaniumMangleContext>(getCXXABI().getMangleContext())
         .mangleModuleInitializer(getContext().getCurrentNamedModule(), Out);
@@ -956,17 +956,17 @@ void CodeGenModule::EmitCXXGlobalCleanUpFunc() {
 
   // Create our global prioritized cleanup function.
   if (!PrioritizedCXXStermFinalizers.empty()) {
-    SmallVector<CXXGlobalDtorsOrStermFinalizer_t, 8> LocalCXXStermFinalizers;
+    llvm::SmallVector<CXXGlobalDtorsOrStermFinalizer_t, 8> LocalCXXStermFinalizers;
     llvm::array_pod_sort(PrioritizedCXXStermFinalizers.begin(),
                          PrioritizedCXXStermFinalizers.end());
     // Iterate over "chunks" of dtors with same priority and emit each chunk
     // into separate function. Note - everything is sorted first by priority,
     // second - by lex order, so we emit dtor functions in proper order.
-    for (SmallVectorImpl<StermFinalizerData>::iterator
+    for (llvm::SmallVectorImpl<StermFinalizerData>::iterator
              I = PrioritizedCXXStermFinalizers.begin(),
              E = PrioritizedCXXStermFinalizers.end();
          I != E;) {
-      SmallVectorImpl<StermFinalizerData>::iterator PrioE =
+      llvm::SmallVectorImpl<StermFinalizerData>::iterator PrioE =
           std::upper_bound(I + 1, E, *I, StermFinalizerPriorityCmp());
 
       LocalCXXStermFinalizers.clear();
@@ -1041,7 +1041,7 @@ void CodeGenFunction::GenerateCXXGlobalVarDeclInitFunc(llvm::Function *Fn,
 
 void
 CodeGenFunction::GenerateCXXGlobalInitFunc(llvm::Function *Fn,
-                                           ArrayRef<llvm::Function *> Decls,
+                                           llvm::ArrayRef<llvm::Function *> Decls,
                                            ConstantAddress Guard) {
   {
     auto NL = ApplyDebugLocation::CreateEmpty(*this);
@@ -1100,7 +1100,7 @@ CodeGenFunction::GenerateCXXGlobalInitFunc(llvm::Function *Fn,
 
 void CodeGenFunction::GenerateCXXGlobalCleanUpFunc(
     llvm::Function *Fn,
-    ArrayRef<std::tuple<llvm::FunctionType *, llvm::WeakTrackingVH,
+    llvm::ArrayRef<std::tuple<llvm::FunctionType *, llvm::WeakTrackingVH,
                         llvm::Constant *>>
         DtorsOrStermFinalizers) {
   {

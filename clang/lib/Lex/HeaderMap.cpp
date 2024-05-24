@@ -30,7 +30,7 @@ using namespace clang;
 /// HashHMapKey - This is the 'well known' hash function required by the file
 /// format, used to look up keys in the hash table.  The hash table uses simple
 /// linear probing based on this function.
-static inline unsigned HashHMapKey(StringRef Str) {
+static inline unsigned HashHMapKey(llvm::StringRef Str) {
   unsigned Result = 0;
   const char *S = Str.begin(), *End = Str.end();
 
@@ -106,7 +106,7 @@ bool HeaderMapImpl::checkHeader(const llvm::MemoryBuffer &File,
 
 
 /// getFileName - Return the filename of the headermap.
-StringRef HeaderMapImpl::getFileName() const {
+llvm::StringRef HeaderMapImpl::getFileName() const {
   return FileBuffer->getBufferIdentifier();
 }
 
@@ -145,7 +145,7 @@ HMapBucket HeaderMapImpl::getBucket(unsigned BucketNo) const {
   return Result;
 }
 
-std::optional<StringRef> HeaderMapImpl::getString(unsigned StrTabIdx) const {
+std::optional<llvm::StringRef> HeaderMapImpl::getString(unsigned StrTabIdx) const {
   // Add the start of the string table to the idx.
   StrTabIdx += getEndianAdjustedWord(getHeader().StringsOffset);
 
@@ -161,7 +161,7 @@ std::optional<StringRef> HeaderMapImpl::getString(unsigned StrTabIdx) const {
   if (Len == MaxLen && Data[Len - 1])
     return std::nullopt;
 
-  return StringRef(Data, Len);
+  return llvm::StringRef(Data, Len);
 }
 
 //===----------------------------------------------------------------------===//
@@ -176,8 +176,8 @@ LLVM_DUMP_METHOD void HeaderMapImpl::dump() const {
   llvm::dbgs() << "Header Map " << getFileName() << ":\n  " << NumBuckets
                << ", " << getEndianAdjustedWord(Hdr.NumEntries) << "\n";
 
-  auto getStringOrInvalid = [this](unsigned Id) -> StringRef {
-    if (std::optional<StringRef> S = getString(Id))
+  auto getStringOrInvalid = [this](unsigned Id) -> llvm::StringRef {
+    if (std::optional<llvm::StringRef> S = getString(Id))
       return *S;
     return "<invalid>";
   };
@@ -186,16 +186,16 @@ LLVM_DUMP_METHOD void HeaderMapImpl::dump() const {
     HMapBucket B = getBucket(i);
     if (B.Key == HMAP_EmptyBucketKey) continue;
 
-    StringRef Key = getStringOrInvalid(B.Key);
-    StringRef Prefix = getStringOrInvalid(B.Prefix);
-    StringRef Suffix = getStringOrInvalid(B.Suffix);
+    llvm::StringRef Key = getStringOrInvalid(B.Key);
+    llvm::StringRef Prefix = getStringOrInvalid(B.Prefix);
+    llvm::StringRef Suffix = getStringOrInvalid(B.Suffix);
     llvm::dbgs() << "  " << i << ". " << Key << " -> '" << Prefix << "' '"
                  << Suffix << "'\n";
   }
 }
 
-StringRef HeaderMapImpl::lookupFilename(StringRef Filename,
-                                        SmallVectorImpl<char> &DestPath) const {
+llvm::StringRef HeaderMapImpl::lookupFilename(llvm::StringRef Filename,
+                                        llvm::SmallVectorImpl<char> &DestPath) const {
   const HMapHeader &Hdr = getHeader();
   unsigned NumBuckets = getEndianAdjustedWord(Hdr.NumBuckets);
 
@@ -205,10 +205,10 @@ StringRef HeaderMapImpl::lookupFilename(StringRef Filename,
   // Linearly probe the hash table.
   for (unsigned Bucket = HashHMapKey(Filename);; ++Bucket) {
     HMapBucket B = getBucket(Bucket & (NumBuckets-1));
-    if (B.Key == HMAP_EmptyBucketKey) return StringRef(); // Hash miss.
+    if (B.Key == HMAP_EmptyBucketKey) return llvm::StringRef(); // Hash miss.
 
     // See if the key matches.  If not, probe on.
-    std::optional<StringRef> Key = getString(B.Key);
+    std::optional<llvm::StringRef> Key = getString(B.Key);
     if (LLVM_UNLIKELY(!Key))
       continue;
     if (!Filename.equals_insensitive(*Key))
@@ -216,38 +216,38 @@ StringRef HeaderMapImpl::lookupFilename(StringRef Filename,
 
     // If so, we have a match in the hash table.  Construct the destination
     // path.
-    std::optional<StringRef> Prefix = getString(B.Prefix);
-    std::optional<StringRef> Suffix = getString(B.Suffix);
+    std::optional<llvm::StringRef> Prefix = getString(B.Prefix);
+    std::optional<llvm::StringRef> Suffix = getString(B.Suffix);
 
     DestPath.clear();
     if (LLVM_LIKELY(Prefix && Suffix)) {
       DestPath.append(Prefix->begin(), Prefix->end());
       DestPath.append(Suffix->begin(), Suffix->end());
     }
-    return StringRef(DestPath.begin(), DestPath.size());
+    return llvm::StringRef(DestPath.begin(), DestPath.size());
   }
 }
 
-StringRef HeaderMapImpl::reverseLookupFilename(StringRef DestPath) const {
+llvm::StringRef HeaderMapImpl::reverseLookupFilename(llvm::StringRef DestPath) const {
   if (!ReverseMap.empty())
     return ReverseMap.lookup(DestPath);
 
   const HMapHeader &Hdr = getHeader();
   unsigned NumBuckets = getEndianAdjustedWord(Hdr.NumBuckets);
-  StringRef RetKey;
+  llvm::StringRef RetKey;
   for (unsigned i = 0; i != NumBuckets; ++i) {
     HMapBucket B = getBucket(i);
     if (B.Key == HMAP_EmptyBucketKey)
       continue;
 
-    std::optional<StringRef> Key = getString(B.Key);
-    std::optional<StringRef> Prefix = getString(B.Prefix);
-    std::optional<StringRef> Suffix = getString(B.Suffix);
+    std::optional<llvm::StringRef> Key = getString(B.Key);
+    std::optional<llvm::StringRef> Prefix = getString(B.Prefix);
+    std::optional<llvm::StringRef> Suffix = getString(B.Suffix);
     if (LLVM_LIKELY(Key && Prefix && Suffix)) {
-      SmallVector<char, 1024> Buf;
+      llvm::SmallVector<char, 1024> Buf;
       Buf.append(Prefix->begin(), Prefix->end());
       Buf.append(Suffix->begin(), Suffix->end());
-      StringRef Value(Buf.begin(), Buf.size());
+      llvm::StringRef Value(Buf.begin(), Buf.size());
       ReverseMap[Value] = *Key;
 
       if (DestPath == Value)

@@ -785,10 +785,10 @@ Sema::ActOnDecompositionDeclarator(Scope *S, Declarator &D,
   {
     // Note: While constrained-auto needs to be checked, we do so separately so
     // we can emit a better diagnostic.
-    SmallVector<StringRef, 8> BadSpecifiers;
-    SmallVector<SourceLocation, 8> BadSpecifierLocs;
-    SmallVector<StringRef, 8> CPlusPlus20Specifiers;
-    SmallVector<SourceLocation, 8> CPlusPlus20SpecifierLocs;
+    llvm::SmallVector<llvm::StringRef, 8> BadSpecifiers;
+    llvm::SmallVector<SourceLocation, 8> BadSpecifierLocs;
+    llvm::SmallVector<llvm::StringRef, 8> CPlusPlus20Specifiers;
+    llvm::SmallVector<SourceLocation, 8> CPlusPlus20SpecifierLocs;
     if (auto SCS = DS.getStorageClassSpec()) {
       if (SCS == DeclSpec::SCS_static) {
         CPlusPlus20Specifiers.push_back(DeclSpec::getSpecifierName(SCS));
@@ -887,7 +887,7 @@ Sema::ActOnDecompositionDeclarator(Scope *S, Declarator &D,
   }
 
   // Build the BindingDecls.
-  SmallVector<BindingDecl*, 8> Bindings;
+  llvm::SmallVector<BindingDecl*, 8> Bindings;
 
   // Build the BindingDecls.
   for (auto &B : D.getDecompositionDeclarator().bindings()) {
@@ -973,7 +973,7 @@ Sema::ActOnDecompositionDeclarator(Scope *S, Declarator &D,
 }
 
 static bool checkSimpleDecomposition(
-    Sema &S, ArrayRef<BindingDecl *> Bindings, ValueDecl *Src,
+    Sema &S, llvm::ArrayRef<BindingDecl *> Bindings, ValueDecl *Src,
     QualType DecompType, const llvm::APSInt &NumElems, QualType ElemType,
     llvm::function_ref<ExprResult(SourceLocation, Expr *, unsigned)> GetInit) {
   if ((int64_t)Bindings.size() != NumElems) {
@@ -1000,7 +1000,7 @@ static bool checkSimpleDecomposition(
 }
 
 static bool checkArrayLikeDecomposition(Sema &S,
-                                        ArrayRef<BindingDecl *> Bindings,
+                                        llvm::ArrayRef<BindingDecl *> Bindings,
                                         ValueDecl *Src, QualType DecompType,
                                         const llvm::APSInt &NumElems,
                                         QualType ElemType) {
@@ -1014,7 +1014,7 @@ static bool checkArrayLikeDecomposition(Sema &S,
       });
 }
 
-static bool checkArrayDecomposition(Sema &S, ArrayRef<BindingDecl*> Bindings,
+static bool checkArrayDecomposition(Sema &S, llvm::ArrayRef<BindingDecl*> Bindings,
                                     ValueDecl *Src, QualType DecompType,
                                     const ConstantArrayType *CAT) {
   return checkArrayLikeDecomposition(S, Bindings, Src, DecompType,
@@ -1022,7 +1022,7 @@ static bool checkArrayDecomposition(Sema &S, ArrayRef<BindingDecl*> Bindings,
                                      CAT->getElementType());
 }
 
-static bool checkVectorDecomposition(Sema &S, ArrayRef<BindingDecl*> Bindings,
+static bool checkVectorDecomposition(Sema &S, llvm::ArrayRef<BindingDecl*> Bindings,
                                      ValueDecl *Src, QualType DecompType,
                                      const VectorType *VT) {
   return checkArrayLikeDecomposition(
@@ -1032,7 +1032,7 @@ static bool checkVectorDecomposition(Sema &S, ArrayRef<BindingDecl*> Bindings,
 }
 
 static bool checkComplexDecomposition(Sema &S,
-                                      ArrayRef<BindingDecl *> Bindings,
+                                      llvm::ArrayRef<BindingDecl *> Bindings,
                                       ValueDecl *Src, QualType DecompType,
                                       const ComplexType *CT) {
   return checkSimpleDecomposition(
@@ -1047,7 +1047,7 @@ static bool checkComplexDecomposition(Sema &S,
 static std::string printTemplateArgs(const PrintingPolicy &PrintingPolicy,
                                      TemplateArgumentListInfo &Args,
                                      const TemplateParameterList *Params) {
-  SmallString<128> SS;
+  llvm::SmallString<128> SS;
   llvm::raw_svector_ostream OS(SS);
   bool First = true;
   unsigned I = 0;
@@ -1064,7 +1064,7 @@ static std::string printTemplateArgs(const PrintingPolicy &PrintingPolicy,
 }
 
 static bool lookupStdTypeTraitMember(Sema &S, LookupResult &TraitMemberLookup,
-                                     SourceLocation Loc, StringRef Trait,
+                                     SourceLocation Loc, llvm::StringRef Trait,
                                      TemplateArgumentListInfo &Args,
                                      unsigned DiagID) {
   auto DiagnoseMissing = [&] {
@@ -1228,7 +1228,7 @@ struct InitializingBinding {
 }
 
 static bool checkTupleLikeDecomposition(Sema &S,
-                                        ArrayRef<BindingDecl *> Bindings,
+                                        llvm::ArrayRef<BindingDecl *> Bindings,
                                         VarDecl *Src, QualType DecompType,
                                         const llvm::APSInt &TupleSize) {
   if ((int64_t)Bindings.size() != TupleSize) {
@@ -1438,7 +1438,7 @@ static DeclAccessPair findDecomposableBaseClass(Sema &S, SourceLocation Loc,
   return DeclAccessPair::make(const_cast<CXXRecordDecl*>(ClassWithFields), AS);
 }
 
-static bool checkMemberDecomposition(Sema &S, ArrayRef<BindingDecl*> Bindings,
+static bool checkMemberDecomposition(Sema &S, llvm::ArrayRef<BindingDecl*> Bindings,
                                      ValueDecl *Src, QualType DecompType,
                                      const CXXRecordDecl *OrigRD) {
   if (S.RequireCompleteType(Src->getLocation(), DecompType,
@@ -1550,7 +1550,7 @@ void Sema::CheckCompleteDecompositionDeclaration(DecompositionDecl *DD) {
   }
 
   DecompType = DecompType.getNonReferenceType();
-  ArrayRef<BindingDecl*> Bindings = DD->bindings();
+  llvm::ArrayRef<BindingDecl*> Bindings = DD->bindings();
 
   // C++1z [dcl.decomp]/2:
   //   If E is an array type [...]
@@ -2113,7 +2113,7 @@ static bool CheckConstexprCtorInitializer(Sema &SemaRef,
 /// definition.
 static bool
 CheckConstexprFunctionStmt(Sema &SemaRef, const FunctionDecl *Dcl, Stmt *S,
-                           SmallVectorImpl<SourceLocation> &ReturnStmts,
+                           llvm::SmallVectorImpl<SourceLocation> &ReturnStmts,
                            SourceLocation &Cxx1yLoc, SourceLocation &Cxx2aLoc,
                            SourceLocation &Cxx2bLoc,
                            Sema::CheckConstexprKind Kind) {
@@ -2277,7 +2277,7 @@ CheckConstexprFunctionStmt(Sema &SemaRef, const FunctionDecl *Dcl, Stmt *S,
 static bool CheckConstexprFunctionBody(Sema &SemaRef, const FunctionDecl *Dcl,
                                        Stmt *Body,
                                        Sema::CheckConstexprKind Kind) {
-  SmallVector<SourceLocation, 4> ReturnStmts;
+  llvm::SmallVector<SourceLocation, 4> ReturnStmts;
 
   if (isa<CXXTryStmt>(Body)) {
     // C++11 [dcl.constexpr]p3:
@@ -2470,7 +2470,7 @@ static bool CheckConstexprFunctionBody(Sema &SemaRef, const FunctionDecl *Dcl,
   //
   // Note that this rule is distinct from the "requirements for a constexpr
   // function", so is not checked in CheckValid mode.
-  SmallVector<PartialDiagnosticAt, 8> Diags;
+  llvm::SmallVector<PartialDiagnosticAt, 8> Diags;
   if (Kind == Sema::CheckConstexprKind::Diagnose &&
       !Expr::isPotentialConstantExpr(Dcl, Diags) &&
       !SemaRef.getLangOpts().CPlusPlus23) {
@@ -2866,7 +2866,7 @@ NoteIndirectBases(ASTContext &Context, IndirectBaseSet &Set,
 /// Performs the actual work of attaching the given base class
 /// specifiers to a C++ class.
 bool Sema::AttachBaseSpecifiers(CXXRecordDecl *Class,
-                                MutableArrayRef<CXXBaseSpecifier *> Bases) {
+                                llvm::MutableArrayRef<CXXBaseSpecifier *> Bases) {
  if (Bases.empty())
     return false;
 
@@ -2974,7 +2974,7 @@ bool Sema::AttachBaseSpecifiers(CXXRecordDecl *Class,
 /// class, after checking whether there are any duplicate base
 /// classes.
 void Sema::ActOnBaseSpecifiers(Decl *ClassDecl,
-                               MutableArrayRef<CXXBaseSpecifier *> Bases) {
+                               llvm::MutableArrayRef<CXXBaseSpecifier *> Bases) {
   if (!ClassDecl || Bases.empty())
     return;
 
@@ -3227,7 +3227,7 @@ void Sema::CheckOverrideControl(NamedDecl *D) {
   if (MD && !MD->isVirtual()) {
     // If we have a non-virtual method, check if it hides a virtual method.
     // (In that case, it's most likely the method has the wrong type.)
-    SmallVector<CXXMethodDecl *, 8> OverloadedMethods;
+    llvm::SmallVector<CXXMethodDecl *, 8> OverloadedMethods;
     FindHiddenVirtualMethods(MD, OverloadedMethods);
 
     if (!OverloadedMethods.empty()) {
@@ -4141,7 +4141,7 @@ void Sema::ActOnStartTrailingRequiresClause(Scope *S, Declarator &D) {
   auto &FTI = D.getFunctionTypeInfo();
   if (!FTI.Params)
     return;
-  for (auto &Param : ArrayRef<DeclaratorChunk::ParamInfo>(FTI.Params,
+  for (auto &Param : llvm::ArrayRef<DeclaratorChunk::ParamInfo>(FTI.Params,
                                                           FTI.NumParams)) {
     auto *ParamDecl = cast<NamedDecl>(Param.Param);
     if (ParamDecl->getDeclName())
@@ -4298,7 +4298,7 @@ Sema::ActOnMemInitializer(Decl *ConstructorD,
                           const DeclSpec &DS,
                           SourceLocation IdLoc,
                           SourceLocation LParenLoc,
-                          ArrayRef<Expr *> Args,
+                          llvm::ArrayRef<Expr *> Args,
                           SourceLocation RParenLoc,
                           SourceLocation EllipsisLoc) {
   Expr *List = ParenListExpr::Create(Context, LParenLoc, Args, RParenLoc);
@@ -5139,7 +5139,7 @@ struct BaseAndFieldInfo {
   bool AnyErrorsInInits;
   ImplicitInitializerKind IIK;
   llvm::DenseMap<const void *, CXXCtorInitializer*> AllBaseFields;
-  SmallVector<CXXCtorInitializer*, 8> AllToInit;
+  llvm::SmallVector<CXXCtorInitializer*, 8> AllToInit;
   llvm::DenseMap<TagDecl*, FieldDecl*> ActiveUnionMember;
 
   BaseAndFieldInfo(Sema &S, CXXConstructorDecl *Ctor, bool ErrorsInInits)
@@ -5329,7 +5329,7 @@ Sema::SetDelegatingInitializer(CXXConstructorDecl *Constructor,
 }
 
 bool Sema::SetCtorInitializers(CXXConstructorDecl *Constructor, bool AnyErrors,
-                               ArrayRef<CXXCtorInitializer *> Initializers) {
+                               llvm::ArrayRef<CXXCtorInitializer *> Initializers) {
   if (Constructor->isDependentContext()) {
     // Just store the initializers as written, they will be checked during
     // instantiation.
@@ -5504,7 +5504,7 @@ bool Sema::SetCtorInitializers(CXXConstructorDecl *Constructor, bool AnyErrors,
   return HadError;
 }
 
-static void PopulateKeysForFields(FieldDecl *Field, SmallVectorImpl<const void*> &IdealInits) {
+static void PopulateKeysForFields(FieldDecl *Field, llvm::SmallVectorImpl<const void*> &IdealInits) {
   if (const RecordType *RT = Field->getType()->getAs<RecordType>()) {
     const RecordDecl *RD = RT->getDecl();
     if (RD->isAnonymousStructOrUnion()) {
@@ -5544,7 +5544,7 @@ static void AddInitializerToDiag(const Sema::SemaDiagnosticBuilder &Diag,
 
 static void DiagnoseBaseOrMemInitializerOrder(
     Sema &SemaRef, const CXXConstructorDecl *Constructor,
-    ArrayRef<CXXCtorInitializer *> Inits) {
+    llvm::ArrayRef<CXXCtorInitializer *> Inits) {
   if (Constructor->getDeclContext()->isDependentContext())
     return;
 
@@ -5565,7 +5565,7 @@ static void DiagnoseBaseOrMemInitializerOrder(
   // Build the list of bases and members in the order that they'll
   // actually be initialized.  The explicit initializers should be in
   // this same order but may be missing things.
-  SmallVector<const void*, 32> IdealInitKeys;
+  llvm::SmallVector<const void*, 32> IdealInitKeys;
 
   const CXXRecordDecl *ClassDecl = Constructor->getParent();
 
@@ -5593,10 +5593,10 @@ static void DiagnoseBaseOrMemInitializerOrder(
 
   // Track initializers that are in an incorrect order for either a warning or
   // note if multiple ones occur.
-  SmallVector<unsigned> WarnIndexes;
+  llvm::SmallVector<unsigned> WarnIndexes;
   // Correlates the index of an initializer in the init-list to the index of
   // the field/base in the class.
-  SmallVector<std::pair<unsigned, unsigned>, 32> CorrelatedInitOrder;
+  llvm::SmallVector<std::pair<unsigned, unsigned>, 32> CorrelatedInitOrder;
 
   for (unsigned InitIndex = 0; InitIndex != Inits.size(); ++InitIndex) {
     const void *InitKey = GetKeyForMember(SemaRef.Context, Inits[InitIndex]);
@@ -5740,7 +5740,7 @@ bool CheckRedundantUnionInit(Sema &S,
 /// ActOnMemInitializers - Handle the member initializers for a constructor.
 void Sema::ActOnMemInitializers(Decl *ConstructorDecl,
                                 SourceLocation ColonLoc,
-                                ArrayRef<CXXCtorInitializer*> MemInits,
+                                llvm::ArrayRef<CXXCtorInitializer*> MemInits,
                                 bool AnyErrors) {
   if (!ConstructorDecl)
     return;
@@ -7928,7 +7928,7 @@ public:
                              DefaultedComparisonKind DCK)
       : S(S), RD(RD), FD(FD), DCK(DCK) {
     if (auto *Info = FD->getDefalutedOrDeletedInfo()) {
-      // FIXME: Change CreateOverloadedBinOp to take an ArrayRef instead of an
+      // FIXME: Change CreateOverloadedBinOp to take an llvm::ArrayRef instead of an
       // UnresolvedSet to avoid this copy.
       Fns.assign(Info->getUnqualifiedLookups().begin(),
                  Info->getUnqualifiedLookups().end());
@@ -8137,7 +8137,7 @@ private:
   }
 
   Result
-  visitBinaryOperator(OverloadedOperatorKind OO, ArrayRef<Expr *> Args,
+  visitBinaryOperator(OverloadedOperatorKind OO, llvm::ArrayRef<Expr *> Args,
                       Subobject Subobj,
                       OverloadCandidateSet *SpaceshipCandidates = nullptr) {
     // Note that there is no need to consider rewritten candidates here if
@@ -8589,7 +8589,7 @@ private:
     // Build 'size_t i$n = 0'.
     IdentifierInfo *IterationVarName = nullptr;
     {
-      SmallString<8> Str;
+      llvm::SmallString<8> Str;
       llvm::raw_svector_ostream OS(Str);
       OS << "i" << ArrayDepth;
       IterationVarName = &S.Context.Idents.get(OS.str());
@@ -10296,7 +10296,7 @@ struct FindHiddenVirtualMethod {
   Sema *S;
   CXXMethodDecl *Method;
   llvm::SmallPtrSet<const CXXMethodDecl *, 8> OverridenAndUsingBaseMethods;
-  SmallVector<CXXMethodDecl *, 8> OverloadedMethods;
+  llvm::SmallVector<CXXMethodDecl *, 8> OverloadedMethods;
 
 private:
   /// Check whether any most overridden method from MD in Methods
@@ -10323,7 +10323,7 @@ public:
     assert(Name.getNameKind() == DeclarationName::Identifier);
 
     bool foundSameNameMethod = false;
-    SmallVector<CXXMethodDecl *, 8> overloadedMethods;
+    llvm::SmallVector<CXXMethodDecl *, 8> overloadedMethods;
     for (Path.Decls = BaseRecord->lookup(Name).begin();
          Path.Decls != DeclContext::lookup_iterator(); ++Path.Decls) {
       NamedDecl *D = *Path.Decls;
@@ -10372,7 +10372,7 @@ static void AddMostOverridenMethods(const CXXMethodDecl *MD,
 /// Check if a method overloads virtual methods in a base class without
 /// overriding any.
 void Sema::FindHiddenVirtualMethods(CXXMethodDecl *MD,
-                          SmallVectorImpl<CXXMethodDecl*> &OverloadedMethods) {
+                          llvm::SmallVectorImpl<CXXMethodDecl*> &OverloadedMethods) {
   if (!MD->getDeclName().isIdentifier())
     return;
 
@@ -10400,7 +10400,7 @@ void Sema::FindHiddenVirtualMethods(CXXMethodDecl *MD,
 }
 
 void Sema::NoteHiddenVirtualMethods(CXXMethodDecl *MD,
-                          SmallVectorImpl<CXXMethodDecl*> &OverloadedMethods) {
+                          llvm::SmallVectorImpl<CXXMethodDecl*> &OverloadedMethods) {
   for (unsigned i = 0, e = OverloadedMethods.size(); i != e; ++i) {
     CXXMethodDecl *overloadedMD = OverloadedMethods[i];
     PartialDiagnostic PD = PDiag(
@@ -10419,7 +10419,7 @@ void Sema::DiagnoseHiddenVirtualMethods(CXXMethodDecl *MD) {
   if (Diags.isIgnored(diag::warn_overloaded_virtual, MD->getLocation()))
     return;
 
-  SmallVector<CXXMethodDecl *, 8> OverloadedMethods;
+  llvm::SmallVector<CXXMethodDecl *, 8> OverloadedMethods;
   FindHiddenVirtualMethods(MD, OverloadedMethods);
   if (!OverloadedMethods.empty()) {
     Diag(MD->getLocation(), diag::warn_overloaded_virtual)
@@ -10677,7 +10677,7 @@ Sema::ActOnReenterTemplateScope(Decl *D,
 
   // In order to get name lookup right, reenter template scopes in order from
   // outermost to innermost.
-  SmallVector<TemplateParameterList *, 4> ParameterLists;
+  llvm::SmallVector<TemplateParameterList *, 4> ParameterLists;
   DeclContext *LookupDC = dyn_cast<DeclContext>(D);
 
   if (DeclaratorDecl *DD = dyn_cast<DeclaratorDecl>(D)) {
@@ -10819,7 +10819,7 @@ static void checkMethodTypeQualifiers(Sema &S, Declarator &D, unsigned DiagID) {
   if (FTI.hasMethodTypeQualifiers() && !D.isInvalidType()) {
     bool DiagOccured = false;
     FTI.MethodQualifiers->forEachQualifier(
-        [DiagID, &S, &DiagOccured](DeclSpec::TQ, StringRef QualName,
+        [DiagID, &S, &DiagOccured](DeclSpec::TQ, llvm::StringRef QualName,
                                    SourceLocation SL) {
           // This diagnostic should be emitted on any qualifier except an addr
           // space qualifier. However, forEachQualifier currently doesn't visit
@@ -11830,7 +11830,7 @@ struct InvalidSTLDiagnoser {
   SourceLocation Loc;
   QualType TyForDiags;
 
-  QualType operator()(UnsupportedSTLSelect Sel = USS_Other, StringRef Name = "",
+  QualType operator()(UnsupportedSTLSelect Sel = USS_Other, llvm::StringRef Name = "",
                       const VarDecl *VD = nullptr) {
     {
       auto D = S.Diag(Loc, diag::err_std_compare_type_not_supported)
@@ -11923,7 +11923,7 @@ QualType Sema::CheckComparisonCategoryType(ComparisonCategoryType Kind,
   // Build each of the require values and store them in Info.
   for (ComparisonCategoryResult CCR :
        ComparisonCategories::getPossibleResultsForType(Kind)) {
-    StringRef MemName = ComparisonCategories::getResultString(CCR);
+    llvm::StringRef MemName = ComparisonCategories::getResultString(CCR);
     ComparisonCategoryInfo::ValueInfo *ValInfo = Info->lookupValueInfo(CCR);
 
     if (!ValInfo)
@@ -13154,7 +13154,7 @@ NamedDecl *Sema::BuildUsingEnumDeclaration(Scope *S, AccessSpecifier AS,
 }
 
 NamedDecl *Sema::BuildUsingPackDecl(NamedDecl *InstantiatedFrom,
-                                    ArrayRef<NamedDecl *> Expansions) {
+                                    llvm::ArrayRef<NamedDecl *> Expansions) {
   assert(isa<UnresolvedUsingValueDecl>(InstantiatedFrom) ||
          isa<UnresolvedUsingTypenameDecl>(InstantiatedFrom) ||
          isa<UsingPackDecl>(InstantiatedFrom));
@@ -13946,7 +13946,7 @@ void Sema::CheckImplicitSpecialMemberDeclaration(Scope *S, FunctionDecl *FD) {
 
 void Sema::setupImplicitSpecialMemberType(CXXMethodDecl *SpecialMem,
                                           QualType ResultTy,
-                                          ArrayRef<QualType> Args) {
+                                          llvm::ArrayRef<QualType> Args) {
   // Build an exception specification pointing back at this constructor.
   FunctionProtoType::ExtProtoInfo EPI = getImplicitMethodEPI(*this, SpecialMem);
 
@@ -14141,7 +14141,7 @@ Sema::findInheritingConstructor(SourceLocation Loc,
                                                FPT->getParamTypes(), EPI));
 
   // Build the parameter declarations.
-  SmallVector<ParmVarDecl *, 16> ParamDecls;
+  llvm::SmallVector<ParmVarDecl *, 16> ParamDecls;
   for (unsigned I = 0, N = FPT->getNumParams(); I != N; ++I) {
     TypeSourceInfo *TInfo =
         Context.getTrivialTypeSourceInfo(FPT->getParamType(I), UsingLoc);
@@ -14216,7 +14216,7 @@ void Sema::DefineInheritingConstructor(SourceLocation CurrentLocation,
 
   // Build explicit initializers for all base classes from which the
   // constructor was inherited.
-  SmallVector<CXXCtorInitializer*, 8> Inits;
+  llvm::SmallVector<CXXCtorInitializer*, 8> Inits;
   for (bool VBase : {false, true}) {
     for (CXXBaseSpecifier &B : VBase ? RD->vbases() : RD->bases()) {
       if (B.isVirtual() != VBase)
@@ -14405,7 +14405,7 @@ void Sema::ActOnFinishCXXNonNestedClass() {
   referenceDLLExportedClassMethods();
 
   if (!DelayedDllExportMemberFunctions.empty()) {
-    SmallVector<CXXMethodDecl*, 4> WorkList;
+    llvm::SmallVector<CXXMethodDecl*, 4> WorkList;
     std::swap(DelayedDllExportMemberFunctions, WorkList);
     for (CXXMethodDecl *M : WorkList) {
       DefineDefaultedFunction(*this, M, M->getLocation());
@@ -14424,7 +14424,7 @@ void Sema::referenceDLLExportedClassMethods() {
   if (!DelayedDllExportClasses.empty()) {
     // Calling ReferenceDllExportedMembers might cause the current function to
     // be called again, so use a local copy of DelayedDllExportClasses.
-    SmallVector<CXXRecordDecl *, 4> WorkList;
+    llvm::SmallVector<CXXRecordDecl *, 4> WorkList;
     std::swap(DelayedDllExportClasses, WorkList);
     for (CXXRecordDecl *Class : WorkList)
       ReferenceDllExportedMembers(*this, Class);
@@ -14622,7 +14622,7 @@ buildMemcpyForAssignmentOp(Sema &S, SourceLocation Loc, QualType T,
       E->castAs<RecordType>()->getDecl()->hasObjectMember();
 
   // Create a reference to the __builtin_objc_memmove_collectable function
-  StringRef MemCpyName = NeedsCollectableMemCpy ?
+  llvm::StringRef MemCpyName = NeedsCollectableMemCpy ?
     "__builtin_objc_memmove_collectable" :
     "__builtin_memcpy";
   LookupResult R(S, &S.Context.Idents.get(MemCpyName), Loc,
@@ -14804,7 +14804,7 @@ buildSingleCopyAssignRecursively(Sema &S, SourceLocation Loc, QualType T,
   // Create the iteration variable.
   IdentifierInfo *IterationVarName = nullptr;
   {
-    SmallString<8> Str;
+    llvm::SmallString<8> Str;
     llvm::raw_svector_ostream OS(Str);
     OS << "__i" << Depth;
     IterationVarName = &S.Context.Idents.get(OS.str());
@@ -15067,7 +15067,7 @@ void Sema::DefineImplicitCopyAssignment(SourceLocation CurrentLocation,
   //   which they were declared in the class definition.
 
   // The statements that form the synthesized function body.
-  SmallVector<Stmt*, 8> Statements;
+  llvm::SmallVector<Stmt*, 8> Statements;
 
   // The parameter for the "other" object, which we are copying from.
   ParmVarDecl *Other = CopyAssignOperator->getNonObjectParameter(0);
@@ -15449,7 +15449,7 @@ void Sema::DefineImplicitMoveAssignment(SourceLocation CurrentLocation,
   Scope.addContextNote(CurrentLocation);
 
   // The statements that form the synthesized function body.
-  SmallVector<Stmt*, 8> Statements;
+  llvm::SmallVector<Stmt*, 8> Statements;
 
   // The parameter for the "other" object, which we are move from.
   ParmVarDecl *Other = MoveAssignOperator->getNonObjectParameter(0);
@@ -16189,7 +16189,7 @@ void Sema::FinalizeVarWithDestructor(VarDecl *VD, const RecordType *Record) {
     bool HasConstantInit = false;
     if (VD->getInit() && !VD->getInit()->isValueDependent())
       HasConstantInit = VD->evaluateValue();
-    SmallVector<PartialDiagnosticAt, 8> Notes;
+    llvm::SmallVector<PartialDiagnosticAt, 8> Notes;
     if (!VD->evaluateDestruction(Notes) && VD->isConstexpr() &&
         HasConstantInit) {
       Diag(VD->getLocation(),
@@ -16220,7 +16220,7 @@ void Sema::FinalizeVarWithDestructor(VarDecl *VD, const RecordType *Record) {
 bool Sema::CompleteConstructorCall(CXXConstructorDecl *Constructor,
                                    QualType DeclInitType, MultiExprArg ArgsPtr,
                                    SourceLocation Loc,
-                                   SmallVectorImpl<Expr *> &ConvertedArgs,
+                                   llvm::SmallVectorImpl<Expr *> &ConvertedArgs,
                                    bool AllowExplicit,
                                    bool IsListInitialization) {
   // FIXME: This duplicates a lot of code from Sema::ConvertArgumentsForCall.
@@ -16238,7 +16238,7 @@ bool Sema::CompleteConstructorCall(CXXConstructorDecl *Constructor,
 
   VariadicCallType CallType =
     Proto->isVariadic() ? VariadicConstructor : VariadicDoesNotApply;
-  SmallVector<Expr *, 8> AllArgs;
+  llvm::SmallVector<Expr *, 8> AllArgs;
   bool Invalid = GatherArgumentsForCall(
       Loc, Constructor, Proto, 0, llvm::ArrayRef(Args, NumArgs), AllArgs,
       CallType, AllowExplicit, IsListInitialization);
@@ -16838,7 +16838,7 @@ Decl *Sema::ActOnStartLinkageSpecification(Scope *S, SourceLocation ExternLoc,
   StringLiteral *Lit = cast<StringLiteral>(LangStr);
   assert(Lit->isUnevaluated() && "Unexpected string literal kind");
 
-  StringRef Lang = Lit->getString();
+  llvm::StringRef Lang = Lit->getString();
   LinkageSpecLanguageIDs Language;
   if (Lang == "C")
     Language = LinkageSpecLanguageIDs::C;
@@ -17140,7 +17140,7 @@ static void WriteCharTypePrefix(BuiltinType::Kind BTK, llvm::raw_ostream &OS) {
 /// FIXME: This assumes Unicode literal encodings
 static void WriteCharValueForDiagnostic(uint32_t Value, const BuiltinType *BTy,
                                         unsigned TyWidth,
-                                        SmallVectorImpl<char> &Str) {
+                                        llvm::SmallVectorImpl<char> &Str) {
   char Arr[UNI_MAX_UTF8_BYTES_PER_CODE_POINT];
   char *Ptr = Arr;
   BuiltinType::Kind K = BTy->getKind();
@@ -17150,7 +17150,7 @@ static void WriteCharValueForDiagnostic(uint32_t Value, const BuiltinType *BTy,
   // other types.
   if (K == BuiltinType::Char_S || K == BuiltinType::Char_U ||
       K == BuiltinType::Char8 || Value <= 0x7F) {
-    StringRef Escaped = escapeCStyle<EscapeChar::Single>(Value);
+    llvm::StringRef Escaped = escapeCStyle<EscapeChar::Single>(Value);
     if (!Escaped.empty())
       EscapeStringForDiagnostic(Escaped, Str);
     else
@@ -17164,7 +17164,7 @@ static void WriteCharValueForDiagnostic(uint32_t Value, const BuiltinType *BTy,
   case BuiltinType::WChar_S:
   case BuiltinType::WChar_U: {
     if (llvm::ConvertCodePointToUTF8(Value, Ptr))
-      EscapeStringForDiagnostic(StringRef(Arr, Ptr - Arr), Str);
+      EscapeStringForDiagnostic(llvm::StringRef(Arr, Ptr - Arr), Str);
     else
       OS << "\\x"
          << llvm::format_hex_no_prefix(Value, TyWidth / 4, /*Upper=*/true);
@@ -17178,7 +17178,7 @@ static void WriteCharValueForDiagnostic(uint32_t Value, const BuiltinType *BTy,
 /// Convert \V to a string we can present to the user in a diagnostic
 /// \T is the type of the expression that has been evaluated into \V
 static bool ConvertAPValueToString(const APValue &V, QualType T,
-                                   SmallVectorImpl<char> &Str,
+                                   llvm::SmallVectorImpl<char> &Str,
                                    ASTContext &Context) {
   if (!V.hasValue())
     return false;
@@ -17313,7 +17313,7 @@ void Sema::DiagnoseStaticAssertDetails(const Expr *E) {
     struct {
       const clang::Expr *Cond;
       Expr::EvalResult Result;
-      SmallString<12> ValueString;
+      llvm::SmallString<12> ValueString;
       bool Print;
     } DiagSide[2] = {{LHS, Expr::EvalResult(), {}, false},
                      {RHS, Expr::EvalResult(), {}, false}};
@@ -17356,7 +17356,7 @@ bool Sema::EvaluateStaticAssertMessageAsString(Expr *Message,
     return false;
   }
 
-  auto FindMember = [&](StringRef Member, bool &Empty,
+  auto FindMember = [&](llvm::StringRef Member, bool &Empty,
                         bool Diag = false) -> std::optional<LookupResult> {
     DeclarationName DN = PP.getIdentifierInfo(Member);
     LookupResult MemberLookup(*this, DN, Loc, Sema::LookupMemberName);
@@ -17434,7 +17434,7 @@ bool Sema::EvaluateStaticAssertMessageAsString(Expr *Message,
     return true;
 
   Expr::EvalResult Status;
-  SmallVector<PartialDiagnosticAt, 8> Notes;
+  llvm::SmallVector<PartialDiagnosticAt, 8> Notes;
   Status.Diag = &Notes;
   if (!Message->EvaluateCharRangeAsString(Result, EvaluatedSize.get(),
                                           EvaluatedData.get(), Ctx, Status) ||
@@ -17505,7 +17505,7 @@ Decl *Sema::BuildStaticAssertDeclaration(SourceLocation StaticAssertLoc,
         getLangOpts().CPlusPlus && CurContext->isDependentContext();
 
     if (!Failed && !Cond && !InTemplateDefinition) {
-      SmallString<256> MsgBuffer;
+      llvm::SmallString<256> MsgBuffer;
       llvm::raw_svector_ostream Msg(MsgBuffer);
       bool HasMessage = AssertMessage;
       if (AssertMessage) {
@@ -17754,7 +17754,7 @@ Decl *Sema::ActOnFriendTypeDecl(Scope *S, const DeclSpec &DS,
       Diag(Loc, diag::err_tagless_friend_type_template) << DS.getSourceRange();
       return nullptr;
     } else if (const RecordDecl *RD = T->getAsRecordDecl()) {
-      SmallString<16> InsertionText(" ");
+      llvm::SmallString<16> InsertionText(" ");
       InsertionText += RD->getKindName();
 
       Diag(Loc, getLangOpts().CPlusPlus11
@@ -18581,9 +18581,9 @@ void Sema::LoadExternalVTableUses() {
   if (!ExternalSource)
     return;
 
-  SmallVector<ExternalVTableUse, 4> VTables;
+  llvm::SmallVector<ExternalVTableUse, 4> VTables;
   ExternalSource->ReadUsedVTables(VTables);
-  SmallVector<VTableUse, 4> NewUses;
+  llvm::SmallVector<VTableUse, 4> NewUses;
   for (unsigned I = 0, N = VTables.size(); I != N; ++I) {
     llvm::DenseMap<CXXRecordDecl *, bool>::iterator Pos
       = VTablesUsed.find(VTables[I].Record);
@@ -18976,7 +18976,7 @@ bool Sema::checkThisInStaticMemberFunctionAttributes(CXXMethodDecl *Method) {
   for (const auto *A : Method->attrs()) {
     // FIXME: This should be emitted by tblgen.
     Expr *Arg = nullptr;
-    ArrayRef<Expr *> Args;
+    llvm::ArrayRef<Expr *> Args;
     if (const auto *G = dyn_cast<GuardedByAttr>(A))
       Arg = G->getArg();
     else if (const auto *G = dyn_cast<PtGuardedByAttr>(A))
@@ -19018,9 +19018,9 @@ bool Sema::checkThisInStaticMemberFunctionAttributes(CXXMethodDecl *Method) {
 
 void Sema::checkExceptionSpecification(
     bool IsTopLevel, ExceptionSpecificationType EST,
-    ArrayRef<ParsedType> DynamicExceptions,
-    ArrayRef<SourceRange> DynamicExceptionRanges, Expr *NoexceptExpr,
-    SmallVectorImpl<QualType> &Exceptions,
+    llvm::ArrayRef<ParsedType> DynamicExceptions,
+    llvm::ArrayRef<SourceRange> DynamicExceptionRanges, Expr *NoexceptExpr,
+    llvm::SmallVectorImpl<QualType> &Exceptions,
     FunctionProtoType::ExceptionSpecInfo &ESI) {
   Exceptions.clear();
   ESI.Type = EST;
@@ -19031,7 +19031,7 @@ void Sema::checkExceptionSpecification(
       QualType ET = GetTypeFromParser(DynamicExceptions[ei]);
 
       if (IsTopLevel) {
-        SmallVector<UnexpandedParameterPack, 2> Unexpanded;
+        llvm::SmallVector<UnexpandedParameterPack, 2> Unexpanded;
         collectUnexpandedParameterPacks(ET, Unexpanded);
         if (!Unexpanded.empty()) {
           DiagnoseUnexpandedParameterPacks(
@@ -19067,8 +19067,8 @@ void Sema::checkExceptionSpecification(
 
 void Sema::actOnDelayedExceptionSpecification(
     Decl *D, ExceptionSpecificationType EST, SourceRange SpecificationRange,
-    ArrayRef<ParsedType> DynamicExceptions,
-    ArrayRef<SourceRange> DynamicExceptionRanges, Expr *NoexceptExpr) {
+    llvm::ArrayRef<ParsedType> DynamicExceptions,
+    llvm::ArrayRef<SourceRange> DynamicExceptionRanges, Expr *NoexceptExpr) {
   if (!D)
     return;
 
@@ -19200,7 +19200,7 @@ void Sema::ActOnStartFunctionDeclarationDeclarator(
     Declarator &Declarator, unsigned TemplateParameterDepth) {
   auto &Info = InventedParameterInfos.emplace_back();
   TemplateParameterList *ExplicitParams = nullptr;
-  ArrayRef<TemplateParameterList *> ExplicitLists =
+  llvm::ArrayRef<TemplateParameterList *> ExplicitLists =
       Declarator.getTemplateParameterLists();
   if (!ExplicitLists.empty()) {
     bool IsMemberSpecialization, IsInvalid;

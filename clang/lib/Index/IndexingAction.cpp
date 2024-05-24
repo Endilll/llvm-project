@@ -159,7 +159,7 @@ public:
 
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override {
+                                                 llvm::StringRef InFile) override {
     return std::make_unique<IndexASTConsumer>(
         DataConsumer, Opts, CI.getPreprocessorPtr(),
         /*ShouldSkipFunctionBody=*/[](const Decl *) { return false; });
@@ -271,7 +271,7 @@ void index::indexASTUnit(ASTUnit &Unit, IndexDataConsumer &DataConsumer,
 }
 
 void index::indexTopLevelDecls(ASTContext &Ctx, Preprocessor &PP,
-                               ArrayRef<const Decl *> Decls,
+                               llvm::ArrayRef<const Decl *> Decls,
                                IndexDataConsumer &DataConsumer,
                                IndexingOptions Opts) {
   IndexingContext IndexCtx(Opts, DataConsumer);

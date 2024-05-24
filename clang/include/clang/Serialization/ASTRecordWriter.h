@@ -35,12 +35,12 @@ class ASTRecordWriter
 
   /// Statements that we've encountered while serializing a
   /// declaration or type.
-  SmallVector<Stmt *, 16> StmtsToEmit;
+  llvm::SmallVector<Stmt *, 16> StmtsToEmit;
 
   /// Indices of record elements that describe offsets within the
   /// bitcode. These will be converted to offsets relative to the current
   /// record when emitted.
-  SmallVector<unsigned, 8> OffsetIndices;
+  llvm::SmallVector<unsigned, 8> OffsetIndices;
 
   /// Flush all of the statements and expressions that have
   /// been added to the queue via AddStmt().
@@ -202,7 +202,7 @@ public:
   void AddCXXBaseSpecifier(const CXXBaseSpecifier &Base);
 
   /// Emit a set of C++ base specifiers.
-  void AddCXXBaseSpecifiers(ArrayRef<CXXBaseSpecifier> Bases);
+  void AddCXXBaseSpecifiers(llvm::ArrayRef<CXXBaseSpecifier> Bases);
 
   /// Emit a reference to a type.
   void AddTypeRef(QualType T) {
@@ -279,7 +279,7 @@ public:
   void AddUnresolvedSet(const ASTUnresolvedSet &Set);
 
   /// Emit a CXXCtorInitializer array.
-  void AddCXXCtorInitializers(ArrayRef<CXXCtorInitializer *> CtorInits);
+  void AddCXXCtorInitializers(llvm::ArrayRef<CXXCtorInitializer *> CtorInits);
 
   void AddCXXDefinitionData(const CXXRecordDecl *D);
 
@@ -296,26 +296,26 @@ public:
 
   void writeOpenACCVarList(const OpenACCClauseWithVarList *C);
 
-  void writeOpenACCIntExprList(ArrayRef<Expr *> Exprs);
+  void writeOpenACCIntExprList(llvm::ArrayRef<Expr *> Exprs);
 
   /// Writes out a single OpenACC Clause.
   void writeOpenACCClause(const OpenACCClause *C);
 
   /// Writes out a list of OpenACC clauses.
-  void writeOpenACCClauseList(ArrayRef<const OpenACCClause *> Clauses);
+  void writeOpenACCClauseList(llvm::ArrayRef<const OpenACCClause *> Clauses);
 
   /// Emit a string.
-  void AddString(StringRef Str) {
+  void AddString(llvm::StringRef Str) {
     return Writer->AddString(Str, *Record);
   }
 
   /// Emit a path.
-  void AddPath(StringRef Path) {
+  void AddPath(llvm::StringRef Path) {
     return Writer->AddPath(Path, *Record);
   }
 
   /// Emit a version tuple.
-  void AddVersionTuple(const VersionTuple &Version) {
+  void AddVersionTuple(const llvm::VersionTuple &Version) {
     return Writer->AddVersionTuple(Version, *Record);
   }
 
@@ -323,7 +323,7 @@ public:
   void AddAttr(const Attr *A);
 
   /// Emit a list of attributes.
-  void AddAttributes(ArrayRef<const Attr*> Attrs);
+  void AddAttributes(llvm::ArrayRef<const Attr*> Attrs);
 };
 
 } // end namespace clang

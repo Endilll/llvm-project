@@ -15,7 +15,7 @@ namespace clang::tidy::misc {
 
 class MisleadingBidirectionalCheck : public ClangTidyCheck {
 public:
-  MisleadingBidirectionalCheck(StringRef Name, ClangTidyContext *Context);
+  MisleadingBidirectionalCheck(llvm::StringRef Name, ClangTidyContext *Context);
   ~MisleadingBidirectionalCheck();
 
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,

@@ -58,7 +58,7 @@ void ProTypeCstyleCastCheck::check(const MatchFinder::MatchResult &Result) {
       // Leave type spelling exactly as it was (unlike
       // getTypeAsWritten().getAsString() which would spell enum types 'enum
       // X').
-      StringRef DestTypeString = Lexer::getSourceText(
+      llvm::StringRef DestTypeString = Lexer::getSourceText(
           CharSourceRange::getTokenRange(
               MatchedCast->getLParenLoc().getLocWithOffset(1),
               MatchedCast->getRParenLoc().getLocWithOffset(-1)),

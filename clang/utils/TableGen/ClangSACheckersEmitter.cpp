@@ -24,17 +24,17 @@ using namespace llvm;
 // Static Analyzer Checkers Tables generation
 //===----------------------------------------------------------------------===//
 
-static std::string getPackageFullName(const Record *R, StringRef Sep = ".");
+static std::string getPackageFullName(const Record *R, llvm::StringRef Sep = ".");
 
 static std::string getParentPackageFullName(const Record *R,
-                                            StringRef Sep = ".") {
+                                            llvm::StringRef Sep = ".") {
   std::string name;
   if (DefInit *DI = dyn_cast<DefInit>(R->getValueInit("ParentPackage")))
     name = getPackageFullName(DI->getDef(), Sep);
   return name;
 }
 
-static std::string getPackageFullName(const Record *R, StringRef Sep) {
+static std::string getPackageFullName(const Record *R, llvm::StringRef Sep) {
   std::string name = getParentPackageFullName(R, Sep);
   if (!name.empty())
     name += Sep;
@@ -43,7 +43,7 @@ static std::string getPackageFullName(const Record *R, StringRef Sep) {
   return name;
 }
 
-static std::string getCheckerFullName(const Record *R, StringRef Sep = ".") {
+static std::string getCheckerFullName(const Record *R, llvm::StringRef Sep = ".") {
   std::string name = getParentPackageFullName(R, Sep);
   if (!name.empty())
     name += Sep;
@@ -52,7 +52,7 @@ static std::string getCheckerFullName(const Record *R, StringRef Sep = ".") {
   return name;
 }
 
-static std::string getStringValue(const Record &R, StringRef field) {
+static std::string getStringValue(const Record &R, llvm::StringRef field) {
   if (StringInit *SI = dyn_cast<StringInit>(R.getValueInit(field)))
     return std::string(SI->getValue());
   return std::string();
@@ -84,7 +84,7 @@ static std::string getCheckerDocs(const Record &R) {
   if (getValueFromBitsInit(BI, R) == 0)
     return "";
 
-  std::string CheckerFullName = StringRef(getCheckerFullName(&R, "-")).lower();
+  std::string CheckerFullName = llvm::StringRef(getCheckerFullName(&R, "-")).lower();
   return (llvm::Twine("https://clang.llvm.org/docs/analyzer/checkers.html#") +
           CheckerFullName)
       .str();
@@ -155,7 +155,7 @@ static void printChecker(llvm::raw_ostream &OS, const Record &R) {
   OS << ")\n";
 }
 
-static void printOption(llvm::raw_ostream &OS, StringRef FullName,
+static void printOption(llvm::raw_ostream &OS, llvm::StringRef FullName,
                         const Record &R) {
   OS << "\"";
   OS.write_escaped(getCheckerOptionType(R)) << "\", \"";
@@ -174,7 +174,7 @@ static void printOption(llvm::raw_ostream &OS, StringRef FullName,
     OS << "true";
 }
 
-void clang::EmitClangSACheckers(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitClangSACheckers(RecordKeeper &Records, llvm::raw_ostream &OS) {
   std::vector<Record*> checkers = Records.getAllDerivedDefinitions("Checker");
   std::vector<Record*> packages = Records.getAllDerivedDefinitions("Package");
 

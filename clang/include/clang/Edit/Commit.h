@@ -36,7 +36,7 @@ public:
 
   struct Edit {
     EditKind Kind;
-    StringRef Text;
+    llvm::StringRef Text;
     SourceLocation OrigLoc;
     FileOffset Offset;
     FileOffset InsertFromRangeOffs;
@@ -55,7 +55,7 @@ private:
   EditedSource *Editor = nullptr;
 
   bool IsCommitable = true;
-  SmallVector<Edit, 8> CachedEdits;
+  llvm::SmallVector<Edit, 8> CachedEdits;
 
   llvm::BumpPtrAllocator StrAlloc;
 
@@ -67,15 +67,15 @@ public:
 
   bool isCommitable() const { return IsCommitable; }
 
-  bool insert(SourceLocation loc, StringRef text, bool afterToken = false,
+  bool insert(SourceLocation loc, llvm::StringRef text, bool afterToken = false,
               bool beforePreviousInsertions = false);
 
-  bool insertAfterToken(SourceLocation loc, StringRef text,
+  bool insertAfterToken(SourceLocation loc, llvm::StringRef text,
                         bool beforePreviousInsertions = false) {
     return insert(loc, text, /*afterToken=*/true, beforePreviousInsertions);
   }
 
-  bool insertBefore(SourceLocation loc, StringRef text) {
+  bool insertBefore(SourceLocation loc, llvm::StringRef text) {
     return insert(loc, text, /*afterToken=*/false,
                   /*beforePreviousInsertions=*/true);
   }
@@ -83,14 +83,14 @@ public:
   bool insertFromRange(SourceLocation loc, CharSourceRange range,
                        bool afterToken = false,
                        bool beforePreviousInsertions = false);
-  bool insertWrap(StringRef before, CharSourceRange range, StringRef after);
+  bool insertWrap(llvm::StringRef before, CharSourceRange range, llvm::StringRef after);
 
   bool remove(CharSourceRange range);
 
-  bool replace(CharSourceRange range, StringRef text);
+  bool replace(CharSourceRange range, llvm::StringRef text);
   bool replaceWithInner(CharSourceRange range, CharSourceRange innerRange);
-  bool replaceText(SourceLocation loc, StringRef text,
-                   StringRef replacementText);
+  bool replaceText(SourceLocation loc, llvm::StringRef text,
+                   llvm::StringRef replacementText);
 
   bool insertFromRange(SourceLocation loc, SourceRange TokenRange,
                        bool afterToken = false,
@@ -99,7 +99,7 @@ public:
                            afterToken, beforePreviousInsertions);
   }
 
-  bool insertWrap(StringRef before, SourceRange TokenRange, StringRef after) {
+  bool insertWrap(llvm::StringRef before, SourceRange TokenRange, llvm::StringRef after) {
     return insertWrap(before, CharSourceRange::getTokenRange(TokenRange), after);
   }
 
@@ -107,7 +107,7 @@ public:
     return remove(CharSourceRange::getTokenRange(TokenRange));
   }
 
-  bool replace(SourceRange TokenRange, StringRef text) {
+  bool replace(SourceRange TokenRange, llvm::StringRef text) {
     return replace(CharSourceRange::getTokenRange(TokenRange), text);
   }
 
@@ -116,14 +116,14 @@ public:
                             CharSourceRange::getTokenRange(TokenInnerRange));
   }
 
-  using edit_iterator = SmallVectorImpl<Edit>::const_iterator;
+  using edit_iterator = llvm::SmallVectorImpl<Edit>::const_iterator;
 
   edit_iterator edit_begin() const { return CachedEdits.begin(); }
   edit_iterator edit_end() const { return CachedEdits.end(); }
 
 private:
   void addInsert(SourceLocation OrigLoc,
-                FileOffset Offs, StringRef text, bool beforePreviousInsertions);
+                FileOffset Offs, llvm::StringRef text, bool beforePreviousInsertions);
   void addInsertFromRange(SourceLocation OrigLoc, FileOffset Offs,
                           FileOffset RangeOffs, unsigned RangeLen,
                           bool beforePreviousInsertions);
@@ -134,10 +134,10 @@ private:
                            SourceLocation &AfterLoc);
   bool canInsertInOffset(SourceLocation OrigLoc, FileOffset Offs);
   bool canRemoveRange(CharSourceRange range, FileOffset &Offs, unsigned &Len);
-  bool canReplaceText(SourceLocation loc, StringRef text,
+  bool canReplaceText(SourceLocation loc, llvm::StringRef text,
                       FileOffset &Offs, unsigned &Len);
 
-  void commitInsert(FileOffset offset, StringRef text,
+  void commitInsert(FileOffset offset, llvm::StringRef text,
                     bool beforePreviousInsertions);
   void commitRemove(FileOffset offset, unsigned length);
 

@@ -85,9 +85,9 @@ public:
   Build(const CompilerInvocation &Invocation,
         const llvm::MemoryBuffer *MainFileBuffer, PreambleBounds Bounds,
         DiagnosticsEngine &Diagnostics,
-        IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
+        llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
         std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-        bool StoreInMemory, StringRef StoragePath,
+        bool StoreInMemory, llvm::StringRef StoragePath,
         PreambleCallbacks &Callbacks);
 
   PrecompiledPreamble(PrecompiledPreamble &&);
@@ -122,14 +122,14 @@ public:
   /// responsible for making sure the PrecompiledPreamble instance outlives the
   /// compiler run and the AST that will be using the PCH.
   void AddImplicitPreamble(CompilerInvocation &CI,
-                           IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
+                           llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
                            llvm::MemoryBuffer *MainFileBuffer) const;
 
   /// Configure \p CI to use this preamble.
   /// Like AddImplicitPreamble, but doesn't assume CanReuse() is true.
   /// If this preamble does not match the file, it may parse differently.
   void OverridePreamble(CompilerInvocation &CI,
-                        IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
+                        llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
                         llvm::MemoryBuffer *MainFileBuffer) const;
 
 private:
@@ -171,7 +171,7 @@ private:
   /// Helper function to set up PCH for the preamble into \p CI and \p VFS to
   /// with the specified \p Bounds.
   void configurePreamble(PreambleBounds Bounds, CompilerInvocation &CI,
-                         IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
+                         llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
                          llvm::MemoryBuffer *MainFileBuffer) const;
 
   /// Sets up the PreprocessorOptions and changes VFS, so that PCH stored in \p
@@ -180,7 +180,7 @@ private:
   static void
   setupPreambleStorage(const PCHStorage &Storage,
                        PreprocessorOptions &PreprocessorOpts,
-                       IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS);
+                       llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS);
 
   /// Manages the memory buffer or temporary file that stores the PCH.
   std::unique_ptr<PCHStorage> Storage;

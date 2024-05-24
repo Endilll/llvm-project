@@ -147,7 +147,7 @@ void SuspiciousReallocUsageCheck::check(
         if (FindAssignToVarBefore{Var, DeclRef, SM}.Visit(Func->getBody()))
           return;
 
-  StringRef CodeOfAssignedExpr = Lexer::getSourceText(
+  llvm::StringRef CodeOfAssignedExpr = Lexer::getSourceText(
       CharSourceRange::getTokenRange(PtrResultExpr->getSourceRange()), SM,
       getLangOpts());
   diag(Call->getBeginLoc(), "'%0' may be set to null if 'realloc' fails, which "

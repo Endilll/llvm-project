@@ -21,7 +21,7 @@ namespace clang::tidy::misc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/misc/const-correctness.html
 class ConstCorrectnessCheck : public ClangTidyCheck {
 public:
-  ConstCorrectnessCheck(StringRef Name, ClangTidyContext *Context);
+  ConstCorrectnessCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   // The rules for C and 'const' are different and incompatible for this check.
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {

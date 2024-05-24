@@ -15,7 +15,7 @@ using namespace clang;
 using namespace arcmt;
 using namespace markup;
 
-static StringRef getLevelName(DiagnosticsEngine::Level Level) {
+static llvm::StringRef getLevelName(DiagnosticsEngine::Level Level) {
   switch (Level) {
   case DiagnosticsEngine::Ignored:
     llvm_unreachable("ignored");
@@ -32,7 +32,7 @@ static StringRef getLevelName(DiagnosticsEngine::Level Level) {
 }
 
 void arcmt::writeARCDiagsToPlist(const std::string &outPath,
-                                 ArrayRef<StoredDiagnostic> diags,
+                                 llvm::ArrayRef<StoredDiagnostic> diags,
                                  SourceManager &SM,
                                  const LangOptions &LangOpts) {
   DiagnosticIDs DiagIDs;
@@ -40,9 +40,9 @@ void arcmt::writeARCDiagsToPlist(const std::string &outPath,
   // Build up a set of FIDs that we use by scanning the locations and
   // ranges of the diagnostics.
   FIDMap FM;
-  SmallVector<FileID, 10> Fids;
+  llvm::SmallVector<FileID, 10> Fids;
 
-  for (ArrayRef<StoredDiagnostic>::iterator
+  for (llvm::ArrayRef<StoredDiagnostic>::iterator
          I = diags.begin(), E = diags.end(); I != E; ++I) {
     const StoredDiagnostic &D = *I;
 
@@ -78,7 +78,7 @@ void arcmt::writeARCDiagsToPlist(const std::string &outPath,
        " <key>diagnostics</key>\n"
        " <array>\n";
 
-  for (ArrayRef<StoredDiagnostic>::iterator
+  for (llvm::ArrayRef<StoredDiagnostic>::iterator
          DI = diags.begin(), DE = diags.end(); DI != DE; ++DI) {
 
     const StoredDiagnostic &D = *DI;

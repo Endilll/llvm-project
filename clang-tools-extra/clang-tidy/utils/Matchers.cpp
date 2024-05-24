@@ -18,7 +18,7 @@ bool NotIdenticalStatementsPredicate::operator()(
 }
 
 MatchesAnyListedTypeNameMatcher::MatchesAnyListedTypeNameMatcher(
-    llvm::ArrayRef<StringRef> NameList)
+    llvm::ArrayRef<llvm::StringRef> NameList)
     : NameMatchers(NameList.begin(), NameList.end()) {}
 
 MatchesAnyListedTypeNameMatcher::~MatchesAnyListedTypeNameMatcher() = default;

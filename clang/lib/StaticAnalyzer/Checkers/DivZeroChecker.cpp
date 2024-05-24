@@ -28,9 +28,9 @@ namespace {
 class DivZeroChecker : public Checker< check::PreStmt<BinaryOperator> > {
   const BugType BT{this, "Division by zero"};
   const BugType TaintBT{this, "Division by zero", categories::TaintedData};
-  void reportBug(StringRef Msg, ProgramStateRef StateZero,
+  void reportBug(llvm::StringRef Msg, ProgramStateRef StateZero,
                  CheckerContext &C) const;
-  void reportTaintBug(StringRef Msg, ProgramStateRef StateZero,
+  void reportTaintBug(llvm::StringRef Msg, ProgramStateRef StateZero,
                       CheckerContext &C,
                       llvm::ArrayRef<SymbolRef> TaintedSyms) const;
 
@@ -46,7 +46,7 @@ static const Expr *getDenomExpr(const ExplodedNode *N) {
   return nullptr;
 }
 
-void DivZeroChecker::reportBug(StringRef Msg, ProgramStateRef StateZero,
+void DivZeroChecker::reportBug(llvm::StringRef Msg, ProgramStateRef StateZero,
                                CheckerContext &C) const {
   if (ExplodedNode *N = C.generateErrorNode(StateZero)) {
     auto R = std::make_unique<PathSensitiveBugReport>(BT, Msg, N);
@@ -56,7 +56,7 @@ void DivZeroChecker::reportBug(StringRef Msg, ProgramStateRef StateZero,
 }
 
 void DivZeroChecker::reportTaintBug(
-    StringRef Msg, ProgramStateRef StateZero, CheckerContext &C,
+    llvm::StringRef Msg, ProgramStateRef StateZero, CheckerContext &C,
     llvm::ArrayRef<SymbolRef> TaintedSyms) const {
   if (ExplodedNode *N = C.generateErrorNode(StateZero)) {
     auto R = std::make_unique<PathSensitiveBugReport>(TaintBT, Msg, N);

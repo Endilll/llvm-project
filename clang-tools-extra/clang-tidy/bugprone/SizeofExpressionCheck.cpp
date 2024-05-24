@@ -57,7 +57,7 @@ CharUnits getSizeOfType(const ASTContext &Ctx, const Type *Ty) {
 
 } // namespace
 
-SizeofExpressionCheck::SizeofExpressionCheck(StringRef Name,
+SizeofExpressionCheck::SizeofExpressionCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       WarnOnSizeOfConstant(Options.get("WarnOnSizeOfConstant", true)),

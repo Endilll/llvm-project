@@ -229,14 +229,14 @@ static SourceRange getTypeRange(ASTContext &Context,
 // Returns the original source text of the second argument of a call to
 // enable_if_t. E.g., in enable_if_t<Condition, TheType>, this function
 // returns 'TheType'.
-static std::optional<StringRef>
+static std::optional<llvm::StringRef>
 getTypeText(ASTContext &Context,
             const TemplateSpecializationTypeLoc &EnableIf) {
   if (EnableIf.getNumArgs() > 1) {
     const LangOptions &LangOpts = Context.getLangOpts();
     const SourceManager &SM = Context.getSourceManager();
     bool Invalid = false;
-    StringRef Text = Lexer::getSourceText(CharSourceRange::getCharRange(
+    llvm::StringRef Text = Lexer::getSourceText(CharSourceRange::getCharRange(
                                               getTypeRange(Context, EnableIf)),
                                           SM, LangOpts, &Invalid)
                          .trim();
@@ -352,11 +352,11 @@ static std::vector<FixItHint> handleReturnType(const FunctionDecl *Function,
   if (!ConditionText)
     return {};
 
-  std::optional<StringRef> TypeText = getTypeText(Context, EnableIf.Loc);
+  std::optional<llvm::StringRef> TypeText = getTypeText(Context, EnableIf.Loc);
   if (!TypeText)
     return {};
 
-  SmallVector<const Expr *, 3> ExistingConstraints;
+  llvm::SmallVector<const Expr *, 3> ExistingConstraints;
   Function->getAssociatedConstraints(ExistingConstraints);
   if (!ExistingConstraints.empty()) {
     // FIXME - Support adding new constraints to existing ones. Do we need to
@@ -404,7 +404,7 @@ handleTrailingTemplateType(const FunctionTemplateDecl *FunctionTemplate,
   if (!ConditionText)
     return {};
 
-  SmallVector<const Expr *, 3> ExistingConstraints;
+  llvm::SmallVector<const Expr *, 3> ExistingConstraints;
   Function->getAssociatedConstraints(ExistingConstraints);
   if (!ExistingConstraints.empty()) {
     // FIXME - Support adding new constraints to existing ones. Do we need to

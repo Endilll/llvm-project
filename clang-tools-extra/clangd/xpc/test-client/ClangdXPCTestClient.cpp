@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
   for (llvm::line_iterator It(**Stdin, /*SkipBlanks=*/true,
                               /*CommentMarker=*/'#');
        !It.is_at_eof(); ++It) {
-    StringRef Line = *It;
+    llvm::StringRef Line = *It;
     if (auto Request = json::parse(Line)) {
       xpc_object_t Object = clangd::jsonToXpc(*Request);
       xpc_connection_send_message(conn, Object);

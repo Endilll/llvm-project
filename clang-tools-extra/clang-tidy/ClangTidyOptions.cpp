@@ -87,7 +87,7 @@ void yamlize(IO &IO, ClangTidyOptions::OptionMap &Val, bool,
              EmptyContext &Ctx) {
   if (IO.outputting()) {
     // Ensure check options are sorted
-    std::vector<std::pair<StringRef, StringRef>> SortedOptions;
+    std::vector<std::pair<llvm::StringRef, llvm::StringRef>> SortedOptions;
     SortedOptions.reserve(Val.size());
     for (auto &Key : Val) {
       SortedOptions.emplace_back(Key.getKey(), Key.getValue().Value);
@@ -115,7 +115,7 @@ void yamlize(IO &IO, ClangTidyOptions::OptionMap &Val, bool,
       yamlize(IO, NOpts->Options, true, Ctx);
     } else if (isa<MappingNode>(I.getCurrentNode())) {
       IO.beginMapping();
-      for (StringRef Key : IO.keys()) {
+      for (llvm::StringRef Key : IO.keys()) {
         IO.mapRequired(Key.data(), Val[Key].Value);
       }
       IO.endMapping();
@@ -340,8 +340,8 @@ void FileOptionsBaseProvider::addRawFileOptions(
 
   // Look for a suitable configuration file in all parent directories of the
   // file. Start with the immediate parent directory and move up.
-  StringRef Path = llvm::sys::path::parent_path(AbsolutePath);
-  for (StringRef CurrentPath = Path; !CurrentPath.empty();
+  llvm::StringRef Path = llvm::sys::path::parent_path(AbsolutePath);
+  for (llvm::StringRef CurrentPath = Path; !CurrentPath.empty();
        CurrentPath = llvm::sys::path::parent_path(CurrentPath)) {
     std::optional<OptionsSource> Result;
 
@@ -393,7 +393,7 @@ FileOptionsProvider::FileOptionsProvider(
 // Consider pulling out common bits to a findParentFileWithName function or
 // similar.
 std::vector<OptionsSource>
-FileOptionsProvider::getRawOptions(StringRef FileName) {
+FileOptionsProvider::getRawOptions(llvm::StringRef FileName) {
   LLVM_DEBUG(llvm::dbgs() << "Getting options for file " << FileName
                           << "...\n");
   assert(FS && "FS must be set.");
@@ -414,7 +414,7 @@ FileOptionsProvider::getRawOptions(StringRef FileName) {
 }
 
 std::optional<OptionsSource>
-FileOptionsBaseProvider::tryReadConfigFile(StringRef Directory) {
+FileOptionsBaseProvider::tryReadConfigFile(llvm::StringRef Directory) {
   assert(!Directory.empty());
 
   llvm::ErrorOr<llvm::vfs::Status> DirectoryStatus = FS->status(Directory);
@@ -426,7 +426,7 @@ FileOptionsBaseProvider::tryReadConfigFile(StringRef Directory) {
   }
 
   for (const ConfigFileHandler &ConfigHandler : ConfigHandlers) {
-    SmallString<128> ConfigFile(Directory);
+    llvm::SmallString<128> ConfigFile(Directory);
     llvm::sys::path::append(ConfigFile, ConfigHandler.first);
     LLVM_DEBUG(llvm::dbgs() << "Trying " << ConfigFile << "...\n");
 
@@ -461,7 +461,7 @@ FileOptionsBaseProvider::tryReadConfigFile(StringRef Directory) {
 }
 
 /// Parses -line-filter option and stores it to the \c Options.
-std::error_code parseLineFilter(StringRef LineFilter,
+std::error_code parseLineFilter(llvm::StringRef LineFilter,
                                 clang::tidy::ClangTidyGlobalOptions &Options) {
   llvm::yaml::Input Input(LineFilter);
   Input >> Options.LineFilter;

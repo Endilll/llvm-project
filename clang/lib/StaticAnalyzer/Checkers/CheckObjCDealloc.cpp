@@ -1029,8 +1029,8 @@ bool ObjCDeallocChecker::classHasSeparateTeardown(
 bool ObjCDeallocChecker::isReleasedByCIFilterDealloc(
     const ObjCPropertyImplDecl *PropImpl) const {
   assert(PropImpl->getPropertyIvarDecl());
-  StringRef PropName = PropImpl->getPropertyDecl()->getName();
-  StringRef IvarName = PropImpl->getPropertyIvarDecl()->getName();
+  llvm::StringRef PropName = PropImpl->getPropertyDecl()->getName();
+  llvm::StringRef IvarName = PropImpl->getPropertyIvarDecl()->getName();
 
   const char *ReleasePrefix = "input";
   if (!(PropName.starts_with(ReleasePrefix) ||

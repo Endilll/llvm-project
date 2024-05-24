@@ -62,10 +62,10 @@ public:
   }
 
   void InclusionDirective(SourceLocation Hash, const Token &IncludeTok,
-                          StringRef SpelledFilename, bool IsAngled,
+                          llvm::StringRef SpelledFilename, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind) override {
     if (!Active)
@@ -300,7 +300,7 @@ public:
     }
     auto CommentUID = FE->getUniqueID();
     if (Pragma->consume_front("private")) {
-      StringRef PublicHeader;
+      llvm::StringRef PublicHeader;
       if (Pragma->consume_front(", include ")) {
         // We always insert using the spelling from the pragma.
         PublicHeader =
@@ -333,7 +333,7 @@ public:
   }
 
 private:
-  StringRef save(llvm::StringRef S) { return UniqueStrings.save(S); }
+  llvm::StringRef save(llvm::StringRef S) { return UniqueStrings.save(S); }
 
   bool InMainFile = false;
   const SourceManager &SM;
@@ -349,7 +349,7 @@ private:
     // The file where we saw the pragma.
     FileID SeenAtFile;
     // Name (per FileEntry::getName()) of the file SeenAtFile.
-    StringRef Path;
+    llvm::StringRef Path;
     // true if it is a block begin/end_exports pragma; false if it is a
     // single-line export pragma.
     bool Block = false;
@@ -388,7 +388,7 @@ llvm::StringRef PragmaIncludes::getPublic(const FileEntry *F) const {
 }
 
 static llvm::SmallVector<FileEntryRef>
-toFileEntries(llvm::ArrayRef<StringRef> FileNames, FileManager &FM) {
+toFileEntries(llvm::ArrayRef<llvm::StringRef> FileNames, FileManager &FM) {
   llvm::SmallVector<FileEntryRef> Results;
 
   for (auto FName : FileNames) {

@@ -1,7 +1,7 @@
 #include "b.h"
 
 class A {
-  SmallVector<char, 8> LegalIntWidths;
+  llvm::SmallVector<char, 8> LegalIntWidths;
   A() {}
 };
 

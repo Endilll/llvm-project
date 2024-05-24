@@ -25,7 +25,7 @@ class ExtractAPIAction : public ASTFrontendAction,
                          private ExtractAPIActionBase {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
 private:
 
@@ -33,7 +33,7 @@ private:
   ///
   /// This captures the spelling used to include the file and whether the
   /// include is quoted or not.
-  SmallVector<std::pair<SmallString<32>, bool>> KnownInputFiles;
+  llvm::SmallVector<std::pair<llvm::SmallString<32>, bool>> KnownInputFiles;
 
   /// Prepare to execute the action on the given CompilerInstance.
   ///
@@ -48,7 +48,7 @@ private:
   /// emit them in this callback.
   void EndSourceFileAction() override;
 
-  static StringRef getInputBufferName() { return "<extract-api-includes>"; }
+  static llvm::StringRef getInputBufferName() { return "<extract-api-includes>"; }
 };
 
 /// Wrap ExtractAPIAction on top of a pre-existing action
@@ -67,7 +67,7 @@ protected:
   ///
   /// This allows us to execute ExtractAPI action while on top of
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
 private:
   /// Flag to check if the wrapper front end action's consumer is

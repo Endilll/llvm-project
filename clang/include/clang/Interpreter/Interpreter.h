@@ -83,7 +83,7 @@ public:
   virtual ~RuntimeInterfaceBuilder() = default;
 
   using TransformExprFunction = ExprResult(RuntimeInterfaceBuilder *Builder,
-                                           Expr *, ArrayRef<Expr *>);
+                                           Expr *, llvm::ArrayRef<Expr *>);
   virtual TransformExprFunction *getPrintValueTransformer() = 0;
 };
 

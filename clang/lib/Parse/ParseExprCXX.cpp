@@ -1392,7 +1392,7 @@ ExprResult Parser::ParseLambdaExpressionAfterIntroducer(
                   ? diag::warn_cxx17_compat_lambda_template_parameter_list
                   : diag::ext_lambda_template_parameter_list);
 
-    SmallVector<NamedDecl*, 4> TemplateParams;
+    llvm::SmallVector<NamedDecl*, 4> TemplateParams;
     SourceLocation LAngleLoc, RAngleLoc;
     if (ParseTemplateParameters(TemplateParamScope,
                                 CurTemplateDepthTracker.getDepth(),
@@ -1454,7 +1454,7 @@ ExprResult Parser::ParseLambdaExpressionAfterIntroducer(
                                  Scope::DeclScope);
 
   // Parse parameter-declaration-clause.
-  SmallVector<DeclaratorChunk::ParamInfo, 16> ParamInfo;
+  llvm::SmallVector<DeclaratorChunk::ParamInfo, 16> ParamInfo;
   SourceLocation EllipsisLoc;
 
   if (Tok.is(tok::l_paren)) {
@@ -1528,8 +1528,8 @@ ExprResult Parser::ParseLambdaExpressionAfterIntroducer(
     // Parse exception-specification[opt].
     ExceptionSpecificationType ESpecType = EST_None;
     SourceRange ESpecRange;
-    SmallVector<ParsedType, 2> DynamicExceptions;
-    SmallVector<SourceRange, 2> DynamicExceptionRanges;
+    llvm::SmallVector<ParsedType, 2> DynamicExceptions;
+    llvm::SmallVector<SourceRange, 2> DynamicExceptionRanges;
     ExprResult NoexceptExpr;
     CachedTokens *ExceptionSpecTokens;
 
@@ -2826,8 +2826,8 @@ bool Parser::ParseUnqualifiedIdOperator(CXXScopeSpec &SS, bool EnteringContext,
 
     // We're past translation phase 6, so perform string literal concatenation
     // before checking for "".
-    SmallVector<Token, 4> Toks;
-    SmallVector<SourceLocation, 4> TokLocs;
+    llvm::SmallVector<Token, 4> Toks;
+    llvm::SmallVector<SourceLocation, 4> TokLocs;
     while (isTokenStringLiteral()) {
       if (!Tok.is(tok::string_literal) && !DiagId) {
         // C++11 [over.literal]p1:
@@ -2877,7 +2877,7 @@ bool Parser::ParseUnqualifiedIdOperator(CXXScopeSpec &SS, bool EnteringContext,
     if (DiagId) {
       // This isn't a valid literal-operator-id, but we think we know
       // what the user meant. Tell them what they should have written.
-      SmallString<32> Str;
+      llvm::SmallString<32> Str;
       Str += "\"\"";
       Str += II->getName();
       Diag(DiagLoc, DiagId) << FixItHint::CreateReplacement(
@@ -3453,7 +3453,7 @@ void Parser::ParseDirectNewDeclarator(Declarator &D) {
 ///                   '(' expression-list ')'
 ///
 bool Parser::ParseExpressionListOrTypeId(
-                                   SmallVectorImpl<Expr*> &PlacementArgs,
+                                   llvm::SmallVectorImpl<Expr*> &PlacementArgs,
                                          Declarator &D) {
   // The '(' was already consumed.
   if (isTypeIdInParens()) {
@@ -3929,7 +3929,7 @@ ExprResult Parser::ParseTypeTrait() {
   if (Parens.expectAndConsume())
     return ExprError();
 
-  SmallVector<ParsedType, 2> Args;
+  llvm::SmallVector<ParsedType, 2> Args;
   do {
     // Parse the next type.
     TypeResult Ty = ParseTypeName(/*SourceRange=*/nullptr,

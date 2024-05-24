@@ -144,7 +144,7 @@ isAssignmentToMemberOf(const CXXRecordDecl *Rec, const Stmt *S,
 }
 
 PreferMemberInitializerCheck::PreferMemberInitializerCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context) {}
 
 void PreferMemberInitializerCheck::registerMatchers(MatchFinder *Finder) {
@@ -171,7 +171,7 @@ void PreferMemberInitializerCheck::check(
 
   for (const Stmt *S : Body->body()) {
     if (S->getBeginLoc().isMacroID()) {
-      StringRef MacroName = Lexer::getImmediateMacroName(
+      llvm::StringRef MacroName = Lexer::getImmediateMacroName(
           S->getBeginLoc(), *Result.SourceManager, getLangOpts());
       if (MacroName.contains_insensitive("assert"))
         return;
@@ -198,7 +198,7 @@ void PreferMemberInitializerCheck::check(
     if (!canAdvanceAssignment(AssignedFields[Field]))
       continue;
 
-    StringRef InsertPrefix = "";
+    llvm::StringRef InsertPrefix = "";
     bool HasInitAlready = false;
     SourceLocation InsertPos;
     SourceRange ReplaceRange;
@@ -275,7 +275,7 @@ void PreferMemberInitializerCheck::check(
                 << Field;
     if (InvalidFix)
       continue;
-    StringRef NewInit = Lexer::getSourceText(
+    llvm::StringRef NewInit = Lexer::getSourceText(
         Result.SourceManager->getExpansionRange(InitValue->getSourceRange()),
         *Result.SourceManager, getLangOpts());
     if (HasInitAlready) {
@@ -287,7 +287,7 @@ void PreferMemberInitializerCheck::check(
       else
         Diag << FixItHint::CreateReplacement(ReplaceRange, NewInit);
     } else {
-      SmallString<128> Insertion({InsertPrefix, Field->getName(), "(", NewInit,
+      llvm::SmallString<128> Insertion({InsertPrefix, Field->getName(), "(", NewInit,
                                   AddComma ? "), " : ")"});
       Diag << FixItHint::CreateInsertion(InsertPos, Insertion,
                                          FirstToCtorInits);

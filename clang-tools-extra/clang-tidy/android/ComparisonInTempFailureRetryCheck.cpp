@@ -17,10 +17,10 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::android {
 
 ComparisonInTempFailureRetryCheck::ComparisonInTempFailureRetryCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       RawRetryList(Options.get("RetryMacros", "TEMP_FAILURE_RETRY")) {
-  StringRef(RawRetryList).split(RetryMacros, ",", -1, false);
+  llvm::StringRef(RawRetryList).split(RetryMacros, ",", -1, false);
 }
 
 void ComparisonInTempFailureRetryCheck::storeOptions(
@@ -53,7 +53,7 @@ void ComparisonInTempFailureRetryCheck::registerMatchers(MatchFinder *Finder) {
 
 void ComparisonInTempFailureRetryCheck::check(
     const MatchFinder::MatchResult &Result) {
-  StringRef RetryMacroName;
+  llvm::StringRef RetryMacroName;
   const auto &Node = *Result.Nodes.getNodeAs<BinaryOperator>("outer");
   if (!Node.getBeginLoc().isMacroID())
     return;

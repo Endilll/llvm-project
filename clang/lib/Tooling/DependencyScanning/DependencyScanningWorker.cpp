@@ -40,7 +40,7 @@ namespace {
 class DependencyConsumerForwarder : public DependencyFileGenerator {
 public:
   DependencyConsumerForwarder(std::unique_ptr<DependencyOutputOptions> Opts,
-                              StringRef WorkingDirectory, DependencyConsumer &C)
+                              llvm::StringRef WorkingDirectory, DependencyConsumer &C)
       : DependencyFileGenerator(*Opts), WorkingDirectory(WorkingDirectory),
         Opts(std::move(Opts)), C(C) {}
 
@@ -56,7 +56,7 @@ public:
   }
 
 private:
-  StringRef WorkingDirectory;
+  llvm::StringRef WorkingDirectory;
   std::unique_ptr<DependencyOutputOptions> Opts;
   DependencyConsumer &C;
 };
@@ -69,7 +69,7 @@ static bool checkHeaderSearchPaths(const HeaderSearchOptions &HSOpts,
     if (HSOpts.VFSOverlayFiles != ExistingHSOpts.VFSOverlayFiles) {
       if (Diags) {
         Diags->Report(diag::warn_pch_vfsoverlay_mismatch);
-        auto VFSNote = [&](int Type, ArrayRef<std::string> VFSOverlays) {
+        auto VFSNote = [&](int Type, llvm::ArrayRef<std::string> VFSOverlays) {
           if (VFSOverlays.empty()) {
             Diags->Report(diag::note_pch_vfsoverlay_empty) << Type;
           } else {
@@ -103,12 +103,12 @@ public:
 
   bool needsImportVisitation() const override { return true; }
 
-  void visitImport(StringRef ModuleName, StringRef Filename) override {
+  void visitImport(llvm::StringRef ModuleName, llvm::StringRef Filename) override {
     if (PrebuiltModuleFiles.insert({ModuleName.str(), Filename.str()}).second)
       NewModuleFiles.push_back(Filename.str());
   }
 
-  void visitModuleFile(StringRef Filename,
+  void visitModuleFile(llvm::StringRef Filename,
                        serialization::ModuleKind Kind) override {
     CurrentFile = Filename;
   }
@@ -134,7 +134,7 @@ private:
 
 /// Visit the given prebuilt module and collect all of the modules it
 /// transitively imports and contributing input files.
-static bool visitPrebuiltModule(StringRef PrebuiltModuleFilename,
+static bool visitPrebuiltModule(llvm::StringRef PrebuiltModuleFilename,
                                 CompilerInstance &CI,
                                 PrebuiltModuleFilesT &ModuleFiles,
                                 PrebuiltModuleVFSMapT &PrebuiltModuleVFSMap,
@@ -167,8 +167,8 @@ static bool visitPrebuiltModule(StringRef PrebuiltModuleFilename,
 }
 
 /// Transform arbitrary file name into an object-like file name.
-static std::string makeObjFileName(StringRef FileName) {
-  SmallString<128> ObjFileName(FileName);
+static std::string makeObjFileName(llvm::StringRef FileName) {
+  llvm::SmallString<128> ObjFileName(FileName);
   llvm::sys::path::replace_extension(ObjFileName, "o");
   return std::string(ObjFileName);
 }
@@ -176,7 +176,7 @@ static std::string makeObjFileName(StringRef FileName) {
 /// Deduce the dependency target based on the output file and input files.
 static std::string
 deduceDepTarget(const std::string &OutputFile,
-                const SmallVectorImpl<FrontendInputFile> &InputFiles) {
+                const llvm::SmallVectorImpl<FrontendInputFile> &InputFiles) {
   if (OutputFile != "-")
     return OutputFile;
 
@@ -199,7 +199,7 @@ static void sanitizeDiagOpts(DiagnosticOptions &DiagOpts) {
   //       `#pragma clang diagnostic`, while still allowing some scanning
   //       warnings for things we're not ready to turn into errors yet.
   //       See `test/ClangScanDeps/diagnostic-pragmas.c` for an example.
-  llvm::erase_if(DiagOpts.Warnings, [](StringRef Warning) {
+  llvm::erase_if(DiagOpts.Warnings, [](llvm::StringRef Warning) {
     return llvm::StringSwitch<bool>(Warning)
         .Cases("pch-vfs-diff", "error=pch-vfs-diff", false)
         .StartsWith("no-error=", false)
@@ -217,12 +217,12 @@ static void sanitizeDiagOpts(DiagnosticOptions &DiagOpts) {
 //
 // We could set up a preprocessor and actually lex the name, but that's very
 // heavyweight for a situation that will almost never happen in practice.
-static std::optional<StringRef> getSimpleMacroName(StringRef Macro) {
-  StringRef Name = Macro.split("=").first.ltrim(" \t");
+static std::optional<llvm::StringRef> getSimpleMacroName(llvm::StringRef Macro) {
+  llvm::StringRef Name = Macro.split("=").first.ltrim(" \t");
   std::size_t I = 0;
 
-  auto FinishName = [&]() -> std::optional<StringRef> {
-    StringRef SimpleName = Name.slice(0, I);
+  auto FinishName = [&]() -> std::optional<llvm::StringRef> {
+    llvm::StringRef SimpleName = Name.slice(0, I);
     if (SimpleName.empty())
       return std::nullopt;
     return SimpleName;
@@ -246,7 +246,7 @@ static std::optional<StringRef> getSimpleMacroName(StringRef Macro) {
 }
 
 static void canonicalizeDefines(PreprocessorOptions &PPOpts) {
-  using MacroOpt = std::pair<StringRef, std::size_t>;
+  using MacroOpt = std::pair<llvm::StringRef, std::size_t>;
   std::vector<MacroOpt> SimpleNames;
   SimpleNames.reserve(PPOpts.Macros.size());
   std::size_t Index = 0;
@@ -284,12 +284,12 @@ static void canonicalizeDefines(PreprocessorOptions &PPOpts) {
 class DependencyScanningAction : public tooling::ToolAction {
 public:
   DependencyScanningAction(
-      StringRef WorkingDirectory, DependencyConsumer &Consumer,
+      llvm::StringRef WorkingDirectory, DependencyConsumer &Consumer,
       DependencyActionController &Controller,
       llvm::IntrusiveRefCntPtr<DependencyScanningWorkerFilesystem> DepFS,
       ScanningOutputFormat Format, ScanningOptimizations OptimizeArgs,
       bool EagerLoadModules, bool DisableFree,
-      std::optional<StringRef> ModuleName = std::nullopt)
+      std::optional<llvm::StringRef> ModuleName = std::nullopt)
       : WorkingDirectory(WorkingDirectory), Consumer(Consumer),
         Controller(Controller), DepFS(std::move(DepFS)), Format(Format),
         OptimizeArgs(OptimizeArgs), EagerLoadModules(EagerLoadModules),
@@ -367,7 +367,7 @@ public:
     if (DepFS)
       ScanInstance.getPreprocessorOpts().DependencyDirectivesForFile =
           [LocalDepFS = DepFS](FileEntryRef File)
-          -> std::optional<ArrayRef<dependency_directives_scan::Directive>> {
+          -> std::optional<llvm::ArrayRef<dependency_directives_scan::Directive>> {
         if (llvm::ErrorOr<EntryRef> Entry =
                 LocalDepFS->getOrCreateFileSystemEntry(File.getName()))
           if (LocalDepFS->ensureDirectiveTokensArePopulated(*Entry))
@@ -464,7 +464,7 @@ private:
   }
 
 private:
-  StringRef WorkingDirectory;
+  llvm::StringRef WorkingDirectory;
   DependencyConsumer &Consumer;
   DependencyActionController &Controller;
   llvm::IntrusiveRefCntPtr<DependencyScanningWorkerFilesystem> DepFS;
@@ -472,7 +472,7 @@ private:
   ScanningOptimizations OptimizeArgs;
   bool EagerLoadModules;
   bool DisableFree;
-  std::optional<StringRef> ModuleName;
+  std::optional<llvm::StringRef> ModuleName;
   std::optional<CompilerInstance> ScanInstanceStorage;
   std::shared_ptr<ModuleDepCollector> MDC;
   std::vector<std::string> LastCC1Arguments;
@@ -507,9 +507,9 @@ DependencyScanningWorker::DependencyScanningWorker(
 }
 
 llvm::Error DependencyScanningWorker::computeDependencies(
-    StringRef WorkingDirectory, const std::vector<std::string> &CommandLine,
+    llvm::StringRef WorkingDirectory, const std::vector<std::string> &CommandLine,
     DependencyConsumer &Consumer, DependencyActionController &Controller,
-    std::optional<StringRef> ModuleName) {
+    std::optional<llvm::StringRef> ModuleName) {
   std::vector<const char *> CLI;
   for (const std::string &Arg : CommandLine)
     CLI.push_back(Arg.c_str());
@@ -530,9 +530,9 @@ llvm::Error DependencyScanningWorker::computeDependencies(
 }
 
 static bool forEachDriverJob(
-    ArrayRef<std::string> ArgStrs, DiagnosticsEngine &Diags, FileManager &FM,
+    llvm::ArrayRef<std::string> ArgStrs, DiagnosticsEngine &Diags, FileManager &FM,
     llvm::function_ref<bool(const driver::Command &Cmd)> Callback) {
-  SmallVector<const char *, 256> Argv;
+  llvm::SmallVector<const char *, 256> Argv;
   Argv.reserve(ArgStrs.size());
   for (const std::string &Arg : ArgStrs)
     Argv.push_back(Arg.c_str());
@@ -546,7 +546,7 @@ static bool forEachDriverJob(
 
   llvm::BumpPtrAllocator Alloc;
   bool CLMode = driver::IsClangCL(
-      driver::getDriverMode(Argv[0], ArrayRef(Argv).slice(1)));
+      driver::getDriverMode(Argv[0], llvm::ArrayRef(Argv).slice(1)));
 
   if (llvm::Error E = driver::expandResponseFiles(Argv, CLMode, Alloc, FS)) {
     Diags.Report(diag::err_drv_expand_response_file)
@@ -590,9 +590,9 @@ static bool createAndRunToolInvocation(
 }
 
 bool DependencyScanningWorker::computeDependencies(
-    StringRef WorkingDirectory, const std::vector<std::string> &CommandLine,
+    llvm::StringRef WorkingDirectory, const std::vector<std::string> &CommandLine,
     DependencyConsumer &Consumer, DependencyActionController &Controller,
-    DiagnosticConsumer &DC, std::optional<StringRef> ModuleName) {
+    DiagnosticConsumer &DC, std::optional<llvm::StringRef> ModuleName) {
   // Reset what might have been modified in the previous worker invocation.
   BaseFS->setCurrentWorkingDirectory(WorkingDirectory);
 
@@ -611,7 +611,7 @@ bool DependencyScanningWorker::computeDependencies(
     OverlayFS->pushOverlay(InMemoryFS);
     ModifiedFS = OverlayFS;
 
-    SmallString<128> FakeInputPath;
+    llvm::SmallString<128> FakeInputPath;
     // TODO: We should retry the creation if the path already exists.
     llvm::sys::fs::createUniquePath(*ModuleName + "-%%%%%%%%.input",
                                     FakeInputPath,
@@ -635,7 +635,7 @@ bool DependencyScanningWorker::computeDependencies(
 
   auto DiagOpts = CreateAndPopulateDiagOpts(FinalCCommandLine);
   sanitizeDiagOpts(*DiagOpts);
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
       CompilerInstance::createDiagnostics(DiagOpts.release(), &DC,
                                           /*ShouldOwnClient=*/false);
 
@@ -658,7 +658,7 @@ bool DependencyScanningWorker::computeDependencies(
   } else {
     Success = forEachDriverJob(
         FinalCommandLine, *Diags, *FileMgr, [&](const driver::Command &Cmd) {
-          if (StringRef(Cmd.getCreator().getName()) != "clang") {
+          if (llvm::StringRef(Cmd.getCreator().getName()) != "clang") {
             // Non-clang command. Just pass through to the dependency
             // consumer.
             Consumer.handleBuildCommand(

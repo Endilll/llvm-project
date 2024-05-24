@@ -36,7 +36,7 @@ static MaybeCount readRequiredParams(MaybeCount RequiredArgs,
 }
 
 ento::CallDescription::CallDescription(Mode MatchAs,
-                                       ArrayRef<StringRef> QualifiedName,
+                                       llvm::ArrayRef<llvm::StringRef> QualifiedName,
                                        MaybeCount RequiredArgs /*= None*/,
                                        MaybeCount RequiredParams /*= None*/)
     : RequiredArgs(RequiredArgs),
@@ -45,7 +45,7 @@ ento::CallDescription::CallDescription(Mode MatchAs,
   assert(!QualifiedName.empty());
   this->QualifiedName.reserve(QualifiedName.size());
   llvm::transform(QualifiedName, std::back_inserter(this->QualifiedName),
-                  [](StringRef From) { return From.str(); });
+                  [](llvm::StringRef From) { return From.str(); });
 }
 
 bool ento::CallDescription::matches(const CallEvent &Call) const {

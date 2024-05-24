@@ -47,7 +47,7 @@ using ast_matchers::stmtExpr;
 using ast_matchers::unless;
 using ast_matchers::voidType;
 
-const Expr *getCondition(const BoundNodes &Nodes, const StringRef NodeId) {
+const Expr *getCondition(const BoundNodes &Nodes, const llvm::StringRef NodeId) {
   const auto *If = Nodes.getNodeAs<IfStmt>(NodeId);
   if (If != nullptr)
     return If->getCond();

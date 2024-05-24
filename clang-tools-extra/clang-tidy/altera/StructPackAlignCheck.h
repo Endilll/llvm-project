@@ -20,7 +20,7 @@ namespace clang::tidy::altera {
 /// http://clang.llvm.org/extra/clang-tidy/checks/altera/struct-pack-align.html
 class StructPackAlignCheck : public ClangTidyCheck {
 public:
-  StructPackAlignCheck(StringRef Name, ClangTidyContext *Context)
+  StructPackAlignCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
     MaxConfiguredAlignment(Options.get("MaxConfiguredAlignment", 128)) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

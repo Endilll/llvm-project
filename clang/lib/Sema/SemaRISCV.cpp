@@ -47,7 +47,7 @@ struct RVVIntrinsicDef {
 
 struct RVVOverloadIntrinsicDef {
   // Indexes of RISCVIntrinsicManagerImpl::IntrinsicList.
-  SmallVector<uint16_t, 8> Indexes;
+  llvm::SmallVector<uint16_t, 8> Indexes;
 };
 
 } // namespace
@@ -77,13 +77,13 @@ static const RVVIntrinsicRecord RVSiFiveVectorIntrinsicRecords[] = {
 };
 
 // Get subsequence of signature table.
-static ArrayRef<PrototypeDescriptor>
+static llvm::ArrayRef<PrototypeDescriptor>
 ProtoSeq2ArrayRef(IntrinsicKind K, uint16_t Index, uint8_t Length) {
   switch (K) {
   case IntrinsicKind::RVV:
-    return ArrayRef(&RVVSignatureTable[Index], Length);
+    return llvm::ArrayRef(&RVVSignatureTable[Index], Length);
   case IntrinsicKind::SIFIVE_VECTOR:
-    return ArrayRef(&RVSiFiveVectorSignatureTable[Index], Length);
+    return llvm::ArrayRef(&RVSiFiveVectorSignatureTable[Index], Length);
   }
   llvm_unreachable("Unhandled IntrinsicKind");
 }
@@ -171,8 +171,8 @@ private:
   StringMap<RVVOverloadIntrinsicDef> OverloadIntrinsics;
 
   // Create RVVIntrinsicDef.
-  void InitRVVIntrinsic(const RVVIntrinsicRecord &Record, StringRef SuffixStr,
-                        StringRef OverloadedSuffixStr, bool IsMask,
+  void InitRVVIntrinsic(const RVVIntrinsicRecord &Record, llvm::StringRef SuffixStr,
+                        llvm::StringRef OverloadedSuffixStr, bool IsMask,
                         RVVTypes &Types, bool HasPolicy, Policy PolicyAttrs);
 
   // Create FunctionDecl for a vector intrinsic.
@@ -180,7 +180,7 @@ private:
                               Preprocessor &PP, uint32_t Index,
                               bool IsOverload);
 
-  void ConstructRVVIntrinsics(ArrayRef<RVVIntrinsicRecord> Recs,
+  void ConstructRVVIntrinsics(llvm::ArrayRef<RVVIntrinsicRecord> Recs,
                               IntrinsicKind K);
 
 public:
@@ -200,7 +200,7 @@ public:
 } // namespace
 
 void RISCVIntrinsicManagerImpl::ConstructRVVIntrinsics(
-    ArrayRef<RVVIntrinsicRecord> Recs, IntrinsicKind K) {
+    llvm::ArrayRef<RVVIntrinsicRecord> Recs, IntrinsicKind K) {
   const TargetInfo &TI = Context.getTargetInfo();
   static const std::pair<const char *, RVVRequire> FeatureCheckList[] = {
       {"64bit", RVV_REQ_RV64},
@@ -234,11 +234,11 @@ void RISCVIntrinsicManagerImpl::ConstructRVVIntrinsics(
 
     // Create Intrinsics for each type and LMUL.
     BasicType BaseType = BasicType::Unknown;
-    ArrayRef<PrototypeDescriptor> BasicProtoSeq =
+    llvm::ArrayRef<PrototypeDescriptor> BasicProtoSeq =
         ProtoSeq2ArrayRef(K, Record.PrototypeIndex, Record.PrototypeLength);
-    ArrayRef<PrototypeDescriptor> SuffixProto =
+    llvm::ArrayRef<PrototypeDescriptor> SuffixProto =
         ProtoSeq2ArrayRef(K, Record.SuffixIndex, Record.SuffixLength);
-    ArrayRef<PrototypeDescriptor> OverloadedSuffixProto = ProtoSeq2ArrayRef(
+    llvm::ArrayRef<PrototypeDescriptor> OverloadedSuffixProto = ProtoSeq2ArrayRef(
         K, Record.OverloadedSuffixIndex, Record.OverloadedSuffixSize);
 
     PolicyScheme UnMaskedPolicyScheme =
@@ -263,9 +263,9 @@ void RISCVIntrinsicManagerImpl::ConstructRVVIntrinsics(
 
     bool UnMaskedHasPolicy = UnMaskedPolicyScheme != PolicyScheme::SchemeNone;
     bool MaskedHasPolicy = MaskedPolicyScheme != PolicyScheme::SchemeNone;
-    SmallVector<Policy> SupportedUnMaskedPolicies =
+    llvm::SmallVector<Policy> SupportedUnMaskedPolicies =
         RVVIntrinsic::getSupportedUnMaskedPolicies();
-    SmallVector<Policy> SupportedMaskedPolicies =
+    llvm::SmallVector<Policy> SupportedMaskedPolicies =
         RVVIntrinsic::getSupportedMaskedPolicies(Record.HasTailPolicy,
                                                  Record.HasMaskPolicy);
 
@@ -365,8 +365,8 @@ void RISCVIntrinsicManagerImpl::InitIntrinsicList() {
 
 // Compute name and signatures for intrinsic with practical types.
 void RISCVIntrinsicManagerImpl::InitRVVIntrinsic(
-    const RVVIntrinsicRecord &Record, StringRef SuffixStr,
-    StringRef OverloadedSuffixStr, bool IsMasked, RVVTypes &Signature,
+    const RVVIntrinsicRecord &Record, llvm::StringRef SuffixStr,
+    llvm::StringRef OverloadedSuffixStr, bool IsMasked, RVVTypes &Signature,
     bool HasPolicy, Policy PolicyAttrs) {
   // Function name, e.g. vadd_vv_i32m1.
   std::string Name = Record.Name;
@@ -376,7 +376,7 @@ void RISCVIntrinsicManagerImpl::InitRVVIntrinsic(
   // Overloaded function name, e.g. vadd.
   std::string OverloadedName;
   if (!Record.OverloadedName)
-    OverloadedName = StringRef(Record.Name).split("_").first.str();
+    OverloadedName = llvm::StringRef(Record.Name).split("_").first.str();
   else
     OverloadedName = Record.OverloadedName;
   if (!OverloadedSuffixStr.empty())
@@ -417,7 +417,7 @@ void RISCVIntrinsicManagerImpl::CreateRVVIntrinsicDecl(LookupResult &LR,
   size_t SigLength = Sigs.size();
   RVVType *ReturnType = Sigs[0];
   QualType RetType = RVVType2Qual(Context, ReturnType);
-  SmallVector<QualType, 8> ArgTypes;
+  llvm::SmallVector<QualType, 8> ArgTypes;
   QualType BuiltinFuncType;
 
   // Skip return type, and convert RVVType to QualType for arguments.
@@ -442,7 +442,7 @@ void RISCVIntrinsicManagerImpl::CreateRVVIntrinsicDecl(LookupResult &LR,
   // Create Decl objects for each parameter, adding them to the
   // FunctionDecl.
   const auto *FP = cast<FunctionProtoType>(BuiltinFuncType);
-  SmallVector<ParmVarDecl *, 8> ParmList;
+  llvm::SmallVector<ParmVarDecl *, 8> ParmList;
   for (unsigned IParm = 0, E = FP->getNumParams(); IParm != E; ++IParm) {
     ParmVarDecl *Parm =
         ParmVarDecl::Create(Context, RVVIntrinsicDecl, Loc, Loc, nullptr,
@@ -469,7 +469,7 @@ void RISCVIntrinsicManagerImpl::CreateRVVIntrinsicDecl(LookupResult &LR,
 bool RISCVIntrinsicManagerImpl::CreateIntrinsicIfFound(LookupResult &LR,
                                                        IdentifierInfo *II,
                                                        Preprocessor &PP) {
-  StringRef Name = II->getName();
+  llvm::StringRef Name = II->getName();
   if (!Name.consume_front("__riscv_"))
     return false;
 

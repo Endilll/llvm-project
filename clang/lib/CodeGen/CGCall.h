@@ -255,7 +255,7 @@ public:
 
 /// CallArgList - Type for representing both the value and type of
 /// arguments in a call.
-class CallArgList : public SmallVector<CallArg, 8> {
+class CallArgList : public llvm::SmallVector<CallArg, 8> {
 public:
   CallArgList() = default;
 
@@ -307,7 +307,7 @@ public:
 
   bool hasWritebacks() const { return !Writebacks.empty(); }
 
-  typedef llvm::iterator_range<SmallVectorImpl<Writeback>::const_iterator>
+  typedef llvm::iterator_range<llvm::SmallVectorImpl<Writeback>::const_iterator>
       writeback_const_range;
 
   writeback_const_range writebacks() const {
@@ -322,7 +322,7 @@ public:
     CleanupsToDeactivate.push_back(ArgCleanup);
   }
 
-  ArrayRef<CallArgCleanup> getCleanupsToDeactivate() const {
+  llvm::ArrayRef<CallArgCleanup> getCleanupsToDeactivate() const {
     return CleanupsToDeactivate;
   }
 
@@ -335,12 +335,12 @@ public:
   bool isUsingInAlloca() const { return StackBase; }
 
 private:
-  SmallVector<Writeback, 1> Writebacks;
+  llvm::SmallVector<Writeback, 1> Writebacks;
 
   /// Deactivate these cleanups immediately before making the call.  This
   /// is used to cleanup objects that are owned by the callee once the call
   /// occurs.
-  SmallVector<CallArgCleanup, 1> CleanupsToDeactivate;
+  llvm::SmallVector<CallArgCleanup, 1> CleanupsToDeactivate;
 
   /// The stacksave call.  It dominates all of the argument evaluation.
   llvm::CallInst *StackBase = nullptr;
@@ -349,7 +349,7 @@ private:
 /// FunctionArgList - Type for representing both the decl and type
 /// of parameters to a function. The decl must be either a
 /// ParmVarDecl or ImplicitParamDecl.
-class FunctionArgList : public SmallVector<const VarDecl *, 16> {};
+class FunctionArgList : public llvm::SmallVector<const VarDecl *, 16> {};
 
 /// ReturnValueSlot - Contains the address where the return value of a
 /// function can be stored, and whether the address is volatile or not.

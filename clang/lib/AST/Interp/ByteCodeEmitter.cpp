@@ -61,8 +61,8 @@ Function *ByteCodeEmitter::compileFunc(const FunctionDecl *FuncDecl) {
 
   // Set up argument indices.
   unsigned ParamOffset = 0;
-  SmallVector<PrimType, 8> ParamTypes;
-  SmallVector<unsigned, 8> ParamOffsets;
+  llvm::SmallVector<PrimType, 8> ParamTypes;
+  llvm::SmallVector<unsigned, 8> ParamOffsets;
   llvm::DenseMap<unsigned, Function::ParamDescriptor> ParamDescriptors;
 
   // If the return is not a primitive, a pointer to the storage where the

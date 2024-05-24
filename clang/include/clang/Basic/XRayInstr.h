@@ -66,11 +66,11 @@ struct XRayInstrSet {
 };
 
 /// Parses a command line argument into a mask.
-XRayInstrMask parseXRayInstrValue(StringRef Value);
+XRayInstrMask parseXRayInstrValue(llvm::StringRef Value);
 
 /// Serializes a set into a list of command line arguments.
 void serializeXRayInstrValue(XRayInstrSet Set,
-                             SmallVectorImpl<StringRef> &Values);
+                             llvm::SmallVectorImpl<llvm::StringRef> &Values);
 
 } // namespace clang
 

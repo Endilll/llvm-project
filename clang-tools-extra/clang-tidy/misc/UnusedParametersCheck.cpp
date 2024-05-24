@@ -120,7 +120,7 @@ private:
 
 UnusedParametersCheck::~UnusedParametersCheck() = default;
 
-UnusedParametersCheck::UnusedParametersCheck(StringRef Name,
+UnusedParametersCheck::UnusedParametersCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StrictMode(Options.getLocalOrGlobal("StrictMode", false)),
@@ -159,7 +159,7 @@ void UnusedParametersCheck::warnOnUnusedParameter(
     // a '*/*' for pointer types, which doesn't start a comment. clang-format
     // will clean this up afterwards.
     MyDiag << FixItHint::CreateReplacement(
-        RemovalRange, (Twine(" /*") + Param->getName() + "*/").str());
+        RemovalRange, (llvm::Twine(" /*") + Param->getName() + "*/").str());
     return;
   }
 

@@ -105,7 +105,7 @@ getPrimaryTemplateOfGenericLambda(const FunctionDecl *LambdaCallOperator) {
 struct EnclosingTypeAliasTemplateDetails {
   TypeAliasTemplateDecl *Template = nullptr;
   TypeAliasTemplateDecl *PrimaryTypeAliasDecl = nullptr;
-  ArrayRef<TemplateArgument> AssociatedTemplateArguments;
+  llvm::ArrayRef<TemplateArgument> AssociatedTemplateArguments;
 
   explicit operator bool() noexcept { return Template; }
 };
@@ -341,7 +341,7 @@ Response HandleFunctionTemplateDecl(const FunctionTemplateDecl *FTD,
     while (const Type *Ty = NNS ? NNS->getAsType() : nullptr) {
       if (NNS->isInstantiationDependent()) {
         if (const auto *TSTy = Ty->getAs<TemplateSpecializationType>()) {
-          ArrayRef<TemplateArgument> Arguments = TSTy->template_arguments();
+          llvm::ArrayRef<TemplateArgument> Arguments = TSTy->template_arguments();
           // Prefer template arguments from the injected-class-type if possible.
           // For example,
           // ```cpp
@@ -493,7 +493,7 @@ Response HandleGenericDeclContext(const Decl *CurDecl) {
 
 MultiLevelTemplateArgumentList Sema::getTemplateInstantiationArgs(
     const NamedDecl *ND, const DeclContext *DC, bool Final,
-    std::optional<ArrayRef<TemplateArgument>> Innermost, bool RelativeToPrimary,
+    std::optional<llvm::ArrayRef<TemplateArgument>> Innermost, bool RelativeToPrimary,
     const FunctionDecl *Pattern, bool ForConstraintInstantiation,
     bool SkipForSpecialization) {
   assert((ND || DC) && "Can't find arguments for a decl if one isn't provided");
@@ -611,7 +611,7 @@ bool Sema::CodeSynthesisContext::isInstantiationRecord() const {
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, CodeSynthesisContext::SynthesisKind Kind,
     SourceLocation PointOfInstantiation, SourceRange InstantiationRange,
-    Decl *Entity, NamedDecl *Template, ArrayRef<TemplateArgument> TemplateArgs,
+    Decl *Entity, NamedDecl *Template, llvm::ArrayRef<TemplateArgument> TemplateArgs,
     sema::TemplateDeductionInfo *DeductionInfo)
     : SemaRef(SemaRef) {
   // Don't allow further instantiation if a fatal error and an uncompilable
@@ -659,7 +659,7 @@ Sema::InstantiatingTemplate::InstantiatingTemplate(
 
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, SourceLocation PointOfInstantiation, TemplateParameter Param,
-    TemplateDecl *Template, ArrayRef<TemplateArgument> TemplateArgs,
+    TemplateDecl *Template, llvm::ArrayRef<TemplateArgument> TemplateArgs,
     SourceRange InstantiationRange)
     : InstantiatingTemplate(
           SemaRef,
@@ -670,7 +670,7 @@ Sema::InstantiatingTemplate::InstantiatingTemplate(
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, SourceLocation PointOfInstantiation,
     FunctionTemplateDecl *FunctionTemplate,
-    ArrayRef<TemplateArgument> TemplateArgs,
+    llvm::ArrayRef<TemplateArgument> TemplateArgs,
     CodeSynthesisContext::SynthesisKind Kind,
     sema::TemplateDeductionInfo &DeductionInfo, SourceRange InstantiationRange)
     : InstantiatingTemplate(SemaRef, Kind, PointOfInstantiation,
@@ -684,7 +684,7 @@ Sema::InstantiatingTemplate::InstantiatingTemplate(
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, SourceLocation PointOfInstantiation,
     TemplateDecl *Template,
-    ArrayRef<TemplateArgument> TemplateArgs,
+    llvm::ArrayRef<TemplateArgument> TemplateArgs,
     sema::TemplateDeductionInfo &DeductionInfo, SourceRange InstantiationRange)
     : InstantiatingTemplate(
           SemaRef,
@@ -695,7 +695,7 @@ Sema::InstantiatingTemplate::InstantiatingTemplate(
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, SourceLocation PointOfInstantiation,
     ClassTemplatePartialSpecializationDecl *PartialSpec,
-    ArrayRef<TemplateArgument> TemplateArgs,
+    llvm::ArrayRef<TemplateArgument> TemplateArgs,
     sema::TemplateDeductionInfo &DeductionInfo, SourceRange InstantiationRange)
     : InstantiatingTemplate(
           SemaRef,
@@ -706,7 +706,7 @@ Sema::InstantiatingTemplate::InstantiatingTemplate(
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, SourceLocation PointOfInstantiation,
     VarTemplatePartialSpecializationDecl *PartialSpec,
-    ArrayRef<TemplateArgument> TemplateArgs,
+    llvm::ArrayRef<TemplateArgument> TemplateArgs,
     sema::TemplateDeductionInfo &DeductionInfo, SourceRange InstantiationRange)
     : InstantiatingTemplate(
           SemaRef,
@@ -716,7 +716,7 @@ Sema::InstantiatingTemplate::InstantiatingTemplate(
 
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, SourceLocation PointOfInstantiation, ParmVarDecl *Param,
-    ArrayRef<TemplateArgument> TemplateArgs, SourceRange InstantiationRange)
+    llvm::ArrayRef<TemplateArgument> TemplateArgs, SourceRange InstantiationRange)
     : InstantiatingTemplate(
           SemaRef,
           CodeSynthesisContext::DefaultFunctionArgumentInstantiation,
@@ -725,7 +725,7 @@ Sema::InstantiatingTemplate::InstantiatingTemplate(
 
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, SourceLocation PointOfInstantiation, NamedDecl *Template,
-    NonTypeTemplateParmDecl *Param, ArrayRef<TemplateArgument> TemplateArgs,
+    NonTypeTemplateParmDecl *Param, llvm::ArrayRef<TemplateArgument> TemplateArgs,
     SourceRange InstantiationRange)
     : InstantiatingTemplate(
           SemaRef,
@@ -735,7 +735,7 @@ Sema::InstantiatingTemplate::InstantiatingTemplate(
 
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, SourceLocation PointOfInstantiation, NamedDecl *Template,
-    TemplateTemplateParmDecl *Param, ArrayRef<TemplateArgument> TemplateArgs,
+    TemplateTemplateParmDecl *Param, llvm::ArrayRef<TemplateArgument> TemplateArgs,
     SourceRange InstantiationRange)
     : InstantiatingTemplate(
           SemaRef,
@@ -745,7 +745,7 @@ Sema::InstantiatingTemplate::InstantiatingTemplate(
 
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, SourceLocation PointOfInstantiation,
-    TypeAliasTemplateDecl *Entity, ArrayRef<TemplateArgument> TemplateArgs,
+    TypeAliasTemplateDecl *Entity, llvm::ArrayRef<TemplateArgument> TemplateArgs,
     SourceRange InstantiationRange)
     : InstantiatingTemplate(
           SemaRef, CodeSynthesisContext::TypeAliasTemplateInstantiation,
@@ -754,7 +754,7 @@ Sema::InstantiatingTemplate::InstantiatingTemplate(
 
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, SourceLocation PointOfInstantiation, TemplateDecl *Template,
-    NamedDecl *Param, ArrayRef<TemplateArgument> TemplateArgs,
+    NamedDecl *Param, llvm::ArrayRef<TemplateArgument> TemplateArgs,
     SourceRange InstantiationRange)
     : InstantiatingTemplate(
           SemaRef, CodeSynthesisContext::DefaultTemplateArgumentChecking,
@@ -792,7 +792,7 @@ Sema::InstantiatingTemplate::InstantiatingTemplate(
 Sema::InstantiatingTemplate::InstantiatingTemplate(
     Sema &SemaRef, SourceLocation PointOfInstantiation,
     ConstraintsCheck, NamedDecl *Template,
-    ArrayRef<TemplateArgument> TemplateArgs, SourceRange InstantiationRange)
+    llvm::ArrayRef<TemplateArgument> TemplateArgs, SourceRange InstantiationRange)
     : InstantiatingTemplate(
           SemaRef, CodeSynthesisContext::ConstraintsCheck,
           PointOfInstantiation, InstantiationRange, Template, nullptr,
@@ -937,7 +937,7 @@ void Sema::PrintInstantiationStack() {
 
   // FIXME: In all of these cases, we need to show the template arguments
   unsigned InstantiationIdx = 0;
-  for (SmallVectorImpl<CodeSynthesisContext>::reverse_iterator
+  for (llvm::SmallVectorImpl<CodeSynthesisContext>::reverse_iterator
          Active = CodeSynthesisContexts.rbegin(),
          ActiveEnd = CodeSynthesisContexts.rend();
        Active != ActiveEnd;
@@ -997,7 +997,7 @@ void Sema::PrintInstantiationStack() {
 
     case CodeSynthesisContext::DefaultTemplateArgumentInstantiation: {
       TemplateDecl *Template = cast<TemplateDecl>(Active->Template);
-      SmallString<128> TemplateArgsStr;
+      llvm::SmallString<128> TemplateArgsStr;
       llvm::raw_svector_ostream OS(TemplateArgsStr);
       Template->printName(OS, getPrintingPolicy());
       printTemplateArgumentList(OS, Active->template_arguments(),
@@ -1063,7 +1063,7 @@ void Sema::PrintInstantiationStack() {
       ParmVarDecl *Param = cast<ParmVarDecl>(Active->Entity);
       FunctionDecl *FD = cast<FunctionDecl>(Param->getDeclContext());
 
-      SmallString<128> TemplateArgsStr;
+      llvm::SmallString<128> TemplateArgsStr;
       llvm::raw_svector_ostream OS(TemplateArgsStr);
       FD->printName(OS, getPrintingPolicy());
       printTemplateArgumentList(OS, Active->template_arguments(),
@@ -1235,7 +1235,7 @@ void Sema::PrintInstantiationStack() {
         assert(isa<FunctionDecl>(Active->Entity));
         DiagID = diag::note_checking_constraints_for_function_here;
       }
-      SmallString<128> TemplateArgsStr;
+      llvm::SmallString<128> TemplateArgsStr;
       llvm::raw_svector_ostream OS(TemplateArgsStr);
       cast<NamedDecl>(Active->Entity)->printName(OS, getPrintingPolicy());
       if (!isa<FunctionDecl>(Active->Entity)) {
@@ -1280,7 +1280,7 @@ std::optional<TemplateDeductionInfo *> Sema::isSFINAEContext() const {
   if (InNonInstantiationSFINAEContext)
     return std::optional<TemplateDeductionInfo *>(nullptr);
 
-  for (SmallVectorImpl<CodeSynthesisContext>::const_reverse_iterator
+  for (llvm::SmallVectorImpl<CodeSynthesisContext>::const_reverse_iterator
          Active = CodeSynthesisContexts.rbegin(),
          ActiveEnd = CodeSynthesisContexts.rend();
        Active != ActiveEnd;
@@ -1422,7 +1422,7 @@ namespace {
 
     bool TryExpandParameterPacks(SourceLocation EllipsisLoc,
                                  SourceRange PatternRange,
-                                 ArrayRef<UnexpandedParameterPack> Unexpanded,
+                                 llvm::ArrayRef<UnexpandedParameterPack> Unexpanded,
                                  bool &ShouldExpand, bool &RetainExpansion,
                                  std::optional<unsigned> &NumExpansions) {
       return getSema().CheckParameterPacksForExpansion(EllipsisLoc,
@@ -1476,7 +1476,7 @@ namespace {
       SemaRef.InstantiateAttrs(TemplateArgs, Old, New);
     }
 
-    void transformedLocalDecl(Decl *Old, ArrayRef<Decl *> NewDecls) {
+    void transformedLocalDecl(Decl *Old, llvm::ArrayRef<Decl *> NewDecls) {
       if (Old->isParameterPack()) {
         SemaRef.CurrentInstantiationScope->MakeInstantiatedLocalArgPack(Old);
         for (auto *New : NewDecls)
@@ -1522,7 +1522,7 @@ namespace {
 
     bool TransformExceptionSpec(SourceLocation Loc,
                                 FunctionProtoType::ExceptionSpecInfo &ESI,
-                                SmallVectorImpl<QualType> &Exceptions,
+                                llvm::SmallVectorImpl<QualType> &Exceptions,
                                 bool &Changed);
 
     /// Rebuild the exception declaration and register the declaration
@@ -1751,8 +1751,8 @@ namespace {
     }
 
     bool TransformRequiresExprRequirements(
-        ArrayRef<concepts::Requirement *> Reqs,
-        SmallVectorImpl<concepts::Requirement *> &Transformed) {
+        llvm::ArrayRef<concepts::Requirement *> Reqs,
+        llvm::SmallVectorImpl<concepts::Requirement *> &Transformed) {
       bool SatisfactionDetermined = false;
       for (concepts::Requirement *Req : Reqs) {
         concepts::Requirement *TransReq = nullptr;
@@ -1799,9 +1799,9 @@ namespace {
     TransformNestedRequirement(concepts::NestedRequirement *Req);
     ExprResult TransformRequiresTypeParams(
         SourceLocation KWLoc, SourceLocation RBraceLoc, const RequiresExpr *RE,
-        RequiresExprBodyDecl *Body, ArrayRef<ParmVarDecl *> Params,
-        SmallVectorImpl<QualType> &PTypes,
-        SmallVectorImpl<ParmVarDecl *> &TransParams,
+        RequiresExprBodyDecl *Body, llvm::ArrayRef<ParmVarDecl *> Params,
+        llvm::SmallVectorImpl<QualType> &PTypes,
+        llvm::SmallVectorImpl<ParmVarDecl *> &TransParams,
         Sema::ExtParameterInfoBuilder &PInfos);
 
   private:
@@ -1880,7 +1880,7 @@ Decl *TemplateInstantiator::TransformDefinition(SourceLocation Loc, Decl *D) {
 
 bool TemplateInstantiator::TransformExceptionSpec(
     SourceLocation Loc, FunctionProtoType::ExceptionSpecInfo &ESI,
-    SmallVectorImpl<QualType> &Exceptions, bool &Changed) {
+    llvm::SmallVectorImpl<QualType> &Exceptions, bool &Changed) {
   if (ESI.Type == EST_Uninstantiated) {
     ESI.instantiate();
     Changed = true;
@@ -2351,7 +2351,7 @@ TemplateInstantiator::TransformFunctionParmPackExpr(FunctionParmPackExpr *E) {
 
   // Transform each of the parameter expansions into the corresponding
   // parameters in the instantiation of the function decl.
-  SmallVector<VarDecl *, 8> Vars;
+  llvm::SmallVector<VarDecl *, 8> Vars;
   Vars.reserve(E->getNumExpansions());
   for (FunctionParmPackExpr::iterator I = E->begin(), End = E->end();
        I != End; ++I) {
@@ -2597,7 +2597,7 @@ QualType TemplateInstantiator::TransformSubstTemplateTypeParmPackType(
 static concepts::Requirement::SubstitutionDiagnostic *
 createSubstDiag(Sema &S, TemplateDeductionInfo &Info,
                 concepts::EntityPrinter Printer) {
-  SmallString<128> Message;
+  llvm::SmallString<128> Message;
   SourceLocation ErrorLoc;
   if (Info.hasSFINAEDiagnostic()) {
     PartialDiagnosticAt PDA(SourceLocation(),
@@ -2610,34 +2610,34 @@ createSubstDiag(Sema &S, TemplateDeductionInfo &Info,
   }
   char *MessageBuf = new (S.Context) char[Message.size()];
   std::copy(Message.begin(), Message.end(), MessageBuf);
-  SmallString<128> Entity;
+  llvm::SmallString<128> Entity;
   llvm::raw_svector_ostream OS(Entity);
   Printer(OS);
   char *EntityBuf = new (S.Context) char[Entity.size()];
   std::copy(Entity.begin(), Entity.end(), EntityBuf);
   return new (S.Context) concepts::Requirement::SubstitutionDiagnostic{
-      StringRef(EntityBuf, Entity.size()), ErrorLoc,
-      StringRef(MessageBuf, Message.size())};
+      llvm::StringRef(EntityBuf, Entity.size()), ErrorLoc,
+      llvm::StringRef(MessageBuf, Message.size())};
 }
 
 concepts::Requirement::SubstitutionDiagnostic *
 concepts::createSubstDiagAt(Sema &S, SourceLocation Location,
                             EntityPrinter Printer) {
-  SmallString<128> Entity;
+  llvm::SmallString<128> Entity;
   llvm::raw_svector_ostream OS(Entity);
   Printer(OS);
   char *EntityBuf = new (S.Context) char[Entity.size()];
   llvm::copy(Entity, EntityBuf);
   return new (S.Context) concepts::Requirement::SubstitutionDiagnostic{
-      /*SubstitutedEntity=*/StringRef(EntityBuf, Entity.size()),
-      /*DiagLoc=*/Location, /*DiagMessage=*/StringRef()};
+      /*SubstitutedEntity=*/llvm::StringRef(EntityBuf, Entity.size()),
+      /*DiagLoc=*/Location, /*DiagMessage=*/llvm::StringRef()};
 }
 
 ExprResult TemplateInstantiator::TransformRequiresTypeParams(
     SourceLocation KWLoc, SourceLocation RBraceLoc, const RequiresExpr *RE,
-    RequiresExprBodyDecl *Body, ArrayRef<ParmVarDecl *> Params,
-    SmallVectorImpl<QualType> &PTypes,
-    SmallVectorImpl<ParmVarDecl *> &TransParams,
+    RequiresExprBodyDecl *Body, llvm::ArrayRef<ParmVarDecl *> Params,
+    llvm::SmallVectorImpl<QualType> &PTypes,
+    llvm::SmallVectorImpl<ParmVarDecl *> &TransParams,
     Sema::ExtParameterInfoBuilder &PInfos) {
 
   TemplateDeductionInfo Info(KWLoc);
@@ -2651,7 +2651,7 @@ ExprResult TemplateInstantiator::TransformRequiresTypeParams(
           KWLoc, Params, /*ParamTypes=*/nullptr, /*ParamInfos=*/nullptr, PTypes,
           &TransParams, PInfos, &ErrorIdx) ||
       Trap.hasErrorOccurred()) {
-    SmallVector<concepts::Requirement *, 4> TransReqs;
+    llvm::SmallVector<concepts::Requirement *, 4> TransReqs;
     ParmVarDecl *FailedDecl = Params[ErrorIdx];
     // Add a 'failed' Requirement to contain the error that caused the failure
     // here.
@@ -2811,14 +2811,14 @@ TemplateInstantiator::TransformNestedRequirement(
         concepts::NestedRequirement(TransConstraint.get());
   if (TransConstraint.isInvalid() || !TransConstraint.get() ||
       Satisfaction.HasSubstitutionFailure()) {
-    SmallString<128> Entity;
+    llvm::SmallString<128> Entity;
     llvm::raw_svector_ostream OS(Entity);
     Req->getConstraintExpr()->printPretty(OS, nullptr,
                                           SemaRef.getPrintingPolicy());
     char *EntityBuf = new (SemaRef.Context) char[Entity.size()];
     std::copy(Entity.begin(), Entity.end(), EntityBuf);
     return new (SemaRef.Context) concepts::NestedRequirement(
-        SemaRef.Context, StringRef(EntityBuf, Entity.size()), Satisfaction);
+        SemaRef.Context, llvm::StringRef(EntityBuf, Entity.size()), Satisfaction);
   }
   return new (SemaRef.Context) concepts::NestedRequirement(
       SemaRef.Context, TransConstraint.get(), Satisfaction);
@@ -2994,7 +2994,7 @@ TypeSourceInfo *Sema::SubstFunctionDeclType(TypeSourceInfo *T,
 
 bool Sema::SubstExceptionSpec(SourceLocation Loc,
                               FunctionProtoType::ExceptionSpecInfo &ESI,
-                              SmallVectorImpl<QualType> &ExceptionStorage,
+                              llvm::SmallVectorImpl<QualType> &ExceptionStorage,
                               const MultiLevelTemplateArgumentList &Args) {
   bool Changed = false;
   TemplateInstantiator Instantiator(*this, Args, Loc, DeclarationName());
@@ -3007,7 +3007,7 @@ void Sema::SubstExceptionSpec(FunctionDecl *New, const FunctionProtoType *Proto,
   FunctionProtoType::ExceptionSpecInfo ESI =
       Proto->getExtProtoInfo().ExceptionSpec;
 
-  SmallVector<QualType, 4> ExceptionStorage;
+  llvm::SmallVector<QualType, 4> ExceptionStorage;
   if (SubstExceptionSpec(New->getTypeSourceInfo()->getTypeLoc().getEndLoc(),
                          ESI, ExceptionStorage, Args))
     // On error, recover by dropping the exception specification.
@@ -3261,11 +3261,11 @@ ParmVarDecl *Sema::SubstParmVarDecl(
 /// parameters, producing the set of parameter types that would be generated
 /// from such a substitution.
 bool Sema::SubstParmTypes(
-    SourceLocation Loc, ArrayRef<ParmVarDecl *> Params,
+    SourceLocation Loc, llvm::ArrayRef<ParmVarDecl *> Params,
     const FunctionProtoType::ExtParameterInfo *ExtParamInfos,
     const MultiLevelTemplateArgumentList &TemplateArgs,
-    SmallVectorImpl<QualType> &ParamTypes,
-    SmallVectorImpl<ParmVarDecl *> *OutParams,
+    llvm::SmallVectorImpl<QualType> &ParamTypes,
+    llvm::SmallVectorImpl<ParmVarDecl *> *OutParams,
     ExtParameterInfoBuilder &ParamInfos) {
   assert(!CodeSynthesisContexts.empty() &&
          "Cannot perform an instantiation without some context on the "
@@ -3380,7 +3380,7 @@ Sema::SubstBaseSpecifiers(CXXRecordDecl *Instantiation,
                           CXXRecordDecl *Pattern,
                           const MultiLevelTemplateArgumentList &TemplateArgs) {
   bool Invalid = false;
-  SmallVector<CXXBaseSpecifier*, 4> InstantiatedBases;
+  llvm::SmallVector<CXXBaseSpecifier*, 4> InstantiatedBases;
   for (const auto &Base : Pattern->bases()) {
     if (!Base.getType()->isDependentType()) {
       if (const CXXRecordDecl *RD = Base.getType()->getAsCXXRecordDecl()) {
@@ -3396,7 +3396,7 @@ Sema::SubstBaseSpecifiers(CXXRecordDecl *Instantiation,
     if (Base.isPackExpansion()) {
       // This is a pack expansion. See whether we should expand it now, or
       // wait until later.
-      SmallVector<UnexpandedParameterPack, 2> Unexpanded;
+      llvm::SmallVector<UnexpandedParameterPack, 2> Unexpanded;
       collectUnexpandedParameterPacks(Base.getTypeSourceInfo()->getTypeLoc(),
                                       Unexpanded);
       bool ShouldExpand = false;
@@ -3589,7 +3589,7 @@ Sema::InstantiateClass(SourceLocation PointOfInstantiation,
 
   TemplateDeclInstantiator Instantiator(*this, Instantiation, TemplateArgs);
   Instantiator.setEvaluateConstraints(false);
-  SmallVector<Decl*, 4> Fields;
+  llvm::SmallVector<Decl*, 4> Fields;
   // Delay instantiation of late parsed attributes.
   LateInstantiatedAttrVec LateAttrs;
   Instantiator.enableLateAttributeInstantiation(&LateAttrs);
@@ -3917,7 +3917,7 @@ bool Sema::usesPartialOrExplicitSpecialization(
       TSK_ExplicitSpecialization)
     return true;
 
-  SmallVector<ClassTemplatePartialSpecializationDecl *, 4> PartialSpecs;
+  llvm::SmallVector<ClassTemplatePartialSpecializationDecl *, 4> PartialSpecs;
   ClassTemplateSpec->getSpecializedTemplate()
                    ->getPartialSpecializations(PartialSpecs);
   for (unsigned I = 0, N = PartialSpecs.size(); I != N; ++I) {
@@ -3961,8 +3961,8 @@ getPatternForClassTemplateSpecialization(
     //   specialization with the template argument lists of the partial
     //   specializations.
     typedef PartialSpecMatchResult MatchResult;
-    SmallVector<MatchResult, 4> Matched;
-    SmallVector<ClassTemplatePartialSpecializationDecl *, 4> PartialSpecs;
+    llvm::SmallVector<MatchResult, 4> Matched;
+    llvm::SmallVector<ClassTemplatePartialSpecializationDecl *, 4> PartialSpecs;
     Template->getPartialSpecializations(PartialSpecs);
     TemplateSpecCandidateSet FailedCandidates(PointOfInstantiation);
     for (unsigned I = 0, N = PartialSpecs.size(); I != N; ++I) {
@@ -3989,7 +3989,7 @@ getPatternForClassTemplateSpecialization(
     // from which the member template's parameters were instantiated.
 
     if (Matched.size() >= 1) {
-      SmallVectorImpl<MatchResult>::iterator Best = Matched.begin();
+      llvm::SmallVectorImpl<MatchResult>::iterator Best = Matched.begin();
       if (Matched.size() == 1) {
         //   -- If exactly one matching specialization is found, the
         //      instantiation is generated from that specialization.
@@ -4002,7 +4002,7 @@ getPatternForClassTemplateSpecialization(
         //      specialized than all of the other matching
         //      specializations, then the use of the class template is
         //      ambiguous and the program is ill-formed.
-        for (SmallVectorImpl<MatchResult>::iterator P = Best + 1,
+        for (llvm::SmallVectorImpl<MatchResult>::iterator P = Best + 1,
                                                  PEnd = Matched.end();
              P != PEnd; ++P) {
           if (S.getMoreSpecializedPartialSpecialization(
@@ -4014,7 +4014,7 @@ getPatternForClassTemplateSpecialization(
         // Determine if the best partial specialization is more specialized than
         // the others.
         bool Ambiguous = false;
-        for (SmallVectorImpl<MatchResult>::iterator P = Matched.begin(),
+        for (llvm::SmallVectorImpl<MatchResult>::iterator P = Matched.begin(),
                                                  PEnd = Matched.end();
              P != PEnd; ++P) {
           if (P != Best && S.getMoreSpecializedPartialSpecialization(
@@ -4034,7 +4034,7 @@ getPatternForClassTemplateSpecialization(
               << ClassTemplateSpec;
 
           // Print the matching partial specializations.
-          for (SmallVectorImpl<MatchResult>::iterator P = Matched.begin(),
+          for (llvm::SmallVectorImpl<MatchResult>::iterator P = Matched.begin(),
                                                    PEnd = Matched.end();
                P != PEnd; ++P)
             S.Diag(P->Partial->getLocation(), diag::note_partial_spec_match)
@@ -4377,7 +4377,7 @@ bool Sema::SubstTemplateArgument(
 }
 
 bool Sema::SubstTemplateArguments(
-    ArrayRef<TemplateArgumentLoc> Args,
+    llvm::ArrayRef<TemplateArgumentLoc> Args,
     const MultiLevelTemplateArgumentList &TemplateArgs,
     TemplateArgumentListInfo &Out) {
   TemplateInstantiator Instantiator(*this, TemplateArgs, SourceLocation(),
@@ -4423,9 +4423,9 @@ ExprResult Sema::SubstInitializer(Expr *Init,
   return Instantiator.TransformInitializer(Init, CXXDirectInit);
 }
 
-bool Sema::SubstExprs(ArrayRef<Expr *> Exprs, bool IsCall,
+bool Sema::SubstExprs(llvm::ArrayRef<Expr *> Exprs, bool IsCall,
                       const MultiLevelTemplateArgumentList &TemplateArgs,
-                      SmallVectorImpl<Expr *> &Outputs) {
+                      llvm::SmallVectorImpl<Expr *> &Outputs) {
   if (Exprs.empty())
     return false;
 

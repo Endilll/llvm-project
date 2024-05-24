@@ -76,12 +76,12 @@ enum class TemplateSubstitutionKind : char {
   class MultiLevelTemplateArgumentList {
     /// The template argument list at a certain template depth
 
-    using ArgList = ArrayRef<TemplateArgument>;
+    using ArgList = llvm::ArrayRef<TemplateArgument>;
     struct ArgumentListLevel {
       llvm::PointerIntPair<Decl *, 1, bool> AssociatedDeclAndFinal;
       ArgList Args;
     };
-    using ContainerType = SmallVector<ArgumentListLevel, 4>;
+    using ContainerType = llvm::SmallVector<ArgumentListLevel, 4>;
 
     using ArgListsIterator = ContainerType::iterator;
     using ConstArgListsIterator = ContainerType::const_iterator;
@@ -365,7 +365,7 @@ enum class TemplateSubstitutionKind : char {
   class LocalInstantiationScope {
   public:
     /// A set of declarations.
-    using DeclArgumentPack = SmallVector<VarDecl *, 4>;
+    using DeclArgumentPack = llvm::SmallVector<VarDecl *, 4>;
 
   private:
     /// Reference to the semantic analysis that is performing
@@ -397,7 +397,7 @@ enum class TemplateSubstitutionKind : char {
     LocalDeclsMap LocalDecls;
 
     /// The set of argument packs we've allocated.
-    SmallVector<DeclArgumentPack *, 1> ArgumentPacks;
+    llvm::SmallVector<DeclArgumentPack *, 1> ArgumentPacks;
 
     /// The outer scope, which contains local variable
     /// definitions from some other instantiation (that may not be
@@ -570,7 +570,7 @@ enum class TemplateSubstitutionKind : char {
     /// A list of out-of-line class template partial
     /// specializations that will need to be instantiated after the
     /// enclosing class's instantiation is complete.
-    SmallVector<std::pair<ClassTemplateDecl *,
+    llvm::SmallVector<std::pair<ClassTemplateDecl *,
                                 ClassTemplatePartialSpecializationDecl *>, 4>
       OutOfLinePartialSpecs;
 
@@ -578,7 +578,7 @@ enum class TemplateSubstitutionKind : char {
     /// specializations that will need to be instantiated after the
     /// enclosing variable's instantiation is complete.
     /// FIXME: Verify that this is needed.
-    SmallVector<
+    llvm::SmallVector<
         std::pair<VarTemplateDecl *, VarTemplatePartialSpecializationDecl *>, 4>
     OutOfLineVarPartialSpecs;
 
@@ -639,7 +639,7 @@ enum class TemplateSubstitutionKind : char {
                             RewriteKind RK = RewriteKind::None);
     Decl *VisitDecl(Decl *D);
     Decl *VisitVarDecl(VarDecl *D, bool InstantiatingVarTemplate,
-                       ArrayRef<BindingDecl *> *Bindings = nullptr);
+                       llvm::ArrayRef<BindingDecl *> *Bindings = nullptr);
     Decl *VisitBaseUsingDecls(BaseUsingDecl *D, BaseUsingDecl *Inst,
                               LookupResult *Lookup);
 
@@ -658,10 +658,10 @@ enum class TemplateSubstitutionKind : char {
 
     LocalInstantiationScope *getStartingScope() const { return StartingScope; }
 
-    using delayed_partial_spec_iterator = SmallVectorImpl<std::pair<
+    using delayed_partial_spec_iterator = llvm::SmallVectorImpl<std::pair<
       ClassTemplateDecl *, ClassTemplatePartialSpecializationDecl *>>::iterator;
 
-    using delayed_var_partial_spec_iterator = SmallVectorImpl<std::pair<
+    using delayed_var_partial_spec_iterator = llvm::SmallVectorImpl<std::pair<
         VarTemplateDecl *, VarTemplatePartialSpecializationDecl *>>::iterator;
 
     /// Return an iterator to the beginning of the set of
@@ -690,7 +690,7 @@ enum class TemplateSubstitutionKind : char {
 
     // Helper functions for instantiating methods.
     TypeSourceInfo *SubstFunctionType(FunctionDecl *D,
-                             SmallVectorImpl<ParmVarDecl *> &Params);
+                             llvm::SmallVectorImpl<ParmVarDecl *> &Params);
     bool InitFunctionInstantiation(FunctionDecl *New, FunctionDecl *Tmpl);
     bool InitMethodInstantiation(CXXMethodDecl *New, CXXMethodDecl *Tmpl);
 
@@ -707,7 +707,7 @@ enum class TemplateSubstitutionKind : char {
     Decl *VisitVarTemplateSpecializationDecl(
         VarTemplateDecl *VarTemplate, VarDecl *FromVar,
         const TemplateArgumentListInfo &TemplateArgsInfo,
-        ArrayRef<TemplateArgument> Converted,
+        llvm::ArrayRef<TemplateArgument> Converted,
         VarTemplateSpecializationDecl *PrevDecl = nullptr);
 
     Decl *InstantiateTypedefNameDecl(TypedefNameDecl *D, bool IsTypeAlias);

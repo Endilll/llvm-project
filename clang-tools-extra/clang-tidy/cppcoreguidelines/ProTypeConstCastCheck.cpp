@@ -29,7 +29,7 @@ static bool hasVolatileQualifier(QualType Type) {
   return Type.isVolatileQualified();
 }
 
-ProTypeConstCastCheck::ProTypeConstCastCheck(StringRef Name,
+ProTypeConstCastCheck::ProTypeConstCastCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StrictMode(Options.getLocalOrGlobal("StrictMode", false)) {}

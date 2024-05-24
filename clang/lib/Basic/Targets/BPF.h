@@ -47,18 +47,18 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  bool hasFeature(StringRef Feature) const override {
+  bool hasFeature(llvm::StringRef Feature) const override {
     return Feature == "bpf" || Feature == "alu32" || Feature == "dwarfris";
   }
 
-  void setFeatureEnabled(llvm::StringMap<bool> &Features, StringRef Name,
+  void setFeatureEnabled(llvm::StringMap<bool> &Features, llvm::StringRef Name,
                          bool Enabled) const override {
     Features[Name] = Enabled;
   }
   bool handleTargetFeatures(std::vector<std::string> &Features,
                             DiagnosticsEngine &Diags) override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
   std::string_view getClobbers() const override { return ""; }
 
@@ -66,8 +66,8 @@ public:
     return TargetInfo::VoidPtrBuiltinVaList;
   }
 
-  bool isValidGCCRegisterName(StringRef Name) const override { return true; }
-  ArrayRef<const char *> getGCCRegNames() const override {
+  bool isValidGCCRegisterName(llvm::StringRef Name) const override { return true; }
+  llvm::ArrayRef<const char *> getGCCRegNames() const override {
     return std::nullopt;
   }
 
@@ -85,7 +85,7 @@ public:
     return true;
   }
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     return std::nullopt;
   }
 
@@ -101,16 +101,16 @@ public:
     }
   }
 
-  bool isValidCPUName(StringRef Name) const override;
+  bool isValidCPUName(llvm::StringRef Name) const override;
 
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
 
   bool setCPU(const std::string &Name) override {
     if (Name == "v3" || Name == "v4") {
       HasAlu32 = true;
     }
 
-    StringRef CPUName(Name);
+    llvm::StringRef CPUName(Name);
     return isValidCPUName(CPUName);
   }
 

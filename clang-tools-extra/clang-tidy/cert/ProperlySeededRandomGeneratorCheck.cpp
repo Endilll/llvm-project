@@ -16,11 +16,11 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::cert {
 
 ProperlySeededRandomGeneratorCheck::ProperlySeededRandomGeneratorCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       RawDisallowedSeedTypes(
           Options.get("DisallowedSeedTypes", "time_t,std::time_t")) {
-  StringRef(RawDisallowedSeedTypes).split(DisallowedSeedTypes, ',');
+  llvm::StringRef(RawDisallowedSeedTypes).split(DisallowedSeedTypes, ',');
 }
 
 void ProperlySeededRandomGeneratorCheck::storeOptions(

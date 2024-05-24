@@ -87,17 +87,17 @@ void VEToolChain::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> P(getDriver().ResourceDir);
+    llvm::SmallString<128> P(getDriver().ResourceDir);
     llvm::sys::path::append(P, "include");
     addSystemInclude(DriverArgs, CC1Args, P);
   }
 
   if (!DriverArgs.hasArg(options::OPT_nostdlibinc)) {
     if (const char *cl_include_dir = getenv("NCC_C_INCLUDE_PATH")) {
-      SmallVector<StringRef, 4> Dirs;
+      llvm::SmallVector<llvm::StringRef, 4> Dirs;
       const char EnvPathSeparatorStr[] = {llvm::sys::EnvPathSeparator, '\0'};
-      StringRef(cl_include_dir).split(Dirs, StringRef(EnvPathSeparatorStr));
-      ArrayRef<StringRef> DirVec(Dirs);
+      llvm::StringRef(cl_include_dir).split(Dirs, llvm::StringRef(EnvPathSeparatorStr));
+      llvm::ArrayRef<llvm::StringRef> DirVec(Dirs);
       addSystemIncludes(DriverArgs, CC1Args, DirVec);
     } else {
       addSystemInclude(DriverArgs, CC1Args,
@@ -123,10 +123,10 @@ void VEToolChain::AddClangCXXStdlibIncludeArgs(const ArgList &DriverArgs,
       DriverArgs.hasArg(options::OPT_nostdincxx))
     return;
   if (const char *cl_include_dir = getenv("NCC_CPLUS_INCLUDE_PATH")) {
-    SmallVector<StringRef, 4> Dirs;
+    llvm::SmallVector<llvm::StringRef, 4> Dirs;
     const char EnvPathSeparatorStr[] = {llvm::sys::EnvPathSeparator, '\0'};
-    StringRef(cl_include_dir).split(Dirs, StringRef(EnvPathSeparatorStr));
-    ArrayRef<StringRef> DirVec(Dirs);
+    llvm::StringRef(cl_include_dir).split(Dirs, llvm::StringRef(EnvPathSeparatorStr));
+    llvm::ArrayRef<llvm::StringRef> DirVec(Dirs);
     addSystemIncludes(DriverArgs, CC1Args, DirVec);
   } else {
     // Add following paths for multiple target installation.

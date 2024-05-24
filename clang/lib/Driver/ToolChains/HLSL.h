@@ -47,9 +47,9 @@ public:
   bool isPICDefaultForced() const override { return false; }
 
   llvm::opt::DerivedArgList *
-  TranslateArgs(const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+  TranslateArgs(const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
                 Action::OffloadKind DeviceOffloadKind) const override;
-  static std::optional<std::string> parseTargetProfile(StringRef TargetProfile);
+  static std::optional<std::string> parseTargetProfile(llvm::StringRef TargetProfile);
   bool requiresValidation(llvm::opt::DerivedArgList &Args) const;
 
 private:

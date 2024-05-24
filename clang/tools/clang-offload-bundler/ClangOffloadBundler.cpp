@@ -56,7 +56,7 @@ using namespace llvm;
 using namespace llvm::object;
 using namespace clang;
 
-static void PrintVersion(raw_ostream &OS) {
+static void PrintVersion(llvm::raw_ostream &OS) {
   OS << clang::getClangToolFullVersion("clang-offload-bundler") << '\n';
 }
 
@@ -205,8 +205,8 @@ int main(int argc, const char **argv) {
     }
   };
 
-  auto warningOS = [argv]() -> raw_ostream & {
-    return WithColor::warning(errs(), StringRef(argv[0]));
+  auto warningOS = [argv]() -> llvm::raw_ostream & {
+    return WithColor::warning(errs(), llvm::StringRef(argv[0]));
   };
 
   /// Path to the current binary.
@@ -343,12 +343,12 @@ int main(int argc, const char **argv) {
   unsigned Index = 0u;
   unsigned HostTargetNum = 0u;
   bool HIPOnly = true;
-  llvm::DenseSet<StringRef> ParsedTargets;
+  llvm::DenseSet<llvm::StringRef> ParsedTargets;
   // Map {offload-kind}-{triple} to target IDs.
-  std::map<std::string, std::set<StringRef>> TargetIDs;
+  std::map<std::string, std::set<llvm::StringRef>> TargetIDs;
   // Standardize target names to include env field
   std::vector<std::string> StandardizedTargetNames;
-  for (StringRef Target : TargetNames) {
+  for (llvm::StringRef Target : TargetNames) {
     if (ParsedTargets.contains(Target)) {
       reportError(createStringError(errc::invalid_argument,
                                     "Duplicate targets are not allowed"));
@@ -362,7 +362,7 @@ int main(int argc, const char **argv) {
     StandardizedTargetNames.push_back(OffloadInfo.str());
 
     if (!KindIsValid || !TripleIsValid) {
-      SmallVector<char, 128u> Buf;
+      llvm::SmallVector<char, 128u> Buf;
       raw_svector_ostream Msg(Buf);
       Msg << "invalid target '" << Target << "'";
       if (!KindIsValid)
@@ -391,7 +391,7 @@ int main(int argc, const char **argv) {
   for (const auto &TargetID : TargetIDs) {
     if (auto ConflictingTID =
             clang::getConflictTargetIDCombination(TargetID.second)) {
-      SmallVector<char, 128u> Buf;
+      llvm::SmallVector<char, 128u> Buf;
       raw_svector_ostream Msg(Buf);
       Msg << "Cannot bundle inputs with conflicting targets: '"
           << TargetID.first + "-" + ConflictingTID->first << "' and '"
@@ -411,7 +411,7 @@ int main(int argc, const char **argv) {
       (!Unbundle && HostTargetNum != 1 && !BundlerConfig.AllowNoHost)) {
     reportError(createStringError(errc::invalid_argument,
                                   "expecting exactly one host target but got " +
-                                      Twine(HostTargetNum)));
+                                      llvm::Twine(HostTargetNum)));
   }
 
   OffloadBundler Bundler(BundlerConfig);

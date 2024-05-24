@@ -31,7 +31,7 @@ void CommandTraits::registerCommentOptions(
   }
 }
 
-const CommandInfo *CommandTraits::getCommandInfoOrNULL(StringRef Name) const {
+const CommandInfo *CommandTraits::getCommandInfoOrNULL(llvm::StringRef Name) const {
   if (const CommandInfo *Info = getBuiltinCommandInfo(Name))
     return Info;
   return getRegisteredCommandInfo(Name);
@@ -44,7 +44,7 @@ const CommandInfo *CommandTraits::getCommandInfo(unsigned CommandID) const {
 }
 
 const CommandInfo *
-CommandTraits::getTypoCorrectCommandInfo(StringRef Typo) const {
+CommandTraits::getTypoCorrectCommandInfo(llvm::StringRef Typo) const {
   // Single-character command impostures, such as \t or \n, should not go
   // through the fixit logic.
   if (Typo.size() <= 1)
@@ -54,10 +54,10 @@ CommandTraits::getTypoCorrectCommandInfo(StringRef Typo) const {
   const unsigned MaxEditDistance = 1;
 
   unsigned BestEditDistance = MaxEditDistance;
-  SmallVector<const CommandInfo *, 2> BestCommand;
+  llvm::SmallVector<const CommandInfo *, 2> BestCommand;
 
   auto ConsiderCorrection = [&](const CommandInfo *Command) {
-    StringRef Name = Command->Name;
+    llvm::StringRef Name = Command->Name;
 
     unsigned MinPossibleEditDistance = abs((int)Name.size() - (int)Typo.size());
     if (MinPossibleEditDistance <= BestEditDistance) {
@@ -81,7 +81,7 @@ CommandTraits::getTypoCorrectCommandInfo(StringRef Typo) const {
   return BestCommand.size() == 1 ? BestCommand[0] : nullptr;
 }
 
-CommandInfo *CommandTraits::createCommandInfoWithName(StringRef CommandName) {
+CommandInfo *CommandTraits::createCommandInfoWithName(llvm::StringRef CommandName) {
   char *Name = Allocator.Allocate<char>(CommandName.size() + 1);
   memcpy(Name, CommandName.data(), CommandName.size());
   Name[CommandName.size()] = '\0';
@@ -101,13 +101,13 @@ CommandInfo *CommandTraits::createCommandInfoWithName(StringRef CommandName) {
 }
 
 const CommandInfo *CommandTraits::registerUnknownCommand(
-                                                  StringRef CommandName) {
+                                                  llvm::StringRef CommandName) {
   CommandInfo *Info = createCommandInfoWithName(CommandName);
   Info->IsUnknownCommand = true;
   return Info;
 }
 
-const CommandInfo *CommandTraits::registerBlockCommand(StringRef CommandName) {
+const CommandInfo *CommandTraits::registerBlockCommand(llvm::StringRef CommandName) {
   CommandInfo *Info = createCommandInfoWithName(CommandName);
   Info->IsBlockCommand = true;
   return Info;
@@ -121,7 +121,7 @@ const CommandInfo *CommandTraits::getBuiltinCommandInfo(
 }
 
 const CommandInfo *CommandTraits::getRegisteredCommandInfo(
-                                                  StringRef Name) const {
+                                                  llvm::StringRef Name) const {
   for (unsigned i = 0, e = RegisteredCommands.size(); i != e; ++i) {
     if (RegisteredCommands[i]->Name == Name)
       return RegisteredCommands[i];

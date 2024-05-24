@@ -49,7 +49,7 @@ public:
                                      const CallEvent *Call,
                                      PointerEscapeKind Kind) const;
 
-  void printState(raw_ostream &OS, ProgramStateRef State,
+  void printState(llvm::raw_ostream &OS, ProgramStateRef State,
                   const char *NL, const char *Sep) const override;
 };
 } // end anonymous namespace
@@ -65,7 +65,7 @@ void ObjCContainersChecker::addSizeInfo(const Expr *Array, const Expr *Size,
   if (SizeV.isUnknownOrUndef())
     return;
 
-  // Get the ArrayRef symbol.
+  // Get the llvm::ArrayRef symbol.
   SVal ArrayRef = C.getSVal(Array);
   SymbolRef ArraySym = ArrayRef.getAsSymbol();
   if (!ArraySym)
@@ -77,7 +77,7 @@ void ObjCContainersChecker::addSizeInfo(const Expr *Array, const Expr *Size,
 
 void ObjCContainersChecker::checkPostStmt(const CallExpr *CE,
                                           CheckerContext &C) const {
-  StringRef Name = C.getCalleeName(CE);
+  llvm::StringRef Name = C.getCalleeName(CE);
   if (Name.empty() || CE->getNumArgs() < 1)
     return;
 
@@ -100,7 +100,7 @@ void ObjCContainersChecker::checkPostStmt(const CallExpr *CE,
 
 void ObjCContainersChecker::checkPreStmt(const CallExpr *CE,
                                          CheckerContext &C) const {
-  StringRef Name = C.getCalleeName(CE);
+  llvm::StringRef Name = C.getCalleeName(CE);
   if (Name.empty() || CE->getNumArgs() < 2)
     return;
 
@@ -164,7 +164,7 @@ ObjCContainersChecker::checkPointerEscape(ProgramStateRef State,
   return State;
 }
 
-void ObjCContainersChecker::printState(raw_ostream &OS, ProgramStateRef State,
+void ObjCContainersChecker::printState(llvm::raw_ostream &OS, ProgramStateRef State,
                                        const char *NL, const char *Sep) const {
   ArraySizeMapTy Map = State->get<ArraySizeMap>();
   if (Map.isEmpty())

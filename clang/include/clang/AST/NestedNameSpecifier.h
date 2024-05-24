@@ -222,7 +222,7 @@ public:
   /// `ResolveTemplateArguments` is true, we'll print actual types, e.g.
   /// `ns::SomeTemplate<int, MyClass>` instead of
   /// `ns::SomeTemplate<Container::value_type, T>`.
-  void print(raw_ostream &OS, const PrintingPolicy &Policy,
+  void print(llvm::raw_ostream &OS, const PrintingPolicy &Policy,
              bool ResolveTemplateArguments = false) const;
 
   void Profile(llvm::FoldingSetNodeID &ID) const {
@@ -362,7 +362,7 @@ class NestedNameSpecifierLocBuilder {
   /// nested-name-specifier.
   ///
   /// Note that we explicitly manage the buffer (rather than using a
-  /// SmallVector) because \c Declarator expects it to be possible to memcpy()
+  /// llvm::SmallVector) because \c Declarator expects it to be possible to memcpy()
   /// a \c CXXScopeSpec, and CXXScopeSpec uses a NestedNameSpecifierLocBuilder.
   char *Buffer = nullptr;
 

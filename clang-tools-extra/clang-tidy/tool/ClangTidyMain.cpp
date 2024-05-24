@@ -31,7 +31,7 @@
 using namespace clang::tooling;
 using namespace llvm;
 
-static cl::desc desc(StringRef description) { return {description.ltrim()}; }
+static cl::desc desc(llvm::StringRef description) { return {description.ltrim()}; }
 
 static cl::OptionCategory ClangTidyCategory("clang-tidy options");
 
@@ -330,7 +330,7 @@ namespace clang::tidy {
 static void printStats(const ClangTidyStats &Stats) {
   if (Stats.errorsIgnored()) {
     llvm::errs() << "Suppressed " << Stats.errorsIgnored() << " warnings (";
-    StringRef Separator = "";
+    llvm::StringRef Separator = "";
     if (Stats.ErrorsIgnoredNonUserCode) {
       llvm::errs() << Stats.ErrorsIgnoredNonUserCode << " in non-user code";
       Separator = ", ";
@@ -393,8 +393,8 @@ static std::unique_ptr<ClangTidyOptionsProvider> createOptionsProvider(
     OverrideOptions.UseColor = UseColor;
 
   auto LoadConfig =
-      [&](StringRef Configuration,
-          StringRef Source) -> std::unique_ptr<ClangTidyOptionsProvider> {
+      [&](llvm::StringRef Configuration,
+          llvm::StringRef Source) -> std::unique_ptr<ClangTidyOptionsProvider> {
     llvm::ErrorOr<ClangTidyOptions> ParsedConfig =
         parseConfiguration(MemoryBufferRef(Configuration, Source));
     if (ParsedConfig)
@@ -445,7 +445,7 @@ getVfsFromFile(const std::string &OverlayFile,
     return nullptr;
   }
 
-  IntrusiveRefCntPtr<vfs::FileSystem> FS = vfs::getVFSFromYAML(
+  llvm::IntrusiveRefCntPtr<vfs::FileSystem> FS = vfs::getVFSFromYAML(
       std::move(Buffer.get()), /*DiagHandler*/ nullptr, OverlayFile);
   if (!FS) {
     llvm::errs() << "Error: invalid virtual filesystem overlay file '"
@@ -455,9 +455,9 @@ getVfsFromFile(const std::string &OverlayFile,
   return FS;
 }
 
-static StringRef closest(StringRef Value, const StringSet<> &Allowed) {
+static llvm::StringRef closest(llvm::StringRef Value, const StringSet<> &Allowed) {
   unsigned MaxEdit = 5U;
-  StringRef Closest;
+  llvm::StringRef Closest;
   for (auto Item : Allowed.keys()) {
     unsigned Cur = Value.edit_distance_insensitive(Item, true, MaxEdit);
     if (Cur < MaxEdit) {
@@ -470,15 +470,15 @@ static StringRef closest(StringRef Value, const StringSet<> &Allowed) {
 
 static constexpr StringLiteral VerifyConfigWarningEnd = " [-verify-config]\n";
 
-static bool verifyChecks(const StringSet<> &AllChecks, StringRef CheckGlob,
-                         StringRef Source) {
+static bool verifyChecks(const StringSet<> &AllChecks, llvm::StringRef CheckGlob,
+                         llvm::StringRef Source) {
   GlobList Globs(CheckGlob);
   bool AnyInvalid = false;
   for (const auto &Item : Globs.getItems()) {
     if (Item.Text.starts_with("clang-diagnostic"))
       continue;
     if (llvm::none_of(AllChecks.keys(),
-                      [&Item](StringRef S) { return Item.Regex.match(S); })) {
+                      [&Item](llvm::StringRef S) { return Item.Regex.match(S); })) {
       AnyInvalid = true;
       if (Item.Text.contains('*'))
         llvm::WithColor::warning(llvm::errs(), Source)
@@ -501,7 +501,7 @@ static bool verifyChecks(const StringSet<> &AllChecks, StringRef CheckGlob,
 static bool verifyFileExtensions(
     const std::vector<std::string> &HeaderFileExtensions,
     const std::vector<std::string> &ImplementationFileExtensions,
-    StringRef Source) {
+    llvm::StringRef Source) {
   bool AnyInvalid = false;
   for (const auto &HeaderExtension : HeaderFileExtensions) {
     for (const auto &ImplementationExtension : ImplementationFileExtensions) {
@@ -518,10 +518,10 @@ static bool verifyFileExtensions(
   return AnyInvalid;
 }
 
-static SmallString<256> makeAbsolute(llvm::StringRef Input) {
+static llvm::SmallString<256> makeAbsolute(llvm::StringRef Input) {
   if (Input.empty())
     return {};
-  SmallString<256> AbsolutePath(Input);
+  llvm::SmallString<256> AbsolutePath(Input);
   if (std::error_code EC = llvm::sys::fs::make_absolute(AbsolutePath)) {
     llvm::errs() << "Can't make absolute path from " << Input << ": "
                  << EC.message() << "\n";
@@ -534,7 +534,7 @@ static llvm::IntrusiveRefCntPtr<vfs::OverlayFileSystem> createBaseFS() {
       new vfs::OverlayFileSystem(vfs::getRealFileSystem()));
 
   if (!VfsOverlay.empty()) {
-    IntrusiveRefCntPtr<vfs::FileSystem> VfsFromFile =
+    llvm::IntrusiveRefCntPtr<vfs::FileSystem> VfsFromFile =
         getVfsFromFile(VfsOverlay, BaseFS);
     if (!VfsFromFile)
       return nullptr;
@@ -567,15 +567,15 @@ int clangTidyMain(int argc, const char **argv) {
   if (!OptionsProvider)
     return 1;
 
-  SmallString<256> ProfilePrefix = makeAbsolute(StoreCheckProfile);
+  llvm::SmallString<256> ProfilePrefix = makeAbsolute(StoreCheckProfile);
 
-  StringRef FileName("dummy");
+  llvm::StringRef FileName("dummy");
   auto PathList = OptionsParser->getSourcePathList();
   if (!PathList.empty()) {
     FileName = PathList.front();
   }
 
-  SmallString<256> FilePath = makeAbsolute(FileName);
+  llvm::SmallString<256> FilePath = makeAbsolute(FileName);
   ClangTidyOptions EffectiveOptions = OptionsProvider->getOptions(FilePath);
 
   std::vector<std::string> EnabledChecks =
@@ -709,7 +709,7 @@ int clangTidyMain(int argc, const char **argv) {
 
   if (WErrorCount) {
     if (!Quiet) {
-      StringRef Plural = WErrorCount == 1 ? "" : "s";
+      llvm::StringRef Plural = WErrorCount == 1 ? "" : "s";
       llvm::errs() << WErrorCount << " warning" << Plural << " treated as error"
                    << Plural << "\n";
     }

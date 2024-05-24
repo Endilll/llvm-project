@@ -99,7 +99,7 @@ namespace {
 /// A (CallPiece, node assiciated with its CallEnter) pair.
 using CallWithEntry =
     std::pair<PathDiagnosticCallPiece *, const ExplodedNode *>;
-using CallWithEntryStack = SmallVector<CallWithEntry, 6>;
+using CallWithEntryStack = llvm::SmallVector<CallWithEntry, 6>;
 
 /// Map from each node to the diagnostic pieces visitors emit for them.
 using VisitorsDiagnosticsTy =
@@ -226,7 +226,7 @@ public:
   /// a PathDiagnosticBuilder able to construct bug reports for different
   /// consumers. Returns std::nullopt if no valid report is found.
   static std::optional<PathDiagnosticBuilder>
-  findValidReport(ArrayRef<PathSensitiveBugReport *> &bugReports,
+  findValidReport(llvm::ArrayRef<PathSensitiveBugReport *> &bugReports,
                   PathSensitiveBugReporter &Reporter);
 
   PathDiagnosticBuilder(
@@ -1287,7 +1287,7 @@ void PathDiagnosticBuilder::generatePathDiagnosticsForNode(
         bool IsInLoopBody = isInLoopBody(
             PM, getStmtBeforeCond(PM, TermCond, C.getCurrentNode()), Term);
 
-        StringRef str;
+        llvm::StringRef str;
 
         if (isJumpToFalseBranch(&*BE)) {
           if (!IsInLoopBody) {
@@ -1433,7 +1433,7 @@ static void addContextEdges(PathPieces &pieces, const LocationContext *LC) {
       continue;
 
     PathDiagnosticLocation SrcLoc = Piece->getStartLocation();
-    SmallVector<PathDiagnosticLocation, 4> SrcContexts;
+    llvm::SmallVector<PathDiagnosticLocation, 4> SrcContexts;
 
     PathDiagnosticLocation NextSrcContext = SrcLoc;
     const Stmt *InnerStmt = nullptr;
@@ -1528,7 +1528,7 @@ static void simplifySimpleBranches(PathPieces &pieces) {
 
       const auto *EV = dyn_cast<PathDiagnosticEventPiece>(NextI->get());
       if (EV) {
-        StringRef S = EV->getString();
+        llvm::StringRef S = EV->getString();
         if (S == StrEnteringLoop || S == StrLoopBodyZero ||
             S == StrLoopCollectionEmpty || S == StrLoopRangeEmpty) {
           ++NextI;
@@ -1588,13 +1588,13 @@ static std::optional<size_t> getLengthOnSingleLine(const SourceManager &SM,
 
   unsigned BeginOffset = SM.getFileOffset(ExpansionRange.getBegin());
   unsigned EndOffset = SM.getFileOffset(ExpansionRange.getEnd());
-  StringRef Snippet = Buffer->getBuffer().slice(BeginOffset, EndOffset);
+  llvm::StringRef Snippet = Buffer->getBuffer().slice(BeginOffset, EndOffset);
 
   // We're searching the raw bytes of the buffer here, which might include
   // escaped newlines and such. That's okay; we're trying to decide whether the
   // SourceRange is covering a large or small amount of space in the user's
   // editor.
-  if (Snippet.find_first_of("\r\n") != StringRef::npos)
+  if (Snippet.find_first_of("\r\n") != llvm::StringRef::npos)
     return std::nullopt;
 
   // This isn't Unicode-aware, but it doesn't need to be.
@@ -2112,8 +2112,8 @@ void BugType::anchor() {}
 //===----------------------------------------------------------------------===//
 
 LLVM_ATTRIBUTE_USED static bool
-isDependency(const CheckerRegistryData &Registry, StringRef CheckerName) {
-  for (const std::pair<StringRef, StringRef> &Pair : Registry.Dependencies) {
+isDependency(const CheckerRegistryData &Registry, llvm::StringRef CheckerName) {
+  for (const std::pair<llvm::StringRef, llvm::StringRef> &Pair : Registry.Dependencies) {
     if (Pair.second == CheckerName)
       return true;
   }
@@ -2121,7 +2121,7 @@ isDependency(const CheckerRegistryData &Registry, StringRef CheckerName) {
 }
 
 LLVM_ATTRIBUTE_USED static bool isHidden(const CheckerRegistryData &Registry,
-                                         StringRef CheckerName) {
+                                         llvm::StringRef CheckerName) {
   for (const CheckerInfo &Checker : Registry.Checkers) {
     if (Checker.FullName == CheckerName)
       return Checker.IsHidden;
@@ -2132,7 +2132,7 @@ LLVM_ATTRIBUTE_USED static bool isHidden(const CheckerRegistryData &Registry,
 }
 
 PathSensitiveBugReport::PathSensitiveBugReport(
-    const BugType &bt, StringRef shortDesc, StringRef desc,
+    const BugType &bt, llvm::StringRef shortDesc, llvm::StringRef desc,
     const ExplodedNode *errorNode, PathDiagnosticLocation LocationToUnique,
     const Decl *DeclToUnique)
     : BugReport(Kind::PathSensitive, bt, shortDesc, desc), ErrorNode(errorNode),
@@ -2401,7 +2401,7 @@ const Stmt *PathSensitiveBugReport::getStmt() const {
   return S;
 }
 
-ArrayRef<SourceRange>
+llvm::ArrayRef<SourceRange>
 PathSensitiveBugReport::getRanges() const {
   // If no custom ranges, add the range of the statement corresponding to
   // the error node.
@@ -2527,7 +2527,7 @@ class BugPathGetter {
   /// we need to pair it to the error node of the constructed trimmed graph.
   using ReportNewNodePair =
       std::pair<PathSensitiveBugReport *, const ExplodedNode *>;
-  SmallVector<ReportNewNodePair, 32> ReportNodes;
+  llvm::SmallVector<ReportNewNodePair, 32> ReportNodes;
 
   BugPathInfo CurrentBugPath;
 
@@ -2561,7 +2561,7 @@ class BugPathGetter {
 
 public:
   BugPathGetter(const ExplodedGraph *OriginalGraph,
-                ArrayRef<PathSensitiveBugReport *> &bugReports);
+                llvm::ArrayRef<PathSensitiveBugReport *> &bugReports);
 
   BugPathInfo *getNextBugPath();
 };
@@ -2569,8 +2569,8 @@ public:
 } // namespace
 
 BugPathGetter::BugPathGetter(const ExplodedGraph *OriginalGraph,
-                             ArrayRef<PathSensitiveBugReport *> &bugReports) {
-  SmallVector<const ExplodedNode *, 32> Nodes;
+                             llvm::ArrayRef<PathSensitiveBugReport *> &bugReports) {
+  llvm::SmallVector<const ExplodedNode *, 32> Nodes;
   for (const auto I : bugReports) {
     assert(I->isValid() &&
            "We only allow BugReporterVisitors and BugReporter itself to "
@@ -2832,7 +2832,7 @@ generateVisitorsDiagnostics(PathSensitiveBugReport *R,
 }
 
 std::optional<PathDiagnosticBuilder> PathDiagnosticBuilder::findValidReport(
-    ArrayRef<PathSensitiveBugReport *> &bugReports,
+    llvm::ArrayRef<PathSensitiveBugReport *> &bugReports,
     PathSensitiveBugReporter &Reporter) {
 
   BugPathGetter BugGraph(&Reporter.getGraph(), bugReports);
@@ -2884,8 +2884,8 @@ std::optional<PathDiagnosticBuilder> PathDiagnosticBuilder::findValidReport(
 
 std::unique_ptr<DiagnosticForConsumerMapTy>
 PathSensitiveBugReporter::generatePathDiagnostics(
-    ArrayRef<PathDiagnosticConsumer *> consumers,
-    ArrayRef<PathSensitiveBugReport *> &bugReports) {
+    llvm::ArrayRef<PathDiagnosticConsumer *> consumers,
+    llvm::ArrayRef<PathSensitiveBugReport *> &bugReports) {
   assert(!bugReports.empty());
 
   auto Out = std::make_unique<DiagnosticForConsumerMapTy>();
@@ -2971,7 +2971,7 @@ struct FRIEC_WLItem {
 } // namespace
 
 BugReport *PathSensitiveBugReporter::findReportInEquivalenceClass(
-    BugReportEquivClass &EQ, SmallVectorImpl<BugReport *> &bugReports) {
+    BugReportEquivClass &EQ, llvm::SmallVectorImpl<BugReport *> &bugReports) {
   // If we don't need to suppress any of the nodes because they are
   // post-dominated by a sink, simply add all the nodes in the equivalence class
   // to 'Nodes'.  Any of the reports will serve as a "representative" report.
@@ -3025,7 +3025,7 @@ BugReport *PathSensitiveBugReporter::findReportInEquivalenceClass(
     // At this point we know that 'N' is not a sink and it has at least one
     // successor.  Use a DFS worklist to find a non-sink end-of-path node.
     using WLItem = FRIEC_WLItem;
-    using DFSWorkList = SmallVector<WLItem, 10>;
+    using DFSWorkList = llvm::SmallVector<WLItem, 10>;
 
     llvm::DenseMap<const ExplodedNode *, unsigned> Visited;
 
@@ -3075,7 +3075,7 @@ BugReport *PathSensitiveBugReporter::findReportInEquivalenceClass(
 }
 
 void BugReporter::FlushReport(BugReportEquivClass& EQ) {
-  SmallVector<BugReport*, 10> bugReports;
+  llvm::SmallVector<BugReport*, 10> bugReports;
   BugReport *report = findReportInEquivalenceClass(EQ, bugReports);
   if (!report)
     return;
@@ -3087,7 +3087,7 @@ void BugReporter::FlushReport(BugReportEquivClass& EQ) {
       return;
   }
 
-  ArrayRef<PathDiagnosticConsumer*> Consumers = getPathDiagnosticConsumers();
+  llvm::ArrayRef<PathDiagnosticConsumer*> Consumers = getPathDiagnosticConsumers();
   std::unique_ptr<DiagnosticForConsumerMapTy> Diagnostics =
       generateDiagnosticForConsumerMap(report, Consumers, bugReports);
 
@@ -3221,8 +3221,8 @@ findExecutedLines(const SourceManager &SM, const ExplodedNode *N) {
 
 std::unique_ptr<DiagnosticForConsumerMapTy>
 BugReporter::generateDiagnosticForConsumerMap(
-    BugReport *exampleReport, ArrayRef<PathDiagnosticConsumer *> consumers,
-    ArrayRef<BugReport *> bugReports) {
+    BugReport *exampleReport, llvm::ArrayRef<PathDiagnosticConsumer *> consumers,
+    llvm::ArrayRef<BugReport *> bugReports) {
   auto *basicReport = cast<BasicBugReport>(exampleReport);
   auto Out = std::make_unique<DiagnosticForConsumerMapTy>();
   for (auto *Consumer : consumers)
@@ -3279,7 +3279,7 @@ static void resetDiagnosticLocationToMainFile(PathDiagnostic &PD) {
       // Update the path diagnostic message.
       const auto *ND = dyn_cast<NamedDecl>(CP->getCallee());
       if (ND) {
-        SmallString<200> buf;
+        llvm::SmallString<200> buf;
         llvm::raw_svector_ostream os(buf);
         os << " (within a call to '" << ND->getDeclName() << "')";
         PD.appendToDesc(os.str());
@@ -3298,8 +3298,8 @@ static void resetDiagnosticLocationToMainFile(PathDiagnostic &PD) {
 
 std::unique_ptr<DiagnosticForConsumerMapTy>
 PathSensitiveBugReporter::generateDiagnosticForConsumerMap(
-    BugReport *exampleReport, ArrayRef<PathDiagnosticConsumer *> consumers,
-    ArrayRef<BugReport *> bugReports) {
+    BugReport *exampleReport, llvm::ArrayRef<PathDiagnosticConsumer *> consumers,
+    llvm::ArrayRef<BugReport *> bugReports) {
   std::vector<BasicBugReport *> BasicBugReports;
   std::vector<PathSensitiveBugReport *> PathSensitiveBugReports;
   if (isa<BasicBugReport>(exampleReport))
@@ -3314,7 +3314,7 @@ PathSensitiveBugReporter::generateDiagnosticForConsumerMap(
   MaxBugClassSize.updateMax(bugReports.size());
 
   // Avoid copying the whole array because there may be a lot of reports.
-  ArrayRef<PathSensitiveBugReport *> convertedArrayOfReports(
+  llvm::ArrayRef<PathSensitiveBugReport *> convertedArrayOfReports(
       reinterpret_cast<PathSensitiveBugReport *const *>(&*bugReports.begin()),
       reinterpret_cast<PathSensitiveBugReport *const *>(&*bugReports.end()));
   std::unique_ptr<DiagnosticForConsumerMapTy> Out = generatePathDiagnostics(
@@ -3336,21 +3336,21 @@ PathSensitiveBugReporter::generateDiagnosticForConsumerMap(
 }
 
 void BugReporter::EmitBasicReport(const Decl *DeclWithIssue,
-                                  const CheckerBase *Checker, StringRef Name,
-                                  StringRef Category, StringRef Str,
+                                  const CheckerBase *Checker, llvm::StringRef Name,
+                                  llvm::StringRef Category, llvm::StringRef Str,
                                   PathDiagnosticLocation Loc,
-                                  ArrayRef<SourceRange> Ranges,
-                                  ArrayRef<FixItHint> Fixits) {
+                                  llvm::ArrayRef<SourceRange> Ranges,
+                                  llvm::ArrayRef<FixItHint> Fixits) {
   EmitBasicReport(DeclWithIssue, Checker->getCheckerName(), Name, Category, Str,
                   Loc, Ranges, Fixits);
 }
 
 void BugReporter::EmitBasicReport(const Decl *DeclWithIssue,
                                   CheckerNameRef CheckName,
-                                  StringRef name, StringRef category,
-                                  StringRef str, PathDiagnosticLocation Loc,
-                                  ArrayRef<SourceRange> Ranges,
-                                  ArrayRef<FixItHint> Fixits) {
+                                  llvm::StringRef name, llvm::StringRef category,
+                                  llvm::StringRef str, PathDiagnosticLocation Loc,
+                                  llvm::ArrayRef<SourceRange> Ranges,
+                                  llvm::ArrayRef<FixItHint> Fixits) {
   // 'BT' is owned by BugReporter.
   BugType *BT = getBugTypeForName(CheckName, name, category);
   auto R = std::make_unique<BasicBugReport>(*BT, str, Loc);
@@ -3363,8 +3363,8 @@ void BugReporter::EmitBasicReport(const Decl *DeclWithIssue,
 }
 
 BugType *BugReporter::getBugTypeForName(CheckerNameRef CheckName,
-                                        StringRef name, StringRef category) {
-  SmallString<136> fullDesc;
+                                        llvm::StringRef name, llvm::StringRef category) {
+  llvm::SmallString<136> fullDesc;
   llvm::raw_svector_ostream(fullDesc) << CheckName.getName() << ":" << name
                                       << ":" << category;
   std::unique_ptr<BugType> &BT = StrBugTypes[fullDesc];

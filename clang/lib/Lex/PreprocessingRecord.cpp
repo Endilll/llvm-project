@@ -40,7 +40,7 @@ ExternalPreprocessingRecordSource::~ExternalPreprocessingRecordSource() =
     default;
 
 InclusionDirective::InclusionDirective(PreprocessingRecord &PPRec,
-                                       InclusionKind Kind, StringRef FileName,
+                                       InclusionKind Kind, llvm::StringRef FileName,
                                        bool InQuotes, bool ImportedModule,
                                        OptionalFileEntryRef File,
                                        SourceRange Range)
@@ -49,7 +49,7 @@ InclusionDirective::InclusionDirective(PreprocessingRecord &PPRec,
   char *Memory = (char *)PPRec.Allocate(FileName.size() + 1, alignof(char));
   memcpy(Memory, FileName.data(), FileName.size());
   Memory[FileName.size()] = 0;
-  this->FileName = StringRef(Memory, FileName.size());
+  this->FileName = llvm::StringRef(Memory, FileName.size());
 }
 
 PreprocessingRecord::PreprocessingRecord(SourceManager &SM) : SourceMgr(SM) {}
@@ -470,9 +470,9 @@ void PreprocessingRecord::MacroUndefined(const Token &Id,
 }
 
 void PreprocessingRecord::InclusionDirective(
-    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    SourceLocation HashLoc, const Token &IncludeTok, llvm::StringRef FileName,
     bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
-    StringRef SearchPath, StringRef RelativePath, const Module *SuggestedModule,
+    llvm::StringRef SearchPath, llvm::StringRef RelativePath, const Module *SuggestedModule,
     bool ModuleImported, SrcMgr::CharacteristicKind FileType) {
   InclusionDirective::InclusionKind Kind = InclusionDirective::Include;
 

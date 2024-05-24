@@ -18,7 +18,7 @@ namespace clang::tidy::readability {
 /// Finds unnecessary string initializations.
 class RedundantStringInitCheck : public ClangTidyCheck {
 public:
-  RedundantStringInitCheck(StringRef Name, ClangTidyContext *Context);
+  RedundantStringInitCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }
@@ -27,7 +27,7 @@ public:
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
-  std::vector<StringRef> StringNames;
+  std::vector<llvm::StringRef> StringNames;
 };
 
 } // namespace clang::tidy::readability

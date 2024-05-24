@@ -211,7 +211,7 @@ public:
     return State->set<ConstraintSMT>(CZ);
   }
 
-  void printJson(raw_ostream &Out, ProgramStateRef State, const char *NL = "\n",
+  void printJson(llvm::raw_ostream &Out, ProgramStateRef State, const char *NL = "\n",
                  unsigned int Space = 0, bool IsDot = false) const override {
     ConstraintSMTType Constraints = State->get<ConstraintSMT>();
 

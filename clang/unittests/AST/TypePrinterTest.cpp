@@ -23,7 +23,7 @@ using namespace tooling;
 
 namespace {
 
-static void PrintType(raw_ostream &Out, const ASTContext *Context,
+static void PrintType(llvm::raw_ostream &Out, const ASTContext *Context,
                       const QualType *T,
                       PrintingPolicyAdjuster PolicyAdjuster) {
   assert(T && !T->isNull() && "Expected non-null Type");
@@ -34,9 +34,9 @@ static void PrintType(raw_ostream &Out, const ASTContext *Context,
 }
 
 ::testing::AssertionResult
-PrintedTypeMatches(StringRef Code, const std::vector<std::string> &Args,
+PrintedTypeMatches(llvm::StringRef Code, const std::vector<std::string> &Args,
                    const DeclarationMatcher &NodeMatch,
-                   StringRef ExpectedPrinted,
+                   llvm::StringRef ExpectedPrinted,
                    PrintingPolicyAdjuster PolicyAdjuster) {
   return PrintedNodeMatches<QualType>(Code, Args, NodeMatch, ExpectedPrinted,
                                       "", PrintType, PolicyAdjuster);

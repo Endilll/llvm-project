@@ -33,7 +33,7 @@ public:
 
   std::unique_ptr<clang::ASTConsumer>
   CreateASTConsumer(clang::CompilerInstance &Compiler,
-                    StringRef InFile) override {
+                    llvm::StringRef InFile) override {
     SemaSource->setFilePath(InFile);
     return std::make_unique<clang::ASTConsumer>();
   }
@@ -67,14 +67,14 @@ public:
   }
 
 private:
-  IntrusiveRefCntPtr<IncludeFixerSemaSource> SemaSource;
+  llvm::IntrusiveRefCntPtr<IncludeFixerSemaSource> SemaSource;
 };
 
 } // namespace
 
 IncludeFixerActionFactory::IncludeFixerActionFactory(
     SymbolIndexManager &SymbolIndexMgr,
-    std::vector<IncludeFixerContext> &Contexts, StringRef StyleName,
+    std::vector<IncludeFixerContext> &Contexts, llvm::StringRef StyleName,
     bool MinimizeIncludePaths)
     : SymbolIndexMgr(SymbolIndexMgr), Contexts(Contexts),
       MinimizeIncludePaths(MinimizeIncludePaths) {}
@@ -120,7 +120,7 @@ bool IncludeFixerActionFactory::runInvocation(
 
 static bool addDiagnosticsForContext(TypoCorrection &Correction,
                                      const IncludeFixerContext &Context,
-                                     StringRef Code, SourceLocation StartOfFile,
+                                     llvm::StringRef Code, SourceLocation StartOfFile,
                                      ASTContext &Ctx) {
   auto Reps = createIncludeFixerReplacements(
       Code, Context, format::getLLVMStyle(), /*AddQualifiers=*/false);
@@ -165,7 +165,7 @@ bool IncludeFixerSemaSource::MaybeDiagnoseMissingCompleteType(
   if (!MatchedSymbols.empty() && GenerateDiagnostics) {
     TypoCorrection Correction;
     FileID FID = CI->getSourceManager().getFileID(Loc);
-    StringRef Code = CI->getSourceManager().getBufferData(FID);
+    llvm::StringRef Code = CI->getSourceManager().getBufferData(FID);
     SourceLocation StartOfFile =
         CI->getSourceManager().getLocForStartOfFile(FID);
     addDiagnosticsForContext(
@@ -226,7 +226,7 @@ clang::TypoCorrection IncludeFixerSemaSource::CorrectTypo(
   }
 
   auto ExtendNestedNameSpecifier = [this](CharSourceRange Range) {
-    StringRef Source =
+    llvm::StringRef Source =
         Lexer::getSourceText(Range, CI->getSourceManager(), CI->getLangOpts());
 
     // Skip forward until we find a character that's neither identifier nor
@@ -286,7 +286,7 @@ clang::TypoCorrection IncludeFixerSemaSource::CorrectTypo(
     TypoCorrection Correction(Typo.getName());
     Correction.setCorrectionRange(SS, Typo);
     FileID FID = SM.getFileID(Typo.getLoc());
-    StringRef Code = SM.getBufferData(FID);
+    llvm::StringRef Code = SM.getBufferData(FID);
     SourceLocation StartOfFile = SM.getLocForStartOfFile(FID);
     if (addDiagnosticsForContext(
             Correction, getIncludeFixerContext(
@@ -300,13 +300,13 @@ clang::TypoCorrection IncludeFixerSemaSource::CorrectTypo(
 
 /// Get the minimal include for a given path.
 std::string IncludeFixerSemaSource::minimizeInclude(
-    StringRef Include, const clang::SourceManager &SourceManager,
+    llvm::StringRef Include, const clang::SourceManager &SourceManager,
     clang::HeaderSearch &HeaderSearch) const {
   if (!MinimizeIncludePaths)
     return std::string(Include);
 
   // Get the FileEntry for the include.
-  StringRef StrippedInclude = Include.trim("\"<>");
+  llvm::StringRef StrippedInclude = Include.trim("\"<>");
   auto Entry =
       SourceManager.getFileManager().getOptionalFileRef(StrippedInclude);
 
@@ -326,7 +326,7 @@ std::string IncludeFixerSemaSource::minimizeInclude(
 IncludeFixerContext IncludeFixerSemaSource::getIncludeFixerContext(
     const clang::SourceManager &SourceManager,
     clang::HeaderSearch &HeaderSearch,
-    ArrayRef<find_all_symbols::SymbolInfo> MatchedSymbols) const {
+    llvm::ArrayRef<find_all_symbols::SymbolInfo> MatchedSymbols) const {
   std::vector<find_all_symbols::SymbolInfo> SymbolCandidates;
   for (const auto &Symbol : MatchedSymbols) {
     std::string FilePath = Symbol.getFilePath().str();
@@ -341,7 +341,7 @@ IncludeFixerContext IncludeFixerSemaSource::getIncludeFixerContext(
 }
 
 std::vector<find_all_symbols::SymbolInfo>
-IncludeFixerSemaSource::query(StringRef Query, StringRef ScopedQualifiers,
+IncludeFixerSemaSource::query(llvm::StringRef Query, llvm::StringRef ScopedQualifiers,
                               tooling::Range Range) {
   assert(!Query.empty() && "Empty query!");
 
@@ -403,11 +403,11 @@ IncludeFixerSemaSource::query(StringRef Query, StringRef ScopedQualifiers,
 }
 
 llvm::Expected<tooling::Replacements> createIncludeFixerReplacements(
-    StringRef Code, const IncludeFixerContext &Context,
+    llvm::StringRef Code, const IncludeFixerContext &Context,
     const clang::format::FormatStyle &Style, bool AddQualifiers) {
   if (Context.getHeaderInfos().empty())
     return tooling::Replacements();
-  StringRef FilePath = Context.getFilePath();
+  llvm::StringRef FilePath = Context.getFilePath();
   std::string IncludeName =
       "#include " + Context.getHeaderInfos().front().Header + "\n";
   // Create replacements for the new header.

@@ -18,7 +18,7 @@ namespace {
 AST_MATCHER(NamedDecl, isValid) { return !Node.isInvalidDecl(); }
 } // namespace
 
-UseNoexceptCheck::UseNoexceptCheck(StringRef Name, ClangTidyContext *Context)
+UseNoexceptCheck::UseNoexceptCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       NoexceptMacro(Options.get("ReplacementString", "")),
       UseNoexceptFalse(Options.get("UseNoexceptFalse", true)) {}
@@ -86,7 +86,7 @@ void UseNoexceptCheck::check(const MatchFinder::MatchResult &Result) {
       Result.Context->getLangOpts());
 
   bool IsNoThrow = FnTy->isNothrow();
-  StringRef ReplacementStr =
+  llvm::StringRef ReplacementStr =
       IsNoThrow ? NoexceptMacro.empty() ? "noexcept" : NoexceptMacro
       : NoexceptMacro.empty()
           ? (DtorOrOperatorDel || UseNoexceptFalse) ? "noexcept(false)" : ""

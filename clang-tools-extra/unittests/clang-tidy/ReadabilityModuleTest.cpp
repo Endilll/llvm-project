@@ -490,7 +490,7 @@ TEST(BracesAroundStatementsCheckTest, ImplicitCastInReturn) {
   ClangTidyOptions Opts;
   Opts.CheckOptions["test-check-0.ShortStatementLines"] = "1";
 
-  StringRef Input = "const char *f() {\n"
+  llvm::StringRef Input = "const char *f() {\n"
                     "  if (true) return \"\";\n"
                     "  return \"abc\";\n"
                     "}\n";

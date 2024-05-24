@@ -65,7 +65,7 @@ public:
   bool VisitTypeAliasDecl(const TypeAliasDecl *D) { return mapDecl(D); }
 };
 
-void ExtractInfosFromCode(StringRef Code, size_t NumExpectedInfos, bool Public,
+void ExtractInfosFromCode(llvm::StringRef Code, size_t NumExpectedInfos, bool Public,
                           EmittedInfoList &EmittedInfos) {
   auto ASTUnit = clang::tooling::buildASTFromCode(Code);
   auto TU = ASTUnit->getASTContext().getTranslationUnitDecl();
@@ -74,7 +74,7 @@ void ExtractInfosFromCode(StringRef Code, size_t NumExpectedInfos, bool Public,
   ASSERT_EQ(NumExpectedInfos, EmittedInfos.size());
 }
 
-void ExtractInfosFromCodeWithArgs(StringRef Code, size_t NumExpectedInfos,
+void ExtractInfosFromCodeWithArgs(llvm::StringRef Code, size_t NumExpectedInfos,
                                   bool Public, EmittedInfoList &EmittedInfos,
                                   std::vector<std::string> &Args) {
   auto ASTUnit = clang::tooling::buildASTFromCodeWithArgs(Code, Args);

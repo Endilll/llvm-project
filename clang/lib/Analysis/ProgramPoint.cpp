@@ -234,10 +234,10 @@ void ProgramPoint::printJson(llvm::raw_ostream &Out, const char *NL) const {
   }
 }
 
-SimpleProgramPointTag::SimpleProgramPointTag(StringRef MsgProvider,
-                                             StringRef Msg)
+SimpleProgramPointTag::SimpleProgramPointTag(llvm::StringRef MsgProvider,
+                                             llvm::StringRef Msg)
   : Desc((MsgProvider + " : " + Msg).str()) {}
 
-StringRef SimpleProgramPointTag::getTagDescription() const {
+llvm::StringRef SimpleProgramPointTag::getTagDescription() const {
   return Desc;
 }

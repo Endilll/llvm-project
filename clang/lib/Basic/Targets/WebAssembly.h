@@ -88,7 +88,7 @@ public:
     HasUnalignedAccess = true;
   }
 
-  StringRef getABI() const override;
+  llvm::StringRef getABI() const override;
   bool setABI(const std::string &Name) override;
 
 protected:
@@ -101,30 +101,30 @@ private:
 
   bool
   initFeatureMap(llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags,
-                 StringRef CPU,
+                 llvm::StringRef CPU,
                  const std::vector<std::string> &FeaturesVec) const override;
-  bool hasFeature(StringRef Feature) const final;
+  bool hasFeature(llvm::StringRef Feature) const final;
 
-  void setFeatureEnabled(llvm::StringMap<bool> &Features, StringRef Name,
+  void setFeatureEnabled(llvm::StringMap<bool> &Features, llvm::StringRef Name,
                          bool Enabled) const final;
 
   bool handleTargetFeatures(std::vector<std::string> &Features,
                             DiagnosticsEngine &Diags) final;
 
-  bool isValidCPUName(StringRef Name) const final;
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const final;
+  bool isValidCPUName(llvm::StringRef Name) const final;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const final;
 
   bool setCPU(const std::string &Name) final { return isValidCPUName(Name); }
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const final;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const final;
 
   BuiltinVaListKind getBuiltinVaListKind() const final {
     return VoidPtrBuiltinVaList;
   }
 
-  ArrayRef<const char *> getGCCRegNames() const final { return std::nullopt; }
+  llvm::ArrayRef<const char *> getGCCRegNames() const final { return std::nullopt; }
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const final {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const final {
     return std::nullopt;
   }
 

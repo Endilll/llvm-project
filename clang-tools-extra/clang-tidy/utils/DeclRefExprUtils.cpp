@@ -30,7 +30,7 @@ template <typename S> bool isSetDifferenceEmpty(const S &S1, const S &S2) {
 
 // Extracts all Nodes keyed by ID from Matches and inserts them into Nodes.
 template <typename Node>
-void extractNodesByIdTo(ArrayRef<BoundNodes> Matches, StringRef ID,
+void extractNodesByIdTo(llvm::ArrayRef<BoundNodes> Matches, llvm::StringRef ID,
                         SmallPtrSet<const Node *, 16> &Nodes) {
   for (const auto &Match : Matches)
     Nodes.insert(Match.getNodeAs<Node>(ID));

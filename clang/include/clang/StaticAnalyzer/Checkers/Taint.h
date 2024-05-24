@@ -117,7 +117,7 @@ std::vector<SymbolRef> getTaintedSymbolsImpl(ProgramStateRef State,
                                              TaintTagType Kind,
                                              bool returnFirstOnly);
 
-void printTaint(ProgramStateRef State, raw_ostream &Out, const char *nl = "\n",
+void printTaint(ProgramStateRef State, llvm::raw_ostream &Out, const char *nl = "\n",
                 const char *sep = "");
 
 LLVM_DUMP_METHOD void dumpTaint(ProgramStateRef State);

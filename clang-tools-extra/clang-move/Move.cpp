@@ -60,7 +60,7 @@ AST_MATCHER_P(CXXMethodDecl, ofOutermostEnclosingClass,
   return InnerMatcher.matches(*Parent, Finder, Builder);
 }
 
-std::string CleanPath(StringRef PathRef) {
+std::string CleanPath(llvm::StringRef PathRef) {
   llvm::SmallString<128> Path(PathRef);
   llvm::sys::path::remove_dots(Path, /*remove_dot_dot=*/true);
   // FIXME: figure out why this is necessary.
@@ -70,7 +70,7 @@ std::string CleanPath(StringRef PathRef) {
 
 // Make the Path absolute using the CurrentDir if the Path is not an absolute
 // path. An empty Path will result in an empty string.
-std::string MakeAbsolutePath(StringRef CurrentDir, StringRef Path) {
+std::string MakeAbsolutePath(llvm::StringRef CurrentDir, llvm::StringRef Path) {
   if (Path.empty())
     return "";
   llvm::SmallString<128> InitialDirectory(CurrentDir);
@@ -84,7 +84,7 @@ std::string MakeAbsolutePath(StringRef CurrentDir, StringRef Path) {
 //
 // The Path can be a path relative to the build directory, or retrieved from
 // the SourceManager.
-std::string MakeAbsolutePath(const SourceManager &SM, StringRef Path) {
+std::string MakeAbsolutePath(const SourceManager &SM, llvm::StringRef Path) {
   llvm::SmallString<128> AbsolutePath(Path);
   if (std::error_code EC =
           SM.getFileManager().getVirtualFileSystem().makeAbsolute(AbsolutePath))
@@ -95,10 +95,10 @@ std::string MakeAbsolutePath(const SourceManager &SM, StringRef Path) {
   auto Dir = SM.getFileManager().getOptionalDirectoryRef(
       llvm::sys::path::parent_path(AbsolutePath.str()));
   if (Dir) {
-    StringRef DirName = SM.getFileManager().getCanonicalName(*Dir);
+    llvm::StringRef DirName = SM.getFileManager().getCanonicalName(*Dir);
     // FIXME: getCanonicalName might fail to get real path on VFS.
     if (llvm::sys::path::is_absolute(DirName)) {
-      SmallString<128> AbsoluteFilename;
+      llvm::SmallString<128> AbsoluteFilename;
       llvm::sys::path::append(AbsoluteFilename, DirName,
                               llvm::sys::path::filename(AbsolutePath.str()));
       return CleanPath(AbsoluteFilename);
@@ -129,10 +129,10 @@ public:
       : SM(*SM), MoveTool(MoveTool) {}
 
   void InclusionDirective(SourceLocation HashLoc, const Token & /*IncludeTok*/,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef /*File*/, StringRef SearchPath,
-                          StringRef /*RelativePath*/,
+                          OptionalFileEntryRef /*File*/, llvm::StringRef SearchPath,
+                          llvm::StringRef /*RelativePath*/,
                           const Module * /*SuggestedModule*/,
                           bool /*ModuleImported*/,
                           SrcMgr::CharacteristicKind /*FileType*/) override {
@@ -369,7 +369,7 @@ tooling::Replacements
 createInsertedReplacements(const std::vector<std::string> &Includes,
                            const std::vector<const NamedDecl *> &Decls,
                            llvm::StringRef FileName, bool IsHeader = false,
-                           StringRef OldHeaderInclude = "") {
+                           llvm::StringRef OldHeaderInclude = "") {
   std::string NewCode;
   std::string GuardName(FileName);
   if (IsHeader) {
@@ -377,7 +377,7 @@ createInsertedReplacements(const std::vector<std::string> &Includes,
       if (!isAlphanumeric(GuardName[i]))
         GuardName[i] = '_';
     }
-    GuardName = StringRef(GuardName).upper();
+    GuardName = llvm::StringRef(GuardName).upper();
     NewCode += "#ifndef " + GuardName + "\n";
     NewCode += "#define " + GuardName + "\n\n";
   }
@@ -476,7 +476,7 @@ getUsedDecls(const HelperDeclRefGraph *RG,
 
 std::unique_ptr<ASTConsumer>
 ClangMoveAction::CreateASTConsumer(CompilerInstance &Compiler,
-                                   StringRef /*InFile*/) {
+                                   llvm::StringRef /*InFile*/) {
   Compiler.getPreprocessor().addPPCallbacks(std::make_unique<FindAllIncludes>(
       &Compiler.getSourceManager(), &MoveTool));
   return MatchFinder.newASTConsumer();
@@ -492,7 +492,7 @@ ClangMoveTool::ClangMoveTool(ClangMoveContext *const Context,
 void ClangMoveTool::addRemovedDecl(const NamedDecl *Decl) {
   const auto &SM = Decl->getASTContext().getSourceManager();
   auto Loc = Decl->getLocation();
-  StringRef FilePath = SM.getFilename(Loc);
+  llvm::StringRef FilePath = SM.getFilename(Loc);
   FilePathToFileID[FilePath] = SM.getFileID(Loc);
   RemovedDecls.push_back(Decl);
 }
@@ -553,9 +553,9 @@ void ClangMoveTool::registerMatchers(ast_matchers::MatchFinder *Finder) {
 
   // Match static functions/variable definitions which are defined in named
   // namespaces.
-  SmallVector<std::string, 4> QualNames;
+  llvm::SmallVector<std::string, 4> QualNames;
   QualNames.reserve(Context->Spec.Names.size());
-  for (StringRef SymbolName : Context->Spec.Names) {
+  for (llvm::StringRef SymbolName : Context->Spec.Names) {
     QualNames.push_back(("::" + SymbolName.trim().ltrim(':')).str());
   }
 
@@ -565,7 +565,7 @@ void ClangMoveTool::registerMatchers(ast_matchers::MatchFinder *Finder) {
   }
 
   ast_matchers::internal::Matcher<NamedDecl> HasAnySymbolNames =
-      hasAnyName(SmallVector<StringRef, 4>(QualNames.begin(), QualNames.end()));
+      hasAnyName(llvm::SmallVector<llvm::StringRef, 4>(QualNames.begin(), QualNames.end()));
 
   auto InMovedClass =
       hasOutermostEnclosingClass(cxxRecordDecl(HasAnySymbolNames));
@@ -683,7 +683,7 @@ void ClangMoveTool::run(const ast_matchers::MatchFinder::MatchResult &Result) {
   }
 }
 
-std::string ClangMoveTool::makeAbsolutePath(StringRef Path) {
+std::string ClangMoveTool::makeAbsolutePath(llvm::StringRef Path) {
   return MakeAbsolutePath(Context->OriginalRunningDirectory, Path);
 }
 
@@ -692,7 +692,7 @@ void ClangMoveTool::addIncludes(llvm::StringRef IncludeHeader, bool IsAngled,
                                 llvm::StringRef FileName,
                                 CharSourceRange IncludeFilenameRange,
                                 const SourceManager &SM) {
-  SmallString<128> HeaderWithSearchPath;
+  llvm::SmallString<128> HeaderWithSearchPath;
   llvm::sys::path::append(HeaderWithSearchPath, SearchPath, IncludeHeader);
   std::string AbsoluteIncludeHeader =
       MakeAbsolutePath(SM, HeaderWithSearchPath);
@@ -761,7 +761,7 @@ void ClangMoveTool::removeDeclsInOldFiles() {
 
   // Post process of cleanup around all the replacements.
   for (auto &FileAndReplacements : Context->FileToReplacements) {
-    StringRef FilePath = FileAndReplacements.first;
+    llvm::StringRef FilePath = FileAndReplacements.first;
     // Add #include of new header to old header.
     if (Context->Spec.OldDependOnNew &&
         MakeAbsolutePath(SM, FilePath) ==
@@ -842,8 +842,8 @@ void ClangMoveTool::moveDeclsToNewFiles() {
 }
 
 // Move all contents from OldFile to NewFile.
-void ClangMoveTool::moveAll(SourceManager &SM, StringRef OldFile,
-                            StringRef NewFile) {
+void ClangMoveTool::moveAll(SourceManager &SM, llvm::StringRef OldFile,
+                            llvm::StringRef NewFile) {
   auto FE = SM.getFileManager().getOptionalFileRef(makeAbsolutePath(OldFile));
   if (!FE) {
     llvm::errs() << "Failed to get file: " << OldFile << "\n";
@@ -857,7 +857,7 @@ void ClangMoveTool::moveAll(SourceManager &SM, StringRef OldFile,
   std::string FilePath = RemoveAll.getFilePath().str();
   Context->FileToReplacements[FilePath] = tooling::Replacements(RemoveAll);
 
-  StringRef Code = SM.getBufferData(ID);
+  llvm::StringRef Code = SM.getBufferData(ID);
   if (!NewFile.empty()) {
     auto AllCode =
         tooling::Replacements(tooling::Replacement(NewFile, 0, 0, Code));

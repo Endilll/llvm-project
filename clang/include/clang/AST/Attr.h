@@ -110,9 +110,9 @@ public:
   bool isLateParsed() const { return IsLateParsed; }
 
   // Pretty print this attribute.
-  void printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const;
+  void printPretty(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const;
 
-  static StringRef getDocumentation(attr::Kind);
+  static llvm::StringRef getDocumentation(attr::Kind);
 };
 
 class TypeAttr : public Attr {

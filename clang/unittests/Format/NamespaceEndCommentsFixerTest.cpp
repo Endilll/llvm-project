@@ -20,7 +20,7 @@ namespace {
 class NamespaceEndCommentsFixerTest : public testing::Test {
 protected:
   std::string
-  fixNamespaceEndComments(StringRef Code,
+  fixNamespaceEndComments(llvm::StringRef Code,
                           const std::vector<tooling::Range> &Ranges,
                           const FormatStyle &Style = getLLVMStyle()) {
     LLVM_DEBUG(llvm::errs() << "---\n");
@@ -34,20 +34,20 @@ protected:
   }
 
   std::string
-  fixNamespaceEndComments(StringRef Code,
+  fixNamespaceEndComments(llvm::StringRef Code,
                           const FormatStyle &Style = getLLVMStyle()) {
     return fixNamespaceEndComments(
         Code,
         /*Ranges=*/{1, tooling::Range(0, Code.size())}, Style);
   }
 
-  bool isFormatted(StringRef Code, const std::vector<tooling::Range> &Ranges,
+  bool isFormatted(llvm::StringRef Code, const std::vector<tooling::Range> &Ranges,
                    const FormatStyle &Style = getLLVMStyle()) const {
     return format::fixNamespaceEndComments(Style, Code, Ranges, "<stdin>")
         .empty();
   }
 
-  bool isFormatted(StringRef Code,
+  bool isFormatted(llvm::StringRef Code,
                    const FormatStyle &Style = getLLVMStyle()) const {
     return isFormatted(Code, {1, tooling::Range(0, Code.size())}, Style);
   }

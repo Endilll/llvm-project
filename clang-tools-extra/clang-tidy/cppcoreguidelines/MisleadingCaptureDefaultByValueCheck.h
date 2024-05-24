@@ -22,7 +22,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/misleading-capture-default-by-value.html
 class MisleadingCaptureDefaultByValueCheck : public ClangTidyCheck {
 public:
-  MisleadingCaptureDefaultByValueCheck(StringRef Name,
+  MisleadingCaptureDefaultByValueCheck(llvm::StringRef Name,
                                        ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

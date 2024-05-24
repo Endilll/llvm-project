@@ -37,7 +37,7 @@ enum TestLanguage {
 std::vector<std::string> getCommandLineArgsForTesting(TestLanguage Lang);
 std::vector<std::string> getCC1ArgsForTesting(TestLanguage Lang);
 
-StringRef getFilenameForTesting(TestLanguage Lang);
+llvm::StringRef getFilenameForTesting(TestLanguage Lang);
 
 /// Find a target name such that looking for it in TargetRegistry by that name
 /// returns the same target. We expect that there is at least one target

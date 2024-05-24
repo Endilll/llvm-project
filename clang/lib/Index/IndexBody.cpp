@@ -23,7 +23,7 @@ class BodyIndexer : public RecursiveASTVisitor<BodyIndexer> {
   IndexingContext &IndexCtx;
   const NamedDecl *Parent;
   const DeclContext *ParentDC;
-  SmallVector<Stmt*, 16> StmtStack;
+  llvm::SmallVector<Stmt*, 16> StmtStack;
 
   typedef RecursiveASTVisitor<BodyIndexer> base;
 
@@ -59,7 +59,7 @@ public:
   }
 
   SymbolRoleSet getRolesForRef(const Expr *E,
-                               SmallVectorImpl<SymbolRelation> &Relations) {
+                               llvm::SmallVectorImpl<SymbolRelation> &Relations) {
     SymbolRoleSet Roles{};
     assert(!StmtStack.empty() && E == StmtStack.back());
     if (StmtStack.size() == 1)
@@ -129,7 +129,7 @@ public:
   }
 
   void addCallRole(SymbolRoleSet &Roles,
-                   SmallVectorImpl<SymbolRelation> &Relations) {
+                   llvm::SmallVectorImpl<SymbolRelation> &Relations) {
     Roles |= (unsigned)SymbolRole::Call;
     if (auto *FD = dyn_cast<FunctionDecl>(ParentDC))
       Relations.emplace_back((unsigned)SymbolRole::RelationCalledBy, FD);
@@ -138,7 +138,7 @@ public:
   }
 
   bool VisitDeclRefExpr(DeclRefExpr *E) {
-    SmallVector<SymbolRelation, 4> Relations;
+    llvm::SmallVector<SymbolRelation, 4> Relations;
     SymbolRoleSet Roles = getRolesForRef(E, Relations);
     return IndexCtx.handleReference(E->getDecl(), E->getLocation(),
                                     Parent, ParentDC, Roles, Relations, E);
@@ -159,7 +159,7 @@ public:
     SourceLocation Loc = E->getMemberLoc();
     if (Loc.isInvalid())
       Loc = E->getBeginLoc();
-    SmallVector<SymbolRelation, 4> Relations;
+    llvm::SmallVector<SymbolRelation, 4> Relations;
     SymbolRoleSet Roles = getRolesForRef(E, Relations);
     return IndexCtx.handleReference(E->getMemberDecl(), Loc,
                                     Parent, ParentDC, Roles, Relations, E);
@@ -191,7 +191,7 @@ public:
     SourceLocation Loc = NameInfo.getLoc();
     if (Loc.isInvalid())
       Loc = E->getBeginLoc();
-    SmallVector<SymbolRelation, 4> Relations;
+    llvm::SmallVector<SymbolRelation, 4> Relations;
     SymbolRoleSet Roles = getRolesForRef(E, Relations);
     return IndexCtx.handleReference(Symbols[0], Loc, Parent, ParentDC, Roles,
                                     Relations, E);
@@ -225,7 +225,7 @@ public:
   }
 
   bool VisitObjCIvarRefExpr(ObjCIvarRefExpr *E) {
-    SmallVector<SymbolRelation, 4> Relations;
+    llvm::SmallVector<SymbolRelation, 4> Relations;
     SymbolRoleSet Roles = getRolesForRef(E, Relations);
     return IndexCtx.handleReference(E->getDecl(), E->getLocation(),
                                     Parent, ParentDC, Roles, Relations, E);
@@ -245,7 +245,7 @@ public:
 
     if (ObjCMethodDecl *MD = E->getMethodDecl()) {
       SymbolRoleSet Roles{};
-      SmallVector<SymbolRelation, 2> Relations;
+      llvm::SmallVector<SymbolRelation, 2> Relations;
       addCallRole(Roles, Relations);
       Stmt *Containing = getParentStmt();
 
@@ -305,7 +305,7 @@ public:
 
   bool VisitObjCPropertyRefExpr(ObjCPropertyRefExpr *E) {
     if (E->isExplicitProperty()) {
-      SmallVector<SymbolRelation, 2> Relations;
+      llvm::SmallVector<SymbolRelation, 2> Relations;
       SymbolRoleSet Roles = getRolesForRef(E, Relations);
       return IndexCtx.handleReference(E->getExplicitProperty(), E->getLocation(),
                                       Parent, ParentDC, Roles, Relations, E);
@@ -315,7 +315,7 @@ public:
       // properties.
       if (Getter->isClassMethod()) {
         if (const auto *PD = Getter->getCanonicalDecl()->findPropertyDecl()) {
-          SmallVector<SymbolRelation, 2> Relations;
+          llvm::SmallVector<SymbolRelation, 2> Relations;
           SymbolRoleSet Roles = getRolesForRef(E, Relations);
           return IndexCtx.handleReference(PD, E->getLocation(), Parent,
                                           ParentDC, Roles, Relations, E);
@@ -340,7 +340,7 @@ public:
 
   bool passObjCLiteralMethodCall(const ObjCMethodDecl *MD, const Expr *E) {
     SymbolRoleSet Roles{};
-    SmallVector<SymbolRelation, 2> Relations;
+    llvm::SmallVector<SymbolRelation, 2> Relations;
     addCallRole(Roles, Relations);
     Roles |= (unsigned)SymbolRole::Implicit;
     return IndexCtx.handleReference(MD, E->getBeginLoc(), Parent, ParentDC,
@@ -370,7 +370,7 @@ public:
 
   bool VisitCXXConstructExpr(CXXConstructExpr *E) {
     SymbolRoleSet Roles{};
-    SmallVector<SymbolRelation, 2> Relations;
+    llvm::SmallVector<SymbolRelation, 2> Relations;
     addCallRole(Roles, Relations);
     return IndexCtx.handleReference(E->getConstructor(), E->getLocation(),
                                     Parent, ParentDC, Roles, Relations, E);
@@ -486,7 +486,7 @@ public:
   }
 
   bool VisitOverloadExpr(OverloadExpr *E) {
-    SmallVector<SymbolRelation, 4> Relations;
+    llvm::SmallVector<SymbolRelation, 4> Relations;
     SymbolRoleSet Roles = getRolesForRef(E, Relations);
     for (auto *D : E->decls())
       IndexCtx.handleReference(D, E->getNameLoc(), Parent, ParentDC, Roles,

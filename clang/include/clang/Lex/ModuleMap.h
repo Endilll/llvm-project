@@ -63,7 +63,7 @@ public:
   /// Called when a header is added during module map parsing.
   ///
   /// \param Filename The header file itself.
-  virtual void moduleMapAddHeader(StringRef Filename) {}
+  virtual void moduleMapAddHeader(llvm::StringRef Filename) {}
 
   /// Called when an umbrella header is added during module map parsing.
   ///
@@ -199,7 +199,7 @@ public:
 private:
   friend class ModuleMapParser;
 
-  using HeadersMap = llvm::DenseMap<FileEntryRef, SmallVector<KnownHeader, 1>>;
+  using HeadersMap = llvm::DenseMap<FileEntryRef, llvm::SmallVector<KnownHeader, 1>>;
 
   /// Mapping from each header to the module that owns the contents of
   /// that header.
@@ -268,7 +268,7 @@ private:
 
     /// The names of modules that cannot be inferred within this
     /// directory.
-    SmallVector<std::string, 2> ExcludedModules;
+    llvm::SmallVector<std::string, 2> ExcludedModules;
 
     InferredDirectory() : InferModules(false) {}
   };
@@ -338,7 +338,7 @@ private:
   /// \return The resolved file, if any.
   OptionalFileEntryRef
   findHeader(Module *M, const Module::UnresolvedHeaderDirective &Header,
-             SmallVectorImpl<char> &RelativePathName, bool &NeedsFramework);
+             llvm::SmallVectorImpl<char> &RelativePathName, bool &NeedsFramework);
 
   /// Resolve the given header directive.
   ///
@@ -369,7 +369,7 @@ private:
   /// \param IntermediateDirs On success, contains the set of directories
   /// searched before finding \p File.
   KnownHeader findHeaderInUmbrellaDirs(
-      FileEntryRef File, SmallVectorImpl<DirectoryEntryRef> &IntermediateDirs);
+      FileEntryRef File, llvm::SmallVectorImpl<DirectoryEntryRef> &IntermediateDirs);
 
   /// Given that \p File is not in the Headers map, look it up within
   /// umbrella directories and find or create a module for it.
@@ -378,7 +378,7 @@ private:
   /// A convenience method to determine if \p File is (possibly nested)
   /// in an umbrella directory.
   bool isHeaderInUmbrellaDirs(FileEntryRef File) {
-    SmallVector<DirectoryEntryRef, 2> IntermediateDirs;
+    llvm::SmallVector<DirectoryEntryRef, 2> IntermediateDirs;
     return static_cast<bool>(findHeaderInUmbrellaDirs(File, IntermediateDirs));
   }
 
@@ -417,7 +417,7 @@ public:
   /// Is this a compiler builtin header?
   bool isBuiltinHeader(FileEntryRef File);
 
-  bool shouldImportRelativeToBuiltinIncludeDir(StringRef FileName,
+  bool shouldImportRelativeToBuiltinIncludeDir(llvm::StringRef FileName,
                                                Module *Module) const;
 
   /// Add a module map callback.
@@ -449,11 +449,11 @@ public:
   ///
   /// Typically, \ref findModuleForHeader should be used instead, as it picks
   /// the preferred module for the header.
-  ArrayRef<KnownHeader> findAllModulesForHeader(FileEntryRef File);
+  llvm::ArrayRef<KnownHeader> findAllModulesForHeader(FileEntryRef File);
 
   /// Like \ref findAllModulesForHeader, but do not attempt to infer module
   /// ownership from umbrella headers if we've not already done so.
-  ArrayRef<KnownHeader> findResolvedModulesForHeader(FileEntryRef File) const;
+  llvm::ArrayRef<KnownHeader> findResolvedModulesForHeader(FileEntryRef File) const;
 
   /// Resolve all lazy header directives for the specified file.
   ///
@@ -483,7 +483,7 @@ public:
   /// \param File The included file.
   void diagnoseHeaderInclusion(Module *RequestingModule,
                                bool RequestingModuleIsModuleInterface,
-                               SourceLocation FilenameLoc, StringRef Filename,
+                               SourceLocation FilenameLoc, llvm::StringRef Filename,
                                FileEntryRef File);
 
   /// Determine whether the given header is part of a module
@@ -500,7 +500,7 @@ public:
   /// \param Name The name of the module to look up.
   ///
   /// \returns The named module, if known; otherwise, returns null.
-  Module *findModule(StringRef Name) const;
+  Module *findModule(llvm::StringRef Name) const;
 
   /// Retrieve a module with the given name using lexical name lookup,
   /// starting at the given context.
@@ -511,7 +511,7 @@ public:
   /// name lookup.
   ///
   /// \returns The named module, if known; otherwise, returns null.
-  Module *lookupModuleUnqualified(StringRef Name, Module *Context) const;
+  Module *lookupModuleUnqualified(llvm::StringRef Name, Module *Context) const;
 
   /// Retrieve a module with the given name within the given context,
   /// using direct (qualified) name lookup.
@@ -522,7 +522,7 @@ public:
   /// null, we will look for a top-level module.
   ///
   /// \returns The named submodule, if known; otherwose, returns null.
-  Module *lookupModuleQualified(StringRef Name, Module *Context) const;
+  Module *lookupModuleQualified(llvm::StringRef Name, Module *Context) const;
 
   /// Find a new module or submodule, or create it if it does not already
   /// exist.
@@ -538,7 +538,7 @@ public:
   ///
   /// \returns The found or newly-created module, along with a boolean value
   /// that will be true if the module is newly-created.
-  std::pair<Module *, bool> findOrCreateModule(StringRef Name, Module *Parent,
+  std::pair<Module *, bool> findOrCreateModule(llvm::StringRef Name, Module *Parent,
                                                bool IsFramework,
                                                bool IsExplicit);
 
@@ -560,7 +560,7 @@ public:
 
   /// Create a new C++ module with the specified kind, and reparent any pending
   /// global module fragment(s) to it.
-  Module *createModuleUnitWithKind(SourceLocation Loc, StringRef Name,
+  Module *createModuleUnitWithKind(SourceLocation Loc, llvm::StringRef Name,
                                    Module::ModuleKind Kind);
 
   /// Create a new module for a C++ module interface unit.
@@ -570,17 +570,17 @@ public:
   /// Note that this also sets the current module to the newly-created module.
   ///
   /// \returns The newly-created module.
-  Module *createModuleForInterfaceUnit(SourceLocation Loc, StringRef Name);
+  Module *createModuleForInterfaceUnit(SourceLocation Loc, llvm::StringRef Name);
 
   /// Create a new module for a C++ module implementation unit.
   /// The interface module for this implementation (implicitly imported) must
   /// exist and be loaded and present in the modules map.
   ///
   /// \returns The newly-created module.
-  Module *createModuleForImplementationUnit(SourceLocation Loc, StringRef Name);
+  Module *createModuleForImplementationUnit(SourceLocation Loc, llvm::StringRef Name);
 
   /// Create a C++20 header unit.
-  Module *createHeaderUnit(SourceLocation Loc, StringRef Name,
+  Module *createHeaderUnit(SourceLocation Loc, llvm::StringRef Name,
                            Module::Header H);
 
   /// Infer the contents of a framework module map from the given
@@ -590,7 +590,7 @@ public:
 
   /// Create a new top-level module that is shadowed by
   /// \p ShadowingModule.
-  Module *createShadowedModule(StringRef Name, bool IsFramework,
+  Module *createShadowedModule(llvm::StringRef Name, bool IsFramework,
                                Module *ShadowingModule);
 
   /// Creates a new declaration scope for module names, allowing
@@ -643,7 +643,7 @@ public:
   ///
   /// \returns an error code if any filesystem operations failed. In this case
   /// \p Path is not modified.
-  std::error_code canonicalizeModuleMapPath(SmallVectorImpl<char> &Path);
+  std::error_code canonicalizeModuleMapPath(llvm::SmallVectorImpl<char> &Path);
 
   /// Get any module map files other than getModuleMapFileForUniquing(M)
   /// that define submodules of a top-level module \p M. This is cheaper than
@@ -691,13 +691,13 @@ public:
   /// Sets the umbrella header of the given module to the given header.
   void
   setUmbrellaHeaderAsWritten(Module *Mod, FileEntryRef UmbrellaHeader,
-                             const Twine &NameAsWritten,
-                             const Twine &PathRelativeToRootModuleDirectory);
+                             const llvm::Twine &NameAsWritten,
+                             const llvm::Twine &PathRelativeToRootModuleDirectory);
 
   /// Sets the umbrella directory of the given module to the given directory.
   void setUmbrellaDirAsWritten(Module *Mod, DirectoryEntryRef UmbrellaDir,
-                               const Twine &NameAsWritten,
-                               const Twine &PathRelativeToRootModuleDirectory);
+                               const llvm::Twine &NameAsWritten,
+                               const llvm::Twine &PathRelativeToRootModuleDirectory);
 
   /// Adds this header to the given module.
   /// \param Role The role of the header wrt the module.

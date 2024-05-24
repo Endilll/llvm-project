@@ -6,13 +6,13 @@
 @import templates_top;
 
 struct TestEmitDefaultedSpecialMembers {
-  EmitDefaultedSpecialMembers::SmallVector<char, 256> V;
+  EmitDefaultedSpecialMembers::llvm::SmallVector<char, 256> V;
 };
 
 @import templates_left;
 
 void testEmitDefaultedSpecialMembers() {
-  EmitDefaultedSpecialMembers::SmallString<256> V;
+  EmitDefaultedSpecialMembers::llvm::SmallString<256> V;
   // CHECK: call {{.*}} @_ZN27EmitDefaultedSpecialMembers11SmallStringILj256EEC1Ev(
   // CHECK: call {{.*}} @_ZN27EmitDefaultedSpecialMembers11SmallStringILj256EED1Ev(
 }

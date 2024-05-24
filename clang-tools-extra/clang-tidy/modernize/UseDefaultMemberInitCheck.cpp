@@ -21,7 +21,7 @@ AST_MATCHER_P(InitListExpr, initCountIs, unsigned, N) {
 }
 } // namespace
 
-static StringRef getValueOfValueInit(const QualType InitType) {
+static llvm::StringRef getValueOfValueInit(const QualType InitType) {
   switch (InitType->getScalarTypeKind()) {
   case Type::STK_CPointer:
   case Type::STK_BlockPointer:
@@ -181,7 +181,7 @@ static bool sameValue(const Expr *E1, const Expr *E2) {
   }
 }
 
-UseDefaultMemberInitCheck::UseDefaultMemberInitCheck(StringRef Name,
+UseDefaultMemberInitCheck::UseDefaultMemberInitCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       UseAssignment(Options.get("UseAssignment", false)),

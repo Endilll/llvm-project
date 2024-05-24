@@ -95,11 +95,11 @@ protected:
 
   FileSystemOptions FileMgrOpts;
   FileManager FileMgr;
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
   DiagnosticsEngine Diags;
   SourceManager SourceMgr;
   std::shared_ptr<TargetOptions> TargetOpts;
-  IntrusiveRefCntPtr<TargetInfo> Target;
+  llvm::IntrusiveRefCntPtr<TargetInfo> Target;
   LangOptions LangOpts;
   TrivialModuleLoader ModLoader;
   std::optional<HeaderSearch> HeaderInfo;

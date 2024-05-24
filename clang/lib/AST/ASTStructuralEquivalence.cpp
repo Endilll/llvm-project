@@ -642,8 +642,8 @@ static bool IsStructurallyEquivalent(StructuralEquivalenceContext &Context,
 }
 
 static bool IsStructurallyEquivalent(StructuralEquivalenceContext &Context,
-                                     ArrayRef<TemplateArgument> Args1,
-                                     ArrayRef<TemplateArgument> Args2);
+                                     llvm::ArrayRef<TemplateArgument> Args1,
+                                     llvm::ArrayRef<TemplateArgument> Args2);
 
 /// Determine whether two template arguments are equivalent.
 static bool IsStructurallyEquivalent(StructuralEquivalenceContext &Context,
@@ -699,8 +699,8 @@ static bool IsStructurallyEquivalent(StructuralEquivalenceContext &Context,
 
 /// Determine structural equivalence of two template argument lists.
 static bool IsStructurallyEquivalent(StructuralEquivalenceContext &Context,
-                                     ArrayRef<TemplateArgument> Args1,
-                                     ArrayRef<TemplateArgument> Args2) {
+                                     llvm::ArrayRef<TemplateArgument> Args1,
+                                     llvm::ArrayRef<TemplateArgument> Args2) {
   if (Args1.size() != Args2.size())
     return false;
   for (unsigned I = 0, N = Args1.size(); I != N; ++I) {

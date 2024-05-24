@@ -25,7 +25,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/suspicious-include.html
 class SuspiciousIncludeCheck : public ClangTidyCheck {
 public:
-  SuspiciousIncludeCheck(StringRef Name, ClangTidyContext *Context);
+  SuspiciousIncludeCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;
 

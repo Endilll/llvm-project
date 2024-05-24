@@ -43,7 +43,7 @@ public:
   /// If version is empty, one will be automatically assigned.
   /// Returns the version.
   std::string addDraft(PathRef File, llvm::StringRef Version,
-                       StringRef Contents);
+                       llvm::StringRef Contents);
 
   /// Remove the draft from the store.
   void removeDraft(PathRef File);

@@ -21,7 +21,7 @@ namespace clang::tidy::google {
 /// http://clang.llvm.org/extra/clang-tidy/checks/google/explicit-constructor.html
 class ExplicitConstructorCheck : public ClangTidyCheck {
 public:
-  ExplicitConstructorCheck(StringRef Name, ClangTidyContext *Context)
+  ExplicitConstructorCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

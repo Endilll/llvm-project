@@ -99,8 +99,8 @@ class ConstantAggregateBuilder : private ConstantAggregateBuilderUtils {
   std::optional<size_t> splitAt(CharUnits Pos);
 
   static llvm::Constant *buildFrom(CodeGenModule &CGM,
-                                   ArrayRef<llvm::Constant *> Elems,
-                                   ArrayRef<CharUnits> Offsets,
+                                   llvm::ArrayRef<llvm::Constant *> Elems,
+                                   llvm::ArrayRef<CharUnits> Offsets,
                                    CharUnits StartOffset, CharUnits Size,
                                    bool NaturalLayout, llvm::Type *DesiredTy,
                                    bool AllowOversized);
@@ -394,12 +394,12 @@ bool ConstantAggregateBuilder::split(size_t Index, CharUnits Hint) {
 static llvm::Constant *
 EmitArrayConstant(CodeGenModule &CGM, llvm::ArrayType *DesiredType,
                   llvm::Type *CommonElementType, uint64_t ArrayBound,
-                  SmallVectorImpl<llvm::Constant *> &Elements,
+                  llvm::SmallVectorImpl<llvm::Constant *> &Elements,
                   llvm::Constant *Filler);
 
 llvm::Constant *ConstantAggregateBuilder::buildFrom(
-    CodeGenModule &CGM, ArrayRef<llvm::Constant *> Elems,
-    ArrayRef<CharUnits> Offsets, CharUnits StartOffset, CharUnits Size,
+    CodeGenModule &CGM, llvm::ArrayRef<llvm::Constant *> Elems,
+    llvm::ArrayRef<CharUnits> Offsets, CharUnits StartOffset, CharUnits Size,
     bool NaturalLayout, llvm::Type *DesiredTy, bool AllowOversized) {
   ConstantAggregateBuilderUtils Utils(CGM);
 
@@ -417,7 +417,7 @@ llvm::Constant *ConstantAggregateBuilder::buildFrom(
     llvm::Type *CommonType = Elems[0]->getType();
     llvm::Constant *Filler = llvm::Constant::getNullValue(CommonType);
     CharUnits ElemSize = Utils.getSize(ATy->getElementType());
-    SmallVector<llvm::Constant*, 32> ArrayElements;
+    llvm::SmallVector<llvm::Constant*, 32> ArrayElements;
     for (size_t I = 0; I != Elems.size(); ++I) {
       // Skip zeroes; we'll use a zero value as our array filler.
       if (Elems[I]->isNullValue())
@@ -459,7 +459,7 @@ llvm::Constant *ConstantAggregateBuilder::buildFrom(
   CharUnits AlignedSize = Size.alignTo(Align);
 
   bool Packed = false;
-  ArrayRef<llvm::Constant*> UnpackedElems = Elems;
+  llvm::ArrayRef<llvm::Constant*> UnpackedElems = Elems;
   llvm::SmallVector<llvm::Constant*, 32> UnpackedElemStorage;
   if (DesiredSize < AlignedSize || DesiredSize.alignTo(Align) != DesiredSize) {
     // The natural layout would be too big; force use of a packed layout.
@@ -545,8 +545,8 @@ void ConstantAggregateBuilder::condense(CharUnits Offset,
   }
 
   llvm::Constant *Replacement = buildFrom(
-      CGM, ArrayRef(Elems).slice(First, Length),
-      ArrayRef(Offsets).slice(First, Length), Offset, getSize(DesiredTy),
+      CGM, llvm::ArrayRef(Elems).slice(First, Length),
+      llvm::ArrayRef(Offsets).slice(First, Length), Offset, getSize(DesiredTy),
       /*known to have natural layout=*/false, DesiredTy, false);
   replace(Elems, First, Last, {Replacement});
   replace(Offsets, First, Last, {Offset});
@@ -809,7 +809,7 @@ bool ConstStructBuilder::Build(const APValue &Val, const RecordDecl *RD,
 
     // Accumulate and sort bases, in order to visit them in address order, which
     // may not be the same as declaration order.
-    SmallVector<BaseInfo, 8> Bases;
+    llvm::SmallVector<BaseInfo, 8> Bases;
     Bases.reserve(CD->getNumBases());
     unsigned BaseNo = 0;
     for (CXXRecordDecl::base_class_const_iterator Base = CD->bases_begin(),
@@ -950,7 +950,7 @@ tryEmitGlobalCompoundLiteral(ConstantEmitter &emitter,
 static llvm::Constant *
 EmitArrayConstant(CodeGenModule &CGM, llvm::ArrayType *DesiredType,
                   llvm::Type *CommonElementType, uint64_t ArrayBound,
-                  SmallVectorImpl<llvm::Constant *> &Elements,
+                  llvm::SmallVectorImpl<llvm::Constant *> &Elements,
                   llvm::Constant *Filler) {
   // Figure out how long the initial prefix of non-zero elements is.
   uint64_t NonzeroLength = ArrayBound;
@@ -975,7 +975,7 @@ EmitArrayConstant(CodeGenModule &CGM, llvm::ArrayType *DesiredType,
     if (CommonElementType && NonzeroLength >= 8) {
       llvm::Constant *Initial = llvm::ConstantArray::get(
           llvm::ArrayType::get(CommonElementType, NonzeroLength),
-          ArrayRef(Elements).take_front(NonzeroLength));
+          llvm::ArrayRef(Elements).take_front(NonzeroLength));
       Elements.resize(2);
       Elements[0] = Initial;
     } else {
@@ -1082,8 +1082,8 @@ public:
 
       // Build a struct with the union sub-element as the first member,
       // and padded to the appropriate size.
-      SmallVector<llvm::Constant*, 2> Elts;
-      SmallVector<llvm::Type*, 2> Types;
+      llvm::SmallVector<llvm::Constant*, 2> Elts;
+      llvm::SmallVector<llvm::Type*, 2> Types;
       Elts.push_back(C);
       Types.push_back(C->getType());
       unsigned CurSize = CGM.getDataLayout().getTypeAllocSize(C->getType());
@@ -1270,7 +1270,7 @@ public:
     }
 
     // Copy initializer elements.
-    SmallVector<llvm::Constant*, 16> Elts;
+    llvm::SmallVector<llvm::Constant*, 16> Elts;
     if (fillC && fillC->isNullValue())
       Elts.reserve(NumInitableElts + 1);
     else
@@ -1549,7 +1549,7 @@ namespace {
     llvm::SmallVector<llvm::Constant*, 8> IndexValues;
 
     ReplacePlaceholders(CodeGenModule &CGM, llvm::Constant *base,
-                        ArrayRef<std::pair<llvm::Constant*,
+                        llvm::ArrayRef<std::pair<llvm::Constant*,
                                            llvm::GlobalVariable*>> addresses)
         : CGM(CGM), Base(base),
           PlaceholderAddresses(addresses.begin(), addresses.end()) {
@@ -2063,7 +2063,7 @@ ConstantLValueEmitter::VisitCallExpr(const CallExpr *E) {
 
 ConstantLValue
 ConstantLValueEmitter::VisitBlockExpr(const BlockExpr *E) {
-  StringRef functionName;
+  llvm::StringRef functionName;
   if (auto CGF = Emitter.CGF)
     functionName = CGF->CurFn->getName();
   else
@@ -2142,7 +2142,7 @@ llvm::Constant *ConstantEmitter::tryEmitPrivate(const APValue &Value,
   }
   case APValue::Vector: {
     unsigned NumElts = Value.getVectorLength();
-    SmallVector<llvm::Constant *, 4> Inits(NumElts);
+    llvm::SmallVector<llvm::Constant *, 4> Inits(NumElts);
 
     for (unsigned I = 0; I != NumElts; ++I) {
       const APValue &Elt = Value.getVectorElt(I);
@@ -2194,7 +2194,7 @@ llvm::Constant *ConstantEmitter::tryEmitPrivate(const APValue &Value,
     }
 
     // Emit initializer elements.
-    SmallVector<llvm::Constant*, 16> Elts;
+    llvm::SmallVector<llvm::Constant*, 16> Elts;
     if (Filler && Filler->isNullValue())
       Elts.reserve(NumInitElts + 1);
     else
@@ -2388,7 +2388,7 @@ llvm::Constant *CodeGenModule::EmitNullConstant(QualType T) {
     llvm::Constant *Element =
       ConstantEmitter::emitNullForMemory(*this, ElementTy);
     unsigned NumElements = CAT->getZExtSize();
-    SmallVector<llvm::Constant *, 8> Array(NumElements, Element);
+    llvm::SmallVector<llvm::Constant *, 8> Array(NumElements, Element);
     return llvm::ConstantArray::get(ATy, Array);
   }
 

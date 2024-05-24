@@ -498,8 +498,8 @@ StaticAssertDecl
 )cpp");
   }
 
-  auto varChecker = [&AST](StringRef varName, StringRef SemanticDump,
-                           StringRef SyntacticDump) {
+  auto varChecker = [&AST](llvm::StringRef varName, llvm::StringRef SemanticDump,
+                           llvm::StringRef SyntacticDump) {
     auto FN = ast_matchers::match(
         functionDecl(
             hasName("varDeclCtors"),

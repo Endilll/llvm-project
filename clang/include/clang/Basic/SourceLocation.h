@@ -181,7 +181,7 @@ public:
   }
 
   unsigned getHashValue() const;
-  void print(raw_ostream &OS, const SourceManager &SM) const;
+  void print(llvm::raw_ostream &OS, const SourceManager &SM) const;
   std::string printToString(const SourceManager &SM) const;
   void dump(const SourceManager &SM) const;
 };
@@ -241,7 +241,7 @@ public:
     return B <= other.B && E >= other.E;
   }
 
-  void print(raw_ostream &OS, const SourceManager &SM) const;
+  void print(llvm::raw_ostream &OS, const SourceManager &SM) const;
   std::string printToString(const SourceManager &SM) const;
   void dump(const SourceManager &SM) const;
 };
@@ -393,7 +393,7 @@ public:
   PresumedLoc getPresumedLoc(bool UseLineDirectives = true) const;
   bool isMacroArgExpansion(FullSourceLoc *StartLoc = nullptr) const;
   FullSourceLoc getImmediateMacroCallerLoc() const;
-  std::pair<FullSourceLoc, StringRef> getModuleImportLoc() const;
+  std::pair<FullSourceLoc, llvm::StringRef> getModuleImportLoc() const;
   unsigned getFileOffset() const;
 
   unsigned getExpansionLineNumber(bool *Invalid = nullptr) const;
@@ -416,9 +416,9 @@ public:
   const FileEntry *getFileEntry() const;
   OptionalFileEntryRef getFileEntryRef() const;
 
-  /// Return a StringRef to the source buffer data for the
+  /// Return a llvm::StringRef to the source buffer data for the
   /// specified FileID.
-  StringRef getBufferData(bool *Invalid = nullptr) const;
+  llvm::StringRef getBufferData(bool *Invalid = nullptr) const;
 
   /// Decompose the specified location into a raw FileID + Offset pair.
   ///

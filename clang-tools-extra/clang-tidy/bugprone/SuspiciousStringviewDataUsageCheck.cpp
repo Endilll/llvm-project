@@ -17,7 +17,7 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::bugprone {
 
 SuspiciousStringviewDataUsageCheck::SuspiciousStringviewDataUsageCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StringViewTypes(utils::options::parseStringList(Options.get(
           "StringViewTypes", "::std::basic_string_view;::llvm::StringRef"))),

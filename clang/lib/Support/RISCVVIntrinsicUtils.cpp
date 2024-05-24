@@ -262,10 +262,10 @@ void RVVType::initTypeStr() {
   if (IsConstant)
     Str += "const ";
 
-  auto getTypeString = [&](StringRef TypeStr) {
+  auto getTypeString = [&](llvm::StringRef TypeStr) {
     if (isScalar())
-      return Twine(TypeStr + Twine(ElementBitwidth) + "_t").str();
-    return Twine("v" + TypeStr + Twine(ElementBitwidth) + LMUL.str() +
+      return llvm::Twine(TypeStr + llvm::Twine(ElementBitwidth) + "_t").str();
+    return llvm::Twine("v" + TypeStr + llvm::Twine(ElementBitwidth) + LMUL.str() +
                  (IsTuple ? "x" + utostr(NF) : "") + "_t")
         .str();
   };
@@ -468,8 +468,8 @@ PrototypeDescriptor::parsePrototypeDescriptor(
     assert(VTM == VectorTypeModifier::NoModifier &&
            "VectorTypeModifier should only have one modifier");
     size_t Idx = PrototypeDescriptorStr.find(')');
-    assert(Idx != StringRef::npos);
-    StringRef ComplexType = PrototypeDescriptorStr.slice(1, Idx);
+    assert(Idx != llvm::StringRef::npos);
+    llvm::StringRef ComplexType = PrototypeDescriptorStr.slice(1, Idx);
     PrototypeDescriptorStr = PrototypeDescriptorStr.drop_front(Idx + 1);
     assert(!PrototypeDescriptorStr.contains('(') &&
            "Only allow one vector type modifier");
@@ -920,7 +920,7 @@ void RVVType::applyFixedLog2LMUL(int Log2LMUL, enum FixedLMULType Type) {
 
 std::optional<RVVTypes>
 RVVTypeCache::computeTypes(BasicType BT, int Log2LMUL, unsigned NF,
-                           ArrayRef<PrototypeDescriptor> Prototype) {
+                           llvm::ArrayRef<PrototypeDescriptor> Prototype) {
   RVVTypes Types;
   for (const PrototypeDescriptor &Proto : Prototype) {
     auto T = computeType(BT, Log2LMUL, Proto);
@@ -973,12 +973,12 @@ std::optional<RVVTypePtr> RVVTypeCache::computeType(BasicType BT, int Log2LMUL,
 // RVVIntrinsic implementation
 //===----------------------------------------------------------------------===//
 RVVIntrinsic::RVVIntrinsic(
-    StringRef NewName, StringRef Suffix, StringRef NewOverloadedName,
-    StringRef OverloadedSuffix, StringRef IRName, bool IsMasked,
+    llvm::StringRef NewName, llvm::StringRef Suffix, llvm::StringRef NewOverloadedName,
+    llvm::StringRef OverloadedSuffix, llvm::StringRef IRName, bool IsMasked,
     bool HasMaskedOffOperand, bool HasVL, PolicyScheme Scheme,
-    bool SupportOverloading, bool HasBuiltinAlias, StringRef ManualCodegen,
+    bool SupportOverloading, bool HasBuiltinAlias, llvm::StringRef ManualCodegen,
     const RVVTypes &OutInTypes, const std::vector<int64_t> &NewIntrinsicTypes,
-    const std::vector<StringRef> &RequiredFeatures, unsigned NF,
+    const std::vector<llvm::StringRef> &RequiredFeatures, unsigned NF,
     Policy NewPolicyAttrs, bool HasFRMRoundModeOp)
     : IRName(IRName), IsMasked(IsMasked),
       HasMaskedOffOperand(HasMaskedOffOperand), HasVL(HasVL), Scheme(Scheme),
@@ -1028,7 +1028,7 @@ std::string RVVIntrinsic::getBuiltinTypeStr() const {
 std::string RVVIntrinsic::getSuffixStr(
     RVVTypeCache &TypeCache, BasicType Type, int Log2LMUL,
     llvm::ArrayRef<PrototypeDescriptor> PrototypeDescriptors) {
-  SmallVector<std::string> SuffixStrs;
+  llvm::SmallVector<std::string> SuffixStrs;
   for (auto PD : PrototypeDescriptors) {
     auto T = TypeCache.computeType(Type, Log2LMUL, PD);
     SuffixStrs.push_back((*T)->getShortStr());
@@ -1040,7 +1040,7 @@ llvm::SmallVector<PrototypeDescriptor> RVVIntrinsic::computeBuiltinTypes(
     llvm::ArrayRef<PrototypeDescriptor> Prototype, bool IsMasked,
     bool HasMaskedOffOperand, bool HasVL, unsigned NF,
     PolicyScheme DefaultScheme, Policy PolicyAttrs, bool IsTuple) {
-  SmallVector<PrototypeDescriptor> NewPrototype(Prototype.begin(),
+  llvm::SmallVector<PrototypeDescriptor> NewPrototype(Prototype.begin(),
                                                 Prototype.end());
   bool HasPassthruOp = DefaultScheme == PolicyScheme::HasPassthruOperand;
   if (IsMasked) {
@@ -1177,9 +1177,9 @@ void RVVIntrinsic::updateNamesAndPolicy(
   }
 }
 
-SmallVector<PrototypeDescriptor> parsePrototypes(StringRef Prototypes) {
-  SmallVector<PrototypeDescriptor> PrototypeDescriptors;
-  const StringRef Primaries("evwqom0ztulf");
+llvm::SmallVector<PrototypeDescriptor> parsePrototypes(llvm::StringRef Prototypes) {
+  llvm::SmallVector<PrototypeDescriptor> PrototypeDescriptors;
+  const llvm::StringRef Primaries("evwqom0ztulf");
   while (!Prototypes.empty()) {
     size_t Idx = 0;
     // Skip over complex prototype because it could contain primitive type
@@ -1187,7 +1187,7 @@ SmallVector<PrototypeDescriptor> parsePrototypes(StringRef Prototypes) {
     if (Prototypes[0] == '(')
       Idx = Prototypes.find_first_of(')');
     Idx = Prototypes.find_first_of(Primaries, Idx);
-    assert(Idx != StringRef::npos);
+    assert(Idx != llvm::StringRef::npos);
     auto PD = PrototypeDescriptor::parsePrototypeDescriptor(
         Prototypes.slice(0, Idx + 1));
     if (!PD)
@@ -1198,11 +1198,11 @@ SmallVector<PrototypeDescriptor> parsePrototypes(StringRef Prototypes) {
   return PrototypeDescriptors;
 }
 
-raw_ostream &operator<<(raw_ostream &OS, const RVVIntrinsicRecord &Record) {
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const RVVIntrinsicRecord &Record) {
   OS << "{";
   OS << "\"" << Record.Name << "\",";
   if (Record.OverloadedName == nullptr ||
-      StringRef(Record.OverloadedName).empty())
+      llvm::StringRef(Record.OverloadedName).empty())
     OS << "nullptr,";
   else
     OS << "\"" << Record.OverloadedName << "\",";

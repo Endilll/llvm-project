@@ -3,10 +3,10 @@
 // PR5775
 class Twine {
 public:
-  Twine(const char *Str) { }
+  llvm::Twine(const char *Str) { }
 };
 
-static void error(const Twine &Message) {}
+static void error(const llvm::Twine &Message) {}
 
 template<typename>
 struct opt_storage {

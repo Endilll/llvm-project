@@ -87,10 +87,10 @@ public:
 
   // Include directive callback.
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override {
     Checker.collectUmbrellaHeaderHeader(File->getName());
@@ -117,7 +117,7 @@ public:
 
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-    StringRef InFile) override {
+    llvm::StringRef InFile) override {
     return std::make_unique<CoverageCheckerConsumer>(Checker,
       CI.getPreprocessor());
   }
@@ -142,9 +142,9 @@ private:
 // CoverageChecker class implementation.
 
 // Constructor.
-CoverageChecker::CoverageChecker(StringRef ModuleMapPath,
+CoverageChecker::CoverageChecker(llvm::StringRef ModuleMapPath,
     std::vector<std::string> &IncludePaths,
-    ArrayRef<std::string> CommandLine,
+    llvm::ArrayRef<std::string> CommandLine,
     clang::ModuleMap *ModuleMap)
   : ModuleMapPath(ModuleMapPath), IncludePaths(IncludePaths),
     CommandLine(CommandLine),
@@ -153,8 +153,8 @@ CoverageChecker::CoverageChecker(StringRef ModuleMapPath,
 // Create instance of CoverageChecker, to simplify setting up
 // subordinate objects.
 std::unique_ptr<CoverageChecker> CoverageChecker::createCoverageChecker(
-    StringRef ModuleMapPath, std::vector<std::string> &IncludePaths,
-    ArrayRef<std::string> CommandLine, clang::ModuleMap *ModuleMap) {
+    llvm::StringRef ModuleMapPath, std::vector<std::string> &IncludePaths,
+    llvm::ArrayRef<std::string> CommandLine, clang::ModuleMap *ModuleMap) {
 
   return std::make_unique<CoverageChecker>(ModuleMapPath, IncludePaths,
                                             CommandLine, ModuleMap);
@@ -235,9 +235,9 @@ bool CoverageChecker::collectModuleHeaders(const Module &Mod) {
 }
 
 // Collect headers from an umbrella directory.
-bool CoverageChecker::collectUmbrellaHeaders(StringRef UmbrellaDirName) {
+bool CoverageChecker::collectUmbrellaHeaders(llvm::StringRef UmbrellaDirName) {
   // Initialize directory name.
-  SmallString<256> Directory(ModuleMapDirectory);
+  llvm::SmallString<256> Directory(ModuleMapDirectory);
   if (UmbrellaDirName.size())
     sys::path::append(Directory, UmbrellaDirName);
   if (Directory.size() == 0)
@@ -270,9 +270,9 @@ bool CoverageChecker::collectUmbrellaHeaders(StringRef UmbrellaDirName) {
 
 // Collect headers referenced from an umbrella file.
 bool
-CoverageChecker::collectUmbrellaHeaderHeaders(StringRef UmbrellaHeaderName) {
+CoverageChecker::collectUmbrellaHeaderHeaders(llvm::StringRef UmbrellaHeaderName) {
 
-  SmallString<256> PathBuf(ModuleMapDirectory);
+  llvm::SmallString<256> PathBuf(ModuleMapDirectory);
 
   // If directory is empty, it's the current directory.
   if (ModuleMapDirectory.length() == 0)
@@ -280,7 +280,7 @@ CoverageChecker::collectUmbrellaHeaderHeaders(StringRef UmbrellaHeaderName) {
 
   // Create the compilation database.
   std::unique_ptr<CompilationDatabase> Compilations;
-  Compilations.reset(new FixedCompilationDatabase(Twine(PathBuf), CommandLine));
+  Compilations.reset(new FixedCompilationDatabase(llvm::Twine(PathBuf), CommandLine));
 
   std::vector<std::string> HeaderPath;
   HeaderPath.push_back(std::string(UmbrellaHeaderName));
@@ -295,9 +295,9 @@ CoverageChecker::collectUmbrellaHeaderHeaders(StringRef UmbrellaHeaderName) {
 
 // Called from CoverageCheckerCallbacks to track a header included
 // from an umbrella header.
-void CoverageChecker::collectUmbrellaHeaderHeader(StringRef HeaderName) {
+void CoverageChecker::collectUmbrellaHeaderHeader(llvm::StringRef HeaderName) {
 
-  SmallString<256> PathBuf(ModuleMapDirectory);
+  llvm::SmallString<256> PathBuf(ModuleMapDirectory);
   // If directory is empty, it's the current directory.
   if (ModuleMapDirectory.length() == 0)
     sys::fs::current_path(PathBuf);
@@ -324,7 +324,7 @@ bool CoverageChecker::collectFileSystemHeaders() {
   // If no include paths specified, we do the whole tree starting
   // at the module.modulemap directory.
   if (IncludePaths.size() == 0) {
-    if (!collectFileSystemHeaders(StringRef("")))
+    if (!collectFileSystemHeaders(llvm::StringRef("")))
       return false;
   }
   else {
@@ -349,10 +349,10 @@ bool CoverageChecker::collectFileSystemHeaders() {
 // starting at the given directory, which is assumed to be
 // relative to the directory of the module.modulemap file.
 // \returns True if no errors.
-bool CoverageChecker::collectFileSystemHeaders(StringRef IncludePath) {
+bool CoverageChecker::collectFileSystemHeaders(llvm::StringRef IncludePath) {
 
   // Initialize directory name.
-  SmallString<256> Directory(ModuleMapDirectory);
+  llvm::SmallString<256> Directory(ModuleMapDirectory);
   if (IncludePath.size())
     sys::path::append(Directory, IncludePath);
   if (Directory.size() == 0)
@@ -372,7 +372,7 @@ bool CoverageChecker::collectFileSystemHeaders(StringRef IncludePath) {
     if (EC)
       return false;
     //std::string file(I->path());
-    StringRef file(I->path());
+    llvm::StringRef file(I->path());
     llvm::ErrorOr<sys::fs::basic_file_status> Status = I->status();
     if (!Status)
       return false;

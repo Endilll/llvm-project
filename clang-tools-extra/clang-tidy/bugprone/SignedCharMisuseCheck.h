@@ -23,7 +23,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/signed-char-misuse.html
 class SignedCharMisuseCheck : public ClangTidyCheck {
 public:
-  SignedCharMisuseCheck(StringRef Name, ClangTidyContext *Context);
+  SignedCharMisuseCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
@@ -35,7 +35,7 @@ private:
       const ast_matchers::internal::Matcher<clang::QualType> &IntegerType,
       const std::string &CastBindName) const;
 
-  const StringRef CharTypdefsToIgnoreList;
+  const llvm::StringRef CharTypdefsToIgnoreList;
   const bool DiagnoseSignedUnsignedCharComparisons;
 };
 

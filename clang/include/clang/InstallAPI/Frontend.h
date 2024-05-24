@@ -34,7 +34,7 @@ public:
   explicit InstallAPIAction(InstallAPIContext &Ctx) : Ctx(Ctx) {}
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override {
+                                                 llvm::StringRef InFile) override {
     Ctx.Diags->getClient()->BeginSourceFile(CI.getLangOpts());
     Ctx.Verifier->setSourceManager(CI.getSourceManagerPtr());
     return std::make_unique<InstallAPIVisitor>(

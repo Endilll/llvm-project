@@ -25,11 +25,11 @@ using llvm::StringRef;
 using utils::decl_ref_expr::allDeclRefExprs;
 using utils::decl_ref_expr::isOnlyUsedAsConst;
 
-static constexpr StringRef ObjectArgId = "objectArg";
-static constexpr StringRef InitFunctionCallId = "initFunctionCall";
-static constexpr StringRef MethodDeclId = "methodDecl";
-static constexpr StringRef FunctionDeclId = "functionDecl";
-static constexpr StringRef OldVarDeclId = "oldVarDecl";
+static constexpr llvm::StringRef ObjectArgId = "objectArg";
+static constexpr llvm::StringRef InitFunctionCallId = "initFunctionCall";
+static constexpr llvm::StringRef MethodDeclId = "methodDecl";
+static constexpr llvm::StringRef FunctionDeclId = "functionDecl";
+static constexpr llvm::StringRef OldVarDeclId = "oldVarDecl";
 
 void recordFixes(const VarDecl &Var, ASTContext &Context,
                  DiagnosticBuilder &Diagnostic) {
@@ -76,7 +76,7 @@ void recordRemoval(const DeclStmt &Stmt, ASTContext &Context,
 }
 
 AST_MATCHER_FUNCTION_P(StatementMatcher, isConstRefReturningMethodCall,
-                       std::vector<StringRef>, ExcludedContainerTypes) {
+                       std::vector<llvm::StringRef>, ExcludedContainerTypes) {
   // Match method call expressions where the `this` argument is only used as
   // const, this will be checked in `check()` part. This returned const
   // reference is highly likely to outlive the local const reference of the
@@ -116,7 +116,7 @@ AST_MATCHER_FUNCTION(StatementMatcher, isConstRefReturningFunctionCall) {
 }
 
 AST_MATCHER_FUNCTION_P(StatementMatcher, initializerReturnsReferenceToConst,
-                       std::vector<StringRef>, ExcludedContainerTypes) {
+                       std::vector<llvm::StringRef>, ExcludedContainerTypes) {
   auto OldVarDeclRef =
       declRefExpr(to(varDecl(hasLocalStorage()).bind(OldVarDeclId)));
   return expr(
@@ -141,7 +141,7 @@ AST_MATCHER_FUNCTION_P(StatementMatcher, initializerReturnsReferenceToConst,
 // object arg or variable that is referenced is immutable as well.
 static bool isInitializingVariableImmutable(
     const VarDecl &InitializingVar, const Stmt &BlockStmt, ASTContext &Context,
-    const std::vector<StringRef> &ExcludedContainerTypes) {
+    const std::vector<llvm::StringRef> &ExcludedContainerTypes) {
   QualType T = InitializingVar.getType().getCanonicalType();
   if (!isOnlyUsedAsConst(InitializingVar, BlockStmt, Context,
                          T->isPointerType() ? 1 : 0))
@@ -224,7 +224,7 @@ QualType constructorArgumentType(const VarDecl *OldVar,
 } // namespace
 
 UnnecessaryCopyInitialization::UnnecessaryCopyInitialization(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       AllowedTypes(
           utils::options::parseStringList(Options.get("AllowedTypes", ""))),

@@ -21,7 +21,7 @@ namespace format {
 
 // Check whether `FilePath` matches `Pattern` based on POSIX 2.13.1, 2.13.2, and
 // Rule 1 of 2.13.3.
-bool matchFilePath(StringRef Pattern, StringRef FilePath) {
+bool matchFilePath(llvm::StringRef Pattern, llvm::StringRef FilePath) {
   assert(!Pattern.empty());
   assert(!FilePath.empty());
 
@@ -52,7 +52,7 @@ bool matchFilePath(StringRef Pattern, StringRef FilePath) {
       while (++I < EOP && Pattern[I] == '*') { // Skip consecutive stars.
       }
       const auto K = FilePath.find(Separator, J); // Index of next `Separator`.
-      const bool NoMoreSeparatorsInFilePath = K == StringRef::npos;
+      const bool NoMoreSeparatorsInFilePath = K == llvm::StringRef::npos;
       if (I == EOP) // `Pattern` ends with a star.
         return NoMoreSeparatorsInFilePath;
       // `Pattern` ends with a lone backslash.
@@ -78,7 +78,7 @@ bool matchFilePath(StringRef Pattern, StringRef FilePath) {
       if (I + 3 < EOP || (I + 3 == EOP && Pattern[I + 1] != '!')) {
         // Skip unpaired `[`, brackets containing slashes, and `[]`.
         if (const auto K = Pattern.find_first_of("]/", I + 1);
-            K != StringRef::npos && Pattern[K] == ']' && K > I + 1) {
+            K != llvm::StringRef::npos && Pattern[K] == ']' && K > I + 1) {
           if (F == Separator)
             return false;
           ++I; // After the `[`.

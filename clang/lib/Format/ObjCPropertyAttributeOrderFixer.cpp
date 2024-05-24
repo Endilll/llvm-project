@@ -30,8 +30,8 @@ ObjCPropertyAttributeOrderFixer::ObjCPropertyAttributeOrderFixer(
 }
 
 struct ObjCPropertyEntry {
-  StringRef Attribute; // eg, `readwrite`
-  StringRef Value;     // eg, the `foo` of the attribute `getter=foo`
+  llvm::StringRef Attribute; // eg, `readwrite`
+  llvm::StringRef Value;     // eg, the `foo` of the attribute `getter=foo`
 };
 
 void ObjCPropertyAttributeOrderFixer::sortPropertyAttributes(
@@ -49,10 +49,10 @@ void ObjCPropertyAttributeOrderFixer::sortPropertyAttributes(
   std::set<unsigned> Ordinals;
 
   // Create a "remapping index" on how to reorder the attributes.
-  SmallVector<int> Indices;
+  llvm::SmallVector<int> Indices;
 
   // Collect the attributes.
-  SmallVector<ObjCPropertyEntry> PropertyAttributes;
+  llvm::SmallVector<ObjCPropertyEntry> PropertyAttributes;
   bool HasDuplicates = false;
   int Index = 0;
   for (auto Tok = BeginTok; Tok != EndTok; Tok = Tok->Next) {
@@ -68,8 +68,8 @@ void ObjCPropertyAttributeOrderFixer::sortPropertyAttributes(
       return;
     }
 
-    const StringRef Attribute{Tok->TokenText};
-    StringRef Value;
+    const llvm::StringRef Attribute{Tok->TokenText};
+    llvm::StringRef Value;
 
     // Also handle `getter=getFoo` attributes.
     // (Note: no check needed against `EndTok`, since its type is not
@@ -181,7 +181,7 @@ void ObjCPropertyAttributeOrderFixer::analyzeObjCPropertyDecl(
 std::pair<tooling::Replacements, unsigned>
 ObjCPropertyAttributeOrderFixer::analyze(
     TokenAnnotator & /*Annotator*/,
-    SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+    llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
     FormatTokenLexer &Tokens) {
   tooling::Replacements Fixes;
   const AdditionalKeywords &Keywords = Tokens.getKeywords();

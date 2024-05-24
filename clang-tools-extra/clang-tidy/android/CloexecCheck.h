@@ -25,7 +25,7 @@ namespace clang::tidy::android {
 /// utilities to identify and fix these C functions.
 class CloexecCheck : public ClangTidyCheck {
 public:
-  CloexecCheck(StringRef Name, ClangTidyContext *Context)
+  CloexecCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
 protected:
@@ -49,7 +49,7 @@ protected:
   /// \param MacroFlag The macro name of the flag.
   /// \param ArgPos The 0-based position of the flag argument.
   void insertMacroFlag(const ast_matchers::MatchFinder::MatchResult &Result,
-                       StringRef MacroFlag, int ArgPos);
+                       llvm::StringRef MacroFlag, int ArgPos);
 
   /// Type2 is to replace the API to another function that has required the
   /// ability. For example:
@@ -65,7 +65,7 @@ protected:
   /// \param WarningMsg The warning message.
   /// \param FixMsg The fix message.
   void replaceFunc(const ast_matchers::MatchFinder::MatchResult &Result,
-                   StringRef WarningMsg, StringRef FixMsg);
+                   llvm::StringRef WarningMsg, llvm::StringRef FixMsg);
 
   /// Type3 is also to add a flag to the corresponding argument, but this time,
   /// the flag is some string and each char represents a mode rather than a
@@ -85,7 +85,7 @@ protected:
                         const char Mode, const int ArgPos);
 
   /// Helper function to get the spelling of a particular argument.
-  StringRef getSpellingArg(const ast_matchers::MatchFinder::MatchResult &Result,
+  llvm::StringRef getSpellingArg(const ast_matchers::MatchFinder::MatchResult &Result,
                            int N) const;
 
   /// Binding name of the FuncDecl of a function call.

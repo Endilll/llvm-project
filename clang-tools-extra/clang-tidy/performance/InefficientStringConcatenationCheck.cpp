@@ -20,7 +20,7 @@ void InefficientStringConcatenationCheck::storeOptions(
 }
 
 InefficientStringConcatenationCheck::InefficientStringConcatenationCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StrictMode(Options.getLocalOrGlobal("StrictMode", false)) {}
 

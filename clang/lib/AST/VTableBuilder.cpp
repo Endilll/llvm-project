@@ -128,7 +128,7 @@ private:
 
   /// dump - dump the final overriders for a base subobject, and all its direct
   /// and indirect base subobjects.
-  void dump(raw_ostream &Out, BaseSubobject Base,
+  void dump(llvm::raw_ostream &Out, BaseSubobject Base,
             VisitedVirtualBasesSetTy& VisitedVirtualBases);
 
 public:
@@ -375,7 +375,7 @@ FinalOverriders::ComputeBaseOffsets(BaseSubobject Base, bool IsVirtual,
   }
 }
 
-void FinalOverriders::dump(raw_ostream &Out, BaseSubobject Base,
+void FinalOverriders::dump(llvm::raw_ostream &Out, BaseSubobject Base,
                            VisitedVirtualBasesSetTy &VisitedVirtualBases) {
   const CXXRecordDecl *RD = Base.getBase();
   const ASTRecordLayout &Layout = Context.getASTRecordLayout(RD);
@@ -446,7 +446,7 @@ struct VCallOffsetMap {
 
   /// Offsets - Keeps track of methods and their offsets.
   // FIXME: This should be a real map and not a vector.
-  SmallVector<MethodAndOffsetPairTy, 16> Offsets;
+  llvm::SmallVector<MethodAndOffsetPairTy, 16> Offsets;
 
   /// MethodsCanShareVCallOffset - Returns whether two virtual member functions
   /// can share the same vcall offset.
@@ -551,7 +551,7 @@ private:
   ASTContext &Context;
 
   /// Components - vcall and vbase offset components
-  typedef SmallVector<VTableComponent, 64> VTableComponentVectorTy;
+  typedef llvm::SmallVector<VTableComponent, 64> VTableComponentVectorTy;
   VTableComponentVectorTy Components;
 
   /// VisitedVirtualBases - Visited virtual bases.
@@ -831,7 +831,7 @@ private:
   VBaseOffsetOffsetsMapTy VBaseOffsetOffsets;
 
   /// Components - The components of the vtable being built.
-  SmallVector<VTableComponent, 64> Components;
+  llvm::SmallVector<VTableComponent, 64> Components;
 
   /// AddressPoints - Address points for the vtable being built.
   AddressPointsMapTy AddressPoints;
@@ -880,7 +880,7 @@ private:
   /// built.
   VTableThunksMapTy VTableThunks;
 
-  typedef SmallVector<ThunkInfo, 1> ThunkInfoVectorTy;
+  typedef llvm::SmallVector<ThunkInfo, 1> ThunkInfoVectorTy;
   typedef llvm::DenseMap<const CXXMethodDecl *, ThunkInfoVectorTy> ThunksMapTy;
 
   /// Thunks - A map that contains all the thunks needed for all methods in the
@@ -998,7 +998,7 @@ private:
 public:
   /// Component indices of the first component of each of the vtables in the
   /// vtable group.
-  SmallVector<size_t, 4> VTableIndices;
+  llvm::SmallVector<size_t, 4> VTableIndices;
 
   ItaniumVTableBuilder(ItaniumVTableContext &VTables,
                        const CXXRecordDecl *MostDerivedClass,
@@ -1046,7 +1046,7 @@ public:
     return MethodVTableIndices.end();
   }
 
-  ArrayRef<VTableComponent> vtable_components() const { return Components; }
+  llvm::ArrayRef<VTableComponent> vtable_components() const { return Components; }
 
   AddressPointsMapTy::const_iterator address_points_begin() const {
     return AddressPoints.begin();
@@ -1065,7 +1065,7 @@ public:
   }
 
   /// dumpLayout - Dump the vtable layout.
-  void dumpLayout(raw_ostream&);
+  void dumpLayout(llvm::raw_ostream&);
 };
 
 void ItaniumVTableBuilder::AddThunk(const CXXMethodDecl *MD,
@@ -1073,7 +1073,7 @@ void ItaniumVTableBuilder::AddThunk(const CXXMethodDecl *MD,
   assert(!isBuildingConstructorVTable() &&
          "Can't add thunks for construction vtable");
 
-  SmallVectorImpl<ThunkInfo> &ThunksVector = Thunks[MD];
+  llvm::SmallVectorImpl<ThunkInfo> &ThunksVector = Thunks[MD];
 
   // Check if we have this thunk already.
   if (llvm::is_contained(ThunksVector, Thunk))
@@ -1891,7 +1891,7 @@ void ItaniumVTableBuilder::LayoutVTablesForVirtualBases(
 }
 
 /// dumpLayout - Dump the vtable layout.
-void ItaniumVTableBuilder::dumpLayout(raw_ostream &Out) {
+void ItaniumVTableBuilder::dumpLayout(llvm::raw_ostream &Out) {
   // FIXME: write more tests that actually use the dumpLayout output to prevent
   // ItaniumVTableBuilder regressions.
 
@@ -2239,9 +2239,9 @@ MakeAddressPointIndices(const VTableLayout::AddressPointsMapTy &addressPoints,
   return indexMap;
 }
 
-VTableLayout::VTableLayout(ArrayRef<size_t> VTableIndices,
-                           ArrayRef<VTableComponent> VTableComponents,
-                           ArrayRef<VTableThunkTy> VTableThunks,
+VTableLayout::VTableLayout(llvm::ArrayRef<size_t> VTableIndices,
+                           llvm::ArrayRef<VTableComponent> VTableComponents,
+                           llvm::ArrayRef<VTableThunkTy> VTableThunks,
                            const AddressPointsMapTy &AddressPoints)
     : VTableComponents(VTableComponents), VTableThunks(VTableThunks),
       AddressPoints(AddressPoints), AddressPointIndices(MakeAddressPointIndices(
@@ -2249,7 +2249,7 @@ VTableLayout::VTableLayout(ArrayRef<size_t> VTableIndices,
   if (VTableIndices.size() <= 1)
     assert(VTableIndices.size() == 1 && VTableIndices[0] == 0);
   else
-    this->VTableIndices = OwningArrayRef<size_t>(VTableIndices);
+    this->VTableIndices = llvm::OwningArrayRef<size_t>(VTableIndices);
 
   llvm::sort(this->VTableThunks, [](const VTableLayout::VTableThunkTy &LHS,
                                     const VTableLayout::VTableThunkTy &RHS) {
@@ -2316,7 +2316,7 @@ ItaniumVTableContext::getVirtualBaseOffsetOffset(const CXXRecordDecl *RD,
 
 static std::unique_ptr<VTableLayout>
 CreateVTableLayout(const ItaniumVTableBuilder &Builder) {
-  SmallVector<VTableLayout::VTableThunkTy, 1>
+  llvm::SmallVector<VTableLayout::VTableThunkTy, 1>
     VTableThunks(Builder.vtable_thunks_begin(), Builder.vtable_thunks_end());
 
   return std::make_unique<VTableLayout>(
@@ -2442,7 +2442,7 @@ private:
   const FinalOverriders Overriders;
 
   /// Components - The components of the vftable being built.
-  SmallVector<VTableComponent, 64> Components;
+  llvm::SmallVector<VTableComponent, 64> Components;
 
   MethodVFTableLocationsTy MethodVFTableLocations;
 
@@ -2490,7 +2490,7 @@ private:
   /// built.
   VTableThunksMapTy VTableThunks;
 
-  typedef SmallVector<ThunkInfo, 1> ThunkInfoVectorTy;
+  typedef llvm::SmallVector<ThunkInfo, 1> ThunkInfoVectorTy;
   typedef llvm::DenseMap<const CXXMethodDecl *, ThunkInfoVectorTy> ThunksMapTy;
 
   /// Thunks - A map that contains all the thunks needed for all methods in the
@@ -2499,7 +2499,7 @@ private:
 
   /// AddThunk - Add a thunk for the given method.
   void AddThunk(const CXXMethodDecl *MD, const ThunkInfo &Thunk) {
-    SmallVector<ThunkInfo, 1> &ThunksVector = Thunks[MD];
+    llvm::SmallVector<ThunkInfo, 1> &ThunksVector = Thunks[MD];
 
     // Check if we have this thunk already.
     if (llvm::is_contained(ThunksVector, Thunk))
@@ -2603,7 +2603,7 @@ public:
                                   MethodVFTableLocations.end());
   }
 
-  ArrayRef<VTableComponent> vtable_components() const { return Components; }
+  llvm::ArrayRef<VTableComponent> vtable_components() const { return Components; }
 
   VTableThunksMapTy::const_iterator vtable_thunks_begin() const {
     return VTableThunks.begin();
@@ -2613,7 +2613,7 @@ public:
     return VTableThunks.end();
   }
 
-  void dumpLayout(raw_ostream &);
+  void dumpLayout(llvm::raw_ostream &);
 };
 
 } // end namespace
@@ -2904,15 +2904,15 @@ void VFTableBuilder::CalculateVtordispAdjustment(
 
 static void GroupNewVirtualOverloads(
     const CXXRecordDecl *RD,
-    SmallVector<const CXXMethodDecl *, 10> &VirtualMethods) {
+    llvm::SmallVector<const CXXMethodDecl *, 10> &VirtualMethods) {
   // Put the virtual methods into VirtualMethods in the proper order:
   // 1) Group overloads by declaration name. New groups are added to the
   //    vftable in the order of their first declarations in this class
   //    (including overrides, non-virtual methods and any other named decl that
   //    might be nested within the class).
   // 2) In each group, new overloads appear in the reverse order of declaration.
-  typedef SmallVector<const CXXMethodDecl *, 1> MethodGroup;
-  SmallVector<MethodGroup, 10> Groups;
+  typedef llvm::SmallVector<const CXXMethodDecl *, 1> MethodGroup;
+  llvm::SmallVector<MethodGroup, 10> Groups;
   typedef llvm::DenseMap<DeclarationName, unsigned> VisitedGroupIndicesTy;
   VisitedGroupIndicesTy VisitedGroupIndices;
   for (const auto *D : RD->decls()) {
@@ -2979,7 +2979,7 @@ void VFTableBuilder::AddMethods(BaseSubobject Base, unsigned BaseDepth,
       llvm_unreachable("Found a duplicate primary base!");
   }
 
-  SmallVector<const CXXMethodDecl*, 10> VirtualMethods;
+  llvm::SmallVector<const CXXMethodDecl*, 10> VirtualMethods;
   // Put virtual methods in the proper order.
   GroupNewVirtualOverloads(RD, VirtualMethods);
 
@@ -3101,7 +3101,7 @@ void VFTableBuilder::AddMethods(BaseSubobject Base, unsigned BaseDepth,
   }
 }
 
-static void PrintBasePath(const VPtrInfo::BasePath &Path, raw_ostream &Out) {
+static void PrintBasePath(const VPtrInfo::BasePath &Path, llvm::raw_ostream &Out) {
   for (const CXXRecordDecl *Elem : llvm::reverse(Path)) {
     Out << "'";
     Elem->printQualifiedName(Out);
@@ -3109,7 +3109,7 @@ static void PrintBasePath(const VPtrInfo::BasePath &Path, raw_ostream &Out) {
   }
 }
 
-static void dumpMicrosoftThunkAdjustment(const ThunkInfo &TI, raw_ostream &Out,
+static void dumpMicrosoftThunkAdjustment(const ThunkInfo &TI, llvm::raw_ostream &Out,
                                          bool ContinueFirstLine) {
   const ReturnAdjustment &R = TI.Return;
   bool Multiline = false;
@@ -3147,7 +3147,7 @@ static void dumpMicrosoftThunkAdjustment(const ThunkInfo &TI, raw_ostream &Out,
   }
 }
 
-void VFTableBuilder::dumpLayout(raw_ostream &Out) {
+void VFTableBuilder::dumpLayout(llvm::raw_ostream &Out) {
   Out << "VFTable for ";
   PrintBasePath(WhichVFPtr.PathToIntroducingObject, Out);
   Out << "'";
@@ -3264,7 +3264,7 @@ void VFTableBuilder::dumpLayout(raw_ostream &Out) {
 }
 
 static bool setsIntersect(const llvm::SmallPtrSet<const CXXRecordDecl *, 4> &A,
-                          ArrayRef<const CXXRecordDecl *> B) {
+                          llvm::ArrayRef<const CXXRecordDecl *> B) {
   for (const CXXRecordDecl *Decl : B) {
     if (A.count(Decl))
       return true;
@@ -3622,10 +3622,10 @@ void MicrosoftVTableContext::computeVTableRelatedInformation(
 
     VFTableIdTy id(RD, VFPtr->FullOffsetInMDC);
     assert(VFTableLayouts.count(id) == 0);
-    SmallVector<VTableLayout::VTableThunkTy, 1> VTableThunks(
+    llvm::SmallVector<VTableLayout::VTableThunkTy, 1> VTableThunks(
         Builder.vtable_thunks_begin(), Builder.vtable_thunks_end());
     VFTableLayouts[id] = std::make_unique<VTableLayout>(
-        ArrayRef<size_t>{0}, Builder.vtable_components(), VTableThunks,
+        llvm::ArrayRef<size_t>{0}, Builder.vtable_components(), VTableThunks,
         EmptyAddressPointsMap);
     Thunks.insert(Builder.thunks_begin(), Builder.thunks_end());
 
@@ -3649,7 +3649,7 @@ void MicrosoftVTableContext::computeVTableRelatedInformation(
 
 void MicrosoftVTableContext::dumpMethodLocations(
     const CXXRecordDecl *RD, const MethodVFTableLocationsTy &NewMethods,
-    raw_ostream &Out) {
+    llvm::raw_ostream &Out) {
   // Compute the vtable indices for all the member functions.
   // Store them in a map keyed by the location so we'll get a sorted table.
   std::map<MethodVFTableLocation, std::string> IndicesMap;

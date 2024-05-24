@@ -37,7 +37,7 @@ using namespace llvm::opt;
 
 static bool shouldSkipSanitizeOption(const ToolChain &TC,
                                      const llvm::opt::ArgList &DriverArgs,
-                                     StringRef TargetID,
+                                     llvm::StringRef TargetID,
                                      const llvm::opt::Arg *A) {
   // For actions without targetID, do nothing.
   if (TargetID.empty())
@@ -144,7 +144,7 @@ void AMDGCN::Linker::constructLldCommand(Compilation &C, const JobAction &JA,
 
   for (const Arg *A : Args.filtered(options::OPT_mllvm)) {
     LldArgs.push_back(
-        Args.MakeArgString(Twine("-plugin-opt=") + A->getValue(0)));
+        Args.MakeArgString(llvm::Twine("-plugin-opt=") + A->getValue(0)));
   }
 
   if (C.getDriver().isSaveTempsEnabled())
@@ -165,11 +165,11 @@ void AMDGCN::Linker::constructLldCommand(Compilation &C, const JobAction &JA,
   LldArgs.push_back("--whole-archive");
 
   for (auto *Arg : Args.filtered(options::OPT_Xoffload_linker)) {
-    StringRef ArgVal = Arg->getValue(1);
+    llvm::StringRef ArgVal = Arg->getValue(1);
     auto SplitArg = ArgVal.split("-mllvm=");
     if (!SplitArg.second.empty()) {
       LldArgs.push_back(
-          Args.MakeArgString(Twine("-plugin-opt=") + SplitArg.second));
+          Args.MakeArgString(llvm::Twine("-plugin-opt=") + SplitArg.second));
     } else {
       LldArgs.push_back(Args.MakeArgString(ArgVal));
     }
@@ -252,11 +252,11 @@ void HIPAMDToolChain::addClangTargetOptions(
   if (DriverArgs.hasArgNoClaim(options::OPT_hipstdpar))
     CC1Args.append({"-mllvm", "-amdgpu-enable-hipstdpar"});
 
-  StringRef MaxThreadsPerBlock =
+  llvm::StringRef MaxThreadsPerBlock =
       DriverArgs.getLastArgValue(options::OPT_gpu_max_threads_per_block_EQ);
   if (!MaxThreadsPerBlock.empty()) {
     std::string ArgStr =
-        (Twine("--gpu-max-threads-per-block=") + MaxThreadsPerBlock).str();
+        (llvm::Twine("--gpu-max-threads-per-block=") + MaxThreadsPerBlock).str();
     CC1Args.push_back(DriverArgs.MakeArgStringRef(ArgStr));
   }
 
@@ -279,7 +279,7 @@ void HIPAMDToolChain::addClangTargetOptions(
 
 llvm::opt::DerivedArgList *
 HIPAMDToolChain::TranslateArgs(const llvm::opt::DerivedArgList &Args,
-                               StringRef BoundArch,
+                               llvm::StringRef BoundArch,
                                Action::OffloadKind DeviceOffloadKind) const {
   DerivedArgList *DAL =
       HostTC.TranslateArgs(Args, BoundArch, DeviceOffloadKind);
@@ -350,7 +350,7 @@ SanitizerMask HIPAMDToolChain::getSupportedSanitizers() const {
   return HostTC.getSupportedSanitizers();
 }
 
-VersionTuple HIPAMDToolChain::computeMSVCVersion(const Driver *D,
+llvm::VersionTuple HIPAMDToolChain::computeMSVCVersion(const Driver *D,
                                                  const ArgList &Args) const {
   return HostTC.computeMSVCVersion(D, Args);
 }
@@ -363,7 +363,7 @@ HIPAMDToolChain::getDeviceLibs(const llvm::opt::ArgList &DriverArgs) const {
   ArgStringList LibraryPaths;
 
   // Find in --hip-device-lib-path and HIP_LIBRARY_PATH.
-  for (StringRef Path : RocmInstallation->getRocmDeviceLibPathArg())
+  for (llvm::StringRef Path : RocmInstallation->getRocmDeviceLibPathArg())
     LibraryPaths.push_back(DriverArgs.MakeArgString(Path));
 
   addDirectoryList(DriverArgs, LibraryPaths, "", "HIP_DEVICE_LIB_PATH");
@@ -371,10 +371,10 @@ HIPAMDToolChain::getDeviceLibs(const llvm::opt::ArgList &DriverArgs) const {
   // Maintain compatability with --hip-device-lib.
   auto BCLibArgs = DriverArgs.getAllArgValues(options::OPT_hip_device_lib_EQ);
   if (!BCLibArgs.empty()) {
-    llvm::for_each(BCLibArgs, [&](StringRef BCName) {
-      StringRef FullName;
-      for (StringRef LibraryPath : LibraryPaths) {
-        SmallString<128> Path(LibraryPath);
+    llvm::for_each(BCLibArgs, [&](llvm::StringRef BCName) {
+      llvm::StringRef FullName;
+      for (llvm::StringRef LibraryPath : LibraryPaths) {
+        llvm::SmallString<128> Path(LibraryPath);
         llvm::sys::path::append(Path, BCName);
         FullName = Path;
         if (llvm::sys::fs::exists(FullName)) {
@@ -389,7 +389,7 @@ HIPAMDToolChain::getDeviceLibs(const llvm::opt::ArgList &DriverArgs) const {
       getDriver().Diag(diag::err_drv_no_rocm_device_lib) << 0;
       return {};
     }
-    StringRef GpuArch = getGPUArch(DriverArgs);
+    llvm::StringRef GpuArch = getGPUArch(DriverArgs);
     assert(!GpuArch.empty() && "Must have an explicit GPU arch.");
 
     // If --hip-device-lib is not set, add the default bitcode libraries.
@@ -413,7 +413,7 @@ HIPAMDToolChain::getDeviceLibs(const llvm::opt::ArgList &DriverArgs) const {
     BCLibs.push_back(RocmInstallation->getHIPPath());
 
     // Add common device libraries like ocml etc.
-    for (StringRef N : getCommonDeviceLibNames(DriverArgs, GpuArch.str()))
+    for (llvm::StringRef N : getCommonDeviceLibNames(DriverArgs, GpuArch.str()))
       BCLibs.emplace_back(N);
 
     // Add instrument lib.

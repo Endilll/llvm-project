@@ -17,7 +17,7 @@ namespace clang::tidy::misc {
 /// Finds unused namespace alias declarations.
 class UnusedAliasDeclsCheck : public ClangTidyCheck {
 public:
-  UnusedAliasDeclsCheck(StringRef Name, ClangTidyContext *Context)
+  UnusedAliasDeclsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;

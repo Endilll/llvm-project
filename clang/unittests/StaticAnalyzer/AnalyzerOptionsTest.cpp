@@ -14,10 +14,10 @@ namespace clang {
 namespace ento {
 
 TEST(StaticAnalyzerOptions, getRegisteredCheckers) {
-  auto IsDebugChecker = [](StringRef CheckerName) {
+  auto IsDebugChecker = [](llvm::StringRef CheckerName) {
     return CheckerName.starts_with("debug");
   };
-  auto IsAlphaChecker = [](StringRef CheckerName) {
+  auto IsAlphaChecker = [](llvm::StringRef CheckerName) {
     return CheckerName.starts_with("alpha");
   };
   const auto &AllCheckers =
@@ -38,12 +38,12 @@ TEST(StaticAnalyzerOptions, SearchInParentPackageTests) {
   Opts.Config["Outer:Option2"] = "false";
 
   struct CheckerOneMock : CheckerBase {
-    StringRef getTagDescription() const override {
+    llvm::StringRef getTagDescription() const override {
       return "Outer.Inner.CheckerOne";
     }
   };
   struct CheckerTwoMock : CheckerBase {
-    StringRef getTagDescription() const override {
+    llvm::StringRef getTagDescription() const override {
       return "Outer.Inner.CheckerTwo";
     }
   };
@@ -76,7 +76,7 @@ TEST(StaticAnalyzerOptions, StringOptions) {
   Opts.Config["Outer.Inner.CheckerOne:Option"] = "StringValue";
 
   struct CheckerOneMock : CheckerBase {
-    StringRef getTagDescription() const override {
+    llvm::StringRef getTagDescription() const override {
       return "Outer.Inner.CheckerOne";
     }
   };

@@ -57,7 +57,7 @@ public:
   std::string getDynamicLinker(const llvm::opt::ArgList &Args) const override;
 
   std::string
-  getCompilerRT(const llvm::opt::ArgList &Args, StringRef Component,
+  getCompilerRT(const llvm::opt::ArgList &Args, llvm::StringRef Component,
                 FileType Type = ToolChain::FT_Static) const override;
 
   const char *getDefaultLinker() const override {
@@ -77,7 +77,7 @@ protected:
   std::string getMultiarchTriple(const llvm::Triple &T) const;
   std::string getMultiarchTriple(const Driver &D,
                                  const llvm::Triple &TargetTriple,
-                                 StringRef SysRoot) const override;
+                                 llvm::StringRef SysRoot) const override;
   void addExtraOpts(llvm::opt::ArgStringList &CmdArgs) const override;
   SanitizerMask getSupportedSanitizers() const override;
   void addProfileRTLibs(const llvm::opt::ArgList &Args,

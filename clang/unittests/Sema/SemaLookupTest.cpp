@@ -15,7 +15,7 @@ namespace {
 
 class LookupAction : public ASTFrontendAction {
   std::unique_ptr<ASTConsumer>
-  CreateASTConsumer(CompilerInstance &CI, StringRef /*Unused*/) override {
+  CreateASTConsumer(CompilerInstance &CI, llvm::StringRef /*Unused*/) override {
     return std::make_unique<clang::ASTConsumer>();
   }
 

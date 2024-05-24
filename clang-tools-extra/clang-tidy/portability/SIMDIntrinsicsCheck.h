@@ -21,7 +21,7 @@ namespace clang::tidy::portability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/portability/simd-intrinsics.html
 class SIMDIntrinsicsCheck : public ClangTidyCheck {
 public:
-  SIMDIntrinsicsCheck(StringRef Name, ClangTidyContext *Context);
+  SIMDIntrinsicsCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;

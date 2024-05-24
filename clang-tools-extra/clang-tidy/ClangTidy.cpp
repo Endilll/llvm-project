@@ -68,7 +68,7 @@ public:
   void FlushDiagnosticsImpl(std::vector<const ento::PathDiagnostic *> &Diags,
                             FilesMade *FilesMade) override {
     for (const ento::PathDiagnostic *PD : Diags) {
-      SmallString<64> CheckName(AnalyzerCheckNamePrefix);
+      llvm::SmallString<64> CheckName(AnalyzerCheckNamePrefix);
       CheckName += PD->getCheckerName();
       Context.diag(CheckName, PD->getLocation().asLocation(),
                    PD->getShortDescription())
@@ -83,7 +83,7 @@ public:
     }
   }
 
-  StringRef getName() const override { return "ClangTidyDiags"; }
+  llvm::StringRef getName() const override { return "ClangTidyDiags"; }
   bool supportsLogicalOpControlFlow() const override { return true; }
   bool supportsCrossFileDiagnostics() const override { return true; }
 
@@ -99,7 +99,7 @@ public:
       : Files(FileSystemOptions(), std::move(BaseFS)),
         DiagOpts(new DiagnosticOptions()),
         DiagPrinter(new TextDiagnosticPrinter(llvm::outs(), &*DiagOpts)),
-        Diags(IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs), &*DiagOpts,
+        Diags(llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs), &*DiagOpts,
               DiagPrinter),
         SourceMgr(Diags, Files), Context(Context), ApplyFixes(ApplyFixes) {
     DiagOpts->ShowColors = Context.getOptions().UseColor.value_or(
@@ -117,7 +117,7 @@ public:
     SourceLocation Loc = getLocation(Message.FilePath, Message.FileOffset);
     // Contains a pair for each attempted fix: location and whether the fix was
     // applied successfully.
-    SmallVector<std::pair<SourceLocation, bool>, 4> FixLocations;
+    llvm::SmallVector<std::pair<SourceLocation, bool>, 4> FixLocations;
     {
       auto Level = static_cast<DiagnosticsEngine::Level>(Error.DiagLevel);
       std::string Name = Error.DiagnosticName;
@@ -143,7 +143,7 @@ public:
             if (!Repl.isApplicable())
               continue;
             SourceLocation FixLoc;
-            SmallString<128> FixAbsoluteFilePath = Repl.getFilePath();
+            llvm::SmallString<128> FixAbsoluteFilePath = Repl.getFilePath();
             Files.makeAbsolutePath(FixAbsoluteFilePath);
             tooling::Replacement R(FixAbsoluteFilePath, Repl.getOffset(),
                                    Repl.getLength(), Repl.getReplacementText());
@@ -197,7 +197,7 @@ public:
 
       for (const auto &FileAndReplacements : FileReplacements) {
         Rewriter Rewrite(SourceMgr, LangOpts);
-        StringRef File = FileAndReplacements.first();
+        llvm::StringRef File = FileAndReplacements.first();
         VFS.setCurrentWorkingDirectory(FileAndReplacements.second.BuildDir);
         llvm::ErrorOr<std::unique_ptr<MemoryBuffer>> Buffer =
             SourceMgr.getFileManager().getBufferForFile(File);
@@ -207,7 +207,7 @@ public:
           // FIXME: Maybe don't apply fixes for other files as well.
           continue;
         }
-        StringRef Code = Buffer.get()->getBuffer();
+        llvm::StringRef Code = Buffer.get()->getBuffer();
         auto Style = format::getStyle(
             *Context.getOptionsForFile(File).FormatStyle, File, "none");
         if (!Style) {
@@ -251,7 +251,7 @@ public:
   unsigned getWarningsAsErrorsCount() const { return WarningsAsErrors; }
 
 private:
-  SourceLocation getLocation(StringRef FilePath, unsigned Offset) {
+  SourceLocation getLocation(llvm::StringRef FilePath, unsigned Offset) {
     if (FilePath.empty())
       return {};
 
@@ -291,7 +291,7 @@ private:
   }
 
   CharSourceRange getRange(const FileByteRange &Range) {
-    SmallString<128> AbsoluteFilePath{Range.FilePath};
+    llvm::SmallString<128> AbsoluteFilePath{Range.FilePath};
     Files.makeAbsolutePath(AbsoluteFilePath);
     SourceLocation BeginLoc = getLocation(AbsoluteFilePath, Range.FileOffset);
     SourceLocation EndLoc = BeginLoc.getLocWithOffset(Range.Length);
@@ -302,13 +302,13 @@ private:
   }
 
   struct ReplacementsWithBuildDir {
-    StringRef BuildDir;
+    llvm::StringRef BuildDir;
     Replacements Replaces;
   };
 
   FileManager Files;
   LangOptions LangOpts; // FIXME: use langopts from each original file
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
   DiagnosticConsumer *DiagPrinter;
   DiagnosticsEngine Diags;
   SourceManager SourceMgr;
@@ -342,7 +342,7 @@ private:
 
 ClangTidyASTConsumerFactory::ClangTidyASTConsumerFactory(
     ClangTidyContext &Context,
-    IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFS)
+    llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFS)
     : Context(Context), OverlayFS(std::move(OverlayFS)),
       CheckFactories(new ClangTidyCheckFactories) {
   for (ClangTidyModuleRegistry::entry E : ClangTidyModuleRegistry::entries()) {
@@ -355,9 +355,9 @@ ClangTidyASTConsumerFactory::ClangTidyASTConsumerFactory(
 static void
 setStaticAnalyzerCheckerOpts(const ClangTidyOptions &Opts,
                              clang::AnalyzerOptions &AnalyzerOptions) {
-  StringRef AnalyzerPrefix(AnalyzerCheckNamePrefix);
+  llvm::StringRef AnalyzerPrefix(AnalyzerCheckNamePrefix);
   for (const auto &Opt : Opts.CheckOptions) {
-    StringRef OptName(Opt.getKey());
+    llvm::StringRef OptName(Opt.getKey());
     if (!OptName.consume_front(AnalyzerPrefix))
       continue;
     // Analyzer options are always local options so we can ignore priority.
@@ -374,7 +374,7 @@ static CheckersList getAnalyzerCheckersAndPackages(ClangTidyContext &Context,
   const auto &RegisteredCheckers =
       AnalyzerOptions::getRegisteredCheckers(IncludeExperimental);
   const bool AnalyzerChecksEnabled =
-      llvm::any_of(RegisteredCheckers, [&](StringRef CheckName) -> bool {
+      llvm::any_of(RegisteredCheckers, [&](llvm::StringRef CheckName) -> bool {
         return Context.isCheckEnabled(
             (AnalyzerCheckNamePrefix + CheckName).str());
       });
@@ -387,7 +387,7 @@ static CheckersList getAnalyzerCheckersAndPackages(ClangTidyContext &Context,
   // Always add all core checkers if any other static analyzer check is enabled.
   // This is currently necessary, as other path sensitive checks rely on the
   // core checkers.
-  for (StringRef CheckName : RegisteredCheckers) {
+  for (llvm::StringRef CheckName : RegisteredCheckers) {
     std::string ClangTidyCheckName((AnalyzerCheckNamePrefix + CheckName).str());
 
     if (CheckName.starts_with("core") ||
@@ -401,7 +401,7 @@ static CheckersList getAnalyzerCheckersAndPackages(ClangTidyContext &Context,
 
 std::unique_ptr<clang::ASTConsumer>
 ClangTidyASTConsumerFactory::createASTConsumer(
-    clang::CompilerInstance &Compiler, StringRef File) {
+    clang::CompilerInstance &Compiler, llvm::StringRef File) {
   // FIXME: Move this to a separate method, so that CreateASTConsumer doesn't
   // modify Compiler.
   SourceManager *SM = &Compiler.getSourceManager();
@@ -527,7 +527,7 @@ getCheckOptions(const ClangTidyOptions &Options,
 std::vector<ClangTidyError>
 runClangTidy(clang::tidy::ClangTidyContext &Context,
              const CompilationDatabase &Compilations,
-             ArrayRef<std::string> InputFiles,
+             llvm::ArrayRef<std::string> InputFiles,
              llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> BaseFS,
              bool ApplyAnyFix, bool EnableCheckProfile,
              llvm::StringRef StoreCheckProfile) {
@@ -536,12 +536,12 @@ runClangTidy(clang::tidy::ClangTidyContext &Context,
 
   // Add extra arguments passed by the clang-tidy command-line.
   ArgumentsAdjuster PerFileExtraArgumentsInserter =
-      [&Context](const CommandLineArguments &Args, StringRef Filename) {
+      [&Context](const CommandLineArguments &Args, llvm::StringRef Filename) {
         ClangTidyOptions Opts = Context.getOptionsForFile(Filename);
         CommandLineArguments AdjustedArgs = Args;
         if (Opts.ExtraArgsBefore) {
           auto I = AdjustedArgs.begin();
-          if (I != AdjustedArgs.end() && !StringRef(*I).starts_with("-"))
+          if (I != AdjustedArgs.end() && !llvm::StringRef(*I).starts_with("-"))
             ++I; // Skip compiler binary name, if it is there.
           AdjustedArgs.insert(I, Opts.ExtraArgsBefore->begin(),
                               Opts.ExtraArgsBefore->end());
@@ -566,7 +566,7 @@ runClangTidy(clang::tidy::ClangTidyContext &Context,
   class ActionFactory : public FrontendActionFactory {
   public:
     ActionFactory(ClangTidyContext &Context,
-                  IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> BaseFS)
+                  llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> BaseFS)
         : ConsumerFactory(Context, std::move(BaseFS)) {}
     std::unique_ptr<FrontendAction> create() override {
       return std::make_unique<Action>(&ConsumerFactory);
@@ -587,7 +587,7 @@ runClangTidy(clang::tidy::ClangTidyContext &Context,
     public:
       Action(ClangTidyASTConsumerFactory *Factory) : Factory(Factory) {}
       std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &Compiler,
-                                                     StringRef File) override {
+                                                     llvm::StringRef File) override {
         return Factory->createASTConsumer(Compiler, File);
       }
 
@@ -632,7 +632,7 @@ void handleErrors(llvm::ArrayRef<ClangTidyError> Errors,
 
 void exportReplacements(const llvm::StringRef MainFilePath,
                         const std::vector<ClangTidyError> &Errors,
-                        raw_ostream &OS) {
+                        llvm::raw_ostream &OS) {
   TranslationUnitDiagnostics TUD;
   TUD.MainSourceFile = std::string(MainFilePath);
   for (const auto &Error : Errors) {
@@ -664,7 +664,7 @@ getAllChecksAndOptions(bool AllowEnablingAnalyzerAlphaCheckers) {
     Result.Names.insert(Factory.getKey());
 
 #if CLANG_TIDY_ENABLE_STATIC_ANALYZER
-  SmallString<64> Buffer(AnalyzerCheckNamePrefix);
+  llvm::SmallString<64> Buffer(AnalyzerCheckNamePrefix);
   size_t DefSize = Buffer.size();
   for (const auto &AnalyzerCheck : AnalyzerOptions::getRegisteredCheckers(
            AllowEnablingAnalyzerAlphaCheckers)) {

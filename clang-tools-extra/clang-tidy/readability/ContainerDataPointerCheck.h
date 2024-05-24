@@ -22,7 +22,7 @@ namespace clang::tidy::readability {
 /// those which cannot be statically identified can be caught using UBSan.
 class ContainerDataPointerCheck : public ClangTidyCheck {
 public:
-  ContainerDataPointerCheck(StringRef Name, ClangTidyContext *Context);
+  ContainerDataPointerCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   bool isLanguageVersionSupported(const LangOptions &LO) const override {
     return LO.CPlusPlus11;
@@ -38,7 +38,7 @@ public:
   }
 
 private:
-  const std::vector<StringRef> IgnoredContainers;
+  const std::vector<llvm::StringRef> IgnoredContainers;
 };
 } // namespace clang::tidy::readability
 

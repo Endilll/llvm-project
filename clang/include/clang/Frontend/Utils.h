@@ -53,7 +53,7 @@ void InitializePreprocessor(Preprocessor &PP, const PreprocessorOptions &PPOpts,
                             const CodeGenOptions &CodeGenOpts);
 
 /// DoPrintPreprocessedInput - Implement -E mode.
-void DoPrintPreprocessedInput(Preprocessor &PP, raw_ostream *OS,
+void DoPrintPreprocessedInput(Preprocessor &PP, llvm::raw_ostream *OS,
                               const PreprocessorOutputOptions &Opts);
 
 /// An interface for collecting the dependencies of a compilation. Users should
@@ -66,13 +66,13 @@ public:
 
   virtual void attachToPreprocessor(Preprocessor &PP);
   virtual void attachToASTReader(ASTReader &R);
-  ArrayRef<std::string> getDependencies() const { return Dependencies; }
+  llvm::ArrayRef<std::string> getDependencies() const { return Dependencies; }
 
   /// Called when a new file is seen. Return true if \p Filename should be added
   /// to the list of dependencies.
   ///
   /// The default implementation ignores <built-in> and system files.
-  virtual bool sawDependency(StringRef Filename, bool FromModule,
+  virtual bool sawDependency(llvm::StringRef Filename, bool FromModule,
                              bool IsSystem, bool IsModuleFile, bool IsMissing);
 
   /// Called when the end of the main file is reached.
@@ -83,14 +83,14 @@ public:
 
   /// Add a dependency \p Filename if it has not been seen before and
   /// sawDependency() returns true.
-  virtual void maybeAddDependency(StringRef Filename, bool FromModule,
+  virtual void maybeAddDependency(llvm::StringRef Filename, bool FromModule,
                                   bool IsSystem, bool IsModuleFile,
                                   bool IsMissing);
 
 protected:
   /// Return true if the filename was added to the list of dependencies, false
   /// otherwise.
-  bool addDependency(StringRef Filename);
+  bool addDependency(llvm::StringRef Filename);
 
 private:
   llvm::StringSet<> Seen;
@@ -111,7 +111,7 @@ public:
 
   bool needSystemDependencies() final { return IncludeSystemHeaders; }
 
-  bool sawDependency(StringRef Filename, bool FromModule, bool IsSystem,
+  bool sawDependency(llvm::StringRef Filename, bool FromModule, bool IsSystem,
                      bool IsModuleFile, bool IsMissing) final;
 
 protected:
@@ -140,18 +140,18 @@ class ModuleDependencyCollector : public DependencyCollector {
   llvm::vfs::YAMLVFSWriter VFSWriter;
   llvm::FileCollector::PathCanonicalizer Canonicalizer;
 
-  std::error_code copyToRoot(StringRef Src, StringRef Dst = {});
+  std::error_code copyToRoot(llvm::StringRef Src, llvm::StringRef Dst = {});
 
 public:
   ModuleDependencyCollector(std::string DestDir)
       : DestDir(std::move(DestDir)) {}
   ~ModuleDependencyCollector() override { writeFileMap(); }
 
-  StringRef getDest() { return DestDir; }
-  virtual bool insertSeen(StringRef Filename) { return Seen.insert(Filename).second; }
-  virtual void addFile(StringRef Filename, StringRef FileDst = {});
+  llvm::StringRef getDest() { return DestDir; }
+  virtual bool insertSeen(llvm::StringRef Filename) { return Seen.insert(Filename).second; }
+  virtual void addFile(llvm::StringRef Filename, llvm::StringRef FileDst = {});
 
-  virtual void addFileMapping(StringRef VPath, StringRef RPath) {
+  virtual void addFileMapping(llvm::StringRef VPath, llvm::StringRef RPath) {
     VFSWriter.addFileMapping(VPath, RPath);
   }
 
@@ -164,8 +164,8 @@ public:
 
 /// AttachDependencyGraphGen - Create a dependency graph generator, and attach
 /// it to the given preprocessor.
-void AttachDependencyGraphGen(Preprocessor &PP, StringRef OutputFile,
-                              StringRef SysRoot);
+void AttachDependencyGraphGen(Preprocessor &PP, llvm::StringRef OutputFile,
+                              llvm::StringRef SysRoot);
 
 /// AttachHeaderIncludeGen - Create a header include list generator, and attach
 /// it to the given preprocessor.
@@ -182,24 +182,24 @@ void AttachDependencyGraphGen(Preprocessor &PP, StringRef OutputFile,
 void AttachHeaderIncludeGen(Preprocessor &PP,
                             const DependencyOutputOptions &DepOpts,
                             bool ShowAllHeaders = false,
-                            StringRef OutputPath = {},
+                            llvm::StringRef OutputPath = {},
                             bool ShowDepth = true, bool MSStyle = false);
 
 /// The ChainedIncludesSource class converts headers to chained PCHs in
 /// memory, mainly for testing.
-IntrusiveRefCntPtr<ExternalSemaSource>
+llvm::IntrusiveRefCntPtr<ExternalSemaSource>
 createChainedIncludesSource(CompilerInstance &CI,
-                            IntrusiveRefCntPtr<ExternalSemaSource> &Reader);
+                            llvm::IntrusiveRefCntPtr<ExternalSemaSource> &Reader);
 
 /// Optional inputs to createInvocation.
 struct CreateInvocationOptions {
   /// Receives diagnostics encountered while parsing command-line flags.
   /// If not provided, these are printed to stderr.
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags = nullptr;
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags = nullptr;
   /// Used e.g. to probe for system headers locations.
   /// If not provided, the real filesystem is used.
   /// FIXME: the driver does perform some non-virtualized IO.
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr;
   /// Whether to attempt to produce a non-null (possibly incorrect) invocation
   /// if any errors were encountered.
   /// By default, always return null on errors.
@@ -233,7 +233,7 @@ struct CreateInvocationOptions {
 /// May return nullptr if an invocation could not be determined.
 /// See CreateInvocationOptions::ShouldRecoverOnErrors to try harder!
 std::unique_ptr<CompilerInvocation>
-createInvocation(ArrayRef<const char *> Args,
+createInvocation(llvm::ArrayRef<const char *> Args,
                  CreateInvocationOptions Opts = {});
 
 } // namespace clang

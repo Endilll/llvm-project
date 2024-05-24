@@ -96,7 +96,7 @@ public:
       return;
 
     CharUnits OptimalPad;
-    SmallVector<const FieldDecl *, 20> OptimalFieldsOrder;
+    llvm::SmallVector<const FieldDecl *, 20> OptimalFieldsOrder;
     std::tie(OptimalPad, OptimalFieldsOrder) =
         calculateOptimalPad(RD, ASTContext, RL);
 
@@ -228,7 +228,7 @@ public:
   /// 7.  Add tail padding by rounding the current offset up to the structure
   ///     alignment. Track the amount of padding added.
 
-  static std::pair<CharUnits, SmallVector<const FieldDecl *, 20>>
+  static std::pair<CharUnits, llvm::SmallVector<const FieldDecl *, 20>>
   calculateOptimalPad(const RecordDecl *RD, const ASTContext &ASTContext,
                       const ASTRecordLayout &RL) {
     struct FieldInfo {
@@ -248,7 +248,7 @@ public:
                              : 0);
       }
     };
-    SmallVector<FieldInfo, 20> Fields;
+    llvm::SmallVector<FieldInfo, 20> Fields;
     auto GatherSizesAndAlignments = [](const FieldDecl *FD) {
       FieldInfo RetVal;
       RetVal.Field = FD;
@@ -270,7 +270,7 @@ public:
     // could pack more bytes in to a base class's tail padding.
     CharUnits NewOffset = ASTContext.toCharUnitsFromBits(RL.getFieldOffset(0));
     CharUnits NewPad;
-    SmallVector<const FieldDecl *, 20> OptimalFieldsOrder;
+    llvm::SmallVector<const FieldDecl *, 20> OptimalFieldsOrder;
     while (!Fields.empty()) {
       unsigned TrailingZeros =
           llvm::countr_zero((unsigned long long)NewOffset.getQuantity());
@@ -309,8 +309,8 @@ public:
 
   void reportRecord(
       const RecordDecl *RD, CharUnits BaselinePad, CharUnits OptimalPad,
-      const SmallVector<const FieldDecl *, 20> &OptimalFieldsOrder) const {
-    SmallString<100> Buf;
+      const llvm::SmallVector<const FieldDecl *, 20> &OptimalFieldsOrder) const {
+    llvm::SmallString<100> Buf;
     llvm::raw_svector_ostream Os(Buf);
     Os << "Excessive padding in '";
     Os << QualType::getAsString(RD->getTypeForDecl(), Qualifiers(),

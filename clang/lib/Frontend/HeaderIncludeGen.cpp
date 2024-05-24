@@ -19,7 +19,7 @@ using namespace clang;
 namespace {
 class HeaderIncludesCallback : public PPCallbacks {
   SourceManager &SM;
-  raw_ostream *OutputFile;
+  llvm::raw_ostream *OutputFile;
   const DependencyOutputOptions &DepOpts;
   unsigned CurrentIncludeDepth;
   bool HasProcessedPredefines;
@@ -30,7 +30,7 @@ class HeaderIncludesCallback : public PPCallbacks {
 
 public:
   HeaderIncludesCallback(const Preprocessor *PP, bool ShowAllHeaders_,
-                         raw_ostream *OutputFile_,
+                         llvm::raw_ostream *OutputFile_,
                          const DependencyOutputOptions &DepOpts,
                          bool OwnsOutputFile_, bool ShowDepth_, bool MSStyle_)
       : SM(PP->getSourceManager()), OutputFile(OutputFile_), DepOpts(DepOpts),
@@ -78,12 +78,12 @@ private:
 /// directory.
 class HeaderIncludesJSONCallback : public PPCallbacks {
   SourceManager &SM;
-  raw_ostream *OutputFile;
+  llvm::raw_ostream *OutputFile;
   bool OwnsOutputFile;
-  SmallVector<std::string, 16> IncludedHeaders;
+  llvm::SmallVector<std::string, 16> IncludedHeaders;
 
 public:
-  HeaderIncludesJSONCallback(const Preprocessor *PP, raw_ostream *OutputFile_,
+  HeaderIncludesJSONCallback(const Preprocessor *PP, llvm::raw_ostream *OutputFile_,
                              bool OwnsOutputFile_)
       : SM(PP->getSourceManager()), OutputFile(OutputFile_),
         OwnsOutputFile(OwnsOutputFile_) {}
@@ -108,15 +108,15 @@ public:
 };
 }
 
-static void PrintHeaderInfo(raw_ostream *OutputFile, StringRef Filename,
+static void PrintHeaderInfo(llvm::raw_ostream *OutputFile, llvm::StringRef Filename,
                             bool ShowDepth, unsigned CurrentIncludeDepth,
                             bool MSStyle) {
   // Write to a temporary string to avoid unnecessary flushing on errs().
-  SmallString<512> Pathname(Filename);
+  llvm::SmallString<512> Pathname(Filename);
   if (!MSStyle)
     Lexer::Stringify(Pathname);
 
-  SmallString<256> Msg;
+  llvm::SmallString<256> Msg;
   if (MSStyle)
     Msg += "Note: including file:";
 
@@ -137,9 +137,9 @@ static void PrintHeaderInfo(raw_ostream *OutputFile, StringRef Filename,
 
 void clang::AttachHeaderIncludeGen(Preprocessor &PP,
                                    const DependencyOutputOptions &DepOpts,
-                                   bool ShowAllHeaders, StringRef OutputPath,
+                                   bool ShowAllHeaders, llvm::StringRef OutputPath,
                                    bool ShowDepth, bool MSStyle) {
-  raw_ostream *OutputFile = &llvm::errs();
+  llvm::raw_ostream *OutputFile = &llvm::errs();
   bool OwnsOutputFile = false;
 
   // Choose output stream, when printing in cl.exe /showIncludes style.
@@ -239,7 +239,7 @@ void HeaderIncludesCallback::FileChanged(SourceLocation Loc,
   // FIXME: Identify headers in a more robust way than comparing their name to
   // "<command line>" and "<built-in>" in a bunch of places.
   if (Reason == PPCallbacks::EnterFile &&
-      UserLoc.getFilename() != StringRef("<command line>")) {
+      UserLoc.getFilename() != llvm::StringRef("<command line>")) {
     PrintHeaderInfo(OutputFile, UserLoc.getFilename(), ShowDepth, IncludeDepth,
                     MSStyle);
   }
@@ -260,7 +260,7 @@ void HeaderIncludesCallback::FileSkipped(const FileEntryRef &SkippedFile, const
 
 void HeaderIncludesJSONCallback::EndOfMainFile() {
   OptionalFileEntryRef FE = SM.getFileEntryRefForID(SM.getMainFileID());
-  SmallString<256> MainFile(FE->getName());
+  llvm::SmallString<256> MainFile(FE->getName());
   SM.getFileManager().makeAbsolutePath(MainFile);
 
   std::string Str;
@@ -277,7 +277,7 @@ void HeaderIncludesJSONCallback::EndOfMainFile() {
   });
   OS << "\n";
 
-  if (OutputFile->get_kind() == raw_ostream::OStreamKind::OK_FDStream) {
+  if (OutputFile->get_kind() == llvm::raw_ostream::OStreamKind::OK_FDStream) {
     llvm::raw_fd_ostream *FDS = static_cast<llvm::raw_fd_ostream *>(OutputFile);
     if (auto L = FDS->lock())
       *OutputFile << Str;
@@ -307,7 +307,7 @@ void HeaderIncludesJSONCallback::FileChanged(
     return;
 
   if (Reason == PPCallbacks::EnterFile &&
-      UserLoc.getFilename() != StringRef("<command line>"))
+      UserLoc.getFilename() != llvm::StringRef("<command line>"))
     IncludedHeaders.push_back(UserLoc.getFilename());
 }
 

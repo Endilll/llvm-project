@@ -454,7 +454,7 @@ void index::applyForEachSymbolRole(SymbolRoleSet Roles,
   });
 }
 
-void index::printSymbolRoles(SymbolRoleSet Roles, raw_ostream &OS) {
+void index::printSymbolRoles(SymbolRoleSet Roles, llvm::raw_ostream &OS) {
   bool VisitedOnce = false;
   applyForEachSymbolRole(Roles, [&](SymbolRole Role) {
     if (VisitedOnce)
@@ -488,7 +488,7 @@ void index::printSymbolRoles(SymbolRoleSet Roles, raw_ostream &OS) {
 }
 
 bool index::printSymbolName(const Decl *D, const LangOptions &LO,
-                            raw_ostream &OS) {
+                            llvm::raw_ostream &OS) {
   if (auto *ND = dyn_cast<NamedDecl>(D)) {
     PrintingPolicy Policy(LO);
     // Forward references can have different template argument names. Suppress
@@ -505,7 +505,7 @@ bool index::printSymbolName(const Decl *D, const LangOptions &LO,
   }
 }
 
-StringRef index::getSymbolKindString(SymbolKind K) {
+llvm::StringRef index::getSymbolKindString(SymbolKind K) {
   switch (K) {
   case SymbolKind::Unknown: return "<unknown>";
   case SymbolKind::Module: return "module";
@@ -543,7 +543,7 @@ StringRef index::getSymbolKindString(SymbolKind K) {
   llvm_unreachable("invalid symbol kind");
 }
 
-StringRef index::getSymbolSubKindString(SymbolSubKind K) {
+llvm::StringRef index::getSymbolSubKindString(SymbolSubKind K) {
   switch (K) {
   case SymbolSubKind::None: return "<none>";
   case SymbolSubKind::CXXCopyConstructor: return "cxx-copy-ctor";
@@ -557,7 +557,7 @@ StringRef index::getSymbolSubKindString(SymbolSubKind K) {
   llvm_unreachable("invalid symbol subkind");
 }
 
-StringRef index::getSymbolLanguageString(SymbolLanguage K) {
+llvm::StringRef index::getSymbolLanguageString(SymbolLanguage K) {
   switch (K) {
   case SymbolLanguage::C: return "C";
   case SymbolLanguage::ObjC: return "ObjC";
@@ -586,7 +586,7 @@ void index::applyForEachSymbolProperty(SymbolPropertySet Props,
 #undef APPLY_FOR_PROPERTY
 }
 
-void index::printSymbolProperties(SymbolPropertySet Props, raw_ostream &OS) {
+void index::printSymbolProperties(SymbolPropertySet Props, llvm::raw_ostream &OS) {
   bool VisitedOnce = false;
   applyForEachSymbolProperty(Props, [&](SymbolProperty Prop) {
     if (VisitedOnce)

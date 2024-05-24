@@ -320,7 +320,7 @@ bool CursorVisitor::visitDeclsFromFileRegion(FileID File, unsigned Offset,
   SourceManager &SM = Unit->getSourceManager();
   SourceRange Range = RegionOfInterest;
 
-  SmallVector<Decl *, 16> Decls;
+  llvm::SmallVector<Decl *, 16> Decls;
   Unit->findFileRegionDecls(File, Offset, Length, Decls);
 
   // If we didn't find any file level decls for the file, try looking at the
@@ -348,8 +348,8 @@ bool CursorVisitor::visitDeclsFromFileRegion(FileID File, unsigned Offset,
 
   bool VisitedAtLeastOnce = false;
   DeclContext *CurDC = nullptr;
-  SmallVectorImpl<Decl *>::iterator DIt = Decls.begin();
-  for (SmallVectorImpl<Decl *>::iterator DE = Decls.end(); DIt != DE; ++DIt) {
+  llvm::SmallVectorImpl<Decl *>::iterator DIt = Decls.begin();
+  for (llvm::SmallVectorImpl<Decl *>::iterator DE = Decls.end(); DIt != DE; ++DIt) {
     Decl *D = *DIt;
     if (D->getSourceRange().isInvalid())
       continue;
@@ -641,8 +641,8 @@ bool CursorVisitor::VisitDeclContext(DeclContext *DC) {
 
   // FIXME: Eventually remove.  This part of a hack to support proper
   // iteration over all Decls contained lexically within an ObjC container.
-  SaveAndRestore DI_saved(DI_current, &I);
-  SaveAndRestore DE_saved(DE_current, E);
+  llvm::SaveAndRestore DI_saved(DI_current, &I);
+  llvm::SaveAndRestore DE_saved(DE_current, E);
 
   for (; I != E; ++I) {
     Decl *D = *I;
@@ -879,7 +879,7 @@ bool CursorVisitor::VisitFunctionDecl(FunctionDecl *ND) {
   if (ND->doesThisDeclarationHaveABody() && !ND->isLateTemplateParsed()) {
     if (CXXConstructorDecl *Constructor = dyn_cast<CXXConstructorDecl>(ND)) {
       // Find the initializers that were written in the source.
-      SmallVector<CXXCtorInitializer *, 4> WrittenInits;
+      llvm::SmallVector<CXXCtorInitializer *, 4> WrittenInits;
       for (auto *I : Constructor->inits()) {
         if (!I->isWritten())
           continue;
@@ -1012,7 +1012,7 @@ bool CursorVisitor::VisitObjCMethodDecl(ObjCMethodDecl *ND) {
 template <typename DeclIt>
 static void addRangedDeclsInContainer(DeclIt *DI_current, DeclIt DE_current,
                                       SourceManager &SM, SourceLocation EndLoc,
-                                      SmallVectorImpl<Decl *> &Decls) {
+                                      llvm::SmallVectorImpl<Decl *> &Decls) {
   DeclIt next = *DI_current;
   while (++next != DE_current) {
     Decl *D_next = *next;
@@ -1042,7 +1042,7 @@ bool CursorVisitor::VisitObjCContainerDecl(ObjCContainerDecl *D) {
   // in the current DeclContext.  If any fall within the
   // container's lexical region, stash them into a vector
   // for later processing.
-  SmallVector<Decl *, 24> DeclsInContainer;
+  llvm::SmallVector<Decl *, 24> DeclsInContainer;
   SourceLocation EndLoc = D->getSourceRange().getEnd();
   SourceManager &SM = AU->getSourceManager();
   if (EndLoc.isValid()) {
@@ -1078,7 +1078,7 @@ bool CursorVisitor::VisitObjCContainerDecl(ObjCContainerDecl *D) {
   });
 
   // Now visit the decls.
-  for (SmallVectorImpl<Decl *>::iterator I = DeclsInContainer.begin(),
+  for (llvm::SmallVectorImpl<Decl *>::iterator I = DeclsInContainer.begin(),
                                          E = DeclsInContainer.end();
        I != E; ++I) {
     CXCursor Cursor = MakeCXCursor(*I, TU, RegionOfInterest);
@@ -1468,7 +1468,7 @@ bool CursorVisitor::VisitNestedNameSpecifier(NestedNameSpecifier *NNS,
 
 bool CursorVisitor::VisitNestedNameSpecifierLoc(
     NestedNameSpecifierLoc Qualifier) {
-  SmallVector<NestedNameSpecifierLoc, 4> Qualifiers;
+  llvm::SmallVector<NestedNameSpecifierLoc, 4> Qualifiers;
   for (; Qualifier; Qualifier = Qualifier.getPrefix())
     Qualifiers.push_back(Qualifier);
 
@@ -3185,7 +3185,7 @@ void EnqueueVisitor::VisitPseudoObjectExpr(const PseudoObjectExpr *E) {
 void EnqueueVisitor::VisitOMPExecutableDirective(
     const OMPExecutableDirective *D) {
   EnqueueChildren(D);
-  for (ArrayRef<OMPClause *>::iterator I = D->clauses().begin(),
+  for (llvm::ArrayRef<OMPClause *>::iterator I = D->clauses().begin(),
                                        E = D->clauses().end();
        I != E; ++I)
     EnqueueChildren(*I);
@@ -3799,7 +3799,7 @@ bool CursorVisitor::Visit(const Attr *A) {
 }
 
 namespace {
-typedef SmallVector<SourceRange, 4> RefNamePieces;
+typedef llvm::SmallVector<SourceRange, 4> RefNamePieces;
 RefNamePieces buildPieces(unsigned NameFlags, bool IsMemberRefExpr,
                           const DeclarationNameInfo &NI, SourceRange QLoc,
                           const SourceRange *TemplateArgsLoc = nullptr) {
@@ -4000,7 +4000,7 @@ enum CXErrorCode clang_createTranslationUnit2(CXIndex CIdx,
   FileSystemOptions FileSystemOpts;
   auto HSOpts = std::make_shared<HeaderSearchOptions>();
 
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
       CompilerInstance::createDiagnostics(new DiagnosticOptions());
   std::unique_ptr<ASTUnit> AU = ASTUnit::LoadFromASTFile(
       ast_filename, CXXIdx->getPCHContainerOperations()->getRawReader(),
@@ -4031,7 +4031,7 @@ static CXErrorCode
 clang_parseTranslationUnit_Impl(CXIndex CIdx, const char *source_filename,
                                 const char *const *command_line_args,
                                 int num_command_line_args,
-                                ArrayRef<CXUnsavedFile> unsaved_files,
+                                llvm::ArrayRef<CXUnsavedFile> unsaved_files,
                                 unsigned options, CXTranslationUnit *out_TU) {
   // Set up the initial return values.
   if (out_TU)
@@ -4073,7 +4073,7 @@ clang_parseTranslationUnit_Impl(CXIndex CIdx, const char *source_filename,
   // Configure the diagnostics.
   std::unique_ptr<DiagnosticOptions> DiagOpts = CreateAndPopulateDiagOpts(
       llvm::ArrayRef(command_line_args, num_command_line_args));
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
       CompilerInstance::createDiagnostics(DiagOpts.release()));
 
   if (options & CXTranslationUnit_KeepGoing)
@@ -4216,7 +4216,7 @@ enum CXErrorCode clang_parseTranslationUnit2(
     struct CXUnsavedFile *unsaved_files, unsigned num_unsaved_files,
     unsigned options, CXTranslationUnit *out_TU) {
   noteBottomOfStack();
-  SmallVector<const char *, 4> Args;
+  llvm::SmallVector<const char *, 4> Args;
   Args.push_back("clang");
   Args.append(command_line_args, command_line_args + num_command_line_args);
   return clang_parseTranslationUnit2FullArgv(
@@ -4722,7 +4722,7 @@ unsigned clang_defaultReparseOptions(CXTranslationUnit TU) {
 
 static CXErrorCode
 clang_reparseTranslationUnit_Impl(CXTranslationUnit TU,
-                                  ArrayRef<CXUnsavedFile> unsaved_files,
+                                  llvm::ArrayRef<CXUnsavedFile> unsaved_files,
                                   unsigned options) {
   // Check arguments.
   if (isNotUsableTU(TU)) {
@@ -5102,7 +5102,7 @@ static CXString getDeclSpelling(const Decl *D) {
   if (isa<UsingDirectiveDecl>(D))
     return cxstring::createEmpty();
 
-  SmallString<1024> S;
+  llvm::SmallString<1024> S;
   llvm::raw_svector_ostream os(S);
   ND->printName(os);
 
@@ -5206,7 +5206,7 @@ CXString clang_getCursorSpelling(CXCursor C) {
       } else {
         SLit = cast<StringLiteral>(E);
       }
-      SmallString<256> Buf;
+      llvm::SmallString<256> Buf;
       llvm::raw_svector_ostream OS(Buf);
       SLit->outputString(OS);
       return cxstring::createDup(OS.str());
@@ -5324,7 +5324,7 @@ CXSourceRange clang_Cursor_getSpellingNameRange(CXCursor C, unsigned pieceIndex,
       return clang_getNullRange();
     if (const ImportDecl *ImportD =
             dyn_cast_or_null<ImportDecl>(getCursorDecl(C))) {
-      ArrayRef<SourceLocation> Locs = ImportD->getIdentifierLocs();
+      llvm::ArrayRef<SourceLocation> Locs = ImportD->getIdentifierLocs();
       if (!Locs.empty())
         return cxloc::translateSourceRange(
             Ctx, SourceRange(Locs.front(), Locs.back()));
@@ -5583,7 +5583,7 @@ CXString clang_getCursorPrettyPrinted(CXCursor C, CXPrintingPolicy cxPolicy) {
     if (!D)
       return cxstring::createEmpty();
 
-    SmallString<128> Str;
+    llvm::SmallString<128> Str;
     llvm::raw_svector_ostream OS(Str);
     PrintingPolicy *UserPolicy = static_cast<PrintingPolicy *>(cxPolicy);
     D->print(OS, UserPolicy ? *UserPolicy
@@ -5608,7 +5608,7 @@ CXString clang_getCursorDisplayName(CXCursor C) {
     D = FunTmpl->getTemplatedDecl();
 
   if (const FunctionDecl *Function = dyn_cast<FunctionDecl>(D)) {
-    SmallString<64> Str;
+    llvm::SmallString<64> Str;
     llvm::raw_svector_ostream OS(Str);
     OS << *Function;
     if (Function->getPrimaryTemplate())
@@ -5630,7 +5630,7 @@ CXString clang_getCursorDisplayName(CXCursor C) {
   }
 
   if (const ClassTemplateDecl *ClassTemplate = dyn_cast<ClassTemplateDecl>(D)) {
-    SmallString<64> Str;
+    llvm::SmallString<64> Str;
     llvm::raw_svector_ostream OS(Str);
     OS << *ClassTemplate;
     OS << "<";
@@ -5667,7 +5667,7 @@ CXString clang_getCursorDisplayName(CXCursor C) {
 
   if (const ClassTemplateSpecializationDecl *ClassSpec =
           dyn_cast<ClassTemplateSpecializationDecl>(D)) {
-    SmallString<128> Str;
+    llvm::SmallString<128> Str;
     llvm::raw_svector_ostream OS(Str);
     OS << *ClassSpec;
     // If the template arguments were written explicitly, use them..
@@ -7302,7 +7302,7 @@ CXSourceRange clang_getCursorReferenceNameRange(CXCursor C, unsigned NameFlags,
 
 void clang_enableStackTraces(void) {
   // FIXME: Provide an argv0 here so we can find llvm-symbolizer.
-  llvm::sys::PrintStackTraceOnErrorSignal(StringRef());
+  llvm::sys::PrintStackTraceOnErrorSignal(llvm::StringRef());
 }
 
 void clang_executeOnThread(void (*fn)(void *), void *user_data,
@@ -7340,7 +7340,7 @@ CXString clang_getTokenSpelling(CXTranslationUnit TU, CXToken CXTok) {
   case CXToken_Literal: {
     // We have stashed the starting pointer in the ptr_data field. Use it.
     const char *Text = static_cast<const char *>(CXTok.ptr_data);
-    return cxstring::createDup(StringRef(Text, CXTok.int_data[2]));
+    return cxstring::createDup(llvm::StringRef(Text, CXTok.int_data[2]));
   }
 
   case CXToken_Punctuation:
@@ -7363,7 +7363,7 @@ CXString clang_getTokenSpelling(CXTranslationUnit TU, CXToken CXTok) {
   std::pair<FileID, unsigned> LocInfo =
       CXXUnit->getSourceManager().getDecomposedSpellingLoc(Loc);
   bool Invalid = false;
-  StringRef Buffer =
+  llvm::StringRef Buffer =
       CXXUnit->getSourceManager().getBufferData(LocInfo.first, &Invalid);
   if (Invalid)
     return cxstring::createEmpty();
@@ -7402,7 +7402,7 @@ CXSourceRange clang_getTokenExtent(CXTranslationUnit TU, CXToken CXTok) {
 }
 
 static void getTokens(ASTUnit *CXXUnit, SourceRange Range,
-                      SmallVectorImpl<CXToken> &CXTokens) {
+                      llvm::SmallVectorImpl<CXToken> &CXTokens) {
   SourceManager &SourceMgr = CXXUnit->getSourceManager();
   std::pair<FileID, unsigned> BeginLocInfo =
       SourceMgr.getDecomposedSpellingLoc(Range.getBegin());
@@ -7415,7 +7415,7 @@ static void getTokens(ASTUnit *CXXUnit, SourceRange Range,
 
   // Create a lexer
   bool Invalid = false;
-  StringRef Buffer = SourceMgr.getBufferData(BeginLocInfo.first, &Invalid);
+  llvm::StringRef Buffer = SourceMgr.getBufferData(BeginLocInfo.first, &Invalid);
   if (Invalid)
     return;
 
@@ -7492,7 +7492,7 @@ CXToken *clang_getToken(CXTranslationUnit TU, CXSourceLocation Location) {
   SourceLocation End =
       SM.getComposedLoc(DecomposedEnd.first, DecomposedEnd.second);
 
-  SmallVector<CXToken, 32> CXTokens;
+  llvm::SmallVector<CXToken, 32> CXTokens;
   getTokens(CXXUnit, SourceRange(Begin, End), CXTokens);
 
   if (CXTokens.empty())
@@ -7529,7 +7529,7 @@ void clang_tokenize(CXTranslationUnit TU, CXSourceRange Range, CXToken **Tokens,
   if (R.isInvalid())
     return;
 
-  SmallVector<CXToken, 32> CXTokens;
+  llvm::SmallVector<CXToken, 32> CXTokens;
   getTokens(CXXUnit, R, CXTokens);
 
   if (CXTokens.empty())
@@ -7571,7 +7571,7 @@ class AnnotateTokensWorker {
     CXCursor cursor;
     enum Action { Invalid, Ignore, Postpone } action;
   };
-  using PostChildrenActions = SmallVector<PostChildrenAction, 0>;
+  using PostChildrenActions = llvm::SmallVector<PostChildrenAction, 0>;
 
   struct PostChildrenInfo {
     CXCursor Cursor;
@@ -7580,7 +7580,7 @@ class AnnotateTokensWorker {
     unsigned BeforeChildrenTokenIdx;
     PostChildrenActions ChildActions;
   };
-  SmallVector<PostChildrenInfo, 8> PostChildrenInfos;
+  llvm::SmallVector<PostChildrenInfo, 8> PostChildrenInfos;
 
   CXToken &getTok(unsigned Idx) {
     assert(Idx < NumTokens);
@@ -8142,7 +8142,7 @@ static void annotatePreprocessorTokens(CXTranslationUnit TU,
   if (BeginLocInfo.first != EndLocInfo.first)
     return;
 
-  StringRef Buffer;
+  llvm::StringRef Buffer;
   bool Invalid = false;
   Buffer = SourceMgr.getBufferData(BeginLocInfo.first, &Invalid);
   if (Buffer.empty() || Invalid)
@@ -8506,7 +8506,7 @@ enum CXAvailabilityKind clang_getCursorAvailability(CXCursor cursor) {
   return CXAvailability_Available;
 }
 
-static CXVersion convertVersion(VersionTuple In) {
+static CXVersion convertVersion(llvm::VersionTuple In) {
   CXVersion Out = {-1, -1, -1};
   if (In.empty())
     return Out;
@@ -8529,7 +8529,7 @@ static CXVersion convertVersion(VersionTuple In) {
 static void getCursorPlatformAvailabilityForDecl(
     const Decl *D, int *always_deprecated, CXString *deprecated_message,
     int *always_unavailable, CXString *unavailable_message,
-    SmallVectorImpl<AvailabilityAttr *> &AvailabilityAttrs) {
+    llvm::SmallVectorImpl<AvailabilityAttr *> &AvailabilityAttrs) {
   bool HadAvailAttr = false;
   for (auto A : D->attrs()) {
     if (DeprecatedAttr *Deprecated = dyn_cast<DeprecatedAttr>(A)) {
@@ -8666,7 +8666,7 @@ int clang_getCursorPlatformAvailability(CXCursor cursor, int *always_deprecated,
   if (!D)
     return 0;
 
-  SmallVector<AvailabilityAttr *, 8> AvailabilityAttrs;
+  llvm::SmallVector<AvailabilityAttr *, 8> AvailabilityAttrs;
   getCursorPlatformAvailabilityForDecl(D, always_deprecated, deprecated_message,
                                        always_unavailable, unavailable_message,
                                        AvailabilityAttrs);
@@ -8960,8 +8960,8 @@ CXString clang_Cursor_getRawCommentText(CXCursor C) {
   const Decl *D = getCursorDecl(C);
   ASTContext &Context = getCursorContext(C);
   const RawComment *RC = Context.getRawCommentForAnyRedecl(D);
-  StringRef RawText =
-      RC ? RC->getRawText(Context.getSourceManager()) : StringRef();
+  llvm::StringRef RawText =
+      RC ? RC->getRawText(Context.getSourceManager()) : llvm::StringRef();
 
   // Don't duplicate the string because RawText points directly into source
   // code.
@@ -8977,7 +8977,7 @@ CXString clang_Cursor_getBriefCommentText(CXCursor C) {
   const RawComment *RC = Context.getRawCommentForAnyRedecl(D);
 
   if (RC) {
-    StringRef BriefText = RC->getBriefText(Context);
+    llvm::StringRef BriefText = RC->getBriefText(Context);
 
     // Don't duplicate the string because RawComment ensures that this memory
     // will not go away.
@@ -9058,7 +9058,7 @@ unsigned clang_Module_getNumTopLevelHeaders(CXTranslationUnit TU,
     return 0;
   Module *Mod = static_cast<Module *>(CXMod);
   FileManager &FileMgr = cxtu::getASTUnit(TU)->getFileManager();
-  ArrayRef<FileEntryRef> TopHeaders = Mod->getTopHeaders(FileMgr);
+  llvm::ArrayRef<FileEntryRef> TopHeaders = Mod->getTopHeaders(FileMgr);
   return TopHeaders.size();
 }
 
@@ -9073,7 +9073,7 @@ CXFile clang_Module_getTopLevelHeader(CXTranslationUnit TU, CXModule CXMod,
   Module *Mod = static_cast<Module *>(CXMod);
   FileManager &FileMgr = cxtu::getASTUnit(TU)->getFileManager();
 
-  ArrayRef<FileEntryRef> TopHeaders = Mod->getTopHeaders(FileMgr);
+  llvm::ArrayRef<FileEntryRef> TopHeaders = Mod->getTopHeaders(FileMgr);
   if (Index < TopHeaders.size())
     return cxfile::makeCXFile(TopHeaders[Index]);
 
@@ -9792,7 +9792,7 @@ cxindex::Logger::~Logger() {
 
   static llvm::TimeRecord sBeginTR = llvm::TimeRecord::getCurrentTime();
 
-  raw_ostream &OS = llvm::errs();
+  llvm::raw_ostream &OS = llvm::errs();
   OS << "[libclang:" << Name << ':';
 
 #ifdef USE_DARWIN_THREADS

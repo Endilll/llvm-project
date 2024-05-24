@@ -264,7 +264,7 @@ private:
   ///     A a;
   ///    foo:
   ///     bar();
-  SmallVector<BranchFixup, 8> BranchFixups;
+  llvm::SmallVector<BranchFixup, 8> BranchFixups;
 
   char *allocate(size_t Size);
   void deallocate(size_t Size);

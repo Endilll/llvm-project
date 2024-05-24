@@ -20,7 +20,7 @@ namespace clang::tidy::abseil {
 /// http://clang.llvm.org/extra/clang-tidy/checks/abseil/no-namespace.html
 class NoNamespaceCheck : public ClangTidyCheck {
 public:
-  NoNamespaceCheck(StringRef Name, ClangTidyContext *Context)
+  NoNamespaceCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

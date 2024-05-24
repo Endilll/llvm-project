@@ -80,8 +80,8 @@ const CXXRecordDecl *Expr::getBestDynamicClassType() const {
 }
 
 const Expr *Expr::skipRValueSubobjectAdjustments(
-    SmallVectorImpl<const Expr *> &CommaLHSs,
-    SmallVectorImpl<SubobjectAdjustment> &Adjustments) const {
+    llvm::SmallVectorImpl<const Expr *> &CommaLHSs,
+    llvm::SmallVectorImpl<SubobjectAdjustment> &Adjustments) const {
   const Expr *E = this;
   while (true) {
     E = E->IgnoreParens();
@@ -651,7 +651,7 @@ PredefinedExpr *PredefinedExpr::CreateEmpty(const ASTContext &Ctx,
   return new (Mem) PredefinedExpr(EmptyShell(), HasFunctionName);
 }
 
-StringRef PredefinedExpr::getIdentKindName(PredefinedIdentKind IK) {
+llvm::StringRef PredefinedExpr::getIdentKindName(PredefinedIdentKind IK) {
   switch (IK) {
   case PredefinedIdentKind::Func:
     return "__func__";
@@ -686,7 +686,7 @@ std::string PredefinedExpr::ComputeName(PredefinedIdentKind IK,
       MC.reset(Context.createMangleContext());
 
       if (MC->shouldMangleDeclName(ND)) {
-        SmallString<256> Buffer;
+        llvm::SmallString<256> Buffer;
         llvm::raw_svector_ostream Out(Buffer);
         GlobalDecl GD;
         if (const CXXConstructorDecl *CD = dyn_cast<CXXConstructorDecl>(ND))
@@ -715,7 +715,7 @@ std::string PredefinedExpr::ComputeName(PredefinedIdentKind IK,
     if (DC->isFileContext())
       return "";
 
-    SmallString<256> Buffer;
+    llvm::SmallString<256> Buffer;
     llvm::raw_svector_ostream Out(Buffer);
     if (auto *DCBlock = dyn_cast<BlockDecl>(DC))
       // For nested blocks, propagate up to the parent.
@@ -742,7 +742,7 @@ std::string PredefinedExpr::ComputeName(PredefinedIdentKind IK,
         (!ForceElaboratedPrinting && IsFuncOrFunctionOrLFunctionOrFuncDName))
       return FD->getNameAsString();
 
-    SmallString<256> Name;
+    llvm::SmallString<256> Name;
     llvm::raw_svector_ostream Out(Name);
 
     if (const CXXMethodDecl *MD = dyn_cast<CXXMethodDecl>(FD)) {
@@ -755,8 +755,8 @@ std::string PredefinedExpr::ComputeName(PredefinedIdentKind IK,
     class PrettyCallbacks final : public PrintingCallbacks {
     public:
       PrettyCallbacks(const LangOptions &LO) : LO(LO) {}
-      std::string remapPath(StringRef Path) const override {
-        SmallString<128> p(Path);
+      std::string remapPath(llvm::StringRef Path) const override {
+        llvm::SmallString<128> p(Path);
         LO.remapPathPrefix(p);
         return std::string(p);
       }
@@ -834,7 +834,7 @@ std::string PredefinedExpr::ComputeName(PredefinedIdentKind IK,
         POut << " &&";
     }
 
-    typedef SmallVector<const ClassTemplateSpecializationDecl *, 8> SpecsTy;
+    typedef llvm::SmallVector<const ClassTemplateSpecializationDecl *, 8> SpecsTy;
     SpecsTy Specs;
     const DeclContext *Ctx = FD->getDeclContext();
     while (Ctx && isa<NamedDecl>(Ctx)) {
@@ -853,7 +853,7 @@ std::string PredefinedExpr::ComputeName(PredefinedIdentKind IK,
       const TemplateArgumentList &Args = D->getTemplateArgs();
       assert(Params->size() == Args.size());
       for (unsigned i = 0, numParams = Params->size(); i != numParams; ++i) {
-        StringRef Param = Params->getParam(i)->getName();
+        llvm::StringRef Param = Params->getParam(i)->getName();
         if (Param.empty()) continue;
         TOut << Param << " = ";
         Args.get(i).print(Policy, TOut,
@@ -871,7 +871,7 @@ std::string PredefinedExpr::ComputeName(PredefinedIdentKind IK,
       const TemplateArgumentList* Args = FSI->TemplateArguments;
       assert(Params->size() == Args->size());
       for (unsigned i = 0, e = Params->size(); i != e; ++i) {
-        StringRef Param = Params->getParam(i)->getName();
+        llvm::StringRef Param = Params->getParam(i)->getName();
         if (Param.empty()) continue;
         TOut << Param << " = ";
         Args->get(i).print(Policy, TOut, /*IncludeType*/ true);
@@ -918,7 +918,7 @@ std::string PredefinedExpr::ComputeName(PredefinedIdentKind IK,
     llvm_unreachable("CapturedDecl not inside a function or method");
   }
   if (const ObjCMethodDecl *MD = dyn_cast<ObjCMethodDecl>(CurrentDecl)) {
-    SmallString<256> Name;
+    llvm::SmallString<256> Name;
     llvm::raw_svector_ostream Out(Name);
     Out << (MD->isInstanceMethod() ? '-' : '+');
     Out << '[';
@@ -1013,14 +1013,14 @@ std::string FixedPointLiteral::getValueAsString(unsigned Radix) const {
   // Currently the longest decimal number that can be printed is the max for an
   // unsigned long _Accum: 4294967295.99999999976716935634613037109375
   // which is 43 characters.
-  SmallString<64> S;
+  llvm::SmallString<64> S;
   FixedPointValueToString(
       S, llvm::APSInt::getUnsigned(getValue().getZExtValue()), Scale);
   return std::string(S);
 }
 
 void CharacterLiteral::print(unsigned Val, CharacterLiteralKind Kind,
-                             raw_ostream &OS) {
+                             llvm::raw_ostream &OS) {
   switch (Kind) {
   case CharacterLiteralKind::Ascii:
     break; // no prefix.
@@ -1038,7 +1038,7 @@ void CharacterLiteral::print(unsigned Val, CharacterLiteralKind Kind,
     break;
   }
 
-  StringRef Escaped = escapeCStyle<EscapeChar::Single>(Val);
+  llvm::StringRef Escaped = escapeCStyle<EscapeChar::Single>(Val);
   if (!Escaped.empty()) {
     OS << "'" << Escaped << "'";
   } else {
@@ -1123,7 +1123,7 @@ unsigned StringLiteral::mapCharByteWidth(TargetInfo const &Target,
   return CharByteWidth;
 }
 
-StringLiteral::StringLiteral(const ASTContext &Ctx, StringRef Str,
+StringLiteral::StringLiteral(const ASTContext &Ctx, llvm::StringRef Str,
                              StringLiteralKind Kind, bool Pascal, QualType Ty,
                              const SourceLocation *Loc,
                              unsigned NumConcatenated)
@@ -1188,7 +1188,7 @@ StringLiteral::StringLiteral(EmptyShell Empty, unsigned NumConcatenated,
   *getTrailingObjects<unsigned>() = Length;
 }
 
-StringLiteral *StringLiteral::Create(const ASTContext &Ctx, StringRef Str,
+StringLiteral *StringLiteral::Create(const ASTContext &Ctx, llvm::StringRef Str,
                                      StringLiteralKind Kind, bool Pascal,
                                      QualType Ty, const SourceLocation *Loc,
                                      unsigned NumConcatenated) {
@@ -1210,7 +1210,7 @@ StringLiteral *StringLiteral::CreateEmpty(const ASTContext &Ctx,
       StringLiteral(EmptyShell(), NumConcatenated, Length, CharByteWidth);
 }
 
-void StringLiteral::outputString(raw_ostream &OS) const {
+void StringLiteral::outputString(llvm::raw_ostream &OS) const {
   switch (getKind()) {
   case StringLiteralKind::Unevaluated:
   case StringLiteralKind::Ordinary:
@@ -1234,7 +1234,7 @@ void StringLiteral::outputString(raw_ostream &OS) const {
   unsigned LastSlashX = getLength();
   for (unsigned I = 0, N = getLength(); I != N; ++I) {
     uint32_t Char = getCodeUnit(I);
-    StringRef Escaped = escapeCStyle<EscapeChar::Double>(Char);
+    llvm::StringRef Escaped = escapeCStyle<EscapeChar::Double>(Char);
     if (Escaped.empty()) {
       // FIXME: Convert UTF-8 back to codepoints before rendering.
 
@@ -1358,7 +1358,7 @@ StringLiteral::getLocationOfByte(unsigned ByteNo, const SourceManager &SM,
     std::pair<FileID, unsigned> LocInfo =
         SM.getDecomposedLoc(StrTokSpellingLoc);
     bool Invalid = false;
-    StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
+    llvm::StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
     if (Invalid) {
       if (StartTokenByteOffset != nullptr)
         *StartTokenByteOffset = StringOffset;
@@ -1402,7 +1402,7 @@ StringLiteral::getLocationOfByte(unsigned ByteNo, const SourceManager &SM,
 
 /// getOpcodeStr - Turn an Opcode enum value into the punctuation char it
 /// corresponds to, e.g. "sizeof" or "[pre]++".
-StringRef UnaryOperator::getOpcodeStr(Opcode Op) {
+llvm::StringRef UnaryOperator::getOpcodeStr(Opcode Op) {
   switch (Op) {
 #define UNARY_OPERATION(Name, Spelling) case UO_##Name: return Spelling;
 #include "clang/AST/OperationKinds.def"
@@ -1446,8 +1446,8 @@ OverloadedOperatorKind UnaryOperator::getOverloadedOperator(Opcode Opc) {
 // Postfix Operators.
 //===----------------------------------------------------------------------===//
 
-CallExpr::CallExpr(StmtClass SC, Expr *Fn, ArrayRef<Expr *> PreArgs,
-                   ArrayRef<Expr *> Args, QualType Ty, ExprValueKind VK,
+CallExpr::CallExpr(StmtClass SC, Expr *Fn, llvm::ArrayRef<Expr *> PreArgs,
+                   llvm::ArrayRef<Expr *> Args, QualType Ty, ExprValueKind VK,
                    SourceLocation RParenLoc, FPOptionsOverride FPFeatures,
                    unsigned MinNumArgs, ADLCallKind UsesADL)
     : Expr(SC, Ty, VK, OK_Ordinary), RParenLoc(RParenLoc) {
@@ -1492,7 +1492,7 @@ CallExpr::CallExpr(StmtClass SC, unsigned NumPreArgs, unsigned NumArgs,
 }
 
 CallExpr *CallExpr::Create(const ASTContext &Ctx, Expr *Fn,
-                           ArrayRef<Expr *> Args, QualType Ty, ExprValueKind VK,
+                           llvm::ArrayRef<Expr *> Args, QualType Ty, ExprValueKind VK,
                            SourceLocation RParenLoc,
                            FPOptionsOverride FPFeatures, unsigned MinNumArgs,
                            ADLCallKind UsesADL) {
@@ -1657,8 +1657,8 @@ SourceLocation CallExpr::getEndLoc() const {
 OffsetOfExpr *OffsetOfExpr::Create(const ASTContext &C, QualType type,
                                    SourceLocation OperatorLoc,
                                    TypeSourceInfo *tsi,
-                                   ArrayRef<OffsetOfNode> comps,
-                                   ArrayRef<Expr*> exprs,
+                                   llvm::ArrayRef<OffsetOfNode> comps,
+                                   llvm::ArrayRef<Expr*> exprs,
                                    SourceLocation RParenLoc) {
   void *Mem = C.Allocate(
       totalSizeToAlloc<OffsetOfNode, Expr *>(comps.size(), exprs.size()));
@@ -1676,7 +1676,7 @@ OffsetOfExpr *OffsetOfExpr::CreateEmpty(const ASTContext &C,
 
 OffsetOfExpr::OffsetOfExpr(const ASTContext &C, QualType type,
                            SourceLocation OperatorLoc, TypeSourceInfo *tsi,
-                           ArrayRef<OffsetOfNode> comps, ArrayRef<Expr *> exprs,
+                           llvm::ArrayRef<OffsetOfNode> comps, llvm::ArrayRef<Expr *> exprs,
                            SourceLocation RParenLoc)
     : Expr(OffsetOfExprClass, type, VK_PRValue, OK_Ordinary),
       OperatorLoc(OperatorLoc), RParenLoc(RParenLoc), TSInfo(tsi),
@@ -2131,7 +2131,7 @@ CStyleCastExpr *CStyleCastExpr::CreateEmpty(const ASTContext &C,
 
 /// getOpcodeStr - Turn an Opcode enum value into the punctuation char it
 /// corresponds to, e.g. "<<=".
-StringRef BinaryOperator::getOpcodeStr(Opcode Op) {
+llvm::StringRef BinaryOperator::getOpcodeStr(Opcode Op) {
   switch (Op) {
 #define BINARY_OPERATION(Name, Spelling) case BO_##Name: return Spelling;
 #include "clang/AST/OperationKinds.def"
@@ -2250,7 +2250,7 @@ SourceLocExpr::SourceLocExpr(const ASTContext &Ctx, SourceLocIdentKind Kind,
                     : ExprDependence::None);
 }
 
-StringRef SourceLocExpr::getBuiltinStr() const {
+llvm::StringRef SourceLocExpr::getBuiltinStr() const {
   switch (getIdentKind()) {
   case SourceLocIdentKind::File:
     return "__builtin_FILE";
@@ -2290,7 +2290,7 @@ APValue SourceLocExpr::EvaluateInContext(const ASTContext &Ctx,
   PresumedLoc PLoc = Ctx.getSourceManager().getPresumedLoc(
       Ctx.getSourceManager().getExpansionRange(Loc).getEnd());
 
-  auto MakeStringLiteral = [&](StringRef Tmp) {
+  auto MakeStringLiteral = [&](llvm::StringRef Tmp) {
     using LValuePathEntry = APValue::LValuePathEntry;
     StringLiteral *Res = Ctx.getPredefinedStringLiteralFromCache(Tmp);
     // Decay the string to a pointer to the first character.
@@ -2302,13 +2302,13 @@ APValue SourceLocExpr::EvaluateInContext(const ASTContext &Ctx,
   case SourceLocIdentKind::FileName: {
     // __builtin_FILE_NAME() is a Clang-specific extension that expands to the
     // the last part of __builtin_FILE().
-    SmallString<256> FileName;
+    llvm::SmallString<256> FileName;
     clang::Preprocessor::processPathToFileName(
         FileName, PLoc, Ctx.getLangOpts(), Ctx.getTargetInfo());
     return MakeStringLiteral(FileName);
   }
   case SourceLocIdentKind::File: {
-    SmallString<256> Path(PLoc.getFilename());
+    llvm::SmallString<256> Path(PLoc.getFilename());
     clang::Preprocessor::processPathForFileMacro(Path, Ctx.getLangOpts(),
                                                  Ctx.getTargetInfo());
     return MakeStringLiteral(Path);
@@ -2339,9 +2339,9 @@ APValue SourceLocExpr::EvaluateInContext(const ASTContext &Ctx,
 
     APValue Value(APValue::UninitStruct(), 0, 4);
     for (const FieldDecl *F : ImplDecl->fields()) {
-      StringRef Name = F->getName();
+      llvm::StringRef Name = F->getName();
       if (Name == "_M_file_name") {
-        SmallString<256> Path(PLoc.getFilename());
+        llvm::SmallString<256> Path(PLoc.getFilename());
         clang::Preprocessor::processPathForFileMacro(Path, Ctx.getLangOpts(),
                                                      Ctx.getTargetInfo());
         Value.getStructField(F->getFieldIndex()) = MakeStringLiteral(Path);
@@ -2351,7 +2351,7 @@ APValue SourceLocExpr::EvaluateInContext(const ASTContext &Ctx,
         const auto *CurDecl = dyn_cast<Decl>(Context);
         Value.getStructField(F->getFieldIndex()) = MakeStringLiteral(
             CurDecl && !isa<TranslationUnitDecl>(CurDecl)
-                ? StringRef(PredefinedExpr::ComputeName(
+                ? llvm::StringRef(PredefinedExpr::ComputeName(
                       PredefinedIdentKind::PrettyFunction, CurDecl))
                 : "");
       } else if (Name == "_M_line") {
@@ -2366,7 +2366,7 @@ APValue SourceLocExpr::EvaluateInContext(const ASTContext &Ctx,
     UnnamedGlobalConstantDecl *GV =
         Ctx.getUnnamedGlobalConstantDecl(getType()->getPointeeType(), Value);
 
-    return APValue(GV, CharUnits::Zero(), ArrayRef<APValue::LValuePathEntry>{},
+    return APValue(GV, CharUnits::Zero(), llvm::ArrayRef<APValue::LValuePathEntry>{},
                    false);
   }
   }
@@ -2374,7 +2374,7 @@ APValue SourceLocExpr::EvaluateInContext(const ASTContext &Ctx,
 }
 
 InitListExpr::InitListExpr(const ASTContext &C, SourceLocation lbraceloc,
-                           ArrayRef<Expr *> initExprs, SourceLocation rbraceloc)
+                           llvm::ArrayRef<Expr *> initExprs, SourceLocation rbraceloc)
     : Expr(InitListExprClass, QualType(), VK_PRValue, OK_Ordinary),
       InitExprs(C, initExprs.size()), LBraceLoc(lbraceloc),
       RBraceLoc(rbraceloc), AltForm(nullptr, true) {
@@ -3276,7 +3276,7 @@ bool Expr::isImplicitCXXThis() const {
 
 /// hasAnyTypeDependentArguments - Determines if any of the expressions
 /// in Exprs is type-dependent.
-bool Expr::hasAnyTypeDependentArguments(ArrayRef<Expr *> Exprs) {
+bool Expr::hasAnyTypeDependentArguments(llvm::ArrayRef<Expr *> Exprs) {
   for (unsigned I = 0; I < Exprs.size(); ++I)
     if (Exprs[I]->isTypeDependent())
       return true;
@@ -4294,7 +4294,7 @@ unsigned ExtVectorElementExpr::getNumElements() const {
 bool ExtVectorElementExpr::containsDuplicateElements() const {
   // FIXME: Refactor this code to an accessor on the AST node which returns the
   // "type" of component access, and share with code below and in Sema.
-  StringRef Comp = Accessor->getName();
+  llvm::StringRef Comp = Accessor->getName();
 
   // Halving swizzles do not contain duplicate elements.
   if (Comp == "hi" || Comp == "lo" || Comp == "even" || Comp == "odd")
@@ -4313,8 +4313,8 @@ bool ExtVectorElementExpr::containsDuplicateElements() const {
 
 /// getEncodedElementAccess - We encode the fields as a llvm ConstantArray.
 void ExtVectorElementExpr::getEncodedElementAccess(
-    SmallVectorImpl<uint32_t> &Elts) const {
-  StringRef Comp = Accessor->getName();
+    llvm::SmallVectorImpl<uint32_t> &Elts) const {
+  llvm::StringRef Comp = Accessor->getName();
   bool isNumericAccessor = false;
   if (Comp[0] == 's' || Comp[0] == 'S') {
     Comp = Comp.substr(1);
@@ -4344,7 +4344,7 @@ void ExtVectorElementExpr::getEncodedElementAccess(
   }
 }
 
-ShuffleVectorExpr::ShuffleVectorExpr(const ASTContext &C, ArrayRef<Expr *> args,
+ShuffleVectorExpr::ShuffleVectorExpr(const ASTContext &C, llvm::ArrayRef<Expr *> args,
                                      QualType Type, SourceLocation BLoc,
                                      SourceLocation RP)
     : Expr(ShuffleVectorExprClass, Type, VK_PRValue, OK_Ordinary),
@@ -4356,7 +4356,7 @@ ShuffleVectorExpr::ShuffleVectorExpr(const ASTContext &C, ArrayRef<Expr *> args,
   setDependence(computeDependence(this));
 }
 
-void ShuffleVectorExpr::setExprs(const ASTContext &C, ArrayRef<Expr *> Exprs) {
+void ShuffleVectorExpr::setExprs(const ASTContext &C, llvm::ArrayRef<Expr *> Exprs) {
   if (SubExprs) C.Deallocate(SubExprs);
 
   this->NumExprs = Exprs.size();
@@ -4366,7 +4366,7 @@ void ShuffleVectorExpr::setExprs(const ASTContext &C, ArrayRef<Expr *> Exprs) {
 
 GenericSelectionExpr::GenericSelectionExpr(
     const ASTContext &, SourceLocation GenericLoc, Expr *ControllingExpr,
-    ArrayRef<TypeSourceInfo *> AssocTypes, ArrayRef<Expr *> AssocExprs,
+    llvm::ArrayRef<TypeSourceInfo *> AssocTypes, llvm::ArrayRef<Expr *> AssocExprs,
     SourceLocation DefaultLoc, SourceLocation RParenLoc,
     bool ContainsUnexpandedParameterPack, unsigned ResultIndex)
     : Expr(GenericSelectionExprClass, AssocExprs[ResultIndex]->getType(),
@@ -4393,8 +4393,8 @@ GenericSelectionExpr::GenericSelectionExpr(
 
 GenericSelectionExpr::GenericSelectionExpr(
     const ASTContext &, SourceLocation GenericLoc,
-    TypeSourceInfo *ControllingType, ArrayRef<TypeSourceInfo *> AssocTypes,
-    ArrayRef<Expr *> AssocExprs, SourceLocation DefaultLoc,
+    TypeSourceInfo *ControllingType, llvm::ArrayRef<TypeSourceInfo *> AssocTypes,
+    llvm::ArrayRef<Expr *> AssocExprs, SourceLocation DefaultLoc,
     SourceLocation RParenLoc, bool ContainsUnexpandedParameterPack,
     unsigned ResultIndex)
     : Expr(GenericSelectionExprClass, AssocExprs[ResultIndex]->getType(),
@@ -4421,7 +4421,7 @@ GenericSelectionExpr::GenericSelectionExpr(
 
 GenericSelectionExpr::GenericSelectionExpr(
     const ASTContext &Context, SourceLocation GenericLoc, Expr *ControllingExpr,
-    ArrayRef<TypeSourceInfo *> AssocTypes, ArrayRef<Expr *> AssocExprs,
+    llvm::ArrayRef<TypeSourceInfo *> AssocTypes, llvm::ArrayRef<Expr *> AssocExprs,
     SourceLocation DefaultLoc, SourceLocation RParenLoc,
     bool ContainsUnexpandedParameterPack)
     : Expr(GenericSelectionExprClass, Context.DependentTy, VK_PRValue,
@@ -4446,8 +4446,8 @@ GenericSelectionExpr::GenericSelectionExpr(
 
 GenericSelectionExpr::GenericSelectionExpr(
     const ASTContext &Context, SourceLocation GenericLoc,
-    TypeSourceInfo *ControllingType, ArrayRef<TypeSourceInfo *> AssocTypes,
-    ArrayRef<Expr *> AssocExprs, SourceLocation DefaultLoc,
+    TypeSourceInfo *ControllingType, llvm::ArrayRef<TypeSourceInfo *> AssocTypes,
+    llvm::ArrayRef<Expr *> AssocExprs, SourceLocation DefaultLoc,
     SourceLocation RParenLoc, bool ContainsUnexpandedParameterPack)
     : Expr(GenericSelectionExprClass, Context.DependentTy, VK_PRValue,
            OK_Ordinary),
@@ -4474,7 +4474,7 @@ GenericSelectionExpr::GenericSelectionExpr(EmptyShell Empty, unsigned NumAssocs)
 
 GenericSelectionExpr *GenericSelectionExpr::Create(
     const ASTContext &Context, SourceLocation GenericLoc, Expr *ControllingExpr,
-    ArrayRef<TypeSourceInfo *> AssocTypes, ArrayRef<Expr *> AssocExprs,
+    llvm::ArrayRef<TypeSourceInfo *> AssocTypes, llvm::ArrayRef<Expr *> AssocExprs,
     SourceLocation DefaultLoc, SourceLocation RParenLoc,
     bool ContainsUnexpandedParameterPack, unsigned ResultIndex) {
   unsigned NumAssocs = AssocExprs.size();
@@ -4488,7 +4488,7 @@ GenericSelectionExpr *GenericSelectionExpr::Create(
 
 GenericSelectionExpr *GenericSelectionExpr::Create(
     const ASTContext &Context, SourceLocation GenericLoc, Expr *ControllingExpr,
-    ArrayRef<TypeSourceInfo *> AssocTypes, ArrayRef<Expr *> AssocExprs,
+    llvm::ArrayRef<TypeSourceInfo *> AssocTypes, llvm::ArrayRef<Expr *> AssocExprs,
     SourceLocation DefaultLoc, SourceLocation RParenLoc,
     bool ContainsUnexpandedParameterPack) {
   unsigned NumAssocs = AssocExprs.size();
@@ -4502,8 +4502,8 @@ GenericSelectionExpr *GenericSelectionExpr::Create(
 
 GenericSelectionExpr *GenericSelectionExpr::Create(
     const ASTContext &Context, SourceLocation GenericLoc,
-    TypeSourceInfo *ControllingType, ArrayRef<TypeSourceInfo *> AssocTypes,
-    ArrayRef<Expr *> AssocExprs, SourceLocation DefaultLoc,
+    TypeSourceInfo *ControllingType, llvm::ArrayRef<TypeSourceInfo *> AssocTypes,
+    llvm::ArrayRef<Expr *> AssocExprs, SourceLocation DefaultLoc,
     SourceLocation RParenLoc, bool ContainsUnexpandedParameterPack,
     unsigned ResultIndex) {
   unsigned NumAssocs = AssocExprs.size();
@@ -4517,8 +4517,8 @@ GenericSelectionExpr *GenericSelectionExpr::Create(
 
 GenericSelectionExpr *GenericSelectionExpr::Create(
     const ASTContext &Context, SourceLocation GenericLoc,
-    TypeSourceInfo *ControllingType, ArrayRef<TypeSourceInfo *> AssocTypes,
-    ArrayRef<Expr *> AssocExprs, SourceLocation DefaultLoc,
+    TypeSourceInfo *ControllingType, llvm::ArrayRef<TypeSourceInfo *> AssocTypes,
+    llvm::ArrayRef<Expr *> AssocExprs, SourceLocation DefaultLoc,
     SourceLocation RParenLoc, bool ContainsUnexpandedParameterPack) {
   unsigned NumAssocs = AssocExprs.size();
   void *Mem = Context.Allocate(
@@ -4553,7 +4553,7 @@ DesignatedInitExpr::DesignatedInitExpr(const ASTContext &C, QualType Ty,
                                        llvm::ArrayRef<Designator> Designators,
                                        SourceLocation EqualOrColonLoc,
                                        bool GNUSyntax,
-                                       ArrayRef<Expr *> IndexExprs, Expr *Init)
+                                       llvm::ArrayRef<Expr *> IndexExprs, Expr *Init)
     : Expr(DesignatedInitExprClass, Ty, Init->getValueKind(),
            Init->getObjectKind()),
       EqualOrColonLoc(EqualOrColonLoc), GNUSyntax(GNUSyntax),
@@ -4586,7 +4586,7 @@ DesignatedInitExpr::DesignatedInitExpr(const ASTContext &C, QualType Ty,
 DesignatedInitExpr *
 DesignatedInitExpr::Create(const ASTContext &C,
                            llvm::ArrayRef<Designator> Designators,
-                           ArrayRef<Expr*> IndexExprs,
+                           llvm::ArrayRef<Expr*> IndexExprs,
                            SourceLocation ColonOrEqualLoc,
                            bool UsesColonSyntax, Expr *Init) {
   void *Mem = C.Allocate(totalSizeToAlloc<Stmt *>(IndexExprs.size() + 1),
@@ -4709,7 +4709,7 @@ SourceLocation DesignatedInitUpdateExpr::getEndLoc() const {
   return getBase()->getEndLoc();
 }
 
-ParenListExpr::ParenListExpr(SourceLocation LParenLoc, ArrayRef<Expr *> Exprs,
+ParenListExpr::ParenListExpr(SourceLocation LParenLoc, llvm::ArrayRef<Expr *> Exprs,
                              SourceLocation RParenLoc)
     : Expr(ParenListExprClass, QualType(), VK_PRValue, OK_Ordinary),
       LParenLoc(LParenLoc), RParenLoc(RParenLoc) {
@@ -4727,7 +4727,7 @@ ParenListExpr::ParenListExpr(EmptyShell Empty, unsigned NumExprs)
 
 ParenListExpr *ParenListExpr::Create(const ASTContext &Ctx,
                                      SourceLocation LParenLoc,
-                                     ArrayRef<Expr *> Exprs,
+                                     llvm::ArrayRef<Expr *> Exprs,
                                      SourceLocation RParenLoc) {
   void *Mem = Ctx.Allocate(totalSizeToAlloc<Stmt *>(Exprs.size()),
                            alignof(ParenListExpr));
@@ -4878,7 +4878,7 @@ PseudoObjectExpr::PseudoObjectExpr(EmptyShell shell, unsigned numSemanticExprs)
 }
 
 PseudoObjectExpr *PseudoObjectExpr::Create(const ASTContext &C, Expr *syntax,
-                                           ArrayRef<Expr*> semantics,
+                                           llvm::ArrayRef<Expr*> semantics,
                                            unsigned resultIndex) {
   assert(syntax && "no syntactic expression!");
   assert(semantics.size() && "no semantic expressions!");
@@ -4902,7 +4902,7 @@ PseudoObjectExpr *PseudoObjectExpr::Create(const ASTContext &C, Expr *syntax,
 }
 
 PseudoObjectExpr::PseudoObjectExpr(QualType type, ExprValueKind VK,
-                                   Expr *syntax, ArrayRef<Expr *> semantics,
+                                   Expr *syntax, llvm::ArrayRef<Expr *> semantics,
                                    unsigned resultIndex)
     : Expr(PseudoObjectExprClass, type, VK, OK_Ordinary) {
   PseudoObjectExprBits.NumSubExprs = semantics.size() + 1;
@@ -4945,7 +4945,7 @@ Stmt::const_child_range UnaryExprOrTypeTraitExpr::children() const {
   return const_child_range(&Argument.Ex, &Argument.Ex + 1);
 }
 
-AtomicExpr::AtomicExpr(SourceLocation BLoc, ArrayRef<Expr *> args, QualType t,
+AtomicExpr::AtomicExpr(SourceLocation BLoc, llvm::ArrayRef<Expr *> args, QualType t,
                        AtomicOp op, SourceLocation RP)
     : Expr(AtomicExprClass, t, VK_PRValue, OK_Ordinary),
       NumSubExprs(args.size()), BuiltinLoc(BLoc), RParenLoc(RP), Op(op) {
@@ -5094,7 +5094,7 @@ QualType ArraySectionExpr::getBaseOriginalType(const Expr *Base) {
 }
 
 RecoveryExpr::RecoveryExpr(ASTContext &Ctx, QualType T, SourceLocation BeginLoc,
-                           SourceLocation EndLoc, ArrayRef<Expr *> SubExprs)
+                           SourceLocation EndLoc, llvm::ArrayRef<Expr *> SubExprs)
     : Expr(RecoveryExprClass, T.getNonReferenceType(),
            T->isDependentType() ? VK_LValue : getValueKindForType(T),
            OK_Ordinary),
@@ -5109,7 +5109,7 @@ RecoveryExpr::RecoveryExpr(ASTContext &Ctx, QualType T, SourceLocation BeginLoc,
 RecoveryExpr *RecoveryExpr::Create(ASTContext &Ctx, QualType T,
                                    SourceLocation BeginLoc,
                                    SourceLocation EndLoc,
-                                   ArrayRef<Expr *> SubExprs) {
+                                   llvm::ArrayRef<Expr *> SubExprs) {
   void *Mem = Ctx.Allocate(totalSizeToAlloc<Expr *>(SubExprs.size()),
                            alignof(RecoveryExpr));
   return new (Mem) RecoveryExpr(Ctx, T, BeginLoc, EndLoc, SubExprs);
@@ -5121,14 +5121,14 @@ RecoveryExpr *RecoveryExpr::CreateEmpty(ASTContext &Ctx, unsigned NumSubExprs) {
   return new (Mem) RecoveryExpr(EmptyShell(), NumSubExprs);
 }
 
-void OMPArrayShapingExpr::setDimensions(ArrayRef<Expr *> Dims) {
+void OMPArrayShapingExpr::setDimensions(llvm::ArrayRef<Expr *> Dims) {
   assert(
       NumDims == Dims.size() &&
       "Preallocated number of dimensions is different from the provided one.");
   llvm::copy(Dims, getTrailingObjects<Expr *>());
 }
 
-void OMPArrayShapingExpr::setBracketsRanges(ArrayRef<SourceRange> BR) {
+void OMPArrayShapingExpr::setBracketsRanges(llvm::ArrayRef<SourceRange> BR) {
   assert(
       NumDims == BR.size() &&
       "Preallocated number of dimensions is different from the provided one.");
@@ -5137,7 +5137,7 @@ void OMPArrayShapingExpr::setBracketsRanges(ArrayRef<SourceRange> BR) {
 
 OMPArrayShapingExpr::OMPArrayShapingExpr(QualType ExprTy, Expr *Op,
                                          SourceLocation L, SourceLocation R,
-                                         ArrayRef<Expr *> Dims)
+                                         llvm::ArrayRef<Expr *> Dims)
     : Expr(OMPArrayShapingExprClass, ExprTy, VK_LValue, OK_Ordinary), LPLoc(L),
       RPLoc(R), NumDims(Dims.size()) {
   setBase(Op);
@@ -5148,8 +5148,8 @@ OMPArrayShapingExpr::OMPArrayShapingExpr(QualType ExprTy, Expr *Op,
 OMPArrayShapingExpr *
 OMPArrayShapingExpr::Create(const ASTContext &Context, QualType T, Expr *Op,
                             SourceLocation L, SourceLocation R,
-                            ArrayRef<Expr *> Dims,
-                            ArrayRef<SourceRange> BracketRanges) {
+                            llvm::ArrayRef<Expr *> Dims,
+                            llvm::ArrayRef<SourceRange> BracketRanges) {
   assert(Dims.size() == BracketRanges.size() &&
          "Different number of dimensions and brackets ranges.");
   void *Mem = Context.Allocate(
@@ -5258,8 +5258,8 @@ const OMPIteratorHelperData &OMPIteratorExpr::getHelper(unsigned I) const {
 
 OMPIteratorExpr::OMPIteratorExpr(
     QualType ExprTy, SourceLocation IteratorKwLoc, SourceLocation L,
-    SourceLocation R, ArrayRef<OMPIteratorExpr::IteratorDefinition> Data,
-    ArrayRef<OMPIteratorHelperData> Helpers)
+    SourceLocation R, llvm::ArrayRef<OMPIteratorExpr::IteratorDefinition> Data,
+    llvm::ArrayRef<OMPIteratorHelperData> Helpers)
     : Expr(OMPIteratorExprClass, ExprTy, VK_LValue, OK_Ordinary),
       IteratorKwLoc(IteratorKwLoc), LPLoc(L), RPLoc(R),
       NumIterators(Data.size()) {
@@ -5278,8 +5278,8 @@ OMPIteratorExpr *
 OMPIteratorExpr::Create(const ASTContext &Context, QualType T,
                         SourceLocation IteratorKwLoc, SourceLocation L,
                         SourceLocation R,
-                        ArrayRef<OMPIteratorExpr::IteratorDefinition> Data,
-                        ArrayRef<OMPIteratorHelperData> Helpers) {
+                        llvm::ArrayRef<OMPIteratorExpr::IteratorDefinition> Data,
+                        llvm::ArrayRef<OMPIteratorHelperData> Helpers) {
   assert(Data.size() == Helpers.size() &&
          "Data and helpers must have the same size.");
   void *Mem = Context.Allocate(

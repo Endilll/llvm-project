@@ -34,7 +34,7 @@ class SourceManager;
 class LangOptions;
 
 /// Copy characters from Input to Buf, expanding any UCNs.
-void expandUCNs(SmallVectorImpl<char> &Buf, StringRef Input);
+void expandUCNs(llvm::SmallVectorImpl<char> &Buf, llvm::StringRef Input);
 
 /// Return true if the token corresponds to a function local predefined macro,
 /// which expands to a string literal, that can be concatenated with other
@@ -62,10 +62,10 @@ class NumericLiteralParser {
 
   bool saw_exponent, saw_period, saw_ud_suffix, saw_fixed_point_suffix;
 
-  SmallString<32> UDSuffixBuf;
+  llvm::SmallString<32> UDSuffixBuf;
 
 public:
-  NumericLiteralParser(StringRef TokSpelling, SourceLocation TokLoc,
+  NumericLiteralParser(llvm::StringRef TokSpelling, SourceLocation TokLoc,
                        const SourceManager &SM, const LangOptions &LangOpts,
                        const TargetInfo &Target, DiagnosticsEngine &Diags);
   bool hadError : 1;
@@ -99,7 +99,7 @@ public:
   bool hasUDSuffix() const {
     return saw_ud_suffix;
   }
-  StringRef getUDSuffix() const {
+  llvm::StringRef getUDSuffix() const {
     assert(saw_ud_suffix);
     return UDSuffixBuf;
   }
@@ -108,7 +108,7 @@ public:
     return SuffixBegin - ThisTokBegin;
   }
 
-  static bool isValidUDSuffix(const LangOptions &LangOpts, StringRef Suffix);
+  static bool isValidUDSuffix(const LangOptions &LangOpts, llvm::StringRef Suffix);
 
   unsigned getRadix() const { return radix; }
 
@@ -131,9 +131,9 @@ public:
 
   /// Get the digits that comprise the literal. This excludes any prefix or
   /// suffix associated with the literal.
-  StringRef getLiteralDigits() const {
+  llvm::StringRef getLiteralDigits() const {
     assert(!hadError && "cannot reliably get the literal digits with an error");
-    return StringRef(DigitsBegin, SuffixBegin - DigitsBegin);
+    return llvm::StringRef(DigitsBegin, SuffixBegin - DigitsBegin);
   }
 
 private:
@@ -198,7 +198,7 @@ class CharLiteralParser {
   tok::TokenKind Kind;
   bool IsMultiChar;
   bool HadError;
-  SmallString<32> UDSuffixBuf;
+  llvm::SmallString<32> UDSuffixBuf;
   unsigned UDSuffixOffset;
 public:
   CharLiteralParser(const char *begin, const char *end,
@@ -213,7 +213,7 @@ public:
   bool isUTF32() const { return Kind == tok::utf32_char_constant; }
   bool isMultiChar() const { return IsMultiChar; }
   uint64_t getValue() const { return Value; }
-  StringRef getUDSuffix() const { return UDSuffixBuf; }
+  llvm::StringRef getUDSuffix() const { return UDSuffixBuf; }
   unsigned getUDSuffixOffset() const {
     assert(!UDSuffixBuf.empty() && "no ud-suffix");
     return UDSuffixOffset;
@@ -238,18 +238,18 @@ class StringLiteralParser {
   unsigned SizeBound;
   unsigned CharByteWidth;
   tok::TokenKind Kind;
-  SmallString<512> ResultBuf;
+  llvm::SmallString<512> ResultBuf;
   char *ResultPtr; // cursor
-  SmallString<32> UDSuffixBuf;
+  llvm::SmallString<32> UDSuffixBuf;
   unsigned UDSuffixToken;
   unsigned UDSuffixOffset;
   StringLiteralEvalMethod EvalMethod;
 
 public:
-  StringLiteralParser(ArrayRef<Token> StringToks, Preprocessor &PP,
+  StringLiteralParser(llvm::ArrayRef<Token> StringToks, Preprocessor &PP,
                       StringLiteralEvalMethod StringMethod =
                           StringLiteralEvalMethod::Evaluated);
-  StringLiteralParser(ArrayRef<Token> StringToks, const SourceManager &sm,
+  StringLiteralParser(llvm::ArrayRef<Token> StringToks, const SourceManager &sm,
                       const LangOptions &features, const TargetInfo &target,
                       DiagnosticsEngine *diags = nullptr)
       : SM(sm), Features(features), Target(target), Diags(diags),
@@ -263,8 +263,8 @@ public:
   bool hadError;
   bool Pascal;
 
-  StringRef GetString() const {
-    return StringRef(ResultBuf.data(), GetStringLength());
+  llvm::StringRef GetString() const {
+    return llvm::StringRef(ResultBuf.data(), GetStringLength());
   }
   unsigned GetStringLength() const { return ResultPtr-ResultBuf.data(); }
 
@@ -289,7 +289,7 @@ public:
     return EvalMethod == StringLiteralEvalMethod::Unevaluated;
   }
 
-  StringRef getUDSuffix() const { return UDSuffixBuf; }
+  llvm::StringRef getUDSuffix() const { return UDSuffixBuf; }
 
   /// Get the index of a token containing a ud-suffix.
   unsigned getUDSuffixToken() const {
@@ -302,12 +302,12 @@ public:
     return UDSuffixOffset;
   }
 
-  static bool isValidUDSuffix(const LangOptions &LangOpts, StringRef Suffix);
+  static bool isValidUDSuffix(const LangOptions &LangOpts, llvm::StringRef Suffix);
 
 private:
-  void init(ArrayRef<Token> StringToks);
+  void init(llvm::ArrayRef<Token> StringToks);
   bool CopyStringFragment(const Token &Tok, const char *TokBegin,
-                          StringRef Fragment);
+                          llvm::StringRef Fragment);
   void DiagnoseLexingError(SourceLocation Loc);
 };
 

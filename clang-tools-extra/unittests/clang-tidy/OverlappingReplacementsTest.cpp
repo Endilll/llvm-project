@@ -24,7 +24,7 @@ const char BoundIf[] = "if";
 // several replacement ranges in an error, etc).
 class UseCharCheck : public ClangTidyCheck {
 public:
-  UseCharCheck(StringRef CheckName, ClangTidyContext *Context)
+  UseCharCheck(llvm::StringRef CheckName, ClangTidyContext *Context)
       : ClangTidyCheck(CheckName, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override {
     using namespace ast_matchers;
@@ -40,7 +40,7 @@ public:
 
 class IfFalseCheck : public ClangTidyCheck {
 public:
-  IfFalseCheck(StringRef CheckName, ClangTidyContext *Context)
+  IfFalseCheck(llvm::StringRef CheckName, ClangTidyContext *Context)
       : ClangTidyCheck(CheckName, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override {
     using namespace ast_matchers;
@@ -60,12 +60,12 @@ public:
 
 class RefactorCheck : public ClangTidyCheck {
 public:
-  RefactorCheck(StringRef CheckName, ClangTidyContext *Context)
+  RefactorCheck(llvm::StringRef CheckName, ClangTidyContext *Context)
       : ClangTidyCheck(CheckName, Context), NamePattern("::$") {}
-  RefactorCheck(StringRef CheckName, ClangTidyContext *Context,
-                StringRef NamePattern)
+  RefactorCheck(llvm::StringRef CheckName, ClangTidyContext *Context,
+                llvm::StringRef NamePattern)
       : ClangTidyCheck(CheckName, Context), NamePattern(NamePattern) {}
-  virtual std::string newName(StringRef OldName) = 0;
+  virtual std::string newName(llvm::StringRef OldName) = 0;
 
   void registerMatchers(ast_matchers::MatchFinder *Finder) final {
     using namespace ast_matchers;
@@ -85,7 +85,7 @@ public:
 
     class UsageVisitor : public RecursiveASTVisitor<UsageVisitor> {
     public:
-      UsageVisitor(const ValueDecl *VD, StringRef NewName,
+      UsageVisitor(const ValueDecl *VD, llvm::StringRef NewName,
                    DiagnosticBuilder &Diag)
           : VD(VD), NewName(NewName), Diag(Diag) {}
       bool VisitDeclRefExpr(DeclRefExpr *E) {
@@ -100,7 +100,7 @@ public:
 
     private:
       const ValueDecl *VD;
-      StringRef NewName;
+      llvm::StringRef NewName;
       DiagnosticBuilder &Diag;
     };
 
@@ -114,20 +114,20 @@ protected:
 
 class StartsWithPotaCheck : public RefactorCheck {
 public:
-  StartsWithPotaCheck(StringRef CheckName, ClangTidyContext *Context)
+  StartsWithPotaCheck(llvm::StringRef CheckName, ClangTidyContext *Context)
       : RefactorCheck(CheckName, Context, "::pota") {}
 
-  std::string newName(StringRef OldName) override {
+  std::string newName(llvm::StringRef OldName) override {
     return "toma" + OldName.substr(4).str();
   }
 };
 
 class EndsWithTatoCheck : public RefactorCheck {
 public:
-  EndsWithTatoCheck(StringRef CheckName, ClangTidyContext *Context)
+  EndsWithTatoCheck(llvm::StringRef CheckName, ClangTidyContext *Context)
       : RefactorCheck(CheckName, Context, "tato$") {}
 
-  std::string newName(StringRef OldName) override {
+  std::string newName(llvm::StringRef OldName) override {
     return OldName.substr(0, OldName.size() - 4).str() + "melo";
   }
 };

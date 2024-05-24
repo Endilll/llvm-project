@@ -29,31 +29,31 @@ using namespace clang;
 using namespace driver;
 using namespace llvm::sys;
 
-Multilib::Multilib(StringRef GCCSuffix, StringRef OSSuffix,
-                   StringRef IncludeSuffix, const flags_list &Flags,
-                   StringRef ExclusiveGroup)
+Multilib::Multilib(llvm::StringRef GCCSuffix, llvm::StringRef OSSuffix,
+                   llvm::StringRef IncludeSuffix, const flags_list &Flags,
+                   llvm::StringRef ExclusiveGroup)
     : GCCSuffix(GCCSuffix), OSSuffix(OSSuffix), IncludeSuffix(IncludeSuffix),
       Flags(Flags), ExclusiveGroup(ExclusiveGroup) {
   assert(GCCSuffix.empty() ||
-         (StringRef(GCCSuffix).front() == '/' && GCCSuffix.size() > 1));
+         (llvm::StringRef(GCCSuffix).front() == '/' && GCCSuffix.size() > 1));
   assert(OSSuffix.empty() ||
-         (StringRef(OSSuffix).front() == '/' && OSSuffix.size() > 1));
+         (llvm::StringRef(OSSuffix).front() == '/' && OSSuffix.size() > 1));
   assert(IncludeSuffix.empty() ||
-         (StringRef(IncludeSuffix).front() == '/' && IncludeSuffix.size() > 1));
+         (llvm::StringRef(IncludeSuffix).front() == '/' && IncludeSuffix.size() > 1));
 }
 
 LLVM_DUMP_METHOD void Multilib::dump() const {
   print(llvm::errs());
 }
 
-void Multilib::print(raw_ostream &OS) const {
+void Multilib::print(llvm::raw_ostream &OS) const {
   if (GCCSuffix.empty())
     OS << ".";
   else {
-    OS << StringRef(GCCSuffix).drop_front();
+    OS << llvm::StringRef(GCCSuffix).drop_front();
   }
   OS << ";";
-  for (StringRef Flag : Flags) {
+  for (llvm::StringRef Flag : Flags) {
     if (Flag.front() == '-')
       OS << "@" << Flag.substr(1);
   }
@@ -82,7 +82,7 @@ bool Multilib::operator==(const Multilib &Other) const {
   return true;
 }
 
-raw_ostream &clang::driver::operator<<(raw_ostream &OS, const Multilib &M) {
+llvm::raw_ostream &clang::driver::operator<<(llvm::raw_ostream &OS, const Multilib &M) {
   M.print(OS);
   return OS;
 }
@@ -100,7 +100,7 @@ bool MultilibSet::select(const Multilib::flags_list &Flags,
   Selected.clear();
 
   // Decide which multilibs we're going to select at all.
-  llvm::DenseSet<StringRef> ExclusiveGroupsSelected;
+  llvm::DenseSet<llvm::StringRef> ExclusiveGroupsSelected;
   for (const Multilib &M : llvm::reverse(Multilibs)) {
     // If this multilib doesn't match all our flags, don't select it.
     if (!llvm::all_of(M.flags(), [&FlagSet](const std::string &F) {
@@ -141,15 +141,15 @@ MultilibSet::expandFlags(const Multilib::flags_list &InFlags) const {
     std::string RegexString(M.Match);
 
     // Make the regular expression match the whole string.
-    if (!StringRef(M.Match).starts_with("^"))
+    if (!llvm::StringRef(M.Match).starts_with("^"))
       RegexString.insert(RegexString.begin(), '^');
-    if (!StringRef(M.Match).ends_with("$"))
+    if (!llvm::StringRef(M.Match).ends_with("$"))
       RegexString.push_back('$');
 
     const llvm::Regex Regex(RegexString);
     assert(Regex.isValid());
     if (llvm::any_of(InFlags,
-                     [&Regex](StringRef F) { return Regex.match(F); })) {
+                     [&Regex](llvm::StringRef F) { return Regex.match(F); })) {
       Result.insert(M.Flags.begin(), M.Flags.end());
     }
   }
@@ -159,7 +159,7 @@ MultilibSet::expandFlags(const Multilib::flags_list &InFlags) const {
 namespace {
 
 // When updating this also update MULTILIB_VERSION in MultilibTest.cpp
-static const VersionTuple MultilibVersionCurrent(1, 0);
+static const llvm::VersionTuple MultilibVersionCurrent(1, 0);
 
 struct MultilibSerialization {
   std::string Dir;
@@ -210,7 +210,7 @@ template <> struct llvm::yaml::MappingTraits<MultilibSerialization> {
     io.mapOptional("Group", V.Group);
   }
   static std::string validate(IO &io, MultilibSerialization &V) {
-    if (StringRef(V.Dir).starts_with("/"))
+    if (llvm::StringRef(V.Dir).starts_with("/"))
       return "paths must be relative but \"" + V.Dir + "\" starts with \"/\"";
     return std::string{};
   }
@@ -312,12 +312,12 @@ LLVM_DUMP_METHOD void MultilibSet::dump() const {
   print(llvm::errs());
 }
 
-void MultilibSet::print(raw_ostream &OS) const {
+void MultilibSet::print(llvm::raw_ostream &OS) const {
   for (const auto &M : *this)
     OS << M << "\n";
 }
 
-raw_ostream &clang::driver::operator<<(raw_ostream &OS, const MultilibSet &MS) {
+llvm::raw_ostream &clang::driver::operator<<(llvm::raw_ostream &OS, const MultilibSet &MS) {
   MS.print(OS);
   return OS;
 }

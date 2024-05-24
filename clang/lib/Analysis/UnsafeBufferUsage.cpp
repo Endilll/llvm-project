@@ -448,10 +448,10 @@ AST_MATCHER(ArraySubscriptExpr, isSafeArraySubscript) {
 namespace {
 // Because the analysis revolves around variables and their types, we'll need to
 // track uses of variables (aka DeclRefExprs).
-using DeclUseList = SmallVector<const DeclRefExpr *, 1>;
+using DeclUseList = llvm::SmallVector<const DeclRefExpr *, 1>;
 
 // Convenience typedef.
-using FixItList = SmallVector<FixItHint, 4>;
+using FixItList = llvm::SmallVector<FixItHint, 4>;
 } // namespace
 
 namespace {
@@ -480,7 +480,7 @@ public:
   Kind getKind() const { return K; }
 
 #ifndef NDEBUG
-  StringRef getDebugName() const {
+  llvm::StringRef getDebugName() const {
     switch (K) {
 #define GADGET(x)                                                              \
   case Kind::x:                                                                \
@@ -586,7 +586,7 @@ public:
   SourceLocation getSourceLoc() const override { return Op->getBeginLoc(); }
 
   DeclUseList getClaimedVarUseSites() const override {
-    SmallVector<const DeclRefExpr *, 2> Uses;
+    llvm::SmallVector<const DeclRefExpr *, 2> Uses;
     if (const auto *DRE =
             dyn_cast<DeclRefExpr>(Op->getSubExpr()->IgnoreParenImpCasts())) {
       Uses.push_back(DRE);
@@ -1553,7 +1553,7 @@ groupFixablesByVar(FixableGadgetList &&AllFixableOperations) {
   return FixablesForUnsafeVars;
 }
 
-bool clang::internal::anyConflict(const SmallVectorImpl<FixItHint> &FixIts,
+bool clang::internal::anyConflict(const llvm::SmallVectorImpl<FixItHint> &FixIts,
                                   const SourceManager &SM) {
   // A simple interval overlap detection algorithm.  Sorts all ranges by their
   // begin location then finds the first overlap in one pass.
@@ -1720,13 +1720,13 @@ UPCAddressofArraySubscriptGadget::getFixits(const FixitStrategy &S) const {
 }
 
 // FIXME: this function should be customizable through format
-static StringRef getEndOfLine() {
+static llvm::StringRef getEndOfLine() {
   static const char *const EOL = "\n";
   return EOL;
 }
 
 // Returns the text indicating that the user needs to provide input there:
-std::string getUserFillPlaceHolder(StringRef HintTextToUser = "placeholder") {
+std::string getUserFillPlaceHolder(llvm::StringRef HintTextToUser = "placeholder") {
   std::string s = std::string("<# ");
   s += HintTextToUser;
   s += " #>";
@@ -1760,7 +1760,7 @@ static std::optional<SourceLocation> getPastLoc(const NodeTy *Node,
 }
 
 // Return text representation of an `Expr`.
-static std::optional<StringRef> getExprText(const Expr *E,
+static std::optional<llvm::StringRef> getExprText(const Expr *E,
                                             const SourceManager &SM,
                                             const LangOptions &LangOpts) {
   std::optional<SourceLocation> LastCharLoc = getPastLoc(E, SM, LangOpts);
@@ -1774,12 +1774,12 @@ static std::optional<StringRef> getExprText(const Expr *E,
 }
 
 // Returns the literal text in `SourceRange SR`, if `SR` is a valid range.
-static std::optional<StringRef> getRangeText(SourceRange SR,
+static std::optional<llvm::StringRef> getRangeText(SourceRange SR,
                                              const SourceManager &SM,
                                              const LangOptions &LangOpts) {
   bool Invalid = false;
   CharSourceRange CSR = CharSourceRange::getCharRange(SR);
-  StringRef Text = Lexer::getSourceText(CSR, SM, LangOpts, &Invalid);
+  llvm::StringRef Text = Lexer::getSourceText(CSR, SM, LangOpts, &Invalid);
 
   if (!Invalid)
     return Text;
@@ -1795,7 +1795,7 @@ static SourceLocation getVarDeclIdentifierLoc(const VarDecl *VD) {
 }
 
 // Returns the literal text of the identifier of the given variable declaration.
-static std::optional<StringRef>
+static std::optional<llvm::StringRef>
 getVarDeclIdentifierText(const VarDecl *VD, const SourceManager &SM,
                          const LangOptions &LangOpts) {
   SourceLocation ParmIdentBeginLoc = getVarDeclIdentifierLoc(VD);
@@ -1924,7 +1924,7 @@ getPointeeTypeText(const VarDecl *VD, const SourceManager &SM,
 }
 
 // Returns the text of the name (with qualifiers) of a `FunctionDecl`.
-static std::optional<StringRef> getFunNameText(const FunctionDecl *FD,
+static std::optional<llvm::StringRef> getFunNameText(const FunctionDecl *FD,
                                                const SourceManager &SM,
                                                const LangOptions &LangOpts) {
   SourceLocation BeginLoc = FD->getQualifier()
@@ -1945,7 +1945,7 @@ static std::optional<StringRef> getFunNameText(const FunctionDecl *FD,
 // Note the optional parameter `Qualifiers`: one needs to pass qualifiers
 // explicitly if the element type needs to be qualified.
 static std::string
-getSpanTypeText(StringRef EltTyText,
+getSpanTypeText(llvm::StringRef EltTyText,
                 std::optional<Qualifiers> Quals = std::nullopt) {
   const char *const SpanOpen = "std::span<";
 
@@ -2101,7 +2101,7 @@ fixUPCAddressofArraySubscriptWithSpan(const UnaryOperator *Node) {
   if (auto ICE = Idx->getIntegerConstantExpr(Ctx))
     if ((*ICE).isZero())
       IdxIsLitZero = true;
-  std::optional<StringRef> DreString = getExprText(DRE, SM, LangOpts);
+  std::optional<llvm::StringRef> DreString = getExprText(DRE, SM, LangOpts);
   if (!DreString)
     return std::nullopt;
 
@@ -2109,7 +2109,7 @@ fixUPCAddressofArraySubscriptWithSpan(const UnaryOperator *Node) {
     // If the index is literal zero, we produce the most concise fix-it:
     SS << (*DreString).str() << ".data()";
   } else {
-    std::optional<StringRef> IndexString = getExprText(Idx, SM, LangOpts);
+    std::optional<llvm::StringRef> IndexString = getExprText(Idx, SM, LangOpts);
     if (!IndexString)
       return std::nullopt;
 
@@ -2132,7 +2132,7 @@ UUCAddAssignGadget::getFixits(const FixitStrategy &S) const {
       FixItList Fixes;
 
       const Stmt *AddAssignNode = Node;
-      StringRef varName = VD->getName();
+      llvm::StringRef varName = VD->getName();
       const ASTContext &Ctx = VD->getASTContext();
 
       if (!isNonNegativeIntegerExpr(Offset, VD, Ctx))
@@ -2173,7 +2173,7 @@ UPCPreIncrementGadget::getFixits(const FixitStrategy &S) const {
     if (S.lookup(VD) == FixitStrategy::Kind::Span) {
       FixItList Fixes;
       std::stringstream SS;
-      StringRef varName = VD->getName();
+      llvm::StringRef varName = VD->getName();
       const ASTContext &Ctx = VD->getASTContext();
 
       // To transform UPC(++p) to UPC((p = p.subspan(1)).data()):
@@ -2209,7 +2209,7 @@ UPCPreIncrementGadget::getFixits(const FixitStrategy &S) const {
 //   `Ctx` a reference to the ASTContext
 static std::optional<FixItList>
 FixVarInitializerWithSpan(const Expr *Init, ASTContext &Ctx,
-                          const StringRef UserFillPlaceHolder) {
+                          const llvm::StringRef UserFillPlaceHolder) {
   const SourceManager &SM = Ctx.getSourceManager();
   const LangOptions &LangOpts = Ctx.getLangOpts();
 
@@ -2235,7 +2235,7 @@ FixVarInitializerWithSpan(const Expr *Init, ASTContext &Ctx,
 
   FixItList FixIts{};
   std::string ExtentText = UserFillPlaceHolder.data();
-  StringRef One = "1";
+  llvm::StringRef One = "1";
 
   // Insert `{` before `Init`:
   FixIts.push_back(FixItHint::CreateInsertion(Init->getBeginLoc(), "{"));
@@ -2247,7 +2247,7 @@ FixVarInitializerWithSpan(const Expr *Init, ASTContext &Ctx,
     // simpler for the case where `Init` is `new T`.
     if (const Expr *Ext = CxxNew->getArraySize().value_or(nullptr)) {
       if (!Ext->HasSideEffects(Ctx)) {
-        std::optional<StringRef> ExtentString = getExprText(Ext, SM, LangOpts);
+        std::optional<llvm::StringRef> ExtentString = getExprText(Ext, SM, LangOpts);
         if (!ExtentString)
           return std::nullopt;
         ExtentText = *ExtentString;
@@ -2272,7 +2272,7 @@ FixVarInitializerWithSpan(const Expr *Init, ASTContext &Ctx,
     // and explicit casting, etc. etc.
   }
 
-  SmallString<32> StrBuffer{};
+  llvm::SmallString<32> StrBuffer{};
   std::optional<SourceLocation> LocPassInit = getPastLoc(Init, SM, LangOpts);
 
   if (!LocPassInit)
@@ -2335,7 +2335,7 @@ createSpanTypeForVarDecl(const VarDecl *VD, const ASTContext &Ctx) {
 //    the non-empty fix-it list, if fix-its are successfuly generated; empty
 //    list otherwise.
 static FixItList fixLocalVarDeclWithSpan(const VarDecl *D, ASTContext &Ctx,
-                                         const StringRef UserFillPlaceHolder,
+                                         const llvm::StringRef UserFillPlaceHolder,
                                          UnsafeBufferUsageHandler &Handler) {
   if (hasUnsupportedSpecifiers(D, Ctx.getSourceManager()))
     return {};
@@ -2605,7 +2605,7 @@ static FixItList fixParamWithSpan(const ParmVarDecl *PVD, const ASTContext &Ctx,
     return {};
   }
 
-  std::optional<StringRef> PVDNameText = PVD->getIdentifier()->getName();
+  std::optional<llvm::StringRef> PVDNameText = PVD->getIdentifier()->getName();
 
   if (!PVDNameText) {
     DEBUG_NOTE_DECL_FAIL(PVD, " : invalid identifier name");
@@ -2707,7 +2707,7 @@ static FixItList fixVarDeclWithArray(const VarDecl *D, const ASTContext &Ctx,
       return {};
     }
 
-    std::optional<StringRef> IdentText =
+    std::optional<llvm::StringRef> IdentText =
         getVarDeclIdentifierText(D, Ctx.getSourceManager(), Ctx.getLangOpts());
 
     if (!IdentText) {
@@ -2715,7 +2715,7 @@ static FixItList fixVarDeclWithArray(const VarDecl *D, const ASTContext &Ctx,
       return {};
     }
 
-    SmallString<32> Replacement;
+    llvm::SmallString<32> Replacement;
     raw_svector_ostream OS(Replacement);
     OS << "std::array<" << ElemTypeTxt << ", " << ArraySizeTxt << "> "
        << IdentText->str();
@@ -2835,7 +2835,7 @@ static void eraseVarsForUnfixableGroupMates(
     std::map<const VarDecl *, FixItList> &FixItsForVariable,
     const VariableGroupsManager &VarGrpMgr) {
   // Variables will be removed from `FixItsForVariable`:
-  SmallVector<const VarDecl *, 8> ToErase;
+  llvm::SmallVector<const VarDecl *, 8> ToErase;
 
   for (const auto &[VD, Ignore] : FixItsForVariable) {
     VarGrpRef Grp = VarGrpMgr.getGroupOfVar(VD);

@@ -72,7 +72,7 @@ AST_MATCHER(TypeLoc, isBuiltinType) {
 
 namespace tidy::google::runtime {
 
-IntegerTypesCheck::IntegerTypesCheck(StringRef Name, ClangTidyContext *Context)
+IntegerTypesCheck::IntegerTypesCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       UnsignedTypePrefix(Options.get("UnsignedTypePrefix", "uint")),
       SignedTypePrefix(Options.get("SignedTypePrefix", "int")),
@@ -158,14 +158,14 @@ void IntegerTypesCheck::check(const MatchFinder::MatchResult &Result) {
 
   // We allow "unsigned short port" as that's reasonably common and required by
   // the sockets API.
-  const StringRef Port = "unsigned short port";
+  const llvm::StringRef Port = "unsigned short port";
   const char *Data = Result.SourceManager->getCharacterData(Loc);
   if (!std::strncmp(Data, Port.data(), Port.size()) &&
       !isAsciiIdentifierContinue(Data[Port.size()]))
     return;
 
   std::string Replacement =
-      ((IsSigned ? SignedTypePrefix : UnsignedTypePrefix) + Twine(Width) +
+      ((IsSigned ? SignedTypePrefix : UnsignedTypePrefix) + llvm::Twine(Width) +
        TypeSuffix)
           .str();
 

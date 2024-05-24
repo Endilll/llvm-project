@@ -141,7 +141,7 @@ public:
   }
 
   /// \returns formal parameters for direct calls (including virtual calls)
-  ArrayRef<ParmVarDecl *> parameters() const {
+  llvm::ArrayRef<ParmVarDecl *> parameters() const {
     if (!D)
       return std::nullopt;
 
@@ -156,7 +156,7 @@ public:
     }
   }
 
-  using param_const_iterator = ArrayRef<ParmVarDecl *>::const_iterator;
+  using param_const_iterator = llvm::ArrayRef<ParmVarDecl *>::const_iterator;
   param_const_iterator param_begin() const { return parameters().begin(); }
   param_const_iterator param_end() const { return parameters().end(); }
   size_t param_size() const { return parameters().size(); }

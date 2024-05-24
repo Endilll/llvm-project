@@ -21,14 +21,14 @@ namespace clang::tidy::performance {
 /// http://clang.llvm.org/extra/clang-tidy/checks/performance/enum-size.html
 class EnumSizeCheck : public ClangTidyCheck {
 public:
-  EnumSizeCheck(StringRef Name, ClangTidyContext *Context);
+  EnumSizeCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override;
 
 private:
-  const std::vector<StringRef> EnumIgnoreList;
+  const std::vector<llvm::StringRef> EnumIgnoreList;
 };
 
 } // namespace clang::tidy::performance

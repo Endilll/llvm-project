@@ -21,7 +21,7 @@
 #include <algorithm>
 using namespace clang;
 
-TextDiagnosticPrinter::TextDiagnosticPrinter(raw_ostream &os,
+TextDiagnosticPrinter::TextDiagnosticPrinter(llvm::raw_ostream &os,
                                              DiagnosticOptions *diags,
                                              bool _OwnsOutputStream)
   : OS(os), DiagOpts(diags),
@@ -43,12 +43,12 @@ void TextDiagnosticPrinter::EndSourceFile() {
   TextDiag.reset();
 }
 
-/// Print any diagnostic option information to a raw_ostream.
+/// Print any diagnostic option information to a llvm::raw_ostream.
 ///
 /// This implements all of the logic for adding diagnostic options to a message
 /// (via OS). Each relevant option is comma separated and all are enclosed in
 /// the standard bracketing: " [...]".
-static void printDiagnosticOptions(raw_ostream &OS,
+static void printDiagnosticOptions(llvm::raw_ostream &OS,
                                    DiagnosticsEngine::Level Level,
                                    const Diagnostic &Info,
                                    const DiagnosticOptions &DiagOpts) {
@@ -76,11 +76,11 @@ static void printDiagnosticOptions(raw_ostream &OS,
       Started = true;
     }
 
-    StringRef Opt = DiagnosticIDs::getWarningOptionForDiag(Info.getID());
+    llvm::StringRef Opt = DiagnosticIDs::getWarningOptionForDiag(Info.getID());
     if (!Opt.empty()) {
       OS << (Started ? "," : " [")
          << (Level == DiagnosticsEngine::Remark ? "-R" : "-W") << Opt;
-      StringRef OptValue = Info.getDiags()->getFlagValue();
+      llvm::StringRef OptValue = Info.getDiags()->getFlagValue();
       if (!OptValue.empty())
         OS << "=" << OptValue;
       Started = true;
@@ -113,7 +113,7 @@ void TextDiagnosticPrinter::HandleDiagnostic(DiagnosticsEngine::Level Level,
 
   // Render the diagnostic message into a temporary buffer eagerly. We'll use
   // this later as we print out the diagnostic to the terminal.
-  SmallString<100> OutStr;
+  llvm::SmallString<100> OutStr;
   Info.FormatDiagnostic(OutStr);
 
   llvm::raw_svector_ostream DiagMessageStream(OutStr);

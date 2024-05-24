@@ -149,7 +149,7 @@ def ExceptionSpecInfo : PropertyType<"FunctionProtoType::ExceptionSpecInfo"> {
   let BufferElementTypes = [ QualType ];
 }
 
-/// Arrays.  The corresponding C++ type is ArrayRef of the corresponding
+/// Arrays.  The corresponding C++ type is llvm::ArrayRef of the corresponding
 /// C++ type of the element.
 class Array<PropertyType element> : PropertyType {
   PropertyType Element = element;
@@ -328,7 +328,7 @@ let Class = PropertyTypeCase<APValue, "ComplexFloat"> in {
 }
 let Class = PropertyTypeCase<APValue, "Vector"> in {
   def : ReadHelper<[{
-    SmallVector<APValue, 4> buffer;
+    llvm::SmallVector<APValue, 4> buffer;
     unsigned len = node.getVectorLength();
     for (unsigned i = 0; i < len; ++i)
       buffer.push_back(node.getVectorElt(i));
@@ -348,7 +348,7 @@ let Class = PropertyTypeCase<APValue, "Vector"> in {
 }
 let Class = PropertyTypeCase<APValue, "Array"> in {
   def : ReadHelper<[{
-    SmallVector<APValue, 4> buffer{};
+    llvm::SmallVector<APValue, 4> buffer{};
     unsigned initLength = node.getArrayInitializedElts();
     for (unsigned i = 0; i < initLength; ++i)
       buffer.push_back(node.getArrayInitializedElt(i));
@@ -377,11 +377,11 @@ let Class = PropertyTypeCase<APValue, "Array"> in {
 }
 let Class = PropertyTypeCase<APValue, "Struct"> in {
   def : ReadHelper<[{
-    SmallVector<APValue, 4> structBases;
+    llvm::SmallVector<APValue, 4> structBases;
     unsigned numBases = node.getStructNumBases();
     for (unsigned i = 0; i < numBases; ++i)
       structBases.push_back(node.getStructBase(i));
-    SmallVector<APValue, 4> structFields;
+    llvm::SmallVector<APValue, 4> structFields;
     unsigned numFields = node.getStructNumFields();
     for (unsigned i = 0; i < numFields; ++i)
       structFields.push_back(node.getStructField(i));

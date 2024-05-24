@@ -21,7 +21,7 @@ namespace clang::tidy::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/objc/dealloc-in-category.html
 class DeallocInCategoryCheck final : public ClangTidyCheck {
 public:
-  DeallocInCategoryCheck(StringRef Name, ClangTidyContext *Context)
+  DeallocInCategoryCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC;

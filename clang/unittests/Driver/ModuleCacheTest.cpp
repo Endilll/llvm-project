@@ -18,9 +18,9 @@ using namespace clang::driver;
 namespace {
 
 TEST(ModuleCacheTest, GetTargetAndMode) {
-  SmallString<128> Buf;
+  llvm::SmallString<128> Buf;
   Driver::getDefaultModuleCachePath(Buf);
-  StringRef Path = Buf;
+  llvm::StringRef Path = Buf;
   EXPECT_TRUE(Path.find("clang") != Path.npos);
   EXPECT_TRUE(Path.ends_with("ModuleCache"));
 }

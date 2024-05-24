@@ -18,8 +18,8 @@ namespace {
 
 class DeclNameOption final : public OptionalRefactoringOption<std::string> {
 public:
-  StringRef getName() const override { return "name"; }
-  StringRef getDescription() const override {
+  llvm::StringRef getName() const override { return "name"; }
+  llvm::StringRef getDescription() const override {
     return "Name of the extracted declaration";
   }
 };
@@ -28,9 +28,9 @@ public:
 // rules.
 class ExtractRefactoring final : public RefactoringAction {
 public:
-  StringRef getCommand() const override { return "extract"; }
+  llvm::StringRef getCommand() const override { return "extract"; }
 
-  StringRef getDescription() const override {
+  llvm::StringRef getDescription() const override {
     return "(WIP action; use with caution!) Extracts code into a new function";
   }
 
@@ -47,24 +47,24 @@ public:
 
 class OldQualifiedNameOption : public RequiredRefactoringOption<std::string> {
 public:
-  StringRef getName() const override { return "old-qualified-name"; }
-  StringRef getDescription() const override {
+  llvm::StringRef getName() const override { return "old-qualified-name"; }
+  llvm::StringRef getDescription() const override {
     return "The old qualified name to be renamed";
   }
 };
 
 class NewQualifiedNameOption : public RequiredRefactoringOption<std::string> {
 public:
-  StringRef getName() const override { return "new-qualified-name"; }
-  StringRef getDescription() const override {
+  llvm::StringRef getName() const override { return "new-qualified-name"; }
+  llvm::StringRef getDescription() const override {
     return "The new qualified name to change the symbol to";
   }
 };
 
 class NewNameOption : public RequiredRefactoringOption<std::string> {
 public:
-  StringRef getName() const override { return "new-name"; }
-  StringRef getDescription() const override {
+  llvm::StringRef getName() const override { return "new-name"; }
+  llvm::StringRef getDescription() const override {
     return "The new name to change the symbol to";
   }
 };
@@ -73,9 +73,9 @@ public:
 // rules.
 class LocalRename final : public RefactoringAction {
 public:
-  StringRef getCommand() const override { return "local-rename"; }
+  llvm::StringRef getCommand() const override { return "local-rename"; }
 
-  StringRef getDescription() const override {
+  llvm::StringRef getDescription() const override {
     return "Finds and renames symbols in code with no indexer support";
   }
 

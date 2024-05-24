@@ -423,7 +423,7 @@ bool SemaX86::CheckBuiltinGatherScatterScale(unsigned BuiltinID,
 enum { TileRegLow = 0, TileRegHigh = 7 };
 
 bool SemaX86::CheckBuiltinTileArgumentsRange(CallExpr *TheCall,
-                                             ArrayRef<int> ArgNums) {
+                                             llvm::ArrayRef<int> ArgNums) {
   for (int ArgNum : ArgNums) {
     if (SemaRef.BuiltinConstantArgRange(TheCall, ArgNum, TileRegLow,
                                         TileRegHigh))
@@ -433,7 +433,7 @@ bool SemaX86::CheckBuiltinTileArgumentsRange(CallExpr *TheCall,
 }
 
 bool SemaX86::CheckBuiltinTileDuplicate(CallExpr *TheCall,
-                                        ArrayRef<int> ArgNums) {
+                                        llvm::ArrayRef<int> ArgNums) {
   // Because the max number of tile register is TileRegHigh + 1, so here we use
   // each bit to represent the usage of them in bitset.
   std::bitset<TileRegHigh + 1> ArgValues;
@@ -458,7 +458,7 @@ bool SemaX86::CheckBuiltinTileDuplicate(CallExpr *TheCall,
 }
 
 bool SemaX86::CheckBuiltinTileRangeAndDuplicate(CallExpr *TheCall,
-                                                ArrayRef<int> ArgNums) {
+                                                llvm::ArrayRef<int> ArgNums) {
   return CheckBuiltinTileArgumentsRange(TheCall, ArgNums) ||
          CheckBuiltinTileDuplicate(TheCall, ArgNums);
 }

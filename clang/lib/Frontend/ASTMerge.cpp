@@ -13,11 +13,12 @@
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendActions.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 
 using namespace clang;
 
 std::unique_ptr<ASTConsumer>
-ASTMergeAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+ASTMergeAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   return AdaptedAction->CreateASTConsumer(CI, InFile);
 }
 
@@ -36,12 +37,12 @@ void ASTMergeAction::ExecuteAction() {
                                              CI.getASTContext().getLangOpts());
   CI.getDiagnostics().SetArgToStringFn(&FormatASTNodeDiagnosticArgument,
                                        &CI.getASTContext());
-  IntrusiveRefCntPtr<DiagnosticIDs>
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs>
       DiagIDs(CI.getDiagnostics().getDiagnosticIDs());
   auto SharedState = std::make_shared<ASTImporterSharedState>(
       *CI.getASTContext().getTranslationUnitDecl());
   for (unsigned I = 0, N = ASTFiles.size(); I != N; ++I) {
-    IntrusiveRefCntPtr<DiagnosticsEngine>
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine>
         Diags(new DiagnosticsEngine(DiagIDs, &CI.getDiagnosticOpts(),
                                     new ForwardingDiagnosticConsumer(
                                           *CI.getDiagnostics().getClient()),
@@ -85,7 +86,7 @@ void ASTMergeAction::EndSourceFileAction() {
 }
 
 ASTMergeAction::ASTMergeAction(std::unique_ptr<FrontendAction> adaptedAction,
-                               ArrayRef<std::string> ASTFiles)
+                               llvm::ArrayRef<std::string> ASTFiles)
 : AdaptedAction(std::move(adaptedAction)), ASTFiles(ASTFiles.begin(), ASTFiles.end()) {
   assert(AdaptedAction && "ASTMergeAction needs an action to adapt");
 }

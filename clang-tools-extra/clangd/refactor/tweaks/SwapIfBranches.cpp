@@ -33,7 +33,7 @@ public:
   const char *id() const final;
 
   bool prepare(const Selection &Inputs) override;
-  Expected<Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Effect> apply(const Selection &Inputs) override;
   std::string title() const override { return "Swap if branches"; }
   llvm::StringLiteral kind() const override {
     return CodeAction::REFACTOR_KIND;
@@ -60,7 +60,7 @@ bool SwapIfBranches::prepare(const Selection &Inputs) {
          isa_and_nonnull<CompoundStmt>(If->getElse());
 }
 
-Expected<Tweak::Effect> SwapIfBranches::apply(const Selection &Inputs) {
+llvm::Expected<Tweak::Effect> SwapIfBranches::apply(const Selection &Inputs) {
   auto &Ctx = Inputs.AST->getASTContext();
   auto &SrcMgr = Inputs.AST->getSourceManager();
 

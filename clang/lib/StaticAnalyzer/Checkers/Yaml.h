@@ -27,7 +27,7 @@ namespace ento {
 /// Emit diagnostic error in case of any failure.
 template <class T, class Checker>
 std::optional<T> getConfiguration(CheckerManager &Mgr, Checker *Chk,
-                                  StringRef Option, StringRef ConfigFile) {
+                                  llvm::StringRef Option, llvm::StringRef ConfigFile) {
   if (ConfigFile.trim().empty())
     return std::nullopt;
 

@@ -28,11 +28,11 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override;
 
 private:
-  void separateBlocks(SmallVectorImpl<AnnotatedLine *> &Lines,
+  void separateBlocks(llvm::SmallVectorImpl<AnnotatedLine *> &Lines,
                       tooling::Replacements &Result, FormatTokenLexer &Tokens);
 };
 } // namespace format

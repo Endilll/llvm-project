@@ -21,11 +21,11 @@
 using namespace clang;
 using namespace ento;
 
-bool cocoa::isRefType(QualType RetTy, StringRef Prefix,
-                      StringRef Name) {
+bool cocoa::isRefType(QualType RetTy, llvm::StringRef Prefix,
+                      llvm::StringRef Name) {
   // Recursively walk the typedef stack, allowing typedefs of reference types.
   while (const TypedefType *TD = RetTy->getAs<TypedefType>()) {
-    StringRef TDName = TD->getDecl()->getIdentifier()->getName();
+    llvm::StringRef TDName = TD->getDecl()->getIdentifier()->getName();
     if (TDName.starts_with(Prefix) && TDName.ends_with("Ref"))
       return true;
     // XPC unfortunately uses CF-style function names, but aren't CF types.
@@ -99,11 +99,11 @@ bool coreFoundation::followsCreateRule(const FunctionDecl *fn) {
 
   const IdentifierInfo *ident = fn->getIdentifier();
   if (!ident) return false;
-  StringRef functionName = ident->getName();
+  llvm::StringRef functionName = ident->getName();
 
-  StringRef::iterator it = functionName.begin();
-  StringRef::iterator start = it;
-  StringRef::iterator endI = functionName.end();
+  llvm::StringRef::iterator it = functionName.begin();
+  llvm::StringRef::iterator start = it;
+  llvm::StringRef::iterator endI = functionName.end();
 
   while (true) {
     // Scan for the start of 'create' or 'copy'.
@@ -126,7 +126,7 @@ bool coreFoundation::followsCreateRule(const FunctionDecl *fn) {
 
     // Scan for *lowercase* 'reate' or 'opy', followed by no lowercase
     // character.
-    StringRef suffix = functionName.substr(it - start);
+    llvm::StringRef suffix = functionName.substr(it - start);
     if (suffix.starts_with("reate")) {
       it += 5;
     } else if (suffix.starts_with("opy")) {

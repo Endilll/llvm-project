@@ -45,8 +45,8 @@ CodeGenVTables::EmitVTTDefinition(llvm::GlobalVariable *VTT,
   llvm::ArrayType *ArrayType = llvm::ArrayType::get(
       CGM.GlobalsInt8PtrTy, Builder.getVTTComponents().size());
 
-  SmallVector<llvm::GlobalVariable *, 8> VTables;
-  SmallVector<VTableAddressPointsMapTy, 8> VTableAddressPoints;
+  llvm::SmallVector<llvm::GlobalVariable *, 8> VTables;
+  llvm::SmallVector<VTableAddressPointsMapTy, 8> VTableAddressPoints;
   for (const VTTVTable *i = Builder.getVTTVTables().begin(),
                        *e = Builder.getVTTVTables().end(); i != e; ++i) {
     VTableAddressPoints.push_back(VTableAddressPointsMapTy());
@@ -54,7 +54,7 @@ CodeGenVTables::EmitVTTDefinition(llvm::GlobalVariable *VTT,
                                          VTableAddressPoints.back()));
   }
 
-  SmallVector<llvm::Constant *, 8> VTTComponents;
+  llvm::SmallVector<llvm::Constant *, 8> VTTComponents;
   for (const VTTComponent *i = Builder.getVTTComponents().begin(),
                           *e = Builder.getVTTComponents().end(); i != e; ++i) {
     const VTTVTable &VTTVT = Builder.getVTTVTables()[i->VTableIndex];
@@ -112,11 +112,11 @@ CodeGenVTables::EmitVTTDefinition(llvm::GlobalVariable *VTT,
 llvm::GlobalVariable *CodeGenVTables::GetAddrOfVTT(const CXXRecordDecl *RD) {
   assert(RD->getNumVBases() && "Only classes with virtual bases need a VTT");
 
-  SmallString<256> OutName;
+  llvm::SmallString<256> OutName;
   llvm::raw_svector_ostream Out(OutName);
   cast<ItaniumMangleContext>(CGM.getCXXABI().getMangleContext())
       .mangleCXXVTT(RD, Out);
-  StringRef Name = OutName.str();
+  llvm::StringRef Name = OutName.str();
 
   // This will also defer the definition of the VTT.
   (void) CGM.getCXXABI().getAddrOfVTable(RD, CharUnits());

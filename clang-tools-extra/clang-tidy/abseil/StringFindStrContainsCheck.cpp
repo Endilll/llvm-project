@@ -38,8 +38,8 @@ static const char DefaultStringLikeClasses[] = "::std::basic_string;"
 static const char DefaultAbseilStringsMatchHeader[] = "absl/strings/match.h";
 
 static transformer::RewriteRuleWith<std::string>
-makeRewriteRule(ArrayRef<StringRef> StringLikeClassNames,
-                StringRef AbseilStringsMatchHeader) {
+makeRewriteRule(llvm::ArrayRef<llvm::StringRef> StringLikeClassNames,
+                llvm::StringRef AbseilStringsMatchHeader) {
   auto StringLikeClass = cxxRecordDecl(hasAnyName(StringLikeClassNames));
   auto StringType =
       hasUnqualifiedDesugaredType(recordType(hasDeclaration(StringLikeClass)));
@@ -81,7 +81,7 @@ makeRewriteRule(ArrayRef<StringRef> StringLikeClassNames,
 }
 
 StringFindStrContainsCheck::StringFindStrContainsCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : TransformerClangTidyCheck(Name, Context),
       StringLikeClassesOption(utils::options::parseStringList(
           Options.get("StringLikeClasses", DefaultStringLikeClasses))),

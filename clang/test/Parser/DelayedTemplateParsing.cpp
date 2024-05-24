@@ -92,7 +92,7 @@ template <typename = void> struct ArrayRef {
   constexpr ArrayRef() {}
 };
 template <typename = void> void CreateConstInBoundsGEP2_32() {
-  ArrayRef<> IdxList;
+  llvm::ArrayRef<> IdxList;
 }
 void LLVMBuildStructGEP() { CreateConstInBoundsGEP2_32(); }
 

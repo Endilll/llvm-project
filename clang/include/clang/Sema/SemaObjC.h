@@ -81,31 +81,31 @@ public:
   /// Build a an Objective-C protocol-qualified 'id' type where no
   /// base type was specified.
   TypeResult actOnObjCProtocolQualifierType(
-      SourceLocation lAngleLoc, ArrayRef<Decl *> protocols,
-      ArrayRef<SourceLocation> protocolLocs, SourceLocation rAngleLoc);
+      SourceLocation lAngleLoc, llvm::ArrayRef<Decl *> protocols,
+      llvm::ArrayRef<SourceLocation> protocolLocs, SourceLocation rAngleLoc);
 
   /// Build a specialized and/or protocol-qualified Objective-C type.
   TypeResult actOnObjCTypeArgsAndProtocolQualifiers(
       Scope *S, SourceLocation Loc, ParsedType BaseType,
-      SourceLocation TypeArgsLAngleLoc, ArrayRef<ParsedType> TypeArgs,
+      SourceLocation TypeArgsLAngleLoc, llvm::ArrayRef<ParsedType> TypeArgs,
       SourceLocation TypeArgsRAngleLoc, SourceLocation ProtocolLAngleLoc,
-      ArrayRef<Decl *> Protocols, ArrayRef<SourceLocation> ProtocolLocs,
+      llvm::ArrayRef<Decl *> Protocols, llvm::ArrayRef<SourceLocation> ProtocolLocs,
       SourceLocation ProtocolRAngleLoc);
 
   /// Build an Objective-C type parameter type.
   QualType BuildObjCTypeParamType(const ObjCTypeParamDecl *Decl,
                                   SourceLocation ProtocolLAngleLoc,
-                                  ArrayRef<ObjCProtocolDecl *> Protocols,
-                                  ArrayRef<SourceLocation> ProtocolLocs,
+                                  llvm::ArrayRef<ObjCProtocolDecl *> Protocols,
+                                  llvm::ArrayRef<SourceLocation> ProtocolLocs,
                                   SourceLocation ProtocolRAngleLoc,
                                   bool FailOnError = false);
 
   /// Build an Objective-C object pointer type.
   QualType BuildObjCObjectType(
       QualType BaseType, SourceLocation Loc, SourceLocation TypeArgsLAngleLoc,
-      ArrayRef<TypeSourceInfo *> TypeArgs, SourceLocation TypeArgsRAngleLoc,
-      SourceLocation ProtocolLAngleLoc, ArrayRef<ObjCProtocolDecl *> Protocols,
-      ArrayRef<SourceLocation> ProtocolLocs, SourceLocation ProtocolRAngleLoc,
+      llvm::ArrayRef<TypeSourceInfo *> TypeArgs, SourceLocation TypeArgsRAngleLoc,
+      SourceLocation ProtocolLAngleLoc, llvm::ArrayRef<ObjCProtocolDecl *> Protocols,
+      llvm::ArrayRef<SourceLocation> ProtocolLocs, SourceLocation ProtocolRAngleLoc,
       bool FailOnError, bool Rebuilding);
 
   /// The parser has parsed the context-sensitive type 'instancetype'
@@ -120,7 +120,7 @@ public:
 
   bool CheckObjCString(Expr *Arg);
   bool CheckObjCMethodCall(ObjCMethodDecl *Method, SourceLocation loc,
-                           ArrayRef<const Expr *> Args);
+                           llvm::ArrayRef<const Expr *> Args);
   /// Check whether receiver is mutable ObjC container which
   /// attempts to add itself into the container
   void CheckObjCCircularContainer(ObjCMessageExpr *Message);
@@ -232,7 +232,7 @@ public:
                                 SourceLocation colonLoc, ParsedType typeBound);
 
   ObjCTypeParamList *actOnObjCTypeParamList(Scope *S, SourceLocation lAngleLoc,
-                                            ArrayRef<Decl *> typeParams,
+                                            llvm::ArrayRef<Decl *> typeParams,
                                             SourceLocation rAngleLoc);
   void popObjCTypeParamList(Scope *S, ObjCTypeParamList *typeParamList);
 
@@ -240,7 +240,7 @@ public:
       Scope *S, SourceLocation AtInterfaceLoc, IdentifierInfo *ClassName,
       SourceLocation ClassLoc, ObjCTypeParamList *typeParamList,
       IdentifierInfo *SuperName, SourceLocation SuperLoc,
-      ArrayRef<ParsedType> SuperTypeArgs, SourceRange SuperTypeArgsRange,
+      llvm::ArrayRef<ParsedType> SuperTypeArgs, SourceRange SuperTypeArgsRange,
       Decl *const *ProtoRefs, unsigned NumProtoRefs,
       const SourceLocation *ProtoLocs, SourceLocation EndProtoLoc,
       const ParsedAttributesView &AttrList, SkipBodyInfo *SkipBody);
@@ -249,10 +249,10 @@ public:
       Scope *S, SourceLocation AtInterfaceLoc, ObjCInterfaceDecl *IDecl,
       IdentifierInfo *ClassName, SourceLocation ClassLoc,
       IdentifierInfo *SuperName, SourceLocation SuperLoc,
-      ArrayRef<ParsedType> SuperTypeArgs, SourceRange SuperTypeArgsRange);
+      llvm::ArrayRef<ParsedType> SuperTypeArgs, SourceRange SuperTypeArgsRange);
 
-  void ActOnTypedefedProtocols(SmallVectorImpl<Decl *> &ProtocolRefs,
-                               SmallVectorImpl<SourceLocation> &ProtocolLocs,
+  void ActOnTypedefedProtocols(llvm::SmallVectorImpl<Decl *> &ProtocolRefs,
+                               llvm::SmallVectorImpl<SourceLocation> &ProtocolLocs,
                                IdentifierInfo *SuperName,
                                SourceLocation SuperLoc);
 
@@ -294,16 +294,16 @@ public:
   using DeclGroupPtrTy = OpaquePtr<DeclGroupRef>;
 
   DeclGroupPtrTy ActOnFinishObjCImplementation(Decl *ObjCImpDecl,
-                                               ArrayRef<Decl *> Decls);
+                                               llvm::ArrayRef<Decl *> Decls);
 
   DeclGroupPtrTy
   ActOnForwardProtocolDeclaration(SourceLocation AtProtoclLoc,
-                                  ArrayRef<IdentifierLocPair> IdentList,
+                                  llvm::ArrayRef<IdentifierLocPair> IdentList,
                                   const ParsedAttributesView &attrList);
 
   void FindProtocolDeclaration(bool WarnOnDeclarations, bool ForObjCContainer,
-                               ArrayRef<IdentifierLocPair> ProtocolId,
-                               SmallVectorImpl<Decl *> &Protocols);
+                               llvm::ArrayRef<IdentifierLocPair> ProtocolId,
+                               llvm::SmallVectorImpl<Decl *> &Protocols);
 
   void DiagnoseTypeArgsAndProtocols(IdentifierInfo *ProtocolId,
                                     SourceLocation ProtocolLoc,
@@ -316,19 +316,19 @@ public:
   /// arguments, as appropriate.
   void actOnObjCTypeArgsOrProtocolQualifiers(
       Scope *S, ParsedType baseType, SourceLocation lAngleLoc,
-      ArrayRef<IdentifierInfo *> identifiers,
-      ArrayRef<SourceLocation> identifierLocs, SourceLocation rAngleLoc,
-      SourceLocation &typeArgsLAngleLoc, SmallVectorImpl<ParsedType> &typeArgs,
+      llvm::ArrayRef<IdentifierInfo *> identifiers,
+      llvm::ArrayRef<SourceLocation> identifierLocs, SourceLocation rAngleLoc,
+      SourceLocation &typeArgsLAngleLoc, llvm::SmallVectorImpl<ParsedType> &typeArgs,
       SourceLocation &typeArgsRAngleLoc, SourceLocation &protocolLAngleLoc,
-      SmallVectorImpl<Decl *> &protocols, SourceLocation &protocolRAngleLoc,
+      llvm::SmallVectorImpl<Decl *> &protocols, SourceLocation &protocolRAngleLoc,
       bool warnOnIncompleteProtocols);
 
   void DiagnoseClassExtensionDupMethods(ObjCCategoryDecl *CAT,
                                         ObjCInterfaceDecl *ID);
 
   Decl *ActOnAtEnd(Scope *S, SourceRange AtEnd,
-                   ArrayRef<Decl *> allMethods = std::nullopt,
-                   ArrayRef<DeclGroupPtrTy> allTUVars = std::nullopt);
+                   llvm::ArrayRef<Decl *> allMethods = std::nullopt,
+                   llvm::ArrayRef<DeclGroupPtrTy> allTUVars = std::nullopt);
 
   struct ObjCArgInfo {
     IdentifierInfo *Name;
@@ -347,7 +347,7 @@ public:
       SourceLocation BeginLoc, // location of the + or -.
       SourceLocation EndLoc,   // location of the ; or {.
       tok::TokenKind MethodType, ObjCDeclSpec &ReturnQT, ParsedType ReturnType,
-      ArrayRef<SourceLocation> SelectorLocs, Selector Sel,
+      llvm::ArrayRef<SourceLocation> SelectorLocs, Selector Sel,
       // optional arguments. The number of types/arguments is obtained
       // from the Sel.getNumArgs().
       ObjCArgInfo *ArgInfo, DeclaratorChunk::ParamInfo *CParamInfo,
@@ -425,7 +425,7 @@ public:
 
   DeclGroupPtrTy ActOnForwardClassDeclaration(
       SourceLocation Loc, IdentifierInfo **IdentList, SourceLocation *IdentLocs,
-      ArrayRef<ObjCTypeParamList *> TypeParamLists, unsigned NumElts);
+      llvm::ArrayRef<ObjCTypeParamList *> TypeParamLists, unsigned NumElts);
 
   /// MatchTwoMethodDeclarations - Checks if two methods' type match and returns
   /// true, or false, accordingly.
@@ -446,17 +446,17 @@ public:
   /// returns true.
   bool
   CollectMultipleMethodsInGlobalPool(Selector Sel,
-                                     SmallVectorImpl<ObjCMethodDecl *> &Methods,
+                                     llvm::SmallVectorImpl<ObjCMethodDecl *> &Methods,
                                      bool InstanceFirst, bool CheckTheOther,
                                      const ObjCObjectType *TypeBound = nullptr);
 
   bool
   AreMultipleMethodsInGlobalPool(Selector Sel, ObjCMethodDecl *BestMethod,
                                  SourceRange R, bool receiverIdOrClass,
-                                 SmallVectorImpl<ObjCMethodDecl *> &Methods);
+                                 llvm::SmallVectorImpl<ObjCMethodDecl *> &Methods);
 
   void
-  DiagnoseMultipleMethodInGlobalPool(SmallVectorImpl<ObjCMethodDecl *> &Methods,
+  DiagnoseMultipleMethodInGlobalPool(llvm::SmallVectorImpl<ObjCMethodDecl *> &Methods,
                                      Selector Sel, SourceRange R,
                                      bool receiverIdOrClass);
 
@@ -475,7 +475,7 @@ public:
 
   void ActOnDefs(Scope *S, Decl *TagD, SourceLocation DeclStart,
                  const IdentifierInfo *ClassName,
-                 SmallVectorImpl<Decl *> &Decls);
+                 llvm::SmallVectorImpl<Decl *> &Decls);
 
   VarDecl *BuildObjCExceptionDecl(TypeSourceInfo *TInfo, QualType ExceptionType,
                                   SourceLocation StartLoc, SourceLocation IdLoc,
@@ -488,7 +488,7 @@ public:
   /// initialization.
   void
   CollectIvarsToConstructOrDestruct(ObjCInterfaceDecl *OI,
-                                    SmallVectorImpl<ObjCIvarDecl *> &Ivars);
+                                    llvm::SmallVectorImpl<ObjCIvarDecl *> &Ivars);
 
   void DiagnoseUseOfUnimplementedSelectors();
 
@@ -636,7 +636,7 @@ public:
 
   // ParseObjCStringLiteral - Parse Objective-C string literals.
   ExprResult ParseObjCStringLiteral(SourceLocation *AtLocs,
-                                    ArrayRef<Expr *> Strings);
+                                    llvm::ArrayRef<Expr *> Strings);
 
   ExprResult BuildObjCStringLiteral(SourceLocation AtLoc, StringLiteral *S);
 
@@ -662,7 +662,7 @@ public:
 
   ExprResult
   BuildObjCDictionaryLiteral(SourceRange SR,
-                             MutableArrayRef<ObjCDictionaryElement> Elements);
+                             llvm::MutableArrayRef<ObjCDictionaryElement> Elements);
 
   ExprResult BuildObjCEncodeExpression(SourceLocation AtLoc,
                                        TypeSourceInfo *EncodedTypeInfo,
@@ -709,14 +709,14 @@ public:
 
   ExprResult ActOnSuperMessage(Scope *S, SourceLocation SuperLoc, Selector Sel,
                                SourceLocation LBracLoc,
-                               ArrayRef<SourceLocation> SelectorLocs,
+                               llvm::ArrayRef<SourceLocation> SelectorLocs,
                                SourceLocation RBracLoc, MultiExprArg Args);
 
   ExprResult BuildClassMessage(TypeSourceInfo *ReceiverTypeInfo,
                                QualType ReceiverType, SourceLocation SuperLoc,
                                Selector Sel, ObjCMethodDecl *Method,
                                SourceLocation LBracLoc,
-                               ArrayRef<SourceLocation> SelectorLocs,
+                               llvm::ArrayRef<SourceLocation> SelectorLocs,
                                SourceLocation RBracLoc, MultiExprArg Args,
                                bool isImplicit = false);
 
@@ -727,14 +727,14 @@ public:
 
   ExprResult ActOnClassMessage(Scope *S, ParsedType Receiver, Selector Sel,
                                SourceLocation LBracLoc,
-                               ArrayRef<SourceLocation> SelectorLocs,
+                               llvm::ArrayRef<SourceLocation> SelectorLocs,
                                SourceLocation RBracLoc, MultiExprArg Args);
 
   ExprResult BuildInstanceMessage(Expr *Receiver, QualType ReceiverType,
                                   SourceLocation SuperLoc, Selector Sel,
                                   ObjCMethodDecl *Method,
                                   SourceLocation LBracLoc,
-                                  ArrayRef<SourceLocation> SelectorLocs,
+                                  llvm::ArrayRef<SourceLocation> SelectorLocs,
                                   SourceLocation RBracLoc, MultiExprArg Args,
                                   bool isImplicit = false);
 
@@ -745,7 +745,7 @@ public:
 
   ExprResult ActOnInstanceMessage(Scope *S, Expr *Receiver, Selector Sel,
                                   SourceLocation LBracLoc,
-                                  ArrayRef<SourceLocation> SelectorLocs,
+                                  llvm::ArrayRef<SourceLocation> SelectorLocs,
                                   SourceLocation RBracLoc, MultiExprArg Args);
 
   ExprResult BuildObjCBridgedCast(SourceLocation LParenLoc,
@@ -788,7 +788,7 @@ public:
   ObjCMethodDecl *LookupMethodInObjectType(Selector Sel, QualType Ty,
                                            bool IsInstance);
 
-  bool isKnownName(StringRef name);
+  bool isKnownName(llvm::StringRef name);
 
   enum ARCConversionResult { ACR_okay, ACR_unbridged, ACR_error };
 
@@ -813,7 +813,7 @@ public:
   /// \return true iff there were any incompatible types.
   bool CheckMessageArgumentTypes(const Expr *Receiver, QualType ReceiverType,
                                  MultiExprArg Args, Selector Sel,
-                                 ArrayRef<SourceLocation> SelectorLocs,
+                                 llvm::ArrayRef<SourceLocation> SelectorLocs,
                                  ObjCMethodDecl *Method, bool isClassMessage,
                                  bool isSuperMessage, SourceLocation lbrac,
                                  SourceLocation rbrac, SourceRange RecRange,

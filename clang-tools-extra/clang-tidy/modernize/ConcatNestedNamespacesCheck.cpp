@@ -23,7 +23,7 @@ static bool locationsInSameFile(const SourceManager &Sources,
          Sources.getFileID(Loc1) == Sources.getFileID(Loc2);
 }
 
-static StringRef getRawStringRef(const SourceRange &Range,
+static llvm::StringRef getRawStringRef(const SourceRange &Range,
                                  const SourceManager &Sources,
                                  const LangOptions &LangOpts) {
   CharSourceRange TextRange = Lexer::getAsCharRange(Range, Sources, LangOpts);
@@ -65,7 +65,7 @@ SourceRange NS::getNamespaceBackRange(const SourceManager &SM,
   if (Tok->getKind() != tok::TokenKind::comment)
     return getDefaultNamespaceBackRange();
   SourceRange TokRange = SourceRange{Tok->getLocation(), Tok->getEndLoc()};
-  StringRef TokText = getRawStringRef(TokRange, SM, LangOpts);
+  llvm::StringRef TokText = getRawStringRef(TokRange, SM, LangOpts);
   NamespaceName CloseComment{"namespace "};
   appendCloseComment(CloseComment);
   // current fix hint in readability/NamespaceCommentCheck.cpp use single line
@@ -126,9 +126,9 @@ void ConcatNestedNamespacesCheck::reportDiagnostic(
       diag(Namespaces.front().front()->getBeginLoc(),
            "nested namespaces can be concatenated", DiagnosticIDs::Warning);
 
-  SmallVector<SourceRange, 6> Fronts;
+  llvm::SmallVector<SourceRange, 6> Fronts;
   Fronts.reserve(Namespaces.size() - 1U);
-  SmallVector<SourceRange, 6> Backs;
+  llvm::SmallVector<SourceRange, 6> Backs;
   Backs.reserve(Namespaces.size());
 
   for (const NS &ND : Namespaces) {

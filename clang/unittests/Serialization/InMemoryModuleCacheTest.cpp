@@ -16,9 +16,9 @@ using namespace clang;
 namespace {
 
 std::unique_ptr<MemoryBuffer> getBuffer(int I) {
-  SmallVector<char, 8> Bytes;
+  llvm::SmallVector<char, 8> Bytes;
   raw_svector_ostream(Bytes) << "data:" << I;
-  return MemoryBuffer::getMemBuffer(StringRef(Bytes.data(), Bytes.size()), "",
+  return MemoryBuffer::getMemBuffer(llvm::StringRef(Bytes.data(), Bytes.size()), "",
                                     /* RequiresNullTerminator = */ false);
 }
 

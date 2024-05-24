@@ -17,7 +17,7 @@ using namespace llvm::MachO;
 
 namespace clang::installapi {
 std::pair<GlobalRecord *, FrontendAttrs *> FrontendRecordsSlice::addGlobal(
-    StringRef Name, RecordLinkage Linkage, GlobalRecord::Kind GV,
+    llvm::StringRef Name, RecordLinkage Linkage, GlobalRecord::Kind GV,
     const clang::AvailabilityInfo Avail, const Decl *D, const HeaderType Access,
     SymbolFlags Flags, bool Inlined) {
 
@@ -29,7 +29,7 @@ std::pair<GlobalRecord *, FrontendAttrs *> FrontendRecordsSlice::addGlobal(
 }
 
 std::pair<ObjCInterfaceRecord *, FrontendAttrs *>
-FrontendRecordsSlice::addObjCInterface(StringRef Name, RecordLinkage Linkage,
+FrontendRecordsSlice::addObjCInterface(llvm::StringRef Name, RecordLinkage Linkage,
                                        const clang::AvailabilityInfo Avail,
                                        const Decl *D, HeaderType Access,
                                        bool IsEHType) {
@@ -46,8 +46,8 @@ FrontendRecordsSlice::addObjCInterface(StringRef Name, RecordLinkage Linkage,
 }
 
 std::pair<ObjCCategoryRecord *, FrontendAttrs *>
-FrontendRecordsSlice::addObjCCategory(StringRef ClassToExtend,
-                                      StringRef CategoryName,
+FrontendRecordsSlice::addObjCCategory(llvm::StringRef ClassToExtend,
+                                      llvm::StringRef CategoryName,
                                       const clang::AvailabilityInfo Avail,
                                       const Decl *D, HeaderType Access) {
   ObjCCategoryRecord *ObjCR =
@@ -58,7 +58,7 @@ FrontendRecordsSlice::addObjCCategory(StringRef ClassToExtend,
 }
 
 std::pair<ObjCIVarRecord *, FrontendAttrs *> FrontendRecordsSlice::addObjCIVar(
-    ObjCContainerRecord *Container, StringRef IvarName, RecordLinkage Linkage,
+    ObjCContainerRecord *Container, llvm::StringRef IvarName, RecordLinkage Linkage,
     const clang::AvailabilityInfo Avail, const Decl *D, HeaderType Access,
     const clang::ObjCIvarDecl::AccessControl AC) {
   // If the decl otherwise would have been exported, check their access control.
@@ -93,7 +93,7 @@ InstallAPIContext::findAndRecordFile(const FileEntry *FE,
   // If file was not found, search by how the header was
   // included. This is primarily to resolve headers found
   // in a different location than what passed directly as input.
-  StringRef IncludeName = PP.getHeaderSearchInfo().getIncludeNameForHeader(FE);
+  llvm::StringRef IncludeName = PP.getHeaderSearchInfo().getIncludeNameForHeader(FE);
   auto BackupIt = KnownIncludes.find(IncludeName.str());
   if (BackupIt != KnownIncludes.end()) {
     KnownFiles[FE] = BackupIt->second;
@@ -118,7 +118,7 @@ void InstallAPIContext::addKnownHeader(const HeaderFile &H) {
   KnownIncludes[H.getIncludeName()] = H.getType();
 }
 
-static StringRef getFileExtension(clang::Language Lang) {
+static llvm::StringRef getFileExtension(clang::Language Lang) {
   switch (Lang) {
   default:
     llvm_unreachable("Unexpected language option.");
@@ -136,7 +136,7 @@ static StringRef getFileExtension(clang::Language Lang) {
 std::unique_ptr<MemoryBuffer> createInputBuffer(InstallAPIContext &Ctx) {
   assert(Ctx.Type != HeaderType::Unknown &&
          "unexpected access level for parsing");
-  SmallString<4096> Contents;
+  llvm::SmallString<4096> Contents;
   raw_svector_ostream OS(Contents);
   for (const HeaderFile &H : Ctx.InputHeaders) {
     if (H.isExcluded())
@@ -157,20 +157,20 @@ std::unique_ptr<MemoryBuffer> createInputBuffer(InstallAPIContext &Ctx) {
   if (Contents.empty())
     return nullptr;
 
-  SmallString<64> BufferName(
+  llvm::SmallString<64> BufferName(
       {"installapi-includes-", Ctx.Slice->getTriple().str(), "-",
        getName(Ctx.Type), getFileExtension(Ctx.LangMode)});
   return llvm::MemoryBuffer::getMemBufferCopy(Contents, BufferName);
 }
 
-std::string findLibrary(StringRef InstallName, FileManager &FM,
-                        ArrayRef<std::string> FrameworkSearchPaths,
-                        ArrayRef<std::string> LibrarySearchPaths,
-                        ArrayRef<std::string> SearchPaths) {
+std::string findLibrary(llvm::StringRef InstallName, FileManager &FM,
+                        llvm::ArrayRef<std::string> FrameworkSearchPaths,
+                        llvm::ArrayRef<std::string> LibrarySearchPaths,
+                        llvm::ArrayRef<std::string> SearchPaths) {
   auto getLibrary =
-      [&](const StringRef FullPath) -> std::optional<std::string> {
+      [&](const llvm::StringRef FullPath) -> std::optional<std::string> {
     // Prefer TextAPI files when possible.
-    SmallString<PATH_MAX> TextAPIFilePath = FullPath;
+    llvm::SmallString<PATH_MAX> TextAPIFilePath = FullPath;
     replace_extension(TextAPIFilePath, ".tbd");
 
     if (FM.getOptionalFileRef(TextAPIFilePath))
@@ -182,13 +182,13 @@ std::string findLibrary(StringRef InstallName, FileManager &FM,
     return std::nullopt;
   };
 
-  const StringRef Filename = sys::path::filename(InstallName);
+  const llvm::StringRef Filename = sys::path::filename(InstallName);
   const bool IsFramework = sys::path::parent_path(InstallName)
                                .ends_with((Filename + ".framework").str());
   if (IsFramework) {
-    for (const StringRef Path : FrameworkSearchPaths) {
-      SmallString<PATH_MAX> FullPath(Path);
-      sys::path::append(FullPath, Filename + StringRef(".framework"), Filename);
+    for (const llvm::StringRef Path : FrameworkSearchPaths) {
+      llvm::SmallString<PATH_MAX> FullPath(Path);
+      sys::path::append(FullPath, Filename + llvm::StringRef(".framework"), Filename);
       if (auto LibOrNull = getLibrary(FullPath))
         return *LibOrNull;
     }
@@ -198,8 +198,8 @@ std::string findLibrary(StringRef InstallName, FileManager &FM,
     bool IsEmbeddedDylib = (sys::path::extension(InstallName) == ".dylib") &&
                            InstallName.contains(".framework/");
     if (!IsEmbeddedDylib) {
-      for (const StringRef Path : LibrarySearchPaths) {
-        SmallString<PATH_MAX> FullPath(Path);
+      for (const llvm::StringRef Path : LibrarySearchPaths) {
+        llvm::SmallString<PATH_MAX> FullPath(Path);
         sys::path::append(FullPath, Filename);
         if (auto LibOrNull = getLibrary(FullPath))
           return *LibOrNull;
@@ -207,8 +207,8 @@ std::string findLibrary(StringRef InstallName, FileManager &FM,
     }
   }
 
-  for (const StringRef Path : SearchPaths) {
-    SmallString<PATH_MAX> FullPath(Path);
+  for (const llvm::StringRef Path : SearchPaths) {
+    llvm::SmallString<PATH_MAX> FullPath(Path);
     sys::path::append(FullPath, InstallName);
     if (auto LibOrNull = getLibrary(FullPath))
       return *LibOrNull;

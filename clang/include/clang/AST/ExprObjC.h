@@ -193,7 +193,7 @@ class ObjCArrayLiteral final
   SourceRange Range;
   ObjCMethodDecl *ArrayWithObjectsMethod;
 
-  ObjCArrayLiteral(ArrayRef<Expr *> Elements,
+  ObjCArrayLiteral(llvm::ArrayRef<Expr *> Elements,
                    QualType T, ObjCMethodDecl * Method,
                    SourceRange SR);
 
@@ -205,7 +205,7 @@ public:
   friend TrailingObjects;
 
   static ObjCArrayLiteral *Create(const ASTContext &C,
-                                  ArrayRef<Expr *> Elements,
+                                  llvm::ArrayRef<Expr *> Elements,
                                   QualType T, ObjCMethodDecl * Method,
                                   SourceRange SR);
 
@@ -326,7 +326,7 @@ class ObjCDictionaryLiteral final
   using KeyValuePair = ObjCDictionaryLiteral_KeyValuePair;
   using ExpansionData = ObjCDictionaryLiteral_ExpansionData;
 
-  ObjCDictionaryLiteral(ArrayRef<ObjCDictionaryElement> VK,
+  ObjCDictionaryLiteral(llvm::ArrayRef<ObjCDictionaryElement> VK,
                         bool HasPackExpansions,
                         QualType T, ObjCMethodDecl *method,
                         SourceRange SR);
@@ -346,7 +346,7 @@ public:
   friend TrailingObjects;
 
   static ObjCDictionaryLiteral *Create(const ASTContext &C,
-                                       ArrayRef<ObjCDictionaryElement> VK,
+                                       llvm::ArrayRef<ObjCDictionaryElement> VK,
                                        bool HasPackExpansions,
                                        QualType T, ObjCMethodDecl *method,
                                        SourceRange SR);
@@ -1021,30 +1021,30 @@ private:
                   bool IsInstanceSuper,
                   QualType SuperType,
                   Selector Sel,
-                  ArrayRef<SourceLocation> SelLocs,
+                  llvm::ArrayRef<SourceLocation> SelLocs,
                   SelectorLocationsKind SelLocsK,
                   ObjCMethodDecl *Method,
-                  ArrayRef<Expr *> Args,
+                  llvm::ArrayRef<Expr *> Args,
                   SourceLocation RBracLoc,
                   bool isImplicit);
   ObjCMessageExpr(QualType T, ExprValueKind VK,
                   SourceLocation LBracLoc,
                   TypeSourceInfo *Receiver,
                   Selector Sel,
-                  ArrayRef<SourceLocation> SelLocs,
+                  llvm::ArrayRef<SourceLocation> SelLocs,
                   SelectorLocationsKind SelLocsK,
                   ObjCMethodDecl *Method,
-                  ArrayRef<Expr *> Args,
+                  llvm::ArrayRef<Expr *> Args,
                   SourceLocation RBracLoc,
                   bool isImplicit);
   ObjCMessageExpr(QualType T, ExprValueKind VK,
                   SourceLocation LBracLoc,
                   Expr *Receiver,
                   Selector Sel,
-                  ArrayRef<SourceLocation> SelLocs,
+                  llvm::ArrayRef<SourceLocation> SelLocs,
                   SelectorLocationsKind SelLocsK,
                   ObjCMethodDecl *Method,
-                  ArrayRef<Expr *> Args,
+                  llvm::ArrayRef<Expr *> Args,
                   SourceLocation RBracLoc,
                   bool isImplicit);
 
@@ -1055,8 +1055,8 @@ private:
     NumArgs = Num;
   }
 
-  void initArgsAndSelLocs(ArrayRef<Expr *> Args,
-                          ArrayRef<SourceLocation> SelLocs,
+  void initArgsAndSelLocs(llvm::ArrayRef<Expr *> Args,
+                          llvm::ArrayRef<SourceLocation> SelLocs,
                           SelectorLocationsKind SelLocsK);
 
   /// Retrieve the pointer value of the message receiver.
@@ -1093,9 +1093,9 @@ private:
   }
 
   static ObjCMessageExpr *alloc(const ASTContext &C,
-                                ArrayRef<Expr *> Args,
+                                llvm::ArrayRef<Expr *> Args,
                                 SourceLocation RBraceLoc,
-                                ArrayRef<SourceLocation> SelLocs,
+                                llvm::ArrayRef<SourceLocation> SelLocs,
                                 Selector Sel,
                                 SelectorLocationsKind &SelLocsK);
   static ObjCMessageExpr *alloc(const ASTContext &C,
@@ -1139,9 +1139,9 @@ public:
                                  bool IsInstanceSuper,
                                  QualType SuperType,
                                  Selector Sel,
-                                 ArrayRef<SourceLocation> SelLocs,
+                                 llvm::ArrayRef<SourceLocation> SelLocs,
                                  ObjCMethodDecl *Method,
-                                 ArrayRef<Expr *> Args,
+                                 llvm::ArrayRef<Expr *> Args,
                                  SourceLocation RBracLoc,
                                  bool isImplicit);
 
@@ -1173,9 +1173,9 @@ public:
                                  SourceLocation LBracLoc,
                                  TypeSourceInfo *Receiver,
                                  Selector Sel,
-                                 ArrayRef<SourceLocation> SelLocs,
+                                 llvm::ArrayRef<SourceLocation> SelLocs,
                                  ObjCMethodDecl *Method,
-                                 ArrayRef<Expr *> Args,
+                                 llvm::ArrayRef<Expr *> Args,
                                  SourceLocation RBracLoc,
                                  bool isImplicit);
 
@@ -1207,9 +1207,9 @@ public:
                                  SourceLocation LBracLoc,
                                  Expr *Receiver,
                                  Selector Sel,
-                                 ArrayRef<SourceLocation> SeLocs,
+                                 llvm::ArrayRef<SourceLocation> SeLocs,
                                  ObjCMethodDecl *Method,
-                                 ArrayRef<Expr *> Args,
+                                 llvm::ArrayRef<Expr *> Args,
                                  SourceLocation RBracLoc,
                                  bool isImplicit);
 
@@ -1432,7 +1432,7 @@ public:
     return getStoredSelLocs()[Index];
   }
 
-  void getSelectorLocs(SmallVectorImpl<SourceLocation> &SelLocs) const;
+  void getSelectorLocs(llvm::SmallVectorImpl<SourceLocation> &SelLocs) const;
 
   unsigned getNumSelectorLocs() const {
     if (isImplicit())
@@ -1664,7 +1664,7 @@ public:
   }
 
   /// Retrieve the kind of bridge being performed as a string.
-  StringRef getBridgeKindName() const;
+  llvm::StringRef getBridgeKindName() const;
 
   /// The location of the bridge keyword.
   SourceLocation getBridgeKeywordLoc() const { return BridgeKeywordLoc; }
@@ -1688,7 +1688,7 @@ public:
 ///   __builtin_available(macos 10.10, ios 8, *); // C, C++, and Objective-C
 /// \endcode
 ///
-/// Note that we only need to keep track of one \c VersionTuple here, which is
+/// Note that we only need to keep track of one \c llvm::VersionTuple here, which is
 /// the one that corresponds to the current deployment target. This is meant to
 /// be used in the condition of an \c if, but it is also usable as top level
 /// expressions.
@@ -1696,11 +1696,11 @@ public:
 class ObjCAvailabilityCheckExpr : public Expr {
   friend class ASTStmtReader;
 
-  VersionTuple VersionToCheck;
+  llvm::VersionTuple VersionToCheck;
   SourceLocation AtLoc, RParen;
 
 public:
-  ObjCAvailabilityCheckExpr(VersionTuple VersionToCheck, SourceLocation AtLoc,
+  ObjCAvailabilityCheckExpr(llvm::VersionTuple VersionToCheck, SourceLocation AtLoc,
                             SourceLocation RParen, QualType Ty)
       : Expr(ObjCAvailabilityCheckExprClass, Ty, VK_PRValue, OK_Ordinary),
         VersionToCheck(VersionToCheck), AtLoc(AtLoc), RParen(RParen) {
@@ -1716,7 +1716,7 @@ public:
 
   /// This may be '*', in which case this should fold to true.
   bool hasVersion() const { return !VersionToCheck.empty(); }
-  VersionTuple getVersion() const { return VersionToCheck; }
+  llvm::VersionTuple getVersion() const { return VersionToCheck; }
 
   child_range children() {
     return child_range(child_iterator(), child_iterator());

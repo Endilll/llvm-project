@@ -247,32 +247,32 @@ namespace {
 /// AllocatedCXCodeCompleteResults outlives the CXTranslationUnit, so we can
 /// not rely on the StringPool in the TU.
 struct AllocatedCXCodeCompleteResults : public CXCodeCompleteResults {
-  AllocatedCXCodeCompleteResults(IntrusiveRefCntPtr<FileManager> FileMgr);
+  AllocatedCXCodeCompleteResults(llvm::IntrusiveRefCntPtr<FileManager> FileMgr);
   ~AllocatedCXCodeCompleteResults();
   
   /// Diagnostics produced while performing code completion.
-  SmallVector<StoredDiagnostic, 8> Diagnostics;
+  llvm::SmallVector<StoredDiagnostic, 8> Diagnostics;
 
   /// Allocated API-exposed wrappters for Diagnostics.
-  SmallVector<std::unique_ptr<CXStoredDiagnostic>, 8> DiagnosticsWrappers;
+  llvm::SmallVector<std::unique_ptr<CXStoredDiagnostic>, 8> DiagnosticsWrappers;
 
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
   
   /// Diag object
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diag;
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diag;
   
   /// Language options used to adjust source locations.
   LangOptions LangOpts;
 
   /// File manager, used for diagnostics.
-  IntrusiveRefCntPtr<FileManager> FileMgr;
+  llvm::IntrusiveRefCntPtr<FileManager> FileMgr;
 
   /// Source manager, used for diagnostics.
-  IntrusiveRefCntPtr<SourceManager> SourceMgr;
+  llvm::IntrusiveRefCntPtr<SourceManager> SourceMgr;
   
   /// Temporary buffers that will be deleted once we have finished with
   /// the code-completion results.
-  SmallVector<const llvm::MemoryBuffer *, 1> TemporaryBuffers;
+  llvm::SmallVector<const llvm::MemoryBuffer *, 1> TemporaryBuffers;
   
   /// Allocator used to store globally cached code-completion results.
   std::shared_ptr<clang::GlobalCodeCompletionAllocator>
@@ -331,7 +331,7 @@ CXString clang_getCompletionFixIt(CXCodeCompleteResults *results,
     return cxstring::createNull();
   }
 
-  ArrayRef<FixItHint> FixIts = allocated_results->FixItsVector[completion_index];
+  llvm::ArrayRef<FixItHint> FixIts = allocated_results->FixItsVector[completion_index];
   if (FixIts.size() <= fixit_index) {
     if (replacement_range)
       *replacement_range = clang_getNullRange();
@@ -355,10 +355,10 @@ CXString clang_getCompletionFixIt(CXCodeCompleteResults *results,
 static std::atomic<unsigned> CodeCompletionResultObjects;
 
 AllocatedCXCodeCompleteResults::AllocatedCXCodeCompleteResults(
-    IntrusiveRefCntPtr<FileManager> FileMgr)
+    llvm::IntrusiveRefCntPtr<FileManager> FileMgr)
     : CXCodeCompleteResults(), DiagOpts(new DiagnosticOptions),
       Diag(new DiagnosticsEngine(
-          IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs), &*DiagOpts)),
+          llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs), &*DiagOpts)),
       FileMgr(std::move(FileMgr)),
       SourceMgr(new SourceManager(*Diag, *this->FileMgr)),
       CodeCompletionAllocator(
@@ -564,7 +564,7 @@ namespace {
   class CaptureCompletionResults : public CodeCompleteConsumer {
     AllocatedCXCodeCompleteResults &AllocatedResults;
     CodeCompletionTUInfo CCTUInfo;
-    SmallVector<CXCompletionResult, 16> StoredResults;
+    llvm::SmallVector<CXCompletionResult, 16> StoredResults;
     CXTranslationUnit *TU;
   public:
     CaptureCompletionResults(const CodeCompleteOptions &Opts,
@@ -601,8 +601,8 @@ namespace {
       AllocatedResults.Contexts = getContextsForContextKind(contextKind, S);
       
       AllocatedResults.Selector = "";
-      ArrayRef<const IdentifierInfo *> SelIdents = Context.getSelIdents();
-      for (ArrayRef<const IdentifierInfo *>::iterator I = SelIdents.begin(),
+      llvm::ArrayRef<const IdentifierInfo *> SelIdents = Context.getSelIdents();
+      for (llvm::ArrayRef<const IdentifierInfo *>::iterator I = SelIdents.begin(),
                                                       E = SelIdents.end();
            I != E; ++I) {
         if (const IdentifierInfo *selIdent = *I)
@@ -694,7 +694,7 @@ namespace {
 static CXCodeCompleteResults *
 clang_codeCompleteAt_Impl(CXTranslationUnit TU, const char *complete_filename,
                           unsigned complete_line, unsigned complete_column,
-                          ArrayRef<CXUnsavedFile> unsaved_files,
+                          llvm::ArrayRef<CXUnsavedFile> unsaved_files,
                           unsigned options) {
   bool IncludeBriefComments = options & CXCodeComplete_IncludeBriefComments;
   bool SkipPreamble = options & CXCodeComplete_SkipPreamble;
@@ -723,7 +723,7 @@ clang_codeCompleteAt_Impl(CXTranslationUnit TU, const char *complete_filename,
   ASTUnit::ConcurrencyCheck Check(*AST);
 
   // Perform the remapping of source files.
-  SmallVector<ASTUnit::RemappedFile, 4> RemappedFiles;
+  llvm::SmallVector<ASTUnit::RemappedFile, 4> RemappedFiles;
 
   for (auto &UF : unsaved_files) {
     std::unique_ptr<llvm::MemoryBuffer> MB =
@@ -781,7 +781,7 @@ clang_codeCompleteAt_Impl(CXTranslationUnit TU, const char *complete_filename,
 #ifdef UDP_CODE_COMPLETION_LOGGER
 #ifdef UDP_CODE_COMPLETION_LOGGER_PORT
   const llvm::TimeRecord &EndTime =  llvm::TimeRecord::getCurrentTime();
-  SmallString<256> LogResult;
+  llvm::SmallString<256> LogResult;
   llvm::raw_svector_ostream os(LogResult);
 
   // Figure out the language and whether or not it uses PCH.
@@ -801,7 +801,7 @@ clang_codeCompleteAt_Impl(CXTranslationUnit TU, const char *complete_filename,
     else if (strcmp(*I, "-include") == 0) {
       if (I+1 != E) {
         const char *arg = *(++I);
-        SmallString<512> pchName;
+        llvm::SmallString<512> pchName;
         {
           llvm::raw_svector_ostream os(pchName);
           os << arg << ".pth";
@@ -826,7 +826,7 @@ clang_codeCompleteAt_Impl(CXTranslationUnit TU, const char *complete_filename,
   os << ", \"clangVer\": \"" << getClangFullVersion() << '"';
   os << " }";
 
-  StringRef res = os.str();
+  llvm::StringRef res = os.str();
   if (res.size() > 0) {
     do {
       // Setup the UDP socket.
@@ -982,8 +982,8 @@ CXString clang_codeCompleteGetObjCSelector(CXCodeCompleteResults *ResultsIn) {
 ///
 /// \param Buffer A buffer that stores the actual, concatenated string. It will
 /// be used if the old string is already-non-empty.
-static void AppendToString(StringRef &Old, StringRef New,
-                           SmallString<256> &Buffer) {
+static void AppendToString(llvm::StringRef &Old, llvm::StringRef New,
+                           llvm::SmallString<256> &Buffer) {
   if (Old.empty()) {
     Old = New;
     return;
@@ -1002,9 +1002,9 @@ static void AppendToString(StringRef &Old, StringRef New,
 /// concatenated.
 ///
 /// \param Buffer A buffer used for storage of the completed name.
-static StringRef GetTypedName(CodeCompletionString *String,
-                                    SmallString<256> &Buffer) {
-  StringRef Result;
+static llvm::StringRef GetTypedName(CodeCompletionString *String,
+                                    llvm::SmallString<256> &Buffer) {
+  llvm::StringRef Result;
   for (CodeCompletionString::iterator C = String->begin(), CEnd = String->end();
        C != CEnd; ++C) {
     if (C->Kind == CodeCompletionString::CK_TypedText)
@@ -1023,10 +1023,10 @@ namespace {
       CodeCompletionString *Y
         = (CodeCompletionString *)YR.CompletionString;
 
-      SmallString<256> XBuffer;
-      StringRef XText = GetTypedName(X, XBuffer);
-      SmallString<256> YBuffer;
-      StringRef YText = GetTypedName(Y, YBuffer);
+      llvm::SmallString<256> XBuffer;
+      llvm::StringRef XText = GetTypedName(X, XBuffer);
+      llvm::SmallString<256> YBuffer;
+      llvm::StringRef YText = GetTypedName(Y, YBuffer);
       
       if (XText.empty() || YText.empty())
         return !XText.empty();

@@ -32,8 +32,8 @@ public:
                         Action::OffloadKind DeviceOffloadKind) const override;
 
   std::optional<std::string> findAVRLibcInstallation() const;
-  StringRef getGCCInstallPath() const { return GCCInstallPath; }
-  std::string getCompilerRT(const llvm::opt::ArgList &Args, StringRef Component,
+  llvm::StringRef getGCCInstallPath() const { return GCCInstallPath; }
+  std::string getCompilerRT(const llvm::opt::ArgList &Args, llvm::StringRef Component,
                             FileType Type) const override;
 
   bool HasNativeLLVMSupport() const override { return true; }
@@ -42,7 +42,7 @@ protected:
   Tool *buildLinker() const override;
 
 private:
-  StringRef GCCInstallPath;
+  llvm::StringRef GCCInstallPath;
 };
 
 } // end namespace toolchains

@@ -43,7 +43,7 @@ public:
     return CodeAction::REFACTOR_KIND;
   }
   bool prepare(const Selection &Inputs) override;
-  Expected<Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Effect> apply(const Selection &Inputs) override;
   std::string title() const override;
 
 private:
@@ -129,7 +129,7 @@ bool ExpandDeducedType::prepare(const Selection &Inputs) {
   return Range.isValid();
 }
 
-Expected<Tweak::Effect> ExpandDeducedType::apply(const Selection &Inputs) {
+llvm::Expected<Tweak::Effect> ExpandDeducedType::apply(const Selection &Inputs) {
   auto &SrcMgr = Inputs.AST->getSourceManager();
 
   std::optional<clang::QualType> DeducedType =

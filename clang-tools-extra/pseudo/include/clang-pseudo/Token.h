@@ -57,7 +57,7 @@ struct Token {
   /// The token text.
   ///
   /// Typically from the original source file, but may have been synthesized.
-  StringRef text() const { return StringRef(Data, Length); }
+  llvm::StringRef text() const { return llvm::StringRef(Data, Length); }
   const char *Data = nullptr;
   uint32_t Length = 0;
 
@@ -159,15 +159,15 @@ public:
     return &T - Tokens.data();
   }
 
-  ArrayRef<Token> tokens() const {
+  llvm::ArrayRef<Token> tokens() const {
     assert(isFinalized());
     return Tokens;
   }
-  ArrayRef<Token> tokens(Token::Range R) const {
+  llvm::ArrayRef<Token> tokens(Token::Range R) const {
     return tokens().slice(R.Begin, R.End - R.Begin);
   }
 
-  MutableArrayRef<Token> tokens() {
+  llvm::MutableArrayRef<Token> tokens() {
     assert(isFinalized());
     return Tokens;
   }
@@ -198,7 +198,7 @@ public:
 private:
   std::shared_ptr<void> Payload;
 
-  MutableArrayRef<Token> Tokens;
+  llvm::MutableArrayRef<Token> Tokens;
   std::vector<Token> Storage; // eof + Tokens + eof
 };
 llvm::raw_ostream &operator<<(llvm::raw_ostream &, const TokenStream &);

@@ -35,8 +35,8 @@ using namespace llvm;
 using clang::detail::SarifArtifact;
 using clang::detail::SarifArtifactLocation;
 
-static StringRef getFileName(FileEntryRef FE) {
-  StringRef Filename = FE.getFileEntry().tryGetRealPathName();
+static llvm::StringRef getFileName(FileEntryRef FE) {
+  llvm::StringRef Filename = FE.getFileEntry().tryGetRealPathName();
   if (Filename.empty())
     Filename = FE.getName();
   return Filename;
@@ -57,9 +57,9 @@ static std::string percentEncodeURICharacter(char C) {
   // should be written out directly. Otherwise, percent
   // encode the character and write that out instead of the
   // reserved character.
-  if (llvm::isAlnum(C) || StringRef("-._~:@!$&'()*+,;=").contains(C))
+  if (llvm::isAlnum(C) || llvm::StringRef("-._~:@!$&'()*+,;=").contains(C))
     return std::string(&C, 1);
-  return "%" + llvm::toHex(StringRef(&C, 1));
+  return "%" + llvm::toHex(llvm::StringRef(&C, 1));
 }
 
 /// \internal
@@ -68,24 +68,24 @@ static std::string percentEncodeURICharacter(char C) {
 /// \param Filename The filename to be represented as URI.
 ///
 /// \return RFC3986 URI representing the input file name.
-static std::string fileNameToURI(StringRef Filename) {
-  SmallString<32> Ret = StringRef("file://");
+static std::string fileNameToURI(llvm::StringRef Filename) {
+  llvm::SmallString<32> Ret = llvm::StringRef("file://");
 
   // Get the root name to see if it has a URI authority.
-  StringRef Root = sys::path::root_name(Filename);
+  llvm::StringRef Root = sys::path::root_name(Filename);
   if (Root.starts_with("//")) {
     // There is an authority, so add it to the URI.
     Ret += Root.drop_front(2).str();
   } else if (!Root.empty()) {
     // There is no authority, so end the component and add the root to the URI.
-    Ret += Twine("/" + Root).str();
+    Ret += llvm::Twine("/" + Root).str();
   }
 
   auto Iter = sys::path::begin(Filename), End = sys::path::end(Filename);
   assert(Iter != End && "Expected there to be a non-root path component.");
   // Add the rest of the path components, encoding any reserved characters;
   // we skip past the first path component, as it was handled it above.
-  for (StringRef Component : llvm::make_range(++Iter, End)) {
+  for (llvm::StringRef Component : llvm::make_range(++Iter, End)) {
     // For reasons unknown to me, we may get a backslash with Windows native
     // paths for the initial backslash following the drive component, which
     // we need to ignore as a URI path part.
@@ -141,7 +141,7 @@ static unsigned int adjustColumnPos(FullSourceLoc Loc,
 /// @{
 
 /// \internal
-json::Object createMessage(StringRef Text) {
+json::Object createMessage(llvm::StringRef Text) {
   return json::Object{{"text", Text.str()}};
 }
 
@@ -164,14 +164,14 @@ static json::Object createTextRegion(const SourceManager &SM,
 }
 
 static json::Object createLocation(json::Object &&PhysicalLocation,
-                                   StringRef Message = "") {
+                                   llvm::StringRef Message = "") {
   json::Object Ret{{"physicalLocation", std::move(PhysicalLocation)}};
   if (!Message.empty())
     Ret.insert({"message", createMessage(Message)});
   return Ret;
 }
 
-static StringRef importanceToStr(ThreadFlowImportance I) {
+static llvm::StringRef importanceToStr(ThreadFlowImportance I) {
   switch (I) {
   case ThreadFlowImportance::Important:
     return "important";
@@ -183,7 +183,7 @@ static StringRef importanceToStr(ThreadFlowImportance I) {
   llvm_unreachable("Fully covered switch is not so fully covered");
 }
 
-static StringRef resultLevelToStr(SarifResultLevel R) {
+static llvm::StringRef resultLevelToStr(SarifResultLevel R) {
   switch (R) {
   case SarifResultLevel::None:
     return "none";
@@ -292,7 +292,7 @@ void SarifDocumentWriter::endRun() {
   // Flush all the artifacts.
   json::Object &Run = getCurrentRun();
   json::Array *Artifacts = Run.getArray("artifacts");
-  SmallVector<std::pair<StringRef, SarifArtifact>, 0> Vec;
+  llvm::SmallVector<std::pair<llvm::StringRef, SarifArtifact>, 0> Vec;
   for (const auto &[K, V] : CurrentArtifacts)
     Vec.emplace_back(K, V);
   llvm::sort(Vec, llvm::less_first());
@@ -322,7 +322,7 @@ void SarifDocumentWriter::endRun() {
 }
 
 json::Array
-SarifDocumentWriter::createThreadFlows(ArrayRef<ThreadFlow> ThreadFlows) {
+SarifDocumentWriter::createThreadFlows(llvm::ArrayRef<ThreadFlow> ThreadFlows) {
   json::Object Ret{{"locations", json::Array{}}};
   json::Array Locs;
   for (const auto &ThreadFlow : ThreadFlows) {
@@ -336,13 +336,13 @@ SarifDocumentWriter::createThreadFlows(ArrayRef<ThreadFlow> ThreadFlows) {
 }
 
 json::Object
-SarifDocumentWriter::createCodeFlow(ArrayRef<ThreadFlow> ThreadFlows) {
+SarifDocumentWriter::createCodeFlow(llvm::ArrayRef<ThreadFlow> ThreadFlows) {
   return json::Object{{"threadFlows", createThreadFlows(ThreadFlows)}};
 }
 
-void SarifDocumentWriter::createRun(StringRef ShortToolName,
-                                    StringRef LongToolName,
-                                    StringRef ToolVersion) {
+void SarifDocumentWriter::createRun(llvm::StringRef ShortToolName,
+                                    llvm::StringRef LongToolName,
+                                    llvm::StringRef ToolVersion) {
   // Clear resources associated with a previous run.
   endRun();
 

@@ -21,8 +21,8 @@ namespace clang::tidy::modernize {
 /// Base class for MakeSharedCheck and MakeUniqueCheck.
 class MakeSmartPtrCheck : public ClangTidyCheck {
 public:
-  MakeSmartPtrCheck(StringRef Name, ClangTidyContext *Context,
-                    StringRef MakeSmartPtrFunctionName);
+  MakeSmartPtrCheck(llvm::StringRef Name, ClangTidyContext *Context,
+                    llvm::StringRef MakeSmartPtrFunctionName);
   void registerMatchers(ast_matchers::MatchFinder *Finder) final;
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;
@@ -45,8 +45,8 @@ protected:
 
 private:
   utils::IncludeInserter Inserter;
-  const StringRef MakeSmartPtrFunctionHeader;
-  const StringRef MakeSmartPtrFunctionName;
+  const llvm::StringRef MakeSmartPtrFunctionHeader;
+  const llvm::StringRef MakeSmartPtrFunctionName;
   const bool IgnoreMacros;
   const bool IgnoreDefaultInitialization;
 

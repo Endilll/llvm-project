@@ -56,7 +56,7 @@ class USRLocFindingASTVisitor
     : public RecursiveSymbolVisitor<USRLocFindingASTVisitor> {
 public:
   explicit USRLocFindingASTVisitor(const std::vector<std::string> &USRs,
-                                   StringRef PrevName,
+                                   llvm::StringRef PrevName,
                                    const ASTContext &Context)
       : RecursiveSymbolVisitor(Context.getSourceManager(),
                                Context.getLangOpts()),
@@ -64,7 +64,7 @@ public:
   }
 
   bool visitSymbolOccurrence(const NamedDecl *ND,
-                             ArrayRef<SourceRange> NameRanges) {
+                             llvm::ArrayRef<SourceRange> NameRanges) {
     if (USRSet.find(getUSRForDecl(ND)) != USRSet.end()) {
       assert(NameRanges.size() == 1 &&
              "Multiple name pieces are not supported yet!");
@@ -89,14 +89,14 @@ private:
     const SourceLocation BeginLoc = Loc;
     const SourceLocation EndLoc = Lexer::getLocForEndOfToken(
         BeginLoc, 0, Context.getSourceManager(), Context.getLangOpts());
-    StringRef TokenName =
+    llvm::StringRef TokenName =
         Lexer::getSourceText(CharSourceRange::getTokenRange(BeginLoc, EndLoc),
                              Context.getSourceManager(), Context.getLangOpts());
     size_t Offset = TokenName.find(PrevName.getNamePieces()[0]);
 
     // The token of the source location we find actually has the old
     // name.
-    if (Offset != StringRef::npos)
+    if (Offset != llvm::StringRef::npos)
       Occurrences.emplace_back(PrevName, SymbolOccurrence::MatchingSymbol,
                                BeginLoc.getLocWithOffset(Offset));
   }
@@ -518,8 +518,8 @@ private:
 
 } // namespace
 
-SymbolOccurrences getOccurrencesOfUSRs(ArrayRef<std::string> USRs,
-                                       StringRef PrevName, Decl *Decl) {
+SymbolOccurrences getOccurrencesOfUSRs(llvm::ArrayRef<std::string> USRs,
+                                       llvm::StringRef PrevName, Decl *Decl) {
   USRLocFindingASTVisitor Visitor(USRs, PrevName, Decl->getASTContext());
   Visitor.TraverseDecl(Decl);
   return Visitor.takeOccurrences();

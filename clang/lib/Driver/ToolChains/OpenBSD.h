@@ -79,7 +79,7 @@ public:
   void AddCXXStdlibLibArgs(const llvm::opt::ArgList &Args,
                            llvm::opt::ArgStringList &CmdArgs) const override;
 
-  std::string getCompilerRT(const llvm::opt::ArgList &Args, StringRef Component,
+  std::string getCompilerRT(const llvm::opt::ArgList &Args, llvm::StringRef Component,
                             FileType Type = ToolChain::FT_Static) const override;
 
   UnwindTableLevel

@@ -43,7 +43,7 @@ public:
   void FlushDiagnosticsImpl(std::vector<const PathDiagnostic *> &Diags,
                             FilesMade *FM) override;
 
-  StringRef getName() const override { return "SarifDiagnostics"; }
+  llvm::StringRef getName() const override { return "SarifDiagnostics"; }
   PathGenerationScheme getGenerationScheme() const override { return Minimal; }
   bool supportsLogicalOpControlFlow() const override { return true; }
   bool supportsCrossFileDiagnostics() const override { return true; }
@@ -66,8 +66,8 @@ void ento::createSarifDiagnosticConsumer(
                                           CTU, MacroExpansions);
 }
 
-static StringRef getRuleDescription(StringRef CheckName) {
-  return llvm::StringSwitch<StringRef>(CheckName)
+static llvm::StringRef getRuleDescription(llvm::StringRef CheckName) {
+  return llvm::StringSwitch<llvm::StringRef>(CheckName)
 #define GET_CHECKERS
 #define CHECKER(FULLNAME, CLASS, HELPTEXT, DOC_URI, IS_HIDDEN)                 \
   .Case(FULLNAME, HELPTEXT)
@@ -77,8 +77,8 @@ static StringRef getRuleDescription(StringRef CheckName) {
       ;
 }
 
-static StringRef getRuleHelpURIStr(StringRef CheckName) {
-  return llvm::StringSwitch<StringRef>(CheckName)
+static llvm::StringRef getRuleHelpURIStr(llvm::StringRef CheckName) {
+  return llvm::StringSwitch<llvm::StringRef>(CheckName)
 #define GET_CHECKERS
 #define CHECKER(FULLNAME, CLASS, HELPTEXT, DOC_URI, IS_HIDDEN)                 \
   .Case(FULLNAME, DOC_URI)
@@ -126,9 +126,9 @@ static CharSourceRange convertTokenRangeToCharRange(const SourceRange &R,
   return CharSourceRange::getCharRange(BeginCharLoc, EndCharLoc);
 }
 
-static SmallVector<ThreadFlow, 8> createThreadFlows(const PathDiagnostic *Diag,
+static llvm::SmallVector<ThreadFlow, 8> createThreadFlows(const PathDiagnostic *Diag,
                                                     const LangOptions &LO) {
-  SmallVector<ThreadFlow, 8> Flows;
+  llvm::SmallVector<ThreadFlow, 8> Flows;
   const PathPieces &Pieces = Diag->path.flatten(false);
   for (const auto &Piece : Pieces) {
     auto Range = convertTokenRangeToCharRange(
@@ -149,7 +149,7 @@ createRuleMapping(const std::vector<const PathDiagnostic *> &Diags,
   llvm::StringSet<> Seen;
 
   for (const PathDiagnostic *D : Diags) {
-    StringRef CheckName = D->getCheckerName();
+    llvm::StringRef CheckName = D->getCheckerName();
     std::pair<llvm::StringSet<>::iterator, bool> P = Seen.insert(CheckName);
     if (P.second) {
       auto Rule = SarifRule::create()
@@ -168,12 +168,12 @@ static SarifResult createResult(const PathDiagnostic *Diag,
                                 const StringMap<uint32_t> &RuleMapping,
                                 const LangOptions &LO) {
 
-  StringRef CheckName = Diag->getCheckerName();
+  llvm::StringRef CheckName = Diag->getCheckerName();
   uint32_t RuleIdx = RuleMapping.lookup(CheckName);
   auto Range = convertTokenRangeToCharRange(
       Diag->getLocation().asRange(), Diag->getLocation().getManager(), LO);
 
-  SmallVector<ThreadFlow, 8> Flows = createThreadFlows(Diag, LO);
+  llvm::SmallVector<ThreadFlow, 8> Flows = createThreadFlows(Diag, LO);
   auto Result = SarifResult::create(RuleIdx)
                     .setRuleId(CheckName)
                     .setDiagnosticMessage(Diag->getVerboseDescription())

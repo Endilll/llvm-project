@@ -19,7 +19,7 @@ namespace clang::tidy::llvm_libc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/llvmlibc/callee-namespace.html
 class CalleeNamespaceCheck : public ClangTidyCheck {
 public:
-  CalleeNamespaceCheck(StringRef Name, ClangTidyContext *Context)
+  CalleeNamespaceCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {

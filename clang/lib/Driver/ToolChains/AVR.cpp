@@ -29,9 +29,9 @@ namespace {
 
 // NOTE: This list has been synchronized with gcc-avr 7.3.0 and avr-libc 2.0.0.
 constexpr struct {
-  StringRef Name;
-  StringRef SubPath;
-  StringRef Family;
+  llvm::StringRef Name;
+  llvm::StringRef SubPath;
+  llvm::StringRef Family;
   unsigned DataAddr;
 } MCUInfo[] = {
     {"at90s1200", "", "avr1", 0},
@@ -333,28 +333,28 @@ constexpr struct {
     {"attiny3217", "avrxmega3", "avrxmega3", 0x803800},
 };
 
-std::string GetMCUSubPath(StringRef MCUName) {
+std::string GetMCUSubPath(llvm::StringRef MCUName) {
   for (const auto &MCU : MCUInfo)
     if (MCU.Name == MCUName)
       return std::string(MCU.SubPath);
   return "";
 }
 
-std::optional<StringRef> GetMCUFamilyName(StringRef MCUName) {
+std::optional<llvm::StringRef> GetMCUFamilyName(llvm::StringRef MCUName) {
   for (const auto &MCU : MCUInfo)
     if (MCU.Name == MCUName)
-      return std::optional<StringRef>(MCU.Family);
+      return std::optional<llvm::StringRef>(MCU.Family);
   return std::nullopt;
 }
 
-std::optional<unsigned> GetMCUSectionAddressData(StringRef MCUName) {
+std::optional<unsigned> GetMCUSectionAddressData(llvm::StringRef MCUName) {
   for (const auto &MCU : MCUInfo)
     if (MCU.Name == MCUName && MCU.DataAddr > 0)
       return std::optional<unsigned>(MCU.DataAddr);
   return std::nullopt;
 }
 
-const StringRef PossibleAVRLibcLocations[] = {
+const llvm::StringRef PossibleAVRLibcLocations[] = {
     "/avr",
     "/usr/avr",
     "/usr/lib/avr",
@@ -417,17 +417,17 @@ Tool *AVRToolChain::buildLinker() const {
 }
 
 std::string
-AVRToolChain::getCompilerRT(const llvm::opt::ArgList &Args, StringRef Component,
+AVRToolChain::getCompilerRT(const llvm::opt::ArgList &Args, llvm::StringRef Component,
                             FileType Type = ToolChain::FT_Static) const {
   assert(Type == ToolChain::FT_Static && "AVR only supports static libraries");
   // Since AVR can never be a host environment, its compiler-rt library files
   // should always have ".a" suffix, even on windows.
-  SmallString<32> File("/libclang_rt.");
+  llvm::SmallString<32> File("/libclang_rt.");
   File += Component.str();
   File += ".a";
   // Return the default compiler-rt path appended with
   // "avr/libclang_rt.$COMPONENT.a".
-  SmallString<256> Path(ToolChain::getCompilerRTPath());
+  llvm::SmallString<256> Path(ToolChain::getCompilerRTPath());
   llvm::sys::path::append(Path, "avr");
   llvm::sys::path::append(Path, File.str());
   return std::string(Path);
@@ -442,7 +442,7 @@ void AVR::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 
   // Compute information about the target AVR.
   std::string CPU = getCPUName(D, Args, getToolChain().getTriple());
-  std::optional<StringRef> FamilyName = GetMCUFamilyName(CPU);
+  std::optional<llvm::StringRef> FamilyName = GetMCUFamilyName(CPU);
   std::optional<std::string> AVRLibcRoot = TC.findAVRLibcInstallation();
   std::optional<unsigned> SectionAddressData = GetMCUSectionAddressData(CPU);
 
@@ -487,7 +487,7 @@ void AVR::Linker::ConstructJob(Compilation &C, const JobAction &JA,
         std::string SubPath = GetMCUSubPath(CPU);
         // Add path of avr-libc.
         CmdArgs.push_back(
-            Args.MakeArgString(Twine("-L") + *AVRLibcRoot + "/lib/" + SubPath));
+            Args.MakeArgString(llvm::Twine("-L") + *AVRLibcRoot + "/lib/" + SubPath));
         if (RtLib == ToolChain::RLT_Libgcc)
           CmdArgs.push_back(Args.MakeArgString("-L" + TC.getGCCInstallPath() +
                                                "/" + SubPath));
@@ -502,7 +502,7 @@ void AVR::Linker::ConstructJob(Compilation &C, const JobAction &JA,
     if (SectionAddressData) {
       CmdArgs.push_back(
           Args.MakeArgString("--defsym=__DATA_REGION_ORIGIN__=0x" +
-                             Twine::utohexstr(*SectionAddressData)));
+                             llvm::Twine::utohexstr(*SectionAddressData)));
     } else {
       // We do not have an entry for this CPU in the address mapping table
       // yet.
@@ -605,7 +605,7 @@ std::optional<std::string> AVRToolChain::findAVRLibcInstallation() const {
 
   // Search avr-libc installation from possible locations, and return the first
   // one that exists, if there is no avr-gcc installed.
-  for (StringRef PossiblePath : PossibleAVRLibcLocations) {
+  for (llvm::StringRef PossiblePath : PossibleAVRLibcLocations) {
     std::string Path = getDriver().SysRoot + PossiblePath.str();
     if (llvm::sys::fs::is_directory(Path))
       return Path;

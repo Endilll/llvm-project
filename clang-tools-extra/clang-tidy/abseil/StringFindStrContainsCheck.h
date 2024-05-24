@@ -21,13 +21,13 @@ namespace clang::tidy::abseil {
 /// http://clang.llvm.org/extra/clang-tidy/checks/abseil/string-find-str-contains.html
 class StringFindStrContainsCheck : public utils::TransformerClangTidyCheck {
 public:
-  StringFindStrContainsCheck(StringRef Name, ClangTidyContext *Context);
+  StringFindStrContainsCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
 
 private:
-  const std::vector<StringRef> StringLikeClassesOption;
-  const StringRef AbseilStringsMatchHeaderOption;
+  const std::vector<llvm::StringRef> StringLikeClassesOption;
+  const llvm::StringRef AbseilStringsMatchHeaderOption;
 };
 
 } // namespace clang::tidy::abseil

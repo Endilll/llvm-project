@@ -19,7 +19,7 @@ namespace clang::tidy::fuchsia {
 /// http://clang.llvm.org/extra/clang-tidy/checks/fuchsia/virtual-inheritance.html
 class VirtualInheritanceCheck : public ClangTidyCheck {
  public:
-  VirtualInheritanceCheck(StringRef Name, ClangTidyContext *Context)
+  VirtualInheritanceCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

@@ -21,7 +21,7 @@ namespace clang::tidy::abseil {
 /// http://clang.llvm.org/extra/clang-tidy/checks/abseil/cleanup-ctad.html
 class CleanupCtadCheck : public utils::TransformerClangTidyCheck {
 public:
-  CleanupCtadCheck(StringRef Name, ClangTidyContext *Context);
+  CleanupCtadCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus17;

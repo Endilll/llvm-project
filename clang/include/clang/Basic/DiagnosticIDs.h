@@ -176,7 +176,7 @@ public:
 /// Used for handling and querying diagnostic IDs.
 ///
 /// Can be used and shared by multiple Diagnostics for multiple translation units.
-class DiagnosticIDs : public RefCountedBase<DiagnosticIDs> {
+class DiagnosticIDs : public llvm::RefCountedBase<DiagnosticIDs> {
 public:
   /// The level of the diagnostic, after it has been through mapping.
   enum Level {
@@ -200,14 +200,14 @@ public:
   // FIXME: Replace this function with a create-only facilty like
   // createCustomDiagIDFromFormatString() to enforce safe usage. At the time of
   // writing, nearly all callers of this function were invalid.
-  unsigned getCustomDiagID(Level L, StringRef FormatString);
+  unsigned getCustomDiagID(Level L, llvm::StringRef FormatString);
 
   //===--------------------------------------------------------------------===//
   // Diagnostic classification and reporting interfaces.
   //
 
   /// Given a diagnostic ID, return a description of the issue.
-  StringRef getDescription(unsigned DiagID) const;
+  llvm::StringRef getDescription(unsigned DiagID) const;
 
   /// Return true if the unmapped diagnostic levelof the specified
   /// diagnostic ID is a Warning or Extension.
@@ -245,15 +245,15 @@ public:
   /// Given a group ID, returns the flag that toggles the group.
   /// For example, for Group::DeprecatedDeclarations, returns
   /// "deprecated-declarations".
-  static StringRef getWarningOptionForGroup(diag::Group);
+  static llvm::StringRef getWarningOptionForGroup(diag::Group);
 
   /// Given a diagnostic group ID, return its documentation.
-  static StringRef getWarningOptionDocumentation(diag::Group GroupID);
+  static llvm::StringRef getWarningOptionDocumentation(diag::Group GroupID);
 
   /// Given a group ID, returns the flag that toggles the group.
   /// For example, for "deprecated-declarations", returns
   /// Group::DeprecatedDeclarations.
-  static std::optional<diag::Group> getGroupForWarningOption(StringRef);
+  static std::optional<diag::Group> getGroupForWarningOption(llvm::StringRef);
 
   /// Return the lowest-level group that contains the specified diagnostic.
   static std::optional<diag::Group> getGroupForDiag(unsigned DiagID);
@@ -262,7 +262,7 @@ public:
   /// diagnostic.
   ///
   /// If there is no -Wfoo flag that controls the diagnostic, this returns null.
-  static StringRef getWarningOptionForDiag(unsigned DiagID);
+  static llvm::StringRef getWarningOptionForDiag(unsigned DiagID);
 
   /// Return the category number that a specified \p DiagID belongs to,
   /// or 0 if no category.
@@ -272,7 +272,7 @@ public:
   static unsigned getNumberOfCategories();
 
   /// Given a category ID, return the name of the category.
-  static StringRef getCategoryNameFromID(unsigned CategoryID);
+  static llvm::StringRef getCategoryNameFromID(unsigned CategoryID);
 
   /// Return true if a given diagnostic falls into an ARC diagnostic
   /// category.
@@ -335,8 +335,8 @@ public:
   ///
   /// \param[out] Diags - On return, the diagnostics in the group.
   /// \returns \c true if the given group is unknown, \c false otherwise.
-  bool getDiagnosticsInGroup(diag::Flavor Flavor, StringRef Group,
-                             SmallVectorImpl<diag::kind> &Diags) const;
+  bool getDiagnosticsInGroup(diag::Flavor Flavor, llvm::StringRef Group,
+                             llvm::SmallVectorImpl<diag::kind> &Diags) const;
 
   /// Get the set of all diagnostic IDs.
   static void getAllDiagnostics(diag::Flavor Flavor,
@@ -344,7 +344,7 @@ public:
 
   /// Get the diagnostic option with the closest edit distance to the
   /// given group name.
-  static StringRef getNearestOption(diag::Flavor Flavor, StringRef Group);
+  static llvm::StringRef getNearestOption(diag::Flavor Flavor, llvm::StringRef Group);
 
 private:
   /// Classify the specified diagnostic ID into a Level, consumable by

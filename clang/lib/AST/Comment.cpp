@@ -365,14 +365,14 @@ void DeclInfo::fill() {
   IsFilled = true;
 }
 
-StringRef ParamCommandComment::getParamName(const FullComment *FC) const {
+llvm::StringRef ParamCommandComment::getParamName(const FullComment *FC) const {
   assert(isParamIndexValid());
   if (isVarArgParam())
     return "...";
   return FC->getDeclInfo()->ParamVars[getParamIndex()]->getName();
 }
 
-StringRef TParamCommandComment::getParamName(const FullComment *FC) const {
+llvm::StringRef TParamCommandComment::getParamName(const FullComment *FC) const {
   assert(isPositionValid());
   const TemplateParameterList *TPL = FC->getDeclInfo()->TemplateParameters;
   for (unsigned i = 0, e = getDepth(); i != e; ++i) {

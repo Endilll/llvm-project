@@ -141,15 +141,15 @@ private:
 
 ParsedSourceLocation offsetToPosition(llvm::StringRef Code, size_t Offset) {
   Offset = std::min(Code.size(), Offset);
-  StringRef Before = Code.substr(0, Offset);
+  llvm::StringRef Before = Code.substr(0, Offset);
   int Lines = Before.count('\n');
   size_t PrevNL = Before.rfind('\n');
-  size_t StartOfLine = (PrevNL == StringRef::npos) ? 0 : (PrevNL + 1);
+  size_t StartOfLine = (PrevNL == llvm::StringRef::npos) ? 0 : (PrevNL + 1);
   return {TestCCName, static_cast<unsigned>(Lines + 1),
           static_cast<unsigned>(Offset - StartOfLine + 1)};
 }
 
-CompletionContext runCompletion(StringRef Code, size_t Offset) {
+CompletionContext runCompletion(llvm::StringRef Code, size_t Offset) {
   CompletionContext ResultCtx;
   clang::tooling::runToolOnCodeWithArgs(
       std::make_unique<CodeCompleteAction>(offsetToPosition(Code, Offset),
@@ -158,13 +158,13 @@ CompletionContext runCompletion(StringRef Code, size_t Offset) {
   return ResultCtx;
 }
 
-CompletionContext runCodeCompleteOnCode(StringRef AnnotatedCode) {
+CompletionContext runCodeCompleteOnCode(llvm::StringRef AnnotatedCode) {
   llvm::Annotations A(AnnotatedCode);
   return runCompletion(A.code(), A.point());
 }
 
 std::vector<std::string>
-collectPreferredTypes(StringRef AnnotatedCode,
+collectPreferredTypes(llvm::StringRef AnnotatedCode,
                       std::string *PtrDiffType = nullptr) {
   llvm::Annotations A(AnnotatedCode);
   std::vector<std::string> Types;
@@ -180,7 +180,7 @@ collectPreferredTypes(StringRef AnnotatedCode,
 }
 
 std::vector<CompletedFunctionDecl>
-CollectCompletedFunctions(StringRef Code, std::size_t Point) {
+CollectCompletedFunctions(llvm::StringRef Code, std::size_t Point) {
   std::vector<CompletedFunctionDecl> Result;
   clang::tooling::runToolOnCodeWithArgs(
       std::make_unique<CodeCompleteAction>(offsetToPosition(Code, Point),
@@ -314,7 +314,7 @@ TEST(SemaCodeCompleteTest, VisitedNSWithoutQualifier) {
 
 TEST(PreferredTypeTest, BinaryExpr) {
   // Check various operations for arithmetic types.
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
     void test(int x) {
       x = ^10;
       x += ^10; x -= ^10; x *= ^10; x /= ^10; x %= ^10;
@@ -459,7 +459,7 @@ TEST(PreferredTypeTest, BinaryExpr) {
 }
 
 TEST(PreferredTypeTest, Members) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
     struct vector {
       int *begin();
       vector clone();
@@ -473,7 +473,7 @@ TEST(PreferredTypeTest, Members) {
 }
 
 TEST(PreferredTypeTest, Conditions) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
     struct vector {
       bool empty();
     };
@@ -488,7 +488,7 @@ TEST(PreferredTypeTest, Conditions) {
 }
 
 TEST(PreferredTypeTest, InitAndAssignment) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
     struct vector {
       int* begin();
     };
@@ -504,7 +504,7 @@ TEST(PreferredTypeTest, InitAndAssignment) {
 }
 
 TEST(PreferredTypeTest, UnaryExprs) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
     void test(long long a) {
       a = +^a;
       a = -^a
@@ -552,14 +552,14 @@ TEST(PreferredTypeTest, UnaryExprs) {
 }
 
 TEST(PreferredTypeTest, ParenExpr) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
     const int *i = ^(^(^(^10)));
   )cpp";
   EXPECT_THAT(collectPreferredTypes(Code), Each("const int *"));
 }
 
 TEST(PreferredTypeTest, FunctionArguments) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
     void foo(const int*);
 
     void bar(const int*);
@@ -622,7 +622,7 @@ TEST(PreferredTypeTest, FunctionArguments) {
 }
 
 TEST(PreferredTypeTest, NoCrashOnInvalidTypes) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
     auto x = decltype(&1)(^);
     auto y = new decltype(&1)(^);
     // GNU decimal type extension is not supported in clang.

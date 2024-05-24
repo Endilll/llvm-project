@@ -20,7 +20,7 @@
 namespace clang {
 namespace format {
 std::pair<tooling::Replacements, unsigned> DefinitionBlockSeparator::analyze(
-    TokenAnnotator &Annotator, SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+    TokenAnnotator &Annotator, llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
     FormatTokenLexer &Tokens) {
   assert(Style.SeparateDefinitionBlocks != FormatStyle::SDS_Leave);
   AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
@@ -30,7 +30,7 @@ std::pair<tooling::Replacements, unsigned> DefinitionBlockSeparator::analyze(
 }
 
 void DefinitionBlockSeparator::separateBlocks(
-    SmallVectorImpl<AnnotatedLine *> &Lines, tooling::Replacements &Result,
+    llvm::SmallVectorImpl<AnnotatedLine *> &Lines, tooling::Replacements &Result,
     FormatTokenLexer &Tokens) {
   const bool IsNeverStyle =
       Style.SeparateDefinitionBlocks == FormatStyle::SDS_Never;

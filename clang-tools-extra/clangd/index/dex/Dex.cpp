@@ -211,7 +211,7 @@ Dex::createTypeBoostingIterator(llvm::ArrayRef<std::string> Types) const {
 /// of the matched symbols.
 bool Dex::fuzzyFind(const FuzzyFindRequest &Req,
                     llvm::function_ref<void(const Symbol &)> Callback) const {
-  assert(!StringRef(Req.Query).contains("::") &&
+  assert(!llvm::StringRef(Req.Query).contains("::") &&
          "There must be no :: in query.");
   trace::Span Tracer("Dex fuzzyFind");
   FuzzyMatcher Filter(Req.Query);
@@ -387,7 +387,7 @@ generateProximityURIs(llvm::StringRef URI) {
   // The original is a proximity URI.
   llvm::SmallVector<llvm::StringRef, ProximityURILimit> Result = {URI};
   // Form proximity URIs by chopping before each slash in the path part.
-  for (auto Slash = Path.rfind('/'); Slash > 0 && Slash != StringRef::npos;
+  for (auto Slash = Path.rfind('/'); Slash > 0 && Slash != llvm::StringRef::npos;
        Slash = Path.rfind('/')) {
     Path = Path.substr(0, Slash);
     Result.push_back(URI.substr(0, Path.end() - URI.data()));

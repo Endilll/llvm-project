@@ -70,7 +70,7 @@ isOrPointsTo(const clang::ast_matchers::DeclarationMatcher &TypeMatcher) {
   return anyOf(hasDeclaration(TypeMatcher), pointsTo(TypeMatcher));
 }
 
-static std::string format(StringRef Code) {
+static std::string format(llvm::StringRef Code) {
   const std::vector<Range> Ranges(1, Range(0, Code.size()));
   auto Style = format::getLLVMStyle();
   const auto Replacements = format::reformat(Style, Code, Ranges);
@@ -83,7 +83,7 @@ static std::string format(StringRef Code) {
   return *Formatted;
 }
 
-static void compareSnippets(StringRef Expected,
+static void compareSnippets(llvm::StringRef Expected,
                             const std::optional<std::string> &MaybeActual) {
   ASSERT_TRUE(MaybeActual) << "Rewrite failed. Expecting: " << Expected;
   auto Actual = *MaybeActual;
@@ -97,13 +97,13 @@ static void compareSnippets(StringRef Expected,
 // FIXME: consider separating this class into its own file(s).
 class ClangRefactoringTestBase : public testing::Test {
 protected:
-  void appendToHeader(StringRef S) { FileContents[0].second += S; }
+  void appendToHeader(llvm::StringRef S) { FileContents[0].second += S; }
 
-  void addFile(StringRef Filename, StringRef Content) {
+  void addFile(llvm::StringRef Filename, llvm::StringRef Content) {
     FileContents.emplace_back(std::string(Filename), std::string(Content));
   }
 
-  std::optional<std::string> rewrite(StringRef Input) {
+  std::optional<std::string> rewrite(llvm::StringRef Input) {
     std::string Code = ("#include \"header.h\"\n" + Input).str();
     auto Factory = newFrontendActionFactory(&MatchFinder);
     if (!runToolOnCodeWithArgs(
@@ -128,7 +128,7 @@ protected:
   }
 
   Transformer::ChangeSetConsumer consumer() {
-    return [this](Expected<MutableArrayRef<AtomicChange>> C) {
+    return [this](llvm::Expected<llvm::MutableArrayRef<AtomicChange>> C) {
       if (C) {
         Changes.insert(Changes.end(), std::make_move_iterator(C->begin()),
                        std::make_move_iterator(C->end()));
@@ -142,7 +142,7 @@ protected:
   }
 
   auto consumerWithStringMetadata() {
-    return [this](Expected<TransformerResult<std::string>> C) {
+    return [this](llvm::Expected<TransformerResult<std::string>> C) {
       if (C) {
         Changes.insert(Changes.end(),
                        std::make_move_iterator(C->Changes.begin()),
@@ -157,29 +157,29 @@ protected:
     };
   }
 
-  void testRule(RewriteRule Rule, StringRef Input, StringRef Expected) {
+  void testRule(RewriteRule Rule, llvm::StringRef Input, llvm::StringRef Expected) {
     Transformers.push_back(
         std::make_unique<Transformer>(std::move(Rule), consumer()));
     Transformers.back()->registerMatchers(&MatchFinder);
     compareSnippets(Expected, rewrite(Input));
   }
 
-  void testRule(RewriteRuleWith<std::string> Rule, StringRef Input,
-                StringRef Expected) {
+  void testRule(RewriteRuleWith<std::string> Rule, llvm::StringRef Input,
+                llvm::StringRef Expected) {
     Transformers.push_back(std::make_unique<Transformer>(
         std::move(Rule), consumerWithStringMetadata()));
     Transformers.back()->registerMatchers(&MatchFinder);
     compareSnippets(Expected, rewrite(Input));
   }
 
-  void testRuleFailure(RewriteRule Rule, StringRef Input) {
+  void testRuleFailure(RewriteRule Rule, llvm::StringRef Input) {
     Transformers.push_back(
         std::make_unique<Transformer>(std::move(Rule), consumer()));
     Transformers.back()->registerMatchers(&MatchFinder);
     ASSERT_FALSE(rewrite(Input)) << "Expected failure to rewrite code";
   }
 
-  void testRuleFailure(RewriteRuleWith<std::string> Rule, StringRef Input) {
+  void testRuleFailure(RewriteRuleWith<std::string> Rule, llvm::StringRef Input) {
     Transformers.push_back(std::make_unique<Transformer>(
         std::move(Rule), consumerWithStringMetadata()));
     Transformers.back()->registerMatchers(&MatchFinder);
@@ -205,7 +205,7 @@ protected:
 
 // Given string s, change strlen($s.c_str()) to REPLACED.
 static RewriteRuleWith<std::string> ruleStrlenSize() {
-  StringRef StringExpr = "strexpr";
+  llvm::StringRef StringExpr = "strexpr";
   auto StringType = namedDecl(hasAnyName("::basic_string", "::string"));
   auto R = makeRule(
       callExpr(callee(functionDecl(hasName("strlen"))),
@@ -231,7 +231,7 @@ TEST_F(TransformerTest, NoMatch) {
 
 // Tests replacing an expression.
 TEST_F(TransformerTest, Flag) {
-  StringRef Flag = "flag";
+  llvm::StringRef Flag = "flag";
   RewriteRule Rule = makeRule(
       cxxMemberCallExpr(on(expr(hasType(cxxRecordDecl(
                                     hasName("proto::ProtoCommandLineFlag"))))
@@ -327,7 +327,7 @@ TEST_F(TransformerTest, AddIncludeAngledForRule) {
 }
 
 TEST_F(TransformerTest, NodePartNameNamedDecl) {
-  StringRef Fun = "fun";
+  llvm::StringRef Fun = "fun";
   RewriteRule Rule = makeRule(functionDecl(hasName("bad")).bind(Fun),
                               changeTo(name(std::string(Fun)), cat("good")));
 
@@ -359,7 +359,7 @@ TEST_F(TransformerTest, NodePartNameDeclRef) {
     int neutral(int x) { return good<int>(x) * x; }
   )cc";
 
-  StringRef Ref = "ref";
+  llvm::StringRef Ref = "ref";
   testRule(makeRule(declRefExpr(to(functionDecl(hasName("bad")))).bind(Ref),
                     changeTo(name(std::string(Ref)), cat("good"))),
            Input, Expected);
@@ -377,7 +377,7 @@ TEST_F(TransformerTest, NodePartNameDeclRefFailure) {
     }
   )cc";
 
-  StringRef Ref = "ref";
+  llvm::StringRef Ref = "ref";
   Transformer T(makeRule(declRefExpr(to(functionDecl())).bind(Ref),
                          changeTo(name(std::string(Ref)), cat("good"))),
                 consumer());
@@ -386,7 +386,7 @@ TEST_F(TransformerTest, NodePartNameDeclRefFailure) {
 }
 
 TEST_F(TransformerTest, NodePartMember) {
-  StringRef E = "expr";
+  llvm::StringRef E = "expr";
   RewriteRule Rule =
       makeRule(memberExpr(clang::ast_matchers::member(hasName("bad"))).bind(E),
                changeTo(member(std::string(E)), cat("good")));
@@ -441,7 +441,7 @@ TEST_F(TransformerTest, NodePartMemberQualified) {
     }
   )cc";
 
-  StringRef E = "expr";
+  llvm::StringRef E = "expr";
   testRule(makeRule(memberExpr().bind(E),
                     changeTo(member(std::string(E)), cat("good"))),
            Input, Expected);
@@ -473,7 +473,7 @@ TEST_F(TransformerTest, NodePartMemberMultiToken) {
     }
   )cc";
 
-  StringRef MemExpr = "member";
+  llvm::StringRef MemExpr = "member";
   testRule(makeRule(memberExpr().bind(MemExpr),
                     changeTo(member(std::string(MemExpr)), cat("good"))),
            Input, Expected);
@@ -731,7 +731,7 @@ TEST_F(TransformerTest, InsertBeforeEdit) {
     }
   )cc";
 
-  StringRef Ret = "return";
+  llvm::StringRef Ret = "return";
   testRule(
       makeRule(returnStmt().bind(Ret),
                insertBefore(statement(std::string(Ret)), cat("int y = 3;"))),
@@ -753,7 +753,7 @@ TEST_F(TransformerTest, InsertAfterEdit) {
     }
   )cc";
 
-  StringRef Decl = "decl";
+  llvm::StringRef Decl = "decl";
   testRule(
       makeRule(declStmt().bind(Decl),
                insertAfter(statement(std::string(Decl)), cat("int y = 3;"))),
@@ -773,7 +773,7 @@ TEST_F(TransformerTest, RemoveEdit) {
     }
   )cc";
 
-  StringRef Decl = "decl";
+  llvm::StringRef Decl = "decl";
   testRule(
       makeRule(declStmt().bind(Decl), remove(statement(std::string(Decl)))),
       Input, Expected);
@@ -827,7 +827,7 @@ TEST_F(TransformerTest, MultiChange) {
     }
   )";
 
-  StringRef C = "C", T = "T", E = "E";
+  llvm::StringRef C = "C", T = "T", E = "E";
   testRule(
       makeRule(ifStmt(hasCondition(expr().bind(C)), hasThen(stmt().bind(T)),
                       hasElse(stmt().bind(E))),
@@ -853,7 +853,7 @@ TEST_F(TransformerTest, EditList) {
     }
   )";
 
-  StringRef C = "C", T = "T", E = "E";
+  llvm::StringRef C = "C", T = "T", E = "E";
   testRule(makeRule(ifStmt(hasCondition(expr().bind(C)),
                            hasThen(stmt().bind(T)), hasElse(stmt().bind(E))),
                     editList({changeTo(node(std::string(C)), cat("true")),
@@ -880,7 +880,7 @@ TEST_F(TransformerTest, Flatten) {
     }
   )";
 
-  StringRef C = "C", T = "T", E = "E";
+  llvm::StringRef C = "C", T = "T", E = "E";
   testRule(
       makeRule(
           ifStmt(hasCondition(expr().bind(C)), hasThen(stmt().bind(T)),
@@ -908,7 +908,7 @@ TEST_F(TransformerTest, FlattenWithMixedArgs) {
     }
   )";
 
-  StringRef C = "C", T = "T", E = "E";
+  llvm::StringRef C = "C", T = "T", E = "E";
   testRule(makeRule(ifStmt(hasCondition(expr().bind(C)),
                            hasThen(stmt().bind(T)), hasElse(stmt().bind(E))),
                     flatten(changeTo(node(std::string(C)), cat("true")),
@@ -920,7 +920,7 @@ TEST_F(TransformerTest, FlattenWithMixedArgs) {
 }
 
 TEST_F(TransformerTest, OrderedRuleUnrelated) {
-  StringRef Flag = "flag";
+  llvm::StringRef Flag = "flag";
   RewriteRuleWith<std::string> FlagRule = makeRule(
       cxxMemberCallExpr(on(expr(hasType(cxxRecordDecl(
                                     hasName("proto::ProtoCommandLineFlag"))))
@@ -1058,7 +1058,7 @@ TEST_F(TransformerTest, OrderedRuleImplicitMatched) {
 TEST_F(TransformerTest, TextGeneratorFailure) {
   std::string Input = "int conflictOneRule() { return 3 + 7; }";
   // Try to change the whole binary-operator expression AND one its operands:
-  StringRef O = "O";
+  llvm::StringRef O = "O";
   class AlwaysFail : public transformer::MatchComputation<std::string> {
     llvm::Error eval(const ast_matchers::MatchFinder::MatchResult &,
                      std::string *) const override {
@@ -1080,7 +1080,7 @@ TEST_F(TransformerTest, TextGeneratorFailure) {
 TEST_F(TransformerTest, OverlappingEditsInRule) {
   std::string Input = "int conflictOneRule() { return 3 + 7; }";
   // Try to change the whole binary-operator expression AND one its operands:
-  StringRef O = "O", L = "L";
+  llvm::StringRef O = "O", L = "L";
   Transformer T(makeRule(binaryOperator(hasLHS(expr().bind(L))).bind(O),
                          {changeTo(node(std::string(O)), cat("DELETE_OP")),
                           changeTo(node(std::string(L)), cat("DELETE_LHS"))}),
@@ -1095,7 +1095,7 @@ TEST_F(TransformerTest, OverlappingEditsInRule) {
 TEST_F(TransformerTest, OverlappingEditsMultipleMatches) {
   std::string Input = "int conflictOneRule() { return -7; }";
   // Try to change the whole binary-operator expression AND one its operands:
-  StringRef E = "E";
+  llvm::StringRef E = "E";
   Transformer T(makeRule(expr().bind(E),
                          changeTo(node(std::string(E)), cat("DELETE_EXPR"))),
                 consumer());
@@ -1439,7 +1439,7 @@ TEST_F(TransformerTest, SimpleMacro) {
     int f(string s) { return 999; }
   )cc";
 
-  StringRef zero = "zero";
+  llvm::StringRef zero = "zero";
   RewriteRule R = makeRule(integerLiteral(equals(0)).bind(zero),
                            changeTo(node(std::string(zero)), cat("999")));
   testRule(R, Input, Expected);
@@ -1536,7 +1536,7 @@ TEST_F(TransformerTest, MatchSpansMacroTextButChangeDoesNot) {
     int f() { return PLUS_ONE(LIT); }
   )cc";
 
-  StringRef E = "expr";
+  llvm::StringRef E = "expr";
   testRule(makeRule(binaryOperator(hasLHS(expr().bind(E))),
                     changeTo(node(std::string(E)), cat("LIT"))),
            Input, Expected);
@@ -1554,7 +1554,7 @@ TEST_F(TransformerTest, MatchSpansMacroTextButChangeDoesNotAnchoredInMacro) {
     int f() { return PLUS_ONE(LIT); }
   )cc";
 
-  StringRef E = "expr";
+  llvm::StringRef E = "expr";
   testRule(makeRule(binaryOperator(hasRHS(expr().bind(E))),
                     changeTo(node(std::string(E)), cat("LIT"))),
            Input, Expected);
@@ -1569,7 +1569,7 @@ TEST_F(TransformerTest, NoPartialRewriteOMacroExpansion) {
 #define ZERO_PLUS 0 + 3
     int f(string s) { return ZERO_PLUS; })cc";
 
-  StringRef zero = "zero";
+  llvm::StringRef zero = "zero";
   RewriteRule R = makeRule(integerLiteral(equals(0)).bind(zero),
                            changeTo(node(std::string(zero)), cat("0")));
   testRule(R, Input, Input);
@@ -1691,7 +1691,7 @@ TEST_F(TransformerTest, MultiFileEdit) {
                                                  parmVarDecl().bind("param"))),
                {changeTo(node("arg"), cat("ARG")),
                 changeTo(node("param"), cat("PARAM"))}),
-      [&](Expected<MutableArrayRef<AtomicChange>> Changes) {
+      [&](llvm::Expected<llvm::MutableArrayRef<AtomicChange>> Changes) {
         if (Changes)
           ChangeSets.push_back(AtomicChanges(Changes->begin(), Changes->end()));
         else

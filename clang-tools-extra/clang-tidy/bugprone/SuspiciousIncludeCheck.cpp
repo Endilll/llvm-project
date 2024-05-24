@@ -23,10 +23,10 @@ public:
       : Check(Check), PP(PP) {}
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
 
@@ -36,7 +36,7 @@ private:
 };
 } // namespace
 
-SuspiciousIncludeCheck::SuspiciousIncludeCheck(StringRef Name,
+SuspiciousIncludeCheck::SuspiciousIncludeCheck(llvm::StringRef Name,
                                                ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       HeaderFileExtensions(Context->getHeaderFileExtensions()),
@@ -50,16 +50,16 @@ void SuspiciousIncludeCheck::registerPPCallbacks(
 }
 
 void SuspiciousIncludePPCallbacks::InclusionDirective(
-    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    SourceLocation HashLoc, const Token &IncludeTok, llvm::StringRef FileName,
     bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
-    StringRef SearchPath, StringRef RelativePath, const Module *SuggestedModule,
+    llvm::StringRef SearchPath, llvm::StringRef RelativePath, const Module *SuggestedModule,
     bool ModuleImported, SrcMgr::CharacteristicKind FileType) {
   if (IncludeTok.getIdentifierInfo()->getPPKeywordID() == tok::pp_import)
     return;
 
   SourceLocation DiagLoc = FilenameRange.getBegin().getLocWithOffset(1);
 
-  const std::optional<StringRef> IFE =
+  const std::optional<llvm::StringRef> IFE =
       utils::getFileExtension(FileName, Check.ImplementationFileExtensions);
   if (!IFE)
     return;
@@ -68,7 +68,7 @@ void SuspiciousIncludePPCallbacks::InclusionDirective(
       << IncludeTok.getIdentifierInfo()->getName() << *IFE;
 
   for (const auto &HFE : Check.HeaderFileExtensions) {
-    SmallString<128> GuessedFileName(FileName);
+    llvm::SmallString<128> GuessedFileName(FileName);
     llvm::sys::path::replace_extension(GuessedFileName,
                                        (!HFE.empty() ? "." : "") + HFE);
 

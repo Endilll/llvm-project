@@ -86,19 +86,19 @@ private:
 };
 } // namespace
 
-static void printVersion(raw_ostream &OS) {
+static void printVersion(llvm::raw_ostream &OS) {
   OS << "clang-apply-replacements version " CLANG_VERSION_STRING << "\n";
 }
 
 int main(int argc, char **argv) {
-  cl::HideUnrelatedOptions(ArrayRef(VisibleCategories));
+  cl::HideUnrelatedOptions(llvm::ArrayRef(VisibleCategories));
 
   cl::SetVersionPrinter(printVersion);
   cl::ParseCommandLineOptions(argc, argv);
 
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(new DiagnosticOptions());
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(new DiagnosticOptions());
   DiagnosticsEngine Diagnostics(
-      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), DiagOpts.get());
+      llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), DiagOpts.get());
 
   // Determine a formatting style from options.
   auto FormatStyleOrError = format::getStyle(FormatStyleOpt, FormatStyleConfig,
@@ -147,7 +147,7 @@ int main(int argc, char **argv) {
 
   for (const auto &FileChange : Changes) {
     FileEntryRef Entry = FileChange.first;
-    StringRef FileName = Entry.getName();
+    llvm::StringRef FileName = Entry.getName();
     llvm::Expected<std::string> NewFileData =
         applyChanges(FileName, FileChange.second, Spec, Diagnostics);
     if (!NewFileData) {

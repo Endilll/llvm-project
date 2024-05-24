@@ -31,10 +31,10 @@ bool isSpellingLocInHeaderFile(SourceLocation Loc, SourceManager &SM,
   return isFileExtension(SM.getFilename(SpellingLoc), HeaderFileExtensions);
 }
 
-bool parseFileExtensions(StringRef AllFileExtensions,
+bool parseFileExtensions(llvm::StringRef AllFileExtensions,
                          FileExtensionsSet &FileExtensions,
-                         StringRef Delimiters) {
-  SmallVector<StringRef, 5> Suffixes;
+                         llvm::StringRef Delimiters) {
+  llvm::SmallVector<llvm::StringRef, 5> Suffixes;
   for (char Delimiter : Delimiters) {
     if (AllFileExtensions.contains(Delimiter)) {
       AllFileExtensions.split(Suffixes, Delimiter);
@@ -43,8 +43,8 @@ bool parseFileExtensions(StringRef AllFileExtensions,
   }
 
   FileExtensions.clear();
-  for (StringRef Suffix : Suffixes) {
-    StringRef Extension = Suffix.trim();
+  for (llvm::StringRef Suffix : Suffixes) {
+    llvm::StringRef Extension = Suffix.trim();
     if (!llvm::all_of(Extension, isAlphanumeric))
       return false;
     FileExtensions.insert(Extension);
@@ -52,9 +52,9 @@ bool parseFileExtensions(StringRef AllFileExtensions,
   return true;
 }
 
-std::optional<StringRef>
-getFileExtension(StringRef FileName, const FileExtensionsSet &FileExtensions) {
-  StringRef Extension = llvm::sys::path::extension(FileName);
+std::optional<llvm::StringRef>
+getFileExtension(llvm::StringRef FileName, const FileExtensionsSet &FileExtensions) {
+  llvm::StringRef Extension = llvm::sys::path::extension(FileName);
   if (Extension.empty())
     return std::nullopt;
   // Skip "." prefix.
@@ -63,7 +63,7 @@ getFileExtension(StringRef FileName, const FileExtensionsSet &FileExtensions) {
   return Extension;
 }
 
-bool isFileExtension(StringRef FileName,
+bool isFileExtension(llvm::StringRef FileName,
                      const FileExtensionsSet &FileExtensions) {
   return getFileExtension(FileName, FileExtensions).has_value();
 }

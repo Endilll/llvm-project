@@ -21,11 +21,11 @@ class RefactoringRuleContext;
 
 struct RefactoringDescriptor {
   /// A unique identifier for the specific refactoring.
-  StringRef Name;
+  llvm::StringRef Name;
   /// A human readable title for the refactoring.
-  StringRef Title;
+  llvm::StringRef Title;
   /// A human readable description of what the refactoring does.
-  StringRef Description;
+  llvm::StringRef Description;
 };
 
 /// A common refactoring action rule interface that defines the 'invoke'

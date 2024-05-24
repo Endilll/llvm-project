@@ -119,7 +119,7 @@ template <typename T> struct TypeListContainsSuperOf<EmptyTypeList, T> {
 /// using plain C++11 variadic functions, but the function object allows us to
 /// capture it on the dynamic matcher registry.
 template <typename ResultT, typename ArgT,
-          ResultT (*Func)(ArrayRef<const ArgT *>)>
+          ResultT (*Func)(llvm::ArrayRef<const ArgT *>)>
 struct VariadicFunction {
   ResultT operator()() const { return Func(std::nullopt); }
 
@@ -130,7 +130,7 @@ struct VariadicFunction {
 
   // We also allow calls with an already created array, in case the caller
   // already had it.
-  ResultT operator()(ArrayRef<ArgT> Args) const {
+  ResultT operator()(llvm::ArrayRef<ArgT> Args) const {
     return Func(llvm::to_vector<8>(llvm::make_pointer_range(Args)));
   }
 
@@ -139,7 +139,7 @@ private:
   // before we make the array.
   template <typename... ArgsT> ResultT Execute(const ArgsT &... Args) const {
     const ArgT *const ArgsArray[] = {&Args...};
-    return Func(ArrayRef<const ArgT *>(ArgsArray, sizeof...(ArgsT)));
+    return Func(llvm::ArrayRef<const ArgT *>(ArgsArray, sizeof...(ArgsT)));
   }
 };
 
@@ -213,7 +213,7 @@ public:
   /// Adds \c Node to the map with key \c ID.
   ///
   /// The node's base type should be in NodeBaseType or it will be unaccessible.
-  void addNode(StringRef ID, const DynTypedNode &DynNode) {
+  void addNode(llvm::StringRef ID, const DynTypedNode &DynNode) {
     NodeMap[std::string(ID)] = DynNode;
   }
 
@@ -222,7 +222,7 @@ public:
   /// Returns NULL if there was no node bound to \c ID or if there is a node but
   /// it cannot be converted to the specified type.
   template <typename T>
-  const T *getNodeAs(StringRef ID) const {
+  const T *getNodeAs(llvm::StringRef ID) const {
     IDToNodeMap::const_iterator It = NodeMap.find(ID);
     if (It == NodeMap.end()) {
       return nullptr;
@@ -230,7 +230,7 @@ public:
     return It->second.get<T>();
   }
 
-  DynTypedNode getNode(StringRef ID) const {
+  DynTypedNode getNode(llvm::StringRef ID) const {
     IDToNodeMap::const_iterator It = NodeMap.find(ID);
     if (It == NodeMap.end()) {
       return DynTypedNode();
@@ -287,7 +287,7 @@ public:
   };
 
   /// Add a binding from an id to a node.
-  void setBinding(StringRef Id, const DynTypedNode &DynNode) {
+  void setBinding(llvm::StringRef Id, const DynTypedNode &DynNode) {
     if (Bindings.empty())
       Bindings.emplace_back();
     for (BoundNodesMap &Binding : Bindings)
@@ -324,7 +324,7 @@ public:
   }
 
 private:
-  SmallVector<BoundNodesMap, 1> Bindings;
+  llvm::SmallVector<BoundNodesMap, 1> Bindings;
 };
 
 class ASTMatchFinder;
@@ -479,7 +479,7 @@ public:
   /// Bind the specified \p ID to the matcher.
   /// \return A new matcher with the \p ID bound to it if this matcher supports
   ///   binding. Otherwise, returns an empty \c std::optional<>.
-  std::optional<DynTypedMatcher> tryBind(StringRef ID) const;
+  std::optional<DynTypedMatcher> tryBind(llvm::StringRef ID) const;
 
   /// Returns a unique \p ID for the matcher.
   ///
@@ -538,7 +538,7 @@ public:
 
 private:
   DynTypedMatcher(ASTNodeKind SupportedKind, ASTNodeKind RestrictKind,
-                  IntrusiveRefCntPtr<DynMatcherInterface> Implementation)
+                  llvm::IntrusiveRefCntPtr<DynMatcherInterface> Implementation)
       : SupportedKind(SupportedKind), RestrictKind(RestrictKind),
         Implementation(std::move(Implementation)) {}
 
@@ -550,7 +550,7 @@ private:
   /// It allows to perform implicit and dynamic cast of matchers without
   /// needing to change \c Implementation.
   ASTNodeKind RestrictKind;
-  IntrusiveRefCntPtr<DynMatcherInterface> Implementation;
+  llvm::IntrusiveRefCntPtr<DynMatcherInterface> Implementation;
 };
 
 /// Wrapper of a MatcherInterface<T> *that allows copying.
@@ -896,7 +896,7 @@ public:
 /// Matches overloaded operators with a specific name.
 ///
 /// The type argument ArgT is not used by this matcher but is used by
-/// PolymorphicMatcher and should be StringRef.
+/// PolymorphicMatcher and should be llvm::StringRef.
 template <typename T, typename ArgT>
 class HasOverloadedOperatorNameMatcher : public SingleNodeMatcherInterface<T> {
   static_assert(std::is_same<T, CXXOperatorCallExpr>::value ||
@@ -970,12 +970,12 @@ private:
 
 /// Trampoline function to use VariadicFunction<> to construct a
 ///        HasNameMatcher.
-Matcher<NamedDecl> hasAnyNameFunc(ArrayRef<const StringRef *> NameRefs);
+Matcher<NamedDecl> hasAnyNameFunc(llvm::ArrayRef<const llvm::StringRef *> NameRefs);
 
 /// Trampoline function to use VariadicFunction<> to construct a
 ///        hasAnySelector matcher.
 Matcher<ObjCMessageExpr> hasAnySelectorFunc(
-    ArrayRef<const StringRef *> NameRefs);
+    llvm::ArrayRef<const llvm::StringRef *> NameRefs);
 
 /// Matches declarations for QualType and CallExpr.
 ///
@@ -1229,7 +1229,7 @@ public:
   ///
   /// The returned matcher is equivalent to this matcher, but will
   /// bind the matched node on a match.
-  Matcher<T> bind(StringRef ID) const {
+  Matcher<T> bind(llvm::StringRef ID) const {
     return DynTypedMatcher(*this)
         .tryBind(ID)
         ->template unconditionalConvertTo<T>();
@@ -1261,7 +1261,7 @@ public:
 /// Creates a Matcher<T> that matches if all inner matchers match.
 template <typename T>
 BindableMatcher<T>
-makeAllOfComposite(ArrayRef<const Matcher<T> *> InnerMatchers) {
+makeAllOfComposite(llvm::ArrayRef<const Matcher<T> *> InnerMatchers) {
   // For the size() == 0 case, we return a "true" matcher.
   if (InnerMatchers.empty()) {
     return BindableMatcher<T>(TrueMatcher());
@@ -1291,7 +1291,7 @@ makeAllOfComposite(ArrayRef<const Matcher<T> *> InnerMatchers) {
 /// so there is no ambiguity with what gets bound.
 template <typename T, typename InnerT>
 BindableMatcher<T>
-makeDynCastAllOfComposite(ArrayRef<const Matcher<InnerT> *> InnerMatchers) {
+makeDynCastAllOfComposite(llvm::ArrayRef<const Matcher<InnerT> *> InnerMatchers) {
   return BindableMatcher<T>(
       makeAllOfComposite(InnerMatchers).template dynCastTo<T>());
 }
@@ -1434,7 +1434,7 @@ template <typename... MatcherTypes> struct MapAnyOfHelper {
 
   operator BindableMatcher<CladeType>() const { return with(); }
 
-  Matcher<CladeType> bind(StringRef ID) const { return with().bind(ID); }
+  Matcher<CladeType> bind(llvm::StringRef ID) const { return with().bind(ID); }
 };
 
 template <template <typename ToArg, typename FromArg> class ArgumentAdapterT,
@@ -1875,13 +1875,13 @@ private:
   using Self = TypeTraversePolymorphicMatcher<InnerTBase, Getter, MatcherImpl,
                                               ReturnTypesF>;
 
-  static Self create(ArrayRef<const Matcher<InnerTBase> *> InnerMatchers);
+  static Self create(llvm::ArrayRef<const Matcher<InnerTBase> *> InnerMatchers);
 
 public:
   using ReturnTypes = typename ExtractFunctionArgMeta<ReturnTypesF>::type;
 
   explicit TypeTraversePolymorphicMatcher(
-      ArrayRef<const Matcher<InnerTBase> *> InnerMatchers)
+      llvm::ArrayRef<const Matcher<InnerTBase> *> InnerMatchers)
       : InnerMatcher(makeAllOfComposite(InnerMatchers)) {}
 
   template <typename OuterT> operator Matcher<OuterT>() const {
@@ -1924,65 +1924,65 @@ template <typename InnerTBase, template <typename OuterT> class Getter,
 TypeTraversePolymorphicMatcher<InnerTBase, Getter, MatcherImpl, ReturnTypesF>
 TypeTraversePolymorphicMatcher<
     InnerTBase, Getter, MatcherImpl,
-    ReturnTypesF>::create(ArrayRef<const Matcher<InnerTBase> *> InnerMatchers) {
+    ReturnTypesF>::create(llvm::ArrayRef<const Matcher<InnerTBase> *> InnerMatchers) {
   return Self(InnerMatchers);
 }
 
 // FIXME: unify ClassTemplateSpecializationDecl and TemplateSpecializationType's
 // APIs for accessing the template argument list.
-inline ArrayRef<TemplateArgument>
+inline llvm::ArrayRef<TemplateArgument>
 getTemplateSpecializationArgs(const ClassTemplateSpecializationDecl &D) {
   return D.getTemplateArgs().asArray();
 }
 
-inline ArrayRef<TemplateArgument>
+inline llvm::ArrayRef<TemplateArgument>
 getTemplateSpecializationArgs(const VarTemplateSpecializationDecl &D) {
   return D.getTemplateArgs().asArray();
 }
 
-inline ArrayRef<TemplateArgument>
+inline llvm::ArrayRef<TemplateArgument>
 getTemplateSpecializationArgs(const TemplateSpecializationType &T) {
   return T.template_arguments();
 }
 
-inline ArrayRef<TemplateArgument>
+inline llvm::ArrayRef<TemplateArgument>
 getTemplateSpecializationArgs(const FunctionDecl &FD) {
   if (const auto* TemplateArgs = FD.getTemplateSpecializationArgs())
     return TemplateArgs->asArray();
   return std::nullopt;
 }
 
-inline ArrayRef<TemplateArgumentLoc>
+inline llvm::ArrayRef<TemplateArgumentLoc>
 getTemplateArgsWritten(const ClassTemplateSpecializationDecl &D) {
   if (const ASTTemplateArgumentListInfo *Args = D.getTemplateArgsAsWritten())
     return Args->arguments();
   return std::nullopt;
 }
 
-inline ArrayRef<TemplateArgumentLoc>
+inline llvm::ArrayRef<TemplateArgumentLoc>
 getTemplateArgsWritten(const VarTemplateSpecializationDecl &D) {
   if (const ASTTemplateArgumentListInfo *Args = D.getTemplateArgsAsWritten())
     return Args->arguments();
   return std::nullopt;
 }
 
-inline ArrayRef<TemplateArgumentLoc>
+inline llvm::ArrayRef<TemplateArgumentLoc>
 getTemplateArgsWritten(const FunctionDecl &FD) {
   if (const auto *Args = FD.getTemplateSpecializationArgsAsWritten())
     return Args->arguments();
   return std::nullopt;
 }
 
-inline ArrayRef<TemplateArgumentLoc>
+inline llvm::ArrayRef<TemplateArgumentLoc>
 getTemplateArgsWritten(const DeclRefExpr &DRE) {
   if (const auto *Args = DRE.getTemplateArgs())
     return {Args, DRE.getNumTemplateArgs()};
   return std::nullopt;
 }
 
-inline SmallVector<TemplateArgumentLoc>
+inline llvm::SmallVector<TemplateArgumentLoc>
 getTemplateArgsWritten(const TemplateSpecializationTypeLoc &T) {
-  SmallVector<TemplateArgumentLoc> Args;
+  llvm::SmallVector<TemplateArgumentLoc> Args;
   if (!T.isNull()) {
     Args.reserve(T.getNumArgs());
     for (unsigned I = 0; I < T.getNumArgs(); ++I)
@@ -2212,20 +2212,20 @@ CompoundStmtMatcher<StmtExpr>::get(const StmtExpr &Node) {
 /// location (in the chain of expansions) at which \p MacroName was
 /// expanded. Since the macro may have been expanded inside a series of
 /// expansions, that location may itself be a MacroID.
-std::optional<SourceLocation> getExpansionLocOfMacro(StringRef MacroName,
+std::optional<SourceLocation> getExpansionLocOfMacro(llvm::StringRef MacroName,
                                                      SourceLocation Loc,
                                                      const ASTContext &Context);
 
-inline std::optional<StringRef> getOpName(const UnaryOperator &Node) {
+inline std::optional<llvm::StringRef> getOpName(const UnaryOperator &Node) {
   return Node.getOpcodeStr(Node.getOpcode());
 }
-inline std::optional<StringRef> getOpName(const BinaryOperator &Node) {
+inline std::optional<llvm::StringRef> getOpName(const BinaryOperator &Node) {
   return Node.getOpcodeStr();
 }
-inline StringRef getOpName(const CXXRewrittenBinaryOperator &Node) {
+inline llvm::StringRef getOpName(const CXXRewrittenBinaryOperator &Node) {
   return Node.getOpcodeStr();
 }
-inline std::optional<StringRef> getOpName(const CXXOperatorCallExpr &Node) {
+inline std::optional<llvm::StringRef> getOpName(const CXXOperatorCallExpr &Node) {
   auto optBinaryOpcode = equivalentBinaryOperator(Node);
   if (!optBinaryOpcode) {
     auto optUnaryOpcode = equivalentUnaryOperator(Node);
@@ -2235,7 +2235,7 @@ inline std::optional<StringRef> getOpName(const CXXOperatorCallExpr &Node) {
   }
   return BinaryOperator::getOpcodeStr(*optBinaryOpcode);
 }
-inline StringRef getOpName(const CXXFoldExpr &Node) {
+inline llvm::StringRef getOpName(const CXXFoldExpr &Node) {
   return BinaryOperator::getOpcodeStr(Node.getOperator());
 }
 
@@ -2259,21 +2259,21 @@ public:
       : SingleNodeMatcherInterface<T>(), Names(std::move(Names)) {}
 
   bool matchesNode(const T &Node) const override {
-    std::optional<StringRef> OptOpName = getOpName(Node);
+    std::optional<llvm::StringRef> OptOpName = getOpName(Node);
     return OptOpName && llvm::is_contained(Names, *OptOpName);
   }
 
 private:
-  static std::optional<StringRef> getOpName(const UnaryOperator &Node) {
+  static std::optional<llvm::StringRef> getOpName(const UnaryOperator &Node) {
     return Node.getOpcodeStr(Node.getOpcode());
   }
-  static std::optional<StringRef> getOpName(const BinaryOperator &Node) {
+  static std::optional<llvm::StringRef> getOpName(const BinaryOperator &Node) {
     return Node.getOpcodeStr();
   }
-  static StringRef getOpName(const CXXRewrittenBinaryOperator &Node) {
+  static llvm::StringRef getOpName(const CXXRewrittenBinaryOperator &Node) {
     return Node.getOpcodeStr();
   }
-  static std::optional<StringRef> getOpName(const CXXOperatorCallExpr &Node) {
+  static std::optional<llvm::StringRef> getOpName(const CXXOperatorCallExpr &Node) {
     auto optBinaryOpcode = equivalentBinaryOperator(Node);
     if (!optBinaryOpcode) {
       auto optUnaryOpcode = equivalentUnaryOperator(Node);
@@ -2294,7 +2294,7 @@ using HasOpNameMatcher =
                                     CXXRewrittenBinaryOperator, UnaryOperator>),
                        std::vector<std::string>>;
 
-HasOpNameMatcher hasAnyOperatorNameFunc(ArrayRef<const StringRef *> NameRefs);
+HasOpNameMatcher hasAnyOperatorNameFunc(llvm::ArrayRef<const llvm::StringRef *> NameRefs);
 
 using HasOverloadOpNameMatcher =
     PolymorphicMatcher<HasOverloadedOperatorNameMatcher,
@@ -2302,7 +2302,7 @@ using HasOverloadOpNameMatcher =
                        std::vector<std::string>>;
 
 HasOverloadOpNameMatcher
-hasAnyOverloadedOperatorNameFunc(ArrayRef<const StringRef *> NameRefs);
+hasAnyOverloadedOperatorNameFunc(llvm::ArrayRef<const llvm::StringRef *> NameRefs);
 
 /// Returns true if \p Node has a base specifier matching \p BaseSpec.
 ///
@@ -2311,9 +2311,9 @@ bool matchesAnyBase(const CXXRecordDecl &Node,
                     const Matcher<CXXBaseSpecifier> &BaseSpecMatcher,
                     ASTMatchFinder *Finder, BoundNodesTreeBuilder *Builder);
 
-std::shared_ptr<llvm::Regex> createAndVerifyRegex(StringRef Regex,
+std::shared_ptr<llvm::Regex> createAndVerifyRegex(llvm::StringRef Regex,
                                                   llvm::Regex::RegexFlags Flags,
-                                                  StringRef MatcherID);
+                                                  llvm::StringRef MatcherID);
 
 inline bool
 MatchTemplateArgLocAt(const DeclRefExpr &Node, unsigned int Index,

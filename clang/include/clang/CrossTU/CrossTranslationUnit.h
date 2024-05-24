@@ -69,7 +69,7 @@ public:
       : Code(C), FileName(std::move(FileName)),
         TripleToName(std::move(TripleToName)),
         TripleFromName(std::move(TripleFromName)) {}
-  void log(raw_ostream &OS) const override;
+  void log(llvm::raw_ostream &OS) const override;
   std::error_code convertToErrorCode() const override;
   index_error_code getCode() const { return Code; }
   int getLineNum() const { return LineNo; }
@@ -95,7 +95,7 @@ private:
 /// \return Returns a map where the USR is the key and the filepath is the value
 ///         or an error.
 llvm::Expected<llvm::StringMap<std::string>>
-parseCrossTUIndex(StringRef IndexPath);
+parseCrossTUIndex(llvm::StringRef IndexPath);
 
 std::string createCrossTUIndexString(const llvm::StringMap<std::string> &Index);
 
@@ -106,7 +106,7 @@ using InvocationListTy = llvm::StringMap<llvm::SmallVector<std::string, 32>>;
 /// constitute the invocation needed to compile that file. That invocation
 /// will be used to produce the AST of the TU.
 llvm::Expected<InvocationListTy> parseInvocationList(
-    StringRef FileContent,
+    llvm::StringRef FileContent,
     llvm::sys::path::Style PathStyle = llvm::sys::path::Style::posix);
 
 /// Returns true if it makes sense to import a foreign variable definition.
@@ -146,11 +146,11 @@ public:
   ///
   /// Note that the AST files should also be in the \p CrossTUDir.
   llvm::Expected<const FunctionDecl *>
-  getCrossTUDefinition(const FunctionDecl *FD, StringRef CrossTUDir,
-                       StringRef IndexName, bool DisplayCTUProgress = false);
+  getCrossTUDefinition(const FunctionDecl *FD, llvm::StringRef CrossTUDir,
+                       llvm::StringRef IndexName, bool DisplayCTUProgress = false);
   llvm::Expected<const VarDecl *>
-  getCrossTUDefinition(const VarDecl *VD, StringRef CrossTUDir,
-                       StringRef IndexName, bool DisplayCTUProgress = false);
+  getCrossTUDefinition(const VarDecl *VD, llvm::StringRef CrossTUDir,
+                       llvm::StringRef IndexName, bool DisplayCTUProgress = false);
 
   /// This function loads a definition from an external AST file.
   ///
@@ -165,9 +165,9 @@ public:
   /// The returned pointer is never a nullptr.
   ///
   /// Note that the AST files should also be in the \p CrossTUDir.
-  llvm::Expected<ASTUnit *> loadExternalAST(StringRef LookupName,
-                                            StringRef CrossTUDir,
-                                            StringRef IndexName,
+  llvm::Expected<ASTUnit *> loadExternalAST(llvm::StringRef LookupName,
+                                            llvm::StringRef CrossTUDir,
+                                            llvm::StringRef IndexName,
                                             bool DisplayCTUProgress = false);
 
   /// This function merges a definition from a separate AST Unit into
@@ -210,12 +210,12 @@ private:
   ASTImporter &getOrCreateASTImporter(ASTUnit *Unit);
   template <typename T>
   llvm::Expected<const T *> getCrossTUDefinitionImpl(const T *D,
-                                                     StringRef CrossTUDir,
-                                                     StringRef IndexName,
+                                                     llvm::StringRef CrossTUDir,
+                                                     llvm::StringRef IndexName,
                                                      bool DisplayCTUProgress);
   template <typename T>
   const T *findDefInDeclContext(const DeclContext *DC,
-                                StringRef LookupName);
+                                llvm::StringRef LookupName);
   template <typename T>
   llvm::Expected<const T *> importDefinitionImpl(const T *D, ASTUnit *Unit);
 
@@ -232,14 +232,14 @@ private:
   /// Loads ASTUnits from AST-dumps or source-files.
   class ASTLoader {
   public:
-    ASTLoader(CompilerInstance &CI, StringRef CTUDir,
-              StringRef InvocationListFilePath);
+    ASTLoader(CompilerInstance &CI, llvm::StringRef CTUDir,
+              llvm::StringRef InvocationListFilePath);
 
     /// Load the ASTUnit by its identifier found in the index file. If the
     /// identifier is suffixed with '.ast' it is considered a dump. Otherwise
     /// it is treated as source-file, and on-demand parsed. Relative paths are
     /// prefixed with CTUDir.
-    LoadResultTy load(StringRef Identifier);
+    LoadResultTy load(llvm::StringRef Identifier);
 
     /// Lazily initialize the invocation list information, which is needed for
     /// on-demand parsing.
@@ -251,16 +251,16 @@ private:
     const llvm::sys::path::Style PathStyle = llvm::sys::path::Style::posix;
 
     /// Loads an AST from a pch-dump.
-    LoadResultTy loadFromDump(StringRef Identifier);
+    LoadResultTy loadFromDump(llvm::StringRef Identifier);
     /// Loads an AST from a source-file.
-    LoadResultTy loadFromSource(StringRef Identifier);
+    LoadResultTy loadFromSource(llvm::StringRef Identifier);
 
     CompilerInstance &CI;
-    StringRef CTUDir;
+    llvm::StringRef CTUDir;
     /// The path to the file containing the invocation list, which is in YAML
     /// format, and contains a mapping from source files to compiler invocations
     /// that produce the AST used for analysis.
-    StringRef InvocationListFilePath;
+    llvm::StringRef InvocationListFilePath;
     /// In case of on-demand parsing, the invocations for parsing the source
     /// files is stored.
     std::optional<InvocationListTy> InvocationList;
@@ -302,9 +302,9 @@ private:
     ///
     /// \return An Expected instance which contains the ASTUnit pointer or the
     /// error occurred during the load.
-    llvm::Expected<ASTUnit *> getASTUnitForFunction(StringRef FunctionName,
-                                                    StringRef CrossTUDir,
-                                                    StringRef IndexName,
+    llvm::Expected<ASTUnit *> getASTUnitForFunction(llvm::StringRef FunctionName,
+                                                    llvm::StringRef CrossTUDir,
+                                                    llvm::StringRef IndexName,
                                                     bool DisplayCTUProgress);
     /// Identifies the path of the file which can be used to load the ASTUnit
     /// for a given function.
@@ -316,13 +316,13 @@ private:
     /// AST-dumps.
     ///
     /// \return An Expected instance containing the filepath.
-    llvm::Expected<std::string> getFileForFunction(StringRef FunctionName,
-                                                   StringRef CrossTUDir,
-                                                   StringRef IndexName);
+    llvm::Expected<std::string> getFileForFunction(llvm::StringRef FunctionName,
+                                                   llvm::StringRef CrossTUDir,
+                                                   llvm::StringRef IndexName);
 
   private:
-    llvm::Error ensureCTUIndexLoaded(StringRef CrossTUDir, StringRef IndexName);
-    llvm::Expected<ASTUnit *> getASTUnitForFile(StringRef FileName,
+    llvm::Error ensureCTUIndexLoaded(llvm::StringRef CrossTUDir, llvm::StringRef IndexName);
+    llvm::Expected<ASTUnit *> getASTUnitForFile(llvm::StringRef FileName,
                                                 bool DisplayCTUProgress);
 
     template <typename... T> using BaseMapTy = llvm::StringMap<T...>;

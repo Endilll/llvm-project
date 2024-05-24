@@ -179,11 +179,11 @@ public:
   /// non-device kinds, except if \a CreatePrefixForHost is set.
   static std::string
   GetOffloadingFileNamePrefix(OffloadKind Kind,
-                              StringRef NormalizedTriple,
+                              llvm::StringRef NormalizedTriple,
                               bool CreatePrefixForHost = false);
 
   /// Return a string containing a offload kind name.
-  static StringRef GetOffloadKindName(OffloadKind Kind);
+  static llvm::StringRef GetOffloadKindName(OffloadKind Kind);
 
   /// Set the device offload info of this action and propagate it to its
   /// dependences.
@@ -233,12 +233,12 @@ class InputAction : public Action {
 
 public:
   InputAction(const llvm::opt::Arg &Input, types::ID Type,
-              StringRef Id = StringRef());
+              llvm::StringRef Id = llvm::StringRef());
 
   const llvm::opt::Arg &getInputArg() const { return Input; }
 
-  void setId(StringRef _Id) { Id = _Id.str(); }
-  StringRef getId() const { return Id; }
+  void setId(llvm::StringRef _Id) { Id = _Id.str(); }
+  llvm::StringRef getId() const { return Id; }
 
   static bool classof(const Action *A) {
     return A->getKind() == InputClass;
@@ -250,12 +250,12 @@ class BindArchAction : public Action {
 
   /// The architecture to bind, or 0 if the default architecture
   /// should be bound.
-  StringRef ArchName;
+  llvm::StringRef ArchName;
 
 public:
-  BindArchAction(Action *Input, StringRef ArchName);
+  BindArchAction(Action *Input, llvm::StringRef ArchName);
 
-  StringRef getArchName() const { return ArchName; }
+  llvm::StringRef getArchName() const { return ArchName; }
 
   static bool classof(const Action *A) {
     return A->getKind() == BindArchClass;
@@ -273,9 +273,9 @@ public:
   /// toolchain, and offload kind to each action.
   class DeviceDependences final {
   public:
-    using ToolChainList = SmallVector<const ToolChain *, 3>;
-    using BoundArchList = SmallVector<const char *, 3>;
-    using OffloadKindList = SmallVector<OffloadKind, 3>;
+    using ToolChainList = llvm::SmallVector<const ToolChain *, 3>;
+    using BoundArchList = llvm::SmallVector<const char *, 3>;
+    using OffloadKindList = llvm::SmallVector<OffloadKind, 3>;
 
   private:
     // Lists that keep the information for each dependency. All the lists are
@@ -604,13 +604,13 @@ public:
     const ToolChain *DependentToolChain = nullptr;
 
     /// The bound architecture of the dependent action.
-    StringRef DependentBoundArch;
+    llvm::StringRef DependentBoundArch;
 
     /// The offload kind of the dependent action.
     const OffloadKind DependentOffloadKind = OFK_None;
 
     DependentActionInfo(const ToolChain *DependentToolChain,
-                        StringRef DependentBoundArch,
+                        llvm::StringRef DependentBoundArch,
                         const OffloadKind DependentOffloadKind)
         : DependentToolChain(DependentToolChain),
           DependentBoundArch(DependentBoundArch),
@@ -620,20 +620,20 @@ public:
 private:
   /// Container that keeps information about each dependence of this unbundling
   /// action.
-  SmallVector<DependentActionInfo, 6> DependentActionInfoArray;
+  llvm::SmallVector<DependentActionInfo, 6> DependentActionInfoArray;
 
 public:
   // Offloading unbundling doesn't change the type of output.
   OffloadUnbundlingJobAction(Action *Input);
 
   /// Register information about a dependent action.
-  void registerDependentActionInfo(const ToolChain *TC, StringRef BoundArch,
+  void registerDependentActionInfo(const ToolChain *TC, llvm::StringRef BoundArch,
                                    OffloadKind Kind) {
     DependentActionInfoArray.push_back({TC, BoundArch, Kind});
   }
 
   /// Return the information about all depending actions.
-  ArrayRef<DependentActionInfo> getDependentActionsInfo() const {
+  llvm::ArrayRef<DependentActionInfo> getDependentActionsInfo() const {
     return DependentActionInfoArray;
   }
 

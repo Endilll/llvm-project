@@ -44,7 +44,7 @@ struct Case {
 class ClangRenameTest : public testing::Test,
                         public testing::WithParamInterface<Case> {
 protected:
-  void AppendToHeader(StringRef Code) { HeaderContent += Code.str(); }
+  void AppendToHeader(llvm::StringRef Code) { HeaderContent += Code.str(); }
 
   std::string runClangRenameOnCode(llvm::StringRef Code,
                                    llvm::StringRef OldName,
@@ -85,7 +85,7 @@ protected:
     return Context.getRewrittenText(InputFileID);
   }
 
-  void CompareSnippets(StringRef Expected, StringRef Actual) {
+  void CompareSnippets(llvm::StringRef Expected, llvm::StringRef Actual) {
     std::string ExpectedCode;
     llvm::raw_string_ostream(ExpectedCode) << llvm::format(
         "#include \"%s\"\n%s", HeaderName.c_str(), Expected.str().c_str());

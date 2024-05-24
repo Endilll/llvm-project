@@ -20,7 +20,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/return-braced-init-list.html
 class ReturnBracedInitListCheck : public ClangTidyCheck {
 public:
-  ReturnBracedInitListCheck(StringRef Name, ClangTidyContext *Context)
+  ReturnBracedInitListCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;

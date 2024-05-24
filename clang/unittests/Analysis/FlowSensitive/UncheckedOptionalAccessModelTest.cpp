@@ -1272,7 +1272,7 @@ struct OptionalTypeIdentifier {
   std::string TypeName;
 };
 
-static raw_ostream &operator<<(raw_ostream &OS,
+static llvm::raw_ostream &operator<<(llvm::raw_ostream &OS,
                                const OptionalTypeIdentifier &TypeId) {
   OS << TypeId.NamespaceName << "::" << TypeId.TypeName;
   return OS;
@@ -1363,7 +1363,7 @@ protected:
             unsigned Line = SrcMgr.getPresumedLineNumber(Loc);
             DiagnosticLines.insert(Line);
             if (!AnnotationLines.contains(Line)) {
-              IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(
+              llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(
                   new DiagnosticOptions());
               TextDiagnostic TD(llvm::errs(), AO.ASTCtx.getLangOpts(),
                                 DiagOpts.get());

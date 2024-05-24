@@ -161,11 +161,11 @@ void RedundantSmartptrGetCheck::check(const MatchFinder::MatchResult &Result) {
                                          getLangOpts())
                   .getLocWithOffset(1));
 
-  StringRef SmartptrText = Lexer::getSourceText(
+  llvm::StringRef SmartptrText = Lexer::getSourceText(
       CharSourceRange::getTokenRange(Smartptr->getSourceRange()),
       *Result.SourceManager, getLangOpts());
   // Replace foo->get() with *foo, and foo.get() with foo.
-  std::string Replacement = Twine(IsPtrToPtr ? "*" : "", SmartptrText).str();
+  std::string Replacement = llvm::Twine(IsPtrToPtr ? "*" : "", SmartptrText).str();
   diag(GetCall->getBeginLoc(), "redundant get() call on smart pointer")
       << FixItHint::CreateReplacement(SR, Replacement);
 }

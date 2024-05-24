@@ -66,7 +66,7 @@ using namespace sema;
 
 static inline std::optional<unsigned>
 getStackIndexOfNearestEnclosingCaptureReadyLambda(
-    ArrayRef<const clang::sema::FunctionScopeInfo *> FunctionScopes,
+    llvm::ArrayRef<const clang::sema::FunctionScopeInfo *> FunctionScopes,
     ValueDecl *VarToCapture) {
   // Label failure to capture.
   const std::optional<unsigned> NoLambdaIsCaptureReady;
@@ -177,7 +177,7 @@ getStackIndexOfNearestEnclosingCaptureReadyLambda(
 
 std::optional<unsigned>
 clang::getStackIndexOfNearestEnclosingCaptureCapableLambda(
-    ArrayRef<const sema::FunctionScopeInfo *> FunctionScopes,
+    llvm::ArrayRef<const sema::FunctionScopeInfo *> FunctionScopes,
     ValueDecl *VarToCapture, Sema &S) {
 
   const std::optional<unsigned> NoLambdaIsCaptureCapable;
@@ -543,7 +543,7 @@ void Sema::finishLambdaExplicitCaptures(LambdaScopeInfo *LSI) {
 
 void Sema::ActOnLambdaExplicitTemplateParameterList(
     LambdaIntroducer &Intro, SourceLocation LAngleLoc,
-    ArrayRef<NamedDecl *> TParams, SourceLocation RAngleLoc,
+    llvm::ArrayRef<NamedDecl *> TParams, SourceLocation RAngleLoc,
     ExprResult RequiresClause) {
   LambdaScopeInfo *LSI = getCurLambda();
   assert(LSI && "Expected a lambda scope");
@@ -639,8 +639,8 @@ static EnumDecl *findEnumForBlockReturn(ReturnStmt *ret) {
 /// Attempt to find a common type T for which all of the returned
 /// expressions in a block are enumerator-like expressions of that
 /// type.
-static EnumDecl *findCommonEnumForBlockReturns(ArrayRef<ReturnStmt*> returns) {
-  ArrayRef<ReturnStmt*>::iterator i = returns.begin(), e = returns.end();
+static EnumDecl *findCommonEnumForBlockReturns(llvm::ArrayRef<ReturnStmt*> returns) {
+  llvm::ArrayRef<ReturnStmt*>::iterator i = returns.begin(), e = returns.end();
 
   // Try to find one for the first return.
   EnumDecl *ED = findEnumForBlockReturn(*i);
@@ -660,9 +660,9 @@ static EnumDecl *findCommonEnumForBlockReturns(ArrayRef<ReturnStmt*> returns) {
 
 /// Adjust the given return statements so that they formally return
 /// the given type.  It should require, at most, an IntegralCast.
-static void adjustBlockReturnsToEnum(Sema &S, ArrayRef<ReturnStmt*> returns,
+static void adjustBlockReturnsToEnum(Sema &S, llvm::ArrayRef<ReturnStmt*> returns,
                                      QualType returnType) {
-  for (ArrayRef<ReturnStmt*>::iterator
+  for (llvm::ArrayRef<ReturnStmt*>::iterator
          i = returns.begin(), e = returns.end(); i != e; ++i) {
     ReturnStmt *ret = *i;
     Expr *retValue = ret->getRetValue();
@@ -1009,7 +1009,7 @@ void Sema::CompleteLambdaCallOperator(
     CXXMethodDecl *Method, SourceLocation LambdaLoc,
     SourceLocation CallOperatorLoc, Expr *TrailingRequiresClause,
     TypeSourceInfo *MethodTyInfo, ConstexprSpecKind ConstexprKind,
-    StorageClass SC, ArrayRef<ParmVarDecl *> Params,
+    StorageClass SC, llvm::ArrayRef<ParmVarDecl *> Params,
     bool HasExplicitResultType) {
 
   LambdaScopeInfo *LSI = getCurrentLambdaScopeUnsafe(*this);
@@ -1344,7 +1344,7 @@ void Sema::ActOnLambdaClosureQualifiers(LambdaIntroducer &Intro,
 }
 
 void Sema::ActOnLambdaClosureParameters(
-    Scope *LambdaScope, MutableArrayRef<DeclaratorChunk::ParamInfo> Params) {
+    Scope *LambdaScope, llvm::MutableArrayRef<DeclaratorChunk::ParamInfo> Params) {
   LambdaScopeInfo *LSI = getCurrentLambdaScopeUnsafe(*this);
   PushDeclContext(LambdaScope, LSI->CallOperator);
 
@@ -1376,7 +1376,7 @@ void Sema::ActOnStartOfLambdaDefinition(LambdaIntroducer &Intro,
   LambdaScopeInfo *LSI = getCurrentLambdaScopeUnsafe(*this);
   LSI->CallOperator->setConstexprKind(DS.getConstexprSpecifier());
 
-  SmallVector<ParmVarDecl *, 8> Params;
+  llvm::SmallVector<ParmVarDecl *, 8> Params;
   bool ExplicitResultType;
 
   SourceLocation TypeLoc, CallOperatorLoc;
@@ -1550,7 +1550,7 @@ void Sema::ActOnLambdaError(SourceLocation StartLoc, Scope *CurScope,
   // Finalize the lambda.
   CXXRecordDecl *Class = LSI->Lambda;
   Class->setInvalidDecl();
-  SmallVector<Decl*, 4> Fields(Class->fields());
+  llvm::SmallVector<Decl*, 4> Fields(Class->fields());
   ActOnFields(nullptr, Class->getLocation(), Class, Fields, SourceLocation(),
               SourceLocation(), ParsedAttributesView());
   CheckCompletedCXXClass(nullptr, Class);
@@ -1715,7 +1715,7 @@ static void addFunctionPointerConversion(Sema &S, SourceRange IntroducerRange,
   // decltype(some_type<decltype(a)>::type{} + decltype(a){}) etc.)
   // - we can simply use the return type of the call operator, and
   // everything should work.
-  SmallVector<ParmVarDecl *, 4> InvokerParams;
+  llvm::SmallVector<ParmVarDecl *, 4> InvokerParams;
   for (unsigned I = 0, N = CallOperator->getNumParams(); I != N; ++I) {
     ParmVarDecl *From = CallOperator->getParamDecl(I);
 
@@ -2051,8 +2051,8 @@ FieldDecl *Sema::BuildCaptureField(RecordDecl *RD,
 ExprResult Sema::BuildLambdaExpr(SourceLocation StartLoc, SourceLocation EndLoc,
                                  LambdaScopeInfo *LSI) {
   // Collect information from the lambda scope.
-  SmallVector<LambdaCapture, 4> Captures;
-  SmallVector<Expr *, 4> CaptureInits;
+  llvm::SmallVector<LambdaCapture, 4> Captures;
+  llvm::SmallVector<Expr *, 4> CaptureInits;
   SourceLocation CaptureDefaultLoc = LSI->CaptureDefaultLoc;
   LambdaCaptureDefault CaptureDefault =
       mapImplicitCaptureStyle(LSI->ImpCaptureStyle);
@@ -2202,7 +2202,7 @@ ExprResult Sema::BuildLambdaExpr(SourceLocation StartLoc, SourceLocation EndLoc,
       addBlockPointerConversion(*this, IntroducerRange, Class, CallOperator);
 
     // Finalize the lambda class.
-    SmallVector<Decl*, 4> Fields(Class->fields());
+    llvm::SmallVector<Decl*, 4> Fields(Class->fields());
     ActOnFields(nullptr, Class->getLocation(), Class, Fields, SourceLocation(),
                 SourceLocation(), ParsedAttributesView());
     CheckCompletedCXXClass(nullptr, Class);
@@ -2298,7 +2298,7 @@ ExprResult Sema::BuildBlockForLambdaConversion(SourceLocation CurrentLocation,
   Block->setBlockMissingReturnType(false);
 
   // Add parameters.
-  SmallVector<ParmVarDecl *, 4> BlockParams;
+  llvm::SmallVector<ParmVarDecl *, 4> BlockParams;
   for (unsigned I = 0, N = CallOperator->getNumParams(); I != N; ++I) {
     ParmVarDecl *From = CallOperator->getParamDecl(I);
     BlockParams.push_back(ParmVarDecl::Create(

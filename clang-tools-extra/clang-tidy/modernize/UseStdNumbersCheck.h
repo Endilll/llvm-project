@@ -24,7 +24,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-std-numbers.html
 class UseStdNumbersCheck : public ClangTidyCheck {
 public:
-  UseStdNumbersCheck(StringRef Name, ClangTidyContext *Context);
+  UseStdNumbersCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus20;
@@ -40,7 +40,7 @@ public:
 
 private:
   utils::IncludeInserter IncludeInserter;
-  StringRef DiffThresholdString;
+  llvm::StringRef DiffThresholdString;
   double DiffThreshold;
 };
 

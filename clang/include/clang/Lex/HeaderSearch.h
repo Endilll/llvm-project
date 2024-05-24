@@ -138,7 +138,7 @@ struct HeaderFileInfo {
 
   /// If this header came from a framework include, this is the name
   /// of the framework.
-  StringRef Framework;
+  llvm::StringRef Framework;
 
   HeaderFileInfo()
       : IsLocallyIncluded(false), isImport(false), isPragmaOnce(false),
@@ -404,7 +404,7 @@ public:
   }
 
   /// Set the list of system header prefixes.
-  void SetSystemHeaderPrefixes(ArrayRef<std::pair<std::string, bool>> P) {
+  void SetSystemHeaderPrefixes(llvm::ArrayRef<std::pair<std::string, bool>> P) {
     SystemHeaderPrefixes.assign(P.begin(), P.end());
   }
 
@@ -415,7 +415,7 @@ public:
   ///
   /// The Source should include the angle brackets or quotes, the dest
   /// should not.  This allows for distinction between <> and "" headers.
-  void AddIncludeAlias(StringRef Source, StringRef Dest) {
+  void AddIncludeAlias(llvm::StringRef Source, llvm::StringRef Dest) {
     if (!IncludeAliases)
       IncludeAliases.reset(new IncludeAliasMap);
     (*IncludeAliases)[Source] = std::string(Dest);
@@ -423,9 +423,9 @@ public:
 
   /// Maps one header file name to a different header
   /// file name, for use with the include_alias pragma.  Note that the source
-  /// file name should include the angle brackets or quotes.  Returns StringRef
+  /// file name should include the angle brackets or quotes.  Returns llvm::StringRef
   /// as null if the header cannot be mapped.
-  StringRef MapHeaderToIncludeAlias(StringRef Source) {
+  llvm::StringRef MapHeaderToIncludeAlias(llvm::StringRef Source) {
     assert(IncludeAliases && "Trying to map headers when there's no map");
 
     // Do any filename replacements before anything else
@@ -436,18 +436,18 @@ public:
   }
 
   /// Set the hash to use for module cache paths.
-  void setModuleHash(StringRef Hash) { ModuleHash = std::string(Hash); }
+  void setModuleHash(llvm::StringRef Hash) { ModuleHash = std::string(Hash); }
 
   /// Set the path to the module cache.
-  void setModuleCachePath(StringRef CachePath) {
+  void setModuleCachePath(llvm::StringRef CachePath) {
     ModuleCachePath = std::string(CachePath);
   }
 
   /// Retrieve the module hash.
-  StringRef getModuleHash() const { return ModuleHash; }
+  llvm::StringRef getModuleHash() const { return ModuleHash; }
 
   /// Retrieve the path to the module cache.
-  StringRef getModuleCachePath() const { return ModuleCachePath; }
+  llvm::StringRef getModuleCachePath() const { return ModuleCachePath; }
 
   /// Consider modules when including files from this directory.
   void setDirectoryHasModuleMap(const DirectoryEntry* Dir) {
@@ -512,10 +512,10 @@ public:
   /// is found only through header maps. Doesn't guarantee the requested file is
   /// found.
   OptionalFileEntryRef LookupFile(
-      StringRef Filename, SourceLocation IncludeLoc, bool isAngled,
+      llvm::StringRef Filename, SourceLocation IncludeLoc, bool isAngled,
       ConstSearchDirIterator FromDir, ConstSearchDirIterator *CurDir,
-      ArrayRef<std::pair<OptionalFileEntryRef, DirectoryEntryRef>> Includers,
-      SmallVectorImpl<char> *SearchPath, SmallVectorImpl<char> *RelativePath,
+      llvm::ArrayRef<std::pair<OptionalFileEntryRef, DirectoryEntryRef>> Includers,
+      llvm::SmallVectorImpl<char> *SearchPath, llvm::SmallVectorImpl<char> *RelativePath,
       Module *RequestingModule, ModuleMap::KnownHeader *SuggestedModule,
       bool *IsMapped, bool *IsFrameworkFound, bool SkipCache = false,
       bool BuildSystemModule = false, bool OpenFile = true,
@@ -528,13 +528,13 @@ public:
   /// HIToolbox is a subframework within Carbon.framework.  If so, return
   /// the FileEntry for the designated file, otherwise return null.
   OptionalFileEntryRef LookupSubframeworkHeader(
-      StringRef Filename, FileEntryRef ContextFileEnt,
-      SmallVectorImpl<char> *SearchPath, SmallVectorImpl<char> *RelativePath,
+      llvm::StringRef Filename, FileEntryRef ContextFileEnt,
+      llvm::SmallVectorImpl<char> *SearchPath, llvm::SmallVectorImpl<char> *RelativePath,
       Module *RequestingModule, ModuleMap::KnownHeader *SuggestedModule);
 
   /// Look up the specified framework name in our framework cache.
   /// \returns The DirectoryEntry it is in if we know, null otherwise.
-  FrameworkCacheEntry &LookupFrameworkCache(StringRef FWName) {
+  FrameworkCacheEntry &LookupFrameworkCache(llvm::StringRef FWName) {
     return FrameworkMap[FWName];
   }
 
@@ -613,7 +613,7 @@ public:
   const HeaderMap *CreateHeaderMap(FileEntryRef FE);
 
   /// Get filenames for all registered header maps.
-  void getHeaderMapFileNames(SmallVectorImpl<std::string> &Names) const;
+  void getHeaderMapFileNames(llvm::SmallVectorImpl<std::string> &Names) const;
 
   /// Retrieve the name of the cached module file that should be used
   /// to load the given module.
@@ -634,7 +634,7 @@ public:
   ///
   /// \returns The name of the module file that corresponds to this module,
   /// or an empty string if this module does not correspond to any module file.
-  std::string getPrebuiltModuleFileName(StringRef ModuleName,
+  std::string getPrebuiltModuleFileName(llvm::StringRef ModuleName,
                                         bool FileMapOnly = false);
 
   /// Retrieve the name of the prebuilt module file that should be used
@@ -656,8 +656,8 @@ public:
   ///
   /// \returns The name of the module file that corresponds to this module,
   /// or an empty string if this module does not correspond to any module file.
-  std::string getCachedModuleFileName(StringRef ModuleName,
-                                      StringRef ModuleMapPath);
+  std::string getCachedModuleFileName(llvm::StringRef ModuleName,
+                                      llvm::StringRef ModuleMapPath);
 
   /// Lookup a module Search for a module with the given name.
   ///
@@ -673,7 +673,7 @@ public:
   /// in subdirectories.
   ///
   /// \returns The module with the given name.
-  Module *lookupModule(StringRef ModuleName,
+  Module *lookupModule(llvm::StringRef ModuleName,
                        SourceLocation ImportLoc = SourceLocation(),
                        bool AllowSearch = true,
                        bool AllowExtraModuleMapSearch = false);
@@ -694,7 +694,7 @@ public:
   ///
   /// \param IsSystem Whether the directories we're looking at are system
   /// header directories.
-  bool hasModuleMap(StringRef Filename, const DirectoryEntry *Root,
+  bool hasModuleMap(llvm::StringRef Filename, const DirectoryEntry *Root,
                     bool IsSystem);
 
   /// Retrieve the module that corresponds to the given file, if any.
@@ -708,12 +708,12 @@ public:
   /// Retrieve all the modules corresponding to the given file.
   ///
   /// \ref findModuleForHeader should typically be used instead of this.
-  ArrayRef<ModuleMap::KnownHeader>
+  llvm::ArrayRef<ModuleMap::KnownHeader>
   findAllModulesForHeader(FileEntryRef File) const;
 
   /// Like \ref findAllModulesForHeader, but do not attempt to infer module
   /// ownership from umbrella headers if we've not already done so.
-  ArrayRef<ModuleMap::KnownHeader>
+  llvm::ArrayRef<ModuleMap::KnownHeader>
   findResolvedModulesForHeader(FileEntryRef File) const;
 
   /// Read the contents of the given module map file.
@@ -731,12 +731,12 @@ public:
   /// \returns true if an error occurred, false otherwise.
   bool loadModuleMapFile(FileEntryRef File, bool IsSystem, FileID ID = FileID(),
                          unsigned *Offset = nullptr,
-                         StringRef OriginalModuleMapFile = StringRef());
+                         llvm::StringRef OriginalModuleMapFile = llvm::StringRef());
 
   /// Collect the set of all known, top-level modules.
   ///
   /// \param Modules Will be filled with the set of known, top-level modules.
-  void collectAllModules(SmallVectorImpl<Module *> &Modules);
+  void collectAllModules(llvm::SmallVectorImpl<Module *> &Modules);
 
   /// Load all known, top-level system modules.
   void loadTopLevelSystemModules();
@@ -757,7 +757,7 @@ private:
   /// in subdirectories.
   ///
   /// \returns The module named ModuleName.
-  Module *lookupModule(StringRef ModuleName, StringRef SearchName,
+  Module *lookupModule(llvm::StringRef ModuleName, llvm::StringRef SearchName,
                        SourceLocation ImportLoc,
                        bool AllowExtraModuleMapSearch = false);
 
@@ -773,9 +773,9 @@ private:
   ///
   /// \returns The name of the module file that corresponds to this module,
   /// or an empty string if this module does not correspond to any module file.
-  std::string getCachedModuleFileNameImpl(StringRef ModuleName,
-                                          StringRef ModuleMapPath,
-                                          StringRef CachePath);
+  std::string getCachedModuleFileNameImpl(llvm::StringRef ModuleName,
+                                          llvm::StringRef ModuleMapPath,
+                                          llvm::StringRef CachePath);
 
   /// Retrieve a module with the given name, which may be part of the
   /// given framework.
@@ -788,7 +788,7 @@ private:
   /// frameworks.
   ///
   /// \returns The module, if found; otherwise, null.
-  Module *loadFrameworkModule(StringRef Name, DirectoryEntryRef Dir,
+  Module *loadFrameworkModule(llvm::StringRef Name, DirectoryEntryRef Dir,
                               bool IsSystem);
 
   /// Load all of the module maps within the immediate subdirectories
@@ -810,13 +810,13 @@ private:
   /// \return \c true if the file can be used, \c false if we are not permitted to
   ///         find this file due to requirements from \p RequestingModule.
   bool findUsableModuleForFrameworkHeader(
-      FileEntryRef File, StringRef FrameworkName, Module *RequestingModule,
+      FileEntryRef File, llvm::StringRef FrameworkName, Module *RequestingModule,
       ModuleMap::KnownHeader *SuggestedModule, bool IsSystemFramework);
 
   /// Look up the file with the specified name and determine its owning
   /// module.
   OptionalFileEntryRef
-  getFileAndSuggestModule(StringRef FileName, SourceLocation IncludeLoc,
+  getFileAndSuggestModule(llvm::StringRef FileName, SourceLocation IncludeLoc,
                           const DirectoryEntry *Dir, bool IsSystemHeaderDir,
                           Module *RequestingModule,
                           ModuleMap::KnownHeader *SuggestedModule,
@@ -890,14 +890,14 @@ public:
   unsigned searchDirIdx(const DirectoryLookup &DL) const;
 
   /// Retrieve a uniqued framework name.
-  StringRef getUniqueFrameworkName(StringRef Framework);
+  llvm::StringRef getUniqueFrameworkName(llvm::StringRef Framework);
 
   /// Retrieve the include name for the header.
   ///
   /// \param File The entry for a given header.
   /// \returns The name of how the file was included when the header's location
   /// was resolved.
-  StringRef getIncludeNameForHeader(const FileEntry *File) const;
+  llvm::StringRef getIncludeNameForHeader(const FileEntry *File) const;
 
   /// Suggest a path by which the specified file could be found, for use in
   /// diagnostics to suggest a #include. Returned path will only contain forward
@@ -961,7 +961,7 @@ private:
   ///
   /// \returns The result of attempting to load the module map file from the
   /// named directory.
-  LoadModuleMapResult loadModuleMapFile(StringRef DirName, bool IsSystem,
+  LoadModuleMapResult loadModuleMapFile(llvm::StringRef DirName, bool IsSystem,
                                         bool IsFramework);
 
   /// Try to load the module map file in the given directory.

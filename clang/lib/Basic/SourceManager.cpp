@@ -75,7 +75,7 @@ unsigned ContentCache::getSize() const {
                 : (unsigned)ContentsEntry->getSize();
 }
 
-const char *ContentCache::getInvalidBOM(StringRef BufStr) {
+const char *ContentCache::getInvalidBOM(llvm::StringRef BufStr) {
   // If the buffer is valid, check to see if it has a UTF Byte Order Mark
   // (BOM).  We only support UTF-8 with and without a BOM right now.  See
   // http://en.wikipedia.org/wiki/Byte_order_mark for more information.
@@ -173,7 +173,7 @@ ContentCache::getBufferOrNone(DiagnosticsEngine &Diag, FileManager &FM,
   // If the buffer is valid, check to see if it has a UTF Byte Order Mark
   // (BOM).  We only support UTF-8 with and without a BOM right now.  See
   // http://en.wikipedia.org/wiki/Byte_order_mark for more information.
-  StringRef BufStr = Buffer->getBuffer();
+  llvm::StringRef BufStr = Buffer->getBuffer();
   const char *InvalidBOM = getInvalidBOM(BufStr);
 
   if (InvalidBOM) {
@@ -187,7 +187,7 @@ ContentCache::getBufferOrNone(DiagnosticsEngine &Diag, FileManager &FM,
   return Buffer->getMemBufferRef();
 }
 
-unsigned LineTableInfo::getLineTableFilenameID(StringRef Name) {
+unsigned LineTableInfo::getLineTableFilenameID(llvm::StringRef Name) {
   auto IterBool = FilenameIDs.try_emplace(Name, FilenamesByID.size());
   if (IterBool.second)
     FilenamesByID.push_back(&*IterBool.first);
@@ -262,7 +262,7 @@ void LineTableInfo::AddEntry(FileID FID,
 }
 
 /// getLineTableFilenameID - Return the uniqued ID for the specified filename.
-unsigned SourceManager::getLineTableFilenameID(StringRef Name) {
+unsigned SourceManager::getLineTableFilenameID(llvm::StringRef Name) {
   return getLineTable().getLineTableFilenameID(Name);
 }
 
@@ -560,7 +560,7 @@ FileID SourceManager::createFileID(std::unique_ptr<llvm::MemoryBuffer> Buffer,
                                    int LoadedID,
                                    SourceLocation::UIntTy LoadedOffset,
                                    SourceLocation IncludeLoc) {
-  StringRef Name = Buffer->getBufferIdentifier();
+  llvm::StringRef Name = Buffer->getBufferIdentifier();
   return createFileIDImpl(createMemBufferContentCache(std::move(Buffer)), Name,
                           IncludeLoc, FileCharacter, LoadedID, LoadedOffset);
 }
@@ -591,7 +591,7 @@ SourceManager::getOrCreateFileID(FileEntryRef SourceFile,
 /// createFileID - Create a new FileID for the specified ContentCache and
 /// include position.  This works regardless of whether the ContentCache
 /// corresponds to a file or some other input source.
-FileID SourceManager::createFileIDImpl(ContentCache &File, StringRef Filename,
+FileID SourceManager::createFileIDImpl(ContentCache &File, llvm::StringRef Filename,
                                        SourceLocation IncludePos,
                                        SrcMgr::CharacteristicKind FileCharacter,
                                        int LoadedID,
@@ -730,7 +730,7 @@ void SourceManager::setFileIsTransient(FileEntryRef File) {
   getOrCreateContentCache(File).IsTransient = true;
 }
 
-std::optional<StringRef>
+std::optional<llvm::StringRef>
 SourceManager::getNonBuiltinFilenameForID(FileID FID) const {
   if (const SrcMgr::SLocEntry *Entry = getSLocEntryForFile(FID))
     if (Entry->getFile().getContentCache().OrigEntry)
@@ -738,21 +738,21 @@ SourceManager::getNonBuiltinFilenameForID(FileID FID) const {
   return std::nullopt;
 }
 
-StringRef SourceManager::getBufferData(FileID FID, bool *Invalid) const {
+llvm::StringRef SourceManager::getBufferData(FileID FID, bool *Invalid) const {
   auto B = getBufferDataOrNone(FID);
   if (Invalid)
     *Invalid = !B;
   return B ? *B : "<<<<<INVALID SOURCE LOCATION>>>>>";
 }
 
-std::optional<StringRef>
+std::optional<llvm::StringRef>
 SourceManager::getBufferDataIfLoaded(FileID FID) const {
   if (const SrcMgr::SLocEntry *Entry = getSLocEntryForFile(FID))
     return Entry->getFile().getContentCache().getBufferDataIfLoaded();
   return std::nullopt;
 }
 
-std::optional<StringRef> SourceManager::getBufferDataOrNone(FileID FID) const {
+std::optional<llvm::StringRef> SourceManager::getBufferDataOrNone(FileID FID) const {
   if (const SrcMgr::SLocEntry *Entry = getSLocEntryForFile(FID))
     if (auto B = Entry->getFile().getContentCache().getBufferOrNone(
             Diag, getFileManager(), SourceLocation()))
@@ -956,10 +956,10 @@ SourceLocation SourceManager::getImmediateSpellingLoc(SourceLocation Loc) const{
 }
 
 /// Return the filename of the file containing a SourceLocation.
-StringRef SourceManager::getFilename(SourceLocation SpellingLoc) const {
+llvm::StringRef SourceManager::getFilename(SourceLocation SpellingLoc) const {
   if (OptionalFileEntryRef F = getFileEntryRefForID(getFileID(SpellingLoc)))
     return F->getName();
-  return StringRef();
+  return llvm::StringRef();
 }
 
 /// getImmediateExpansionRange - Loc is required to be an expansion location.
@@ -1214,7 +1214,7 @@ LineOffsetMapping LineOffsetMapping::get(llvm::MemoryBufferRef Buffer,
 
   // Find the file offsets of all of the *physical* source lines.  This does
   // not look at trigraphs, escaped newlines, or anything else tricky.
-  SmallVector<unsigned, 256> LineOffsets;
+  llvm::SmallVector<unsigned, 256> LineOffsets;
 
   // Line #1 starts at char 0.
   LineOffsets.push_back(0);
@@ -1275,7 +1275,7 @@ LineOffsetMapping LineOffsetMapping::get(llvm::MemoryBufferRef Buffer,
   return LineOffsetMapping(LineOffsets, Alloc);
 }
 
-LineOffsetMapping::LineOffsetMapping(ArrayRef<unsigned> LineOffsets,
+LineOffsetMapping::LineOffsetMapping(llvm::ArrayRef<unsigned> LineOffsets,
                                      llvm::BumpPtrAllocator &Alloc)
     : Storage(Alloc.Allocate<unsigned>(LineOffsets.size() + 1)) {
   Storage[0] = LineOffsets.size();
@@ -1440,7 +1440,7 @@ SourceManager::getFileCharacteristic(SourceLocation Loc) const {
 /// Return the filename or buffer identifier of the buffer the location is in.
 /// Note that this name does not respect \#line directives.  Use getPresumedLoc
 /// for normal clients.
-StringRef SourceManager::getBufferName(SourceLocation Loc,
+llvm::StringRef SourceManager::getBufferName(SourceLocation Loc,
                                        bool *Invalid) const {
   if (isInvalid(Loc, Invalid)) return "<invalid loc>";
 
@@ -1476,7 +1476,7 @@ PresumedLoc SourceManager::getPresumedLoc(SourceLocation Loc,
   // before the MemBuffer as this will avoid unnecessarily paging in the
   // MemBuffer.
   FileID FID = LocInfo.first;
-  StringRef Filename;
+  llvm::StringRef Filename;
   if (C->OrigEntry)
     Filename = C->OrigEntry->getName();
   else if (auto Buffer = C->getBufferOrNone(Diag, getFileManager()))
@@ -2085,8 +2085,8 @@ std::pair<bool, bool> SourceManager::isInTheSameTranslationUnit(
   // If we found no match, the location is either in a built-ins buffer or
   // associated with global inline asm. PR5662 and PR22576 are examples.
 
-  StringRef LB = getBufferOrFake(LOffs.first).getBufferIdentifier();
-  StringRef RB = getBufferOrFake(ROffs.first).getBufferIdentifier();
+  llvm::StringRef LB = getBufferOrFake(LOffs.first).getBufferIdentifier();
+  llvm::StringRef RB = getBufferOrFake(ROffs.first).getBufferIdentifier();
 
   bool LIsBuiltins = LB == "<built-in>";
   bool RIsBuiltins = RB == "<built-in>";
@@ -2330,11 +2330,11 @@ size_t SourceManager::getDataStructureSizes() const {
   return size;
 }
 
-SourceManagerForFile::SourceManagerForFile(StringRef FileName,
-                                           StringRef Content) {
+SourceManagerForFile::SourceManagerForFile(llvm::StringRef FileName,
+                                           llvm::StringRef Content) {
   // This is referenced by `FileMgr` and will be released by `FileMgr` when it
   // is deleted.
-  IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
+  llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
       new llvm::vfs::InMemoryFileSystem);
   InMemoryFileSystem->addFile(
       FileName, 0,
@@ -2347,7 +2347,7 @@ SourceManagerForFile::SourceManagerForFile(StringRef FileName,
   // This is passed to `SM` as reference, so the pointer has to be referenced
   // by `Environment` due to the same reason above.
   Diagnostics = std::make_unique<DiagnosticsEngine>(
-      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs),
+      llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs),
       new DiagnosticOptions);
   SourceMgr = std::make_unique<SourceManager>(*Diagnostics, *FileMgr);
   FileEntryRef FE = llvm::cantFail(FileMgr->getFileRef(FileName));

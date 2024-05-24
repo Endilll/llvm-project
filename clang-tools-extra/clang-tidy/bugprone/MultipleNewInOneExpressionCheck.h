@@ -17,7 +17,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/multiple-new-in-one-expression.html
 class MultipleNewInOneExpressionCheck : public ClangTidyCheck {
 public:
-  MultipleNewInOneExpressionCheck(StringRef Name, ClangTidyContext *Context)
+  MultipleNewInOneExpressionCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

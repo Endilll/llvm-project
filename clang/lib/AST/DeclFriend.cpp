@@ -35,7 +35,7 @@ FriendDecl *FriendDecl::Create(ASTContext &C, DeclContext *DC,
                                SourceLocation L,
                                FriendUnion Friend,
                                SourceLocation FriendL,
-                          ArrayRef<TemplateParameterList *> FriendTypeTPLists) {
+                          llvm::ArrayRef<TemplateParameterList *> FriendTypeTPLists) {
 #ifndef NDEBUG
   if (Friend.is<NamedDecl *>()) {
     const auto *D = Friend.get<NamedDecl*>();

@@ -32,7 +32,7 @@
 using namespace clang;
 using namespace CodeGen;
 
-CGBlockInfo::CGBlockInfo(const BlockDecl *block, StringRef name)
+CGBlockInfo::CGBlockInfo(const BlockDecl *block, llvm::StringRef name)
     : Name(name), CXXThisIndex(0), CanBeGlobal(false), NeedsCopyDispose(false),
       NoEscape(false), HasCXXObject(false), UsesStret(false),
       HasCapturedVariableLayout(false), CapturesNonExternalType(false),
@@ -381,7 +381,7 @@ computeDestroyInfoForBlockCapture(const BlockDecl::Capture &CI, QualType T,
 static void addBlockLayout(CharUnits align, CharUnits size,
                            const BlockDecl::Capture *capture, llvm::Type *type,
                            QualType fieldType,
-                           SmallVectorImpl<BlockLayoutChunk> &Layout,
+                           llvm::SmallVectorImpl<BlockLayoutChunk> &Layout,
                            CGBlockInfo &Info, CodeGenModule &CGM) {
   if (!capture) {
     // 'this' capture.
@@ -472,7 +472,7 @@ static CharUnits getLowBit(CharUnits v) {
 }
 
 static void initializeForBlockHeader(CodeGenModule &CGM, CGBlockInfo &info,
-                             SmallVectorImpl<llvm::Type*> &elementTypes) {
+                             llvm::SmallVectorImpl<llvm::Type*> &elementTypes) {
 
   assert(elementTypes.empty());
   if (CGM.getLangOpts().OpenCL) {
@@ -548,7 +548,7 @@ static void computeBlockInfo(CodeGenModule &CGM, CodeGenFunction *CGF,
   ASTContext &C = CGM.getContext();
   const BlockDecl *block = info.getBlockDecl();
 
-  SmallVector<llvm::Type*, 8> elementTypes;
+  llvm::SmallVector<llvm::Type*, 8> elementTypes;
   initializeForBlockHeader(CGM, info, elementTypes);
   bool hasNonConstantCustomFields = false;
   if (auto *OpenCLHelper =
@@ -569,7 +569,7 @@ static void computeBlockInfo(CodeGenModule &CGM, CodeGenFunction *CGF,
     info.NoEscape = true;
 
   // Collect the layout chunks.
-  SmallVector<BlockLayoutChunk, 16> layout;
+  llvm::SmallVector<BlockLayoutChunk, 16> layout;
   layout.reserve(block->capturesCXXThis() +
                  (block->capture_end() - block->capture_begin()));
 
@@ -675,7 +675,7 @@ static void computeBlockInfo(CodeGenModule &CGM, CodeGenFunction *CGF,
   // which has 7 bytes of padding, as opposed to the naive solution
   // which might have less (?).
   if (endAlign < maxFieldAlign) {
-    SmallVectorImpl<BlockLayoutChunk>::iterator
+    llvm::SmallVectorImpl<BlockLayoutChunk>::iterator
       li = layout.begin() + 1, le = layout.end();
 
     // Look for something that the header end is already
@@ -686,7 +686,7 @@ static void computeBlockInfo(CodeGenModule &CGM, CodeGenFunction *CGF,
     // If we found something that's naturally aligned for the end of
     // the header, keep adding things...
     if (li != le) {
-      SmallVectorImpl<BlockLayoutChunk>::iterator first = li;
+      llvm::SmallVectorImpl<BlockLayoutChunk>::iterator first = li;
       for (; li != le; ++li) {
         assert(endAlign >= li->Alignment);
 
@@ -731,7 +731,7 @@ static void computeBlockInfo(CodeGenModule &CGM, CodeGenFunction *CGF,
   // Slam everything else on now.  This works because they have
   // strictly decreasing alignment and we expect that size is always a
   // multiple of alignment.
-  for (SmallVectorImpl<BlockLayoutChunk>::iterator
+  for (llvm::SmallVectorImpl<BlockLayoutChunk>::iterator
          li = layout.begin(), le = layout.end(); li != le; ++li) {
     if (endAlign < li->Alignment) {
       // size may not be multiple of alignment. This can only happen with
@@ -827,10 +827,10 @@ llvm::Value *CodeGenFunction::EmitBlockLiteral(const CGBlockInfo &blockInfo) {
       flags |= BLOCK_IS_NOESCAPE | BLOCK_IS_GLOBAL;
   }
 
-  auto projectField = [&](unsigned index, const Twine &name) -> Address {
+  auto projectField = [&](unsigned index, const llvm::Twine &name) -> Address {
     return Builder.CreateStructGEP(blockAddr, index, name);
   };
-  auto storeField = [&](llvm::Value *value, unsigned index, const Twine &name) {
+  auto storeField = [&](llvm::Value *value, unsigned index, const llvm::Twine &name) {
     Builder.CreateStore(value, projectField(index, name));
   };
 
@@ -840,7 +840,7 @@ llvm::Value *CodeGenFunction::EmitBlockLiteral(const CGBlockInfo &blockInfo) {
     unsigned index = 0;
     CharUnits offset;
     auto addHeaderField = [&](llvm::Value *value, CharUnits size,
-                              const Twine &name) {
+                              const llvm::Twine &name) {
       storeField(value, index, name);
       offset += size;
       index++;
@@ -1130,7 +1130,7 @@ llvm::Type *CodeGenModule::getGenericBlockLiteralType() {
     //   __generic void *__invoke;
     //   /* custom fields */
     // };
-    SmallVector<llvm::Type *, 8> StructFields(
+    llvm::SmallVector<llvm::Type *, 8> StructFields(
         {IntTy, IntTy, getOpenCLRuntime().getGenericVoidPointerType()});
     if (auto *Helper = getTargetCodeGenInfo().getTargetOpenCLBlockHelper()) {
       llvm::append_range(StructFields, Helper->getCustomFieldTypes());
@@ -1255,7 +1255,7 @@ void CodeGenModule::setAddrOfGlobalBlock(const BlockExpr *BE,
 
 llvm::Constant *
 CodeGenModule::GetAddrOfGlobalBlock(const BlockExpr *BE,
-                                    StringRef Name) {
+                                    llvm::StringRef Name) {
   if (llvm::Constant *Block = getAddrOfGlobalBlockIfEmitted(BE))
     return Block;
 
@@ -1466,7 +1466,7 @@ llvm::Function *CodeGenFunction::GenerateBlockFunction(
 
   llvm::FunctionType *fnLLVMType = CGM.getTypes().GetFunctionType(fnInfo);
 
-  StringRef name = CGM.getBlockMangledName(GD, blockDecl);
+  llvm::StringRef name = CGM.getBlockMangledName(GD, blockDecl);
   llvm::Function *fn = llvm::Function::Create(
       fnLLVMType, llvm::GlobalValue::InternalLinkage, name, &CGM.getModule());
   CGM.SetInternalFunctionAttributes(blockDecl, fn, fnInfo);
@@ -1710,7 +1710,7 @@ static std::string getBlockCaptureStr(const CGBlockInfo::Capture &Cap,
   switch (Kind) {
   case BlockCaptureEntityKind::CXXRecord: {
     Str += "c";
-    SmallString<256> TyStr;
+    llvm::SmallString<256> TyStr;
     llvm::raw_svector_ostream Out(TyStr);
     CGM.getCXXABI().getMangleContext().mangleCanonicalTypeName(CaptureTy, Out);
     Str += llvm::to_string(TyStr.size()) + TyStr.c_str();
@@ -1777,7 +1777,7 @@ static std::string getBlockCaptureStr(const CGBlockInfo::Capture &Cap,
 }
 
 static std::string getCopyDestroyHelperFuncName(
-    const SmallVectorImpl<CGBlockInfo::Capture> &Captures,
+    const llvm::SmallVectorImpl<CGBlockInfo::Capture> &Captures,
     CharUnits BlockAlignment, CaptureStrKind StrKind, CodeGenModule &CGM) {
   assert((StrKind == CaptureStrKind::CopyHelper ||
           StrKind == CaptureStrKind::DisposeHelper) &&
@@ -1896,7 +1896,7 @@ CodeGenFunction::GenerateCopyHelperFunction(const CGBlockInfo &blockInfo) {
   if (CGM.supportsCOMDAT())
     Fn->setComdat(CGM.getModule().getOrInsertComdat(FuncName));
 
-  SmallVector<QualType, 2> ArgTys;
+  llvm::SmallVector<QualType, 2> ArgTys;
   ArgTys.push_back(C.VoidPtrTy);
   ArgTys.push_back(C.VoidPtrTy);
 
@@ -2083,7 +2083,7 @@ CodeGenFunction::GenerateDestroyHelperFunction(const CGBlockInfo &blockInfo) {
   if (CGM.supportsCOMDAT())
     Fn->setComdat(CGM.getModule().getOrInsertComdat(FuncName));
 
-  SmallVector<QualType, 1> ArgTys;
+  llvm::SmallVector<QualType, 1> ArgTys;
   ArgTys.push_back(C.VoidPtrTy);
 
   setBlockHelperAttributesVisibility(blockInfo.CapturesNonExternalType, Fn, FI,
@@ -2326,7 +2326,7 @@ generateByrefCopyHelper(CodeGenFunction &CGF, const BlockByrefInfo &byrefInfo,
     llvm::Function::Create(LTy, llvm::GlobalValue::InternalLinkage,
                            "__Block_byref_object_copy_", &CGF.CGM.getModule());
 
-  SmallVector<QualType, 2> ArgTys;
+  llvm::SmallVector<QualType, 2> ArgTys;
   ArgTys.push_back(Context.VoidPtrTy);
   ArgTys.push_back(Context.VoidPtrTy);
 
@@ -2392,7 +2392,7 @@ generateByrefDisposeHelper(CodeGenFunction &CGF,
                            "__Block_byref_object_dispose_",
                            &CGF.CGM.getModule());
 
-  SmallVector<QualType, 1> ArgTys;
+  llvm::SmallVector<QualType, 1> ArgTys;
   ArgTys.push_back(Context.VoidPtrTy);
 
   CGF.CGM.SetInternalFunctionAttributes(GlobalDecl(), Fn, FI);
@@ -2584,7 +2584,7 @@ const BlockByrefInfo &CodeGenFunction::getBlockByrefInfo(const VarDecl *D) {
   QualType Ty = D->getType();
 
   CharUnits size;
-  SmallVector<llvm::Type *, 8> types;
+  llvm::SmallVector<llvm::Type *, 8> types;
 
   // void *__isa;
   types.push_back(VoidPtrTy);
@@ -2670,7 +2670,7 @@ void CodeGenFunction::emitByrefStructureInit(const AutoVarEmission &emission) {
   unsigned nextHeaderIndex = 0;
   CharUnits nextHeaderOffset;
   auto storeHeaderField = [&](llvm::Value *value, CharUnits fieldSize,
-                              const Twine &name) {
+                              const llvm::Twine &name) {
     auto fieldAddr = Builder.CreateStructGEP(addr, nextHeaderIndex, name);
     Builder.CreateStore(value, fieldAddr);
 

@@ -129,8 +129,8 @@ bool CommentInfo::operator<(const CommentInfo &Other) const {
 }
 
 static llvm::SmallString<64>
-calculateRelativeFilePath(const InfoType &Type, const StringRef &Path,
-                          const StringRef &Name, const StringRef &CurrentPath) {
+calculateRelativeFilePath(const InfoType &Type, const llvm::StringRef &Path,
+                          const llvm::StringRef &Name, const llvm::StringRef &CurrentPath) {
   llvm::SmallString<64> FilePath;
 
   if (CurrentPath != Path) {
@@ -151,7 +151,7 @@ calculateRelativeFilePath(const InfoType &Type, const StringRef &Path,
 }
 
 llvm::SmallString<64>
-Reference::getRelativeFilePath(const StringRef &CurrentPath) const {
+Reference::getRelativeFilePath(const llvm::StringRef &CurrentPath) const {
   return calculateRelativeFilePath(RefType, Path, Name, CurrentPath);
 }
 
@@ -163,7 +163,7 @@ llvm::SmallString<16> Reference::getFileBaseName() const {
 }
 
 llvm::SmallString<64>
-Info::getRelativeFilePath(const StringRef &CurrentPath) const {
+Info::getRelativeFilePath(const llvm::StringRef &CurrentPath) const {
   return calculateRelativeFilePath(IT, Path, extractName(), CurrentPath);
 }
 
@@ -220,7 +220,7 @@ void SymbolInfo::merge(SymbolInfo &&Other) {
   mergeBase(std::move(Other));
 }
 
-NamespaceInfo::NamespaceInfo(SymbolID USR, StringRef Name, StringRef Path)
+NamespaceInfo::NamespaceInfo(SymbolID USR, llvm::StringRef Name, llvm::StringRef Path)
       : Info(InfoType::IT_namespace, USR, Name, Path) {}
 
 void NamespaceInfo::merge(NamespaceInfo &&Other) {
@@ -234,7 +234,7 @@ void NamespaceInfo::merge(NamespaceInfo &&Other) {
   mergeBase(std::move(Other));
 }
 
-RecordInfo::RecordInfo(SymbolID USR, StringRef Name, StringRef Path)
+RecordInfo::RecordInfo(SymbolID USR, llvm::StringRef Name, llvm::StringRef Path)
     : SymbolInfo(InfoType::IT_record, USR, Name, Path) {}
 
 void RecordInfo::merge(RecordInfo &&Other) {
@@ -297,7 +297,7 @@ void TypedefInfo::merge(TypedefInfo &&Other) {
 
 BaseRecordInfo::BaseRecordInfo() : RecordInfo() {}
 
-BaseRecordInfo::BaseRecordInfo(SymbolID USR, StringRef Name, StringRef Path,
+BaseRecordInfo::BaseRecordInfo(SymbolID USR, llvm::StringRef Name, llvm::StringRef Path,
                                bool IsVirtual, AccessSpecifier Access,
                                bool IsParent)
     : RecordInfo(USR, Name, Path), IsVirtual(IsVirtual), Access(Access),
@@ -365,9 +365,9 @@ void Index::sort() {
 }
 
 ClangDocContext::ClangDocContext(tooling::ExecutionContext *ECtx,
-                                 StringRef ProjectName, bool PublicOnly,
-                                 StringRef OutDirectory, StringRef SourceRoot,
-                                 StringRef RepositoryUrl,
+                                 llvm::StringRef ProjectName, bool PublicOnly,
+                                 llvm::StringRef OutDirectory, llvm::StringRef SourceRoot,
+                                 llvm::StringRef RepositoryUrl,
                                  std::vector<std::string> UserStylesheets,
                                  std::vector<std::string> JsScripts)
     : ECtx(ECtx), ProjectName(ProjectName), PublicOnly(PublicOnly),

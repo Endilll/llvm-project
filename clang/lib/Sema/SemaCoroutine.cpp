@@ -182,7 +182,7 @@ static QualType lookupCoroutineHandleType(Sema &S, QualType PromiseType,
 }
 
 static bool isValidCoroutineContext(Sema &S, SourceLocation Loc,
-                                    StringRef Keyword) {
+                                    llvm::StringRef Keyword) {
   // [expr.await]p2 dictates that 'co_await' and 'co_yield' must be used within
   // a function body.
   // FIXME: This also covers [expr.await]p2: "An await-expression shall not
@@ -300,7 +300,7 @@ struct ReadySuspendResumeResult {
 };
 
 static ExprResult buildMemberCall(Sema &S, Expr *Base, SourceLocation Loc,
-                                  StringRef Name, MultiExprArg Args) {
+                                  llvm::StringRef Name, MultiExprArg Args) {
   DeclarationNameInfo NameInfo(&S.PP.getIdentifierTable().get(Name), Loc);
 
   // FIXME: Fix BuildMemberReferenceExpr to take a const CXXScopeSpec&.
@@ -381,7 +381,7 @@ static ReadySuspendResumeResult buildCoawaitCalls(Sema &S, VarDecl *CoroPromise,
 
   using ACT = ReadySuspendResumeResult::AwaitCallType;
 
-  auto BuildSubExpr = [&](ACT CallType, StringRef Func,
+  auto BuildSubExpr = [&](ACT CallType, llvm::StringRef Func,
                           MultiExprArg Arg) -> Expr * {
     ExprResult Result = buildMemberCall(S, Operand, Loc, Func, Arg);
     if (Result.isInvalid()) {
@@ -463,7 +463,7 @@ static ReadySuspendResumeResult buildCoawaitCalls(Sema &S, VarDecl *CoroPromise,
 }
 
 static ExprResult buildPromiseCall(Sema &S, VarDecl *Promise,
-                                   SourceLocation Loc, StringRef Name,
+                                   SourceLocation Loc, llvm::StringRef Name,
                                    MultiExprArg Args) {
 
   // Form a reference to the promise.
@@ -580,7 +580,7 @@ VarDecl *Sema::buildCoroutinePromise(SourceLocation Loc) {
 
 /// Check that this is a context in which a coroutine suspension can appear.
 static FunctionScopeInfo *checkCoroutineContext(Sema &S, SourceLocation Loc,
-                                                StringRef Keyword,
+                                                llvm::StringRef Keyword,
                                                 bool IsImplicit = false) {
   if (!isValidCoroutineContext(S, Loc, Keyword))
     return nullptr;
@@ -685,7 +685,7 @@ bool Sema::checkFinalSuspendNoThrow(const Stmt *FinalSuspend) {
 }
 
 bool Sema::ActOnCoroutineBodyStart(Scope *SC, SourceLocation KWLoc,
-                                   StringRef Keyword) {
+                                   llvm::StringRef Keyword) {
   // Ignore previous expr evaluation contexts.
   EnterExpressionEvaluationContext PotentiallyEvaluated(
       *this, Sema::ExpressionEvaluationContext::PotentiallyEvaluated);
@@ -704,7 +704,7 @@ bool Sema::ActOnCoroutineBodyStart(Scope *SC, SourceLocation KWLoc,
   auto *Fn = cast<FunctionDecl>(CurContext);
   SourceLocation Loc = Fn->getLocation();
   // Build the initial suspend point
-  auto buildSuspends = [&](StringRef Name) mutable -> StmtResult {
+  auto buildSuspends = [&](llvm::StringRef Name) mutable -> StmtResult {
     ExprResult Operand = buildPromiseCall(*this, ScopeInfo->CoroutinePromise,
                                           Loc, Name, std::nullopt);
     if (Operand.isInvalid())
@@ -769,7 +769,7 @@ static bool isWithinCatchScope(Scope *S) {
 // where an await-expression can appear is called a suspension context of the
 // function."
 static bool checkSuspensionContext(Sema &S, SourceLocation Loc,
-                                   StringRef Keyword) {
+                                   llvm::StringRef Keyword) {
   // First emphasis of [expr.await]p2: must be a potentially evaluated context.
   // That is, 'co_await' and 'co_yield' cannot appear in subexpressions of
   // \c sizeof.
@@ -1285,7 +1285,7 @@ bool CoroutineStmtBuilder::makeReturnOnAllocFailure() {
 // Return true if we collect placement arguments succesfully. Return false,
 // otherwise.
 static bool collectPlacementArgs(Sema &S, FunctionDecl &FD, SourceLocation Loc,
-                                 SmallVectorImpl<Expr *> &PlacementArgs) {
+                                 llvm::SmallVectorImpl<Expr *> &PlacementArgs) {
   if (auto *MD = dyn_cast<CXXMethodDecl>(&FD)) {
     if (MD->isImplicitObjectMemberFunction() && !isLambdaCallOperator(MD)) {
       ExprResult ThisExpr = S.ActOnCXXThis(Loc);
@@ -1361,7 +1361,7 @@ bool CoroutineStmtBuilder::makeNewAndDeleteExpr() {
   // lvalue that denotes the parameter copy corresponding to p_i.
 
   FunctionDecl *OperatorNew = nullptr;
-  SmallVector<Expr *, 1> PlacementArgs;
+  llvm::SmallVector<Expr *, 1> PlacementArgs;
 
   const bool PromiseContainsNew = [this, &PromiseType]() -> bool {
     DeclarationName NewName =
@@ -1541,7 +1541,7 @@ bool CoroutineStmtBuilder::makeNewAndDeleteExpr() {
   if (NewRef.isInvalid())
     return false;
 
-  SmallVector<Expr *, 2> NewArgs(1, FrameSize);
+  llvm::SmallVector<Expr *, 2> NewArgs(1, FrameSize);
   if (S.getLangOpts().CoroAlignedAllocation && PassAlignment)
     NewArgs.push_back(FrameAlignment);
 
@@ -1566,7 +1566,7 @@ bool CoroutineStmtBuilder::makeNewAndDeleteExpr() {
   Expr *CoroFree =
       S.BuildBuiltinCallExpr(Loc, Builtin::BI__builtin_coro_free, {FramePtr});
 
-  SmallVector<Expr *, 2> DeleteArgs{CoroFree};
+  llvm::SmallVector<Expr *, 2> DeleteArgs{CoroFree};
 
   // [dcl.fct.def.coroutine]p12
   //   The selected deallocation function shall be called with the address of

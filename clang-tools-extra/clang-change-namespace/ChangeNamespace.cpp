@@ -19,7 +19,7 @@ namespace change_namespace {
 
 namespace {
 
-inline std::string joinNamespaces(ArrayRef<StringRef> Namespaces) {
+inline std::string joinNamespaces(llvm::ArrayRef<llvm::StringRef> Namespaces) {
   return llvm::join(Namespaces, "::");
 }
 
@@ -243,7 +243,7 @@ std::string getShortestQualifiedNameInNamespace(llvm::StringRef DeclName,
                    .str();
 }
 
-std::string wrapCodeInNamespace(StringRef NestedNs, std::string Code) {
+std::string wrapCodeInNamespace(llvm::StringRef NestedNs, std::string Code) {
   if (Code.back() != '\n')
     Code += "\n";
   auto NsSplitted = splitSymbolName(NestedNs);
@@ -371,7 +371,7 @@ void ChangeNamespaceTool::registerMatchers(ast_matchers::MatchFinder *Finder) {
              /*KeepEmpty=*/false);
   std::string Prefix = "-";
   if (!DiffOldNsSplitted.empty())
-    Prefix = (StringRef(FullOldNs).drop_back(DiffOldNamespace.size()) +
+    Prefix = (llvm::StringRef(FullOldNs).drop_back(DiffOldNamespace.size()) +
               DiffOldNsSplitted.front())
                  .str();
   auto IsInMovedNs =
@@ -799,7 +799,7 @@ void ChangeNamespaceTool::replaceQualifiedSymbolInDeclContext(
     if (!isDeclVisibleAtLocation(*Result.SourceManager, UsingNamespace, DeclCtx,
                                  Start))
       continue;
-    StringRef FromDeclNameRef = FromDeclName;
+    llvm::StringRef FromDeclNameRef = FromDeclName;
     if (FromDeclNameRef.consume_front(UsingNamespace->getNominatedNamespace()
                                           ->getQualifiedNameAsString())) {
       FromDeclNameRef = FromDeclNameRef.drop_front(2);
@@ -813,7 +813,7 @@ void ChangeNamespaceTool::replaceQualifiedSymbolInDeclContext(
     if (!isDeclVisibleAtLocation(*Result.SourceManager, NamespaceAlias, DeclCtx,
                                  Start))
       continue;
-    StringRef FromDeclNameRef = FromDeclName;
+    llvm::StringRef FromDeclNameRef = FromDeclName;
     if (FromDeclNameRef.consume_front(
             NamespaceAlias->getNamespace()->getQualifiedNameAsString() +
             "::")) {
@@ -827,9 +827,9 @@ void ChangeNamespaceTool::replaceQualifiedSymbolInDeclContext(
       // "IsVisibleInNewNs" matcher.
       if (AliasQualifiedName != AliasName) {
         // The alias is defined in some namespace.
-        assert(StringRef(AliasQualifiedName).ends_with("::" + AliasName));
+        assert(llvm::StringRef(AliasQualifiedName).ends_with("::" + AliasName));
         llvm::StringRef AliasNs =
-            StringRef(AliasQualifiedName).drop_back(AliasName.size() + 2);
+            llvm::StringRef(AliasQualifiedName).drop_back(AliasName.size() + 2);
         if (!llvm::StringRef(OldNs).starts_with(AliasNs))
           continue;
       }

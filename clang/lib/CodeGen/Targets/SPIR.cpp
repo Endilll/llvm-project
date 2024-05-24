@@ -133,8 +133,8 @@ void SPIRVTargetCodeGenInfo::setCUDAKernelCallingConvention(
 }
 
 /// Construct a SPIR-V target extension type for the given OpenCL image type.
-static llvm::Type *getSPIRVImageType(llvm::LLVMContext &Ctx, StringRef BaseType,
-                                     StringRef OpenCLName,
+static llvm::Type *getSPIRVImageType(llvm::LLVMContext &Ctx, llvm::StringRef BaseType,
+                                     llvm::StringRef OpenCLName,
                                      unsigned AccessQualifier) {
   // These parameters compare to the operands of OpTypeImage (see
   // https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#OpTypeImage
@@ -142,7 +142,7 @@ static llvm::Type *getSPIRVImageType(llvm::LLVMContext &Ctx, StringRef BaseType,
   // will be changed to 1 only for the image type(s) that set the parameter to
   // one. The 7th integer parameter is the access qualifier, which is tacked on
   // at the end.
-  SmallVector<unsigned, 7> IntParams = {0, 0, 0, 0, 0, 0};
+  llvm::SmallVector<unsigned, 7> IntParams = {0, 0, 0, 0, 0, 0};
 
   // Choose the dimension of the image--this corresponds to the Dim enum in
   // SPIR-V (first integer parameter of OpTypeImage).

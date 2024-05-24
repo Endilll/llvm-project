@@ -21,7 +21,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/string-compare.html
 class StringCompareCheck : public ClangTidyCheck {
 public:
-  StringCompareCheck(StringRef Name, ClangTidyContext *Context);
+  StringCompareCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
@@ -32,7 +32,7 @@ public:
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
 
 private:
-  const std::vector<StringRef> StringLikeClasses;
+  const std::vector<llvm::StringRef> StringLikeClasses;
 };
 
 } // namespace clang::tidy::readability

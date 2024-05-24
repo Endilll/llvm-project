@@ -177,7 +177,7 @@ Let's see in more detail at the check class definition:
   ...
   class AwesomeFunctionNamesCheck : public ClangTidyCheck {
   public:
-    AwesomeFunctionNamesCheck(StringRef Name, ClangTidyContext *Context)
+    AwesomeFunctionNamesCheck(llvm::StringRef Name, ClangTidyContext *Context)
         : ClangTidyCheck(Name, Context) {}
     void registerMatchers(ast_matchers::MatchFinder *Finder) override;
     void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
@@ -243,9 +243,9 @@ in the codebase and working on your check incrementally.
 Guide to useful documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Many of the support classes created for LLVM are used by Clang, such as `StringRef
+Many of the support classes created for LLVM are used by Clang, such as `llvm::StringRef
 <https://llvm.org/docs/ProgrammersManual.html#the-stringref-class>`_
-and `SmallVector <https://llvm.org/docs/ProgrammersManual.html#llvm-adt-smallvector-h>`_.
+and `llvm::SmallVector <https://llvm.org/docs/ProgrammersManual.html#llvm-adt-smallvector-h>`_.
 These and other commonly used classes are described in the `Important and useful LLVM APIs
 <https://llvm.org/docs/ProgrammersManual.html#important-and-useful-llvm-apis>`_ and
 `Picking the Right Data Structure for the Task
@@ -502,7 +502,7 @@ the check implements and what the current values are (e.g. for the
     const std::string SomeOption2;
 
   public:
-    MyCheck(StringRef Name, ClangTidyContext *Context)
+    MyCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         SomeOption(Options.get("SomeOption1", -1U)),
         SomeOption(Options.get("SomeOption2", "some default")) {}

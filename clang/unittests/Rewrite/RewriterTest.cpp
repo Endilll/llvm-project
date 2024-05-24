@@ -25,7 +25,7 @@ struct RangeTypeTest {
   CharSourceRange makeCharRange(int StartOff, int EndOff) {
     return CharSourceRange::getCharRange(makeLoc(StartOff), makeLoc(EndOff));
   }
-  RangeTypeTest(StringRef Code, int StartOff, int EndOff) {
+  RangeTypeTest(llvm::StringRef Code, int StartOff, int EndOff) {
     AST = tooling::buildASTFromCode(Code);
     ASTContext &C = AST->getASTContext();
     Rewrite = Rewriter(C.getSourceManager(), C.getLangOpts());
@@ -40,7 +40,7 @@ TEST(Rewriter, GetRewrittenTextRangeTypes) {
   // Check that correct text is retrieved for each range type.  Check again
   // after a modification.  Ranges remain in terms of the original text but
   // include the new text.
-  StringRef Code = "int main() { return 0; }";
+  llvm::StringRef Code = "int main() { return 0; }";
   //              get char range ^~~    = "ret"
   //             get token range ^~~+++ = "return"
   //            get source range ^~~+++ = "return"
@@ -61,7 +61,7 @@ TEST(Rewriter, GetRewrittenTextRangeTypes) {
 TEST(Rewriter, ReplaceTextRangeTypes) {
   // Check that correct text is replaced for each range type.  Ranges remain in
   // terms of the original text but include the new text.
-  StringRef Code = "int main(int argc, char *argv[]) { return argc; }";
+  llvm::StringRef Code = "int main(int argc, char *argv[]) { return argc; }";
   //                            replace char range with "foo" ^~
   //                                                      get ^~~~~ = "foogc;"
   //                           replace token range with "bar" ^~++

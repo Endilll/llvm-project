@@ -84,7 +84,7 @@ void InstallAPIVisitor::HandleTranslationUnit(ASTContext &ASTCtx) {
 }
 
 std::string InstallAPIVisitor::getMangledName(const NamedDecl *D) const {
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   if (MC->shouldMangleDeclName(D)) {
     raw_svector_ostream NStream(Name);
     MC->mangleName(D, NStream);
@@ -94,8 +94,8 @@ std::string InstallAPIVisitor::getMangledName(const NamedDecl *D) const {
   return getBackendMangledName(Name);
 }
 
-std::string InstallAPIVisitor::getBackendMangledName(Twine Name) const {
-  SmallString<256> FinalName;
+std::string InstallAPIVisitor::getBackendMangledName(llvm::Twine Name) const {
+  llvm::SmallString<256> FinalName;
   Mangler::getNameWithPrefix(FinalName, Name, DataLayout(Layout));
   return std::string(FinalName);
 }
@@ -138,7 +138,7 @@ static bool hasObjCExceptionAttribute(const ObjCInterfaceDecl *D) {
   return false;
 }
 void InstallAPIVisitor::recordObjCInstanceVariables(
-    const ASTContext &ASTCtx, ObjCContainerRecord *Record, StringRef SuperClass,
+    const ASTContext &ASTCtx, ObjCContainerRecord *Record, llvm::StringRef SuperClass,
     const llvm::iterator_range<
         DeclContext::specific_decl_iterator<ObjCIvarDecl>>
         Ivars) {
@@ -154,7 +154,7 @@ void InstallAPIVisitor::recordObjCInstanceVariables(
     auto Access = getAccessForDecl(IV);
     if (!Access)
       continue;
-    StringRef Name = IV->getName();
+    llvm::StringRef Name = IV->getName();
     const AvailabilityInfo Avail = AvailabilityInfo::createFromDecl(IV);
     auto AC = IV->getCanonicalAccessControl();
     auto [ObjCIVR, FA] =
@@ -173,7 +173,7 @@ bool InstallAPIVisitor::VisitObjCInterfaceDecl(const ObjCInterfaceDecl *D) {
   if (!Access)
     return true;
 
-  StringRef Name = D->getObjCRuntimeNameAsString();
+  llvm::StringRef Name = D->getObjCRuntimeNameAsString();
   const RecordLinkage Linkage =
       isExported(D) ? RecordLinkage::Exported : RecordLinkage::Internal;
   const AvailabilityInfo Avail = AvailabilityInfo::createFromDecl(D);
@@ -186,7 +186,7 @@ bool InstallAPIVisitor::VisitObjCInterfaceDecl(const ObjCInterfaceDecl *D) {
   Ctx.Verifier->verify(Class, FA);
 
   // Get base class.
-  StringRef SuperClassName;
+  llvm::StringRef SuperClassName;
   if (const auto *SuperClass = D->getSuperClass())
     SuperClassName = SuperClass->getObjCRuntimeNameAsString();
 
@@ -196,14 +196,14 @@ bool InstallAPIVisitor::VisitObjCInterfaceDecl(const ObjCInterfaceDecl *D) {
 }
 
 bool InstallAPIVisitor::VisitObjCCategoryDecl(const ObjCCategoryDecl *D) {
-  StringRef CategoryName = D->getName();
+  llvm::StringRef CategoryName = D->getName();
   // Skip over declarations that access could not be collected for.
   auto Access = getAccessForDecl(D);
   if (!Access)
     return true;
   const AvailabilityInfo Avail = AvailabilityInfo::createFromDecl(D);
   const ObjCInterfaceDecl *InterfaceD = D->getClassInterface();
-  const StringRef InterfaceName = InterfaceD->getName();
+  const llvm::StringRef InterfaceName = InterfaceD->getName();
 
   ObjCCategoryRecord *CategoryRecord =
       Ctx.Slice->addObjCCategory(InterfaceName, CategoryName, Avail, D, *Access)
@@ -423,7 +423,7 @@ static bool hasRTTI(const CXXRecordDecl *D) {
 
 std::string
 InstallAPIVisitor::getMangledCXXRTTIName(const CXXRecordDecl *D) const {
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   raw_svector_ostream NameStream(Name);
   MC->mangleCXXRTTIName(QualType(D->getTypeForDecl(), 0), NameStream);
 
@@ -431,7 +431,7 @@ InstallAPIVisitor::getMangledCXXRTTIName(const CXXRecordDecl *D) const {
 }
 
 std::string InstallAPIVisitor::getMangledCXXRTTI(const CXXRecordDecl *D) const {
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   raw_svector_ostream NameStream(Name);
   MC->mangleCXXRTTI(QualType(D->getTypeForDecl(), 0), NameStream);
 
@@ -440,7 +440,7 @@ std::string InstallAPIVisitor::getMangledCXXRTTI(const CXXRecordDecl *D) const {
 
 std::string
 InstallAPIVisitor::getMangledCXXVTableName(const CXXRecordDecl *D) const {
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   raw_svector_ostream NameStream(Name);
   MC->mangleCXXVTable(D, NameStream);
 
@@ -450,7 +450,7 @@ InstallAPIVisitor::getMangledCXXVTableName(const CXXRecordDecl *D) const {
 std::string
 InstallAPIVisitor::getMangledCXXThunk(const GlobalDecl &D,
                                       const ThunkInfo &Thunk) const {
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   raw_svector_ostream NameStream(Name);
   const auto *Method = cast<CXXMethodDecl>(D.getDecl());
   if (const auto *Dtor = dyn_cast<CXXDestructorDecl>(Method))
@@ -463,7 +463,7 @@ InstallAPIVisitor::getMangledCXXThunk(const GlobalDecl &D,
 
 std::string InstallAPIVisitor::getMangledCtorDtor(const CXXMethodDecl *D,
                                                   int Type) const {
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   raw_svector_ostream NameStream(Name);
   GlobalDecl GD;
   if (const auto *Ctor = dyn_cast<CXXConstructorDecl>(D))

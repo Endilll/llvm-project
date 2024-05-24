@@ -216,7 +216,7 @@ private:
   void emitBlockInfo(BlockId BID, const std::vector<RecordId> &RIDs);
 
   // Emission of individual record types.
-  void emitRecord(StringRef Str, RecordId ID);
+  void emitRecord(llvm::StringRef Str, RecordId ID);
   void emitRecord(const SymbolID &Str, RecordId ID);
   void emitRecord(const Location &Loc, RecordId ID);
   void emitRecord(const Reference &Ref, RecordId ID);
@@ -231,7 +231,7 @@ private:
 
   // Static size is the maximum length of the block/record names we're pushing
   // to this + 1. Longest is currently `MemberTypeBlock` at 15 chars.
-  SmallVector<uint32_t, BitCodeConstants::RecordSize> Record;
+  llvm::SmallVector<uint32_t, BitCodeConstants::RecordSize> Record;
   llvm::BitstreamWriter &Stream;
   AbbreviationMap Abbrevs;
 };

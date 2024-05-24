@@ -42,7 +42,7 @@ std::string replaceNestedName(const NestedNameSpecifier *Use,
                               SourceLocation UseLoc,
                               const DeclContext *UseContext,
                               const NamedDecl *FromDecl,
-                              StringRef ReplacementString);
+                              llvm::StringRef ReplacementString);
 
 } // end namespace tooling
 } // end namespace clang

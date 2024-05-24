@@ -266,7 +266,7 @@ calculateConstraintSatisfaction(Sema &S, const Expr *ConstraintExpr,
     Satisfaction.ContainsErrors = true;
 
     PartialDiagnostic Msg = S.PDiag(diag::note_constraint_references_error);
-    SmallString<128> DiagString;
+    llvm::SmallString<128> DiagString;
     DiagString = ": ";
     Msg.EmitToString(S.getDiagnostics(), DiagString);
     unsigned MessageSize = DiagString.size();
@@ -276,13 +276,13 @@ calculateConstraintSatisfaction(Sema &S, const Expr *ConstraintExpr,
         ConstraintExpr,
         new (S.Context) ConstraintSatisfaction::SubstitutionDiagnostic{
             SubstitutedAtomicExpr.get()->getBeginLoc(),
-            StringRef(Mem, MessageSize)});
+            llvm::StringRef(Mem, MessageSize)});
     return SubstitutedAtomicExpr;
   }
 
   EnterExpressionEvaluationContext ConstantEvaluated(
       S, Sema::ExpressionEvaluationContext::ConstantEvaluated);
-  SmallVector<PartialDiagnosticAt, 2> EvaluationDiags;
+  llvm::SmallVector<PartialDiagnosticAt, 2> EvaluationDiags;
   Expr::EvalResult EvalResult;
   EvalResult.Diag = &EvaluationDiags;
   if (!SubstitutedAtomicExpr.get()->EvaluateAsConstantExpr(EvalResult,
@@ -386,7 +386,7 @@ static ExprResult calculateConstraintSatisfaction(
             //  just storing them as strings. We would still like, in the
             //  future, to serialize the proper PartialDiagnostic as serializing
             //  it as a string defeats the purpose of the diagnostic mechanism.
-            SmallString<128> DiagString;
+            llvm::SmallString<128> DiagString;
             DiagString = ": ";
             SubstDiag.second.EmitToString(S.getDiagnostics(), DiagString);
             unsigned MessageSize = DiagString.size();
@@ -395,7 +395,7 @@ static ExprResult calculateConstraintSatisfaction(
             Satisfaction.Details.emplace_back(
                 AtomicExpr,
                 new (S.Context) ConstraintSatisfaction::SubstitutionDiagnostic{
-                        SubstDiag.first, StringRef(Mem, MessageSize)});
+                        SubstDiag.first, llvm::StringRef(Mem, MessageSize)});
             Satisfaction.IsSatisfied = false;
             return ExprEmpty();
           }
@@ -425,7 +425,7 @@ static ExprResult calculateConstraintSatisfaction(
 }
 
 static bool CheckConstraintSatisfaction(
-    Sema &S, const NamedDecl *Template, ArrayRef<const Expr *> ConstraintExprs,
+    Sema &S, const NamedDecl *Template, llvm::ArrayRef<const Expr *> ConstraintExprs,
     llvm::SmallVectorImpl<Expr *> &Converted,
     const MultiLevelTemplateArgumentList &TemplateArgsLists,
     SourceRange TemplateIDRange, ConstraintSatisfaction &Satisfaction) {
@@ -440,10 +440,10 @@ static bool CheckConstraintSatisfaction(
     return false;
   }
 
-  ArrayRef<TemplateArgument> TemplateArgs =
+  llvm::ArrayRef<TemplateArgument> TemplateArgs =
       TemplateArgsLists.getNumSubstitutedLevels() > 0
           ? TemplateArgsLists.getOutermost()
-          : ArrayRef<TemplateArgument> {};
+          : llvm::ArrayRef<TemplateArgument> {};
   Sema::InstantiatingTemplate Inst(S, TemplateIDRange.getBegin(),
       Sema::InstantiatingTemplate::ConstraintsCheck{},
       const_cast<NamedDecl *>(Template), TemplateArgs, TemplateIDRange);
@@ -473,7 +473,7 @@ static bool CheckConstraintSatisfaction(
 }
 
 bool Sema::CheckConstraintSatisfaction(
-    const NamedDecl *Template, ArrayRef<const Expr *> ConstraintExprs,
+    const NamedDecl *Template, llvm::ArrayRef<const Expr *> ConstraintExprs,
     llvm::SmallVectorImpl<Expr *> &ConvertedConstraints,
     const MultiLevelTemplateArgumentList &TemplateArgsLists,
     SourceRange TemplateIDRange, ConstraintSatisfaction &OutSatisfaction) {
@@ -585,7 +585,7 @@ bool Sema::addInstantiatedCapturesToScope(
 }
 
 bool Sema::SetupConstraintScope(
-    FunctionDecl *FD, std::optional<ArrayRef<TemplateArgument>> TemplateArgs,
+    FunctionDecl *FD, std::optional<llvm::ArrayRef<TemplateArgument>> TemplateArgs,
     const MultiLevelTemplateArgumentList &MLTAL,
     LocalInstantiationScope &Scope) {
   if (FD->isTemplateInstantiation() && FD->getPrimaryTemplate()) {
@@ -593,7 +593,7 @@ bool Sema::SetupConstraintScope(
     InstantiatingTemplate Inst(
         *this, FD->getPointOfInstantiation(),
         Sema::InstantiatingTemplate::ConstraintsCheck{}, PrimaryTemplate,
-        TemplateArgs ? *TemplateArgs : ArrayRef<TemplateArgument>{},
+        TemplateArgs ? *TemplateArgs : llvm::ArrayRef<TemplateArgument>{},
         SourceRange());
     if (Inst.isInvalid())
       return true;
@@ -639,7 +639,7 @@ bool Sema::SetupConstraintScope(
     InstantiatingTemplate Inst(
         *this, FD->getPointOfInstantiation(),
         Sema::InstantiatingTemplate::ConstraintsCheck{}, InstantiatedFrom,
-        TemplateArgs ? *TemplateArgs : ArrayRef<TemplateArgument>{},
+        TemplateArgs ? *TemplateArgs : llvm::ArrayRef<TemplateArgument>{},
         SourceRange());
     if (Inst.isInvalid())
       return true;
@@ -657,7 +657,7 @@ bool Sema::SetupConstraintScope(
 // constraint-instantiation and checking.
 std::optional<MultiLevelTemplateArgumentList>
 Sema::SetupConstraintCheckingTemplateArgumentsAndScope(
-    FunctionDecl *FD, std::optional<ArrayRef<TemplateArgument>> TemplateArgs,
+    FunctionDecl *FD, std::optional<llvm::ArrayRef<TemplateArgument>> TemplateArgs,
     LocalInstantiationScope &Scope) {
   MultiLevelTemplateArgumentList MLTAL;
 
@@ -875,7 +875,7 @@ bool Sema::FriendConstraintsDependOnEnclosingTemplate(const FunctionDecl *FD) {
   assert(FD->getDescribedFunctionTemplate() &&
          "Non-function templates don't need to be checked");
 
-  SmallVector<const Expr *, 3> ACs;
+  llvm::SmallVector<const Expr *, 3> ACs;
   FD->getDescribedFunctionTemplate()->getAssociatedConstraints(ACs);
 
   unsigned OldTemplateDepth = CalculateTemplateDepthForConstraints(*this, FD);
@@ -898,7 +898,7 @@ bool Sema::EnsureTemplateArgumentListConstraints(
     return true;
 
   if (!Satisfaction.IsSatisfied) {
-    SmallString<128> TemplateArgString;
+    llvm::SmallString<128> TemplateArgString;
     TemplateArgString = " ";
     TemplateArgString += getTemplateArgumentBindingsText(
         TD->getTemplateParameters(), TemplateArgsLists.getInnermost().data(),
@@ -916,13 +916,13 @@ bool Sema::EnsureTemplateArgumentListConstraints(
 
 bool Sema::CheckInstantiatedFunctionTemplateConstraints(
     SourceLocation PointOfInstantiation, FunctionDecl *Decl,
-    ArrayRef<TemplateArgument> TemplateArgs,
+    llvm::ArrayRef<TemplateArgument> TemplateArgs,
     ConstraintSatisfaction &Satisfaction) {
   // In most cases we're not going to have constraints, so check for that first.
   FunctionTemplateDecl *Template = Decl->getPrimaryTemplate();
   // Note - code synthesis context for the constraints check is created
   // inside CheckConstraintsSatisfaction.
-  SmallVector<const Expr *, 3> TemplateAC;
+  llvm::SmallVector<const Expr *, 3> TemplateAC;
   Template->getAssociatedConstraints(TemplateAC);
   if (TemplateAC.empty()) {
     Satisfaction.IsSatisfied = true;
@@ -1055,7 +1055,7 @@ static void diagnoseWellFormedUnsatisfiedConstraintExpr(Sema &S,
 static void diagnoseUnsatisfiedRequirement(Sema &S,
                                            concepts::NestedRequirement *Req,
                                            bool First) {
-  using SubstitutionDiagnostic = std::pair<SourceLocation, StringRef>;
+  using SubstitutionDiagnostic = std::pair<SourceLocation, llvm::StringRef>;
   for (auto &Pair : Req->getConstraintSatisfaction()) {
     if (auto *SubstDiag = Pair.second.dyn_cast<SubstitutionDiagnostic *>())
       S.Diag(SubstDiag->first, diag::note_nested_requirement_substitution_error)
@@ -1215,7 +1215,7 @@ void Sema::DiagnoseUnsatisfiedConstraint(
 
 const NormalizedConstraint *
 Sema::getNormalizedAssociatedConstraints(
-    NamedDecl *ConstrainedDecl, ArrayRef<const Expr *> AssociatedConstraints) {
+    NamedDecl *ConstrainedDecl, llvm::ArrayRef<const Expr *> AssociatedConstraints) {
   // In case the ConstrainedDecl comes from modules, it is necessary to use
   // the canonical decl to avoid different atomic constraints with the 'same'
   // declarations.
@@ -1318,7 +1318,7 @@ static bool substituteParameterMappings(Sema &S, NormalizedConstraint &N,
 
 std::optional<NormalizedConstraint>
 NormalizedConstraint::fromConstraintExprs(Sema &S, NamedDecl *D,
-                                          ArrayRef<const Expr *> E) {
+                                          llvm::ArrayRef<const Expr *> E) {
   assert(E.size() != 0);
   auto Conjunction = fromConstraintExpr(S, D, E[0]);
   if (!Conjunction)
@@ -1489,8 +1489,8 @@ static bool subsumes(const NormalForm &PDNF, const NormalForm &QCNF,
 }
 
 template<typename AtomicSubsumptionEvaluator>
-static bool subsumes(Sema &S, NamedDecl *DP, ArrayRef<const Expr *> P,
-                     NamedDecl *DQ, ArrayRef<const Expr *> Q, bool &Subsumes,
+static bool subsumes(Sema &S, NamedDecl *DP, llvm::ArrayRef<const Expr *> P,
+                     NamedDecl *DQ, llvm::ArrayRef<const Expr *> Q, bool &Subsumes,
                      AtomicSubsumptionEvaluator E) {
   // C++ [temp.constr.order] p2
   //   In order to determine if a constraint P subsumes a constraint Q, P is
@@ -1511,9 +1511,9 @@ static bool subsumes(Sema &S, NamedDecl *DP, ArrayRef<const Expr *> P,
 }
 
 bool Sema::IsAtLeastAsConstrained(NamedDecl *D1,
-                                  MutableArrayRef<const Expr *> AC1,
+                                  llvm::MutableArrayRef<const Expr *> AC1,
                                   NamedDecl *D2,
-                                  MutableArrayRef<const Expr *> AC2,
+                                  llvm::MutableArrayRef<const Expr *> AC2,
                                   bool &Result) {
   if (const auto *FD1 = dyn_cast<FunctionDecl>(D1)) {
     auto IsExpectedEntity = [](const FunctionDecl *FD) {
@@ -1572,7 +1572,7 @@ bool Sema::IsAtLeastAsConstrained(NamedDecl *D1,
 }
 
 bool Sema::MaybeEmitAmbiguousAtomicConstraintsDiagnostic(NamedDecl *D1,
-    ArrayRef<const Expr *> AC1, NamedDecl *D2, ArrayRef<const Expr *> AC2) {
+    llvm::ArrayRef<const Expr *> AC1, NamedDecl *D2, llvm::ArrayRef<const Expr *> AC2) {
   if (isSFINAEContext())
     // No need to work here because our notes would be discarded.
     return false;

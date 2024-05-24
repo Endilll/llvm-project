@@ -73,7 +73,7 @@ namespace tidy::readability {
 const char DefaultIgnoredIntegerValues[] = "1;2;3;4;";
 const char DefaultIgnoredFloatingPointValues[] = "1.0;100.0;";
 
-MagicNumbersCheck::MagicNumbersCheck(StringRef Name, ClangTidyContext *Context)
+MagicNumbersCheck::MagicNumbersCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreAllFloatingPointValues(
           Options.get("IgnoreAllFloatingPointValues", false)),
@@ -88,11 +88,11 @@ MagicNumbersCheck::MagicNumbersCheck(StringRef Name, ClangTidyContext *Context)
       RawIgnoredFloatingPointValues(Options.get(
           "IgnoredFloatingPointValues", DefaultIgnoredFloatingPointValues)) {
   // Process the set of ignored integer values.
-  const std::vector<StringRef> IgnoredIntegerValuesInput =
+  const std::vector<llvm::StringRef> IgnoredIntegerValuesInput =
       utils::options::parseStringList(RawIgnoredIntegerValues);
   IgnoredIntegerValues.resize(IgnoredIntegerValuesInput.size());
   llvm::transform(IgnoredIntegerValuesInput, IgnoredIntegerValues.begin(),
-                  [](StringRef Value) {
+                  [](llvm::StringRef Value) {
                     int64_t Res = 0;
                     Value.getAsInteger(10, Res);
                     return Res;
@@ -101,7 +101,7 @@ MagicNumbersCheck::MagicNumbersCheck(StringRef Name, ClangTidyContext *Context)
 
   if (!IgnoreAllFloatingPointValues) {
     // Process the set of ignored floating point values.
-    const std::vector<StringRef> IgnoredFloatingPointValuesInput =
+    const std::vector<llvm::StringRef> IgnoredFloatingPointValuesInput =
         utils::options::parseStringList(RawIgnoredFloatingPointValues);
     IgnoredFloatingPointValues.reserve(IgnoredFloatingPointValuesInput.size());
     IgnoredDoublePointValues.reserve(IgnoredFloatingPointValuesInput.size());
@@ -233,7 +233,7 @@ bool MagicNumbersCheck::isSyntheticValue(const SourceManager *SourceManager,
   if (FileOffset.first.isInvalid())
     return false;
 
-  const StringRef BufferIdentifier =
+  const llvm::StringRef BufferIdentifier =
       SourceManager->getBufferOrFake(FileOffset.first).getBufferIdentifier();
 
   return BufferIdentifier.empty();

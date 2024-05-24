@@ -74,7 +74,7 @@ namespace clang {
 class CXXScopeSpec {
   SourceRange Range;
   NestedNameSpecifierLocBuilder Builder;
-  ArrayRef<TemplateParameterList *> TemplateParamLists;
+  llvm::ArrayRef<TemplateParameterList *> TemplateParamLists;
 
 public:
   SourceRange getRange() const { return Range; }
@@ -84,10 +84,10 @@ public:
   SourceLocation getBeginLoc() const { return Range.getBegin(); }
   SourceLocation getEndLoc() const { return Range.getEnd(); }
 
-  void setTemplateParamLists(ArrayRef<TemplateParameterList *> L) {
+  void setTemplateParamLists(llvm::ArrayRef<TemplateParameterList *> L) {
     TemplateParamLists = L;
   }
-  ArrayRef<TemplateParameterList *> getTemplateParamLists() const {
+  llvm::ArrayRef<TemplateParameterList *> getTemplateParamLists() const {
     return TemplateParamLists;
   }
 
@@ -676,13 +676,13 @@ public:
   /// set.
   /// Handle - a handler to be invoked.
   void forEachCVRUQualifier(
-      llvm::function_ref<void(TQ, StringRef, SourceLocation)> Handle);
+      llvm::function_ref<void(TQ, llvm::StringRef, SourceLocation)> Handle);
 
   /// This method calls the passed in handler on each qual being
   /// set.
   /// Handle - a handler to be invoked.
   void forEachQualifier(
-      llvm::function_ref<void(TQ, StringRef, SourceLocation)> Handle);
+      llvm::function_ref<void(TQ, llvm::StringRef, SourceLocation)> Handle);
 
   /// Return true if any type-specifier has been found.
   bool hasTypeSpecifier() const {
@@ -1239,7 +1239,7 @@ public:
 };
 
 /// A set of tokens that has been cached for later parsing.
-typedef SmallVector<Token, 4> CachedTokens;
+typedef llvm::SmallVector<Token, 4> CachedTokens;
 
 /// One instance of this struct is used for each type in a
 /// declarator that is parsed.
@@ -1573,7 +1573,7 @@ struct DeclaratorChunk {
 
     /// Get the non-parameter decls defined within this function
     /// prototype. Typically these are tag declarations.
-    ArrayRef<NamedDecl *> getDeclsInPrototype() const {
+    llvm::ArrayRef<NamedDecl *> getDeclsInPrototype() const {
       assert(ExceptionSpecType == EST_None);
       return llvm::ArrayRef(DeclsInPrototype, NumExceptionsOrDecls);
     }
@@ -1724,7 +1724,7 @@ struct DeclaratorChunk {
                                      unsigned NumExceptions,
                                      Expr *NoexceptExpr,
                                      CachedTokens *ExceptionSpecTokens,
-                                     ArrayRef<NamedDecl *> DeclsInPrototype,
+                                     llvm::ArrayRef<NamedDecl *> DeclsInPrototype,
                                      SourceLocation LocalRangeBegin,
                                      SourceLocation LocalRangeEnd,
                                      Declarator &TheDeclarator,
@@ -1825,7 +1825,7 @@ public:
     DeleteBindings = false;
   }
 
-  ArrayRef<Binding> bindings() const {
+  llvm::ArrayRef<Binding> bindings() const {
     return llvm::ArrayRef(Bindings, NumBindings);
   }
 
@@ -1915,7 +1915,7 @@ private:
   /// parsed.  This is pushed from the identifier out, which means that element
   /// #0 will be the most closely bound to the identifier, and
   /// DeclTypeInfo.back() will be the least closely bound.
-  SmallVector<DeclaratorChunk, 8> DeclTypeInfo;
+  llvm::SmallVector<DeclaratorChunk, 8> DeclTypeInfo;
 
   /// InvalidType - Set by Sema::GetTypeForDeclarator().
   LLVM_PREFERRED_TYPE(bool)
@@ -1971,7 +1971,7 @@ private:
   Expr *TrailingRequiresClause;
 
   /// If this declarator declares a template, its template parameter lists.
-  ArrayRef<TemplateParameterList *> TemplateParameterLists;
+  llvm::ArrayRef<TemplateParameterList *> TemplateParameterLists;
 
   /// If the declarator declares an abbreviated function template, the innermost
   /// template parameter list containing the invented and explicit template
@@ -2343,7 +2343,7 @@ public:
   /// Set the decomposition bindings for this declarator.
   void setDecompositionBindings(
       SourceLocation LSquareLoc,
-      MutableArrayRef<DecompositionDeclarator::Binding> Bindings,
+      llvm::MutableArrayRef<DecompositionDeclarator::Binding> Bindings,
       SourceLocation RSquareLoc);
 
   /// AddTypeInfo - Add a chunk to this declarator. Also extend the range to
@@ -2404,7 +2404,7 @@ public:
     return DeclTypeInfo[i];
   }
 
-  typedef SmallVectorImpl<DeclaratorChunk>::const_iterator type_object_iterator;
+  typedef llvm::SmallVectorImpl<DeclaratorChunk>::const_iterator type_object_iterator;
   typedef llvm::iterator_range<type_object_iterator> type_object_range;
 
   /// Returns the range of type objects, from the identifier outwards.
@@ -2641,12 +2641,12 @@ public:
   }
 
   /// Sets the template parameter lists that preceded the declarator.
-  void setTemplateParameterLists(ArrayRef<TemplateParameterList *> TPLs) {
+  void setTemplateParameterLists(llvm::ArrayRef<TemplateParameterList *> TPLs) {
     TemplateParameterLists = TPLs;
   }
 
   /// The template parameter lists that preceded the declarator.
-  ArrayRef<TemplateParameterList *> getTemplateParameterLists() const {
+  llvm::ArrayRef<TemplateParameterList *> getTemplateParameterLists() const {
     return TemplateParameterLists;
   }
 
@@ -2854,7 +2854,7 @@ struct LambdaIntroducer {
   SourceRange Range;
   SourceLocation DefaultLoc;
   LambdaCaptureDefault Default = LCD_None;
-  SmallVector<LambdaCapture, 4> Captures;
+  llvm::SmallVector<LambdaCapture, 4> Captures;
 
   LambdaIntroducer() = default;
 
@@ -2893,7 +2893,7 @@ struct InventedTemplateParameterInfo {
   /// converted into TemplateTypeParmDecls.
   /// It can be used to construct the generic lambda or abbreviated template's
   /// template parameter list during initial AST construction.
-  SmallVector<NamedDecl*, 4> TemplateParams;
+  llvm::SmallVector<NamedDecl*, 4> TemplateParams;
 };
 
 } // end namespace clang

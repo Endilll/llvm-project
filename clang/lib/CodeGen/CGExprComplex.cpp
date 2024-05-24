@@ -285,7 +285,7 @@ public:
   ComplexPairTy EmitRangeReductionDiv(llvm::Value *A, llvm::Value *B,
                                       llvm::Value *C, llvm::Value *D);
 
-  ComplexPairTy EmitComplexBinOpLibCall(StringRef LibCallName,
+  ComplexPairTy EmitComplexBinOpLibCall(llvm::StringRef LibCallName,
                                         const BinOpInfo &Op);
 
   QualType GetHigherPrecisionFPType(QualType ElementType) {
@@ -745,7 +745,7 @@ ComplexPairTy ComplexExprEmitter::EmitBinSub(const BinOpInfo &Op) {
 }
 
 /// Emit a libcall for a binary operation on complex types.
-ComplexPairTy ComplexExprEmitter::EmitComplexBinOpLibCall(StringRef LibCallName,
+ComplexPairTy ComplexExprEmitter::EmitComplexBinOpLibCall(llvm::StringRef LibCallName,
                                                           const BinOpInfo &Op) {
   CallArgList Args;
   Args.add(RValue::get(Op.LHS.first),
@@ -766,7 +766,7 @@ ComplexPairTy ComplexExprEmitter::EmitComplexBinOpLibCall(StringRef LibCallName,
   FunctionProtoType::ExtProtoInfo EPI;
   EPI = EPI.withExceptionSpec(
       FunctionProtoType::ExceptionSpecInfo(EST_BasicNoexcept));
-  SmallVector<QualType, 4> ArgsQTys(
+  llvm::SmallVector<QualType, 4> ArgsQTys(
       4, Op.Ty->castAs<ComplexType>()->getElementType());
   QualType FQTy = CGF.getContext().getFunctionType(Op.Ty, ArgsQTys, EPI);
   const CGFunctionInfo &FuncInfo = CGF.CGM.getTypes().arrangeFreeFunctionCall(
@@ -785,7 +785,7 @@ ComplexPairTy ComplexExprEmitter::EmitComplexBinOpLibCall(StringRef LibCallName,
 
 /// Lookup the libcall name for a given floating point type complex
 /// multiply.
-static StringRef getComplexMultiplyLibCallName(llvm::Type *Ty) {
+static llvm::StringRef getComplexMultiplyLibCallName(llvm::Type *Ty) {
   switch (Ty->getTypeID()) {
   default:
     llvm_unreachable("Unsupported floating point type!");

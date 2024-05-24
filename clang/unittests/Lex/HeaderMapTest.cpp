@@ -103,7 +103,7 @@ TEST(HeaderMapTest, lookupFilename) {
   ASSERT_FALSE(NeedsSwap);
   HeaderMapImpl Map(File.getBuffer(), NeedsSwap);
 
-  SmallString<8> DestPath;
+  llvm::SmallString<8> DestPath;
   ASSERT_EQ("bc", Map.lookupFilename("a", DestPath));
 }
 
@@ -143,7 +143,7 @@ TEST(HeaderMapTest, lookupFilenameTruncatedSuffix) {
 
   // The string for "c" runs to the end of File.  Check that the suffix
   // ("cxxxx...") is detected as truncated, and an empty string is returned.
-  SmallString<24> DestPath;
+  llvm::SmallString<24> DestPath;
   ASSERT_EQ("", Map.lookupFilename("a", DestPath));
 }
 
@@ -178,7 +178,7 @@ TEST(HeaderMapTest, lookupFilenameTruncatedPrefix) {
 
   // The string for "b" runs to the end of File.  Check that the prefix
   // ("bxxxx...") is detected as truncated, and an empty string is returned.
-  SmallString<24> DestPath;
+  llvm::SmallString<24> DestPath;
   ASSERT_EQ("", Map.lookupFilename("a", DestPath));
 }
 

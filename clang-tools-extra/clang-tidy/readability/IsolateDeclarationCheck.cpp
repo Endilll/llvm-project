@@ -199,10 +199,10 @@ declRanges(const DeclStmt *DS, const SourceManager &SM,
   return Slices;
 }
 
-static std::optional<std::vector<StringRef>>
+static std::optional<std::vector<llvm::StringRef>>
 collectSourceRanges(llvm::ArrayRef<SourceRange> Ranges, const SourceManager &SM,
                     const LangOptions &LangOpts) {
-  std::vector<StringRef> Snippets;
+  std::vector<llvm::StringRef> Snippets;
   Snippets.reserve(Ranges.size());
 
   for (const auto &Range : Ranges) {
@@ -214,7 +214,7 @@ collectSourceRanges(llvm::ArrayRef<SourceRange> Ranges, const SourceManager &SM,
       return std::nullopt;
 
     bool InvalidText = false;
-    StringRef Snippet =
+    llvm::StringRef Snippet =
         Lexer::getSourceText(CharRange, SM, LangOpts, &InvalidText);
 
     if (InvalidText)
@@ -228,13 +228,13 @@ collectSourceRanges(llvm::ArrayRef<SourceRange> Ranges, const SourceManager &SM,
 
 /// Expects a vector {TypeSnippet, Firstdecl, SecondDecl, ...}.
 static std::vector<std::string>
-createIsolatedDecls(llvm::ArrayRef<StringRef> Snippets) {
+createIsolatedDecls(llvm::ArrayRef<llvm::StringRef> Snippets) {
   // The first section is the type snippet, which does not make a decl itself.
   assert(Snippets.size() > 2 && "Not enough snippets to create isolated decls");
   std::vector<std::string> Decls(Snippets.size() - 1);
 
   for (std::size_t I = 1; I < Snippets.size(); ++I)
-    Decls[I - 1] = Twine(Snippets[0])
+    Decls[I - 1] = llvm::Twine(Snippets[0])
                        .concat(Snippets[0].ends_with(" ") ? "" : " ")
                        .concat(Snippets[I].ltrim())
                        .concat(";")
@@ -255,7 +255,7 @@ void IsolateDeclarationCheck::check(const MatchFinder::MatchResult &Result) {
   if (!PotentialRanges)
     return;
 
-  std::optional<std::vector<StringRef>> PotentialSnippets = collectSourceRanges(
+  std::optional<std::vector<llvm::StringRef>> PotentialSnippets = collectSourceRanges(
       *PotentialRanges, *Result.SourceManager, getLangOpts());
 
   if (!PotentialSnippets)
@@ -264,7 +264,7 @@ void IsolateDeclarationCheck::check(const MatchFinder::MatchResult &Result) {
   std::vector<std::string> NewDecls = createIsolatedDecls(*PotentialSnippets);
   std::string Replacement = llvm::join(
       NewDecls,
-      (Twine("\n") + Lexer::getIndentationForLine(WholeDecl->getBeginLoc(),
+      (llvm::Twine("\n") + Lexer::getIndentationForLine(WholeDecl->getBeginLoc(),
                                                   *Result.SourceManager))
           .str());
 

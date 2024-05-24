@@ -89,7 +89,7 @@ public:
   /// \returns A \c StringError with the diagnostic output if clang errors
   /// occurred, dependency file contents otherwise.
   llvm::Expected<std::string>
-  getDependencyFile(const std::vector<std::string> &CommandLine, StringRef CWD);
+  getDependencyFile(const std::vector<std::string> &CommandLine, llvm::StringRef CWD);
 
   /// Collect the module dependency in P1689 format for C++20 named modules.
   ///
@@ -104,11 +104,11 @@ public:
   /// occurred, P1689 dependency format rules otherwise.
   llvm::Expected<P1689Rule>
   getP1689ModuleDependencyFile(const clang::tooling::CompileCommand &Command,
-                               StringRef CWD, std::string &MakeformatOutput,
+                               llvm::StringRef CWD, std::string &MakeformatOutput,
                                std::string &MakeformatOutputPath);
   llvm::Expected<P1689Rule>
   getP1689ModuleDependencyFile(const clang::tooling::CompileCommand &Command,
-                               StringRef CWD) {
+                               llvm::StringRef CWD) {
     std::string MakeformatOutput;
     std::string MakeformatOutputPath;
 
@@ -132,7 +132,7 @@ public:
   /// occurred, \c TranslationUnitDeps otherwise.
   llvm::Expected<TranslationUnitDeps>
   getTranslationUnitDependencies(const std::vector<std::string> &CommandLine,
-                                 StringRef CWD,
+                                 llvm::StringRef CWD,
                                  const llvm::DenseSet<ModuleID> &AlreadySeen,
                                  LookupModuleOutputCallback LookupModuleOutput);
 
@@ -140,8 +140,8 @@ public:
   /// gather modular dependencies of module with the given name, and return the
   /// information needed for explicit build.
   llvm::Expected<ModuleDepsGraph> getModuleDependencies(
-      StringRef ModuleName, const std::vector<std::string> &CommandLine,
-      StringRef CWD, const llvm::DenseSet<ModuleID> &AlreadySeen,
+      llvm::StringRef ModuleName, const std::vector<std::string> &CommandLine,
+      llvm::StringRef CWD, const llvm::DenseSet<ModuleID> &AlreadySeen,
       LookupModuleOutputCallback LookupModuleOutput);
 
 private:
@@ -159,7 +159,7 @@ public:
 
   void handleDependencyOutputOpts(const DependencyOutputOptions &) override {}
 
-  void handleFileDependency(StringRef File) override {
+  void handleFileDependency(llvm::StringRef File) override {
     Dependencies.push_back(std::string(File));
   }
 

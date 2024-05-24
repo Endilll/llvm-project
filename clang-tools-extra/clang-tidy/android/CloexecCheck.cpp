@@ -26,11 +26,11 @@ std::string buildFixMsgForStringFlag(const Expr *Arg, const SourceManager &SM,
     return (Lexer::getSourceText(
                 CharSourceRange::getTokenRange(Arg->getSourceRange()), SM,
                 LangOpts) +
-            " \"" + Twine(Mode) + "\"")
+            " \"" + llvm::Twine(Mode) + "\"")
         .str();
 
-  StringRef SR = cast<StringLiteral>(Arg->IgnoreParenCasts())->getString();
-  return ("\"" + SR + Twine(Mode) + "\"").str();
+  llvm::StringRef SR = cast<StringLiteral>(Arg->IgnoreParenCasts())->getString();
+  return ("\"" + SR + llvm::Twine(Mode) + "\"").str();
 }
 } // namespace
 
@@ -49,7 +49,7 @@ void CloexecCheck::registerMatchersImpl(
 }
 
 void CloexecCheck::insertMacroFlag(const MatchFinder::MatchResult &Result,
-                                   StringRef MacroFlag, int ArgPos) {
+                                   llvm::StringRef MacroFlag, int ArgPos) {
   const auto *MatchedCall = Result.Nodes.getNodeAs<CallExpr>(FuncBindingStr);
   const auto *FlagArg = MatchedCall->getArg(ArgPos);
   const auto *FD = Result.Nodes.getNodeAs<FunctionDecl>(FuncDeclBindingStr);
@@ -66,11 +66,11 @@ void CloexecCheck::insertMacroFlag(const MatchFinder::MatchResult &Result,
 
   diag(EndLoc, "%0 should use %1 where possible")
       << FD << MacroFlag
-      << FixItHint::CreateInsertion(EndLoc, (Twine(" | ") + MacroFlag).str());
+      << FixItHint::CreateInsertion(EndLoc, (llvm::Twine(" | ") + MacroFlag).str());
 }
 
 void CloexecCheck::replaceFunc(const MatchFinder::MatchResult &Result,
-                               StringRef WarningMsg, StringRef FixMsg) {
+                               llvm::StringRef WarningMsg, llvm::StringRef FixMsg) {
   const auto *MatchedCall = Result.Nodes.getNodeAs<CallExpr>(FuncBindingStr);
   diag(MatchedCall->getBeginLoc(), WarningMsg)
       << FixItHint::CreateReplacement(MatchedCall->getSourceRange(), FixMsg);
@@ -97,7 +97,7 @@ void CloexecCheck::insertStringFlag(
                                       ReplacementText);
 }
 
-StringRef CloexecCheck::getSpellingArg(const MatchFinder::MatchResult &Result,
+llvm::StringRef CloexecCheck::getSpellingArg(const MatchFinder::MatchResult &Result,
                                        int N) const {
   const auto *MatchedCall = Result.Nodes.getNodeAs<CallExpr>(FuncBindingStr);
   const SourceManager &SM = *Result.SourceManager;

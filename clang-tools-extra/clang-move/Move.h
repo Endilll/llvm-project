@@ -61,7 +61,7 @@ private:
 // declarations.
 struct MoveDefinitionSpec {
   // The list of fully qualified names, e.g. Foo, a::Foo, b::Foo.
-  SmallVector<std::string, 4> Names;
+  llvm::SmallVector<std::string, 4> Names;
   // The file path of old header, can be relative path and absolute path.
   std::string OldHeader;
   // The file path of old cc, can be relative path and absolute path.
@@ -154,11 +154,11 @@ public:
 private:
   // Make the Path absolute using the OrignalRunningDirectory if the Path is not
   // an absolute path. An empty Path will result in an empty string.
-  std::string makeAbsolutePath(StringRef Path);
+  std::string makeAbsolutePath(llvm::StringRef Path);
 
   void removeDeclsInOldFiles();
   void moveDeclsToNewFiles();
-  void moveAll(SourceManager& SM, StringRef OldFile, StringRef NewFile);
+  void moveAll(SourceManager& SM, llvm::StringRef OldFile, llvm::StringRef NewFile);
 
   // Stores all MatchCallbacks created by this tool.
   std::vector<std::unique_ptr<ast_matchers::MatchFinder::MatchCallback>>

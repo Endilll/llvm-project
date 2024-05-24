@@ -480,7 +480,7 @@ addConstraintSatisfaction(ASTRecordWriter &Record,
         Record.AddStmt(E);
       else {
         auto *Diag = DetailRecord.second.get<std::pair<SourceLocation,
-                                                       StringRef> *>();
+                                                       llvm::StringRef> *>();
         Record.AddSourceLocation(Diag->first);
         Record.AddString(Diag->second);
       }
@@ -761,7 +761,7 @@ void ASTStmtWriter::VisitStringLiteral(StringLiteral *E) {
     Record.AddSourceLocation(E->getStrTokenLoc(I));
 
   // Store the trailing array of char holding the string data.
-  StringRef StrData = E->getBytes();
+  llvm::StringRef StrData = E->getBytes();
   for (unsigned I = 0, N = E->getByteLength(); I != N; ++I)
     Record.push_back(StrData[I]);
 
@@ -2228,7 +2228,7 @@ void ASTStmtWriter::VisitCXXFoldExpr(CXXFoldExpr *E) {
 
 void ASTStmtWriter::VisitCXXParenListInitExpr(CXXParenListInitExpr *E) {
   VisitExpr(E);
-  ArrayRef<Expr *> InitExprs = E->getInitExprs();
+  llvm::ArrayRef<Expr *> InitExprs = E->getInitExprs();
   Record.push_back(InitExprs.size());
   Record.push_back(E->getUserSpecifiedInitExprs().size());
   Record.AddSourceLocation(E->getInitLoc());
@@ -2942,7 +2942,7 @@ void ASTRecordWriter::FlushStmts() {
     // Note that we are at the end of a full expression. Any
     // expression records that follow this one are part of a different
     // expression.
-    Writer->Stream.EmitRecord(serialization::STMT_STOP, ArrayRef<uint32_t>());
+    Writer->Stream.EmitRecord(serialization::STMT_STOP, llvm::ArrayRef<uint32_t>());
 
     Writer->SubStmtEntries.clear();
     Writer->ParentStmts.clear();

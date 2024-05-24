@@ -40,7 +40,7 @@ static SourceRange findToken(const SourceManager &Sources,
   if (StartLoc.isMacroID() || EndLoc.isMacroID())
     return {};
   FileID File = Sources.getFileID(Sources.getSpellingLoc(StartLoc));
-  StringRef Buf = Sources.getBufferData(File);
+  llvm::StringRef Buf = Sources.getBufferData(File);
   const char *StartChar = Sources.getCharacterData(StartLoc);
   Lexer Lex(StartLoc, LangOpts, StartChar, StartChar, Buf.end());
   Lex.SetCommentRetentionState(true);
@@ -116,7 +116,7 @@ void ExplicitConstructorCheck::check(const MatchFinder::MatchResult &Result) {
     SourceRange ExplicitTokenRange =
         findToken(*Result.SourceManager, getLangOpts(),
                   Ctor->getOuterLocStart(), Ctor->getEndLoc(), IsKwExplicit);
-    StringRef ConstructorDescription;
+    llvm::StringRef ConstructorDescription;
     if (Ctor->isMoveConstructor())
       ConstructorDescription = "move";
     else if (Ctor->isCopyConstructor())

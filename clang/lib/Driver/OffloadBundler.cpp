@@ -71,7 +71,7 @@ static llvm::TimerGroup
 /// Magic string that marks the existence of offloading data.
 #define OFFLOAD_BUNDLER_MAGIC_STR "__CLANG_OFFLOAD_BUNDLE__"
 
-OffloadTargetInfo::OffloadTargetInfo(const StringRef Target,
+OffloadTargetInfo::OffloadTargetInfo(const llvm::StringRef Target,
                                      const OffloadBundlerConfig &BC)
     : BundlerConfig(BC) {
 
@@ -112,7 +112,7 @@ bool OffloadTargetInfo::isOffloadKindValid() const {
 }
 
 bool OffloadTargetInfo::isOffloadKindCompatible(
-    const StringRef TargetOffloadKind) const {
+    const llvm::StringRef TargetOffloadKind) const {
   if ((OffloadKind == TargetOffloadKind) ||
       (OffloadKind == "hip" && TargetOffloadKind == "hipv4") ||
       (OffloadKind == "hipv4" && TargetOffloadKind == "hip"))
@@ -139,11 +139,11 @@ bool OffloadTargetInfo::operator==(const OffloadTargetInfo &Target) const {
 }
 
 std::string OffloadTargetInfo::str() const {
-  return Twine(OffloadKind + "-" + Triple.str() + "-" + TargetID).str();
+  return llvm::Twine(OffloadKind + "-" + Triple.str() + "-" + TargetID).str();
 }
 
-static StringRef getDeviceFileExtension(StringRef Device,
-                                        StringRef BundleFileName) {
+static llvm::StringRef getDeviceFileExtension(llvm::StringRef Device,
+                                        llvm::StringRef BundleFileName) {
   if (Device.contains("gfx"))
     return ".bc";
   if (Device.contains("sm_"))
@@ -151,10 +151,10 @@ static StringRef getDeviceFileExtension(StringRef Device,
   return sys::path::extension(BundleFileName);
 }
 
-static std::string getDeviceLibraryFileName(StringRef BundleFileName,
-                                            StringRef Device) {
-  StringRef LibName = sys::path::stem(BundleFileName);
-  StringRef Extension = getDeviceFileExtension(Device, BundleFileName);
+static std::string getDeviceLibraryFileName(llvm::StringRef BundleFileName,
+                                            llvm::StringRef Device) {
+  llvm::StringRef LibName = sys::path::stem(BundleFileName);
+  llvm::StringRef Extension = getDeviceFileExtension(Device, BundleFileName);
 
   std::string Result;
   Result += LibName;
@@ -167,7 +167,7 @@ namespace {
 class FileHandler {
 public:
   struct BundleInfo {
-    StringRef BundleID;
+    llvm::StringRef BundleID;
   };
 
   FileHandler() {}
@@ -181,30 +181,30 @@ public:
   /// Read the marker of the next bundled to be read in the file. The bundle
   /// name is returned if there is one in the file, or `std::nullopt` if there
   /// are no more bundles to be read.
-  virtual Expected<std::optional<StringRef>>
+  virtual llvm::Expected<std::optional<llvm::StringRef>>
   ReadBundleStart(MemoryBuffer &Input) = 0;
 
   /// Read the marker that closes the current bundle.
   virtual Error ReadBundleEnd(MemoryBuffer &Input) = 0;
 
   /// Read the current bundle and write the result into the stream \a OS.
-  virtual Error ReadBundle(raw_ostream &OS, MemoryBuffer &Input) = 0;
+  virtual Error ReadBundle(llvm::raw_ostream &OS, MemoryBuffer &Input) = 0;
 
   /// Write the header of the bundled file to \a OS based on the information
   /// gathered from \a Inputs.
-  virtual Error WriteHeader(raw_ostream &OS,
-                            ArrayRef<std::unique_ptr<MemoryBuffer>> Inputs) = 0;
+  virtual Error WriteHeader(llvm::raw_ostream &OS,
+                            llvm::ArrayRef<std::unique_ptr<MemoryBuffer>> Inputs) = 0;
 
   /// Write the marker that initiates a bundle for the triple \a TargetTriple to
   /// \a OS.
-  virtual Error WriteBundleStart(raw_ostream &OS, StringRef TargetTriple) = 0;
+  virtual Error WriteBundleStart(llvm::raw_ostream &OS, llvm::StringRef TargetTriple) = 0;
 
   /// Write the marker that closes a bundle for the triple \a TargetTriple to \a
   /// OS.
-  virtual Error WriteBundleEnd(raw_ostream &OS, StringRef TargetTriple) = 0;
+  virtual Error WriteBundleEnd(llvm::raw_ostream &OS, llvm::StringRef TargetTriple) = 0;
 
   /// Write the bundle from \a Input into \a OS.
-  virtual Error WriteBundle(raw_ostream &OS, MemoryBuffer &Input) = 0;
+  virtual Error WriteBundle(llvm::raw_ostream &OS, MemoryBuffer &Input) = 0;
 
   /// Finalize output file.
   virtual Error finalizeOutputFile() { return Error::success(); }
@@ -224,7 +224,7 @@ public:
 
   /// Get bundle IDs in \a Input in \a BundleIds.
   virtual Error getBundleIDs(MemoryBuffer &Input,
-                             std::set<StringRef> &BundleIds) {
+                             std::set<llvm::StringRef> &BundleIds) {
     if (Error Err = ReadHeader(Input))
       return Err;
     return forEachBundle(Input, [&](const BundleInfo &Info) -> Error {
@@ -240,7 +240,7 @@ public:
   Error forEachBundle(MemoryBuffer &Input,
                       std::function<Error(const BundleInfo &)> Func) {
     while (true) {
-      Expected<std::optional<StringRef>> CurTripleOrErr =
+      llvm::Expected<std::optional<llvm::StringRef>> CurTripleOrErr =
           ReadBundleStart(Input);
       if (!CurTripleOrErr)
         return CurTripleOrErr.takeError();
@@ -249,7 +249,7 @@ public:
       if (!*CurTripleOrErr)
         break;
 
-      StringRef CurTriple = **CurTripleOrErr;
+      llvm::StringRef CurTriple = **CurTripleOrErr;
       assert(!CurTriple.empty());
 
       BundleInfo Info{CurTriple};
@@ -290,12 +290,12 @@ protected:
 /// BundleN
 
 /// Read 8-byte integers from a buffer in little-endian format.
-static uint64_t Read8byteIntegerFromBuffer(StringRef Buffer, size_t pos) {
+static uint64_t Read8byteIntegerFromBuffer(llvm::StringRef Buffer, size_t pos) {
   return llvm::support::endian::read64le(Buffer.data() + pos);
 }
 
 /// Write 8-byte integers to a buffer in little-endian format.
-static void Write8byteIntegerToBuffer(raw_ostream &OS, uint64_t Val) {
+static void Write8byteIntegerToBuffer(llvm::raw_ostream &OS, uint64_t Val) {
   llvm::support::endian::write(OS, Val, llvm::endianness::little);
 }
 
@@ -332,7 +332,7 @@ public:
   ~BinaryFileHandler() final {}
 
   Error ReadHeader(MemoryBuffer &Input) final {
-    StringRef FC = Input.getBuffer();
+    llvm::StringRef FC = Input.getBuffer();
 
     // Initialize the current bundle with the end of the container.
     CurBundleInfo = BundlesInfo.end();
@@ -381,7 +381,7 @@ public:
       if (ReadChars + TripleSize > FC.size())
         return Error::success();
 
-      StringRef Triple(&FC.data()[ReadChars], TripleSize);
+      llvm::StringRef Triple(&FC.data()[ReadChars], TripleSize);
       ReadChars += TripleSize;
 
       // Check if the offset and size make sense.
@@ -397,7 +397,7 @@ public:
     return Error::success();
   }
 
-  Expected<std::optional<StringRef>>
+  llvm::Expected<std::optional<llvm::StringRef>>
   ReadBundleStart(MemoryBuffer &Input) final {
     if (NextBundleInfo == BundlesInfo.end())
       return std::nullopt;
@@ -410,16 +410,16 @@ public:
     return Error::success();
   }
 
-  Error ReadBundle(raw_ostream &OS, MemoryBuffer &Input) final {
+  Error ReadBundle(llvm::raw_ostream &OS, MemoryBuffer &Input) final {
     assert(CurBundleInfo != BundlesInfo.end() && "Invalid reader info!");
-    StringRef FC = Input.getBuffer();
+    llvm::StringRef FC = Input.getBuffer();
     OS.write(FC.data() + CurBundleInfo->second.Offset,
              CurBundleInfo->second.Size);
     return Error::success();
   }
 
-  Error WriteHeader(raw_ostream &OS,
-                    ArrayRef<std::unique_ptr<MemoryBuffer>> Inputs) final {
+  Error WriteHeader(llvm::raw_ostream &OS,
+                    llvm::ArrayRef<std::unique_ptr<MemoryBuffer>> Inputs) final {
 
     // Compute size of the header.
     uint64_t HeaderSize = 0;
@@ -455,16 +455,16 @@ public:
     return Error::success();
   }
 
-  Error WriteBundleStart(raw_ostream &OS, StringRef TargetTriple) final {
+  Error WriteBundleStart(llvm::raw_ostream &OS, llvm::StringRef TargetTriple) final {
     CurWriteBundleTarget = TargetTriple.str();
     return Error::success();
   }
 
-  Error WriteBundleEnd(raw_ostream &OS, StringRef TargetTriple) final {
+  Error WriteBundleEnd(llvm::raw_ostream &OS, llvm::StringRef TargetTriple) final {
     return Error::success();
   }
 
-  Error WriteBundle(raw_ostream &OS, MemoryBuffer &Input) final {
+  Error WriteBundle(llvm::raw_ostream &OS, MemoryBuffer &Input) final {
     auto BI = BundlesInfo[CurWriteBundleTarget];
 
     // Pad with 0 to reach specified offset.
@@ -490,8 +490,8 @@ public:
   }
 
   // Creates temporary file with given contents.
-  Expected<StringRef> Create(std::optional<ArrayRef<char>> Contents) {
-    SmallString<128u> File;
+  llvm::Expected<llvm::StringRef> Create(std::optional<llvm::ArrayRef<char>> Contents) {
+    llvm::SmallString<128u> File;
     if (std::error_code EC =
             sys::fs::createTemporaryFile("clang-offload-bundler", "tmp", File))
       return createFileError(File, EC);
@@ -508,7 +508,7 @@ public:
   }
 
 private:
-  std::forward_list<SmallString<128u>> Files;
+  std::forward_list<llvm::SmallString<128u>> Files;
 };
 
 /// Handler for object files. The bundles are organized by sections with a
@@ -521,13 +521,13 @@ class ObjectFileHandler final : public FileHandler {
   std::unique_ptr<ObjectFile> Obj;
 
   /// Return the input file contents.
-  StringRef getInputFileContents() const { return Obj->getData(); }
+  llvm::StringRef getInputFileContents() const { return Obj->getData(); }
 
   /// Return bundle name (<kind>-<triple>) if the provided section is an offload
   /// section.
-  static Expected<std::optional<StringRef>>
+  static llvm::Expected<std::optional<llvm::StringRef>>
   IsOffloadSection(SectionRef CurSection) {
-    Expected<StringRef> NameOrErr = CurSection.getName();
+    llvm::Expected<llvm::StringRef> NameOrErr = CurSection.getName();
     if (!NameOrErr)
       return NameOrErr.takeError();
 
@@ -564,7 +564,7 @@ public:
 
   Error ReadHeader(MemoryBuffer &Input) final { return Error::success(); }
 
-  Expected<std::optional<StringRef>>
+  llvm::Expected<std::optional<llvm::StringRef>>
   ReadBundleStart(MemoryBuffer &Input) final {
     while (NextSection != Obj->section_end()) {
       CurrentSection = NextSection;
@@ -572,7 +572,7 @@ public:
 
       // Check if the current section name starts with the reserved prefix. If
       // so, return the triple.
-      Expected<std::optional<StringRef>> TripleOrErr =
+      llvm::Expected<std::optional<llvm::StringRef>> TripleOrErr =
           IsOffloadSection(*CurrentSection);
       if (!TripleOrErr)
         return TripleOrErr.takeError();
@@ -584,17 +584,17 @@ public:
 
   Error ReadBundleEnd(MemoryBuffer &Input) final { return Error::success(); }
 
-  Error ReadBundle(raw_ostream &OS, MemoryBuffer &Input) final {
-    Expected<StringRef> ContentOrErr = CurrentSection->getContents();
+  Error ReadBundle(llvm::raw_ostream &OS, MemoryBuffer &Input) final {
+    llvm::Expected<llvm::StringRef> ContentOrErr = CurrentSection->getContents();
     if (!ContentOrErr)
       return ContentOrErr.takeError();
-    StringRef Content = *ContentOrErr;
+    llvm::StringRef Content = *ContentOrErr;
 
     // Copy fat object contents to the output when extracting host bundle.
     std::string ModifiedContent;
     if (Content.size() == 1u && Content.front() == 0) {
       auto HostBundleOrErr = getHostBundle(
-          StringRef(Input.getBufferStart(), Input.getBufferSize()));
+          llvm::StringRef(Input.getBufferStart(), Input.getBufferSize()));
       if (!HostBundleOrErr)
         return HostBundleOrErr.takeError();
 
@@ -606,8 +606,8 @@ public:
     return Error::success();
   }
 
-  Error WriteHeader(raw_ostream &OS,
-                    ArrayRef<std::unique_ptr<MemoryBuffer>> Inputs) final {
+  Error WriteHeader(llvm::raw_ostream &OS,
+                    llvm::ArrayRef<std::unique_ptr<MemoryBuffer>> Inputs) final {
     assert(BundlerConfig.HostInputIndex != ~0u &&
            "Host input index not defined.");
 
@@ -616,12 +616,12 @@ public:
     return Error::success();
   }
 
-  Error WriteBundleStart(raw_ostream &OS, StringRef TargetTriple) final {
+  Error WriteBundleStart(llvm::raw_ostream &OS, llvm::StringRef TargetTriple) final {
     ++NumberOfProcessedInputs;
     return Error::success();
   }
 
-  Error WriteBundleEnd(raw_ostream &OS, StringRef TargetTriple) final {
+  Error WriteBundleEnd(llvm::raw_ostream &OS, llvm::StringRef TargetTriple) final {
     return Error::success();
   }
 
@@ -650,26 +650,26 @@ public:
     // appropriate flags.
     BumpPtrAllocator Alloc;
     StringSaver SS{Alloc};
-    SmallVector<StringRef, 8u> ObjcopyArgs{"llvm-objcopy"};
+    llvm::SmallVector<llvm::StringRef, 8u> ObjcopyArgs{"llvm-objcopy"};
 
     for (unsigned I = 0; I < NumberOfInputs; ++I) {
-      StringRef InputFile = BundlerConfig.InputFileNames[I];
+      llvm::StringRef InputFile = BundlerConfig.InputFileNames[I];
       if (I == BundlerConfig.HostInputIndex) {
         // Special handling for the host bundle. We do not need to add a
         // standard bundle for the host object since we are going to use fat
         // object as a host object. Therefore use dummy contents (one zero byte)
         // when creating section for the host bundle.
-        Expected<StringRef> TempFileOrErr = TempFiles.Create(ArrayRef<char>(0));
+        llvm::Expected<llvm::StringRef> TempFileOrErr = TempFiles.Create(llvm::ArrayRef<char>(0));
         if (!TempFileOrErr)
           return TempFileOrErr.takeError();
         InputFile = *TempFileOrErr;
       }
 
       ObjcopyArgs.push_back(
-          SS.save(Twine("--add-section=") + OFFLOAD_BUNDLER_MAGIC_STR +
+          SS.save(llvm::Twine("--add-section=") + OFFLOAD_BUNDLER_MAGIC_STR +
                   BundlerConfig.TargetNames[I] + "=" + InputFile));
       ObjcopyArgs.push_back(
-          SS.save(Twine("--set-section-flags=") + OFFLOAD_BUNDLER_MAGIC_STR +
+          SS.save(llvm::Twine("--set-section-flags=") + OFFLOAD_BUNDLER_MAGIC_STR +
                   BundlerConfig.TargetNames[I] + "=readonly,exclude"));
     }
     ObjcopyArgs.push_back("--");
@@ -683,17 +683,17 @@ public:
     return Error::success();
   }
 
-  Error WriteBundle(raw_ostream &OS, MemoryBuffer &Input) final {
+  Error WriteBundle(llvm::raw_ostream &OS, MemoryBuffer &Input) final {
     return Error::success();
   }
 
 private:
-  Error executeObjcopy(StringRef Objcopy, ArrayRef<StringRef> Args) {
+  Error executeObjcopy(llvm::StringRef Objcopy, llvm::ArrayRef<llvm::StringRef> Args) {
     // If the user asked for the commands to be printed out, we do that
     // instead of executing it.
     if (BundlerConfig.PrintExternalCommands) {
       errs() << "\"" << Objcopy << "\"";
-      for (StringRef Arg : drop_begin(Args, 1))
+      for (llvm::StringRef Arg : drop_begin(Args, 1))
         errs() << " \"" << Arg << "\"";
       errs() << "\n";
     } else {
@@ -704,32 +704,32 @@ private:
     return Error::success();
   }
 
-  Expected<std::string> getHostBundle(StringRef Input) {
+  llvm::Expected<std::string> getHostBundle(llvm::StringRef Input) {
     TempFileHandlerRAII TempFiles;
 
     auto ModifiedObjPathOrErr = TempFiles.Create(std::nullopt);
     if (!ModifiedObjPathOrErr)
       return ModifiedObjPathOrErr.takeError();
-    StringRef ModifiedObjPath = *ModifiedObjPathOrErr;
+    llvm::StringRef ModifiedObjPath = *ModifiedObjPathOrErr;
 
     BumpPtrAllocator Alloc;
     StringSaver SS{Alloc};
-    SmallVector<StringRef, 16> ObjcopyArgs{"llvm-objcopy"};
+    llvm::SmallVector<llvm::StringRef, 16> ObjcopyArgs{"llvm-objcopy"};
 
     ObjcopyArgs.push_back("--regex");
     ObjcopyArgs.push_back("--remove-section=__CLANG_OFFLOAD_BUNDLE__.*");
     ObjcopyArgs.push_back("--");
 
-    StringRef ObjcopyInputFileName;
+    llvm::StringRef ObjcopyInputFileName;
     // When unbundling an archive, the content of each object file in the
     // archive is passed to this function by parameter Input, which is different
     // from the content of the original input archive file, therefore it needs
     // to be saved to a temporary file before passed to llvm-objcopy. Otherwise,
     // Input is the same as the content of the original input file, therefore
     // temporary file is not needed.
-    if (StringRef(BundlerConfig.FilesType).starts_with("a")) {
+    if (llvm::StringRef(BundlerConfig.FilesType).starts_with("a")) {
       auto InputFileOrErr =
-          TempFiles.Create(ArrayRef<char>(Input.data(), Input.size()));
+          TempFiles.Create(llvm::ArrayRef<char>(Input.data(), Input.size()));
       if (!InputFileOrErr)
         return InputFileOrErr.takeError();
       ObjcopyInputFileName = *InputFileOrErr;
@@ -762,7 +762,7 @@ private:
 /// "Comment OFFLOAD_BUNDLER_MAGIC_STR__END__ triple"
 class TextFileHandler final : public FileHandler {
   /// String that begins a line comment.
-  StringRef Comment;
+  llvm::StringRef Comment;
 
   /// String that initiates a bundle.
   std::string BundleStartString;
@@ -776,9 +776,9 @@ class TextFileHandler final : public FileHandler {
 protected:
   Error ReadHeader(MemoryBuffer &Input) final { return Error::success(); }
 
-  Expected<std::optional<StringRef>>
+  llvm::Expected<std::optional<llvm::StringRef>>
   ReadBundleStart(MemoryBuffer &Input) final {
-    StringRef FC = Input.getBuffer();
+    llvm::StringRef FC = Input.getBuffer();
 
     // Find start of the bundle.
     ReadChars = FC.find(BundleStartString, ReadChars);
@@ -796,11 +796,11 @@ protected:
     // Next time we read after the new line.
     ++ReadChars;
 
-    return StringRef(&FC.data()[TripleStart], TripleEnd - TripleStart);
+    return llvm::StringRef(&FC.data()[TripleStart], TripleEnd - TripleStart);
   }
 
   Error ReadBundleEnd(MemoryBuffer &Input) final {
-    StringRef FC = Input.getBuffer();
+    llvm::StringRef FC = Input.getBuffer();
 
     // Read up to the next new line.
     assert(FC[ReadChars] == '\n' && "The bundle should end with a new line.");
@@ -813,41 +813,41 @@ protected:
     return Error::success();
   }
 
-  Error ReadBundle(raw_ostream &OS, MemoryBuffer &Input) final {
-    StringRef FC = Input.getBuffer();
+  Error ReadBundle(llvm::raw_ostream &OS, MemoryBuffer &Input) final {
+    llvm::StringRef FC = Input.getBuffer();
     size_t BundleStart = ReadChars;
 
     // Find end of the bundle.
     size_t BundleEnd = ReadChars = FC.find(BundleEndString, ReadChars);
 
-    StringRef Bundle(&FC.data()[BundleStart], BundleEnd - BundleStart);
+    llvm::StringRef Bundle(&FC.data()[BundleStart], BundleEnd - BundleStart);
     OS << Bundle;
 
     return Error::success();
   }
 
-  Error WriteHeader(raw_ostream &OS,
-                    ArrayRef<std::unique_ptr<MemoryBuffer>> Inputs) final {
+  Error WriteHeader(llvm::raw_ostream &OS,
+                    llvm::ArrayRef<std::unique_ptr<MemoryBuffer>> Inputs) final {
     return Error::success();
   }
 
-  Error WriteBundleStart(raw_ostream &OS, StringRef TargetTriple) final {
+  Error WriteBundleStart(llvm::raw_ostream &OS, llvm::StringRef TargetTriple) final {
     OS << BundleStartString << TargetTriple << "\n";
     return Error::success();
   }
 
-  Error WriteBundleEnd(raw_ostream &OS, StringRef TargetTriple) final {
+  Error WriteBundleEnd(llvm::raw_ostream &OS, llvm::StringRef TargetTriple) final {
     OS << BundleEndString << TargetTriple << "\n";
     return Error::success();
   }
 
-  Error WriteBundle(raw_ostream &OS, MemoryBuffer &Input) final {
+  Error WriteBundle(llvm::raw_ostream &OS, MemoryBuffer &Input) final {
     OS << Input.getBuffer();
     return Error::success();
   }
 
 public:
-  TextFileHandler(StringRef Comment) : Comment(Comment), ReadChars(0) {
+  TextFileHandler(llvm::StringRef Comment) : Comment(Comment), ReadChars(0) {
     BundleStartString =
         "\n" + Comment.str() + " " OFFLOAD_BUNDLER_MAGIC_STR "__START__ ";
     BundleEndString =
@@ -875,7 +875,7 @@ static std::unique_ptr<FileHandler>
 CreateObjectFileHandler(MemoryBuffer &FirstInput,
                         const OffloadBundlerConfig &BundlerConfig) {
   // Check if the input file format is one that we know how to deal with.
-  Expected<std::unique_ptr<Binary>> BinaryOrErr = createBinary(FirstInput);
+  llvm::Expected<std::unique_ptr<Binary>> BinaryOrErr = createBinary(FirstInput);
 
   // We only support regular object files. If failed to open the input as a
   // known binary or this is not an object file use the default binary handler.
@@ -890,7 +890,7 @@ CreateObjectFileHandler(MemoryBuffer &FirstInput,
 }
 
 /// Return an appropriate handler given the input files and options.
-static Expected<std::unique_ptr<FileHandler>>
+static llvm::Expected<std::unique_ptr<FileHandler>>
 CreateFileHandler(MemoryBuffer &FirstInput,
                   const OffloadBundlerConfig &BundlerConfig) {
   std::string FilesType = BundlerConfig.FilesType;
@@ -998,7 +998,7 @@ CompressedOffloadBundle::compress(llvm::compression::Params P,
   if (Verbose)
     HashTimer.stopTimer();
 
-  SmallVector<uint8_t, 0> CompressedBuffer;
+  llvm::SmallVector<uint8_t, 0> CompressedBuffer;
   auto BufferUint8 = llvm::ArrayRef<uint8_t>(
       reinterpret_cast<const uint8_t *>(Input.getBuffer().data()),
       Input.getBuffer().size());
@@ -1018,7 +1018,7 @@ CompressedOffloadBundle::compress(llvm::compression::Params P,
                            sizeof(UncompressedSize) + sizeof(TruncatedHash) +
                            CompressedBuffer.size();
 
-  SmallVector<char, 0> FinalBuffer;
+  llvm::SmallVector<char, 0> FinalBuffer;
   llvm::raw_svector_ostream OS(FinalBuffer);
   OS << MagicNumber;
   OS.write(reinterpret_cast<const char *>(&Version), sizeof(Version));
@@ -1068,7 +1068,7 @@ llvm::Expected<std::unique_ptr<llvm::MemoryBuffer>>
 CompressedOffloadBundle::decompress(const llvm::MemoryBuffer &Input,
                                     bool Verbose) {
 
-  StringRef Blob = Input.getBuffer();
+  llvm::StringRef Blob = Input.getBuffer();
 
   if (Blob.size() < V1HeaderSize)
     return llvm::MemoryBuffer::getMemBufferCopy(Blob);
@@ -1123,8 +1123,8 @@ CompressedOffloadBundle::decompress(const llvm::MemoryBuffer &Input,
   if (Verbose)
     DecompressTimer.startTimer();
 
-  SmallVector<uint8_t, 0> DecompressedData;
-  StringRef CompressedData = Blob.substr(CurrentOffset);
+  llvm::SmallVector<uint8_t, 0> DecompressedData;
+  llvm::StringRef CompressedData = Blob.substr(CurrentOffset);
   if (llvm::Error DecompressionError = llvm::compression::decompress(
           CompressionFormat, llvm::arrayRefFromStringRef(CompressedData),
           DecompressedData, UncompressedSize))
@@ -1188,7 +1188,7 @@ CompressedOffloadBundle::decompress(const llvm::MemoryBuffer &Input,
 
 // List bundle IDs. Return true if an error was found.
 Error OffloadBundler::ListBundleIDsInFile(
-    StringRef InputFileName, const OffloadBundlerConfig &BundlerConfig) {
+    llvm::StringRef InputFileName, const OffloadBundlerConfig &BundlerConfig) {
   // Open Input file.
   ErrorOr<std::unique_ptr<MemoryBuffer>> CodeOrErr =
       MemoryBuffer::getFileOrSTDIN(InputFileName);
@@ -1196,7 +1196,7 @@ Error OffloadBundler::ListBundleIDsInFile(
     return createFileError(InputFileName, EC);
 
   // Decompress the input if necessary.
-  Expected<std::unique_ptr<MemoryBuffer>> DecompressedBufferOrErr =
+  llvm::Expected<std::unique_ptr<MemoryBuffer>> DecompressedBufferOrErr =
       CompressedOffloadBundle::decompress(**CodeOrErr, BundlerConfig.Verbose);
   if (!DecompressedBufferOrErr)
     return createStringError(
@@ -1207,7 +1207,7 @@ Error OffloadBundler::ListBundleIDsInFile(
   MemoryBuffer &DecompressedInput = **DecompressedBufferOrErr;
 
   // Select the right files handler.
-  Expected<std::unique_ptr<FileHandler>> FileHandlerOrErr =
+  llvm::Expected<std::unique_ptr<FileHandler>> FileHandlerOrErr =
       CreateFileHandler(DecompressedInput, BundlerConfig);
   if (!FileHandlerOrErr)
     return FileHandlerOrErr.takeError();
@@ -1245,9 +1245,9 @@ bool isCodeObjectCompatible(const OffloadTargetInfo &CodeObjectInfo,
 
   // Incompatible if Processors mismatch.
   llvm::StringMap<bool> CodeObjectFeatureMap, TargetFeatureMap;
-  std::optional<StringRef> CodeObjectProc = clang::parseTargetID(
+  std::optional<llvm::StringRef> CodeObjectProc = clang::parseTargetID(
       CodeObjectInfo.Triple, CodeObjectInfo.TargetID, &CodeObjectFeatureMap);
-  std::optional<StringRef> TargetProc = clang::parseTargetID(
+  std::optional<llvm::StringRef> TargetProc = clang::parseTargetID(
       TargetInfo.Triple, TargetInfo.TargetID, &TargetFeatureMap);
 
   // Both TargetProc and CodeObjectProc can't be empty here.
@@ -1315,11 +1315,11 @@ Error OffloadBundler::BundleFiles() {
   std::error_code EC;
 
   // Create a buffer to hold the content before compressing.
-  SmallVector<char, 0> Buffer;
+  llvm::SmallVector<char, 0> Buffer;
   llvm::raw_svector_ostream BufferStream(Buffer);
 
   // Open input files.
-  SmallVector<std::unique_ptr<MemoryBuffer>, 8u> InputBuffers;
+  llvm::SmallVector<std::unique_ptr<MemoryBuffer>, 8u> InputBuffers;
   InputBuffers.reserve(BundlerConfig.InputFileNames.size());
   for (auto &I : BundlerConfig.InputFileNames) {
     ErrorOr<std::unique_ptr<MemoryBuffer>> CodeOrErr =
@@ -1332,7 +1332,7 @@ Error OffloadBundler::BundleFiles() {
   // Get the file handler. We use the host buffer as reference.
   assert((BundlerConfig.HostInputIndex != ~0u || BundlerConfig.AllowNoHost) &&
          "Host input index undefined??");
-  Expected<std::unique_ptr<FileHandler>> FileHandlerOrErr = CreateFileHandler(
+  llvm::Expected<std::unique_ptr<FileHandler>> FileHandlerOrErr = CreateFileHandler(
       *InputBuffers[BundlerConfig.AllowNoHost ? 0
                                               : BundlerConfig.HostInputIndex],
       BundlerConfig);
@@ -1364,7 +1364,7 @@ Error OffloadBundler::BundleFiles() {
   if (EC)
     return createFileError(BundlerConfig.OutputFileNames.front(), EC);
 
-  SmallVector<char, 0> CompressedBuffer;
+  llvm::SmallVector<char, 0> CompressedBuffer;
   if (BundlerConfig.Compress) {
     std::unique_ptr<llvm::MemoryBuffer> BufferMemory =
         llvm::MemoryBuffer::getMemBufferCopy(
@@ -1396,7 +1396,7 @@ Error OffloadBundler::UnbundleFiles() {
     return createFileError(BundlerConfig.InputFileNames.front(), EC);
 
   // Decompress the input if necessary.
-  Expected<std::unique_ptr<MemoryBuffer>> DecompressedBufferOrErr =
+  llvm::Expected<std::unique_ptr<MemoryBuffer>> DecompressedBufferOrErr =
       CompressedOffloadBundle::decompress(**CodeOrErr, BundlerConfig.Verbose);
   if (!DecompressedBufferOrErr)
     return createStringError(
@@ -1407,7 +1407,7 @@ Error OffloadBundler::UnbundleFiles() {
   MemoryBuffer &Input = **DecompressedBufferOrErr;
 
   // Select the right files handler.
-  Expected<std::unique_ptr<FileHandler>> FileHandlerOrErr =
+  llvm::Expected<std::unique_ptr<FileHandler>> FileHandlerOrErr =
       CreateFileHandler(Input, BundlerConfig);
   if (!FileHandlerOrErr)
     return FileHandlerOrErr.takeError();
@@ -1420,7 +1420,7 @@ Error OffloadBundler::UnbundleFiles() {
     return Err;
 
   // Create a work list that consist of the map triple/output file.
-  StringMap<StringRef> Worklist;
+  StringMap<llvm::StringRef> Worklist;
   auto Output = BundlerConfig.OutputFileNames.begin();
   for (auto &Triple : BundlerConfig.TargetNames) {
     Worklist[Triple] = *Output;
@@ -1431,7 +1431,7 @@ Error OffloadBundler::UnbundleFiles() {
   // assume the file is meant for the host target.
   bool FoundHostBundle = false;
   while (!Worklist.empty()) {
-    Expected<std::optional<StringRef>> CurTripleOrErr =
+    llvm::Expected<std::optional<llvm::StringRef>> CurTripleOrErr =
         FH->ReadBundleStart(Input);
     if (!CurTripleOrErr)
       return CurTripleOrErr.takeError();
@@ -1440,7 +1440,7 @@ Error OffloadBundler::UnbundleFiles() {
     if (!*CurTripleOrErr)
       break;
 
-    StringRef CurTriple = **CurTripleOrErr;
+    llvm::StringRef CurTriple = **CurTripleOrErr;
     assert(!CurTriple.empty());
 
     auto Output = Worklist.begin();
@@ -1473,7 +1473,7 @@ Error OffloadBundler::UnbundleFiles() {
 
   if (!BundlerConfig.AllowMissingBundles && !Worklist.empty()) {
     std::string ErrMsg = "Can't find bundles for";
-    std::set<StringRef> Sorted;
+    std::set<llvm::StringRef> Sorted;
     for (auto &E : Worklist)
       Sorted.insert(E.first());
     unsigned I = 0;
@@ -1538,7 +1538,7 @@ static Archive::Kind getDefaultArchiveKindForHost() {
 /// @return false, if no compatible target is found.
 static bool
 getCompatibleOffloadTargets(OffloadTargetInfo &CodeObjectInfo,
-                            SmallVectorImpl<StringRef> &CompatibleTargets,
+                            llvm::SmallVectorImpl<llvm::StringRef> &CompatibleTargets,
                             const OffloadBundlerConfig &BundlerConfig) {
   if (!CompatibleTargets.empty()) {
     DEBUG_WITH_TYPE("CodeObjectCompatibility",
@@ -1558,7 +1558,7 @@ getCompatibleOffloadTargets(OffloadTargetInfo &CodeObjectInfo,
 // or does not show up in any target IDs. Otherwise the target ID combination is
 // invalid.
 static Error
-CheckHeterogeneousArchive(StringRef ArchiveName,
+CheckHeterogeneousArchive(llvm::StringRef ArchiveName,
                           const OffloadBundlerConfig &BundlerConfig) {
   std::vector<std::unique_ptr<MemoryBuffer>> ArchiveBuffers;
   ErrorOr<std::unique_ptr<MemoryBuffer>> BufOrErr =
@@ -1567,7 +1567,7 @@ CheckHeterogeneousArchive(StringRef ArchiveName,
     return createFileError(ArchiveName, EC);
 
   ArchiveBuffers.push_back(std::move(*BufOrErr));
-  Expected<std::unique_ptr<llvm::object::Archive>> LibOrErr =
+  llvm::Expected<std::unique_ptr<llvm::object::Archive>> LibOrErr =
       Archive::create(ArchiveBuffers.back()->getMemBufferRef());
   if (!LibOrErr)
     return LibOrErr.takeError();
@@ -1593,7 +1593,7 @@ CheckHeterogeneousArchive(StringRef ArchiveName,
     auto CodeObjectBuffer =
         MemoryBuffer::getMemBuffer(*CodeObjectBufferRefOrErr, false);
 
-    Expected<std::unique_ptr<FileHandler>> FileHandlerOrErr =
+    llvm::Expected<std::unique_ptr<FileHandler>> FileHandlerOrErr =
         CreateFileHandler(*CodeObjectBuffer, BundlerConfig);
     if (!FileHandlerOrErr)
       return FileHandlerOrErr.takeError();
@@ -1601,7 +1601,7 @@ CheckHeterogeneousArchive(StringRef ArchiveName,
     std::unique_ptr<FileHandler> &FileHandler = *FileHandlerOrErr;
     assert(FileHandler);
 
-    std::set<StringRef> BundleIds;
+    std::set<llvm::StringRef> BundleIds;
     auto CodeObjectFileError =
         FileHandler->getBundleIDs(*CodeObjectBuffer, BundleIds);
     if (CodeObjectFileError)
@@ -1610,7 +1610,7 @@ CheckHeterogeneousArchive(StringRef ArchiveName,
     auto &&ConflictingArchs = clang::getConflictTargetIDCombination(BundleIds);
     if (ConflictingArchs) {
       std::string ErrMsg =
-          Twine("conflicting TargetIDs [" + ConflictingArchs.value().first +
+          llvm::Twine("conflicting TargetIDs [" + ConflictingArchs.value().first +
                 ", " + ConflictingArchs.value().second + "] found in " +
                 ArchiveChildNameOrErr.get() + " of " + ArchiveName)
               .str();
@@ -1636,7 +1636,7 @@ Error OffloadBundler::UnbundleArchive() {
   StringMap<std::vector<NewArchiveMember>> OutputArchivesMap;
 
   // Map of target names and output archive filenames
-  StringMap<StringRef> TargetOutputFileNameMap;
+  StringMap<llvm::StringRef> TargetOutputFileNameMap;
 
   auto Output = BundlerConfig.OutputFileNames.begin();
   for (auto &Target : BundlerConfig.TargetNames) {
@@ -1644,7 +1644,7 @@ Error OffloadBundler::UnbundleArchive() {
     ++Output;
   }
 
-  StringRef IFName = BundlerConfig.InputFileNames.front();
+  llvm::StringRef IFName = BundlerConfig.InputFileNames.front();
 
   if (BundlerConfig.CheckInputArchive) {
     // For a specific processor, a feature either shows up in all target IDs, or
@@ -1662,7 +1662,7 @@ Error OffloadBundler::UnbundleArchive() {
     return createFileError(BundlerConfig.InputFileNames.front(), EC);
 
   ArchiveBuffers.push_back(std::move(*BufOrErr));
-  Expected<std::unique_ptr<llvm::object::Archive>> LibOrErr =
+  llvm::Expected<std::unique_ptr<llvm::object::Archive>> LibOrErr =
       Archive::create(ArchiveBuffers.back()->getMemBufferRef());
   if (!LibOrErr)
     return LibOrErr.takeError();
@@ -1681,7 +1681,7 @@ Error OffloadBundler::UnbundleArchive() {
     if (!ArchiveChildNameOrErr)
       return ArchiveChildNameOrErr.takeError();
 
-    StringRef BundledObjectFile = sys::path::filename(*ArchiveChildNameOrErr);
+    llvm::StringRef BundledObjectFile = sys::path::filename(*ArchiveChildNameOrErr);
 
     auto CodeObjectBufferRefOrErr = (*ArchiveIter).getMemoryBufferRef();
     if (!CodeObjectBufferRefOrErr)
@@ -1691,7 +1691,7 @@ Error OffloadBundler::UnbundleArchive() {
         MemoryBuffer::getMemBuffer(*CodeObjectBufferRefOrErr, false);
 
     // Decompress the buffer if necessary.
-    Expected<std::unique_ptr<MemoryBuffer>> DecompressedBufferOrErr =
+    llvm::Expected<std::unique_ptr<MemoryBuffer>> DecompressedBufferOrErr =
         CompressedOffloadBundle::decompress(*TempCodeObjectBuffer,
                                             BundlerConfig.Verbose);
     if (!DecompressedBufferOrErr)
@@ -1702,7 +1702,7 @@ Error OffloadBundler::UnbundleArchive() {
 
     MemoryBuffer &CodeObjectBuffer = **DecompressedBufferOrErr;
 
-    Expected<std::unique_ptr<FileHandler>> FileHandlerOrErr =
+    llvm::Expected<std::unique_ptr<FileHandler>> FileHandlerOrErr =
         CreateFileHandler(CodeObjectBuffer, BundlerConfig);
     if (!FileHandlerOrErr)
       return FileHandlerOrErr.takeError();
@@ -1714,21 +1714,21 @@ Error OffloadBundler::UnbundleArchive() {
     if (Error ReadErr = FileHandler->ReadHeader(CodeObjectBuffer))
       return ReadErr;
 
-    Expected<std::optional<StringRef>> CurBundleIDOrErr =
+    llvm::Expected<std::optional<llvm::StringRef>> CurBundleIDOrErr =
         FileHandler->ReadBundleStart(CodeObjectBuffer);
     if (!CurBundleIDOrErr)
       return CurBundleIDOrErr.takeError();
 
-    std::optional<StringRef> OptionalCurBundleID = *CurBundleIDOrErr;
+    std::optional<llvm::StringRef> OptionalCurBundleID = *CurBundleIDOrErr;
     // No device code in this child, skip.
     if (!OptionalCurBundleID)
       continue;
-    StringRef CodeObject = *OptionalCurBundleID;
+    llvm::StringRef CodeObject = *OptionalCurBundleID;
 
     // Process all bundle entries (CodeObjects) found in this child of input
     // archive.
     while (!CodeObject.empty()) {
-      SmallVector<StringRef> CompatibleTargets;
+      llvm::SmallVector<llvm::StringRef> CompatibleTargets;
       auto CodeObjectInfo = OffloadTargetInfo(CodeObject, BundlerConfig);
       if (getCompatibleOffloadTargets(CodeObjectInfo, CompatibleTargets,
                                       BundlerConfig)) {
@@ -1738,10 +1738,10 @@ Error OffloadBundler::UnbundleArchive() {
           return Err;
 
         for (auto &CompatibleTarget : CompatibleTargets) {
-          SmallString<128> BundledObjectFileName;
+          llvm::SmallString<128> BundledObjectFileName;
           BundledObjectFileName.assign(BundledObjectFile);
           auto OutputBundleName =
-              Twine(llvm::sys::path::stem(BundledObjectFileName) + "-" +
+              llvm::Twine(llvm::sys::path::stem(BundledObjectFileName) + "-" +
                     CodeObject +
                     getDeviceLibraryFileName(BundledObjectFileName,
                                              CodeObjectInfo.TargetID))
@@ -1775,7 +1775,7 @@ Error OffloadBundler::UnbundleArchive() {
       if (Error Err = FileHandler->ReadBundleEnd(CodeObjectBuffer))
         return Err;
 
-      Expected<std::optional<StringRef>> NextTripleOrErr =
+      llvm::Expected<std::optional<llvm::StringRef>> NextTripleOrErr =
           FileHandler->ReadBundleStart(CodeObjectBuffer);
       if (!NextTripleOrErr)
         return NextTripleOrErr.takeError();
@@ -1788,7 +1788,7 @@ Error OffloadBundler::UnbundleArchive() {
 
   /// Write out an archive for each target
   for (auto &Target : BundlerConfig.TargetNames) {
-    StringRef FileName = TargetOutputFileNameMap[Target];
+    llvm::StringRef FileName = TargetOutputFileNameMap[Target];
     StringMapIterator<std::vector<llvm::NewArchiveMember>> CurArchiveMembers =
         OutputArchivesMap.find(Target);
     if (CurArchiveMembers != OutputArchivesMap.end()) {
@@ -1799,7 +1799,7 @@ Error OffloadBundler::UnbundleArchive() {
         return WriteErr;
     } else if (!BundlerConfig.AllowMissingBundles) {
       std::string ErrMsg =
-          Twine("no compatible code object found for the target '" + Target +
+          llvm::Twine("no compatible code object found for the target '" + Target +
                 "' in heterogeneous archive library: " + IFName)
               .str();
       return createStringError(inconvertibleErrorCode(), ErrMsg);

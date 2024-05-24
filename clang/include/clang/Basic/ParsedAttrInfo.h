@@ -67,9 +67,9 @@ struct ParsedAttrInfo {
     AttributeCommonInfo::Syntax Syntax;
     const char *NormalizedFullName;
   };
-  ArrayRef<Spelling> Spellings;
+  llvm::ArrayRef<Spelling> Spellings;
   // The names of the known arguments of this attribute.
-  ArrayRef<const char *> ArgNames;
+  llvm::ArrayRef<const char *> ArgNames;
 
 protected:
   constexpr ParsedAttrInfo(AttributeCommonInfo::Kind AttrKind =
@@ -84,8 +84,8 @@ protected:
                            unsigned IsTargetSpecific, unsigned IsType,
                            unsigned IsStmt, unsigned IsKnownToGCC,
                            unsigned IsSupportedByPragmaAttribute,
-                           ArrayRef<Spelling> Spellings,
-                           ArrayRef<const char *> ArgNames)
+                           llvm::ArrayRef<Spelling> Spellings,
+                           llvm::ArrayRef<const char *> ArgNames)
       : AttrKind(AttrKind), NumArgs(NumArgs), OptArgs(OptArgs),
         NumArgMembers(NumArgMembers), HasCustomParsing(HasCustomParsing),
         AcceptsExprPack(AcceptsExprPack), IsTargetSpecific(IsTargetSpecific),
@@ -97,7 +97,7 @@ public:
   virtual ~ParsedAttrInfo() = default;
 
   /// Check if this attribute has specified spelling.
-  bool hasSpelling(AttributeCommonInfo::Syntax Syntax, StringRef Name) const {
+  bool hasSpelling(AttributeCommonInfo::Syntax Syntax, llvm::StringRef Name) const {
     return llvm::any_of(Spellings, [&](const Spelling &S) {
       return (S.Syntax == Syntax && S.NormalizedFullName == Name);
     });
@@ -156,7 +156,7 @@ public:
   }
 
   static const ParsedAttrInfo &get(const AttributeCommonInfo &A);
-  static ArrayRef<const ParsedAttrInfo *> getAllBuiltin();
+  static llvm::ArrayRef<const ParsedAttrInfo *> getAllBuiltin();
 };
 
 typedef llvm::Registry<ParsedAttrInfo> ParsedAttrInfoRegistry;

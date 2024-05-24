@@ -82,8 +82,8 @@ ProgramStateRef processLoopEnd(const Stmt *LoopStmt, ProgramStateRef State) {
   return State;
 }
 
-static internal::Matcher<Stmt> simpleCondition(StringRef BindName,
-                                               StringRef RefName) {
+static internal::Matcher<Stmt> simpleCondition(llvm::StringRef BindName,
+                                               llvm::StringRef RefName) {
   return binaryOperator(
              anyOf(hasOperatorName("<"), hasOperatorName(">"),
                    hasOperatorName("<="), hasOperatorName(">="),
@@ -130,7 +130,7 @@ getAddrTo(internal::Matcher<Decl> VarNodeMatcher) {
       hasUnaryOperand(declRefExpr(hasDeclaration(VarNodeMatcher))));
 }
 
-static internal::Matcher<Stmt> hasSuspiciousStmt(StringRef NodeName) {
+static internal::Matcher<Stmt> hasSuspiciousStmt(llvm::StringRef NodeName) {
   return hasDescendant(stmt(
       anyOf(gotoStmt(), switchStmt(), returnStmt(),
             // Escaping and not known mutation of the loop counter is handled

@@ -99,7 +99,7 @@ CXRemapping clang_getRemappingsFromFileList(const char **filePaths,
   }
 
   TextDiagnosticBuffer diagBuffer;
-  SmallVector<StringRef, 32> Files(filePaths, filePaths + numFiles);
+  llvm::SmallVector<llvm::StringRef, 32> Files(filePaths, filePaths + numFiles);
 
   bool err = arcmt::getFileRemappingsFromFileList(remap->Vec, Files,
                                                   &diagBuffer);

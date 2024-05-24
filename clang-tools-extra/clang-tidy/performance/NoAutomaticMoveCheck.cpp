@@ -22,7 +22,7 @@ AST_MATCHER(VarDecl, isNRVOVariable) { return Node.isNRVOVariable(); }
 
 } // namespace
 
-NoAutomaticMoveCheck::NoAutomaticMoveCheck(StringRef Name,
+NoAutomaticMoveCheck::NoAutomaticMoveCheck(llvm::StringRef Name,
                                            ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       AllowedTypes(

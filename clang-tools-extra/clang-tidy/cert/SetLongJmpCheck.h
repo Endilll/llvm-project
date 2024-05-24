@@ -19,7 +19,7 @@ namespace clang::tidy::cert {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cert/err52-cpp.html
 class SetLongJmpCheck : public ClangTidyCheck {
 public:
-  SetLongJmpCheck(StringRef Name, ClangTidyContext *Context)
+  SetLongJmpCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

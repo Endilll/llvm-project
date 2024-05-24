@@ -35,7 +35,7 @@ public:
 
 TEST(RecursiveASTVisitor,
      NestedNameSpecifiersForTemplateSpecializationsAreVisited) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 namespace ns {
 struct Outer {
     template<typename T, typename U>

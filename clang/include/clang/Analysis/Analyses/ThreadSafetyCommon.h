@@ -181,7 +181,7 @@ public:
 
       // Process predecessors, handling back edges last
       if (V.visitPredecessors()) {
-        SmallVector<CFGBlock*, 4> BackEdges;
+        llvm::SmallVector<CFGBlock*, 4> BackEdges;
         // Process successors
         for (CFGBlock::const_pred_iterator SI = CurrBlock->pred_begin(),
                                            SE = CurrBlock->pred_end();
@@ -226,7 +226,7 @@ public:
 
       // Process successors, handling back edges first.
       if (V.visitSuccessors()) {
-        SmallVector<CFGBlock*, 8> ForwardEdges;
+        llvm::SmallVector<CFGBlock*, 8> ForwardEdges;
 
         // Process successors
         for (CFGBlock::const_succ_iterator SI = CurrBlock->succ_begin(),
@@ -275,18 +275,18 @@ private:
   llvm::PointerIntPair<const til::SExpr *, 1, bool> CapExpr;
 
   /// The kind of capability as specified by @ref CapabilityAttr::getName.
-  StringRef CapKind;
+  llvm::StringRef CapKind;
 
 public:
   CapabilityExpr() : CapExpr(nullptr, false) {}
-  CapabilityExpr(const til::SExpr *E, StringRef Kind, bool Neg)
+  CapabilityExpr(const til::SExpr *E, llvm::StringRef Kind, bool Neg)
       : CapExpr(E, Neg), CapKind(Kind) {}
 
-  // Don't allow implicitly-constructed StringRefs since we'll capture them.
+  // Don't allow implicitly-constructed llvm::StringRefs since we'll capture them.
   template <typename T> CapabilityExpr(const til::SExpr *, T, bool) = delete;
 
   const til::SExpr *sexpr() const { return CapExpr.getPointer(); }
-  StringRef getKind() const { return CapKind; }
+  llvm::StringRef getKind() const { return CapKind; }
   bool negative() const { return CapExpr.getInt(); }
 
   CapabilityExpr operator!() const {
@@ -388,7 +388,7 @@ public:
   til::LiteralPtr *createVariable(const VarDecl *VD);
 
   // Create placeholder for this: we don't know the VarDecl on construction yet.
-  std::pair<til::LiteralPtr *, StringRef>
+  std::pair<til::LiteralPtr *, llvm::StringRef>
   createThisPlaceholder(const Expr *Exp);
 
   // Translate a clang statement or expression to a TIL expression.

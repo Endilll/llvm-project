@@ -64,7 +64,7 @@ protected:
   /// Offset of the This parameter in a lambda record.
   ParamOffset LambdaThisCapture{0, false};
   /// Local descriptors.
-  llvm::SmallVector<SmallVector<Local, 8>, 2> Descriptors;
+  llvm::SmallVector<llvm::SmallVector<Local, 8>, 2> Descriptors;
 
 private:
   /// Current compilation context.

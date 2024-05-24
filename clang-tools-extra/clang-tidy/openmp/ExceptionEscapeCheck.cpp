@@ -19,17 +19,17 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::openmp {
 
-ExceptionEscapeCheck::ExceptionEscapeCheck(StringRef Name,
+ExceptionEscapeCheck::ExceptionEscapeCheck(llvm::StringRef Name,
                                            ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       RawIgnoredExceptions(Options.get("IgnoredExceptions", "")) {
-  llvm::SmallVector<StringRef, 8> FunctionsThatShouldNotThrowVec,
+  llvm::SmallVector<llvm::StringRef, 8> FunctionsThatShouldNotThrowVec,
       IgnoredExceptionsVec;
 
   llvm::StringSet<> IgnoredExceptions;
-  StringRef(RawIgnoredExceptions).split(IgnoredExceptionsVec, ",", -1, false);
+  llvm::StringRef(RawIgnoredExceptions).split(IgnoredExceptionsVec, ",", -1, false);
   llvm::transform(IgnoredExceptionsVec, IgnoredExceptionsVec.begin(),
-                  [](StringRef S) { return S.trim(); });
+                  [](llvm::StringRef S) { return S.trim(); });
   IgnoredExceptions.insert(IgnoredExceptionsVec.begin(),
                            IgnoredExceptionsVec.end());
   Tracer.ignoreExceptions(std::move(IgnoredExceptions));

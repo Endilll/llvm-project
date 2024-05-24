@@ -38,7 +38,7 @@ constexpr char DefaultForbiddenSuperClassNames[] =
 } // namespace
 
 ForbiddenSubclassingCheck::ForbiddenSubclassingCheck(
-    StringRef Name,
+    llvm::StringRef Name,
     ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       ForbiddenSuperClassNames(

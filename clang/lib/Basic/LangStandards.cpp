@@ -13,7 +13,7 @@
 #include "llvm/TargetParser/Triple.h"
 using namespace clang;
 
-StringRef clang::languageToString(Language L) {
+llvm::StringRef clang::languageToString(Language L) {
   switch (L) {
   case Language::Unknown:
     return "Unknown";
@@ -63,7 +63,7 @@ const LangStandard &LangStandard::getLangStandardForKind(Kind K) {
   llvm_unreachable("Invalid language kind!");
 }
 
-LangStandard::Kind LangStandard::getLangKind(StringRef Name) {
+LangStandard::Kind LangStandard::getLangKind(llvm::StringRef Name) {
   return llvm::StringSwitch<Kind>(Name)
 #define LANGSTANDARD(id, name, lang, desc, features) .Case(name, lang_##id)
 #define LANGSTANDARD_ALIAS(id, alias) .Case(alias, lang_##id)
@@ -71,7 +71,7 @@ LangStandard::Kind LangStandard::getLangKind(StringRef Name) {
       .Default(lang_unspecified);
 }
 
-LangStandard::Kind LangStandard::getHLSLLangKind(StringRef Name) {
+LangStandard::Kind LangStandard::getHLSLLangKind(llvm::StringRef Name) {
   return llvm::StringSwitch<LangStandard::Kind>(Name)
       .Case("2016", LangStandard::lang_hlsl2016)
       .Case("2017", LangStandard::lang_hlsl2017)
@@ -81,7 +81,7 @@ LangStandard::Kind LangStandard::getHLSLLangKind(StringRef Name) {
       .Default(LangStandard::lang_unspecified);
 }
 
-const LangStandard *LangStandard::getLangStandardForName(StringRef Name) {
+const LangStandard *LangStandard::getLangStandardForName(llvm::StringRef Name) {
   Kind K = getLangKind(Name);
   if (K == lang_unspecified)
     return nullptr;

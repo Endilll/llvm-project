@@ -98,7 +98,7 @@ public:
   }
 
 private:
-  SmallVector<Query, 8> MatchStack;
+  llvm::SmallVector<Query, 8> MatchStack;
 };
 
 
@@ -231,7 +231,7 @@ public:
 /// Value matcher tuned to test instructions.
 ///
 class InstructionMatcher : public EntityMatcher<Value> {
-  SmallVector<std::shared_ptr<Matcher>, 8> OperandMatchers;
+  llvm::SmallVector<std::shared_ptr<Matcher>, 8> OperandMatchers;
   std::shared_ptr<EntityMatcher<Metadata>> MetaMatcher = nullptr;
   unsigned Code;
 public:
@@ -267,7 +267,7 @@ public:
         C.pop();
       }
       if (MetaMatcher) {
-        SmallVector<std::pair<unsigned, MDNode *>, 8> MDs;
+        llvm::SmallVector<std::pair<unsigned, MDNode *>, 8> MDs;
         I->getAllMetadata(MDs);
         bool Found = false;
         for (auto Item : MDs) {
@@ -312,9 +312,9 @@ public:
 /// Matcher that matches string metadata.
 ///
 class NameMetaMatcher : public EntityMatcher<Metadata> {
-  StringRef Name;
+  llvm::StringRef Name;
 public:
-  NameMetaMatcher(StringRef N) : Name(N) {}
+  NameMetaMatcher(llvm::StringRef N) : Name(N) {}
   bool matchEntity(const Metadata &M, MatcherContext &C) override {
     if (auto *MDS = dyn_cast<MDString>(&M))
       return MDS->getString() == Name;
@@ -326,7 +326,7 @@ public:
 /// Matcher that matches metadata tuples.
 ///
 class MTupleMatcher : public EntityMatcher<Metadata> {
-  SmallVector<std::shared_ptr<Matcher>, 4> Operands;
+  llvm::SmallVector<std::shared_ptr<Matcher>, 4> Operands;
 public:
   void push(std::shared_ptr<Matcher> M) { Operands.push_back(M); }
   template<typename... Args>

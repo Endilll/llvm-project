@@ -313,7 +313,7 @@ struct FormatToken {
   ///
   /// Contains the raw token text without leading whitespace and without leading
   /// escaped newlines.
-  StringRef TokenText;
+  llvm::StringRef TokenText;
 
   /// A token can have a special role that can carry extra information
   /// about the token's formatting.
@@ -546,7 +546,7 @@ public:
   ///
   /// If multiple fake parentheses start at a token, this vector stores them in
   /// reverse order, i.e. inner fake parenthesis first.
-  SmallVector<prec::Level, 4> FakeLParens;
+  llvm::SmallVector<prec::Level, 4> FakeLParens;
   /// Insert this many fake ) after this token for correct indentation.
   unsigned FakeRParens = 0;
 
@@ -590,7 +590,7 @@ public:
 
   /// If this token starts a block, this contains all the unwrapped lines
   /// in it.
-  SmallVector<AnnotatedLine *, 1> Children;
+  llvm::SmallVector<AnnotatedLine *, 1> Children;
 
   // Contains all attributes related to how this token takes part
   // in a configured macro expansion.
@@ -773,7 +773,7 @@ public:
   bool isLabelString() const {
     if (isNot(tok::string_literal))
       return false;
-    StringRef Content = TokenText;
+    llvm::StringRef Content = TokenText;
     if (Content.starts_with("\"") || Content.starts_with("'"))
       Content = Content.drop_front(1);
     if (Content.ends_with("\"") || Content.ends_with("'"))
@@ -976,7 +976,7 @@ private:
     unsigned LineCount;
 
     /// The size of each column in characters.
-    SmallVector<unsigned, 8> ColumnSizes;
+    llvm::SmallVector<unsigned, 8> ColumnSizes;
   };
 
   /// Calculate which \c ColumnFormat fits best into
@@ -984,14 +984,14 @@ private:
   const ColumnFormat *getColumnFormat(unsigned RemainingCharacters) const;
 
   /// The ordered \c FormatTokens making up the commas of this list.
-  SmallVector<const FormatToken *, 8> Commas;
+  llvm::SmallVector<const FormatToken *, 8> Commas;
 
   /// The length of each of the list's items in characters including the
   /// trailing comma.
-  SmallVector<unsigned, 8> ItemLengths;
+  llvm::SmallVector<unsigned, 8> ItemLengths;
 
   /// Precomputed formats that can be used for this list.
-  SmallVector<ColumnFormat, 4> Formats;
+  llvm::SmallVector<ColumnFormat, 4> Formats;
 
   bool HasNestedBracedList;
 };

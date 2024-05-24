@@ -218,7 +218,7 @@ static unsigned ProcessCharEscape(const char *ThisTokBegin,
         if (Diags)
           Diag(Diags, Features, Loc, ThisTokBegin, EscapeBegin, ThisTokBuf,
                diag::err_delimited_escape_invalid)
-              << StringRef(ThisTokBuf, 1);
+              << llvm::StringRef(ThisTokBuf, 1);
         continue;
       }
       // About to shift out a digit?
@@ -299,7 +299,7 @@ static unsigned ProcessCharEscape(const char *ThisTokBegin,
         if (Diags)
           Diag(Diags, Features, Loc, ThisTokBegin, EscapeBegin, ThisTokBuf,
                diag::err_delimited_escape_invalid)
-              << StringRef(ThisTokBuf, 1);
+              << llvm::StringRef(ThisTokBuf, 1);
         ThisTokBuf++;
         continue;
       }
@@ -362,7 +362,7 @@ static unsigned ProcessCharEscape(const char *ThisTokBegin,
       !IsEscapeValidInUnevaluatedStringLiteral(Escape)) {
     Diag(Diags, Features, Loc, ThisTokBegin, EscapeBegin, ThisTokBuf,
          diag::err_unevaluated_string_invalid_escape_sequence)
-        << StringRef(EscapeBegin, ThisTokBuf - EscapeBegin);
+        << llvm::StringRef(EscapeBegin, ThisTokBuf - EscapeBegin);
     HadError = true;
   }
 
@@ -377,8 +377,8 @@ static void appendCodePoint(unsigned Codepoint,
     Str.append(ResultBuf, ResultPtr);
 }
 
-void clang::expandUCNs(SmallVectorImpl<char> &Buf, StringRef Input) {
-  for (StringRef::iterator I = Input.begin(), E = Input.end(); I != E; ++I) {
+void clang::expandUCNs(llvm::SmallVectorImpl<char> &Buf, llvm::StringRef Input) {
+  for (llvm::StringRef::iterator I = Input.begin(), E = Input.end(); I != E; ++I) {
     if (*I != '\\') {
       Buf.push_back(*I);
       continue;
@@ -407,7 +407,7 @@ void clang::expandUCNs(SmallVectorImpl<char> &Buf, StringRef Input) {
       ++I;
       auto Delim = std::find(I, Input.end(), '}');
       assert(Delim != Input.end());
-      StringRef Name(I, std::distance(I, Delim));
+      llvm::StringRef Name(I, std::distance(I, Delim));
       std::optional<llvm::sys::unicode::LooseMatchingResult> Res =
           llvm::sys::unicode::nameToCodepointLooseMatching(Name);
       assert(Res && "could not find a codepoint that was previously found");
@@ -474,7 +474,7 @@ static bool ProcessNumericUCNEscape(const char *ThisTokBegin,
     if (Diags)
       Diag(Diags, Features, Loc, ThisTokBegin, UcnBegin, ThisTokBuf,
            diag::err_hex_escape_no_digits)
-          << StringRef(&ThisTokBuf[-1], 1);
+          << llvm::StringRef(&ThisTokBuf[-1], 1);
     return false;
   }
   UcnLen = (ThisTokBuf[-1] == 'u' ? 4 : 8);
@@ -496,7 +496,7 @@ static bool ProcessNumericUCNEscape(const char *ThisTokBegin,
       if (Diags) {
         Diag(Diags, Features, Loc, ThisTokBegin, UcnBegin, ThisTokBuf,
              diag::err_delimited_escape_invalid)
-            << StringRef(ThisTokBuf, 1);
+            << llvm::StringRef(ThisTokBuf, 1);
       }
       Count++;
       continue;
@@ -562,7 +562,7 @@ static void DiagnoseInvalidUnicodeCharacterName(
   }
 
   unsigned Distance = 0;
-  SmallVector<u::MatchForCodepointName> Matches =
+  llvm::SmallVector<u::MatchForCodepointName> Matches =
       u::nearestMatchesForCodepointName(Name, 5);
   assert(!Matches.empty() && "No unicode characters found");
 
@@ -606,7 +606,7 @@ static bool ProcessNamedUCNEscape(const char *ThisTokBegin,
     if (Diags) {
       Diag(Diags, Features, Loc, ThisTokBegin, UcnBegin, ThisTokBuf,
            diag::err_delimited_escape_missing_brace)
-          << StringRef(&ThisTokBuf[-1], 1);
+          << llvm::StringRef(&ThisTokBuf[-1], 1);
     }
     return false;
   }
@@ -621,12 +621,12 @@ static bool ProcessNamedUCNEscape(const char *ThisTokBegin,
       Diag(Diags, Features, Loc, ThisTokBegin, UcnBegin, ThisTokBuf,
            Incomplete ? diag::err_ucn_escape_incomplete
                       : diag::err_delimited_escape_empty)
-          << StringRef(&UcnBegin[1], 1);
+          << llvm::StringRef(&UcnBegin[1], 1);
     }
     ThisTokBuf = ClosingBrace == ThisTokEnd ? ClosingBrace : ClosingBrace + 1;
     return false;
   }
-  StringRef Name(ThisTokBuf, ClosingBrace - ThisTokBuf);
+  llvm::StringRef Name(ThisTokBuf, ClosingBrace - ThisTokBuf);
   ThisTokBuf = ClosingBrace + 1;
   std::optional<char32_t> Res = llvm::sys::unicode::nameToCodepointStrict(Name);
   if (!Res) {
@@ -690,7 +690,7 @@ static bool ProcessUCNEscape(const char *ThisTokBegin, const char *&ThisTokBuf,
              : Features.CPlusPlus
                  ? diag::warn_cxx98_compat_literal_ucn_escape_basic_scs
                  : diag::warn_c23_compat_literal_ucn_escape_basic_scs)
-            << StringRef(&BasicSCSChar, 1);
+            << llvm::StringRef(&BasicSCSChar, 1);
       else
         Diag(Diags, Features, Loc, ThisTokBegin, UcnBegin, ThisTokBuf,
              IsError ? diag::err_ucn_control_character
@@ -897,7 +897,7 @@ static void EncodeUCNEscape(const char *ThisTokBegin, const char *&ThisTokBuf,
 ///       floating-constant: [C99 6.4.4.2]
 ///         TODO: add rules...
 ///
-NumericLiteralParser::NumericLiteralParser(StringRef TokSpelling,
+NumericLiteralParser::NumericLiteralParser(llvm::StringRef TokSpelling,
                                            SourceLocation TokLoc,
                                            const SourceManager &SM,
                                            const LangOptions &LangOpts,
@@ -1169,7 +1169,7 @@ NumericLiteralParser::NumericLiteralParser(StringRef TokSpelling,
   // "i", "if", and "il" are user-defined suffixes in C++1y.
   if (s != ThisTokEnd || isImaginary) {
     // FIXME: Don't bother expanding UCNs if !tok.hasUCN().
-    expandUCNs(UDSuffixBuf, StringRef(SuffixBegin, ThisTokEnd - SuffixBegin));
+    expandUCNs(UDSuffixBuf, llvm::StringRef(SuffixBegin, ThisTokEnd - SuffixBegin));
     if (isValidUDSuffix(LangOpts, UDSuffixBuf)) {
       if (!isImaginary) {
         // Any suffix pieces we might have parsed are actually part of the
@@ -1198,7 +1198,7 @@ NumericLiteralParser::NumericLiteralParser(StringRef TokSpelling,
       Diags.Report(Lexer::AdvanceToTokenCharacter(
                        TokLoc, SuffixBegin - ThisTokBegin, SM, LangOpts),
                    diag::err_invalid_suffix_constant)
-          << StringRef(SuffixBegin, ThisTokEnd - SuffixBegin)
+          << llvm::StringRef(SuffixBegin, ThisTokEnd - SuffixBegin)
           << (isFixedPointConstant ? 2 : isFPConstant);
       hadError = true;
     }
@@ -1218,11 +1218,11 @@ void NumericLiteralParser::ParseDecimalOrOctalCommon(SourceLocation TokLoc){
   // If we have a hex digit other than 'e' (which denotes a FP exponent) then
   // the code is using an incorrect base.
   if (isHexDigit(*s) && *s != 'e' && *s != 'E' &&
-      !isValidUDSuffix(LangOpts, StringRef(s, ThisTokEnd - s))) {
+      !isValidUDSuffix(LangOpts, llvm::StringRef(s, ThisTokEnd - s))) {
     Diags.Report(
         Lexer::AdvanceToTokenCharacter(TokLoc, s - ThisTokBegin, SM, LangOpts),
         diag::err_invalid_digit)
-        << StringRef(s, 1) << (radix == 8 ? 1 : 0);
+        << llvm::StringRef(s, 1) << (radix == 8 ? 1 : 0);
     hadError = true;
     return;
   }
@@ -1262,7 +1262,7 @@ void NumericLiteralParser::ParseDecimalOrOctalCommon(SourceLocation TokLoc){
 /// suffixes as ud-suffixes, because the diagnostic experience is better if we
 /// treat it as an invalid suffix.
 bool NumericLiteralParser::isValidUDSuffix(const LangOptions &LangOpts,
-                                           StringRef Suffix) {
+                                           llvm::StringRef Suffix) {
   if (!LangOpts.CPlusPlus11 || Suffix.empty())
     return false;
 
@@ -1405,11 +1405,11 @@ void NumericLiteralParser::ParseNumberStartingWithZero(SourceLocation TokLoc) {
     if (s == ThisTokEnd) {
       // Done.
     } else if (isHexDigit(*s) &&
-               !isValidUDSuffix(LangOpts, StringRef(s, ThisTokEnd - s))) {
+               !isValidUDSuffix(LangOpts, llvm::StringRef(s, ThisTokEnd - s))) {
       Diags.Report(Lexer::AdvanceToTokenCharacter(TokLoc, s - ThisTokBegin, SM,
                                                   LangOpts),
                    diag::err_invalid_digit)
-          << StringRef(s, 1) << 2;
+          << llvm::StringRef(s, 1) << 2;
       hadError = true;
     }
     // Other suffixes will be diagnosed by the caller.
@@ -1527,7 +1527,7 @@ NumericLiteralParser::GetFloatValue(llvm::APFloat &Result,
   unsigned n = std::min(SuffixBegin - ThisTokBegin, ThisTokEnd - ThisTokBegin);
 
   llvm::SmallString<16> Buffer;
-  StringRef Str(ThisTokBegin, n);
+  llvm::StringRef Str(ThisTokBegin, n);
   if (Str.contains('\'')) {
     Buffer.reserve(n);
     std::remove_copy_if(Str.begin(), Str.end(), std::back_inserter(Buffer),
@@ -1735,7 +1735,7 @@ CharLiteralParser::CharLiteralParser(const char *begin, const char *end,
       --end;
     } while (end[-1] != '\'');
     // FIXME: Don't bother with this if !tok.hasUCN().
-    expandUCNs(UDSuffixBuf, StringRef(end, UDSuffixEnd - end));
+    expandUCNs(UDSuffixBuf, llvm::StringRef(end, UDSuffixEnd - end));
     UDSuffixOffset = end - TokBegin;
   }
 
@@ -1754,7 +1754,7 @@ CharLiteralParser::CharLiteralParser(const char *begin, const char *end,
   assert(PP.getTargetInfo().getWCharWidth() <= 64 &&
          "Assumes sizeof(wchar) on target is <= 64");
 
-  SmallVector<uint32_t, 4> codepoint_buffer;
+  llvm::SmallVector<uint32_t, 4> codepoint_buffer;
   codepoint_buffer.resize(end - begin);
   uint32_t *buffer_begin = &codepoint_buffer.front();
   uint32_t *buffer_end = buffer_begin + codepoint_buffer.size();
@@ -1946,7 +1946,7 @@ CharLiteralParser::CharLiteralParser(const char *begin, const char *end,
 ///         hex-digit hex-digit hex-digit hex-digit
 /// \endverbatim
 ///
-StringLiteralParser::StringLiteralParser(ArrayRef<Token> StringToks,
+StringLiteralParser::StringLiteralParser(llvm::ArrayRef<Token> StringToks,
                                          Preprocessor &PP,
                                          StringLiteralEvalMethod EvalMethod)
     : SM(PP.getSourceManager()), Features(PP.getLangOpts()),
@@ -1957,7 +1957,7 @@ StringLiteralParser::StringLiteralParser(ArrayRef<Token> StringToks,
   init(StringToks);
 }
 
-void StringLiteralParser::init(ArrayRef<Token> StringToks){
+void StringLiteralParser::init(llvm::ArrayRef<Token> StringToks){
   // The literal token may have come from an invalid source location (e.g. due
   // to a PCH error), in which case the token length will be 0.
   if (StringToks.empty() || StringToks[0].getLength() < 2)
@@ -1999,7 +1999,7 @@ void StringLiteralParser::init(ArrayRef<Token> StringToks){
             Features);
         CharSourceRange Range =
             CharSourceRange::getCharRange({Tok.getLocation(), PrefixEndLoc});
-        StringRef Prefix(SM.getCharacterData(Tok.getLocation()),
+        llvm::StringRef Prefix(SM.getCharacterData(Tok.getLocation()),
                          getEncodingPrefixLen(Tok.getKind()));
         Diags->Report(Tok.getLocation(),
                       Features.CPlusPlus26
@@ -2038,7 +2038,7 @@ void StringLiteralParser::init(ArrayRef<Token> StringToks){
   ResultBuf.resize(SizeBound);
 
   // Likewise, but for each string piece.
-  SmallString<512> TokenBuf;
+  llvm::SmallString<512> TokenBuf;
   TokenBuf.resize(MaxTokenLength);
 
   // Loop over all the strings, getting their spelling, and expanding them to
@@ -2071,7 +2071,7 @@ void StringLiteralParser::init(ArrayRef<Token> StringToks){
         --ThisTokEnd;
       } while (ThisTokEnd[-1] != '"');
 
-      StringRef UDSuffix(ThisTokEnd, UDSuffixEnd - ThisTokEnd);
+      llvm::StringRef UDSuffix(ThisTokEnd, UDSuffixEnd - ThisTokEnd);
 
       if (UDSuffixBuf.empty()) {
         if (StringToks[i].hasUCN())
@@ -2082,7 +2082,7 @@ void StringLiteralParser::init(ArrayRef<Token> StringToks){
         UDSuffixOffset = ThisTokEnd - ThisTokBuf;
         UDSuffixTokLoc = StringToks[i].getLocation();
       } else {
-        SmallString<32> ExpandedUDSuffix;
+        llvm::SmallString<32> ExpandedUDSuffix;
         if (StringToks[i].hasUCN()) {
           expandUCNs(ExpandedUDSuffix, UDSuffix);
           UDSuffix = ExpandedUDSuffix;
@@ -2151,12 +2151,12 @@ void StringLiteralParser::init(ArrayRef<Token> StringToks){
 
       // C++14 [lex.string]p4: A source-file new-line in a raw string literal
       // results in a new-line in the resulting execution string-literal.
-      StringRef RemainingTokenSpan(ThisTokBuf, ThisTokEnd - ThisTokBuf);
+      llvm::StringRef RemainingTokenSpan(ThisTokBuf, ThisTokEnd - ThisTokBuf);
       while (!RemainingTokenSpan.empty()) {
         // Split the string literal on \r\n boundaries.
         size_t CRLFPos = RemainingTokenSpan.find("\r\n");
-        StringRef BeforeCRLF = RemainingTokenSpan.substr(0, CRLFPos);
-        StringRef AfterCRLF = RemainingTokenSpan.substr(CRLFPos);
+        llvm::StringRef BeforeCRLF = RemainingTokenSpan.substr(0, CRLFPos);
+        llvm::StringRef AfterCRLF = RemainingTokenSpan.substr(CRLFPos);
 
         // Copy everything before the \r\n sequence into the string literal.
         if (CopyStringFragment(StringToks[i], ThisTokBegin, BeforeCRLF))
@@ -2198,7 +2198,7 @@ void StringLiteralParser::init(ArrayRef<Token> StringToks){
 
           // Copy the character span over.
           if (CopyStringFragment(StringToks[i], ThisTokBegin,
-                                 StringRef(InStart, ThisTokBuf - InStart)))
+                                 llvm::StringRef(InStart, ThisTokBuf - InStart)))
             hadError = true;
           continue;
         }
@@ -2293,7 +2293,7 @@ static const char *resyncUTF8(const char *Err, const char *End) {
 /// Performs widening for multi-byte characters.
 bool StringLiteralParser::CopyStringFragment(const Token &Tok,
                                              const char *TokBegin,
-                                             StringRef Fragment) {
+                                             llvm::StringRef Fragment) {
   const llvm::UTF8 *ErrorPtrTmp;
   if (ConvertUTF8toWide(CharByteWidth, Fragment, ResultPtr, ErrorPtrTmp))
     return false;
@@ -2318,10 +2318,10 @@ bool StringLiteralParser::CopyStringFragment(const Token &Tok,
                                 : diag::err_bad_string_encoding);
 
     const char *NextStart = resyncUTF8(ErrorPtr, Fragment.end());
-    StringRef NextFragment(NextStart, Fragment.end()-NextStart);
+    llvm::StringRef NextFragment(NextStart, Fragment.end()-NextStart);
 
     // Decode into a dummy buffer.
-    SmallString<512> Dummy;
+    llvm::SmallString<512> Dummy;
     Dummy.reserve(Fragment.size() * CharByteWidth);
     char *Ptr = Dummy.data();
 
@@ -2330,7 +2330,7 @@ bool StringLiteralParser::CopyStringFragment(const Token &Tok,
       NextStart = resyncUTF8(ErrorPtr, Fragment.end());
       Builder << MakeCharSourceRange(Features, SourceLoc, TokBegin,
                                      ErrorPtr, NextStart);
-      NextFragment = StringRef(NextStart, Fragment.end()-NextStart);
+      NextFragment = llvm::StringRef(NextStart, Fragment.end()-NextStart);
     }
   }
   return !NoErrorOnBadEncoding;
@@ -2348,7 +2348,7 @@ void StringLiteralParser::DiagnoseLexingError(SourceLocation Loc) {
 unsigned StringLiteralParser::getOffsetOfStringByte(const Token &Tok,
                                                     unsigned ByteNo) const {
   // Get the spelling of the token.
-  SmallString<32> SpellingBuffer;
+  llvm::SmallString<32> SpellingBuffer;
   SpellingBuffer.resize(Tok.getLength());
 
   bool StringInvalid = false;
@@ -2426,7 +2426,7 @@ unsigned StringLiteralParser::getOffsetOfStringByte(const Token &Tok,
 /// suffixes as ud-suffixes, because the diagnostic experience is better if we
 /// treat it as an invalid suffix.
 bool StringLiteralParser::isValidUDSuffix(const LangOptions &LangOpts,
-                                          StringRef Suffix) {
+                                          llvm::StringRef Suffix) {
   return NumericLiteralParser::isValidUDSuffix(LangOpts, Suffix) ||
          Suffix == "sv";
 }

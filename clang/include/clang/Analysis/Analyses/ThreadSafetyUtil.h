@@ -351,7 +351,7 @@ private:
   VectorData *Data = nullptr;
 };
 
-inline std::ostream& operator<<(std::ostream& ss, const StringRef str) {
+inline std::ostream& operator<<(std::ostream& ss, const llvm::StringRef str) {
   return ss.write(str.data(), str.size());
 }
 

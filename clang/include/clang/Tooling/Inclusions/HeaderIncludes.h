@@ -27,22 +27,22 @@ namespace tooling {
 /// include sorting functions are also moved here.
 class IncludeCategoryManager {
 public:
-  IncludeCategoryManager(const IncludeStyle &Style, StringRef FileName);
+  IncludeCategoryManager(const IncludeStyle &Style, llvm::StringRef FileName);
 
   /// Returns the priority of the category which \p IncludeName belongs to.
   /// If \p CheckMainHeader is true and \p IncludeName is a main header, returns
   /// 0. Otherwise, returns the priority of the matching category or INT_MAX.
   /// NOTE: this API is not thread-safe!
-  int getIncludePriority(StringRef IncludeName, bool CheckMainHeader) const;
-  int getSortIncludePriority(StringRef IncludeName, bool CheckMainHeader) const;
+  int getIncludePriority(llvm::StringRef IncludeName, bool CheckMainHeader) const;
+  int getSortIncludePriority(llvm::StringRef IncludeName, bool CheckMainHeader) const;
 
 private:
-  bool isMainHeader(StringRef IncludeName) const;
+  bool isMainHeader(llvm::StringRef IncludeName) const;
 
   const IncludeStyle Style;
   bool IsMainFile;
   std::string FileName;
-  SmallVector<llvm::Regex, 4> CategoryRegexs;
+  llvm::SmallVector<llvm::Regex, 4> CategoryRegexs;
 };
 
 enum class IncludeDirective { Include, Import };
@@ -88,7 +88,7 @@ public:
 
 private:
   struct Include {
-    Include(StringRef Name, tooling::Range R, IncludeDirective D)
+    Include(llvm::StringRef Name, tooling::Range R, IncludeDirective D)
         : Name(Name), R(R), Directive(D) {}
 
     // An include header quoted with either <> or "".

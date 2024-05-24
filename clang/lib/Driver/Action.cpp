@@ -138,7 +138,7 @@ std::string Action::getOffloadingKindPrefix() const {
 /// for each offloading kind.
 std::string
 Action::GetOffloadingFileNamePrefix(OffloadKind Kind,
-                                    StringRef NormalizedTriple,
+                                    llvm::StringRef NormalizedTriple,
                                     bool CreatePrefixForHost) {
   // Don't generate prefix for host actions unless required.
   if (!CreatePrefixForHost && (Kind == OFK_None || Kind == OFK_Host))
@@ -153,7 +153,7 @@ Action::GetOffloadingFileNamePrefix(OffloadKind Kind,
 
 /// Return a string with the offload kind name. If that is not defined, we
 /// assume 'host'.
-StringRef Action::GetOffloadKindName(OffloadKind Kind) {
+llvm::StringRef Action::GetOffloadKindName(OffloadKind Kind) {
   switch (Kind) {
   case OFK_None:
   case OFK_Host:
@@ -173,12 +173,12 @@ StringRef Action::GetOffloadKindName(OffloadKind Kind) {
 
 void InputAction::anchor() {}
 
-InputAction::InputAction(const Arg &_Input, types::ID _Type, StringRef _Id)
+InputAction::InputAction(const Arg &_Input, types::ID _Type, llvm::StringRef _Id)
     : Action(InputClass, _Type), Input(_Input), Id(_Id.str()) {}
 
 void BindArchAction::anchor() {}
 
-BindArchAction::BindArchAction(Action *Input, StringRef ArchName)
+BindArchAction::BindArchAction(Action *Input, llvm::StringRef ArchName)
     : Action(BindArchClass, Input), ArchName(ArchName) {}
 
 void OffloadAction::anchor() {}

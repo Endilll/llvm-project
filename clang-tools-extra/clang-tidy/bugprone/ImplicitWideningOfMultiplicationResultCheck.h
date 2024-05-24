@@ -30,7 +30,7 @@ class ImplicitWideningOfMultiplicationResultCheck : public ClangTidyCheck {
   void handlePointerOffsetting(const Expr *E);
 
 public:
-  ImplicitWideningOfMultiplicationResultCheck(StringRef Name,
+  ImplicitWideningOfMultiplicationResultCheck(llvm::StringRef Name,
                                               ClangTidyContext *Context);
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;

@@ -51,7 +51,7 @@ AST_MATCHER_FUNCTION(ast_matchers::internal::Matcher<Expr>,
 
 } // namespace
 
-FasterStringFindCheck::FasterStringFindCheck(StringRef Name,
+FasterStringFindCheck::FasterStringFindCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StringLikeClasses(utils::options::parseStringList(

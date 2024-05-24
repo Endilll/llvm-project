@@ -51,7 +51,7 @@ namespace {
 /// unescapeCommandLine(...)).
 class CommandLineArgumentParser {
  public:
-  CommandLineArgumentParser(StringRef CommandLine)
+  CommandLineArgumentParser(llvm::StringRef CommandLine)
       : Input(CommandLine), Position(Input.begin()-1) {}
 
   std::vector<std::string> parse() {
@@ -127,13 +127,13 @@ class CommandLineArgumentParser {
     return Position != Input.end();
   }
 
-  const StringRef Input;
-  StringRef::iterator Position;
+  const llvm::StringRef Input;
+  llvm::StringRef::iterator Position;
   std::vector<std::string> CommandLine;
 };
 
 std::vector<std::string> unescapeCommandLine(JSONCommandLineSyntax Syntax,
-                                             StringRef EscapedCommandLine) {
+                                             llvm::StringRef EscapedCommandLine) {
   if (Syntax == JSONCommandLineSyntax::AutoDetect) {
 #ifdef _WIN32
     // Assume Windows command line parsing on Win32
@@ -160,8 +160,8 @@ std::vector<std::string> unescapeCommandLine(JSONCommandLineSyntax Syntax,
 // compile commands for files not present in the database.
 class JSONCompilationDatabasePlugin : public CompilationDatabasePlugin {
   std::unique_ptr<CompilationDatabase>
-  loadFromDirectory(StringRef Directory, std::string &ErrorMessage) override {
-    SmallString<1024> JSONDatabasePath(Directory);
+  loadFromDirectory(llvm::StringRef Directory, std::string &ErrorMessage) override {
+    llvm::SmallString<1024> JSONDatabasePath(Directory);
     llvm::sys::path::append(JSONDatabasePath, "compile_commands.json");
     auto Base = JSONCompilationDatabase::loadFromFile(
         JSONDatabasePath, ErrorMessage, JSONCommandLineSyntax::AutoDetect);
@@ -190,7 +190,7 @@ volatile int JSONAnchorSource = 0;
 } // namespace clang
 
 std::unique_ptr<JSONCompilationDatabase>
-JSONCompilationDatabase::loadFromFile(StringRef FilePath,
+JSONCompilationDatabase::loadFromFile(llvm::StringRef FilePath,
                                       std::string &ErrorMessage,
                                       JSONCommandLineSyntax Syntax) {
   // Don't mmap: if we're a long-lived process, the build system may overwrite.
@@ -210,7 +210,7 @@ JSONCompilationDatabase::loadFromFile(StringRef FilePath,
 }
 
 std::unique_ptr<JSONCompilationDatabase>
-JSONCompilationDatabase::loadFromBuffer(StringRef DatabaseString,
+JSONCompilationDatabase::loadFromBuffer(llvm::StringRef DatabaseString,
                                         std::string &ErrorMessage,
                                         JSONCommandLineSyntax Syntax) {
   std::unique_ptr<llvm::MemoryBuffer> DatabaseBuffer(
@@ -223,13 +223,13 @@ JSONCompilationDatabase::loadFromBuffer(StringRef DatabaseString,
 }
 
 std::vector<CompileCommand>
-JSONCompilationDatabase::getCompileCommands(StringRef FilePath) const {
-  SmallString<128> NativeFilePath;
+JSONCompilationDatabase::getCompileCommands(llvm::StringRef FilePath) const {
+  llvm::SmallString<128> NativeFilePath;
   llvm::sys::path::native(FilePath, NativeFilePath);
 
   std::string Error;
   llvm::raw_string_ostream ES(Error);
-  StringRef Match = MatchTrie.findEquivalent(NativeFilePath, ES);
+  llvm::StringRef Match = MatchTrie.findEquivalent(NativeFilePath, ES);
   if (Match.empty())
     return {};
   const auto CommandsRefI = IndexByFile.find(Match);
@@ -267,7 +267,7 @@ static llvm::StringRef stripExecutableExtension(llvm::StringRef Name) {
 static bool unwrapCommand(std::vector<std::string> &Args) {
   if (Args.size() < 2)
     return false;
-  StringRef Wrapper =
+  llvm::StringRef Wrapper =
       stripExecutableExtension(llvm::sys::path::filename(Args.front()));
   if (Wrapper == "distcc" || Wrapper == "gomacc" || Wrapper == "ccache" ||
       Wrapper == "sccache") {
@@ -297,7 +297,7 @@ static bool unwrapCommand(std::vector<std::string> &Args) {
 static std::vector<std::string>
 nodeToCommandLine(JSONCommandLineSyntax Syntax,
                   const std::vector<llvm::yaml::ScalarNode *> &Nodes) {
-  SmallString<1024> Storage;
+  llvm::SmallString<1024> Storage;
   std::vector<std::string> Arguments;
   if (Nodes.size() == 1)
     Arguments = unescapeCommandLine(Syntax, Nodes[0]->getValue(Storage));
@@ -311,12 +311,12 @@ nodeToCommandLine(JSONCommandLineSyntax Syntax,
 }
 
 void JSONCompilationDatabase::getCommands(
-    ArrayRef<CompileCommandRef> CommandsRef,
+    llvm::ArrayRef<CompileCommandRef> CommandsRef,
     std::vector<CompileCommand> &Commands) const {
   for (const auto &CommandRef : CommandsRef) {
-    SmallString<8> DirectoryStorage;
-    SmallString<32> FilenameStorage;
-    SmallString<32> OutputStorage;
+    llvm::SmallString<8> DirectoryStorage;
+    llvm::SmallString<32> FilenameStorage;
+    llvm::SmallString<32> OutputStorage;
     auto Output = std::get<3>(CommandRef);
     Commands.emplace_back(
         std::get<0>(CommandRef)->getValue(DirectoryStorage),
@@ -358,8 +358,8 @@ bool JSONCompilationDatabase::parse(std::string &ErrorMessage) {
         ErrorMessage = "Expected strings as key.";
         return false;
       }
-      SmallString<10> KeyStorage;
-      StringRef KeyValue = KeyString->getValue(KeyStorage);
+      llvm::SmallString<10> KeyStorage;
+      llvm::StringRef KeyValue = KeyString->getValue(KeyStorage);
       llvm::yaml::Node *Value = NextKeyValue.getValue();
       if (!Value) {
         ErrorMessage = "Expected value.";
@@ -414,12 +414,12 @@ bool JSONCompilationDatabase::parse(std::string &ErrorMessage) {
       ErrorMessage = "Missing key: \"directory\".";
       return false;
     }
-    SmallString<8> FileStorage;
-    StringRef FileName = File->getValue(FileStorage);
-    SmallString<128> NativeFilePath;
+    llvm::SmallString<8> FileStorage;
+    llvm::StringRef FileName = File->getValue(FileStorage);
+    llvm::SmallString<128> NativeFilePath;
     if (llvm::sys::path::is_relative(FileName)) {
-      SmallString<8> DirectoryStorage;
-      SmallString<128> AbsolutePath(Directory->getValue(DirectoryStorage));
+      llvm::SmallString<8> DirectoryStorage;
+      llvm::SmallString<128> AbsolutePath(Directory->getValue(DirectoryStorage));
       llvm::sys::path::append(AbsolutePath, FileName);
       llvm::sys::path::native(AbsolutePath, NativeFilePath);
     } else {

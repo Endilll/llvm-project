@@ -111,13 +111,13 @@ enum PPElifDiag {
   PED_Elifndef
 };
 
-static bool isFeatureTestMacro(StringRef MacroName) {
+static bool isFeatureTestMacro(llvm::StringRef MacroName) {
   // list from:
   // * https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_macros.html
   // * https://docs.microsoft.com/en-us/cpp/c-runtime-library/security-features-in-the-crt?view=msvc-160
   // * man 7 feature_test_macros
   // The list must be sorted for correct binary search.
-  static constexpr StringRef ReservedMacro[] = {
+  static constexpr llvm::StringRef ReservedMacro[] = {
       "_ATFILE_SOURCE",
       "_BSD_SOURCE",
       "_CRT_NONSTDC_NO_WARNINGS",
@@ -154,7 +154,7 @@ static bool isFeatureTestMacro(StringRef MacroName) {
 
 static bool isLanguageDefinedBuiltin(const SourceManager &SourceMgr,
                                      const MacroInfo *MI,
-                                     const StringRef MacroName) {
+                                     const llvm::StringRef MacroName) {
   // If this is a macro with special handling (like __LINE__) then it's language
   // defined.
   if (MI->isBuiltinMacro())
@@ -178,7 +178,7 @@ static bool isLanguageDefinedBuiltin(const SourceManager &SourceMgr,
 
 static MacroDiag shouldWarnOnMacroDef(Preprocessor &PP, IdentifierInfo *II) {
   const LangOptions &Lang = PP.getLangOpts();
-  StringRef Text = II->getName();
+  llvm::StringRef Text = II->getName();
   if (isReservedInAllContexts(II->isReserved(Lang)))
     return isFeatureTestMacro(Text) ? MD_NoWarn : MD_ReservedMacro;
   if (II->isKeyword(Lang))
@@ -201,7 +201,7 @@ static MacroDiag shouldWarnOnMacroUndef(Preprocessor &PP, IdentifierInfo *II) {
 // this includes the standard C and C++ headers, Posix headers,
 // and Boost headers. Improper case for these #includes is a
 // potential portability issue.
-static bool warnByDefaultOnWrongCase(StringRef Include) {
+static bool warnByDefaultOnWrongCase(llvm::StringRef Include) {
   // If the first component of the path is "boost", treat this like a standard header
   // for the purposes of diagnostics.
   if (::llvm::sys::path::begin(Include)->equals_insensitive("boost"))
@@ -214,7 +214,7 @@ static bool warnByDefaultOnWrongCase(StringRef Include) {
     return false;
 
   // Lowercase and normalize the search string.
-  SmallString<32> LowerInclude{Include};
+  llvm::SmallString<32> LowerInclude{Include};
   for (char &Ch : LowerInclude) {
     // In the ASCII range?
     if (static_cast<unsigned char>(Ch) > 0x7f)
@@ -283,11 +283,11 @@ static bool warnByDefaultOnWrongCase(StringRef Include) {
 ///
 /// \returns a similar string if exists. If no similar string exists,
 /// returns std::nullopt.
-static std::optional<StringRef>
-findSimilarStr(StringRef LHS, const std::vector<StringRef> &Candidates) {
+static std::optional<llvm::StringRef>
+findSimilarStr(llvm::StringRef LHS, const std::vector<llvm::StringRef> &Candidates) {
   // We need to check if `Candidates` has the exact case-insensitive string
   // because the Levenshtein distance match does not care about it.
-  for (StringRef C : Candidates) {
+  for (llvm::StringRef C : Candidates) {
     if (LHS.equals_insensitive(C)) {
       return C;
     }
@@ -299,8 +299,8 @@ findSimilarStr(StringRef LHS, const std::vector<StringRef> &Candidates) {
   size_t Length = LHS.size();
   size_t MaxDist = Length < 3 ? Length - 1 : Length / 3;
 
-  std::optional<std::pair<StringRef, size_t>> SimilarStr;
-  for (StringRef C : Candidates) {
+  std::optional<std::pair<llvm::StringRef, size_t>> SimilarStr;
+  for (llvm::StringRef C : Candidates) {
     size_t CurDist = LHS.edit_distance(C, true);
     if (CurDist <= MaxDist) {
       if (!SimilarStr) {
@@ -444,24 +444,24 @@ SourceLocation Preprocessor::CheckEndOfDirective(const char *DirType,
 }
 
 void Preprocessor::SuggestTypoedDirective(const Token &Tok,
-                                          StringRef Directive) const {
+                                          llvm::StringRef Directive) const {
   // If this is a `.S` file, treat unknown # directives as non-preprocessor
   // directives.
   if (getLangOpts().AsmPreprocessor) return;
 
-  std::vector<StringRef> Candidates = {
+  std::vector<llvm::StringRef> Candidates = {
       "if", "ifdef", "ifndef", "elif", "else", "endif"
   };
   if (LangOpts.C23 || LangOpts.CPlusPlus23)
     Candidates.insert(Candidates.end(), {"elifdef", "elifndef"});
 
-  if (std::optional<StringRef> Sugg = findSimilarStr(Directive, Candidates)) {
+  if (std::optional<llvm::StringRef> Sugg = findSimilarStr(Directive, Candidates)) {
     // Directive cannot be coming from macro.
     assert(Tok.getLocation().isFileID());
     CharSourceRange DirectiveRange = CharSourceRange::getCharRange(
         Tok.getLocation(),
         Tok.getLocation().getLocWithOffset(Directive.size()));
-    StringRef SuggValue = *Sugg;
+    llvm::StringRef SuggValue = *Sugg;
 
     auto Hint = FixItHint::CreateReplacement(DirectiveRange, SuggValue);
     Diag(Tok, diag::warn_pp_invalid_directive) << 1 << SuggValue << Hint;
@@ -615,7 +615,7 @@ void Preprocessor::SkipExcludedConditionalBlock(SourceLocation HashTokenLoc,
     // to spell an i/e in a strange way that is another letter.  Skipping this
     // allows us to avoid looking up the identifier info for #define/#undef and
     // other common directives.
-    StringRef RI = Tok.getRawIdentifier();
+    llvm::StringRef RI = Tok.getRawIdentifier();
 
     char FirstChar = RI[0];
     if (FirstChar >= 'a' && FirstChar <= 'z' &&
@@ -630,7 +630,7 @@ void Preprocessor::SkipExcludedConditionalBlock(SourceLocation HashTokenLoc,
     // that we can't use Tok.getIdentifierInfo() because its lookup is disabled
     // when skipping.
     char DirectiveBuf[20];
-    StringRef Directive;
+    llvm::StringRef Directive;
     if (!Tok.needsCleaning() && RI.size() < 20) {
       Directive = RI;
     } else {
@@ -643,11 +643,11 @@ void Preprocessor::SkipExcludedConditionalBlock(SourceLocation HashTokenLoc,
         continue;
       }
       memcpy(DirectiveBuf, &DirectiveStr[0], IdLen);
-      Directive = StringRef(DirectiveBuf, IdLen);
+      Directive = llvm::StringRef(DirectiveBuf, IdLen);
     }
 
     if (Directive.starts_with("if")) {
-      StringRef Sub = Directive.substr(2);
+      llvm::StringRef Sub = Directive.substr(2);
       if (Sub.empty() ||   // "if"
           Sub == "def" ||   // "ifdef"
           Sub == "ndef") {  // "ifndef"
@@ -661,7 +661,7 @@ void Preprocessor::SkipExcludedConditionalBlock(SourceLocation HashTokenLoc,
         SuggestTypoedDirective(Tok, Directive);
       }
     } else if (Directive[0] == 'e') {
-      StringRef Sub = Directive.substr(1);
+      llvm::StringRef Sub = Directive.substr(1);
       if (Sub == "ndif") {  // "endif"
         PPConditionalInfo CondInfo;
         CondInfo.WasSkipping = true; // Silence bogus warning.
@@ -949,10 +949,10 @@ Preprocessor::getHeaderToIncludeForDiagnostics(SourceLocation IncLoc,
 }
 
 OptionalFileEntryRef Preprocessor::LookupFile(
-    SourceLocation FilenameLoc, StringRef Filename, bool isAngled,
+    SourceLocation FilenameLoc, llvm::StringRef Filename, bool isAngled,
     ConstSearchDirIterator FromDir, const FileEntry *FromFile,
-    ConstSearchDirIterator *CurDirArg, SmallVectorImpl<char> *SearchPath,
-    SmallVectorImpl<char> *RelativePath,
+    ConstSearchDirIterator *CurDirArg, llvm::SmallVectorImpl<char> *SearchPath,
+    llvm::SmallVectorImpl<char> *RelativePath,
     ModuleMap::KnownHeader *SuggestedModule, bool *IsMapped,
     bool *IsFrameworkFound, bool SkipCache, bool OpenFile, bool CacheFailures) {
   ConstSearchDirIterator CurDirLocal = nullptr;
@@ -963,7 +963,7 @@ OptionalFileEntryRef Preprocessor::LookupFile(
 
   // If the header lookup mechanism may be relative to the current inclusion
   // stack, record the parent #includes.
-  SmallVector<std::pair<OptionalFileEntryRef, DirectoryEntryRef>, 16> Includers;
+  llvm::SmallVector<std::pair<OptionalFileEntryRef, DirectoryEntryRef>, 16> Includers;
   bool BuildSystemModule = false;
   if (!FromDir && !FromFile) {
     FileID FID = getCurrentFileLexer()->getFileID();
@@ -1347,7 +1347,7 @@ static bool GetLineValue(Token &DigitTok, unsigned &Val,
     return true;
   }
 
-  SmallString<64> IntegerBuffer;
+  llvm::SmallString<64> IntegerBuffer;
   IntegerBuffer.resize(DigitTok.getLength());
   const char *DigitTokBegin = &IntegerBuffer[0];
   bool Invalid = false;
@@ -1640,12 +1640,12 @@ void Preprocessor::HandleUserDiagnosticDirective(Token &Tok,
   // tokens.  For example, this is allowed: "#warning `   'foo".  GCC does
   // collapse multiple consecutive white space between tokens, but this isn't
   // specified by the standard.
-  SmallString<128> Message;
+  llvm::SmallString<128> Message;
   CurLexer->ReadToEndOfLine(&Message);
 
   // Find the first non-whitespace character, so that we can make the
   // diagnostic more succinct.
-  StringRef Msg = Message.str().ltrim(' ');
+  llvm::StringRef Msg = Message.str().ltrim(' ');
 
   if (isWarning)
     Diag(Tok, diag::pp_hash_warning) << Msg;
@@ -1754,7 +1754,7 @@ void Preprocessor::HandleMacroPrivateDirective() {
 /// spelling of the filename, but is also expected to handle the case when
 /// this method decides to use a different buffer.
 bool Preprocessor::GetIncludeFilenameSpelling(SourceLocation Loc,
-                                              StringRef &Buffer) {
+                                              llvm::StringRef &Buffer) {
   // Get the text form of the filename.
   assert(!Buffer.empty() && "Can't have tokens with empty spellings!");
 
@@ -1771,27 +1771,27 @@ bool Preprocessor::GetIncludeFilenameSpelling(SourceLocation Loc,
   if (Buffer[0] == '<') {
     if (Buffer.back() != '>') {
       Diag(Loc, diag::err_pp_expects_filename);
-      Buffer = StringRef();
+      Buffer = llvm::StringRef();
       return true;
     }
     isAngled = true;
   } else if (Buffer[0] == '"') {
     if (Buffer.back() != '"') {
       Diag(Loc, diag::err_pp_expects_filename);
-      Buffer = StringRef();
+      Buffer = llvm::StringRef();
       return true;
     }
     isAngled = false;
   } else {
     Diag(Loc, diag::err_pp_expects_filename);
-    Buffer = StringRef();
+    Buffer = llvm::StringRef();
     return true;
   }
 
   // Diagnose #include "" as invalid.
   if (Buffer.size() <= 2) {
     Diag(Loc, diag::err_pp_empty_filename);
-    Buffer = StringRef();
+    Buffer = llvm::StringRef();
     return true;
   }
 
@@ -1819,9 +1819,9 @@ void Preprocessor::EnterAnnotationToken(SourceRange Range,
 /// was implicitly treated as a module import.
 static void diagnoseAutoModuleImport(
     Preprocessor &PP, SourceLocation HashLoc, Token &IncludeTok,
-    ArrayRef<std::pair<IdentifierInfo *, SourceLocation>> Path,
+    llvm::ArrayRef<std::pair<IdentifierInfo *, SourceLocation>> Path,
     SourceLocation PathEnd) {
-  SmallString<128> PathString;
+  llvm::SmallString<128> PathString;
   for (size_t I = 0, N = Path.size(); I != N; ++I) {
     if (I)
       PathString += '.';
@@ -1857,15 +1857,15 @@ static void diagnoseAutoModuleImport(
 // Given a vector of path components and a string containing the real
 // path to the file, build a properly-cased replacement in the vector,
 // and return true if the replacement should be suggested.
-static bool trySimplifyPath(SmallVectorImpl<StringRef> &Components,
-                            StringRef RealPathName,
+static bool trySimplifyPath(llvm::SmallVectorImpl<llvm::StringRef> &Components,
+                            llvm::StringRef RealPathName,
                             llvm::sys::path::Style Separator) {
   auto RealPathComponentIter = llvm::sys::path::rbegin(RealPathName);
   auto RealPathComponentEnd = llvm::sys::path::rend(RealPathName);
   int Cnt = 0;
   bool SuggestReplacement = false;
 
-  auto IsSep = [Separator](StringRef Component) {
+  auto IsSep = [Separator](llvm::StringRef Component) {
     return Component.size() == 1 &&
            llvm::sys::path::is_separator(Component[0], Separator);
   };
@@ -2016,12 +2016,12 @@ void Preprocessor::HandleIncludeDirective(SourceLocation HashLoc,
 }
 
 OptionalFileEntryRef Preprocessor::LookupHeaderIncludeOrImport(
-    ConstSearchDirIterator *CurDir, StringRef &Filename,
+    ConstSearchDirIterator *CurDir, llvm::StringRef &Filename,
     SourceLocation FilenameLoc, CharSourceRange FilenameRange,
     const Token &FilenameTok, bool &IsFrameworkFound, bool IsImportDecl,
     bool &IsMapped, ConstSearchDirIterator LookupFrom,
-    const FileEntry *LookupFromFile, StringRef &LookupFilename,
-    SmallVectorImpl<char> &RelativePath, SmallVectorImpl<char> &SearchPath,
+    const FileEntry *LookupFromFile, llvm::StringRef &LookupFilename,
+    llvm::SmallVectorImpl<char> &RelativePath, llvm::SmallVectorImpl<char> &SearchPath,
     ModuleMap::KnownHeader &SuggestedModule, bool isAngled) {
   auto DiagnoseHeaderInclusion = [&](FileEntryRef FE) {
     if (LangOpts.AsmPreprocessor)
@@ -2074,7 +2074,7 @@ OptionalFileEntryRef Preprocessor::LookupHeaderIncludeOrImport(
 
   // Check for likely typos due to leading or trailing non-isAlphanumeric
   // characters
-  StringRef OriginalFilename = Filename;
+  llvm::StringRef OriginalFilename = Filename;
   if (LangOpts.SpellChecking) {
     // A heuristic to correct a typo file name by removing leading and
     // trailing non-isAlphanumeric characters.
@@ -2085,8 +2085,8 @@ OptionalFileEntryRef Preprocessor::LookupHeaderIncludeOrImport(
       }
       return Filename;
     };
-    StringRef TypoCorrectionName = CorrectTypoFilename(Filename);
-    StringRef TypoCorrectionLookupName = CorrectTypoFilename(LookupFilename);
+    llvm::StringRef TypoCorrectionName = CorrectTypoFilename(Filename);
+    llvm::StringRef TypoCorrectionLookupName = CorrectTypoFilename(LookupFilename);
 
     OptionalFileEntryRef File = LookupFile(
         FilenameLoc, TypoCorrectionLookupName, isAngled, LookupFrom,
@@ -2116,9 +2116,9 @@ OptionalFileEntryRef Preprocessor::LookupHeaderIncludeOrImport(
       << OriginalFilename << FilenameRange;
   if (IsFrameworkFound) {
     size_t SlashPos = OriginalFilename.find('/');
-    assert(SlashPos != StringRef::npos &&
+    assert(SlashPos != llvm::StringRef::npos &&
            "Include with framework name should have '/' in the filename");
-    StringRef FrameworkName = OriginalFilename.substr(0, SlashPos);
+    llvm::StringRef FrameworkName = OriginalFilename.substr(0, SlashPos);
     FrameworkCacheEntry &CacheEntry =
         HeaderInfo.LookupFrameworkCache(FrameworkName);
     assert(CacheEntry.Directory && "Found framework should be in cache");
@@ -2146,13 +2146,13 @@ Preprocessor::ImportAction Preprocessor::HandleHeaderIncludeOrImport(
     SourceLocation HashLoc, Token &IncludeTok, Token &FilenameTok,
     SourceLocation EndLoc, ConstSearchDirIterator LookupFrom,
     const FileEntry *LookupFromFile) {
-  SmallString<128> FilenameBuffer;
-  StringRef Filename = getSpelling(FilenameTok, FilenameBuffer);
+  llvm::SmallString<128> FilenameBuffer;
+  llvm::StringRef Filename = getSpelling(FilenameTok, FilenameBuffer);
   SourceLocation CharEnd = FilenameTok.getEndLoc();
 
   CharSourceRange FilenameRange
     = CharSourceRange::getCharRange(FilenameTok.getLocation(), CharEnd);
-  StringRef OriginalFilename = Filename;
+  llvm::StringRef OriginalFilename = Filename;
   bool isAngled =
     GetIncludeFilenameSpelling(FilenameTok.getLocation(), Filename);
 
@@ -2186,7 +2186,7 @@ Preprocessor::ImportAction Preprocessor::HandleHeaderIncludeOrImport(
     // Map the filename with the brackets still attached.  If the name doesn't
     // map to anything, fall back on the filename we've already gotten the
     // spelling for.
-    StringRef NewName = HeaderInfo.MapHeaderToIncludeAlias(OriginalFilename);
+    llvm::StringRef NewName = HeaderInfo.MapHeaderToIncludeAlias(OriginalFilename);
     if (!NewName.empty())
       Filename = NewName;
   }
@@ -2195,17 +2195,17 @@ Preprocessor::ImportAction Preprocessor::HandleHeaderIncludeOrImport(
   bool IsMapped = false;
   bool IsFrameworkFound = false;
   ConstSearchDirIterator CurDir = nullptr;
-  SmallString<1024> SearchPath;
-  SmallString<1024> RelativePath;
+  llvm::SmallString<1024> SearchPath;
+  llvm::SmallString<1024> RelativePath;
   // We get the raw path only if we have 'Callbacks' to which we later pass
   // the path.
   ModuleMap::KnownHeader SuggestedModule;
   SourceLocation FilenameLoc = FilenameTok.getLocation();
-  StringRef LookupFilename = Filename;
+  llvm::StringRef LookupFilename = Filename;
 
   // Normalize slashes when compiling with -fms-extensions on non-Windows. This
   // is unnecessary on Windows since the filesystem there handles backslashes.
-  SmallString<128> NormalizedPath;
+  llvm::SmallString<128> NormalizedPath;
   llvm::sys::path::Style BackslashStyle = llvm::sys::path::Style::native;
   if (is_style_posix(BackslashStyle) && LangOpts.MicrosoftExt) {
     NormalizedPath = Filename.str();
@@ -2295,7 +2295,7 @@ Preprocessor::ImportAction Preprocessor::HandleHeaderIncludeOrImport(
     // Compute the module access path corresponding to this module.
     // FIXME: Should we have a second loadModule() overload to avoid this
     // extra lookup step?
-    SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> Path;
+    llvm::SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> Path;
     for (Module *Mod = ModuleToImport; Mod; Mod = Mod->Parent)
       Path.push_back(std::make_pair(getIdentifierInfo(Mod->Name),
                                     FilenameTok.getLocation()));
@@ -2423,16 +2423,16 @@ Preprocessor::ImportAction Preprocessor::HandleHeaderIncludeOrImport(
       !IsMapped && !File->getFileEntry().tryGetRealPathName().empty();
 
   if (CheckIncludePathPortability) {
-    StringRef Name = LookupFilename;
-    StringRef NameWithoriginalSlashes = Filename;
+    llvm::StringRef Name = LookupFilename;
+    llvm::StringRef NameWithoriginalSlashes = Filename;
 #if defined(_WIN32)
     // Skip UNC prefix if present. (tryGetRealPathName() always
     // returns a path with the prefix skipped.)
     bool NameWasUNC = Name.consume_front("\\\\?\\");
     NameWithoriginalSlashes.consume_front("\\\\?\\");
 #endif
-    StringRef RealPathName = File->getFileEntry().tryGetRealPathName();
-    SmallVector<StringRef, 16> Components(llvm::sys::path::begin(Name),
+    llvm::StringRef RealPathName = File->getFileEntry().tryGetRealPathName();
+    llvm::SmallVector<llvm::StringRef, 16> Components(llvm::sys::path::begin(Name),
                                           llvm::sys::path::end(Name));
 #if defined(_WIN32)
     // -Wnonportable-include-path is designed to diagnose includes using
@@ -2445,7 +2445,7 @@ Preprocessor::ImportAction Preprocessor::HandleHeaderIncludeOrImport(
     // the drive letter, whose case is dependent on if `cd` is used
     // with upper- or lower-case drive letters, always consider the
     // given drive letter case as correct for the purpose of this warning.
-    SmallString<128> FixedDriveRealPath;
+    llvm::SmallString<128> FixedDriveRealPath;
     if (llvm::sys::path::is_absolute(Name) &&
         llvm::sys::path::is_absolute(RealPathName) &&
         toLowercase(Name[0]) == toLowercase(RealPathName[0]) &&
@@ -2459,7 +2459,7 @@ Preprocessor::ImportAction Preprocessor::HandleHeaderIncludeOrImport(
 #endif
 
     if (trySimplifyPath(Components, RealPathName, BackslashStyle)) {
-      SmallString<128> Path;
+      llvm::SmallString<128> Path;
       Path.reserve(Name.size()+2);
       Path.push_back(isAngled ? '<' : '"');
 
@@ -2689,7 +2689,7 @@ void Preprocessor::HandleIncludeMacrosDirective(SourceLocation HashLoc,
 /// closing ), updating MI with what we learn.  Return true if an error occurs
 /// parsing the param list.
 bool Preprocessor::ReadMacroParameterList(MacroInfo *MI, Token &Tok) {
-  SmallVector<IdentifierInfo*, 32> Parameters;
+  llvm::SmallVector<IdentifierInfo*, 32> Parameters;
 
   while (true) {
     LexUnexpandedNonComment(Tok);
@@ -2791,12 +2791,12 @@ static bool isConfigurationPattern(Token &MacroName, MacroInfo *MI,
     //    #define inline __inline
     //    #define inline __inline__
     //    #define inline _inline (in MS compatibility mode)
-    StringRef MacroText = MacroName.getIdentifierInfo()->getName();
+    llvm::StringRef MacroText = MacroName.getIdentifierInfo()->getName();
     if (IdentifierInfo *II = Value.getIdentifierInfo()) {
       if (!II->isKeyword(LOptions))
         return false;
-      StringRef ValueText = II->getName();
-      StringRef TrimmedValue = ValueText;
+      llvm::StringRef ValueText = II->getName();
+      llvm::StringRef TrimmedValue = ValueText;
       if (!ValueText.starts_with("__")) {
         if (ValueText.starts_with("_"))
           TrimmedValue = TrimmedValue.drop_front(1);
@@ -2908,7 +2908,7 @@ MacroInfo *Preprocessor::ReadOptionalMacroParameterListAndBody(
   if (!Tok.is(tok::eod))
     LastTok = Tok;
 
-  SmallVector<Token, 16> Tokens;
+  llvm::SmallVector<Token, 16> Tokens;
 
   // Read the rest of the macro body.
   if (MI->isObjectLike()) {

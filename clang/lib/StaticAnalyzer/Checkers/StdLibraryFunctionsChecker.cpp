@@ -274,11 +274,11 @@ class StdLibraryFunctionsChecker
     /// A textual description of this constraint for the specific case where the
     /// constraint is used. If empty a generated description will be used that
     /// is built from the range of the constraint.
-    StringRef Description;
+    llvm::StringRef Description;
 
   public:
     RangeConstraint(ArgNo ArgN, RangeKind Kind, const IntRangeVector &Ranges,
-                    StringRef Desc = "")
+                    llvm::StringRef Desc = "")
         : ValueConstraint(ArgN), Kind(Kind), Ranges(Ranges), Description(Desc) {
     }
 
@@ -653,23 +653,23 @@ class StdLibraryFunctionsChecker
   class SummaryCase {
     ConstraintSet Constraints;
     const ErrnoConstraintBase &ErrnoConstraint;
-    StringRef Note;
+    llvm::StringRef Note;
 
   public:
     SummaryCase(ConstraintSet &&Constraints, const ErrnoConstraintBase &ErrnoC,
-                StringRef Note)
+                llvm::StringRef Note)
         : Constraints(std::move(Constraints)), ErrnoConstraint(ErrnoC),
           Note(Note) {}
 
     SummaryCase(const ConstraintSet &Constraints,
-                const ErrnoConstraintBase &ErrnoC, StringRef Note)
+                const ErrnoConstraintBase &ErrnoC, llvm::StringRef Note)
         : Constraints(Constraints), ErrnoConstraint(ErrnoC), Note(Note) {}
 
     const ConstraintSet &getConstraints() const { return Constraints; }
     const ErrnoConstraintBase &getErrnoConstraint() const {
       return ErrnoConstraint;
     }
-    StringRef getNote() const { return Note; }
+    llvm::StringRef getNote() const { return Note; }
   };
 
   using ArgTypes = std::vector<std::optional<QualType>>;
@@ -768,12 +768,12 @@ class StdLibraryFunctionsChecker
     Summary(InvalidationKind InvalidationKd) : InvalidationKd(InvalidationKd) {}
 
     Summary &Case(ConstraintSet &&CS, const ErrnoConstraintBase &ErrnoC,
-                  StringRef Note = "") {
+                  llvm::StringRef Note = "") {
       Cases.push_back(SummaryCase(std::move(CS), ErrnoC, Note));
       return *this;
     }
     Summary &Case(const ConstraintSet &CS, const ErrnoConstraintBase &ErrnoC,
-                  StringRef Note = "") {
+                  llvm::StringRef Note = "") {
       Cases.push_back(SummaryCase(CS, ErrnoC, Note));
       return *this;
     }
@@ -860,7 +860,7 @@ private:
                  const Summary &Summary, CheckerContext &C) const {
     assert(Call.getDecl() &&
            "Function found in summary must have a declaration available");
-    SmallString<256> Msg;
+    llvm::SmallString<256> Msg;
     llvm::raw_svector_ostream MsgOs(Msg);
 
     MsgOs << "The ";
@@ -1104,7 +1104,7 @@ bool StdLibraryFunctionsChecker::RangeConstraint::describeArgumentValue(
       return true;
     }
     QualType T = Summary.getArgType(getArgNo());
-    SmallString<128> MoreInfo;
+    llvm::SmallString<128> MoreInfo;
     llvm::raw_svector_ostream MoreInfoOs(MoreInfo);
     auto ApplyF = [&](const llvm::APSInt &Min, const llvm::APSInt &Max) {
       if (CM.assumeInclusiveRange(State, *N, Min, Max, true)) {
@@ -1337,7 +1337,7 @@ void StdLibraryFunctionsChecker::checkPreCall(const CallEvent &Call,
     assert(SuccessSt);
     NewState = SuccessSt;
     if (NewState != State) {
-      SmallString<128> Msg;
+      llvm::SmallString<128> Msg;
       llvm::raw_svector_ostream Os(Msg);
       Os << "Assuming that the ";
       printArgDesc(Constraint->getArgNo(), Os);
@@ -1573,7 +1573,7 @@ void StdLibraryFunctionsChecker::initFunctionSummaries(
     LookupType(const ASTContext &ACtx) : ACtx(ACtx) {}
 
     // Find the type. If not found then the optional is not set.
-    std::optional<QualType> operator()(StringRef Name) {
+    std::optional<QualType> operator()(llvm::StringRef Name) {
       IdentifierInfo &II = ACtx.Idents.get(Name);
       auto LookupRes = ACtx.getTranslationUnitDecl()->lookup(&II);
       if (LookupRes.empty())
@@ -1720,7 +1720,7 @@ void StdLibraryFunctionsChecker::initFunctionSummaries(
     // to the found FunctionDecl only if the signatures match.
     //
     // Returns true if the summary has been added, false otherwise.
-    bool operator()(StringRef Name, Signature Sign, Summary Sum) {
+    bool operator()(llvm::StringRef Name, Signature Sign, Summary Sum) {
       if (Sign.isInvalid())
         return false;
       IdentifierInfo &II = ACtx.Idents.get(Name);
@@ -1746,15 +1746,15 @@ void StdLibraryFunctionsChecker::initFunctionSummaries(
     }
     // Add the same summary for different names with the Signature explicitly
     // given.
-    void operator()(std::vector<StringRef> Names, Signature Sign, Summary Sum) {
-      for (StringRef Name : Names)
+    void operator()(std::vector<llvm::StringRef> Names, Signature Sign, Summary Sum) {
+      for (llvm::StringRef Name : Names)
         operator()(Name, Sign, Sum);
     }
   } addToFunctionSummaryMap(ACtx, FunctionSummaryMap, DisplayLoadedSummaries);
 
   // Below are helpers functions to create the summaries.
   auto ArgumentCondition = [](ArgNo ArgN, RangeKind Kind, IntRangeVector Ranges,
-                              StringRef Desc = "") {
+                              llvm::StringRef Desc = "") {
     return std::make_shared<RangeConstraint>(ArgN, Kind, Ranges, Desc);
   };
   auto BufferSize = [](auto... Args) {

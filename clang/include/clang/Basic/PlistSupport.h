@@ -24,7 +24,7 @@ namespace markup {
 
 using FIDMap = llvm::DenseMap<FileID, unsigned>;
 
-inline unsigned AddFID(FIDMap &FIDs, SmallVectorImpl<FileID> &V,
+inline unsigned AddFID(FIDMap &FIDs, llvm::SmallVectorImpl<FileID> &V,
                    FileID FID) {
   FIDMap::iterator I = FIDs.find(FID);
   if (I != FIDs.end())
@@ -35,7 +35,7 @@ inline unsigned AddFID(FIDMap &FIDs, SmallVectorImpl<FileID> &V,
   return NewValue;
 }
 
-inline unsigned AddFID(FIDMap &FIDs, SmallVectorImpl<FileID> &V,
+inline unsigned AddFID(FIDMap &FIDs, llvm::SmallVectorImpl<FileID> &V,
                    const SourceManager &SM, SourceLocation L) {
   FileID FID = SM.getFileID(SM.getExpansionLoc(L));
   return AddFID(FIDs, V, FID);
@@ -53,13 +53,13 @@ inline unsigned GetFID(const FIDMap &FIDs, const SourceManager &SM,
   return GetFID(FIDs, FID);
 }
 
-inline raw_ostream &Indent(raw_ostream &o, const unsigned indent) {
+inline llvm::raw_ostream &Indent(llvm::raw_ostream &o, const unsigned indent) {
   for (unsigned i = 0; i < indent; ++i)
     o << ' ';
   return o;
 }
 
-inline raw_ostream &EmitPlistHeader(raw_ostream &o) {
+inline llvm::raw_ostream &EmitPlistHeader(llvm::raw_ostream &o) {
   static const char *PlistHeader =
       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
       "<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" "
@@ -68,14 +68,14 @@ inline raw_ostream &EmitPlistHeader(raw_ostream &o) {
   return o << PlistHeader;
 }
 
-inline raw_ostream &EmitInteger(raw_ostream &o, int64_t value) {
+inline llvm::raw_ostream &EmitInteger(llvm::raw_ostream &o, int64_t value) {
   o << "<integer>";
   o << value;
   o << "</integer>";
   return o;
 }
 
-inline raw_ostream &EmitString(raw_ostream &o, StringRef s) {
+inline llvm::raw_ostream &EmitString(llvm::raw_ostream &o, llvm::StringRef s) {
   o << "<string>";
   for (char c : s) {
     switch (c) {
@@ -103,7 +103,7 @@ inline raw_ostream &EmitString(raw_ostream &o, StringRef s) {
   return o;
 }
 
-inline void EmitLocation(raw_ostream &o, const SourceManager &SM,
+inline void EmitLocation(llvm::raw_ostream &o, const SourceManager &SM,
                          SourceLocation L, const FIDMap &FM, unsigned indent) {
   if (L.isInvalid()) return;
 
@@ -119,7 +119,7 @@ inline void EmitLocation(raw_ostream &o, const SourceManager &SM,
   Indent(o, indent) << "</dict>\n";
 }
 
-inline void EmitRange(raw_ostream &o, const SourceManager &SM,
+inline void EmitRange(llvm::raw_ostream &o, const SourceManager &SM,
                       CharSourceRange R, const FIDMap &FM, unsigned indent) {
   if (R.isInvalid()) return;
 

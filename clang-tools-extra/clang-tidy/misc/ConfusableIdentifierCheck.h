@@ -21,7 +21,7 @@ namespace clang::tidy::misc {
 /// not reported.
 class ConfusableIdentifierCheck : public ClangTidyCheck {
 public:
-  ConfusableIdentifierCheck(StringRef Name, ClangTidyContext *Context);
+  ConfusableIdentifierCheck(llvm::StringRef Name, ClangTidyContext *Context);
   ~ConfusableIdentifierCheck();
 
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

@@ -149,7 +149,7 @@ public:
   /// Get a string representation of a region for debug use.
   std::string getString() const;
 
-  virtual void dumpToStream(raw_ostream &os) const;
+  virtual void dumpToStream(llvm::raw_ostream &os) const;
 
   void dump() const;
 
@@ -157,7 +157,7 @@ public:
   virtual bool canPrintPretty() const;
 
   /// Print the region for use in diagnostics.
-  virtual void printPretty(raw_ostream &os) const;
+  virtual void printPretty(llvm::raw_ostream &os) const;
 
   /// Returns true if this region's textual representation can be used
   /// as part of a larger expression.
@@ -167,7 +167,7 @@ public:
   ///
   /// When this region represents a subexpression, the method is for printing
   /// an expression containing it.
-  virtual void printPrettyAsExpr(raw_ostream &os) const;
+  virtual void printPrettyAsExpr(llvm::raw_ostream &os) const;
 
   Kind getKind() const { return kind; }
 
@@ -230,7 +230,7 @@ class CodeSpaceRegion : public MemSpaceRegion {
       : MemSpaceRegion(mgr, CodeSpaceRegionKind) {}
 
 public:
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion *R) {
     return R->getKind() == CodeSpaceRegionKind;
@@ -270,7 +270,7 @@ class StaticGlobalSpaceRegion : public GlobalsSpaceRegion {
 public:
   void Profile(llvm::FoldingSetNodeID &ID) const override;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   LLVM_ATTRIBUTE_RETURNS_NONNULL
   const CodeTextRegion *getCodeRegion() const { return CR; }
@@ -312,7 +312,7 @@ class GlobalSystemSpaceRegion : public NonStaticGlobalSpaceRegion {
       : NonStaticGlobalSpaceRegion(mgr, GlobalSystemSpaceRegionKind) {}
 
 public:
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion *R) {
     return R->getKind() == GlobalSystemSpaceRegionKind;
@@ -331,7 +331,7 @@ class GlobalImmutableSpaceRegion : public NonStaticGlobalSpaceRegion {
       : NonStaticGlobalSpaceRegion(mgr, GlobalImmutableSpaceRegionKind) {}
 
 public:
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion *R) {
     return R->getKind() == GlobalImmutableSpaceRegionKind;
@@ -348,7 +348,7 @@ class GlobalInternalSpaceRegion : public NonStaticGlobalSpaceRegion {
       : NonStaticGlobalSpaceRegion(mgr, GlobalInternalSpaceRegionKind) {}
 
 public:
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion *R) {
     return R->getKind() == GlobalInternalSpaceRegionKind;
@@ -362,7 +362,7 @@ class HeapSpaceRegion : public MemSpaceRegion {
       : MemSpaceRegion(mgr, HeapSpaceRegionKind) {}
 
 public:
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion *R) {
     return R->getKind() == HeapSpaceRegionKind;
@@ -376,7 +376,7 @@ class UnknownSpaceRegion : public MemSpaceRegion {
       : MemSpaceRegion(mgr, UnknownSpaceRegionKind) {}
 
 public:
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion *R) {
     return R->getKind() == UnknownSpaceRegionKind;
@@ -414,7 +414,7 @@ class StackLocalsSpaceRegion : public StackSpaceRegion {
       : StackSpaceRegion(mgr, StackLocalsSpaceRegionKind, sfc) {}
 
 public:
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion *R) {
     return R->getKind() == StackLocalsSpaceRegionKind;
@@ -429,7 +429,7 @@ private:
       : StackSpaceRegion(mgr, StackArgumentsSpaceRegionKind, sfc) {}
 
 public:
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion *R) {
     return R->getKind() == StackArgumentsSpaceRegionKind;
@@ -495,7 +495,7 @@ public:
 
   void Profile(llvm::FoldingSetNodeID& ID) const override;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion* R) {
     return R->getKind() == AllocaRegionKind;
@@ -608,7 +608,7 @@ public:
     return FD;
   }
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   void Profile(llvm::FoldingSetNodeID& ID) const override;
 
@@ -655,7 +655,7 @@ public:
   LLVM_ATTRIBUTE_RETURNS_NONNULL
   AnalysisDeclContext *getAnalysisDeclContext() const { return AC; }
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   void Profile(llvm::FoldingSetNodeID& ID) const override;
 
@@ -753,7 +753,7 @@ public:
   referenced_vars_iterator referenced_vars_end() const;
   llvm::iterator_range<referenced_vars_iterator> referenced_vars() const;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   void Profile(llvm::FoldingSetNodeID& ID) const override;
 
@@ -813,7 +813,7 @@ public:
                             SymbolRef sym,
                             const MemRegion* superRegion);
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion* R) {
     return R->getKind() == SymbolicRegionKind;
@@ -847,7 +847,7 @@ public:
     ProfileRegion(ID, Str, superRegion);
   }
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion* R) {
     return R->getKind() == StringRegionKind;
@@ -882,7 +882,7 @@ public:
     ProfileRegion(ID, Str, superRegion);
   }
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion* R) {
     return R->getKind() == ObjCStringRegionKind;
@@ -916,7 +916,7 @@ public:
 
   void Profile(llvm::FoldingSetNodeID& ID) const override;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   LLVM_ATTRIBUTE_RETURNS_NONNULL
   const CompoundLiteralExpr *getLiteralExpr() const { return CL; }
@@ -1005,11 +1005,11 @@ public:
     return getDecl()->getType();
   }
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   bool canPrintPrettyAsExpr() const override;
 
-  void printPrettyAsExpr(raw_ostream &os) const override;
+  void printPrettyAsExpr(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion* R) {
     return R->getKind() == NonParamVarRegionKind;
@@ -1048,7 +1048,7 @@ public:
 
   void Profile(llvm::FoldingSetNodeID& ID) const override;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   QualType getValueType() const override;
 
@@ -1056,7 +1056,7 @@ public:
   const ParmVarDecl *getDecl() const override;
 
   bool canPrintPrettyAsExpr() const override;
-  void printPrettyAsExpr(raw_ostream &os) const override;
+  void printPrettyAsExpr(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion *R) {
     return R->getKind() == ParamVarRegionKind;
@@ -1088,7 +1088,7 @@ public:
     return QualType(ThisPointerTy, 0);
   }
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion* R) {
     return R->getKind() == CXXThisRegionKind;
@@ -1126,12 +1126,12 @@ public:
     return getDecl()->getType();
   }
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   bool canPrintPretty() const override;
-  void printPretty(raw_ostream &os) const override;
+  void printPretty(llvm::raw_ostream &os) const override;
   bool canPrintPrettyAsExpr() const override;
-  void printPrettyAsExpr(raw_ostream &os) const override;
+  void printPrettyAsExpr(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion* R) {
     return R->getKind() == FieldRegionKind;
@@ -1157,9 +1157,9 @@ public:
   QualType getValueType() const override;
 
   bool canPrintPrettyAsExpr() const override;
-  void printPrettyAsExpr(raw_ostream &os) const override;
+  void printPrettyAsExpr(llvm::raw_ostream &os) const override;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion* R) {
     return R->getKind() == ObjCIvarRegionKind;
@@ -1186,7 +1186,7 @@ public:
   // It might return null.
   const MemRegion *getRegion() const { return Region; }
 
-  void dumpToStream(raw_ostream &os) const;
+  void dumpToStream(llvm::raw_ostream &os) const;
   void dump() const;
 };
 
@@ -1220,7 +1220,7 @@ public:
   /// Compute the offset within the array. The array might also be a subobject.
   RegionRawOffset getAsArrayOffset() const;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   void Profile(llvm::FoldingSetNodeID& ID) const override;
 
@@ -1253,7 +1253,7 @@ public:
 
   QualType getValueType() const override { return Ex->getType(); }
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   void Profile(llvm::FoldingSetNodeID &ID) const override;
 
@@ -1292,7 +1292,7 @@ public:
 
   QualType getValueType() const override { return Ex->getType(); }
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   void Profile(llvm::FoldingSetNodeID &ID) const override;
 
@@ -1324,13 +1324,13 @@ public:
 
   QualType getValueType() const override;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   void Profile(llvm::FoldingSetNodeID &ID) const override;
 
   bool canPrintPrettyAsExpr() const override;
 
-  void printPrettyAsExpr(raw_ostream &os) const override;
+  void printPrettyAsExpr(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion *region) {
     return region->getKind() == CXXBaseObjectRegionKind;
@@ -1366,13 +1366,13 @@ public:
 
   QualType getValueType() const override;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   void Profile(llvm::FoldingSetNodeID &ID) const override;
 
   bool canPrintPrettyAsExpr() const override;
 
-  void printPrettyAsExpr(raw_ostream &os) const override;
+  void printPrettyAsExpr(llvm::raw_ostream &os) const override;
 
   static bool classof(const MemRegion *region) {
     return region->getKind() == CXXDerivedObjectRegionKind;
@@ -1661,7 +1661,7 @@ public:
 //===----------------------------------------------------------------------===//
 // Pretty-printing regions.
 //===----------------------------------------------------------------------===//
-inline raw_ostream &operator<<(raw_ostream &os, const MemRegion *R) {
+inline llvm::raw_ostream &operator<<(llvm::raw_ostream &os, const MemRegion *R) {
   R->dumpToStream(os);
   return os;
 }

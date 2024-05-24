@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/use-after-move.html
 class UseAfterMoveCheck : public ClangTidyCheck {
 public:
-  UseAfterMoveCheck(StringRef Name, ClangTidyContext *Context)
+  UseAfterMoveCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;

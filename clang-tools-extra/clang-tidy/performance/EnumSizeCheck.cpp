@@ -77,7 +77,7 @@ getNewType(std::size_t Size, std::uint64_t Min, std::uint64_t Max) noexcept {
 
 } // namespace
 
-EnumSizeCheck::EnumSizeCheck(StringRef Name, ClangTidyContext *Context)
+EnumSizeCheck::EnumSizeCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       EnumIgnoreList(
           utils::options::parseStringList(Options.get("EnumIgnoreList", ""))) {}

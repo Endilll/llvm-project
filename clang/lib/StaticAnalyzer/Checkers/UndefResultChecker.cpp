@@ -74,7 +74,7 @@ void UndefResultChecker::checkPostStmt(const BinaryOperator *B,
     if (!N)
       return;
 
-    SmallString<256> sbuf;
+    llvm::SmallString<256> sbuf;
     llvm::raw_svector_ostream OS(sbuf);
     const Expr *Ex = nullptr;
     bool isLeft = true;

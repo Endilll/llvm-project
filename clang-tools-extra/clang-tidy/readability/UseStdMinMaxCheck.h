@@ -20,7 +20,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/UseStdMinMax.html
 class UseStdMinMaxCheck : public ClangTidyCheck {
 public:
-  UseStdMinMaxCheck(StringRef Name, ClangTidyContext *Context);
+  UseStdMinMaxCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

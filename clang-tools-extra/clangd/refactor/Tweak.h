@@ -79,7 +79,7 @@ public:
     /// Note that it applies to all files.
     bool FormatEdits = true;
 
-    static Effect showMessage(StringRef S) {
+    static Effect showMessage(llvm::StringRef S) {
       Effect E;
       E.ShowMessage = std::string(S);
       return E;
@@ -112,7 +112,7 @@ public:
   virtual bool prepare(const Selection &Sel) = 0;
   /// Run the second stage of the action that would produce the actual effect.
   /// EXPECTS: prepare() was called and returned true.
-  virtual Expected<Effect> apply(const Selection &Sel) = 0;
+  virtual llvm::Expected<Effect> apply(const Selection &Sel) = 0;
 
   /// A one-line title of the action that should be shown to the users in the
   /// UI.
@@ -142,7 +142,7 @@ prepareTweaks(const Tweak::Selection &S,
 // If prepare() returns false, returns an error.
 // If prepare() returns true, returns the corresponding tweak.
 llvm::Expected<std::unique_ptr<Tweak>>
-prepareTweak(StringRef ID, const Tweak::Selection &S,
+prepareTweak(llvm::StringRef ID, const Tweak::Selection &S,
              const FeatureModuleSet *Modules);
 } // namespace clangd
 } // namespace clang

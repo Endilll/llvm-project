@@ -26,7 +26,7 @@ using namespace clang;
   constexpr SanitizerMask SanitizerKind::ID##Group;
 #include "clang/Basic/Sanitizers.def"
 
-SanitizerMask clang::parseSanitizerValue(StringRef Value, bool AllowGroups) {
+SanitizerMask clang::parseSanitizerValue(llvm::StringRef Value, bool AllowGroups) {
   SanitizerMask ParsedKind = llvm::StringSwitch<SanitizerMask>(Value)
 #define SANITIZER(NAME, ID) .Case(NAME, SanitizerKind::ID)
 #define SANITIZER_GROUP(NAME, ID, ALIAS)                                       \
@@ -37,7 +37,7 @@ SanitizerMask clang::parseSanitizerValue(StringRef Value, bool AllowGroups) {
 }
 
 void clang::serializeSanitizerSet(SanitizerSet Set,
-                                  SmallVectorImpl<StringRef> &Values) {
+                                  llvm::SmallVectorImpl<llvm::StringRef> &Values) {
 #define SANITIZER(NAME, ID)                                                    \
   if (Set.has(SanitizerKind::ID))                                              \
     Values.push_back(NAME);
@@ -69,7 +69,7 @@ llvm::hash_code hash_value(const clang::SanitizerMask &Arg) {
   return Arg.hash_value();
 }
 
-StringRef AsanDtorKindToString(llvm::AsanDtorKind kind) {
+llvm::StringRef AsanDtorKindToString(llvm::AsanDtorKind kind) {
   switch (kind) {
   case llvm::AsanDtorKind::None:
     return "none";
@@ -81,14 +81,14 @@ StringRef AsanDtorKindToString(llvm::AsanDtorKind kind) {
   return "invalid";
 }
 
-llvm::AsanDtorKind AsanDtorKindFromString(StringRef kindStr) {
+llvm::AsanDtorKind AsanDtorKindFromString(llvm::StringRef kindStr) {
   return llvm::StringSwitch<llvm::AsanDtorKind>(kindStr)
       .Case("none", llvm::AsanDtorKind::None)
       .Case("global", llvm::AsanDtorKind::Global)
       .Default(llvm::AsanDtorKind::Invalid);
 }
 
-StringRef AsanDetectStackUseAfterReturnModeToString(
+llvm::StringRef AsanDetectStackUseAfterReturnModeToString(
     llvm::AsanDetectStackUseAfterReturnMode mode) {
   switch (mode) {
   case llvm::AsanDetectStackUseAfterReturnMode::Always:
@@ -104,7 +104,7 @@ StringRef AsanDetectStackUseAfterReturnModeToString(
 }
 
 llvm::AsanDetectStackUseAfterReturnMode
-AsanDetectStackUseAfterReturnModeFromString(StringRef modeStr) {
+AsanDetectStackUseAfterReturnModeFromString(llvm::StringRef modeStr) {
   return llvm::StringSwitch<llvm::AsanDetectStackUseAfterReturnMode>(modeStr)
       .Case("always", llvm::AsanDetectStackUseAfterReturnMode::Always)
       .Case("runtime", llvm::AsanDetectStackUseAfterReturnMode::Runtime)

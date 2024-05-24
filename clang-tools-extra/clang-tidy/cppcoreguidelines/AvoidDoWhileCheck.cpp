@@ -14,7 +14,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::cppcoreguidelines {
 
-AvoidDoWhileCheck::AvoidDoWhileCheck(StringRef Name, ClangTidyContext *Context)
+AvoidDoWhileCheck::AvoidDoWhileCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreMacros(Options.getLocalOrGlobal("IgnoreMacros", false)) {}
 

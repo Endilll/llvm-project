@@ -31,25 +31,25 @@ class DependencyGraphCallback : public PPCallbacks {
   std::string SysRoot;
   llvm::SetVector<FileEntryRef> AllFiles;
   using DependencyMap =
-      llvm::DenseMap<FileEntryRef, SmallVector<FileEntryRef, 2>>;
+      llvm::DenseMap<FileEntryRef, llvm::SmallVector<FileEntryRef, 2>>;
 
   DependencyMap Dependencies;
 
 private:
-  raw_ostream &writeNodeReference(raw_ostream &OS,
+  llvm::raw_ostream &writeNodeReference(llvm::raw_ostream &OS,
                                   const FileEntry *Node);
   void OutputGraphFile();
 
 public:
-  DependencyGraphCallback(const Preprocessor *_PP, StringRef OutputFile,
-                          StringRef SysRoot)
+  DependencyGraphCallback(const Preprocessor *_PP, llvm::StringRef OutputFile,
+                          llvm::StringRef SysRoot)
     : PP(_PP), OutputFile(OutputFile.str()), SysRoot(SysRoot.str()) { }
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
 
@@ -60,16 +60,16 @@ public:
 };
 }
 
-void clang::AttachDependencyGraphGen(Preprocessor &PP, StringRef OutputFile,
-                                     StringRef SysRoot) {
+void clang::AttachDependencyGraphGen(Preprocessor &PP, llvm::StringRef OutputFile,
+                                     llvm::StringRef SysRoot) {
   PP.addPPCallbacks(std::make_unique<DependencyGraphCallback>(&PP, OutputFile,
                                                                SysRoot));
 }
 
 void DependencyGraphCallback::InclusionDirective(
-    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    SourceLocation HashLoc, const Token &IncludeTok, llvm::StringRef FileName,
     bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
-    StringRef SearchPath, StringRef RelativePath, const Module *SuggestedModule,
+    llvm::StringRef SearchPath, llvm::StringRef RelativePath, const Module *SuggestedModule,
     bool ModuleImported, SrcMgr::CharacteristicKind FileType) {
   if (!File)
     return;
@@ -86,8 +86,8 @@ void DependencyGraphCallback::InclusionDirective(
   AllFiles.insert(*FromFile);
 }
 
-raw_ostream &
-DependencyGraphCallback::writeNodeReference(raw_ostream &OS,
+llvm::raw_ostream &
+DependencyGraphCallback::writeNodeReference(llvm::raw_ostream &OS,
                                             const FileEntry *Node) {
   OS << "header_" << Node->getUID();
   return OS;
@@ -110,7 +110,7 @@ void DependencyGraphCallback::OutputGraphFile() {
     OS.indent(2);
     writeNodeReference(OS, AllFiles[I]);
     OS << " [ shape=\"box\", label=\"";
-    StringRef FileName = AllFiles[I].getName();
+    llvm::StringRef FileName = AllFiles[I].getName();
     FileName.consume_front(SysRoot);
 
     OS << DOT::EscapeString(std::string(FileName)) << "\"];\n";

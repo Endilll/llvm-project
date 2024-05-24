@@ -21,7 +21,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// https://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/avoid-capturing-lambda-coroutines.html
 class AvoidCapturingLambdaCoroutinesCheck : public ClangTidyCheck {
 public:
-  AvoidCapturingLambdaCoroutinesCheck(StringRef Name, ClangTidyContext *Context)
+  AvoidCapturingLambdaCoroutinesCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

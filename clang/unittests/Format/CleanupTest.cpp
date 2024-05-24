@@ -22,7 +22,7 @@ namespace {
 
 class CleanupTest : public testing::Test {
 protected:
-  std::string cleanup(StringRef Code, const std::vector<tooling::Range> &Ranges,
+  std::string cleanup(llvm::StringRef Code, const std::vector<tooling::Range> &Ranges,
                       const FormatStyle &Style = getLLVMStyle()) {
     tooling::Replacements Replaces = format::cleanup(Style, Code, Ranges);
 
@@ -32,7 +32,7 @@ protected:
   }
 
   // Returns code after cleanup around \p Offsets.
-  std::string cleanupAroundOffsets(ArrayRef<unsigned> Offsets, StringRef Code,
+  std::string cleanupAroundOffsets(llvm::ArrayRef<unsigned> Offsets, llvm::StringRef Code,
                                    const FormatStyle &Style = getLLVMStyle()) {
     std::vector<tooling::Range> Ranges;
     for (auto Offset : Offsets)
@@ -314,19 +314,19 @@ TEST_F(CleanupTest, CtorInitializerInNamespace) {
 class CleanUpReplacementsTest : public ReplacementTest {
 protected:
   tooling::Replacement createReplacement(unsigned Offset, unsigned Length,
-                                         StringRef Text) {
+                                         llvm::StringRef Text) {
     return tooling::Replacement(FileName, Offset, Length, Text);
   }
 
-  tooling::Replacement createInsertion(StringRef IncludeDirective) {
+  tooling::Replacement createInsertion(llvm::StringRef IncludeDirective) {
     return createReplacement(UINT_MAX, 0, IncludeDirective);
   }
 
-  tooling::Replacement createDeletion(StringRef HeaderName) {
+  tooling::Replacement createDeletion(llvm::StringRef HeaderName) {
     return createReplacement(UINT_MAX, 1, HeaderName);
   }
 
-  inline std::string apply(StringRef Code,
+  inline std::string apply(llvm::StringRef Code,
                            const tooling::Replacements &Replaces) {
     auto CleanReplaces = cleanupAroundReplacements(Code, Replaces, Style);
     EXPECT_TRUE(static_cast<bool>(CleanReplaces))
@@ -336,7 +336,7 @@ protected:
     return *Result;
   }
 
-  inline std::string formatAndApply(StringRef Code,
+  inline std::string formatAndApply(llvm::StringRef Code,
                                     const tooling::Replacements &Replaces) {
     auto CleanReplaces = cleanupAroundReplacements(Code, Replaces, Style);
     EXPECT_TRUE(static_cast<bool>(CleanReplaces))
@@ -349,7 +349,7 @@ protected:
     return *Result;
   }
 
-  int getOffset(StringRef Code, int Line, int Column) {
+  int getOffset(llvm::StringRef Code, int Line, int Column) {
     RewriterTestContext Context;
     FileID ID = Context.createInMemoryFile(FileName, Code);
     auto DecomposedLocation =

@@ -19,7 +19,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/string-constructor.html
 class StringConstructorCheck : public ClangTidyCheck {
 public:
-  StringConstructorCheck(StringRef Name, ClangTidyContext *Context);
+  StringConstructorCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }
@@ -31,7 +31,7 @@ private:
   const bool IsStringviewNullptrCheckEnabled;
   const bool WarnOnLargeLength;
   const unsigned int LargeLengthThreshold;
-  std::vector<StringRef> StringNames;
+  std::vector<llvm::StringRef> StringNames;
 };
 
 } // namespace clang::tidy::bugprone

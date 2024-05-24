@@ -21,7 +21,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-default-member-init.html
 class UseDefaultMemberInitCheck : public ClangTidyCheck {
 public:
-  UseDefaultMemberInitCheck(StringRef Name, ClangTidyContext *Context);
+  UseDefaultMemberInitCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
   }

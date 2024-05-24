@@ -20,7 +20,7 @@ namespace clang::tidy::hicpp {
 /// http://clang.llvm.org/extra/clang-tidy/checks/hicpp/ignored-remove-result.html
 class IgnoredRemoveResultCheck : public bugprone::UnusedReturnValueCheck {
 public:
-  IgnoredRemoveResultCheck(StringRef Name, ClangTidyContext *Context);
+  IgnoredRemoveResultCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
 };
 

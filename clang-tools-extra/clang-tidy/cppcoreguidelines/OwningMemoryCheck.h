@@ -20,7 +20,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/owning-memory.html
 class OwningMemoryCheck : public ClangTidyCheck {
 public:
-  OwningMemoryCheck(StringRef Name, ClangTidyContext *Context)
+  OwningMemoryCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         LegacyResourceProducers(Options.get(
             "LegacyResourceProducers", "::malloc;::aligned_alloc;::realloc;"
@@ -53,10 +53,10 @@ private:
   /// List of old C-style functions that create resources.
   /// Defaults to
   /// `::malloc;::aligned_alloc;::realloc;::calloc;::fopen;::freopen;::tmpfile`.
-  const StringRef LegacyResourceProducers;
+  const llvm::StringRef LegacyResourceProducers;
   /// List of old C-style functions that consume or release resources.
   /// Defaults to `::free;::realloc;::freopen;::fclose`.
-  const StringRef LegacyResourceConsumers;
+  const llvm::StringRef LegacyResourceConsumers;
 };
 
 } // namespace clang::tidy::cppcoreguidelines

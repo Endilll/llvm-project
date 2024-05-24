@@ -173,7 +173,7 @@ QualType getDeclUsageType(ASTContext &C, const NamedDecl *ND);
 ///
 /// \param PreferredTypeIsPointer Whether the preferred type for the context
 /// of this macro is a pointer type.
-unsigned getMacroUsagePriority(StringRef MacroName,
+unsigned getMacroUsagePriority(llvm::StringRef MacroName,
                                const LangOptions &LangOpts,
                                bool PreferredTypeIsPointer = false);
 
@@ -362,7 +362,7 @@ private:
   QualType BaseType;
 
   /// The identifiers for Objective-C selector parts.
-  ArrayRef<const IdentifierInfo *> SelIdents;
+  llvm::ArrayRef<const IdentifierInfo *> SelIdents;
 
   /// The scope specifier that comes before the completion token e.g.
   /// "a::b::"
@@ -380,7 +380,7 @@ public:
   /// Construct a new code-completion context of the given kind.
   CodeCompletionContext(
       Kind CCKind, QualType T,
-      ArrayRef<const IdentifierInfo *> SelIdents = std::nullopt)
+      llvm::ArrayRef<const IdentifierInfo *> SelIdents = std::nullopt)
       : CCKind(CCKind), IsUsingDeclaration(false), SelIdents(SelIdents) {
     if (CCKind == CCC_DotMemberAccess || CCKind == CCC_ArrowMemberAccess ||
         CCKind == CCC_ObjCPropertyAccess || CCKind == CCC_ObjCClassMessage ||
@@ -407,7 +407,7 @@ public:
   QualType getBaseType() const { return BaseType; }
 
   /// Retrieve the Objective-C selector identifiers.
-  ArrayRef<const IdentifierInfo *> getSelIdents() const { return SelIdents; }
+  llvm::ArrayRef<const IdentifierInfo *> getSelIdents() const { return SelIdents; }
 
   /// Determines whether we want C++ constructors as results within this
   /// context.
@@ -586,7 +586,7 @@ private:
   unsigned Availability : 2;
 
   /// The name of the parent context.
-  StringRef ParentName;
+  llvm::StringRef ParentName;
 
   /// A brief documentation comment attached to the declaration of
   /// entity being completed by this result.
@@ -595,7 +595,7 @@ private:
   CodeCompletionString(const Chunk *Chunks, unsigned NumChunks,
                        unsigned Priority, CXAvailabilityKind Availability,
                        const char **Annotations, unsigned NumAnnotations,
-                       StringRef ParentName,
+                       llvm::StringRef ParentName,
                        const char *BriefComment);
   ~CodeCompletionString() = default;
 
@@ -634,7 +634,7 @@ public:
   const char *getAnnotation(unsigned AnnotationNr) const;
 
   /// Retrieve the name of the parent context.
-  StringRef getParentContextName() const {
+  llvm::StringRef getParentContextName() const {
     return ParentName;
   }
 
@@ -651,14 +651,14 @@ public:
 class CodeCompletionAllocator : public llvm::BumpPtrAllocator {
 public:
   /// Copy the given string into this allocator.
-  const char *CopyString(const Twine &String);
+  const char *CopyString(const llvm::Twine &String);
 };
 
 /// Allocator for a cached set of global code completions.
 class GlobalCodeCompletionAllocator : public CodeCompletionAllocator {};
 
 class CodeCompletionTUInfo {
-  llvm::DenseMap<const DeclContext *, StringRef> ParentNames;
+  llvm::DenseMap<const DeclContext *, llvm::StringRef> ParentNames;
   std::shared_ptr<GlobalCodeCompletionAllocator> AllocatorRef;
 
 public:
@@ -675,7 +675,7 @@ public:
     return *AllocatorRef;
   }
 
-  StringRef getParentName(const DeclContext *DC);
+  llvm::StringRef getParentName(const DeclContext *DC);
 };
 
 } // namespace clang
@@ -692,13 +692,13 @@ private:
   CodeCompletionTUInfo &CCTUInfo;
   unsigned Priority = 0;
   CXAvailabilityKind Availability = CXAvailability_Available;
-  StringRef ParentName;
+  llvm::StringRef ParentName;
   const char *BriefComment = nullptr;
 
   /// The chunks stored in this string.
-  SmallVector<Chunk, 4> Chunks;
+  llvm::SmallVector<Chunk, 4> Chunks;
 
-  SmallVector<const char *, 2> Annotations;
+  llvm::SmallVector<const char *, 2> Annotations;
 
 public:
   CodeCompletionBuilder(CodeCompletionAllocator &Allocator,
@@ -752,9 +752,9 @@ public:
   void addParentContext(const DeclContext *DC);
 
   const char *getBriefComment() const { return BriefComment; }
-  void addBriefComment(StringRef Comment);
+  void addBriefComment(llvm::StringRef Comment);
 
-  StringRef getParentName() const { return ParentName; }
+  llvm::StringRef getParentName() const { return ParentName; }
 };
 
 /// Captures a result of code completion.
@@ -990,8 +990,8 @@ public:
   /// Retrieve the name that should be used to order a result.
   ///
   /// If the name needs to be constructed as a string, that string will be
-  /// saved into Saved and the returned StringRef will refer to it.
-  StringRef getOrderedName(std::string &Saved) const;
+  /// saved into Saved and the returned llvm::StringRef will refer to it.
+  llvm::StringRef getOrderedName(std::string &Saved) const;
 
 private:
   void computeCursorKindAndAvailability(bool Accessible = true);
@@ -1202,7 +1202,7 @@ public:
 
   /// \name Code-completion filtering
   /// Check if the result should be filtered out.
-  virtual bool isResultFilteredOut(StringRef Filter,
+  virtual bool isResultFilteredOut(llvm::StringRef Filter,
                                    CodeCompletionResult Results) {
     return false;
   }
@@ -1261,7 +1261,7 @@ getParameterComment(const ASTContext &Ctx,
 /// receives in a simple format.
 class PrintingCodeCompleteConsumer : public CodeCompleteConsumer {
   /// The raw output stream.
-  raw_ostream &OS;
+  llvm::raw_ostream &OS;
 
   CodeCompletionTUInfo CCTUInfo;
 
@@ -1269,7 +1269,7 @@ public:
   /// Create a new printing code-completion consumer that prints its
   /// results to the given raw output stream.
   PrintingCodeCompleteConsumer(const CodeCompleteOptions &CodeCompleteOpts,
-                               raw_ostream &OS)
+                               llvm::raw_ostream &OS)
       : CodeCompleteConsumer(CodeCompleteOpts), OS(OS),
         CCTUInfo(std::make_shared<GlobalCodeCompletionAllocator>()) {}
 
@@ -1284,7 +1284,7 @@ public:
                                  SourceLocation OpenParLoc,
                                  bool Braced) override;
 
-  bool isResultFilteredOut(StringRef Filter, CodeCompletionResult Results) override;
+  bool isResultFilteredOut(llvm::StringRef Filter, CodeCompletionResult Results) override;
 
   CodeCompletionAllocator &getAllocator() override {
     return CCTUInfo.getAllocator();

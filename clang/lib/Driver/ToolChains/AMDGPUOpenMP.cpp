@@ -44,7 +44,7 @@ void AMDGPUOpenMPToolChain::addClangTargetOptions(
     Action::OffloadKind DeviceOffloadingKind) const {
   HostTC.addClangTargetOptions(DriverArgs, CC1Args, DeviceOffloadingKind);
 
-  StringRef GPUArch = DriverArgs.getLastArgValue(options::OPT_march_EQ);
+  llvm::StringRef GPUArch = DriverArgs.getLastArgValue(options::OPT_march_EQ);
   assert(!GPUArch.empty() && "Must have an explicit GPU arch.");
 
   assert(DeviceOffloadingKind == Action::OFK_OpenMP &&
@@ -69,7 +69,7 @@ void AMDGPUOpenMPToolChain::addClangTargetOptions(
 }
 
 llvm::opt::DerivedArgList *AMDGPUOpenMPToolChain::TranslateArgs(
-    const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+    const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
     Action::OffloadKind DeviceOffloadKind) const {
   DerivedArgList *DAL =
       HostTC.TranslateArgs(Args, BoundArch, DeviceOffloadKind);
@@ -84,7 +84,7 @@ llvm::opt::DerivedArgList *AMDGPUOpenMPToolChain::TranslateArgs(
         DAL->append(A);
 
     if (!DAL->hasArg(options::OPT_march_EQ)) {
-      StringRef Arch = BoundArch;
+      llvm::StringRef Arch = BoundArch;
       if (Arch.empty()) {
         auto ArchsOrErr = getSystemGPUArchs(Args);
         if (!ArchsOrErr) {
@@ -150,7 +150,7 @@ SanitizerMask AMDGPUOpenMPToolChain::getSupportedSanitizers() const {
   return HostTC.getSupportedSanitizers();
 }
 
-VersionTuple
+llvm::VersionTuple
 AMDGPUOpenMPToolChain::computeMSVCVersion(const Driver *D,
                                           const ArgList &Args) const {
   return HostTC.computeMSVCVersion(D, Args);
@@ -166,10 +166,10 @@ AMDGPUOpenMPToolChain::getDeviceLibs(const llvm::opt::ArgList &Args) const {
     return {};
   }
 
-  StringRef GpuArch = getProcessorFromTargetID(
+  llvm::StringRef GpuArch = getProcessorFromTargetID(
       getTriple(), Args.getLastArgValue(options::OPT_march_EQ));
 
-  SmallVector<BitCodeLibraryInfo, 12> BCLibs;
+  llvm::SmallVector<BitCodeLibraryInfo, 12> BCLibs;
   for (auto BCLib : getCommonDeviceLibNames(Args, GpuArch.str(),
                                             /*IsOpenMP=*/true))
     BCLibs.emplace_back(BCLib);

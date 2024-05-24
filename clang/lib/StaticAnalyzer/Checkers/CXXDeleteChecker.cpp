@@ -160,7 +160,7 @@ void CXXArrayDeleteChecker::checkTypedDeleteExpr(
   if (!N)
     return;
 
-  SmallString<256> Buf;
+  llvm::SmallString<256> Buf;
   llvm::raw_svector_ostream OS(Buf);
 
   QualType SourceType = BaseClassRegion->getValueType();
@@ -208,7 +208,7 @@ CXXDeleteChecker::PtrCastVisitor::VisitNode(const ExplodedNode *N,
   if (!BR.isInteresting(M))
     return nullptr;
 
-  SmallString<256> Buf;
+  llvm::SmallString<256> Buf;
   llvm::raw_svector_ostream OS(Buf);
 
   OS << "Casting from '" << SourceType.getAsString() << "' to '"

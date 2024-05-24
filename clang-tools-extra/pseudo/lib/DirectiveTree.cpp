@@ -129,7 +129,7 @@ private:
     const Token *Begin = Tok++;
     while (Tok->Kind != tok::eof && !Tok->flag(LexFlags::StartsPPLine))
       ++Tok;
-    ArrayRef<Token> Tokens{Begin, Tok};
+    llvm::ArrayRef<Token> Tokens{Begin, Tok};
     D->Tokens = {Code.index(*Tokens.begin()), Code.index(*Tokens.end())};
 
     // Directive name is the first non-comment token after the hash.

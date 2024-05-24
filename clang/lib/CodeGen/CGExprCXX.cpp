@@ -518,7 +518,7 @@ static void EmitNullBaseClassInitialization(CodeGenFunction &CGF,
   // We cannot simply zero-initialize the entire base sub-object if vbptrs are
   // present, they are initialized by the most derived class before calling the
   // constructor.
-  SmallVector<std::pair<CharUnits, CharUnits>, 1> Stores;
+  llvm::SmallVector<std::pair<CharUnits, CharUnits>, 1> Stores;
   Stores.emplace_back(CharUnits::Zero(), NVSize);
 
   // Each store is split by the existence of a vbptr.
@@ -557,7 +557,7 @@ static void EmitNullBaseClassInitialization(CodeGenFunction &CGF,
     llvm::GlobalVariable *NullVariable = new llvm::GlobalVariable(
         CGF.CGM.getModule(), NullConstantForBase->getType(),
         /*isConstant=*/true, llvm::GlobalVariable::PrivateLinkage,
-        NullConstantForBase, Twine());
+        NullConstantForBase, llvm::Twine());
 
     CharUnits Align =
         std::max(Layout.getNonVirtualAlignment(), DestPtr.getAlignment());
@@ -1090,7 +1090,7 @@ void CodeGenFunction::EmitNewArrayInitializer(
       return;
     }
 
-    ArrayRef<const Expr *> InitExprs =
+    llvm::ArrayRef<const Expr *> InitExprs =
         ILE ? ILE->inits() : CPLIE->getInitExprs();
     InitListElements = InitExprs.size();
 
@@ -2114,7 +2114,7 @@ void CodeGenFunction::EmitCXXDeleteExpr(const CXXDeleteExpr *E) {
   // (this assumes that A(*)[3][7] is converted to [3 x [7 x %A]]*)
   if (DeleteTy->isConstantArrayType()) {
     llvm::Value *Zero = Builder.getInt32(0);
-    SmallVector<llvm::Value*,8> GEP;
+    llvm::SmallVector<llvm::Value*,8> GEP;
 
     GEP.push_back(Zero); // point at the outermost array
 

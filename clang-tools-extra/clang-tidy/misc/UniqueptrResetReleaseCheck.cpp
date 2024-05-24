@@ -15,7 +15,7 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::misc {
 
 UniqueptrResetReleaseCheck::UniqueptrResetReleaseCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       Inserter(Options.getLocalOrGlobal("IncludeStyle",
                                         utils::IncludeSorter::IS_LLVM),
@@ -55,7 +55,7 @@ void UniqueptrResetReleaseCheck::registerMatchers(MatchFinder *Finder) {
 
 namespace {
 const Type *getDeleterForUniquePtr(const MatchFinder::MatchResult &Result,
-                                   StringRef ID) {
+                                   llvm::StringRef ID) {
   const auto *Class =
       Result.Nodes.getNodeAs<ClassTemplateSpecializationDecl>(ID);
   if (!Class)
@@ -116,8 +116,8 @@ void UniqueptrResetReleaseCheck::check(const MatchFinder::MatchResult &Result) {
   const auto *ResetCall =
       Result.Nodes.getNodeAs<CXXMemberCallExpr>("reset_call");
 
-  StringRef AssignmentText = " = ";
-  StringRef TrailingText = "";
+  llvm::StringRef AssignmentText = " = ";
+  llvm::StringRef TrailingText = "";
   bool NeedsUtilityInclude = false;
   if (ReleaseMember->isArrow()) {
     AssignmentText = " = std::move(*";

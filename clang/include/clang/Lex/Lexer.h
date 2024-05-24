@@ -151,7 +151,7 @@ class Lexer : public PreprocessorLexer {
   ConflictMarkerKind CurrentConflictMarkerState;
 
   /// Non-empty if this \p Lexer is \p isDependencyDirectivesLexer().
-  ArrayRef<dependency_directives_scan::Directive> DepDirectives;
+  llvm::ArrayRef<dependency_directives_scan::Directive> DepDirectives;
 
   /// If this \p Lexer is \p isDependencyDirectivesLexer(), it represents the
   /// next token to use from the current dependency directive.
@@ -281,13 +281,13 @@ public:
   void resetExtendedTokenMode();
 
   /// Gets source code buffer.
-  StringRef getBuffer() const {
-    return StringRef(BufferStart, BufferEnd - BufferStart);
+  llvm::StringRef getBuffer() const {
+    return llvm::StringRef(BufferStart, BufferEnd - BufferStart);
   }
 
   /// ReadToEndOfLine - Read the rest of the current preprocessor line as an
   /// uninterpreted string.  This switches the lexer out of directive mode.
-  void ReadToEndOfLine(SmallVectorImpl<char> *Result = nullptr);
+  void ReadToEndOfLine(llvm::SmallVectorImpl<char> *Result = nullptr);
 
 
   /// Diag - Forwarding function for diagnostics.  This translate a source
@@ -319,11 +319,11 @@ public:
   /// Stringify - Convert the specified string into a C string by i) escaping
   /// '\\' and " characters and ii) replacing newline character(s) with "\\n".
   /// If Charify is true, this escapes the ' character instead of ".
-  static std::string Stringify(StringRef Str, bool Charify = false);
+  static std::string Stringify(llvm::StringRef Str, bool Charify = false);
 
   /// Stringify - Convert the specified string into a C string by i) escaping
   /// '\\' and " characters and ii) replacing newline character(s) with "\\n".
-  static void Stringify(SmallVectorImpl<char> &Str);
+  static void Stringify(llvm::SmallVectorImpl<char> &Str);
 
   /// getSpelling - This method is used to get the spelling of a token into a
   /// preallocated buffer, instead of as an std::string.  The caller is required
@@ -358,8 +358,8 @@ public:
   /// This method lexes at the expansion depth of the given
   /// location and does not jump to the expansion or spelling
   /// location.
-  static StringRef getSpelling(SourceLocation loc,
-                               SmallVectorImpl<char> &buffer,
+  static llvm::StringRef getSpelling(SourceLocation loc,
+                               llvm::SmallVectorImpl<char> &buffer,
                                const SourceManager &SM,
                                const LangOptions &options,
                                bool *invalid = nullptr);
@@ -494,7 +494,7 @@ public:
                                            const LangOptions &LangOpts);
 
   /// Returns a string for the source that the range encompasses.
-  static StringRef getSourceText(CharSourceRange Range,
+  static llvm::StringRef getSourceText(CharSourceRange Range,
                                  const SourceManager &SM,
                                  const LangOptions &LangOpts,
                                  bool *Invalid = nullptr);
@@ -503,10 +503,10 @@ public:
   ///
   /// This routine starts from a source location, and finds the name of the macro
   /// responsible for its immediate expansion. It looks through any intervening
-  /// macro argument expansions to compute this. It returns a StringRef which
+  /// macro argument expansions to compute this. It returns a llvm::StringRef which
   /// refers to the SourceManager-owned buffer of the source where that macro
   /// name is spelled. Thus, the result shouldn't out-live that SourceManager.
-  static StringRef getImmediateMacroName(SourceLocation Loc,
+  static llvm::StringRef getImmediateMacroName(SourceLocation Loc,
                                          const SourceManager &SM,
                                          const LangOptions &LangOpts);
 
@@ -515,7 +515,7 @@ public:
   /// This routine starts from a source location, and finds the name of the
   /// macro responsible for its immediate expansion. It looks through any
   /// intervening macro argument expansions to compute this. It returns a
-  /// StringRef which refers to the SourceManager-owned buffer of the source
+  /// llvm::StringRef which refers to the SourceManager-owned buffer of the source
   /// where that macro name is spelled. Thus, the result shouldn't out-live
   /// that SourceManager.
   ///
@@ -527,7 +527,7 @@ public:
   /// \endcode
   /// for location of 'foo' token, this function will return "MAC1" while
   /// Lexer::getImmediateMacroName will return "MAC2".
-  static StringRef getImmediateMacroNameForDiagnostics(
+  static llvm::StringRef getImmediateMacroNameForDiagnostics(
       SourceLocation Loc, const SourceManager &SM, const LangOptions &LangOpts);
 
   /// Compute the preamble of the given file.
@@ -545,7 +545,7 @@ public:
   /// \returns The offset into the file where the preamble ends and the rest
   /// of the file begins along with a boolean value indicating whether
   /// the preamble ends at the beginning of a new line.
-  static PreambleBounds ComputePreamble(StringRef Buffer,
+  static PreambleBounds ComputePreamble(llvm::StringRef Buffer,
                                         const LangOptions &LangOpts,
                                         unsigned MaxLines = 0);
 
@@ -596,7 +596,7 @@ public:
 
   /// Returns the leading whitespace for line that corresponds to the given
   /// location \p Loc.
-  static StringRef getIndentationForLine(SourceLocation Loc,
+  static llvm::StringRef getIndentationForLine(SourceLocation Loc,
                                          const SourceManager &SM);
 
   /// Check if this is the first time we're lexing the input file.

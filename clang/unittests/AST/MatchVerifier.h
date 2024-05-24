@@ -59,7 +59,7 @@ protected:
   virtual void verify(const MatchFinder::MatchResult &Result,
                       const NodeType &Node) {}
 
-  void setFailure(const Twine &Result) {
+  void setFailure(const llvm::Twine &Result) {
     Verified = false;
     VerifyResult = Result.str();
   }
@@ -86,7 +86,7 @@ MatchVerifier<NodeType>::match(const std::string &Code,
   std::unique_ptr<tooling::FrontendActionFactory> Factory(
       tooling::newFrontendActionFactory(&Finder));
 
-  StringRef FileName;
+  llvm::StringRef FileName;
   switch (L) {
   case Lang_C89:
     Args.push_back("-std=c89");

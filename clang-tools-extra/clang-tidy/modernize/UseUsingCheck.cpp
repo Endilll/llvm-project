@@ -27,7 +27,7 @@ static constexpr llvm::StringLiteral TagDeclName = "tag-decl";
 static constexpr llvm::StringLiteral TypedefName = "typedef";
 static constexpr llvm::StringLiteral DeclStmtName = "decl-stmt";
 
-UseUsingCheck::UseUsingCheck(StringRef Name, ClangTidyContext *Context)
+UseUsingCheck::UseUsingCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreMacros(Options.getLocalOrGlobal("IgnoreMacros", true)),
       IgnoreExternC(Options.get("IgnoreExternC", false)) {}

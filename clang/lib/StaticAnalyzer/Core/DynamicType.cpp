@@ -189,17 +189,17 @@ ProgramStateRef removeDeadClassObjectTypes(ProgramStateRef State,
 //               Implementation of the 'printer-to-JSON' function
 //===----------------------------------------------------------------------===//
 
-static raw_ostream &printJson(const MemRegion *Region, raw_ostream &Out,
+static llvm::raw_ostream &printJson(const MemRegion *Region, llvm::raw_ostream &Out,
                               const char *NL, unsigned int Space, bool IsDot) {
   return Out << "\"region\": \"" << Region << "\"";
 }
 
-static raw_ostream &printJson(const SymExpr *Symbol, raw_ostream &Out,
+static llvm::raw_ostream &printJson(const SymExpr *Symbol, llvm::raw_ostream &Out,
                               const char *NL, unsigned int Space, bool IsDot) {
   return Out << "\"symbol\": \"" << Symbol << "\"";
 }
 
-static raw_ostream &printJson(const DynamicTypeInfo &DTI, raw_ostream &Out,
+static llvm::raw_ostream &printJson(const DynamicTypeInfo &DTI, llvm::raw_ostream &Out,
                               const char *NL, unsigned int Space, bool IsDot) {
   Out << "\"dyn_type\": ";
   if (!DTI.isValid()) {
@@ -215,7 +215,7 @@ static raw_ostream &printJson(const DynamicTypeInfo &DTI, raw_ostream &Out,
   return Out;
 }
 
-static raw_ostream &printJson(const DynamicCastInfo &DCI, raw_ostream &Out,
+static llvm::raw_ostream &printJson(const DynamicCastInfo &DCI, llvm::raw_ostream &Out,
                               const char *NL, unsigned int Space, bool IsDot) {
   return Out << "\"from\": \"" << DCI.from() << "\", \"to\": \"" << DCI.to()
              << "\", \"kind\": \"" << (DCI.succeeds() ? "success" : "fail")
@@ -223,15 +223,15 @@ static raw_ostream &printJson(const DynamicCastInfo &DCI, raw_ostream &Out,
 }
 
 template <class T, class U>
-static raw_ostream &printJson(const std::pair<T, U> &Pair, raw_ostream &Out,
+static llvm::raw_ostream &printJson(const std::pair<T, U> &Pair, llvm::raw_ostream &Out,
                               const char *NL, unsigned int Space, bool IsDot) {
   printJson(Pair.first, Out, NL, Space, IsDot) << ", ";
   return printJson(Pair.second, Out, NL, Space, IsDot);
 }
 
 template <class ContainerTy>
-static raw_ostream &printJsonContainer(const ContainerTy &Container,
-                                       raw_ostream &Out, const char *NL,
+static llvm::raw_ostream &printJsonContainer(const ContainerTy &Container,
+                                       llvm::raw_ostream &Out, const char *NL,
                                        unsigned int Space, bool IsDot) {
   if (Container.isEmpty()) {
     return Out << "null";
@@ -254,14 +254,14 @@ static raw_ostream &printJsonContainer(const ContainerTy &Container,
   return Indent(Out, Space, IsDot) << "]";
 }
 
-static raw_ostream &printJson(const CastSet &Set, raw_ostream &Out,
+static llvm::raw_ostream &printJson(const CastSet &Set, llvm::raw_ostream &Out,
                               const char *NL, unsigned int Space, bool IsDot) {
   Out << "\"casts\": ";
   return printJsonContainer(Set, Out, NL, Space, IsDot);
 }
 
 template <class MapTy>
-static void printJsonImpl(raw_ostream &Out, ProgramStateRef State,
+static void printJsonImpl(llvm::raw_ostream &Out, ProgramStateRef State,
                           const char *Name, const char *NL, unsigned int Space,
                           bool IsDot, bool PrintEvenIfEmpty = true) {
   const auto &Map = State->get<MapTy>();
@@ -272,19 +272,19 @@ static void printJsonImpl(raw_ostream &Out, ProgramStateRef State,
   printJsonContainer(Map, Out, NL, Space, IsDot) << "," << NL;
 }
 
-static void printDynamicTypesJson(raw_ostream &Out, ProgramStateRef State,
+static void printDynamicTypesJson(llvm::raw_ostream &Out, ProgramStateRef State,
                                   const char *NL, unsigned int Space,
                                   bool IsDot) {
   printJsonImpl<DynamicTypeMap>(Out, State, "dynamic_types", NL, Space, IsDot);
 }
 
-static void printDynamicCastsJson(raw_ostream &Out, ProgramStateRef State,
+static void printDynamicCastsJson(llvm::raw_ostream &Out, ProgramStateRef State,
                                   const char *NL, unsigned int Space,
                                   bool IsDot) {
   printJsonImpl<DynamicCastMap>(Out, State, "dynamic_casts", NL, Space, IsDot);
 }
 
-static void printClassObjectDynamicTypesJson(raw_ostream &Out,
+static void printClassObjectDynamicTypesJson(llvm::raw_ostream &Out,
                                              ProgramStateRef State,
                                              const char *NL, unsigned int Space,
                                              bool IsDot) {
@@ -295,7 +295,7 @@ static void printClassObjectDynamicTypesJson(raw_ostream &Out,
                                        /*PrintEvenIfEmpty=*/false);
 }
 
-void printDynamicTypeInfoJson(raw_ostream &Out, ProgramStateRef State,
+void printDynamicTypeInfoJson(llvm::raw_ostream &Out, ProgramStateRef State,
                               const char *NL, unsigned int Space, bool IsDot) {
   printDynamicTypesJson(Out, State, NL, Space, IsDot);
   printDynamicCastsJson(Out, State, NL, Space, IsDot);

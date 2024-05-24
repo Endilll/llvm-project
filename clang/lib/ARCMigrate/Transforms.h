@@ -112,12 +112,12 @@ public:
   }
 
   bool isGCOwnedNonObjC(QualType T);
-  bool removePropertyAttribute(StringRef fromAttr, SourceLocation atLoc) {
-    return rewritePropertyAttribute(fromAttr, StringRef(), atLoc);
+  bool removePropertyAttribute(llvm::StringRef fromAttr, SourceLocation atLoc) {
+    return rewritePropertyAttribute(fromAttr, llvm::StringRef(), atLoc);
   }
-  bool rewritePropertyAttribute(StringRef fromAttr, StringRef toAttr,
+  bool rewritePropertyAttribute(llvm::StringRef fromAttr, llvm::StringRef toAttr,
                                 SourceLocation atLoc);
-  bool addPropertyAttribute(StringRef attr, SourceLocation atLoc);
+  bool addPropertyAttribute(llvm::StringRef attr, SourceLocation atLoc);
 
   void traverse(TranslationUnitDecl *TU);
 
@@ -179,7 +179,7 @@ SourceLocation findSemiAfterLocation(SourceLocation loc, ASTContext &Ctx,
 bool hasSideEffects(Expr *E, ASTContext &Ctx);
 bool isGlobalVar(Expr *E);
 /// Returns "nil" or "0" if 'nil' macro is not actually defined.
-StringRef getNilString(MigrationPass &Pass);
+llvm::StringRef getNilString(MigrationPass &Pass);
 
 template <typename BODY_TRANS>
 class BodyTransform : public RecursiveASTVisitor<BodyTransform<BODY_TRANS> > {
@@ -197,7 +197,7 @@ public:
   }
 
   bool TraverseObjCMethodDecl(ObjCMethodDecl *D) {
-    SaveAndRestore<Decl *> SetParent(ParentD, D);
+    llvm::SaveAndRestore<Decl *> SetParent(ParentD, D);
     return base::TraverseObjCMethodDecl(D);
   }
 };

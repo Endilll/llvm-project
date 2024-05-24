@@ -28,12 +28,12 @@ using ::testing::StartsWith;
 namespace {
 class CommandLineTest : public ::testing::Test {
 public:
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags;
-  SmallVector<const char *, 32> GeneratedArgs;
-  SmallVector<std::string, 32> GeneratedArgsStorage;
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags;
+  llvm::SmallVector<const char *, 32> GeneratedArgs;
+  llvm::SmallVector<std::string, 32> GeneratedArgsStorage;
   CompilerInvocation Invocation;
 
-  const char *operator()(const Twine &Arg) {
+  const char *operator()(const llvm::Twine &Arg) {
     return GeneratedArgsStorage.emplace_back(Arg.str()).c_str();
   }
 
@@ -45,14 +45,14 @@ public:
 
 template <typename M>
 std::string describeContainsN(M InnerMatcher, unsigned N, bool Negation) {
-  StringRef Contains = Negation ? "doesn't contain" : "contains";
-  StringRef Instance = N == 1 ? " instance " : " instances ";
-  StringRef Element = "of element that ";
+  llvm::StringRef Contains = Negation ? "doesn't contain" : "contains";
+  llvm::StringRef Instance = N == 1 ? " instance " : " instances ";
+  llvm::StringRef Element = "of element that ";
 
   std::ostringstream Inner;
   InnerMatcher.impl().DescribeTo(&Inner);
 
-  return (Contains + " exactly " + Twine(N) + Instance + Element + Inner.str())
+  return (Contains + " exactly " + llvm::Twine(N) + Instance + Element + Inner.str())
       .str();
 }
 

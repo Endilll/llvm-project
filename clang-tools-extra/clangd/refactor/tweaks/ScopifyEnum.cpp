@@ -54,25 +54,25 @@ class ScopifyEnum : public Tweak {
     return CodeAction::REFACTOR_KIND;
   }
   bool prepare(const Selection &Inputs) override;
-  Expected<Tweak::Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Tweak::Effect> apply(const Selection &Inputs) override;
 
   using MakeReplacement =
-      std::function<tooling::Replacement(StringRef, StringRef, unsigned)>;
+      std::function<tooling::Replacement(llvm::StringRef, llvm::StringRef, unsigned)>;
   llvm::Error addClassKeywordToDeclarations();
   llvm::Error scopifyEnumValues();
-  llvm::Error scopifyEnumValue(const EnumConstantDecl &CD, StringRef EnumName,
+  llvm::Error scopifyEnumValue(const EnumConstantDecl &CD, llvm::StringRef EnumName,
                                bool StripPrefix);
-  llvm::Expected<StringRef> getContentForFile(StringRef FilePath);
+  llvm::Expected<llvm::StringRef> getContentForFile(llvm::StringRef FilePath);
   llvm::Error addReplacementForReference(const ReferencesResult::Reference &Ref,
                                          const MakeReplacement &GetReplacement);
-  llvm::Error addReplacement(StringRef FilePath, StringRef Content,
+  llvm::Error addReplacement(llvm::StringRef FilePath, llvm::StringRef Content,
                              const tooling::Replacement &Replacement);
 
   const EnumDecl *D = nullptr;
   const Selection *S = nullptr;
   SourceManager *SM = nullptr;
   llvm::SmallVector<std::unique_ptr<llvm::MemoryBuffer>> ExtraBuffers;
-  llvm::StringMap<StringRef> ContentPerFile;
+  llvm::StringMap<llvm::StringRef> ContentPerFile;
   Effect E;
 };
 
@@ -88,7 +88,7 @@ bool ScopifyEnum::prepare(const Selection &Inputs) {
   return D && !D->isScoped() && D->isThisDeclarationADefinition();
 }
 
-Expected<Tweak::Effect> ScopifyEnum::apply(const Selection &Inputs) {
+llvm::Expected<Tweak::Effect> ScopifyEnum::apply(const Selection &Inputs) {
   S = &Inputs;
   SM = &S->AST->getSourceManager();
   E.FormatEdits = false;
@@ -111,8 +111,8 @@ llvm::Error ScopifyEnum::addClassKeywordToDeclarations() {
     if (!(Ref.Attributes & ReferencesResult::Declaration))
       continue;
 
-    static const auto MakeReplacement = [](StringRef FilePath,
-                                           StringRef Content, unsigned Offset) {
+    static const auto MakeReplacement = [](llvm::StringRef FilePath,
+                                           llvm::StringRef Content, unsigned Offset) {
       return tooling::Replacement(FilePath, Offset, 0, "class ");
     };
     if (auto Err = addReplacementForReference(Ref, MakeReplacement))
@@ -122,7 +122,7 @@ llvm::Error ScopifyEnum::addClassKeywordToDeclarations() {
 }
 
 llvm::Error ScopifyEnum::scopifyEnumValues() {
-  StringRef EnumName(D->getName());
+  llvm::StringRef EnumName(D->getName());
   bool StripPrefix = true;
   for (const EnumConstantDecl *E : D->enumerators()) {
     if (!E->getName().starts_with(EnumName)) {
@@ -138,7 +138,7 @@ llvm::Error ScopifyEnum::scopifyEnumValues() {
 }
 
 llvm::Error ScopifyEnum::scopifyEnumValue(const EnumConstantDecl &CD,
-                                          StringRef EnumName,
+                                          llvm::StringRef EnumName,
                                           bool StripPrefix) {
   for (const auto &Ref :
        findReferences(*S->AST, sourceLocToPosition(*SM, CD.getBeginLoc()), 0,
@@ -146,8 +146,8 @@ llvm::Error ScopifyEnum::scopifyEnumValue(const EnumConstantDecl &CD,
            .References) {
     if (Ref.Attributes & ReferencesResult::Declaration) {
       if (StripPrefix) {
-        const auto MakeReplacement = [&EnumName](StringRef FilePath,
-                                                 StringRef Content,
+        const auto MakeReplacement = [&EnumName](llvm::StringRef FilePath,
+                                                 llvm::StringRef Content,
                                                  unsigned Offset) {
           unsigned Length = EnumName.size();
           if (Content[Offset + Length] == '_')
@@ -160,7 +160,7 @@ llvm::Error ScopifyEnum::scopifyEnumValue(const EnumConstantDecl &CD,
       continue;
     }
 
-    const auto MakeReplacement = [&](StringRef FilePath, StringRef Content,
+    const auto MakeReplacement = [&](llvm::StringRef FilePath, llvm::StringRef Content,
                                      unsigned Offset) {
       const auto IsAlreadyScoped = [Content, Offset] {
         if (Offset < 2)
@@ -202,13 +202,13 @@ llvm::Error ScopifyEnum::scopifyEnumValue(const EnumConstantDecl &CD,
   return llvm::Error::success();
 }
 
-llvm::Expected<StringRef> ScopifyEnum::getContentForFile(StringRef FilePath) {
+llvm::Expected<llvm::StringRef> ScopifyEnum::getContentForFile(llvm::StringRef FilePath) {
   if (auto It = ContentPerFile.find(FilePath); It != ContentPerFile.end())
     return It->second;
   auto Buffer = S->FS->getBufferForFile(FilePath);
   if (!Buffer)
     return llvm::errorCodeToError(Buffer.getError());
-  StringRef Content = Buffer->get()->getBuffer();
+  llvm::StringRef Content = Buffer->get()->getBuffer();
   ExtraBuffers.push_back(std::move(*Buffer));
   ContentPerFile.insert(std::make_pair(FilePath, Content));
   return Content;
@@ -217,8 +217,8 @@ llvm::Expected<StringRef> ScopifyEnum::getContentForFile(StringRef FilePath) {
 llvm::Error
 ScopifyEnum::addReplacementForReference(const ReferencesResult::Reference &Ref,
                                         const MakeReplacement &GetReplacement) {
-  StringRef FilePath = Ref.Loc.uri.file();
-  llvm::Expected<StringRef> Content = getContentForFile(FilePath);
+  llvm::StringRef FilePath = Ref.Loc.uri.file();
+  llvm::Expected<llvm::StringRef> Content = getContentForFile(FilePath);
   if (!Content)
     return Content.takeError();
   llvm::Expected<size_t> Offset =
@@ -233,7 +233,7 @@ ScopifyEnum::addReplacementForReference(const ReferencesResult::Reference &Ref,
 }
 
 llvm::Error
-ScopifyEnum::addReplacement(StringRef FilePath, StringRef Content,
+ScopifyEnum::addReplacement(llvm::StringRef FilePath, llvm::StringRef Content,
                             const tooling::Replacement &Replacement) {
   Edit &TheEdit = E.ApplyEdits[FilePath];
   TheEdit.InitialCode = Content;

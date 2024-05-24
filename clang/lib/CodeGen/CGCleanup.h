@@ -264,7 +264,7 @@ class alignas(8) EHCleanupScope : public EHScope {
     llvm::SmallPtrSet<llvm::BasicBlock*, 4> Branches;
 
     /// Normal branch-afters.
-    SmallVector<std::pair<llvm::BasicBlock*,llvm::ConstantInt*>, 4>
+    llvm::SmallVector<std::pair<llvm::BasicBlock*,llvm::ConstantInt*>, 4>
       BranchAfters;
   };
   mutable struct ExtInfo *ExtInfo;
@@ -273,7 +273,7 @@ class alignas(8) EHCleanupScope : public EHScope {
   /// Cleanups should mark these allocas as 'used' if the cleanup is
   /// emitted, otherwise these instructions would be erased.
   struct AuxillaryAllocas {
-    SmallVector<llvm::Instruction *, 1> AuxAllocas;
+    llvm::SmallVector<llvm::Instruction *, 1> AuxAllocas;
     bool used = false;
 
     // Records a potentially unused instruction to be erased later.

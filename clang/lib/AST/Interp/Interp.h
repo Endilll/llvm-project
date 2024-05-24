@@ -174,7 +174,7 @@ bool CheckDivRem(InterpState &S, CodePtr OpPC, const T &LHS, const T &RHS) {
 
   if (LHS.isSigned() && LHS.isMin() && RHS.isNegative() && RHS.isMinusOne()) {
     APSInt LHSInt = LHS.toAPSInt();
-    SmallString<32> Trunc;
+    llvm::SmallString<32> Trunc;
     (-LHSInt.extend(LHSInt.getBitWidth() + 1)).toString(Trunc, 10);
     const SourceInfo &Loc = S.Current->getSource(OpPC);
     const Expr *E = S.Current->getExpr(OpPC);
@@ -290,7 +290,7 @@ bool AddSubMulHelper(InterpState &S, CodePtr OpPC, unsigned Bits, const T &LHS,
   const Expr *E = S.Current->getExpr(OpPC);
   QualType Type = E->getType();
   if (S.checkingForUndefinedBehavior()) {
-    SmallString<32> Trunc;
+    llvm::SmallString<32> Trunc;
     Value.trunc(Result.bitWidth())
         .toString(Trunc, 10, Result.isSigned(), /*formatAsCLiteral=*/false,
                   /*UpperCase=*/true, /*InsertSeparators=*/true);
@@ -504,7 +504,7 @@ bool Neg(InterpState &S, CodePtr OpPC) {
   QualType Type = E->getType();
 
   if (S.checkingForUndefinedBehavior()) {
-    SmallString<32> Trunc;
+    llvm::SmallString<32> Trunc;
     NegatedValue.trunc(Result.bitWidth())
         .toString(Trunc, 10, Result.isSigned(), /*formatAsCLiteral=*/false,
                   /*UpperCase=*/true, /*InsertSeparators=*/true);
@@ -567,7 +567,7 @@ bool IncDecHelper(InterpState &S, CodePtr OpPC, const Pointer &Ptr) {
   const Expr *E = S.Current->getExpr(OpPC);
   QualType Type = E->getType();
   if (S.checkingForUndefinedBehavior()) {
-    SmallString<32> Trunc;
+    llvm::SmallString<32> Trunc;
     APResult.trunc(Result.bitWidth())
         .toString(Trunc, 10, Result.isSigned(), /*formatAsCLiteral=*/false,
                   /*UpperCase=*/true, /*InsertSeparators=*/true);

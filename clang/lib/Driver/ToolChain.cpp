@@ -104,7 +104,7 @@ ToolChain::ToolChain(const Driver &D, const llvm::Triple &T,
 }
 
 llvm::Expected<std::unique_ptr<llvm::MemoryBuffer>>
-ToolChain::executeToolChainProgram(StringRef Executable) const {
+ToolChain::executeToolChainProgram(llvm::StringRef Executable) const {
   llvm::SmallString<64> OutputFile;
   llvm::sys::fs::createTemporaryFile("toolchain-program", "txt", OutputFile);
   llvm::FileRemover OutputRemover(OutputFile.c_str());
@@ -188,10 +188,10 @@ static void getAArch64MultilibFlags(const Driver &D,
                                           const llvm::Triple &Triple,
                                           const llvm::opt::ArgList &Args,
                                           Multilib::flags_list &Result) {
-  std::vector<StringRef> Features;
+  std::vector<llvm::StringRef> Features;
   tools::aarch64::getAArch64TargetFeatures(D, Triple, Args, Features, false);
   const auto UnifiedFeatures = tools::unifyTargetFeatures(Features);
-  llvm::DenseSet<StringRef> FeatureSet(UnifiedFeatures.begin(),
+  llvm::DenseSet<llvm::StringRef> FeatureSet(UnifiedFeatures.begin(),
                                        UnifiedFeatures.end());
   std::vector<std::string> MArch;
   for (const auto &Ext : AArch64::Extensions)
@@ -200,7 +200,7 @@ static void getAArch64MultilibFlags(const Driver &D,
   for (const auto &Ext : AArch64::Extensions)
     if (FeatureSet.contains(Ext.NegFeature))
       MArch.push_back(("no" + Ext.Name).str());
-  StringRef ArchName;
+  llvm::StringRef ArchName;
   for (const auto &ArchInfo : AArch64::ArchInfos)
     if (FeatureSet.contains(ArchInfo->ArchFeature))
       ArchName = ArchInfo->Name;
@@ -213,11 +213,11 @@ static void getARMMultilibFlags(const Driver &D,
                                       const llvm::Triple &Triple,
                                       const llvm::opt::ArgList &Args,
                                       Multilib::flags_list &Result) {
-  std::vector<StringRef> Features;
+  std::vector<llvm::StringRef> Features;
   llvm::ARM::FPUKind FPUKind = tools::arm::getARMTargetFeatures(
       D, Triple, Args, Features, false /*ForAs*/, true /*ForMultilib*/);
   const auto UnifiedFeatures = tools::unifyTargetFeatures(Features);
-  llvm::DenseSet<StringRef> FeatureSet(UnifiedFeatures.begin(),
+  llvm::DenseSet<llvm::StringRef> FeatureSet(UnifiedFeatures.begin(),
                                        UnifiedFeatures.end());
   std::vector<std::string> MArch;
   for (const auto &Ext : ARM::ARCHExtNames)
@@ -318,7 +318,7 @@ struct DriverSuffix {
 
 } // namespace
 
-static const DriverSuffix *FindDriverSuffix(StringRef ProgName, size_t &Pos) {
+static const DriverSuffix *FindDriverSuffix(llvm::StringRef ProgName, size_t &Pos) {
   // A list of known driver suffixes. Suffixes are compared against the
   // program name in order. If there is a match, the frontend type is updated as
   // necessary by applying the ModeFlag.
@@ -340,7 +340,7 @@ static const DriverSuffix *FindDriverSuffix(StringRef ProgName, size_t &Pos) {
   };
 
   for (const auto &DS : DriverSuffixes) {
-    StringRef Suffix(DS.Suffix);
+    llvm::StringRef Suffix(DS.Suffix);
     if (ProgName.ends_with(Suffix)) {
       Pos = ProgName.size() - Suffix.size();
       return &DS;
@@ -361,7 +361,7 @@ static std::string normalizeProgramName(llvm::StringRef Argv0) {
   return ProgName;
 }
 
-static const DriverSuffix *parseDriverSuffix(StringRef ProgName, size_t &Pos) {
+static const DriverSuffix *parseDriverSuffix(llvm::StringRef ProgName, size_t &Pos) {
   // Try to infer frontend type and default target from the program name by
   // comparing it against DriverSuffixes in order.
 
@@ -374,7 +374,7 @@ static const DriverSuffix *parseDriverSuffix(StringRef ProgName, size_t &Pos) {
   if (!DS && ProgName.ends_with(".exe")) {
     // Try again after stripping the executable suffix:
     // clang++.exe -> clang++
-    ProgName = ProgName.drop_back(StringRef(".exe").size());
+    ProgName = ProgName.drop_back(llvm::StringRef(".exe").size());
     DS = FindDriverSuffix(ProgName, Pos);
   }
 
@@ -395,7 +395,7 @@ static const DriverSuffix *parseDriverSuffix(StringRef ProgName, size_t &Pos) {
 }
 
 ParsedClangName
-ToolChain::getTargetAndModeFromProgramName(StringRef PN) {
+ToolChain::getTargetAndModeFromProgramName(llvm::StringRef PN) {
   std::string ProgName = normalizeProgramName(PN);
   size_t SuffixPos;
   const DriverSuffix *DS = parseDriverSuffix(ProgName, SuffixPos);
@@ -410,7 +410,7 @@ ToolChain::getTargetAndModeFromProgramName(StringRef PN) {
                                            SuffixEnd - LastComponent - 1);
 
   // Infer target from the prefix.
-  StringRef Prefix(ProgName);
+  llvm::StringRef Prefix(ProgName);
   Prefix = Prefix.slice(0, LastComponent);
   std::string IgnoredError;
   bool IsRegistered =
@@ -419,7 +419,7 @@ ToolChain::getTargetAndModeFromProgramName(StringRef PN) {
                          IsRegistered};
 }
 
-StringRef ToolChain::getDefaultUniversalArchName() const {
+llvm::StringRef ToolChain::getDefaultUniversalArchName() const {
   // In universal driver terms, the arch name accepted by -arch isn't exactly
   // the same as the ones that appear in the triple. Roughly speaking, this is
   // an inverse of the darwin::getArchTypeForDarwinArchName() function.
@@ -571,7 +571,7 @@ Tool *ToolChain::getTool(Action::ActionClass AC) const {
   llvm_unreachable("Invalid tool kind.");
 }
 
-static StringRef getArchNameForCompilerRTLib(const ToolChain &TC,
+static llvm::StringRef getArchNameForCompilerRTLib(const ToolChain &TC,
                                              const ArgList &Args) {
   const llvm::Triple &Triple = TC.getTriple();
   bool IsWindows = Triple.isOSWindows();
@@ -594,7 +594,7 @@ static StringRef getArchNameForCompilerRTLib(const ToolChain &TC,
   return llvm::Triple::getArchTypeName(TC.getArch());
 }
 
-StringRef ToolChain::getOSLibName() const {
+llvm::StringRef ToolChain::getOSLibName() const {
   if (Triple.isOSDarwin())
     return "darwin";
 
@@ -615,7 +615,7 @@ StringRef ToolChain::getOSLibName() const {
 }
 
 std::string ToolChain::getCompilerRTPath() const {
-  SmallString<128> Path(getDriver().ResourceDir);
+  llvm::SmallString<128> Path(getDriver().ResourceDir);
   if (isBareMetal()) {
     llvm::sys::path::append(Path, "lib", getOSLibName());
     if (!SelectedMultilibs.empty()) {
@@ -630,14 +630,14 @@ std::string ToolChain::getCompilerRTPath() const {
 }
 
 std::string ToolChain::getCompilerRTBasename(const ArgList &Args,
-                                             StringRef Component,
+                                             llvm::StringRef Component,
                                              FileType Type) const {
   std::string CRTAbsolutePath = getCompilerRT(Args, Component, Type);
   return llvm::sys::path::filename(CRTAbsolutePath).str();
 }
 
 std::string ToolChain::buildCompilerRTBasename(const llvm::opt::ArgList &Args,
-                                               StringRef Component,
+                                               llvm::StringRef Component,
                                                FileType Type,
                                                bool AddArch) const {
   const llvm::Triple &TT = getTriple();
@@ -663,21 +663,21 @@ std::string ToolChain::buildCompilerRTBasename(const llvm::opt::ArgList &Args,
 
   std::string ArchAndEnv;
   if (AddArch) {
-    StringRef Arch = getArchNameForCompilerRTLib(*this, Args);
+    llvm::StringRef Arch = getArchNameForCompilerRTLib(*this, Args);
     const char *Env = TT.isAndroid() ? "-android" : "";
     ArchAndEnv = ("-" + Arch + Env).str();
   }
-  return (Prefix + Twine("clang_rt.") + Component + ArchAndEnv + Suffix).str();
+  return (Prefix + llvm::Twine("clang_rt.") + Component + ArchAndEnv + Suffix).str();
 }
 
-std::string ToolChain::getCompilerRT(const ArgList &Args, StringRef Component,
+std::string ToolChain::getCompilerRT(const ArgList &Args, llvm::StringRef Component,
                                      FileType Type) const {
   // Check for runtime files in the new layout without the architecture first.
   std::string CRTBasename =
       buildCompilerRTBasename(Args, Component, Type, /*AddArch=*/false);
-  SmallString<128> Path;
+  llvm::SmallString<128> Path;
   for (const auto &LibPath : getLibraryPaths()) {
-    SmallString<128> P(LibPath);
+    llvm::SmallString<128> P(LibPath);
     llvm::sys::path::append(P, CRTBasename);
     if (getVFS().exists(P))
       return std::string(P);
@@ -690,7 +690,7 @@ std::string ToolChain::getCompilerRT(const ArgList &Args, StringRef Component,
   // Check the filename for the old layout if the new one does not exist.
   CRTBasename =
       buildCompilerRTBasename(Args, Component, Type, /*AddArch=*/true);
-  SmallString<128> OldPath(getCompilerRTPath());
+  llvm::SmallString<128> OldPath(getCompilerRTPath());
   llvm::sys::path::append(OldPath, CRTBasename);
   if (Path.empty() || getVFS().exists(OldPath))
     return std::string(OldPath);
@@ -702,7 +702,7 @@ std::string ToolChain::getCompilerRT(const ArgList &Args, StringRef Component,
 }
 
 const char *ToolChain::getCompilerRTArgString(const llvm::opt::ArgList &Args,
-                                              StringRef Component,
+                                              llvm::StringRef Component,
                                               FileType Type) const {
   return Args.MakeArgString(getCompilerRT(Args, Component, Type));
 }
@@ -711,20 +711,20 @@ const char *ToolChain::getCompilerRTArgString(const llvm::opt::ArgList &Args,
 // for the exact target version, we should fall back to the next newest version
 // or a versionless path, if any.
 std::optional<std::string>
-ToolChain::getFallbackAndroidTargetPath(StringRef BaseDir) const {
+ToolChain::getFallbackAndroidTargetPath(llvm::StringRef BaseDir) const {
   llvm::Triple TripleWithoutLevel(getTriple());
   TripleWithoutLevel.setEnvironmentName("android"); // remove any version number
   const std::string &TripleWithoutLevelStr = TripleWithoutLevel.str();
   unsigned TripleVersion = getTriple().getEnvironmentVersion().getMajor();
   unsigned BestVersion = 0;
 
-  SmallString<32> TripleDir;
+  llvm::SmallString<32> TripleDir;
   bool UsingUnversionedDir = false;
   std::error_code EC;
   for (llvm::vfs::directory_iterator LI = getVFS().dir_begin(BaseDir, EC), LE;
        !EC && LI != LE; LI = LI.increment(EC)) {
-    StringRef DirName = llvm::sys::path::filename(LI->path());
-    StringRef DirNameSuffix = DirName;
+    llvm::StringRef DirName = llvm::sys::path::filename(LI->path());
+    llvm::StringRef DirNameSuffix = DirName;
     if (DirNameSuffix.consume_front(TripleWithoutLevelStr)) {
       if (DirNameSuffix.empty() && TripleDir.empty()) {
         TripleDir = DirName;
@@ -744,7 +744,7 @@ ToolChain::getFallbackAndroidTargetPath(StringRef BaseDir) const {
   if (TripleDir.empty())
     return {};
 
-  SmallString<128> P(BaseDir);
+  llvm::SmallString<128> P(BaseDir);
   llvm::sys::path::append(P, TripleDir);
   if (UsingUnversionedDir)
     D.Diag(diag::warn_android_unversioned_fallback) << P << getTripleString();
@@ -752,10 +752,10 @@ ToolChain::getFallbackAndroidTargetPath(StringRef BaseDir) const {
 }
 
 std::optional<std::string>
-ToolChain::getTargetSubDirPath(StringRef BaseDir) const {
+ToolChain::getTargetSubDirPath(llvm::StringRef BaseDir) const {
   auto getPathForTriple =
       [&](const llvm::Triple &Triple) -> std::optional<std::string> {
-    SmallString<128> P(BaseDir);
+    llvm::SmallString<128> P(BaseDir);
     llvm::sys::path::append(P, Triple.str());
     if (getVFS().exists(P))
       return std::string(P);
@@ -794,7 +794,7 @@ ToolChain::getTargetSubDirPath(StringRef BaseDir) const {
 }
 
 std::optional<std::string> ToolChain::getRuntimePath() const {
-  SmallString<128> P(D.ResourceDir);
+  llvm::SmallString<128> P(D.ResourceDir);
   llvm::sys::path::append(P, "lib");
   if (auto Ret = getTargetSubDirPath(P))
     return Ret;
@@ -806,7 +806,7 @@ std::optional<std::string> ToolChain::getRuntimePath() const {
 }
 
 std::optional<std::string> ToolChain::getStdlibPath() const {
-  SmallString<128> P(D.Dir);
+  llvm::SmallString<128> P(D.Dir);
   llvm::sys::path::append(P, "..", "lib");
   return getTargetSubDirPath(P);
 }
@@ -814,8 +814,8 @@ std::optional<std::string> ToolChain::getStdlibPath() const {
 ToolChain::path_list ToolChain::getArchSpecificLibPaths() const {
   path_list Paths;
 
-  auto AddPath = [&](const ArrayRef<StringRef> &SS) {
-    SmallString<128> Path(getDriver().ResourceDir);
+  auto AddPath = [&](const llvm::ArrayRef<llvm::StringRef> &SS) {
+    llvm::SmallString<128> Path(getDriver().ResourceDir);
     llvm::sys::path::append(Path, "lib");
     for (auto &S : SS)
       llvm::sys::path::append(Path, S);
@@ -872,7 +872,7 @@ std::string ToolChain::GetLinkerPath(bool *LinkerIsLLD) const {
   // Get -fuse-ld= first to prevent -Wunused-command-line-argument. -fuse-ld= is
   // considered as the linker flavor, e.g. "bfd", "gold", or "lld".
   const Arg* A = Args.getLastArg(options::OPT_fuse_ld_EQ);
-  StringRef UseLinker = A ? A->getValue() : CLANG_DEFAULT_LINKER;
+  llvm::StringRef UseLinker = A ? A->getValue() : CLANG_DEFAULT_LINKER;
 
   // --ld-path= takes precedence over -fuse-ld= and specifies the executable
   // name. -B, COMPILER_PATH and PATH and consulted if the value does not
@@ -944,7 +944,7 @@ std::string ToolChain::GetStaticLibToolPath() const {
   return GetProgramPath("llvm-ar");
 }
 
-types::ID ToolChain::LookupTypeForExtension(StringRef Ext) const {
+types::ID ToolChain::LookupTypeForExtension(llvm::StringRef Ext) const {
   types::ID id = types::lookupTypeForExtension(Ext);
 
   // Flang always runs the preprocessor and has no notion of "preprocessed
@@ -978,7 +978,7 @@ bool ToolChain::isCrossCompiling() const {
 
 ObjCRuntime ToolChain::getDefaultObjCRuntime(bool isNonFragile) const {
   return ObjCRuntime(isNonFragile ? ObjCRuntime::GNUstep : ObjCRuntime::GCC,
-                     VersionTuple());
+                     llvm::VersionTuple());
 }
 
 llvm::ExceptionHandling
@@ -986,7 +986,7 @@ ToolChain::GetExceptionModel(const llvm::opt::ArgList &Args) const {
   return llvm::ExceptionHandling::None;
 }
 
-bool ToolChain::isThreadModelSupported(const StringRef Model) const {
+bool ToolChain::isThreadModelSupported(const llvm::StringRef Model) const {
   if (Model == "single") {
     // FIXME: 'single' is only supported on ARM and WebAssembly so far.
     return Triple.getArch() == llvm::Triple::arm ||
@@ -1013,7 +1013,7 @@ std::string ToolChain::ComputeLLVMTriple(const ArgList &Args,
     if (Arg *A = Args.getLastArg(options::OPT_march_EQ)) {
       // x86_64h goes in the triple. Other -march options just use the
       // vanilla triple we already have.
-      StringRef MArch = A->getValue();
+      llvm::StringRef MArch = A->getValue();
       if (MArch == "x86_64h")
         Triple.setArchName(MArch);
     }
@@ -1084,7 +1084,7 @@ ToolChain::RuntimeLibType ToolChain::GetRuntimeLibType(
     return *runtimeLibType;
 
   const Arg* A = Args.getLastArg(options::OPT_rtlib_EQ);
-  StringRef LibName = A ? A->getValue() : CLANG_DEFAULT_RTLIB;
+  llvm::StringRef LibName = A ? A->getValue() : CLANG_DEFAULT_RTLIB;
 
   // Only use "platform" in tests to override CLANG_DEFAULT_RTLIB!
   if (LibName == "compiler-rt")
@@ -1110,7 +1110,7 @@ ToolChain::UnwindLibType ToolChain::GetUnwindLibType(
     return *unwindLibType;
 
   const Arg *A = Args.getLastArg(options::OPT_unwindlib_EQ);
-  StringRef LibName = A ? A->getValue() : CLANG_DEFAULT_UNWINDLIB;
+  llvm::StringRef LibName = A ? A->getValue() : CLANG_DEFAULT_UNWINDLIB;
 
   if (LibName == "none")
     unwindLibType = ToolChain::UNW_None;
@@ -1145,7 +1145,7 @@ ToolChain::CXXStdlibType ToolChain::GetCXXStdlibType(const ArgList &Args) const{
     return *cxxStdlibType;
 
   const Arg *A = Args.getLastArg(options::OPT_stdlib_EQ);
-  StringRef LibName = A ? A->getValue() : CLANG_DEFAULT_CXX_STDLIB;
+  llvm::StringRef LibName = A ? A->getValue() : CLANG_DEFAULT_CXX_STDLIB;
 
   // Only use "platform" in tests to override CLANG_DEFAULT_CXX_STDLIB!
   if (LibName == "libc++")
@@ -1168,7 +1168,7 @@ ToolChain::CXXStdlibType ToolChain::GetCXXStdlibType(const ArgList &Args) const{
 /// Utility function to add a system include directory to CC1 arguments.
 /*static*/ void ToolChain::addSystemInclude(const ArgList &DriverArgs,
                                             ArgStringList &CC1Args,
-                                            const Twine &Path) {
+                                            const llvm::Twine &Path) {
   CC1Args.push_back("-internal-isystem");
   CC1Args.push_back(DriverArgs.MakeArgString(Path));
 }
@@ -1183,14 +1183,14 @@ ToolChain::CXXStdlibType ToolChain::GetCXXStdlibType(const ArgList &Args) const{
 /// classification.
 /*static*/ void ToolChain::addExternCSystemInclude(const ArgList &DriverArgs,
                                                    ArgStringList &CC1Args,
-                                                   const Twine &Path) {
+                                                   const llvm::Twine &Path) {
   CC1Args.push_back("-internal-externc-isystem");
   CC1Args.push_back(DriverArgs.MakeArgString(Path));
 }
 
 void ToolChain::addExternCSystemIncludeIfExists(const ArgList &DriverArgs,
                                                 ArgStringList &CC1Args,
-                                                const Twine &Path) {
+                                                const llvm::Twine &Path) {
   if (llvm::sys::fs::exists(Path))
     addExternCSystemInclude(DriverArgs, CC1Args, Path);
 }
@@ -1198,33 +1198,33 @@ void ToolChain::addExternCSystemIncludeIfExists(const ArgList &DriverArgs,
 /// Utility function to add a list of system include directories to CC1.
 /*static*/ void ToolChain::addSystemIncludes(const ArgList &DriverArgs,
                                              ArgStringList &CC1Args,
-                                             ArrayRef<StringRef> Paths) {
+                                             llvm::ArrayRef<llvm::StringRef> Paths) {
   for (const auto &Path : Paths) {
     CC1Args.push_back("-internal-isystem");
     CC1Args.push_back(DriverArgs.MakeArgString(Path));
   }
 }
 
-/*static*/ std::string ToolChain::concat(StringRef Path, const Twine &A,
-                                         const Twine &B, const Twine &C,
-                                         const Twine &D) {
-  SmallString<128> Result(Path);
+/*static*/ std::string ToolChain::concat(llvm::StringRef Path, const llvm::Twine &A,
+                                         const llvm::Twine &B, const llvm::Twine &C,
+                                         const llvm::Twine &D) {
+  llvm::SmallString<128> Result(Path);
   llvm::sys::path::append(Result, llvm::sys::path::Style::posix, A, B, C, D);
   return std::string(Result);
 }
 
-std::string ToolChain::detectLibcxxVersion(StringRef IncludePath) const {
+std::string ToolChain::detectLibcxxVersion(llvm::StringRef IncludePath) const {
   std::error_code EC;
   int MaxVersion = 0;
   std::string MaxVersionString;
-  SmallString<128> Path(IncludePath);
+  llvm::SmallString<128> Path(IncludePath);
   llvm::sys::path::append(Path, "c++");
   for (llvm::vfs::directory_iterator LI = getVFS().dir_begin(Path, EC), LE;
        !EC && LI != LE; LI = LI.increment(EC)) {
-    StringRef VersionText = llvm::sys::path::filename(LI->path());
+    llvm::StringRef VersionText = llvm::sys::path::filename(LI->path());
     int Version;
     if (VersionText[0] == 'v' &&
-        !VersionText.slice(1, StringRef::npos).getAsInteger(10, Version)) {
+        !VersionText.slice(1, llvm::StringRef::npos).getAsInteger(10, Version)) {
       if (Version > MaxVersion) {
         MaxVersion = Version;
         MaxVersionString = std::string(VersionText);
@@ -1297,7 +1297,7 @@ void ToolChain::AddFilePathLibArgs(const ArgList &Args,
                                    ArgStringList &CmdArgs) const {
   for (const auto &LibPath : getFilePaths())
     if(LibPath.length() > 0)
-      CmdArgs.push_back(Args.MakeArgString(StringRef("-L") + LibPath));
+      CmdArgs.push_back(Args.MakeArgString(llvm::StringRef("-L") + LibPath));
 }
 
 void ToolChain::AddCCKextLibArgs(const ArgList &Args,
@@ -1325,7 +1325,7 @@ bool ToolChain::isFastMathRuntimeAvailable(const ArgList &Args,
         A->getOption().getID() == options::OPT_fno_unsafe_math_optimizations)
       Default = false;
     if (A && A->getOption().getID() == options::OPT_ffp_model_EQ) {
-      StringRef Model = A->getValue();
+      llvm::StringRef Model = A->getValue();
       if (Model != "fast")
         Default = false;
     }
@@ -1352,9 +1352,9 @@ bool ToolChain::addFastMathRuntimeIfAvailable(const ArgList &Args,
   return false;
 }
 
-Expected<SmallVector<std::string>>
+llvm::Expected<llvm::SmallVector<std::string>>
 ToolChain::getSystemGPUArchs(const llvm::opt::ArgList &Args) const {
-  return SmallVector<std::string>();
+  return llvm::SmallVector<std::string>();
 }
 
 SanitizerMask ToolChain::getSupportedSanitizers() const {
@@ -1396,20 +1396,20 @@ ToolChain::getDeviceLibs(const ArgList &DriverArgs) const {
 void ToolChain::AddIAMCUIncludeArgs(const ArgList &DriverArgs,
                                     ArgStringList &CC1Args) const {}
 
-static VersionTuple separateMSVCFullVersion(unsigned Version) {
+static llvm::VersionTuple separateMSVCFullVersion(unsigned Version) {
   if (Version < 100)
-    return VersionTuple(Version);
+    return llvm::VersionTuple(Version);
 
   if (Version < 10000)
-    return VersionTuple(Version / 100, Version % 100);
+    return llvm::VersionTuple(Version / 100, Version % 100);
 
   unsigned Build = 0, Factor = 1;
   for (; Version > 10000; Version = Version / 10, Factor = Factor * 10)
     Build = Build + (Version % 10) * Factor;
-  return VersionTuple(Version / 100, Version % 100, Build);
+  return llvm::VersionTuple(Version / 100, Version % 100, Build);
 }
 
-VersionTuple
+llvm::VersionTuple
 ToolChain::computeMSVCVersion(const Driver *D,
                               const llvm::opt::ArgList &Args) const {
   const Arg *MSCVersion = Args.getLastArg(options::OPT_fmsc_version);
@@ -1421,11 +1421,11 @@ ToolChain::computeMSVCVersion(const Driver *D,
       D->Diag(diag::err_drv_argument_not_allowed_with)
           << MSCVersion->getAsString(Args)
           << MSCompatibilityVersion->getAsString(Args);
-    return VersionTuple();
+    return llvm::VersionTuple();
   }
 
   if (MSCompatibilityVersion) {
-    VersionTuple MSVT;
+    llvm::VersionTuple MSVT;
     if (MSVT.tryParse(MSCompatibilityVersion->getValue())) {
       if (D)
         D->Diag(diag::err_drv_invalid_value)
@@ -1438,7 +1438,7 @@ ToolChain::computeMSVCVersion(const Driver *D,
 
   if (MSCVersion) {
     unsigned Version = 0;
-    if (StringRef(MSCVersion->getValue()).getAsInteger(10, Version)) {
+    if (llvm::StringRef(MSCVersion->getValue()).getAsInteger(10, Version)) {
       if (D)
         D->Diag(diag::err_drv_invalid_value)
             << MSCVersion->getAsString(Args) << MSCVersion->getValue();
@@ -1447,12 +1447,12 @@ ToolChain::computeMSVCVersion(const Driver *D,
     }
   }
 
-  return VersionTuple();
+  return llvm::VersionTuple();
 }
 
 llvm::opt::DerivedArgList *ToolChain::TranslateOpenMPTargetArgs(
     const llvm::opt::DerivedArgList &Args, bool SameTripleAsHost,
-    SmallVectorImpl<llvm::opt::Arg *> &AllocatedArgs) const {
+    llvm::SmallVectorImpl<llvm::opt::Arg *> &AllocatedArgs) const {
   DerivedArgList *DAL = new DerivedArgList(Args.getBaseArgs());
   const OptTable &Opts = getDriver().getOpts();
   bool Modified = false;
@@ -1528,7 +1528,7 @@ llvm::opt::DerivedArgList *ToolChain::TranslateOpenMPTargetArgs(
 void ToolChain::TranslateXarchArgs(
     const llvm::opt::DerivedArgList &Args, llvm::opt::Arg *&A,
     llvm::opt::DerivedArgList *DAL,
-    SmallVectorImpl<llvm::opt::Arg *> *AllocatedArgs) const {
+    llvm::SmallVectorImpl<llvm::opt::Arg *> *AllocatedArgs) const {
   const OptTable &Opts = getDriver().getOpts();
   unsigned ValuePos = 1;
   if (A->getOption().matches(options::OPT_Xarch_device) ||
@@ -1568,9 +1568,9 @@ void ToolChain::TranslateXarchArgs(
 }
 
 llvm::opt::DerivedArgList *ToolChain::TranslateXarchArgs(
-    const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+    const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
     Action::OffloadKind OFK,
-    SmallVectorImpl<llvm::opt::Arg *> *AllocatedArgs) const {
+    llvm::SmallVectorImpl<llvm::opt::Arg *> *AllocatedArgs) const {
   DerivedArgList *DAL = new DerivedArgList(Args.getBaseArgs());
   bool Modified = false;
 

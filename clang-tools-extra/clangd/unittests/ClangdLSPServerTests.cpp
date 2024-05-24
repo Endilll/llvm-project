@@ -97,16 +97,16 @@ private:
     // Color logs so we can distinguish them from test output.
     void log(Level L, const char *Fmt,
              const llvm::formatv_object_base &Message) override {
-      raw_ostream::Colors Color;
+      llvm::raw_ostream::Colors Color;
       switch (L) {
       case Level::Verbose:
-        Color = raw_ostream::BLUE;
+        Color = llvm::raw_ostream::BLUE;
         break;
       case Level::Error:
-        Color = raw_ostream::RED;
+        Color = llvm::raw_ostream::RED;
         break;
       default:
-        Color = raw_ostream::YELLOW;
+        Color = llvm::raw_ostream::YELLOW;
         break;
       }
       std::lock_guard<std::mutex> Lock(LogMu);

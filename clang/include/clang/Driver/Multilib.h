@@ -52,9 +52,9 @@ public:
   /// GCCSuffix, OSSuffix & IncludeSuffix will be appended directly to the
   /// sysroot string so they must either be empty or begin with a '/' character.
   /// This is enforced with an assert in the constructor.
-  Multilib(StringRef GCCSuffix = {}, StringRef OSSuffix = {},
-           StringRef IncludeSuffix = {}, const flags_list &Flags = flags_list(),
-           StringRef ExclusiveGroup = {});
+  Multilib(llvm::StringRef GCCSuffix = {}, llvm::StringRef OSSuffix = {},
+           llvm::StringRef IncludeSuffix = {}, const flags_list &Flags = flags_list(),
+           llvm::StringRef ExclusiveGroup = {});
 
   /// Get the detected GCC installation path suffix for the multi-arch
   /// target variant. Always starts with a '/', unless empty
@@ -77,7 +77,7 @@ public:
 
   LLVM_DUMP_METHOD void dump() const;
   /// print summary of the Multilib
-  void print(raw_ostream &OS) const;
+  void print(llvm::raw_ostream &OS) const;
 
   /// Check whether the default is selected
   bool isDefault() const
@@ -86,7 +86,7 @@ public:
   bool operator==(const Multilib &Other) const;
 };
 
-raw_ostream &operator<<(raw_ostream &OS, const Multilib &M);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const Multilib &M);
 
 /// See also MultilibSetBuilder for combining multilibs into a set.
 class MultilibSet {
@@ -140,7 +140,7 @@ public:
   llvm::StringSet<> expandFlags(const Multilib::flags_list &) const;
 
   LLVM_DUMP_METHOD void dump() const;
-  void print(raw_ostream &OS) const;
+  void print(llvm::raw_ostream &OS) const;
 
   MultilibSet &setIncludeDirsCallback(IncludeDirsFunc F) {
     IncludeCallback = std::move(F);
@@ -161,7 +161,7 @@ public:
             void *DiagHandlerCtxt = nullptr);
 };
 
-raw_ostream &operator<<(raw_ostream &OS, const MultilibSet &MS);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const MultilibSet &MS);
 
 } // namespace driver
 } // namespace clang

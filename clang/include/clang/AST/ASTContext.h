@@ -111,7 +111,7 @@ class VTableContextBase;
 class XRayFunctionFilter;
 
 /// A simple array of base specifiers.
-typedef SmallVector<CXXBaseSpecifier *, 4> CXXCastPath;
+typedef llvm::SmallVector<CXXBaseSpecifier *, 4> CXXCastPath;
 
 namespace Builtin {
 
@@ -182,10 +182,10 @@ struct TypeInfoChars {
 
 /// Holds long-lived AST nodes (such as types and decls) that can be
 /// referred to throughout the semantic analysis of a file.
-class ASTContext : public RefCountedBase<ASTContext> {
+class ASTContext : public llvm::RefCountedBase<ASTContext> {
   friend class NestedNameSpecifier;
 
-  mutable SmallVector<Type *, 0> Types;
+  mutable llvm::SmallVector<Type *, 0> Types;
   mutable llvm::FoldingSet<ExtQuals> ExtQualNodes;
   mutable llvm::FoldingSet<ComplexType> ComplexTypes;
   mutable llvm::FoldingSet<PointerType> PointerTypes{GeneralTypesLog2InitSize};
@@ -649,7 +649,7 @@ public:
   Builtin::Context &BuiltinInfo;
   const TranslationUnitKind TUKind;
   mutable DeclarationNameTable DeclarationNames;
-  IntrusiveRefCntPtr<ExternalASTSource> ExternalSource;
+  llvm::IntrusiveRefCntPtr<ExternalASTSource> ExternalSource;
   ASTMutationListener *Listener = nullptr;
 
   /// Returns the clang bytecode interpreter context.
@@ -876,7 +876,7 @@ public:
   ///
   /// If the last comment in the file is already attached we assume
   /// there are not comments left to be attached to \p Decls.
-  void attachCommentsToJustParsedDecls(ArrayRef<Decl *> Decls,
+  void attachCommentsToJustParsedDecls(llvm::ArrayRef<Decl *> Decls,
                                        const Preprocessor *PP);
 
   /// Return parsed documentation comment attached to a given declaration.
@@ -1019,7 +1019,7 @@ public:
   /// method in the interface or its categories.
   void getOverriddenMethods(
                         const NamedDecl *Method,
-                        SmallVectorImpl<const NamedDecl *> &Overridden) const;
+                        llvm::SmallVectorImpl<const NamedDecl *> &Overridden) const;
 
   /// Notify the AST context that a new import declaration has been
   /// parsed or implicitly created within this translation unit.
@@ -1054,7 +1054,7 @@ public:
 
   /// Get the additional modules in which the definition \p Def has
   /// been merged.
-  ArrayRef<Module*> getModulesWithMergedDefinition(const NamedDecl *Def);
+  llvm::ArrayRef<Module*> getModulesWithMergedDefinition(const NamedDecl *Def);
 
   /// Add a declaration to the list of declarations that are initialized
   /// for a module. This will typically be a global variable (with internal
@@ -1062,10 +1062,10 @@ public:
   /// or an ImportDecl nominating another module that has initializers.
   void addModuleInitializer(Module *M, Decl *Init);
 
-  void addLazyModuleInitializers(Module *M, ArrayRef<GlobalDeclID> IDs);
+  void addLazyModuleInitializers(Module *M, llvm::ArrayRef<GlobalDeclID> IDs);
 
   /// Get the initializations to perform when importing a module, if any.
-  ArrayRef<Decl*> getModuleInitializers(Module *M);
+  llvm::ArrayRef<Decl*> getModuleInitializers(Module *M);
 
   /// Set the (C++20) module we are building.
   void setCurrentNamedModule(Module *M);
@@ -1191,7 +1191,7 @@ public:
   /// The external AST source provides the ability to load parts of
   /// the abstract syntax tree as needed from some external storage,
   /// e.g., a precompiled header.
-  void setExternalSource(IntrusiveRefCntPtr<ExternalASTSource> Source);
+  void setExternalSource(llvm::IntrusiveRefCntPtr<ExternalASTSource> Source);
 
   /// Retrieve a pointer to the external AST source associated
   /// with this AST context, if any.
@@ -1213,7 +1213,7 @@ public:
   ASTMutationListener *getASTMutationListener() const { return Listener; }
 
   void PrintStats() const;
-  const SmallVectorImpl<Type *>& getTypes() const { return Types; }
+  const llvm::SmallVectorImpl<Type *>& getTypes() const { return Types; }
 
   BuiltinTemplateDecl *buildBuiltinTemplateDecl(BuiltinTemplateKind BTK,
                                                 const IdentifierInfo *II) const;
@@ -1221,11 +1221,11 @@ public:
   /// Create a new implicit TU-level CXXRecordDecl or RecordDecl
   /// declaration.
   RecordDecl *buildImplicitRecord(
-      StringRef Name,
+      llvm::StringRef Name,
       RecordDecl::TagKind TK = RecordDecl::TagKind::Struct) const;
 
   /// Create a new implicit TU-level typedef declaration.
-  TypedefDecl *buildImplicitTypedef(QualType T, StringRef Name) const;
+  TypedefDecl *buildImplicitTypedef(QualType T, llvm::StringRef Name) const;
 
   /// Retrieve the declaration for the 128-bit signed integer type.
   TypedefDecl *getInt128Decl() const;
@@ -1266,7 +1266,7 @@ public:
   /// qualifiers on ObjCObjectPointerType. It can be set to true when
   /// constructing the canonical type of a Objective-C type parameter.
   QualType applyObjCProtocolQualifiers(QualType type,
-      ArrayRef<ObjCProtocolDecl *> protocols, bool &hasError,
+      llvm::ArrayRef<ObjCProtocolDecl *> protocols, bool &hasError,
       bool allowOnPointerType = false) const;
 
   /// Return the uniqued reference to the type for an Objective-C
@@ -1360,7 +1360,7 @@ public:
   QualType
   getCountAttributedType(QualType T, Expr *CountExpr, bool CountInBytes,
                          bool OrNull,
-                         ArrayRef<TypeCoupledDeclRefInfo> DependentDecls) const;
+                         llvm::ArrayRef<TypeCoupledDeclRefInfo> DependentDecls) const;
 
   /// Return the uniqued reference to a type adjusted from the original
   /// type to a new type.
@@ -1575,7 +1575,7 @@ public:
   }
 
   /// Return a normal function type with a typed argument list.
-  QualType getFunctionType(QualType ResultTy, ArrayRef<QualType> Args,
+  QualType getFunctionType(QualType ResultTy, llvm::ArrayRef<QualType> Args,
                            const FunctionProtoType::ExtProtoInfo &EPI) const {
     return getFunctionTypeInternal(ResultTy, Args, EPI, false);
   }
@@ -1584,14 +1584,14 @@ public:
 
 private:
   /// Return a normal function type with a typed argument list.
-  QualType getFunctionTypeInternal(QualType ResultTy, ArrayRef<QualType> Args,
+  QualType getFunctionTypeInternal(QualType ResultTy, llvm::ArrayRef<QualType> Args,
                                    const FunctionProtoType::ExtProtoInfo &EPI,
                                    bool OnlyWantCanonical) const;
   QualType
   getAutoTypeInternal(QualType DeducedType, AutoTypeKeyword Keyword,
                       bool IsDependent, bool IsPack = false,
                       ConceptDecl *TypeConstraintConcept = nullptr,
-                      ArrayRef<TemplateArgument> TypeConstraintArgs = {},
+                      llvm::ArrayRef<TemplateArgument> TypeConstraintArgs = {},
                       bool IsCanon = false) const;
 
 public:
@@ -1648,15 +1648,15 @@ public:
                           TemplateTypeParmDecl *ParmDecl = nullptr) const;
 
   QualType getTemplateSpecializationType(TemplateName T,
-                                         ArrayRef<TemplateArgument> Args,
+                                         llvm::ArrayRef<TemplateArgument> Args,
                                          QualType Canon = QualType()) const;
 
   QualType
   getCanonicalTemplateSpecializationType(TemplateName T,
-                                         ArrayRef<TemplateArgument> Args) const;
+                                         llvm::ArrayRef<TemplateArgument> Args) const;
 
   QualType getTemplateSpecializationType(TemplateName T,
-                                         ArrayRef<TemplateArgumentLoc> Args,
+                                         llvm::ArrayRef<TemplateArgumentLoc> Args,
                                          QualType Canon = QualType()) const;
 
   TypeSourceInfo *
@@ -1679,10 +1679,10 @@ public:
 
   QualType getDependentTemplateSpecializationType(
       ElaboratedTypeKeyword Keyword, NestedNameSpecifier *NNS,
-      const IdentifierInfo *Name, ArrayRef<TemplateArgumentLoc> Args) const;
+      const IdentifierInfo *Name, llvm::ArrayRef<TemplateArgumentLoc> Args) const;
   QualType getDependentTemplateSpecializationType(
       ElaboratedTypeKeyword Keyword, NestedNameSpecifier *NNS,
-      const IdentifierInfo *Name, ArrayRef<TemplateArgument> Args) const;
+      const IdentifierInfo *Name, llvm::ArrayRef<TemplateArgument> Args) const;
 
   TemplateArgument getInjectedTemplateArg(NamedDecl *ParamDecl);
 
@@ -1690,7 +1690,7 @@ public:
   /// in a template parameter list, such as for the injected class name of
   /// a class template.
   void getInjectedTemplateArgs(const TemplateParameterList *Params,
-                               SmallVectorImpl<TemplateArgument> &Args);
+                               llvm::SmallVectorImpl<TemplateArgument> &Args);
 
   /// Form a pack expansion type with the given pattern.
   /// \param NumExpansions The number of expansions for the pack, if known.
@@ -1712,12 +1712,12 @@ public:
                              unsigned NumProtocols) const;
 
   QualType getObjCObjectType(QualType Base,
-                             ArrayRef<QualType> typeArgs,
-                             ArrayRef<ObjCProtocolDecl *> protocols,
+                             llvm::ArrayRef<QualType> typeArgs,
+                             llvm::ArrayRef<ObjCProtocolDecl *> protocols,
                              bool isKindOf) const;
 
   QualType getObjCTypeParamType(const ObjCTypeParamDecl *Decl,
-                                ArrayRef<ObjCProtocolDecl *> protocols) const;
+                                llvm::ArrayRef<ObjCProtocolDecl *> protocols) const;
   void adjustObjCTypeParamBoundType(const ObjCTypeParamDecl *Orig,
                                     ObjCTypeParamDecl *New) const;
 
@@ -1743,7 +1743,7 @@ public:
 
   QualType getPackIndexingType(QualType Pattern, Expr *IndexExpr,
                                bool FullySubstituted = false,
-                               ArrayRef<QualType> Expansions = {},
+                               llvm::ArrayRef<QualType> Expansions = {},
                                int Index = -1) const;
 
   /// Unary type transforms
@@ -1754,7 +1754,7 @@ public:
   QualType getAutoType(QualType DeducedType, AutoTypeKeyword Keyword,
                        bool IsDependent, bool IsPack = false,
                        ConceptDecl *TypeConstraintConcept = nullptr,
-                       ArrayRef<TemplateArgument> TypeConstraintArgs ={}) const;
+                       llvm::ArrayRef<TemplateArgument> TypeConstraintArgs ={}) const;
 
   /// C++11 deduction pattern for 'auto' type.
   QualType getAutoDeductType() const;
@@ -2488,7 +2488,7 @@ public:
   const ASTRecordLayout &getASTObjCInterfaceLayout(const ObjCInterfaceDecl *D)
     const;
 
-  void DumpRecordLayout(const RecordDecl *RD, raw_ostream &OS,
+  void DumpRecordLayout(const RecordDecl *RD, llvm::raw_ostream &OS,
                         bool Simple = false) const;
 
   /// Get or compute information about the layout of the specified
@@ -2557,7 +2557,7 @@ public:
   MangleContext *createDeviceMangleContext(const TargetInfo &T);
 
   void DeepCollectObjCIvars(const ObjCInterfaceDecl *OI, bool leafClass,
-                            SmallVectorImpl<const ObjCIvarDecl*> &Ivars) const;
+                            llvm::SmallVectorImpl<const ObjCIvarDecl*> &Ivars) const;
 
   unsigned CountNonClassIvars(const ObjCInterfaceDecl *OI) const;
   void CollectInheritedProtocols(const Decl *CDecl,
@@ -2879,7 +2879,7 @@ public:
   FunctionProtoType::ExceptionSpecInfo
   mergeExceptionSpecs(FunctionProtoType::ExceptionSpecInfo ESI1,
                       FunctionProtoType::ExceptionSpecInfo ESI2,
-                      SmallVectorImpl<QualType> &ExceptionTypeStorage,
+                      llvm::SmallVectorImpl<QualType> &ExceptionTypeStorage,
                       bool AcceptDependent);
 
   // For two "same" types, return a type which has
@@ -2984,7 +2984,7 @@ public:
       const FunctionProtoType *FirstFnType,
       const FunctionProtoType *SecondFnType,
       bool &CanUseFirst, bool &CanUseSecond,
-      SmallVectorImpl<FunctionProtoType::ExtParameterInfo> &NewParamInfos);
+      llvm::SmallVectorImpl<FunctionProtoType::ExtParameterInfo> &NewParamInfos);
 
   void ResetObjCLayout(const ObjCContainerDecl *CD);
 
@@ -3183,7 +3183,7 @@ public:
   /// Return a string representing the human readable name for the specified
   /// function declaration or file name. Used by SourceLocExpr and
   /// PredefinedExpr to cache evaluated results.
-  StringLiteral *getPredefinedStringLiteralFromCache(StringRef Key) const;
+  StringLiteral *getPredefinedStringLiteralFromCache(llvm::StringRef Key) const;
 
   /// Return a declaration for the global GUID object representing the given
   /// GUID value.
@@ -3418,12 +3418,12 @@ public:
   /// Whether a C++ static variable or CUDA/HIP kernel should be externalized.
   bool shouldExternalize(const Decl *D) const;
 
-  StringRef getCUIDHash() const;
+  llvm::StringRef getCUIDHash() const;
 
 private:
   /// All OMPTraitInfo objects live in this collection, one per
   /// `pragma omp [begin] declare variant` directive.
-  SmallVector<std::unique_ptr<OMPTraitInfo>, 4> OMPTraitInfoVector;
+  llvm::SmallVector<std::unique_ptr<OMPTraitInfo>, 4> OMPTraitInfoVector;
 };
 
 /// Insertion operator for diagnostics.
@@ -3431,13 +3431,13 @@ const StreamingDiagnostic &operator<<(const StreamingDiagnostic &DB,
                                       const ASTContext::SectionInfo &Section);
 
 /// Utility function for constructing a nullary selector.
-inline Selector GetNullarySelector(StringRef name, ASTContext &Ctx) {
+inline Selector GetNullarySelector(llvm::StringRef name, ASTContext &Ctx) {
   const IdentifierInfo *II = &Ctx.Idents.get(name);
   return Ctx.Selectors.getSelector(0, &II);
 }
 
 /// Utility function for constructing an unary selector.
-inline Selector GetUnarySelector(StringRef name, ASTContext &Ctx) {
+inline Selector GetUnarySelector(llvm::StringRef name, ASTContext &Ctx) {
   const IdentifierInfo *II = &Ctx.Idents.get(name);
   return Ctx.Selectors.getSelector(1, &II);
 }

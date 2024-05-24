@@ -20,11 +20,11 @@ namespace doc {
 
 // Markdown generation
 
-static std::string genItalic(const Twine &Text) {
+static std::string genItalic(const llvm::Twine &Text) {
   return "*" + Text.str() + "*";
 }
 
-static std::string genEmphasis(const Twine &Text) {
+static std::string genEmphasis(const llvm::Twine &Text) {
   return "**" + Text.str() + "**";
 }
 
@@ -40,25 +40,25 @@ genReferenceList(const llvm::SmallVectorImpl<Reference> &Refs) {
   return Stream.str();
 }
 
-static void writeLine(const Twine &Text, raw_ostream &OS) {
+static void writeLine(const llvm::Twine &Text, llvm::raw_ostream &OS) {
   OS << Text << "\n\n";
 }
 
-static void writeNewLine(raw_ostream &OS) { OS << "\n\n"; }
+static void writeNewLine(llvm::raw_ostream &OS) { OS << "\n\n"; }
 
-static void writeHeader(const Twine &Text, unsigned int Num, raw_ostream &OS) {
+static void writeHeader(const llvm::Twine &Text, unsigned int Num, llvm::raw_ostream &OS) {
   OS << std::string(Num, '#') + " " + Text << "\n\n";
 }
 
 static void writeFileDefinition(const ClangDocContext &CDCtx, const Location &L,
-                                raw_ostream &OS) {
+                                llvm::raw_ostream &OS) {
 
   if (!CDCtx.RepositoryUrl) {
     OS << "*Defined at " << L.Filename << "#" << std::to_string(L.LineNumber)
        << "*";
   } else {
     OS << "*Defined at [" << L.Filename << "#" << std::to_string(L.LineNumber)
-       << "](" << StringRef{*CDCtx.RepositoryUrl}
+       << "](" << llvm::StringRef{*CDCtx.RepositoryUrl}
        << llvm::sys::path::relative_path(L.Filename) << "#"
        << std::to_string(L.LineNumber) << ")"
        << "*";
@@ -66,7 +66,7 @@ static void writeFileDefinition(const ClangDocContext &CDCtx, const Location &L,
   OS << "\n\n";
 }
 
-static void writeDescription(const CommentInfo &I, raw_ostream &OS) {
+static void writeDescription(const CommentInfo &I, llvm::raw_ostream &OS) {
   if (I.Kind == "FullComment") {
     for (const auto &Child : I.Children)
       writeDescription(*Child, OS);
@@ -118,7 +118,7 @@ static void writeDescription(const CommentInfo &I, raw_ostream &OS) {
   }
 }
 
-static void writeNameLink(const StringRef &CurrentPath, const Reference &R,
+static void writeNameLink(const llvm::StringRef &CurrentPath, const Reference &R,
                           llvm::raw_ostream &OS) {
   llvm::SmallString<64> Path = R.getRelativeFilePath(CurrentPath);
   // Paths in Markdown use POSIX separators.
@@ -366,7 +366,7 @@ class MDGenerator : public Generator {
 public:
   static const char *Format;
 
-  llvm::Error generateDocs(StringRef RootDir,
+  llvm::Error generateDocs(llvm::StringRef RootDir,
                            llvm::StringMap<std::unique_ptr<doc::Info>> Infos,
                            const ClangDocContext &CDCtx) override;
   llvm::Error createResources(ClangDocContext &CDCtx) override;
@@ -377,7 +377,7 @@ public:
 const char *MDGenerator::Format = "md";
 
 llvm::Error
-MDGenerator::generateDocs(StringRef RootDir,
+MDGenerator::generateDocs(llvm::StringRef RootDir,
                           llvm::StringMap<std::unique_ptr<doc::Info>> Infos,
                           const ClangDocContext &CDCtx) {
   // Track which directories we already tried to create.

@@ -28,7 +28,7 @@ namespace format {
 // \p AnnotatedLines is the sequence of lines from which \p Line is a member of.
 const FormatToken *
 getNamespaceToken(const AnnotatedLine *Line,
-                  const SmallVectorImpl<AnnotatedLine *> &AnnotatedLines);
+                  const llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines);
 
 class NamespaceEndCommentsFixer : public TokenAnalyzer {
 public:
@@ -36,7 +36,7 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override;
 };
 

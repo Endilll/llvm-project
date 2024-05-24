@@ -20,6 +20,7 @@
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/Preprocessor.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Bitstream/BitstreamReader.h"
 #include "llvm/DebugInfo/DWARF/DWARFContext.h"
@@ -45,7 +46,7 @@ class PCHContainerGenerator : public ASTConsumer {
   const std::string OutputFileName;
   ASTContext *Ctx;
   ModuleMap &MMap;
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS;
   const HeaderSearchOptions &HeaderSearchOpts;
   const PreprocessorOptions &PreprocessorOpts;
   CodeGenOptions CodeGenOpts;
@@ -54,7 +55,7 @@ class PCHContainerGenerator : public ASTConsumer {
   std::unique_ptr<llvm::LLVMContext> VMContext;
   std::unique_ptr<llvm::Module> M;
   std::unique_ptr<CodeGen::CodeGenModule> Builder;
-  std::unique_ptr<raw_pwrite_stream> OS;
+  std::unique_ptr<llvm::raw_pwrite_stream> OS;
   std::shared_ptr<PCHBuffer> Buffer;
 
   /// Visit every type and emit debug info for it.
@@ -106,7 +107,7 @@ class PCHContainerGenerator : public ASTConsumer {
         // mandates a CodeGenFunction.
         return true;
 
-      SmallVector<QualType, 16> ArgTypes;
+      llvm::SmallVector<QualType, 16> ArgTypes;
       for (auto *i : D->parameters())
         ArgTypes.push_back(i->getType());
       QualType RetTy = D->getReturnType();
@@ -122,7 +123,7 @@ class PCHContainerGenerator : public ASTConsumer {
         return true;
 
       bool selfIsPseudoStrong, selfIsConsumed;
-      SmallVector<QualType, 16> ArgTypes;
+      llvm::SmallVector<QualType, 16> ArgTypes;
       ArgTypes.push_back(D->getSelfType(Ctx, D->getClassInterface(),
                                         selfIsPseudoStrong, selfIsConsumed));
       ArgTypes.push_back(Ctx.getObjCSelType());
@@ -140,7 +141,7 @@ class PCHContainerGenerator : public ASTConsumer {
 public:
   PCHContainerGenerator(CompilerInstance &CI, const std::string &MainFileName,
                         const std::string &OutputFileName,
-                        std::unique_ptr<raw_pwrite_stream> OS,
+                        std::unique_ptr<llvm::raw_pwrite_stream> OS,
                         std::shared_ptr<PCHBuffer> Buffer)
       : Diags(CI.getDiagnostics()), MainFileName(MainFileName),
         OutputFileName(OutputFileName), Ctx(nullptr),
@@ -182,7 +183,7 @@ public:
 
     // Prepare CGDebugInfo to emit debug info for a clang module.
     auto *DI = Builder->getModuleDebugInfo();
-    StringRef ModuleName = llvm::sys::path::filename(MainFileName);
+    llvm::StringRef ModuleName = llvm::sys::path::filename(MainFileName);
     DI->setPCHDescriptor(
         {ModuleName, "", OutputFileName, ASTFileSignature::createDISentinel()});
     DI->setModuleMap(MMap);
@@ -292,14 +293,14 @@ public:
       llvm::Metadata *Ops[2] = {
           llvm::MDString::get(*VMContext, "__clangast"),
           llvm::MDString::get(*VMContext,
-                              StringRef(SerializedAST.data(), Size))};
+                              llvm::StringRef(SerializedAST.data(), Size))};
       auto *NameAndContent = llvm::MDTuple::get(*VMContext, Ops);
       MD->addOperand(NameAndContent);
     } else {
       auto Int8Ty = llvm::Type::getInt8Ty(*VMContext);
       auto *Ty = llvm::ArrayType::get(Int8Ty, Size);
       auto *Data = llvm::ConstantDataArray::getString(
-          *VMContext, StringRef(SerializedAST.data(), Size),
+          *VMContext, llvm::StringRef(SerializedAST.data(), Size),
           /*AddNull=*/false);
       auto *ASTSym = new llvm::GlobalVariable(
           *M, Ty, /*constant*/ true, llvm::GlobalVariable::InternalLinkage,
@@ -352,28 +353,28 @@ ObjectFilePCHContainerWriter::CreatePCHContainerGenerator(
       CI, MainFileName, OutputFileName, std::move(OS), Buffer);
 }
 
-ArrayRef<StringRef> ObjectFilePCHContainerReader::getFormats() const {
-  static StringRef Formats[] = {"obj", "raw"};
+llvm::ArrayRef<llvm::StringRef> ObjectFilePCHContainerReader::getFormats() const {
+  static llvm::StringRef Formats[] = {"obj", "raw"};
   return Formats;
 }
 
-StringRef
+llvm::StringRef
 ObjectFilePCHContainerReader::ExtractPCH(llvm::MemoryBufferRef Buffer) const {
-  StringRef PCH;
+  llvm::StringRef PCH;
   auto OFOrErr = llvm::object::ObjectFile::createObjectFile(Buffer);
   if (OFOrErr) {
     auto &OF = OFOrErr.get();
     bool IsCOFF = isa<llvm::object::COFFObjectFile>(*OF);
     // Find the clang AST section in the container.
     for (auto &Section : OF->sections()) {
-      StringRef Name;
-      if (Expected<StringRef> NameOrErr = Section.getName())
+      llvm::StringRef Name;
+      if (llvm::Expected<llvm::StringRef> NameOrErr = Section.getName())
         Name = *NameOrErr;
       else
         consumeError(NameOrErr.takeError());
 
       if ((!IsCOFF && Name == "__clangast") || (IsCOFF && Name == "clangast")) {
-        if (Expected<StringRef> E = Section.getContents())
+        if (llvm::Expected<llvm::StringRef> E = Section.getContents())
           return *E;
         else {
           handleAllErrors(E.takeError(), [&](const llvm::ErrorInfoBase &EIB) {

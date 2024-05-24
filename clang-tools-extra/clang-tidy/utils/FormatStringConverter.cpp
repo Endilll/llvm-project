@@ -75,16 +75,16 @@ getCorrespondingSignedTypeName(const clang::QualType &QT) {
   // Deal with fixed-width integer types from <cstdint>. Use std:: prefix only
   // if the argument type does.
   const std::string TypeName = UQT.getAsString();
-  StringRef SimplifiedTypeName{TypeName};
+  llvm::StringRef SimplifiedTypeName{TypeName};
   const bool InStd = SimplifiedTypeName.consume_front("std::");
-  const StringRef Prefix = InStd ? "std::" : "";
+  const llvm::StringRef Prefix = InStd ? "std::" : "";
 
   if (SimplifiedTypeName.starts_with("uint") &&
       SimplifiedTypeName.ends_with("_t"))
-    return (Twine(Prefix) + SimplifiedTypeName.drop_front()).str();
+    return (llvm::Twine(Prefix) + SimplifiedTypeName.drop_front()).str();
 
   if (SimplifiedTypeName == "size_t")
-    return (Twine(Prefix) + "ssize_t").str();
+    return (llvm::Twine(Prefix) + "ssize_t").str();
 
   llvm::dbgs() << "Unknown corresponding signed type for non-BuiltinType '"
                << UQT.getAsString() << "'\n";
@@ -127,18 +127,18 @@ getCorrespondingUnsignedTypeName(const clang::QualType &QT) {
   // Deal with fixed-width integer types from <cstdint>. Use std:: prefix only
   // if the argument type does.
   const std::string TypeName = UQT.getAsString();
-  StringRef SimplifiedTypeName{TypeName};
+  llvm::StringRef SimplifiedTypeName{TypeName};
   const bool InStd = SimplifiedTypeName.consume_front("std::");
-  const StringRef Prefix = InStd ? "std::" : "";
+  const llvm::StringRef Prefix = InStd ? "std::" : "";
 
   if (SimplifiedTypeName.starts_with("int") &&
       SimplifiedTypeName.ends_with("_t"))
-    return (Twine(Prefix) + "u" + SimplifiedTypeName).str();
+    return (llvm::Twine(Prefix) + "u" + SimplifiedTypeName).str();
 
   if (SimplifiedTypeName == "ssize_t")
-    return (Twine(Prefix) + "size_t").str();
+    return (llvm::Twine(Prefix) + "size_t").str();
   if (SimplifiedTypeName == "ptrdiff_t")
-    return (Twine(Prefix) + "size_t").str();
+    return (llvm::Twine(Prefix) + "size_t").str();
 
   llvm::dbgs() << "Unknown corresponding unsigned type for non-BuiltinType '"
                << UQT.getAsString() << "'\n";
@@ -411,10 +411,10 @@ bool FormatStringConverter::emitIntegerArgument(
       if (const std::optional<std::string> MaybeCastType =
               castTypeForArgument(ArgKind, ET->getDecl()->getIntegerType()))
         ArgFixes.emplace_back(
-            ArgIndex, (Twine("static_cast<") + *MaybeCastType + ">(").str());
+            ArgIndex, (llvm::Twine("static_cast<") + *MaybeCastType + ">(").str());
       else
         return conversionNotPossible(
-            (Twine("argument ") + Twine(ArgIndex) + " has unexpected enum type")
+            (llvm::Twine("argument ") + llvm::Twine(ArgIndex) + " has unexpected enum type")
                 .str());
     }
   } else if (CastMismatchedIntegerTypes &&
@@ -425,11 +425,11 @@ bool FormatStringConverter::emitIntegerArgument(
     if (const std::optional<std::string> MaybeCastType =
             castTypeForArgument(ArgKind, ArgType))
       ArgFixes.emplace_back(
-          ArgIndex, (Twine("static_cast<") + *MaybeCastType + ">(").str());
+          ArgIndex, (llvm::Twine("static_cast<") + *MaybeCastType + ">(").str());
     else
       return conversionNotPossible(
-          (Twine("argument ") + Twine(ArgIndex) + " cannot be cast to " +
-           Twine(ArgKind == ConversionSpecifier::Kind::uArg ? "unsigned"
+          (llvm::Twine("argument ") + llvm::Twine(ArgIndex) + " cannot be cast to " +
+           llvm::Twine(ArgKind == ConversionSpecifier::Kind::uArg ? "unsigned"
                                                             : "signed") +
            " integer type to match format"
            " specifier and StrictMode is enabled")
@@ -507,8 +507,8 @@ bool FormatStringConverter::emitType(const PrintfSpecifier &FS, const Expr *Arg,
     break;
   default:
     // Something we don't understand
-    return conversionNotPossible((Twine("argument ") +
-                                  Twine(FS.getArgIndex() + ArgsOffset) +
+    return conversionNotPossible((llvm::Twine("argument ") +
+                                  llvm::Twine(FS.getArgIndex() + ArgsOffset) +
                                   " has an unsupported format specifier")
                                      .str());
   }
@@ -576,7 +576,7 @@ bool FormatStringConverter::HandlePrintfSpecifier(const PrintfSpecifier &FS,
   // Everything before the specifier needs copying verbatim
   assert(StartSpecifierPos >= PrintfFormatStringPos);
 
-  appendFormatText(StringRef(PrintfFormatString.begin() + PrintfFormatStringPos,
+  appendFormatText(llvm::StringRef(PrintfFormatString.begin() + PrintfFormatStringPos,
                              StartSpecifierPos - PrintfFormatStringPos));
 
   const ConversionSpecifier::Kind ArgKind =
@@ -610,7 +610,7 @@ bool FormatStringConverter::HandlePrintfSpecifier(const PrintfSpecifier &FS,
   if (ArgIndex >= NumArgs) {
     // Argument index out of range. Give up.
     return conversionNotPossible(
-        (Twine("argument index ") + Twine(ArgIndex) + " is out of range")
+        (llvm::Twine("argument index ") + llvm::Twine(ArgIndex) + " is out of range")
             .str());
   }
 
@@ -622,14 +622,14 @@ bool FormatStringConverter::HandlePrintfSpecifier(const PrintfSpecifier &FS,
 /// of the format string.
 void FormatStringConverter::finalizeFormatText() {
   appendFormatText(
-      StringRef(PrintfFormatString.begin() + PrintfFormatStringPos,
+      llvm::StringRef(PrintfFormatString.begin() + PrintfFormatStringPos,
                 PrintfFormatString.size() - PrintfFormatStringPos));
   PrintfFormatStringPos = PrintfFormatString.size();
 
   // It's clearer to convert printf("Hello\r\n"); to std::print("Hello\r\n")
   // than to std::println("Hello\r");
-  // Use StringRef until C++20 std::string::ends_with() is available.
-  const auto StandardFormatStringRef = StringRef(StandardFormatString);
+  // Use llvm::StringRef until C++20 std::string::ends_with() is available.
+  const auto StandardFormatStringRef = llvm::StringRef(StandardFormatString);
   if (Config.AllowTrailingNewlineRemoval &&
       StandardFormatStringRef.ends_with("\\n") &&
       !StandardFormatStringRef.ends_with("\\\\n") &&
@@ -644,7 +644,7 @@ void FormatStringConverter::finalizeFormatText() {
 }
 
 /// Append literal parts of the format text, reinstating escapes as required.
-void FormatStringConverter::appendFormatText(const StringRef Text) {
+void FormatStringConverter::appendFormatText(const llvm::StringRef Text) {
   for (const char Ch : Text) {
     if (Ch == '\a')
       StandardFormatString += "\\a";

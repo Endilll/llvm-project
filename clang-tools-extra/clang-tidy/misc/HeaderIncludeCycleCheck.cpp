@@ -35,10 +35,10 @@ class CyclicDependencyCallbacks : public PPCallbacks {
 public:
   CyclicDependencyCallbacks(HeaderIncludeCycleCheck &Check,
                             const SourceManager &SM,
-                            const std::vector<StringRef> &IgnoredFilesList)
+                            const std::vector<llvm::StringRef> &IgnoredFilesList)
       : Check(Check), SM(SM) {
     IgnoredFilesRegexes.reserve(IgnoredFilesList.size());
-    for (const StringRef &It : IgnoredFilesList) {
+    for (const llvm::StringRef &It : IgnoredFilesList) {
       if (!It.empty())
         IgnoredFilesRegexes.emplace_back(It);
     }
@@ -80,9 +80,9 @@ public:
     NextToEnter.reset();
   }
 
-  void InclusionDirective(SourceLocation, const Token &, StringRef FilePath,
+  void InclusionDirective(SourceLocation, const Token &, llvm::StringRef FilePath,
                           bool, CharSourceRange Range,
-                          OptionalFileEntryRef File, StringRef, StringRef,
+                          OptionalFileEntryRef File, llvm::StringRef, llvm::StringRef,
                           const Module *, bool,
                           SrcMgr::CharacteristicKind FileType) override {
     if (FileType != clang::SrcMgr::C_User)
@@ -116,7 +116,7 @@ public:
     if (It == Files.rend())
       return;
 
-    const std::optional<StringRef> FilePath = SM.getNonBuiltinFilenameForID(Id);
+    const std::optional<llvm::StringRef> FilePath = SM.getNonBuiltinFilenameForID(Id);
     if (!FilePath || isFileIgnored(*FilePath))
       return;
 
@@ -144,7 +144,7 @@ public:
     } while (CurrentIt++ != It);
   }
 
-  bool isFileIgnored(StringRef FileName) const {
+  bool isFileIgnored(llvm::StringRef FileName) const {
     return llvm::any_of(IgnoredFilesRegexes, [&](const llvm::Regex &It) {
       return It.match(FileName);
     });
@@ -160,7 +160,7 @@ private:
 
 } // namespace
 
-HeaderIncludeCycleCheck::HeaderIncludeCycleCheck(StringRef Name,
+HeaderIncludeCycleCheck::HeaderIncludeCycleCheck(llvm::StringRef Name,
                                                  ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoredFilesList(utils::options::parseStringList(

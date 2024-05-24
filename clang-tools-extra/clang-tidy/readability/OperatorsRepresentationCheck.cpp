@@ -20,7 +20,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::readability {
 
-static StringRef getOperatorSpelling(SourceLocation Loc, ASTContext &Context) {
+static llvm::StringRef getOperatorSpelling(SourceLocation Loc, ASTContext &Context) {
   if (Loc.isInvalid())
     return {};
 
@@ -42,7 +42,7 @@ AST_MATCHER_P2(BinaryOperator, hasInvalidBinaryOperatorRepresentation,
   if (Node.getOpcode() != Kind || ExpectedRepresentation.empty())
     return false;
 
-  StringRef Spelling =
+  llvm::StringRef Spelling =
       getOperatorSpelling(Node.getOperatorLoc(), Finder->getASTContext());
   return !Spelling.empty() && Spelling != ExpectedRepresentation;
 }
@@ -53,7 +53,7 @@ AST_MATCHER_P2(UnaryOperator, hasInvalidUnaryOperatorRepresentation,
   if (Node.getOpcode() != Kind || ExpectedRepresentation.empty())
     return false;
 
-  StringRef Spelling =
+  llvm::StringRef Spelling =
       getOperatorSpelling(Node.getOperatorLoc(), Finder->getASTContext());
   return !Spelling.empty() && Spelling != ExpectedRepresentation;
 }
@@ -64,7 +64,7 @@ AST_MATCHER_P2(CXXOperatorCallExpr, hasInvalidOverloadedOperatorRepresentation,
   if (Node.getOperator() != Kind || ExpectedRepresentation.empty())
     return false;
 
-  StringRef Spelling =
+  llvm::StringRef Spelling =
       getOperatorSpelling(Node.getOperatorLoc(), Finder->getASTContext());
   return !Spelling.empty() && Spelling != ExpectedRepresentation;
 }
@@ -145,7 +145,7 @@ static bool isAnyOperatorEnabled(const std::vector<llvm::StringRef> &Config,
 }
 
 OperatorsRepresentationCheck::OperatorsRepresentationCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       BinaryOperators(
           utils::options::parseStringList(Options.get("BinaryOperators", ""))),
@@ -298,22 +298,22 @@ void OperatorsRepresentationCheck::check(
   if (TokenRange.isInvalid())
     return;
 
-  StringRef Spelling = Lexer::getSourceText(TokenRange, *Result.SourceManager,
+  llvm::StringRef Spelling = Lexer::getSourceText(TokenRange, *Result.SourceManager,
                                             Result.Context->getLangOpts());
-  StringRef TranslatedSpelling = translate(Spelling);
+  llvm::StringRef TranslatedSpelling = translate(Spelling);
 
   if (TranslatedSpelling.empty())
     return;
 
   std::string FixSpelling = TranslatedSpelling.str();
 
-  StringRef SourceRepresentation = "an alternative";
-  StringRef TargetRepresentation = "a traditional";
+  llvm::StringRef SourceRepresentation = "an alternative";
+  llvm::StringRef TargetRepresentation = "a traditional";
   if (needEscaping(TranslatedSpelling)) {
     SourceRepresentation = "a traditional";
     TargetRepresentation = "an alternative";
 
-    StringRef SpellingEx = Lexer::getSourceText(
+    llvm::StringRef SpellingEx = Lexer::getSourceText(
         CharSourceRange::getCharRange(
             TokenRange.getBegin().getLocWithOffset(-1),
             TokenRange.getBegin().getLocWithOffset(Spelling.size() + 1U)),

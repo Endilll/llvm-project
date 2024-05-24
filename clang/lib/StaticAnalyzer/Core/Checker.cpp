@@ -18,21 +18,21 @@ using namespace ento;
 
 int ImplicitNullDerefEvent::Tag;
 
-StringRef CheckerBase::getTagDescription() const {
+llvm::StringRef CheckerBase::getTagDescription() const {
   return getCheckerName().getName();
 }
 
 CheckerNameRef CheckerBase::getCheckerName() const { return Name; }
 
-CheckerProgramPointTag::CheckerProgramPointTag(StringRef CheckerName,
-                                               StringRef Msg)
+CheckerProgramPointTag::CheckerProgramPointTag(llvm::StringRef CheckerName,
+                                               llvm::StringRef Msg)
   : SimpleProgramPointTag(CheckerName, Msg) {}
 
 CheckerProgramPointTag::CheckerProgramPointTag(const CheckerBase *Checker,
-                                               StringRef Msg)
+                                               llvm::StringRef Msg)
     : SimpleProgramPointTag(Checker->getCheckerName().getName(), Msg) {}
 
-raw_ostream& clang::ento::operator<<(raw_ostream &Out,
+llvm::raw_ostream& clang::ento::operator<<(llvm::raw_ostream &Out,
                                      const CheckerBase &Checker) {
   Out << Checker.getCheckerName().getName();
   return Out;

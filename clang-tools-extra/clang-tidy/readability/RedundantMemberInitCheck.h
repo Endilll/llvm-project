@@ -20,7 +20,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/redundant-member-init.html
 class RedundantMemberInitCheck : public ClangTidyCheck {
 public:
-  RedundantMemberInitCheck(StringRef Name, ClangTidyContext *Context)
+  RedundantMemberInitCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         IgnoreBaseInCopyConstructors(
             Options.get("IgnoreBaseInCopyConstructors", false)) {}

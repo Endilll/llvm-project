@@ -93,7 +93,7 @@ ast_matchers::internal::BindableMatcher<Stmt> makeContainerMatcher(
 
 } // anonymous namespace
 
-DanglingHandleCheck::DanglingHandleCheck(StringRef Name,
+DanglingHandleCheck::DanglingHandleCheck(llvm::StringRef Name,
                                          ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       HandleClasses(utils::options::parseStringList(Options.get(

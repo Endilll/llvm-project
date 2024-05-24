@@ -46,7 +46,7 @@ public:
 
   /// Add a child of the current node with an optional label.
   /// Calls DoAddChild without arguments.
-  template <typename Fn> void AddChild(StringRef Label, Fn DoAddChild) {
+  template <typename Fn> void AddChild(llvm::StringRef Label, Fn DoAddChild) {
     // If we're at the top level, there's nothing interesting to do; just
     // run the dumper.
     if (TopLevel) {
@@ -105,7 +105,7 @@ public:
     FirstChild = false;
   }
 
-  NodeStreamer(raw_ostream &OS) : JOS(OS, 2) {}
+  NodeStreamer(llvm::raw_ostream &OS) : JOS(OS, 2) {}
 };
 
 // Dumps AST nodes in JSON format. There is no implied stability for the
@@ -129,7 +129,7 @@ class JSONNodeDumper
   ASTNameGenerator ASTNameGen;
   PrintingPolicy PrintPolicy;
   const comments::CommandTraits *Traits;
-  StringRef LastLocFilename, LastLocPresumedFilename;
+  llvm::StringRef LastLocFilename, LastLocPresumedFilename;
   unsigned LastLocLine, LastLocPresumedLine;
 
   using InnerAttrVisitor = ConstAttrVisitor<JSONNodeDumper>;
@@ -141,7 +141,7 @@ class JSONNodeDumper
   using InnerTypeVisitor = TypeVisitor<JSONNodeDumper>;
   using InnerDeclVisitor = ConstDeclVisitor<JSONNodeDumper>;
 
-  void attributeOnlyIfTrue(StringRef Key, bool Value) {
+  void attributeOnlyIfTrue(llvm::StringRef Key, bool Value) {
     if (Value)
       JOS.attribute(Key, Value);
   }
@@ -182,10 +182,10 @@ class JSONNodeDumper
   }
   void addPreviousDeclaration(const Decl *D);
 
-  StringRef getCommentCommandName(unsigned CommandID) const;
+  llvm::StringRef getCommentCommandName(unsigned CommandID) const;
 
 public:
-  JSONNodeDumper(raw_ostream &OS, const SourceManager &SrcMgr, ASTContext &Ctx,
+  JSONNodeDumper(llvm::raw_ostream &OS, const SourceManager &SrcMgr, ASTContext &Ctx,
                  const PrintingPolicy &PrintPolicy,
                  const comments::CommandTraits *Traits)
       : NodeStreamer(OS), SM(SrcMgr), Ctx(Ctx), ASTNameGen(Ctx),
@@ -201,7 +201,7 @@ public:
 
   void Visit(const comments::Comment *C, const comments::FullComment *FC);
   void Visit(const TemplateArgument &TA, SourceRange R = {},
-             const Decl *From = nullptr, StringRef Label = {});
+             const Decl *From = nullptr, llvm::StringRef Label = {});
   void Visit(const CXXCtorInitializer *Init);
   void Visit(const OpenACCClause *C);
   void Visit(const OMPClause *C);
@@ -436,7 +436,7 @@ class JSONDumper : public ASTNodeTraverser<JSONDumper, JSONNodeDumper> {
   }
 
 public:
-  JSONDumper(raw_ostream &OS, const SourceManager &SrcMgr, ASTContext &Ctx,
+  JSONDumper(llvm::raw_ostream &OS, const SourceManager &SrcMgr, ASTContext &Ctx,
              const PrintingPolicy &PrintPolicy,
              const comments::CommandTraits *Traits)
       : NodeDumper(OS, SrcMgr, Ctx, PrintPolicy, Traits) {}

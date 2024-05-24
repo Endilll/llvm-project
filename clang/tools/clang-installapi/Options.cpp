@@ -43,7 +43,7 @@ static constexpr const llvm::StringLiteral PrefixTable_init[] =
 #include "InstallAPIOpts.inc"
 #undef PREFIX_UNION
     ;
-static constexpr const ArrayRef<StringLiteral>
+static constexpr const llvm::ArrayRef<StringLiteral>
     PrefixTable(PrefixTable_init, std::size(PrefixTable_init) - 1);
 
 /// Create table mapping all options defined in InstallAPIOpts.td.
@@ -90,11 +90,11 @@ static llvm::opt::OptTable *createDriverOptTable() {
  */
 ///
 /// Input is interpreted as "-Xlabel ClangArg1 -XLabel ClangArg2".
-static Expected<llvm::opt::InputArgList>
-getArgListFromJSON(const StringRef Input, llvm::opt::OptTable *Table,
+static llvm::Expected<llvm::opt::InputArgList>
+getArgListFromJSON(const llvm::StringRef Input, llvm::opt::OptTable *Table,
                    std::vector<std::string> &Storage) {
   using namespace json;
-  Expected<Value> ValOrErr = json::parse(Input);
+  llvm::Expected<Value> ValOrErr = json::parse(Input);
   if (!ValOrErr)
     return ValOrErr.takeError();
 
@@ -108,7 +108,7 @@ getArgListFromJSON(const StringRef Input, llvm::opt::OptTable *Table,
     if (!ArgList)
       return make_error<TextAPIError>(TextAPIErrorCode::InvalidInputFormat);
     for (auto Arg : *ArgList) {
-      std::optional<StringRef> ArgStr = Arg.getAsString();
+      std::optional<llvm::StringRef> ArgStr = Arg.getAsString();
       if (!ArgStr)
         return make_error<TextAPIError>(TextAPIErrorCode::InvalidInputFormat);
       Storage.emplace_back(Label);
@@ -118,7 +118,7 @@ getArgListFromJSON(const StringRef Input, llvm::opt::OptTable *Table,
 
   std::vector<const char *> CArgs(Storage.size());
   llvm::for_each(Storage,
-                 [&CArgs](StringRef Str) { CArgs.emplace_back(Str.data()); });
+                 [&CArgs](llvm::StringRef Str) { CArgs.emplace_back(Str.data()); });
 
   unsigned MissingArgIndex, MissingArgCount;
   return Table->ParseArgs(CArgs, MissingArgIndex, MissingArgCount);
@@ -130,7 +130,7 @@ bool Options::processDriverOptions(InputArgList &Args) {
                      Args.getAllArgValues(drv::OPT_INPUT));
 
   // Handle output.
-  SmallString<PATH_MAX> OutputPath;
+  llvm::SmallString<PATH_MAX> OutputPath;
   if (auto *Arg = Args.getLastArg(drv::OPT_o)) {
     OutputPath = Arg->getValue();
     if (OutputPath != "-")
@@ -248,7 +248,7 @@ bool Options::processInstallAPIXOptions(InputArgList &Args) {
       continue;
 
     // Handle any user defined labels.
-    const StringRef Label = A->getValue(0);
+    const llvm::StringRef Label = A->getValue(0);
 
     // Ban "public" and "private" labels.
     if ((Label.lower() == "public") || (Label.lower() == "private")) {
@@ -272,12 +272,12 @@ bool Options::processInstallAPIXOptions(InputArgList &Args) {
           << A->getAsString(Args) << NextA->getAsString(Args);
       return false;
     }
-    const StringRef ASpelling = NextA->getSpelling();
+    const llvm::StringRef ASpelling = NextA->getSpelling();
     const auto &AValues = NextA->getValues();
     if (AValues.empty())
       FEOpts.UniqueArgs[Label].emplace_back(ASpelling.str());
     else
-      for (const StringRef Val : AValues)
+      for (const llvm::StringRef Val : AValues)
         FEOpts.UniqueArgs[Label].emplace_back((ASpelling + Val).str());
 
     A->claim();
@@ -342,7 +342,7 @@ bool Options::processXprojectOption(InputArgList &Args, arg_iterator Curr) {
   }
 
   std::string ArgString = NextA->getSpelling().str();
-  for (const StringRef Val : NextA->getValues())
+  for (const llvm::StringRef Val : NextA->getValues())
     ArgString += Val.str();
 
   ProjectLevelArgs.push_back(ArgString);
@@ -396,7 +396,7 @@ bool Options::processOptionList(InputArgList &Args,
   if (!A)
     return true;
 
-  const StringRef Path = A->getValue(0);
+  const llvm::StringRef Path = A->getValue(0);
   auto InputOrErr = FM->getBufferForFile(Path);
   if (auto Err = InputOrErr.getError()) {
     Diags->Report(diag::err_cannot_open_file) << Path << Err.message();
@@ -494,7 +494,7 @@ bool Options::processFrontendOptions(InputArgList &Args) {
 
   // Capture Sysroot.
   if (const Arg *A = Args.getLastArgNoClaim(drv::OPT_isysroot)) {
-    SmallString<PATH_MAX> Path(A->getValue());
+    llvm::SmallString<PATH_MAX> Path(A->getValue());
     FM->makeAbsolutePath(Path);
     if (!FM->getOptionalDirectoryRef(Path)) {
       Diags->Report(diag::err_missing_sysroot) << Path;
@@ -505,7 +505,7 @@ bool Options::processFrontendOptions(InputArgList &Args) {
     // Mirror CLANG and obtain the isysroot from the SDKROOT environment
     // variable, if it wasn't defined by the  command line.
     if (auto *Env = ::getenv("SDKROOT")) {
-      if (StringRef(Env) != "/" && llvm::sys::path::is_absolute(Env) &&
+      if (llvm::StringRef(Env) != "/" && llvm::sys::path::is_absolute(Env) &&
           FM->getOptionalFileRef(Env))
         FEOpts.ISysroot = Env;
     }
@@ -529,13 +529,13 @@ bool Options::processFrontendOptions(InputArgList &Args) {
   PathSeq DefaultFrameworkPaths = {"/Library/Frameworks",
                                    "/System/Library/Frameworks"};
 
-  for (const StringRef LibPath : DefaultLibraryPaths) {
-    SmallString<PATH_MAX> Path(FEOpts.ISysroot);
+  for (const llvm::StringRef LibPath : DefaultLibraryPaths) {
+    llvm::SmallString<PATH_MAX> Path(FEOpts.ISysroot);
     sys::path::append(Path, LibPath);
     LinkerOpts.LibPaths.emplace_back(Path.str());
   }
-  for (const StringRef FwkPath : DefaultFrameworkPaths) {
-    SmallString<PATH_MAX> Path(FEOpts.ISysroot);
+  for (const llvm::StringRef FwkPath : DefaultFrameworkPaths) {
+    llvm::SmallString<PATH_MAX> Path(FEOpts.ISysroot);
     sys::path::append(Path, FwkPath);
     FEOpts.SystemFwkPaths.emplace_back(Path.str(),
                                        std::optional<PlatformType>{});
@@ -546,7 +546,7 @@ bool Options::processFrontendOptions(InputArgList &Args) {
 
 bool Options::addFilePaths(InputArgList &Args, PathSeq &Headers,
                            OptSpecifier ID) {
-  for (const StringRef Path : Args.getAllArgValues(ID)) {
+  for (const llvm::StringRef Path : Args.getAllArgValues(ID)) {
     if ((bool)FM->getDirectory(Path, /*CacheFailure=*/false)) {
       auto InputHeadersOrErr = enumerateFiles(*FM, Path);
       if (!InputHeadersOrErr) {
@@ -556,7 +556,7 @@ bool Options::addFilePaths(InputArgList &Args, PathSeq &Headers,
       }
       // Sort headers to ensure deterministic behavior.
       sort(*InputHeadersOrErr);
-      for (StringRef H : *InputHeadersOrErr)
+      for (llvm::StringRef H : *InputHeadersOrErr)
         Headers.emplace_back(std::move(H));
     } else
       Headers.emplace_back(Path);
@@ -565,7 +565,7 @@ bool Options::addFilePaths(InputArgList &Args, PathSeq &Headers,
 }
 
 std::vector<const char *>
-Options::processAndFilterOutInstallAPIOptions(ArrayRef<const char *> Args) {
+Options::processAndFilterOutInstallAPIOptions(llvm::ArrayRef<const char *> Args) {
   std::unique_ptr<llvm::opt::OptTable> Table;
   Table.reset(createDriverOptTable());
 
@@ -702,7 +702,7 @@ Options::processAndFilterOutInstallAPIOptions(ArrayRef<const char *> Args) {
 }
 
 Options::Options(DiagnosticsEngine &Diag, FileManager *FM,
-                 ArrayRef<const char *> Args, const StringRef ProgName)
+                 llvm::ArrayRef<const char *> Args, const llvm::StringRef ProgName)
     : Diags(&Diag), FM(FM) {
 
   // First process InstallAPI specific options.
@@ -761,16 +761,16 @@ Options::Options(DiagnosticsEngine &Diag, FileManager *FM,
 }
 
 static const Regex Rule("(.+)/(.+)\\.framework/");
-static StringRef getFrameworkNameFromInstallName(StringRef InstallName) {
-  SmallVector<StringRef, 3> Match;
+static llvm::StringRef getFrameworkNameFromInstallName(llvm::StringRef InstallName) {
+  llvm::SmallVector<llvm::StringRef, 3> Match;
   Rule.match(InstallName, &Match);
   if (Match.empty())
     return "";
   return Match.back();
 }
 
-static Expected<std::unique_ptr<InterfaceFile>>
-getInterfaceFile(const StringRef Filename) {
+static llvm::Expected<std::unique_ptr<InterfaceFile>>
+getInterfaceFile(const llvm::StringRef Filename) {
   ErrorOr<std::unique_ptr<MemoryBuffer>> BufferOrErr =
       MemoryBuffer::getFile(Filename);
   if (auto Err = BufferOrErr.getError())
@@ -796,12 +796,12 @@ getInterfaceFile(const StringRef Filename) {
 std::pair<LibAttrs, ReexportedInterfaces> Options::getReexportedLibraries() {
   LibAttrs Reexports;
   ReexportedInterfaces ReexportIFs;
-  auto AccumulateReexports = [&](StringRef Path, const ArchitectureSet &Archs) {
+  auto AccumulateReexports = [&](llvm::StringRef Path, const ArchitectureSet &Archs) {
     auto ReexportIFOrErr = getInterfaceFile(Path);
     if (!ReexportIFOrErr)
       return false;
     std::unique_ptr<InterfaceFile> Reexport = std::move(*ReexportIFOrErr);
-    StringRef InstallName = Reexport->getInstallName();
+    llvm::StringRef InstallName = Reexport->getInstallName();
     assert(!InstallName.empty() && "Parse error for install name");
     Reexports.insert({InstallName, Archs});
     ReexportIFs.emplace_back(std::move(*Reexport));
@@ -879,13 +879,13 @@ InstallAPIContext Options::createContext() {
 
   // Collect symbols from alias lists.
   AliasMap Aliases;
-  for (const StringRef ListPath : LinkerOpts.AliasLists) {
+  for (const llvm::StringRef ListPath : LinkerOpts.AliasLists) {
     auto Buffer = FM->getBufferForFile(ListPath);
     if (auto Err = Buffer.getError()) {
       Diags->Report(diag::err_cannot_open_file) << ListPath << Err.message();
       return Ctx;
     }
-    Expected<AliasMap> Result = parseAliasList(Buffer.get());
+    llvm::Expected<AliasMap> Result = parseAliasList(Buffer.get());
     if (!Result) {
       Diags->Report(diag::err_cannot_read_input_list)
           << "symbol alias" << ListPath << toString(Result.takeError());
@@ -895,12 +895,12 @@ InstallAPIContext Options::createContext() {
   }
 
   // Attempt to find umbrella headers by capturing framework name.
-  StringRef FrameworkName;
+  llvm::StringRef FrameworkName;
   if (!LinkerOpts.IsDylib)
     FrameworkName = getFrameworkNameFromInstallName(LinkerOpts.InstallName);
 
   // Process inputs.
-  for (const StringRef ListPath : DriverOpts.FileLists) {
+  for (const llvm::StringRef ListPath : DriverOpts.FileLists) {
     auto Buffer = FM->getBufferForFile(ListPath);
     if (auto Err = Buffer.getError()) {
       Diags->Report(diag::err_cannot_open_file) << ListPath << Err.message();
@@ -916,12 +916,12 @@ InstallAPIContext Options::createContext() {
   // After initial input has been processed, add any extra headers.
   auto HandleExtraHeaders = [&](PathSeq &Headers, HeaderType Type) -> bool {
     assert(Type != HeaderType::Unknown && "Missing header type.");
-    for (const StringRef Path : Headers) {
+    for (const llvm::StringRef Path : Headers) {
       if (!FM->getOptionalFileRef(Path)) {
         Diags->Report(diag::err_no_such_header_file) << Path << (unsigned)Type;
         return false;
       }
-      SmallString<PATH_MAX> FullPath(Path);
+      llvm::SmallString<PATH_MAX> FullPath(Path);
       FM->makeAbsolutePath(FullPath);
 
       auto IncludeName = createIncludeHeaderName(FullPath);
@@ -943,7 +943,7 @@ InstallAPIContext Options::createContext() {
   std::set<FileEntryRef> ExcludedHeaderFiles;
   auto ParseGlobs = [&](const PathSeq &Paths, HeaderType Type) {
     assert(Type != HeaderType::Unknown && "Missing header type.");
-    for (const StringRef Path : Paths) {
+    for (const llvm::StringRef Path : Paths) {
       auto Glob = HeaderGlob::create(Path, Type);
       if (Glob)
         ExcludedHeaderGlobs.emplace_back(std::move(Glob.get()));
@@ -1007,7 +1007,7 @@ InstallAPIContext Options::createContext() {
     return true;
   };
 
-  auto FindUmbrellaHeader = [&](StringRef HeaderPath, HeaderType Type) -> bool {
+  auto FindUmbrellaHeader = [&](llvm::StringRef HeaderPath, HeaderType Type) -> bool {
     assert(Type != HeaderType::Unknown && "Missing header type.");
     if (!HeaderPath.empty()) {
       auto EscapedString = Regex::escape(HeaderPath);
@@ -1051,7 +1051,7 @@ InstallAPIContext Options::createContext() {
 
   DylibReader::ParseOption PO;
   PO.Undefineds = false;
-  Expected<Records> Slices =
+  llvm::Expected<Records> Slices =
       DylibReader::readFile((*Buffer)->getMemBufferRef(), PO);
   if (auto Err = Slices.takeError()) {
     Diags->Report(diag::err_cannot_open_file)
@@ -1075,14 +1075,14 @@ void Options::addConditionalCC1Args(std::vector<std::string> &ArgStrings,
   // Add specific to platform arguments.
   PathSeq PlatformSearchPaths =
       getPathsForPlatform(FEOpts.SystemFwkPaths, mapToPlatformType(Targ));
-  llvm::for_each(PlatformSearchPaths, [&ArgStrings](const StringRef Path) {
+  llvm::for_each(PlatformSearchPaths, [&ArgStrings](const llvm::StringRef Path) {
     ArgStrings.push_back("-iframework");
     ArgStrings.push_back(Path.str());
   });
 
   // Add specific to header type arguments.
   if (Type == HeaderType::Project)
-    for (const StringRef A : ProjectLevelArgs)
+    for (const llvm::StringRef A : ProjectLevelArgs)
       ArgStrings.emplace_back(A);
 }
 

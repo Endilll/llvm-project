@@ -370,7 +370,7 @@ minimal code in the definition. For example, given a rule
 
    class MyCheck : public TransformerClangTidyCheck {
     public:
-     MyCheck(StringRef Name, ClangTidyContext *Context)
+     MyCheck(llvm::StringRef Name, ClangTidyContext *Context)
 	 : TransformerClangTidyCheck(MyCheckAsRewriteRule, Name, Context) {}
    };
 

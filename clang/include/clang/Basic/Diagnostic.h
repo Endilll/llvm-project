@@ -95,7 +95,7 @@ public:
   /// Create a code modification hint that inserts the given
   /// code string at a specific location.
   static FixItHint CreateInsertion(SourceLocation InsertionLoc,
-                                   StringRef Code,
+                                   llvm::StringRef Code,
                                    bool BeforePreviousInsertions = false) {
     FixItHint Hint;
     Hint.RemoveRange =
@@ -132,7 +132,7 @@ public:
   /// Create a code modification hint that replaces the given
   /// source range with the given code string.
   static FixItHint CreateReplacement(CharSourceRange RemoveRange,
-                                     StringRef Code) {
+                                     llvm::StringRef Code) {
     FixItHint Hint;
     Hint.RemoveRange = RemoveRange;
     Hint.CodeToInsert = std::string(Code);
@@ -140,7 +140,7 @@ public:
   }
 
   static FixItHint CreateReplacement(SourceRange RemoveRange,
-                                     StringRef Code) {
+                                     llvm::StringRef Code) {
     return CreateReplacement(CharSourceRange::getTokenRange(RemoveRange), Code);
   }
 };
@@ -174,11 +174,11 @@ struct DiagnosticStorage {
   std::string DiagArgumentsStr[MaxArguments];
 
   /// The list of ranges added to this diagnostic.
-  SmallVector<CharSourceRange, 8> DiagRanges;
+  llvm::SmallVector<CharSourceRange, 8> DiagRanges;
 
   /// If valid, provides a hint with some code to insert, remove, or
   /// modify at a particular position.
-  SmallVector<FixItHint, 6> FixItHints;
+  llvm::SmallVector<FixItHint, 6> FixItHints;
 
   DiagnosticStorage() = default;
 };
@@ -189,7 +189,7 @@ struct DiagnosticStorage {
 /// as errors" and passes them off to the DiagnosticConsumer for reporting to
 /// the user. DiagnosticsEngine is tied to one translation unit and one
 /// SourceManager.
-class DiagnosticsEngine : public RefCountedBase<DiagnosticsEngine> {
+class DiagnosticsEngine : public llvm::RefCountedBase<DiagnosticsEngine> {
 public:
   /// The level of the diagnostic, after it has been through mapping.
   enum Level {
@@ -290,8 +290,8 @@ private:
   // Cap on depth of constexpr evaluation backtrace stack, 0 -> no limit.
   unsigned ConstexprBacktraceLimit = 0;
 
-  IntrusiveRefCntPtr<DiagnosticIDs> Diags;
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> Diags;
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
   DiagnosticConsumer *Client = nullptr;
   std::unique_ptr<DiagnosticConsumer> Owner;
   SourceManager *SourceMgr = nullptr;
@@ -387,7 +387,7 @@ private:
 
     /// Produce a debugging dump of the diagnostic state.
     LLVM_DUMP_METHOD void dump(SourceManager &SrcMgr,
-                               StringRef DiagName = StringRef()) const;
+                               llvm::StringRef DiagName = llvm::StringRef()) const;
 
     /// Grab the most-recently-added state point.
     DiagState *getCurDiagState() const { return CurDiagState; }
@@ -511,11 +511,11 @@ private:
   /// This is a hack to avoid a layering violation between libbasic and libsema.
   using ArgToStringFnTy = void (*)(
       ArgumentKind Kind, intptr_t Val,
-      StringRef Modifier, StringRef Argument,
-      ArrayRef<ArgumentValue> PrevArgs,
-      SmallVectorImpl<char> &Output,
+      llvm::StringRef Modifier, llvm::StringRef Argument,
+      llvm::ArrayRef<ArgumentValue> PrevArgs,
+      llvm::SmallVectorImpl<char> &Output,
       void *Cookie,
-      ArrayRef<intptr_t> QualTypeVals);
+      llvm::ArrayRef<intptr_t> QualTypeVals);
 
   void *ArgToStringCookie = nullptr;
   ArgToStringFnTy ArgToStringFn;
@@ -542,8 +542,8 @@ private:
   std::string FlagValue;
 
 public:
-  explicit DiagnosticsEngine(IntrusiveRefCntPtr<DiagnosticIDs> Diags,
-                             IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts,
+  explicit DiagnosticsEngine(llvm::IntrusiveRefCntPtr<DiagnosticIDs> Diags,
+                             llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts,
                              DiagnosticConsumer *client = nullptr,
                              bool ShouldOwnClient = true);
   DiagnosticsEngine(const DiagnosticsEngine &) = delete;
@@ -552,9 +552,9 @@ public:
 
   friend void DiagnosticsTestHelper(DiagnosticsEngine &);
   LLVM_DUMP_METHOD void dump() const;
-  LLVM_DUMP_METHOD void dump(StringRef DiagName) const;
+  LLVM_DUMP_METHOD void dump(llvm::StringRef DiagName) const;
 
-  const IntrusiveRefCntPtr<DiagnosticIDs> &getDiagnosticIDs() const {
+  const llvm::IntrusiveRefCntPtr<DiagnosticIDs> &getDiagnosticIDs() const {
     return Diags;
   }
 
@@ -811,7 +811,7 @@ public:
   ///
   /// \param Loc The source location that this change of diagnostic state should
   /// take affect. It can be null if we are setting the state from command-line.
-  bool setSeverityForGroup(diag::Flavor Flavor, StringRef Group,
+  bool setSeverityForGroup(diag::Flavor Flavor, llvm::StringRef Group,
                            diag::Severity Map,
                            SourceLocation Loc = SourceLocation());
   bool setSeverityForGroup(diag::Flavor Flavor, diag::Group Group,
@@ -823,14 +823,14 @@ public:
   /// This function always only operates on the current diagnostic state.
   ///
   /// \returns True if the given group is unknown, false otherwise.
-  bool setDiagnosticGroupWarningAsError(StringRef Group, bool Enabled);
+  bool setDiagnosticGroupWarningAsError(llvm::StringRef Group, bool Enabled);
 
   /// Set the error-as-fatal flag for the given diagnostic group.
   ///
   /// This function always only operates on the current diagnostic state.
   ///
   /// \returns True if the given group is unknown, false otherwise.
-  bool setDiagnosticGroupErrorAsFatal(StringRef Group, bool Enabled);
+  bool setDiagnosticGroupErrorAsFatal(llvm::StringRef Group, bool Enabled);
 
   /// Add the specified mapping to all diagnostics of the specified
   /// flavor.
@@ -872,16 +872,16 @@ public:
   template <unsigned N>
   unsigned getCustomDiagID(Level L, const char (&FormatString)[N]) {
     return Diags->getCustomDiagID((DiagnosticIDs::Level)L,
-                                  StringRef(FormatString, N - 1));
+                                  llvm::StringRef(FormatString, N - 1));
   }
 
   /// Converts a diagnostic argument (as an intptr_t) into the string
   /// that represents it.
   void ConvertArgToString(ArgumentKind Kind, intptr_t Val,
-                          StringRef Modifier, StringRef Argument,
-                          ArrayRef<ArgumentValue> PrevArgs,
-                          SmallVectorImpl<char> &Output,
-                          ArrayRef<intptr_t> QualTypeVals) const {
+                          llvm::StringRef Modifier, llvm::StringRef Argument,
+                          llvm::ArrayRef<ArgumentValue> PrevArgs,
+                          llvm::SmallVectorImpl<char> &Output,
+                          llvm::ArrayRef<intptr_t> QualTypeVals) const {
     ArgToStringFn(Kind, Val, Modifier, Argument, PrevArgs, Output,
                   ArgToStringCookie, QualTypeVals);
   }
@@ -975,14 +975,14 @@ public:
   /// \param Arg3 A string argument that will be provided to the
   /// diagnostic. A copy of this string will be stored in the
   /// DiagnosticsEngine object itself.
-  void SetDelayedDiagnostic(unsigned DiagID, StringRef Arg1 = "",
-                            StringRef Arg2 = "", StringRef Arg3 = "");
+  void SetDelayedDiagnostic(unsigned DiagID, llvm::StringRef Arg1 = "",
+                            llvm::StringRef Arg2 = "", llvm::StringRef Arg3 = "");
 
   /// Clear out the current diagnostic.
   void Clear() { CurDiagID = std::numeric_limits<unsigned>::max(); }
 
   /// Return the value associated with this diagnostic flag.
-  StringRef getFlagValue() const { return FlagValue; }
+  llvm::StringRef getFlagValue() const { return FlagValue; }
 
 private:
   // This is private state used by DiagnosticBuilder.  We put it here instead of
@@ -1196,7 +1196,7 @@ public:
     DiagStorage->DiagArgumentsVal[DiagStorage->NumDiagArgs++] = V;
   }
 
-  void AddString(StringRef V) const {
+  void AddString(llvm::StringRef V) const {
     if (!DiagStorage)
       DiagStorage = getStorage();
 
@@ -1371,13 +1371,13 @@ public:
     return *this;
   }
 
-  void addFlagValue(StringRef V) const { DiagObj->FlagValue = std::string(V); }
+  void addFlagValue(llvm::StringRef V) const { DiagObj->FlagValue = std::string(V); }
 };
 
 struct AddFlagValue {
-  StringRef Val;
+  llvm::StringRef Val;
 
-  explicit AddFlagValue(StringRef V) : Val(V) {}
+  explicit AddFlagValue(llvm::StringRef V) : Val(V) {}
 };
 
 /// Register a value for the flag in the current diagnostic. This
@@ -1391,7 +1391,7 @@ inline const DiagnosticBuilder &operator<<(const DiagnosticBuilder &DB,
 }
 
 inline const StreamingDiagnostic &operator<<(const StreamingDiagnostic &DB,
-                                             StringRef S) {
+                                             llvm::StringRef S) {
   DB.AddString(S);
   return DB;
 }
@@ -1489,7 +1489,7 @@ inline const StreamingDiagnostic &operator<<(const StreamingDiagnostic &DB,
 }
 
 inline const StreamingDiagnostic &operator<<(const StreamingDiagnostic &DB,
-                                             ArrayRef<SourceRange> Ranges) {
+                                             llvm::ArrayRef<SourceRange> Ranges) {
   for (SourceRange R : Ranges)
     DB.AddSourceRange(CharSourceRange::getTokenRange(R));
   return DB;
@@ -1508,7 +1508,7 @@ inline const StreamingDiagnostic &operator<<(const StreamingDiagnostic &DB,
 }
 
 inline const StreamingDiagnostic &operator<<(const StreamingDiagnostic &DB,
-                                             ArrayRef<FixItHint> Hints) {
+                                             llvm::ArrayRef<FixItHint> Hints) {
   for (const FixItHint &Hint : Hints)
     DB.AddFixItHint(Hint);
   return DB;
@@ -1570,11 +1570,11 @@ inline DiagnosticBuilder DiagnosticsEngine::Report(unsigned DiagID) {
 /// currently in-flight diagnostic.
 class Diagnostic {
   const DiagnosticsEngine *DiagObj;
-  std::optional<StringRef> StoredDiagMessage;
+  std::optional<llvm::StringRef> StoredDiagMessage;
 
 public:
   explicit Diagnostic(const DiagnosticsEngine *DO) : DiagObj(DO) {}
-  Diagnostic(const DiagnosticsEngine *DO, StringRef storedDiagMessage)
+  Diagnostic(const DiagnosticsEngine *DO, llvm::StringRef storedDiagMessage)
       : DiagObj(DO), StoredDiagMessage(storedDiagMessage) {}
 
   const DiagnosticsEngine *getDiags() const { return DiagObj; }
@@ -1659,7 +1659,7 @@ public:
   }
 
   /// Return an array reference for this diagnostic's ranges.
-  ArrayRef<CharSourceRange> getRanges() const {
+  llvm::ArrayRef<CharSourceRange> getRanges() const {
     return DiagObj->DiagStorage.DiagRanges;
   }
 
@@ -1672,7 +1672,7 @@ public:
     return DiagObj->DiagStorage.FixItHints[Idx];
   }
 
-  ArrayRef<FixItHint> getFixItHints() const {
+  llvm::ArrayRef<FixItHint> getFixItHints() const {
     return DiagObj->DiagStorage.FixItHints;
   }
 
@@ -1680,12 +1680,12 @@ public:
   /// formal arguments into the %0 slots.
   ///
   /// The result is appended onto the \p OutStr array.
-  void FormatDiagnostic(SmallVectorImpl<char> &OutStr) const;
+  void FormatDiagnostic(llvm::SmallVectorImpl<char> &OutStr) const;
 
   /// Format the given format-string into the output buffer using the
   /// arguments stored in this diagnostic.
   void FormatDiagnostic(const char *DiagStr, const char *DiagEnd,
-                        SmallVectorImpl<char> &OutStr) const;
+                        llvm::SmallVectorImpl<char> &OutStr) const;
 };
 
 /**
@@ -1704,11 +1704,11 @@ public:
   StoredDiagnostic() = default;
   StoredDiagnostic(DiagnosticsEngine::Level Level, const Diagnostic &Info);
   StoredDiagnostic(DiagnosticsEngine::Level Level, unsigned ID,
-                   StringRef Message);
+                   llvm::StringRef Message);
   StoredDiagnostic(DiagnosticsEngine::Level Level, unsigned ID,
-                   StringRef Message, FullSourceLoc Loc,
-                   ArrayRef<CharSourceRange> Ranges,
-                   ArrayRef<FixItHint> Fixits);
+                   llvm::StringRef Message, FullSourceLoc Loc,
+                   llvm::ArrayRef<CharSourceRange> Ranges,
+                   llvm::ArrayRef<FixItHint> Fixits);
 
   /// Evaluates true when this object stores a diagnostic.
   explicit operator bool() const { return !Message.empty(); }
@@ -1716,7 +1716,7 @@ public:
   unsigned getID() const { return ID; }
   DiagnosticsEngine::Level getLevel() const { return Level; }
   const FullSourceLoc &getLocation() const { return Loc; }
-  StringRef getMessage() const { return Message; }
+  llvm::StringRef getMessage() const { return Message; }
 
   void setLocation(FullSourceLoc Loc) { this->Loc = Loc; }
 
@@ -1726,7 +1726,7 @@ public:
   range_iterator range_end() const { return Ranges.end(); }
   unsigned range_size() const { return Ranges.size(); }
 
-  ArrayRef<CharSourceRange> getRanges() const { return llvm::ArrayRef(Ranges); }
+  llvm::ArrayRef<CharSourceRange> getRanges() const { return llvm::ArrayRef(Ranges); }
 
   using fixit_iterator = std::vector<FixItHint>::const_iterator;
 
@@ -1734,7 +1734,7 @@ public:
   fixit_iterator fixit_end() const { return FixIts.end(); }
   unsigned fixit_size() const { return FixIts.size(); }
 
-  ArrayRef<FixItHint> getFixIts() const { return llvm::ArrayRef(FixIts); }
+  llvm::ArrayRef<FixItHint> getFixIts() const { return llvm::ArrayRef(FixIts); }
 };
 
 // Simple debug printing of StoredDiagnostic.
@@ -1850,7 +1850,7 @@ const char ToggleHighlight = 127;
 void ProcessWarningOptions(DiagnosticsEngine &Diags,
                            const DiagnosticOptions &Opts,
                            bool ReportDiags = true);
-void EscapeStringForDiagnostic(StringRef Str, SmallVectorImpl<char> &OutStr);
+void EscapeStringForDiagnostic(llvm::StringRef Str, llvm::SmallVectorImpl<char> &OutStr);
 } // namespace clang
 
 #endif // LLVM_CLANG_BASIC_DIAGNOSTIC_H

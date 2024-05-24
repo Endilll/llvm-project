@@ -26,7 +26,7 @@ inline llvm::Error findError() { return llvm::Error::success(); }
 inline void ignoreError() {}
 
 template <typename FirstT, typename... RestT>
-void ignoreError(Expected<FirstT> &First, Expected<RestT> &... Rest) {
+void ignoreError(llvm::Expected<FirstT> &First, llvm::Expected<RestT> &... Rest) {
   if (!First)
     llvm::consumeError(First.takeError());
   ignoreError(Rest...);
@@ -35,7 +35,7 @@ void ignoreError(Expected<FirstT> &First, Expected<RestT> &... Rest) {
 /// Scans the tuple and returns a valid \c Error if any of the values are
 /// invalid.
 template <typename FirstT, typename... RestT>
-llvm::Error findError(Expected<FirstT> &First, Expected<RestT> &... Rest) {
+llvm::Error findError(llvm::Expected<FirstT> &First, llvm::Expected<RestT> &... Rest) {
   if (!First) {
     ignoreError(Rest...);
     return First.takeError();
@@ -55,7 +55,7 @@ void invokeRuleAfterValidatingRequirements(
   if (Err)
     return Consumer.handleError(std::move(Err));
   // Construct the target action rule by extracting the evaluated
-  // requirements from Expected<> wrappers and then run it.
+  // requirements from llvm::Expected<> wrappers and then run it.
   auto Rule =
       RuleType::initiate(Context, std::move((*std::get<Is>(Values)))...);
   if (!Rule)

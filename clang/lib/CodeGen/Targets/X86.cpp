@@ -25,7 +25,7 @@ bool IsX86_MMXType(llvm::Type *IRType) {
 }
 
 static llvm::Type* X86AdjustInlineAsmType(CodeGen::CodeGenFunction &CGF,
-                                          StringRef Constraint,
+                                          llvm::StringRef Constraint,
                                           llvm::Type* Ty) {
   bool IsMMXCons = llvm::StringSwitch<bool>(Constraint)
                      .Cases("y", "&y", "^Ym", true)
@@ -165,7 +165,7 @@ class X86_32ABIInfo : public ABIInfo {
   /// inalloca.
   void rewriteWithInAlloca(CGFunctionInfo &FI) const;
 
-  void addFieldToArgStruct(SmallVector<llvm::Type *, 6> &FrameFields,
+  void addFieldToArgStruct(llvm::SmallVector<llvm::Type *, 6> &FrameFields,
                            CharUnits &StackOffset, ABIArgInfo &Info,
                            QualType Type) const;
   void runVectorCallFirstPass(CGFunctionInfo &FI, CCState &State) const;
@@ -193,7 +193,7 @@ public:
   explicit X86_32SwiftABIInfo(CodeGenTypes &CGT)
       : SwiftABIInfo(CGT, /*SwiftErrorInRegister=*/false) {}
 
-  bool shouldPassIndirectly(ArrayRef<llvm::Type *> ComponentTys,
+  bool shouldPassIndirectly(llvm::ArrayRef<llvm::Type *> ComponentTys,
                             bool AsReturnValue) const override {
     // LLVM's x86-32 lowering currently only assigns up to three
     // integer registers and three fp registers.  Oddly, it'll use up to
@@ -230,7 +230,7 @@ public:
                                llvm::Value *Address) const override;
 
   llvm::Type* adjustInlineAsmType(CodeGen::CodeGenFunction &CGF,
-                                  StringRef Constraint,
+                                  llvm::StringRef Constraint,
                                   llvm::Type* Ty) const override {
     return X86AdjustInlineAsmType(CGF, Constraint, Ty);
   }
@@ -243,7 +243,7 @@ public:
                                 std::string &AsmString,
                                 unsigned NumOutputs) const override;
 
-  StringRef getARCRetainAutoreleasedReturnValueMarker() const override {
+  llvm::StringRef getARCRetainAutoreleasedReturnValueMarker() const override {
     return "movl\t%ebp, %ebp"
            "\t\t// marker for objc_retainAutoreleaseReturnValue";
   }
@@ -272,7 +272,7 @@ static void rewriteInputConstraintReferences(unsigned FirstIn,
     size_t DollarEnd = AsmString.find_first_not_of('$', DollarStart);
     if (DollarEnd == std::string::npos)
       DollarEnd = AsmString.size();
-    OS << StringRef(&AsmString[Pos], DollarEnd - Pos);
+    OS << llvm::StringRef(&AsmString[Pos], DollarEnd - Pos);
     Pos = DollarEnd;
     size_t NumDollars = DollarEnd - DollarStart;
     if (NumDollars % 2 != 0 && Pos < AsmString.size()) {
@@ -285,7 +285,7 @@ static void rewriteInputConstraintReferences(unsigned FirstIn,
       size_t DigitEnd = AsmString.find_first_not_of("0123456789", DigitStart);
       if (DigitEnd == std::string::npos)
         DigitEnd = AsmString.size();
-      StringRef OperandStr(&AsmString[DigitStart], DigitEnd - DigitStart);
+      llvm::StringRef OperandStr(&AsmString[DigitStart], DigitEnd - DigitStart);
       unsigned OperandIndex;
       if (!OperandStr.getAsInteger(10, OperandIndex)) {
         if (OperandIndex >= FirstIn)
@@ -730,7 +730,7 @@ void X86_32ABIInfo::runVectorCallFirstPass(CGFunctionInfo &FI, CCState &State) c
   // vector registers if possible, or indirectly by address. The address will be
   // passed in ECX/EDX if available. Any other arguments are passed according to
   // the usual fastcall rules.
-  MutableArrayRef<CGFunctionInfoArgInfo> Args = FI.arguments();
+  llvm::MutableArrayRef<CGFunctionInfoArgInfo> Args = FI.arguments();
   for (int I = 0, E = Args.size(); I < E; ++I) {
     const Type *Base = nullptr;
     uint64_t NumElts = 0;
@@ -813,7 +813,7 @@ ABIArgInfo X86_32ABIInfo::classifyArgumentType(QualType Ty, CCState &State,
     bool InReg;
     if (shouldAggregateUseDirect(Ty, State, InReg, NeedsPadding)) {
       unsigned SizeInRegs = (TI.Width + 31) / 32;
-      SmallVector<llvm::Type*, 3> Elements(SizeInRegs, Int32);
+      llvm::SmallVector<llvm::Type*, 3> Elements(SizeInRegs, Int32);
       llvm::Type *Result = llvm::StructType::get(LLVMContext, Elements);
       if (InReg)
         return ABIArgInfo::getDirectInReg(Result);
@@ -952,7 +952,7 @@ void X86_32ABIInfo::computeInfo(CGFunctionInfo &FI) const {
     runVectorCallFirstPass(FI, State);
 
   bool UsedInAlloca = false;
-  MutableArrayRef<CGFunctionInfoArgInfo> Args = FI.arguments();
+  llvm::MutableArrayRef<CGFunctionInfoArgInfo> Args = FI.arguments();
   for (unsigned I = 0, E = Args.size(); I < E; ++I) {
     // Skip arguments that have already been assigned.
     if (State.IsPreassigned.test(I))
@@ -970,7 +970,7 @@ void X86_32ABIInfo::computeInfo(CGFunctionInfo &FI) const {
 }
 
 void
-X86_32ABIInfo::addFieldToArgStruct(SmallVector<llvm::Type *, 6> &FrameFields,
+X86_32ABIInfo::addFieldToArgStruct(llvm::SmallVector<llvm::Type *, 6> &FrameFields,
                                    CharUnits &StackOffset, ABIArgInfo &Info,
                                    QualType Type) const {
   // Arguments are always 4-byte-aligned.
@@ -1026,7 +1026,7 @@ void X86_32ABIInfo::rewriteWithInAlloca(CGFunctionInfo &FI) const {
   assert(IsWin32StructABI && "inalloca only supported on win32");
 
   // Build a packed struct type for all of the arguments in memory.
-  SmallVector<llvm::Type *, 6> FrameFields;
+  llvm::SmallVector<llvm::Type *, 6> FrameFields;
 
   // The stack alignment is always 4.
   CharUnits StackAlign = CharUnits::fromQuantity(4);
@@ -1438,7 +1438,7 @@ public:
   }
 
   llvm::Type* adjustInlineAsmType(CodeGen::CodeGenFunction &CGF,
-                                  StringRef Constraint,
+                                  llvm::StringRef Constraint,
                                   llvm::Type* Ty) const override {
     return X86AdjustInlineAsmType(CGF, Constraint, Ty);
   }
@@ -1507,7 +1507,7 @@ static bool checkAVXParamFeature(DiagnosticsEngine &Diag,
                                  SourceLocation CallLoc,
                                  const llvm::StringMap<bool> &CallerMap,
                                  const llvm::StringMap<bool> &CalleeMap,
-                                 QualType Ty, StringRef Feature,
+                                 QualType Ty, llvm::StringRef Feature,
                                  bool IsArgument) {
   bool CallerHasFeat = CallerMap.lookup(Feature);
   bool CalleeHasFeat = CalleeMap.lookup(Feature);
@@ -1610,7 +1610,7 @@ void X86_64TargetCodeGenInfo::checkFunctionCallABI(CodeGenModule &CGM,
   }
 }
 
-std::string TargetCodeGenInfo::qualifyWindowsLibrary(StringRef Lib) {
+std::string TargetCodeGenInfo::qualifyWindowsLibrary(llvm::StringRef Lib) {
   // If the argument does not end in .lib, automatically add the suffix.
   // If the argument contains a space, enclose it in quotes.
   // This matches the behavior of MSVC.

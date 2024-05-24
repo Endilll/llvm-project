@@ -861,12 +861,12 @@ RangeSet RangeSet::Factory::deletePoint(RangeSet From,
   return intersect(From, Upper, Lower);
 }
 
-LLVM_DUMP_METHOD void Range::dump(raw_ostream &OS) const {
+LLVM_DUMP_METHOD void Range::dump(llvm::raw_ostream &OS) const {
   OS << '[' << toString(From(), 10) << ", " << toString(To(), 10) << ']';
 }
 LLVM_DUMP_METHOD void Range::dump() const { dump(llvm::errs()); }
 
-LLVM_DUMP_METHOD void RangeSet::dump(raw_ostream &OS) const {
+LLVM_DUMP_METHOD void RangeSet::dump(llvm::raw_ostream &OS) const {
   OS << "{ ";
   llvm::interleaveComma(*this, OS, [&OS](const Range &R) { R.dump(OS); });
   OS << " }";
@@ -977,7 +977,7 @@ public:
                                                        ProgramStateRef State,
                                                        EquivalenceClass Class);
 
-  void dumpToStream(ProgramStateRef State, raw_ostream &os) const;
+  void dumpToStream(ProgramStateRef State, llvm::raw_ostream &os) const;
   LLVM_DUMP_METHOD void dump(ProgramStateRef State) const {
     dumpToStream(State, llvm::errs());
   }
@@ -1885,17 +1885,17 @@ public:
   ProgramStateRef removeDeadBindings(ProgramStateRef State,
                                      SymbolReaper &SymReaper) override;
 
-  void printJson(raw_ostream &Out, ProgramStateRef State, const char *NL = "\n",
+  void printJson(llvm::raw_ostream &Out, ProgramStateRef State, const char *NL = "\n",
                  unsigned int Space = 0, bool IsDot = false) const override;
-  void printValue(raw_ostream &Out, ProgramStateRef State,
+  void printValue(llvm::raw_ostream &Out, ProgramStateRef State,
                   SymbolRef Sym) override;
-  void printConstraints(raw_ostream &Out, ProgramStateRef State,
+  void printConstraints(llvm::raw_ostream &Out, ProgramStateRef State,
                         const char *NL = "\n", unsigned int Space = 0,
                         bool IsDot = false) const;
-  void printEquivalenceClasses(raw_ostream &Out, ProgramStateRef State,
+  void printEquivalenceClasses(llvm::raw_ostream &Out, ProgramStateRef State,
                                const char *NL = "\n", unsigned int Space = 0,
                                bool IsDot = false) const;
-  void printDisequalities(raw_ostream &Out, ProgramStateRef State,
+  void printDisequalities(llvm::raw_ostream &Out, ProgramStateRef State,
                           const char *NL = "\n", unsigned int Space = 0,
                           bool IsDot = false) const;
 
@@ -2285,7 +2285,7 @@ ConstraintMap ento::getConstraintMap(ProgramStateRef State) {
 //===----------------------------------------------------------------------===//
 
 LLVM_DUMP_METHOD void EquivalenceClass::dumpToStream(ProgramStateRef State,
-                                                     raw_ostream &os) const {
+                                                     llvm::raw_ostream &os) const {
   SymbolSet ClassMembers = getClassMembers(State);
   for (const SymbolRef &MemberSym : ClassMembers) {
     MemberSym->dump();
@@ -3259,7 +3259,7 @@ ProgramStateRef RangeConstraintManager::assumeSymOutsideInclusiveRange(
 // Pretty-printing.
 //===----------------------------------------------------------------------===//
 
-void RangeConstraintManager::printJson(raw_ostream &Out, ProgramStateRef State,
+void RangeConstraintManager::printJson(llvm::raw_ostream &Out, ProgramStateRef State,
                                        const char *NL, unsigned int Space,
                                        bool IsDot) const {
   printConstraints(Out, State, NL, Space, IsDot);
@@ -3267,7 +3267,7 @@ void RangeConstraintManager::printJson(raw_ostream &Out, ProgramStateRef State,
   printDisequalities(Out, State, NL, Space, IsDot);
 }
 
-void RangeConstraintManager::printValue(raw_ostream &Out, ProgramStateRef State,
+void RangeConstraintManager::printValue(llvm::raw_ostream &Out, ProgramStateRef State,
                                         SymbolRef Sym) {
   const RangeSet RS = getRange(State, Sym);
   if (RS.isEmpty()) {
@@ -3285,7 +3285,7 @@ static std::string toString(const SymbolRef &Sym) {
   return O.str();
 }
 
-void RangeConstraintManager::printConstraints(raw_ostream &Out,
+void RangeConstraintManager::printConstraints(llvm::raw_ostream &Out,
                                               ProgramStateRef State,
                                               const char *NL,
                                               unsigned int Space,
@@ -3356,7 +3356,7 @@ static std::string toString(ProgramStateRef State, EquivalenceClass Class) {
   return Out.str();
 }
 
-void RangeConstraintManager::printEquivalenceClasses(raw_ostream &Out,
+void RangeConstraintManager::printEquivalenceClasses(llvm::raw_ostream &Out,
                                                      ProgramStateRef State,
                                                      const char *NL,
                                                      unsigned int Space,
@@ -3392,7 +3392,7 @@ void RangeConstraintManager::printEquivalenceClasses(raw_ostream &Out,
   Indent(Out, Space, IsDot) << "]," << NL;
 }
 
-void RangeConstraintManager::printDisequalities(raw_ostream &Out,
+void RangeConstraintManager::printDisequalities(llvm::raw_ostream &Out,
                                                 ProgramStateRef State,
                                                 const char *NL,
                                                 unsigned int Space,

@@ -56,7 +56,7 @@ SourceLocation SourceMgrAdapter::mapLocation(const llvm::SourceMgr &LLVMSrcMgr,
       DefaultFile = std::nullopt;
     } else {
       // Make a copy of the memory buffer.
-      StringRef bufferName = Buffer->getBufferIdentifier();
+      llvm::StringRef bufferName = Buffer->getBufferIdentifier();
       auto bufferCopy = std::unique_ptr<llvm::MemoryBuffer>(
           llvm::MemoryBuffer::getMemBufferCopy(Buffer->getBuffer(),
                                                bufferName));
@@ -95,7 +95,7 @@ void SourceMgrAdapter::handleDiag(const llvm::SMDiagnostic &Diag) {
     Loc = mapLocation(*LLVMSrcMgr, Diag.getLoc());
 
   // Extract the message.
-  StringRef Message = Diag.getMessage();
+  llvm::StringRef Message = Diag.getMessage();
 
   // Map the diagnostic kind.
   unsigned DiagID;

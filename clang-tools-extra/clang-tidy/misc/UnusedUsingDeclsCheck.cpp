@@ -37,7 +37,7 @@ static bool shouldCheckDecl(const Decl *TargetDecl) {
          isa<EnumConstantDecl>(TargetDecl);
 }
 
-UnusedUsingDeclsCheck::UnusedUsingDeclsCheck(StringRef Name,
+UnusedUsingDeclsCheck::UnusedUsingDeclsCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       HeaderFileExtensions(Context->getHeaderFileExtensions()) {}

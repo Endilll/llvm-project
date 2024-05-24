@@ -38,7 +38,7 @@ class RefactoringTool : public ClangTool {
 public:
   /// \see ClangTool::ClangTool.
   RefactoringTool(const CompilationDatabase &Compilations,
-                  ArrayRef<std::string> SourcePaths,
+                  llvm::ArrayRef<std::string> SourcePaths,
                   std::shared_ptr<PCHContainerOperations> PCHContainerOps =
                       std::make_shared<PCHContainerOperations>());
 
@@ -91,7 +91,7 @@ private:
 /// \returns true if all replacements applied and formatted. false otherwise.
 bool formatAndApplyAllReplacements(
     const std::map<std::string, Replacements> &FileToReplaces,
-    Rewriter &Rewrite, StringRef Style = "file");
+    Rewriter &Rewrite, llvm::StringRef Style = "file");
 
 } // end namespace tooling
 } // end namespace clang

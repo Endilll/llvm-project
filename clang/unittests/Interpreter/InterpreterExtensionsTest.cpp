@@ -128,7 +128,7 @@ class RecordRuntimeIBMetrics : public Interpreter {
     }
 
     static ExprResult noop(RuntimeInterfaceBuilder *Builder, Expr *E,
-                           ArrayRef<Expr *> FixedArgs) {
+                           llvm::ArrayRef<Expr *> FixedArgs) {
       auto *B = static_cast<NoopRuntimeInterfaceBuilder *>(Builder);
       B->TransformedExprs += 1;
       return B->S.ActOnFinishFullExpr(E, /*DiscardedValue=*/false);

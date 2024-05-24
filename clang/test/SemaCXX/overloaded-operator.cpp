@@ -410,8 +410,8 @@ namespace rdar9136502 {
 
 namespace rdar9222009 {
 class StringRef {
-  inline bool operator==(StringRef LHS, StringRef RHS) { // expected-error{{overloaded 'operator==' must be a binary operator (has 3 parameters)}}
-    return !(LHS == RHS); // expected-error{{invalid operands to binary expression ('StringRef' and 'StringRef')}}
+  inline bool operator==(llvm::StringRef LHS, llvm::StringRef RHS) { // expected-error{{overloaded 'operator==' must be a binary operator (has 3 parameters)}}
+    return !(LHS == RHS); // expected-error{{invalid operands to binary expression ('llvm::StringRef' and 'llvm::StringRef')}}
   }
 };
 

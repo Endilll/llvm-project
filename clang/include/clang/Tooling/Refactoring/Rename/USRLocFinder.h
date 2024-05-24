@@ -43,8 +43,8 @@ createRenameAtomicChanges(llvm::ArrayRef<std::string> USRs,
 ///
 /// \return SymbolOccurrences that can be converted to AtomicChanges when
 /// renaming.
-SymbolOccurrences getOccurrencesOfUSRs(ArrayRef<std::string> USRs,
-                                       StringRef PrevName, Decl *Decl);
+SymbolOccurrences getOccurrencesOfUSRs(llvm::ArrayRef<std::string> USRs,
+                                       llvm::StringRef PrevName, Decl *Decl);
 
 } // end namespace tooling
 } // end namespace clang

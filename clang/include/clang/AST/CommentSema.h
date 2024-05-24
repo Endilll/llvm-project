@@ -66,7 +66,7 @@ class Sema {
 
   /// A stack of HTML tags that are currently open (not matched with closing
   /// tags).
-  SmallVector<HTMLStartTagComment *, 8> HTMLOpenTags;
+  llvm::SmallVector<HTMLStartTagComment *, 8> HTMLOpenTags;
 
 public:
   Sema(llvm::BumpPtrAllocator &Allocator, const SourceManager &SourceMgr,
@@ -77,14 +77,14 @@ public:
 
   /// Returns a copy of array, owned by Sema's allocator.
   template<typename T>
-  ArrayRef<T> copyArray(ArrayRef<T> Source) {
+  llvm::ArrayRef<T> copyArray(llvm::ArrayRef<T> Source) {
     if (!Source.empty())
       return Source.copy(Allocator);
     return std::nullopt;
   }
 
   ParagraphComment *actOnParagraphComment(
-      ArrayRef<InlineContentComment *> Content);
+      llvm::ArrayRef<InlineContentComment *> Content);
 
   BlockCommandComment *actOnBlockCommandStart(SourceLocation LocBegin,
                                               SourceLocation LocEnd,
@@ -92,7 +92,7 @@ public:
                                               CommandMarkerKind CommandMarker);
 
   void actOnBlockCommandArgs(BlockCommandComment *Command,
-                             ArrayRef<BlockCommandComment::Argument> Args);
+                             llvm::ArrayRef<BlockCommandComment::Argument> Args);
 
   void actOnBlockCommandFinish(BlockCommandComment *Command,
                                ParagraphComment *Paragraph);
@@ -105,12 +105,12 @@ public:
   void actOnParamCommandDirectionArg(ParamCommandComment *Command,
                                      SourceLocation ArgLocBegin,
                                      SourceLocation ArgLocEnd,
-                                     StringRef Arg);
+                                     llvm::StringRef Arg);
 
   void actOnParamCommandParamNameArg(ParamCommandComment *Command,
                                      SourceLocation ArgLocBegin,
                                      SourceLocation ArgLocEnd,
-                                     StringRef Arg);
+                                     llvm::StringRef Arg);
 
   void actOnParamCommandFinish(ParamCommandComment *Command,
                                ParagraphComment *Paragraph);
@@ -123,7 +123,7 @@ public:
   void actOnTParamCommandParamNameArg(TParamCommandComment *Command,
                                       SourceLocation ArgLocBegin,
                                       SourceLocation ArgLocEnd,
-                                      StringRef Arg);
+                                      llvm::StringRef Arg);
 
   void actOnTParamCommandFinish(TParamCommandComment *Command,
                                 ParagraphComment *Paragraph);
@@ -131,11 +131,11 @@ public:
   InlineCommandComment *actOnInlineCommand(SourceLocation CommandLocBegin,
                                            SourceLocation CommandLocEnd,
                                            unsigned CommandID,
-                                           ArrayRef<Comment::Argument> Args);
+                                           llvm::ArrayRef<Comment::Argument> Args);
 
   InlineContentComment *actOnUnknownCommand(SourceLocation LocBegin,
                                             SourceLocation LocEnd,
-                                            StringRef CommandName);
+                                            llvm::StringRef CommandName);
 
   InlineContentComment *actOnUnknownCommand(SourceLocation LocBegin,
                                             SourceLocation LocEnd,
@@ -143,37 +143,37 @@ public:
 
   TextComment *actOnText(SourceLocation LocBegin,
                          SourceLocation LocEnd,
-                         StringRef Text);
+                         llvm::StringRef Text);
 
   VerbatimBlockComment *actOnVerbatimBlockStart(SourceLocation Loc,
                                                 unsigned CommandID);
 
   VerbatimBlockLineComment *actOnVerbatimBlockLine(SourceLocation Loc,
-                                                   StringRef Text);
+                                                   llvm::StringRef Text);
 
   void actOnVerbatimBlockFinish(VerbatimBlockComment *Block,
                                 SourceLocation CloseNameLocBegin,
-                                StringRef CloseName,
-                                ArrayRef<VerbatimBlockLineComment *> Lines);
+                                llvm::StringRef CloseName,
+                                llvm::ArrayRef<VerbatimBlockLineComment *> Lines);
 
   VerbatimLineComment *actOnVerbatimLine(SourceLocation LocBegin,
                                          unsigned CommandID,
                                          SourceLocation TextBegin,
-                                         StringRef Text);
+                                         llvm::StringRef Text);
 
   HTMLStartTagComment *actOnHTMLStartTagStart(SourceLocation LocBegin,
-                                              StringRef TagName);
+                                              llvm::StringRef TagName);
 
   void actOnHTMLStartTagFinish(HTMLStartTagComment *Tag,
-                               ArrayRef<HTMLStartTagComment::Attribute> Attrs,
+                               llvm::ArrayRef<HTMLStartTagComment::Attribute> Attrs,
                                SourceLocation GreaterLoc,
                                bool IsSelfClosing);
 
   HTMLEndTagComment *actOnHTMLEndTag(SourceLocation LocBegin,
                                      SourceLocation LocEnd,
-                                     StringRef TagName);
+                                     llvm::StringRef TagName);
 
-  FullComment *actOnFullComment(ArrayRef<BlockContentComment *> Blocks);
+  FullComment *actOnFullComment(llvm::ArrayRef<BlockContentComment *> Blocks);
 
 private:
   void checkBlockCommandEmptyParagraph(BlockCommandComment *Command);
@@ -221,30 +221,30 @@ private:
   bool isClassTemplateDecl();
   bool isFunctionTemplateDecl();
 
-  ArrayRef<const ParmVarDecl *> getParamVars();
+  llvm::ArrayRef<const ParmVarDecl *> getParamVars();
 
   /// Extract all important semantic information from
   /// \c ThisDeclInfo->ThisDecl into \c ThisDeclInfo members.
   void inspectThisDecl();
 
   /// Returns index of a function parameter with a given name.
-  unsigned resolveParmVarReference(StringRef Name,
-                                   ArrayRef<const ParmVarDecl *> ParamVars);
+  unsigned resolveParmVarReference(llvm::StringRef Name,
+                                   llvm::ArrayRef<const ParmVarDecl *> ParamVars);
 
   /// Returns index of a function parameter with the name closest to a given
   /// typo.
-  unsigned correctTypoInParmVarReference(StringRef Typo,
-                                         ArrayRef<const ParmVarDecl *> ParamVars);
+  unsigned correctTypoInParmVarReference(llvm::StringRef Typo,
+                                         llvm::ArrayRef<const ParmVarDecl *> ParamVars);
 
-  bool resolveTParamReference(StringRef Name,
+  bool resolveTParamReference(llvm::StringRef Name,
                               const TemplateParameterList *TemplateParameters,
-                              SmallVectorImpl<unsigned> *Position);
+                              llvm::SmallVectorImpl<unsigned> *Position);
 
-  StringRef correctTypoInTParamReference(
-                              StringRef Typo,
+  llvm::StringRef correctTypoInTParamReference(
+                              llvm::StringRef Typo,
                               const TemplateParameterList *TemplateParameters);
 
-  InlineCommandRenderKind getInlineCommandRenderKind(StringRef Name) const;
+  InlineCommandRenderKind getInlineCommandRenderKind(llvm::StringRef Name) const;
 };
 
 } // end namespace comments

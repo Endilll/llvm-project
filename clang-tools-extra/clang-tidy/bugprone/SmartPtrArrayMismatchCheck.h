@@ -18,8 +18,8 @@ namespace clang::tidy::bugprone {
 /// new-expression) is passed to it.
 class SmartPtrArrayMismatchCheck : public ClangTidyCheck {
 public:
-  SmartPtrArrayMismatchCheck(StringRef Name, ClangTidyContext *Context,
-                             StringRef SmartPointerName);
+  SmartPtrArrayMismatchCheck(llvm::StringRef Name, ClangTidyContext *Context,
+                             llvm::StringRef SmartPointerName);
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
@@ -40,7 +40,7 @@ protected:
   static const char PointerTypeN[];
 
 private:
-  StringRef const SmartPointerName;
+  llvm::StringRef const SmartPointerName;
 };
 
 } // namespace clang::tidy::bugprone

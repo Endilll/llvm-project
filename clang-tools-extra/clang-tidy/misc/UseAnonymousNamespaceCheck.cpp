@@ -30,7 +30,7 @@ AST_MATCHER(VarDecl, isStaticDataMember) { return Node.isStaticDataMember(); }
 } // namespace
 
 UseAnonymousNamespaceCheck::UseAnonymousNamespaceCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       HeaderFileExtensions(Context->getHeaderFileExtensions()) {}
 
@@ -52,7 +52,7 @@ void UseAnonymousNamespaceCheck::registerMatchers(MatchFinder *Finder) {
 
 void UseAnonymousNamespaceCheck::check(const MatchFinder::MatchResult &Result) {
   if (const auto *MatchedDecl = Result.Nodes.getNodeAs<NamedDecl>("x")) {
-    StringRef Type = llvm::isa<VarDecl>(MatchedDecl) ? "variable" : "function";
+    llvm::StringRef Type = llvm::isa<VarDecl>(MatchedDecl) ? "variable" : "function";
     diag(MatchedDecl->getLocation(),
          "%0 %1 declared 'static', move to anonymous namespace instead")
         << Type << MatchedDecl;

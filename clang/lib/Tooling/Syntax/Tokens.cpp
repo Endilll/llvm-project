@@ -217,7 +217,7 @@ llvm::raw_ostream &syntax::operator<<(llvm::raw_ostream &OS,
 
 llvm::StringRef FileRange::text(const SourceManager &SM) const {
   bool Invalid = false;
-  StringRef Text = SM.getBufferData(File, &Invalid);
+  llvm::StringRef Text = SM.getBufferData(File, &Invalid);
   if (Invalid)
     return "";
   assert(Begin <= Text.size());

@@ -39,13 +39,13 @@ struct Node {
   NodeId Parent, LeftMostDescendant, RightMostDescendant;
   int Depth, Height, Shift = 0;
   DynTypedNode ASTNode;
-  SmallVector<NodeId, 4> Children;
+  llvm::SmallVector<NodeId, 4> Children;
   ChangeKind Change = None;
 
   ASTNodeKind getType() const;
-  StringRef getTypeLabel() const;
+  llvm::StringRef getTypeLabel() const;
   bool isLeaf() const { return Children.empty(); }
-  std::optional<StringRef> getIdentifier() const;
+  std::optional<llvm::StringRef> getIdentifier() const;
   std::optional<std::string> getQualifiedIdentifier() const;
 };
 
@@ -63,7 +63,7 @@ public:
   ~SyntaxTree();
 
   const ASTContext &getASTContext() const;
-  StringRef getFilename() const;
+  llvm::StringRef getFilename() const;
 
   int getSize() const;
   NodeId getRootId() const;

@@ -297,7 +297,7 @@ void AIXTargetCodeGenInfo::setTargetAttributes(
         Ty->isRecordType() ? Ty->getAs<RecordType>()->getDecl() : nullptr;
 
     bool EmitDiagnostic = UserSpecifiedTOC && GV->hasExternalLinkage();
-    auto reportUnsupportedWarning = [&](bool ShouldEmitWarning, StringRef Msg) {
+    auto reportUnsupportedWarning = [&](bool ShouldEmitWarning, llvm::StringRef Msg) {
       if (ShouldEmitWarning)
         M.getDiags().Report(D->getLocation(), diag::warn_toc_unsupported_type)
             << GVId << Msg;
@@ -681,7 +681,7 @@ public:
   bool initDwarfEHRegSizeTable(CodeGen::CodeGenFunction &CGF,
                                llvm::Value *Address) const override;
   void emitTargetMetadata(CodeGen::CodeGenModule &CGM,
-                          const llvm::MapVector<GlobalDecl, StringRef>
+                          const llvm::MapVector<GlobalDecl, llvm::StringRef>
                               &MangledDeclNames) const override;
 };
 
@@ -1005,7 +1005,7 @@ PPC64_SVR4_TargetCodeGenInfo::initDwarfEHRegSizeTable(
 
 void PPC64_SVR4_TargetCodeGenInfo::emitTargetMetadata(
     CodeGen::CodeGenModule &CGM,
-    const llvm::MapVector<GlobalDecl, StringRef> &MangledDeclNames) const {
+    const llvm::MapVector<GlobalDecl, llvm::StringRef> &MangledDeclNames) const {
   if (CGM.getTypes().isLongDoubleReferenced()) {
     llvm::LLVMContext &Ctx = CGM.getLLVMContext();
     const auto *flt = &CGM.getTarget().getLongDoubleFormat();

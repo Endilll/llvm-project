@@ -24,7 +24,7 @@ namespace clang::tidy::performance {
 /// http://clang.llvm.org/extra/clang-tidy/checks/performance/faster-string-find.html
 class FasterStringFindCheck : public ClangTidyCheck {
 public:
-  FasterStringFindCheck(StringRef Name, ClangTidyContext *Context);
+  FasterStringFindCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override{
     return LangOpts.CPlusPlus;
   }
@@ -33,7 +33,7 @@ public:
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
 
 private:
-  const std::vector<StringRef> StringLikeClasses;
+  const std::vector<llvm::StringRef> StringLikeClasses;
 };
 
 } // namespace clang::tidy::performance

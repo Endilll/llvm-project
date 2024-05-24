@@ -31,7 +31,7 @@ buildSyntaxTree(Arena &A, TokenBufferTokenManager &TBTM, ASTContext &Context);
 /// Create `Leaf` from token with `Spelling` and assert it has the desired
 /// `TokenKind`.
 syntax::Leaf *createLeaf(syntax::Arena &A, TokenBufferTokenManager &TBTM,
-                         tok::TokenKind K, StringRef Spelling);
+                         tok::TokenKind K, llvm::StringRef Spelling);
 
 /// Infer the token spelling from its `TokenKind`, then create `Leaf` from
 /// this token
@@ -43,7 +43,7 @@ syntax::Leaf *createLeaf(syntax::Arena &A, TokenBufferTokenManager &TBTM,
 /// Returns it as a pointer to the base class `Tree`.
 syntax::Tree *
 createTree(syntax::Arena &A,
-           ArrayRef<std::pair<syntax::Node *, syntax::NodeRole>> Children,
+           llvm::ArrayRef<std::pair<syntax::Node *, syntax::NodeRole>> Children,
            syntax::NodeKind K);
 
 // Synthesis of Syntax Nodes

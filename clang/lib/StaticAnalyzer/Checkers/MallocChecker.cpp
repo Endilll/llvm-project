@@ -118,15 +118,15 @@ enum AllocationFamily {
 /// Print names of allocators and deallocators.
 ///
 /// \returns true on success.
-static bool printMemFnName(raw_ostream &os, CheckerContext &C, const Expr *E);
+static bool printMemFnName(llvm::raw_ostream &os, CheckerContext &C, const Expr *E);
 
 /// Print expected name of an allocator based on the deallocator's family
 /// derived from the DeallocExpr.
-static void printExpectedAllocName(raw_ostream &os, AllocationFamily Family);
+static void printExpectedAllocName(llvm::raw_ostream &os, AllocationFamily Family);
 
 /// Print expected name of a deallocator based on the allocator's
 /// family.
-static void printExpectedDeallocName(raw_ostream &os, AllocationFamily Family);
+static void printExpectedDeallocName(llvm::raw_ostream &os, AllocationFamily Family);
 
 //===----------------------------------------------------------------------===//
 // The state of a symbol, in terms of memory management.
@@ -197,7 +197,7 @@ public:
     ID.AddInteger(Family);
   }
 
-  LLVM_DUMP_METHOD void dump(raw_ostream &OS) const {
+  LLVM_DUMP_METHOD void dump(llvm::raw_ostream &OS) const {
     switch (K) {
 #define CASE(ID) case ID: OS << #ID; break;
     CASE(Allocated)
@@ -352,7 +352,7 @@ public:
                                           const CallEvent *Call,
                                           PointerEscapeKind Kind) const;
 
-  void printState(raw_ostream &Out, ProgramStateRef State,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State,
                   const char *NL, const char *Sep) const override;
 
 private:
@@ -702,8 +702,8 @@ private:
   std::optional<CheckKind> getCheckIfTracked(CheckerContext &C, SymbolRef Sym,
                                              bool IsALeakCheck = false) const;
   ///@}
-  static bool SummarizeValue(raw_ostream &os, SVal V);
-  static bool SummarizeRegion(raw_ostream &os, const MemRegion *MR);
+  static bool SummarizeValue(llvm::raw_ostream &os, SVal V);
+  static bool SummarizeRegion(llvm::raw_ostream &os, const MemRegion *MR);
 
   void HandleNonHeapDealloc(CheckerContext &C, SVal ArgVal, SourceRange Range,
                             const Expr *DeallocExpr,
@@ -916,7 +916,7 @@ protected:
     // into a function call" out by reusing the code in
     // NoStoreFuncVisitor::maybeEmitNoteForParameters, maybe by incorporating
     // the printing technology in UninitializedObject's FieldChainInfo.
-    ArrayRef<ParmVarDecl *> Parameters = Call.parameters();
+    llvm::ArrayRef<ParmVarDecl *> Parameters = Call.parameters();
     for (unsigned I = 0; I < Call.getNumArgs() && I < Parameters.size(); ++I) {
       SVal V = Call.getArgSVal(I);
       if (V.getAsSymbol() == Sym)
@@ -1045,14 +1045,14 @@ private:
   class StackHintGeneratorForReallocationFailed
       : public StackHintGeneratorForSymbol {
   public:
-    StackHintGeneratorForReallocationFailed(SymbolRef S, StringRef M)
+    StackHintGeneratorForReallocationFailed(SymbolRef S, llvm::StringRef M)
         : StackHintGeneratorForSymbol(S, M) {}
 
     std::string getMessageForArg(const Expr *ArgE, unsigned ArgIndex) override {
       // Printed parameters start at 1, not 0.
       ++ArgIndex;
 
-      SmallString<200> buf;
+      llvm::SmallString<200> buf;
       llvm::raw_svector_ostream os(buf);
 
       os << "Reallocation of " << ArgIndex << llvm::getOrdinalSuffix(ArgIndex)
@@ -1716,7 +1716,7 @@ static bool isKnownDeallocObjCMethodName(const ObjCMethodCall &Call) {
   // with free().
   // Ex:  [NSData dataWithBytesNoCopy:bytes length:10];
   // (...unless a 'freeWhenDone' parameter is false, but that's checked later.)
-  StringRef FirstSlot = Call.getSelector().getNameForSlot(0);
+  llvm::StringRef FirstSlot = Call.getSelector().getNameForSlot(0);
   return FirstSlot == "dataWithBytesNoCopy" ||
          FirstSlot == "initWithBytesNoCopy" ||
          FirstSlot == "initWithCharactersNoCopy";
@@ -1917,7 +1917,7 @@ static bool didPreviousFreeFail(ProgramStateRef State,
   return false;
 }
 
-static bool printMemFnName(raw_ostream &os, CheckerContext &C, const Expr *E) {
+static bool printMemFnName(llvm::raw_ostream &os, CheckerContext &C, const Expr *E) {
   if (const CallExpr *CE = dyn_cast<CallExpr>(E)) {
     // FIXME: This doesn't handle indirect calls.
     const FunctionDecl *FD = CE->getDirectCallee();
@@ -1956,7 +1956,7 @@ static bool printMemFnName(raw_ostream &os, CheckerContext &C, const Expr *E) {
   return false;
 }
 
-static void printExpectedAllocName(raw_ostream &os, AllocationFamily Family) {
+static void printExpectedAllocName(llvm::raw_ostream &os, AllocationFamily Family) {
 
   switch(Family) {
     case AF_Malloc: os << "malloc()"; return;
@@ -1969,7 +1969,7 @@ static void printExpectedAllocName(raw_ostream &os, AllocationFamily Family) {
   }
 }
 
-static void printExpectedDeallocName(raw_ostream &os, AllocationFamily Family) {
+static void printExpectedDeallocName(llvm::raw_ostream &os, AllocationFamily Family) {
   switch(Family) {
     case AF_Malloc: os << "free()"; return;
     case AF_CXXNew: os << "'delete'"; return;
@@ -2202,7 +2202,7 @@ MallocChecker::getCheckIfTracked(CheckerContext &C, SymbolRef Sym,
   return getCheckIfTracked(RS->getAllocationFamily(), IsALeakCheck);
 }
 
-bool MallocChecker::SummarizeValue(raw_ostream &os, SVal V) {
+bool MallocChecker::SummarizeValue(llvm::raw_ostream &os, SVal V) {
   if (std::optional<nonloc::ConcreteInt> IntVal =
           V.getAs<nonloc::ConcreteInt>())
     os << "an integer (" << IntVal->getValue() << ")";
@@ -2217,7 +2217,7 @@ bool MallocChecker::SummarizeValue(raw_ostream &os, SVal V) {
   return true;
 }
 
-bool MallocChecker::SummarizeRegion(raw_ostream &os,
+bool MallocChecker::SummarizeRegion(llvm::raw_ostream &os,
                                     const MemRegion *MR) {
   switch (MR->getKind()) {
   case MemRegion::FunctionCodeRegionKind: {
@@ -2310,7 +2310,7 @@ void MallocChecker::HandleNonHeapDealloc(CheckerContext &C, SVal ArgVal,
       BT_BadFree[*CheckKind].reset(new BugType(
           CheckNames[*CheckKind], "Bad free", categories::MemoryError));
 
-    SmallString<100> buf;
+    llvm::SmallString<100> buf;
     llvm::raw_svector_ostream os(buf);
 
     const MemRegion *MR = ArgVal.getAsRegion();
@@ -2384,13 +2384,13 @@ void MallocChecker::HandleMismatchedDealloc(CheckerContext &C,
           new BugType(CheckNames[CK_MismatchedDeallocatorChecker],
                       "Bad deallocator", categories::MemoryError));
 
-    SmallString<100> buf;
+    llvm::SmallString<100> buf;
     llvm::raw_svector_ostream os(buf);
 
     const Expr *AllocExpr = cast<Expr>(RS->getStmt());
-    SmallString<20> AllocBuf;
+    llvm::SmallString<20> AllocBuf;
     llvm::raw_svector_ostream AllocOs(AllocBuf);
-    SmallString<20> DeallocBuf;
+    llvm::SmallString<20> DeallocBuf;
     llvm::raw_svector_ostream DeallocOs(DeallocBuf);
 
     if (OwnershipTransferred) {
@@ -2446,9 +2446,9 @@ void MallocChecker::HandleOffsetFree(CheckerContext &C, SVal ArgVal,
     BT_OffsetFree[*CheckKind].reset(new BugType(
         CheckNames[*CheckKind], "Offset free", categories::MemoryError));
 
-  SmallString<100> buf;
+  llvm::SmallString<100> buf;
   llvm::raw_svector_ostream os(buf);
-  SmallString<20> AllocNameBuf;
+  llvm::SmallString<20> AllocNameBuf;
   llvm::raw_svector_ostream AllocNameOs(AllocNameBuf);
 
   const MemRegion *MR = ArgVal.getAsRegion();
@@ -2629,7 +2629,7 @@ void MallocChecker::HandleFunctionPtrFree(CheckerContext &C, SVal ArgVal,
       BT_BadFree[*CheckKind].reset(new BugType(
           CheckNames[*CheckKind], "Bad free", categories::MemoryError));
 
-    SmallString<100> Buf;
+    llvm::SmallString<100> Buf;
     llvm::raw_svector_ostream Os(Buf);
 
     const MemRegion *MR = ArgVal.getAsRegion();
@@ -2863,7 +2863,7 @@ void MallocChecker::HandleLeak(SymbolRef Sym, ExplodedNode *N,
                                               C.getSourceManager(),
                                               AllocNode->getLocationContext());
 
-  SmallString<200> buf;
+  llvm::SmallString<200> buf;
   llvm::raw_svector_ostream os(buf);
   if (Region && Region->canPrintPretty()) {
     os << "Potential leak of memory pointed to by ";
@@ -2890,7 +2890,7 @@ void MallocChecker::checkDeadSymbols(SymbolReaper &SymReaper,
   RegionStateTy::Factory &F = state->get_context<RegionState>();
 
   RegionStateTy RS = OldRS;
-  SmallVector<SymbolRef, 2> Errors;
+  llvm::SmallVector<SymbolRef, 2> Errors;
   for (auto [Sym, State] : RS) {
     if (SymReaper.isDead(Sym)) {
       if (State.isAllocated() || State.isAllocatedOfSizeZero())
@@ -3066,7 +3066,7 @@ void MallocChecker::checkPostStmt(const BlockExpr *BE,
   if (ReferencedVars.empty())
     return;
 
-  SmallVector<const MemRegion*, 10> Regions;
+  llvm::SmallVector<const MemRegion*, 10> Regions;
   const LocationContext *LC = C.getLocationContext();
   MemRegionManager &MemMgr = C.getSValBuilder().getRegionManager();
 
@@ -3094,7 +3094,7 @@ bool MallocChecker::suppressDeallocationsInSuspiciousContexts(
   if (Call.getNumArgs() == 0)
     return false;
 
-  StringRef FunctionStr = "";
+  llvm::StringRef FunctionStr = "";
   if (const auto *FD = dyn_cast<FunctionDecl>(C.getStackFrame()->getDecl()))
     if (const Stmt *Body = FD->getBody())
       if (Body->getBeginLoc().isValid())
@@ -3244,7 +3244,7 @@ bool MallocChecker::mayFreeAnyEscapedMemoryOrIsModeledExplicitly(
     // "freeWhenDone" parameter set to zero, we know ownership is being
     // transferred. Again, though, we can't be sure that the object will use
     // free() to deallocate the memory, so we can't model it explicitly.
-    StringRef FirstSlot = Msg->getSelector().getNameForSlot(0);
+    llvm::StringRef FirstSlot = Msg->getSelector().getNameForSlot(0);
     if (FirstSlot.ends_with("NoCopy"))
       return true;
 
@@ -3290,7 +3290,7 @@ bool MallocChecker::mayFreeAnyEscapedMemoryOrIsModeledExplicitly(
   const IdentifierInfo *II = FD->getIdentifier();
   if (!II)
     return true;
-  StringRef FName = II->getName();
+  llvm::StringRef FName = II->getName();
 
   // White list the 'XXXNoCopy' CoreFoundation functions.
   // We specifically check these before
@@ -3301,7 +3301,7 @@ bool MallocChecker::mayFreeAnyEscapedMemoryOrIsModeledExplicitly(
     for (unsigned i = 1; i < Call->getNumArgs(); ++i) {
       const Expr *ArgE = Call->getArgExpr(i)->IgnoreParenCasts();
       if (const DeclRefExpr *DE = dyn_cast<DeclRefExpr>(ArgE)) {
-        StringRef DeallocatorName = DE->getFoundDecl()->getName();
+        llvm::StringRef DeallocatorName = DE->getFoundDecl()->getName();
         if (DeallocatorName == "kCFAllocatorNull")
           return false;
       }
@@ -3447,7 +3447,7 @@ static SymbolRef findFailedReallocSymbol(ProgramStateRef currState,
 
 static bool isReferenceCountingPointerDestructor(const CXXDestructorDecl *DD) {
   if (const IdentifierInfo *II = DD->getParent()->getIdentifier()) {
-    StringRef N = II->getName();
+    llvm::StringRef N = II->getName();
     if (N.contains_insensitive("ptr") || N.contains_insensitive("pointer")) {
       if (N.contains_insensitive("ref") || N.contains_insensitive("cnt") ||
           N.contains_insensitive("intrusive") ||
@@ -3500,7 +3500,7 @@ PathDiagnosticPieceRef MallocBugVisitor::VisitNode(const ExplodedNode *N,
         const CXXRecordDecl *RD = MD->getParent();
         // A bit wobbly with ".contains()" because it may be like
         // "__atomic_base" or something.
-        if (StringRef(RD->getNameAsString()).contains("atomic")) {
+        if (llvm::StringRef(RD->getNameAsString()).contains("atomic")) {
           BR.markInvalid(getTag(), S);
         }
       }
@@ -3511,9 +3511,9 @@ PathDiagnosticPieceRef MallocBugVisitor::VisitNode(const ExplodedNode *N,
   // (__attribute__((cleanup))).
 
   // Find out if this is an interesting point and what is the kind.
-  StringRef Msg;
+  llvm::StringRef Msg;
   std::unique_ptr<StackHintGeneratorForSymbol> StackHint = nullptr;
-  SmallString<256> Buf;
+  llvm::SmallString<256> Buf;
   llvm::raw_svector_ostream OS(Buf);
 
   if (Mode == Normal) {
@@ -3659,7 +3659,7 @@ PathDiagnosticPieceRef MallocBugVisitor::VisitNode(const ExplodedNode *N,
   return P;
 }
 
-void MallocChecker::printState(raw_ostream &Out, ProgramStateRef State,
+void MallocChecker::printState(llvm::raw_ostream &Out, ProgramStateRef State,
                                const char *NL, const char *Sep) const {
 
   RegionStateTy RS = State->get<RegionState>();

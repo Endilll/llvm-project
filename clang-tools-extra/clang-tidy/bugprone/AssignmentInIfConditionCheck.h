@@ -19,7 +19,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/assignment-in-if-condition.html
 class AssignmentInIfConditionCheck : public ClangTidyCheck {
 public:
-  AssignmentInIfConditionCheck(StringRef Name, ClangTidyContext *Context)
+  AssignmentInIfConditionCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

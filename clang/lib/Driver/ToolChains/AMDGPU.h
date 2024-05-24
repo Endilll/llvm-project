@@ -39,7 +39,7 @@ public:
 
 void getAMDGPUTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                              const llvm::opt::ArgList &Args,
-                             std::vector<StringRef> &Features);
+                             std::vector<llvm::StringRef> &Features);
 
 } // end namespace amdgpu
 } // end namespace tools
@@ -48,10 +48,10 @@ namespace toolchains {
 
 class LLVM_LIBRARY_VISIBILITY AMDGPUToolChain : public Generic_ELF {
 protected:
-  const std::map<options::ID, const StringRef> OptionsDefault;
+  const std::map<options::ID, const llvm::StringRef> OptionsDefault;
 
   Tool *buildLinker() const override;
-  StringRef getOptionDefault(options::ID OptID) const {
+  llvm::StringRef getOptionDefault(options::ID OptID) const {
     auto opt = OptionsDefault.find(OptID);
     assert(opt != OptionsDefault.end() && "No Default for Option");
     return opt->second;
@@ -72,7 +72,7 @@ public:
   bool SupportsProfiling() const override { return false; }
 
   llvm::opt::DerivedArgList *
-  TranslateArgs(const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+  TranslateArgs(const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
                 Action::OffloadKind DeviceOffloadKind) const override;
 
   void addClangTargetOptions(const llvm::opt::ArgList &DriverArgs,
@@ -99,7 +99,7 @@ public:
 
   /// Uses amdgpu-arch tool to get arch of the system GPU. Will return error
   /// if unable to find one.
-  virtual Expected<SmallVector<std::string>>
+  virtual llvm::Expected<llvm::SmallVector<std::string>>
   getSystemGPUArchs(const llvm::opt::ArgList &Args) const override;
 
 protected:
@@ -119,7 +119,7 @@ protected:
   getParsedTargetID(const llvm::opt::ArgList &DriverArgs) const;
 
   /// Get GPU arch from -mcpu without checking.
-  StringRef getGPUArch(const llvm::opt::ArgList &DriverArgs) const;
+  llvm::StringRef getGPUArch(const llvm::opt::ArgList &DriverArgs) const;
 
   /// Common warning options shared by AMDGPU HIP, OpenCL and OpenMP toolchains.
   /// Language specific warning options should go to derived classes.

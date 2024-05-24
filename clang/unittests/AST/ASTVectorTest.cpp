@@ -33,7 +33,7 @@ protected:
 
   FileSystemOptions FileMgrOpts;
   FileManager FileMgr;
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
   DiagnosticsEngine Diags;
   SourceManager SourceMgr;
   LangOptions LangOpts;
@@ -70,7 +70,7 @@ TEST_F(ASTVectorTest, InsertEmpty) {
 
   // Ensure no pointer overflow when inserting empty range
   int Values[] = { 0, 1, 2, 3 };
-  ArrayRef<int> IntVec(Values);
+  llvm::ArrayRef<int> IntVec(Values);
   auto I = V.insert(Ctxt, V.begin(), IntVec.begin(), IntVec.begin());
   ASSERT_EQ(V.begin(), I);
   ASSERT_TRUE(V.empty());

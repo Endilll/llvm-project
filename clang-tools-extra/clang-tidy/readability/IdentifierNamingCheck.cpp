@@ -33,11 +33,11 @@ using namespace clang::ast_matchers;
 namespace clang::tidy {
 
 llvm::ArrayRef<
-    std::pair<readability::IdentifierNamingCheck::CaseType, StringRef>>
+    std::pair<readability::IdentifierNamingCheck::CaseType, llvm::StringRef>>
 OptionEnumMapping<
     readability::IdentifierNamingCheck::CaseType>::getEnumMapping() {
   static constexpr std::pair<readability::IdentifierNamingCheck::CaseType,
-                             StringRef>
+                             llvm::StringRef>
       Mapping[] = {
           {readability::IdentifierNamingCheck::CT_AnyCase, "aNy_CasE"},
           {readability::IdentifierNamingCheck::CT_LowerCase, "lower_case"},
@@ -58,9 +58,9 @@ struct OptionEnumMapping<
     readability::IdentifierNamingCheck::HungarianPrefixType> {
   using HungarianPrefixType =
       readability::IdentifierNamingCheck::HungarianPrefixType;
-  static llvm::ArrayRef<std::pair<HungarianPrefixType, StringRef>>
+  static llvm::ArrayRef<std::pair<HungarianPrefixType, llvm::StringRef>>
   getEnumMapping() {
-    static constexpr std::pair<HungarianPrefixType, StringRef> Mapping[] = {
+    static constexpr std::pair<HungarianPrefixType, llvm::StringRef> Mapping[] = {
         {HungarianPrefixType::HPT_Off, "Off"},
         {HungarianPrefixType::HPT_On, "On"},
         {HungarianPrefixType::HPT_LowerCase, "LowerCase"},
@@ -135,7 +135,7 @@ enum StyleKind : int {
   SK_Invalid
 };
 
-static StringRef const StyleNames[] = {
+static llvm::StringRef const StyleNames[] = {
 #define STRINGIZE(v) #v,
   NAMING_KEYS(STRINGIZE)
 #undef STRINGIZE
@@ -188,7 +188,7 @@ static StringRef const StyleNames[] = {
      m(ptrdiff_t) \
      m(void) \
 
-static StringRef const HungarainNotationPrimitiveTypes[] = {
+static llvm::StringRef const HungarainNotationPrimitiveTypes[] = {
 #define STRINGIZE(v) #v,
   HUNGARIAN_NOTATION_PRIMITIVE_TYPES(STRINGIZE)
 #undef STRINGIZE
@@ -224,7 +224,7 @@ static StringRef const HungarainNotationPrimitiveTypes[] = {
      m(UINT64) \
      m(PVOID) \
 
-static StringRef const HungarainNotationUserDefinedTypes[] = {
+static llvm::StringRef const HungarainNotationUserDefinedTypes[] = {
 #define STRINGIZE(v) #v,
   HUNGARIAN_NOTATION_USER_DEFINED_TYPES(STRINGIZE)
 #undef STRINGIZE
@@ -235,8 +235,8 @@ static StringRef const HungarainNotationUserDefinedTypes[] = {
 // clang-format on
 
 IdentifierNamingCheck::NamingStyle::NamingStyle(
-    std::optional<IdentifierNamingCheck::CaseType> Case, StringRef Prefix,
-    StringRef Suffix, StringRef IgnoredRegexpStr, HungarianPrefixType HPType)
+    std::optional<IdentifierNamingCheck::CaseType> Case, llvm::StringRef Prefix,
+    llvm::StringRef Suffix, llvm::StringRef IgnoredRegexpStr, HungarianPrefixType HPType)
     : Case(Case), Prefix(Prefix), Suffix(Suffix),
       IgnoredRegexpStr(IgnoredRegexpStr), HPType(HPType) {
   if (!IgnoredRegexpStr.empty()) {
@@ -255,9 +255,9 @@ IdentifierNamingCheck::FileStyle IdentifierNamingCheck::getFileStyleFromOptions(
   HungarianNotation.loadDefaultConfig(HNOption);
   HungarianNotation.loadFileConfig(Options, HNOption);
 
-  SmallVector<std::optional<IdentifierNamingCheck::NamingStyle>, 0> Styles;
+  llvm::SmallVector<std::optional<IdentifierNamingCheck::NamingStyle>, 0> Styles;
   Styles.resize(SK_Count);
-  SmallString<64> StyleString;
+  llvm::SmallString<64> StyleString;
   for (unsigned I = 0; I < SK_Count; ++I) {
     size_t StyleSize = StyleNames[I].size();
     StyleString.assign({StyleNames[I], "HungarianPrefix"});
@@ -269,13 +269,13 @@ IdentifierNamingCheck::FileStyle IdentifierNamingCheck::getFileStyleFromOptions(
 
     memcpy(&StyleString[StyleSize], "IgnoredRegexp", 13);
     StyleString.truncate(StyleSize + 13);
-    std::optional<StringRef> IgnoredRegexpStr = Options.get(StyleString);
+    std::optional<llvm::StringRef> IgnoredRegexpStr = Options.get(StyleString);
     memcpy(&StyleString[StyleSize], "Prefix", 6);
     StyleString.truncate(StyleSize + 6);
-    std::optional<StringRef> Prefix(Options.get(StyleString));
+    std::optional<llvm::StringRef> Prefix(Options.get(StyleString));
     // Fast replacement of [Pre]fix -> [Suf]fix.
     memcpy(&StyleString[StyleSize], "Suf", 3);
-    std::optional<StringRef> Postfix(Options.get(StyleString));
+    std::optional<llvm::StringRef> Postfix(Options.get(StyleString));
     memcpy(&StyleString[StyleSize], "Case", 4);
     StyleString.pop_back_n(2);
     std::optional<CaseType> CaseOptional =
@@ -327,7 +327,7 @@ std::string IdentifierNamingCheck::HungarianNotation::getDeclTypeName(
   if (StrLen > 0) {
     std::string Type(Begin, StrLen);
 
-    static constexpr StringRef Keywords[] = {
+    static constexpr llvm::StringRef Keywords[] = {
         // Constexpr specifiers
         "constexpr", "constinit", "consteval",
         // Qualifier
@@ -338,7 +338,7 @@ std::string IdentifierNamingCheck::HungarianNotation::getDeclTypeName(
         "virtual"};
 
     // Remove keywords
-    for (StringRef Kw : Keywords) {
+    for (llvm::StringRef Kw : Keywords) {
       for (size_t Pos = 0;
            (Pos = Type.find(Kw.data(), Pos)) != std::string::npos;) {
         Type.replace(Pos, Kw.size(), "");
@@ -371,7 +371,7 @@ std::string IdentifierNamingCheck::HungarianNotation::getDeclTypeName(
     }
 
     // Remove redundant tailing.
-    static constexpr StringRef TailsOfMultiWordType[] = {
+    static constexpr llvm::StringRef TailsOfMultiWordType[] = {
         " int", " char", " double", " long", " short"};
     bool RedundantRemoved = false;
     for (auto Kw : TailsOfMultiWordType) {
@@ -401,7 +401,7 @@ std::string IdentifierNamingCheck::HungarianNotation::getDeclTypeName(
   return TypeName;
 }
 
-IdentifierNamingCheck::IdentifierNamingCheck(StringRef Name,
+IdentifierNamingCheck::IdentifierNamingCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : RenamerClangTidyCheck(Name, Context), Context(Context),
       GetConfigPerFile(Options.get("GetConfigPerFile", true)),
@@ -431,7 +431,7 @@ bool IdentifierNamingCheck::HungarianNotation::checkOptionValid(
 }
 
 bool IdentifierNamingCheck::HungarianNotation::isOptionEnabled(
-    StringRef OptionKey, const llvm::StringMap<std::string> &StrMap) const {
+    llvm::StringRef OptionKey, const llvm::StringMap<std::string> &StrMap) const {
   if (OptionKey.empty())
     return false;
 
@@ -446,18 +446,18 @@ void IdentifierNamingCheck::HungarianNotation::loadFileConfig(
     const ClangTidyCheck::OptionsView &Options,
     IdentifierNamingCheck::HungarianNotationOption &HNOption) const {
 
-  static constexpr StringRef HNOpts[] = {"TreatStructAsClass"};
-  static constexpr StringRef HNDerivedTypes[] = {"Array", "Pointer",
+  static constexpr llvm::StringRef HNOpts[] = {"TreatStructAsClass"};
+  static constexpr llvm::StringRef HNDerivedTypes[] = {"Array", "Pointer",
                                                  "FunctionPointer"};
 
-  StringRef Section = "HungarianNotation.";
+  llvm::StringRef Section = "HungarianNotation.";
 
-  SmallString<128> Buffer = {Section, "General."};
+  llvm::SmallString<128> Buffer = {Section, "General."};
   size_t DefSize = Buffer.size();
   for (const auto &Opt : HNOpts) {
     Buffer.truncate(DefSize);
     Buffer.append(Opt);
-    StringRef Val = Options.get(Buffer, "");
+    llvm::StringRef Val = Options.get(Buffer, "");
     if (!Val.empty())
       HNOption.General[Opt] = Val.str();
   }
@@ -467,12 +467,12 @@ void IdentifierNamingCheck::HungarianNotation::loadFileConfig(
   for (const auto &Type : HNDerivedTypes) {
     Buffer.truncate(DefSize);
     Buffer.append(Type);
-    StringRef Val = Options.get(Buffer, "");
+    llvm::StringRef Val = Options.get(Buffer, "");
     if (!Val.empty())
       HNOption.DerivedType[Type] = Val.str();
   }
 
-  static constexpr std::pair<StringRef, StringRef> HNCStrings[] = {
+  static constexpr std::pair<llvm::StringRef, llvm::StringRef> HNCStrings[] = {
       {"CharPointer", "char*"},
       {"CharArray", "char[]"},
       {"WideCharPointer", "wchar_t*"},
@@ -483,7 +483,7 @@ void IdentifierNamingCheck::HungarianNotation::loadFileConfig(
   for (const auto &CStr : HNCStrings) {
     Buffer.truncate(DefSize);
     Buffer.append(CStr.first);
-    StringRef Val = Options.get(Buffer, "");
+    llvm::StringRef Val = Options.get(Buffer, "");
     if (!Val.empty())
       HNOption.CString[CStr.second] = Val.str();
   }
@@ -493,7 +493,7 @@ void IdentifierNamingCheck::HungarianNotation::loadFileConfig(
   for (const auto &PrimType : HungarainNotationPrimitiveTypes) {
     Buffer.truncate(DefSize);
     Buffer.append(PrimType);
-    StringRef Val = Options.get(Buffer, "");
+    llvm::StringRef Val = Options.get(Buffer, "");
     if (!Val.empty()) {
       std::string Type = PrimType.str();
       std::replace(Type.begin(), Type.end(), '-', ' ');
@@ -506,7 +506,7 @@ void IdentifierNamingCheck::HungarianNotation::loadFileConfig(
   for (const auto &Type : HungarainNotationUserDefinedTypes) {
     Buffer.truncate(DefSize);
     Buffer.append(Type);
-    StringRef Val = Options.get(Buffer, "");
+    llvm::StringRef Val = Options.get(Buffer, "");
     if (!Val.empty())
       HNOption.UserDefinedType[Type] = Val.str();
   }
@@ -536,7 +536,7 @@ std::string IdentifierNamingCheck::HungarianNotation::getPrefix(
 }
 
 bool IdentifierNamingCheck::HungarianNotation::removeDuplicatedPrefix(
-    SmallVector<StringRef, 8> &Words,
+    llvm::SmallVector<llvm::StringRef, 8> &Words,
     const IdentifierNamingCheck::HungarianNotationOption &HNOption) const {
   if (Words.size() <= 1)
     return true;
@@ -559,7 +559,7 @@ bool IdentifierNamingCheck::HungarianNotation::removeDuplicatedPrefix(
 }
 
 std::string IdentifierNamingCheck::HungarianNotation::getDataTypePrefix(
-    StringRef TypeName, const NamedDecl *ND,
+    llvm::StringRef TypeName, const NamedDecl *ND,
     const IdentifierNamingCheck::HungarianNotationOption &HNOption) const {
   if (!ND || TypeName.empty())
     return TypeName.str();
@@ -602,7 +602,7 @@ std::string IdentifierNamingCheck::HungarianNotation::getDataTypePrefix(
   // Pointers
   size_t PtrCount = getAsteriskCount(ModifiedTypeName);
   if (PtrCount > 0) {
-    ModifiedTypeName = [&](std::string Str, StringRef From, StringRef To) {
+    ModifiedTypeName = [&](std::string Str, llvm::StringRef From, llvm::StringRef To) {
       size_t StartPos = 0;
       while ((StartPos = Str.find(From.data(), StartPos)) !=
              std::string::npos) {
@@ -658,7 +658,7 @@ std::string IdentifierNamingCheck::HungarianNotation::getEnumPrefix(
   const auto *ED = cast<EnumDecl>(ECD->getDeclContext());
 
   std::string Name = ED->getName().str();
-  if (StringRef(Name).contains("enum")) {
+  if (llvm::StringRef(Name).contains("enum")) {
     Name = Name.substr(strlen("enum"), Name.length() - strlen("enum"));
     Name = Name.erase(0, Name.find_first_not_of(' '));
   }
@@ -666,12 +666,12 @@ std::string IdentifierNamingCheck::HungarianNotation::getEnumPrefix(
   static llvm::Regex Splitter(
       "([a-z0-9A-Z]*)(_+)|([A-Z]?[a-z0-9]+)([A-Z]|$)|([A-Z]+)([A-Z]|$)");
 
-  StringRef EnumName(Name);
-  SmallVector<StringRef, 8> Substrs;
+  llvm::StringRef EnumName(Name);
+  llvm::SmallVector<llvm::StringRef, 8> Substrs;
   EnumName.split(Substrs, "_", -1, false);
 
-  SmallVector<StringRef, 8> Words;
-  SmallVector<StringRef, 8> Groups;
+  llvm::SmallVector<llvm::StringRef, 8> Words;
+  llvm::SmallVector<llvm::StringRef, 8> Groups;
   for (auto Substr : Substrs) {
     while (!Substr.empty()) {
       Groups.clear();
@@ -692,7 +692,7 @@ std::string IdentifierNamingCheck::HungarianNotation::getEnumPrefix(
   }
 
   std::string Initial;
-  for (StringRef Word : Words)
+  for (llvm::StringRef Word : Words)
     Initial += tolower(Word[0]);
 
   return Initial;
@@ -724,19 +724,19 @@ void IdentifierNamingCheck::HungarianNotation::loadDefaultConfig(
     IdentifierNamingCheck::HungarianNotationOption &HNOption) const {
 
   // Options
-  static constexpr std::pair<StringRef, StringRef> General[] = {
+  static constexpr std::pair<llvm::StringRef, llvm::StringRef> General[] = {
       {"TreatStructAsClass", "false"}};
   for (const auto &G : General)
     HNOption.General.try_emplace(G.first, G.second);
 
   // Derived types
-  static constexpr std::pair<StringRef, StringRef> DerivedTypes[] = {
+  static constexpr std::pair<llvm::StringRef, llvm::StringRef> DerivedTypes[] = {
       {"Array", "a"}, {"Pointer", "p"}, {"FunctionPointer", "fn"}};
   for (const auto &DT : DerivedTypes)
     HNOption.DerivedType.try_emplace(DT.first, DT.second);
 
   // C strings
-  static constexpr std::pair<StringRef, StringRef> CStrings[] = {
+  static constexpr std::pair<llvm::StringRef, llvm::StringRef> CStrings[] = {
       {"char*", "sz"},
       {"char[]", "sz"},
       {"wchar_t*", "wsz"},
@@ -745,7 +745,7 @@ void IdentifierNamingCheck::HungarianNotation::loadDefaultConfig(
     HNOption.CString.try_emplace(CStr.first, CStr.second);
 
   // clang-format off
-  static constexpr std::pair<StringRef, StringRef> PrimitiveTypes[] = {
+  static constexpr std::pair<llvm::StringRef, llvm::StringRef> PrimitiveTypes[] = {
         {"int8_t",                  "i8"  },
         {"int16_t",                 "i16" },
         {"int32_t",                 "i32" },
@@ -796,7 +796,7 @@ void IdentifierNamingCheck::HungarianNotation::loadDefaultConfig(
     HNOption.PrimitiveType.try_emplace(PT.first, PT.second);
 
   // clang-format off
-  static constexpr std::pair<StringRef, StringRef> UserDefinedTypes[] = {
+  static constexpr std::pair<llvm::StringRef, llvm::StringRef> UserDefinedTypes[] = {
       // Windows data types
       {"BOOL",                    "b"   },
       {"BOOLEAN",                 "b"   },
@@ -833,8 +833,8 @@ void IdentifierNamingCheck::HungarianNotation::loadDefaultConfig(
 
 void IdentifierNamingCheck::storeOptions(ClangTidyOptions::OptionMap &Opts) {
   RenamerClangTidyCheck::storeOptions(Opts);
-  SmallString<64> StyleString;
-  ArrayRef<std::optional<NamingStyle>> Styles = MainFileStyle->getStyles();
+  llvm::SmallString<64> StyleString;
+  llvm::ArrayRef<std::optional<NamingStyle>> Styles = MainFileStyle->getStyles();
   for (size_t I = 0; I < SK_Count; ++I) {
     if (!Styles[I])
       continue;
@@ -867,7 +867,7 @@ void IdentifierNamingCheck::storeOptions(ClangTidyOptions::OptionMap &Opts) {
 }
 
 bool IdentifierNamingCheck::matchesStyle(
-    StringRef Type, StringRef Name,
+    llvm::StringRef Type, llvm::StringRef Name,
     const IdentifierNamingCheck::NamingStyle &Style,
     const IdentifierNamingCheck::HungarianNotationOption &HNOption,
     const NamedDecl *Decl) const {
@@ -910,18 +910,18 @@ bool IdentifierNamingCheck::matchesStyle(
 }
 
 std::string IdentifierNamingCheck::fixupWithCase(
-    StringRef Type, StringRef Name, const Decl *D,
+    llvm::StringRef Type, llvm::StringRef Name, const Decl *D,
     const IdentifierNamingCheck::NamingStyle &Style,
     const IdentifierNamingCheck::HungarianNotationOption &HNOption,
     IdentifierNamingCheck::CaseType Case) const {
   static llvm::Regex Splitter(
       "([a-z0-9A-Z]*)(_+)|([A-Z]?[a-z0-9]+)([A-Z]|$)|([A-Z]+)([A-Z]|$)");
 
-  SmallVector<StringRef, 8> Substrs;
+  llvm::SmallVector<llvm::StringRef, 8> Substrs;
   Name.split(Substrs, "_", -1, false);
 
-  SmallVector<StringRef, 8> Words;
-  SmallVector<StringRef, 8> Groups;
+  llvm::SmallVector<llvm::StringRef, 8> Words;
+  llvm::SmallVector<llvm::StringRef, 8> Groups;
   for (auto Substr : Substrs) {
     while (!Substr.empty()) {
       Groups.clear();
@@ -948,7 +948,7 @@ std::string IdentifierNamingCheck::fixupWithCase(
     HungarianNotation.removeDuplicatedPrefix(Words, HNOption);
   }
 
-  SmallString<128> Fixup;
+  llvm::SmallString<128> Fixup;
   switch (Case) {
   case IdentifierNamingCheck::CT_AnyCase:
     return Name.str();
@@ -1090,7 +1090,7 @@ bool IdentifierNamingCheck::isParamInMainLikeFunction(
 }
 
 std::string IdentifierNamingCheck::fixupWithStyle(
-    StringRef Type, StringRef Name,
+    llvm::StringRef Type, llvm::StringRef Name,
     const IdentifierNamingCheck::NamingStyle &Style,
     const IdentifierNamingCheck::HungarianNotationOption &HNOption,
     const Decl *D) const {
@@ -1112,7 +1112,7 @@ std::string IdentifierNamingCheck::fixupWithStyle(
         Fixed[0] = toupper(Fixed[0]);
     }
   }
-  StringRef Mid = StringRef(Fixed).trim("_");
+  llvm::StringRef Mid = llvm::StringRef(Fixed).trim("_");
   if (Mid.empty())
     Mid = "_";
 
@@ -1121,7 +1121,7 @@ std::string IdentifierNamingCheck::fixupWithStyle(
 
 StyleKind IdentifierNamingCheck::findStyleKind(
     const NamedDecl *D,
-    ArrayRef<std::optional<IdentifierNamingCheck::NamingStyle>> NamingStyles,
+    llvm::ArrayRef<std::optional<IdentifierNamingCheck::NamingStyle>> NamingStyles,
     bool IgnoreMainLikeFunctions, bool CheckAnonFieldInParentScope) const {
   assert(D && D->getIdentifier() && !D->getName().empty() && !D->isImplicit() &&
          "Decl must be an explicit identifier with a name.");
@@ -1337,9 +1337,9 @@ StyleKind IdentifierNamingCheck::findStyleKind(
 
 std::optional<RenamerClangTidyCheck::FailureInfo>
 IdentifierNamingCheck::getFailureInfo(
-    StringRef Type, StringRef Name, const NamedDecl *ND,
+    llvm::StringRef Type, llvm::StringRef Name, const NamedDecl *ND,
     SourceLocation Location,
-    ArrayRef<std::optional<IdentifierNamingCheck::NamingStyle>> NamingStyles,
+    llvm::ArrayRef<std::optional<IdentifierNamingCheck::NamingStyle>> NamingStyles,
     const IdentifierNamingCheck::HungarianNotationOption &HNOption,
     StyleKind SK, const SourceManager &SM, bool IgnoreFailedSplit) const {
   if (SK == SK_Invalid || !NamingStyles[SK])
@@ -1358,7 +1358,7 @@ IdentifierNamingCheck::getFailureInfo(
   std::replace(KindName.begin(), KindName.end(), '_', ' ');
 
   std::string Fixup = fixupWithStyle(Type, Name, Style, HNOption, ND);
-  if (StringRef(Fixup) == Name) {
+  if (llvm::StringRef(Fixup) == Name) {
     if (!IgnoreFailedSplit) {
       LLVM_DEBUG(Location.print(llvm::dbgs(), SM);
                  llvm::dbgs()
@@ -1415,13 +1415,13 @@ IdentifierNamingCheck::getDiagInfo(const NamingCheckId &ID,
 }
 
 const IdentifierNamingCheck::FileStyle &
-IdentifierNamingCheck::getStyleForFile(StringRef FileName) const {
+IdentifierNamingCheck::getStyleForFile(llvm::StringRef FileName) const {
   if (!GetConfigPerFile)
     return *MainFileStyle;
 
-  SmallString<128> RealFileName;
+  llvm::SmallString<128> RealFileName;
   llvm::sys::fs::real_path(FileName, RealFileName);
-  StringRef Parent = llvm::sys::path::parent_path(RealFileName);
+  llvm::StringRef Parent = llvm::sys::path::parent_path(RealFileName);
   auto Iter = NamingStylesCache.find(Parent);
   if (Iter != NamingStylesCache.end())
     return Iter->getValue();
@@ -1443,7 +1443,7 @@ IdentifierNamingCheck::getStyleForFile(StringRef FileName) const {
 
 StyleKind IdentifierNamingCheck::findStyleKindForAnonField(
     const FieldDecl *AnonField,
-    ArrayRef<std::optional<NamingStyle>> NamingStyles) const {
+    llvm::ArrayRef<std::optional<NamingStyle>> NamingStyles) const {
   const IndirectFieldDecl *IFD =
       utils::findOutermostIndirectFieldDeclForField(AnonField);
   assert(IFD && "Found an anonymous record field without an IndirectFieldDecl");
@@ -1463,7 +1463,7 @@ StyleKind IdentifierNamingCheck::findStyleKindForAnonField(
 
 StyleKind IdentifierNamingCheck::findStyleKindForField(
     const FieldDecl *Field, QualType Type,
-    ArrayRef<std::optional<NamingStyle>> NamingStyles) const {
+    llvm::ArrayRef<std::optional<NamingStyle>> NamingStyles) const {
   if (!Type.isNull() && Type.isConstQualified()) {
     if (NamingStyles[SK_ConstantMember])
       return SK_ConstantMember;
@@ -1489,7 +1489,7 @@ StyleKind IdentifierNamingCheck::findStyleKindForField(
 
 StyleKind IdentifierNamingCheck::findStyleKindForVar(
     const VarDecl *Var, QualType Type,
-    ArrayRef<std::optional<NamingStyle>> NamingStyles) const {
+    llvm::ArrayRef<std::optional<NamingStyle>> NamingStyles) const {
   if (Var->isConstexpr() && NamingStyles[SK_ConstexprVariable])
     return SK_ConstexprVariable;
 

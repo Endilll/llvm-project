@@ -42,10 +42,10 @@ public:
 private:
   // List of fully qualified types which should not persist across a suspension
   // point in a coroutine.
-  std::vector<StringRef> RAIITypesList;
+  std::vector<llvm::StringRef> RAIITypesList;
   // List of fully qualified awaitable types which are considered safe to
   // co_await.
-  std::vector<StringRef> AllowedAwaitablesList;
+  std::vector<llvm::StringRef> AllowedAwaitablesList;
 };
 
 } // namespace clang::tidy::misc

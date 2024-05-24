@@ -18,9 +18,9 @@
 using namespace clang;
 
 XRayFunctionFilter::XRayFunctionFilter(
-    ArrayRef<std::string> AlwaysInstrumentPaths,
-    ArrayRef<std::string> NeverInstrumentPaths,
-    ArrayRef<std::string> AttrListPaths, SourceManager &SM)
+    llvm::ArrayRef<std::string> AlwaysInstrumentPaths,
+    llvm::ArrayRef<std::string> NeverInstrumentPaths,
+    llvm::ArrayRef<std::string> AttrListPaths, SourceManager &SM)
     : AlwaysInstrument(llvm::SpecialCaseList::createOrDie(
           AlwaysInstrumentPaths, SM.getFileManager().getVirtualFileSystem())),
       NeverInstrument(llvm::SpecialCaseList::createOrDie(
@@ -32,7 +32,7 @@ XRayFunctionFilter::XRayFunctionFilter(
 XRayFunctionFilter::~XRayFunctionFilter() = default;
 
 XRayFunctionFilter::ImbueAttribute
-XRayFunctionFilter::shouldImbueFunction(StringRef FunctionName) const {
+XRayFunctionFilter::shouldImbueFunction(llvm::StringRef FunctionName) const {
   // First apply the always instrument list, than if it isn't an "always" see
   // whether it's treated as a "never" instrument function.
   // TODO: Remove these as they're deprecated; use the AttrList exclusively.
@@ -54,8 +54,8 @@ XRayFunctionFilter::shouldImbueFunction(StringRef FunctionName) const {
 }
 
 XRayFunctionFilter::ImbueAttribute
-XRayFunctionFilter::shouldImbueFunctionsInFile(StringRef Filename,
-                                               StringRef Category) const {
+XRayFunctionFilter::shouldImbueFunctionsInFile(llvm::StringRef Filename,
+                                               llvm::StringRef Category) const {
   if (AlwaysInstrument->inSection("xray_always_instrument", "src", Filename,
                                   Category) ||
       AttrList->inSection("always", "src", Filename, Category))
@@ -69,7 +69,7 @@ XRayFunctionFilter::shouldImbueFunctionsInFile(StringRef Filename,
 
 XRayFunctionFilter::ImbueAttribute
 XRayFunctionFilter::shouldImbueLocation(SourceLocation Loc,
-                                        StringRef Category) const {
+                                        llvm::StringRef Category) const {
   if (!Loc.isValid())
     return ImbueAttribute::NONE;
   return this->shouldImbueFunctionsInFile(SM.getFilename(SM.getFileLoc(Loc)),

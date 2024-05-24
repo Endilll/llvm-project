@@ -35,7 +35,7 @@ using namespace clang;
 using namespace clang::syntax;
 
 namespace {
-ArrayRef<syntax::Token> tokens(syntax::Node *N,
+llvm::ArrayRef<syntax::Token> tokens(syntax::Node *N,
                                const TokenBufferTokenManager &STM) {
   assert(N->isOriginal() && "tokens of modified nodes are not well-defined");
   if (auto *L = dyn_cast<syntax::Leaf>(N))
@@ -64,7 +64,7 @@ std::vector<TestClangConfig> clang::syntax::allTestClangConfigs() {
 }
 
 syntax::TranslationUnit *
-SyntaxTreeTest::buildTree(StringRef Code, const TestClangConfig &ClangConfig) {
+SyntaxTreeTest::buildTree(llvm::StringRef Code, const TestClangConfig &ClangConfig) {
   // FIXME: this code is almost the identical to the one in TokensTest. Share
   //        it.
   class BuildSyntaxTree : public ASTConsumer {
@@ -104,7 +104,7 @@ SyntaxTreeTest::buildTree(StringRef Code, const TestClangConfig &ClangConfig) {
         : Root(Root), TM(TM), TB(TB), Arena(Arena) {}
 
     std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                   StringRef InFile) override {
+                                                   llvm::StringRef InFile) override {
       // We start recording the tokens, ast consumer will take on the result.
       auto Tokens =
           std::make_unique<syntax::TokenCollector>(CI.getPreprocessor());
@@ -169,7 +169,7 @@ SyntaxTreeTest::buildTree(StringRef Code, const TestClangConfig &ClangConfig) {
 
 syntax::Node *SyntaxTreeTest::nodeByRange(llvm::Annotations::Range R,
                                           syntax::Node *Root) {
-  ArrayRef<syntax::Token> Toks = tokens(Root, *TM);
+  llvm::ArrayRef<syntax::Token> Toks = tokens(Root, *TM);
 
   if (Toks.front().location().isFileID() && Toks.back().location().isFileID() &&
       syntax::Token::range(*SourceMgr, Toks.front(), Toks.back()) ==

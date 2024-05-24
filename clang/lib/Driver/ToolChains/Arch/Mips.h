@@ -29,15 +29,15 @@ enum class FloatABI {
   Hard,
 };
 
-IEEE754Standard getIEEE754Standard(StringRef &CPU);
-bool hasCompactBranches(StringRef &CPU);
+IEEE754Standard getIEEE754Standard(llvm::StringRef &CPU);
+bool hasCompactBranches(llvm::StringRef &CPU);
 void getMipsCPUAndABI(const llvm::opt::ArgList &Args,
-                      const llvm::Triple &Triple, StringRef &CPUName,
-                      StringRef &ABIName);
+                      const llvm::Triple &Triple, llvm::StringRef &CPUName,
+                      llvm::StringRef &ABIName);
 void getMIPSTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                            const llvm::opt::ArgList &Args,
-                           std::vector<StringRef> &Features);
-StringRef getGnuCompatibleMipsABIName(StringRef ABI);
+                           std::vector<llvm::StringRef> &Features);
+llvm::StringRef getGnuCompatibleMipsABIName(llvm::StringRef ABI);
 mips::FloatABI getMipsFloatABI(const Driver &D, const llvm::opt::ArgList &Args,
                                const llvm::Triple &Triple);
 std::string getMipsABILibSuffix(const llvm::opt::ArgList &Args,
@@ -46,13 +46,13 @@ bool hasMipsAbiArg(const llvm::opt::ArgList &Args, const char *Value);
 bool isUCLibc(const llvm::opt::ArgList &Args);
 bool isNaN2008(const Driver &D, const llvm::opt::ArgList &Args,
                const llvm::Triple &Triple);
-bool isFP64ADefault(const llvm::Triple &Triple, StringRef CPUName);
-bool isFPXXDefault(const llvm::Triple &Triple, StringRef CPUName,
-                   StringRef ABIName, mips::FloatABI FloatABI);
+bool isFP64ADefault(const llvm::Triple &Triple, llvm::StringRef CPUName);
+bool isFPXXDefault(const llvm::Triple &Triple, llvm::StringRef CPUName,
+                   llvm::StringRef ABIName, mips::FloatABI FloatABI);
 bool shouldUseFPXX(const llvm::opt::ArgList &Args, const llvm::Triple &Triple,
-                   StringRef CPUName, StringRef ABIName,
+                   llvm::StringRef CPUName, llvm::StringRef ABIName,
                    mips::FloatABI FloatABI);
-bool supportsIndirectJumpHazardBarrier(StringRef &CPU);
+bool supportsIndirectJumpHazardBarrier(llvm::StringRef &CPU);
 
 } // end namespace mips
 } // end namespace target

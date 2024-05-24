@@ -69,7 +69,7 @@ static cl::opt<std::string> OutputFileName(
     cl::desc("Output trace to the given file name or '-' for stdout."),
     cl::cat(Cat));
 
-[[noreturn]] static void error(Twine Message) {
+[[noreturn]] static void error(llvm::Twine Message) {
   WithColor::error() << Message << '\n';
   exit(1);
 }
@@ -78,12 +78,12 @@ namespace {
 
 class PPTraceAction : public ASTFrontendAction {
 public:
-  PPTraceAction(const FilterType &Filters, raw_ostream &OS)
+  PPTraceAction(const FilterType &Filters, llvm::raw_ostream &OS)
       : Filters(Filters), OS(OS) {}
 
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override {
+                                                 llvm::StringRef InFile) override {
     Preprocessor &PP = CI.getPreprocessor();
     PP.addPPCallbacks(
         std::make_unique<PPCallbacksTracker>(Filters, CallbackCalls, PP));
@@ -104,13 +104,13 @@ protected:
 
 private:
   const FilterType &Filters;
-  raw_ostream &OS;
+  llvm::raw_ostream &OS;
   std::vector<CallbackCall> CallbackCalls;
 };
 
 class PPTraceFrontendActionFactory : public tooling::FrontendActionFactory {
 public:
-  PPTraceFrontendActionFactory(const FilterType &Filters, raw_ostream &OS)
+  PPTraceFrontendActionFactory(const FilterType &Filters, llvm::raw_ostream &OS)
       : Filters(Filters), OS(OS) {}
 
   std::unique_ptr<FrontendAction> create() override {
@@ -119,7 +119,7 @@ public:
 
 private:
   const FilterType &Filters;
-  raw_ostream &OS;
+  llvm::raw_ostream &OS;
 };
 } // namespace
 } // namespace pp_trace
@@ -133,14 +133,14 @@ int main(int argc, const char **argv) {
   if (!OptionsParser)
     error(toString(OptionsParser.takeError()));
   // Parse the IgnoreCallbacks list into strings.
-  SmallVector<StringRef, 32> Patterns;
+  llvm::SmallVector<llvm::StringRef, 32> Patterns;
   FilterType Filters;
-  StringRef(Callbacks).split(Patterns, ",",
+  llvm::StringRef(Callbacks).split(Patterns, ",",
                              /*MaxSplit=*/-1, /*KeepEmpty=*/false);
-  for (StringRef Pattern : Patterns) {
+  for (llvm::StringRef Pattern : Patterns) {
     Pattern = Pattern.trim();
     bool Enabled = !Pattern.consume_front("-");
-    Expected<GlobPattern> Pat = GlobPattern::create(Pattern);
+    llvm::Expected<GlobPattern> Pat = GlobPattern::create(Pattern);
     if (Pat)
       Filters.emplace_back(std::move(*Pat), Enabled);
     else

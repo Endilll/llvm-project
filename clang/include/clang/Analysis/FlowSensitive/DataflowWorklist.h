@@ -23,7 +23,7 @@ namespace clang {
 template <typename Comp, unsigned QueueSize> class DataflowWorklistBase {
   llvm::BitVector EnqueuedBlocks;
   llvm::PriorityQueue<const CFGBlock *,
-                      SmallVector<const CFGBlock *, QueueSize>, Comp>
+                      llvm::SmallVector<const CFGBlock *, QueueSize>, Comp>
       WorkList;
 
 public:

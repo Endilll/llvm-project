@@ -27,7 +27,7 @@ namespace ento {
 namespace {
 
 void reportBug(const CheckerBase *Checker, const CallEvent &Call,
-               CheckerContext &C, StringRef WarningMsg) {
+               CheckerContext &C, llvm::StringRef WarningMsg) {
   C.getBugReporter().EmitBasicReport(
       nullptr, Checker, "", categories::LogicError, WarningMsg,
       PathDiagnosticLocation(Call.getOriginExpr(), C.getSourceManager(),
@@ -43,7 +43,7 @@ public:
       return;
     }
 
-    SmallString<100> WarningBuf;
+    llvm::SmallString<100> WarningBuf;
     llvm::raw_svector_ostream WarningOS(WarningBuf);
     WarningOS << "NumArgs: " << DC->getNumArgs();
 

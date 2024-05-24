@@ -507,7 +507,7 @@ static bool tryDiagnoseOverloadedCast(Sema &S, CastType CT,
         PartialDiagnosticAt(range.getBegin(),
                             S.PDiag(diag::err_ovl_deleted_conversion_in_cast)
                                 << CT << srcType << destType << (Msg != nullptr)
-                                << (Msg ? Msg->getString() : StringRef())
+                                << (Msg ? Msg->getString() : llvm::StringRef())
                                 << range << src->getSourceRange()),
         S, OCD_ViableCandidates, src);
     return true;
@@ -2150,8 +2150,8 @@ static void DiagnoseCallingConvCast(Sema &Self, const ExprResult &SrcExpr,
     return;
 
   // Diagnose this cast, as it is probably bad.
-  StringRef SrcCCName = FunctionType::getNameForCallConv(SrcCC);
-  StringRef DstCCName = FunctionType::getNameForCallConv(DstCC);
+  llvm::StringRef SrcCCName = FunctionType::getNameForCallConv(SrcCC);
+  llvm::StringRef DstCCName = FunctionType::getNameForCallConv(DstCC);
   Self.Diag(OpRange.getBegin(), diag::warn_cast_calling_conv)
       << SrcCCName << DstCCName << OpRange;
 
@@ -2167,8 +2167,8 @@ static void DiagnoseCallingConvCast(Sema &Self, const ExprResult &SrcExpr,
   // to match the Windows header declarations.
   SourceLocation NameLoc = FD->getFirstDecl()->getNameInfo().getLoc();
   Preprocessor &PP = Self.getPreprocessor();
-  SmallVector<TokenValue, 6> AttrTokens;
-  SmallString<64> CCAttrText;
+  llvm::SmallVector<TokenValue, 6> AttrTokens;
+  llvm::SmallString<64> CCAttrText;
   llvm::raw_svector_ostream OS(CCAttrText);
   if (Self.getLangOpts().MicrosoftExt) {
     // __stdcall or __vectorcall
@@ -2190,7 +2190,7 @@ static void DiagnoseCallingConvCast(Sema &Self, const ExprResult &SrcExpr,
     AttrTokens.push_back(tok::r_paren);
     AttrTokens.push_back(tok::r_paren);
   }
-  StringRef AttrSpelling = PP.getLastMacroWithSpelling(NameLoc, AttrTokens);
+  llvm::StringRef AttrSpelling = PP.getLastMacroWithSpelling(NameLoc, AttrTokens);
   if (!AttrSpelling.empty())
     CCAttrText = AttrSpelling;
   OS << ' ';

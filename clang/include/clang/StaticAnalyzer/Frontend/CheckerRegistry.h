@@ -88,9 +88,9 @@ class CheckerManager;
 /// "core.builtin", or the full name "core.builtin.NoReturnFunctionChecker".
 class CheckerRegistry {
 public:
-  CheckerRegistry(CheckerRegistryData &Data, ArrayRef<std::string> Plugins,
+  CheckerRegistry(CheckerRegistryData &Data, llvm::ArrayRef<std::string> Plugins,
                   DiagnosticsEngine &Diags, AnalyzerOptions &AnOpts,
-                  ArrayRef<std::function<void(CheckerRegistry &)>>
+                  llvm::ArrayRef<std::function<void(CheckerRegistry &)>>
                       CheckerRegistrationFns = {});
 
   /// Collects all enabled checkers in the field EnabledCheckers. It preserves
@@ -116,7 +116,7 @@ public:
   /// Adds a checker to the registry. Use this non-templated overload when your
   /// checker requires custom initialization.
   void addChecker(RegisterCheckerFn Fn, ShouldRegisterFunction sfn,
-                  StringRef FullName, StringRef Desc, StringRef DocsUri,
+                  llvm::StringRef FullName, llvm::StringRef Desc, llvm::StringRef DocsUri,
                   bool IsHidden);
 
   /// Adds a checker to the registry. Use this templated overload when your
@@ -125,7 +125,7 @@ public:
   /// the tiny convenience that it provides, but external plugins might use it,
   /// and there isn't a strong incentive to remove it.
   template <class T>
-  void addChecker(StringRef FullName, StringRef Desc, StringRef DocsUri,
+  void addChecker(llvm::StringRef FullName, llvm::StringRef Desc, llvm::StringRef DocsUri,
                   bool IsHidden = false) {
     // Avoid MSVC's Compiler Error C2276:
     // http://msdn.microsoft.com/en-us/library/850cstw1(v=VS.80).aspx
@@ -136,11 +136,11 @@ public:
 
   /// Makes the checker with the full name \p fullName depend on the checker
   /// called \p dependency.
-  void addDependency(StringRef FullName, StringRef Dependency);
+  void addDependency(llvm::StringRef FullName, llvm::StringRef Dependency);
 
   /// Makes the checker with the full name \p fullName weak depend on the
   /// checker called \p dependency.
-  void addWeakDependency(StringRef FullName, StringRef Dependency);
+  void addWeakDependency(llvm::StringRef FullName, llvm::StringRef Dependency);
 
   /// Registers an option to a given checker. A checker option will always have
   /// the following format:
@@ -151,13 +151,13 @@ public:
   /// Options for unknown checkers, or unknown options for a given checker, or
   /// invalid value types for that given option are reported as an error in
   /// non-compatibility mode.
-  void addCheckerOption(StringRef OptionType, StringRef CheckerFullName,
-                        StringRef OptionName, StringRef DefaultValStr,
-                        StringRef Description, StringRef DevelopmentStatus,
+  void addCheckerOption(llvm::StringRef OptionType, llvm::StringRef CheckerFullName,
+                        llvm::StringRef OptionName, llvm::StringRef DefaultValStr,
+                        llvm::StringRef Description, llvm::StringRef DevelopmentStatus,
                         bool IsHidden = false);
 
   /// Adds a package to the registry.
-  void addPackage(StringRef FullName);
+  void addPackage(llvm::StringRef FullName);
 
   /// Registers an option to a given package. A package option will always have
   /// the following format:
@@ -168,9 +168,9 @@ public:
   /// Options for unknown packages, or unknown options for a given package, or
   /// invalid value types for that given option are reported as an error in
   /// non-compatibility mode.
-  void addPackageOption(StringRef OptionType, StringRef PackageFullName,
-                        StringRef OptionName, StringRef DefaultValStr,
-                        StringRef Description, StringRef DevelopmentStatus,
+  void addPackageOption(llvm::StringRef OptionType, llvm::StringRef PackageFullName,
+                        llvm::StringRef OptionName, llvm::StringRef DefaultValStr,
+                        llvm::StringRef Description, llvm::StringRef DevelopmentStatus,
                         bool IsHidden = false);
 
   // FIXME: This *really* should be added to the frontend flag descriptions.

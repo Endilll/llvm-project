@@ -16,7 +16,7 @@ namespace clang::tidy::readability {
 /// Finds unnecessary calls to `std::string::c_str()`.
 class RedundantStringCStrCheck : public ClangTidyCheck {
 public:
-  RedundantStringCStrCheck(StringRef Name, ClangTidyContext *Context);
+  RedundantStringCStrCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }
@@ -24,7 +24,7 @@ public:
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
-  std::vector<StringRef> StringParameterFunctions;
+  std::vector<llvm::StringRef> StringParameterFunctions;
 };
 
 } // namespace clang::tidy::readability

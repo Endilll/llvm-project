@@ -26,12 +26,12 @@ namespace clang {
   void FormatASTNodeDiagnosticArgument(
       DiagnosticsEngine::ArgumentKind Kind,
       intptr_t Val,
-      StringRef Modifier,
-      StringRef Argument,
-      ArrayRef<DiagnosticsEngine::ArgumentValue> PrevArgs,
-      SmallVectorImpl<char> &Output,
+      llvm::StringRef Modifier,
+      llvm::StringRef Argument,
+      llvm::ArrayRef<DiagnosticsEngine::ArgumentValue> PrevArgs,
+      llvm::SmallVectorImpl<char> &Output,
       void *Cookie,
-      ArrayRef<intptr_t> QualTypeVals);
+      llvm::ArrayRef<intptr_t> QualTypeVals);
 
   /// Returns a desugared version of the QualType, and marks ShouldAKA as true
   /// whenever we remove significant sugar from the type. Make sure ShouldAKA

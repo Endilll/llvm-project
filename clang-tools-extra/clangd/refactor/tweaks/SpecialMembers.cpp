@@ -111,7 +111,7 @@ public:
     return NeedCopy || NeedMove;
   }
 
-  Expected<Effect> apply(const Selection &Inputs) override {
+  llvm::Expected<Effect> apply(const Selection &Inputs) override {
     // Implicit special members are created lazily by clang.
     // We need them so we can tell whether they should be =default or =delete.
     Inputs.AST->getSema().ForceDeclarationOfImplicitMembers(Class);

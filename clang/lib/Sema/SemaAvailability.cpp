@@ -52,15 +52,15 @@ static const AvailabilityAttr *getAttrForPlatform(ASTContext &Context,
 
       // Check if this is an App Extension "platform", and if so chop off
       // the suffix for matching with the actual platform.
-      StringRef ActualPlatform = Avail->getPlatform()->getName();
-      StringRef RealizedPlatform = ActualPlatform;
+      llvm::StringRef ActualPlatform = Avail->getPlatform()->getName();
+      llvm::StringRef RealizedPlatform = ActualPlatform;
       if (Context.getLangOpts().AppExt) {
         size_t suffix = RealizedPlatform.rfind("_app_extension");
-        if (suffix != StringRef::npos)
+        if (suffix != llvm::StringRef::npos)
           RealizedPlatform = RealizedPlatform.slice(0, suffix);
       }
 
-      StringRef TargetPlatform = Context.getTargetInfo().getPlatformName();
+      llvm::StringRef TargetPlatform = Context.getTargetInfo().getPlatformName();
 
       // Match the platform name.
       if (RealizedPlatform == TargetPlatform) {
@@ -140,7 +140,7 @@ ShouldDiagnoseAvailabilityOfDecl(Sema &S, const NamedDecl *D,
 /// the context of \c Ctx. For example, we should emit an unavailable diagnostic
 /// in a deprecated context, but not the other way around.
 static bool ShouldDiagnoseAvailabilityInContext(
-    Sema &S, AvailabilityResult K, VersionTuple DeclVersion,
+    Sema &S, AvailabilityResult K, llvm::VersionTuple DeclVersion,
     const IdentifierInfo *DeclEnv, Decl *Ctx, const NamedDecl *OffendingDecl) {
   assert(K != AR_Available && "Expected an unavailable declaration here!");
 
@@ -149,7 +149,7 @@ static bool ShouldDiagnoseAvailabilityInContext(
   // This is only a problem in Foundation's C++ implementation for CF_OPTIONS.
   if (DeclLoc.isMacroID() && S.getLangOpts().CPlusPlus &&
       isa<TypedefDecl>(OffendingDecl)) {
-    StringRef MacroName = S.getPreprocessor().getImmediateMacroName(DeclLoc);
+    llvm::StringRef MacroName = S.getPreprocessor().getImmediateMacroName(DeclLoc);
     if (MacroName == "CF_OPTIONS" || MacroName == "OBJC_OPTIONS" ||
         MacroName == "SWIFT_OPTIONS" || MacroName == "NS_OPTIONS") {
       return false;
@@ -211,21 +211,21 @@ static bool ShouldDiagnoseAvailabilityInContext(
 
 static bool
 shouldDiagnoseAvailabilityByDefault(const ASTContext &Context,
-                                    const VersionTuple &DeploymentVersion,
-                                    const VersionTuple &DeclVersion) {
+                                    const llvm::VersionTuple &DeploymentVersion,
+                                    const llvm::VersionTuple &DeclVersion) {
   const auto &Triple = Context.getTargetInfo().getTriple();
-  VersionTuple ForceAvailabilityFromVersion;
+  llvm::VersionTuple ForceAvailabilityFromVersion;
   switch (Triple.getOS()) {
   case llvm::Triple::IOS:
   case llvm::Triple::TvOS:
-    ForceAvailabilityFromVersion = VersionTuple(/*Major=*/11);
+    ForceAvailabilityFromVersion = llvm::VersionTuple(/*Major=*/11);
     break;
   case llvm::Triple::WatchOS:
-    ForceAvailabilityFromVersion = VersionTuple(/*Major=*/4);
+    ForceAvailabilityFromVersion = llvm::VersionTuple(/*Major=*/4);
     break;
   case llvm::Triple::Darwin:
   case llvm::Triple::MacOSX:
-    ForceAvailabilityFromVersion = VersionTuple(/*Major=*/10, /*Minor=*/13);
+    ForceAvailabilityFromVersion = llvm::VersionTuple(/*Major=*/10, /*Minor=*/13);
     break;
   case llvm::Triple::ShaderModel:
     // Always enable availability diagnostics for shader models.
@@ -256,9 +256,9 @@ static NamedDecl *findEnclosingDeclToAnnotate(Decl *OrigCtx) {
 namespace {
 
 struct AttributeInsertion {
-  StringRef Prefix;
+  llvm::StringRef Prefix;
   SourceLocation Loc;
-  StringRef Suffix;
+  llvm::StringRef Suffix;
 
   static AttributeInsertion createInsertionAfter(const NamedDecl *D) {
     return {" ", D->getEndLoc(), ""};
@@ -282,7 +282,7 @@ struct AttributeInsertion {
 /// \returns A number of method parameters if parsing was successful,
 /// std::nullopt otherwise.
 static std::optional<unsigned>
-tryParseObjCMethodName(StringRef Name, SmallVectorImpl<StringRef> &SlotNames,
+tryParseObjCMethodName(llvm::StringRef Name, llvm::SmallVectorImpl<llvm::StringRef> &SlotNames,
                        const LangOptions &LangOpts) {
   // Accept replacements starting with - or + as valid ObjC method names.
   if (!Name.empty() && (Name.front() == '-' || Name.front() == '+'))
@@ -303,7 +303,7 @@ tryParseObjCMethodName(StringRef Name, SmallVectorImpl<StringRef> &SlotNames,
   }
   // Verify all slot names are valid.
   bool AllowDollar = LangOpts.DollarIdents;
-  for (StringRef S : SlotNames) {
+  for (llvm::StringRef S : SlotNames) {
     if (S.empty())
       continue;
     if (!isValidAsciiIdentifier(S, AllowDollar))
@@ -348,8 +348,8 @@ createAttributeInsertion(const NamedDecl *D, const SourceManager &SM,
 static void DoEmitAvailabilityWarning(Sema &S, AvailabilityResult K,
                                       Decl *Ctx, const NamedDecl *ReferringDecl,
                                       const NamedDecl *OffendingDecl,
-                                      StringRef Message,
-                                      ArrayRef<SourceLocation> Locs,
+                                      llvm::StringRef Message,
+                                      llvm::ArrayRef<SourceLocation> Locs,
                                       const ObjCInterfaceDecl *UnknownObjCClass,
                                       const ObjCPropertyDecl *ObjCProperty,
                                       bool ObjCPropertyAccess) {
@@ -364,7 +364,7 @@ static void DoEmitAvailabilityWarning(Sema &S, AvailabilityResult K,
   // Matches diag::note_availability_specified_here.
   unsigned available_here_select_kind;
 
-  VersionTuple DeclVersion;
+  llvm::VersionTuple DeclVersion;
   const AvailabilityAttr *AA = getAttrForPlatform(S.Context, OffendingDecl);
   const IdentifierInfo *IIEnv = nullptr;
   if (AA) {
@@ -401,7 +401,7 @@ static void DoEmitAvailabilityWarning(Sema &S, AvailabilityResult K,
     // for declarations that were introduced in iOS 11 (macOS 10.13, ...) or
     // later.
     assert(AA != nullptr && "expecting valid availability attribute");
-    VersionTuple Introduced = AA->getIntroduced();
+    llvm::VersionTuple Introduced = AA->getIntroduced();
     bool EnvironmentMatchesOrNone =
         hasMatchingEnvironmentOrNone(S.getASTContext(), AA);
 
@@ -541,9 +541,9 @@ static void DoEmitAvailabilityWarning(Sema &S, AvailabilityResult K,
     llvm_unreachable("Warning for availability of available declaration?");
   }
 
-  SmallVector<FixItHint, 12> FixIts;
+  llvm::SmallVector<FixItHint, 12> FixIts;
   if (K == AR_Deprecated) {
-    StringRef Replacement;
+    llvm::StringRef Replacement;
     if (auto AL = OffendingDecl->getAttr<DeprecatedAttr>())
       Replacement = AL->getReplacement();
     if (auto AL = getAttrForPlatform(S.Context, OffendingDecl))
@@ -556,7 +556,7 @@ static void DoEmitAvailabilityWarning(Sema &S, AvailabilityResult K,
     if (UseRange.isValid()) {
       if (const auto *MethodDecl = dyn_cast<ObjCMethodDecl>(ReferringDecl)) {
         Selector Sel = MethodDecl->getSelector();
-        SmallVector<StringRef, 12> SelectorSlotNames;
+        llvm::SmallVector<llvm::StringRef, 12> SelectorSlotNames;
         std::optional<unsigned> NumParams = tryParseObjCMethodName(
             Replacement, SelectorSlotNames, S.getLangOpts());
         if (NumParams && *NumParams == Sel.getNumArgs()) {
@@ -635,8 +635,8 @@ void Sema::handleDelayedAvailabilityCheck(DelayedDiagnostic &DD, Decl *Ctx) {
 static void EmitAvailabilityWarning(Sema &S, AvailabilityResult AR,
                                     const NamedDecl *ReferringDecl,
                                     const NamedDecl *OffendingDecl,
-                                    StringRef Message,
-                                    ArrayRef<SourceLocation> Locs,
+                                    llvm::StringRef Message,
+                                    llvm::ArrayRef<SourceLocation> Locs,
                                     const ObjCInterfaceDecl *UnknownObjCClass,
                                     const ObjCPropertyDecl *ObjCProperty,
                                     bool ObjCPropertyAccess) {
@@ -733,8 +733,8 @@ class DiagnoseUnguardedAvailability
   Decl *Ctx;
 
   /// Stack of potentially nested 'if (@available(...))'s.
-  SmallVector<VersionTuple, 8> AvailabilityStack;
-  SmallVector<const Stmt *, 16> StmtStack;
+  llvm::SmallVector<llvm::VersionTuple, 8> AvailabilityStack;
+  llvm::SmallVector<const Stmt *, 16> StmtStack;
 
   void DiagnoseDeclAvailability(NamedDecl *D, SourceRange Range,
                                 ObjCInterfaceDecl *ClassReceiver = nullptr);
@@ -815,7 +815,7 @@ void DiagnoseUnguardedAvailability::DiagnoseDeclAvailability(
       getAttrForPlatform(SemaRef.getASTContext(), OffendingDecl);
     bool EnvironmentMatchesOrNone =
         hasMatchingEnvironmentOrNone(SemaRef.getASTContext(), AA);
-    VersionTuple Introduced = AA->getIntroduced();
+    llvm::VersionTuple Introduced = AA->getIntroduced();
 
     if (EnvironmentMatchesOrNone && AvailabilityStack.back() >= Introduced)
       return;
@@ -909,7 +909,7 @@ void DiagnoseUnguardedAvailability::DiagnoseDeclAvailability(
     if (SM.getFileID(IfInsertionLoc) != SM.getFileID(StmtEndLoc))
       return;
 
-    StringRef Indentation = Lexer::getIndentationForLine(IfInsertionLoc, SM);
+    llvm::StringRef Indentation = Lexer::getIndentationForLine(IfInsertionLoc, SM);
     const char *ExtraIndentation = "    ";
     std::string FixItString;
     llvm::raw_string_ostream FixItOS(FixItString);
@@ -961,7 +961,7 @@ bool DiagnoseUnguardedAvailability::VisitTypeLoc(TypeLoc Ty) {
 }
 
 bool DiagnoseUnguardedAvailability::TraverseIfStmt(IfStmt *If) {
-  VersionTuple CondVersion;
+  llvm::VersionTuple CondVersion;
   if (auto *E = dyn_cast<ObjCAvailabilityCheckExpr>(If->getCond())) {
     CondVersion = E->getVersion();
 
@@ -1020,7 +1020,7 @@ FunctionScopeInfo *Sema::getCurFunctionAvailabilityContext() {
 }
 
 void Sema::DiagnoseAvailabilityOfDecl(NamedDecl *D,
-                                      ArrayRef<SourceLocation> Locs,
+                                      llvm::ArrayRef<SourceLocation> Locs,
                                       const ObjCInterfaceDecl *UnknownObjCClass,
                                       bool ObjCPropertyAccess,
                                       bool AvoidPartialAvailabilityChecks,

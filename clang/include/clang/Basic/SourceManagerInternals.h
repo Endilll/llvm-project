@@ -98,9 +98,9 @@ public:
     LineEntries.clear();
   }
 
-  unsigned getLineTableFilenameID(StringRef Str);
+  unsigned getLineTableFilenameID(llvm::StringRef Str);
 
-  StringRef getFilename(unsigned ID) const {
+  llvm::StringRef getFilename(unsigned ID) const {
     assert(ID < FilenamesByID.size() && "Invalid FilenameID");
     return FilenamesByID[ID]->getKey();
   }

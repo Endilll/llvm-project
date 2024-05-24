@@ -26,7 +26,7 @@ namespace clang::tidy::misc {
 // due to not warning on throwing string literals.
 class ThrowByValueCatchByReferenceCheck : public ClangTidyCheck {
 public:
-  ThrowByValueCatchByReferenceCheck(StringRef Name, ClangTidyContext *Context);
+  ThrowByValueCatchByReferenceCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

@@ -82,7 +82,7 @@ class APINotesManager {
   ///
   /// \returns the API notes reader for this file, or null if there is
   /// a failure.
-  std::unique_ptr<APINotesReader> loadAPINotes(StringRef Buffer);
+  std::unique_ptr<APINotesReader> loadAPINotes(llvm::StringRef Buffer);
 
   /// Load the given API notes file for the given header directory.
   ///
@@ -95,7 +95,7 @@ class APINotesManager {
   ///
   /// This might find either a binary or source API notes.
   OptionalFileEntryRef findAPINotesFile(DirectoryEntryRef Directory,
-                                        StringRef FileName,
+                                        llvm::StringRef FileName,
                                         bool WantPublic = true);
 
   /// Attempt to load API notes for the given framework. A framework will have
@@ -132,7 +132,7 @@ public:
   ///
   /// \returns true if API notes were successfully loaded, \c false otherwise.
   bool loadCurrentModuleAPINotes(Module *M, bool LookInModule,
-                                 ArrayRef<std::string> SearchPaths);
+                                 llvm::ArrayRef<std::string> SearchPaths);
 
   /// Get FileEntry for the APINotes of the module that is currently being
   /// compiled.
@@ -146,23 +146,23 @@ public:
   /// \returns a vector of FileEntry where APINotes files are.
   llvm::SmallVector<FileEntryRef, 2>
   getCurrentModuleAPINotes(Module *M, bool LookInModule,
-                           ArrayRef<std::string> SearchPaths);
+                           llvm::ArrayRef<std::string> SearchPaths);
 
   /// Load Compiled API notes for current module.
   ///
   /// \param Buffers Array of compiled API notes.
   ///
   /// \returns true if API notes were successfully loaded, \c false otherwise.
-  bool loadCurrentModuleAPINotesFromBuffer(ArrayRef<StringRef> Buffers);
+  bool loadCurrentModuleAPINotesFromBuffer(llvm::ArrayRef<llvm::StringRef> Buffers);
 
   /// Retrieve the set of API notes readers for the current module.
-  ArrayRef<APINotesReader *> getCurrentModuleReaders() const {
+  llvm::ArrayRef<APINotesReader *> getCurrentModuleReaders() const {
     bool HasPublic = CurrentModuleReaders[ReaderKind::Public];
     bool HasPrivate = CurrentModuleReaders[ReaderKind::Private];
     assert((!HasPrivate || HasPublic) && "private module requires public module");
     if (!HasPrivate && !HasPublic)
       return {};
-    return ArrayRef(CurrentModuleReaders).slice(0, HasPrivate ? 2 : 1);
+    return llvm::ArrayRef(CurrentModuleReaders).slice(0, HasPrivate ? 2 : 1);
   }
 
   /// Find the API notes readers that correspond to the given source location.

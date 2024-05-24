@@ -114,7 +114,7 @@ static bool willObjectBeAnalyzedLater(const CXXConstructorDecl *Ctor,
 
 /// Checks whether RD contains a field with a name or type name that matches
 /// \p Pattern.
-static bool shouldIgnoreRecord(const RecordDecl *RD, StringRef Pattern);
+static bool shouldIgnoreRecord(const RecordDecl *RD, llvm::StringRef Pattern);
 
 /// Checks _syntactically_ whether it is possible to access FD from the record
 /// that contains it without a preceding assert (even if that access happens
@@ -190,7 +190,7 @@ void UninitializedObjectChecker::checkEndFunction(
     return;
   }
 
-  SmallString<100> WarningBuf;
+  llvm::SmallString<100> WarningBuf;
   llvm::raw_svector_ostream WarningOS(WarningBuf);
   WarningOS << UninitFields.size() << " uninitialized field"
             << (UninitFields.size() == 1 ? "" : "s")
@@ -494,7 +494,7 @@ static bool willObjectBeAnalyzedLater(const CXXConstructorDecl *Ctor,
   return false;
 }
 
-static bool shouldIgnoreRecord(const RecordDecl *RD, StringRef Pattern) {
+static bool shouldIgnoreRecord(const RecordDecl *RD, llvm::StringRef Pattern) {
   llvm::Regex R(Pattern);
 
   for (const FieldDecl *FD : RD->fields()) {

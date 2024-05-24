@@ -56,8 +56,8 @@ private:
 };
 
 std::unique_ptr<Environment>
-Environment::make(StringRef Code, StringRef FileName,
-                  ArrayRef<tooling::Range> Ranges, unsigned FirstStartColumn,
+Environment::make(llvm::StringRef Code, llvm::StringRef FileName,
+                  llvm::ArrayRef<tooling::Range> Ranges, unsigned FirstStartColumn,
                   unsigned NextStartColumn, unsigned LastStartColumn) {
   auto Env = std::make_unique<Environment>(Code, FileName, FirstStartColumn,
                                            NextStartColumn, LastStartColumn);
@@ -76,7 +76,7 @@ Environment::make(StringRef Code, StringRef FileName,
   return Env;
 }
 
-Environment::Environment(StringRef Code, StringRef FileName,
+Environment::Environment(llvm::StringRef Code, llvm::StringRef FileName,
                          unsigned FirstStartColumn, unsigned NextStartColumn,
                          unsigned LastStartColumn)
     : VirtualSM(new SourceManagerForFile(FileName, Code)), SM(VirtualSM->get()),
@@ -105,8 +105,8 @@ TokenAnalyzer::process(bool SkipAnnotation) {
   FormatTokenLexer Lex(Env.getSourceManager(), Env.getFileID(),
                        Env.getFirstStartColumn(), Style, Encoding, Allocator,
                        IdentTable);
-  ArrayRef<FormatToken *> Toks(Lex.lex());
-  SmallVector<FormatToken *, 10> Tokens(Toks.begin(), Toks.end());
+  llvm::ArrayRef<FormatToken *> Toks(Lex.lex());
+  llvm::SmallVector<FormatToken *, 10> Tokens(Toks.begin(), Toks.end());
   UnwrappedLineParser Parser(Env.getSourceManager(), Style, Lex.getKeywords(),
                              Env.getFirstStartColumn(), Tokens, *this,
                              Allocator, IdentTable);
@@ -116,7 +116,7 @@ TokenAnalyzer::process(bool SkipAnnotation) {
   for (unsigned Run = 0, RunE = UnwrappedLines.size(); Run + 1 != RunE; ++Run) {
     const auto &Lines = UnwrappedLines[Run];
     LLVM_DEBUG(llvm::dbgs() << "Run " << Run << "...\n");
-    SmallVector<AnnotatedLine *, 16> AnnotatedLines;
+    llvm::SmallVector<AnnotatedLine *, 16> AnnotatedLines;
     AnnotatedLines.reserve(Lines.size());
 
     TokenAnnotator Annotator(Style, Lex.getKeywords());
@@ -157,7 +157,7 @@ void TokenAnalyzer::consumeUnwrappedLine(const UnwrappedLine &TheLine) {
 }
 
 void TokenAnalyzer::finishRun() {
-  UnwrappedLines.push_back(SmallVector<UnwrappedLine, 16>());
+  UnwrappedLines.push_back(llvm::SmallVector<UnwrappedLine, 16>());
 }
 
 } // end namespace format

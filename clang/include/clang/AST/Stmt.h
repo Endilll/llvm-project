@@ -1374,7 +1374,7 @@ public:
   static void PrintStats();
 
   /// \returns the likelihood of a set of attributes.
-  static Likelihood getLikelihood(ArrayRef<const Attr *> Attrs);
+  static Likelihood getLikelihood(llvm::ArrayRef<const Attr *> Attrs);
 
   /// \returns the likelihood of a statement.
   static Likelihood getLikelihood(const Stmt *S);
@@ -1396,7 +1396,7 @@ public:
   /// Dumps the specified AST fragment and all subtrees to
   /// \c llvm::errs().
   void dump() const;
-  void dump(raw_ostream &OS, const ASTContext &Context) const;
+  void dump(llvm::raw_ostream &OS, const ASTContext &Context) const;
 
   /// \return Unique reproducible object identifier
   int64_t getID(const ASTContext &Context) const;
@@ -1407,18 +1407,18 @@ public:
   /// dumpPretty/printPretty - These two methods do a "pretty print" of the AST
   /// back to its original source language syntax.
   void dumpPretty(const ASTContext &Context) const;
-  void printPretty(raw_ostream &OS, PrinterHelper *Helper,
+  void printPretty(llvm::raw_ostream &OS, PrinterHelper *Helper,
                    const PrintingPolicy &Policy, unsigned Indentation = 0,
-                   StringRef NewlineSymbol = "\n",
+                   llvm::StringRef NewlineSymbol = "\n",
                    const ASTContext *Context = nullptr) const;
-  void printPrettyControlled(raw_ostream &OS, PrinterHelper *Helper,
+  void printPrettyControlled(llvm::raw_ostream &OS, PrinterHelper *Helper,
                              const PrintingPolicy &Policy,
                              unsigned Indentation = 0,
-                             StringRef NewlineSymbol = "\n",
+                             llvm::StringRef NewlineSymbol = "\n",
                              const ASTContext *Context = nullptr) const;
 
   /// Pretty-prints in JSON format.
-  void printJson(raw_ostream &Out, PrinterHelper *Helper,
+  void printJson(llvm::raw_ostream &Out, PrinterHelper *Helper,
                  const PrintingPolicy &Policy, bool AddQuotes) const;
 
   /// viewAST - Visualize an AST rooted at this Stmt* using GraphViz.  Only
@@ -1613,11 +1613,11 @@ class CompoundStmt final
   /// The location of the closing "}".
   SourceLocation RBraceLoc;
 
-  CompoundStmt(ArrayRef<Stmt *> Stmts, FPOptionsOverride FPFeatures,
+  CompoundStmt(llvm::ArrayRef<Stmt *> Stmts, FPOptionsOverride FPFeatures,
                SourceLocation LB, SourceLocation RB);
   explicit CompoundStmt(EmptyShell Empty) : Stmt(CompoundStmtClass, Empty) {}
 
-  void setStmts(ArrayRef<Stmt *> Stmts);
+  void setStmts(llvm::ArrayRef<Stmt *> Stmts);
 
   /// Set FPOptionsOverride in trailing storage. Used only by Serialization.
   void setStoredFPFeatures(FPOptionsOverride F) {
@@ -1630,7 +1630,7 @@ class CompoundStmt final
   }
 
 public:
-  static CompoundStmt *Create(const ASTContext &C, ArrayRef<Stmt *> Stmts,
+  static CompoundStmt *Create(const ASTContext &C, llvm::ArrayRef<Stmt *> Stmts,
                               FPOptionsOverride FPFeatures, SourceLocation LB,
                               SourceLocation RB);
 
@@ -2083,7 +2083,7 @@ class AttributedStmt final
 
   Stmt *SubStmt;
 
-  AttributedStmt(SourceLocation Loc, ArrayRef<const Attr *> Attrs,
+  AttributedStmt(SourceLocation Loc, llvm::ArrayRef<const Attr *> Attrs,
                  Stmt *SubStmt)
       : ValueStmt(AttributedStmtClass), SubStmt(SubStmt) {
     AttributedStmtBits.NumAttrs = Attrs.size();
@@ -2105,13 +2105,13 @@ class AttributedStmt final
 
 public:
   static AttributedStmt *Create(const ASTContext &C, SourceLocation Loc,
-                                ArrayRef<const Attr *> Attrs, Stmt *SubStmt);
+                                llvm::ArrayRef<const Attr *> Attrs, Stmt *SubStmt);
 
   // Build an empty attributed statement.
   static AttributedStmt *CreateEmpty(const ASTContext &C, unsigned NumAttrs);
 
   SourceLocation getAttrLoc() const { return AttributedStmtBits.AttrLoc; }
-  ArrayRef<const Attr *> getAttrs() const {
+  llvm::ArrayRef<const Attr *> getAttrs() const {
     return llvm::ArrayRef(getAttrArrayPtr(), AttributedStmtBits.NumAttrs);
   }
 
@@ -3151,7 +3151,7 @@ public:
   /// getOutputConstraint - Return the constraint string for the specified
   /// output operand.  All output constraints are known to be non-empty (either
   /// '=' or '+').
-  StringRef getOutputConstraint(unsigned i) const;
+  llvm::StringRef getOutputConstraint(unsigned i) const;
 
   /// isOutputPlusConstraint - Return true if the specified output constraint
   /// is a "+" constraint (which is both an input and an output) or false if it
@@ -3172,14 +3172,14 @@ public:
 
   /// getInputConstraint - Return the specified input constraint.  Unlike output
   /// constraints, these can be empty.
-  StringRef getInputConstraint(unsigned i) const;
+  llvm::StringRef getInputConstraint(unsigned i) const;
 
   const Expr *getInputExpr(unsigned i) const;
 
   //===--- Other ---===//
 
   unsigned getNumClobbers() const { return NumClobbers; }
-  StringRef getClobber(unsigned i) const;
+  llvm::StringRef getClobber(unsigned i) const;
 
   static bool classof(const Stmt *T) {
     return T->getStmtClass() == GCCAsmStmtClass ||
@@ -3338,7 +3338,7 @@ public:
   /// true, otherwise return false.  This handles canonicalization and
   /// translation of strings from GCC syntax to LLVM IR syntax, and handles
   //// flattening of named references like %[foo] to Operand AsmStringPiece's.
-  unsigned AnalyzeAsmString(SmallVectorImpl<AsmStringPiece> &Pieces,
+  unsigned AnalyzeAsmString(llvm::SmallVectorImpl<AsmStringPiece> &Pieces,
                             const ASTContext &C, unsigned &DiagOffs) const;
 
   /// Assemble final IR asm string.
@@ -3348,14 +3348,14 @@ public:
 
   IdentifierInfo *getOutputIdentifier(unsigned i) const { return Names[i]; }
 
-  StringRef getOutputName(unsigned i) const {
+  llvm::StringRef getOutputName(unsigned i) const {
     if (IdentifierInfo *II = getOutputIdentifier(i))
       return II->getName();
 
     return {};
   }
 
-  StringRef getOutputConstraint(unsigned i) const;
+  llvm::StringRef getOutputConstraint(unsigned i) const;
 
   const StringLiteral *getOutputConstraintLiteral(unsigned i) const {
     return Constraints[i];
@@ -3376,14 +3376,14 @@ public:
     return Names[i + NumOutputs];
   }
 
-  StringRef getInputName(unsigned i) const {
+  llvm::StringRef getInputName(unsigned i) const {
     if (IdentifierInfo *II = getInputIdentifier(i))
       return II->getName();
 
     return {};
   }
 
-  StringRef getInputConstraint(unsigned i) const;
+  llvm::StringRef getInputConstraint(unsigned i) const;
 
   const StringLiteral *getInputConstraintLiteral(unsigned i) const {
     return Constraints[i + NumOutputs];
@@ -3414,7 +3414,7 @@ public:
   }
 
   AddrLabelExpr *getLabelExpr(unsigned i) const;
-  StringRef getLabelName(unsigned i) const;
+  llvm::StringRef getLabelName(unsigned i) const;
   using labels_iterator = CastIterator<AddrLabelExpr>;
   using const_labels_iterator = ConstCastIterator<AddrLabelExpr>;
   using labels_range = llvm::iterator_range<labels_iterator>;
@@ -3461,9 +3461,9 @@ public:
   /// getNamedOperand - Given a symbolic operand reference like %[foo],
   /// translate this into a numeric value needed to reference the same operand.
   /// This returns -1 if the operand name is invalid.
-  int getNamedOperand(StringRef SymbolicName) const;
+  int getNamedOperand(llvm::StringRef SymbolicName) const;
 
-  StringRef getClobber(unsigned i) const;
+  llvm::StringRef getClobber(unsigned i) const;
 
   StringLiteral *getClobberStringLiteral(unsigned i) { return Clobbers[i]; }
   const StringLiteral *getClobberStringLiteral(unsigned i) const {
@@ -3483,21 +3483,21 @@ class MSAsmStmt : public AsmStmt {
   friend class ASTStmtReader;
 
   SourceLocation LBraceLoc, EndLoc;
-  StringRef AsmStr;
+  llvm::StringRef AsmStr;
 
   unsigned NumAsmToks = 0;
 
   Token *AsmToks = nullptr;
-  StringRef *Constraints = nullptr;
-  StringRef *Clobbers = nullptr;
+  llvm::StringRef *Constraints = nullptr;
+  llvm::StringRef *Clobbers = nullptr;
 
 public:
   MSAsmStmt(const ASTContext &C, SourceLocation asmloc,
             SourceLocation lbraceloc, bool issimple, bool isvolatile,
-            ArrayRef<Token> asmtoks, unsigned numoutputs, unsigned numinputs,
-            ArrayRef<StringRef> constraints,
-            ArrayRef<Expr*> exprs, StringRef asmstr,
-            ArrayRef<StringRef> clobbers, SourceLocation endloc);
+            llvm::ArrayRef<Token> asmtoks, unsigned numoutputs, unsigned numinputs,
+            llvm::ArrayRef<llvm::StringRef> constraints,
+            llvm::ArrayRef<Expr*> exprs, llvm::StringRef asmstr,
+            llvm::ArrayRef<llvm::StringRef> clobbers, SourceLocation endloc);
 
   /// Build an empty MS-style inline-assembly statement.
   explicit MSAsmStmt(EmptyShell Empty) : AsmStmt(MSAsmStmtClass, Empty) {}
@@ -3513,14 +3513,14 @@ public:
   Token *getAsmToks() { return AsmToks; }
 
   //===--- Asm String Analysis ---===//
-  StringRef getAsmString() const { return AsmStr; }
+  llvm::StringRef getAsmString() const { return AsmStr; }
 
   /// Assemble final IR asm string.
   std::string generateAsmString(const ASTContext &C) const;
 
   //===--- Output operands ---===//
 
-  StringRef getOutputConstraint(unsigned i) const {
+  llvm::StringRef getOutputConstraint(unsigned i) const {
     assert(i < NumOutputs);
     return Constraints[i];
   }
@@ -3533,7 +3533,7 @@ public:
 
   //===--- Input operands ---===//
 
-  StringRef getInputConstraint(unsigned i) const {
+  llvm::StringRef getInputConstraint(unsigned i) const {
     assert(i < NumInputs);
     return Constraints[i + NumOutputs];
   }
@@ -3547,25 +3547,25 @@ public:
 
   //===--- Other ---===//
 
-  ArrayRef<StringRef> getAllConstraints() const {
+  llvm::ArrayRef<llvm::StringRef> getAllConstraints() const {
     return llvm::ArrayRef(Constraints, NumInputs + NumOutputs);
   }
 
-  ArrayRef<StringRef> getClobbers() const {
+  llvm::ArrayRef<llvm::StringRef> getClobbers() const {
     return llvm::ArrayRef(Clobbers, NumClobbers);
   }
 
-  ArrayRef<Expr*> getAllExprs() const {
+  llvm::ArrayRef<Expr*> getAllExprs() const {
     return llvm::ArrayRef(reinterpret_cast<Expr **>(Exprs),
                           NumInputs + NumOutputs);
   }
 
-  StringRef getClobber(unsigned i) const { return getClobbers()[i]; }
+  llvm::StringRef getClobber(unsigned i) const { return getClobbers()[i]; }
 
 private:
-  void initialize(const ASTContext &C, StringRef AsmString,
-                  ArrayRef<Token> AsmToks, ArrayRef<StringRef> Constraints,
-                  ArrayRef<Expr*> Exprs, ArrayRef<StringRef> Clobbers);
+  void initialize(const ASTContext &C, llvm::StringRef AsmString,
+                  llvm::ArrayRef<Token> AsmToks, llvm::ArrayRef<llvm::StringRef> Constraints,
+                  llvm::ArrayRef<Expr*> Exprs, llvm::ArrayRef<llvm::StringRef> Clobbers);
 
 public:
   SourceLocation getBeginLoc() const LLVM_READONLY { return AsmLoc; }
@@ -3829,8 +3829,8 @@ private:
   RecordDecl *TheRecordDecl = nullptr;
 
   /// Construct a captured statement.
-  CapturedStmt(Stmt *S, CapturedRegionKind Kind, ArrayRef<Capture> Captures,
-               ArrayRef<Expr *> CaptureInits, CapturedDecl *CD, RecordDecl *RD);
+  CapturedStmt(Stmt *S, CapturedRegionKind Kind, llvm::ArrayRef<Capture> Captures,
+               llvm::ArrayRef<Expr *> CaptureInits, CapturedDecl *CD, RecordDecl *RD);
 
   /// Construct an empty captured statement.
   CapturedStmt(EmptyShell Empty, unsigned NumCaptures);
@@ -3850,8 +3850,8 @@ public:
 
   static CapturedStmt *Create(const ASTContext &Context, Stmt *S,
                               CapturedRegionKind Kind,
-                              ArrayRef<Capture> Captures,
-                              ArrayRef<Expr *> CaptureInits,
+                              llvm::ArrayRef<Capture> Captures,
+                              llvm::ArrayRef<Expr *> CaptureInits,
                               CapturedDecl *CD, RecordDecl *RD);
 
   static CapturedStmt *CreateDeserialized(const ASTContext &Context,

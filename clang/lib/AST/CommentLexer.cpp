@@ -36,15 +36,15 @@ static inline bool isHTMLHexCharacterReferenceCharacter(char C) {
   return isHexDigit(C);
 }
 
-static inline StringRef convertCodePointToUTF8(
+static inline llvm::StringRef convertCodePointToUTF8(
                                       llvm::BumpPtrAllocator &Allocator,
                                       unsigned CodePoint) {
   char *Resolved = Allocator.Allocate<char>(UNI_MAX_UTF8_BYTES_PER_CODE_POINT);
   char *ResolvedPtr = Resolved;
   if (llvm::ConvertCodePointToUTF8(CodePoint, ResolvedPtr))
-    return StringRef(Resolved, ResolvedPtr - Resolved);
+    return llvm::StringRef(Resolved, ResolvedPtr - Resolved);
   else
-    return StringRef();
+    return llvm::StringRef();
 }
 
 namespace {
@@ -54,9 +54,9 @@ namespace {
 
 } // end anonymous namespace
 
-StringRef Lexer::resolveHTMLNamedCharacterReference(StringRef Name) const {
+llvm::StringRef Lexer::resolveHTMLNamedCharacterReference(llvm::StringRef Name) const {
   // Fast path, first check a few most widely used named character references.
-  return llvm::StringSwitch<StringRef>(Name)
+  return llvm::StringSwitch<llvm::StringRef>(Name)
       .Case("amp", "&")
       .Case("lt", "<")
       .Case("gt", ">")
@@ -66,7 +66,7 @@ StringRef Lexer::resolveHTMLNamedCharacterReference(StringRef Name) const {
       .Default(translateHTMLNamedCharacterReferenceToUTF8(Name));
 }
 
-StringRef Lexer::resolveHTMLDecimalCharacterReference(StringRef Name) const {
+llvm::StringRef Lexer::resolveHTMLDecimalCharacterReference(llvm::StringRef Name) const {
   unsigned CodePoint = 0;
   for (unsigned i = 0, e = Name.size(); i != e; ++i) {
     assert(isHTMLDecimalCharacterReferenceCharacter(Name[i]));
@@ -76,7 +76,7 @@ StringRef Lexer::resolveHTMLDecimalCharacterReference(StringRef Name) const {
   return convertCodePointToUTF8(Allocator, CodePoint);
 }
 
-StringRef Lexer::resolveHTMLHexCharacterReference(StringRef Name) const {
+llvm::StringRef Lexer::resolveHTMLHexCharacterReference(llvm::StringRef Name) const {
   unsigned CodePoint = 0;
   for (unsigned i = 0, e = Name.size(); i != e; ++i) {
     CodePoint *= 16;
@@ -273,20 +273,20 @@ void Lexer::formTokenWithChars(Token &Result, const char *TokEnd,
 const char *Lexer::skipTextToken() {
   const char *TokenPtr = BufferPtr;
   assert(TokenPtr < CommentEnd);
-  StringRef TokStartSymbols = ParseCommands ? "\n\r\\@\"&<" : "\n\r";
+  llvm::StringRef TokStartSymbols = ParseCommands ? "\n\r\\@\"&<" : "\n\r";
 
 again:
   size_t End =
-      StringRef(TokenPtr, CommentEnd - TokenPtr).find_first_of(TokStartSymbols);
-  if (End == StringRef::npos)
+      llvm::StringRef(TokenPtr, CommentEnd - TokenPtr).find_first_of(TokStartSymbols);
+  if (End == llvm::StringRef::npos)
     return CommentEnd;
 
   // Doxygen doesn't recognize any commands in a one-line double quotation.
   // If we don't find an ending quotation mark, we pretend it never began.
   if (*(TokenPtr + End) == '\"') {
     TokenPtr += End + 1;
-    End = StringRef(TokenPtr, CommentEnd - TokenPtr).find_first_of("\n\r\"");
-    if (End != StringRef::npos && *(TokenPtr + End) == '\"')
+    End = llvm::StringRef(TokenPtr, CommentEnd - TokenPtr).find_first_of("\n\r\"");
+    if (End != llvm::StringRef::npos && *(TokenPtr + End) == '\"')
       TokenPtr += End + 1;
     goto again;
   }
@@ -371,7 +371,7 @@ void Lexer::lexCommentText(Token &T) {
           // This is the \:: escape sequence.
           TokenPtr++;
         }
-        StringRef UnescapedText(BufferPtr + 1, TokenPtr - (BufferPtr + 1));
+        llvm::StringRef UnescapedText(BufferPtr + 1, TokenPtr - (BufferPtr + 1));
         formTokenWithChars(T, TokenPtr, tok::text);
         T.setText(UnescapedText);
         return;
@@ -397,12 +397,12 @@ void Lexer::lexCommentText(Token &T) {
         }
       }
 
-      StringRef CommandName(BufferPtr + 1, Length);
+      llvm::StringRef CommandName(BufferPtr + 1, Length);
 
       const CommandInfo *Info = Traits.getCommandInfoOrNULL(CommandName);
       if (!Info) {
         if ((Info = Traits.getTypoCorrectCommandInfo(CommandName))) {
-          StringRef CorrectedName = Info->Name;
+          llvm::StringRef CorrectedName = Info->Name;
           SourceLocation Loc = getSourceLocation(BufferPtr);
           SourceLocation EndLoc = getSourceLocation(TokenPtr);
           SourceRange FullRange = SourceRange(Loc, EndLoc);
@@ -490,20 +490,20 @@ again:
   //
   // Extract current line.
   const char *Newline = findNewline(BufferPtr, CommentEnd);
-  StringRef Line(BufferPtr, Newline - BufferPtr);
+  llvm::StringRef Line(BufferPtr, Newline - BufferPtr);
 
   // Look for end command in current line.
   size_t Pos = Line.find(VerbatimBlockEndCommandName);
   const char *TextEnd;
   const char *NextLine;
-  if (Pos == StringRef::npos) {
+  if (Pos == llvm::StringRef::npos) {
     // Current line is completely verbatim.
     TextEnd = Newline;
     NextLine = skipNewline(Newline, CommentEnd);
   } else if (Pos == 0) {
     // Current line contains just an end command.
     const char *End = BufferPtr + VerbatimBlockEndCommandName.size();
-    StringRef Name(BufferPtr + 1, End - (BufferPtr + 1));
+    llvm::StringRef Name(BufferPtr + 1, End - (BufferPtr + 1));
     formTokenWithChars(T, End, tok::verbatim_block_end);
     T.setVerbatimBlockID(Traits.getCommandInfo(Name)->getID());
     State = LS_Normal;
@@ -519,7 +519,7 @@ again:
     }
   }
 
-  StringRef Text(BufferPtr, TextEnd - BufferPtr);
+  llvm::StringRef Text(BufferPtr, TextEnd - BufferPtr);
   formTokenWithChars(T, NextLine, tok::verbatim_block_line);
   T.setVerbatimBlockText(Text);
 
@@ -555,7 +555,7 @@ void Lexer::lexVerbatimLineText(Token &T) {
 
   // Extract current line.
   const char *Newline = findNewline(BufferPtr, CommentEnd);
-  StringRef Text(BufferPtr, Newline - BufferPtr);
+  llvm::StringRef Text(BufferPtr, Newline - BufferPtr);
   formTokenWithChars(T, Newline, tok::verbatim_line_text);
   T.setVerbatimLineText(Text);
 
@@ -606,9 +606,9 @@ void Lexer::lexHTMLCharacterReference(Token &T) {
     formTextToken(T, TokenPtr);
     return;
   }
-  StringRef Name(NamePtr, TokenPtr - NamePtr);
+  llvm::StringRef Name(NamePtr, TokenPtr - NamePtr);
   TokenPtr++; // Skip semicolon.
-  StringRef Resolved;
+  llvm::StringRef Resolved;
   if (isNamed)
     Resolved = resolveHTMLNamedCharacterReference(Name);
   else if (isDecimal)
@@ -628,7 +628,7 @@ void Lexer::setupAndLexHTMLStartTag(Token &T) {
   assert(BufferPtr[0] == '<' &&
          isHTMLIdentifierStartingCharacter(BufferPtr[1]));
   const char *TagNameEnd = skipHTMLIdentifier(BufferPtr + 2, CommentEnd);
-  StringRef Name(BufferPtr + 1, TagNameEnd - (BufferPtr + 1));
+  llvm::StringRef Name(BufferPtr + 1, TagNameEnd - (BufferPtr + 1));
   if (!isHTMLTagName(Name)) {
     formTextToken(T, TagNameEnd);
     return;
@@ -652,7 +652,7 @@ void Lexer::lexHTMLStartTag(Token &T) {
   char C = *TokenPtr;
   if (isHTMLIdentifierCharacter(C)) {
     TokenPtr = skipHTMLIdentifier(TokenPtr, CommentEnd);
-    StringRef Ident(BufferPtr, TokenPtr - BufferPtr);
+    llvm::StringRef Ident(BufferPtr, TokenPtr - BufferPtr);
     formTokenWithChars(T, TokenPtr, tok::html_ident);
     T.setHTMLIdent(Ident);
   } else {
@@ -669,7 +669,7 @@ void Lexer::lexHTMLStartTag(Token &T) {
       if (TokenPtr != CommentEnd) // Skip closing quote.
         TokenPtr++;
       formTokenWithChars(T, TokenPtr, tok::html_quoted_string);
-      T.setHTMLQuotedString(StringRef(OpenQuote + 1,
+      T.setHTMLQuotedString(llvm::StringRef(OpenQuote + 1,
                                       ClosingQuote - (OpenQuote + 1)));
       break;
     }
@@ -712,7 +712,7 @@ void Lexer::setupAndLexHTMLEndTag(Token &T) {
 
   const char *TagNameBegin = skipWhitespace(BufferPtr + 2, CommentEnd);
   const char *TagNameEnd = skipHTMLIdentifier(TagNameBegin, CommentEnd);
-  StringRef Name(TagNameBegin, TagNameEnd - TagNameBegin);
+  llvm::StringRef Name(TagNameBegin, TagNameEnd - TagNameBegin);
   if (!isHTMLTagName(Name)) {
     formTextToken(T, TagNameEnd);
     return;
@@ -844,18 +844,18 @@ again:
   }
 }
 
-StringRef Lexer::getSpelling(const Token &Tok,
+llvm::StringRef Lexer::getSpelling(const Token &Tok,
                              const SourceManager &SourceMgr) const {
   SourceLocation Loc = Tok.getLocation();
   std::pair<FileID, unsigned> LocInfo = SourceMgr.getDecomposedLoc(Loc);
 
   bool InvalidTemp = false;
-  StringRef File = SourceMgr.getBufferData(LocInfo.first, &InvalidTemp);
+  llvm::StringRef File = SourceMgr.getBufferData(LocInfo.first, &InvalidTemp);
   if (InvalidTemp)
-    return StringRef();
+    return llvm::StringRef();
 
   const char *Begin = File.data() + LocInfo.second;
-  return StringRef(Begin, Tok.getLength());
+  return llvm::StringRef(Begin, Tok.getLength());
 }
 
 } // end namespace comments

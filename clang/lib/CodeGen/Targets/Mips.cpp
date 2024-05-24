@@ -22,7 +22,7 @@ class MipsABIInfo : public ABIInfo {
   bool IsO32;
   const unsigned MinABIStackAlignInBytes, StackAlignInBytes;
   void CoerceToIntArgs(uint64_t TySize,
-                       SmallVectorImpl<llvm::Type *> &ArgList) const;
+                       llvm::SmallVectorImpl<llvm::Type *> &ArgList) const;
   llvm::Type* HandleAggregates(QualType Ty, uint64_t TySize) const;
   llvm::Type* returnAggregateInRegs(QualType RetTy, uint64_t Size) const;
   llvm::Type* getPaddingType(uint64_t Align, uint64_t Offset) const;
@@ -108,7 +108,7 @@ public:
 }
 
 void MipsABIInfo::CoerceToIntArgs(
-    uint64_t TySize, SmallVectorImpl<llvm::Type *> &ArgList) const {
+    uint64_t TySize, llvm::SmallVectorImpl<llvm::Type *> &ArgList) const {
   llvm::IntegerType *IntTy =
     llvm::IntegerType::get(getVMContext(), MinABIStackAlignInBytes * 8);
 
@@ -126,7 +126,7 @@ void MipsABIInfo::CoerceToIntArgs(
 // In N32/64, an aligned double precision floating point field is passed in
 // a register.
 llvm::Type* MipsABIInfo::HandleAggregates(QualType Ty, uint64_t TySize) const {
-  SmallVector<llvm::Type*, 8> ArgList, IntArgList;
+  llvm::SmallVector<llvm::Type*, 8> ArgList, IntArgList;
 
   if (IsO32) {
     CoerceToIntArgs(TySize, ArgList);
@@ -244,7 +244,7 @@ MipsABIInfo::classifyArgumentType(QualType Ty, uint64_t &Offset) const {
 llvm::Type*
 MipsABIInfo::returnAggregateInRegs(QualType RetTy, uint64_t Size) const {
   const RecordType *RT = RetTy->getAs<RecordType>();
-  SmallVector<llvm::Type*, 8> RTList;
+  llvm::SmallVector<llvm::Type*, 8> RTList;
 
   if (RT && RT->isStructureOrClassType()) {
     const RecordDecl *RD = RT->getDecl();

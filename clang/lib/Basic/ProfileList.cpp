@@ -35,7 +35,7 @@ public:
 
   bool isEmpty() const { return Sections.empty(); }
 
-  bool hasPrefix(StringRef Prefix) const {
+  bool hasPrefix(llvm::StringRef Prefix) const {
     for (const auto &It : Sections)
       if (It.second.Entries.count(Prefix) > 0)
         return true;
@@ -64,14 +64,14 @@ ProfileSpecialCaseList::createOrDie(const std::vector<std::string> &Paths,
 
 }
 
-ProfileList::ProfileList(ArrayRef<std::string> Paths, SourceManager &SM)
+ProfileList::ProfileList(llvm::ArrayRef<std::string> Paths, SourceManager &SM)
     : SCL(ProfileSpecialCaseList::createOrDie(
           Paths, SM.getFileManager().getVirtualFileSystem())),
       Empty(SCL->isEmpty()), SM(SM) {}
 
 ProfileList::~ProfileList() = default;
 
-static StringRef getSectionName(CodeGenOptions::ProfileInstrKind Kind) {
+static llvm::StringRef getSectionName(CodeGenOptions::ProfileInstrKind Kind) {
   switch (Kind) {
   case CodeGenOptions::ProfileNone:
     return "";
@@ -87,7 +87,7 @@ static StringRef getSectionName(CodeGenOptions::ProfileInstrKind Kind) {
 
 ProfileList::ExclusionType
 ProfileList::getDefault(CodeGenOptions::ProfileInstrKind Kind) const {
-  StringRef Section = getSectionName(Kind);
+  llvm::StringRef Section = getSectionName(Kind);
   // Check for "default:<type>"
   if (SCL->inSection(Section, "default", "allow"))
     return Allow;
@@ -102,8 +102,8 @@ ProfileList::getDefault(CodeGenOptions::ProfileInstrKind Kind) const {
 }
 
 std::optional<ProfileList::ExclusionType>
-ProfileList::inSection(StringRef Section, StringRef Prefix,
-                       StringRef Query) const {
+ProfileList::inSection(llvm::StringRef Section, llvm::StringRef Prefix,
+                       llvm::StringRef Query) const {
   if (SCL->inSection(Section, Prefix, Query, "allow"))
     return Allow;
   if (SCL->inSection(Section, Prefix, Query, "skip"))
@@ -116,9 +116,9 @@ ProfileList::inSection(StringRef Section, StringRef Prefix,
 }
 
 std::optional<ProfileList::ExclusionType>
-ProfileList::isFunctionExcluded(StringRef FunctionName,
+ProfileList::isFunctionExcluded(llvm::StringRef FunctionName,
                                 CodeGenOptions::ProfileInstrKind Kind) const {
-  StringRef Section = getSectionName(Kind);
+  llvm::StringRef Section = getSectionName(Kind);
   // Check for "function:<regex>=<case>"
   if (auto V = inSection(Section, "function", FunctionName))
     return V;
@@ -136,9 +136,9 @@ ProfileList::isLocationExcluded(SourceLocation Loc,
 }
 
 std::optional<ProfileList::ExclusionType>
-ProfileList::isFileExcluded(StringRef FileName,
+ProfileList::isFileExcluded(llvm::StringRef FileName,
                             CodeGenOptions::ProfileInstrKind Kind) const {
-  StringRef Section = getSectionName(Kind);
+  llvm::StringRef Section = getSectionName(Kind);
   // Check for "source:<regex>=<case>"
   if (auto V = inSection(Section, "source", FileName))
     return V;

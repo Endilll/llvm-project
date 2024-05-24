@@ -36,8 +36,8 @@ class InclusionRewriter : public PPCallbacks {
   };
   Preprocessor &PP; ///< Used to find inclusion directives.
   SourceManager &SM; ///< Used to read and manage source files.
-  raw_ostream &OS; ///< The destination stream for rewritten contents.
-  StringRef MainEOL; ///< The line ending marker to use.
+  llvm::raw_ostream &OS; ///< The destination stream for rewritten contents.
+  llvm::StringRef MainEOL; ///< The line ending marker to use.
   llvm::MemoryBufferRef PredefinesBuffer; ///< The preprocessor predefines.
   bool ShowLineMarkers; ///< Show #line markers.
   bool UseLineDirectives; ///< Use of line directives or line markers.
@@ -53,7 +53,7 @@ class InclusionRewriter : public PPCallbacks {
   /// various \c PPCallbacks callbacks.
   SourceLocation LastInclusionLocation;
 public:
-  InclusionRewriter(Preprocessor &PP, raw_ostream &OS, bool ShowLineMarkers,
+  InclusionRewriter(Preprocessor &PP, llvm::raw_ostream &OS, bool ShowLineMarkers,
                     bool UseLineDirectives);
   void Process(FileID FileId, SrcMgr::CharacteristicKind FileType);
   void setPredefinesBuffer(const llvm::MemoryBufferRef &Buf) {
@@ -72,39 +72,39 @@ private:
   void FileSkipped(const FileEntryRef &SkippedFile, const Token &FilenameTok,
                    SrcMgr::CharacteristicKind FileType) override;
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
   void If(SourceLocation Loc, SourceRange ConditionRange,
           ConditionValueKind ConditionValue) override;
   void Elif(SourceLocation Loc, SourceRange ConditionRange,
             ConditionValueKind ConditionValue, SourceLocation IfLoc) override;
-  void WriteLineInfo(StringRef Filename, int Line,
+  void WriteLineInfo(llvm::StringRef Filename, int Line,
                      SrcMgr::CharacteristicKind FileType,
-                     StringRef Extra = StringRef());
+                     llvm::StringRef Extra = llvm::StringRef());
   void WriteImplicitModuleImport(const Module *Mod);
   void OutputContentUpTo(const MemoryBufferRef &FromFile, unsigned &WriteFrom,
-                         unsigned WriteTo, StringRef EOL, int &lines,
+                         unsigned WriteTo, llvm::StringRef EOL, int &lines,
                          bool EnsureNewline);
   void CommentOutDirective(Lexer &DirectivesLex, const Token &StartToken,
-                           const MemoryBufferRef &FromFile, StringRef EOL,
+                           const MemoryBufferRef &FromFile, llvm::StringRef EOL,
                            unsigned &NextToWrite, int &Lines,
                            const IncludedFile *Inc = nullptr);
   const IncludedFile *FindIncludeAtLocation(SourceLocation Loc) const;
-  StringRef getIncludedFileName(const IncludedFile *Inc) const;
+  llvm::StringRef getIncludedFileName(const IncludedFile *Inc) const;
   const Module *FindModuleAtLocation(SourceLocation Loc) const;
   const Module *FindEnteredModule(SourceLocation Loc) const;
   bool IsIfAtLocationTrue(SourceLocation Loc) const;
-  StringRef NextIdentifierName(Lexer &RawLex, Token &RawToken);
+  llvm::StringRef NextIdentifierName(Lexer &RawLex, Token &RawToken);
 };
 
 }  // end anonymous namespace
 
 /// Initializes an InclusionRewriter with a \p PP source and \p OS destination.
-InclusionRewriter::InclusionRewriter(Preprocessor &PP, raw_ostream &OS,
+InclusionRewriter::InclusionRewriter(Preprocessor &PP, llvm::raw_ostream &OS,
                                      bool ShowLineMarkers,
                                      bool UseLineDirectives)
     : PP(PP), SM(PP.getSourceManager()), OS(OS), MainEOL("\n"),
@@ -115,9 +115,9 @@ InclusionRewriter::InclusionRewriter(Preprocessor &PP, raw_ostream &OS,
 /// markers depending on what mode we're in, including the \p Filename and
 /// \p Line we are located at, using the specified \p EOL line separator, and
 /// any \p Extra context specifiers in GNU line directives.
-void InclusionRewriter::WriteLineInfo(StringRef Filename, int Line,
+void InclusionRewriter::WriteLineInfo(llvm::StringRef Filename, int Line,
                                       SrcMgr::CharacteristicKind FileType,
-                                      StringRef Extra) {
+                                      llvm::StringRef Extra) {
   if (!ShowLineMarkers)
     return;
   if (UseLineDirectives) {
@@ -187,9 +187,9 @@ void InclusionRewriter::FileSkipped(const FileEntryRef & /*SkippedFile*/,
 /// anything).
 void InclusionRewriter::InclusionDirective(
     SourceLocation HashLoc, const Token & /*IncludeTok*/,
-    StringRef /*FileName*/, bool /*IsAngled*/,
+    llvm::StringRef /*FileName*/, bool /*IsAngled*/,
     CharSourceRange /*FilenameRange*/, OptionalFileEntryRef /*File*/,
-    StringRef /*SearchPath*/, StringRef /*RelativePath*/,
+    llvm::StringRef /*SearchPath*/, llvm::StringRef /*RelativePath*/,
     const Module *SuggestedModule, bool ModuleImported,
     SrcMgr::CharacteristicKind FileType) {
   if (ModuleImported) {
@@ -265,7 +265,7 @@ void InclusionRewriter::detectMainFileEOL() {
 /// \p WriteTo - 1.
 void InclusionRewriter::OutputContentUpTo(const MemoryBufferRef &FromFile,
                                           unsigned &WriteFrom, unsigned WriteTo,
-                                          StringRef LocalEOL, int &Line,
+                                          llvm::StringRef LocalEOL, int &Line,
                                           bool EnsureNewline) {
   if (WriteTo <= WriteFrom)
     return;
@@ -283,7 +283,7 @@ void InclusionRewriter::OutputContentUpTo(const MemoryBufferRef &FromFile,
       LocalEOL[1] == (FromFile.getBufferStart() + WriteTo)[0])
     WriteTo++;
 
-  StringRef TextToWrite(FromFile.getBufferStart() + WriteFrom,
+  llvm::StringRef TextToWrite(FromFile.getBufferStart() + WriteFrom,
                         WriteTo - WriteFrom);
   // count lines manually, it's faster than getPresumedLoc()
   Line += TextToWrite.count(LocalEOL);
@@ -292,13 +292,13 @@ void InclusionRewriter::OutputContentUpTo(const MemoryBufferRef &FromFile,
     OS << TextToWrite;
   } else {
     // Output the file one line at a time, rewriting the line endings as we go.
-    StringRef Rest = TextToWrite;
+    llvm::StringRef Rest = TextToWrite;
     while (!Rest.empty()) {
       // Identify and output the next line excluding an EOL sequence if present.
       size_t Idx = Rest.find(LocalEOL);
-      StringRef LineText = Rest.substr(0, Idx);
+      llvm::StringRef LineText = Rest.substr(0, Idx);
       OS << LineText;
-      if (Idx != StringRef::npos) {
+      if (Idx != llvm::StringRef::npos) {
         // An EOL sequence was present, output the EOL sequence for the
         // main source file and skip past the local EOL sequence.
         OS << MainEOL;
@@ -315,7 +315,7 @@ void InclusionRewriter::OutputContentUpTo(const MemoryBufferRef &FromFile,
   WriteFrom = WriteTo;
 }
 
-StringRef
+llvm::StringRef
 InclusionRewriter::getIncludedFileName(const IncludedFile *Inc) const {
   if (Inc) {
     auto B = SM.getBufferOrNone(Inc->Id);
@@ -323,7 +323,7 @@ InclusionRewriter::getIncludedFileName(const IncludedFile *Inc) const {
     if (B)
       return llvm::sys::path::filename(B->getBufferIdentifier());
   }
-  return StringRef();
+  return llvm::StringRef();
 }
 
 /// Print characters from \p FromFile starting at \p NextToWrite up until the
@@ -334,7 +334,7 @@ InclusionRewriter::getIncludedFileName(const IncludedFile *Inc) const {
 void InclusionRewriter::CommentOutDirective(Lexer &DirectiveLex,
                                             const Token &StartToken,
                                             const MemoryBufferRef &FromFile,
-                                            StringRef LocalEOL,
+                                            llvm::StringRef LocalEOL,
                                             unsigned &NextToWrite, int &Line,
                                             const IncludedFile *Inc) {
   OutputContentUpTo(FromFile, NextToWrite,
@@ -366,14 +366,14 @@ void InclusionRewriter::CommentOutDirective(Lexer &DirectiveLex,
 }
 
 /// Find the next identifier in the pragma directive specified by \p RawToken.
-StringRef InclusionRewriter::NextIdentifierName(Lexer &RawLex,
+llvm::StringRef InclusionRewriter::NextIdentifierName(Lexer &RawLex,
                                                 Token &RawToken) {
   RawLex.LexFromRawLexer(RawToken);
   if (RawToken.is(tok::raw_identifier))
     PP.LookUpIdentifierInfo(RawToken);
   if (RawToken.is(tok::identifier))
     return RawToken.getIdentifierInfo()->getName();
-  return StringRef();
+  return llvm::StringRef();
 }
 
 /// Use a raw lexer to analyze \p FileId, incrementally copying parts of it
@@ -387,11 +387,11 @@ void InclusionRewriter::Process(FileID FileId,
     if (B)
       FromFile = *B;
   }
-  StringRef FileName = FromFile.getBufferIdentifier();
+  llvm::StringRef FileName = FromFile.getBufferIdentifier();
   Lexer RawLex(FileId, FromFile, PP.getSourceManager(), PP.getLangOpts());
   RawLex.SetCommentRetentionState(false);
 
-  StringRef LocalEOL = FromFile.getBuffer().detectEOL();
+  llvm::StringRef LocalEOL = FromFile.getBuffer().detectEOL();
 
   // Per the GNU docs: "1" indicates entering a new file.
   if (FileId == SM.getMainFileID() || FileId == PP.getPredefinesFileID())
@@ -431,7 +431,7 @@ void InclusionRewriter::Process(FileID FileId,
                                 NextToWrite, Line, Inc);
             if (FileId != PP.getPredefinesFileID())
               WriteLineInfo(FileName, Line - 1, FileType, "");
-            StringRef LineInfoExtra;
+            llvm::StringRef LineInfoExtra;
             if (const Module *Mod = FindModuleAtLocation(Loc))
               WriteImplicitModuleImport(Mod);
             else if (Inc) {
@@ -462,7 +462,7 @@ void InclusionRewriter::Process(FileID FileId,
             break;
           }
           case tok::pp_pragma: {
-            StringRef Identifier = NextIdentifierName(RawLex, RawToken);
+            llvm::StringRef Identifier = NextIdentifierName(RawLex, RawToken);
             if (Identifier == "clang" || Identifier == "GCC") {
               if (NextIdentifierName(RawLex, RawToken) == "system_header") {
                 // keep the directive in, commented out
@@ -546,7 +546,7 @@ void InclusionRewriter::Process(FileID FileId,
 }
 
 /// InclusionRewriterInInput - Implement -frewrite-includes mode.
-void clang::RewriteIncludesInInput(Preprocessor &PP, raw_ostream *OS,
+void clang::RewriteIncludesInInput(Preprocessor &PP, llvm::raw_ostream *OS,
                                    const PreprocessorOutputOptions &Opts) {
   SourceManager &SM = PP.getSourceManager();
   InclusionRewriter *Rewrite = new InclusionRewriter(

@@ -22,7 +22,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/magic-numbers.html
 class MagicNumbersCheck : public ClangTidyCheck {
 public:
-  MagicNumbersCheck(StringRef Name, ClangTidyContext *Context);
+  MagicNumbersCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
@@ -80,7 +80,7 @@ private:
         isUserDefinedLiteral(Result, *MatchedLiteral))
       return;
 
-    const StringRef LiteralSourceText = Lexer::getSourceText(
+    const llvm::StringRef LiteralSourceText = Lexer::getSourceText(
         CharSourceRange::getTokenRange(MatchedLiteral->getSourceRange()),
         *Result.SourceManager, getLangOpts());
 
@@ -94,8 +94,8 @@ private:
   const bool IgnorePowersOf2IntegerValues;
   const bool IgnoreTypeAliases;
   const bool IgnoreUserDefinedLiterals;
-  const StringRef RawIgnoredIntegerValues;
-  const StringRef RawIgnoredFloatingPointValues;
+  const llvm::StringRef RawIgnoredIntegerValues;
+  const llvm::StringRef RawIgnoredFloatingPointValues;
 
   constexpr static unsigned SensibleNumberOfMagicValueExceptions = 16;
 

@@ -566,7 +566,7 @@ bool ClangASTSource::IgnoreName(const ConstString name,
     if (name == id_name || name == Class_name)
       return true;
 
-  StringRef name_string_ref = name.GetStringRef();
+  llvm::StringRef name_string_ref = name.GetStringRef();
 
   // The ClangASTSource is not responsible for finding $-names.
   return name_string_ref.empty() ||
@@ -724,7 +724,7 @@ bool ClangASTSource::FindObjCMethodDeclsWithOrigin(
         &original_ctx->Idents.get(decl_name_string_without_colon);
     original_selector = original_ctx->Selectors.getSelector(1, &ident);
   } else {
-    SmallVector<const IdentifierInfo *, 4> idents;
+    llvm::SmallVector<const IdentifierInfo *, 4> idents;
 
     clang::Selector sel = decl_name.getObjCSelector();
 
@@ -1147,7 +1147,7 @@ bool ClangASTSource::FindObjCPropertyAndIvarDeclsWithOrigin(
     return false;
 
   std::string name_str = context.m_decl_name.getAsString();
-  StringRef name(name_str);
+  llvm::StringRef name(name_str);
   IdentifierInfo &name_identifier(
       origin_iface_decl->getASTContext().Idents.get(name));
 

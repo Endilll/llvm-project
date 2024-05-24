@@ -85,7 +85,7 @@ public:
   void assignRegionCounters(GlobalDecl GD, llvm::Function *Fn);
   /// Emit a coverage mapping range with a counter zero
   /// for an unused declaration.
-  void emitEmptyCounterMapping(const Decl *D, StringRef FuncName,
+  void emitEmptyCounterMapping(const Decl *D, llvm::StringRef FuncName,
                                llvm::GlobalValue::LinkageTypes Linkage);
   // Insert instrumentation or attach profile metadata at value sites
   void valueProfile(CGBuilderTy &Builder, uint32_t ValueKind,
@@ -98,7 +98,7 @@ public:
 
 private:
   void setFuncName(llvm::Function *Fn);
-  void setFuncName(StringRef Name, llvm::GlobalValue::LinkageTypes Linkage);
+  void setFuncName(llvm::StringRef Name, llvm::GlobalValue::LinkageTypes Linkage);
   void mapRegionCounters(const Decl *D);
   void computeRegionCounts(const Decl *D);
   void applyFunctionAttributes(llvm::IndexedInstrProfReader *PGOReader,

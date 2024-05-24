@@ -29,7 +29,7 @@ AST_MATCHER_P(QualType, hasCleanType, ast_matchers::internal::Matcher<QualType>,
 } // namespace
 
 OptionalValueConversionCheck::OptionalValueConversionCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       OptionalTypes(utils::options::parseStringList(
           Options.get("OptionalTypes",

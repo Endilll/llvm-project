@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/misplaced-pointer-arithmetic-in-alloc.html
 class MisplacedPointerArithmeticInAllocCheck : public ClangTidyCheck {
 public:
-  MisplacedPointerArithmeticInAllocCheck(StringRef Name,
+  MisplacedPointerArithmeticInAllocCheck(llvm::StringRef Name,
                                          ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

@@ -46,7 +46,7 @@ class DiagnosticWatcher : public clang::DiagnosticConsumer {
   std::string ToName;
 
 public:
-  DiagnosticWatcher(StringRef From, StringRef To)
+  DiagnosticWatcher(llvm::StringRef From, llvm::StringRef To)
       : Chained(nullptr), FromName(From), ToName("'"), SeenCount(0) {
     ToName.append(std::string(To));
     ToName.append("'");
@@ -97,7 +97,7 @@ class NamespaceTypoProvider : public clang::ExternalSemaSource {
   Sema *CurrentSema;
 
 public:
-  NamespaceTypoProvider(StringRef From, StringRef To)
+  NamespaceTypoProvider(llvm::StringRef From, llvm::StringRef To)
       : CorrectFrom(From), CorrectTo(To), CurrentSema(nullptr), CallCount(0) {}
 
   void InitializeSema(Sema &S) override { CurrentSema = &S; }
@@ -139,7 +139,7 @@ class FunctionTypoProvider : public clang::ExternalSemaSource {
   Sema *CurrentSema;
 
 public:
-  FunctionTypoProvider(StringRef From, StringRef To)
+  FunctionTypoProvider(llvm::StringRef From, llvm::StringRef To)
       : CorrectFrom(From), CorrectTo(To), CurrentSema(nullptr), CallCount(0) {}
 
   void InitializeSema(Sema &S) override { CurrentSema = &S; }

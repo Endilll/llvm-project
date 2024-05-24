@@ -27,33 +27,33 @@ NoSanitizeList::NoSanitizeList(const std::vector<std::string> &NoSanitizePaths,
 
 NoSanitizeList::~NoSanitizeList() = default;
 
-bool NoSanitizeList::containsGlobal(SanitizerMask Mask, StringRef GlobalName,
-                                    StringRef Category) const {
+bool NoSanitizeList::containsGlobal(SanitizerMask Mask, llvm::StringRef GlobalName,
+                                    llvm::StringRef Category) const {
   return SSCL->inSection(Mask, "global", GlobalName, Category);
 }
 
-bool NoSanitizeList::containsType(SanitizerMask Mask, StringRef MangledTypeName,
-                                  StringRef Category) const {
+bool NoSanitizeList::containsType(SanitizerMask Mask, llvm::StringRef MangledTypeName,
+                                  llvm::StringRef Category) const {
   return SSCL->inSection(Mask, "type", MangledTypeName, Category);
 }
 
 bool NoSanitizeList::containsFunction(SanitizerMask Mask,
-                                      StringRef FunctionName) const {
+                                      llvm::StringRef FunctionName) const {
   return SSCL->inSection(Mask, "fun", FunctionName);
 }
 
-bool NoSanitizeList::containsFile(SanitizerMask Mask, StringRef FileName,
-                                  StringRef Category) const {
+bool NoSanitizeList::containsFile(SanitizerMask Mask, llvm::StringRef FileName,
+                                  llvm::StringRef Category) const {
   return SSCL->inSection(Mask, "src", FileName, Category);
 }
 
-bool NoSanitizeList::containsMainFile(SanitizerMask Mask, StringRef FileName,
-                                      StringRef Category) const {
+bool NoSanitizeList::containsMainFile(SanitizerMask Mask, llvm::StringRef FileName,
+                                      llvm::StringRef Category) const {
   return SSCL->inSection(Mask, "mainfile", FileName, Category);
 }
 
 bool NoSanitizeList::containsLocation(SanitizerMask Mask, SourceLocation Loc,
-                                      StringRef Category) const {
+                                      llvm::StringRef Category) const {
   return Loc.isValid() &&
          containsFile(Mask, SM.getFilename(SM.getFileLoc(Loc)), Category);
 }

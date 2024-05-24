@@ -45,7 +45,7 @@ Commit::Commit(EditedSource &Editor)
       PPRec(Editor.getPPCondDirectiveRecord()),
       Editor(&Editor) {}
 
-bool Commit::insert(SourceLocation loc, StringRef text,
+bool Commit::insert(SourceLocation loc, llvm::StringRef text,
                     bool afterToken, bool beforePreviousInsertions) {
   if (text.empty())
     return true;
@@ -100,8 +100,8 @@ bool Commit::remove(CharSourceRange range) {
   return true;
 }
 
-bool Commit::insertWrap(StringRef before, CharSourceRange range,
-                        StringRef after) {
+bool Commit::insertWrap(llvm::StringRef before, CharSourceRange range,
+                        llvm::StringRef after) {
   bool commitableBefore = insert(range.getBegin(), before, /*afterToken=*/false,
                                  /*beforePreviousInsertions=*/true);
   bool commitableAfter;
@@ -113,7 +113,7 @@ bool Commit::insertWrap(StringRef before, CharSourceRange range,
   return commitableBefore && commitableAfter;
 }
 
-bool Commit::replace(CharSourceRange range, StringRef text) {
+bool Commit::replace(CharSourceRange range, llvm::StringRef text) {
   if (text.empty())
     return remove(range);
 
@@ -162,8 +162,8 @@ bool Commit::replaceWithInner(CharSourceRange range,
   return true;
 }
 
-bool Commit::replaceText(SourceLocation loc, StringRef text,
-                         StringRef replacementText) {
+bool Commit::replaceText(SourceLocation loc, llvm::StringRef text,
+                         llvm::StringRef replacementText) {
   if (text.empty() || replacementText.empty())
     return true;
 
@@ -179,7 +179,7 @@ bool Commit::replaceText(SourceLocation loc, StringRef text,
   return true;
 }
 
-void Commit::addInsert(SourceLocation OrigLoc, FileOffset Offs, StringRef text,
+void Commit::addInsert(SourceLocation OrigLoc, FileOffset Offs, llvm::StringRef text,
                        bool beforePreviousInsertions) {
   if (text.empty())
     return;
@@ -320,7 +320,7 @@ bool Commit::canRemoveRange(CharSourceRange range,
   return true;
 }
 
-bool Commit::canReplaceText(SourceLocation loc, StringRef text,
+bool Commit::canReplaceText(SourceLocation loc, llvm::StringRef text,
                             FileOffset &Offs, unsigned &Len) {
   assert(!text.empty());
 
@@ -329,7 +329,7 @@ bool Commit::canReplaceText(SourceLocation loc, StringRef text,
 
   // Try to load the file buffer.
   bool invalidTemp = false;
-  StringRef file = SourceMgr.getBufferData(Offs.getFID(), &invalidTemp);
+  llvm::StringRef file = SourceMgr.getBufferData(Offs.getFID(), &invalidTemp);
   if (invalidTemp)
     return false;
 

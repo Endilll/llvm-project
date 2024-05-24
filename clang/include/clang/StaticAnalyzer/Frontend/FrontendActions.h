@@ -26,7 +26,7 @@ namespace ento {
 class AnalysisAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 };
 
 /// Frontend action to parse model files.
@@ -44,7 +44,7 @@ public:
 
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
 private:
   llvm::StringMap<Stmt *> &Bodies;

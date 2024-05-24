@@ -33,10 +33,10 @@ namespace {
 // individual names is that all non-namespace names come before all namespace
 // names, and within those groups, names are in case-insensitive lexicographic
 // order.
-int compareLabelsLexicographicNumeric(StringRef A, StringRef B) {
-  SmallVector<StringRef, 2> NamesA;
+int compareLabelsLexicographicNumeric(llvm::StringRef A, llvm::StringRef B) {
+  llvm::SmallVector<llvm::StringRef, 2> NamesA;
   A.split(NamesA, "::", /*MaxSplit=*/-1, /*KeepEmpty=*/false);
-  SmallVector<StringRef, 2> NamesB;
+  llvm::SmallVector<llvm::StringRef, 2> NamesB;
   B.split(NamesB, "::", /*MaxSplit=*/-1, /*KeepEmpty=*/false);
   size_t SizeA = NamesA.size();
   size_t SizeB = NamesB.size();
@@ -65,10 +65,10 @@ int compareLabelsLexicographicNumeric(StringRef A, StringRef B) {
   return 0;
 }
 
-int compareLabelsLexicographic(StringRef A, StringRef B) {
-  SmallVector<StringRef, 2> NamesA;
+int compareLabelsLexicographic(llvm::StringRef A, llvm::StringRef B) {
+  llvm::SmallVector<llvm::StringRef, 2> NamesA;
   A.split(NamesA, "::", /*MaxSplit=*/-1, /*KeepEmpty=*/false);
-  SmallVector<StringRef, 2> NamesB;
+  llvm::SmallVector<llvm::StringRef, 2> NamesB;
   B.split(NamesB, "::", /*MaxSplit=*/-1, /*KeepEmpty=*/false);
   size_t SizeA = NamesA.size();
   size_t SizeB = NamesB.size();
@@ -84,7 +84,7 @@ int compareLabelsLexicographic(StringRef A, StringRef B) {
 }
 
 int compareLabels(
-    StringRef A, StringRef B,
+    llvm::StringRef A, llvm::StringRef B,
     FormatStyle::SortUsingDeclarationsOptions SortUsingDeclarations) {
   if (SortUsingDeclarations == FormatStyle::SUD_LexicographicNumeric)
     return compareLabelsLexicographicNumeric(A, B);
@@ -135,7 +135,7 @@ std::string computeUsingDeclarationLabel(const FormatToken *UsingTok) {
 }
 
 void endUsingDeclarationBlock(
-    SmallVectorImpl<UsingDeclaration> *UsingDeclarations,
+    llvm::SmallVectorImpl<UsingDeclaration> *UsingDeclarations,
     const SourceManager &SourceMgr, tooling::Replacements *Fixes,
     FormatStyle::SortUsingDeclarationsOptions SortUsingDeclarations) {
   bool BlockAffected = false;
@@ -149,7 +149,7 @@ void endUsingDeclarationBlock(
     UsingDeclarations->clear();
     return;
   }
-  SmallVector<UsingDeclaration, 4> SortedUsingDeclarations(
+  llvm::SmallVector<UsingDeclaration, 4> SortedUsingDeclarations(
       UsingDeclarations->begin(), UsingDeclarations->end());
   auto Comp = [SortUsingDeclarations](const UsingDeclaration &Lhs,
                                       const UsingDeclaration &Rhs) -> bool {
@@ -184,11 +184,11 @@ void endUsingDeclarationBlock(
     auto SortedBegin =
         SortedUsingDeclarations[I].Line->First->Tok.getLocation();
     auto SortedEnd = SortedUsingDeclarations[I].Line->Last->Tok.getEndLoc();
-    StringRef Text(SourceMgr.getCharacterData(SortedBegin),
+    llvm::StringRef Text(SourceMgr.getCharacterData(SortedBegin),
                    SourceMgr.getCharacterData(SortedEnd) -
                        SourceMgr.getCharacterData(SortedBegin));
     LLVM_DEBUG({
-      StringRef OldText(SourceMgr.getCharacterData(Begin),
+      llvm::StringRef OldText(SourceMgr.getCharacterData(Begin),
                         SourceMgr.getCharacterData(End) -
                             SourceMgr.getCharacterData(Begin));
       llvm::dbgs() << "Replacing '" << OldText << "' with '" << Text << "'\n";
@@ -210,12 +210,12 @@ UsingDeclarationsSorter::UsingDeclarationsSorter(const Environment &Env,
     : TokenAnalyzer(Env, Style) {}
 
 std::pair<tooling::Replacements, unsigned> UsingDeclarationsSorter::analyze(
-    TokenAnnotator &Annotator, SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+    TokenAnnotator &Annotator, llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
     FormatTokenLexer &Tokens) {
   const SourceManager &SourceMgr = Env.getSourceManager();
   AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
   tooling::Replacements Fixes;
-  SmallVector<UsingDeclaration, 4> UsingDeclarations;
+  llvm::SmallVector<UsingDeclaration, 4> UsingDeclarations;
   for (const AnnotatedLine *Line : AnnotatedLines) {
     const auto *FirstTok = Line->First;
     if (Line->InPPDirective || !Line->startsWith(tok::kw_using) ||

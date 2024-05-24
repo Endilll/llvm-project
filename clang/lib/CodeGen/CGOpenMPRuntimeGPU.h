@@ -86,7 +86,7 @@ private:
   /// \param IsOffloadEntry True if the outlined function is an offload entry.
   /// An outlined function may not be an entry if, e.g. the if clause always
   /// evaluates to false.
-  void emitNonSPMDKernel(const OMPExecutableDirective &D, StringRef ParentName,
+  void emitNonSPMDKernel(const OMPExecutableDirective &D, llvm::StringRef ParentName,
                          llvm::Function *&OutlinedFn,
                          llvm::Constant *&OutlinedFnID, bool IsOffloadEntry,
                          const RegionCodeGenTy &CodeGen);
@@ -102,7 +102,7 @@ private:
   /// \param CodeGen Object containing the target statements.
   /// An outlined function may not be an entry if, e.g. the if clause always
   /// evaluates to false.
-  void emitSPMDKernel(const OMPExecutableDirective &D, StringRef ParentName,
+  void emitSPMDKernel(const OMPExecutableDirective &D, llvm::StringRef ParentName,
                       llvm::Function *&OutlinedFn,
                       llvm::Constant *&OutlinedFnID, bool IsOffloadEntry,
                       const RegionCodeGenTy &CodeGen);
@@ -117,7 +117,7 @@ private:
   /// An outlined function may not be an entry if, e.g. the if clause always
   /// evaluates to false.
   void emitTargetOutlinedFunction(const OMPExecutableDirective &D,
-                                  StringRef ParentName,
+                                  llvm::StringRef ParentName,
                                   llvm::Function *&OutlinedFn,
                                   llvm::Constant *&OutlinedFnID,
                                   bool IsOffloadEntry,
@@ -220,7 +220,7 @@ public:
   ///
   void emitTeamsCall(CodeGenFunction &CGF, const OMPExecutableDirective &D,
                      SourceLocation Loc, llvm::Function *OutlinedFn,
-                     ArrayRef<llvm::Value *> CapturedVars) override;
+                     llvm::ArrayRef<llvm::Value *> CapturedVars) override;
 
   /// Emits code for parallel or serial call of the \a OutlinedFn with
   /// variables captured in a record which address is stored in \a
@@ -236,7 +236,7 @@ public:
   ///                   or nullptr.
   void emitParallelCall(CodeGenFunction &CGF, SourceLocation Loc,
                         llvm::Function *OutlinedFn,
-                        ArrayRef<llvm::Value *> CapturedVars,
+                        llvm::ArrayRef<llvm::Value *> CapturedVars,
                         const Expr *IfCond, llvm::Value *NumThreads) override;
 
   /// Emit an implicit/explicit barrier for OpenMP threads.
@@ -256,7 +256,7 @@ public:
   /// \param CriticalOpGen Generator for the statement associated with the given
   /// critical region.
   /// \param Hint Value of the 'hint' clause (optional).
-  void emitCriticalRegion(CodeGenFunction &CGF, StringRef CriticalName,
+  void emitCriticalRegion(CodeGenFunction &CGF, llvm::StringRef CriticalName,
                           const RegionCodeGenTy &CriticalOpGen,
                           SourceLocation Loc,
                           const Expr *Hint = nullptr) override;
@@ -275,10 +275,10 @@ public:
   ///     directive on the host.
   ///     ReductionKind The kind of reduction to perform.
   void emitReduction(CodeGenFunction &CGF, SourceLocation Loc,
-                     ArrayRef<const Expr *> Privates,
-                     ArrayRef<const Expr *> LHSExprs,
-                     ArrayRef<const Expr *> RHSExprs,
-                     ArrayRef<const Expr *> ReductionOps,
+                     llvm::ArrayRef<const Expr *> Privates,
+                     llvm::ArrayRef<const Expr *> LHSExprs,
+                     llvm::ArrayRef<const Expr *> RHSExprs,
+                     llvm::ArrayRef<const Expr *> ReductionOps,
                      ReductionOptionsTy Options) override;
 
   /// Translates the native parameter of outlined function if this is required
@@ -299,7 +299,7 @@ public:
   /// translating these arguments to correct target-specific arguments.
   void emitOutlinedFunctionCall(
       CodeGenFunction &CGF, SourceLocation Loc, llvm::FunctionCallee OutlinedFn,
-      ArrayRef<llvm::Value *> Args = std::nullopt) const override;
+      llvm::ArrayRef<llvm::Value *> Args = std::nullopt) const override;
 
   /// Emits OpenMP-specific function prolog.
   /// Required for device constructs.

@@ -30,7 +30,7 @@
 
 namespace clang {
 
-SARIFDiagnostic::SARIFDiagnostic(raw_ostream &OS, const LangOptions &LangOpts,
+SARIFDiagnostic::SARIFDiagnostic(llvm::raw_ostream &OS, const LangOptions &LangOpts,
                                  DiagnosticOptions *DiagOpts,
                                  SarifDocumentWriter *Writer)
     : DiagnosticRenderer(LangOpts, DiagOpts), Writer(Writer) {}
@@ -38,7 +38,7 @@ SARIFDiagnostic::SARIFDiagnostic(raw_ostream &OS, const LangOptions &LangOpts,
 // FIXME(llvm-project/issues/57323): Refactor Diagnostic classes.
 void SARIFDiagnostic::emitDiagnosticMessage(
     FullSourceLoc Loc, PresumedLoc PLoc, DiagnosticsEngine::Level Level,
-    StringRef Message, ArrayRef<clang::CharSourceRange> Ranges,
+    llvm::StringRef Message, llvm::ArrayRef<clang::CharSourceRange> Ranges,
     DiagOrStoredDiag D) {
 
   const auto *Diag = D.dyn_cast<const Diagnostic *>();
@@ -63,8 +63,8 @@ void SARIFDiagnostic::emitDiagnosticMessage(
 
 SarifResult SARIFDiagnostic::addLocationToResult(
     SarifResult Result, FullSourceLoc Loc, PresumedLoc PLoc,
-    ArrayRef<CharSourceRange> Ranges, const Diagnostic &Diag) {
-  SmallVector<CharSourceRange> Locations = {};
+    llvm::ArrayRef<CharSourceRange> Ranges, const Diagnostic &Diag) {
+  llvm::SmallVector<CharSourceRange> Locations = {};
 
   if (PLoc.isInvalid()) {
     // At least add the file name if available:
@@ -161,7 +161,7 @@ SARIFDiagnostic::addDiagnosticLevelToRule(SarifRule Rule,
   return Rule.setDefaultConfiguration(Config);
 }
 
-llvm::StringRef SARIFDiagnostic::emitFilename(StringRef Filename,
+llvm::StringRef SARIFDiagnostic::emitFilename(llvm::StringRef Filename,
                                               const SourceManager &SM) {
   if (DiagOpts->AbsolutePath) {
     auto File = SM.getFileManager().getOptionalFileRef(Filename);
@@ -181,11 +181,11 @@ llvm::StringRef SARIFDiagnostic::emitFilename(StringRef Filename,
       // on Windows we can just use llvm::sys::path::remove_dots(), because,
       // on that system, both aforementioned paths point to the same place.
 #ifdef _WIN32
-      SmallString<256> TmpFilename = File->getName();
+      llvm::SmallString<256> TmpFilename = File->getName();
       llvm::sys::fs::make_absolute(TmpFilename);
       llvm::sys::path::native(TmpFilename);
       llvm::sys::path::remove_dots(TmpFilename, /* remove_dot_dot */ true);
-      Filename = StringRef(TmpFilename.data(), TmpFilename.size());
+      Filename = llvm::StringRef(TmpFilename.data(), TmpFilename.size());
 #else
       Filename = SM.getFileManager().getCanonicalName(*File);
 #endif
@@ -203,7 +203,7 @@ llvm::StringRef SARIFDiagnostic::emitFilename(StringRef Filename,
 /// ranges necessary.
 void SARIFDiagnostic::emitDiagnosticLoc(FullSourceLoc Loc, PresumedLoc PLoc,
                                         DiagnosticsEngine::Level Level,
-                                        ArrayRef<CharSourceRange> Ranges) {
+                                        llvm::ArrayRef<CharSourceRange> Ranges) {
   assert(false && "Not implemented in SARIF mode");
 }
 
@@ -212,13 +212,13 @@ void SARIFDiagnostic::emitIncludeLocation(FullSourceLoc Loc, PresumedLoc PLoc) {
 }
 
 void SARIFDiagnostic::emitImportLocation(FullSourceLoc Loc, PresumedLoc PLoc,
-                                         StringRef ModuleName) {
+                                         llvm::StringRef ModuleName) {
   assert(false && "Not implemented in SARIF mode");
 }
 
 void SARIFDiagnostic::emitBuildingModuleLocation(FullSourceLoc Loc,
                                                  PresumedLoc PLoc,
-                                                 StringRef ModuleName) {
+                                                 llvm::StringRef ModuleName) {
   assert(false && "Not implemented in SARIF mode");
 }
 } // namespace clang

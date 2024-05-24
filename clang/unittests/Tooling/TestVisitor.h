@@ -51,7 +51,7 @@ public:
   };
 
   /// \brief Runs the current AST visitor over the given code.
-  bool runOver(StringRef Code, Language L = Lang_CXX) {
+  bool runOver(llvm::StringRef Code, Language L = Lang_CXX) {
     std::vector<std::string> Args;
     switch (L) {
       case Lang_C:
@@ -131,7 +131,7 @@ public:
   /// \brief Expect 'Match' *not* to occur at the given 'Line' and 'Column'.
   ///
   /// Any number of matches can be disallowed.
-  void DisallowMatch(Twine Match, unsigned Line, unsigned Column) {
+  void DisallowMatch(llvm::Twine Match, unsigned Line, unsigned Column) {
     DisallowedMatches.push_back(MatchCandidate(Match, Line, Column));
   }
 
@@ -141,7 +141,7 @@ public:
   /// Each is expected to be matched 'Times' number of times. (This is useful in
   /// cases in which different AST nodes can match at the same source code
   /// location.)
-  void ExpectMatch(Twine Match, unsigned Line, unsigned Column,
+  void ExpectMatch(llvm::Twine Match, unsigned Line, unsigned Column,
                    unsigned Times = 1) {
     ExpectedMatches.push_back(ExpectedMatch(Match, Line, Column, Times));
   }
@@ -160,7 +160,7 @@ protected:
   ///
   /// Implementations are required to call this with appropriate values
   /// for 'Name' during visitation.
-  void Match(StringRef Name, SourceLocation Location) {
+  void Match(llvm::StringRef Name, SourceLocation Location) {
     const FullSourceLoc FullLocation = this->Context->getFullLoc(Location);
 
     for (typename std::vector<MatchCandidate>::const_iterator
@@ -183,20 +183,20 @@ protected:
     unsigned LineNumber;
     unsigned ColumnNumber;
 
-    MatchCandidate(Twine Name, unsigned LineNumber, unsigned ColumnNumber)
+    MatchCandidate(llvm::Twine Name, unsigned LineNumber, unsigned ColumnNumber)
       : ExpectedName(Name.str()), LineNumber(LineNumber),
         ColumnNumber(ColumnNumber) {
     }
 
-    bool Matches(StringRef Name, FullSourceLoc const &Location) const {
+    bool Matches(llvm::StringRef Name, FullSourceLoc const &Location) const {
       return MatchesName(Name) && MatchesLocation(Location);
     }
 
-    bool PartiallyMatches(StringRef Name, FullSourceLoc const &Location) const {
+    bool PartiallyMatches(llvm::StringRef Name, FullSourceLoc const &Location) const {
       return MatchesName(Name) || MatchesLocation(Location);
     }
 
-    bool MatchesName(StringRef Name) const {
+    bool MatchesName(llvm::StringRef Name) const {
       return Name == ExpectedName;
     }
 
@@ -214,12 +214,12 @@ protected:
   };
 
   struct ExpectedMatch {
-    ExpectedMatch(Twine Name, unsigned LineNumber, unsigned ColumnNumber,
+    ExpectedMatch(llvm::Twine Name, unsigned LineNumber, unsigned ColumnNumber,
                   unsigned Times)
         : Candidate(Name, LineNumber, ColumnNumber), TimesExpected(Times),
           TimesSeen(0) {}
 
-    void UpdateFor(StringRef Name, FullSourceLoc Location, SourceManager &SM) {
+    void UpdateFor(llvm::StringRef Name, FullSourceLoc Location, SourceManager &SM) {
       if (Candidate.Matches(Name, Location)) {
         EXPECT_LT(TimesSeen, TimesExpected);
         ++TimesSeen;

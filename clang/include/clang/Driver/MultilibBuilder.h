@@ -30,44 +30,44 @@ private:
   flags_list Flags;
 
 public:
-  MultilibBuilder(StringRef GCCSuffix, StringRef OSSuffix,
-                  StringRef IncludeSuffix);
+  MultilibBuilder(llvm::StringRef GCCSuffix, llvm::StringRef OSSuffix,
+                  llvm::StringRef IncludeSuffix);
 
   /// Initializes GCCSuffix, OSSuffix & IncludeSuffix to the same value.
-  MultilibBuilder(StringRef Suffix = {});
+  MultilibBuilder(llvm::StringRef Suffix = {});
 
   /// Get the detected GCC installation path suffix for the multi-arch
   /// target variant. Always starts with a '/', unless empty
   const std::string &gccSuffix() const {
     assert(GCCSuffix.empty() ||
-           (StringRef(GCCSuffix).front() == '/' && GCCSuffix.size() > 1));
+           (llvm::StringRef(GCCSuffix).front() == '/' && GCCSuffix.size() > 1));
     return GCCSuffix;
   }
 
   /// Set the GCC installation path suffix.
-  MultilibBuilder &gccSuffix(StringRef S);
+  MultilibBuilder &gccSuffix(llvm::StringRef S);
 
   /// Get the detected os path suffix for the multi-arch
   /// target variant. Always starts with a '/', unless empty
   const std::string &osSuffix() const {
     assert(OSSuffix.empty() ||
-           (StringRef(OSSuffix).front() == '/' && OSSuffix.size() > 1));
+           (llvm::StringRef(OSSuffix).front() == '/' && OSSuffix.size() > 1));
     return OSSuffix;
   }
 
   /// Set the os path suffix.
-  MultilibBuilder &osSuffix(StringRef S);
+  MultilibBuilder &osSuffix(llvm::StringRef S);
 
   /// Get the include directory suffix. Always starts with a '/', unless
   /// empty
   const std::string &includeSuffix() const {
-    assert(IncludeSuffix.empty() || (StringRef(IncludeSuffix).front() == '/' &&
+    assert(IncludeSuffix.empty() || (llvm::StringRef(IncludeSuffix).front() == '/' &&
                                      IncludeSuffix.size() > 1));
     return IncludeSuffix;
   }
 
   /// Set the include directory suffix
-  MultilibBuilder &includeSuffix(StringRef S);
+  MultilibBuilder &includeSuffix(llvm::StringRef S);
 
   /// Get the flags that indicate or contraindicate this multilib's use
   /// All elements begin with either '-' or '!'
@@ -77,7 +77,7 @@ public:
   /// Add a flag to the flags list
   /// \p Flag must be a flag accepted by the driver.
   /// \p Disallow defines whether the flag is negated and therefore disallowed.
-  MultilibBuilder &flag(StringRef Flag, bool Disallow = false);
+  MultilibBuilder &flag(llvm::StringRef Flag, bool Disallow = false);
 
   Multilib makeMultilib() const;
 
@@ -117,7 +117,7 @@ public:
                              const MultilibBuilder &M3,
                              const MultilibBuilder &M4,
                              const MultilibBuilder &M5);
-  MultilibSetBuilder &Either(ArrayRef<MultilibBuilder> Ms);
+  MultilibSetBuilder &Either(llvm::ArrayRef<MultilibBuilder> Ms);
 
   /// Filter out those Multilibs whose gccSuffix matches the given expression
   MultilibSetBuilder &FilterOut(const char *Regex);

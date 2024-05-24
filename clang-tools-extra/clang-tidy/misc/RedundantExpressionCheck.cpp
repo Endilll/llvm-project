@@ -348,7 +348,7 @@ static const TExpr *checkOpKind(const Expr *TheExpr,
 // is already handled by operands/parametersAreEquivalent
 template <typename TExpr, unsigned N>
 static bool collectOperands(const Expr *Part,
-                            SmallVector<const Expr *, N> &AllOperands,
+                            llvm::SmallVector<const Expr *, N> &AllOperands,
                             OverloadedOperatorKind OpKind) {
   if (const auto *BinOp = checkOpKind<TExpr>(Part, OpKind)) {
     const std::pair<const Expr *, const Expr *> Operands = getOperands(BinOp);
@@ -403,7 +403,7 @@ markDuplicateOperands(const TExpr *TheExpr,
   if (hasSameOperatorParent<TExpr>(TheExpr, OpKind, Context))
     return false;
 
-  SmallVector<const Expr *, 4> AllOperands;
+  llvm::SmallVector<const Expr *, 4> AllOperands;
   if (collectOperands<TExpr>(Operands.first, AllOperands, OpKind))
     return false;
   if (collectOperands<TExpr>(Operands.second, AllOperands, OpKind))
@@ -422,13 +422,13 @@ markDuplicateOperands(const TExpr *TheExpr,
       if (areEquivalentExpr(AllOperands[I], AllOperands[J])) {
         FoundDuplicates = true;
         Duplicates.set(J);
-        Builder->setBinding(SmallString<11>(llvm::formatv("duplicate{0}", J)),
+        Builder->setBinding(llvm::SmallString<11>(llvm::formatv("duplicate{0}", J)),
                             DynTypedNode::create(*AllOperands[J]));
       }
     }
 
     if (FoundDuplicates)
-      Builder->setBinding(SmallString<11>(llvm::formatv("duplicate{0}", I)),
+      Builder->setBinding(llvm::SmallString<11>(llvm::formatv("duplicate{0}", I)),
                           DynTypedNode::create(*AllOperands[I]));
   }
 
@@ -472,12 +472,12 @@ AST_MATCHER(ConditionalOperator, conditionalOperatorIsInMacro) {
 
 AST_MATCHER(Expr, isMacro) { return Node.getExprLoc().isMacroID(); }
 
-AST_MATCHER_P(Expr, expandedByMacro, ArrayRef<llvm::StringLiteral>, Names) {
+AST_MATCHER_P(Expr, expandedByMacro, llvm::ArrayRef<llvm::StringLiteral>, Names) {
   const SourceManager &SM = Finder->getASTContext().getSourceManager();
   const LangOptions &LO = Finder->getASTContext().getLangOpts();
   SourceLocation Loc = Node.getExprLoc();
   while (Loc.isMacroID()) {
-    StringRef MacroName = Lexer::getImmediateMacroName(Loc, SM, LO);
+    llvm::StringRef MacroName = Lexer::getImmediateMacroName(Loc, SM, LO);
     if (llvm::is_contained(Names, MacroName))
       return true;
     Loc = SM.getImmediateMacroCallerLoc(Loc);
@@ -487,7 +487,7 @@ AST_MATCHER_P(Expr, expandedByMacro, ArrayRef<llvm::StringLiteral>, Names) {
 
 // Returns a matcher for integer constant expressions.
 static ast_matchers::internal::Matcher<Expr>
-matchIntegerConstantExpr(StringRef Id) {
+matchIntegerConstantExpr(llvm::StringRef Id) {
   std::string CstId = (Id + "-const").str();
   return expr(isIntegerConstantExpr()).bind(CstId);
 }
@@ -496,7 +496,7 @@ matchIntegerConstantExpr(StringRef Id) {
 // name 'Id' and stores it into 'ConstExpr', the value of the expression is
 // stored into `Value`.
 static bool retrieveIntegerConstantExpr(const MatchFinder::MatchResult &Result,
-                                        StringRef Id, APSInt &Value,
+                                        llvm::StringRef Id, APSInt &Value,
                                         const Expr *&ConstExpr) {
   std::string CstId = (Id + "-const").str();
   ConstExpr = Result.Nodes.getNodeAs<Expr>(CstId);
@@ -512,14 +512,14 @@ static bool retrieveIntegerConstantExpr(const MatchFinder::MatchResult &Result,
 
 // Overloaded `retrieveIntegerConstantExpr` for compatibility.
 static bool retrieveIntegerConstantExpr(const MatchFinder::MatchResult &Result,
-                                        StringRef Id, APSInt &Value) {
+                                        llvm::StringRef Id, APSInt &Value) {
   const Expr *ConstExpr = nullptr;
   return retrieveIntegerConstantExpr(Result, Id, Value, ConstExpr);
 }
 
 // Returns a matcher for symbolic expressions (matches every expression except
 // ingeter constant expressions).
-static ast_matchers::internal::Matcher<Expr> matchSymbolicExpr(StringRef Id) {
+static ast_matchers::internal::Matcher<Expr> matchSymbolicExpr(llvm::StringRef Id) {
   std::string SymId = (Id + "-sym").str();
   return ignoringParenImpCasts(
       expr(unless(isIntegerConstantExpr())).bind(SymId));
@@ -528,7 +528,7 @@ static ast_matchers::internal::Matcher<Expr> matchSymbolicExpr(StringRef Id) {
 // Retrieves the expression matched by 'matchSymbolicExpr' with name 'Id' and
 // stores it into 'SymExpr'.
 static bool retrieveSymbolicExpr(const MatchFinder::MatchResult &Result,
-                                 StringRef Id, const Expr *&SymExpr) {
+                                 llvm::StringRef Id, const Expr *&SymExpr) {
   std::string SymId = (Id + "-sym").str();
   if (const auto *Node = Result.Nodes.getNodeAs<Expr>(SymId)) {
     SymExpr = Node;
@@ -540,7 +540,7 @@ static bool retrieveSymbolicExpr(const MatchFinder::MatchResult &Result,
 // Match a binary operator between a symbolic expression and an integer constant
 // expression.
 static ast_matchers::internal::Matcher<Expr>
-matchBinOpIntegerConstantExpr(StringRef Id) {
+matchBinOpIntegerConstantExpr(llvm::StringRef Id) {
   const auto BinOpCstExpr =
       expr(anyOf(binaryOperator(hasAnyOperatorName("+", "|", "&"),
                                 hasOperands(matchSymbolicExpr(Id),
@@ -556,7 +556,7 @@ matchBinOpIntegerConstantExpr(StringRef Id) {
 // name 'Id'.
 static bool
 retrieveBinOpIntegerConstantExpr(const MatchFinder::MatchResult &Result,
-                                 StringRef Id, BinaryOperatorKind &Opcode,
+                                 llvm::StringRef Id, BinaryOperatorKind &Opcode,
                                  const Expr *&Symbol, APSInt &Value) {
   if (const auto *BinExpr = Result.Nodes.getNodeAs<BinaryOperator>(Id)) {
     Opcode = BinExpr->getOpcode();
@@ -568,7 +568,7 @@ retrieveBinOpIntegerConstantExpr(const MatchFinder::MatchResult &Result,
 
 // Matches relational expressions: 'Expr <op> k' (i.e. x < 2, x != 3, 12 <= x).
 static ast_matchers::internal::Matcher<Expr>
-matchRelationalIntegerConstantExpr(StringRef Id) {
+matchRelationalIntegerConstantExpr(llvm::StringRef Id) {
   std::string CastId = (Id + "-cast").str();
   std::string SwapId = (Id + "-swap").str();
   std::string NegateId = (Id + "-negate").str();
@@ -656,7 +656,7 @@ canOverloadedOperatorArgsBeModified(const CXXOperatorCallExpr *OperatorCall,
 // Retrieves sub-expressions matched by 'matchRelationalIntegerConstantExpr'
 // with name 'Id'.
 static bool retrieveRelationalIntegerConstantExpr(
-    const MatchFinder::MatchResult &Result, StringRef Id,
+    const MatchFinder::MatchResult &Result, llvm::StringRef Id,
     const Expr *&OperandExpr, BinaryOperatorKind &Opcode, const Expr *&Symbol,
     APSInt &Value, const Expr *&ConstExpr) {
   std::string CastId = (Id + "-cast").str();
@@ -792,8 +792,8 @@ static bool isSameRawIdentifierToken(const Token &T1, const Token &T2,
     return true;
   if (T1.getLength() != T2.getLength())
     return false;
-  return StringRef(SM.getCharacterData(T1.getLocation()), T1.getLength()) ==
-         StringRef(SM.getCharacterData(T2.getLocation()), T2.getLength());
+  return llvm::StringRef(SM.getCharacterData(T1.getLocation()), T1.getLength()) ==
+         llvm::StringRef(SM.getCharacterData(T2.getLocation()), T2.getLength());
 }
 
 bool isTokAtEndOfExpr(SourceRange ExprSR, Token T, const SourceManager &SM) {
@@ -1151,7 +1151,7 @@ void RedundantExpressionCheck::checkBitwiseExpr(
     } else if (exprEvaluatesToBitwiseNegatedZero(Opcode, Value)) {
       SourceRange ConstExprRange(ConstExpr->getBeginLoc(),
                                  ConstExpr->getEndLoc());
-      StringRef ConstExprText = Lexer::getSourceText(
+      llvm::StringRef ConstExprText = Lexer::getSourceText(
           CharSourceRange::getTokenRange(ConstExprRange), *Result.SourceManager,
           Result.Context->getLangOpts());
 
@@ -1160,7 +1160,7 @@ void RedundantExpressionCheck::checkBitwiseExpr(
     } else if (exprEvaluatesToSymbolic(Opcode, Value)) {
       SourceRange SymExprRange(Sym->getBeginLoc(), Sym->getEndLoc());
 
-      StringRef ExprText = Lexer::getSourceText(
+      llvm::StringRef ExprText = Lexer::getSourceText(
           CharSourceRange::getTokenRange(SymExprRange), *Result.SourceManager,
           Result.Context->getLangOpts());
 
@@ -1279,13 +1279,13 @@ void RedundantExpressionCheck::check(const MatchFinder::MatchResult &Result) {
     if (Call && canOverloadedOperatorArgsBeModified(Call, true))
       return;
 
-    StringRef Message =
+    llvm::StringRef Message =
         Call ? "overloaded operator has equivalent nested operands"
              : "operator has equivalent nested operands";
 
     const auto Diag = diag(Op->getExprLoc(), Message);
     for (const auto &KeyValue : Result.Nodes.getMap()) {
-      if (StringRef(KeyValue.first).starts_with("duplicate"))
+      if (llvm::StringRef(KeyValue.first).starts_with("duplicate"))
         Diag << KeyValue.second.getSourceRange();
     }
   }

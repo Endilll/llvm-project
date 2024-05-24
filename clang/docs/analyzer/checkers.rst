@@ -1848,7 +1848,7 @@ Check for leaks and improper reference count management
    NSString *s = [[NSString alloc] init]; // warn
  }
 
- CFStringRef test(char *bytes) {
+ CFllvm::StringRef test(char *bytes) {
    return CFStringCreateWithCStringNoCopy(
             0, bytes, NSNEXTSTEPStringEncoding, 0); // warn
  }
@@ -2570,7 +2570,7 @@ alpha.llvm.Conventions
 
 Check code for LLVM codebase conventions:
 
-* A StringRef should not be bound to a temporary std::string whose lifetime is shorter than the StringRef's.
+* A llvm::StringRef should not be bound to a temporary std::string whose lifetime is shorter than the llvm::StringRef's.
 * Clang AST nodes should not have fields that can allocate memory.
 
 

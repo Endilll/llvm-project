@@ -224,7 +224,7 @@ class Token;
   private:
     /// The name of the file that was included, as written in
     /// the source.
-    StringRef FileName;
+    llvm::StringRef FileName;
 
     /// Whether the file name was in quotation marks; otherwise, it was
     /// in angle brackets.
@@ -247,14 +247,14 @@ class Token;
 
   public:
     InclusionDirective(PreprocessingRecord &PPRec, InclusionKind Kind,
-                       StringRef FileName, bool InQuotes, bool ImportedModule,
+                       llvm::StringRef FileName, bool InQuotes, bool ImportedModule,
                        OptionalFileEntryRef File, SourceRange Range);
 
     /// Determine what kind of inclusion directive this is.
     InclusionKind getKind() const { return static_cast<InclusionKind>(Kind); }
 
     /// Retrieve the included file name as it was written in the source.
-    StringRef getFileName() const { return FileName; }
+    llvm::StringRef getFileName() const { return FileName; }
 
     /// Determine whether the included file name was written in quotes;
     /// otherwise, it was written in angle brackets.
@@ -529,10 +529,10 @@ class Token;
     void MacroUndefined(const Token &Id, const MacroDefinition &MD,
                         const MacroDirective *Undef) override;
     void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                            StringRef FileName, bool IsAngled,
+                            llvm::StringRef FileName, bool IsAngled,
                             CharSourceRange FilenameRange,
-                            OptionalFileEntryRef File, StringRef SearchPath,
-                            StringRef RelativePath,
+                            OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                            llvm::StringRef RelativePath,
                             const Module *SuggestedModule, bool ModuleImported,
                             SrcMgr::CharacteristicKind FileType) override;
     void Ifdef(SourceLocation Loc, const Token &MacroNameTok,

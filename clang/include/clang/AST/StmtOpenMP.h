@@ -275,7 +275,7 @@ class OMPExecutableDirective : public Stmt {
   SourceLocation EndLoc;
 
   /// Get the clauses storage.
-  MutableArrayRef<OMPClause *> getClauses() {
+  llvm::MutableArrayRef<OMPClause *> getClauses() {
     if (!Data)
       return std::nullopt;
     return Data->getClauses();
@@ -307,7 +307,7 @@ protected:
         EndLoc(std::move(EndLoc)) {}
 
   template <typename T, typename... Params>
-  static T *createDirective(const ASTContext &C, ArrayRef<OMPClause *> Clauses,
+  static T *createDirective(const ASTContext &C, llvm::ArrayRef<OMPClause *> Clauses,
                             Stmt *AssociatedStmt, unsigned NumChildren,
                             Params &&... P) {
     void *Mem =
@@ -362,9 +362,9 @@ public:
   /// Iterates over expressions/statements used in the construct.
   class used_clauses_child_iterator
       : public llvm::iterator_adaptor_base<
-            used_clauses_child_iterator, ArrayRef<OMPClause *>::iterator,
+            used_clauses_child_iterator, llvm::ArrayRef<OMPClause *>::iterator,
             std::forward_iterator_tag, Stmt *, ptrdiff_t, Stmt *, Stmt *> {
-    ArrayRef<OMPClause *>::iterator End;
+    llvm::ArrayRef<OMPClause *>::iterator End;
     OMPClause::child_iterator ChildI, ChildEnd;
 
     void MoveToNext() {
@@ -382,7 +382,7 @@ public:
     }
 
   public:
-    explicit used_clauses_child_iterator(ArrayRef<OMPClause *> Clauses)
+    explicit used_clauses_child_iterator(llvm::ArrayRef<OMPClause *> Clauses)
         : used_clauses_child_iterator::iterator_adaptor_base(Clauses.begin()),
           End(Clauses.end()) {
       if (this->I != End) {
@@ -411,7 +411,7 @@ public:
   };
 
   static llvm::iterator_range<used_clauses_child_iterator>
-  used_clauses_children(ArrayRef<OMPClause *> Clauses) {
+  used_clauses_children(llvm::ArrayRef<OMPClause *> Clauses) {
     return {
         used_clauses_child_iterator(Clauses),
         used_clauses_child_iterator(llvm::ArrayRef(Clauses.end(), (size_t)0))};
@@ -425,10 +425,10 @@ public:
   class specific_clause_iterator
       : public llvm::iterator_adaptor_base<
             specific_clause_iterator<SpecificClause>,
-            ArrayRef<OMPClause *>::const_iterator, std::forward_iterator_tag,
+            llvm::ArrayRef<OMPClause *>::const_iterator, std::forward_iterator_tag,
             const SpecificClause *, ptrdiff_t, const SpecificClause *,
             const SpecificClause *> {
-    ArrayRef<OMPClause *>::const_iterator End;
+    llvm::ArrayRef<OMPClause *>::const_iterator End;
 
     void SkipToNextClause() {
       while (this->I != End && !isa<SpecificClause>(*this->I))
@@ -436,7 +436,7 @@ public:
     }
 
   public:
-    explicit specific_clause_iterator(ArrayRef<OMPClause *> Clauses)
+    explicit specific_clause_iterator(llvm::ArrayRef<OMPClause *> Clauses)
         : specific_clause_iterator::iterator_adaptor_base(Clauses.begin()),
           End(Clauses.end()) {
       SkipToNextClause();
@@ -456,7 +456,7 @@ public:
 
   template <typename SpecificClause>
   static llvm::iterator_range<specific_clause_iterator<SpecificClause>>
-  getClausesOfKind(ArrayRef<OMPClause *> Clauses) {
+  getClausesOfKind(llvm::ArrayRef<OMPClause *> Clauses) {
     return {specific_clause_iterator<SpecificClause>(Clauses),
             specific_clause_iterator<SpecificClause>(
                 llvm::ArrayRef(Clauses.end(), (size_t)0))};
@@ -474,7 +474,7 @@ public:
   /// directive). Returns nullptr if no clause of this kind is associated with
   /// the directive.
   template <typename SpecificClause>
-  static const SpecificClause *getSingleClause(ArrayRef<OMPClause *> Clauses) {
+  static const SpecificClause *getSingleClause(llvm::ArrayRef<OMPClause *> Clauses) {
     auto ClausesOfKind = getClausesOfKind<SpecificClause>(Clauses);
 
     if (ClausesOfKind.begin() != ClausesOfKind.end()) {
@@ -547,7 +547,7 @@ public:
   const CapturedStmt *getCapturedStmt(OpenMPDirectiveKind RegionKind) const {
     assert(hasAssociatedStmt() &&
            "Expected directive with the associated statement.");
-    SmallVector<OpenMPDirectiveKind, 4> CaptureRegions;
+    llvm::SmallVector<OpenMPDirectiveKind, 4> CaptureRegions;
     getOpenMPCaptureRegions(CaptureRegions, getDirectiveKind());
     return Data->getCapturedStmt(RegionKind, CaptureRegions);
   }
@@ -556,7 +556,7 @@ public:
   CapturedStmt *getInnermostCapturedStmt() {
     assert(hasAssociatedStmt() &&
            "Expected directive with the associated statement.");
-    SmallVector<OpenMPDirectiveKind, 4> CaptureRegions;
+    llvm::SmallVector<OpenMPDirectiveKind, 4> CaptureRegions;
     getOpenMPCaptureRegions(CaptureRegions, getDirectiveKind());
     return Data->getInnermostCapturedStmt(CaptureRegions);
   }
@@ -583,7 +583,7 @@ public:
     return const_cast<OMPExecutableDirective *>(this)->children();
   }
 
-  ArrayRef<OMPClause *> clauses() const {
+  llvm::ArrayRef<OMPClause *> clauses() const {
     if (!Data)
       return std::nullopt;
     return Data->getClauses();
@@ -666,7 +666,7 @@ public:
   ///
   static OMPParallelDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef,
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef,
          bool HasCancel);
 
   /// Creates an empty directive with the place for \a N clauses.
@@ -801,24 +801,24 @@ public:
     /// expression UB = min (UB, PrevUB)
     Expr *PrevEUB;
     /// Counters Loop counters.
-    SmallVector<Expr *, 4> Counters;
+    llvm::SmallVector<Expr *, 4> Counters;
     /// PrivateCounters Loop counters.
-    SmallVector<Expr *, 4> PrivateCounters;
+    llvm::SmallVector<Expr *, 4> PrivateCounters;
     /// Expressions for loop counters inits for CodeGen.
-    SmallVector<Expr *, 4> Inits;
+    llvm::SmallVector<Expr *, 4> Inits;
     /// Expressions for loop counters update for CodeGen.
-    SmallVector<Expr *, 4> Updates;
+    llvm::SmallVector<Expr *, 4> Updates;
     /// Final loop counter values for GodeGen.
-    SmallVector<Expr *, 4> Finals;
+    llvm::SmallVector<Expr *, 4> Finals;
     /// List of counters required for the generation of the non-rectangular
     /// loops.
-    SmallVector<Expr *, 4> DependentCounters;
+    llvm::SmallVector<Expr *, 4> DependentCounters;
     /// List of initializers required for the generation of the non-rectangular
     /// loops.
-    SmallVector<Expr *, 4> DependentInits;
+    llvm::SmallVector<Expr *, 4> DependentInits;
     /// List of final conditions required for the generation of the
     /// non-rectangular loops.
-    SmallVector<Expr *, 4> FinalsConditions;
+    llvm::SmallVector<Expr *, 4> FinalsConditions;
     /// Init statement for all captured expressions.
     Stmt *PreInits;
 
@@ -1079,14 +1079,14 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   };
 
   /// Get the counters storage.
-  MutableArrayRef<Expr *> getCounters() {
+  llvm::MutableArrayRef<Expr *> getCounters() {
     auto **Storage = reinterpret_cast<Expr **>(
         &Data->getChildren()[getArraysOffset(getDirectiveKind())]);
     return llvm::MutableArrayRef(Storage, getLoopsNumber());
   }
 
   /// Get the private counters storage.
-  MutableArrayRef<Expr *> getPrivateCounters() {
+  llvm::MutableArrayRef<Expr *> getPrivateCounters() {
     auto **Storage = reinterpret_cast<Expr **>(
         &Data->getChildren()[getArraysOffset(getDirectiveKind()) +
                              getLoopsNumber()]);
@@ -1094,7 +1094,7 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   }
 
   /// Get the updates storage.
-  MutableArrayRef<Expr *> getInits() {
+  llvm::MutableArrayRef<Expr *> getInits() {
     auto **Storage = reinterpret_cast<Expr **>(
         &Data->getChildren()[getArraysOffset(getDirectiveKind()) +
                              2 * getLoopsNumber()]);
@@ -1102,7 +1102,7 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   }
 
   /// Get the updates storage.
-  MutableArrayRef<Expr *> getUpdates() {
+  llvm::MutableArrayRef<Expr *> getUpdates() {
     auto **Storage = reinterpret_cast<Expr **>(
         &Data->getChildren()[getArraysOffset(getDirectiveKind()) +
                              3 * getLoopsNumber()]);
@@ -1110,7 +1110,7 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   }
 
   /// Get the final counter updates storage.
-  MutableArrayRef<Expr *> getFinals() {
+  llvm::MutableArrayRef<Expr *> getFinals() {
     auto **Storage = reinterpret_cast<Expr **>(
         &Data->getChildren()[getArraysOffset(getDirectiveKind()) +
                              4 * getLoopsNumber()]);
@@ -1118,7 +1118,7 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   }
 
   /// Get the dependent counters storage.
-  MutableArrayRef<Expr *> getDependentCounters() {
+  llvm::MutableArrayRef<Expr *> getDependentCounters() {
     auto **Storage = reinterpret_cast<Expr **>(
         &Data->getChildren()[getArraysOffset(getDirectiveKind()) +
                              5 * getLoopsNumber()]);
@@ -1126,7 +1126,7 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   }
 
   /// Get the dependent inits storage.
-  MutableArrayRef<Expr *> getDependentInits() {
+  llvm::MutableArrayRef<Expr *> getDependentInits() {
     auto **Storage = reinterpret_cast<Expr **>(
         &Data->getChildren()[getArraysOffset(getDirectiveKind()) +
                              6 * getLoopsNumber()]);
@@ -1134,7 +1134,7 @@ class OMPLoopDirective : public OMPLoopBasedDirective {
   }
 
   /// Get the finals conditions storage.
-  MutableArrayRef<Expr *> getFinalsConditions() {
+  llvm::MutableArrayRef<Expr *> getFinalsConditions() {
     auto **Storage = reinterpret_cast<Expr **>(
         &Data->getChildren()[getArraysOffset(getDirectiveKind()) +
                              7 * getLoopsNumber()]);
@@ -1320,14 +1320,14 @@ protected:
     Data->getChildren()[CombinedParForInDistConditionOffset] =
         CombParForInDistCond;
   }
-  void setCounters(ArrayRef<Expr *> A);
-  void setPrivateCounters(ArrayRef<Expr *> A);
-  void setInits(ArrayRef<Expr *> A);
-  void setUpdates(ArrayRef<Expr *> A);
-  void setFinals(ArrayRef<Expr *> A);
-  void setDependentCounters(ArrayRef<Expr *> A);
-  void setDependentInits(ArrayRef<Expr *> A);
-  void setFinalsConditions(ArrayRef<Expr *> A);
+  void setCounters(llvm::ArrayRef<Expr *> A);
+  void setPrivateCounters(llvm::ArrayRef<Expr *> A);
+  void setInits(llvm::ArrayRef<Expr *> A);
+  void setUpdates(llvm::ArrayRef<Expr *> A);
+  void setFinals(llvm::ArrayRef<Expr *> A);
+  void setDependentCounters(llvm::ArrayRef<Expr *> A);
+  void setDependentInits(llvm::ArrayRef<Expr *> A);
+  void setFinalsConditions(llvm::ArrayRef<Expr *> A);
 
 public:
   Expr *getIterationVariable() const {
@@ -1483,51 +1483,51 @@ public:
     return const_cast<OMPLoopDirective *>(this)->getBody();
   }
 
-  ArrayRef<Expr *> counters() { return getCounters(); }
+  llvm::ArrayRef<Expr *> counters() { return getCounters(); }
 
-  ArrayRef<Expr *> counters() const {
+  llvm::ArrayRef<Expr *> counters() const {
     return const_cast<OMPLoopDirective *>(this)->getCounters();
   }
 
-  ArrayRef<Expr *> private_counters() { return getPrivateCounters(); }
+  llvm::ArrayRef<Expr *> private_counters() { return getPrivateCounters(); }
 
-  ArrayRef<Expr *> private_counters() const {
+  llvm::ArrayRef<Expr *> private_counters() const {
     return const_cast<OMPLoopDirective *>(this)->getPrivateCounters();
   }
 
-  ArrayRef<Expr *> inits() { return getInits(); }
+  llvm::ArrayRef<Expr *> inits() { return getInits(); }
 
-  ArrayRef<Expr *> inits() const {
+  llvm::ArrayRef<Expr *> inits() const {
     return const_cast<OMPLoopDirective *>(this)->getInits();
   }
 
-  ArrayRef<Expr *> updates() { return getUpdates(); }
+  llvm::ArrayRef<Expr *> updates() { return getUpdates(); }
 
-  ArrayRef<Expr *> updates() const {
+  llvm::ArrayRef<Expr *> updates() const {
     return const_cast<OMPLoopDirective *>(this)->getUpdates();
   }
 
-  ArrayRef<Expr *> finals() { return getFinals(); }
+  llvm::ArrayRef<Expr *> finals() { return getFinals(); }
 
-  ArrayRef<Expr *> finals() const {
+  llvm::ArrayRef<Expr *> finals() const {
     return const_cast<OMPLoopDirective *>(this)->getFinals();
   }
 
-  ArrayRef<Expr *> dependent_counters() { return getDependentCounters(); }
+  llvm::ArrayRef<Expr *> dependent_counters() { return getDependentCounters(); }
 
-  ArrayRef<Expr *> dependent_counters() const {
+  llvm::ArrayRef<Expr *> dependent_counters() const {
     return const_cast<OMPLoopDirective *>(this)->getDependentCounters();
   }
 
-  ArrayRef<Expr *> dependent_inits() { return getDependentInits(); }
+  llvm::ArrayRef<Expr *> dependent_inits() { return getDependentInits(); }
 
-  ArrayRef<Expr *> dependent_inits() const {
+  llvm::ArrayRef<Expr *> dependent_inits() const {
     return const_cast<OMPLoopDirective *>(this)->getDependentInits();
   }
 
-  ArrayRef<Expr *> finals_conditions() { return getFinalsConditions(); }
+  llvm::ArrayRef<Expr *> finals_conditions() { return getFinalsConditions(); }
 
-  ArrayRef<Expr *> finals_conditions() const {
+  llvm::ArrayRef<Expr *> finals_conditions() const {
     return const_cast<OMPLoopDirective *>(this)->getFinalsConditions();
   }
 
@@ -1617,7 +1617,7 @@ public:
   ///
   static OMPSimdDirective *Create(const ASTContext &C, SourceLocation StartLoc,
                                   SourceLocation EndLoc, unsigned CollapsedNum,
-                                  ArrayRef<OMPClause *> Clauses,
+                                  llvm::ArrayRef<OMPClause *> Clauses,
                                   Stmt *AssociatedStmt,
                                   const HelperExprs &Exprs,
                                   OpenMPDirectiveKind ParamPrevMappedDirective);
@@ -1696,7 +1696,7 @@ public:
   ///
   static OMPForDirective *Create(const ASTContext &C, SourceLocation StartLoc,
                                  SourceLocation EndLoc, unsigned CollapsedNum,
-                                 ArrayRef<OMPClause *> Clauses,
+                                 llvm::ArrayRef<OMPClause *> Clauses,
                                  Stmt *AssociatedStmt, const HelperExprs &Exprs,
                                  Expr *TaskRedRef, bool HasCancel,
                                  OpenMPDirectiveKind ParamPrevMappedDirective);
@@ -1772,7 +1772,7 @@ public:
   ///
   static OMPForSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place
@@ -1843,7 +1843,7 @@ public:
   ///
   static OMPSectionsDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef,
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef,
          bool HasCancel);
 
   /// Creates an empty directive with the place for \a NumClauses
@@ -1967,7 +1967,7 @@ public:
   ///
   static OMPScopeDirective *Create(const ASTContext &C, SourceLocation StartLoc,
                                    SourceLocation EndLoc,
-                                   ArrayRef<OMPClause *> Clauses,
+                                   llvm::ArrayRef<OMPClause *> Clauses,
                                    Stmt *AssociatedStmt);
 
   /// Creates an empty directive.
@@ -2019,7 +2019,7 @@ public:
   ///
   static OMPSingleDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
 
   /// Creates an empty directive with the place for \a NumClauses
   /// clauses.
@@ -2132,7 +2132,7 @@ public:
   static OMPCriticalDirective *
   Create(const ASTContext &C, const DeclarationNameInfo &Name,
          SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
 
   /// Creates an empty directive.
   ///
@@ -2213,7 +2213,7 @@ public:
   ///
   static OMPParallelForDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs, Expr *TaskRedRef,
          bool HasCancel);
 
@@ -2294,7 +2294,7 @@ public:
   ///
   static OMPParallelForSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place
@@ -2352,7 +2352,7 @@ public:
   ///
   static OMPParallelMasterDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef);
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef);
 
   /// Creates an empty directive with the place for \a NumClauses
   /// clauses.
@@ -2415,7 +2415,7 @@ public:
   ///
   static OMPParallelMaskedDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef);
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef);
 
   /// Creates an empty directive with the place for \a NumClauses
   /// clauses.
@@ -2493,7 +2493,7 @@ public:
   ///
   static OMPParallelSectionsDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef,
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef,
          bool HasCancel);
 
   /// Creates an empty directive with the place for \a NumClauses
@@ -2566,7 +2566,7 @@ public:
   ///
   static OMPTaskDirective *Create(const ASTContext &C, SourceLocation StartLoc,
                                   SourceLocation EndLoc,
-                                  ArrayRef<OMPClause *> Clauses,
+                                  llvm::ArrayRef<OMPClause *> Clauses,
                                   Stmt *AssociatedStmt, bool HasCancel);
 
   /// Creates an empty directive with the place for \a NumClauses
@@ -2714,7 +2714,7 @@ public:
   static OMPTaskwaitDirective *Create(const ASTContext &C,
                                       SourceLocation StartLoc,
                                       SourceLocation EndLoc,
-                                      ArrayRef<OMPClause *> Clauses);
+                                      llvm::ArrayRef<OMPClause *> Clauses);
 
   /// Creates an empty directive.
   ///
@@ -2769,7 +2769,7 @@ public:
   ///
   static OMPTaskgroupDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt,
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt,
          Expr *ReductionRef);
 
   /// Creates an empty directive.
@@ -2831,7 +2831,7 @@ public:
   ///
   static OMPFlushDirective *Create(const ASTContext &C, SourceLocation StartLoc,
                                    SourceLocation EndLoc,
-                                   ArrayRef<OMPClause *> Clauses);
+                                   llvm::ArrayRef<OMPClause *> Clauses);
 
   /// Creates an empty directive with the place for \a NumClauses
   /// clauses.
@@ -2884,7 +2884,7 @@ public:
   static OMPDepobjDirective *Create(const ASTContext &C,
                                     SourceLocation StartLoc,
                                     SourceLocation EndLoc,
-                                    ArrayRef<OMPClause *> Clauses);
+                                    llvm::ArrayRef<OMPClause *> Clauses);
 
   /// Creates an empty directive with the place for \a NumClauses
   /// clauses.
@@ -2936,7 +2936,7 @@ public:
   ///
   static OMPOrderedDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
 
   /// Creates an empty directive.
   ///
@@ -3076,7 +3076,7 @@ public:
   static OMPAtomicDirective *Create(const ASTContext &C,
                                     SourceLocation StartLoc,
                                     SourceLocation EndLoc,
-                                    ArrayRef<OMPClause *> Clauses,
+                                    llvm::ArrayRef<OMPClause *> Clauses,
                                     Stmt *AssociatedStmt, Expressions Exprs);
 
   /// Creates an empty directive with the place for \a NumClauses
@@ -3194,7 +3194,7 @@ public:
   ///
   static OMPTargetDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
 
   /// Creates an empty directive with the place for \a NumClauses
   /// clauses.
@@ -3249,7 +3249,7 @@ public:
   ///
   static OMPTargetDataDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
 
   /// Creates an empty directive with the place for \a N clauses.
   ///
@@ -3304,7 +3304,7 @@ public:
   ///
   static OMPTargetEnterDataDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
 
   /// Creates an empty directive with the place for \a N clauses.
   ///
@@ -3359,7 +3359,7 @@ public:
   ///
   static OMPTargetExitDataDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
 
   /// Creates an empty directive with the place for \a N clauses.
   ///
@@ -3424,7 +3424,7 @@ public:
   ///
   static OMPTargetParallelDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef,
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt, Expr *TaskRedRef,
          bool HasCancel);
 
   /// Creates an empty directive with the place for \a NumClauses
@@ -3515,7 +3515,7 @@ public:
   ///
   static OMPTargetParallelForDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs, Expr *TaskRedRef,
          bool HasCancel);
 
@@ -3586,7 +3586,7 @@ public:
   ///
   static OMPTeamsDirective *Create(const ASTContext &C, SourceLocation StartLoc,
                                    SourceLocation EndLoc,
-                                   ArrayRef<OMPClause *> Clauses,
+                                   llvm::ArrayRef<OMPClause *> Clauses,
                                    Stmt *AssociatedStmt);
 
   /// Creates an empty directive with the place for \a NumClauses
@@ -3701,7 +3701,7 @@ public:
   ///
   static OMPCancelDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, OpenMPDirectiveKind CancelRegion);
+         llvm::ArrayRef<OMPClause *> Clauses, OpenMPDirectiveKind CancelRegion);
 
   /// Creates an empty directive.
   ///
@@ -3770,7 +3770,7 @@ public:
   ///
   static OMPTaskLoopDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs, bool HasCancel);
 
   /// Creates an empty directive with the place
@@ -3838,7 +3838,7 @@ public:
   ///
   static OMPTaskLoopSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place
@@ -3911,7 +3911,7 @@ public:
   ///
   static OMPMasterTaskLoopDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs, bool HasCancel);
 
   /// Creates an empty directive with the place
@@ -3987,7 +3987,7 @@ public:
   ///
   static OMPMaskedTaskLoopDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs, bool HasCancel);
 
   /// Creates an empty directive with the place
@@ -4056,7 +4056,7 @@ public:
   ///
   static OMPMasterTaskLoopSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place for \p NumClauses clauses.
@@ -4121,7 +4121,7 @@ public:
   ///
   static OMPMaskedTaskLoopSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place for \p NumClauses clauses.
@@ -4195,7 +4195,7 @@ public:
   ///
   static OMPParallelMasterTaskLoopDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs, bool HasCancel);
 
   /// Creates an empty directive with the place
@@ -4273,7 +4273,7 @@ public:
   ///
   static OMPParallelMaskedTaskLoopDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs, bool HasCancel);
 
   /// Creates an empty directive with the place
@@ -4344,7 +4344,7 @@ public:
   ///
   static OMPParallelMasterTaskLoopSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place
@@ -4411,7 +4411,7 @@ public:
   ///
   static OMPParallelMaskedTaskLoopSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place
@@ -4476,7 +4476,7 @@ public:
   ///
   static OMPDistributeDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs,
          OpenMPDirectiveKind ParamPrevMappedDirective);
 
@@ -4536,7 +4536,7 @@ public:
   ///
   static OMPTargetUpdateDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
 
   /// Creates an empty directive with the place for \a NumClauses
   /// clauses.
@@ -4614,7 +4614,7 @@ public:
   ///
   static OMPDistributeParallelForDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs, Expr *TaskRedRef,
          bool HasCancel);
 
@@ -4696,7 +4696,7 @@ public:
   ///
   static OMPDistributeParallelForSimdDirective *Create(
       const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-      unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+      unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
       Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place for \a NumClauses clauses.
@@ -4760,7 +4760,7 @@ public:
   ///
   static OMPDistributeSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place for \a NumClauses clauses.
@@ -4827,7 +4827,7 @@ public:
   ///
   static OMPTargetParallelForSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place for \a NumClauses clauses.
@@ -4893,7 +4893,7 @@ public:
   ///
   static OMPTargetSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place for \a NumClauses clauses.
@@ -4958,7 +4958,7 @@ public:
   ///
   static OMPTeamsDistributeDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place for \a NumClauses clauses.
@@ -5024,7 +5024,7 @@ public:
   ///
   static OMPTeamsDistributeSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place
@@ -5093,7 +5093,7 @@ public:
   ///
   static OMPTeamsDistributeParallelForSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place for \a NumClauses clauses.
@@ -5173,7 +5173,7 @@ public:
   ///
   static OMPTeamsDistributeParallelForDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs, Expr *TaskRedRef,
          bool HasCancel);
 
@@ -5245,7 +5245,7 @@ public:
   static OMPTargetTeamsDirective *Create(const ASTContext &C,
                                          SourceLocation StartLoc,
                                          SourceLocation EndLoc,
-                                         ArrayRef<OMPClause *> Clauses,
+                                         llvm::ArrayRef<OMPClause *> Clauses,
                                          Stmt *AssociatedStmt);
 
   /// Creates an empty directive with the place for \a NumClauses clauses.
@@ -5308,7 +5308,7 @@ public:
   ///
   static OMPTargetTeamsDistributeDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place for \a NumClauses clauses.
@@ -5390,7 +5390,7 @@ public:
   ///
   static OMPTargetTeamsDistributeParallelForDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs, Expr *TaskRedRef,
          bool HasCancel);
 
@@ -5476,7 +5476,7 @@ public:
   ///
   static OMPTargetTeamsDistributeParallelForSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place for \a NumClauses clauses.
@@ -5543,7 +5543,7 @@ public:
   ///
   static OMPTargetTeamsDistributeSimdDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place for \a NumClauses clauses.
@@ -5603,7 +5603,7 @@ public:
   /// \param PreInits Helper preinits statements for the loop nest.
   static OMPTileDirective *Create(const ASTContext &C, SourceLocation StartLoc,
                                   SourceLocation EndLoc,
-                                  ArrayRef<OMPClause *> Clauses,
+                                  llvm::ArrayRef<OMPClause *> Clauses,
                                   unsigned NumLoops, Stmt *AssociatedStmt,
                                   Stmt *TransformedStmt, Stmt *PreInits);
 
@@ -5682,7 +5682,7 @@ public:
   /// \param PreInits   Helper preinits statements for the loop nest.
   static OMPUnrollDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt,
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt,
          unsigned NumGeneratedLoops, Stmt *TransformedStmt, Stmt *PreInits);
 
   /// Build an empty '#pragma omp unroll' AST node for deserialization.
@@ -5747,7 +5747,7 @@ public:
   ///
   static OMPScanDirective *Create(const ASTContext &C, SourceLocation StartLoc,
                                   SourceLocation EndLoc,
-                                  ArrayRef<OMPClause *> Clauses);
+                                  llvm::ArrayRef<OMPClause *> Clauses);
 
   /// Creates an empty directive with the place for \a NumClauses
   /// clauses.
@@ -5802,7 +5802,7 @@ public:
   static OMPInteropDirective *Create(const ASTContext &C,
                                      SourceLocation StartLoc,
                                      SourceLocation EndLoc,
-                                     ArrayRef<OMPClause *> Clauses);
+                                     llvm::ArrayRef<OMPClause *> Clauses);
 
   /// Creates an empty directive.
   ///
@@ -5862,7 +5862,7 @@ public:
   ///
   static OMPDispatchDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt,
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt,
          SourceLocation TargetCallLoc);
 
   /// Creates an empty directive with the place for \a NumClauses
@@ -5918,7 +5918,7 @@ public:
   ///
   static OMPMaskedDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
+         llvm::ArrayRef<OMPClause *> Clauses, Stmt *AssociatedStmt);
 
   /// Creates an empty directive.
   ///
@@ -5959,7 +5959,7 @@ class OMPMetaDirective final : public OMPExecutableDirective {
 public:
   static OMPMetaDirective *Create(const ASTContext &C, SourceLocation StartLoc,
                                   SourceLocation EndLoc,
-                                  ArrayRef<OMPClause *> Clauses,
+                                  llvm::ArrayRef<OMPClause *> Clauses,
                                   Stmt *AssociatedStmt, Stmt *IfStmt);
   static OMPMetaDirective *CreateEmpty(const ASTContext &C, unsigned NumClauses,
                                        EmptyShell);
@@ -6014,7 +6014,7 @@ public:
   ///
   static OMPGenericLoopDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with a place for \a NumClauses clauses.
@@ -6078,7 +6078,7 @@ public:
   ///
   static OMPTeamsGenericLoopDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place
@@ -6149,7 +6149,7 @@ public:
   ///
   static OMPTargetTeamsGenericLoopDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs, bool CanBeParallelFor);
 
   /// Creates an empty directive with the place
@@ -6218,7 +6218,7 @@ public:
   ///
   static OMPParallelGenericLoopDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place
@@ -6284,7 +6284,7 @@ public:
   ///
   static OMPTargetParallelGenericLoopDirective *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
-         unsigned CollapsedNum, ArrayRef<OMPClause *> Clauses,
+         unsigned CollapsedNum, llvm::ArrayRef<OMPClause *> Clauses,
          Stmt *AssociatedStmt, const HelperExprs &Exprs);
 
   /// Creates an empty directive with the place
@@ -6334,7 +6334,7 @@ public:
   ///
   static OMPErrorDirective *Create(const ASTContext &C, SourceLocation StartLoc,
                                    SourceLocation EndLoc,
-                                   ArrayRef<OMPClause *> Clauses);
+                                   llvm::ArrayRef<OMPClause *> Clauses);
 
   /// Creates an empty directive.
   ///

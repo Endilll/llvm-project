@@ -69,7 +69,7 @@ private:
   }
 
 protected:
-  IncludeStructure::HeaderID getID(StringRef Filename,
+  IncludeStructure::HeaderID getID(llvm::StringRef Filename,
                                    IncludeStructure &Includes) {
     auto &SM = Clang->getSourceManager();
     auto Entry = SM.getFileManager().getFileRef(Filename);
@@ -268,7 +268,7 @@ TEST_F(HeadersTest, IncludedFilesGraph) {
 
   auto Includes = collectIncludes();
   llvm::DenseMap<IncludeStructure::HeaderID,
-                 SmallVector<IncludeStructure::HeaderID>>
+                 llvm::SmallVector<IncludeStructure::HeaderID>>
       Expected = {{getID(MainFile, Includes),
                    {getID(BarHeader, Includes), getID(FooHeader, Includes)}},
                   {getID(FooHeader, Includes),

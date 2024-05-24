@@ -40,7 +40,7 @@ void solaris::Assembler::ConstructJob(Compilation &C, const JobAction &JA,
 bool solaris::isLinkerGnuLd(const ToolChain &TC, const ArgList &Args) {
   // Only used if targetting Solaris.
   const Arg *A = Args.getLastArg(options::OPT_fuse_ld_EQ);
-  StringRef UseLinker = A ? A->getValue() : CLANG_DEFAULT_LINKER;
+  llvm::StringRef UseLinker = A ? A->getValue() : CLANG_DEFAULT_LINKER;
   return UseLinker == "bfd" || UseLinker == "gld";
 }
 
@@ -57,7 +57,7 @@ static bool getPIE(const ArgList &Args, const ToolChain &TC) {
 std::string solaris::Linker::getLinkerPath(const ArgList &Args) const {
   const ToolChain &ToolChain = getToolChain();
   if (const Arg *A = Args.getLastArg(options::OPT_fuse_ld_EQ)) {
-    StringRef UseLinker = A->getValue();
+    llvm::StringRef UseLinker = A->getValue();
     if (!UseLinker.empty()) {
       if (llvm::sys::path::is_absolute(UseLinker) &&
           llvm::sys::fs::can_execute(UseLinker))
@@ -290,7 +290,7 @@ void solaris::Linker::ConstructJob(Compilation &C, const JobAction &JA,
                                          Exec, CmdArgs, Inputs, Output));
 }
 
-static StringRef getSolarisLibSuffix(const llvm::Triple &Triple) {
+static llvm::StringRef getSolarisLibSuffix(const llvm::Triple &Triple) {
   switch (Triple.getArch()) {
   case llvm::Triple::x86:
   case llvm::Triple::sparc:
@@ -312,7 +312,7 @@ Solaris::Solaris(const Driver &D, const llvm::Triple &Triple,
 
   GCCInstallation.init(Triple, Args);
 
-  StringRef LibSuffix = getSolarisLibSuffix(Triple);
+  llvm::StringRef LibSuffix = getSolarisLibSuffix(Triple);
   path_list &Paths = getFilePaths();
   if (GCCInstallation.isValid()) {
     // On Solaris gcc uses both an architecture-specific path with triple in it
@@ -326,7 +326,7 @@ Solaris::Solaris(const Driver &D, const llvm::Triple &Triple,
 
   // If we are currently running Clang inside of the requested system root,
   // add its parent library path to those searched.
-  if (StringRef(D.Dir).starts_with(D.SysRoot))
+  if (llvm::StringRef(D.Dir).starts_with(D.SysRoot))
     addPathIfExists(D, D.Dir + "/../lib", Paths);
 
   addPathIfExists(D, D.SysRoot + "/usr/lib" + LibSuffix, Paths);
@@ -369,7 +369,7 @@ void Solaris::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     addSystemInclude(DriverArgs, CC1Args, D.SysRoot + "/usr/local/include");
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> P(D.ResourceDir);
+    llvm::SmallString<128> P(D.ResourceDir);
     llvm::sys::path::append(P, "include");
     addSystemInclude(DriverArgs, CC1Args, P);
   }
@@ -378,13 +378,13 @@ void Solaris::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   // Check for configure-time C include directories.
-  StringRef CIncludeDirs(C_INCLUDE_DIRS);
+  llvm::StringRef CIncludeDirs(C_INCLUDE_DIRS);
   if (CIncludeDirs != "") {
-    SmallVector<StringRef, 5> dirs;
+    llvm::SmallVector<llvm::StringRef, 5> dirs;
     CIncludeDirs.split(dirs, ":");
-    for (StringRef dir : dirs) {
-      StringRef Prefix =
-          llvm::sys::path::is_absolute(dir) ? "" : StringRef(D.SysRoot);
+    for (llvm::StringRef dir : dirs) {
+      llvm::StringRef Prefix =
+          llvm::sys::path::is_absolute(dir) ? "" : llvm::StringRef(D.SysRoot);
       addExternCSystemInclude(DriverArgs, CC1Args, Prefix + dir);
     }
     return;
@@ -415,8 +415,8 @@ void Solaris::addLibStdCxxIncludePaths(
   // By default, look for the C++ headers in an include directory adjacent to
   // the lib directory of the GCC installation.
   // On Solaris this usually looks like /usr/gcc/X.Y/include/c++/X.Y.Z
-  StringRef LibDir = GCCInstallation.getParentLibPath();
-  StringRef TripleStr = GCCInstallation.getTriple().str();
+  llvm::StringRef LibDir = GCCInstallation.getParentLibPath();
+  llvm::StringRef TripleStr = GCCInstallation.getTriple().str();
   const Multilib &Multilib = GCCInstallation.getMultilib();
   const GCCVersion &Version = GCCInstallation.getVersion();
 

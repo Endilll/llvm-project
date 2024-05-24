@@ -40,7 +40,7 @@ struct BuiltinTypeDeclBuilder {
     Template = Record->getDescribedClassTemplate();
   }
 
-  BuiltinTypeDeclBuilder(Sema &S, NamespaceDecl *Namespace, StringRef Name)
+  BuiltinTypeDeclBuilder(Sema &S, NamespaceDecl *Namespace, llvm::StringRef Name)
       : HLSLNamespace(Namespace) {
     ASTContext &AST = S.getASTContext();
     IdentifierInfo &II = AST.Idents.get(Name, tok::TokenKind::identifier);
@@ -80,7 +80,7 @@ struct BuiltinTypeDeclBuilder {
   }
 
   BuiltinTypeDeclBuilder &
-  addMemberVariable(StringRef Name, QualType Type,
+  addMemberVariable(llvm::StringRef Name, QualType Type,
                     AccessSpecifier Access = AccessSpecifier::AS_private) {
     if (Record->isCompleteDefinition())
       return *this;
@@ -125,7 +125,7 @@ struct BuiltinTypeDeclBuilder {
   }
 
   static DeclRefExpr *lookupBuiltinFunction(ASTContext &AST, Sema &S,
-                                            StringRef Name) {
+                                            llvm::StringRef Name) {
     IdentifierInfo &II = AST.Idents.get(Name, tok::TokenKind::identifier);
     DeclarationNameInfo NameInfo =
         DeclarationNameInfo(DeclarationName(&II), SourceLocation());
@@ -310,7 +310,7 @@ struct BuiltinTypeDeclBuilder {
 
   TemplateParameterListBuilder addTemplateArgumentList(Sema &S);
   BuiltinTypeDeclBuilder &addSimpleTemplateParams(Sema &S,
-                                                  ArrayRef<StringRef> Names);
+                                                  llvm::ArrayRef<llvm::StringRef> Names);
 };
 
 struct TemplateParameterListBuilder {
@@ -324,7 +324,7 @@ struct TemplateParameterListBuilder {
   ~TemplateParameterListBuilder() { finalizeTemplateArgs(); }
 
   TemplateParameterListBuilder &
-  addTypeParameter(StringRef Name, QualType DefaultValue = QualType()) {
+  addTypeParameter(llvm::StringRef Name, QualType DefaultValue = QualType()) {
     if (Builder.Record->isCompleteDefinition())
       return *this;
     unsigned Position = static_cast<unsigned>(Params.size());
@@ -377,9 +377,9 @@ BuiltinTypeDeclBuilder::addTemplateArgumentList(Sema &S) {
 
 BuiltinTypeDeclBuilder &
 BuiltinTypeDeclBuilder::addSimpleTemplateParams(Sema &S,
-                                                ArrayRef<StringRef> Names) {
+                                                llvm::ArrayRef<llvm::StringRef> Names) {
   TemplateParameterListBuilder Builder = this->addTemplateArgumentList(S);
-  for (StringRef Name : Names)
+  for (llvm::StringRef Name : Names)
     Builder.addTypeParameter(Name);
   return Builder.finalizeTemplateArgs();
 }

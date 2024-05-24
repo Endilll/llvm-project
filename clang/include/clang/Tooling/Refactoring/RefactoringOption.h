@@ -30,9 +30,9 @@ public:
   /// Returns the name of the refactoring option.
   ///
   /// Each refactoring option must have a unique name.
-  virtual StringRef getName() const = 0;
+  virtual llvm::StringRef getName() const = 0;
 
-  virtual StringRef getDescription() const = 0;
+  virtual llvm::StringRef getDescription() const = 0;
 
   /// True when this option must be specified before invoking the refactoring
   /// action.

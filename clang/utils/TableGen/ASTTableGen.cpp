@@ -31,11 +31,11 @@ llvm::StringRef clang::tblgen::HasProperties::getName() const {
   }
 }
 
-static StringRef removeExpectedNodeNameSuffix(Record *node, StringRef suffix) {
-  StringRef nodeName = node->getName();
+static llvm::StringRef removeExpectedNodeNameSuffix(Record *node, llvm::StringRef suffix) {
+  llvm::StringRef nodeName = node->getName();
   if (!nodeName.ends_with(suffix)) {
     PrintFatalError(node->getLoc(),
-                    Twine("name of node doesn't end in ") + suffix);
+                    llvm::Twine("name of node doesn't end in ") + suffix);
   }
   return nodeName.drop_back(suffix.size());
 }
@@ -44,18 +44,18 @@ static StringRef removeExpectedNodeNameSuffix(Record *node, StringRef suffix) {
 // be somewhat annoying to fix now.  Conveniently, this means the ID matches
 // is exactly the node name, and the class name is simply that plus Decl.
 std::string clang::tblgen::DeclNode::getClassName() const {
-  return (Twine(getName()) + "Decl").str();
+  return (llvm::Twine(getName()) + "Decl").str();
 }
-StringRef clang::tblgen::DeclNode::getId() const {
+llvm::StringRef clang::tblgen::DeclNode::getId() const {
   return getName();
 }
 
 // Type nodes are all named ending in Type, just like the corresponding
 // C++ class, and the ID just strips this suffix.
-StringRef clang::tblgen::TypeNode::getClassName() const {
+llvm::StringRef clang::tblgen::TypeNode::getClassName() const {
   return getName();
 }
-StringRef clang::tblgen::TypeNode::getId() const {
+llvm::StringRef clang::tblgen::TypeNode::getId() const {
   return removeExpectedNodeNameSuffix(getRecord(), "Type");
 }
 
@@ -64,15 +64,15 @@ StringRef clang::tblgen::TypeNode::getId() const {
 // and *many* expressions end in Expr, but there are also several
 // core expression classes like IntegerLiteral and BinaryOperator with
 // no standard suffix).  The ID adds "Class" for historical reasons.
-StringRef clang::tblgen::StmtNode::getClassName() const {
+llvm::StringRef clang::tblgen::StmtNode::getClassName() const {
   return getName();
 }
 std::string clang::tblgen::StmtNode::getId() const {
-  return (Twine(getName()) + "Class").str();
+  return (llvm::Twine(getName()) + "Class").str();
 }
 
 /// Emit a string spelling out the C++ value type.
-void PropertyType::emitCXXValueTypeName(bool forRead, raw_ostream &out) const {
+void PropertyType::emitCXXValueTypeName(bool forRead, llvm::raw_ostream &out) const {
   if (!isGenericSpecialization()) {
     if (!forRead && isConstWhenWriting())
       out << "const ";
@@ -106,11 +106,11 @@ static void visitASTNodeRecursive(ASTNode node, ASTNode base,
 }
 
 static void visitHierarchy(RecordKeeper &records,
-                           StringRef nodeClassName,
+                           llvm::StringRef nodeClassName,
                            ASTNodeHierarchyVisitor<ASTNode> visit) {
   // Check for the node class, just as a basic correctness check.
   if (!records.getClass(nodeClassName)) {
-    PrintFatalError(Twine("cannot find definition for node class ")
+    PrintFatalError(llvm::Twine("cannot find definition for node class ")
                       + nodeClassName);
   }
 
@@ -130,14 +130,14 @@ static void visitHierarchy(RecordKeeper &records,
       root = node;
   }
   if (!root)
-    PrintFatalError(Twine("no root node in ") + nodeClassName + " hierarchy");
+    PrintFatalError(llvm::Twine("no root node in ") + nodeClassName + " hierarchy");
 
   // Now visit the map recursively, starting at the root node.
   visitASTNodeRecursive(root, ASTNode(), hierarchy, visit);
 }
 
 void clang::tblgen::visitASTNodeHierarchyImpl(RecordKeeper &records,
-                                              StringRef nodeClassName,
+                                              llvm::StringRef nodeClassName,
                                       ASTNodeHierarchyVisitor<ASTNode> visit) {
   visitHierarchy(records, nodeClassName, visit);
 }

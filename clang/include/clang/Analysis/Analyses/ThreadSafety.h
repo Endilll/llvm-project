@@ -98,7 +98,7 @@ enum LockErrorKind {
 /// Handler class for thread safety warnings.
 class ThreadSafetyHandler {
 public:
-  using Name = StringRef;
+  using Name = llvm::StringRef;
 
   ThreadSafetyHandler() = default;
   virtual ~ThreadSafetyHandler();
@@ -110,36 +110,36 @@ public:
   /// Warn about unlock function calls that do not have a prior matching lock
   /// expression.
   /// \param Kind -- the capability's name parameter (role, mutex, etc).
-  /// \param LockName -- A StringRef name for the lock expression, to be printed
+  /// \param LockName -- A llvm::StringRef name for the lock expression, to be printed
   /// in the error message.
   /// \param Loc -- The SourceLocation of the Unlock
   /// \param LocPreviousUnlock -- If valid, the location of a previous Unlock.
-  virtual void handleUnmatchedUnlock(StringRef Kind, Name LockName,
+  virtual void handleUnmatchedUnlock(llvm::StringRef Kind, Name LockName,
                                      SourceLocation Loc,
                                      SourceLocation LocPreviousUnlock) {}
 
   /// Warn about an unlock function call that attempts to unlock a lock with
   /// the incorrect lock kind. For instance, a shared lock being unlocked
   /// exclusively, or vice versa.
-  /// \param LockName -- A StringRef name for the lock expression, to be printed
+  /// \param LockName -- A llvm::StringRef name for the lock expression, to be printed
   /// in the error message.
   /// \param Kind -- the capability's name parameter (role, mutex, etc).
   /// \param Expected -- the kind of lock expected.
   /// \param Received -- the kind of lock received.
   /// \param LocLocked -- The SourceLocation of the Lock.
   /// \param LocUnlock -- The SourceLocation of the Unlock.
-  virtual void handleIncorrectUnlockKind(StringRef Kind, Name LockName,
+  virtual void handleIncorrectUnlockKind(llvm::StringRef Kind, Name LockName,
                                          LockKind Expected, LockKind Received,
                                          SourceLocation LocLocked,
                                          SourceLocation LocUnlock) {}
 
   /// Warn about lock function calls for locks which are already held.
   /// \param Kind -- the capability's name parameter (role, mutex, etc).
-  /// \param LockName -- A StringRef name for the lock expression, to be printed
+  /// \param LockName -- A llvm::StringRef name for the lock expression, to be printed
   /// in the error message.
   /// \param LocLocked -- The location of the first lock expression.
   /// \param LocDoubleLock -- The location of the second lock expression.
-  virtual void handleDoubleLock(StringRef Kind, Name LockName,
+  virtual void handleDoubleLock(llvm::StringRef Kind, Name LockName,
                                 SourceLocation LocLocked,
                                 SourceLocation LocDoubleLock) {}
 
@@ -149,14 +149,14 @@ public:
   /// 2, or a mutex is only held at the start of some loop iterations,
   /// 3. or when a mutex is locked but not unlocked inside a function.
   /// \param Kind -- the capability's name parameter (role, mutex, etc).
-  /// \param LockName -- A StringRef name for the lock expression, to be printed
+  /// \param LockName -- A llvm::StringRef name for the lock expression, to be printed
   /// in the error message.
   /// \param LocLocked -- The location of the lock expression where the mutex is
   ///               locked
   /// \param LocEndOfScope -- The location of the end of the scope where the
   ///               mutex is no longer held
   /// \param LEK -- which of the three above cases we should warn for
-  virtual void handleMutexHeldEndOfScope(StringRef Kind, Name LockName,
+  virtual void handleMutexHeldEndOfScope(llvm::StringRef Kind, Name LockName,
                                          SourceLocation LocLocked,
                                          SourceLocation LocEndOfScope,
                                          LockErrorKind LEK) {}
@@ -165,11 +165,11 @@ public:
   /// example, if a mutex is locked exclusively during an if branch and shared
   /// during the else branch.
   /// \param Kind -- the capability's name parameter (role, mutex, etc).
-  /// \param LockName -- A StringRef name for the lock expression, to be printed
+  /// \param LockName -- A llvm::StringRef name for the lock expression, to be printed
   /// in the error message.
   /// \param Loc1 -- The location of the first lock expression.
   /// \param Loc2 -- The location of the second lock expression.
-  virtual void handleExclusiveAndShared(StringRef Kind, Name LockName,
+  virtual void handleExclusiveAndShared(llvm::StringRef Kind, Name LockName,
                                         SourceLocation Loc1,
                                         SourceLocation Loc2) {}
 
@@ -186,11 +186,11 @@ public:
   /// \param Kind -- the capability's name parameter (role, mutex, etc).
   /// \param D -- The decl for the protected variable or function
   /// \param POK -- The kind of protected operation (e.g. variable access)
-  /// \param LockName -- A StringRef name for the lock expression, to be printed
+  /// \param LockName -- A llvm::StringRef name for the lock expression, to be printed
   /// in the error message.
   /// \param LK -- The kind of access (i.e. read or write) that occurred
   /// \param Loc -- The location of the protected operation.
-  virtual void handleMutexNotHeld(StringRef Kind, const NamedDecl *D,
+  virtual void handleMutexNotHeld(llvm::StringRef Kind, const NamedDecl *D,
                                   ProtectedOperationKind POK, Name LockName,
                                   LockKind LK, SourceLocation Loc,
                                   Name *PossibleMatch = nullptr) {}
@@ -202,7 +202,7 @@ public:
   /// \param Neg -- The name of the negative capability to be printed in the
   /// diagnostic.
   /// \param Loc -- The location of the protected operation.
-  virtual void handleNegativeNotHeld(StringRef Kind, Name LockName, Name Neg,
+  virtual void handleNegativeNotHeld(llvm::StringRef Kind, Name LockName, Name Neg,
                                      SourceLocation Loc) {}
 
   /// Warn when calling a function that a negative capability is not held.
@@ -217,14 +217,14 @@ public:
   /// example, the mutex may be locked inside the function.
   /// \param Kind -- the capability's name parameter (role, mutex, etc).
   /// \param FunName -- The name of the function
-  /// \param LockName -- A StringRef name for the lock expression, to be printed
+  /// \param LockName -- A llvm::StringRef name for the lock expression, to be printed
   /// in the error message.
   /// \param Loc -- The location of the function call.
-  virtual void handleFunExcludesLock(StringRef Kind, Name FunName,
+  virtual void handleFunExcludesLock(llvm::StringRef Kind, Name FunName,
                                      Name LockName, SourceLocation Loc) {}
 
   /// Warn that L1 cannot be acquired before L2.
-  virtual void handleLockAcquiredBefore(StringRef Kind, Name L1Name,
+  virtual void handleLockAcquiredBefore(llvm::StringRef Kind, Name L1Name,
                                         Name L2Name, SourceLocation Loc) {}
 
   /// Warn that there is a cycle in acquired_before/after dependencies.

@@ -22,7 +22,7 @@ namespace utils {
 // can only run on one test case (e.g. wih one SourceManager).
 class InsertUsingCheck : public clang::tidy::ClangTidyCheck {
 public:
-  InsertUsingCheck(StringRef Name, ClangTidyContext *Context)
+  InsertUsingCheck(llvm::StringRef Name, ClangTidyContext *Context)
       :ClangTidyCheck(Name, Context) {}
   void registerMatchers(clang::ast_matchers::MatchFinder *Finder) override {
     Finder->addMatcher(clang::ast_matchers::callExpr().bind("foo"), this);
@@ -51,8 +51,8 @@ private:
 };
 
 template <typename Check>
-std::string runChecker(StringRef Code, unsigned ExpectedWarningCount) {
-  std::map<StringRef, StringRef> AdditionalFileContents = {{"foo.h",
+std::string runChecker(llvm::StringRef Code, unsigned ExpectedWarningCount) {
+  std::map<llvm::StringRef, llvm::StringRef> AdditionalFileContents = {{"foo.h",
                                                             "namespace foo {\n"
                                                             "namespace bar {\n"
                                                             "}\n"

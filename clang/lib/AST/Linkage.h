@@ -106,7 +106,7 @@ class LinkageComputer {
     CachedLinkageInfo[makeCacheKey(ND, Kind)] = Info;
   }
 
-  LinkageInfo getLVForTemplateArgumentList(ArrayRef<TemplateArgument> Args,
+  LinkageInfo getLVForTemplateArgumentList(llvm::ArrayRef<TemplateArgument> Args,
                                            LVComputationKind computation);
 
   LinkageInfo getLVForTemplateArgumentList(const TemplateArgumentList &TArgs,

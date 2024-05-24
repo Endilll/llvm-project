@@ -137,7 +137,7 @@ void TokenLexer::destroy() {
 }
 
 bool TokenLexer::MaybeRemoveCommaBeforeVaArgs(
-    SmallVectorImpl<Token> &ResultToks, bool HasPasteOperator, MacroInfo *Macro,
+    llvm::SmallVectorImpl<Token> &ResultToks, bool HasPasteOperator, MacroInfo *Macro,
     unsigned MacroArgNo, Preprocessor &PP) {
   // Is the macro argument __VA_ARGS__?
   if (!Macro->isVariadic() || MacroArgNo != Macro->getNumParams()-1)
@@ -187,14 +187,14 @@ bool TokenLexer::MaybeRemoveCommaBeforeVaArgs(
 }
 
 void TokenLexer::stringifyVAOPTContents(
-    SmallVectorImpl<Token> &ResultToks, const VAOptExpansionContext &VCtx,
+    llvm::SmallVectorImpl<Token> &ResultToks, const VAOptExpansionContext &VCtx,
     const SourceLocation VAOPTClosingParenLoc) {
   const int NumToksPriorToVAOpt = VCtx.getNumberOfTokensPriorToVAOpt();
   const unsigned int NumVAOptTokens = ResultToks.size() - NumToksPriorToVAOpt;
   Token *const VAOPTTokens =
       NumVAOptTokens ? &ResultToks[NumToksPriorToVAOpt] : nullptr;
 
-  SmallVector<Token, 64> ConcatenatedVAOPTResultToks;
+  llvm::SmallVector<Token, 64> ConcatenatedVAOPTResultToks;
   // FIXME: Should we keep track within VCtx that we did or didnot
   // encounter pasting - and only then perform this loop.
 
@@ -242,7 +242,7 @@ void TokenLexer::stringifyVAOPTContents(
 /// Expand the arguments of a function-like macro so that we can quickly
 /// return preexpanded tokens from Tokens.
 void TokenLexer::ExpandFunctionArguments() {
-  SmallVector<Token, 128> ResultToks;
+  llvm::SmallVector<Token, 128> ResultToks;
 
   // Loop through 'Tokens', expanding them into ResultToks.  Keep
   // track of whether we change anything.  If not, no need to keep them.  If so,
@@ -729,7 +729,7 @@ bool TokenLexer::pasteTokens(Token &Tok) {
 /// operator.  Read the ## and RHS, and paste the LHS/RHS together.  If there
 /// are more ## after it, chomp them iteratively.  Return the result as LHSTok.
 /// If this returns true, the caller should immediately return the token.
-bool TokenLexer::pasteTokens(Token &LHSTok, ArrayRef<Token> TokenStream,
+bool TokenLexer::pasteTokens(Token &LHSTok, llvm::ArrayRef<Token> TokenStream,
                              unsigned int &CurIdx) {
   assert(CurIdx > 0 && "## can not be the first token within tokens");
   assert((TokenStream[CurIdx].is(tok::hashhash) ||
@@ -745,7 +745,7 @@ bool TokenLexer::pasteTokens(Token &LHSTok, ArrayRef<Token> TokenStream,
       TokenStream[CurIdx - 2].is(tok::hashhash))
     LHSTok.clearFlag(Token::LeadingSpace);
 
-  SmallString<128> Buffer;
+  llvm::SmallString<128> Buffer;
   const char *ResultTokStrPtr = nullptr;
   SourceLocation StartLoc = LHSTok.getLocation();
   SourceLocation PasteOpLoc;

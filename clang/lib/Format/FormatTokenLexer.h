@@ -39,7 +39,7 @@ public:
                    llvm::SpecificBumpPtrAllocator<FormatToken> &Allocator,
                    IdentifierTable &IdentTable);
 
-  ArrayRef<FormatToken *> lex();
+  llvm::ArrayRef<FormatToken *> lex();
 
   const AdditionalKeywords &getKeywords() { return Keywords; }
 
@@ -59,11 +59,11 @@ private:
 
   // Merge the most recently lexed tokens into a single token if their kinds are
   // correct.
-  bool tryMergeTokens(ArrayRef<tok::TokenKind> Kinds, TokenType NewType);
+  bool tryMergeTokens(llvm::ArrayRef<tok::TokenKind> Kinds, TokenType NewType);
   // Merge without checking their kinds.
   bool tryMergeTokens(size_t Count, TokenType NewType);
   // Merge if their kinds match any one of Kinds.
-  bool tryMergeTokensAny(ArrayRef<ArrayRef<tok::TokenKind>> Kinds,
+  bool tryMergeTokensAny(llvm::ArrayRef<llvm::ArrayRef<tok::TokenKind>> Kinds,
                          TokenType NewType);
 
   // Returns \c true if \p Tok can only be followed by an operand in JavaScript.
@@ -125,7 +125,7 @@ private:
   llvm::SpecificBumpPtrAllocator<FormatToken> &Allocator;
   // Index (in 'Tokens') of the last token that starts a new line.
   unsigned FirstInLineIndex;
-  SmallVector<FormatToken *, 16> Tokens;
+  llvm::SmallVector<FormatToken *, 16> Tokens;
 
   llvm::SmallMapVector<IdentifierInfo *, TokenType, 8> Macros;
 

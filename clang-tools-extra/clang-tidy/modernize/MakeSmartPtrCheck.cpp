@@ -24,7 +24,7 @@ constexpr char NewExpression[] = "newExpression";
 
 std::string getNewExprName(const CXXNewExpr *NewExpr, const SourceManager &SM,
                            const LangOptions &Lang) {
-  StringRef WrittenName = Lexer::getSourceText(
+  llvm::StringRef WrittenName = Lexer::getSourceText(
       CharSourceRange::getTokenRange(
           NewExpr->getAllocatedTypeSourceInfo()->getTypeLoc().getSourceRange()),
       SM, Lang);
@@ -38,8 +38,8 @@ std::string getNewExprName(const CXXNewExpr *NewExpr, const SourceManager &SM,
 
 const char MakeSmartPtrCheck::PointerType[] = "pointerType";
 
-MakeSmartPtrCheck::MakeSmartPtrCheck(StringRef Name, ClangTidyContext *Context,
-                                     StringRef MakeSmartPtrFunctionName)
+MakeSmartPtrCheck::MakeSmartPtrCheck(llvm::StringRef Name, ClangTidyContext *Context,
+                                     llvm::StringRef MakeSmartPtrFunctionName)
     : ClangTidyCheck(Name, Context),
       Inserter(Options.getLocalOrGlobal("IncludeStyle",
                                         utils::IncludeSorter::IS_LLVM),
@@ -158,7 +158,7 @@ void MakeSmartPtrCheck::checkConstruct(SourceManager &SM, ASTContext *Ctx,
   }
 
   bool Invalid = false;
-  StringRef ExprStr = Lexer::getSourceText(
+  llvm::StringRef ExprStr = Lexer::getSourceText(
       CharSourceRange::getCharRange(
           ConstructCallStart, Construct->getParenOrBraceRange().getBegin()),
       SM, getLangOpts(), &Invalid);
@@ -180,7 +180,7 @@ void MakeSmartPtrCheck::checkConstruct(SourceManager &SM, ASTContext *Ctx,
   // Find the location of the template's left angle.
   size_t LAngle = ExprStr.find('<');
   SourceLocation ConstructCallEnd;
-  if (LAngle == StringRef::npos) {
+  if (LAngle == llvm::StringRef::npos) {
     // If the template argument is missing (because it is part of the alias)
     // we have to add it back.
     ConstructCallEnd = ConstructCallStart.getLocWithOffset(ExprStr.size());

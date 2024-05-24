@@ -153,8 +153,8 @@ static void addExtParameterInfosForCall(
 /// Adds the formal parameters in FPT to the given prefix. If any parameter in
 /// FPT has pass_object_size attrs, then we'll add parameters for those, too.
 static void appendParameterTypes(const CodeGenTypes &CGT,
-                                 SmallVectorImpl<CanQualType> &prefix,
-              SmallVectorImpl<FunctionProtoType::ExtParameterInfo> &paramInfos,
+                                 llvm::SmallVectorImpl<CanQualType> &prefix,
+              llvm::SmallVectorImpl<FunctionProtoType::ExtParameterInfo> &paramInfos,
                                  CanQual<FunctionProtoType> FPT) {
   // Fast path: don't touch param info if we don't need to.
   if (!FPT->hasExtParameterInfos()) {
@@ -186,9 +186,9 @@ static void appendParameterTypes(const CodeGenTypes &CGT,
 /// type, on top of any implicit parameters already stored.
 static const CGFunctionInfo &
 arrangeLLVMFunctionInfo(CodeGenTypes &CGT, bool instanceMethod,
-                        SmallVectorImpl<CanQualType> &prefix,
+                        llvm::SmallVectorImpl<CanQualType> &prefix,
                         CanQual<FunctionProtoType> FTP) {
-  SmallVector<FunctionProtoType::ExtParameterInfo, 16> paramInfos;
+  llvm::SmallVector<FunctionProtoType::ExtParameterInfo, 16> paramInfos;
   RequiredArgs Required = RequiredArgs::forPrototypePlus(FTP, prefix.size());
   // FIXME: Kill copy.
   appendParameterTypes(CGT, prefix, paramInfos, FTP);
@@ -204,7 +204,7 @@ arrangeLLVMFunctionInfo(CodeGenTypes &CGT, bool instanceMethod,
 /// given freestanding function type.
 const CGFunctionInfo &
 CodeGenTypes::arrangeFreeFunctionType(CanQual<FunctionProtoType> FTP) {
-  SmallVector<CanQualType, 16> argTypes;
+  llvm::SmallVector<CanQualType, 16> argTypes;
   return ::arrangeLLVMFunctionInfo(*this, /*instanceMethod=*/false, argTypes,
                                    FTP);
 }
@@ -279,7 +279,7 @@ const CGFunctionInfo &
 CodeGenTypes::arrangeCXXMethodType(const CXXRecordDecl *RD,
                                    const FunctionProtoType *FTP,
                                    const CXXMethodDecl *MD) {
-  SmallVector<CanQualType, 16> argTypes;
+  llvm::SmallVector<CanQualType, 16> argTypes;
 
   // Add the 'this' pointer.
   argTypes.push_back(DeriveThisType(RD, MD));
@@ -334,8 +334,8 @@ const CGFunctionInfo &
 CodeGenTypes::arrangeCXXStructorDeclaration(GlobalDecl GD) {
   auto *MD = cast<CXXMethodDecl>(GD.getDecl());
 
-  SmallVector<CanQualType, 16> argTypes;
-  SmallVector<FunctionProtoType::ExtParameterInfo, 16> paramInfos;
+  llvm::SmallVector<CanQualType, 16> argTypes;
+  llvm::SmallVector<FunctionProtoType::ExtParameterInfo, 16> paramInfos;
 
   const CXXRecordDecl *ThisType = TheCXXABI.getThisArgumentTypeForMethod(GD);
   argTypes.push_back(DeriveThisType(ThisType, MD));
@@ -381,17 +381,17 @@ CodeGenTypes::arrangeCXXStructorDeclaration(GlobalDecl GD) {
                                  argTypes, extInfo, paramInfos, required);
 }
 
-static SmallVector<CanQualType, 16>
+static llvm::SmallVector<CanQualType, 16>
 getArgTypesForCall(ASTContext &ctx, const CallArgList &args) {
-  SmallVector<CanQualType, 16> argTypes;
+  llvm::SmallVector<CanQualType, 16> argTypes;
   for (auto &arg : args)
     argTypes.push_back(ctx.getCanonicalParamType(arg.Ty));
   return argTypes;
 }
 
-static SmallVector<CanQualType, 16>
+static llvm::SmallVector<CanQualType, 16>
 getArgTypesForDeclaration(ASTContext &ctx, const FunctionArgList &args) {
-  SmallVector<CanQualType, 16> argTypes;
+  llvm::SmallVector<CanQualType, 16> argTypes;
   for (auto &arg : args)
     argTypes.push_back(ctx.getCanonicalParamType(arg->getType()));
   return argTypes;
@@ -423,7 +423,7 @@ CodeGenTypes::arrangeCXXConstructorCall(const CallArgList &args,
                                         unsigned ExtraSuffixArgs,
                                         bool PassProtoArgs) {
   // FIXME: Kill copy.
-  SmallVector<CanQualType, 16> ArgTypes;
+  llvm::SmallVector<CanQualType, 16> ArgTypes;
   for (const auto &Arg : args)
     ArgTypes.push_back(Context.getCanonicalParamType(Arg.Ty));
 
@@ -499,8 +499,8 @@ CodeGenTypes::arrangeObjCMethodDeclaration(const ObjCMethodDecl *MD) {
 const CGFunctionInfo &
 CodeGenTypes::arrangeObjCMessageSendSignature(const ObjCMethodDecl *MD,
                                               QualType receiverType) {
-  SmallVector<CanQualType, 16> argTys;
-  SmallVector<FunctionProtoType::ExtParameterInfo, 4> extParamInfos(
+  llvm::SmallVector<CanQualType, 16> argTys;
+  llvm::SmallVector<FunctionProtoType::ExtParameterInfo, 4> extParamInfos(
       MD->isDirectMethod() ? 1 : 2);
   argTys.push_back(Context.getCanonicalParamType(receiverType));
   if (!MD->isDirectMethod())
@@ -571,7 +571,7 @@ CodeGenTypes::arrangeMSCtorClosure(const CXXConstructorDecl *CD,
   assert(CT == Ctor_CopyingClosure || CT == Ctor_DefaultClosure);
 
   CanQual<FunctionProtoType> FTP = GetFormalType(CD);
-  SmallVector<CanQualType, 2> ArgTys;
+  llvm::SmallVector<CanQualType, 2> ArgTys;
   const CXXRecordDecl *RD = CD->getParent();
   ArgTys.push_back(DeriveThisType(RD, CD));
   if (CT == Ctor_CopyingClosure)
@@ -622,7 +622,7 @@ arrangeFreeFunctionLikeCall(CodeGenTypes &CGT,
   }
 
   // FIXME: Kill copy.
-  SmallVector<CanQualType, 16> argTypes;
+  llvm::SmallVector<CanQualType, 16> argTypes;
   for (const auto &arg : args)
     argTypes.push_back(CGT.getContext().getCanonicalParamType(arg.Ty));
   FnInfoOpts opts = chainCall ? FnInfoOpts::IsChainCall : FnInfoOpts::None;
@@ -668,7 +668,7 @@ const CGFunctionInfo &
 CodeGenTypes::arrangeBuiltinFunctionCall(QualType resultType,
                                          const CallArgList &args) {
   // FIXME: Kill copy.
-  SmallVector<CanQualType, 16> argTypes;
+  llvm::SmallVector<CanQualType, 16> argTypes;
   for (const auto &Arg : args)
     argTypes.push_back(Context.getCanonicalParamType(Arg.Ty));
   return arrangeLLVMFunctionInfo(GetReturnType(resultType), FnInfoOpts::None,
@@ -688,7 +688,7 @@ CodeGenTypes::arrangeBuiltinFunctionDeclaration(QualType resultType,
 
 const CGFunctionInfo &
 CodeGenTypes::arrangeBuiltinFunctionDeclaration(CanQualType resultType,
-                                              ArrayRef<CanQualType> argTypes) {
+                                              llvm::ArrayRef<CanQualType> argTypes) {
   return arrangeLLVMFunctionInfo(resultType, FnInfoOpts::None, argTypes,
                                  FunctionType::ExtInfo(), {},
                                  RequiredArgs::All);
@@ -732,7 +732,7 @@ CodeGenTypes::arrangeCall(const CGFunctionInfo &signature,
   if (signature.arg_size() == args.size())
     return signature;
 
-  SmallVector<FunctionProtoType::ExtParameterInfo, 16> paramInfos;
+  llvm::SmallVector<FunctionProtoType::ExtParameterInfo, 16> paramInfos;
   auto sigParamInfos = signature.getExtParameterInfos();
   if (!sigParamInfos.empty()) {
     paramInfos.append(sigParamInfos.begin(), sigParamInfos.end());
@@ -764,9 +764,9 @@ void computeSPIRKernelABIInfo(CodeGenModule &CGM, CGFunctionInfo &FI);
 /// of a given function type.  This is the method which all of the
 /// above functions ultimately defer to.
 const CGFunctionInfo &CodeGenTypes::arrangeLLVMFunctionInfo(
-    CanQualType resultType, FnInfoOpts opts, ArrayRef<CanQualType> argTypes,
+    CanQualType resultType, FnInfoOpts opts, llvm::ArrayRef<CanQualType> argTypes,
     FunctionType::ExtInfo info,
-    ArrayRef<FunctionProtoType::ExtParameterInfo> paramInfos,
+    llvm::ArrayRef<FunctionProtoType::ExtParameterInfo> paramInfos,
     RequiredArgs required) {
   assert(llvm::all_of(argTypes,
                       [](CanQualType T) { return T.isCanonicalAsParam(); }));
@@ -829,9 +829,9 @@ const CGFunctionInfo &CodeGenTypes::arrangeLLVMFunctionInfo(
 CGFunctionInfo *CGFunctionInfo::create(unsigned llvmCC, bool instanceMethod,
                                        bool chainCall, bool delegateCall,
                                        const FunctionType::ExtInfo &info,
-                                       ArrayRef<ExtParameterInfo> paramInfos,
+                                       llvm::ArrayRef<ExtParameterInfo> paramInfos,
                                        CanQualType resultType,
-                                       ArrayRef<CanQualType> argTypes,
+                                       llvm::ArrayRef<CanQualType> argTypes,
                                        RequiredArgs required) {
   assert(paramInfos.empty() || paramInfos.size() == argTypes.size());
   assert(!required.allowsOptionalArgs() ||
@@ -906,12 +906,12 @@ struct ConstantArrayExpansion : TypeExpansion {
 };
 
 struct RecordExpansion : TypeExpansion {
-  SmallVector<const CXXBaseSpecifier *, 1> Bases;
+  llvm::SmallVector<const CXXBaseSpecifier *, 1> Bases;
 
-  SmallVector<const FieldDecl *, 1> Fields;
+  llvm::SmallVector<const FieldDecl *, 1> Fields;
 
-  RecordExpansion(SmallVector<const CXXBaseSpecifier *, 1> &&Bases,
-                  SmallVector<const FieldDecl *, 1> &&Fields)
+  RecordExpansion(llvm::SmallVector<const CXXBaseSpecifier *, 1> &&Bases,
+                  llvm::SmallVector<const FieldDecl *, 1> &&Fields)
       : TypeExpansion(TEK_Record), Bases(std::move(Bases)),
         Fields(std::move(Fields)) {}
   static bool classof(const TypeExpansion *TE) {
@@ -943,8 +943,8 @@ getTypeExpansion(QualType Ty, const ASTContext &Context) {
                                                     AT->getZExtSize());
   }
   if (const RecordType *RT = Ty->getAs<RecordType>()) {
-    SmallVector<const CXXBaseSpecifier *, 1> Bases;
-    SmallVector<const FieldDecl *, 1> Fields;
+    llvm::SmallVector<const CXXBaseSpecifier *, 1> Bases;
+    llvm::SmallVector<const FieldDecl *, 1> Fields;
     const RecordDecl *RD = RT->getDecl();
     assert(!RD->hasFlexibleArrayMember() &&
            "Cannot expand structure with flexible array.");
@@ -1012,7 +1012,7 @@ static int getExpansionSize(QualType Ty, const ASTContext &Context) {
 
 void
 CodeGenTypes::getExpandedTypes(QualType Ty,
-                               SmallVectorImpl<llvm::Type *>::iterator &TI) {
+                               llvm::SmallVectorImpl<llvm::Type *>::iterator &TI) {
   auto Exp = getTypeExpansion(Ty, Context);
   if (auto CAExp = dyn_cast<ConstantArrayExpansion>(Exp.get())) {
     for (int i = 0, n = CAExp->NumElts; i < n; i++) {
@@ -1098,7 +1098,7 @@ void CodeGenFunction::ExpandTypeFromArgs(QualType Ty, LValue LV,
 
 void CodeGenFunction::ExpandTypeToArgs(
     QualType Ty, CallArg Arg, llvm::FunctionType *IRFuncTy,
-    SmallVectorImpl<llvm::Value *> &IRCallArgs, unsigned &IRCallArgPos) {
+    llvm::SmallVectorImpl<llvm::Value *> &IRCallArgs, unsigned &IRCallArgPos) {
   auto Exp = getTypeExpansion(Ty, getContext());
   if (auto CAExp = dyn_cast<ConstantArrayExpansion>(Exp.get())) {
     Address Addr = Arg.hasLValue() ? Arg.getKnownLValue().getAddress()
@@ -1157,7 +1157,7 @@ void CodeGenFunction::ExpandTypeToArgs(
 static RawAddress CreateTempAllocaForCoercion(CodeGenFunction &CGF,
                                               llvm::Type *Ty,
                                               CharUnits MinAlign,
-                                              const Twine &Name = "tmp") {
+                                              const llvm::Twine &Name = "tmp") {
   // Don't use an alignment that's worse than what LLVM would prefer.
   auto PrefAlign = CGF.CGM.getDataLayout().getPrefTypeAlign(Ty);
   CharUnits Align = std::max(MinAlign, CharUnits::fromQuantity(PrefAlign));
@@ -1459,7 +1459,7 @@ class ClangToLLVMArgMapping {
           NumberOfArgs(0) {}
   };
 
-  SmallVector<IRArgs, 8> ArgInfo;
+  llvm::SmallVector<IRArgs, 8> ArgInfo;
 
 public:
   ClangToLLVMArgMapping(const ASTContext &Context, const CGFunctionInfo &FI,
@@ -1669,7 +1669,7 @@ CodeGenTypes::GetFunctionType(const CGFunctionInfo &FI) {
   }
 
   ClangToLLVMArgMapping IRFunctionArgs(getContext(), FI, true);
-  SmallVector<llvm::Type*, 8> ArgTypes(IRFunctionArgs.totalIRArgs());
+  llvm::SmallVector<llvm::Type*, 8> ArgTypes(IRFunctionArgs.totalIRArgs());
 
   // Add type for sret argument.
   if (IRFunctionArgs.hasSRetArg()) {
@@ -1808,7 +1808,7 @@ static void AddAttributesFromOMPAssumes(llvm::AttrBuilder &FuncAttrs,
   if (!Callee)
     return;
 
-  SmallVector<StringRef, 4> Attrs;
+  llvm::SmallVector<llvm::StringRef, 4> Attrs;
 
   for (const OMPAssumeAttr *AA : Callee->specific_attrs<OMPAssumeAttr>())
     AA->getAssumption().split(Attrs, ",");
@@ -1886,7 +1886,7 @@ addMergableDefaultFunctionAttributes(const CodeGenOptions &CodeGenOpts,
 }
 
 static void getTrivialDefaultFunctionAttributes(
-    StringRef Name, bool HasOptnone, const CodeGenOptions &CodeGenOpts,
+    llvm::StringRef Name, bool HasOptnone, const CodeGenOptions &CodeGenOpts,
     const LangOptions &LangOpts, bool AttrOnCallSite,
     llvm::AttrBuilder &FuncAttrs) {
   // OptimizeNoneAttr takes precedence over -Os or -Oz. No warning needed.
@@ -2024,8 +2024,8 @@ static void getTrivialDefaultFunctionAttributes(
     FuncAttrs.addAttribute(llvm::Attribute::NoUnwind);
   }
 
-  for (StringRef Attr : CodeGenOpts.DefaultFunctionAttrs) {
-    StringRef Var, Value;
+  for (llvm::StringRef Attr : CodeGenOpts.DefaultFunctionAttrs) {
+    llvm::StringRef Var, Value;
     std::tie(Var, Value) = Attr.split('=');
     FuncAttrs.addAttribute(Var, Value);
   }
@@ -2043,15 +2043,15 @@ overrideFunctionFeaturesWithTargetFeatures(llvm::AttrBuilder &FuncAttr,
   auto FFeatures = F.getFnAttribute("target-features");
 
   llvm::StringSet<> MergedNames;
-  SmallVector<StringRef> MergedFeatures;
+  llvm::SmallVector<llvm::StringRef> MergedFeatures;
   MergedFeatures.reserve(TargetOpts.Features.size());
 
   auto AddUnmergedFeatures = [&](auto &&FeatureRange) {
-    for (StringRef Feature : FeatureRange) {
+    for (llvm::StringRef Feature : FeatureRange) {
       if (Feature.empty())
         continue;
       assert(Feature[0] == '+' || Feature[0] == '-');
-      StringRef Name = Feature.drop_front(1);
+      llvm::StringRef Name = Feature.drop_front(1);
       bool Merged = !MergedNames.insert(Name).second;
       if (!Merged)
         MergedFeatures.push_back(Feature);
@@ -2132,14 +2132,14 @@ void CodeGen::mergeDefaultFunctionDefinitionAttributes(
 }
 
 void CodeGenModule::getTrivialDefaultFunctionAttributes(
-    StringRef Name, bool HasOptnone, bool AttrOnCallSite,
+    llvm::StringRef Name, bool HasOptnone, bool AttrOnCallSite,
     llvm::AttrBuilder &FuncAttrs) {
   ::getTrivialDefaultFunctionAttributes(Name, HasOptnone, getCodeGenOpts(),
                                         getLangOpts(), AttrOnCallSite,
                                         FuncAttrs);
 }
 
-void CodeGenModule::getDefaultFunctionAttributes(StringRef Name,
+void CodeGenModule::getDefaultFunctionAttributes(llvm::StringRef Name,
                                                  bool HasOptnone,
                                                  bool AttrOnCallSite,
                                                  llvm::AttrBuilder &FuncAttrs) {
@@ -2161,8 +2161,8 @@ void CodeGenModule::addDefaultFunctionDefinitionAttributes(
 static void addNoBuiltinAttributes(llvm::AttrBuilder &FuncAttrs,
                                    const LangOptions &LangOpts,
                                    const NoBuiltinAttr *NBA = nullptr) {
-  auto AddNoBuiltinAttr = [&FuncAttrs](StringRef BuiltinName) {
-    SmallString<32> AttributeName;
+  auto AddNoBuiltinAttr = [&FuncAttrs](llvm::StringRef BuiltinName) {
+    llvm::SmallString<32> AttributeName;
     AttributeName += "no-builtin-";
     AttributeName += BuiltinName;
     FuncAttrs.addAttribute(AttributeName);
@@ -2298,7 +2298,7 @@ static llvm::FPClassTest getNoFPClassTestMask(const LangOptions &LangOpts) {
   return Mask;
 }
 
-void CodeGenModule::AdjustMemoryAttribute(StringRef Name,
+void CodeGenModule::AdjustMemoryAttribute(llvm::StringRef Name,
                                           CGCalleeInfo CalleeInfo,
                                           llvm::AttributeList &Attrs) {
   if (Attrs.getMemoryEffects().getModRef() == llvm::ModRefInfo::NoModRef) {
@@ -2326,7 +2326,7 @@ void CodeGenModule::AdjustMemoryAttribute(StringRef Name,
 ///     attributes that restrict how the frontend generates code must be
 ///     added here rather than getDefaultFunctionAttributes.
 ///
-void CodeGenModule::ConstructAttributeList(StringRef Name,
+void CodeGenModule::ConstructAttributeList(llvm::StringRef Name,
                                            const CGFunctionInfo &FI,
                                            CGCalleeInfo CalleeInfo,
                                            llvm::AttributeList &AttrList,
@@ -2629,7 +2629,7 @@ void CodeGenModule::ConstructAttributeList(StringRef Name,
   }
 
   bool hasUsedSRet = false;
-  SmallVector<llvm::AttributeSet, 4> ArgAttrs(IRFunctionArgs.totalIRArgs());
+  llvm::SmallVector<llvm::AttributeSet, 4> ArgAttrs(IRFunctionArgs.totalIRArgs());
 
   // Attach attributes to sret.
   if (IRFunctionArgs.hasSRetArg()) {
@@ -2981,7 +2981,7 @@ void CodeGenFunction::EmitFunctionProlog(const CGFunctionInfo &FI,
   // Track if we received the parameter as a pointer (indirect, byval, or
   // inalloca).  If already have a pointer, EmitParmDecl doesn't need to copy it
   // into a local alloca for us.
-  SmallVector<ParamValue, 16> ArgVals;
+  llvm::SmallVector<ParamValue, 16> ArgVals;
   ArgVals.reserve(Args.size());
 
   // Create a pointer value for every parameter declaration.  This usually
@@ -3270,7 +3270,7 @@ void CodeGenFunction::EmitFunctionProlog(const CGFunctionInfo &FI,
           llvm::Value *LoadedStructValue = llvm::PoisonValue::get(STy);
           for (unsigned i = 0, e = STy->getNumElements(); i != e; ++i) {
             auto *AI = Fn->getArg(FirstIRArg + i);
-            AI->setName(Arg->getName() + ".coerce" + Twine(i));
+            AI->setName(Arg->getName() + ".coerce" + llvm::Twine(i));
             LoadedStructValue =
                 Builder.CreateInsertValue(LoadedStructValue, AI, i);
           }
@@ -3291,7 +3291,7 @@ void CodeGenFunction::EmitFunctionProlog(const CGFunctionInfo &FI,
           assert(STy->getNumElements() == NumIRArgs);
           for (unsigned i = 0, e = STy->getNumElements(); i != e; ++i) {
             auto AI = Fn->getArg(FirstIRArg + i);
-            AI->setName(Arg->getName() + ".coerce" + Twine(i));
+            AI->setName(Arg->getName() + ".coerce" + llvm::Twine(i));
             Address EltPtr = Builder.CreateStructGEP(AddrToStoreInto, i);
             Builder.CreateStore(AI, EltPtr);
           }
@@ -3356,7 +3356,7 @@ void CodeGenFunction::EmitFunctionProlog(const CGFunctionInfo &FI,
       assert(FnArgIter == Fn->arg_begin() + FirstIRArg + NumIRArgs);
       for (unsigned i = 0, e = NumIRArgs; i != e; ++i) {
         auto AI = Fn->getArg(FirstIRArg + i);
-        AI->setName(Arg->getName() + "." + Twine(i));
+        AI->setName(Arg->getName() + "." + llvm::Twine(i));
       }
       break;
     }
@@ -3407,7 +3407,7 @@ static llvm::Value *tryEmitFusedAutoreleaseOfResult(CodeGenFunction &CGF,
   // result is in a BasicBlock and is therefore an Instruction.
   llvm::Instruction *generator = cast<llvm::Instruction>(result);
 
-  SmallVector<llvm::Instruction *, 4> InstsToKill;
+  llvm::SmallVector<llvm::Instruction *, 4> InstsToKill;
 
   // Look for:
   //  %generator = bitcast %type1* %generator2 to %type2*
@@ -3605,7 +3605,7 @@ static llvm::StoreInst *findDominatingStoreToReturnValue(CodeGenFunction &CGF) {
 // offset `BitOffset` (from the least significant bit) within a storage unit of
 // `Bits.size()` bytes. Each element of `Bits` corresponds to one target byte.
 // Use little-endian layout, i.e.`Bits[0]` is the LSB.
-static void setBitRange(SmallVectorImpl<uint64_t> &Bits, int BitOffset,
+static void setBitRange(llvm::SmallVectorImpl<uint64_t> &Bits, int BitOffset,
                         int BitWidth, int CharWidth) {
   assert(CharWidth <= 64);
   assert(static_cast<unsigned>(BitWidth) <= Bits.size() * CharWidth);
@@ -3636,11 +3636,11 @@ static void setBitRange(SmallVectorImpl<uint64_t> &Bits, int BitOffset,
 // offset `BitOffset` (from the least significant bit) within a storage unit of
 // `StorageSize` bytes, located at `StorageOffset` in `Bits`. Each element of
 // `Bits` corresponds to one target byte. Use target endian layout.
-static void setBitRange(SmallVectorImpl<uint64_t> &Bits, int StorageOffset,
+static void setBitRange(llvm::SmallVectorImpl<uint64_t> &Bits, int StorageOffset,
                         int StorageSize, int BitOffset, int BitWidth,
                         int CharWidth, bool BigEndian) {
 
-  SmallVector<uint64_t, 8> TmpBits(StorageSize);
+  llvm::SmallVector<uint64_t, 8> TmpBits(StorageSize);
   setBitRange(TmpBits, BitOffset, BitWidth, CharWidth);
 
   if (BigEndian)
@@ -3651,7 +3651,7 @@ static void setBitRange(SmallVectorImpl<uint64_t> &Bits, int StorageOffset,
 }
 
 static void setUsedBits(CodeGenModule &, QualType, int,
-                        SmallVectorImpl<uint64_t> &);
+                        llvm::SmallVectorImpl<uint64_t> &);
 
 // Set the bits in `Bits`, which correspond to the value representations of
 // the actual members of the record type `RTy`. Note that this function does
@@ -3659,7 +3659,7 @@ static void setUsedBits(CodeGenModule &, QualType, int,
 // CMSE function arguments or return. The bit mask corresponds to the target
 // memory layout, i.e. it's endian dependent.
 static void setUsedBits(CodeGenModule &CGM, const RecordType *RTy, int Offset,
-                        SmallVectorImpl<uint64_t> &Bits) {
+                        llvm::SmallVectorImpl<uint64_t> &Bits) {
   ASTContext &Context = CGM.getContext();
   int CharWidth = Context.getCharWidth();
   const RecordDecl *RD = RTy->getDecl()->getDefinition();
@@ -3691,12 +3691,12 @@ static void setUsedBits(CodeGenModule &CGM, const RecordType *RTy, int Offset,
 // Set the bits in `Bits`, which correspond to the value representations of
 // the elements of an array type `ATy`.
 static void setUsedBits(CodeGenModule &CGM, const ConstantArrayType *ATy,
-                        int Offset, SmallVectorImpl<uint64_t> &Bits) {
+                        int Offset, llvm::SmallVectorImpl<uint64_t> &Bits) {
   const ASTContext &Context = CGM.getContext();
 
   QualType ETy = Context.getBaseElementType(ATy);
   int Size = Context.getTypeSizeInChars(ETy).getQuantity();
-  SmallVector<uint64_t, 4> TmpBits(Size);
+  llvm::SmallVector<uint64_t, 4> TmpBits(Size);
   setUsedBits(CGM, ETy, 0, TmpBits);
 
   for (int I = 0, N = Context.getConstantArrayElementCount(ATy); I < N; ++I) {
@@ -3710,7 +3710,7 @@ static void setUsedBits(CodeGenModule &CGM, const ConstantArrayType *ATy,
 // Set the bits in `Bits`, which correspond to the value representations of
 // the type `QTy`.
 static void setUsedBits(CodeGenModule &CGM, QualType QTy, int Offset,
-                        SmallVectorImpl<uint64_t> &Bits) {
+                        llvm::SmallVectorImpl<uint64_t> &Bits) {
   if (const auto *RTy = QTy->getAs<RecordType>())
     return setUsedBits(CGM, RTy, Offset, Bits);
 
@@ -3726,7 +3726,7 @@ static void setUsedBits(CodeGenModule &CGM, QualType QTy, int Offset,
               (uint64_t(1) << Context.getCharWidth()) - 1);
 }
 
-static uint64_t buildMultiCharMask(const SmallVectorImpl<uint64_t> &Bits,
+static uint64_t buildMultiCharMask(const llvm::SmallVectorImpl<uint64_t> &Bits,
                                    int Pos, int Size, int CharWidth,
                                    bool BigEndian) {
   assert(Size > 0);
@@ -3754,7 +3754,7 @@ llvm::Value *CodeGenFunction::EmitCMSEClearRecord(llvm::Value *Src,
 
   const llvm::DataLayout &DataLayout = CGM.getDataLayout();
   int Size = DataLayout.getTypeStoreSize(ITy);
-  SmallVector<uint64_t, 4> Bits(Size);
+  llvm::SmallVector<uint64_t, 4> Bits(Size);
   setUsedBits(CGM, QTy->castAs<RecordType>(), 0, Bits);
 
   int CharWidth = CGM.getContext().getCharWidth();
@@ -3771,7 +3771,7 @@ llvm::Value *CodeGenFunction::EmitCMSEClearRecord(llvm::Value *Src,
                                                   QualType QTy) {
   const llvm::DataLayout &DataLayout = CGM.getDataLayout();
   int Size = DataLayout.getTypeStoreSize(ATy);
-  SmallVector<uint64_t, 16> Bits(Size);
+  llvm::SmallVector<uint64_t, 16> Bits(Size);
   setUsedBits(CGM, QTy->castAs<RecordType>(), 0, Bits);
 
   // Clear each element of the LLVM array.
@@ -4206,7 +4206,7 @@ static void emitWritebacks(CodeGenFunction &CGF,
 
 static void deactivateArgCleanupsBeforeCall(CodeGenFunction &CGF,
                                             const CallArgList &CallArgs) {
-  ArrayRef<CallArgList::CallArgCleanup> Cleanups =
+  llvm::ArrayRef<CallArgList::CallArgCleanup> Cleanups =
     CallArgs.getCleanupsToDeactivate();
   // Iterate in reverse to increase the likelihood of popping the cleanup.
   for (const auto &I : llvm::reverse(Cleanups)) {
@@ -4431,7 +4431,7 @@ void CodeGenFunction::EmitNonNullArgCheck(Address Addr, QualType ArgType,
 // agree with CGFunctionInfo::usesInAlloca. The CGFunctionInfo is arranged
 // later, so we can't check it directly.
 static bool hasInAllocaArgs(CodeGenModule &CGM, CallingConv ExplicitCC,
-                            ArrayRef<QualType> ArgTypes) {
+                            llvm::ArrayRef<QualType> ArgTypes) {
   // The Swift calling conventions don't go through the target-specific
   // argument classification, they never use inalloca.
   // TODO: Consider limiting inalloca use to only calling conventions supported
@@ -4467,7 +4467,7 @@ void CodeGenFunction::EmitCallArgs(
     CallArgList &Args, PrototypeWrapper Prototype,
     llvm::iterator_range<CallExpr::const_arg_iterator> ArgRange,
     AbstractCallee AC, unsigned ParamsToSkip, EvaluationOrder Order) {
-  SmallVector<QualType, 16> ArgTypes;
+  llvm::SmallVector<QualType, 16> ArgTypes;
 
   assert((ParamsToSkip == 0 || Prototype.P) &&
          "Can't skip parameters if type info is not provided");
@@ -4769,15 +4769,15 @@ CodeGenFunction::AddObjCARCExceptionMetadata(llvm::Instruction *Inst) {
 llvm::CallInst *
 CodeGenFunction::EmitNounwindRuntimeCall(llvm::FunctionCallee callee,
                                          const llvm::Twine &name) {
-  return EmitNounwindRuntimeCall(callee, ArrayRef<llvm::Value *>(), name);
+  return EmitNounwindRuntimeCall(callee, llvm::ArrayRef<llvm::Value *>(), name);
 }
 
 /// Emits a call to the given nounwind runtime function.
 llvm::CallInst *
 CodeGenFunction::EmitNounwindRuntimeCall(llvm::FunctionCallee callee,
-                                         ArrayRef<Address> args,
+                                         llvm::ArrayRef<Address> args,
                                          const llvm::Twine &name) {
-  SmallVector<llvm::Value *, 3> values;
+  llvm::SmallVector<llvm::Value *, 3> values;
   for (auto arg : args)
     values.push_back(arg.emitRawPointer(*this));
   return EmitNounwindRuntimeCall(callee, values, name);
@@ -4785,7 +4785,7 @@ CodeGenFunction::EmitNounwindRuntimeCall(llvm::FunctionCallee callee,
 
 llvm::CallInst *
 CodeGenFunction::EmitNounwindRuntimeCall(llvm::FunctionCallee callee,
-                                         ArrayRef<llvm::Value *> args,
+                                         llvm::ArrayRef<llvm::Value *> args,
                                          const llvm::Twine &name) {
   llvm::CallInst *call = EmitRuntimeCall(callee, args, name);
   call->setDoesNotThrow();
@@ -4801,12 +4801,12 @@ llvm::CallInst *CodeGenFunction::EmitRuntimeCall(llvm::FunctionCallee callee,
 
 // Calls which may throw must have operand bundles indicating which funclet
 // they are nested within.
-SmallVector<llvm::OperandBundleDef, 1>
+llvm::SmallVector<llvm::OperandBundleDef, 1>
 CodeGenFunction::getBundlesForFunclet(llvm::Value *Callee) {
   // There is no need for a funclet operand bundle if we aren't inside a
   // funclet.
   if (!CurrentFuncletPad)
-    return (SmallVector<llvm::OperandBundleDef, 1>());
+    return (llvm::SmallVector<llvm::OperandBundleDef, 1>());
 
   // Skip intrinsics which cannot throw (as long as they don't lower into
   // regular function calls in the course of IR transformations).
@@ -4814,18 +4814,18 @@ CodeGenFunction::getBundlesForFunclet(llvm::Value *Callee) {
     if (CalleeFn->isIntrinsic() && CalleeFn->doesNotThrow()) {
       auto IID = CalleeFn->getIntrinsicID();
       if (!llvm::IntrinsicInst::mayLowerToFunctionCall(IID))
-        return (SmallVector<llvm::OperandBundleDef, 1>());
+        return (llvm::SmallVector<llvm::OperandBundleDef, 1>());
     }
   }
 
-  SmallVector<llvm::OperandBundleDef, 1> BundleList;
+  llvm::SmallVector<llvm::OperandBundleDef, 1> BundleList;
   BundleList.emplace_back("funclet", CurrentFuncletPad);
   return BundleList;
 }
 
 /// Emits a simple call (never an invoke) to the given runtime function.
 llvm::CallInst *CodeGenFunction::EmitRuntimeCall(llvm::FunctionCallee callee,
-                                                 ArrayRef<llvm::Value *> args,
+                                                 llvm::ArrayRef<llvm::Value *> args,
                                                  const llvm::Twine &name) {
   llvm::CallInst *call = Builder.CreateCall(
       callee, args, getBundlesForFunclet(callee.getCallee()), name);
@@ -4838,8 +4838,8 @@ llvm::CallInst *CodeGenFunction::EmitRuntimeCall(llvm::FunctionCallee callee,
 
 /// Emits a call or invoke to the given noreturn runtime function.
 void CodeGenFunction::EmitNoreturnRuntimeCallOrInvoke(
-    llvm::FunctionCallee callee, ArrayRef<llvm::Value *> args) {
-  SmallVector<llvm::OperandBundleDef, 1> BundleList =
+    llvm::FunctionCallee callee, llvm::ArrayRef<llvm::Value *> args) {
+  llvm::SmallVector<llvm::OperandBundleDef, 1> BundleList =
       getBundlesForFunclet(callee.getCallee());
 
   if (getInvokeDest()) {
@@ -4862,15 +4862,15 @@ void CodeGenFunction::EmitNoreturnRuntimeCallOrInvoke(
 /// Emits a call or invoke instruction to the given nullary runtime function.
 llvm::CallBase *
 CodeGenFunction::EmitRuntimeCallOrInvoke(llvm::FunctionCallee callee,
-                                         const Twine &name) {
+                                         const llvm::Twine &name) {
   return EmitRuntimeCallOrInvoke(callee, std::nullopt, name);
 }
 
 /// Emits a call or invoke instruction to the given runtime function.
 llvm::CallBase *
 CodeGenFunction::EmitRuntimeCallOrInvoke(llvm::FunctionCallee callee,
-                                         ArrayRef<llvm::Value *> args,
-                                         const Twine &name) {
+                                         llvm::ArrayRef<llvm::Value *> args,
+                                         const llvm::Twine &name) {
   llvm::CallBase *call = EmitCallOrInvoke(callee, args, name);
   call->setCallingConv(getRuntimeCC());
   return call;
@@ -4879,10 +4879,10 @@ CodeGenFunction::EmitRuntimeCallOrInvoke(llvm::FunctionCallee callee,
 /// Emits a call or invoke instruction to the given function, depending
 /// on the current state of the EH stack.
 llvm::CallBase *CodeGenFunction::EmitCallOrInvoke(llvm::FunctionCallee Callee,
-                                                  ArrayRef<llvm::Value *> Args,
-                                                  const Twine &Name) {
+                                                  llvm::ArrayRef<llvm::Value *> Args,
+                                                  const llvm::Twine &Name) {
   llvm::BasicBlock *InvokeDest = getInvokeDest();
-  SmallVector<llvm::OperandBundleDef, 1> BundleList =
+  llvm::SmallVector<llvm::OperandBundleDef, 1> BundleList =
       getBundlesForFunclet(Callee.getCallee());
 
   llvm::CallBase *Inst;
@@ -5085,7 +5085,7 @@ RValue CodeGenFunction::EmitCall(const CGFunctionInfo &CallInfo,
   }
 
   ClangToLLVMArgMapping IRFunctionArgs(CGM.getContext(), CallInfo);
-  SmallVector<llvm::Value *, 16> IRCallArgs(IRFunctionArgs.totalIRArgs());
+  llvm::SmallVector<llvm::Value *, 16> IRCallArgs(IRFunctionArgs.totalIRArgs());
 
   // If the call returns a temporary with struct return, create a temporary
   // alloca to hold the result, unless one is given to us.
@@ -5119,7 +5119,7 @@ RValue CodeGenFunction::EmitCall(const CGFunctionInfo &CallInfo,
   // When passing arguments using temporary allocas, we need to add the
   // appropriate lifetime markers. This vector keeps track of all the lifetime
   // markers that need to be ended right after the call.
-  SmallVector<CallLifetimeEnd, 2> CallLifetimeEndAfterCall;
+  llvm::SmallVector<CallLifetimeEnd, 2> CallLifetimeEndAfterCall;
 
   // Translate all of the arguments as necessary to match the IR lowering.
   assert(CallInfo.arg_size() == CallArgs.size() &&
@@ -5390,7 +5390,7 @@ RValue CodeGenFunction::EmitCall(const CGFunctionInfo &CallInfo,
               Builder.CreateLoad(Src, Src.getName() + ".tuple");
           for (unsigned i = 0, e = STy->getNumElements(); i != e; ++i) {
             llvm::Value *Extract = Builder.CreateExtractValue(
-                StoredStructValue, i, Src.getName() + ".extract" + Twine(i));
+                StoredStructValue, i, Src.getName() + ".extract" + llvm::Twine(i));
             IRCallArgs[FirstIRArg + i] = Extract;
           }
         } else {
@@ -5670,7 +5670,7 @@ RValue CodeGenFunction::EmitCall(const CGFunctionInfo &CallInfo,
 
   llvm::BasicBlock *InvokeDest = CannotThrow ? nullptr : getInvokeDest();
 
-  SmallVector<llvm::OperandBundleDef, 1> BundleList =
+  llvm::SmallVector<llvm::OperandBundleDef, 1> BundleList =
       getBundlesForFunclet(CalleePtr);
 
   if (SanOpts.has(SanitizerKind::KCFI) &&

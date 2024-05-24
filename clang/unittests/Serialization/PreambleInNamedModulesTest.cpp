@@ -29,11 +29,11 @@ class PreambleInNamedModulesTest : public ::testing::Test {
   void TearDown() override { sys::fs::remove_directories(TestDir); }
 
 public:
-  using PathType = SmallString<256>;
+  using PathType = llvm::SmallString<256>;
 
   PathType TestDir;
 
-  void addFile(StringRef Path, StringRef Contents, PathType &AbsPath) {
+  void addFile(llvm::StringRef Path, llvm::StringRef Contents, PathType &AbsPath) {
     ASSERT_FALSE(sys::path::is_absolute(Path));
 
     AbsPath = TestDir;
@@ -48,7 +48,7 @@ public:
     OS << Contents;
   }
 
-  void addFile(StringRef Path, StringRef Contents) {
+  void addFile(llvm::StringRef Path, llvm::StringRef Contents) {
     PathType UnusedAbsPath;
     addFile(Path, Contents, UnusedAbsPath);
   }
@@ -75,9 +75,9 @@ export using ::E;
   )cpp",
           MainFilePath);
 
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
       CompilerInstance::createDiagnostics(new DiagnosticOptions());
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS =
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS =
       llvm::vfs::createPhysicalFileSystem();
 
   CreateInvocationOptions CIOpts;

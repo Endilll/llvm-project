@@ -55,32 +55,32 @@ class InitHeaderSearch {
   bool HasSysroot;
 
 public:
-  InitHeaderSearch(HeaderSearch &HS, bool verbose, StringRef sysroot)
+  InitHeaderSearch(HeaderSearch &HS, bool verbose, llvm::StringRef sysroot)
       : Headers(HS), Verbose(verbose), IncludeSysroot(std::string(sysroot)),
         HasSysroot(!(sysroot.empty() || sysroot == "/")) {}
 
   /// Add the specified path to the specified group list, prefixing the sysroot
   /// if used.
   /// Returns true if the path exists, false if it was ignored.
-  bool AddPath(const Twine &Path, IncludeDirGroup Group, bool isFramework,
+  bool AddPath(const llvm::Twine &Path, IncludeDirGroup Group, bool isFramework,
                std::optional<unsigned> UserEntryIdx = std::nullopt);
 
   /// Add the specified path to the specified group list, without performing any
   /// sysroot remapping.
   /// Returns true if the path exists, false if it was ignored.
-  bool AddUnmappedPath(const Twine &Path, IncludeDirGroup Group,
+  bool AddUnmappedPath(const llvm::Twine &Path, IncludeDirGroup Group,
                        bool isFramework,
                        std::optional<unsigned> UserEntryIdx = std::nullopt);
 
   /// Add the specified prefix to the system header prefix list.
-  void AddSystemHeaderPrefix(StringRef Prefix, bool IsSystemHeader) {
+  void AddSystemHeaderPrefix(llvm::StringRef Prefix, bool IsSystemHeader) {
     SystemHeaderPrefixes.emplace_back(std::string(Prefix), IsSystemHeader);
   }
 
   /// Add the necessary paths to support a MinGW libstdc++.
-  void AddMinGWCPlusPlusIncludePaths(StringRef Base,
-                                     StringRef Arch,
-                                     StringRef Version);
+  void AddMinGWCPlusPlusIncludePaths(llvm::StringRef Base,
+                                     llvm::StringRef Arch,
+                                     llvm::StringRef Version);
 
   /// Add paths that should always be searched.
   void AddDefaultCIncludePaths(const llvm::Triple &triple,
@@ -106,7 +106,7 @@ public:
 
 }  // end anonymous namespace.
 
-static bool CanPrefixSysroot(StringRef Path) {
+static bool CanPrefixSysroot(llvm::StringRef Path) {
 #if defined(_WIN32)
   return !Path.empty() && llvm::sys::path::is_separator(Path[0]);
 #else
@@ -114,14 +114,14 @@ static bool CanPrefixSysroot(StringRef Path) {
 #endif
 }
 
-bool InitHeaderSearch::AddPath(const Twine &Path, IncludeDirGroup Group,
+bool InitHeaderSearch::AddPath(const llvm::Twine &Path, IncludeDirGroup Group,
                                bool isFramework,
                                std::optional<unsigned> UserEntryIdx) {
   // Add the path with sysroot prepended, if desired and this is a system header
   // group.
   if (HasSysroot) {
-    SmallString<256> MappedPathStorage;
-    StringRef MappedPathStr = Path.toStringRef(MappedPathStorage);
+    llvm::SmallString<256> MappedPathStorage;
+    llvm::StringRef MappedPathStr = Path.toStringRef(MappedPathStorage);
     if (CanPrefixSysroot(MappedPathStr)) {
       return AddUnmappedPath(IncludeSysroot + Path, Group, isFramework,
                              UserEntryIdx);
@@ -131,14 +131,14 @@ bool InitHeaderSearch::AddPath(const Twine &Path, IncludeDirGroup Group,
   return AddUnmappedPath(Path, Group, isFramework, UserEntryIdx);
 }
 
-bool InitHeaderSearch::AddUnmappedPath(const Twine &Path, IncludeDirGroup Group,
+bool InitHeaderSearch::AddUnmappedPath(const llvm::Twine &Path, IncludeDirGroup Group,
                                        bool isFramework,
                                        std::optional<unsigned> UserEntryIdx) {
   assert(!Path.isTriviallyEmpty() && "can't handle empty path here");
 
   FileManager &FM = Headers.getFileMgr();
-  SmallString<256> MappedPathStorage;
-  StringRef MappedPathStr = Path.toStringRef(MappedPathStorage);
+  llvm::SmallString<256> MappedPathStorage;
+  llvm::StringRef MappedPathStr = Path.toStringRef(MappedPathStorage);
 
   // If use system headers while cross-compiling, emit the warning.
   if (HasSysroot && (MappedPathStr.starts_with("/usr/include") ||
@@ -184,9 +184,9 @@ bool InitHeaderSearch::AddUnmappedPath(const Twine &Path, IncludeDirGroup Group,
   return false;
 }
 
-void InitHeaderSearch::AddMinGWCPlusPlusIncludePaths(StringRef Base,
-                                                     StringRef Arch,
-                                                     StringRef Version) {
+void InitHeaderSearch::AddMinGWCPlusPlusIncludePaths(llvm::StringRef Base,
+                                                     llvm::StringRef Arch,
+                                                     llvm::StringRef Version) {
   AddPath(Base + "/" + Arch + "/" + Version + "/include/c++",
           CXXSystem, false);
   AddPath(Base + "/" + Arch + "/" + Version + "/include/c++/" + Arch,
@@ -220,7 +220,7 @@ void InitHeaderSearch::AddDefaultCIncludePaths(const llvm::Triple &triple,
   if (HSOpts.UseBuiltinIncludes) {
     // Ignore the sys root, we *always* look for clang headers relative to
     // supplied path.
-    SmallString<128> P = StringRef(HSOpts.ResourceDir);
+    llvm::SmallString<128> P = llvm::StringRef(HSOpts.ResourceDir);
     llvm::sys::path::append(P, "include");
     AddUnmappedPath(P, ExternCSystem, false);
   }
@@ -231,11 +231,11 @@ void InitHeaderSearch::AddDefaultCIncludePaths(const llvm::Triple &triple,
     return;
 
   // Add dirs specified via 'configure --with-c-include-dirs'.
-  StringRef CIncludeDirs(C_INCLUDE_DIRS);
+  llvm::StringRef CIncludeDirs(C_INCLUDE_DIRS);
   if (CIncludeDirs != "") {
-    SmallVector<StringRef, 5> dirs;
+    llvm::SmallVector<llvm::StringRef, 5> dirs;
     CIncludeDirs.split(dirs, ":");
-    for (StringRef dir : dirs)
+    for (llvm::StringRef dir : dirs)
       AddPath(dir, ExternCSystem, false);
     return;
   }
@@ -524,7 +524,7 @@ void InitHeaderSearch::Realize(const LangOptions &Lang) {
     for (unsigned i = 0, e = SearchList.size(); i != e; ++i) {
       if (i == NumQuoted)
         llvm::errs() << "#include <...> search starts here:\n";
-      StringRef Name = SearchList[i].Lookup.getName();
+      llvm::StringRef Name = SearchList[i].Lookup.getName();
       const char *Suffix;
       if (SearchList[i].Lookup.isNormalDir())
         Suffix = "";
@@ -564,7 +564,7 @@ void clang::ApplyHeaderSearchOptions(HeaderSearch &HS,
 
   if (HSOpts.UseBuiltinIncludes) {
     // Set up the builtin include directory in the module map.
-    SmallString<128> P = StringRef(HSOpts.ResourceDir);
+    llvm::SmallString<128> P = llvm::StringRef(HSOpts.ResourceDir);
     llvm::sys::path::append(P, "include");
     if (auto Dir = HS.getFileMgr().getOptionalDirectoryRef(P))
       HS.getModuleMap().setBuiltinIncludeDir(*Dir);

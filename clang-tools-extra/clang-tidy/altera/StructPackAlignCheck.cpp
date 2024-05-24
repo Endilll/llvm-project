@@ -115,11 +115,11 @@ void StructPackAlignCheck::check(const MatchFinder::MatchResult &Result) {
   if (Attribute) {
     FixIt = FixItHint::CreateReplacement(
         Attribute->getRange(),
-        (Twine("aligned(") + NewAlignQuantity + ")").str());
+        (llvm::Twine("aligned(") + NewAlignQuantity + ")").str());
   } else {
     FixIt = FixItHint::CreateInsertion(
         Struct->getEndLoc().getLocWithOffset(1),
-        (Twine(" __attribute__((aligned(") + NewAlignQuantity + ")))").str());
+        (llvm::Twine(" __attribute__((aligned(") + NewAlignQuantity + ")))").str());
   }
 
   // And suggest the minimum power-of-two alignment for the struct as a whole

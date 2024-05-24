@@ -22,7 +22,7 @@ namespace clang::tidy::portability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/portability/restrict-system-includes.html
 class RestrictSystemIncludesCheck : public ClangTidyCheck {
 public:
-  RestrictSystemIncludesCheck(StringRef Name, ClangTidyContext *Context,
+  RestrictSystemIncludesCheck(llvm::StringRef Name, ClangTidyContext *Context,
                               std::string DefaultAllowedIncludes = "*")
       : ClangTidyCheck(Name, Context),
         AllowedIncludes(Options.get("Includes", DefaultAllowedIncludes)),
@@ -31,7 +31,7 @@ public:
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
-  bool contains(StringRef FileName) {
+  bool contains(llvm::StringRef FileName) {
     return AllowedIncludesGlobList.contains(FileName);
   }
 
@@ -47,10 +47,10 @@ public:
       : Check(Check), SM(SM) {}
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
   void EndOfMainFile() override;
@@ -59,7 +59,7 @@ private:
   struct IncludeDirective {
     IncludeDirective() = default;
     IncludeDirective(SourceLocation Loc, CharSourceRange Range,
-                     StringRef Filename, StringRef FullPath, bool IsInMainFile)
+                     llvm::StringRef Filename, llvm::StringRef FullPath, bool IsInMainFile)
         : Loc(Loc), Range(Range), IncludeFile(Filename), IncludePath(FullPath),
           IsInMainFile(IsInMainFile) {}
 

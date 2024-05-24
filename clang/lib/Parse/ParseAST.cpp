@@ -51,12 +51,12 @@ class PrettyStackTraceParserEntry : public llvm::PrettyStackTraceEntry {
   const Parser &P;
 public:
   PrettyStackTraceParserEntry(const Parser &p) : P(p) {}
-  void print(raw_ostream &OS) const override;
+  void print(llvm::raw_ostream &OS) const override;
 };
 
 /// If a crash happens while the parser is active, print out a line indicating
 /// what the current token is.
-void PrettyStackTraceParserEntry::print(raw_ostream &OS) const {
+void PrettyStackTraceParserEntry::print(llvm::raw_ostream &OS) const {
   const Token &Tok = P.getCurToken();
   if (Tok.is(tok::eof)) {
     OS << "<eof> parser at end of file\n";
@@ -83,7 +83,7 @@ void PrettyStackTraceParserEntry::print(raw_ostream &OS) const {
       OS << ": unknown current parser token\n";
       return;
     }
-    OS << ": current parser token '" << StringRef(Spelling, Length) << "'\n";
+    OS << ": current parser token '" << llvm::StringRef(Spelling, Length) << "'\n";
   }
 }
 

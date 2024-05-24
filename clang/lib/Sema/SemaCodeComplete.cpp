@@ -93,7 +93,7 @@ private:
   /// a single (declaration, index) mapping (the common case) but
   /// can also store a list of (declaration, index) mappings.
   class ShadowMapEntry {
-    typedef SmallVector<DeclIndexPair, 4> DeclIndexPairVector;
+    typedef llvm::SmallVector<DeclIndexPair, 4> DeclIndexPairVector;
 
     /// Contains either the solitary NamedDecl * or a vector
     /// of (declaration, index) pairs.
@@ -735,7 +735,7 @@ ResultBuilder::ShadowMapEntry::end() const {
 static NestedNameSpecifier *
 getRequiredQualification(ASTContext &Context, const DeclContext *CurContext,
                          const DeclContext *TargetContext) {
-  SmallVector<const DeclContext *, 4> TargetParents;
+  llvm::SmallVector<const DeclContext *, 4> TargetParents;
 
   for (const DeclContext *CommonAncestor = TargetContext;
        CommonAncestor && !CommonAncestor->Encloses(CurContext);
@@ -2925,12 +2925,12 @@ static std::string formatBlockPlaceholder(
     const PrintingPolicy &Policy, const NamedDecl *BlockDecl,
     FunctionTypeLoc &Block, FunctionProtoTypeLoc &BlockProto,
     bool SuppressBlockName = false, bool SuppressBlock = false,
-    std::optional<ArrayRef<QualType>> ObjCSubsts = std::nullopt);
+    std::optional<llvm::ArrayRef<QualType>> ObjCSubsts = std::nullopt);
 
 static std::string FormatFunctionParameter(
     const PrintingPolicy &Policy, const DeclaratorDecl *Param,
     bool SuppressName = false, bool SuppressBlock = false,
-    std::optional<ArrayRef<QualType>> ObjCSubsts = std::nullopt) {
+    std::optional<llvm::ArrayRef<QualType>> ObjCSubsts = std::nullopt) {
   // Params are unavailable in FunctionTypeLoc if the FunctionType is invalid.
   // It would be better to pass in the param Type, which is usually available.
   // But this case is rare, so just pretend we fell back to int as elsewhere.
@@ -3025,7 +3025,7 @@ static std::string
 formatBlockPlaceholder(const PrintingPolicy &Policy, const NamedDecl *BlockDecl,
                        FunctionTypeLoc &Block, FunctionProtoTypeLoc &BlockProto,
                        bool SuppressBlockName, bool SuppressBlock,
-                       std::optional<ArrayRef<QualType>> ObjCSubsts) {
+                       std::optional<llvm::ArrayRef<QualType>> ObjCSubsts) {
   std::string Result;
   QualType ResultType = Block.getTypePtr()->getReturnType();
   if (ObjCSubsts)
@@ -3084,7 +3084,7 @@ static std::string GetDefaultValueString(const ParmVarDecl *Param,
   bool Invalid = CharSrcRange.isInvalid();
   if (Invalid)
     return "";
-  StringRef srcText =
+  llvm::StringRef srcText =
       Lexer::getSourceText(CharSrcRange, SM, LangOpts, &Invalid);
   if (Invalid)
     return "";
@@ -3425,7 +3425,7 @@ CodeCompletionString *CodeCompletionResult::CreateCodeCompletionStringForMacro(
       Result.AddChunk(CodeCompletionString::CK_Comma);
 
     if (MI->isVariadic() && (A + 1) == AEnd) {
-      SmallString<32> Arg = (*A)->getName();
+      llvm::SmallString<32> Arg = (*A)->getName();
       if (MI->isC99Varargs())
         Arg += ", ...";
       else
@@ -3709,7 +3709,7 @@ CodeCompletionString *CodeCompletionResult::createCodeCompletionStringForDecl(
 
       std::string Arg;
       QualType ParamType = (*P)->getType();
-      std::optional<ArrayRef<QualType>> ObjCSubsts;
+      std::optional<llvm::ArrayRef<QualType>> ObjCSubsts;
       if (!CCContext.getBaseType().isNull())
         ObjCSubsts = CCContext.getBaseType()->getObjCSubstitutions(Method);
 
@@ -4046,7 +4046,7 @@ CodeCompleteConsumer::OverloadCandidate::CreateSignatureString(
   return Result.TakeString();
 }
 
-unsigned clang::getMacroUsagePriority(StringRef MacroName,
+unsigned clang::getMacroUsagePriority(llvm::StringRef MacroName,
                                       const LangOptions &LangOpts,
                                       bool PreferredTypeIsPointer) {
   unsigned Priority = CCP_Macro;
@@ -4382,7 +4382,7 @@ void SemaCodeCompletion::CodeCompleteModuleImport(SourceLocation ImportLoc,
   typedef CodeCompletionResult Result;
   if (Path.empty()) {
     // Enumerate all top-level modules.
-    SmallVector<Module *, 8> Modules;
+    llvm::SmallVector<Module *, 8> Modules;
     SemaRef.PP.getHeaderSearchInfo().collectAllModules(Modules);
     for (unsigned I = 0, N = Modules.size(); I != N; ++I) {
       Builder.AddTypedTextChunk(
@@ -4507,7 +4507,7 @@ void SemaCodeCompletion::CodeCompleteOrdinaryName(
 
 static void
 AddClassMessageCompletions(Sema &SemaRef, Scope *S, ParsedType Receiver,
-                           ArrayRef<const IdentifierInfo *> SelIdents,
+                           llvm::ArrayRef<const IdentifierInfo *> SelIdents,
                            bool AtArgumentExpression, bool IsSuper,
                            ResultBuilder &Results);
 
@@ -4746,7 +4746,7 @@ struct SemaCodeCompletion::CodeCompleteExpressionData {
   bool IntegralConstantExpression;
   bool ObjCCollection;
   bool IsParenthesized;
-  SmallVector<Decl *, 4> IgnoreDecls;
+  llvm::SmallVector<Decl *, 4> IgnoreDecls;
 };
 
 namespace {
@@ -5282,7 +5282,7 @@ public:
     // We don't have the declared parameter types, only the actual types of
     // arguments we've seen. These are still valuable, as it's hard to render
     // a useful function completion with neither parameter types nor names!
-    std::optional<SmallVector<QualType, 1>> ArgTypes;
+    std::optional<llvm::SmallVector<QualType, 1>> ArgTypes;
     // Whether this is accessed as T.member, T->member, or T::member.
     enum AccessOperator {
       Colons,
@@ -5571,9 +5571,9 @@ private:
 
   // Gets all the type constraint expressions that might apply to the type
   // variables associated with DC (as returned by getTemplatedEntity()).
-  static SmallVector<const Expr *, 1>
+  static llvm::SmallVector<const Expr *, 1>
   constraintsForTemplatedEntity(DeclContext *DC) {
-    SmallVector<const Expr *, 1> Result;
+    llvm::SmallVector<const Expr *, 1> Result;
     if (DC == nullptr)
       return Result;
     // Primary templates can have constraints.
@@ -6078,7 +6078,7 @@ void SemaCodeCompletion::CodeCompleteCase(Scope *S) {
                             Results.size());
 }
 
-static bool anyNullArguments(ArrayRef<Expr *> Args) {
+static bool anyNullArguments(llvm::ArrayRef<Expr *> Args) {
   if (Args.size() && !Args.data())
     return true;
 
@@ -6092,7 +6092,7 @@ static bool anyNullArguments(ArrayRef<Expr *> Args) {
 typedef CodeCompleteConsumer::OverloadCandidate ResultCandidate;
 
 static void mergeCandidatesWithResults(
-    Sema &SemaRef, SmallVectorImpl<ResultCandidate> &Results,
+    Sema &SemaRef, llvm::SmallVectorImpl<ResultCandidate> &Results,
     OverloadCandidateSet &CandidateSet, SourceLocation Loc, size_t ArgSize) {
   // Sort the overload candidate set by placing the best overloads first.
   llvm::stable_sort(CandidateSet, [&](const OverloadCandidate &X,
@@ -6125,7 +6125,7 @@ static void mergeCandidatesWithResults(
 /// Get the type of the Nth parameter from a given set of overload
 /// candidates.
 static QualType getParamType(Sema &SemaRef,
-                             ArrayRef<ResultCandidate> Candidates, unsigned N) {
+                             llvm::ArrayRef<ResultCandidate> Candidates, unsigned N) {
 
   // Given the overloads 'Candidates' for a function call matching all arguments
   // up to N, return the type of the Nth parameter if it is the same for all
@@ -6150,7 +6150,7 @@ static QualType getParamType(Sema &SemaRef,
 }
 
 static QualType
-ProduceSignatureHelp(Sema &SemaRef, MutableArrayRef<ResultCandidate> Candidates,
+ProduceSignatureHelp(Sema &SemaRef, llvm::MutableArrayRef<ResultCandidate> Candidates,
                      unsigned CurrentArg, SourceLocation OpenParLoc,
                      bool Braced) {
   if (Candidates.empty())
@@ -6211,7 +6211,7 @@ static FunctionProtoTypeLoc GetPrototypeLoc(Expr *Fn) {
 }
 
 QualType
-SemaCodeCompletion::ProduceCallSignatureHelp(Expr *Fn, ArrayRef<Expr *> Args,
+SemaCodeCompletion::ProduceCallSignatureHelp(Expr *Fn, llvm::ArrayRef<Expr *> Args,
                                              SourceLocation OpenParLoc) {
   Fn = unwrapParenList(Fn);
   if (!CodeCompleter || !Fn)
@@ -6227,7 +6227,7 @@ SemaCodeCompletion::ProduceCallSignatureHelp(Expr *Fn, ArrayRef<Expr *> Args,
   auto ArgsWithoutDependentTypes =
       Args.take_while([](Expr *Arg) { return !Arg->isTypeDependent(); });
 
-  SmallVector<ResultCandidate, 8> Results;
+  llvm::SmallVector<ResultCandidate, 8> Results;
 
   Expr *NakedFn = Fn->IgnoreParenCasts();
   // Build an overload candidate set based on the functions we find.
@@ -6246,7 +6246,7 @@ SemaCodeCompletion::ProduceCallSignatureHelp(Expr *Fn, ArrayRef<Expr *> Args,
     }
 
     // Add the base as first argument (use a nullptr if the base is implicit).
-    SmallVector<Expr *, 12> ArgExprs(
+    llvm::SmallVector<Expr *, 12> ArgExprs(
         1, UME->isImplicitAccess() ? nullptr : UME->getBase());
     ArgExprs.append(ArgsWithoutDependentTypes.begin(),
                     ArgsWithoutDependentTypes.end());
@@ -6284,7 +6284,7 @@ SemaCodeCompletion::ProduceCallSignatureHelp(Expr *Fn, ArrayRef<Expr *> Args,
         LookupResult R(SemaRef, OpName, Loc, Sema::LookupOrdinaryName);
         SemaRef.LookupQualifiedName(R, DC);
         R.suppressDiagnostics();
-        SmallVector<Expr *, 12> ArgExprs(1, NakedFn);
+        llvm::SmallVector<Expr *, 12> ArgExprs(1, NakedFn);
         ArgExprs.append(ArgsWithoutDependentTypes.begin(),
                         ArgsWithoutDependentTypes.end());
         SemaRef.AddFunctionCandidates(R.asUnresolvedSet(), ArgExprs,
@@ -6342,7 +6342,7 @@ SemaCodeCompletion::ProduceCallSignatureHelp(Expr *Fn, ArrayRef<Expr *> Args,
 //     Returns std::nullopt.
 static std::optional<unsigned>
 getNextAggregateIndexAfterDesignatedInit(const ResultCandidate &Aggregate,
-                                         ArrayRef<Expr *> Args) {
+                                         llvm::ArrayRef<Expr *> Args) {
   static constexpr unsigned Invalid = std::numeric_limits<unsigned>::max();
   assert(Aggregate.getKind() == ResultCandidate::CK_Aggregate);
 
@@ -6392,11 +6392,11 @@ getNextAggregateIndexAfterDesignatedInit(const ResultCandidate &Aggregate,
 }
 
 QualType SemaCodeCompletion::ProduceConstructorSignatureHelp(
-    QualType Type, SourceLocation Loc, ArrayRef<Expr *> Args,
+    QualType Type, SourceLocation Loc, llvm::ArrayRef<Expr *> Args,
     SourceLocation OpenParLoc, bool Braced) {
   if (!CodeCompleter)
     return QualType();
-  SmallVector<ResultCandidate, 8> Results;
+  llvm::SmallVector<ResultCandidate, 8> Results;
 
   // A complete type is needed to lookup for constructors.
   RecordDecl *RD =
@@ -6470,7 +6470,7 @@ QualType SemaCodeCompletion::ProduceConstructorSignatureHelp(
 
 QualType SemaCodeCompletion::ProduceCtorInitMemberSignatureHelp(
     Decl *ConstructorDecl, CXXScopeSpec SS, ParsedType TemplateTypeTy,
-    ArrayRef<Expr *> ArgExprs, IdentifierInfo *II, SourceLocation OpenParLoc,
+    llvm::ArrayRef<Expr *> ArgExprs, IdentifierInfo *II, SourceLocation OpenParLoc,
     bool Braced) {
   if (!CodeCompleter)
     return QualType();
@@ -6511,12 +6511,12 @@ static bool argMatchesTemplateParams(const ParsedTemplateArgument &Arg,
 }
 
 QualType SemaCodeCompletion::ProduceTemplateArgumentSignatureHelp(
-    TemplateTy ParsedTemplate, ArrayRef<ParsedTemplateArgument> Args,
+    TemplateTy ParsedTemplate, llvm::ArrayRef<ParsedTemplateArgument> Args,
     SourceLocation LAngleLoc) {
   if (!CodeCompleter || !ParsedTemplate)
     return QualType();
 
-  SmallVector<ResultCandidate, 8> Results;
+  llvm::SmallVector<ResultCandidate, 8> Results;
   auto Consider = [&](const TemplateDecl *TD) {
     // Only add if the existing args are compatible with the template.
     bool Matches = true;
@@ -6933,7 +6933,7 @@ void SemaCodeCompletion::CodeCompleteOperatorName(Scope *S) {
 }
 
 void SemaCodeCompletion::CodeCompleteConstructorInitializer(
-    Decl *ConstructorD, ArrayRef<CXXCtorInitializer *> Initializers) {
+    Decl *ConstructorD, llvm::ArrayRef<CXXCtorInitializer *> Initializers) {
   if (!ConstructorD)
     return;
 
@@ -7576,7 +7576,7 @@ enum ObjCMethodKind {
 };
 
 static bool isAcceptableObjCSelector(Selector Sel, ObjCMethodKind WantKind,
-                                     ArrayRef<const IdentifierInfo *> SelIdents,
+                                     llvm::ArrayRef<const IdentifierInfo *> SelIdents,
                                      bool AllowSameLength = true) {
   unsigned NumSelIdents = SelIdents.size();
   if (NumSelIdents > Sel.getNumArgs())
@@ -7603,7 +7603,7 @@ static bool isAcceptableObjCSelector(Selector Sel, ObjCMethodKind WantKind,
 
 static bool isAcceptableObjCMethod(ObjCMethodDecl *Method,
                                    ObjCMethodKind WantKind,
-                                   ArrayRef<const IdentifierInfo *> SelIdents,
+                                   llvm::ArrayRef<const IdentifierInfo *> SelIdents,
                                    bool AllowSameLength = true) {
   return isAcceptableObjCSelector(Method->getSelector(), WantKind, SelIdents,
                                   AllowSameLength);
@@ -7635,7 +7635,7 @@ typedef llvm::SmallPtrSet<Selector, 16> VisitedSelectorSet;
 /// \param Results the structure into which we'll add results.
 static void AddObjCMethods(ObjCContainerDecl *Container,
                            bool WantInstanceMethods, ObjCMethodKind WantKind,
-                           ArrayRef<const IdentifierInfo *> SelIdents,
+                           llvm::ArrayRef<const IdentifierInfo *> SelIdents,
                            DeclContext *CurContext,
                            VisitedSelectorSet &Selectors, bool AllowSameLength,
                            ResultBuilder &Results, bool InOriginalClass = true,
@@ -7949,7 +7949,7 @@ static ObjCInterfaceDecl *GetAssumedMessageSendExprType(Expr *E) {
 /// this "super" completion. If NULL, no completion was added.
 static ObjCMethodDecl *
 AddSuperSendCompletion(Sema &S, bool NeedSuperKeyword,
-                       ArrayRef<const IdentifierInfo *> SelIdents,
+                       llvm::ArrayRef<const IdentifierInfo *> SelIdents,
                        ResultBuilder &Results) {
   ObjCMethodDecl *CurMethod = S.getCurMethodDecl();
   if (!CurMethod)
@@ -8089,7 +8089,7 @@ void SemaCodeCompletion::CodeCompleteObjCMessageReceiver(Scope *S) {
 
 void SemaCodeCompletion::CodeCompleteObjCSuperMessage(
     Scope *S, SourceLocation SuperLoc,
-    ArrayRef<const IdentifierInfo *> SelIdents, bool AtArgumentExpression) {
+    llvm::ArrayRef<const IdentifierInfo *> SelIdents, bool AtArgumentExpression) {
   ObjCInterfaceDecl *CDecl = nullptr;
   if (ObjCMethodDecl *CurMethod = SemaRef.getCurMethodDecl()) {
     // Figure out which interface we're in.
@@ -8186,7 +8186,7 @@ static QualType getPreferredArgumentTypeForMessageSend(ResultBuilder &Results,
 
 static void
 AddClassMessageCompletions(Sema &SemaRef, Scope *S, ParsedType Receiver,
-                           ArrayRef<const IdentifierInfo *> SelIdents,
+                           llvm::ArrayRef<const IdentifierInfo *> SelIdents,
                            bool AtArgumentExpression, bool IsSuper,
                            ResultBuilder &Results) {
   typedef CodeCompletionResult Result;
@@ -8261,7 +8261,7 @@ AddClassMessageCompletions(Sema &SemaRef, Scope *S, ParsedType Receiver,
 }
 
 void SemaCodeCompletion::CodeCompleteObjCClassMessage(
-    Scope *S, ParsedType Receiver, ArrayRef<const IdentifierInfo *> SelIdents,
+    Scope *S, ParsedType Receiver, llvm::ArrayRef<const IdentifierInfo *> SelIdents,
     bool AtArgumentExpression, bool IsSuper) {
 
   QualType T = SemaRef.GetTypeFromParser(Receiver);
@@ -8296,7 +8296,7 @@ void SemaCodeCompletion::CodeCompleteObjCClassMessage(
 }
 
 void SemaCodeCompletion::CodeCompleteObjCInstanceMessage(
-    Scope *S, Expr *Receiver, ArrayRef<const IdentifierInfo *> SelIdents,
+    Scope *S, Expr *Receiver, llvm::ArrayRef<const IdentifierInfo *> SelIdents,
     bool AtArgumentExpression, ObjCInterfaceDecl *Super) {
   typedef CodeCompletionResult Result;
   ASTContext &Context = getASTContext();
@@ -8473,7 +8473,7 @@ void SemaCodeCompletion::CodeCompleteObjCForCollection(
 }
 
 void SemaCodeCompletion::CodeCompleteObjCSelector(
-    Scope *S, ArrayRef<const IdentifierInfo *> SelIdents) {
+    Scope *S, llvm::ArrayRef<const IdentifierInfo *> SelIdents) {
   // If we have an external source, load the entire class method
   // pool from the AST file.
   if (SemaRef.ExternalSource) {
@@ -8550,7 +8550,7 @@ static void AddProtocolResults(DeclContext *Ctx, DeclContext *CurContext,
 }
 
 void SemaCodeCompletion::CodeCompleteObjCProtocolReferences(
-    ArrayRef<IdentifierLocPair> Protocols) {
+    llvm::ArrayRef<IdentifierLocPair> Protocols) {
   ResultBuilder Results(SemaRef, CodeCompleter->getAllocator(),
                         CodeCompleter->getCodeCompletionTUInfo(),
                         CodeCompletionContext::CCC_ObjCProtocolName);
@@ -9018,7 +9018,7 @@ static void AddObjCPassingTypeChunk(QualType Type, unsigned ObjCDeclQuals,
 
 /// Determine whether the given class is or inherits from a class by
 /// the given name.
-static bool InheritsFromClassNamed(ObjCInterfaceDecl *Class, StringRef Name) {
+static bool InheritsFromClassNamed(ObjCInterfaceDecl *Class, llvm::StringRef Name) {
   if (!Class)
     return false;
 
@@ -9053,10 +9053,10 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
   // on demand.
   struct KeyHolder {
     CodeCompletionAllocator &Allocator;
-    StringRef Key;
+    llvm::StringRef Key;
     const char *CopiedKey;
 
-    KeyHolder(CodeCompletionAllocator &Allocator, StringRef Key)
+    KeyHolder(CodeCompletionAllocator &Allocator, llvm::StringRef Key)
         : Allocator(Allocator), Key(Key), CopiedKey(nullptr) {}
 
     operator const char *() {
@@ -9098,7 +9098,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
         (ReturnType->isIntegerType() || ReturnType->isBooleanType())) ||
        (ReturnType.isNull() && (Property->getType()->isIntegerType() ||
                                 Property->getType()->isBooleanType())))) {
-    std::string SelectorName = (Twine("is") + UpperKey).str();
+    std::string SelectorName = (llvm::Twine("is") + UpperKey).str();
     IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getNullarySelector(SelectorId))
             .second) {
@@ -9117,7 +9117,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
   // Add the normal mutator.
   if (IsInstanceMethod && ReturnTypeMatchesVoid &&
       !Property->getSetterMethodDecl()) {
-    std::string SelectorName = (Twine("set") + UpperKey).str();
+    std::string SelectorName = (llvm::Twine("set") + UpperKey).str();
     IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getUnarySelector(SelectorId)).second) {
       if (ReturnType.isNull()) {
@@ -9168,7 +9168,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
   // Add -(NSUInteger)countOf<key>
   if (IsInstanceMethod &&
       (ReturnType.isNull() || ReturnType->isIntegerType())) {
-    std::string SelectorName = (Twine("countOf") + UpperKey).str();
+    std::string SelectorName = (llvm::Twine("countOf") + UpperKey).str();
     IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getNullarySelector(SelectorId))
             .second) {
@@ -9190,7 +9190,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
   // Add -(id)objectInKeyAtIndex:(NSUInteger)index
   if (IsInstanceMethod &&
       (ReturnType.isNull() || ReturnType->isObjCObjectPointerType())) {
-    std::string SelectorName = (Twine("objectIn") + UpperKey + "AtIndex").str();
+    std::string SelectorName = (llvm::Twine("objectIn") + UpperKey + "AtIndex").str();
     IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getUnarySelector(SelectorId)).second) {
       if (ReturnType.isNull()) {
@@ -9217,7 +9217,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
         ReturnType->castAs<ObjCObjectPointerType>()
                 ->getInterfaceDecl()
                 ->getName() == "NSArray"))) {
-    std::string SelectorName = (Twine(Property->getName()) + "AtIndexes").str();
+    std::string SelectorName = (llvm::Twine(Property->getName()) + "AtIndexes").str();
     IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getUnarySelector(SelectorId)).second) {
       if (ReturnType.isNull()) {
@@ -9238,7 +9238,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
 
   // Add -(void)getKey:(type **)buffer range:(NSRange)inRange
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
-    std::string SelectorName = (Twine("get") + UpperKey).str();
+    std::string SelectorName = (llvm::Twine("get") + UpperKey).str();
     const IdentifierInfo *SelectorIds[2] = {&Context.Idents.get(SelectorName),
                                             &Context.Idents.get("range")};
 
@@ -9270,7 +9270,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
 
   // - (void)insertObject:(type *)object inKeyAtIndex:(NSUInteger)index
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
-    std::string SelectorName = (Twine("in") + UpperKey + "AtIndex").str();
+    std::string SelectorName = (llvm::Twine("in") + UpperKey + "AtIndex").str();
     const IdentifierInfo *SelectorIds[2] = {&Context.Idents.get("insertObject"),
                                             &Context.Idents.get(SelectorName)};
 
@@ -9300,7 +9300,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
 
   // - (void)insertKey:(NSArray *)array atIndexes:(NSIndexSet *)indexes
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
-    std::string SelectorName = (Twine("insert") + UpperKey).str();
+    std::string SelectorName = (llvm::Twine("insert") + UpperKey).str();
     const IdentifierInfo *SelectorIds[2] = {&Context.Idents.get(SelectorName),
                                             &Context.Idents.get("atIndexes")};
 
@@ -9330,7 +9330,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
   // -(void)removeObjectFromKeyAtIndex:(NSUInteger)index
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
     std::string SelectorName =
-        (Twine("removeObjectFrom") + UpperKey + "AtIndex").str();
+        (llvm::Twine("removeObjectFrom") + UpperKey + "AtIndex").str();
     const IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getUnarySelector(SelectorId)).second) {
       if (ReturnType.isNull()) {
@@ -9351,7 +9351,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
 
   // -(void)removeKeyAtIndexes:(NSIndexSet *)indexes
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
-    std::string SelectorName = (Twine("remove") + UpperKey + "AtIndexes").str();
+    std::string SelectorName = (llvm::Twine("remove") + UpperKey + "AtIndexes").str();
     const IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getUnarySelector(SelectorId)).second) {
       if (ReturnType.isNull()) {
@@ -9373,7 +9373,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
   // - (void)replaceObjectInKeyAtIndex:(NSUInteger)index withObject:(id)object
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
     std::string SelectorName =
-        (Twine("replaceObjectIn") + UpperKey + "AtIndex").str();
+        (llvm::Twine("replaceObjectIn") + UpperKey + "AtIndex").str();
     const IdentifierInfo *SelectorIds[2] = {&Context.Idents.get(SelectorName),
                                             &Context.Idents.get("withObject")};
 
@@ -9403,8 +9403,8 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
   // - (void)replaceKeyAtIndexes:(NSIndexSet *)indexes withKey:(NSArray *)array
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
     std::string SelectorName1 =
-        (Twine("replace") + UpperKey + "AtIndexes").str();
-    std::string SelectorName2 = (Twine("with") + UpperKey).str();
+        (llvm::Twine("replace") + UpperKey + "AtIndexes").str();
+    std::string SelectorName2 = (llvm::Twine("with") + UpperKey).str();
     const IdentifierInfo *SelectorIds[2] = {&Context.Idents.get(SelectorName1),
                                             &Context.Idents.get(SelectorName2)};
 
@@ -9440,7 +9440,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
         ReturnType->castAs<ObjCObjectPointerType>()
                 ->getInterfaceDecl()
                 ->getName() == "NSEnumerator"))) {
-    std::string SelectorName = (Twine("enumeratorOf") + UpperKey).str();
+    std::string SelectorName = (llvm::Twine("enumeratorOf") + UpperKey).str();
     const IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getNullarySelector(SelectorId))
             .second) {
@@ -9459,7 +9459,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
   // - (type *)memberOfKey:(type *)object
   if (IsInstanceMethod &&
       (ReturnType.isNull() || ReturnType->isObjCObjectPointerType())) {
-    std::string SelectorName = (Twine("memberOf") + UpperKey).str();
+    std::string SelectorName = (llvm::Twine("memberOf") + UpperKey).str();
     const IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getUnarySelector(SelectorId)).second) {
       if (ReturnType.isNull()) {
@@ -9489,7 +9489,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
   // - (void)addKeyObject:(type *)object
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
     std::string SelectorName =
-        (Twine("add") + UpperKey + Twine("Object")).str();
+        (llvm::Twine("add") + UpperKey + llvm::Twine("Object")).str();
     const IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getUnarySelector(SelectorId)).second) {
       if (ReturnType.isNull()) {
@@ -9511,7 +9511,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
 
   // - (void)addKey:(NSSet *)objects
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
-    std::string SelectorName = (Twine("add") + UpperKey).str();
+    std::string SelectorName = (llvm::Twine("add") + UpperKey).str();
     const IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getUnarySelector(SelectorId)).second) {
       if (ReturnType.isNull()) {
@@ -9533,7 +9533,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
   // - (void)removeKeyObject:(type *)object
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
     std::string SelectorName =
-        (Twine("remove") + UpperKey + Twine("Object")).str();
+        (llvm::Twine("remove") + UpperKey + llvm::Twine("Object")).str();
     const IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getUnarySelector(SelectorId)).second) {
       if (ReturnType.isNull()) {
@@ -9555,7 +9555,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
 
   // - (void)removeKey:(NSSet *)objects
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
-    std::string SelectorName = (Twine("remove") + UpperKey).str();
+    std::string SelectorName = (llvm::Twine("remove") + UpperKey).str();
     const IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getUnarySelector(SelectorId)).second) {
       if (ReturnType.isNull()) {
@@ -9576,7 +9576,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
 
   // - (void)intersectKey:(NSSet *)objects
   if (IsInstanceMethod && ReturnTypeMatchesVoid) {
-    std::string SelectorName = (Twine("intersect") + UpperKey).str();
+    std::string SelectorName = (llvm::Twine("intersect") + UpperKey).str();
     const IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getUnarySelector(SelectorId)).second) {
       if (ReturnType.isNull()) {
@@ -9605,7 +9605,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
                 ->getInterfaceDecl()
                 ->getName() == "NSSet"))) {
     std::string SelectorName =
-        (Twine("keyPathsForValuesAffecting") + UpperKey).str();
+        (llvm::Twine("keyPathsForValuesAffecting") + UpperKey).str();
     const IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getNullarySelector(SelectorId))
             .second) {
@@ -9626,7 +9626,7 @@ static void AddObjCKeyValueCompletions(ObjCPropertyDecl *Property,
       (ReturnType.isNull() || ReturnType->isIntegerType() ||
        ReturnType->isBooleanType())) {
     std::string SelectorName =
-        (Twine("automaticallyNotifiesObserversOf") + UpperKey).str();
+        (llvm::Twine("automaticallyNotifiesObserversOf") + UpperKey).str();
     const IdentifierInfo *SelectorId = &Context.Idents.get(SelectorName);
     if (KnownSelectors.insert(Selectors.getNullarySelector(SelectorId))
             .second) {
@@ -9789,7 +9789,7 @@ void SemaCodeCompletion::CodeCompleteObjCMethodDecl(
   // Add Key-Value-Coding and Key-Value-Observing accessor methods for all of
   // the properties in this class and its categories.
   if (Context.getLangOpts().ObjC) {
-    SmallVector<ObjCContainerDecl *, 4> Containers;
+    llvm::SmallVector<ObjCContainerDecl *, 4> Containers;
     Containers.push_back(SearchDecl);
 
     VisitedSelectorSet KnownSelectors;
@@ -9823,7 +9823,7 @@ void SemaCodeCompletion::CodeCompleteObjCMethodDecl(
 
 void SemaCodeCompletion::CodeCompleteObjCMethodDeclSelector(
     Scope *S, bool IsInstanceMethod, bool AtParameterName, ParsedType ReturnTy,
-    ArrayRef<const IdentifierInfo *> SelIdents) {
+    llvm::ArrayRef<const IdentifierInfo *> SelIdents) {
   // If we have an external source, load the entire class method
   // pool from the AST file.
   if (SemaRef.ExternalSource) {
@@ -10158,7 +10158,7 @@ void SemaCodeCompletion::CodeCompleteIncludedFile(llvm::StringRef Dir,
   // Our completions will normalize to / for simplicity, this case is rare.
   std::string RelDir = llvm::sys::path::convert_to_slash(Dir);
   // We need the native slashes for the actual file system interactions.
-  SmallString<128> NativeRelDir = StringRef(RelDir);
+  llvm::SmallString<128> NativeRelDir = llvm::StringRef(RelDir);
   llvm::sys::path::native(NativeRelDir);
   llvm::vfs::FileSystem &FS =
       SemaRef.getSourceManager().getFileManager().getVirtualFileSystem();
@@ -10166,17 +10166,17 @@ void SemaCodeCompletion::CodeCompleteIncludedFile(llvm::StringRef Dir,
   ResultBuilder Results(SemaRef, CodeCompleter->getAllocator(),
                         CodeCompleter->getCodeCompletionTUInfo(),
                         CodeCompletionContext::CCC_IncludedFile);
-  llvm::DenseSet<StringRef> SeenResults; // To deduplicate results.
+  llvm::DenseSet<llvm::StringRef> SeenResults; // To deduplicate results.
 
   // Helper: adds one file or directory completion result.
-  auto AddCompletion = [&](StringRef Filename, bool IsDirectory) {
-    SmallString<64> TypedChunk = Filename;
+  auto AddCompletion = [&](llvm::StringRef Filename, bool IsDirectory) {
+    llvm::SmallString<64> TypedChunk = Filename;
     // Directory completion is up to the slash, e.g. <sys/
     TypedChunk.push_back(IsDirectory ? '/' : Angled ? '>' : '"');
     auto R = SeenResults.insert(TypedChunk);
     if (R.second) { // New completion
       const char *InternedTyped = Results.getAllocator().CopyString(TypedChunk);
-      *R.first = InternedTyped; // Avoid dangling StringRef.
+      *R.first = InternedTyped; // Avoid dangling llvm::StringRef.
       CodeCompletionBuilder Builder(CodeCompleter->getAllocator(),
                                     CodeCompleter->getCodeCompletionTUInfo());
       Builder.AddTypedTextChunk(InternedTyped);
@@ -10187,7 +10187,7 @@ void SemaCodeCompletion::CodeCompleteIncludedFile(llvm::StringRef Dir,
   };
 
   // Helper: scans IncludeDir for nice files, and adds results for each.
-  auto AddFilesFromIncludeDir = [&](StringRef IncludeDir,
+  auto AddFilesFromIncludeDir = [&](llvm::StringRef IncludeDir,
                                     bool IsSystem,
                                     DirectoryLookup::LookupType_t LookupType) {
     llvm::SmallString<128> Dir = IncludeDir;
@@ -10205,7 +10205,7 @@ void SemaCodeCompletion::CodeCompleteIncludedFile(llvm::StringRef Dir,
       }
     }
 
-    const StringRef &Dirname = llvm::sys::path::filename(Dir);
+    const llvm::StringRef &Dirname = llvm::sys::path::filename(Dir);
     const bool isQt = Dirname.starts_with("Qt") || Dirname == "ActiveQt";
     const bool ExtensionlessHeaders =
         IsSystem || isQt || Dir.ends_with(".framework/Headers");
@@ -10215,7 +10215,7 @@ void SemaCodeCompletion::CodeCompleteIncludedFile(llvm::StringRef Dir,
          !EC && It != llvm::vfs::directory_iterator(); It.increment(EC)) {
       if (++Count == 2500) // If we happen to hit a huge directory,
         break;             // bail out early so we're not too slow.
-      StringRef Filename = llvm::sys::path::filename(It->path());
+      llvm::StringRef Filename = llvm::sys::path::filename(It->path());
 
       // To know whether a symlink should be treated as file or a directory, we
       // have to stat it. This should be cheap enough as there shouldn't be many
@@ -10310,7 +10310,7 @@ void SemaCodeCompletion::CodeCompleteAvailabilityPlatformName() {
   for (const char *Platform : llvm::ArrayRef(Platforms)) {
     Results.AddResult(CodeCompletionResult(Platform));
     Results.AddResult(CodeCompletionResult(Results.getAllocator().CopyString(
-        Twine(Platform) + "ApplicationExtension")));
+        llvm::Twine(Platform) + "ApplicationExtension")));
   }
   Results.ExitScope();
   HandleCodeCompleteResults(&SemaRef, CodeCompleter,
@@ -10320,7 +10320,7 @@ void SemaCodeCompletion::CodeCompleteAvailabilityPlatformName() {
 
 void SemaCodeCompletion::GatherGlobalCodeCompletions(
     CodeCompletionAllocator &Allocator, CodeCompletionTUInfo &CCTUInfo,
-    SmallVectorImpl<CodeCompletionResult> &Results) {
+    llvm::SmallVectorImpl<CodeCompletionResult> &Results) {
   ResultBuilder Builder(SemaRef, Allocator, CCTUInfo,
                         CodeCompletionContext::CCC_Recovery);
   if (!CodeCompleter || CodeCompleter->includeGlobals()) {

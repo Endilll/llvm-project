@@ -47,7 +47,7 @@ private:
 
   int getLine(const NamedDecl *D, const ASTContext &Context) const;
   llvm::SmallString<128> getFile(const NamedDecl *D, const ASTContext &Context,
-                                 StringRef RootDir,
+                                 llvm::StringRef RootDir,
                                  bool &IsFileInRootDir) const;
   comments::FullComment *getComment(const NamedDecl *D,
                                     const ASTContext &Context) const;

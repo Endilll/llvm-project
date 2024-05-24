@@ -21,10 +21,10 @@ public:
   // Implements PPCallbacks::InclusionDirective(). Records the names and source
   // locations of the inclusions in the main source file being processed.
   void InclusionDirective(SourceLocation HashLocation,
-                          const Token &IncludeToken, StringRef FileNameRef,
+                          const Token &IncludeToken, llvm::StringRef FileNameRef,
                           bool IsAngled, CharSourceRange FileNameRange,
                           OptionalFileEntryRef /*IncludedFile*/,
-                          StringRef /*SearchPath*/, StringRef /*RelativePath*/,
+                          llvm::StringRef /*SearchPath*/, llvm::StringRef /*RelativePath*/,
                           const Module * /*SuggestedModule*/,
                           bool /*ModuleImported*/,
                           SrcMgr::CharacteristicKind /*FileType*/) override {
@@ -83,13 +83,13 @@ IncludeInserter::createIncludeInsertion(FileID FileID, llvm::StringRef Header) {
 }
 
 std::optional<FixItHint>
-IncludeInserter::createMainFileIncludeInsertion(StringRef Header) {
+IncludeInserter::createMainFileIncludeInsertion(llvm::StringRef Header) {
   assert(SourceMgr && "SourceMgr shouldn't be null; did you remember to call "
                       "registerPreprocessor()?");
   return createIncludeInsertion(SourceMgr->getMainFileID(), Header);
 }
 
-void IncludeInserter::addInclude(StringRef FileName, bool IsAngled,
+void IncludeInserter::addInclude(llvm::StringRef FileName, bool IsAngled,
                                  SourceLocation HashLocation,
                                  SourceLocation EndLocation) {
   assert(SourceMgr && "SourceMgr shouldn't be null; did you remember to call "

@@ -57,7 +57,7 @@ constexpr llvm::StringLiteral FloatingLiteralCheck::Suffixes;
 
 struct NewSuffix {
   SourceRange LiteralLocation;
-  StringRef OldSuffix;
+  llvm::StringRef OldSuffix;
   std::optional<FixItHint> FixIt;
 };
 
@@ -85,13 +85,13 @@ std::optional<SourceRange> getMacroAwareSourceRange(SourceRange Loc,
 
 std::optional<std::string>
 getNewSuffix(llvm::StringRef OldSuffix,
-             const std::vector<StringRef> &NewSuffixes) {
+             const std::vector<llvm::StringRef> &NewSuffixes) {
   // If there is no config, just uppercase the entirety of the suffix.
   if (NewSuffixes.empty())
     return OldSuffix.upper();
   // Else, find matching suffix, case-*insensitive*ly.
   auto NewSuffix =
-      llvm::find_if(NewSuffixes, [OldSuffix](StringRef PotentialNewSuffix) {
+      llvm::find_if(NewSuffixes, [OldSuffix](llvm::StringRef PotentialNewSuffix) {
         return OldSuffix.equals_insensitive(PotentialNewSuffix);
       });
   // Have a match, return it.
@@ -104,7 +104,7 @@ getNewSuffix(llvm::StringRef OldSuffix,
 template <typename LiteralType>
 std::optional<NewSuffix>
 shouldReplaceLiteralSuffix(const Expr &Literal,
-                           const std::vector<StringRef> &NewSuffixes,
+                           const std::vector<llvm::StringRef> &NewSuffixes,
                            const SourceManager &SM, const LangOptions &LO) {
   NewSuffix ReplacementDsc;
 
@@ -129,7 +129,7 @@ shouldReplaceLiteralSuffix(const Expr &Literal,
 
   // Get the whole literal from the source buffer.
   bool Invalid = false;
-  const StringRef LiteralSourceText = Lexer::getSourceText(
+  const llvm::StringRef LiteralSourceText = Lexer::getSourceText(
       CharSourceRange::getTokenRange(*Range), SM, LO, &Invalid);
   assert(!Invalid && "Failed to retrieve the source text.");
 
@@ -147,7 +147,7 @@ shouldReplaceLiteralSuffix(const Expr &Literal,
     // because hex-digit-sequence may contain 'f'.
     Skip = LiteralSourceText.find_first_of(LiteralType::SkipFirst);
     // We could be in non-hexadecimal floating-point literal, with no exponent.
-    if (Skip == StringRef::npos)
+    if (Skip == llvm::StringRef::npos)
       Skip = 0;
   }
 
@@ -158,7 +158,7 @@ shouldReplaceLiteralSuffix(const Expr &Literal,
 
   // We can't check whether the *Literal has any suffix or not without actually
   // looking for the suffix. So it is totally possible that there is no suffix.
-  if (Skip == StringRef::npos)
+  if (Skip == llvm::StringRef::npos)
     return std::nullopt;
 
   // Move the cursor in the source range to the beginning of the suffix.
@@ -183,7 +183,7 @@ shouldReplaceLiteralSuffix(const Expr &Literal,
 } // namespace
 
 UppercaseLiteralSuffixCheck::UppercaseLiteralSuffixCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       NewSuffixes(
           utils::options::parseStringList(Options.get("NewSuffixes", ""))),

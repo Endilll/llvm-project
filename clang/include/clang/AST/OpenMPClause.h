@@ -294,13 +294,13 @@ protected:
       : OMPClause(K, StartLoc, EndLoc), LParenLoc(LParenLoc), NumVars(N) {}
 
   /// Fetches list of variables associated with this clause.
-  MutableArrayRef<Expr *> getVarRefs() {
-    return MutableArrayRef<Expr *>(
+  llvm::MutableArrayRef<Expr *> getVarRefs() {
+    return llvm::MutableArrayRef<Expr *>(
         static_cast<T *>(this)->template getTrailingObjects<Expr *>(), NumVars);
   }
 
   /// Sets the list of variables for this clause.
-  void setVarRefs(ArrayRef<Expr *> VL) {
+  void setVarRefs(llvm::ArrayRef<Expr *> VL) {
     assert(VL.size() == NumVars &&
            "Number of variables is not the same as the preallocated buffer");
     std::copy(VL.begin(), VL.end(),
@@ -308,8 +308,8 @@ protected:
   }
 
 public:
-  using varlist_iterator = MutableArrayRef<Expr *>::iterator;
-  using varlist_const_iterator = ArrayRef<const Expr *>::iterator;
+  using varlist_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using varlist_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using varlist_range = llvm::iterator_range<varlist_iterator>;
   using varlist_const_range = llvm::iterator_range<varlist_const_iterator>;
 
@@ -335,7 +335,7 @@ public:
   SourceLocation getLParenLoc() const { return LParenLoc; }
 
   /// Fetches list of all variables in the clause.
-  ArrayRef<const Expr *> getVarRefs() const {
+  llvm::ArrayRef<const Expr *> getVarRefs() const {
     return llvm::ArrayRef(
         static_cast<const T *>(this)->template getTrailingObjects<Expr *>(),
         NumVars);
@@ -481,7 +481,7 @@ public:
   static OMPAllocateClause *Create(const ASTContext &C, SourceLocation StartLoc,
                                    SourceLocation LParenLoc, Expr *Allocator,
                                    SourceLocation ColonLoc,
-                                   SourceLocation EndLoc, ArrayRef<Expr *> VL);
+                                   SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL);
 
   /// Returns the allocator expression or nullptr, if no allocator is specified.
   Expr *getAllocator() const { return Allocator; }
@@ -810,7 +810,7 @@ public:
   /// \param Sizes     Content of the clause.
   static OMPSizesClause *Create(const ASTContext &C, SourceLocation StartLoc,
                                 SourceLocation LParenLoc, SourceLocation EndLoc,
-                                ArrayRef<Expr *> Sizes);
+                                llvm::ArrayRef<Expr *> Sizes);
 
   /// Build an empty 'sizes' AST node for deserialization.
   ///
@@ -828,19 +828,19 @@ public:
   unsigned getNumSizes() const { return NumSizes; }
 
   /// Returns the tile size expressions.
-  MutableArrayRef<Expr *> getSizesRefs() {
-    return MutableArrayRef<Expr *>(static_cast<OMPSizesClause *>(this)
+  llvm::MutableArrayRef<Expr *> getSizesRefs() {
+    return llvm::MutableArrayRef<Expr *>(static_cast<OMPSizesClause *>(this)
                                        ->template getTrailingObjects<Expr *>(),
                                    NumSizes);
   }
-  ArrayRef<Expr *> getSizesRefs() const {
-    return ArrayRef<Expr *>(static_cast<const OMPSizesClause *>(this)
+  llvm::ArrayRef<Expr *> getSizesRefs() const {
+    return llvm::ArrayRef<Expr *>(static_cast<const OMPSizesClause *>(this)
                                 ->template getTrailingObjects<Expr *>(),
                             NumSizes);
   }
 
   /// Sets the tile size expressions.
-  void setSizesRefs(ArrayRef<Expr *> VL) {
+  void setSizesRefs(llvm::ArrayRef<Expr *> VL) {
     assert(VL.size() == NumSizes);
     std::copy(VL.begin(), VL.end(),
               static_cast<OMPSizesClause *>(this)
@@ -848,12 +848,12 @@ public:
   }
 
   child_range children() {
-    MutableArrayRef<Expr *> Sizes = getSizesRefs();
+    llvm::MutableArrayRef<Expr *> Sizes = getSizesRefs();
     return child_range(reinterpret_cast<Stmt **>(Sizes.begin()),
                        reinterpret_cast<Stmt **>(Sizes.end()));
   }
   const_child_range children() const {
-    ArrayRef<Expr *> Sizes = getSizesRefs();
+    llvm::ArrayRef<Expr *> Sizes = getSizesRefs();
     return const_child_range(reinterpret_cast<Stmt *const *>(Sizes.begin()),
                              reinterpret_cast<Stmt *const *>(Sizes.end()));
   }
@@ -1890,7 +1890,7 @@ public:
   /// Set number of iterations for the specified loop.
   void setLoopNumIterations(unsigned NumLoop, Expr *NumIterations);
   /// Get number of iterations for all the loops.
-  ArrayRef<Expr *> getLoopNumIterations() const;
+  llvm::ArrayRef<Expr *> getLoopNumIterations() const;
 
   /// Set loop counter for the specified loop.
   void setLoopCounter(unsigned NumLoop, Expr *Counter);
@@ -2672,14 +2672,14 @@ class OMPPrivateClause final
   /// Sets the list of references to private copies with initializers for
   /// new private variables.
   /// \param VL List of references.
-  void setPrivateCopies(ArrayRef<Expr *> VL);
+  void setPrivateCopies(llvm::ArrayRef<Expr *> VL);
 
   /// Gets the list of references to private copies with initializers for
   /// new private variables.
-  MutableArrayRef<Expr *> getPrivateCopies() {
-    return MutableArrayRef<Expr *>(varlist_end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getPrivateCopies() {
+    return llvm::MutableArrayRef<Expr *>(varlist_end(), varlist_size());
   }
-  ArrayRef<const Expr *> getPrivateCopies() const {
+  llvm::ArrayRef<const Expr *> getPrivateCopies() const {
     return llvm::ArrayRef(varlist_end(), varlist_size());
   }
 
@@ -2694,8 +2694,8 @@ public:
   /// \param PrivateVL List of references to private copies with initializers.
   static OMPPrivateClause *Create(const ASTContext &C, SourceLocation StartLoc,
                                   SourceLocation LParenLoc,
-                                  SourceLocation EndLoc, ArrayRef<Expr *> VL,
-                                  ArrayRef<Expr *> PrivateVL);
+                                  SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL,
+                                  llvm::ArrayRef<Expr *> PrivateVL);
 
   /// Creates an empty clause with the place for \a N variables.
   ///
@@ -2703,8 +2703,8 @@ public:
   /// \param N The number of variables.
   static OMPPrivateClause *CreateEmpty(const ASTContext &C, unsigned N);
 
-  using private_copies_iterator = MutableArrayRef<Expr *>::iterator;
-  using private_copies_const_iterator = ArrayRef<const Expr *>::iterator;
+  using private_copies_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using private_copies_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using private_copies_range = llvm::iterator_range<private_copies_iterator>;
   using private_copies_const_range =
       llvm::iterator_range<private_copies_const_iterator>;
@@ -2781,28 +2781,28 @@ class OMPFirstprivateClause final
   /// Sets the list of references to private copies with initializers for
   /// new private variables.
   /// \param VL List of references.
-  void setPrivateCopies(ArrayRef<Expr *> VL);
+  void setPrivateCopies(llvm::ArrayRef<Expr *> VL);
 
   /// Gets the list of references to private copies with initializers for
   /// new private variables.
-  MutableArrayRef<Expr *> getPrivateCopies() {
-    return MutableArrayRef<Expr *>(varlist_end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getPrivateCopies() {
+    return llvm::MutableArrayRef<Expr *>(varlist_end(), varlist_size());
   }
-  ArrayRef<const Expr *> getPrivateCopies() const {
+  llvm::ArrayRef<const Expr *> getPrivateCopies() const {
     return llvm::ArrayRef(varlist_end(), varlist_size());
   }
 
   /// Sets the list of references to initializer variables for new
   /// private variables.
   /// \param VL List of references.
-  void setInits(ArrayRef<Expr *> VL);
+  void setInits(llvm::ArrayRef<Expr *> VL);
 
   /// Gets the list of references to initializer variables for new
   /// private variables.
-  MutableArrayRef<Expr *> getInits() {
-    return MutableArrayRef<Expr *>(getPrivateCopies().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getInits() {
+    return llvm::MutableArrayRef<Expr *>(getPrivateCopies().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getInits() const {
+  llvm::ArrayRef<const Expr *> getInits() const {
     return llvm::ArrayRef(getPrivateCopies().end(), varlist_size());
   }
 
@@ -2822,8 +2822,8 @@ public:
   /// region with this clause.
   static OMPFirstprivateClause *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-         SourceLocation EndLoc, ArrayRef<Expr *> VL, ArrayRef<Expr *> PrivateVL,
-         ArrayRef<Expr *> InitVL, Stmt *PreInit);
+         SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL, llvm::ArrayRef<Expr *> PrivateVL,
+         llvm::ArrayRef<Expr *> InitVL, Stmt *PreInit);
 
   /// Creates an empty clause with the place for \a N variables.
   ///
@@ -2831,8 +2831,8 @@ public:
   /// \param N The number of variables.
   static OMPFirstprivateClause *CreateEmpty(const ASTContext &C, unsigned N);
 
-  using private_copies_iterator = MutableArrayRef<Expr *>::iterator;
-  using private_copies_const_iterator = ArrayRef<const Expr *>::iterator;
+  using private_copies_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using private_copies_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using private_copies_range = llvm::iterator_range<private_copies_iterator>;
   using private_copies_const_range =
       llvm::iterator_range<private_copies_const_iterator>;
@@ -2846,8 +2846,8 @@ public:
                                       getPrivateCopies().end());
   }
 
-  using inits_iterator = MutableArrayRef<Expr *>::iterator;
-  using inits_const_iterator = ArrayRef<const Expr *>::iterator;
+  using inits_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using inits_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using inits_range = llvm::iterator_range<inits_iterator>;
   using inits_const_range = llvm::iterator_range<inits_const_iterator>;
 
@@ -2947,10 +2947,10 @@ class OMPLastprivateClause final
 
   /// Get the list of helper expressions for initialization of private
   /// copies for lastprivate variables.
-  MutableArrayRef<Expr *> getPrivateCopies() {
-    return MutableArrayRef<Expr *>(varlist_end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getPrivateCopies() {
+    return llvm::MutableArrayRef<Expr *>(varlist_end(), varlist_size());
   }
-  ArrayRef<const Expr *> getPrivateCopies() const {
+  llvm::ArrayRef<const Expr *> getPrivateCopies() const {
     return llvm::ArrayRef(varlist_end(), varlist_size());
   }
 
@@ -2958,13 +2958,13 @@ class OMPLastprivateClause final
   /// clause. These expressions represent private variables (for arrays, single
   /// array element) in the final assignment statement performed by the
   /// lastprivate clause.
-  void setSourceExprs(ArrayRef<Expr *> SrcExprs);
+  void setSourceExprs(llvm::ArrayRef<Expr *> SrcExprs);
 
   /// Get the list of helper source expressions.
-  MutableArrayRef<Expr *> getSourceExprs() {
-    return MutableArrayRef<Expr *>(getPrivateCopies().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getSourceExprs() {
+    return llvm::MutableArrayRef<Expr *>(getPrivateCopies().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getSourceExprs() const {
+  llvm::ArrayRef<const Expr *> getSourceExprs() const {
     return llvm::ArrayRef(getPrivateCopies().end(), varlist_size());
   }
 
@@ -2972,26 +2972,26 @@ class OMPLastprivateClause final
   /// clause. These expressions represent original variables (for arrays, single
   /// array element) in the final assignment statement performed by the
   /// lastprivate clause.
-  void setDestinationExprs(ArrayRef<Expr *> DstExprs);
+  void setDestinationExprs(llvm::ArrayRef<Expr *> DstExprs);
 
   /// Get the list of helper destination expressions.
-  MutableArrayRef<Expr *> getDestinationExprs() {
-    return MutableArrayRef<Expr *>(getSourceExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getDestinationExprs() {
+    return llvm::MutableArrayRef<Expr *>(getSourceExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getDestinationExprs() const {
+  llvm::ArrayRef<const Expr *> getDestinationExprs() const {
     return llvm::ArrayRef(getSourceExprs().end(), varlist_size());
   }
 
   /// Set list of helper assignment expressions, required for proper
   /// codegen of the clause. These expressions are assignment expressions that
   /// assign private copy of the variable to original variable.
-  void setAssignmentOps(ArrayRef<Expr *> AssignmentOps);
+  void setAssignmentOps(llvm::ArrayRef<Expr *> AssignmentOps);
 
   /// Get the list of helper assignment expressions.
-  MutableArrayRef<Expr *> getAssignmentOps() {
-    return MutableArrayRef<Expr *>(getDestinationExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getAssignmentOps() {
+    return llvm::MutableArrayRef<Expr *>(getDestinationExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getAssignmentOps() const {
+  llvm::ArrayRef<const Expr *> getAssignmentOps() const {
     return llvm::ArrayRef(getDestinationExprs().end(), varlist_size());
   }
 
@@ -3032,8 +3032,8 @@ public:
   /// OpenMP region with this clause.
   static OMPLastprivateClause *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-         SourceLocation EndLoc, ArrayRef<Expr *> VL, ArrayRef<Expr *> SrcExprs,
-         ArrayRef<Expr *> DstExprs, ArrayRef<Expr *> AssignmentOps,
+         SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL, llvm::ArrayRef<Expr *> SrcExprs,
+         llvm::ArrayRef<Expr *> DstExprs, llvm::ArrayRef<Expr *> AssignmentOps,
          OpenMPLastprivateModifier LPKind, SourceLocation LPKindLoc,
          SourceLocation ColonLoc, Stmt *PreInit, Expr *PostUpdate);
 
@@ -3050,15 +3050,15 @@ public:
   /// Returns the location of the ':' symbol, if any.
   SourceLocation getColonLoc() const { return ColonLoc; }
 
-  using helper_expr_iterator = MutableArrayRef<Expr *>::iterator;
-  using helper_expr_const_iterator = ArrayRef<const Expr *>::iterator;
+  using helper_expr_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using helper_expr_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using helper_expr_range = llvm::iterator_range<helper_expr_iterator>;
   using helper_expr_const_range =
       llvm::iterator_range<helper_expr_const_iterator>;
 
   /// Set list of helper expressions, required for generation of private
   /// copies of original lastprivate variables.
-  void setPrivateCopies(ArrayRef<Expr *> PrivateCopies);
+  void setPrivateCopies(llvm::ArrayRef<Expr *> PrivateCopies);
 
   helper_expr_const_range private_copies() const {
     return helper_expr_const_range(getPrivateCopies().begin(),
@@ -3163,7 +3163,7 @@ public:
   /// \param VL List of references to the variables.
   static OMPSharedClause *Create(const ASTContext &C, SourceLocation StartLoc,
                                  SourceLocation LParenLoc,
-                                 SourceLocation EndLoc, ArrayRef<Expr *> VL);
+                                 SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL);
 
   /// Creates an empty clause with \a N variables.
   ///
@@ -3273,26 +3273,26 @@ class OMPReductionClause final
   /// Set list of helper expressions, required for proper codegen of the
   /// clause. These expressions represent private copy of the reduction
   /// variable.
-  void setPrivates(ArrayRef<Expr *> Privates);
+  void setPrivates(llvm::ArrayRef<Expr *> Privates);
 
   /// Get the list of helper privates.
-  MutableArrayRef<Expr *> getPrivates() {
-    return MutableArrayRef<Expr *>(varlist_end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getPrivates() {
+    return llvm::MutableArrayRef<Expr *>(varlist_end(), varlist_size());
   }
-  ArrayRef<const Expr *> getPrivates() const {
+  llvm::ArrayRef<const Expr *> getPrivates() const {
     return llvm::ArrayRef(varlist_end(), varlist_size());
   }
 
   /// Set list of helper expressions, required for proper codegen of the
   /// clause. These expressions represent LHS expression in the final
   /// reduction expression performed by the reduction clause.
-  void setLHSExprs(ArrayRef<Expr *> LHSExprs);
+  void setLHSExprs(llvm::ArrayRef<Expr *> LHSExprs);
 
   /// Get the list of helper LHS expressions.
-  MutableArrayRef<Expr *> getLHSExprs() {
-    return MutableArrayRef<Expr *>(getPrivates().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getLHSExprs() {
+    return llvm::MutableArrayRef<Expr *>(getPrivates().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getLHSExprs() const {
+  llvm::ArrayRef<const Expr *> getLHSExprs() const {
     return llvm::ArrayRef(getPrivates().end(), varlist_size());
   }
 
@@ -3301,13 +3301,13 @@ class OMPReductionClause final
   /// reduction expression performed by the reduction clause.
   /// Also, variables in these expressions are used for proper initialization of
   /// reduction copies.
-  void setRHSExprs(ArrayRef<Expr *> RHSExprs);
+  void setRHSExprs(llvm::ArrayRef<Expr *> RHSExprs);
 
   /// Get the list of helper destination expressions.
-  MutableArrayRef<Expr *> getRHSExprs() {
-    return MutableArrayRef<Expr *>(getLHSExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getRHSExprs() {
+    return llvm::MutableArrayRef<Expr *>(getLHSExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getRHSExprs() const {
+  llvm::ArrayRef<const Expr *> getRHSExprs() const {
     return llvm::ArrayRef(getLHSExprs().end(), varlist_size());
   }
 
@@ -3315,48 +3315,48 @@ class OMPReductionClause final
   /// codegen of the clause. These expressions are binary expressions or
   /// operator/custom reduction call that calculates new value from source
   /// helper expressions to destination helper expressions.
-  void setReductionOps(ArrayRef<Expr *> ReductionOps);
+  void setReductionOps(llvm::ArrayRef<Expr *> ReductionOps);
 
   /// Get the list of helper reduction expressions.
-  MutableArrayRef<Expr *> getReductionOps() {
-    return MutableArrayRef<Expr *>(getRHSExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getReductionOps() {
+    return llvm::MutableArrayRef<Expr *>(getRHSExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getReductionOps() const {
+  llvm::ArrayRef<const Expr *> getReductionOps() const {
     return llvm::ArrayRef(getRHSExprs().end(), varlist_size());
   }
 
   /// Set list of helper copy operations for inscan reductions.
   /// The form is: Temps[i] = LHS[i];
-  void setInscanCopyOps(ArrayRef<Expr *> Ops);
+  void setInscanCopyOps(llvm::ArrayRef<Expr *> Ops);
 
   /// Get the list of helper inscan copy operations.
-  MutableArrayRef<Expr *> getInscanCopyOps() {
-    return MutableArrayRef<Expr *>(getReductionOps().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getInscanCopyOps() {
+    return llvm::MutableArrayRef<Expr *>(getReductionOps().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getInscanCopyOps() const {
+  llvm::ArrayRef<const Expr *> getInscanCopyOps() const {
     return llvm::ArrayRef(getReductionOps().end(), varlist_size());
   }
 
   /// Set list of helper temp vars for inscan copy array operations.
-  void setInscanCopyArrayTemps(ArrayRef<Expr *> CopyArrayTemps);
+  void setInscanCopyArrayTemps(llvm::ArrayRef<Expr *> CopyArrayTemps);
 
   /// Get the list of helper inscan copy temps.
-  MutableArrayRef<Expr *> getInscanCopyArrayTemps() {
-    return MutableArrayRef<Expr *>(getInscanCopyOps().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getInscanCopyArrayTemps() {
+    return llvm::MutableArrayRef<Expr *>(getInscanCopyOps().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getInscanCopyArrayTemps() const {
+  llvm::ArrayRef<const Expr *> getInscanCopyArrayTemps() const {
     return llvm::ArrayRef(getInscanCopyOps().end(), varlist_size());
   }
 
   /// Set list of helper temp elements vars for inscan copy array operations.
-  void setInscanCopyArrayElems(ArrayRef<Expr *> CopyArrayElems);
+  void setInscanCopyArrayElems(llvm::ArrayRef<Expr *> CopyArrayElems);
 
   /// Get the list of helper inscan copy temps.
-  MutableArrayRef<Expr *> getInscanCopyArrayElems() {
-    return MutableArrayRef<Expr *>(getInscanCopyArrayTemps().end(),
+  llvm::MutableArrayRef<Expr *> getInscanCopyArrayElems() {
+    return llvm::MutableArrayRef<Expr *>(getInscanCopyArrayTemps().end(),
                                    varlist_size());
   }
-  ArrayRef<const Expr *> getInscanCopyArrayElems() const {
+  llvm::ArrayRef<const Expr *> getInscanCopyArrayElems() const {
     return llvm::ArrayRef(getInscanCopyArrayTemps().end(), varlist_size());
   }
 
@@ -3404,11 +3404,11 @@ public:
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
          SourceLocation ModifierLoc, SourceLocation ColonLoc,
          SourceLocation EndLoc, OpenMPReductionClauseModifier Modifier,
-         ArrayRef<Expr *> VL, NestedNameSpecifierLoc QualifierLoc,
-         const DeclarationNameInfo &NameInfo, ArrayRef<Expr *> Privates,
-         ArrayRef<Expr *> LHSExprs, ArrayRef<Expr *> RHSExprs,
-         ArrayRef<Expr *> ReductionOps, ArrayRef<Expr *> CopyOps,
-         ArrayRef<Expr *> CopyArrayTemps, ArrayRef<Expr *> CopyArrayElems,
+         llvm::ArrayRef<Expr *> VL, NestedNameSpecifierLoc QualifierLoc,
+         const DeclarationNameInfo &NameInfo, llvm::ArrayRef<Expr *> Privates,
+         llvm::ArrayRef<Expr *> LHSExprs, llvm::ArrayRef<Expr *> RHSExprs,
+         llvm::ArrayRef<Expr *> ReductionOps, llvm::ArrayRef<Expr *> CopyOps,
+         llvm::ArrayRef<Expr *> CopyArrayTemps, llvm::ArrayRef<Expr *> CopyArrayElems,
          Stmt *PreInit, Expr *PostUpdate);
 
   /// Creates an empty clause with the place for \a N variables.
@@ -3435,8 +3435,8 @@ public:
   /// Gets the nested name specifier.
   NestedNameSpecifierLoc getQualifierLoc() const { return QualifierLoc; }
 
-  using helper_expr_iterator = MutableArrayRef<Expr *>::iterator;
-  using helper_expr_const_iterator = ArrayRef<const Expr *>::iterator;
+  using helper_expr_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using helper_expr_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using helper_expr_range = llvm::iterator_range<helper_expr_iterator>;
   using helper_expr_const_range =
       llvm::iterator_range<helper_expr_const_iterator>;
@@ -3592,26 +3592,26 @@ class OMPTaskReductionClause final
 
   /// Set list of helper expressions, required for proper codegen of the clause.
   /// These expressions represent private copy of the reduction variable.
-  void setPrivates(ArrayRef<Expr *> Privates);
+  void setPrivates(llvm::ArrayRef<Expr *> Privates);
 
   /// Get the list of helper privates.
-  MutableArrayRef<Expr *> getPrivates() {
-    return MutableArrayRef<Expr *>(varlist_end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getPrivates() {
+    return llvm::MutableArrayRef<Expr *>(varlist_end(), varlist_size());
   }
-  ArrayRef<const Expr *> getPrivates() const {
+  llvm::ArrayRef<const Expr *> getPrivates() const {
     return llvm::ArrayRef(varlist_end(), varlist_size());
   }
 
   /// Set list of helper expressions, required for proper codegen of the clause.
   /// These expressions represent LHS expression in the final reduction
   /// expression performed by the reduction clause.
-  void setLHSExprs(ArrayRef<Expr *> LHSExprs);
+  void setLHSExprs(llvm::ArrayRef<Expr *> LHSExprs);
 
   /// Get the list of helper LHS expressions.
-  MutableArrayRef<Expr *> getLHSExprs() {
-    return MutableArrayRef<Expr *>(getPrivates().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getLHSExprs() {
+    return llvm::MutableArrayRef<Expr *>(getPrivates().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getLHSExprs() const {
+  llvm::ArrayRef<const Expr *> getLHSExprs() const {
     return llvm::ArrayRef(getPrivates().end(), varlist_size());
   }
 
@@ -3619,13 +3619,13 @@ class OMPTaskReductionClause final
   /// These expressions represent RHS expression in the final reduction
   /// expression performed by the reduction clause. Also, variables in these
   /// expressions are used for proper initialization of reduction copies.
-  void setRHSExprs(ArrayRef<Expr *> RHSExprs);
+  void setRHSExprs(llvm::ArrayRef<Expr *> RHSExprs);
 
   ///  Get the list of helper destination expressions.
-  MutableArrayRef<Expr *> getRHSExprs() {
-    return MutableArrayRef<Expr *>(getLHSExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getRHSExprs() {
+    return llvm::MutableArrayRef<Expr *>(getLHSExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getRHSExprs() const {
+  llvm::ArrayRef<const Expr *> getRHSExprs() const {
     return llvm::ArrayRef(getLHSExprs().end(), varlist_size());
   }
 
@@ -3633,13 +3633,13 @@ class OMPTaskReductionClause final
   /// codegen of the clause. These expressions are binary expressions or
   /// operator/custom reduction call that calculates new value from source
   /// helper expressions to destination helper expressions.
-  void setReductionOps(ArrayRef<Expr *> ReductionOps);
+  void setReductionOps(llvm::ArrayRef<Expr *> ReductionOps);
 
   ///  Get the list of helper reduction expressions.
-  MutableArrayRef<Expr *> getReductionOps() {
-    return MutableArrayRef<Expr *>(getRHSExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getReductionOps() {
+    return llvm::MutableArrayRef<Expr *>(getRHSExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getReductionOps() const {
+  llvm::ArrayRef<const Expr *> getReductionOps() const {
     return llvm::ArrayRef(getRHSExprs().end(), varlist_size());
   }
 
@@ -3678,11 +3678,11 @@ public:
   /// OpenMP region with this clause.
   static OMPTaskReductionClause *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-         SourceLocation ColonLoc, SourceLocation EndLoc, ArrayRef<Expr *> VL,
+         SourceLocation ColonLoc, SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL,
          NestedNameSpecifierLoc QualifierLoc,
-         const DeclarationNameInfo &NameInfo, ArrayRef<Expr *> Privates,
-         ArrayRef<Expr *> LHSExprs, ArrayRef<Expr *> RHSExprs,
-         ArrayRef<Expr *> ReductionOps, Stmt *PreInit, Expr *PostUpdate);
+         const DeclarationNameInfo &NameInfo, llvm::ArrayRef<Expr *> Privates,
+         llvm::ArrayRef<Expr *> LHSExprs, llvm::ArrayRef<Expr *> RHSExprs,
+         llvm::ArrayRef<Expr *> ReductionOps, Stmt *PreInit, Expr *PostUpdate);
 
   /// Creates an empty clause with the place for \a N variables.
   ///
@@ -3699,8 +3699,8 @@ public:
   /// Gets the nested name specifier.
   NestedNameSpecifierLoc getQualifierLoc() const { return QualifierLoc; }
 
-  using helper_expr_iterator = MutableArrayRef<Expr *>::iterator;
-  using helper_expr_const_iterator = ArrayRef<const Expr *>::iterator;
+  using helper_expr_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using helper_expr_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using helper_expr_range = llvm::iterator_range<helper_expr_iterator>;
   using helper_expr_const_range =
       llvm::iterator_range<helper_expr_const_iterator>;
@@ -3823,26 +3823,26 @@ class OMPInReductionClause final
 
   /// Set list of helper expressions, required for proper codegen of the clause.
   /// These expressions represent private copy of the reduction variable.
-  void setPrivates(ArrayRef<Expr *> Privates);
+  void setPrivates(llvm::ArrayRef<Expr *> Privates);
 
   /// Get the list of helper privates.
-  MutableArrayRef<Expr *> getPrivates() {
-    return MutableArrayRef<Expr *>(varlist_end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getPrivates() {
+    return llvm::MutableArrayRef<Expr *>(varlist_end(), varlist_size());
   }
-  ArrayRef<const Expr *> getPrivates() const {
+  llvm::ArrayRef<const Expr *> getPrivates() const {
     return llvm::ArrayRef(varlist_end(), varlist_size());
   }
 
   /// Set list of helper expressions, required for proper codegen of the clause.
   /// These expressions represent LHS expression in the final reduction
   /// expression performed by the reduction clause.
-  void setLHSExprs(ArrayRef<Expr *> LHSExprs);
+  void setLHSExprs(llvm::ArrayRef<Expr *> LHSExprs);
 
   /// Get the list of helper LHS expressions.
-  MutableArrayRef<Expr *> getLHSExprs() {
-    return MutableArrayRef<Expr *>(getPrivates().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getLHSExprs() {
+    return llvm::MutableArrayRef<Expr *>(getPrivates().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getLHSExprs() const {
+  llvm::ArrayRef<const Expr *> getLHSExprs() const {
     return llvm::ArrayRef(getPrivates().end(), varlist_size());
   }
 
@@ -3850,13 +3850,13 @@ class OMPInReductionClause final
   /// These expressions represent RHS expression in the final reduction
   /// expression performed by the reduction clause. Also, variables in these
   /// expressions are used for proper initialization of reduction copies.
-  void setRHSExprs(ArrayRef<Expr *> RHSExprs);
+  void setRHSExprs(llvm::ArrayRef<Expr *> RHSExprs);
 
   ///  Get the list of helper destination expressions.
-  MutableArrayRef<Expr *> getRHSExprs() {
-    return MutableArrayRef<Expr *>(getLHSExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getRHSExprs() {
+    return llvm::MutableArrayRef<Expr *>(getLHSExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getRHSExprs() const {
+  llvm::ArrayRef<const Expr *> getRHSExprs() const {
     return llvm::ArrayRef(getLHSExprs().end(), varlist_size());
   }
 
@@ -3864,24 +3864,24 @@ class OMPInReductionClause final
   /// codegen of the clause. These expressions are binary expressions or
   /// operator/custom reduction call that calculates new value from source
   /// helper expressions to destination helper expressions.
-  void setReductionOps(ArrayRef<Expr *> ReductionOps);
+  void setReductionOps(llvm::ArrayRef<Expr *> ReductionOps);
 
   ///  Get the list of helper reduction expressions.
-  MutableArrayRef<Expr *> getReductionOps() {
-    return MutableArrayRef<Expr *>(getRHSExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getReductionOps() {
+    return llvm::MutableArrayRef<Expr *>(getRHSExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getReductionOps() const {
+  llvm::ArrayRef<const Expr *> getReductionOps() const {
     return llvm::ArrayRef(getRHSExprs().end(), varlist_size());
   }
 
   /// Set list of helper reduction taskgroup descriptors.
-  void setTaskgroupDescriptors(ArrayRef<Expr *> ReductionOps);
+  void setTaskgroupDescriptors(llvm::ArrayRef<Expr *> ReductionOps);
 
   ///  Get the list of helper reduction taskgroup descriptors.
-  MutableArrayRef<Expr *> getTaskgroupDescriptors() {
-    return MutableArrayRef<Expr *>(getReductionOps().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getTaskgroupDescriptors() {
+    return llvm::MutableArrayRef<Expr *>(getReductionOps().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getTaskgroupDescriptors() const {
+  llvm::ArrayRef<const Expr *> getTaskgroupDescriptors() const {
     return llvm::ArrayRef(getReductionOps().end(), varlist_size());
   }
 
@@ -3922,11 +3922,11 @@ public:
   /// OpenMP region with this clause.
   static OMPInReductionClause *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-         SourceLocation ColonLoc, SourceLocation EndLoc, ArrayRef<Expr *> VL,
+         SourceLocation ColonLoc, SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL,
          NestedNameSpecifierLoc QualifierLoc,
-         const DeclarationNameInfo &NameInfo, ArrayRef<Expr *> Privates,
-         ArrayRef<Expr *> LHSExprs, ArrayRef<Expr *> RHSExprs,
-         ArrayRef<Expr *> ReductionOps, ArrayRef<Expr *> TaskgroupDescriptors,
+         const DeclarationNameInfo &NameInfo, llvm::ArrayRef<Expr *> Privates,
+         llvm::ArrayRef<Expr *> LHSExprs, llvm::ArrayRef<Expr *> RHSExprs,
+         llvm::ArrayRef<Expr *> ReductionOps, llvm::ArrayRef<Expr *> TaskgroupDescriptors,
          Stmt *PreInit, Expr *PostUpdate);
 
   /// Creates an empty clause with the place for \a N variables.
@@ -3944,8 +3944,8 @@ public:
   /// Gets the nested name specifier.
   NestedNameSpecifierLoc getQualifierLoc() const { return QualifierLoc; }
 
-  using helper_expr_iterator = MutableArrayRef<Expr *>::iterator;
-  using helper_expr_const_iterator = ArrayRef<const Expr *>::iterator;
+  using helper_expr_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using helper_expr_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using helper_expr_range = llvm::iterator_range<helper_expr_iterator>;
   using helper_expr_const_range =
       llvm::iterator_range<helper_expr_const_iterator>;
@@ -4089,51 +4089,51 @@ class OMPLinearClause final
   ///
   /// { Vars[] /* in OMPVarListClause */; Privates[]; Inits[]; Updates[];
   /// Finals[]; Step; CalcStep; }
-  MutableArrayRef<Expr *> getPrivates() {
-    return MutableArrayRef<Expr *>(varlist_end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getPrivates() {
+    return llvm::MutableArrayRef<Expr *>(varlist_end(), varlist_size());
   }
-  ArrayRef<const Expr *> getPrivates() const {
+  llvm::ArrayRef<const Expr *> getPrivates() const {
     return llvm::ArrayRef(varlist_end(), varlist_size());
   }
 
-  MutableArrayRef<Expr *> getInits() {
-    return MutableArrayRef<Expr *>(getPrivates().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getInits() {
+    return llvm::MutableArrayRef<Expr *>(getPrivates().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getInits() const {
+  llvm::ArrayRef<const Expr *> getInits() const {
     return llvm::ArrayRef(getPrivates().end(), varlist_size());
   }
 
   /// Sets the list of update expressions for linear variables.
-  MutableArrayRef<Expr *> getUpdates() {
-    return MutableArrayRef<Expr *>(getInits().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getUpdates() {
+    return llvm::MutableArrayRef<Expr *>(getInits().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getUpdates() const {
+  llvm::ArrayRef<const Expr *> getUpdates() const {
     return llvm::ArrayRef(getInits().end(), varlist_size());
   }
 
   /// Sets the list of final update expressions for linear variables.
-  MutableArrayRef<Expr *> getFinals() {
-    return MutableArrayRef<Expr *>(getUpdates().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getFinals() {
+    return llvm::MutableArrayRef<Expr *>(getUpdates().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getFinals() const {
+  llvm::ArrayRef<const Expr *> getFinals() const {
     return llvm::ArrayRef(getUpdates().end(), varlist_size());
   }
 
   /// Gets the list of used expressions for linear variables.
-  MutableArrayRef<Expr *> getUsedExprs() {
-    return MutableArrayRef<Expr *>(getFinals().end() + 2, varlist_size() + 1);
+  llvm::MutableArrayRef<Expr *> getUsedExprs() {
+    return llvm::MutableArrayRef<Expr *>(getFinals().end() + 2, varlist_size() + 1);
   }
-  ArrayRef<const Expr *> getUsedExprs() const {
+  llvm::ArrayRef<const Expr *> getUsedExprs() const {
     return llvm::ArrayRef(getFinals().end() + 2, varlist_size() + 1);
   }
 
   /// Sets the list of the copies of original linear variables.
   /// \param PL List of expressions.
-  void setPrivates(ArrayRef<Expr *> PL);
+  void setPrivates(llvm::ArrayRef<Expr *> PL);
 
   /// Sets the list of the initial values for linear variables.
   /// \param IL List of expressions.
-  void setInits(ArrayRef<Expr *> IL);
+  void setInits(llvm::ArrayRef<Expr *> IL);
 
 public:
   /// Creates clause with a list of variables \a VL and a linear step
@@ -4160,8 +4160,8 @@ public:
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
          OpenMPLinearClauseKind Modifier, SourceLocation ModifierLoc,
          SourceLocation ColonLoc, SourceLocation StepModifierLoc,
-         SourceLocation EndLoc, ArrayRef<Expr *> VL, ArrayRef<Expr *> PL,
-         ArrayRef<Expr *> IL, Expr *Step, Expr *CalcStep, Stmt *PreInit,
+         SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL, llvm::ArrayRef<Expr *> PL,
+         llvm::ArrayRef<Expr *> IL, Expr *Step, Expr *CalcStep, Stmt *PreInit,
          Expr *PostUpdate);
 
   /// Creates an empty clause with the place for \a NumVars variables.
@@ -4208,17 +4208,17 @@ public:
 
   /// Sets the list of update expressions for linear variables.
   /// \param UL List of expressions.
-  void setUpdates(ArrayRef<Expr *> UL);
+  void setUpdates(llvm::ArrayRef<Expr *> UL);
 
   /// Sets the list of final update expressions for linear variables.
   /// \param FL List of expressions.
-  void setFinals(ArrayRef<Expr *> FL);
+  void setFinals(llvm::ArrayRef<Expr *> FL);
 
   /// Sets the list of used expressions for the linear clause.
-  void setUsedExprs(ArrayRef<Expr *> UE);
+  void setUsedExprs(llvm::ArrayRef<Expr *> UE);
 
-  using privates_iterator = MutableArrayRef<Expr *>::iterator;
-  using privates_const_iterator = ArrayRef<const Expr *>::iterator;
+  using privates_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using privates_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using privates_range = llvm::iterator_range<privates_iterator>;
   using privates_const_range = llvm::iterator_range<privates_const_iterator>;
 
@@ -4230,8 +4230,8 @@ public:
     return privates_const_range(getPrivates().begin(), getPrivates().end());
   }
 
-  using inits_iterator = MutableArrayRef<Expr *>::iterator;
-  using inits_const_iterator = ArrayRef<const Expr *>::iterator;
+  using inits_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using inits_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using inits_range = llvm::iterator_range<inits_iterator>;
   using inits_const_range = llvm::iterator_range<inits_const_iterator>;
 
@@ -4243,8 +4243,8 @@ public:
     return inits_const_range(getInits().begin(), getInits().end());
   }
 
-  using updates_iterator = MutableArrayRef<Expr *>::iterator;
-  using updates_const_iterator = ArrayRef<const Expr *>::iterator;
+  using updates_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using updates_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using updates_range = llvm::iterator_range<updates_iterator>;
   using updates_const_range = llvm::iterator_range<updates_const_iterator>;
 
@@ -4256,8 +4256,8 @@ public:
     return updates_const_range(getUpdates().begin(), getUpdates().end());
   }
 
-  using finals_iterator = MutableArrayRef<Expr *>::iterator;
-  using finals_const_iterator = ArrayRef<const Expr *>::iterator;
+  using finals_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using finals_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using finals_range = llvm::iterator_range<finals_iterator>;
   using finals_const_range = llvm::iterator_range<finals_const_iterator>;
 
@@ -4269,8 +4269,8 @@ public:
     return finals_const_range(getFinals().begin(), getFinals().end());
   }
 
-  using used_expressions_iterator = MutableArrayRef<Expr *>::iterator;
-  using used_expressions_const_iterator = ArrayRef<const Expr *>::iterator;
+  using used_expressions_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using used_expressions_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using used_expressions_range =
       llvm::iterator_range<used_expressions_iterator>;
   using used_expressions_const_range =
@@ -4362,7 +4362,7 @@ public:
   static OMPAlignedClause *Create(const ASTContext &C, SourceLocation StartLoc,
                                   SourceLocation LParenLoc,
                                   SourceLocation ColonLoc,
-                                  SourceLocation EndLoc, ArrayRef<Expr *> VL,
+                                  SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL,
                                   Expr *A);
 
   /// Creates an empty clause with the place for \a NumVars variables.
@@ -4454,26 +4454,26 @@ class OMPCopyinClause final
   /// Set list of helper expressions, required for proper codegen of the
   /// clause. These expressions represent source expression in the final
   /// assignment statement performed by the copyin clause.
-  void setSourceExprs(ArrayRef<Expr *> SrcExprs);
+  void setSourceExprs(llvm::ArrayRef<Expr *> SrcExprs);
 
   /// Get the list of helper source expressions.
-  MutableArrayRef<Expr *> getSourceExprs() {
-    return MutableArrayRef<Expr *>(varlist_end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getSourceExprs() {
+    return llvm::MutableArrayRef<Expr *>(varlist_end(), varlist_size());
   }
-  ArrayRef<const Expr *> getSourceExprs() const {
+  llvm::ArrayRef<const Expr *> getSourceExprs() const {
     return llvm::ArrayRef(varlist_end(), varlist_size());
   }
 
   /// Set list of helper expressions, required for proper codegen of the
   /// clause. These expressions represent destination expression in the final
   /// assignment statement performed by the copyin clause.
-  void setDestinationExprs(ArrayRef<Expr *> DstExprs);
+  void setDestinationExprs(llvm::ArrayRef<Expr *> DstExprs);
 
   /// Get the list of helper destination expressions.
-  MutableArrayRef<Expr *> getDestinationExprs() {
-    return MutableArrayRef<Expr *>(getSourceExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getDestinationExprs() {
+    return llvm::MutableArrayRef<Expr *>(getSourceExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getDestinationExprs() const {
+  llvm::ArrayRef<const Expr *> getDestinationExprs() const {
     return llvm::ArrayRef(getSourceExprs().end(), varlist_size());
   }
 
@@ -4481,13 +4481,13 @@ class OMPCopyinClause final
   /// codegen of the clause. These expressions are assignment expressions that
   /// assign source helper expressions to destination helper expressions
   /// correspondingly.
-  void setAssignmentOps(ArrayRef<Expr *> AssignmentOps);
+  void setAssignmentOps(llvm::ArrayRef<Expr *> AssignmentOps);
 
   /// Get the list of helper assignment expressions.
-  MutableArrayRef<Expr *> getAssignmentOps() {
-    return MutableArrayRef<Expr *>(getDestinationExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getAssignmentOps() {
+    return llvm::MutableArrayRef<Expr *>(getDestinationExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getAssignmentOps() const {
+  llvm::ArrayRef<const Expr *> getAssignmentOps() const {
     return llvm::ArrayRef(getDestinationExprs().end(), varlist_size());
   }
 
@@ -4515,8 +4515,8 @@ public:
   /// implicit threads.
   static OMPCopyinClause *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-         SourceLocation EndLoc, ArrayRef<Expr *> VL, ArrayRef<Expr *> SrcExprs,
-         ArrayRef<Expr *> DstExprs, ArrayRef<Expr *> AssignmentOps);
+         SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL, llvm::ArrayRef<Expr *> SrcExprs,
+         llvm::ArrayRef<Expr *> DstExprs, llvm::ArrayRef<Expr *> AssignmentOps);
 
   /// Creates an empty clause with \a N variables.
   ///
@@ -4524,8 +4524,8 @@ public:
   /// \param N The number of variables.
   static OMPCopyinClause *CreateEmpty(const ASTContext &C, unsigned N);
 
-  using helper_expr_iterator = MutableArrayRef<Expr *>::iterator;
-  using helper_expr_const_iterator = ArrayRef<const Expr *>::iterator;
+  using helper_expr_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using helper_expr_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using helper_expr_range = llvm::iterator_range<helper_expr_iterator>;
   using helper_expr_const_range =
       llvm::iterator_range<helper_expr_const_iterator>;
@@ -4619,26 +4619,26 @@ class OMPCopyprivateClause final
   /// Set list of helper expressions, required for proper codegen of the
   /// clause. These expressions represent source expression in the final
   /// assignment statement performed by the copyprivate clause.
-  void setSourceExprs(ArrayRef<Expr *> SrcExprs);
+  void setSourceExprs(llvm::ArrayRef<Expr *> SrcExprs);
 
   /// Get the list of helper source expressions.
-  MutableArrayRef<Expr *> getSourceExprs() {
-    return MutableArrayRef<Expr *>(varlist_end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getSourceExprs() {
+    return llvm::MutableArrayRef<Expr *>(varlist_end(), varlist_size());
   }
-  ArrayRef<const Expr *> getSourceExprs() const {
+  llvm::ArrayRef<const Expr *> getSourceExprs() const {
     return llvm::ArrayRef(varlist_end(), varlist_size());
   }
 
   /// Set list of helper expressions, required for proper codegen of the
   /// clause. These expressions represent destination expression in the final
   /// assignment statement performed by the copyprivate clause.
-  void setDestinationExprs(ArrayRef<Expr *> DstExprs);
+  void setDestinationExprs(llvm::ArrayRef<Expr *> DstExprs);
 
   /// Get the list of helper destination expressions.
-  MutableArrayRef<Expr *> getDestinationExprs() {
-    return MutableArrayRef<Expr *>(getSourceExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getDestinationExprs() {
+    return llvm::MutableArrayRef<Expr *>(getSourceExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getDestinationExprs() const {
+  llvm::ArrayRef<const Expr *> getDestinationExprs() const {
     return llvm::ArrayRef(getSourceExprs().end(), varlist_size());
   }
 
@@ -4646,13 +4646,13 @@ class OMPCopyprivateClause final
   /// codegen of the clause. These expressions are assignment expressions that
   /// assign source helper expressions to destination helper expressions
   /// correspondingly.
-  void setAssignmentOps(ArrayRef<Expr *> AssignmentOps);
+  void setAssignmentOps(llvm::ArrayRef<Expr *> AssignmentOps);
 
   /// Get the list of helper assignment expressions.
-  MutableArrayRef<Expr *> getAssignmentOps() {
-    return MutableArrayRef<Expr *>(getDestinationExprs().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getAssignmentOps() {
+    return llvm::MutableArrayRef<Expr *>(getDestinationExprs().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getAssignmentOps() const {
+  llvm::ArrayRef<const Expr *> getAssignmentOps() const {
     return llvm::ArrayRef(getDestinationExprs().end(), varlist_size());
   }
 
@@ -4679,8 +4679,8 @@ public:
   /// copyprivate clause.
   static OMPCopyprivateClause *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-         SourceLocation EndLoc, ArrayRef<Expr *> VL, ArrayRef<Expr *> SrcExprs,
-         ArrayRef<Expr *> DstExprs, ArrayRef<Expr *> AssignmentOps);
+         SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL, llvm::ArrayRef<Expr *> SrcExprs,
+         llvm::ArrayRef<Expr *> DstExprs, llvm::ArrayRef<Expr *> AssignmentOps);
 
   /// Creates an empty clause with \a N variables.
   ///
@@ -4688,8 +4688,8 @@ public:
   /// \param N The number of variables.
   static OMPCopyprivateClause *CreateEmpty(const ASTContext &C, unsigned N);
 
-  using helper_expr_iterator = MutableArrayRef<Expr *>::iterator;
-  using helper_expr_const_iterator = ArrayRef<const Expr *>::iterator;
+  using helper_expr_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using helper_expr_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using helper_expr_range = llvm::iterator_range<helper_expr_iterator>;
   using helper_expr_const_range =
       llvm::iterator_range<helper_expr_const_iterator>;
@@ -4792,7 +4792,7 @@ public:
   /// \param VL List of references to the variables.
   static OMPFlushClause *Create(const ASTContext &C, SourceLocation StartLoc,
                                 SourceLocation LParenLoc, SourceLocation EndLoc,
-                                ArrayRef<Expr *> VL);
+                                llvm::ArrayRef<Expr *> VL);
 
   /// Creates an empty clause with \a N variables.
   ///
@@ -5000,7 +5000,7 @@ public:
   static OMPDependClause *Create(const ASTContext &C, SourceLocation StartLoc,
                                  SourceLocation LParenLoc,
                                  SourceLocation EndLoc, DependDataTy Data,
-                                 Expr *DepModifier, ArrayRef<Expr *> VL,
+                                 Expr *DepModifier, llvm::ArrayRef<Expr *> VL,
                                  unsigned NumLoops);
 
   /// Creates an empty clause with \a N variables.
@@ -5265,14 +5265,14 @@ public:
 
   // List of components of an expression. This first one is the whole
   // expression and the last one is the base expression.
-  using MappableExprComponentList = SmallVector<MappableComponent, 8>;
-  using MappableExprComponentListRef = ArrayRef<MappableComponent>;
+  using MappableExprComponentList = llvm::SmallVector<MappableComponent, 8>;
+  using MappableExprComponentListRef = llvm::ArrayRef<MappableComponent>;
 
   // List of all component lists associated to the same base declaration.
   // E.g. if both 'S.a' and 'S.b' are a mappable expressions, each will have
   // their component list but the same base declaration 'S'.
-  using MappableExprComponentLists = SmallVector<MappableExprComponentList, 8>;
-  using MappableExprComponentListsRef = ArrayRef<MappableExprComponentList>;
+  using MappableExprComponentLists = llvm::SmallVector<MappableExprComponentList, 8>;
+  using MappableExprComponentListsRef = llvm::ArrayRef<MappableExprComponentList>;
 
 protected:
   // Return the total number of elements in a list of component lists.
@@ -5282,7 +5282,7 @@ protected:
   // Return the total number of elements in a list of declarations. All
   // declarations are expected to be canonical.
   static unsigned
-  getUniqueDeclarationsTotalNumber(ArrayRef<const ValueDecl *> Declarations);
+  getUniqueDeclarationsTotalNumber(llvm::ArrayRef<const ValueDecl *> Declarations);
 };
 
 /// This structure contains all sizes needed for by an
@@ -5369,16 +5369,16 @@ protected:
 
   /// Get the unique declarations that are in the trailing objects of the
   /// class.
-  MutableArrayRef<ValueDecl *> getUniqueDeclsRef() {
-    return MutableArrayRef<ValueDecl *>(
+  llvm::MutableArrayRef<ValueDecl *> getUniqueDeclsRef() {
+    return llvm::MutableArrayRef<ValueDecl *>(
         static_cast<T *>(this)->template getTrailingObjects<ValueDecl *>(),
         NumUniqueDeclarations);
   }
 
   /// Get the unique declarations that are in the trailing objects of the
   /// class.
-  ArrayRef<ValueDecl *> getUniqueDeclsRef() const {
-    return ArrayRef<ValueDecl *>(
+  llvm::ArrayRef<ValueDecl *> getUniqueDeclsRef() const {
+    return llvm::ArrayRef<ValueDecl *>(
         static_cast<const T *>(this)
             ->template getTrailingObjects<ValueDecl *>(),
         NumUniqueDeclarations);
@@ -5386,7 +5386,7 @@ protected:
 
   /// Set the unique declarations that are in the trailing objects of the
   /// class.
-  void setUniqueDecls(ArrayRef<ValueDecl *> UDs) {
+  void setUniqueDecls(llvm::ArrayRef<ValueDecl *> UDs) {
     assert(UDs.size() == NumUniqueDeclarations &&
            "Unexpected amount of unique declarations.");
     std::copy(UDs.begin(), UDs.end(), getUniqueDeclsRef().begin());
@@ -5394,23 +5394,23 @@ protected:
 
   /// Get the number of lists per declaration that are in the trailing
   /// objects of the class.
-  MutableArrayRef<unsigned> getDeclNumListsRef() {
-    return MutableArrayRef<unsigned>(
+  llvm::MutableArrayRef<unsigned> getDeclNumListsRef() {
+    return llvm::MutableArrayRef<unsigned>(
         static_cast<T *>(this)->template getTrailingObjects<unsigned>(),
         NumUniqueDeclarations);
   }
 
   /// Get the number of lists per declaration that are in the trailing
   /// objects of the class.
-  ArrayRef<unsigned> getDeclNumListsRef() const {
-    return ArrayRef<unsigned>(
+  llvm::ArrayRef<unsigned> getDeclNumListsRef() const {
+    return llvm::ArrayRef<unsigned>(
         static_cast<const T *>(this)->template getTrailingObjects<unsigned>(),
         NumUniqueDeclarations);
   }
 
   /// Set the number of lists per declaration that are in the trailing
   /// objects of the class.
-  void setDeclNumLists(ArrayRef<unsigned> DNLs) {
+  void setDeclNumLists(llvm::ArrayRef<unsigned> DNLs) {
     assert(DNLs.size() == NumUniqueDeclarations &&
            "Unexpected amount of list numbers.");
     std::copy(DNLs.begin(), DNLs.end(), getDeclNumListsRef().begin());
@@ -5418,8 +5418,8 @@ protected:
 
   /// Get the cumulative component lists sizes that are in the trailing
   /// objects of the class. They are appended after the number of lists.
-  MutableArrayRef<unsigned> getComponentListSizesRef() {
-    return MutableArrayRef<unsigned>(
+  llvm::MutableArrayRef<unsigned> getComponentListSizesRef() {
+    return llvm::MutableArrayRef<unsigned>(
         static_cast<T *>(this)->template getTrailingObjects<unsigned>() +
             NumUniqueDeclarations,
         NumComponentLists);
@@ -5427,8 +5427,8 @@ protected:
 
   /// Get the cumulative component lists sizes that are in the trailing
   /// objects of the class. They are appended after the number of lists.
-  ArrayRef<unsigned> getComponentListSizesRef() const {
-    return ArrayRef<unsigned>(
+  llvm::ArrayRef<unsigned> getComponentListSizesRef() const {
+    return llvm::ArrayRef<unsigned>(
         static_cast<const T *>(this)->template getTrailingObjects<unsigned>() +
             NumUniqueDeclarations,
         NumComponentLists);
@@ -5436,23 +5436,23 @@ protected:
 
   /// Set the cumulative component lists sizes that are in the trailing
   /// objects of the class.
-  void setComponentListSizes(ArrayRef<unsigned> CLSs) {
+  void setComponentListSizes(llvm::ArrayRef<unsigned> CLSs) {
     assert(CLSs.size() == NumComponentLists &&
            "Unexpected amount of component lists.");
     std::copy(CLSs.begin(), CLSs.end(), getComponentListSizesRef().begin());
   }
 
   /// Get the components that are in the trailing objects of the class.
-  MutableArrayRef<MappableComponent> getComponentsRef() {
-    return MutableArrayRef<MappableComponent>(
+  llvm::MutableArrayRef<MappableComponent> getComponentsRef() {
+    return llvm::MutableArrayRef<MappableComponent>(
         static_cast<T *>(this)
             ->template getTrailingObjects<MappableComponent>(),
         NumComponents);
   }
 
   /// Get the components that are in the trailing objects of the class.
-  ArrayRef<MappableComponent> getComponentsRef() const {
-    return ArrayRef<MappableComponent>(
+  llvm::ArrayRef<MappableComponent> getComponentsRef() const {
+    return llvm::ArrayRef<MappableComponent>(
         static_cast<const T *>(this)
             ->template getTrailingObjects<MappableComponent>(),
         NumComponents);
@@ -5461,8 +5461,8 @@ protected:
   /// Set the components that are in the trailing objects of the class.
   /// This requires the list sizes so that it can also fill the original
   /// expressions, which are the first component of each list.
-  void setComponents(ArrayRef<MappableComponent> Components,
-                     ArrayRef<unsigned> CLSs) {
+  void setComponents(llvm::ArrayRef<MappableComponent> Components,
+                     llvm::ArrayRef<unsigned> CLSs) {
     assert(Components.size() == NumComponents &&
            "Unexpected amount of component lists.");
     assert(CLSs.size() == NumComponentLists &&
@@ -5472,7 +5472,7 @@ protected:
 
   /// Fill the clause information from the list of declarations and
   /// associated component lists.
-  void setClauseInfo(ArrayRef<ValueDecl *> Declarations,
+  void setClauseInfo(llvm::ArrayRef<ValueDecl *> Declarations,
                      MappableExprComponentListsRef ComponentLists) {
     // Perform some checks to make sure the data sizes are consistent with the
     // information available when the clause was created.
@@ -5489,7 +5489,7 @@ protected:
     // Organize the components by declaration and retrieve the original
     // expression. Original expressions are always the first component of the
     // mappable component list.
-    llvm::MapVector<ValueDecl *, SmallVector<MappableExprComponentListRef, 8>>
+    llvm::MapVector<ValueDecl *, llvm::SmallVector<MappableExprComponentListRef, 8>>
         ComponentListMap;
     {
       auto CI = ComponentLists.begin();
@@ -5558,7 +5558,7 @@ protected:
 
   /// Get the user-defined mapper references that are in the trailing objects of
   /// the class.
-  MutableArrayRef<Expr *> getUDMapperRefs() {
+  llvm::MutableArrayRef<Expr *> getUDMapperRefs() {
     assert(SupportsMapper &&
            "Must be a clause that is possible to have user-defined mappers");
     return llvm::MutableArrayRef<Expr *>(
@@ -5569,7 +5569,7 @@ protected:
 
   /// Get the user-defined mappers references that are in the trailing objects
   /// of the class.
-  ArrayRef<Expr *> getUDMapperRefs() const {
+  llvm::ArrayRef<Expr *> getUDMapperRefs() const {
     assert(SupportsMapper &&
            "Must be a clause that is possible to have user-defined mappers");
     return llvm::ArrayRef<Expr *>(
@@ -5580,7 +5580,7 @@ protected:
 
   /// Set the user-defined mappers that are in the trailing objects of the
   /// class.
-  void setUDMapperRefs(ArrayRef<Expr *> DMDs) {
+  void setUDMapperRefs(llvm::ArrayRef<Expr *> DMDs) {
     assert(DMDs.size() == OMPVarListClause<T>::varlist_size() &&
            "Unexpected number of user-defined mappers.");
     assert(SupportsMapper &&
@@ -5616,16 +5616,16 @@ public:
             std::forward_iterator_tag, MappableComponent, ptrdiff_t,
             MappableComponent, MappableComponent> {
     // The declaration the iterator currently refers to.
-    ArrayRef<ValueDecl *>::iterator DeclCur;
+    llvm::ArrayRef<ValueDecl *>::iterator DeclCur;
 
     // The list number associated with the current declaration.
-    ArrayRef<unsigned>::iterator NumListsCur;
+    llvm::ArrayRef<unsigned>::iterator NumListsCur;
 
     // Whether this clause is possible to have user-defined mappers associated.
     const bool SupportsMapper;
 
     // The user-defined mapper associated with the current declaration.
-    ArrayRef<Expr *>::iterator MapperCur;
+    llvm::ArrayRef<Expr *>::iterator MapperCur;
 
     // Remaining lists for the current declaration.
     unsigned RemainingLists = 0;
@@ -5636,8 +5636,8 @@ public:
 
     // The cumulative sizes of the current list - it will delimit the remaining
     // range of interest.
-    ArrayRef<unsigned>::const_iterator ListSizeCur;
-    ArrayRef<unsigned>::const_iterator ListSizeEnd;
+    llvm::ArrayRef<unsigned>::const_iterator ListSizeCur;
+    llvm::ArrayRef<unsigned>::const_iterator ListSizeEnd;
 
     // Iterator to the end of the components storage.
     MappableExprComponentListRef::const_iterator End;
@@ -5645,10 +5645,10 @@ public:
   public:
     /// Construct an iterator that scans all lists.
     explicit const_component_lists_iterator(
-        ArrayRef<ValueDecl *> UniqueDecls, ArrayRef<unsigned> DeclsListNum,
-        ArrayRef<unsigned> CumulativeListSizes,
+        llvm::ArrayRef<ValueDecl *> UniqueDecls, llvm::ArrayRef<unsigned> DeclsListNum,
+        llvm::ArrayRef<unsigned> CumulativeListSizes,
         MappableExprComponentListRef Components, bool SupportsMapper,
-        ArrayRef<Expr *> Mappers)
+        llvm::ArrayRef<Expr *> Mappers)
         : const_component_lists_iterator::iterator_adaptor_base(
               Components.begin()),
           DeclCur(UniqueDecls.begin()), NumListsCur(DeclsListNum.begin()),
@@ -5666,10 +5666,10 @@ public:
     /// Construct an iterator that scan lists for a given declaration \a
     /// Declaration.
     explicit const_component_lists_iterator(
-        const ValueDecl *Declaration, ArrayRef<ValueDecl *> UniqueDecls,
-        ArrayRef<unsigned> DeclsListNum, ArrayRef<unsigned> CumulativeListSizes,
+        const ValueDecl *Declaration, llvm::ArrayRef<ValueDecl *> UniqueDecls,
+        llvm::ArrayRef<unsigned> DeclsListNum, llvm::ArrayRef<unsigned> CumulativeListSizes,
         MappableExprComponentListRef Components, bool SupportsMapper,
-        ArrayRef<Expr *> Mappers)
+        llvm::ArrayRef<Expr *> Mappers)
         : const_component_lists_iterator(UniqueDecls, DeclsListNum,
                                          CumulativeListSizes, Components,
                                          SupportsMapper, Mappers) {
@@ -5775,7 +5775,7 @@ public:
   }
   const_component_lists_iterator component_lists_end() const {
     return const_component_lists_iterator(
-        ArrayRef<ValueDecl *>(), ArrayRef<unsigned>(), ArrayRef<unsigned>(),
+        llvm::ArrayRef<ValueDecl *>(), llvm::ArrayRef<unsigned>(), llvm::ArrayRef<unsigned>(),
         MappableExprComponentListRef(getComponentsRef().end(),
                                      getComponentsRef().end()),
         SupportsMapper, std::nullopt);
@@ -5802,7 +5802,7 @@ public:
 
   /// Iterators to access all the declarations, number of lists, list sizes, and
   /// components.
-  using const_all_decls_iterator = ArrayRef<ValueDecl *>::iterator;
+  using const_all_decls_iterator = llvm::ArrayRef<ValueDecl *>::iterator;
   using const_all_decls_range = llvm::iterator_range<const_all_decls_iterator>;
 
   const_all_decls_range all_decls() const {
@@ -5810,7 +5810,7 @@ public:
     return const_all_decls_range(A.begin(), A.end());
   }
 
-  using const_all_num_lists_iterator = ArrayRef<unsigned>::iterator;
+  using const_all_num_lists_iterator = llvm::ArrayRef<unsigned>::iterator;
   using const_all_num_lists_range =
       llvm::iterator_range<const_all_num_lists_iterator>;
 
@@ -5819,7 +5819,7 @@ public:
     return const_all_num_lists_range(A.begin(), A.end());
   }
 
-  using const_all_lists_sizes_iterator = ArrayRef<unsigned>::iterator;
+  using const_all_lists_sizes_iterator = llvm::ArrayRef<unsigned>::iterator;
   using const_all_lists_sizes_range =
       llvm::iterator_range<const_all_lists_sizes_iterator>;
 
@@ -5828,7 +5828,7 @@ public:
     return const_all_lists_sizes_range(A.begin(), A.end());
   }
 
-  using const_all_components_iterator = ArrayRef<MappableComponent>::iterator;
+  using const_all_components_iterator = llvm::ArrayRef<MappableComponent>::iterator;
   using const_all_components_range =
       llvm::iterator_range<const_all_components_iterator>;
 
@@ -5837,8 +5837,8 @@ public:
     return const_all_components_range(A.begin(), A.end());
   }
 
-  using mapperlist_iterator = MutableArrayRef<Expr *>::iterator;
-  using mapperlist_const_iterator = ArrayRef<const Expr *>::iterator;
+  using mapperlist_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using mapperlist_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using mapperlist_range = llvm::iterator_range<mapperlist_iterator>;
   using mapperlist_const_range =
       llvm::iterator_range<mapperlist_const_iterator>;
@@ -5932,8 +5932,8 @@ private:
   /// NumUniqueDeclarations: number of unique base declarations in this clause;
   /// 3) NumComponentLists: number of component lists in this clause; and 4)
   /// NumComponents: total number of expression components in the clause.
-  explicit OMPMapClause(ArrayRef<OpenMPMapModifierKind> MapModifiers,
-                        ArrayRef<SourceLocation> MapModifiersLoc,
+  explicit OMPMapClause(llvm::ArrayRef<OpenMPMapModifierKind> MapModifiers,
+                        llvm::ArrayRef<SourceLocation> MapModifiersLoc,
                         NestedNameSpecifierLoc MapperQualifierLoc,
                         DeclarationNameInfo MapperIdInfo,
                         OpenMPMapClauseKind MapType, bool MapTypeIsImplicit,
@@ -6024,11 +6024,11 @@ public:
   /// \param TypeLoc Location of the map type.
   static OMPMapClause *
   Create(const ASTContext &C, const OMPVarListLocTy &Locs,
-         ArrayRef<Expr *> Vars, ArrayRef<ValueDecl *> Declarations,
+         llvm::ArrayRef<Expr *> Vars, llvm::ArrayRef<ValueDecl *> Declarations,
          MappableExprComponentListsRef ComponentLists,
-         ArrayRef<Expr *> UDMapperRefs, Expr *IteratorModifier,
-         ArrayRef<OpenMPMapModifierKind> MapModifiers,
-         ArrayRef<SourceLocation> MapModifiersLoc,
+         llvm::ArrayRef<Expr *> UDMapperRefs, Expr *IteratorModifier,
+         llvm::ArrayRef<OpenMPMapModifierKind> MapModifiers,
+         llvm::ArrayRef<SourceLocation> MapModifiersLoc,
          NestedNameSpecifierLoc UDMQualifierLoc, DeclarationNameInfo MapperId,
          OpenMPMapClauseKind Type, bool TypeIsImplicit, SourceLocation TypeLoc);
 
@@ -6079,13 +6079,13 @@ public:
     return MapTypeModifiersLoc[Cnt];
   }
 
-  /// Fetches ArrayRef of map-type-modifiers.
-  ArrayRef<OpenMPMapModifierKind> getMapTypeModifiers() const LLVM_READONLY {
+  /// Fetches llvm::ArrayRef of map-type-modifiers.
+  llvm::ArrayRef<OpenMPMapModifierKind> getMapTypeModifiers() const LLVM_READONLY {
     return llvm::ArrayRef(MapTypeModifiers);
   }
 
-  /// Fetches ArrayRef of location of map-type-modifiers.
-  ArrayRef<SourceLocation> getMapTypeModifiersLoc() const LLVM_READONLY {
+  /// Fetches llvm::ArrayRef of location of map-type-modifiers.
+  llvm::ArrayRef<SourceLocation> getMapTypeModifiersLoc() const LLVM_READONLY {
     return llvm::ArrayRef(MapTypeModifiersLoc);
   }
 
@@ -6912,8 +6912,8 @@ class OMPToClause final : public OMPMappableExprListClause<OMPToClause>,
   /// NumUniqueDeclarations: number of unique base declarations in this clause;
   /// 3) NumComponentLists: number of component lists in this clause; and 4)
   /// NumComponents: total number of expression components in the clause.
-  explicit OMPToClause(ArrayRef<OpenMPMotionModifierKind> TheMotionModifiers,
-                       ArrayRef<SourceLocation> TheMotionModifiersLoc,
+  explicit OMPToClause(llvm::ArrayRef<OpenMPMotionModifierKind> TheMotionModifiers,
+                       llvm::ArrayRef<SourceLocation> TheMotionModifiersLoc,
                        NestedNameSpecifierLoc MapperQualifierLoc,
                        DeclarationNameInfo MapperIdInfo,
                        const OMPVarListLocTy &Locs,
@@ -6996,12 +6996,12 @@ public:
   /// user-defined mapper.
   /// \param MapperId The identifier of associated user-defined mapper.
   static OMPToClause *Create(const ASTContext &C, const OMPVarListLocTy &Locs,
-                             ArrayRef<Expr *> Vars,
-                             ArrayRef<ValueDecl *> Declarations,
+                             llvm::ArrayRef<Expr *> Vars,
+                             llvm::ArrayRef<ValueDecl *> Declarations,
                              MappableExprComponentListsRef ComponentLists,
-                             ArrayRef<Expr *> UDMapperRefs,
-                             ArrayRef<OpenMPMotionModifierKind> MotionModifiers,
-                             ArrayRef<SourceLocation> MotionModifiersLoc,
+                             llvm::ArrayRef<Expr *> UDMapperRefs,
+                             llvm::ArrayRef<OpenMPMotionModifierKind> MotionModifiers,
+                             llvm::ArrayRef<SourceLocation> MotionModifiersLoc,
                              NestedNameSpecifierLoc UDMQualifierLoc,
                              DeclarationNameInfo MapperId);
 
@@ -7035,13 +7035,13 @@ public:
     return MotionModifiersLoc[Cnt];
   }
 
-  /// Fetches ArrayRef of motion-modifiers.
-  ArrayRef<OpenMPMotionModifierKind> getMotionModifiers() const LLVM_READONLY {
+  /// Fetches llvm::ArrayRef of motion-modifiers.
+  llvm::ArrayRef<OpenMPMotionModifierKind> getMotionModifiers() const LLVM_READONLY {
     return llvm::ArrayRef(MotionModifiers);
   }
 
-  /// Fetches ArrayRef of location of motion-modifiers.
-  ArrayRef<SourceLocation> getMotionModifiersLoc() const LLVM_READONLY {
+  /// Fetches llvm::ArrayRef of location of motion-modifiers.
+  llvm::ArrayRef<SourceLocation> getMotionModifiersLoc() const LLVM_READONLY {
     return llvm::ArrayRef(MotionModifiersLoc);
   }
 
@@ -7113,8 +7113,8 @@ class OMPFromClause final
   /// NumUniqueDeclarations: number of unique base declarations in this clause;
   /// 3) NumComponentLists: number of component lists in this clause; and 4)
   /// NumComponents: total number of expression components in the clause.
-  explicit OMPFromClause(ArrayRef<OpenMPMotionModifierKind> TheMotionModifiers,
-                         ArrayRef<SourceLocation> TheMotionModifiersLoc,
+  explicit OMPFromClause(llvm::ArrayRef<OpenMPMotionModifierKind> TheMotionModifiers,
+                         llvm::ArrayRef<SourceLocation> TheMotionModifiersLoc,
                          NestedNameSpecifierLoc MapperQualifierLoc,
                          DeclarationNameInfo MapperIdInfo,
                          const OMPVarListLocTy &Locs,
@@ -7198,11 +7198,11 @@ public:
   /// \param MapperId The identifier of associated user-defined mapper.
   static OMPFromClause *
   Create(const ASTContext &C, const OMPVarListLocTy &Locs,
-         ArrayRef<Expr *> Vars, ArrayRef<ValueDecl *> Declarations,
+         llvm::ArrayRef<Expr *> Vars, llvm::ArrayRef<ValueDecl *> Declarations,
          MappableExprComponentListsRef ComponentLists,
-         ArrayRef<Expr *> UDMapperRefs,
-         ArrayRef<OpenMPMotionModifierKind> MotionModifiers,
-         ArrayRef<SourceLocation> MotionModifiersLoc,
+         llvm::ArrayRef<Expr *> UDMapperRefs,
+         llvm::ArrayRef<OpenMPMotionModifierKind> MotionModifiers,
+         llvm::ArrayRef<SourceLocation> MotionModifiersLoc,
          NestedNameSpecifierLoc UDMQualifierLoc, DeclarationNameInfo MapperId);
 
   /// Creates an empty clause with the place for \a NumVars variables.
@@ -7235,13 +7235,13 @@ public:
     return MotionModifiersLoc[Cnt];
   }
 
-  /// Fetches ArrayRef of motion-modifiers.
-  ArrayRef<OpenMPMotionModifierKind> getMotionModifiers() const LLVM_READONLY {
+  /// Fetches llvm::ArrayRef of motion-modifiers.
+  llvm::ArrayRef<OpenMPMotionModifierKind> getMotionModifiers() const LLVM_READONLY {
     return llvm::ArrayRef(MotionModifiers);
   }
 
-  /// Fetches ArrayRef of location of motion-modifiers.
-  ArrayRef<SourceLocation> getMotionModifiersLoc() const LLVM_READONLY {
+  /// Fetches llvm::ArrayRef of location of motion-modifiers.
+  llvm::ArrayRef<SourceLocation> getMotionModifiersLoc() const LLVM_READONLY {
     return llvm::ArrayRef(MotionModifiersLoc);
   }
 
@@ -7329,28 +7329,28 @@ class OMPUseDevicePtrClause final
   /// Sets the list of references to private copies with initializers for new
   /// private variables.
   /// \param VL List of references.
-  void setPrivateCopies(ArrayRef<Expr *> VL);
+  void setPrivateCopies(llvm::ArrayRef<Expr *> VL);
 
   /// Gets the list of references to private copies with initializers for new
   /// private variables.
-  MutableArrayRef<Expr *> getPrivateCopies() {
-    return MutableArrayRef<Expr *>(varlist_end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getPrivateCopies() {
+    return llvm::MutableArrayRef<Expr *>(varlist_end(), varlist_size());
   }
-  ArrayRef<const Expr *> getPrivateCopies() const {
+  llvm::ArrayRef<const Expr *> getPrivateCopies() const {
     return llvm::ArrayRef(varlist_end(), varlist_size());
   }
 
   /// Sets the list of references to initializer variables for new private
   /// variables.
   /// \param VL List of references.
-  void setInits(ArrayRef<Expr *> VL);
+  void setInits(llvm::ArrayRef<Expr *> VL);
 
   /// Gets the list of references to initializer variables for new private
   /// variables.
-  MutableArrayRef<Expr *> getInits() {
-    return MutableArrayRef<Expr *>(getPrivateCopies().end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getInits() {
+    return llvm::MutableArrayRef<Expr *>(getPrivateCopies().end(), varlist_size());
   }
-  ArrayRef<const Expr *> getInits() const {
+  llvm::ArrayRef<const Expr *> getInits() const {
     return llvm::ArrayRef(getPrivateCopies().end(), varlist_size());
   }
 
@@ -7368,8 +7368,8 @@ public:
   /// \param ComponentLists Component lists used in the clause.
   static OMPUseDevicePtrClause *
   Create(const ASTContext &C, const OMPVarListLocTy &Locs,
-         ArrayRef<Expr *> Vars, ArrayRef<Expr *> PrivateVars,
-         ArrayRef<Expr *> Inits, ArrayRef<ValueDecl *> Declarations,
+         llvm::ArrayRef<Expr *> Vars, llvm::ArrayRef<Expr *> PrivateVars,
+         llvm::ArrayRef<Expr *> Inits, llvm::ArrayRef<ValueDecl *> Declarations,
          MappableExprComponentListsRef ComponentLists);
 
   /// Creates an empty clause with the place for \a NumVars variables.
@@ -7383,8 +7383,8 @@ public:
   static OMPUseDevicePtrClause *
   CreateEmpty(const ASTContext &C, const OMPMappableExprListSizeTy &Sizes);
 
-  using private_copies_iterator = MutableArrayRef<Expr *>::iterator;
-  using private_copies_const_iterator = ArrayRef<const Expr *>::iterator;
+  using private_copies_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using private_copies_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using private_copies_range = llvm::iterator_range<private_copies_iterator>;
   using private_copies_const_range =
       llvm::iterator_range<private_copies_const_iterator>;
@@ -7399,8 +7399,8 @@ public:
                                       getPrivateCopies().end());
   }
 
-  using inits_iterator = MutableArrayRef<Expr *>::iterator;
-  using inits_const_iterator = ArrayRef<const Expr *>::iterator;
+  using inits_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using inits_const_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using inits_range = llvm::iterator_range<inits_iterator>;
   using inits_const_range = llvm::iterator_range<inits_const_iterator>;
 
@@ -7502,7 +7502,7 @@ public:
   /// \param ComponentLists Component lists used in the clause.
   static OMPUseDeviceAddrClause *
   Create(const ASTContext &C, const OMPVarListLocTy &Locs,
-         ArrayRef<Expr *> Vars, ArrayRef<ValueDecl *> Declarations,
+         llvm::ArrayRef<Expr *> Vars, llvm::ArrayRef<ValueDecl *> Declarations,
          MappableExprComponentListsRef ComponentLists);
 
   /// Creates an empty clause with the place for \a NumVars variables.
@@ -7605,7 +7605,7 @@ public:
   /// \param ComponentLists Component lists used in the clause.
   static OMPIsDevicePtrClause *
   Create(const ASTContext &C, const OMPVarListLocTy &Locs,
-         ArrayRef<Expr *> Vars, ArrayRef<ValueDecl *> Declarations,
+         llvm::ArrayRef<Expr *> Vars, llvm::ArrayRef<ValueDecl *> Declarations,
          MappableExprComponentListsRef ComponentLists);
 
   /// Creates an empty clause with the place for \a NumVars variables.
@@ -7709,7 +7709,7 @@ public:
   /// \param ComponentLists Component lists used in the clause.
   static OMPHasDeviceAddrClause *
   Create(const ASTContext &C, const OMPVarListLocTy &Locs,
-         ArrayRef<Expr *> Vars, ArrayRef<ValueDecl *> Declarations,
+         llvm::ArrayRef<Expr *> Vars, llvm::ArrayRef<ValueDecl *> Declarations,
          MappableExprComponentListsRef ComponentLists);
 
   /// Creates an empty clause with the place for \a NumVars variables.
@@ -7781,10 +7781,10 @@ class OMPNontemporalClause final
 
   /// Get the list of privatied copies if the member expression was captured by
   /// one of the privatization clauses.
-  MutableArrayRef<Expr *> getPrivateRefs() {
-    return MutableArrayRef<Expr *>(varlist_end(), varlist_size());
+  llvm::MutableArrayRef<Expr *> getPrivateRefs() {
+    return llvm::MutableArrayRef<Expr *>(varlist_end(), varlist_size());
   }
-  ArrayRef<const Expr *> getPrivateRefs() const {
+  llvm::ArrayRef<const Expr *> getPrivateRefs() const {
     return llvm::ArrayRef(varlist_end(), varlist_size());
   }
 
@@ -7798,7 +7798,7 @@ public:
   /// \param VL List of references to the variables.
   static OMPNontemporalClause *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-         SourceLocation EndLoc, ArrayRef<Expr *> VL);
+         SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL);
 
   /// Creates an empty clause with the place for \a N variables.
   ///
@@ -7808,7 +7808,7 @@ public:
 
   /// Sets the list of references to private copies created in private clauses.
   /// \param VL List of references.
-  void setPrivateRefs(ArrayRef<Expr *> VL);
+  void setPrivateRefs(llvm::ArrayRef<Expr *> VL);
 
   child_range children() {
     return child_range(reinterpret_cast<Stmt **>(varlist_begin()),
@@ -8048,8 +8048,8 @@ public:
     return const_child_range(const_child_iterator(), const_child_iterator());
   }
 
-  using prefs_iterator = MutableArrayRef<Expr *>::iterator;
-  using const_prefs_iterator = ArrayRef<const Expr *>::iterator;
+  using prefs_iterator = llvm::MutableArrayRef<Expr *>::iterator;
+  using const_prefs_iterator = llvm::ArrayRef<const Expr *>::iterator;
   using prefs_range = llvm::iterator_range<prefs_iterator>;
   using const_prefs_range = llvm::iterator_range<const_prefs_iterator>;
 
@@ -8397,7 +8397,7 @@ public:
   static OMPInclusiveClause *Create(const ASTContext &C,
                                     SourceLocation StartLoc,
                                     SourceLocation LParenLoc,
-                                    SourceLocation EndLoc, ArrayRef<Expr *> VL);
+                                    SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL);
 
   /// Creates an empty clause with the place for \a N variables.
   ///
@@ -8471,7 +8471,7 @@ public:
   static OMPExclusiveClause *Create(const ASTContext &C,
                                     SourceLocation StartLoc,
                                     SourceLocation LParenLoc,
-                                    SourceLocation EndLoc, ArrayRef<Expr *> VL);
+                                    SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL);
 
   /// Creates an empty clause with the place for \a N variables.
   ///
@@ -8572,7 +8572,7 @@ private:
   void setLParenLoc(SourceLocation Loc) { LParenLoc = Loc; }
 
   /// Sets the allocators data for the clause.
-  void setAllocatorsData(ArrayRef<OMPUsesAllocatorsClause::Data> Data);
+  void setAllocatorsData(llvm::ArrayRef<OMPUsesAllocatorsClause::Data> Data);
 
 public:
   /// Creates clause with a list of allocators \p Data.
@@ -8584,7 +8584,7 @@ public:
   /// \param Data List of allocators.
   static OMPUsesAllocatorsClause *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-         SourceLocation EndLoc, ArrayRef<OMPUsesAllocatorsClause::Data> Data);
+         SourceLocation EndLoc, llvm::ArrayRef<OMPUsesAllocatorsClause::Data> Data);
 
   /// Creates an empty clause with the place for \p N allocators.
   ///
@@ -8686,7 +8686,7 @@ public:
                                    SourceLocation LParenLoc,
                                    SourceLocation ColonLoc,
                                    SourceLocation EndLoc, Expr *Modifier,
-                                   ArrayRef<Expr *> Locators);
+                                   llvm::ArrayRef<Expr *> Locators);
 
   /// Creates an empty clause with the place for \p N locator items.
   ///
@@ -8883,7 +8883,7 @@ class ConstOMPClauseVisitor :
       public OMPClauseVisitorBase <ImplClass, const_ptr, RetTy> {};
 
 class OMPClausePrinter final : public OMPClauseVisitor<OMPClausePrinter> {
-  raw_ostream &OS;
+  llvm::raw_ostream &OS;
   const PrintingPolicy &Policy;
 
   /// Process clauses with list of variables.
@@ -8892,7 +8892,7 @@ class OMPClausePrinter final : public OMPClauseVisitor<OMPClausePrinter> {
   template <typename T> void VisitOMPMotionClause(T *Node);
 
 public:
-  OMPClausePrinter(raw_ostream &OS, const PrintingPolicy &Policy)
+  OMPClausePrinter(llvm::raw_ostream &OS, const PrintingPolicy &Policy)
       : OS(OS), Policy(Policy) {}
 
 #define GEN_CLANG_CLAUSE_CLASS
@@ -8905,7 +8905,7 @@ struct OMPTraitProperty {
 
   /// The raw string as we parsed it. This is needed for the `isa` trait set
   /// (which accepts anything) and (later) extensions.
-  StringRef RawString;
+  llvm::StringRef RawString;
 };
 struct OMPTraitSelector {
   Expr *ScoreOrCondition = nullptr;
@@ -8929,7 +8929,7 @@ class OMPTraitInfo {
 
 public:
   /// Reconstruct a (partial) OMPTraitInfo object from a mangled name.
-  OMPTraitInfo(StringRef MangledName);
+  OMPTraitInfo(llvm::StringRef MangledName);
 
   /// The outermost level of selector sets.
   llvm::SmallVector<OMPTraitSet, 2> Sets;
@@ -8983,18 +8983,18 @@ llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const OMPTraitInfo *TI);
 /// Clang specific specialization of the OMPContext to lookup target features.
 struct TargetOMPContext final : public llvm::omp::OMPContext {
   TargetOMPContext(ASTContext &ASTCtx,
-                   std::function<void(StringRef)> &&DiagUnknownTrait,
+                   std::function<void(llvm::StringRef)> &&DiagUnknownTrait,
                    const FunctionDecl *CurrentFunctionDecl,
-                   ArrayRef<llvm::omp::TraitProperty> ConstructTraits);
+                   llvm::ArrayRef<llvm::omp::TraitProperty> ConstructTraits);
 
   virtual ~TargetOMPContext() = default;
 
   /// See llvm::omp::OMPContext::matchesISATrait
-  bool matchesISATrait(StringRef RawString) const override;
+  bool matchesISATrait(llvm::StringRef RawString) const override;
 
 private:
-  std::function<bool(StringRef)> FeatureValidityCheck;
-  std::function<void(StringRef)> DiagUnknownTrait;
+  std::function<bool(llvm::StringRef)> FeatureValidityCheck;
+  std::function<void(llvm::StringRef)> DiagUnknownTrait;
   llvm::StringMap<bool> FeatureMap;
 };
 
@@ -9030,8 +9030,8 @@ class OMPChildren final
   static size_t size(unsigned NumClauses, bool HasAssociatedStmt,
                      unsigned NumChildren);
 
-  static OMPChildren *Create(void *Mem, ArrayRef<OMPClause *> Clauses);
-  static OMPChildren *Create(void *Mem, ArrayRef<OMPClause *> Clauses, Stmt *S,
+  static OMPChildren *Create(void *Mem, llvm::ArrayRef<OMPClause *> Clauses);
+  static OMPChildren *Create(void *Mem, llvm::ArrayRef<OMPClause *> Clauses, Stmt *S,
                              unsigned NumChildren = 0);
   static OMPChildren *CreateEmpty(void *Mem, unsigned NumClauses,
                                   bool HasAssociatedStmt = false,
@@ -9047,13 +9047,13 @@ public:
     getTrailingObjects<Stmt *>()[NumChildren] = S;
   }
 
-  void setChildren(ArrayRef<Stmt *> Children);
+  void setChildren(llvm::ArrayRef<Stmt *> Children);
 
   /// Sets the list of variables for this clause.
   ///
   /// \param Clauses The list of clauses for the directive.
   ///
-  void setClauses(ArrayRef<OMPClause *> Clauses);
+  void setClauses(llvm::ArrayRef<OMPClause *> Clauses);
 
   /// Returns statement associated with the directive.
   const Stmt *getAssociatedStmt() const {
@@ -9066,11 +9066,11 @@ public:
   }
 
   /// Get the clauses storage.
-  MutableArrayRef<OMPClause *> getClauses() {
+  llvm::MutableArrayRef<OMPClause *> getClauses() {
     return llvm::MutableArrayRef(getTrailingObjects<OMPClause *>(),
                                      NumClauses);
   }
-  ArrayRef<OMPClause *> getClauses() const {
+  llvm::ArrayRef<OMPClause *> getClauses() const {
     return const_cast<OMPChildren *>(this)->getClauses();
   }
 
@@ -9080,7 +9080,7 @@ public:
   /// \param RegionKind Component region kind.
   const CapturedStmt *
   getCapturedStmt(OpenMPDirectiveKind RegionKind,
-                  ArrayRef<OpenMPDirectiveKind> CaptureRegions) const {
+                  llvm::ArrayRef<OpenMPDirectiveKind> CaptureRegions) const {
     assert(llvm::is_contained(CaptureRegions, RegionKind) &&
            "RegionKind not found in OpenMP CaptureRegions.");
     auto *CS = cast<CapturedStmt>(getAssociatedStmt());
@@ -9094,7 +9094,7 @@ public:
 
   /// Get innermost captured statement for the construct.
   CapturedStmt *
-  getInnermostCapturedStmt(ArrayRef<OpenMPDirectiveKind> CaptureRegions) {
+  getInnermostCapturedStmt(llvm::ArrayRef<OpenMPDirectiveKind> CaptureRegions) {
     assert(hasAssociatedStmt() && "Must have associated captured statement.");
     assert(!CaptureRegions.empty() &&
            "At least one captured statement must be provided.");
@@ -9105,13 +9105,13 @@ public:
   }
 
   const CapturedStmt *
-  getInnermostCapturedStmt(ArrayRef<OpenMPDirectiveKind> CaptureRegions) const {
+  getInnermostCapturedStmt(llvm::ArrayRef<OpenMPDirectiveKind> CaptureRegions) const {
     return const_cast<OMPChildren *>(this)->getInnermostCapturedStmt(
         CaptureRegions);
   }
 
-  MutableArrayRef<Stmt *> getChildren();
-  ArrayRef<Stmt *> getChildren() const {
+  llvm::MutableArrayRef<Stmt *> getChildren();
+  llvm::ArrayRef<Stmt *> getChildren() const {
     return const_cast<OMPChildren *>(this)->getChildren();
   }
 
@@ -9256,7 +9256,7 @@ public:
   static OMPDoacrossClause *
   Create(const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
          SourceLocation EndLoc, OpenMPDoacrossClauseModifier DepType,
-         SourceLocation DepLoc, SourceLocation ColonLoc, ArrayRef<Expr *> VL,
+         SourceLocation DepLoc, SourceLocation ColonLoc, llvm::ArrayRef<Expr *> VL,
          unsigned NumLoops);
 
   /// Creates an empty clause with \a N expressions.
@@ -9322,7 +9322,7 @@ class OMPXAttributeClause
   SourceLocation LParenLoc;
 
   /// The parsed attributes (clause arguments)
-  SmallVector<const Attr *> Attrs;
+  llvm::SmallVector<const Attr *> Attrs;
 
 public:
   /// Build 'ompx_attribute' clause.
@@ -9331,7 +9331,7 @@ public:
   /// \param StartLoc Starting location of the clause.
   /// \param LParenLoc Location of '('.
   /// \param EndLoc Ending location of the clause.
-  OMPXAttributeClause(ArrayRef<const Attr *> Attrs, SourceLocation StartLoc,
+  OMPXAttributeClause(llvm::ArrayRef<const Attr *> Attrs, SourceLocation StartLoc,
                       SourceLocation LParenLoc, SourceLocation EndLoc)
       : OMPNoChildClause(StartLoc, EndLoc), LParenLoc(LParenLoc), Attrs(Attrs) {
   }
@@ -9346,11 +9346,11 @@ public:
   SourceLocation getLParenLoc() const { return LParenLoc; }
 
   /// Returned the attributes parsed from this clause.
-  ArrayRef<const Attr *> getAttrs() const { return Attrs; }
+  llvm::ArrayRef<const Attr *> getAttrs() const { return Attrs; }
 
 private:
   /// Replace the attributes with \p NewAttrs.
-  void setAttrs(ArrayRef<Attr *> NewAttrs) {
+  void setAttrs(llvm::ArrayRef<Attr *> NewAttrs) {
     Attrs.clear();
     Attrs.append(NewAttrs.begin(), NewAttrs.end());
   }

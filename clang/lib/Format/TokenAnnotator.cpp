@@ -124,7 +124,7 @@ class AnnotatingParser {
 public:
   AnnotatingParser(const FormatStyle &Style, AnnotatedLine &Line,
                    const AdditionalKeywords &Keywords,
-                   SmallVector<ScopeType> &Scopes)
+                   llvm::SmallVector<ScopeType> &Scopes)
       : Style(Style), Line(Line), CurrentToken(Line.First), AutoFound(false),
         IsCpp(Style.isCpp()), LangOpts(getFormattingLangOpts(Style)),
         Keywords(Keywords), Scopes(Scopes) {
@@ -3061,7 +3061,7 @@ private:
     return TT_UnaryOperator;
   }
 
-  SmallVector<Context, 8> Contexts;
+  llvm::SmallVector<Context, 8> Contexts;
 
   const FormatStyle &Style;
   AnnotatedLine &Line;
@@ -3071,7 +3071,7 @@ private:
   LangOptions LangOpts;
   const AdditionalKeywords &Keywords;
 
-  SmallVector<ScopeType> &Scopes;
+  llvm::SmallVector<ScopeType> &Scopes;
 
   // Set of "<" tokens that do not open a template parameter list. If parseAngle
   // determines that a specific token can't be a template opener, it will make
@@ -3484,7 +3484,7 @@ private:
 } // end anonymous namespace
 
 void TokenAnnotator::setCommentLineLevels(
-    SmallVectorImpl<AnnotatedLine *> &Lines) const {
+    llvm::SmallVectorImpl<AnnotatedLine *> &Lines) const {
   const AnnotatedLine *NextNonCommentLine = nullptr;
   for (AnnotatedLine *Line : llvm::reverse(Lines)) {
     assert(Line->First);

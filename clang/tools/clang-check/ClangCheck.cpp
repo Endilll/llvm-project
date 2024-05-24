@@ -149,7 +149,7 @@ public:
 class DumpSyntaxTree : public clang::ASTFrontendAction {
 public:
   std::unique_ptr<clang::ASTConsumer>
-  CreateASTConsumer(clang::CompilerInstance &CI, StringRef InFile) override {
+  CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile) override {
     class Consumer : public clang::ASTConsumer {
     public:
       Consumer(clang::CompilerInstance &CI) : Collector(CI.getPreprocessor()) {}
@@ -232,7 +232,7 @@ int main(int argc, const char **argv) {
     // To enable the static analyzer, we first strip all -fsyntax-only options
     // and then add an --analyze option to the front.
     Tool.appendArgumentsAdjuster(
-        [&](const CommandLineArguments &Args, StringRef /*unused*/) {
+        [&](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
           CommandLineArguments AdjustedArgs;
           for (const std::string &Arg : Args)
             if (Arg != "-fsyntax-only")

@@ -198,7 +198,7 @@ private:
                  Callback<llvm::json::Value> Reply);
 
   void bindMethods(LSPBinder &, const ClientCapabilities &Caps);
-  std::optional<ClangdServer::DiagRef> getDiagRef(StringRef File,
+  std::optional<ClangdServer::DiagRef> getDiagRef(llvm::StringRef File,
                                                   const clangd::Diagnostic &D);
 
   /// Checks if completion request should be ignored. We need this due to the
@@ -265,9 +265,9 @@ private:
   std::unique_ptr<MessageHandler> MsgHandler;
   std::mutex TranspWriter;
 
-  void callMethod(StringRef Method, llvm::json::Value Params,
+  void callMethod(llvm::StringRef Method, llvm::json::Value Params,
                   Callback<llvm::json::Value> CB) override;
-  void notify(StringRef Method, llvm::json::Value Params) override;
+  void notify(llvm::StringRef Method, llvm::json::Value Params) override;
 
   LSPBinder::RawHandlers Handlers;
 

@@ -20,7 +20,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::readability {
 
-NamespaceCommentCheck::NamespaceCommentCheck(StringRef Name,
+NamespaceCommentCheck::NamespaceCommentCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       NamespaceCommentPattern(
@@ -67,7 +67,7 @@ getNamespaceNameAsWritten(SourceLocation &Loc, const SourceManager &Sources,
       --Nesting;
     } else if (Nesting == 0) {
       if (T->is(tok::raw_identifier)) {
-        StringRef ID = T->getRawIdentifier();
+        llvm::StringRef ID = T->getRawIdentifier();
         if (ID != "namespace")
           Result.append(std::string(ID));
         if (ID == "inline")
@@ -144,11 +144,11 @@ void NamespaceCommentCheck::check(const MatchFinder::MatchResult &Result) {
 
   // Try to find existing namespace closing comment on the same line.
   if (Tok.is(tok::comment) && NextTokenIsOnSameLine) {
-    StringRef Comment(Sources.getCharacterData(Loc), Tok.getLength());
-    SmallVector<StringRef, 7> Groups;
+    llvm::StringRef Comment(Sources.getCharacterData(Loc), Tok.getLength());
+    llvm::SmallVector<llvm::StringRef, 7> Groups;
     if (NamespaceCommentPattern.match(Comment, &Groups)) {
-      StringRef NamespaceNameInComment = Groups.size() > 5 ? Groups[5] : "";
-      StringRef Anonymous = Groups.size() > 3 ? Groups[3] : "";
+      llvm::StringRef NamespaceNameInComment = Groups.size() > 5 ? Groups[5] : "";
+      llvm::StringRef Anonymous = Groups.size() > 3 ? Groups[3] : "";
 
       if ((ND->isAnonymousNamespace() && NamespaceNameInComment.empty()) ||
           (*NamespaceNameAsWritten == NamespaceNameInComment &&

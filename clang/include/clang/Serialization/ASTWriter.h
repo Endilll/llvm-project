@@ -92,9 +92,9 @@ public:
   friend class ASTDeclWriter;
   friend class ASTRecordWriter;
 
-  using RecordData = SmallVector<uint64_t, 64>;
-  using RecordDataImpl = SmallVectorImpl<uint64_t>;
-  using RecordDataRef = ArrayRef<uint64_t>;
+  using RecordData = llvm::SmallVector<uint64_t, 64>;
+  using RecordDataImpl = llvm::SmallVectorImpl<uint64_t>;
+  using RecordDataRef = llvm::ArrayRef<uint64_t>;
 
 private:
   /// Map that provides the ID numbers of each type within the
@@ -115,7 +115,7 @@ private:
   llvm::BitstreamWriter &Stream;
 
   /// The buffer associated with the bitstream.
-  const SmallVectorImpl<char> &Buffer;
+  const llvm::SmallVectorImpl<char> &Buffer;
 
   /// The PCM manager which manages memory buffers for pcm files.
   InMemoryModuleCache &ModuleCache;
@@ -238,7 +238,7 @@ private:
   uint64_t DeclTypesBlockStartOffset = 0;
 
   /// Sorted (by file offset) vector of pairs of file offset/LocalDeclID.
-  using LocDeclIDsTy = SmallVector<std::pair<unsigned, LocalDeclID>, 64>;
+  using LocDeclIDsTy = llvm::SmallVector<std::pair<unsigned, LocalDeclID>, 64>;
   struct DeclIDInFileInfo {
     LocDeclIDsTy DeclIDs;
 
@@ -402,7 +402,7 @@ private:
     const Attr *getAttr() const { return Attribute; }
   };
 
-  using UpdateRecord = SmallVector<DeclUpdate, 1>;
+  using UpdateRecord = llvm::SmallVector<DeclUpdate, 1>;
   using DeclUpdateMap = llvm::MapVector<const Decl *, UpdateRecord>;
 
   /// Mapping from declarations that came from a chained PCH to the
@@ -446,7 +446,7 @@ private:
   /// Keeps track of declarations that we must emit, even though we're
   /// not guaranteed to be able to find them by walking the AST starting at the
   /// translation unit.
-  SmallVector<const Decl *, 16> DeclsToEmitEvenIfUnreferenced;
+  llvm::SmallVector<const Decl *, 16> DeclsToEmitEvenIfUnreferenced;
 
   /// The set of Objective-C class that have categories we
   /// should serialize.
@@ -533,7 +533,7 @@ private:
 
   void WriteBlockInfoBlock();
   void WriteControlBlock(Preprocessor &PP, ASTContext &Context,
-                         StringRef isysroot);
+                         llvm::StringRef isysroot);
 
   /// Write out the signature and diagnostic options, and return the signature.
   void writeUnhashedControlBlock(Preprocessor &PP, ASTContext &Context);
@@ -627,15 +627,15 @@ private:
   void WriteDeclAbbrevs();
   void WriteDecl(ASTContext &Context, Decl *D);
 
-  ASTFileSignature WriteASTCore(Sema &SemaRef, StringRef isysroot,
+  ASTFileSignature WriteASTCore(Sema &SemaRef, llvm::StringRef isysroot,
                                 Module *WritingModule);
 
 public:
   /// Create a new precompiled header writer that outputs to
   /// the given bitstream.
-  ASTWriter(llvm::BitstreamWriter &Stream, SmallVectorImpl<char> &Buffer,
+  ASTWriter(llvm::BitstreamWriter &Stream, llvm::SmallVectorImpl<char> &Buffer,
             InMemoryModuleCache &ModuleCache,
-            ArrayRef<std::shared_ptr<ModuleFileExtension>> Extensions,
+            llvm::ArrayRef<std::shared_ptr<ModuleFileExtension>> Extensions,
             bool IncludeTimestamps = true, bool BuildingImplicitModule = false,
             bool GeneratingReducedBMI = false);
   ~ASTWriter() override;
@@ -666,8 +666,8 @@ public:
   ///
   /// \return the module signature, which eventually will be a hash of
   /// the module but currently is merely a random 32-bit number.
-  ASTFileSignature WriteAST(Sema &SemaRef, StringRef OutputFile,
-                            Module *WritingModule, StringRef isysroot,
+  ASTFileSignature WriteAST(Sema &SemaRef, llvm::StringRef OutputFile,
+                            Module *WritingModule, llvm::StringRef isysroot,
                             bool ShouldCacheASTInMemory = false);
 
   /// Emit a token.
@@ -755,21 +755,21 @@ public:
   unsigned getAnonymousDeclarationNumber(const NamedDecl *D);
 
   /// Add a string to the given record.
-  void AddString(StringRef Str, RecordDataImpl &Record);
+  void AddString(llvm::StringRef Str, RecordDataImpl &Record);
 
   /// Convert a path from this build process into one that is appropriate
   /// for emission in the module file.
-  bool PreparePathForOutput(SmallVectorImpl<char> &Path);
+  bool PreparePathForOutput(llvm::SmallVectorImpl<char> &Path);
 
   /// Add a path to the given record.
-  void AddPath(StringRef Path, RecordDataImpl &Record);
+  void AddPath(llvm::StringRef Path, RecordDataImpl &Record);
 
   /// Emit the current record with the given path as a blob.
   void EmitRecordWithPath(unsigned Abbrev, RecordDataRef Record,
-                          StringRef Path);
+                          llvm::StringRef Path);
 
   /// Add a version tuple to the given record
-  void AddVersionTuple(const VersionTuple &Version, RecordDataImpl &Record);
+  void AddVersionTuple(const llvm::VersionTuple &Version, RecordDataImpl &Record);
 
   /// Retrieve or create a submodule ID for this module, or return 0 if
   /// the submodule is neither local (a submodle of the currently-written module)
@@ -919,11 +919,11 @@ class PCHGenerator : public SemaConsumer {
 protected:
   ASTWriter &getWriter() { return Writer; }
   const ASTWriter &getWriter() const { return Writer; }
-  SmallVectorImpl<char> &getPCH() const { return Buffer->Data; }
+  llvm::SmallVectorImpl<char> &getPCH() const { return Buffer->Data; }
 
   bool isComplete() const { return Buffer->IsComplete; }
   PCHBuffer *getBufferPtr() { return Buffer.get(); }
-  StringRef getOutputFile() const { return OutputFile; }
+  llvm::StringRef getOutputFile() const { return OutputFile; }
   DiagnosticsEngine &getDiagnostics() const {
     return SemaPtr->getDiagnostics();
   }
@@ -933,9 +933,9 @@ protected:
 
 public:
   PCHGenerator(Preprocessor &PP, InMemoryModuleCache &ModuleCache,
-               StringRef OutputFile, StringRef isysroot,
+               llvm::StringRef OutputFile, llvm::StringRef isysroot,
                std::shared_ptr<PCHBuffer> Buffer,
-               ArrayRef<std::shared_ptr<ModuleFileExtension>> Extensions,
+               llvm::ArrayRef<std::shared_ptr<ModuleFileExtension>> Extensions,
                bool AllowASTWithErrors = false, bool IncludeTimestamps = true,
                bool BuildingImplicitModule = false,
                bool ShouldCacheASTInMemory = false,
@@ -956,11 +956,11 @@ protected:
   virtual Module *getEmittingModule(ASTContext &Ctx) override;
 
   CXX20ModulesGenerator(Preprocessor &PP, InMemoryModuleCache &ModuleCache,
-                        StringRef OutputFile, bool GeneratingReducedBMI);
+                        llvm::StringRef OutputFile, bool GeneratingReducedBMI);
 
 public:
   CXX20ModulesGenerator(Preprocessor &PP, InMemoryModuleCache &ModuleCache,
-                        StringRef OutputFile)
+                        llvm::StringRef OutputFile)
       : CXX20ModulesGenerator(PP, ModuleCache, OutputFile,
                               /*GeneratingReducedBMI=*/false) {}
 
@@ -972,7 +972,7 @@ class ReducedBMIGenerator : public CXX20ModulesGenerator {
 
 public:
   ReducedBMIGenerator(Preprocessor &PP, InMemoryModuleCache &ModuleCache,
-                      StringRef OutputFile)
+                      llvm::StringRef OutputFile)
       : CXX20ModulesGenerator(PP, ModuleCache, OutputFile,
                               /*GeneratingReducedBMI=*/true) {}
 };

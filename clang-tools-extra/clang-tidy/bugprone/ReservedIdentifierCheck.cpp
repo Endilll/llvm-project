@@ -31,7 +31,7 @@ static const char Message[] =
     "declaration uses identifier '%0', which is %select{a reserved "
     "identifier|not a reserved identifier|reserved in the global namespace}1";
 
-static int getMessageSelectIndex(StringRef Tag) {
+static int getMessageSelectIndex(llvm::StringRef Tag) {
   if (Tag == NonReservedTag)
     return 1;
   if (Tag == GlobalUnderscoreTag)
@@ -55,7 +55,7 @@ ReservedIdentifierCheck::parseAllowedIdentifiers() const {
   return AllowedIdentifiers;
 }
 
-ReservedIdentifierCheck::ReservedIdentifierCheck(StringRef Name,
+ReservedIdentifierCheck::ReservedIdentifierCheck(llvm::StringRef Name,
                                                  ClangTidyContext *Context)
     : RenamerClangTidyCheck(Name, Context),
       Invert(Options.get("Invert", false)),
@@ -70,14 +70,14 @@ void ReservedIdentifierCheck::storeOptions(ClangTidyOptions::OptionMap &Opts) {
                 utils::options::serializeStringList(AllowedIdentifiersRaw));
 }
 
-static std::string collapseConsecutive(StringRef Str, char C) {
+static std::string collapseConsecutive(llvm::StringRef Str, char C) {
   std::string Result;
   std::unique_copy(Str.begin(), Str.end(), std::back_inserter(Result),
                    [C](char A, char B) { return A == C && B == C; });
   return Result;
 }
 
-static bool hasReservedDoubleUnderscore(StringRef Name,
+static bool hasReservedDoubleUnderscore(llvm::StringRef Name,
                                         const LangOptions &LangOpts) {
   if (LangOpts.CPlusPlus)
     return Name.contains("__");
@@ -85,30 +85,30 @@ static bool hasReservedDoubleUnderscore(StringRef Name,
 }
 
 static std::optional<std::string>
-getDoubleUnderscoreFixup(StringRef Name, const LangOptions &LangOpts) {
+getDoubleUnderscoreFixup(llvm::StringRef Name, const LangOptions &LangOpts) {
   if (hasReservedDoubleUnderscore(Name, LangOpts))
     return collapseConsecutive(Name, '_');
   return std::nullopt;
 }
 
-static bool startsWithUnderscoreCapital(StringRef Name) {
+static bool startsWithUnderscoreCapital(llvm::StringRef Name) {
   return Name.size() >= 2 && Name[0] == '_' && std::isupper(Name[1]);
 }
 
-static std::optional<std::string> getUnderscoreCapitalFixup(StringRef Name) {
+static std::optional<std::string> getUnderscoreCapitalFixup(llvm::StringRef Name) {
   if (startsWithUnderscoreCapital(Name))
     return std::string(Name.drop_front(1));
   return std::nullopt;
 }
 
-static bool startsWithUnderscoreInGlobalNamespace(StringRef Name,
+static bool startsWithUnderscoreInGlobalNamespace(llvm::StringRef Name,
                                                   bool IsInGlobalNamespace,
                                                   bool IsMacro) {
   return !IsMacro && IsInGlobalNamespace && Name.starts_with("_");
 }
 
 static std::optional<std::string>
-getUnderscoreGlobalNamespaceFixup(StringRef Name, bool IsInGlobalNamespace,
+getUnderscoreGlobalNamespaceFixup(llvm::StringRef Name, bool IsInGlobalNamespace,
                                   bool IsMacro) {
   if (startsWithUnderscoreInGlobalNamespace(Name, IsInGlobalNamespace, IsMacro))
     return std::string(Name.drop_front(1));
@@ -125,9 +125,9 @@ static std::string getNonReservedFixup(std::string Name) {
 }
 
 static std::optional<RenamerClangTidyCheck::FailureInfo>
-getFailureInfoImpl(StringRef Name, bool IsInGlobalNamespace, bool IsMacro,
+getFailureInfoImpl(llvm::StringRef Name, bool IsInGlobalNamespace, bool IsMacro,
                    const LangOptions &LangOpts, bool Invert,
-                   ArrayRef<llvm::Regex> AllowedIdentifiers) {
+                   llvm::ArrayRef<llvm::Regex> AllowedIdentifiers) {
   assert(!Name.empty());
 
   if (llvm::any_of(AllowedIdentifiers, [&](const llvm::Regex &Regex) {
@@ -142,7 +142,7 @@ getFailureInfoImpl(StringRef Name, bool IsInGlobalNamespace, bool IsMacro,
   using FailureInfo = RenamerClangTidyCheck::FailureInfo;
   if (!Invert) {
     std::optional<FailureInfo> Info;
-    auto AppendFailure = [&](StringRef Kind, std::string &&Fixup) {
+    auto AppendFailure = [&](llvm::StringRef Kind, std::string &&Fixup) {
       if (!Info) {
         Info = FailureInfo{std::string(Kind), std::move(Fixup)};
       } else {
@@ -153,7 +153,7 @@ getFailureInfoImpl(StringRef Name, bool IsInGlobalNamespace, bool IsMacro,
     auto InProgressFixup = [&] {
       return llvm::transformOptional(
                  Info,
-                 [](const FailureInfo &Info) { return StringRef(Info.Fixup); })
+                 [](const FailureInfo &Info) { return llvm::StringRef(Info.Fixup); })
           .value_or(Name);
     };
     if (auto Fixup = getDoubleUnderscoreFixup(InProgressFixup(), LangOpts))

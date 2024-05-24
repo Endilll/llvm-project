@@ -12,6 +12,7 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Lex/DependencyDirectivesScanner.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/ErrorOr.h"
@@ -24,7 +25,7 @@ namespace tooling {
 namespace dependencies {
 
 using DependencyDirectivesTy =
-    SmallVector<dependency_directives_scan::Directive, 20>;
+    llvm::SmallVector<dependency_directives_scan::Directive, 20>;
 
 /// Contents and directive tokens of a cached file entry. Single instance can
 /// be shared between multiple entries.
@@ -37,7 +38,7 @@ struct CachedFileContents {
 
   /// The mutex that must be locked before mutating directive tokens.
   std::mutex ValueLock;
-  SmallVector<dependency_directives_scan::Token, 10> DepDirectiveTokens;
+  llvm::SmallVector<dependency_directives_scan::Token, 10> DepDirectiveTokens;
   /// Accessor to the directive tokens that's atomic to avoid data races.
   /// \p CachedFileContents has ownership of the pointer.
   std::atomic<const std::optional<DependencyDirectivesTy> *> DepDirectives;
@@ -80,7 +81,7 @@ public:
   bool isDirectory() const { return !isError() && MaybeStat->isDirectory(); }
 
   /// \returns Original contents of the file.
-  StringRef getOriginalContents() const {
+  llvm::StringRef getOriginalContents() const {
     assert(!isError() && "error");
     assert(!MaybeStat->isDirectory() && "not a file");
     assert(Contents && "contents not initialized");
@@ -89,14 +90,14 @@ public:
 
   /// \returns The scanned preprocessor directive tokens of the file that are
   /// used to speed up preprocessing, if available.
-  std::optional<ArrayRef<dependency_directives_scan::Directive>>
+  std::optional<llvm::ArrayRef<dependency_directives_scan::Directive>>
   getDirectiveTokens() const {
     assert(!isError() && "error");
     assert(!isDirectory() && "not a file");
     assert(Contents && "contents not initialized");
     if (auto *Directives = Contents->DepDirectives.load()) {
       if (Directives->has_value())
-        return ArrayRef<dependency_directives_scan::Directive>(**Directives);
+        return llvm::ArrayRef<dependency_directives_scan::Directive>(**Directives);
     }
     return std::nullopt;
   }
@@ -176,7 +177,7 @@ public:
     llvm::SpecificBumpPtrAllocator<CachedRealPath> RealPathStorage;
 
     /// Returns entry associated with the filename or nullptr if none is found.
-    const CachedFileSystemEntry *findEntryByFilename(StringRef Filename) const;
+    const CachedFileSystemEntry *findEntryByFilename(llvm::StringRef Filename) const;
 
     /// Returns entry associated with the unique ID or nullptr if none is found.
     const CachedFileSystemEntry *
@@ -186,7 +187,7 @@ public:
     /// constructs new one with the given status, associates it with the
     /// filename and returns the result.
     const CachedFileSystemEntry &
-    getOrEmplaceEntryForFilename(StringRef Filename,
+    getOrEmplaceEntryForFilename(llvm::StringRef Filename,
                                  llvm::ErrorOr<llvm::vfs::Status> Stat);
 
     /// Returns entry associated with the unique ID if there is some. Otherwise,
@@ -199,25 +200,25 @@ public:
     /// Returns entry associated with the filename if there is some. Otherwise,
     /// associates the given entry with the filename and returns it.
     const CachedFileSystemEntry &
-    getOrInsertEntryForFilename(StringRef Filename,
+    getOrInsertEntryForFilename(llvm::StringRef Filename,
                                 const CachedFileSystemEntry &Entry);
 
     /// Returns the real path associated with the filename or nullptr if none is
     /// found.
-    const CachedRealPath *findRealPathByFilename(StringRef Filename) const;
+    const CachedRealPath *findRealPathByFilename(llvm::StringRef Filename) const;
 
     /// Returns the real path associated with the filename if there is some.
     /// Otherwise, constructs new one with the given one, associates it with the
     /// filename and returns the result.
     const CachedRealPath &
-    getOrEmplaceRealPathForFilename(StringRef Filename,
-                                    llvm::ErrorOr<StringRef> RealPath);
+    getOrEmplaceRealPathForFilename(llvm::StringRef Filename,
+                                    llvm::ErrorOr<llvm::StringRef> RealPath);
   };
 
   DependencyScanningFilesystemSharedCache();
 
   /// Returns shard for the given key.
-  CacheShard &getShardForFilename(StringRef Filename) const;
+  CacheShard &getShardForFilename(llvm::StringRef Filename) const;
   CacheShard &getShardForUID(llvm::sys::fs::UniqueID UID) const;
 
 private:
@@ -235,7 +236,7 @@ class DependencyScanningFilesystemLocalCache {
 
 public:
   /// Returns entry associated with the filename or nullptr if none is found.
-  const CachedFileSystemEntry *findEntryByFilename(StringRef Filename) const {
+  const CachedFileSystemEntry *findEntryByFilename(llvm::StringRef Filename) const {
     assert(llvm::sys::path::is_absolute_gnu(Filename));
     auto It = Cache.find(Filename);
     return It == Cache.end() ? nullptr : It->getValue().first;
@@ -244,7 +245,7 @@ public:
   /// Associates the given entry with the filename and returns the given entry
   /// pointer (for convenience).
   const CachedFileSystemEntry &
-  insertEntryForFilename(StringRef Filename,
+  insertEntryForFilename(llvm::StringRef Filename,
                          const CachedFileSystemEntry &Entry) {
     assert(llvm::sys::path::is_absolute_gnu(Filename));
     auto [It, Inserted] = Cache.insert({Filename, {&Entry, nullptr}});
@@ -260,7 +261,7 @@ public:
 
   /// Returns real path associated with the filename or nullptr if none is
   /// found.
-  const CachedRealPath *findRealPathByFilename(StringRef Filename) const {
+  const CachedRealPath *findRealPathByFilename(llvm::StringRef Filename) const {
     assert(llvm::sys::path::is_absolute_gnu(Filename));
     auto It = Cache.find(Filename);
     return It == Cache.end() ? nullptr : It->getValue().second;
@@ -269,7 +270,7 @@ public:
   /// Associates the given real path with the filename and returns the given
   /// entry pointer (for convenience).
   const CachedRealPath &
-  insertRealPathForFilename(StringRef Filename,
+  insertRealPathForFilename(llvm::StringRef Filename,
                             const CachedRealPath &RealPath) {
     assert(llvm::sys::path::is_absolute_gnu(Filename));
     auto [It, Inserted] = Cache.insert({Filename, {nullptr, &RealPath}});
@@ -297,7 +298,7 @@ class EntryRef {
   friend class DependencyScanningWorkerFilesystem;
 
 public:
-  EntryRef(StringRef Name, const CachedFileSystemEntry &Entry)
+  EntryRef(llvm::StringRef Name, const CachedFileSystemEntry &Entry)
       : Filename(Name), Entry(Entry) {}
 
   llvm::vfs::Status getStatus() const {
@@ -317,9 +318,9 @@ public:
     return *this;
   }
 
-  StringRef getContents() const { return Entry.getOriginalContents(); }
+  llvm::StringRef getContents() const { return Entry.getOriginalContents(); }
 
-  std::optional<ArrayRef<dependency_directives_scan::Directive>>
+  std::optional<llvm::ArrayRef<dependency_directives_scan::Directive>>
   getDirectiveTokens() const {
     return Entry.getDirectiveTokens();
   }
@@ -342,22 +343,22 @@ public:
 
   DependencyScanningWorkerFilesystem(
       DependencyScanningFilesystemSharedCache &SharedCache,
-      IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS);
+      llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS);
 
-  llvm::ErrorOr<llvm::vfs::Status> status(const Twine &Path) override;
+  llvm::ErrorOr<llvm::vfs::Status> status(const llvm::Twine &Path) override;
   llvm::ErrorOr<std::unique_ptr<llvm::vfs::File>>
-  openFileForRead(const Twine &Path) override;
+  openFileForRead(const llvm::Twine &Path) override;
 
-  std::error_code getRealPath(const Twine &Path,
-                              SmallVectorImpl<char> &Output) override;
+  std::error_code getRealPath(const llvm::Twine &Path,
+                              llvm::SmallVectorImpl<char> &Output) override;
 
-  std::error_code setCurrentWorkingDirectory(const Twine &Path) override;
+  std::error_code setCurrentWorkingDirectory(const llvm::Twine &Path) override;
 
   /// Returns entry for the given filename.
   ///
   /// Attempts to use the local and shared caches first, then falls back to
   /// using the underlying filesystem.
-  llvm::ErrorOr<EntryRef> getOrCreateFileSystemEntry(StringRef Filename);
+  llvm::ErrorOr<EntryRef> getOrCreateFileSystemEntry(llvm::StringRef Filename);
 
   /// Ensure the directive tokens are populated for this file entry.
   ///
@@ -367,7 +368,7 @@ public:
 
   /// Check whether \p Path exists. By default checks cached result of \c
   /// status(), and falls back on FS if unable to do so.
-  bool exists(const Twine &Path) override;
+  bool exists(const llvm::Twine &Path) override;
 
 private:
   /// For a filename that's not yet associated with any entry in the caches,
@@ -376,8 +377,8 @@ private:
   /// \p FilenameForLookup will always be an absolute path, and different than
   /// \p OriginalFilename if \p OriginalFilename is relative.
   llvm::ErrorOr<const CachedFileSystemEntry &>
-  computeAndStoreResult(StringRef OriginalFilename,
-                        StringRef FilenameForLookup);
+  computeAndStoreResult(llvm::StringRef OriginalFilename,
+                        llvm::StringRef FilenameForLookup);
 
   /// Represents a filesystem entry that has been stat-ed (and potentially read)
   /// and that's about to be inserted into the cache as `CachedFileSystemEntry`.
@@ -392,7 +393,7 @@ private:
 
   /// Reads file at the given path. Enforces consistency between the file size
   /// in status and size of read contents.
-  llvm::ErrorOr<TentativeEntry> readFile(StringRef Filename);
+  llvm::ErrorOr<TentativeEntry> readFile(llvm::StringRef Filename);
 
   /// Returns entry associated with the unique ID of the given tentative entry
   /// if there is some in the shared cache. Otherwise, constructs new one,
@@ -406,7 +407,7 @@ private:
   /// is found in the shared cache, writes it through the local cache and
   /// returns it. Otherwise returns nullptr.
   const CachedFileSystemEntry *
-  findEntryByFilenameWithWriteThrough(StringRef Filename);
+  findEntryByFilenameWithWriteThrough(llvm::StringRef Filename);
 
   /// Returns entry associated with the unique ID in the shared cache or nullptr
   /// if none is found.
@@ -419,7 +420,7 @@ private:
   /// Associates the given entry with the filename in the local cache and
   /// returns it.
   const CachedFileSystemEntry &
-  insertLocalEntryForFilename(StringRef Filename,
+  insertLocalEntryForFilename(llvm::StringRef Filename,
                               const CachedFileSystemEntry &Entry) {
     return LocalCache.insertEntryForFilename(Filename, Entry);
   }
@@ -428,7 +429,7 @@ private:
   /// some. Otherwise, constructs new one with the given error code, associates
   /// it with the filename and returns the result.
   const CachedFileSystemEntry &
-  getOrEmplaceSharedEntryForFilename(StringRef Filename, std::error_code EC) {
+  getOrEmplaceSharedEntryForFilename(llvm::StringRef Filename, std::error_code EC) {
     return SharedCache.getShardForFilename(Filename)
         .getOrEmplaceEntryForFilename(Filename, EC);
   }
@@ -437,13 +438,13 @@ private:
   /// some. Otherwise, associates the given entry with the filename and returns
   /// it.
   const CachedFileSystemEntry &
-  getOrInsertSharedEntryForFilename(StringRef Filename,
+  getOrInsertSharedEntryForFilename(llvm::StringRef Filename,
                                     const CachedFileSystemEntry &Entry) {
     return SharedCache.getShardForFilename(Filename)
         .getOrInsertEntryForFilename(Filename, Entry);
   }
 
-  void printImpl(raw_ostream &OS, PrintType Type,
+  void printImpl(llvm::raw_ostream &OS, PrintType Type,
                  unsigned IndentLevel) const override {
     printIndent(OS, IndentLevel);
     OS << "DependencyScanningFilesystem\n";
@@ -462,8 +463,8 @@ private:
 
   void updateWorkingDirForCacheLookup();
 
-  llvm::ErrorOr<StringRef>
-  tryGetFilenameForLookup(StringRef OriginalFilename,
+  llvm::ErrorOr<llvm::StringRef>
+  tryGetFilenameForLookup(llvm::StringRef OriginalFilename,
                           llvm::SmallVectorImpl<char> &PathBuf) const;
 };
 

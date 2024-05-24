@@ -712,7 +712,7 @@ void NonLocalizedStringChecker::setNonLocalizedState(const SVal S,
 
 
 static bool isDebuggingName(std::string name) {
-  return StringRef(name).contains_insensitive("debug");
+  return llvm::StringRef(name).contains_insensitive("debug");
 }
 
 /// Returns true when, heuristically, the analyzer may be analyzing debugging
@@ -804,7 +804,7 @@ void NonLocalizedStringChecker::checkPreObjCMessage(const ObjCMethodCall &msg,
   Selector S = msg.getSelector();
 
   std::string SelectorString = S.getAsString();
-  StringRef SelectorName = SelectorString;
+  llvm::StringRef SelectorName = SelectorString;
   assert(!SelectorName.empty());
 
   if (odInfo->isStr("NSString")) {
@@ -859,7 +859,7 @@ void NonLocalizedStringChecker::checkPreObjCMessage(const ObjCMethodCall &msg,
 
   if (const ObjCStringRegion *SR =
           dyn_cast_or_null<ObjCStringRegion>(svTitle.getAsRegion())) {
-    StringRef stringValue =
+    llvm::StringRef stringValue =
         SR->getObjCStringLiteral()->getString()->getString();
     if ((stringValue.trim().size() == 0 && stringValue.size() > 0) ||
         stringValue.empty())
@@ -1168,8 +1168,8 @@ void EmptyLocalizationContextChecker::MethodCrawler::VisitObjCMessageExpr(
   if (!isStringLiteral(Result.getKind()))
     return;
 
-  StringRef Comment =
-      StringRef(Result.getLiteralData(), Result.getLength()).trim('"');
+  llvm::StringRef Comment =
+      llvm::StringRef(Result.getLiteralData(), Result.getLength()).trim('"');
 
   if ((Comment.trim().size() == 0 && Comment.size() > 0) || // Is Whitespace
       Comment.empty()) {
@@ -1278,7 +1278,7 @@ bool PluralMisuseChecker::MethodCrawler::VisitCallExpr(const CallExpr *CE) {
   if (InMatchingStatement) {
     if (const FunctionDecl *FD = CE->getDirectCallee()) {
       std::string NormalizedName =
-          StringRef(FD->getNameInfo().getAsString()).lower();
+          llvm::StringRef(FD->getNameInfo().getAsString()).lower();
       if (NormalizedName.find("loc") != std::string::npos) {
         for (const Expr *Arg : CE->arguments()) {
           if (isa<ObjCStringLiteral>(Arg))

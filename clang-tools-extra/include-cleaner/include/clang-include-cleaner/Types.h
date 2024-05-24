@@ -124,7 +124,7 @@ struct Header {
 
   Header(FileEntryRef FE) : Storage(FE) {}
   Header(tooling::stdlib::Header H) : Storage(H) {}
-  Header(StringRef VerbatimSpelling) : Storage(VerbatimSpelling) {}
+  Header(llvm::StringRef VerbatimSpelling) : Storage(VerbatimSpelling) {}
 
   Kind kind() const { return static_cast<Kind>(Storage.index()); }
   bool operator==(const Header &RHS) const { return Storage == RHS.Storage; }
@@ -134,7 +134,7 @@ struct Header {
   tooling::stdlib::Header standard() const {
     return std::get<Standard>(Storage);
   }
-  StringRef verbatim() const { return std::get<Verbatim>(Storage); }
+  llvm::StringRef verbatim() const { return std::get<Verbatim>(Storage); }
 
   /// Absolute path for the header when it's a physical file. Otherwise just
   /// the spelling without surrounding quotes/brackets.
@@ -142,7 +142,7 @@ struct Header {
 
 private:
   // Order must match Kind enum!
-  std::variant<FileEntryRef, tooling::stdlib::Header, StringRef> Storage;
+  std::variant<FileEntryRef, tooling::stdlib::Header, llvm::StringRef> Storage;
 
   // Disambiguation tag to make sure we can call the right constructor from
   // DenseMapInfo methods.

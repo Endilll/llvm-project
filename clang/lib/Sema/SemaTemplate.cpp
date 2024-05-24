@@ -1784,7 +1784,7 @@ Sema::ActOnTemplateParameterList(unsigned Depth,
                                  SourceLocation ExportLoc,
                                  SourceLocation TemplateLoc,
                                  SourceLocation LAngleLoc,
-                                 ArrayRef<NamedDecl *> Params,
+                                 llvm::ArrayRef<NamedDecl *> Params,
                                  SourceLocation RAngleLoc,
                                  Expr *RequiresClause) {
   if (ExportLoc.isValid())
@@ -2279,7 +2279,7 @@ FunctionTemplateDecl *buildDeductionGuide(
           OriginalTemplate);
 
   DeclarationNameInfo Name(DeductionGuideName, Loc);
-  ArrayRef<ParmVarDecl *> Params =
+  llvm::ArrayRef<ParmVarDecl *> Params =
       TInfo->getTypeLoc().castAs<FunctionProtoTypeLoc>().getParams();
 
   // Build the implicit deduction guide template.
@@ -2394,7 +2394,7 @@ struct ConvertConstructorToDeductionGuideTransform {
   /// Transform a constructor declaration into a deduction guide.
   NamedDecl *transformConstructor(FunctionTemplateDecl *FTD,
                                   CXXConstructorDecl *CD) {
-    SmallVector<TemplateArgument, 16> SubstArgs;
+    llvm::SmallVector<TemplateArgument, 16> SubstArgs;
 
     LocalInstantiationScope Scope(SemaRef);
 
@@ -2408,8 +2408,8 @@ struct ConvertConstructorToDeductionGuideTransform {
     TemplateParameterList *TemplateParams = GetTemplateParameterList(Template);
     if (FTD) {
       TemplateParameterList *InnerParams = FTD->getTemplateParameters();
-      SmallVector<NamedDecl *, 16> AllParams;
-      SmallVector<TemplateArgument, 16> Depth1Args;
+      llvm::SmallVector<NamedDecl *, 16> AllParams;
+      llvm::SmallVector<TemplateArgument, 16> Depth1Args;
       AllParams.reserve(TemplateParams->size() + InnerParams->size());
       AllParams.insert(AllParams.begin(),
                        TemplateParams->begin(), TemplateParams->end());
@@ -2489,8 +2489,8 @@ struct ConvertConstructorToDeductionGuideTransform {
     // replacing references to the old parameters with references to the
     // new ones.
     TypeLocBuilder TLB;
-    SmallVector<ParmVarDecl*, 8> Params;
-    SmallVector<TypedefNameDecl *, 4> MaterializedTypedefs;
+    llvm::SmallVector<ParmVarDecl*, 8> Params;
+    llvm::SmallVector<TypedefNameDecl *, 4> MaterializedTypedefs;
     QualType NewType = transformFunctionProtoType(TLB, FPTL, Params, Args,
                                                   MaterializedTypedefs);
     if (NewType.isNull())
@@ -2504,7 +2504,7 @@ struct ConvertConstructorToDeductionGuideTransform {
   }
 
   /// Build a deduction guide with the specified parameter types.
-  NamedDecl *buildSimpleDeductionGuide(MutableArrayRef<QualType> ParamTypes) {
+  NamedDecl *buildSimpleDeductionGuide(llvm::MutableArrayRef<QualType> ParamTypes) {
     SourceLocation Loc = Template->getLocation();
 
     // Build the requested type.
@@ -2521,7 +2521,7 @@ struct ConvertConstructorToDeductionGuideTransform {
         TSI->getTypeLoc().castAs<FunctionProtoTypeLoc>();
 
     // Build the parameters, needed during deduction / substitution.
-    SmallVector<ParmVarDecl*, 4> Params;
+    llvm::SmallVector<ParmVarDecl*, 4> Params;
     for (auto T : ParamTypes) {
       auto *TSI = SemaRef.Context.getTrivialTypeSourceInfo(T, Loc);
       if (NestedPattern)
@@ -2562,10 +2562,10 @@ private:
 
   QualType transformFunctionProtoType(
       TypeLocBuilder &TLB, FunctionProtoTypeLoc TL,
-      SmallVectorImpl<ParmVarDecl *> &Params,
+      llvm::SmallVectorImpl<ParmVarDecl *> &Params,
       MultiLevelTemplateArgumentList &Args,
-      SmallVectorImpl<TypedefNameDecl *> &MaterializedTypedefs) {
-    SmallVector<QualType, 4> ParamTypes;
+      llvm::SmallVectorImpl<TypedefNameDecl *> &MaterializedTypedefs) {
+    llvm::SmallVector<QualType, 4> ParamTypes;
     const FunctionProtoType *T = TL.getTypePtr();
 
     //    -- The types of the function parameters are those of the constructor.
@@ -2692,15 +2692,15 @@ private:
 
 // Find all template parameters that appear in the given DeducedArgs.
 // Return the indices of the template parameters in the TemplateParams.
-SmallVector<unsigned> TemplateParamsReferencedInTemplateArgumentList(
-    ArrayRef<NamedDecl *> TemplateParams,
-    ArrayRef<TemplateArgument> DeducedArgs) {
+llvm::SmallVector<unsigned> TemplateParamsReferencedInTemplateArgumentList(
+    llvm::ArrayRef<NamedDecl *> TemplateParams,
+    llvm::ArrayRef<TemplateArgument> DeducedArgs) {
   struct TemplateParamsReferencedFinder
       : public RecursiveASTVisitor<TemplateParamsReferencedFinder> {
     llvm::DenseSet<NamedDecl *> TemplateParams;
     llvm::DenseSet<const NamedDecl *> ReferencedTemplateParams;
 
-    TemplateParamsReferencedFinder(ArrayRef<NamedDecl *> TemplateParams)
+    TemplateParamsReferencedFinder(llvm::ArrayRef<NamedDecl *> TemplateParams)
         : TemplateParams(TemplateParams.begin(), TemplateParams.end()) {}
 
     bool VisitTemplateTypeParmType(TemplateTypeParmType *TTP) {
@@ -2726,7 +2726,7 @@ SmallVector<unsigned> TemplateParamsReferencedInTemplateArgumentList(
   TemplateParamsReferencedFinder Finder(TemplateParams);
   Finder.TraverseTemplateArguments(DeducedArgs);
 
-  SmallVector<unsigned> Results;
+  llvm::SmallVector<unsigned> Results;
   for (unsigned Index = 0; Index < TemplateParams.size(); ++Index) {
     if (Finder.ReferencedTemplateParams.contains(TemplateParams[Index]))
       Results.push_back(Index);
@@ -2782,7 +2782,7 @@ NamedDecl *transformTemplateParameter(Sema &SemaRef, DeclContext *DC,
 Expr *
 buildAssociatedConstraints(Sema &SemaRef, FunctionTemplateDecl *F,
                            TypeAliasTemplateDecl *AliasTemplate,
-                           ArrayRef<DeducedTemplateArgument> DeduceResults,
+                           llvm::ArrayRef<DeducedTemplateArgument> DeduceResults,
                            Expr *IsDeducible) {
   Expr *RC = F->getTemplateParameters()->getRequiresClause();
   if (!RC)
@@ -2815,7 +2815,7 @@ buildAssociatedConstraints(Sema &SemaRef, FunctionTemplateDecl *F,
 
   // We rebuild all template parameters with the uninstantiated depth, and
   // build template arguments refer to them.
-  SmallVector<TemplateArgument> AdjustedAliasTemplateArgs;
+  llvm::SmallVector<TemplateArgument> AdjustedAliasTemplateArgs;
 
   for (auto *TP : *AliasTemplate->getTemplateParameters()) {
     // Rebuild any internal references to earlier parameters and reindex
@@ -2834,7 +2834,7 @@ buildAssociatedConstraints(Sema &SemaRef, FunctionTemplateDecl *F,
   }
   // Template arguments used to transform the template arguments in
   // DeducedResults.
-  SmallVector<TemplateArgument> TemplateArgsForBuildingRC(
+  llvm::SmallVector<TemplateArgument> TemplateArgsForBuildingRC(
       F->getTemplateParameters()->size());
   // Transform the transformed template args
   MultiLevelTemplateArgumentList Args;
@@ -2914,7 +2914,7 @@ buildAssociatedConstraints(Sema &SemaRef, FunctionTemplateDecl *F,
 Expr *buildIsDeducibleConstraint(Sema &SemaRef,
                                  TypeAliasTemplateDecl *AliasTemplate,
                                  QualType ReturnType,
-                                 SmallVector<NamedDecl *> TemplateParams) {
+                                 llvm::SmallVector<NamedDecl *> TemplateParams) {
   ASTContext &Context = SemaRef.Context;
   // Constraint AST nodes must use uninstantiated depth.
   if (auto *PrimaryTemplate =
@@ -2923,7 +2923,7 @@ Expr *buildIsDeducibleConstraint(Sema &SemaRef,
 
     // Adjust the depth for TemplateParams.
     unsigned AdjustDepth = PrimaryTemplate->getTemplateDepth();
-    SmallVector<TemplateArgument> TransformedTemplateArgs;
+    llvm::SmallVector<TemplateArgument> TransformedTemplateArgs;
     for (auto *TP : TemplateParams) {
       // Rebuild any internal references to earlier parameters and reindex
       // as we go.
@@ -2948,7 +2948,7 @@ Expr *buildIsDeducibleConstraint(Sema &SemaRef,
         Context.DeclarationNames.getCXXDeductionGuideName(AliasTemplate));
   };
 
-  SmallVector<TypeSourceInfo *> IsDeducibleTypeTraitArgs = {
+  llvm::SmallVector<TypeSourceInfo *> IsDeducibleTypeTraitArgs = {
       Context.getTrivialTypeSourceInfo(
           Context.getDeducedTemplateSpecializationType(
               TemplateName(AliasTemplate), /*DeducedType=*/QualType(),
@@ -3042,7 +3042,7 @@ BuildDeductionGuideForTypeAlias(Sema &SemaRef,
   // the return type of the deduction guide from it: Y->int, X->U
   sema::TemplateDeductionInfo TDeduceInfo(Loc);
   // Must initialize n elements, this is required by DeduceTemplateArguments.
-  SmallVector<DeducedTemplateArgument> DeduceResults(
+  llvm::SmallVector<DeducedTemplateArgument> DeduceResults(
       F->getTemplateParameters()->size());
 
   // FIXME: DeduceTemplateArguments stops immediately at the first
@@ -3055,8 +3055,8 @@ BuildDeductionGuideForTypeAlias(Sema &SemaRef,
       AliasRhsTemplateArgs, TDeduceInfo, DeduceResults,
       /*NumberOfArgumentsMustMatch=*/false);
 
-  SmallVector<TemplateArgument> DeducedArgs;
-  SmallVector<unsigned> NonDeducedTemplateParamsInFIndex;
+  llvm::SmallVector<TemplateArgument> DeducedArgs;
+  llvm::SmallVector<unsigned> NonDeducedTemplateParamsInFIndex;
   // !!NOTE: DeduceResults respects the sequence of template parameters of
   // the deduction guide f.
   for (unsigned Index = 0; Index < DeduceResults.size(); ++Index) {
@@ -3069,7 +3069,7 @@ BuildDeductionGuideForTypeAlias(Sema &SemaRef,
       TemplateParamsReferencedInTemplateArgumentList(
           AliasTemplate->getTemplateParameters()->asArray(), DeducedArgs);
   // All template arguments null by default.
-  SmallVector<TemplateArgument> TemplateArgsForBuildingFPrime(
+  llvm::SmallVector<TemplateArgument> TemplateArgsForBuildingFPrime(
       F->getTemplateParameters()->size());
 
   // Create a template parameter list for the synthesized deduction guide f'.
@@ -3079,10 +3079,10 @@ BuildDeductionGuideForTypeAlias(Sema &SemaRef,
   //   parameter list consists of all the template parameters of A
   //   (including their default template arguments) that appear in the above
   //   deductions or (recursively) in their default template arguments
-  SmallVector<NamedDecl *> FPrimeTemplateParams;
+  llvm::SmallVector<NamedDecl *> FPrimeTemplateParams;
   // Store template arguments that refer to the newly-created template
   // parameters, used for building `TemplateArgsForBuildingFPrime`.
-  SmallVector<TemplateArgument, 16> TransformedDeducedAliasArgs(
+  llvm::SmallVector<TemplateArgument, 16> TransformedDeducedAliasArgs(
       AliasTemplate->getTemplateParameters()->size());
 
   for (unsigned AliasTemplateParamIdx : DeducedAliasTemplateParams) {
@@ -3237,7 +3237,7 @@ void DeclareImplicitDeductionGuidesForTypeAlias(
 // Build an aggregate deduction guide for a type alias template.
 FunctionTemplateDecl *DeclareAggregateDeductionGuideForTypeAlias(
     Sema &SemaRef, TypeAliasTemplateDecl *AliasTemplate,
-    MutableArrayRef<QualType> ParamTypes, SourceLocation Loc) {
+    llvm::MutableArrayRef<QualType> ParamTypes, SourceLocation Loc) {
   TemplateDecl *RHSTemplate =
       getRHSTemplateDeclAndArgs(SemaRef, AliasTemplate).first;
   if (!RHSTemplate)
@@ -3253,7 +3253,7 @@ FunctionTemplateDecl *DeclareAggregateDeductionGuideForTypeAlias(
 } // namespace
 
 FunctionTemplateDecl *Sema::DeclareAggregateDeductionGuideFromInitList(
-    TemplateDecl *Template, MutableArrayRef<QualType> ParamTypes,
+    TemplateDecl *Template, llvm::MutableArrayRef<QualType> ParamTypes,
     SourceLocation Loc) {
   llvm::FoldingSetNodeID ID;
   ID.AddPointer(Template);
@@ -3975,7 +3975,7 @@ static SourceRange getRangeOfTypeInNestedNameSpecifier(ASTContext &Context,
 TemplateParameterList *Sema::MatchTemplateParametersToScopeSpecifier(
     SourceLocation DeclStartLoc, SourceLocation DeclLoc, const CXXScopeSpec &SS,
     TemplateIdAnnotation *TemplateId,
-    ArrayRef<TemplateParameterList *> ParamLists, bool IsFriend,
+    llvm::ArrayRef<TemplateParameterList *> ParamLists, bool IsFriend,
     bool &IsMemberSpecialization, bool &Invalid, bool SuppressDiagnostic) {
   IsMemberSpecialization = false;
   Invalid = false;
@@ -3983,7 +3983,7 @@ TemplateParameterList *Sema::MatchTemplateParametersToScopeSpecifier(
   // The sequence of nested types to which we will match up the template
   // parameter lists. We first build this list by starting with the type named
   // by the nested-name-specifier and walking out until we run out of types.
-  SmallVector<QualType, 4> NestedTypes;
+  llvm::SmallVector<QualType, 4> NestedTypes;
   QualType T;
   if (SS.getScopeRep()) {
     if (CXXRecordDecl *Record
@@ -4360,7 +4360,7 @@ void Sema::NoteAllFoundTemplates(TemplateName Name) {
 
 static QualType
 checkBuiltinTemplateIdType(Sema &SemaRef, BuiltinTemplateDecl *BTD,
-                           ArrayRef<TemplateArgument> Converted,
+                           llvm::ArrayRef<TemplateArgument> Converted,
                            SourceLocation TemplateLoc,
                            TemplateArgumentListInfo &TemplateArgs) {
   ASTContext &Context = SemaRef.getASTContext();
@@ -4457,7 +4457,7 @@ static bool isEnableIfAliasTemplate(TypeAliasTemplateDecl *AliasTemplate) {
 /// disjunctive normal form, so we can find the first failed term
 /// within each possible clause.
 static void collectConjunctionTerms(Expr *Clause,
-                                    SmallVectorImpl<Expr *> &Terms) {
+                                    llvm::SmallVectorImpl<Expr *> &Terms) {
   if (auto BinOp = dyn_cast<BinaryOperator>(Clause->IgnoreParenImpCasts())) {
     if (BinOp->getOpcode() == BO_LAnd) {
       collectConjunctionTerms(BinOp->getLHS(), Terms);
@@ -4494,7 +4494,7 @@ static Expr *lookThroughRangesV3Condition(Preprocessor &PP, Expr *Cond) {
   SourceLocation Loc = InnerBinOp->getExprLoc();
   if (!Loc.isMacroID()) return Cond;
 
-  StringRef MacroName = PP.getImmediateMacroName(Loc);
+  llvm::StringRef MacroName = PP.getImmediateMacroName(Loc);
   if (MacroName == "CONCEPT_REQUIRES" || MacroName == "CONCEPT_REQUIRES_")
     return BinOp->getRHS();
 
@@ -4511,7 +4511,7 @@ public:
   explicit FailedBooleanConditionPrinterHelper(const PrintingPolicy &P)
       : Policy(P) {}
 
-  bool handledStmt(Stmt *E, raw_ostream &OS) override {
+  bool handledStmt(Stmt *E, llvm::raw_ostream &OS) override {
     const auto *DR = dyn_cast<DeclRefExpr>(E);
     if (DR && DR->getQualifier()) {
       // If this is a qualified name, expand the template arguments in nested
@@ -4542,7 +4542,7 @@ Sema::findFailedBooleanCondition(Expr *Cond) {
   Cond = lookThroughRangesV3Condition(PP, Cond);
 
   // Separate out all of the terms in a conjunction.
-  SmallVector<Expr *, 4> Terms;
+  llvm::SmallVector<Expr *, 4> Terms;
   collectConjunctionTerms(Cond, Terms);
 
   // Determine which term failed.
@@ -4616,7 +4616,7 @@ QualType Sema::CheckTemplateIdType(TemplateName Name,
 
   // Check that the template argument list is well-formed for this
   // template.
-  SmallVector<TemplateArgument, 4> SugaredConverted, CanonicalConverted;
+  llvm::SmallVector<TemplateArgument, 4> SugaredConverted, CanonicalConverted;
   if (CheckTemplateArgumentList(Template, TemplateLoc, TemplateArgs, false,
                                 SugaredConverted, CanonicalConverted,
                                 /*UpdateArgsWithConversions=*/true))
@@ -5098,7 +5098,7 @@ static bool isTemplateArgumentTemplateParameter(
 }
 
 static bool isSameAsPrimaryTemplate(TemplateParameterList *Params,
-                                    ArrayRef<TemplateArgument> Args) {
+                                    llvm::ArrayRef<TemplateArgument> Args) {
   if (Params->size() != Args.size())
     return false;
 
@@ -5143,7 +5143,7 @@ static void checkMoreSpecializedThanPrimary(Sema &S, PartialSpecDecl *Partial) {
     PartialDiagnosticAt Diag = {SourceLocation(),
                                 PartialDiagnostic::NullDiagnostic()};
     Info.takeSFINAEDiagnostic(Diag);
-    SmallString<128> SFINAEArgString;
+    llvm::SmallString<128> SFINAEArgString;
     Diag.second.EmitToString(S.getDiagnostics(), SFINAEArgString);
     S.Diag(Diag.first,
            diag::note_partial_spec_not_more_specialized_than_primary)
@@ -5151,7 +5151,7 @@ static void checkMoreSpecializedThanPrimary(Sema &S, PartialSpecDecl *Partial) {
   }
 
   S.NoteTemplateLocation(*Template);
-  SmallVector<const Expr *, 3> PartialAC, TemplateAC;
+  llvm::SmallVector<const Expr *, 3> PartialAC, TemplateAC;
   Template->getAssociatedConstraints(TemplateAC);
   Partial->getAssociatedConstraints(PartialAC);
   S.MaybeEmitAmbiguousAtomicConstraintsDiagnostic(Partial, PartialAC, Template,
@@ -5282,7 +5282,7 @@ DeclResult Sema::ActOnVarTemplateSpecialization(
 
   // Check that the template argument list is well-formed for this
   // template.
-  SmallVector<TemplateArgument, 4> SugaredConverted, CanonicalConverted;
+  llvm::SmallVector<TemplateArgument, 4> SugaredConverted, CanonicalConverted;
   if (CheckTemplateArgumentList(VarTemplate, TemplateNameLoc, TemplateArgs,
                                 false, SugaredConverted, CanonicalConverted,
                                 /*UpdateArgsWithConversions=*/true))
@@ -5448,7 +5448,7 @@ Sema::CheckVarTemplateId(VarTemplateDecl *Template, SourceLocation TemplateLoc,
   assert(Template && "A variable template id without template?");
 
   // Check that the template argument list is well-formed for this template.
-  SmallVector<TemplateArgument, 4> SugaredConverted, CanonicalConverted;
+  llvm::SmallVector<TemplateArgument, 4> SugaredConverted, CanonicalConverted;
   if (CheckTemplateArgumentList(
           Template, TemplateNameLoc,
           const_cast<TemplateArgumentListInfo &>(TemplateArgs), false,
@@ -5480,7 +5480,7 @@ Sema::CheckVarTemplateId(VarTemplateDecl *Template, SourceLocation TemplateLoc,
   const TemplateArgumentList *PartialSpecArgs = nullptr;
   bool AmbiguousPartialSpec = false;
   typedef PartialSpecMatchResult MatchResult;
-  SmallVector<MatchResult, 4> Matched;
+  llvm::SmallVector<MatchResult, 4> Matched;
   SourceLocation PointOfInstantiation = TemplateNameLoc;
   TemplateSpecCandidateSet FailedCandidates(PointOfInstantiation,
                                             /*ForTakingAddress=*/false);
@@ -5490,7 +5490,7 @@ Sema::CheckVarTemplateId(VarTemplateDecl *Template, SourceLocation TemplateLoc,
   // TODO: Unify with InstantiateClassTemplateSpecialization()?
   //       Perhaps better after unification of DeduceTemplateArguments() and
   //       getMoreSpecializedPartialSpecialization().
-  SmallVector<VarTemplatePartialSpecializationDecl *, 4> PartialSpecs;
+  llvm::SmallVector<VarTemplatePartialSpecializationDecl *, 4> PartialSpecs;
   Template->getPartialSpecializations(PartialSpecs);
 
   for (unsigned I = 0, N = PartialSpecs.size(); I != N; ++I) {
@@ -5514,7 +5514,7 @@ Sema::CheckVarTemplateId(VarTemplateDecl *Template, SourceLocation TemplateLoc,
   }
 
   if (Matched.size() >= 1) {
-    SmallVector<MatchResult, 4>::iterator Best = Matched.begin();
+    llvm::SmallVector<MatchResult, 4>::iterator Best = Matched.begin();
     if (Matched.size() == 1) {
       //   -- If exactly one matching specialization is found, the
       //      instantiation is generated from that specialization.
@@ -5527,7 +5527,7 @@ Sema::CheckVarTemplateId(VarTemplateDecl *Template, SourceLocation TemplateLoc,
       //      specialized than all of the other matching
       //      specializations, then the use of the variable template is
       //      ambiguous and the program is ill-formed.
-      for (SmallVector<MatchResult, 4>::iterator P = Best + 1,
+      for (llvm::SmallVector<MatchResult, 4>::iterator P = Best + 1,
                                                  PEnd = Matched.end();
            P != PEnd; ++P) {
         if (getMoreSpecializedPartialSpecialization(P->Partial, Best->Partial,
@@ -5538,7 +5538,7 @@ Sema::CheckVarTemplateId(VarTemplateDecl *Template, SourceLocation TemplateLoc,
 
       // Determine if the best partial specialization is more specialized than
       // the others.
-      for (SmallVector<MatchResult, 4>::iterator P = Matched.begin(),
+      for (llvm::SmallVector<MatchResult, 4>::iterator P = Matched.begin(),
                                                  PEnd = Matched.end();
            P != PEnd; ++P) {
         if (P != Best && getMoreSpecializedPartialSpecialization(
@@ -5909,8 +5909,8 @@ TemplateNameKind Sema::ActOnTemplateName(Scope *S,
 
 bool Sema::CheckTemplateTypeArgument(
     TemplateTypeParmDecl *Param, TemplateArgumentLoc &AL,
-    SmallVectorImpl<TemplateArgument> &SugaredConverted,
-    SmallVectorImpl<TemplateArgument> &CanonicalConverted) {
+    llvm::SmallVectorImpl<TemplateArgument> &SugaredConverted,
+    llvm::SmallVectorImpl<TemplateArgument> &CanonicalConverted) {
   const TemplateArgument &Arg = AL.getArgument();
   QualType ArgType;
   TypeSourceInfo *TSI = nullptr;
@@ -6055,8 +6055,8 @@ bool Sema::CheckTemplateTypeArgument(
 static bool SubstDefaultTemplateArgument(
     Sema &SemaRef, TemplateDecl *Template, SourceLocation TemplateLoc,
     SourceLocation RAngleLoc, TemplateTypeParmDecl *Param,
-    ArrayRef<TemplateArgument> SugaredConverted,
-    ArrayRef<TemplateArgument> CanonicalConverted,
+    llvm::ArrayRef<TemplateArgument> SugaredConverted,
+    llvm::ArrayRef<TemplateArgument> CanonicalConverted,
     TemplateArgumentLoc &Output) {
   Output = Param->getDefaultArgument();
 
@@ -6115,8 +6115,8 @@ static bool SubstDefaultTemplateArgument(
 static bool SubstDefaultTemplateArgument(
     Sema &SemaRef, TemplateDecl *Template, SourceLocation TemplateLoc,
     SourceLocation RAngleLoc, NonTypeTemplateParmDecl *Param,
-    ArrayRef<TemplateArgument> SugaredConverted,
-    ArrayRef<TemplateArgument> CanonicalConverted,
+    llvm::ArrayRef<TemplateArgument> SugaredConverted,
+    llvm::ArrayRef<TemplateArgument> CanonicalConverted,
     TemplateArgumentLoc &Output) {
   Sema::InstantiatingTemplate Inst(SemaRef, TemplateLoc, Param, Template,
                                    SugaredConverted,
@@ -6165,8 +6165,8 @@ static bool SubstDefaultTemplateArgument(
 static TemplateName SubstDefaultTemplateArgument(
     Sema &SemaRef, TemplateDecl *Template, SourceLocation TemplateLoc,
     SourceLocation RAngleLoc, TemplateTemplateParmDecl *Param,
-    ArrayRef<TemplateArgument> SugaredConverted,
-    ArrayRef<TemplateArgument> CanonicalConverted,
+    llvm::ArrayRef<TemplateArgument> SugaredConverted,
+    llvm::ArrayRef<TemplateArgument> CanonicalConverted,
     NestedNameSpecifierLoc &QualifierLoc) {
   Sema::InstantiatingTemplate Inst(
       SemaRef, TemplateLoc, TemplateParameter(Param), Template,
@@ -6203,8 +6203,8 @@ static TemplateName SubstDefaultTemplateArgument(
 TemplateArgumentLoc Sema::SubstDefaultTemplateArgumentIfAvailable(
     TemplateDecl *Template, SourceLocation TemplateLoc,
     SourceLocation RAngleLoc, Decl *Param,
-    ArrayRef<TemplateArgument> SugaredConverted,
-    ArrayRef<TemplateArgument> CanonicalConverted, bool &HasDefaultArg) {
+    llvm::ArrayRef<TemplateArgument> SugaredConverted,
+    llvm::ArrayRef<TemplateArgument> CanonicalConverted, bool &HasDefaultArg) {
   HasDefaultArg = false;
 
   if (TemplateTypeParmDecl *TypeParm = dyn_cast<TemplateTypeParmDecl>(Param)) {
@@ -6317,8 +6317,8 @@ bool Sema::CheckTemplateArgument(
     NamedDecl *Param, TemplateArgumentLoc &Arg, NamedDecl *Template,
     SourceLocation TemplateLoc, SourceLocation RAngleLoc,
     unsigned ArgumentPackIndex,
-    SmallVectorImpl<TemplateArgument> &SugaredConverted,
-    SmallVectorImpl<TemplateArgument> &CanonicalConverted,
+    llvm::SmallVectorImpl<TemplateArgument> &SugaredConverted,
+    llvm::SmallVectorImpl<TemplateArgument> &CanonicalConverted,
     CheckTemplateArgumentKind CTAK) {
   // Check template type parameters.
   if (TemplateTypeParmDecl *TTP = dyn_cast<TemplateTypeParmDecl>(Param))
@@ -6605,8 +6605,8 @@ static bool diagnoseMissingArgument(Sema &S, SourceLocation Loc,
 bool Sema::CheckTemplateArgumentList(
     TemplateDecl *Template, SourceLocation TemplateLoc,
     TemplateArgumentListInfo &TemplateArgs, bool PartialTemplateArgs,
-    SmallVectorImpl<TemplateArgument> &SugaredConverted,
-    SmallVectorImpl<TemplateArgument> &CanonicalConverted,
+    llvm::SmallVectorImpl<TemplateArgument> &SugaredConverted,
+    llvm::SmallVectorImpl<TemplateArgument> &CanonicalConverted,
     bool UpdateArgsWithConversions, bool *ConstraintsNotSatisfied,
     bool PartialOrderingTTP) {
 
@@ -6628,8 +6628,8 @@ bool Sema::CheckTemplateArgumentList(
   //   corresponding parameter declared by the template in its
   //   template-parameter-list.
   bool isTemplateTemplateParameter = isa<TemplateTemplateParmDecl>(Template);
-  SmallVector<TemplateArgument, 2> SugaredArgumentPack;
-  SmallVector<TemplateArgument, 2> CanonicalArgumentPack;
+  llvm::SmallVector<TemplateArgument, 2> SugaredArgumentPack;
+  llvm::SmallVector<TemplateArgument, 2> CanonicalArgumentPack;
   unsigned ArgIdx = 0, NumArgs = NewArgs.size();
   LocalInstantiationScope InstScope(*this, true);
   for (TemplateParameterList::iterator Param = Params->begin(),
@@ -7283,7 +7283,7 @@ isNullPointerValueTemplateArgument(Sema &S, NonTypeTemplateParmDecl *Param,
   Arg = ArgRV.get();
 
   Expr::EvalResult EvalResult;
-  SmallVector<PartialDiagnosticAt, 8> Notes;
+  llvm::SmallVector<PartialDiagnosticAt, 8> Notes;
   EvalResult.Diag = &Notes;
   if (!Arg->EvaluateAsRValue(EvalResult, S.Context) ||
       EvalResult.HasSideEffects) {
@@ -8504,7 +8504,7 @@ bool Sema::CheckTemplateTemplateArgument(TemplateTemplateParmDecl *Param,
       // C++20[temp.func.order]p2
       //   [...] If both deductions succeed, the partial ordering selects the
       // more constrained template (if one exists) as determined below.
-      SmallVector<const Expr *, 3> ParamsAC, TemplateAC;
+      llvm::SmallVector<const Expr *, 3> ParamsAC, TemplateAC;
       Params->getAssociatedConstraints(ParamsAC);
       // C++2a[temp.arg.template]p3
       //   [...] In this comparison, if P is unconstrained, the constraints on A
@@ -8547,7 +8547,7 @@ static Sema::SemaDiagnosticBuilder noteLocation(Sema &S, const NamedDecl &Decl,
   if (Decl.getLocation().isValid())
     return S.Diag(Decl.getLocation(), HereDiagID);
 
-  SmallString<128> Str;
+  llvm::SmallString<128> Str;
   llvm::raw_svector_ostream Out(Str);
   PrintingPolicy PP = S.getPrintingPolicy();
   PP.TerseOutput = 1;
@@ -8745,7 +8745,7 @@ static Expr *BuildExpressionFromIntegralTemplateArgumentValue(
 
 static Expr *BuildExpressionFromNonTypeTemplateArgumentValue(
     Sema &S, QualType T, const APValue &Val, SourceLocation Loc) {
-  auto MakeInitList = [&](ArrayRef<Expr *> Elts) -> Expr * {
+  auto MakeInitList = [&](llvm::ArrayRef<Expr *> Elts) -> Expr * {
     auto *ILE = new (S.Context) InitListExpr(S.Context, Loc, Elts, Loc);
     ILE->setType(T);
     return ILE;
@@ -9428,7 +9428,7 @@ static bool CheckNonTypeTemplatePartialSpecializationArgs(
 /// \returns \c true if there was an error, \c false otherwise.
 bool Sema::CheckTemplatePartialSpecializationArgs(
     SourceLocation TemplateNameLoc, TemplateDecl *PrimaryTemplate,
-    unsigned NumExplicit, ArrayRef<TemplateArgument> TemplateArgs) {
+    unsigned NumExplicit, llvm::ArrayRef<TemplateArgument> TemplateArgs) {
   // We have to be conservative when checking a template in a dependent
   // context.
   if (PrimaryTemplate->getDeclContext()->isDependentContext())
@@ -9583,7 +9583,7 @@ DeclResult Sema::ActOnClassTemplateSpecialization(
 
   // Check that the template argument list is well-formed for this
   // template.
-  SmallVector<TemplateArgument, 4> SugaredConverted, CanonicalConverted;
+  llvm::SmallVector<TemplateArgument, 4> SugaredConverted, CanonicalConverted;
   if (CheckTemplateArgumentList(ClassTemplate, TemplateNameLoc, TemplateArgs,
                                 false, SugaredConverted, CanonicalConverted,
                                 /*UpdateArgsWithConversions=*/true))
@@ -10181,7 +10181,7 @@ bool Sema::CheckDependentFunctionTemplateSpecialization(
   DeclContext *FDLookupContext = FD->getDeclContext()->getRedeclContext();
   LookupResult::Filter F = Previous.makeFilter();
   enum DiscardReason { NotAFunctionTemplate, NotAMemberOfEnclosing };
-  SmallVector<std::pair<DiscardReason, Decl *>, 8> DiscardedCandidates;
+  llvm::SmallVector<std::pair<DiscardReason, Decl *>, 8> DiscardedCandidates;
   while (F.hasNext()) {
     NamedDecl *D = F.next()->getUnderlyingDecl();
     if (!isa<FunctionTemplateDecl>(D)) {
@@ -10524,7 +10524,7 @@ Sema::CheckMemberSpecialization(NamedDecl *Member, LookupResult &Previous) {
   if (Previous.empty()) {
     // Nowhere to look anyway.
   } else if (FunctionDecl *Function = dyn_cast<FunctionDecl>(Member)) {
-    SmallVector<FunctionDecl *> Candidates;
+    llvm::SmallVector<FunctionDecl *> Candidates;
     bool Ambiguous = false;
     for (LookupResult::iterator I = Previous.begin(), E = Previous.end();
            I != E; ++I) {
@@ -10955,7 +10955,7 @@ DeclResult Sema::ActOnExplicitInstantiation(
 
   // Check that the template argument list is well-formed for this
   // template.
-  SmallVector<TemplateArgument, 4> SugaredConverted, CanonicalConverted;
+  llvm::SmallVector<TemplateArgument, 4> SugaredConverted, CanonicalConverted;
   if (CheckTemplateArgumentList(ClassTemplate, TemplateNameLoc, TemplateArgs,
                                 false, SugaredConverted, CanonicalConverted,
                                 /*UpdateArgsWithConversions=*/true))
@@ -12259,7 +12259,7 @@ std::string
 Sema::getTemplateArgumentBindingsText(const TemplateParameterList *Params,
                                       const TemplateArgument *Args,
                                       unsigned NumArgs) {
-  SmallString<128> Str;
+  llvm::SmallString<128> Str;
   llvm::raw_svector_ostream Out(Str);
 
   if (!Params || Params->size() == 0 || NumArgs == 0)

@@ -96,7 +96,7 @@ class CGDebugInfo {
 
   public:
     PrintingCallbacks(const CGDebugInfo &Self) : Self(Self) {}
-    std::string remapPath(StringRef Path) const override {
+    std::string remapPath(llvm::StringRef Path) const override {
       return Self.remapDIPath(Path);
     }
   };
@@ -146,7 +146,7 @@ class CGDebugInfo {
   /// This is a storage for names that are constructed on demand. For
   /// example, C++ destructors, C++ operators etc..
   llvm::BumpPtrAllocator DebugInfoNames;
-  StringRef CWDName;
+  llvm::StringRef CWDName;
 
   llvm::DenseMap<const char *, llvm::TrackingMDRef> DIFileCache;
   llvm::DenseMap<const FunctionDecl *, llvm::TrackingMDRef> SPCache;
@@ -250,7 +250,7 @@ class CGDebugInfo {
   llvm::DINamespace *getOrCreateNamespace(const NamespaceDecl *N);
   llvm::DIType *CreatePointerLikeType(llvm::dwarf::Tag Tag, const Type *Ty,
                                       QualType PointeeTy, llvm::DIFile *F);
-  llvm::DIType *getOrCreateStructPtrType(StringRef Name, llvm::DIType *&Cache);
+  llvm::DIType *getOrCreateStructPtrType(llvm::StringRef Name, llvm::DIType *&Cache);
 
   /// A helper function to create a subprogram for a single member
   /// function GlobalDecl.
@@ -262,21 +262,21 @@ class CGDebugInfo {
   /// functions. This is used while creating debug info entry for a
   /// Record.
   void CollectCXXMemberFunctions(const CXXRecordDecl *Decl, llvm::DIFile *F,
-                                 SmallVectorImpl<llvm::Metadata *> &E,
+                                 llvm::SmallVectorImpl<llvm::Metadata *> &E,
                                  llvm::DIType *T);
 
   /// A helper function to collect debug info for C++ base
   /// classes. This is used while creating debug info entry for a
   /// Record.
   void CollectCXXBases(const CXXRecordDecl *Decl, llvm::DIFile *F,
-                       SmallVectorImpl<llvm::Metadata *> &EltTys,
+                       llvm::SmallVectorImpl<llvm::Metadata *> &EltTys,
                        llvm::DIType *RecordTy);
 
   /// Helper function for CollectCXXBases.
   /// Adds debug info entries for types in Bases that are not in SeenTypes.
   void CollectCXXBasesAux(
       const CXXRecordDecl *RD, llvm::DIFile *Unit,
-      SmallVectorImpl<llvm::Metadata *> &EltTys, llvm::DIType *RecordTy,
+      llvm::SmallVectorImpl<llvm::Metadata *> &EltTys, llvm::DIType *RecordTy,
       const CXXRecordDecl::base_class_const_range &Bases,
       llvm::DenseSet<CanonicalDeclPtr<const CXXRecordDecl>> &SeenTypes,
       llvm::DINode::DIFlags StartingFlags);
@@ -316,14 +316,14 @@ class CGDebugInfo {
   /// A helper function to collect debug info for btf_decl_tag annotations.
   llvm::DINodeArray CollectBTFDeclTagAnnotations(const Decl *D);
 
-  llvm::DIType *createFieldType(StringRef name, QualType type,
+  llvm::DIType *createFieldType(llvm::StringRef name, QualType type,
                                 SourceLocation loc, AccessSpecifier AS,
                                 uint64_t offsetInBits, uint32_t AlignInBits,
                                 llvm::DIFile *tunit, llvm::DIScope *scope,
                                 const RecordDecl *RD = nullptr,
                                 llvm::DINodeArray Annotations = nullptr);
 
-  llvm::DIType *createFieldType(StringRef name, QualType type,
+  llvm::DIType *createFieldType(llvm::StringRef name, QualType type,
                                 SourceLocation loc, AccessSpecifier AS,
                                 uint64_t offsetInBits, llvm::DIFile *tunit,
                                 llvm::DIScope *scope,
@@ -349,25 +349,25 @@ class CGDebugInfo {
   /// Helpers for collecting fields of a record.
   /// @{
   void CollectRecordLambdaFields(const CXXRecordDecl *CXXDecl,
-                                 SmallVectorImpl<llvm::Metadata *> &E,
+                                 llvm::SmallVectorImpl<llvm::Metadata *> &E,
                                  llvm::DIType *RecordTy);
   llvm::DIDerivedType *CreateRecordStaticField(const VarDecl *Var,
                                                llvm::DIType *RecordTy,
                                                const RecordDecl *RD);
   void CollectRecordNormalField(const FieldDecl *Field, uint64_t OffsetInBits,
                                 llvm::DIFile *F,
-                                SmallVectorImpl<llvm::Metadata *> &E,
+                                llvm::SmallVectorImpl<llvm::Metadata *> &E,
                                 llvm::DIType *RecordTy, const RecordDecl *RD);
   void CollectRecordNestedType(const TypeDecl *RD,
-                               SmallVectorImpl<llvm::Metadata *> &E);
+                               llvm::SmallVectorImpl<llvm::Metadata *> &E);
   void CollectRecordFields(const RecordDecl *Decl, llvm::DIFile *F,
-                           SmallVectorImpl<llvm::Metadata *> &E,
+                           llvm::SmallVectorImpl<llvm::Metadata *> &E,
                            llvm::DICompositeType *RecordTy);
 
   /// If the C++ class has vtable info then insert appropriate debug
   /// info entry in EltTys vector.
   void CollectVTableInfo(const CXXRecordDecl *Decl, llvm::DIFile *F,
-                         SmallVectorImpl<llvm::Metadata *> &EltTys);
+                         llvm::SmallVectorImpl<llvm::Metadata *> &EltTys);
   /// @}
 
   /// Create a new lexical block node and push it on the stack.
@@ -380,7 +380,7 @@ class CGDebugInfo {
   /// Extended dereferencing mechanism is has the following format:
   ///     DW_OP_constu <DWARF Address Space> DW_OP_swap DW_OP_xderef
   void AppendAddressSpaceXDeref(unsigned AddressSpace,
-                                SmallVectorImpl<uint64_t> &Expr) const;
+                                llvm::SmallVectorImpl<uint64_t> &Expr) const;
 
   /// A helper function to collect debug info for the default elements of a
   /// block.
@@ -389,14 +389,14 @@ class CGDebugInfo {
   uint64_t collectDefaultElementTypesForBlockPointer(
       const BlockPointerType *Ty, llvm::DIFile *Unit,
       llvm::DIDerivedType *DescTy, unsigned LineNo,
-      SmallVectorImpl<llvm::Metadata *> &EltTys);
+      llvm::SmallVectorImpl<llvm::Metadata *> &EltTys);
 
   /// A helper function to collect debug info for the default fields of a
   /// block.
   void collectDefaultFieldsForBlockLiteralDeclare(
       const CGBlockInfo &Block, const ASTContext &Context, SourceLocation Loc,
       const llvm::StructLayout &BlockLayout, llvm::DIFile *Unit,
-      SmallVectorImpl<llvm::Metadata *> &Fields);
+      llvm::SmallVectorImpl<llvm::Metadata *> &Fields);
 
 public:
   CGDebugInfo(CodeGenModule &CGM);
@@ -405,7 +405,7 @@ public:
   void finalize();
 
   /// Remap a given path with the current debug prefix map
-  std::string remapDIPath(StringRef) const;
+  std::string remapDIPath(llvm::StringRef) const;
 
   /// Register VLA size expression debug node with the qualified type.
   void registerVLASizeExpression(QualType Ty, llvm::Metadata *SizeExpr) {
@@ -452,7 +452,7 @@ public:
   void EmitLocation(CGBuilderTy &Builder, SourceLocation Loc);
 
   QualType getFunctionType(const FunctionDecl *FD, QualType RetTy,
-                           const SmallVectorImpl<const VarDecl *> &Args);
+                           const llvm::SmallVectorImpl<const VarDecl *> &Args);
 
   /// Emit a call to llvm.dbg.function.start to indicate
   /// start of a new function.
@@ -516,7 +516,7 @@ public:
   /// Emit call to \c llvm.dbg.declare for the block-literal argument
   /// to a block invocation function.
   void EmitDeclareOfBlockLiteralArgVariable(const CGBlockInfo &block,
-                                            StringRef Name, unsigned ArgNo,
+                                            llvm::StringRef Name, unsigned ArgNo,
                                             llvm::AllocaInst *LocalAddr,
                                             CGBuilderTy &Builder);
 
@@ -589,8 +589,8 @@ public:
   /// Create debug info for a macro defined by a #define directive or a macro
   /// undefined by a #undef directive.
   llvm::DIMacro *CreateMacro(llvm::DIMacroFile *Parent, unsigned MType,
-                             SourceLocation LineLoc, StringRef Name,
-                             StringRef Value);
+                             SourceLocation LineLoc, llvm::StringRef Name,
+                             llvm::StringRef Value);
 
   /// Create debug info for a file referenced by an #include directive.
   llvm::DIMacroFile *CreateTempMacroFile(llvm::DIMacroFile *Parent,
@@ -626,7 +626,7 @@ private:
     llvm::DIType *WrappedType;
   };
 
-  bool HasReconstitutableArgs(ArrayRef<TemplateArgument> Args) const;
+  bool HasReconstitutableArgs(llvm::ArrayRef<TemplateArgument> Args) const;
   std::string GetName(const Decl *, bool Qualified = false) const;
 
   /// Build up structure info for the byref.  See \a BuildByRefType.
@@ -646,17 +646,17 @@ private:
                                                   llvm::DIScope *);
 
   /// Return current directory name.
-  StringRef getCurrentDirname();
+  llvm::StringRef getCurrentDirname();
 
   /// Create new compile unit.
   void CreateCompileUnit();
 
   /// Compute the file checksum debug info for input file ID.
   std::optional<llvm::DIFile::ChecksumKind>
-  computeChecksum(FileID FID, SmallString<64> &Checksum) const;
+  computeChecksum(FileID FID, llvm::SmallString<64> &Checksum) const;
 
   /// Get the source of the given file ID.
-  std::optional<StringRef> getSource(const SourceManager &SM, FileID FID);
+  std::optional<llvm::StringRef> getSource(const SourceManager &SM, FileID FID);
 
   /// Convenience function to get the file debug info descriptor for the input
   /// location.
@@ -664,9 +664,9 @@ private:
 
   /// Create a file debug info descriptor for a source file.
   llvm::DIFile *
-  createFile(StringRef FileName,
-             std::optional<llvm::DIFile::ChecksumInfo<StringRef>> CSInfo,
-             std::optional<StringRef> Source);
+  createFile(llvm::StringRef FileName,
+             std::optional<llvm::DIFile::ChecksumInfo<llvm::StringRef>> CSInfo,
+             std::optional<llvm::StringRef> Source);
 
   /// Get the type from the cache or create a new type if necessary.
   llvm::DIType *getOrCreateType(QualType Ty, llvm::DIFile *Fg);
@@ -688,7 +688,7 @@ private:
 
   /// Create new member and increase Offset by FType's size.
   llvm::DIType *CreateMemberType(llvm::DIFile *Unit, QualType FType,
-                                 StringRef Name, uint64_t *Offset);
+                                 llvm::StringRef Name, uint64_t *Offset);
 
   /// Retrieve the DIDescriptor, if any, for the canonical form of this
   /// declaration.
@@ -741,7 +741,7 @@ private:
   /// there we can have additional unnamed fields.
   llvm::DIGlobalVariableExpression *
   CollectAnonRecordDecls(const RecordDecl *RD, llvm::DIFile *Unit,
-                         unsigned LineNo, StringRef LinkageName,
+                         unsigned LineNo, llvm::StringRef LinkageName,
                          llvm::GlobalVariable *Var, llvm::DIScope *DContext);
 
 
@@ -755,25 +755,25 @@ private:
   /// Get function name for the given FunctionDecl. If the name is
   /// constructed on demand (e.g., C++ destructor) then the name is
   /// stored on the side.
-  StringRef getFunctionName(const FunctionDecl *FD);
+  llvm::StringRef getFunctionName(const FunctionDecl *FD);
 
   /// Returns the unmangled name of an Objective-C method.
   /// This is the display name for the debugging info.
-  StringRef getObjCMethodName(const ObjCMethodDecl *FD);
+  llvm::StringRef getObjCMethodName(const ObjCMethodDecl *FD);
 
   /// Return selector name. This is used for debugging
   /// info.
-  StringRef getSelectorName(Selector S);
+  llvm::StringRef getSelectorName(Selector S);
 
   /// Get class name including template argument list.
-  StringRef getClassName(const RecordDecl *RD);
+  llvm::StringRef getClassName(const RecordDecl *RD);
 
   /// Get the vtable name for the given class.
-  StringRef getVTableName(const CXXRecordDecl *Decl);
+  llvm::StringRef getVTableName(const CXXRecordDecl *Decl);
 
   /// Get the name to use in the debug info for a dynamic initializer or atexit
   /// stub function.
-  StringRef getDynamicInitializerName(const VarDecl *VD,
+  llvm::StringRef getDynamicInitializerName(const VarDecl *VD,
                                       DynamicInitKind StubKind,
                                       llvm::Function *InitFn);
 
@@ -789,15 +789,15 @@ private:
   /// Collect various properties of a FunctionDecl.
   /// \param GD  A GlobalDecl whose getDecl() must return a FunctionDecl.
   void collectFunctionDeclProps(GlobalDecl GD, llvm::DIFile *Unit,
-                                StringRef &Name, StringRef &LinkageName,
+                                llvm::StringRef &Name, llvm::StringRef &LinkageName,
                                 llvm::DIScope *&FDContext,
                                 llvm::DINodeArray &TParamsArray,
                                 llvm::DINode::DIFlags &Flags);
 
   /// Collect various properties of a VarDecl.
   void collectVarDeclProps(const VarDecl *VD, llvm::DIFile *&Unit,
-                           unsigned &LineNo, QualType &T, StringRef &Name,
-                           StringRef &LinkageName,
+                           unsigned &LineNo, QualType &T, llvm::StringRef &Name,
+                           llvm::StringRef &LinkageName,
                            llvm::MDTuple *&TemplateParameters,
                            llvm::DIScope *&VDContext);
 
@@ -809,13 +809,13 @@ private:
   /// Allocate a copy of \p A using the DebugInfoNames allocator
   /// and return a reference to it. If multiple arguments are given the strings
   /// are concatenated.
-  StringRef internString(StringRef A, StringRef B = StringRef()) {
+  llvm::StringRef internString(llvm::StringRef A, llvm::StringRef B = llvm::StringRef()) {
     char *Data = DebugInfoNames.Allocate<char>(A.size() + B.size());
     if (!A.empty())
       std::memcpy(Data, A.data(), A.size());
     if (!B.empty())
       std::memcpy(Data + A.size(), B.data(), B.size());
-    return StringRef(Data, A.size() + B.size());
+    return llvm::StringRef(Data, A.size() + B.size());
   }
 };
 

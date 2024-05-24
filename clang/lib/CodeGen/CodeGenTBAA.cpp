@@ -58,7 +58,7 @@ llvm::MDNode *CodeGenTBAA::getRoot() {
   return Root;
 }
 
-llvm::MDNode *CodeGenTBAA::createScalarTypeNode(StringRef Name,
+llvm::MDNode *CodeGenTBAA::createScalarTypeNode(llvm::StringRef Name,
                                                 llvm::MDNode *Parent,
                                                 uint64_t Size) {
   if (CodeGenOpts.NewStructPathTBAA) {
@@ -207,14 +207,14 @@ llvm::MDNode *CodeGenTBAA::getTypeInfoHelper(const Type *Ty) {
     if (!ETy->getDecl()->isExternallyVisible())
       return getChar();
 
-    SmallString<256> OutName;
+    llvm::SmallString<256> OutName;
     llvm::raw_svector_ostream Out(OutName);
     MContext.mangleCanonicalTypeName(QualType(ETy, 0), Out);
     return createScalarTypeNode(OutName, getChar(), Size);
   }
 
   if (const auto *EIT = dyn_cast<BitIntType>(Ty)) {
-    SmallString<256> OutName;
+    llvm::SmallString<256> OutName;
     llvm::raw_svector_ostream Out(OutName);
     // Don't specify signed/unsigned since integer types can alias despite sign
     // differences.
@@ -280,7 +280,7 @@ TBAAAccessInfo CodeGenTBAA::getVTablePtrAccessInfo(llvm::Type *VTablePtrType) {
 bool
 CodeGenTBAA::CollectFields(uint64_t BaseOffset,
                            QualType QTy,
-                           SmallVectorImpl<llvm::MDBuilder::TBAAStructField> &
+                           llvm::SmallVectorImpl<llvm::MDBuilder::TBAAStructField> &
                              Fields,
                            bool MayAlias) {
   /* Things not handled yet include: C++ base classes, bitfields, */
@@ -365,7 +365,7 @@ CodeGenTBAA::getTBAAStructInfo(QualType QTy) {
   if (llvm::MDNode *N = StructMetadataCache[Ty])
     return N;
 
-  SmallVector<llvm::MDBuilder::TBAAStructField, 4> Fields;
+  llvm::SmallVector<llvm::MDBuilder::TBAAStructField, 4> Fields;
   if (CollectFields(0, QTy, Fields, TypeHasMayAlias(QTy)))
     return MDHelper.createTBAAStructNode(Fields);
 
@@ -378,7 +378,7 @@ llvm::MDNode *CodeGenTBAA::getBaseTypeInfoHelper(const Type *Ty) {
     const RecordDecl *RD = TTy->getDecl()->getDefinition();
     const ASTRecordLayout &Layout = Context.getASTRecordLayout(RD);
     using TBAAStructField = llvm::MDBuilder::TBAAStructField;
-    SmallVector<TBAAStructField, 4> Fields;
+    llvm::SmallVector<TBAAStructField, 4> Fields;
     if (const CXXRecordDecl *CXXRD = dyn_cast<CXXRecordDecl>(RD)) {
       // Handle C++ base classes. Non-virtual bases can treated a kind of
       // field. Virtual bases are more complex and omitted, but avoid an
@@ -430,7 +430,7 @@ llvm::MDNode *CodeGenTBAA::getBaseTypeInfoHelper(const Type *Ty) {
                                                         TypeNode));
     }
 
-    SmallString<256> OutName;
+    llvm::SmallString<256> OutName;
     if (Features.CPlusPlus) {
       // Don't use the mangler for C code.
       llvm::raw_svector_ostream Out(OutName);
@@ -447,7 +447,7 @@ llvm::MDNode *CodeGenTBAA::getBaseTypeInfoHelper(const Type *Ty) {
     }
 
     // Create the struct type node with a vector of pairs (offset, type).
-    SmallVector<std::pair<llvm::MDNode*, uint64_t>, 4> OffsetsAndTypes;
+    llvm::SmallVector<std::pair<llvm::MDNode*, uint64_t>, 4> OffsetsAndTypes;
     for (const auto &Field : Fields)
         OffsetsAndTypes.push_back(std::make_pair(Field.Type, Field.Offset));
     return MDHelper.createTBAAStructTypeNode(OutName, OffsetsAndTypes);

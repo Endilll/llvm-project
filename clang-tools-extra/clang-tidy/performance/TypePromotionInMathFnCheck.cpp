@@ -27,7 +27,7 @@ AST_MATCHER_P(Type, isBuiltinType, BuiltinType::Kind, Kind) {
 } // anonymous namespace
 
 TypePromotionInMathFnCheck::TypePromotionInMathFnCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IncludeInserter(Options.getLocalOrGlobal("IncludeStyle",
                                                utils::IncludeSorter::IS_LLVM),
@@ -155,7 +155,7 @@ void TypePromotionInMathFnCheck::check(const MatchFinder::MatchResult &Result) {
   const auto *Call = Result.Nodes.getNodeAs<CallExpr>("call");
   assert(Call != nullptr);
 
-  StringRef OldFnName = Call->getDirectCallee()->getName();
+  llvm::StringRef OldFnName = Call->getDirectCallee()->getName();
 
   // In C++ mode, we prefer std::foo to ::foof.  But some of these suggestions
   // are only valid in C++11 and newer.

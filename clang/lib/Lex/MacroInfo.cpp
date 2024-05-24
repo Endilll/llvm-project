@@ -58,7 +58,7 @@ unsigned MacroInfo::getDefinitionLengthSlow(const SourceManager &SM) const {
   assert(!IsDefinitionLengthCached);
   IsDefinitionLengthCached = true;
 
-  ArrayRef<Token> ReplacementTokens = tokens();
+  llvm::ArrayRef<Token> ReplacementTokens = tokens();
   if (ReplacementTokens.empty())
     return (DefinitionLength = 0);
 
@@ -187,7 +187,7 @@ LLVM_DUMP_METHOD void MacroInfo::dump() const {
     if (const char *Punc = tok::getPunctuatorSpelling(Tok.getKind()))
       Out << Punc;
     else if (Tok.isLiteral() && Tok.getLiteralData())
-      Out << StringRef(Tok.getLiteralData(), Tok.getLength());
+      Out << llvm::StringRef(Tok.getLiteralData(), Tok.getLength());
     else if (auto *II = Tok.getIdentifierInfo())
       Out << II->getName();
     else
@@ -258,7 +258,7 @@ LLVM_DUMP_METHOD void MacroDirective::dump() const {
 
 ModuleMacro *ModuleMacro::create(Preprocessor &PP, Module *OwningModule,
                                  const IdentifierInfo *II, MacroInfo *Macro,
-                                 ArrayRef<ModuleMacro *> Overrides) {
+                                 llvm::ArrayRef<ModuleMacro *> Overrides) {
   void *Mem = PP.getPreprocessorAllocator().Allocate(
       sizeof(ModuleMacro) + sizeof(ModuleMacro *) * Overrides.size(),
       alignof(ModuleMacro));

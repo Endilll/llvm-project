@@ -24,7 +24,7 @@ using namespace llvm::opt;
 std::string x86::getX86TargetCPU(const Driver &D, const ArgList &Args,
                                  const llvm::Triple &Triple) {
   if (const Arg *A = Args.getLastArg(clang::driver::options::OPT_march_EQ)) {
-    StringRef CPU = A->getValue();
+    llvm::StringRef CPU = A->getValue();
     if (CPU != "native")
       return std::string(CPU);
 
@@ -39,7 +39,7 @@ std::string x86::getX86TargetCPU(const Driver &D, const ArgList &Args,
     // Mapping built by looking at lib/Basic's X86TargetInfo::initFeatureMap().
     // The keys are case-sensitive; this matches link.exe.
     // 32-bit and 64-bit /arch: flags.
-    llvm::StringMap<StringRef> ArchMap({
+    llvm::StringMap<llvm::StringRef> ArchMap({
         {"AVX", "sandybridge"},
         {"AVX2", "haswell"},
         {"AVX512F", "knl"},
@@ -53,9 +53,9 @@ std::string x86::getX86TargetCPU(const Driver &D, const ArgList &Args,
           {"SSE2", "pentium4"},
       });
     }
-    StringRef CPU = ArchMap.lookup(A->getValue());
+    llvm::StringRef CPU = ArchMap.lookup(A->getValue());
     if (CPU.empty()) {
-      std::vector<StringRef> ValidArchs{ArchMap.keys().begin(),
+      std::vector<llvm::StringRef> ValidArchs{ArchMap.keys().begin(),
                                         ArchMap.keys().end()};
       sort(ValidArchs);
       D.Diag(diag::warn_drv_invalid_arch_name_with_suggestion)
@@ -118,11 +118,11 @@ std::string x86::getX86TargetCPU(const Driver &D, const ArgList &Args,
 
 void x86::getX86TargetFeatures(const Driver &D, const llvm::Triple &Triple,
                                const ArgList &Args,
-                               std::vector<StringRef> &Features) {
+                               std::vector<llvm::StringRef> &Features) {
   // Claim and report unsupported -mabi=. Note: we don't support "sysv_abi" or
   // "ms_abi" as default function attributes.
   if (const Arg *A = Args.getLastArg(clang::driver::options::OPT_mabi_EQ)) {
-    StringRef DefaultAbi = Triple.isOSWindows() ? "ms" : "sysv";
+    llvm::StringRef DefaultAbi = Triple.isOSWindows() ? "ms" : "sysv";
     if (A->getValue() != DefaultAbi)
       D.Diag(diag::err_drv_unsupported_opt_for_target)
           << A->getSpelling() << Triple.getTriple();
@@ -130,7 +130,7 @@ void x86::getX86TargetFeatures(const Driver &D, const llvm::Triple &Triple,
 
   // If -march=native, autodetect the feature list.
   if (const Arg *A = Args.getLastArg(clang::driver::options::OPT_march_EQ)) {
-    if (StringRef(A->getValue()) == "native") {
+    if (llvm::StringRef(A->getValue()) == "native") {
       llvm::StringMap<bool> HostFeatures;
       if (llvm::sys::getHostCPUFeatures(HostFeatures))
         for (auto &F : HostFeatures)
@@ -230,7 +230,7 @@ void x86::getX86TargetFeatures(const Driver &D, const llvm::Triple &Triple,
   }
 
   for (const Arg *A : Args.filtered(options::OPT_m_x86_AVX10_Features_Group)) {
-    StringRef Name = A->getOption().getName();
+    llvm::StringRef Name = A->getOption().getName();
     A->claim();
 
     // Skip over "-m".
@@ -241,7 +241,7 @@ void x86::getX86TargetFeatures(const Driver &D, const llvm::Triple &Triple,
 
 #ifndef NDEBUG
     assert(Name.starts_with("avx10.") && "Invalid AVX10 feature name.");
-    StringRef Version, Width;
+    llvm::StringRef Version, Width;
     std::tie(Version, Width) = Name.substr(6).split('-');
     assert(Version == "1" && "Invalid AVX10 feature name.");
     assert((Width == "256" || Width == "512") && "Invalid AVX10 feature name.");
@@ -254,7 +254,7 @@ void x86::getX86TargetFeatures(const Driver &D, const llvm::Triple &Triple,
   // which may override the defaults.
   for (const Arg *A : Args.filtered(options::OPT_m_x86_Features_Group,
                                     options::OPT_mgeneral_regs_only)) {
-    StringRef Name = A->getOption().getName();
+    llvm::StringRef Name = A->getOption().getName();
     A->claim();
 
     // Skip over "-m".
@@ -271,7 +271,7 @@ void x86::getX86TargetFeatures(const Driver &D, const llvm::Triple &Triple,
     if (A->getOption().matches(options::OPT_mapx_features_EQ) ||
         A->getOption().matches(options::OPT_mno_apx_features_EQ)) {
 
-      for (StringRef Value : A->getValues()) {
+      for (llvm::StringRef Value : A->getValues()) {
         if (Value == "egpr" || Value == "push2pop2" || Value == "ppx" ||
             Value == "ndd" || Value == "ccmp" || Value == "nf" ||
             Value == "cf") {
@@ -291,7 +291,7 @@ void x86::getX86TargetFeatures(const Driver &D, const llvm::Triple &Triple,
 
   // Enable/disable straight line speculation hardening.
   if (Arg *A = Args.getLastArg(options::OPT_mharden_sls_EQ)) {
-    StringRef Scope = A->getValue();
+    llvm::StringRef Scope = A->getValue();
     if (Scope == "all") {
       Features.push_back("+harden-sls-ijmp");
       Features.push_back("+harden-sls-ret");

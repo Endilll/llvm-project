@@ -31,7 +31,7 @@ public:
   // Checker options.
   int MinComplexity;
   bool ReportNormalClones = false;
-  StringRef IgnoredFilesPattern;
+  llvm::StringRef IgnoredFilesPattern;
 
 private:
   mutable CloneDetector Detector;

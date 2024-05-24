@@ -145,9 +145,9 @@ public:
   const MemRegion *getAsRegion() const;
 
   /// printJson - Pretty-prints in JSON format.
-  void printJson(raw_ostream &Out, bool AddQuotes) const;
+  void printJson(llvm::raw_ostream &Out, bool AddQuotes) const;
 
-  void dumpToStream(raw_ostream &OS) const;
+  void dumpToStream(llvm::raw_ostream &OS) const;
   void dump() const;
 
   llvm::iterator_range<SymExpr::symbol_iterator> symbols() const {
@@ -171,7 +171,7 @@ public:
   QualType getType(const ASTContext &) const;
 };
 
-inline raw_ostream &operator<<(raw_ostream &os, clang::ento::SVal V) {
+inline llvm::raw_ostream &operator<<(llvm::raw_ostream &os, clang::ento::SVal V) {
   V.dumpToStream(os);
   return os;
 }
@@ -237,7 +237,7 @@ protected:
   NonLoc(SValKind Kind, const void *Data) : DefinedSVal(Kind, Data) {}
 
 public:
-  void dumpToStream(raw_ostream &Out) const;
+  void dumpToStream(llvm::raw_ostream &Out) const;
 
   static bool isCompoundType(QualType T) {
     return T->isArrayType() || T->isRecordType() ||
@@ -254,7 +254,7 @@ protected:
   Loc(SValKind Kind, const void *Data) : DefinedSVal(Kind, Data) {}
 
 public:
-  void dumpToStream(raw_ostream &Out) const;
+  void dumpToStream(llvm::raw_ostream &Out) const;
 
   static bool isLocType(QualType T) {
     return T->isAnyPointerType() || T->isBlockPointerType() ||

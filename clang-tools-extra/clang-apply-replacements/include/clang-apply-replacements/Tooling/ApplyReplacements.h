@@ -107,7 +107,7 @@ bool mergeAndDeduplicate(const TUReplacements &TUs, const TUDiagnostics &TUDs,
 /// \returns The changed code if all changes are applied successfully;
 /// otherwise, an llvm::Error carrying llvm::StringError or an error_code.
 llvm::Expected<std::string>
-applyChanges(StringRef File, const std::vector<tooling::AtomicChange> &Changes,
+applyChanges(llvm::StringRef File, const std::vector<tooling::AtomicChange> &Changes,
              const tooling::ApplyChangesSpec &Spec,
              DiagnosticsEngine &Diagnostics);
 

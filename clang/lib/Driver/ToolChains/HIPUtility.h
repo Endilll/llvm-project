@@ -10,6 +10,7 @@
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_HIPUTILITY_H
 
 #include "clang/Driver/Tool.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 namespace driver {
@@ -18,7 +19,7 @@ namespace HIP {
 
 // Construct command for creating HIP fatbin.
 void constructHIPFatbinCommand(Compilation &C, const JobAction &JA,
-                               StringRef OutputFileName,
+                               llvm::StringRef OutputFileName,
                                const InputInfoList &Inputs,
                                const llvm::opt::ArgList &TCArgs, const Tool &T);
 

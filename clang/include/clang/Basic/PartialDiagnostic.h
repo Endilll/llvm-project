@@ -165,7 +165,7 @@ public:
   }
 
   void EmitToString(DiagnosticsEngine &Diags,
-                    SmallVectorImpl<char> &Buf) const {
+                    llvm::SmallVectorImpl<char> &Buf) const {
     // FIXME: It should be possible to render a diagnostic to a string without
     //        messing with the state of the diagnostics engine.
     DiagnosticBuilder DB(Diags.Report(getDiagID()));
@@ -185,7 +185,7 @@ public:
   bool hasStorage() const { return DiagStorage != nullptr; }
 
   /// Retrieve the string argument at the given index.
-  StringRef getStringArg(unsigned I) {
+  llvm::StringRef getStringArg(unsigned I) {
     assert(DiagStorage && "No diagnostic storage?");
     assert(I < DiagStorage->NumDiagArgs && "Not enough diagnostic args");
     assert(DiagStorage->DiagArgumentsKind[I]

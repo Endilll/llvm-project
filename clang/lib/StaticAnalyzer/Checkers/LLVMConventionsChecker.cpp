@@ -31,12 +31,12 @@ static bool IsLLVMStringRef(QualType T) {
   if (!RT)
     return false;
 
-  return StringRef(QualType(RT, 0).getAsString()) == "class StringRef";
+  return llvm::StringRef(QualType(RT, 0).getAsString()) == "class StringRef";
 }
 
 /// Check whether the declaration is semantically inside the top-level
 /// namespace named by ns.
-static bool InNamespace(const Decl *D, StringRef NS) {
+static bool InNamespace(const Decl *D, llvm::StringRef NS) {
   const NamespaceDecl *ND = dyn_cast<NamespaceDecl>(D->getDeclContext());
   if (!ND)
     return false;
@@ -107,8 +107,8 @@ static bool IsSmallVector(QualType T) {
 }
 
 //===----------------------------------------------------------------------===//
-// CHECK: a StringRef should not be bound to a temporary std::string whose
-// lifetime is shorter than the StringRef's.
+// CHECK: a llvm::StringRef should not be bound to a temporary std::string whose
+// lifetime is shorter than the llvm::StringRef's.
 //===----------------------------------------------------------------------===//
 
 namespace {
@@ -153,7 +153,7 @@ void StringRefCheckerVisitor::VisitVarDecl(VarDecl *VD) {
     return;
 
   // Pattern match for:
-  // StringRef x = call() (where call returns std::string)
+  // llvm::StringRef x = call() (where call returns std::string)
   if (!IsLLVMStringRef(VD->getType()))
     return;
   ExprWithCleanups *Ex1 = dyn_cast<ExprWithCleanups>(Init);
@@ -176,7 +176,7 @@ void StringRefCheckerVisitor::VisitVarDecl(VarDecl *VD) {
     return;
 
   // Okay, badness!  Report an error.
-  const char *desc = "StringRef should not be bound to temporary "
+  const char *desc = "llvm::StringRef should not be bound to temporary "
                      "std::string that it outlives";
   PathDiagnosticLocation VDLoc =
     PathDiagnosticLocation::createBegin(VD, BR.getSourceManager());
@@ -212,7 +212,7 @@ static bool IsPartOfAST(const CXXRecordDecl *R) {
 
 namespace {
 class ASTFieldVisitor {
-  SmallVector<FieldDecl*, 10> FieldChain;
+  llvm::SmallVector<FieldDecl*, 10> FieldChain;
   const CXXRecordDecl *Root;
   BugReporter &BR;
   const CheckerBase *Checker;
@@ -256,7 +256,7 @@ void ASTFieldVisitor::Visit(FieldDecl *D) {
 }
 
 void ASTFieldVisitor::ReportError(QualType T) {
-  SmallString<1024> buf;
+  llvm::SmallString<1024> buf;
   llvm::raw_svector_ostream os(buf);
 
   os << "AST class '" << Root->getName() << "' has a field '"
@@ -264,7 +264,7 @@ void ASTFieldVisitor::ReportError(QualType T) {
   if (FieldChain.size() > 1) {
     os << " via the following chain: ";
     bool isFirst = true;
-    for (SmallVectorImpl<FieldDecl*>::iterator I=FieldChain.begin(),
+    for (llvm::SmallVectorImpl<FieldDecl*>::iterator I=FieldChain.begin(),
          E=FieldChain.end(); I!=E; ++I) {
       if (!isFirst)
         os << '.';

@@ -97,12 +97,12 @@ public:
   /// @param RequiredParams The expected number of parameters in the function
   /// definition that is called. Omit this parameter to match every occurrence
   /// without checking the parameter count in the definition.
-  CallDescription(Mode MatchAs, ArrayRef<StringRef> QualifiedName,
+  CallDescription(Mode MatchAs, llvm::ArrayRef<llvm::StringRef> QualifiedName,
                   MaybeCount RequiredArgs = std::nullopt,
                   MaybeCount RequiredParams = std::nullopt);
 
   /// Get the name of the function that this object matches.
-  StringRef getFunctionName() const { return QualifiedName.back(); }
+  llvm::StringRef getFunctionName() const { return QualifiedName.back(); }
 
   /// Get the qualified name parts in reversed order.
   /// E.g. { "std", "vector", "data" } -> "vector", "std"

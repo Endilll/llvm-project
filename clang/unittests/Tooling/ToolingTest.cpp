@@ -45,7 +45,7 @@ public:
 protected:
   std::unique_ptr<clang::ASTConsumer>
   CreateASTConsumer(clang::CompilerInstance &compiler,
-                    StringRef dummy) override {
+                    llvm::StringRef dummy) override {
     /// TestConsumer will be deleted by the framework calling us.
     return std::move(TestConsumer);
   }
@@ -388,7 +388,7 @@ public:
         Driver("clang", llvm::sys::getDefaultTargetTriple(), *Diags,
                "clang LLVM compiler", overlayRealFS(InMemoryFS)) {}
 
-  void addFile(StringRef Name, StringRef Content) {
+  void addFile(llvm::StringRef Name, llvm::StringRef Content) {
     InMemoryFS->addFile(Name, 0, llvm::MemoryBuffer::getMemBuffer(Content));
   }
 
@@ -520,7 +520,7 @@ struct SkipBodyConsumer : public clang::ASTConsumer {
 
 struct SkipBodyAction : public clang::ASTFrontendAction {
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &Compiler,
-                                                 StringRef) override {
+                                                 llvm::StringRef) override {
     Compiler.getFrontendOpts().SkipFunctionBodies = true;
     return std::make_unique<SkipBodyConsumer>();
   }
@@ -607,7 +607,7 @@ struct CheckColoredDiagnosticsAction : public clang::ASTFrontendAction {
   CheckColoredDiagnosticsAction(bool ShouldShowColor)
       : ShouldShowColor(ShouldShowColor) {}
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &Compiler,
-                                                 StringRef) override {
+                                                 llvm::StringRef) override {
     if (Compiler.getDiagnosticOpts().ShowColors != ShouldShowColor)
       Compiler.getDiagnostics().Report(
           Compiler.getDiagnostics().getCustomDiagID(
@@ -655,7 +655,7 @@ TEST(ClangToolTest, ArgumentAdjusters) {
   bool Found = false;
   bool Ran = false;
   ArgumentsAdjuster CheckSyntaxOnlyAdjuster =
-      [&Found, &Ran](const CommandLineArguments &Args, StringRef /*unused*/) {
+      [&Found, &Ran](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
     Ran = true;
     if (llvm::is_contained(Args, "-fsyntax-only"))
       Found = true;
@@ -687,7 +687,7 @@ TEST(ClangToolTest, NoDoubleSyntaxOnly) {
   size_t SyntaxOnlyCount = 0;
   ArgumentsAdjuster CheckSyntaxOnlyAdjuster =
       [&SyntaxOnlyCount](const CommandLineArguments &Args,
-                         StringRef /*unused*/) {
+                         llvm::StringRef /*unused*/) {
         for (llvm::StringRef Arg : Args) {
           if (Arg == "-fsyntax-only")
             ++SyntaxOnlyCount;
@@ -717,7 +717,7 @@ TEST(ClangToolTest, NoOutputCommands) {
   bool Ran = false;
   ArgumentsAdjuster CheckSyntaxOnlyAdjuster =
       [&OutputCommands, &Ran](const CommandLineArguments &Args,
-                              StringRef /*unused*/) {
+                              llvm::StringRef /*unused*/) {
         for (llvm::StringRef Arg : Args) {
           for (llvm::StringRef OutputCommand : OutputCommands)
             EXPECT_FALSE(Arg.contains(OutputCommand));
@@ -763,7 +763,7 @@ TEST(ClangToolTest, StripDependencyFileAdjuster) {
 
   CommandLineArguments FinalArgs;
   ArgumentsAdjuster CheckFlagsAdjuster =
-    [&FinalArgs](const CommandLineArguments &Args, StringRef /*unused*/) {
+    [&FinalArgs](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
       FinalArgs = Args;
       return Args;
     };
@@ -795,7 +795,7 @@ TEST(ClangToolTest, StripDependencyFileAdjusterShowIncludes) {
 
   CommandLineArguments FinalArgs;
   ArgumentsAdjuster CheckFlagsAdjuster =
-      [&FinalArgs](const CommandLineArguments &Args, StringRef /*unused*/) {
+      [&FinalArgs](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
         FinalArgs = Args;
         return Args;
       };
@@ -828,7 +828,7 @@ TEST(ClangToolTest, StripDependencyFileAdjusterMsvc) {
 
   CommandLineArguments FinalArgs;
   ArgumentsAdjuster CheckFlagsAdjuster =
-      [&FinalArgs](const CommandLineArguments &Args, StringRef /*unused*/) {
+      [&FinalArgs](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
         FinalArgs = Args;
         return Args;
       };
@@ -861,7 +861,7 @@ TEST(ClangToolTest, StripPluginsAdjuster) {
 
   CommandLineArguments FinalArgs;
   ArgumentsAdjuster CheckFlagsAdjuster =
-      [&FinalArgs](const CommandLineArguments &Args, StringRef /*unused*/) {
+      [&FinalArgs](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
         FinalArgs = Args;
         return Args;
       };
@@ -898,7 +898,7 @@ TEST(addTargetAndModeForProgramName, PathIgnored) {
   std::string Target = getAnyTargetForTesting();
   ASSERT_FALSE(Target.empty());
 
-  SmallString<32> ToolPath;
+  llvm::SmallString<32> ToolPath;
   llvm::sys::path::append(ToolPath, "foo", "bar", Target + "-g++");
 
   std::vector<std::string> Args = {"clang", "-foo"};
@@ -984,7 +984,7 @@ TEST(runToolOnCode, TestResetDiagnostics) {
   // This is a tool that resets the diagnostic during the compilation.
   struct ResetDiagnosticAction : public clang::ASTFrontendAction {
     std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &Compiler,
-                                                   StringRef) override {
+                                                   llvm::StringRef) override {
       struct Consumer : public clang::ASTConsumer {
         bool HandleTopLevelDecl(clang::DeclGroupRef D) override {
           auto &Diags = (*D.begin())->getASTContext().getDiagnostics();

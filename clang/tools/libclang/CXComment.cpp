@@ -370,7 +370,7 @@ CXString clang_HTMLTagComment_getAsString(CXComment CXC) {
   if (!TU->CommentToXML)
     TU->CommentToXML = new clang::index::CommentToXMLConverter();
 
-  SmallString<128> Text;
+  llvm::SmallString<128> Text;
   TU->CommentToXML->convertHTMLTagNodeToText(
       HTC, Text, cxtu::getASTUnit(TU)->getASTContext());
   return cxstring::createDup(Text.str());
@@ -385,7 +385,7 @@ CXString clang_FullComment_getAsHTML(CXComment CXC) {
   if (!TU->CommentToXML)
     TU->CommentToXML = new clang::index::CommentToXMLConverter();
 
-  SmallString<1024> HTML;
+  llvm::SmallString<1024> HTML;
   TU->CommentToXML
       ->convertCommentToHTML(FC, HTML, cxtu::getASTUnit(TU)->getASTContext());
   return cxstring::createDup(HTML.str());
@@ -400,7 +400,7 @@ CXString clang_FullComment_getAsXML(CXComment CXC) {
   if (!TU->CommentToXML)
     TU->CommentToXML = new clang::index::CommentToXMLConverter();
 
-  SmallString<1024> XML;
+  llvm::SmallString<1024> XML;
   TU->CommentToXML
       ->convertCommentToXML(FC, XML, cxtu::getASTUnit(TU)->getASTContext());
   return cxstring::createDup(XML.str());

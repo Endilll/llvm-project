@@ -113,7 +113,7 @@ using namespace llvm::opt;
 
 // Parse misexpect tolerance argument value.
 // Valid option values are integers in the range [0, 100)
-static Expected<std::optional<uint32_t>> parseToleranceOption(StringRef Arg) {
+static llvm::Expected<std::optional<uint32_t>> parseToleranceOption(llvm::StringRef Arg) {
   uint32_t Val;
   if (Arg.getAsInteger(10, Val))
     return llvm::createStringError(llvm::inconvertibleErrorCode(),
@@ -304,7 +304,7 @@ static std::optional<bool> normalizeSimpleNegativeFlag(OptSpecifier Opt,
 /// unnecessary template instantiations and just ignore it with a variadic
 /// argument.
 static void denormalizeSimpleFlag(ArgumentConsumer Consumer,
-                                  const Twine &Spelling, Option::OptionClass,
+                                  const llvm::Twine &Spelling, Option::OptionClass,
                                   unsigned, /*T*/...) {
   Consumer(Spelling);
 }
@@ -343,7 +343,7 @@ static auto makeBooleanOptionNormalizer(bool Value, bool OtherValue,
 }
 
 static auto makeBooleanOptionDenormalizer(bool Value) {
-  return [Value](ArgumentConsumer Consumer, const Twine &Spelling,
+  return [Value](ArgumentConsumer Consumer, const llvm::Twine &Spelling,
                  Option::OptionClass, unsigned, bool KeyPath) {
     if (KeyPath == Value)
       Consumer(Spelling);
@@ -351,9 +351,9 @@ static auto makeBooleanOptionDenormalizer(bool Value) {
 }
 
 static void denormalizeStringImpl(ArgumentConsumer Consumer,
-                                  const Twine &Spelling,
+                                  const llvm::Twine &Spelling,
                                   Option::OptionClass OptClass, unsigned,
-                                  const Twine &Value) {
+                                  const llvm::Twine &Value) {
   switch (OptClass) {
   case Option::SeparateClass:
   case Option::JoinedOrSeparateClass:
@@ -372,14 +372,14 @@ static void denormalizeStringImpl(ArgumentConsumer Consumer,
 }
 
 template <typename T>
-static void denormalizeString(ArgumentConsumer Consumer, const Twine &Spelling,
+static void denormalizeString(ArgumentConsumer Consumer, const llvm::Twine &Spelling,
                               Option::OptionClass OptClass, unsigned TableIndex,
                               T Value) {
-  denormalizeStringImpl(Consumer, Spelling, OptClass, TableIndex, Twine(Value));
+  denormalizeStringImpl(Consumer, Spelling, OptClass, TableIndex, llvm::Twine(Value));
 }
 
 static std::optional<SimpleEnumValue>
-findValueTableByName(const SimpleEnumValueTable &Table, StringRef Name) {
+findValueTableByName(const SimpleEnumValueTable &Table, llvm::StringRef Name) {
   for (int I = 0, E = Table.Size; I != E; ++I)
     if (Name == Table.Table[I].Name)
       return Table.Table[I];
@@ -407,7 +407,7 @@ static std::optional<unsigned> normalizeSimpleEnum(OptSpecifier Opt,
   if (!Arg)
     return std::nullopt;
 
-  StringRef ArgValue = Arg->getValue();
+  llvm::StringRef ArgValue = Arg->getValue();
   if (auto MaybeEnumVal = findValueTableByName(Table, ArgValue))
     return MaybeEnumVal->Value;
 
@@ -417,7 +417,7 @@ static std::optional<unsigned> normalizeSimpleEnum(OptSpecifier Opt,
 }
 
 static void denormalizeSimpleEnumImpl(ArgumentConsumer Consumer,
-                                      const Twine &Spelling,
+                                      const llvm::Twine &Spelling,
                                       Option::OptionClass OptClass,
                                       unsigned TableIndex, unsigned Value) {
   assert(TableIndex < SimpleEnumValueTablesSize);
@@ -433,7 +433,7 @@ static void denormalizeSimpleEnumImpl(ArgumentConsumer Consumer,
 
 template <typename T>
 static void denormalizeSimpleEnum(ArgumentConsumer Consumer,
-                                  const Twine &Spelling,
+                                  const llvm::Twine &Spelling,
                                   Option::OptionClass OptClass,
                                   unsigned TableIndex, T Value) {
   return denormalizeSimpleEnumImpl(Consumer, Spelling, OptClass, TableIndex,
@@ -458,7 +458,7 @@ static std::optional<IntTy> normalizeStringIntegral(OptSpecifier Opt, int,
   if (!Arg)
     return std::nullopt;
   IntTy Res;
-  if (StringRef(Arg->getValue()).getAsInteger(0, Res)) {
+  if (llvm::StringRef(Arg->getValue()).getAsInteger(0, Res)) {
     Diags.Report(diag::err_drv_invalid_int_value)
         << Arg->getAsString(Args) << Arg->getValue();
     return std::nullopt;
@@ -473,7 +473,7 @@ normalizeStringVector(OptSpecifier Opt, int, const ArgList &Args,
 }
 
 static void denormalizeStringVector(ArgumentConsumer Consumer,
-                                    const Twine &Spelling,
+                                    const llvm::Twine &Spelling,
                                     Option::OptionClass OptClass,
                                     unsigned TableIndex,
                                     const std::vector<std::string> &Values) {
@@ -564,7 +564,7 @@ static T extractMaskValue(T KeyPath) {
     }(EXTRACTOR(KEYPATH));                                                     \
   }
 
-static StringRef GetInputKindName(InputKind IK);
+static llvm::StringRef GetInputKindName(InputKind IK);
 
 static bool FixupInvocation(CompilerInvocation &Invocation,
                             DiagnosticsEngine &Diags, const ArgList &Args,
@@ -695,7 +695,7 @@ static unsigned getOptimizationLevel(ArgList &Args, InputKind IK,
 
     assert(A->getOption().matches(options::OPT_O));
 
-    StringRef S(A->getValue());
+    llvm::StringRef S(A->getValue());
     if (S == "s" || S == "z")
       return 2;
 
@@ -733,19 +733,19 @@ static void GenerateArg(ArgumentConsumer Consumer,
 
 static void GenerateArg(ArgumentConsumer Consumer,
                         llvm::opt::OptSpecifier OptSpecifier,
-                        const Twine &Value) {
+                        const llvm::Twine &Value) {
   Option Opt = getDriverOptTable().getOption(OptSpecifier);
   denormalizeString(Consumer, Opt.getPrefixedName(), Opt.getKind(), 0, Value);
 }
 
 // Parse command line arguments into CompilerInvocation.
 using ParseFn =
-    llvm::function_ref<bool(CompilerInvocation &, ArrayRef<const char *>,
+    llvm::function_ref<bool(CompilerInvocation &, llvm::ArrayRef<const char *>,
                             DiagnosticsEngine &, const char *)>;
 
 // Generate command line arguments from CompilerInvocation.
 using GenerateFn = llvm::function_ref<void(
-    CompilerInvocation &, SmallVectorImpl<const char *> &,
+    CompilerInvocation &, llvm::SmallVectorImpl<const char *> &,
     CompilerInvocation::StringAllocator)>;
 
 /// May perform round-trip of command line arguments. By default, the round-trip
@@ -769,7 +769,7 @@ using GenerateFn = llvm::function_ref<void(
 static bool RoundTrip(ParseFn Parse, GenerateFn Generate,
                       CompilerInvocation &RealInvocation,
                       CompilerInvocation &DummyInvocation,
-                      ArrayRef<const char *> CommandLineArgs,
+                      llvm::ArrayRef<const char *> CommandLineArgs,
                       DiagnosticsEngine &Diags, const char *Argv0,
                       bool CheckAgainstOriginalInvocation = false,
                       bool ForceRoundTrip = false) {
@@ -784,9 +784,9 @@ static bool RoundTrip(ParseFn Parse, GenerateFn Generate,
     DoRoundTrip = true;
   } else {
     for (const auto *Arg : CommandLineArgs) {
-      if (Arg == StringRef("-round-trip-args"))
+      if (Arg == llvm::StringRef("-round-trip-args"))
         DoRoundTrip = true;
-      if (Arg == StringRef("-no-round-trip-args"))
+      if (Arg == llvm::StringRef("-no-round-trip-args"))
         DoRoundTrip = false;
     }
   }
@@ -797,7 +797,7 @@ static bool RoundTrip(ParseFn Parse, GenerateFn Generate,
     return Parse(RealInvocation, CommandLineArgs, Diags, Argv0);
 
   // Serializes quoted (and potentially escaped) arguments.
-  auto SerializeArgs = [](ArrayRef<const char *> Args) {
+  auto SerializeArgs = [](llvm::ArrayRef<const char *> Args) {
     std::string Buffer;
     llvm::raw_string_ostream OS(Buffer);
     for (const char *Arg : Args) {
@@ -836,14 +836,14 @@ static bool RoundTrip(ParseFn Parse, GenerateFn Generate,
   // Setup string allocator.
   llvm::BumpPtrAllocator Alloc;
   llvm::StringSaver StringPool(Alloc);
-  auto SA = [&StringPool](const Twine &Arg) {
+  auto SA = [&StringPool](const llvm::Twine &Arg) {
     return StringPool.save(Arg).data();
   };
 
   // Generate arguments from the dummy invocation. If Generate is the
   // inverse of Parse, the newly generated arguments must have the same
   // semantics as the original.
-  SmallVector<const char *> GeneratedArgs;
+  llvm::SmallVector<const char *> GeneratedArgs;
   Generate(DummyInvocation, GeneratedArgs, SA);
 
   // Run the second parse, now on the generated arguments, and with the real
@@ -861,7 +861,7 @@ static bool RoundTrip(ParseFn Parse, GenerateFn Generate,
     return false;
   }
 
-  SmallVector<const char *> ComparisonArgs;
+  llvm::SmallVector<const char *> ComparisonArgs;
   if (CheckAgainstOriginalInvocation)
     // Compare against original arguments.
     ComparisonArgs.assign(CommandLineArgs.begin(), CommandLineArgs.end());
@@ -871,11 +871,11 @@ static bool RoundTrip(ParseFn Parse, GenerateFn Generate,
     Generate(RealInvocation, ComparisonArgs, SA);
 
   // Compares two lists of arguments.
-  auto Equal = [](const ArrayRef<const char *> A,
-                  const ArrayRef<const char *> B) {
+  auto Equal = [](const llvm::ArrayRef<const char *> A,
+                  const llvm::ArrayRef<const char *> B) {
     return std::equal(A.begin(), A.end(), B.begin(), B.end(),
                       [](const char *AElem, const char *BElem) {
-                        return StringRef(AElem) == StringRef(BElem);
+                        return llvm::StringRef(AElem) == llvm::StringRef(BElem);
                       });
   };
 
@@ -899,16 +899,16 @@ static bool RoundTrip(ParseFn Parse, GenerateFn Generate,
   return Success2;
 }
 
-bool CompilerInvocation::checkCC1RoundTrip(ArrayRef<const char *> Args,
+bool CompilerInvocation::checkCC1RoundTrip(llvm::ArrayRef<const char *> Args,
                                            DiagnosticsEngine &Diags,
                                            const char *Argv0) {
   CompilerInvocation DummyInvocation1, DummyInvocation2;
   return RoundTrip(
-      [](CompilerInvocation &Invocation, ArrayRef<const char *> CommandLineArgs,
+      [](CompilerInvocation &Invocation, llvm::ArrayRef<const char *> CommandLineArgs,
          DiagnosticsEngine &Diags, const char *Argv0) {
         return CreateFromArgsImpl(Invocation, CommandLineArgs, Diags, Argv0);
       },
-      [](CompilerInvocation &Invocation, SmallVectorImpl<const char *> &Args,
+      [](CompilerInvocation &Invocation, llvm::SmallVectorImpl<const char *> &Args,
          StringAllocator SA) {
         Args.push_back("-cc1");
         Invocation.generateCC1CommandLine(Args, SA);
@@ -1017,7 +1017,7 @@ static void GenerateAnalyzerArgs(const AnalyzerOptions &Opts,
   parseAnalyzerConfigs(ConfigOpts, nullptr);
 
   // Sort options by key to avoid relying on StringMap iteration order.
-  SmallVector<std::pair<StringRef, StringRef>, 4> SortedConfigOpts;
+  llvm::SmallVector<std::pair<llvm::StringRef, llvm::StringRef>, 4> SortedConfigOpts;
   for (const auto &C : Opts.Config)
     SortedConfigOpts.emplace_back(C.getKey(), C.getValue());
   llvm::sort(SortedConfigOpts, llvm::less_first());
@@ -1047,7 +1047,7 @@ static bool ParseAnalyzerArgs(AnalyzerOptions &Opts, ArgList &Args,
 #undef ANALYZER_OPTION_WITH_MARSHALLING
 
   if (Arg *A = Args.getLastArg(OPT_analyzer_constraints)) {
-    StringRef Name = A->getValue();
+    llvm::StringRef Name = A->getValue();
     AnalysisConstraints Value = llvm::StringSwitch<AnalysisConstraints>(Name)
 #define ANALYSIS_CONSTRAINTS(NAME, CMDFLAG, DESC, CREATFN) \
       .Case(CMDFLAG, NAME##Model)
@@ -1067,7 +1067,7 @@ static bool ParseAnalyzerArgs(AnalyzerOptions &Opts, ArgList &Args,
   }
 
   if (Arg *A = Args.getLastArg(OPT_analyzer_output)) {
-    StringRef Name = A->getValue();
+    llvm::StringRef Name = A->getValue();
     AnalysisDiagClients Value = llvm::StringSwitch<AnalysisDiagClients>(Name)
 #define ANALYSIS_DIAGNOSTICS(NAME, CMDFLAG, DESC, CREATFN) \
       .Case(CMDFLAG, PD_##NAME)
@@ -1082,7 +1082,7 @@ static bool ParseAnalyzerArgs(AnalyzerOptions &Opts, ArgList &Args,
   }
 
   if (Arg *A = Args.getLastArg(OPT_analyzer_purge)) {
-    StringRef Name = A->getValue();
+    llvm::StringRef Name = A->getValue();
     AnalysisPurgeMode Value = llvm::StringSwitch<AnalysisPurgeMode>(Name)
 #define ANALYSIS_PURGE(NAME, CMDFLAG, DESC) \
       .Case(CMDFLAG, NAME)
@@ -1097,7 +1097,7 @@ static bool ParseAnalyzerArgs(AnalyzerOptions &Opts, ArgList &Args,
   }
 
   if (Arg *A = Args.getLastArg(OPT_analyzer_inlining_mode)) {
-    StringRef Name = A->getValue();
+    llvm::StringRef Name = A->getValue();
     AnalysisInliningMode Value = llvm::StringSwitch<AnalysisInliningMode>(Name)
 #define ANALYSIS_INLINING_MODE(NAME, CMDFLAG, DESC) \
       .Case(CMDFLAG, NAME)
@@ -1118,10 +1118,10 @@ static bool ParseAnalyzerArgs(AnalyzerOptions &Opts, ArgList &Args,
     bool IsEnabled = A->getOption().getID() == OPT_analyzer_checker;
     // We can have a list of comma separated checker names, e.g:
     // '-analyzer-checker=cocoa,unix'
-    StringRef CheckerAndPackageList = A->getValue();
-    SmallVector<StringRef, 16> CheckersAndPackages;
+    llvm::StringRef CheckerAndPackageList = A->getValue();
+    llvm::SmallVector<llvm::StringRef, 16> CheckersAndPackages;
     CheckerAndPackageList.split(CheckersAndPackages, ",");
-    for (const StringRef &CheckerOrPackage : CheckersAndPackages)
+    for (const llvm::StringRef &CheckerOrPackage : CheckersAndPackages)
       Opts.CheckersAndPackages.emplace_back(std::string(CheckerOrPackage),
                                             IsEnabled);
   }
@@ -1131,11 +1131,11 @@ static bool ParseAnalyzerArgs(AnalyzerOptions &Opts, ArgList &Args,
 
     // We can have a list of comma separated config names, e.g:
     // '-analyzer-config key1=val1,key2=val2'
-    StringRef configList = A->getValue();
-    SmallVector<StringRef, 4> configVals;
+    llvm::StringRef configList = A->getValue();
+    llvm::SmallVector<llvm::StringRef, 4> configVals;
     configList.split(configVals, ",");
     for (const auto &configVal : configVals) {
-      StringRef key, val;
+      llvm::StringRef key, val;
       std::tie(key, val) = configVal.split("=");
       if (val.empty()) {
         Diags.Report(SourceLocation(),
@@ -1178,15 +1178,15 @@ static bool ParseAnalyzerArgs(AnalyzerOptions &Opts, ArgList &Args,
   return Diags.getNumErrors() == NumErrorsBefore;
 }
 
-static StringRef getStringOption(AnalyzerOptions::ConfigTable &Config,
-                                 StringRef OptionName, StringRef DefaultVal) {
+static llvm::StringRef getStringOption(AnalyzerOptions::ConfigTable &Config,
+                                 llvm::StringRef OptionName, llvm::StringRef DefaultVal) {
   return Config.insert({OptionName, std::string(DefaultVal)}).first->second;
 }
 
 static void initOption(AnalyzerOptions::ConfigTable &Config,
                        DiagnosticsEngine *Diags,
-                       StringRef &OptionField, StringRef Name,
-                       StringRef DefaultVal) {
+                       llvm::StringRef &OptionField, llvm::StringRef Name,
+                       llvm::StringRef DefaultVal) {
   // String options may be known to invalid (e.g. if the expected string is a
   // file name, but the file does not exist), those will have to be checked in
   // parseConfigs.
@@ -1195,7 +1195,7 @@ static void initOption(AnalyzerOptions::ConfigTable &Config,
 
 static void initOption(AnalyzerOptions::ConfigTable &Config,
                        DiagnosticsEngine *Diags,
-                       bool &OptionField, StringRef Name, bool DefaultVal) {
+                       bool &OptionField, llvm::StringRef Name, bool DefaultVal) {
   auto PossiblyInvalidVal =
       llvm::StringSwitch<std::optional<bool>>(
           getStringOption(Config, Name, (DefaultVal ? "true" : "false")))
@@ -1215,7 +1215,7 @@ static void initOption(AnalyzerOptions::ConfigTable &Config,
 
 static void initOption(AnalyzerOptions::ConfigTable &Config,
                        DiagnosticsEngine *Diags,
-                       unsigned &OptionField, StringRef Name,
+                       unsigned &OptionField, llvm::StringRef Name,
                        unsigned DefaultVal) {
 
   OptionField = DefaultVal;
@@ -1252,15 +1252,15 @@ static void parseAnalyzerConfigs(AnalyzerOptions &AnOpts,
   // The current approach only validates the registered checkers which does not
   // contain the runtime enabled checkers and optimally we would validate both.
   if (!AnOpts.RawSilencedCheckersAndPackages.empty()) {
-    std::vector<StringRef> Checkers =
+    std::vector<llvm::StringRef> Checkers =
         AnOpts.getRegisteredCheckers(/*IncludeExperimental=*/true);
-    std::vector<StringRef> Packages =
+    std::vector<llvm::StringRef> Packages =
         AnOpts.getRegisteredPackages(/*IncludeExperimental=*/true);
 
-    SmallVector<StringRef, 16> CheckersAndPackages;
+    llvm::SmallVector<llvm::StringRef, 16> CheckersAndPackages;
     AnOpts.RawSilencedCheckersAndPackages.split(CheckersAndPackages, ";");
 
-    for (const StringRef &CheckerOrPackage : CheckersAndPackages) {
+    for (const llvm::StringRef &CheckerOrPackage : CheckersAndPackages) {
       if (Diags) {
         bool IsChecker = CheckerOrPackage.contains('.');
         bool IsValidName = IsChecker
@@ -1296,14 +1296,14 @@ static void parseAnalyzerConfigs(AnalyzerOptions &AnOpts,
 /// Generate a remark argument. This is an inverse of `ParseOptimizationRemark`.
 static void
 GenerateOptimizationRemark(ArgumentConsumer Consumer, OptSpecifier OptEQ,
-                           StringRef Name,
+                           llvm::StringRef Name,
                            const CodeGenOptions::OptRemark &Remark) {
   if (Remark.hasValidPattern()) {
     GenerateArg(Consumer, OptEQ, Remark.Pattern);
   } else if (Remark.Kind == CodeGenOptions::RK_Enabled) {
     GenerateArg(Consumer, OPT_R_Joined, Name);
   } else if (Remark.Kind == CodeGenOptions::RK_Disabled) {
-    GenerateArg(Consumer, OPT_R_Joined, StringRef("no-") + Name);
+    GenerateArg(Consumer, OPT_R_Joined, llvm::StringRef("no-") + Name);
   }
 }
 
@@ -1312,11 +1312,11 @@ GenerateOptimizationRemark(ArgumentConsumer Consumer, OptSpecifier OptEQ,
 /// On top of that, it can be disabled/enabled globally by '-R[no-]everything'.
 static CodeGenOptions::OptRemark
 ParseOptimizationRemark(DiagnosticsEngine &Diags, ArgList &Args,
-                        OptSpecifier OptEQ, StringRef Name) {
+                        OptSpecifier OptEQ, llvm::StringRef Name) {
   CodeGenOptions::OptRemark Result;
 
   auto InitializeResultPattern = [&Diags, &Args, &Result](const Arg *A,
-                                                          StringRef Pattern) {
+                                                          llvm::StringRef Pattern) {
     Result.Pattern = Pattern.str();
 
     std::string RegexError;
@@ -1332,13 +1332,13 @@ ParseOptimizationRemark(DiagnosticsEngine &Diags, ArgList &Args,
 
   for (Arg *A : Args) {
     if (A->getOption().matches(OPT_R_Joined)) {
-      StringRef Value = A->getValue();
+      llvm::StringRef Value = A->getValue();
 
       if (Value == Name)
         Result.Kind = CodeGenOptions::RK_Enabled;
       else if (Value == "everything")
         Result.Kind = CodeGenOptions::RK_EnabledEverything;
-      else if (Value.split('-') == std::make_pair(StringRef("no"), Name))
+      else if (Value.split('-') == std::make_pair(llvm::StringRef("no"), Name))
         Result.Kind = CodeGenOptions::RK_Disabled;
       else if (Value == "no-everything")
         Result.Kind = CodeGenOptions::RK_DisabledEverything;
@@ -1362,7 +1362,7 @@ ParseOptimizationRemark(DiagnosticsEngine &Diags, ArgList &Args,
   return Result;
 }
 
-static bool parseDiagnosticLevelMask(StringRef FlagName,
+static bool parseDiagnosticLevelMask(llvm::StringRef FlagName,
                                      const std::vector<std::string> &Levels,
                                      DiagnosticsEngine &Diags,
                                      DiagnosticLevelMask &M) {
@@ -1384,7 +1384,7 @@ static bool parseDiagnosticLevelMask(StringRef FlagName,
   return Success;
 }
 
-static void parseSanitizerKinds(StringRef FlagName,
+static void parseSanitizerKinds(llvm::StringRef FlagName,
                                 const std::vector<std::string> &Sanitizers,
                                 DiagnosticsEngine &Diags, SanitizerSet &S) {
   for (const auto &Sanitizer : Sanitizers) {
@@ -1396,16 +1396,16 @@ static void parseSanitizerKinds(StringRef FlagName,
   }
 }
 
-static SmallVector<StringRef, 4> serializeSanitizerKinds(SanitizerSet S) {
-  SmallVector<StringRef, 4> Values;
+static llvm::SmallVector<llvm::StringRef, 4> serializeSanitizerKinds(SanitizerSet S) {
+  llvm::SmallVector<llvm::StringRef, 4> Values;
   serializeSanitizerSet(S, Values);
   return Values;
 }
 
-static void parseXRayInstrumentationBundle(StringRef FlagName, StringRef Bundle,
+static void parseXRayInstrumentationBundle(llvm::StringRef FlagName, llvm::StringRef Bundle,
                                            ArgList &Args, DiagnosticsEngine &D,
                                            XRayInstrSet &S) {
-  llvm::SmallVector<StringRef, 2> BundleParts;
+  llvm::SmallVector<llvm::StringRef, 2> BundleParts;
   llvm::SplitString(Bundle, BundleParts, ",");
   for (const auto &B : BundleParts) {
     auto Mask = parseXRayInstrValue(B);
@@ -1422,17 +1422,17 @@ static void parseXRayInstrumentationBundle(StringRef FlagName, StringRef Bundle,
 }
 
 static std::string serializeXRayInstrumentationBundle(const XRayInstrSet &S) {
-  llvm::SmallVector<StringRef, 2> BundleParts;
+  llvm::SmallVector<llvm::StringRef, 2> BundleParts;
   serializeXRayInstrValue(S, BundleParts);
   std::string Buffer;
   llvm::raw_string_ostream OS(Buffer);
-  llvm::interleave(BundleParts, OS, [&OS](StringRef Part) { OS << Part; }, ",");
+  llvm::interleave(BundleParts, OS, [&OS](llvm::StringRef Part) { OS << Part; }, ",");
   return Buffer;
 }
 
 // Set the profile kind using fprofile-instrument-use-path.
 static void setPGOUseInstrumentor(CodeGenOptions &Opts,
-                                  const Twine &ProfileName,
+                                  const llvm::Twine &ProfileName,
                                   llvm::vfs::FileSystem &FS,
                                   DiagnosticsEngine &Diags) {
   auto ReaderOrErr = llvm::IndexedInstrProfReader::create(ProfileName, FS);
@@ -1468,7 +1468,7 @@ void CompilerInvocationBase::GenerateCodeGenArgs(const CodeGenOptions &Opts,
   if (Opts.OptimizationLevel == 0)
     GenerateArg(Consumer, OPT_O0);
   else
-    GenerateArg(Consumer, OPT_O, Twine(Opts.OptimizationLevel));
+    GenerateArg(Consumer, OPT_O, llvm::Twine(Opts.OptimizationLevel));
 
 #define CODEGEN_OPTION_WITH_MARSHALLING(...)                                   \
   GENERATE_OPTION_WITH_MARSHALLING(Consumer, __VA_ARGS__)
@@ -1489,7 +1489,7 @@ void CompilerInvocationBase::GenerateCodeGenArgs(const CodeGenOptions &Opts,
   else if (!Opts.DirectAccessExternalData && LangOpts->PICLevel == 0)
     GenerateArg(Consumer, OPT_fno_direct_access_external_data);
 
-  std::optional<StringRef> DebugInfoVal;
+  std::optional<llvm::StringRef> DebugInfoVal;
   switch (Opts.DebugInfo) {
   case llvm::codegenoptions::DebugLineTablesOnly:
     DebugInfoVal = "line-tables-only";
@@ -1588,7 +1588,7 @@ void CompilerInvocationBase::GenerateCodeGenArgs(const CodeGenOptions &Opts,
   if (Opts.SaveTempsFilePrefix == OutputFile)
     GenerateArg(Consumer, OPT_save_temps_EQ, "obj");
 
-  StringRef MemProfileBasename("memprof.profraw");
+  llvm::StringRef MemProfileBasename("memprof.profraw");
   if (!Opts.MemoryProfileOutput.empty()) {
     if (Opts.MemoryProfileOutput == MemProfileBasename) {
       GenerateArg(Consumer, OPT_fmemory_profile);
@@ -1602,7 +1602,7 @@ void CompilerInvocationBase::GenerateCodeGenArgs(const CodeGenOptions &Opts,
 
   if (memcmp(Opts.CoverageVersion, "408*", 4) != 0)
     GenerateArg(Consumer, OPT_coverage_version_EQ,
-                StringRef(Opts.CoverageVersion, 4));
+                llvm::StringRef(Opts.CoverageVersion, 4));
 
   // TODO: Check if we need to generate arguments stored in CmdArgs. (Namely
   //  '-fembed_bitcode', which does not map to any CompilerInvocation field and
@@ -1677,16 +1677,16 @@ void CompilerInvocationBase::GenerateCodeGenArgs(const CodeGenOptions &Opts,
 
   GenerateArg(Consumer, OPT_fdiagnostics_hotness_threshold_EQ,
               Opts.DiagnosticsHotnessThreshold
-                  ? Twine(*Opts.DiagnosticsHotnessThreshold)
+                  ? llvm::Twine(*Opts.DiagnosticsHotnessThreshold)
                   : "auto");
 
   GenerateArg(Consumer, OPT_fdiagnostics_misexpect_tolerance_EQ,
-              Twine(*Opts.DiagnosticsMisExpectTolerance));
+              llvm::Twine(*Opts.DiagnosticsMisExpectTolerance));
 
-  for (StringRef Sanitizer : serializeSanitizerKinds(Opts.SanitizeRecover))
+  for (llvm::StringRef Sanitizer : serializeSanitizerKinds(Opts.SanitizeRecover))
     GenerateArg(Consumer, OPT_fsanitize_recover_EQ, Sanitizer);
 
-  for (StringRef Sanitizer : serializeSanitizerKinds(Opts.SanitizeTrap))
+  for (llvm::StringRef Sanitizer : serializeSanitizerKinds(Opts.SanitizeTrap))
     GenerateArg(Consumer, OPT_fsanitize_trap_EQ, Sanitizer);
 
   if (!Opts.EmitVersionIdentMetadata)
@@ -1794,12 +1794,12 @@ bool CompilerInvocation::ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args,
   }
 
   for (const auto &Arg : Args.getAllArgValues(OPT_fdebug_prefix_map_EQ)) {
-    auto Split = StringRef(Arg).split('=');
+    auto Split = llvm::StringRef(Arg).split('=');
     Opts.DebugPrefixMap.emplace_back(Split.first, Split.second);
   }
 
   for (const auto &Arg : Args.getAllArgValues(OPT_fcoverage_prefix_map_EQ)) {
-    auto Split = StringRef(Arg).split('=');
+    auto Split = llvm::StringRef(Arg).split('=');
     Opts.CoveragePrefixMap.emplace_back(Split.first, Split.second);
   }
 
@@ -1839,12 +1839,12 @@ bool CompilerInvocation::ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args,
                 ? llvm::DICompileUnit::DebugNameTableKind::Default
                 : llvm::DICompileUnit::DebugNameTableKind::None);
   if (const Arg *A = Args.getLastArg(OPT_gsimple_template_names_EQ)) {
-    StringRef Value = A->getValue();
+    llvm::StringRef Value = A->getValue();
     if (Value != "simple" && Value != "mangled")
       Diags.Report(diag::err_drv_unsupported_option_argument)
           << A->getSpelling() << A->getValue();
     Opts.setDebugSimpleTemplateNames(
-        StringRef(A->getValue()) == "simple"
+        llvm::StringRef(A->getValue()) == "simple"
             ? llvm::codegenoptions::DebugTemplateNamesKind::Simple
             : llvm::codegenoptions::DebugTemplateNamesKind::Mangled);
   }
@@ -1854,7 +1854,7 @@ bool CompilerInvocation::ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args,
 
     // -ftime-report= is only for new pass manager.
     if (A->getOption().getID() == OPT_ftime_report_EQ) {
-      StringRef Val = A->getValue();
+      llvm::StringRef Val = A->getValue();
       if (Val == "per-pass")
         Opts.TimePassesPerRun = false;
       else if (Val == "per-pass-run")
@@ -1869,7 +1869,7 @@ bool CompilerInvocation::ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args,
   Opts.PrepareForThinLTO = false;
   if (Arg *A = Args.getLastArg(OPT_flto_EQ)) {
     Opts.PrepareForLTO = true;
-    StringRef S = A->getValue();
+    llvm::StringRef S = A->getValue();
     if (S == "thin")
       Opts.PrepareForThinLTO = true;
     else if (S != "full")
@@ -1893,7 +1893,7 @@ bool CompilerInvocation::ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args,
   // The memory profile runtime appends the pid to make this name more unique.
   const char *MemProfileBasename = "memprof.profraw";
   if (Args.hasArg(OPT_fmemory_profile_EQ)) {
-    SmallString<128> Path(
+    llvm::SmallString<128> Path(
         std::string(Args.getLastArgValue(OPT_fmemory_profile_EQ)));
     llvm::sys::path::append(Path, MemProfileBasename);
     Opts.MemoryProfileOutput = std::string(Path);
@@ -1903,7 +1903,7 @@ bool CompilerInvocation::ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args,
   memcpy(Opts.CoverageVersion, "408*", 4);
   if (Opts.CoverageNotesFile.size() || Opts.CoverageDataFile.size()) {
     if (Args.hasArg(OPT_coverage_version_EQ)) {
-      StringRef CoverageVersion = Args.getLastArgValue(OPT_coverage_version_EQ);
+      llvm::StringRef CoverageVersion = Args.getLastArgValue(OPT_coverage_version_EQ);
       if (CoverageVersion.size() != 4) {
         Diags.Report(diag::err_drv_invalid_value)
             << Args.getLastArg(OPT_coverage_version_EQ)->getAsString(Args)
@@ -1927,7 +1927,7 @@ bool CompilerInvocation::ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args,
     ArgStringList ASL;
     A->render(Args, ASL);
     for (const auto &arg : ASL) {
-      StringRef ArgStr(arg);
+      llvm::StringRef ArgStr(arg);
       Opts.CmdArgs.insert(Opts.CmdArgs.end(), ArgStr.begin(), ArgStr.end());
       // using \00 to separate each commandline options.
       Opts.CmdArgs.push_back('\0');
@@ -1944,7 +1944,7 @@ bool CompilerInvocation::ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args,
                                      Diags, Opts.XRayInstrumentationBundle);
 
   if (const Arg *A = Args.getLastArg(OPT_fcf_protection_EQ)) {
-    StringRef Name = A->getValue();
+    llvm::StringRef Name = A->getValue();
     if (Name == "full") {
       Opts.CFProtectionReturn = 1;
       Opts.CFProtectionBranch = 1;
@@ -1992,7 +1992,7 @@ bool CompilerInvocation::ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args,
   }
 
   if (Arg *A = Args.getLastArg(OPT_fdenormal_fp_math_EQ)) {
-    StringRef Val = A->getValue();
+    llvm::StringRef Val = A->getValue();
     Opts.FPDenormalMode = llvm::parseDenormalFPAttribute(Val);
     Opts.FP32DenormalMode = Opts.FPDenormalMode;
     if (!Opts.FPDenormalMode.isValid())
@@ -2000,7 +2000,7 @@ bool CompilerInvocation::ParseCodeGenArgs(CodeGenOptions &Opts, ArgList &Args,
   }
 
   if (Arg *A = Args.getLastArg(OPT_fdenormal_fp_math_f32_EQ)) {
-    StringRef Val = A->getValue();
+    llvm::StringRef Val = A->getValue();
     Opts.FP32DenormalMode = llvm::parseDenormalFPAttribute(Val);
     if (!Opts.FP32DenormalMode.isValid())
       Diags.Report(diag::err_drv_invalid_value) << A->getAsString(Args) << Val;
@@ -2226,13 +2226,13 @@ static bool ParseDependencyOutputArgs(DependencyOutputOptions &Opts,
   // we let make / ninja to know about this implicit dependency.
   if (!Args.hasArg(OPT_fno_sanitize_ignorelist)) {
     for (const auto *A : Args.filtered(OPT_fsanitize_ignorelist_EQ)) {
-      StringRef Val = A->getValue();
+      llvm::StringRef Val = A->getValue();
       if (!Val.contains('='))
         Opts.ExtraDeps.emplace_back(std::string(Val), EDK_SanitizeIgnorelist);
     }
     if (Opts.IncludeSystemHeaders) {
       for (const auto *A : Args.filtered(OPT_fsanitize_system_ignorelist_EQ)) {
-        StringRef Val = A->getValue();
+        llvm::StringRef Val = A->getValue();
         if (!Val.contains('='))
           Opts.ExtraDeps.emplace_back(std::string(Val), EDK_SanitizeIgnorelist);
       }
@@ -2249,7 +2249,7 @@ static bool ParseDependencyOutputArgs(DependencyOutputOptions &Opts,
 
   // Only the -fmodule-file=<file> form.
   for (const auto *A : Args.filtered(OPT_fmodule_file)) {
-    StringRef Val = A->getValue();
+    llvm::StringRef Val = A->getValue();
     if (!Val.contains('='))
       Opts.ExtraDeps.emplace_back(std::string(Val), EDK_ModuleFile);
   }
@@ -2284,7 +2284,7 @@ static bool parseShowColorsArgs(const ArgList &Args, bool DefaultColor) {
     } else if (O.matches(options::OPT_fno_color_diagnostics)) {
       ShowColors = Colors_Off;
     } else if (O.matches(options::OPT_fdiagnostics_color_EQ)) {
-      StringRef Value(A->getValue());
+      llvm::StringRef Value(A->getValue());
       if (Value == "always")
         ShowColors = Colors_On;
       else if (Value == "never")
@@ -2407,24 +2407,24 @@ void CompilerInvocationBase::GenerateDiagnosticArgs(
     // This option is automatically generated from UndefPrefixes.
     if (Warning == "undef-prefix")
       continue;
-    Consumer(StringRef("-W") + Warning);
+    Consumer(llvm::StringRef("-W") + Warning);
   }
 
   for (const auto &Remark : Opts.Remarks) {
     // These arguments are generated from OptimizationRemark fields of
     // CodeGenOptions.
-    StringRef IgnoredRemarks[] = {"pass",          "no-pass",
+    llvm::StringRef IgnoredRemarks[] = {"pass",          "no-pass",
                                   "pass-analysis", "no-pass-analysis",
                                   "pass-missed",   "no-pass-missed"};
     if (llvm::is_contained(IgnoredRemarks, Remark))
       continue;
 
-    Consumer(StringRef("-R") + Remark);
+    Consumer(llvm::StringRef("-R") + Remark);
   }
 }
 
 std::unique_ptr<DiagnosticOptions>
-clang::CreateAndPopulateDiagOpts(ArrayRef<const char *> Argv) {
+clang::CreateAndPopulateDiagOpts(llvm::ArrayRef<const char *> Argv) {
   auto DiagOpts = std::make_unique<DiagnosticOptions>();
   unsigned MissingArgIndex, MissingArgCount;
   InputArgList Args = getDriverOptTable().ParseArgs(
@@ -2507,13 +2507,13 @@ bool clang::ParseDiagnosticArgs(DiagnosticOptions &Opts, ArgList &Args,
 /// command-line argument.
 ///
 /// \returns true on error, false on success.
-static bool parseTestModuleFileExtensionArg(StringRef Arg,
+static bool parseTestModuleFileExtensionArg(llvm::StringRef Arg,
                                             std::string &BlockName,
                                             unsigned &MajorVersion,
                                             unsigned &MinorVersion,
                                             bool &Hashed,
                                             std::string &UserInfo) {
-  SmallVector<StringRef, 5> Args;
+  llvm::SmallVector<llvm::StringRef, 5> Args;
   Arg.split(Args, ':', 5);
   if (Args.size() < 5)
     return true;
@@ -2639,7 +2639,7 @@ static void GenerateFrontendArgs(const FrontendOptions &Opts,
       // marshalling infrastructure.
 
       if (Opts.ASTDumpFormat != ADOF_Default) {
-        StringRef Format;
+        llvm::StringRef Format;
         switch (Opts.ASTDumpFormat) {
         case ADOF_Default:
           llvm_unreachable("Default AST dump format.");
@@ -2701,10 +2701,10 @@ static void GenerateFrontendArgs(const FrontendOptions &Opts,
       GenerateArg(Consumer, OPT_aux_target_feature, Feature);
 
   {
-    StringRef Preprocessed = Opts.DashX.isPreprocessed() ? "-cpp-output" : "";
-    StringRef ModuleMap =
+    llvm::StringRef Preprocessed = Opts.DashX.isPreprocessed() ? "-cpp-output" : "";
+    llvm::StringRef ModuleMap =
         Opts.DashX.getFormat() == InputKind::ModuleMap ? "-module-map" : "";
-    StringRef HeaderUnit = "";
+    llvm::StringRef HeaderUnit = "";
     switch (Opts.DashX.getHeaderUnitKind()) {
     case InputKind::HeaderUnit_None:
       break;
@@ -2718,9 +2718,9 @@ static void GenerateFrontendArgs(const FrontendOptions &Opts,
       HeaderUnit = "-header-unit";
       break;
     }
-    StringRef Header = IsHeader ? "-header" : "";
+    llvm::StringRef Header = IsHeader ? "-header" : "";
 
-    StringRef Lang;
+    llvm::StringRef Lang;
     switch (Opts.DashX.getLanguage()) {
     case Language::C:
       Lang = "c";
@@ -2814,7 +2814,7 @@ static bool ParseFrontendArgs(FrontendOptions &Opts, ArgList &Args,
       Opts.FixItSuffix = A->getValue();
 
     if (ProgramAction == frontend::GenerateInterfaceStubs) {
-      StringRef ArgStr =
+      llvm::StringRef ArgStr =
           Args.hasArg(OPT_interface_stub_version_EQ)
               ? Args.getLastArgValue(OPT_interface_stub_version_EQ)
               : "ifs-v1";
@@ -2908,7 +2908,7 @@ static bool ParseFrontendArgs(FrontendOptions &Opts, ArgList &Args,
   Opts.ASTDumpAll = Args.hasArg(OPT_ast_dump_all, OPT_ast_dump_all_EQ);
   // Only the -fmodule-file=<file> form.
   for (const auto *A : Args.filtered(OPT_fmodule_file)) {
-    StringRef Val = A->getValue();
+    llvm::StringRef Val = A->getValue();
     if (!Val.contains('='))
       Opts.ModuleFiles.push_back(std::string(Val));
   }
@@ -2932,7 +2932,7 @@ static bool ParseFrontendArgs(FrontendOptions &Opts, ArgList &Args,
 
   InputKind DashX(Language::Unknown);
   if (const Arg *A = Args.getLastArg(OPT_x)) {
-    StringRef XValue = A->getValue();
+    llvm::StringRef XValue = A->getValue();
 
     // Parse suffixes:
     // '<lang>(-[{header-unit,user,system}-]header|[-module-map][-cpp-output])'.
@@ -3026,7 +3026,7 @@ static bool ParseFrontendArgs(FrontendOptions &Opts, ArgList &Args,
     InputKind IK = DashX;
     if (IK.isUnknown()) {
       IK = FrontendOptions::getInputKindForExtension(
-        StringRef(Inputs[i]).rsplit('.').second);
+        llvm::StringRef(Inputs[i]).rsplit('.').second);
       // FIXME: Warn on this?
       if (IK.isUnknown())
         IK = Language::C;
@@ -3195,7 +3195,7 @@ static bool ParseHeaderSearchArgs(HeaderSearchOptions &Opts, ArgList &Args,
     Opts.UseLibcxx = (strcmp(A->getValue(), "libc++") == 0);
 
   // Canonicalize -fmodules-cache-path before storing it.
-  SmallString<128> P(Args.getLastArgValue(OPT_fmodules_cache_path));
+  llvm::SmallString<128> P(Args.getLastArgValue(OPT_fmodules_cache_path));
   if (!(P.empty() || llvm::sys::path::is_absolute(P))) {
     if (WorkingDir.empty())
       llvm::sys::fs::make_absolute(P);
@@ -3207,7 +3207,7 @@ static bool ParseHeaderSearchArgs(HeaderSearchOptions &Opts, ArgList &Args,
 
   // Only the -fmodule-file=<name>=<file> form.
   for (const auto *A : Args.filtered(OPT_fmodule_file)) {
-    StringRef Val = A->getValue();
+    llvm::StringRef Val = A->getValue();
     if (Val.contains('=')) {
       auto Split = Val.split('=');
       Opts.PrebuiltModuleFiles.insert_or_assign(
@@ -3218,7 +3218,7 @@ static bool ParseHeaderSearchArgs(HeaderSearchOptions &Opts, ArgList &Args,
     Opts.AddPrebuiltModulePath(A->getValue());
 
   for (const auto *A : Args.filtered(OPT_fmodules_ignore_macro)) {
-    StringRef MacroDef = A->getValue();
+    llvm::StringRef MacroDef = A->getValue();
     Opts.ModulesIgnoreMacros.insert(
         llvm::CachedHashString(MacroDef.split('=').first));
   }
@@ -3235,7 +3235,7 @@ static bool ParseHeaderSearchArgs(HeaderSearchOptions &Opts, ArgList &Args,
                                   bool IsFramework = false) -> std::string {
     assert(A->getNumValues() && "Unexpected empty search path flag!");
     if (IsSysrootSpecified && !IsFramework && A->getValue()[0] == '=') {
-      SmallString<32> Buffer;
+      llvm::SmallString<32> Buffer;
       llvm::sys::path::append(Buffer, Opts.Sysroot,
                               llvm::StringRef(A->getValue()).substr(1));
       return std::string(Buffer);
@@ -3260,7 +3260,7 @@ static bool ParseHeaderSearchArgs(HeaderSearchOptions &Opts, ArgList &Args,
   }
 
   // Add -iprefix/-iwithprefix/-iwithprefixbefore options.
-  StringRef Prefix = ""; // FIXME: This isn't the correct default prefix.
+  llvm::StringRef Prefix = ""; // FIXME: This isn't the correct default prefix.
   for (const auto *A :
        Args.filtered(OPT_iprefix, OPT_iwithprefix, OPT_iwithprefixbefore)) {
     if (A->getOption().matches(OPT_iprefix))
@@ -3420,7 +3420,7 @@ static bool IsInputCompatibleWithStandard(InputKind IK,
 }
 
 /// Get language name for given input kind.
-static StringRef GetInputKindName(InputKind IK) {
+static llvm::StringRef GetInputKindName(InputKind IK) {
   switch (IK.getLanguage()) {
   case Language::C:
     return "C";
@@ -3467,10 +3467,10 @@ void CompilerInvocationBase::GenerateLangArgs(const LangOptions &Opts,
     if (Opts.ObjCAutoRefCount)
       GenerateArg(Consumer, OPT_fobjc_arc);
     if (Opts.PICLevel != 0)
-      GenerateArg(Consumer, OPT_pic_level, Twine(Opts.PICLevel));
+      GenerateArg(Consumer, OPT_pic_level, llvm::Twine(Opts.PICLevel));
     if (Opts.PIE)
       GenerateArg(Consumer, OPT_pic_is_pie);
-    for (StringRef Sanitizer : serializeSanitizerKinds(Opts.Sanitize))
+    for (llvm::StringRef Sanitizer : serializeSanitizerKinds(Opts.Sanitize))
       GenerateArg(Consumer, OPT_fsanitize_EQ, Sanitizer);
 
     return;
@@ -3534,7 +3534,7 @@ void CompilerInvocationBase::GenerateLangArgs(const LangOptions &Opts,
     unsigned Minor = (Opts.GNUCVersion / 100) % 100;
     unsigned Patch = Opts.GNUCVersion % 100;
     GenerateArg(Consumer, OPT_fgnuc_version_EQ,
-                Twine(Major) + "." + Twine(Minor) + "." + Twine(Patch));
+                llvm::Twine(Major) + "." + llvm::Twine(Minor) + "." + llvm::Twine(Patch));
   }
 
   if (Opts.IgnoreXCOFFVisibility)
@@ -3552,7 +3552,7 @@ void CompilerInvocationBase::GenerateLangArgs(const LangOptions &Opts,
     unsigned Minor = (Opts.MSCompatibilityVersion / 100000) % 100;
     unsigned Subminor = Opts.MSCompatibilityVersion % 100000;
     GenerateArg(Consumer, OPT_fms_compatibility_version,
-                Twine(Major) + "." + Twine(Minor) + "." + Twine(Subminor));
+                llvm::Twine(Major) + "." + llvm::Twine(Minor) + "." + llvm::Twine(Subminor));
   }
 
   if ((!Opts.GNUMode && !Opts.MSVCCompat && !Opts.CPlusPlus17 && !Opts.C23) ||
@@ -3594,7 +3594,7 @@ void CompilerInvocationBase::GenerateLangArgs(const LangOptions &Opts,
     GenerateArg(Consumer, OPT_fopenmp);
 
     if (Opts.OpenMP != 51)
-      GenerateArg(Consumer, OPT_fopenmp_version_EQ, Twine(Opts.OpenMP));
+      GenerateArg(Consumer, OPT_fopenmp_version_EQ, llvm::Twine(Opts.OpenMP));
 
     if (!Opts.OpenMPUseTLS)
       GenerateArg(Consumer, OPT_fnoopenmp_use_tls);
@@ -3610,7 +3610,7 @@ void CompilerInvocationBase::GenerateLangArgs(const LangOptions &Opts,
     GenerateArg(Consumer, OPT_fopenmp_simd);
 
     if (Opts.OpenMP != 51)
-      GenerateArg(Consumer, OPT_fopenmp_version_EQ, Twine(Opts.OpenMP));
+      GenerateArg(Consumer, OPT_fopenmp_version_EQ, llvm::Twine(Opts.OpenMP));
   }
 
   if (Opts.OpenMPThreadSubscription)
@@ -3621,19 +3621,19 @@ void CompilerInvocationBase::GenerateLangArgs(const LangOptions &Opts,
 
   if (Opts.OpenMPTargetDebug != 0)
     GenerateArg(Consumer, OPT_fopenmp_target_debug_EQ,
-                Twine(Opts.OpenMPTargetDebug));
+                llvm::Twine(Opts.OpenMPTargetDebug));
 
   if (Opts.OpenMPCUDANumSMs != 0)
     GenerateArg(Consumer, OPT_fopenmp_cuda_number_of_sm_EQ,
-                Twine(Opts.OpenMPCUDANumSMs));
+                llvm::Twine(Opts.OpenMPCUDANumSMs));
 
   if (Opts.OpenMPCUDABlocksPerSM != 0)
     GenerateArg(Consumer, OPT_fopenmp_cuda_blocks_per_sm_EQ,
-                Twine(Opts.OpenMPCUDABlocksPerSM));
+                llvm::Twine(Opts.OpenMPCUDABlocksPerSM));
 
   if (Opts.OpenMPCUDAReductionBufNum != 1024)
     GenerateArg(Consumer, OPT_fopenmp_cuda_teams_reduction_recs_num_EQ,
-                Twine(Opts.OpenMPCUDAReductionBufNum));
+                llvm::Twine(Opts.OpenMPCUDAReductionBufNum));
 
   if (!Opts.OMPTargetTriples.empty()) {
     std::string Targets;
@@ -3669,7 +3669,7 @@ void CompilerInvocationBase::GenerateLangArgs(const LangOptions &Opts,
   else if (Opts.DefaultFPContractMode == LangOptions::FPM_FastHonorPragmas)
     GenerateArg(Consumer, OPT_ffp_contract, "fast-honor-pragmas");
 
-  for (StringRef Sanitizer : serializeSanitizerKinds(Opts.Sanitize))
+  for (llvm::StringRef Sanitizer : serializeSanitizerKinds(Opts.Sanitize))
     GenerateArg(Consumer, OPT_fsanitize_EQ, Sanitizer);
 
   // Conflating '-fsanitize-system-ignorelist' and '-fsanitize-ignorelist'.
@@ -3854,7 +3854,7 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
 #undef LANG_OPTION_WITH_MARSHALLING
 
   if (const Arg *A = Args.getLastArg(OPT_fcf_protection_EQ)) {
-    StringRef Name = A->getValue();
+    llvm::StringRef Name = A->getValue();
     if (Name == "full" || Name == "branch") {
       Opts.CFProtectionBranch = 1;
     }
@@ -3872,7 +3872,7 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
 
   if (Opts.ObjC) {
     if (Arg *arg = Args.getLastArg(OPT_fobjc_runtime_EQ)) {
-      StringRef value = arg->getValue();
+      llvm::StringRef value = arg->getValue();
       if (Opts.ObjCRuntime.tryParse(value))
         Diags.Report(diag::err_drv_unknown_objc_runtime) << value;
     }
@@ -3920,7 +3920,7 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
   if (Arg *A = Args.getLastArg(options::OPT_fgnuc_version_EQ)) {
     // Check that the version has 1 to 3 components and the minor and patch
     // versions fit in two decimal digits.
-    VersionTuple GNUCVer;
+    llvm::VersionTuple GNUCVer;
     bool Invalid = GNUCVer.tryParse(A->getValue());
     unsigned Major = GNUCVer.getMajor();
     unsigned Minor = GNUCVer.getMinor().value_or(0);
@@ -3946,7 +3946,7 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
 
   Opts.MSCompatibilityVersion = 0;
   if (const Arg *A = Args.getLastArg(OPT_fms_compatibility_version)) {
-    VersionTuple VT;
+    llvm::VersionTuple VT;
     if (VT.tryParse(A->getValue()))
       Diags.Report(diag::err_drv_invalid_value) << A->getAsString(Args)
                                                 << A->getValue();
@@ -4157,7 +4157,7 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
       Opts.NoInlineDefine = true;
 
   if (Arg *A = Args.getLastArg(OPT_ffp_contract)) {
-    StringRef Val = A->getValue();
+    llvm::StringRef Val = A->getValue();
     if (Val == "fast")
       Opts.setDefaultFPContractMode(LangOptions::FPM_Fast);
     else if (Val == "on")
@@ -4183,8 +4183,8 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
   if (Arg *A = Args.getLastArg(OPT_fclang_abi_compat_EQ)) {
     Opts.setClangABICompat(LangOptions::ClangABI::Latest);
 
-    StringRef Ver = A->getValue();
-    std::pair<StringRef, StringRef> VerParts = Ver.split('.');
+    llvm::StringRef Ver = A->getValue();
+    std::pair<llvm::StringRef, llvm::StringRef> VerParts = Ver.split('.');
     unsigned Major, Minor = 0;
 
     // Check the version number is valid: either 3.x (0 <= x <= 9) or
@@ -4226,7 +4226,7 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
   }
 
   if (Arg *A = Args.getLastArg(OPT_msign_return_address_EQ)) {
-    StringRef SignScope = A->getValue();
+    llvm::StringRef SignScope = A->getValue();
 
     if (SignScope.equals_insensitive("none"))
       Opts.setSignReturnAddressScope(
@@ -4242,7 +4242,7 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
           << A->getAsString(Args) << SignScope;
 
     if (Arg *A = Args.getLastArg(OPT_msign_return_address_key_EQ)) {
-      StringRef SignKey = A->getValue();
+      llvm::StringRef SignKey = A->getValue();
       if (!SignScope.empty() && !SignKey.empty()) {
         if (SignKey == "a_key")
           Opts.setSignReturnAddressKey(
@@ -4258,7 +4258,7 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
   }
 
   // The value can be empty, which indicates the system default should be used.
-  StringRef CXXABI = Args.getLastArgValue(OPT_fcxx_abi_EQ);
+  llvm::StringRef CXXABI = Args.getLastArgValue(OPT_fcxx_abi_EQ);
   if (!CXXABI.empty()) {
     if (!TargetCXXABI::isABI(CXXABI)) {
       Diags.Report(diag::err_invalid_cxx_abi) << CXXABI;
@@ -4285,7 +4285,7 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
     Diags.Report(diag::err_drv_using_omit_rtti_component_without_no_rtti);
 
   for (const auto &A : Args.getAllArgValues(OPT_fmacro_prefix_map_EQ)) {
-    auto Split = StringRef(A).split('=');
+    auto Split = llvm::StringRef(A).split('=');
     Opts.MacroPrefixMap.insert(
         {std::string(Split.first), std::string(Split.second)});
   }
@@ -4299,7 +4299,7 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
   // Error if -mvscale-min is unbounded.
   if (Arg *A = Args.getLastArg(options::OPT_mvscale_min_EQ)) {
     unsigned VScaleMin;
-    if (StringRef(A->getValue()).getAsInteger(10, VScaleMin) || VScaleMin == 0)
+    if (llvm::StringRef(A->getValue()).getAsInteger(10, VScaleMin) || VScaleMin == 0)
       Diags.Report(diag::err_cc1_unbounded_vscale_min);
   }
 
@@ -4338,7 +4338,7 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
       }
 
       if (T.isDXIL()) {
-        if (!T.isShaderModelOS() || T.getOSVersion() == VersionTuple(0)) {
+        if (!T.isShaderModelOS() || T.getOSVersion() == llvm::VersionTuple(0)) {
           Diags.Report(diag::err_drv_hlsl_bad_shader_unsupported)
               << ShaderModel << T.getOSName() << T.str();
         }
@@ -4349,13 +4349,13 @@ bool CompilerInvocation::ParseLangArgs(LangOptions &Opts, ArgList &Args,
           const LangStandard &Std =
               LangStandard::getLangStandardForKind(Opts.LangStd);
           if (!(Opts.LangStd >= LangStandard::lang_hlsl2018 &&
-                T.getOSVersion() >= VersionTuple(6, 2)))
+                T.getOSVersion() >= llvm::VersionTuple(6, 2)))
             Diags.Report(diag::err_drv_hlsl_16bit_types_unsupported)
                 << "-enable-16bit-types" << true << Std.getName()
                 << T.getOSVersion().getAsString();
         }
       } else if (T.isSPIRVLogical()) {
-        if (!T.isVulkanOS() || T.getVulkanVersion() == VersionTuple(0)) {
+        if (!T.isVulkanOS() || T.getVulkanVersion() == llvm::VersionTuple(0)) {
           Diags.Report(diag::err_drv_hlsl_bad_shader_unsupported)
               << VulkanEnv << T.getOSName() << T.str();
         }
@@ -4443,7 +4443,7 @@ static void GeneratePreprocessorArgs(const PreprocessorOptions &Opts,
 
   if (Opts.PrecompiledPreambleBytes != std::make_pair(0u, false))
     GenerateArg(Consumer, OPT_preamble_bytes_EQ,
-                Twine(Opts.PrecompiledPreambleBytes.first) + "," +
+                llvm::Twine(Opts.PrecompiledPreambleBytes.first) + "," +
                     (Opts.PrecompiledPreambleBytes.second ? "1" : "0"));
 
   for (const auto &M : Opts.Macros) {
@@ -4484,7 +4484,7 @@ static void GeneratePreprocessorArgs(const PreprocessorOptions &Opts,
     GenerateArg(Consumer, OPT_remap_file, RF.first + ";" + RF.second);
 
   if (Opts.SourceDateEpoch)
-    GenerateArg(Consumer, OPT_source_date_epoch, Twine(*Opts.SourceDateEpoch));
+    GenerateArg(Consumer, OPT_source_date_epoch, llvm::Twine(*Opts.SourceDateEpoch));
 
   if (Opts.DefineTargetOSMacros)
     GenerateArg(Consumer, OPT_fdefine_target_os_macros);
@@ -4513,12 +4513,12 @@ static bool ParsePreprocessorArgs(PreprocessorOptions &Opts, ArgList &Args,
     Opts.DeserializedPCHDeclsToErrorOn.insert(A->getValue());
 
   if (const Arg *A = Args.getLastArg(OPT_preamble_bytes_EQ)) {
-    StringRef Value(A->getValue());
+    llvm::StringRef Value(A->getValue());
     size_t Comma = Value.find(',');
     unsigned Bytes = 0;
     unsigned EndOfLine = 0;
 
-    if (Comma == StringRef::npos ||
+    if (Comma == llvm::StringRef::npos ||
         Value.substr(0, Comma).getAsInteger(10, Bytes) ||
         Value.substr(Comma + 1).getAsInteger(10, EndOfLine))
       Diags.Report(diag::err_drv_preamble_format);
@@ -4530,7 +4530,7 @@ static bool ParsePreprocessorArgs(PreprocessorOptions &Opts, ArgList &Args,
 
   // Add the __CET__ macro if a CFProtection option is set.
   if (const Arg *A = Args.getLastArg(OPT_fcf_protection_EQ)) {
-    StringRef Name = A->getValue();
+    llvm::StringRef Name = A->getValue();
     if (Name == "branch")
       Opts.addMacroDef("__CET__=1");
     else if (Name == "return")
@@ -4555,7 +4555,7 @@ static bool ParsePreprocessorArgs(PreprocessorOptions &Opts, ArgList &Args,
     Opts.ChainedIncludes.emplace_back(A->getValue());
 
   for (const auto *A : Args.filtered(OPT_remap_file)) {
-    std::pair<StringRef, StringRef> Split = StringRef(A->getValue()).split(';');
+    std::pair<llvm::StringRef, llvm::StringRef> Split = llvm::StringRef(A->getValue()).split(';');
 
     if (Split.second.empty()) {
       Diags.Report(diag::err_drv_invalid_remap_file) << A->getAsString(Args);
@@ -4566,7 +4566,7 @@ static bool ParsePreprocessorArgs(PreprocessorOptions &Opts, ArgList &Args,
   }
 
   if (const Arg *A = Args.getLastArg(OPT_source_date_epoch)) {
-    StringRef Epoch = A->getValue();
+    llvm::StringRef Epoch = A->getValue();
     // SOURCE_DATE_EPOCH, if specified, must be a non-negative decimal integer.
     // On time64 systems, pick 253402300799 (the UNIX timestamp of
     // 9999-12-31T23:59:59Z) as the upper bound.
@@ -4682,7 +4682,7 @@ static bool ParseTargetArgs(TargetOptions &Opts, ArgList &Args,
 }
 
 bool CompilerInvocation::CreateFromArgsImpl(
-    CompilerInvocation &Res, ArrayRef<const char *> CommandLineArgs,
+    CompilerInvocation &Res, llvm::ArrayRef<const char *> CommandLineArgs,
     DiagnosticsEngine &Diags, const char *Argv0) {
   unsigned NumErrorsBefore = Diags.getNumErrors();
 
@@ -4804,17 +4804,17 @@ bool CompilerInvocation::CreateFromArgsImpl(
 }
 
 bool CompilerInvocation::CreateFromArgs(CompilerInvocation &Invocation,
-                                        ArrayRef<const char *> CommandLineArgs,
+                                        llvm::ArrayRef<const char *> CommandLineArgs,
                                         DiagnosticsEngine &Diags,
                                         const char *Argv0) {
   CompilerInvocation DummyInvocation;
 
   return RoundTrip(
-      [](CompilerInvocation &Invocation, ArrayRef<const char *> CommandLineArgs,
+      [](CompilerInvocation &Invocation, llvm::ArrayRef<const char *> CommandLineArgs,
          DiagnosticsEngine &Diags, const char *Argv0) {
         return CreateFromArgsImpl(Invocation, CommandLineArgs, Diags, Argv0);
       },
-      [](CompilerInvocation &Invocation, SmallVectorImpl<const char *> &Args,
+      [](CompilerInvocation &Invocation, llvm::SmallVectorImpl<const char *> &Args,
          StringAllocator SA) {
         Args.push_back("-cc1");
         Invocation.generateCC1CommandLine(Args, SA);
@@ -4864,7 +4864,7 @@ std::string CompilerInvocation::getModuleHash() const {
     // don't put it into the hash.
     if (!hsOpts.ModulesIgnoreMacros.empty()) {
       // Check whether we're ignoring this macro.
-      StringRef MacroDef = Macro.first;
+      llvm::StringRef MacroDef = Macro.first;
       if (hsOpts.ModulesIgnoreMacros.count(
               llvm::CachedHashString(MacroDef.split('=').first)))
         continue;
@@ -4970,7 +4970,7 @@ void CompilerInvocationBase::generateCC1CommandLine(
 std::vector<std::string> CompilerInvocationBase::getCC1CommandLine() const {
   std::vector<std::string> Args{"-cc1"};
   generateCC1CommandLine(
-      [&Args](const Twine &Arg) { Args.push_back(Arg.str()); });
+      [&Args](const llvm::Twine &Arg) { Args.push_back(Arg.str()); });
   return Args;
 }
 
@@ -4992,28 +4992,28 @@ void CompilerInvocation::clearImplicitModuleBuildOptions() {
   getHeaderSearchOpts().ModuleCachePruneAfter = 31 * 24 * 60 * 60;
 }
 
-IntrusiveRefCntPtr<llvm::vfs::FileSystem>
+llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>
 clang::createVFSFromCompilerInvocation(const CompilerInvocation &CI,
                                        DiagnosticsEngine &Diags) {
   return createVFSFromCompilerInvocation(CI, Diags,
                                          llvm::vfs::getRealFileSystem());
 }
 
-IntrusiveRefCntPtr<llvm::vfs::FileSystem>
+llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>
 clang::createVFSFromCompilerInvocation(
     const CompilerInvocation &CI, DiagnosticsEngine &Diags,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS) {
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS) {
   return createVFSFromOverlayFiles(CI.getHeaderSearchOpts().VFSOverlayFiles,
                                    Diags, std::move(BaseFS));
 }
 
-IntrusiveRefCntPtr<llvm::vfs::FileSystem> clang::createVFSFromOverlayFiles(
-    ArrayRef<std::string> VFSOverlayFiles, DiagnosticsEngine &Diags,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS) {
+llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> clang::createVFSFromOverlayFiles(
+    llvm::ArrayRef<std::string> VFSOverlayFiles, DiagnosticsEngine &Diags,
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS) {
   if (VFSOverlayFiles.empty())
     return BaseFS;
 
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem> Result = BaseFS;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> Result = BaseFS;
   // earlier vfs files are on the bottom
   for (const auto &File : VFSOverlayFiles) {
     llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> Buffer =
@@ -5023,7 +5023,7 @@ IntrusiveRefCntPtr<llvm::vfs::FileSystem> clang::createVFSFromOverlayFiles(
       continue;
     }
 
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS = llvm::vfs::getVFSFromYAML(
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS = llvm::vfs::getVFSFromYAML(
         std::move(Buffer.get()), /*DiagHandler*/ nullptr, File,
         /*DiagContext*/ nullptr, Result);
     if (!FS) {

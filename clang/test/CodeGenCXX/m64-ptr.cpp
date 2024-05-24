@@ -9,8 +9,8 @@ public:
   const char *Data;
   long Len;
 };
-void foo(StringRef X);
-void bar(StringRef &A) {
+void foo(llvm::StringRef X);
+void bar(llvm::StringRef &A) {
 // CHECK: @_Z3barR9StringRef
 // CHECK: load ptr, ptr
   foo(A);

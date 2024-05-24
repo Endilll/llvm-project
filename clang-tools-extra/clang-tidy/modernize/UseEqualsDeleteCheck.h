@@ -21,7 +21,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-equals-delete.html
 class UseEqualsDeleteCheck : public ClangTidyCheck {
 public:
-  UseEqualsDeleteCheck(StringRef Name, ClangTidyContext *Context);
+  UseEqualsDeleteCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

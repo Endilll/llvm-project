@@ -13,7 +13,7 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::bugprone {
 
 UniquePtrArrayMismatchCheck::UniquePtrArrayMismatchCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : SmartPtrArrayMismatchCheck(Name, Context, "unique") {}
 
 UniquePtrArrayMismatchCheck::SmartPtrClassMatcher

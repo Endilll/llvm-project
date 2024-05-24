@@ -15,6 +15,7 @@
 #define LLVM_CLANG_AST_SELECTORLOCATIONSKIND_H
 
 #include "clang/Basic/LLVM.h"
+#include "llvm/ADT/ArrayRef.h"
 
 namespace clang {
   class Selector;
@@ -43,8 +44,8 @@ enum SelectorLocationsKind {
 
 /// Returns true if all \p SelLocs are in a "standard" location.
 SelectorLocationsKind hasStandardSelectorLocs(Selector Sel,
-                                              ArrayRef<SourceLocation> SelLocs,
-                                              ArrayRef<Expr *> Args,
+                                              llvm::ArrayRef<SourceLocation> SelLocs,
+                                              llvm::ArrayRef<Expr *> Args,
                                               SourceLocation EndLoc);
 
 /// Get the "standard" location of a selector identifier, e.g:
@@ -56,13 +57,13 @@ SelectorLocationsKind hasStandardSelectorLocs(Selector Sel,
 SourceLocation getStandardSelectorLoc(unsigned Index,
                                       Selector Sel,
                                       bool WithArgSpace,
-                                      ArrayRef<Expr *> Args,
+                                      llvm::ArrayRef<Expr *> Args,
                                       SourceLocation EndLoc);
 
 /// Returns true if all \p SelLocs are in a "standard" location.
 SelectorLocationsKind hasStandardSelectorLocs(Selector Sel,
-                                              ArrayRef<SourceLocation> SelLocs,
-                                              ArrayRef<ParmVarDecl *> Args,
+                                              llvm::ArrayRef<SourceLocation> SelLocs,
+                                              llvm::ArrayRef<ParmVarDecl *> Args,
                                               SourceLocation EndLoc);
 
 /// Get the "standard" location of a selector identifier, e.g:
@@ -74,7 +75,7 @@ SelectorLocationsKind hasStandardSelectorLocs(Selector Sel,
 SourceLocation getStandardSelectorLoc(unsigned Index,
                                       Selector Sel,
                                       bool WithArgSpace,
-                                      ArrayRef<ParmVarDecl *> Args,
+                                      llvm::ArrayRef<ParmVarDecl *> Args,
                                       SourceLocation EndLoc);
 
 } // end namespace clang

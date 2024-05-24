@@ -93,9 +93,9 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  bool hasFeature(StringRef Feature) const override { return Feature == "tce"; }
+  bool hasFeature(llvm::StringRef Feature) const override { return Feature == "tce"; }
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override {
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override {
     return std::nullopt;
   }
 
@@ -105,7 +105,7 @@ public:
     return TargetInfo::VoidPtrBuiltinVaList;
   }
 
-  ArrayRef<const char *> getGCCRegNames() const override {
+  llvm::ArrayRef<const char *> getGCCRegNames() const override {
     return std::nullopt;
   }
 
@@ -114,7 +114,7 @@ public:
     return true;
   }
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     return std::nullopt;
   }
 };

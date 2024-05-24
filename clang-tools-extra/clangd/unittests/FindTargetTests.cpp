@@ -695,14 +695,14 @@ TEST_F(TargetDeclTest, VariableTemplate) {
 TEST_F(TargetDeclTest, TypeAliasTemplate) {
   Code = R"cpp(
     template<typename T, int X> class SmallVector {};
-    template<typename U> using TinyVector = SmallVector<U, 1>;
+    template<typename U> using TinyVector = llvm::SmallVector<U, 1>;
     [[TinyVector<int>]] X;
   )cpp";
   EXPECT_DECLS("TemplateSpecializationTypeLoc",
                {"template<> class SmallVector<int, 1>",
                 Rel::TemplateInstantiation | Rel::Underlying},
                {"class SmallVector", Rel::TemplatePattern | Rel::Underlying},
-               {"using TinyVector = SmallVector<U, 1>",
+               {"using TinyVector = llvm::SmallVector<U, 1>",
                 Rel::Alias | Rel::TemplatePattern});
 }
 

@@ -569,7 +569,7 @@ class ExtractVariable : public Tweak {
 public:
   const char *id() const final;
   bool prepare(const Selection &Inputs) override;
-  Expected<Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Effect> apply(const Selection &Inputs) override;
   std::string title() const override {
     return "Extract subexpression to variable";
   }
@@ -594,7 +594,7 @@ bool ExtractVariable::prepare(const Selection &Inputs) {
   return Target && Target->isExtractable();
 }
 
-Expected<Tweak::Effect> ExtractVariable::apply(const Selection &Inputs) {
+llvm::Expected<Tweak::Effect> ExtractVariable::apply(const Selection &Inputs) {
   tooling::Replacements Result;
   // FIXME: get variable name from user or suggest based on type
   std::string VarName = "placeholder";

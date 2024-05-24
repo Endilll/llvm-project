@@ -21,7 +21,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/easily-swappable-parameters.html
 class EasilySwappableParametersCheck : public ClangTidyCheck {
 public:
-  EasilySwappableParametersCheck(StringRef Name, ClangTidyContext *Context);
+  EasilySwappableParametersCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
@@ -31,11 +31,11 @@ public:
   const std::size_t MinimumLength;
 
   /// The parameter names (as written in the source text) to be ignored.
-  const std::vector<StringRef> IgnoredParameterNames;
+  const std::vector<llvm::StringRef> IgnoredParameterNames;
 
   /// The parameter typename suffixes (as written in the source code) to be
   /// ignored.
-  const std::vector<StringRef> IgnoredParameterTypeSuffixes;
+  const std::vector<llvm::StringRef> IgnoredParameterTypeSuffixes;
 
   /// Whether to consider differently qualified versions of the same type
   /// mixable.

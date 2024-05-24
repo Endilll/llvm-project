@@ -96,7 +96,7 @@ bool Preprocessor::EnterSourceFile(FileID FID, ConstSearchDirIterator CurDir,
   if (getPreprocessorOpts().DependencyDirectivesForFile &&
       FID != PredefinesFileID) {
     if (OptionalFileEntryRef File = SourceMgr.getFileEntryRefForID(FID)) {
-      if (std::optional<ArrayRef<dependency_directives_scan::Directive>>
+      if (std::optional<llvm::ArrayRef<dependency_directives_scan::Directive>>
               DepDirectives =
                   getPreprocessorOpts().DependencyDirectivesForFile(*File)) {
         TheLexer->DepDirectives = *DepDirectives;
@@ -223,11 +223,11 @@ void Preprocessor::EnterTokenStream(const Token *Toks, unsigned NumToks,
 /// Compute the relative path that names the given file relative to
 /// the given directory.
 static void computeRelativePath(FileManager &FM, const DirectoryEntry *Dir,
-                                FileEntryRef File, SmallString<128> &Result) {
+                                FileEntryRef File, llvm::SmallString<128> &Result) {
   Result.clear();
 
-  StringRef FilePath = File.getDir().getName();
-  StringRef Path = FilePath;
+  llvm::StringRef FilePath = File.getDir().getName();
+  llvm::StringRef Path = FilePath;
   while (!Path.empty()) {
     if (auto CurDir = FM.getDirectory(Path)) {
       if (*CurDir == Dir) {
@@ -280,7 +280,7 @@ const char *Preprocessor::getCurLexerEndPos() {
 }
 
 static void collectAllSubModulesWithUmbrellaHeader(
-    const Module &Mod, SmallVectorImpl<const Module *> &SubMods) {
+    const Module &Mod, llvm::SmallVectorImpl<const Module *> &SubMods) {
   if (Mod.getUmbrellaHeaderAsWritten())
     SubMods.push_back(&Mod);
   for (auto *M : Mod.submodules())
@@ -317,7 +317,7 @@ void Preprocessor::diagnoseMissingHeaderInUmbrellaDir(const Module &Mod) {
       if (!getSourceManager().hasFileInfo(*Header)) {
         if (!ModMap.isHeaderInUnavailableModule(*Header)) {
           // Find the relative path that would access this header.
-          SmallString<128> RelativePath;
+          llvm::SmallString<128> RelativePath;
           computeRelativePath(FileMgr, *Dir, *Header, RelativePath);
           Diag(ExpectedHeadersLoc, diag::warn_uncovered_module_header)
               << Mod.getFullModuleName() << RelativePath;
@@ -382,8 +382,8 @@ bool Preprocessor::HandleEndOfFile(Token &Result, bool isEndOfMacro) {
             // completely different. This can be observed in the wild when
             // handling feature macros or header guards in different files.
 
-            const StringRef ControllingMacroName = ControllingMacro->getName();
-            const StringRef DefinedMacroName = DefinedMacro->getName();
+            const llvm::StringRef ControllingMacroName = ControllingMacro->getName();
+            const llvm::StringRef DefinedMacroName = DefinedMacro->getName();
             const size_t MaxHalfLength = std::max(ControllingMacroName.size(),
                                                   DefinedMacroName.size()) / 2;
             const unsigned ED = ControllingMacroName.edit_distance(

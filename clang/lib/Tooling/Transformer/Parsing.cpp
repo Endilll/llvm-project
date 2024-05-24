@@ -39,10 +39,10 @@ template <typename... Ts> using RangeSelectorOp = RangeSelector (*)(Ts...);
 
 struct ParseState {
   // The remaining input to be processed.
-  StringRef Input;
+  llvm::StringRef Input;
   // The original input. Not modified during parsing; only for reference in
   // error reporting.
-  StringRef OriginalInput;
+  llvm::StringRef OriginalInput;
 };
 
 // Represents an intermediate result returned by a parsing function. Functions
@@ -146,7 +146,7 @@ static ParseState advance(ParseState S, size_t N) {
   return S;
 }
 
-static StringRef consumeWhitespace(StringRef S) {
+static llvm::StringRef consumeWhitespace(llvm::StringRef S) {
   return S.drop_while([](char c) { return isASCII(c) && isWhitespace(c); });
 }
 
@@ -181,7 +181,7 @@ static ExpectedProgress<std::string> parseStringId(ParseState State) {
         State,
         "expecting string, but encountered other character or end of input");
 
-  StringRef Id = State.Input.take_until([](char c) { return c == '"'; });
+  llvm::StringRef Id = State.Input.take_until([](char c) { return c == '"'; });
   if (State.Input.size() == Id.size())
     return makeParseError(State, "unterminated string");
   // Advance past the trailing quote as well.
@@ -264,7 +264,7 @@ parseRangeSelectorImpl(ParseState State) {
   return makeParseError(State, "unknown selector name: " + OpName);
 }
 
-Expected<RangeSelector> transformer::parseRangeSelector(llvm::StringRef Input) {
+llvm::Expected<RangeSelector> transformer::parseRangeSelector(llvm::StringRef Input) {
   ParseState State = {Input, Input};
   ExpectedProgress<RangeSelector> Result = parseRangeSelectorImpl(State);
   if (!Result)

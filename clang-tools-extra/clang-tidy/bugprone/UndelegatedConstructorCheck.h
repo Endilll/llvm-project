@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// initializer.
 class UndelegatedConstructorCheck : public ClangTidyCheck {
 public:
-  UndelegatedConstructorCheck(StringRef Name, ClangTidyContext *Context)
+  UndelegatedConstructorCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;

@@ -25,7 +25,7 @@
 using namespace clang;
 using namespace ento;
 
-void ento::printCheckerHelp(raw_ostream &out, CompilerInstance &CI) {
+void ento::printCheckerHelp(llvm::raw_ostream &out, CompilerInstance &CI) {
   out << "OVERVIEW: Clang Static Analyzer Checkers List\n\n";
   out << "USAGE: -analyzer-checker <CHECKER or PACKAGE,...>\n\n";
 
@@ -37,7 +37,7 @@ void ento::printCheckerHelp(raw_ostream &out, CompilerInstance &CI) {
       CI.getAnalyzerOpts(), out);
 }
 
-void ento::printEnabledCheckerList(raw_ostream &out, CompilerInstance &CI) {
+void ento::printEnabledCheckerList(llvm::raw_ostream &out, CompilerInstance &CI) {
   out << "OVERVIEW: Clang Static Analyzer Enabled Checkers List\n\n";
 
   auto CheckerMgr = std::make_unique<CheckerManager>(
@@ -47,7 +47,7 @@ void ento::printEnabledCheckerList(raw_ostream &out, CompilerInstance &CI) {
   CheckerMgr->getCheckerRegistryData().printEnabledCheckerList(out);
 }
 
-void ento::printCheckerConfigList(raw_ostream &out, CompilerInstance &CI) {
+void ento::printCheckerConfigList(llvm::raw_ostream &out, CompilerInstance &CI) {
 
   auto CheckerMgr = std::make_unique<CheckerManager>(
       CI.getAnalyzerOpts(), CI.getLangOpts(), CI.getDiagnostics(),
@@ -57,7 +57,7 @@ void ento::printCheckerConfigList(raw_ostream &out, CompilerInstance &CI) {
       CI.getAnalyzerOpts(), out);
 }
 
-void ento::printAnalyzerConfigList(raw_ostream &out) {
+void ento::printAnalyzerConfigList(llvm::raw_ostream &out) {
   // FIXME: This message sounds scary, should be scary, but incorrectly states
   // that all configs are super dangerous. In reality, many of them should be
   // accessible to the user. We should create a user-facing subset of config
@@ -75,13 +75,13 @@ USAGE: -analyzer-config <OPTION1=VALUE,OPTION2=VALUE,...>
 OPTIONS:
 )";
 
-  using OptionAndDescriptionTy = std::pair<StringRef, std::string>;
+  using OptionAndDescriptionTy = std::pair<llvm::StringRef, std::string>;
   OptionAndDescriptionTy PrintableOptions[] = {
 #define ANALYZER_OPTION(TYPE, NAME, CMDFLAG, DESC, DEFAULT_VAL)                \
     {                                                                          \
       CMDFLAG,                                                                 \
       llvm::Twine(llvm::Twine() + "(" +                                        \
-                  (StringRef(#TYPE) == "StringRef" ? "string" : #TYPE ) +      \
+                  (llvm::StringRef(#TYPE) == "llvm::StringRef" ? "string" : #TYPE ) +      \
                   ") " DESC                                                    \
                   " (default: " #DEFAULT_VAL ")").str()                        \
     },
@@ -91,7 +91,7 @@ OPTIONS:
     {                                                                          \
       CMDFLAG,                                                                 \
       llvm::Twine(llvm::Twine() + "(" +                                        \
-                  (StringRef(#TYPE) == "StringRef" ? "string" : #TYPE ) +      \
+                  (llvm::StringRef(#TYPE) == "llvm::StringRef" ? "string" : #TYPE ) +      \
                   ") " DESC                                                    \
                   " (default: " #SHALLOW_VAL " in shallow mode, " #DEEP_VAL    \
                   " in deep mode)").str()                                      \

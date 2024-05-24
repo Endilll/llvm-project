@@ -96,7 +96,7 @@ public:
     /// used outside of libclang.
     const Decl *Declaration;
 
-    Fragment(StringRef Spelling, FragmentKind Kind, StringRef PreciseIdentifier,
+    Fragment(llvm::StringRef Spelling, FragmentKind Kind, llvm::StringRef PreciseIdentifier,
              const Decl *Declaration)
         : Spelling(Spelling), Kind(Kind), PreciseIdentifier(PreciseIdentifier),
           Declaration(Declaration) {}
@@ -135,8 +135,8 @@ public:
   ///
   /// \returns a reference to the DeclarationFragments object itself after
   /// appending to chain up consecutive operations.
-  DeclarationFragments &append(StringRef Spelling, FragmentKind Kind,
-                               StringRef PreciseIdentifier = "",
+  DeclarationFragments &append(llvm::StringRef Spelling, FragmentKind Kind,
+                               llvm::StringRef PreciseIdentifier = "",
                                const Decl *Declaration = nullptr) {
     if (Kind == FragmentKind::Text && !Fragments.empty() &&
         Fragments.back().Kind == FragmentKind::Text) {
@@ -223,10 +223,10 @@ public:
   DeclarationFragments &removeTrailingSemicolon();
 
   /// Get the string description of a FragmentKind \p Kind.
-  static StringRef getFragmentKindString(FragmentKind Kind);
+  static llvm::StringRef getFragmentKindString(FragmentKind Kind);
 
   /// Get the corresponding FragmentKind from string \p S.
-  static FragmentKind parseFragmentKindFromString(StringRef S);
+  static FragmentKind parseFragmentKindFromString(llvm::StringRef S);
 
   static DeclarationFragments
   getExceptionSpecificationString(ExceptionSpecificationType ExceptionSpec);
@@ -262,14 +262,14 @@ public:
     std::string Name;
     DeclarationFragments Fragments;
 
-    Parameter(StringRef Name, DeclarationFragments Fragments)
+    Parameter(llvm::StringRef Name, DeclarationFragments Fragments)
         : Name(Name), Fragments(Fragments) {}
   };
 
   const std::vector<Parameter> &getParameters() const { return Parameters; }
   const DeclarationFragments &getReturnType() const { return ReturnType; }
 
-  FunctionSignature &addParameter(StringRef Name,
+  FunctionSignature &addParameter(llvm::StringRef Name,
                                   DeclarationFragments Fragments) {
     Parameters.emplace_back(Name, Fragments);
     return *this;
@@ -355,11 +355,11 @@ public:
   getFragmentsForOverloadedOperator(const CXXMethodDecl *);
 
   static DeclarationFragments
-      getFragmentsForTemplateParameters(ArrayRef<NamedDecl *>);
+      getFragmentsForTemplateParameters(llvm::ArrayRef<NamedDecl *>);
 
   static DeclarationFragments getFragmentsForTemplateArguments(
-      const ArrayRef<TemplateArgument>, ASTContext &,
-      const std::optional<ArrayRef<TemplateArgumentLoc>>);
+      const llvm::ArrayRef<TemplateArgument>, ASTContext &,
+      const std::optional<llvm::ArrayRef<TemplateArgumentLoc>>);
 
   static DeclarationFragments getFragmentsForConcept(const ConceptDecl *);
 
@@ -412,7 +412,7 @@ public:
   ///
   /// \param Name name of the macro.
   /// \param MD the associated MacroDirective.
-  static DeclarationFragments getFragmentsForMacro(StringRef Name,
+  static DeclarationFragments getFragmentsForMacro(llvm::StringRef Name,
                                                    const MacroDirective *MD);
 
   /// Build DeclarationFragments for a typedef \p TypedefNameDecl.
@@ -426,7 +426,7 @@ public:
   static DeclarationFragments getSubHeading(const ObjCMethodDecl *);
 
   /// Build a sub-heading for macro \p Name.
-  static DeclarationFragments getSubHeadingForMacro(StringRef Name);
+  static DeclarationFragments getSubHeadingForMacro(llvm::StringRef Name);
 
 private:
   DeclarationFragmentsBuilder() = delete;
@@ -467,7 +467,7 @@ DeclarationFragmentsBuilder::getFunctionSignature(const FunctionT *Function) {
                                    Function->getASTContext(), After);
   if (isa<FunctionDecl>(Function) &&
       dyn_cast<FunctionDecl>(Function)->getDescribedFunctionTemplate() &&
-      StringRef(ReturnType.begin()->Spelling).starts_with("type-parameter")) {
+      llvm::StringRef(ReturnType.begin()->Spelling).starts_with("type-parameter")) {
     std::string ProperArgName = Function->getReturnType().getAsString();
     ReturnType.begin()->Spelling.swap(ProperArgName);
   }

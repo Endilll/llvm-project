@@ -84,8 +84,8 @@ public:
     }
   }
 
-  int showGroup(StringRef RootGroup) {
-    ArrayRef<GroupRecord> AllGroups = getDiagnosticGroups();
+  int showGroup(llvm::StringRef RootGroup) {
+    llvm::ArrayRef<GroupRecord> AllGroups = getDiagnosticGroups();
 
     if (RootGroup.size() > UINT16_MAX) {
       llvm::errs() << "No such diagnostic group exists\n";
@@ -104,7 +104,7 @@ public:
   }
 
   int showAll() {
-    ArrayRef<GroupRecord> AllGroups = getDiagnosticGroups();
+    llvm::ArrayRef<GroupRecord> AllGroups = getDiagnosticGroups();
     llvm::DenseSet<unsigned> NonRootGroupIDs;
 
     for (const GroupRecord &GR : AllGroups) {
@@ -143,7 +143,7 @@ int TreeView::run(unsigned int argc, char **argv, llvm::raw_ostream &out) {
   // First check our one flag (--flags-only).
   bool Internal = false;
   if (argc > 0) {
-    StringRef FirstArg(*argv);
+    llvm::StringRef FirstArg(*argv);
     if (FirstArg == "--internal") {
       Internal = true;
       --argc;
@@ -152,7 +152,7 @@ int TreeView::run(unsigned int argc, char **argv, llvm::raw_ostream &out) {
   }
 
   bool ShowAll = false;
-  StringRef RootGroup;
+  llvm::StringRef RootGroup;
 
   switch (argc) {
   case 0:

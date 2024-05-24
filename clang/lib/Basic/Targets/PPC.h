@@ -103,8 +103,8 @@ public:
   // Note: GCC recognizes the following additional cpus:
   //  401, 403, 405, 405fp, 440fp, 464, 464fp, 476, 476fp, 505, 740, 801,
   //  821, 823, 8540, e300c2, e300c3, e500mc64, e6500, 860, cell, titan, rs64.
-  bool isValidCPUName(StringRef Name) const override;
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  bool isValidCPUName(llvm::StringRef Name) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
 
   bool setCPU(const std::string &Name) override {
     bool CPUKnown = isValidCPUName(Name);
@@ -176,9 +176,9 @@ public:
     return CPUKnown;
   }
 
-  StringRef getABI() const override { return ABI; }
+  llvm::StringRef getABI() const override { return ABI; }
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
   bool isCLZForZeroUndef() const override { return false; }
 
@@ -187,7 +187,7 @@ public:
 
   bool
   initFeatureMap(llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags,
-                 StringRef CPU,
+                 llvm::StringRef CPU,
                  const std::vector<std::string> &FeaturesVec) const override;
 
   void addP10SpecificFeatures(llvm::StringMap<bool> &Features) const;
@@ -196,18 +196,18 @@ public:
   bool handleTargetFeatures(std::vector<std::string> &Features,
                             DiagnosticsEngine &Diags) override;
 
-  bool hasFeature(StringRef Feature) const override;
+  bool hasFeature(llvm::StringRef Feature) const override;
 
-  void setFeatureEnabled(llvm::StringMap<bool> &Features, StringRef Name,
+  void setFeatureEnabled(llvm::StringMap<bool> &Features, llvm::StringRef Name,
                          bool Enabled) const override;
 
   bool supportsTargetAttributeTune() const override { return true; }
 
-  ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
 
-  ArrayRef<TargetInfo::AddlRegName> getGCCAddlRegNames() const override;
+  llvm::ArrayRef<TargetInfo::AddlRegName> getGCCAddlRegNames() const override;
 
   bool validateAsmConstraint(const char *&Name,
                              TargetInfo::ConstraintInfo &Info) const override {
@@ -359,7 +359,7 @@ public:
 
   bool hasBitIntType() const override { return true; }
 
-  bool isSPRegName(StringRef RegName) const override {
+  bool isSPRegName(llvm::StringRef RegName) const override {
     return RegName == "r1" || RegName == "x1";
   }
 
@@ -382,8 +382,8 @@ public:
            (Triple.isOSAIX() &&
             !Triple.isOSVersionLT(MINIMUM_AIX_OS_MAJOR, MINIMUM_AIX_OS_MINOR));
   }
-  bool validateCpuSupports(StringRef Feature) const override;
-  bool validateCpuIs(StringRef Name) const override;
+  bool validateCpuSupports(llvm::StringRef Feature) const override;
+  bool validateCpuIs(llvm::StringRef Name) const override;
 };
 
 class LLVM_LIBRARY_VISIBILITY PPC32TargetInfo : public PPCTargetInfo {

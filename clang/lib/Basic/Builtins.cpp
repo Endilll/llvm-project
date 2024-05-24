@@ -207,7 +207,7 @@ bool Builtin::Context::isScanfLike(unsigned ID, unsigned &FormatIdx,
 }
 
 bool Builtin::Context::performsCallback(unsigned ID,
-                                        SmallVectorImpl<int> &Encoding) const {
+                                        llvm::SmallVectorImpl<int> &Encoding) const {
   const char *CalleePos = ::strchr(getRecord(ID).Attributes, 'C');
   if (!CalleePos)
     return false;
@@ -241,7 +241,7 @@ bool Builtin::Context::canBeRedeclared(unsigned ID) const {
 }
 
 bool Builtin::evaluateRequiredTargetFeatures(
-    StringRef RequiredFeatures, const llvm::StringMap<bool> &TargetFetureMap) {
+    llvm::StringRef RequiredFeatures, const llvm::StringMap<bool> &TargetFetureMap) {
   // Return true if the builtin doesn't have any required features.
   if (RequiredFeatures.empty())
     return true;

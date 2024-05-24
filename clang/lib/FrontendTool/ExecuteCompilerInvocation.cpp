@@ -39,7 +39,7 @@ namespace clang {
 static std::unique_ptr<FrontendAction>
 CreateFrontendBaseAction(CompilerInstance &CI) {
   using namespace clang::frontend;
-  StringRef Action("unknown");
+  llvm::StringRef Action("unknown");
   (void)Action;
 
   switch (CI.getFrontendOpts().ProgramAction) {

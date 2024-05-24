@@ -30,10 +30,10 @@ struct ParsedSourceLocation {
 public:
   /// Construct a parsed source location from a string; the Filename is empty on
   /// error.
-  static ParsedSourceLocation FromString(StringRef Str) {
+  static ParsedSourceLocation FromString(llvm::StringRef Str) {
     ParsedSourceLocation PSL;
-    std::pair<StringRef, StringRef> ColSplit = Str.rsplit(':');
-    std::pair<StringRef, StringRef> LineSplit =
+    std::pair<llvm::StringRef, llvm::StringRef> ColSplit = Str.rsplit(':');
+    std::pair<llvm::StringRef, llvm::StringRef> LineSplit =
       ColSplit.first.rsplit(':');
 
     // If both tail splits were valid integers, return success.
@@ -53,7 +53,7 @@ public:
   /// Serialize ParsedSourceLocation back to a string.
   std::string ToString() const {
     return (llvm::Twine(FileName == "<stdin>" ? "-" : FileName) + ":" +
-            Twine(Line) + ":" + Twine(Column))
+            llvm::Twine(Line) + ":" + llvm::Twine(Column))
         .str();
   }
 };
@@ -77,12 +77,12 @@ struct ParsedSourceRange {
   ///
   /// If the end line and column are omitted, the starting line and columns
   /// are used as the end values.
-  static std::optional<ParsedSourceRange> fromString(StringRef Str) {
-    std::pair<StringRef, StringRef> RangeSplit = Str.rsplit('-');
+  static std::optional<ParsedSourceRange> fromString(llvm::StringRef Str) {
+    std::pair<llvm::StringRef, llvm::StringRef> RangeSplit = Str.rsplit('-');
     unsigned EndLine, EndColumn;
     bool HasEndLoc = false;
     if (!RangeSplit.second.empty()) {
-      std::pair<StringRef, StringRef> Split = RangeSplit.second.rsplit(':');
+      std::pair<llvm::StringRef, llvm::StringRef> Split = RangeSplit.second.rsplit(':');
       if (Split.first.getAsInteger(10, EndLine) ||
           Split.second.getAsInteger(10, EndColumn)) {
         // The string does not end in end_line:end_column, so the '-'
@@ -115,13 +115,13 @@ namespace llvm {
     class parser<clang::ParsedSourceLocation> final
       : public basic_parser<clang::ParsedSourceLocation> {
     public:
-      inline bool parse(Option &O, StringRef ArgName, StringRef ArgValue,
+      inline bool parse(Option &O, llvm::StringRef ArgName, llvm::StringRef ArgValue,
                  clang::ParsedSourceLocation &Val);
     };
 
     bool
     parser<clang::ParsedSourceLocation>::
-    parse(Option &O, StringRef ArgName, StringRef ArgValue,
+    parse(Option &O, llvm::StringRef ArgName, llvm::StringRef ArgValue,
           clang::ParsedSourceLocation &Val) {
       using namespace clang;
 

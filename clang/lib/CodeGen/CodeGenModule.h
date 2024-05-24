@@ -31,6 +31,7 @@
 #include "clang/Basic/XRayLists.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
@@ -241,7 +242,7 @@ public:
   /// Whether or not the stats we've gathered indicate any potential problems.
   bool hasDiagnostics() { return Missing || Mismatched; }
   /// Report potential problems we've found to \c Diags.
-  void reportDiagnostics(DiagnosticsEngine &Diags, StringRef MainFile);
+  void reportDiagnostics(DiagnosticsEngine &Diags, llvm::StringRef MainFile);
 };
 
 /// A pair of helper functions for a __block variable.
@@ -301,7 +302,7 @@ public:
 private:
   ASTContext &Context;
   const LangOptions &LangOpts;
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS; // Only used for debug info.
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS; // Only used for debug info.
   const HeaderSearchOptions &HeaderSearchOpts; // Only used for debug info.
   const PreprocessorOptions &PreprocessorOpts; // Only used for debug info.
   const CodeGenOptions &CodeGenOpts;
@@ -346,7 +347,7 @@ private:
   /// for emission and therefore should only be output if they are actually
   /// used. If a decl is in this, then it is known to have not been referenced
   /// yet.
-  llvm::DenseMap<StringRef, GlobalDecl> DeferredDecls;
+  llvm::DenseMap<llvm::StringRef, GlobalDecl> DeferredDecls;
 
   llvm::StringSet<llvm::BumpPtrAllocator> DeferredResolversToEmit;
 
@@ -389,7 +390,7 @@ private:
   /// multiversion function resolvers and ifuncs are defined and emitted.
   std::vector<GlobalDecl> MultiVersionFuncs;
 
-  llvm::MapVector<StringRef, llvm::TrackingVH<llvm::Constant>> Replacements;
+  llvm::MapVector<llvm::StringRef, llvm::TrackingVH<llvm::Constant>> Replacements;
 
   /// List of global values to be replaced with something else. Used when we
   /// want to replace a GlobalValue but can't identify it by its mangled name
@@ -427,7 +428,7 @@ private:
   CtorList GlobalDtors;
 
   /// An ordered map of canonical GlobalDecls to their mangled names.
-  llvm::MapVector<GlobalDecl, StringRef> MangledDeclNames;
+  llvm::MapVector<GlobalDecl, llvm::StringRef> MangledDeclNames;
   llvm::StringMap<GlobalDecl, llvm::BumpPtrAllocator> Manglings;
 
   /// Global annotations.
@@ -435,7 +436,7 @@ private:
 
   // Store deferred function annotations so they can be emitted at the end with
   // most up to date ValueDecl that will have all the inherited annotations.
-  llvm::DenseMap<StringRef, const ValueDecl *> DeferredAnnotations;
+  llvm::DenseMap<llvm::StringRef, const ValueDecl *> DeferredAnnotations;
 
   /// Map used to get unique annotation strings.
   llvm::StringMap<llvm::Constant*> AnnotationStrings;
@@ -494,7 +495,7 @@ private:
 
   /// Global variables with initializers whose order of initialization is set by
   /// init_priority attribute.
-  SmallVector<GlobalInitData, 8> PrioritizedCXXGlobalInits;
+  llvm::SmallVector<GlobalInitData, 8> PrioritizedCXXGlobalInits;
 
   /// Global destructor functions and arguments that need to run on termination.
   /// When UseSinitAndSterm is set, it instead contains sterm finalizer
@@ -502,7 +503,7 @@ private:
   typedef std::tuple<llvm::FunctionType *, llvm::WeakTrackingVH,
                      llvm::Constant *>
       CXXGlobalDtorsOrStermFinalizer_t;
-  SmallVector<CXXGlobalDtorsOrStermFinalizer_t, 8>
+  llvm::SmallVector<CXXGlobalDtorsOrStermFinalizer_t, 8>
       CXXGlobalDtorsOrStermFinalizers;
 
   typedef std::pair<OrderGlobalInitsOrStermFinalizers, llvm::Function *>
@@ -517,7 +518,7 @@ private:
 
   /// Global variables with sterm finalizers whose order of initialization is
   /// set by init_priority attribute.
-  SmallVector<StermFinalizerData, 8> PrioritizedCXXStermFinalizers;
+  llvm::SmallVector<StermFinalizerData, 8> PrioritizedCXXStermFinalizers;
 
   /// The complete set of modules that has been imported.
   llvm::SetVector<clang::Module *> ImportedModules;
@@ -527,10 +528,10 @@ private:
   llvm::SmallPtrSet<clang::Module *, 16> EmittedModuleInitializers;
 
   /// A vector of metadata strings for linker options.
-  SmallVector<llvm::MDNode *, 16> LinkerOptionsMetadata;
+  llvm::SmallVector<llvm::MDNode *, 16> LinkerOptionsMetadata;
 
   /// A vector of metadata strings for dependent libraries for ELF.
-  SmallVector<llvm::MDNode *, 16> ELFDependentLibraries;
+  llvm::SmallVector<llvm::MDNode *, 16> ELFDependentLibraries;
 
   /// @name Cache for Objective-C runtime types
   /// @{
@@ -610,7 +611,7 @@ private:
       GlobalTopLevelStmtBlockInFlight;
 
 public:
-  CodeGenModule(ASTContext &C, IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS,
+  CodeGenModule(ASTContext &C, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS,
                 const HeaderSearchOptions &headersearchopts,
                 const PreprocessorOptions &ppopts,
                 const CodeGenOptions &CodeGenOpts, llvm::Module &M,
@@ -703,7 +704,7 @@ public:
   Address createUnnamedGlobalFrom(const VarDecl &D, llvm::Constant *Constant,
                                   CharUnits Align);
 
-  bool lookupRepresentativeDecl(StringRef MangledName,
+  bool lookupRepresentativeDecl(llvm::StringRef MangledName,
                                 GlobalDecl &Result) const;
 
   llvm::Constant *getAtomicSetterHelperFnMap(QualType Ty) {
@@ -740,7 +741,7 @@ public:
 
   ASTContext &getContext() const { return Context; }
   const LangOptions &getLangOpts() const { return LangOpts; }
-  const IntrusiveRefCntPtr<llvm::vfs::FileSystem> &getFileSystem() const {
+  const llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> &getFileSystem() const {
     return FS;
   }
   const HeaderSearchOptions &getHeaderSearchOpts()
@@ -889,12 +890,12 @@ public:
   /// will be created and all uses of the old variable will be replaced with a
   /// bitcast to the new variable.
   llvm::GlobalVariable *
-  CreateOrReplaceCXXRuntimeVariable(StringRef Name, llvm::Type *Ty,
+  CreateOrReplaceCXXRuntimeVariable(llvm::StringRef Name, llvm::Type *Ty,
                                     llvm::GlobalValue::LinkageTypes Linkage,
                                     llvm::Align Alignment);
 
   llvm::Function *CreateGlobalInitOrCleanUpFunction(
-      llvm::FunctionType *ty, const Twine &name, const CGFunctionInfo &FI,
+      llvm::FunctionType *ty, const llvm::Twine &name, const CGFunctionInfo &FI,
       SourceLocation Loc = SourceLocation(), bool TLS = false,
       llvm::GlobalVariable::LinkageTypes Linkage =
           llvm::GlobalVariable::InternalLinkage);
@@ -960,7 +961,7 @@ public:
   GetAddrOfTemplateParamObject(const TemplateParamObjectDecl *TPO);
 
   /// Get the address of the thunk for the given global decl.
-  llvm::Constant *GetAddrOfThunk(StringRef Name, llvm::Type *FnTy,
+  llvm::Constant *GetAddrOfThunk(llvm::StringRef Name, llvm::Type *FnTy,
                                  GlobalDecl GD);
 
   /// Get a reference to the target of VD.
@@ -1016,7 +1017,7 @@ public:
   llvm::Type *getGenericBlockLiteralType();
 
   /// Gets the address of a block which requires no captures.
-  llvm::Constant *GetAddrOfGlobalBlock(const BlockExpr *BE, StringRef Name);
+  llvm::Constant *GetAddrOfGlobalBlock(const BlockExpr *BE, llvm::StringRef Name);
 
   /// Returns the address of a block which requires no caputres, or null if
   /// we've yet to emit the block for BE.
@@ -1037,7 +1038,7 @@ public:
   /// Return a pointer to a constant array for the given string literal.
   ConstantAddress
   GetAddrOfConstantStringFromLiteral(const StringLiteral *S,
-                                     StringRef Name = ".str");
+                                     llvm::StringRef Name = ".str");
 
   /// Return a pointer to a constant array for the given ObjCEncodeExpr node.
   ConstantAddress
@@ -1103,7 +1104,7 @@ public:
                                         unsigned BuiltinID);
 
   llvm::Function *getIntrinsic(unsigned IID,
-                               ArrayRef<llvm::Type *> Tys = std::nullopt);
+                               llvm::ArrayRef<llvm::Type *> Tys = std::nullopt);
 
   /// Emit code for a single top level declaration.
   void EmitTopLevelDecl(Decl *D);
@@ -1171,13 +1172,13 @@ public:
   /// and name. If \p AssumeConvergent is true, the call will have the
   /// convergent attribute added.
   llvm::FunctionCallee
-  CreateRuntimeFunction(llvm::FunctionType *Ty, StringRef Name,
+  CreateRuntimeFunction(llvm::FunctionType *Ty, llvm::StringRef Name,
                         llvm::AttributeList ExtraAttrs = llvm::AttributeList(),
                         bool Local = false, bool AssumeConvergent = false);
 
   /// Create a new runtime global variable with the specified type and name.
   llvm::Constant *CreateRuntimeVariable(llvm::Type *Ty,
-                                        StringRef Name);
+                                        llvm::StringRef Name);
 
   ///@name Custom Blocks Runtime Interfaces
   ///@{
@@ -1212,7 +1213,7 @@ public:
   llvm::Constant *EmitNullConstantForBase(const CXXRecordDecl *Record);
 
   /// Emit a general error that something can't be done.
-  void Error(SourceLocation loc, StringRef error);
+  void Error(SourceLocation loc, llvm::StringRef error);
 
   /// Print out an error that codegen doesn't support the specified stmt yet.
   void ErrorUnsupported(const Stmt *S, const char *Type);
@@ -1264,7 +1265,7 @@ public:
   /// contribute to the function attributes and calling convention.
   /// \param Attrs [out] - On return, the attribute list to use.
   /// \param CallingConv [out] - On return, the LLVM calling convention to use.
-  void ConstructAttributeList(StringRef Name, const CGFunctionInfo &Info,
+  void ConstructAttributeList(llvm::StringRef Name, const CGFunctionInfo &Info,
                               CGCalleeInfo CalleeInfo,
                               llvm::AttributeList &Attrs, unsigned &CallingConv,
                               bool AttrOnCallSite, bool IsThunk);
@@ -1272,16 +1273,16 @@ public:
   /// Adjust Memory attribute to ensure that the BE gets the right attribute
   // in order to generate the library call or the intrinsic for the function
   // name 'Name'.
-  void AdjustMemoryAttribute(StringRef Name, CGCalleeInfo CalleeInfo,
+  void AdjustMemoryAttribute(llvm::StringRef Name, CGCalleeInfo CalleeInfo,
                              llvm::AttributeList &Attrs);
 
   /// Like the overload taking a `Function &`, but intended specifically
   /// for frontends that want to build on Clang's target-configuration logic.
   void addDefaultFunctionDefinitionAttributes(llvm::AttrBuilder &attrs);
 
-  StringRef getMangledName(GlobalDecl GD);
-  StringRef getBlockMangledName(GlobalDecl GD, const BlockDecl *BD);
-  const GlobalDecl getMangledNameDecl(StringRef);
+  llvm::StringRef getMangledName(GlobalDecl GD);
+  llvm::StringRef getBlockMangledName(GlobalDecl GD, const BlockDecl *BD);
+  const GlobalDecl getMangledNameDecl(llvm::StringRef);
 
   void EmitTentativeDefinition(const VarDecl *D);
 
@@ -1292,13 +1293,13 @@ public:
   void RefreshTypeCacheForClass(const CXXRecordDecl *Class);
 
   /// Appends Opts to the "llvm.linker.options" metadata value.
-  void AppendLinkerOptions(StringRef Opts);
+  void AppendLinkerOptions(llvm::StringRef Opts);
 
   /// Appends a detect mismatch command to the linker options.
-  void AddDetectMismatch(StringRef Name, StringRef Value);
+  void AddDetectMismatch(llvm::StringRef Name, llvm::StringRef Value);
 
   /// Appends a dependent lib to the appropriate metadata value.
-  void AddDependentLib(StringRef Lib);
+  void AddDependentLib(llvm::StringRef Lib);
 
 
   llvm::GlobalVariable::LinkageTypes getFunctionLinkage(GlobalDecl GD);
@@ -1326,7 +1327,7 @@ public:
   void EmitGlobalAnnotations();
 
   /// Emit an annotation string.
-  llvm::Constant *EmitAnnotationString(StringRef Str);
+  llvm::Constant *EmitAnnotationString(llvm::StringRef Str);
 
   /// Emit the annotation's translation unit.
   llvm::Constant *EmitAnnotationUnit(SourceLocation Loc);
@@ -1357,13 +1358,13 @@ public:
 
   bool isInNoSanitizeList(SanitizerMask Kind, llvm::GlobalVariable *GV,
                           SourceLocation Loc, QualType Ty,
-                          StringRef Category = StringRef()) const;
+                          llvm::StringRef Category = llvm::StringRef()) const;
 
   /// Imbue XRay attributes to a function, applying the always/never attribute
   /// lists in the process. Returns true if we did imbue attributes this way,
   /// false otherwise.
   bool imbueXRayAttrs(llvm::Function *Fn, SourceLocation Loc,
-                      StringRef Category = StringRef()) const;
+                      llvm::StringRef Category = llvm::StringRef()) const;
 
   /// \returns true if \p Fn at \p Loc should be excluded from profile
   /// instrumentation by the SCL passed by \p -fprofile-list.
@@ -1390,7 +1391,7 @@ public:
 
   bool TryEmitBaseDestructorAsAlias(const CXXDestructorDecl *D);
 
-  llvm::GlobalValue *GetGlobalValue(StringRef Ref);
+  llvm::GlobalValue *GetGlobalValue(llvm::StringRef Ref);
 
   /// Set attributes which are common to any form of a global definition (alias,
   /// Objective-C method, function, global variable).
@@ -1398,7 +1399,7 @@ public:
   /// NOTE: This should only be called for definitions.
   void SetCommonAttributes(GlobalDecl GD, llvm::GlobalValue *GV);
 
-  void addReplacement(StringRef Name, llvm::Constant *C);
+  void addReplacement(llvm::StringRef Name, llvm::Constant *C);
 
   void addGlobalValReplacement(llvm::GlobalValue *GV, llvm::Constant *C);
 
@@ -1499,7 +1500,7 @@ public:
   ///
   /// A most-base class of a class C is defined as a recursive base class of C,
   /// including C itself, that does not have any bases.
-  SmallVector<const CXXRecordDecl *, 0>
+  llvm::SmallVector<const CXXRecordDecl *, 0>
   getMostBaseClasses(const CXXRecordDecl *RD);
 
   /// Get the declaration of std::terminate for the platform.
@@ -1575,7 +1576,7 @@ public:
                                   const AMDGPUWavesPerEUAttr *A);
 
   llvm::Constant *
-  GetOrCreateLLVMGlobal(StringRef MangledName, llvm::Type *Ty, LangAS AddrSpace,
+  GetOrCreateLLVMGlobal(llvm::StringRef MangledName, llvm::Type *Ty, LangAS AddrSpace,
                         const VarDecl *D,
                         ForDefinition_t IsForDefinition = NotForDefinition);
 
@@ -1596,7 +1597,7 @@ public:
 
 private:
   llvm::Constant *GetOrCreateLLVMFunction(
-      StringRef MangledName, llvm::Type *Ty, GlobalDecl D, bool ForVTable,
+      llvm::StringRef MangledName, llvm::Type *Ty, GlobalDecl D, bool ForVTable,
       bool DontDefer = false, bool IsThunk = false,
       llvm::AttributeList ExtraAttrs = llvm::AttributeList(),
       ForDefinition_t IsForDefinition = NotForDefinition);
@@ -1617,7 +1618,7 @@ private:
   // multiversion function kind the function is now known to be. This function
   // is responsible for performing such mangled name updates.
   void UpdateMultiVersionNames(GlobalDecl GD, const FunctionDecl *FD,
-                               StringRef &CurName);
+                               llvm::StringRef &CurName);
 
   bool GetCPUAndFeaturesAttributes(GlobalDecl GD,
                                    llvm::AttrBuilder &AttrBuilder,
@@ -1769,19 +1770,19 @@ private:
 
   /// Helper function for getDefaultFunctionAttributes. Builds a set of function
   /// attributes which can be simply added to a function.
-  void getTrivialDefaultFunctionAttributes(StringRef Name, bool HasOptnone,
+  void getTrivialDefaultFunctionAttributes(llvm::StringRef Name, bool HasOptnone,
                                            bool AttrOnCallSite,
                                            llvm::AttrBuilder &FuncAttrs);
 
   /// Helper function for ConstructAttributeList and
   /// addDefaultFunctionDefinitionAttributes.  Builds a set of function
   /// attributes to add to a function with the given properties.
-  void getDefaultFunctionAttributes(StringRef Name, bool HasOptnone,
+  void getDefaultFunctionAttributes(llvm::StringRef Name, bool HasOptnone,
                                     bool AttrOnCallSite,
                                     llvm::AttrBuilder &FuncAttrs);
 
   llvm::Metadata *CreateMetadataIdentifierImpl(QualType T, MetadataTypeMap &Map,
-                                               StringRef Suffix);
+                                               llvm::StringRef Suffix);
 };
 
 }  // end namespace CodeGen

@@ -21,7 +21,7 @@ namespace clang::tidy::misc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/misc/use-anonymous-namespace.html
 class UseAnonymousNamespaceCheck : public ClangTidyCheck {
 public:
-  UseAnonymousNamespaceCheck(StringRef Name, ClangTidyContext *Context);
+  UseAnonymousNamespaceCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

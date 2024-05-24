@@ -55,7 +55,7 @@ public:
 
   bool hasSjLjLowering() const override { return true; }
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
   BuiltinVaListKind getBuiltinVaListKind() const override {
     return TargetInfo::VoidPtrBuiltinVaList;
@@ -72,7 +72,7 @@ public:
 
   std::string_view getClobbers() const override { return ""; }
 
-  ArrayRef<const char *> getGCCRegNames() const override {
+  llvm::ArrayRef<const char *> getGCCRegNames() const override {
     static const char *const GCCRegNames[] = {
         // Regular registers
         "sx0",  "sx1",  "sx2",  "sx3",  "sx4",  "sx5",  "sx6",  "sx7",
@@ -87,7 +87,7 @@ public:
     return llvm::ArrayRef(GCCRegNames);
   }
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     static const TargetInfo::GCCRegAlias GCCRegAliases[] = {
         {{"s0"}, "sx0"},
         {{"s1"}, "sx1"},

@@ -1020,7 +1020,7 @@ TEST(RenameTest, ObjCWithinFileRename) {
       auto RenameResult =
           rename({RenamePos, T.NewName, AST, testPath(TU.Filename),
                   getVFSFromAST(AST), Index.get()});
-      if (std::optional<StringRef> Expected = T.Expected) {
+      if (std::optional<llvm::StringRef> Expected = T.Expected) {
         ASSERT_TRUE(bool(RenameResult)) << RenameResult.takeError();
         ASSERT_EQ(1u, RenameResult->GlobalChanges.size());
         EXPECT_EQ(

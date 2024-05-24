@@ -108,8 +108,8 @@ using namespace ento;
 
 namespace {
 
-static const StringRef HandleTypeName = "zx_handle_t";
-static const StringRef ErrorTypeName = "zx_status_t";
+static const llvm::StringRef HandleTypeName = "zx_handle_t";
+static const llvm::StringRef ErrorTypeName = "zx_status_t";
 
 class HandleState {
 private:
@@ -154,7 +154,7 @@ public:
     ID.AddPointer(ErrorSym);
   }
 
-  LLVM_DUMP_METHOD void dump(raw_ostream &OS) const {
+  LLVM_DUMP_METHOD void dump(llvm::raw_ostream &OS) const {
     switch (K) {
 #define CASE(ID)                                                               \
   case ID:                                                                     \
@@ -207,7 +207,7 @@ public:
                                      const CallEvent *Call,
                                      PointerEscapeKind Kind) const;
 
-  ExplodedNode *reportLeaks(ArrayRef<SymbolRef> LeakedHandles,
+  ExplodedNode *reportLeaks(llvm::ArrayRef<SymbolRef> LeakedHandles,
                             CheckerContext &C, ExplodedNode *Pred) const;
 
   void reportDoubleRelease(SymbolRef HandleSym, const SourceRange &Range,
@@ -221,9 +221,9 @@ public:
 
   void reportBug(SymbolRef Sym, ExplodedNode *ErrorNode, CheckerContext &C,
                  const SourceRange *Range, const BugType &Type,
-                 StringRef Msg) const;
+                 llvm::StringRef Msg) const;
 
-  void printState(raw_ostream &Out, ProgramStateRef State, const char *NL,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State, const char *NL,
                   const char *Sep) const override;
 };
 } // end anonymous namespace
@@ -262,16 +262,16 @@ public:
     return true;
   }
 
-  SmallVector<SymbolRef, 1024> GetSymbols() { return Symbols; }
+  llvm::SmallVector<SymbolRef, 1024> GetSymbols() { return Symbols; }
 
 private:
-  SmallVector<SymbolRef, 1024> Symbols;
+  llvm::SmallVector<SymbolRef, 1024> Symbols;
 };
 } // end anonymous namespace
 
 /// Returns the symbols extracted from the argument or empty vector if it cannot
 /// be found. It is unlikely to have over 1024 symbols in one argument.
-static SmallVector<SymbolRef, 1024>
+static llvm::SmallVector<SymbolRef, 1024>
 getFuchsiaHandleSymbols(QualType QT, SVal Arg, ProgramStateRef State) {
   int PtrToHandleLevel = 0;
   while (QT->isAnyPointerType() || QT->isReferenceType()) {
@@ -333,7 +333,7 @@ void FuchsiaHandleChecker::checkPreCall(const CallEvent &Call,
     if (Arg >= FuncDecl->getNumParams())
       break;
     const ParmVarDecl *PVD = FuncDecl->getParamDecl(Arg);
-    SmallVector<SymbolRef, 1024> Handles =
+    llvm::SmallVector<SymbolRef, 1024> Handles =
         getFuchsiaHandleSymbols(PVD->getType(), Call.getArgSVal(Arg), State);
 
     // Handled in checkPostCall.
@@ -414,7 +414,7 @@ void FuchsiaHandleChecker::checkPostCall(const CallEvent &Call,
       break;
     const ParmVarDecl *PVD = FuncDecl->getParamDecl(Arg);
     unsigned ParamDiagIdx = PVD->getFunctionScopeIndex() + 1;
-    SmallVector<SymbolRef, 1024> Handles =
+    llvm::SmallVector<SymbolRef, 1024> Handles =
         getFuchsiaHandleSymbols(PVD->getType(), Call.getArgSVal(Arg), State);
 
     for (SymbolRef Handle : Handles) {
@@ -503,7 +503,7 @@ void FuchsiaHandleChecker::checkPostCall(const CallEvent &Call,
 void FuchsiaHandleChecker::checkDeadSymbols(SymbolReaper &SymReaper,
                                             CheckerContext &C) const {
   ProgramStateRef State = C.getState();
-  SmallVector<SymbolRef, 2> LeakedSyms;
+  llvm::SmallVector<SymbolRef, 2> LeakedSyms;
   HStateMapTy TrackedHandles = State->get<HStateMap>();
   for (auto &CurItem : TrackedHandles) {
     SymbolRef ErrorSym = CurItem.second.getErrorSym();
@@ -581,7 +581,7 @@ ProgramStateRef FuchsiaHandleChecker::checkPointerEscape(
       if (Arg >= FuncDecl->getNumParams())
         break;
       const ParmVarDecl *PVD = FuncDecl->getParamDecl(Arg);
-      SmallVector<SymbolRef, 1024> Handles =
+      llvm::SmallVector<SymbolRef, 1024> Handles =
           getFuchsiaHandleSymbols(PVD->getType(), Call->getArgSVal(Arg), State);
       for (SymbolRef Handle : Handles) {
         if (hasFuchsiaAttr<UseHandleAttr>(PVD) ||
@@ -608,7 +608,7 @@ ProgramStateRef FuchsiaHandleChecker::checkPointerEscape(
 }
 
 ExplodedNode *
-FuchsiaHandleChecker::reportLeaks(ArrayRef<SymbolRef> LeakedHandles,
+FuchsiaHandleChecker::reportLeaks(llvm::ArrayRef<SymbolRef> LeakedHandles,
                                   CheckerContext &C, ExplodedNode *Pred) const {
   ExplodedNode *ErrNode = C.generateNonFatalErrorNode(C.getState(), Pred);
   for (SymbolRef LeakedHandle : LeakedHandles) {
@@ -645,7 +645,7 @@ void FuchsiaHandleChecker::reportUseAfterFree(SymbolRef HandleSym,
 void FuchsiaHandleChecker::reportBug(SymbolRef Sym, ExplodedNode *ErrorNode,
                                      CheckerContext &C,
                                      const SourceRange *Range,
-                                     const BugType &Type, StringRef Msg) const {
+                                     const BugType &Type, llvm::StringRef Msg) const {
   if (!ErrorNode)
     return;
 
@@ -680,7 +680,7 @@ bool ento::shouldRegisterFuchsiaHandleChecker(const CheckerManager &mgr) {
   return true;
 }
 
-void FuchsiaHandleChecker::printState(raw_ostream &Out, ProgramStateRef State,
+void FuchsiaHandleChecker::printState(llvm::raw_ostream &Out, ProgramStateRef State,
                                       const char *NL, const char *Sep) const {
 
   HStateMapTy StateMap = State->get<HStateMap>();

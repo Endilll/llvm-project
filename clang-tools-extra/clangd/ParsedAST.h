@@ -85,8 +85,8 @@ public:
   /// This function returns top-level decls present in the main file of the AST.
   /// The result does not include the decls that come from the preamble.
   /// (These should be const, but RecursiveASTVisitor requires Decl*).
-  ArrayRef<Decl *> getLocalTopLevelDecls();
-  ArrayRef<const Decl *> getLocalTopLevelDecls() const;
+  llvm::ArrayRef<Decl *> getLocalTopLevelDecls();
+  llvm::ArrayRef<const Decl *> getLocalTopLevelDecls() const;
 
   llvm::ArrayRef<Diag> getDiagnostics() const;
 

@@ -21,7 +21,7 @@ protected:
     return getMicrosoftStyle(FormatStyle::LK_CSharp);
   }
 
-  static std::string format(StringRef Code, unsigned Offset, unsigned Length,
+  static std::string format(llvm::StringRef Code, unsigned Offset, unsigned Length,
                             const FormatStyle &Style) {
     LLVM_DEBUG(llvm::errs() << "---\n");
     LLVM_DEBUG(llvm::errs() << Code << "\n\n");
@@ -34,7 +34,7 @@ protected:
   }
 
   static std::string
-  format(StringRef Code,
+  format(llvm::StringRef Code,
          const FormatStyle &Style = getMicrosoftStyle(FormatStyle::LK_CSharp)) {
     return format(Code, 0, Code.size(), Style);
   }

@@ -27,6 +27,7 @@
 #include "clang/Lex/PPConditionalDirectiveRecord.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Rewrite/Core/Rewriter.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringSet.h"
 #include "llvm/Support/Path.h"
@@ -114,11 +115,11 @@ public:
     return *Summaries;
   }
 
-  ObjCMigrateASTConsumer(StringRef migrateDir, unsigned astMigrateActions,
+  ObjCMigrateASTConsumer(llvm::StringRef migrateDir, unsigned astMigrateActions,
                          FileRemapper &remapper, FileManager &fileMgr,
                          const PPConditionalDirectiveRecord *PPRec,
                          Preprocessor &PP, bool isOutputFile,
-                         ArrayRef<std::string> AllowList)
+                         llvm::ArrayRef<std::string> AllowList)
       : MigrateDir(migrateDir), ASTMigrateActions(astMigrateActions),
         NSIntegerTypedefed(nullptr), NSUIntegerTypedefed(nullptr),
         Remapper(remapper), FileMgr(fileMgr), PPRec(PPRec), PP(PP),
@@ -148,7 +149,7 @@ protected:
 
   void HandleTranslationUnit(ASTContext &Ctx) override;
 
-  bool canModifyFile(StringRef Path) {
+  bool canModifyFile(llvm::StringRef Path) {
     if (AllowListFilenames.empty())
       return true;
     return AllowListFilenames.contains(llvm::sys::path::filename(Path));
@@ -182,7 +183,7 @@ protected:
 } // end anonymous namespace
 
 ObjCMigrateAction::ObjCMigrateAction(
-    std::unique_ptr<FrontendAction> WrappedAction, StringRef migrateDir,
+    std::unique_ptr<FrontendAction> WrappedAction, llvm::StringRef migrateDir,
     unsigned migrateAction)
     : WrapperFrontendAction(std::move(WrappedAction)), MigrateDir(migrateDir),
       ObjCMigAction(migrateAction), CompInst(nullptr) {
@@ -191,7 +192,7 @@ ObjCMigrateAction::ObjCMigrateAction(
 }
 
 std::unique_ptr<ASTConsumer>
-ObjCMigrateAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+ObjCMigrateAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   PPConditionalDirectiveRecord *
     PPRec = new PPConditionalDirectiveRecord(CompInst->getSourceManager());
   CI.getPreprocessor().addPPCallbacks(std::unique_ptr<PPCallbacks>(PPRec));
@@ -467,7 +468,7 @@ static void rewriteToObjCProperty(const ObjCMethodDecl *Getter,
   }
 
   std::string PropertyNameString = Getter->getNameAsString();
-  StringRef PropertyName(PropertyNameString);
+  llvm::StringRef PropertyName(PropertyNameString);
   if (LengthOfPrefix > 0) {
     if (!LParenAdded) {
       PropertyString += "(getter=";
@@ -519,7 +520,7 @@ static void rewriteToObjCProperty(const ObjCMethodDecl *Getter,
   if (LengthOfPrefix > 0) {
     // property name must strip off "is" and lower case the first character
     // after that; e.g. isContinuous will become continuous.
-    StringRef PropertyNameStringRef(PropertyNameString);
+    llvm::StringRef PropertyNameStringRef(PropertyNameString);
     PropertyNameStringRef = PropertyNameStringRef.drop_front(LengthOfPrefix);
     PropertyNameString = std::string(PropertyNameStringRef);
     bool NoLowering = (isUppercase(PropertyNameString[0]) &&
@@ -561,7 +562,7 @@ static void rewriteToObjCProperty(const ObjCMethodDecl *Getter,
 
 static bool IsCategoryNameWithDeprecatedSuffix(ObjCContainerDecl *D) {
   if (ObjCCategoryDecl *CatDecl = dyn_cast<ObjCCategoryDecl>(D)) {
-    StringRef Name = CatDecl->getName();
+    llvm::StringRef Name = CatDecl->getName();
     return Name.ends_with("Deprecated");
   }
   return false;
@@ -688,8 +689,8 @@ static bool rewriteToObjCInterfaceDecl(const ObjCInterfaceDecl *IDecl,
   return true;
 }
 
-static StringRef GetUnsignedName(StringRef NSIntegerName) {
-  StringRef UnsignedName = llvm::StringSwitch<StringRef>(NSIntegerName)
+static llvm::StringRef GetUnsignedName(llvm::StringRef NSIntegerName) {
+  llvm::StringRef UnsignedName = llvm::StringSwitch<llvm::StringRef>(NSIntegerName)
     .Case("int8_t", "uint8_t")
     .Case("int16_t", "uint16_t")
     .Case("int32_t", "uint32_t")
@@ -702,7 +703,7 @@ static StringRef GetUnsignedName(StringRef NSIntegerName) {
 static bool rewriteToNSEnumDecl(const EnumDecl *EnumDcl,
                                 const TypedefDecl *TypedefDcl,
                                 const NSAPI &NS, edit::Commit &commit,
-                                StringRef NSIntegerName,
+                                llvm::StringRef NSIntegerName,
                                 bool NSOptions) {
   std::string ClassString;
   if (NSOptions) {
@@ -920,7 +921,7 @@ bool ObjCMigrateASTConsumer::migrateNSEnumDecl(ASTContext &Ctx,
     return false;
 
   QualType qt = TypedefDcl->getTypeSourceInfo()->getType();
-  StringRef NSIntegerName = NSAPIObj->GetNSIntegralKind(qt);
+  llvm::StringRef NSIntegerName = NSAPIObj->GetNSIntegralKind(qt);
 
   if (NSIntegerName.empty()) {
     // Also check for typedef enum {...} TD;
@@ -1065,7 +1066,7 @@ static bool TypeIsInnerPointer(QualType T) {
 }
 
 /// Check whether the two versions match.
-static bool versionsMatch(const VersionTuple &X, const VersionTuple &Y) {
+static bool versionsMatch(const llvm::VersionTuple &X, const llvm::VersionTuple &Y) {
   return (X == Y);
 }
 
@@ -1080,13 +1081,13 @@ static bool AvailabilityAttrsMatch(Attr *At1, Attr *At2) {
     return true;
   const AvailabilityAttr *AA2 = cast<AvailabilityAttr>(At2);
 
-  VersionTuple Introduced1 = AA1->getIntroduced();
-  VersionTuple Deprecated1 = AA1->getDeprecated();
-  VersionTuple Obsoleted1 = AA1->getObsoleted();
+  llvm::VersionTuple Introduced1 = AA1->getIntroduced();
+  llvm::VersionTuple Deprecated1 = AA1->getDeprecated();
+  llvm::VersionTuple Obsoleted1 = AA1->getObsoleted();
   bool IsUnavailable1 = AA1->getUnavailable();
-  VersionTuple Introduced2 = AA2->getIntroduced();
-  VersionTuple Deprecated2 = AA2->getDeprecated();
-  VersionTuple Obsoleted2 = AA2->getObsoleted();
+  llvm::VersionTuple Introduced2 = AA2->getIntroduced();
+  llvm::VersionTuple Deprecated2 = AA2->getDeprecated();
+  llvm::VersionTuple Obsoleted2 = AA2->getObsoleted();
   bool IsUnavailable2 = AA2->getUnavailable();
   return (versionsMatch(Introduced1, Introduced2) &&
           versionsMatch(Deprecated1, Deprecated2) &&
@@ -1175,7 +1176,7 @@ bool ObjCMigrateASTConsumer::migrateProperty(ASTContext &Ctx,
   unsigned LengthOfPrefix = 0;
   if (!SetterMethod) {
     // try a different naming convention for getter: isXxxxx
-    StringRef getterNameString = getterName->getName();
+    llvm::StringRef getterNameString = getterName->getName();
     bool IsPrefix = getterNameString.starts_with("is");
     // Note that we don't want to change an isXXX method of retainable object
     // type to property (readonly or otherwise).
@@ -1307,7 +1308,7 @@ void ObjCMigrateASTConsumer::migrateFactoryMethod(ASTContext &Ctx,
     return;
 
   std::string StringClassName = std::string(IDecl->getName());
-  StringRef LoweredClassName(StringClassName);
+  llvm::StringRef LoweredClassName(StringClassName);
   std::string StringLoweredClassName = LoweredClassName.lower();
   LoweredClassName = StringLoweredClassName;
 
@@ -1319,7 +1320,7 @@ void ObjCMigrateASTConsumer::migrateFactoryMethod(ASTContext &Ctx,
 
   std::string MethodName = std::string(MethodIdName->getName());
   if (OIT_Family == OIT_Singleton || OIT_Family == OIT_ReturnsSelf) {
-    StringRef STRefMethodName(MethodName);
+    llvm::StringRef STRefMethodName(MethodName);
     size_t len = 0;
     if (STRefMethodName.starts_with("standard"))
       len = strlen("standard");
@@ -1332,14 +1333,14 @@ void ObjCMigrateASTConsumer::migrateFactoryMethod(ASTContext &Ctx,
     MethodName = std::string(STRefMethodName.substr(len));
   }
   std::string MethodNameSubStr = MethodName.substr(0, 3);
-  StringRef MethodNamePrefix(MethodNameSubStr);
+  llvm::StringRef MethodNamePrefix(MethodNameSubStr);
   std::string StringLoweredMethodNamePrefix = MethodNamePrefix.lower();
   MethodNamePrefix = StringLoweredMethodNamePrefix;
   size_t Ix = LoweredClassName.rfind(MethodNamePrefix);
-  if (Ix == StringRef::npos)
+  if (Ix == llvm::StringRef::npos)
     return;
   std::string ClassNamePostfix = std::string(LoweredClassName.substr(Ix));
-  StringRef LoweredMethodName(MethodName);
+  llvm::StringRef LoweredMethodName(MethodName);
   std::string StringLoweredMethodName = LoweredMethodName.lower();
   LoweredMethodName = StringLoweredMethodName;
   if (!LoweredMethodName.starts_with(ClassNamePostfix))
@@ -1746,10 +1747,10 @@ class RewritesReceiver : public edit::EditsReceiver {
 public:
   RewritesReceiver(Rewriter &Rewrite) : Rewrite(Rewrite) { }
 
-  void insert(SourceLocation loc, StringRef text) override {
+  void insert(SourceLocation loc, llvm::StringRef text) override {
     Rewrite.InsertText(loc, text);
   }
-  void replace(CharSourceRange range, StringRef text) override {
+  void replace(CharSourceRange range, llvm::StringRef text) override {
     Rewrite.ReplaceText(range.getBegin(), Rewrite.getRangeSize(range), text);
   }
 };
@@ -1783,8 +1784,8 @@ private:
       unsigned Offset;
       std::tie(FID, Offset) = SourceMgr.getDecomposedLoc(Loc);
       assert(FID.isValid());
-      SmallString<200> Path =
-          StringRef(SourceMgr.getFileEntryRefForID(FID)->getName());
+      llvm::SmallString<200> Path =
+          llvm::StringRef(SourceMgr.getFileEntryRefForID(FID)->getName());
       llvm::sys::fs::make_absolute(Path);
       OS << "  \"file\": \"";
       OS.write_escaped(Path.str()) << "\",\n";
@@ -1804,19 +1805,19 @@ private:
       OS << "  \"remove\": " << Length << ",\n";
     }
 
-    void writeText(StringRef Text) {
+    void writeText(llvm::StringRef Text) {
       OS << "  \"text\": \"";
       OS.write_escaped(Text) << "\",\n";
     }
   };
 
-  void insert(SourceLocation Loc, StringRef Text) override {
+  void insert(SourceLocation Loc, llvm::StringRef Text) override {
     EntryWriter Writer(SourceMgr, OS);
     Writer.writeLoc(Loc);
     Writer.writeText(Text);
   }
 
-  void replace(CharSourceRange Range, StringRef Text) override {
+  void replace(CharSourceRange Range, llvm::StringRef Text) override {
     EntryWriter Writer(SourceMgr, OS);
     Writer.writeLoc(Range.getBegin());
     Writer.writeRemove(Range);
@@ -1959,12 +1960,12 @@ void ObjCMigrateASTConsumer::HandleTranslationUnit(ASTContext &Ctx) {
     OptionalFileEntryRef file =
         Ctx.getSourceManager().getFileEntryRefForID(FID);
     assert(file);
-    SmallString<512> newText;
+    llvm::SmallString<512> newText;
     llvm::raw_svector_ostream vecOS(newText);
     buf.write(vecOS);
     std::unique_ptr<llvm::MemoryBuffer> memBuf(
         llvm::MemoryBuffer::getMemBufferCopy(newText.str(), file->getName()));
-    SmallString<64> filePath(file->getName());
+    llvm::SmallString<64> filePath(file->getName());
     FileMgr.FixupRelativePath(filePath);
     Remapper.remap(filePath.str(), std::move(memBuf));
   }
@@ -1981,7 +1982,7 @@ bool MigrateSourceAction::BeginInvocation(CompilerInstance &CI) {
   return true;
 }
 
-static std::vector<std::string> getAllowListFilenames(StringRef DirPath) {
+static std::vector<std::string> getAllowListFilenames(llvm::StringRef DirPath) {
   using namespace llvm::sys::fs;
   using namespace llvm::sys::path;
 
@@ -2001,7 +2002,7 @@ static std::vector<std::string> getAllowListFilenames(StringRef DirPath) {
 }
 
 std::unique_ptr<ASTConsumer>
-MigrateSourceAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+MigrateSourceAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   PPConditionalDirectiveRecord *
     PPRec = new PPConditionalDirectiveRecord(CI.getSourceManager());
   unsigned ObjCMTAction = CI.getFrontendOpts().ObjCMTAction;
@@ -2065,7 +2066,7 @@ class RemapFileParser {
 public:
   RemapFileParser(FileManager &FileMgr) : FileMgr(FileMgr) { }
 
-  bool parse(StringRef File, SmallVectorImpl<EditEntry> &Entries) {
+  bool parse(llvm::StringRef File, llvm::SmallVectorImpl<EditEntry> &Entries) {
     using namespace llvm::yaml;
 
     llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> FileBufOrErr =
@@ -2099,7 +2100,7 @@ public:
 
 private:
   void parseEdit(llvm::yaml::MappingNode *Node,
-                 SmallVectorImpl<EditEntry> &Entries) {
+                 llvm::SmallVectorImpl<EditEntry> &Entries) {
     using namespace llvm::yaml;
     EditEntry Entry;
     bool Ignore = false;
@@ -2109,14 +2110,14 @@ private:
       ScalarNode *KeyString = dyn_cast<ScalarNode>((*KVI).getKey());
       if (!KeyString)
         continue;
-      SmallString<10> KeyStorage;
-      StringRef Key = KeyString->getValue(KeyStorage);
+      llvm::SmallString<10> KeyStorage;
+      llvm::StringRef Key = KeyString->getValue(KeyStorage);
 
       ScalarNode *ValueString = dyn_cast<ScalarNode>((*KVI).getValue());
       if (!ValueString)
         continue;
-      SmallString<64> ValueStorage;
-      StringRef Val = ValueString->getValue(ValueStorage);
+      llvm::SmallString<64> ValueStorage;
+      llvm::StringRef Val = ValueString->getValue(ValueStorage);
 
       if (Key == "file") {
         if (auto File = FileMgr.getOptionalFileRef(Val))
@@ -2140,14 +2141,14 @@ private:
 };
 } // end anonymous namespace
 
-static bool reportDiag(const Twine &Err, DiagnosticsEngine &Diag) {
+static bool reportDiag(const llvm::Twine &Err, DiagnosticsEngine &Diag) {
   Diag.Report(Diag.getCustomDiagID(DiagnosticsEngine::Error, "%0"))
       << Err.str();
   return true;
 }
 
 static std::string applyEditsToTemp(FileEntryRef FE,
-                                    ArrayRef<EditEntry> Edits,
+                                    llvm::ArrayRef<EditEntry> Edits,
                                     FileManager &FileMgr,
                                     DiagnosticsEngine &Diag) {
   using namespace llvm::sys;
@@ -2156,7 +2157,7 @@ static std::string applyEditsToTemp(FileEntryRef FE,
   FileID FID = SM.createFileID(FE, SourceLocation(), SrcMgr::C_User);
   LangOptions LangOpts;
   edit::EditedSource Editor(SM, LangOpts);
-  for (ArrayRef<EditEntry>::iterator
+  for (llvm::ArrayRef<EditEntry>::iterator
         I = Edits.begin(), E = Edits.end(); I != E; ++I) {
     const EditEntry &Entry = *I;
     assert(Entry.File == FE);
@@ -2184,11 +2185,11 @@ static std::string applyEditsToTemp(FileEntryRef FE,
   Editor.applyRewrites(Rec, /*adjustRemovals=*/false);
 
   const RewriteBuffer *Buf = rewriter.getRewriteBufferFor(FID);
-  SmallString<512> NewText;
+  llvm::SmallString<512> NewText;
   llvm::raw_svector_ostream OS(NewText);
   Buf->write(OS);
 
-  SmallString<64> TempPath;
+  llvm::SmallString<64> TempPath;
   int FD;
   if (fs::createTemporaryFile(path::filename(FE.getName()),
                               path::extension(FE.getName()).drop_front(), FD,
@@ -2206,7 +2207,7 @@ static std::string applyEditsToTemp(FileEntryRef FE,
 
 bool arcmt::getFileRemappingsFromFileList(
                         std::vector<std::pair<std::string,std::string> > &remap,
-                        ArrayRef<StringRef> remapFiles,
+                        llvm::ArrayRef<llvm::StringRef> remapFiles,
                         DiagnosticConsumer *DiagClient) {
   bool hasErrorOccurred = false;
 
@@ -2214,8 +2215,8 @@ bool arcmt::getFileRemappingsFromFileList(
   FileManager FileMgr(FSOpts);
   RemapFileParser Parser(FileMgr);
 
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
       new DiagnosticsEngine(DiagID, new DiagnosticOptions,
                             DiagClient, /*ShouldOwnClient=*/false));
 
@@ -2225,13 +2226,13 @@ bool arcmt::getFileRemappingsFromFileList(
 
   llvm::DenseSet<EditEntry> EntriesSet;
 
-  for (ArrayRef<StringRef>::iterator
+  for (llvm::ArrayRef<llvm::StringRef>::iterator
          I = remapFiles.begin(), E = remapFiles.end(); I != E; ++I) {
-    SmallVector<EditEntry, 16> Entries;
+    llvm::SmallVector<EditEntry, 16> Entries;
     if (Parser.parse(*I, Entries))
       continue;
 
-    for (SmallVectorImpl<EditEntry>::iterator
+    for (llvm::SmallVectorImpl<EditEntry>::iterator
            EI = Entries.begin(), EE = Entries.end(); EI != EE; ++EI) {
       EditEntry &Entry = *EI;
       if (!Entry.File)

@@ -112,7 +112,7 @@ public:
   ///
   /// \param indentNewLines if true new lines in the string are indented
   /// using the indentation of the source line in position \p Loc.
-  bool InsertText(SourceLocation Loc, StringRef Str,
+  bool InsertText(SourceLocation Loc, llvm::StringRef Str,
                   bool InsertAfter = true, bool indentNewLines = false);
 
   /// InsertTextAfter - Insert the specified string at the specified location in
@@ -120,20 +120,20 @@ public:
   ///  the input location was not rewritable, false otherwise.  Text is
   ///  inserted after any other text that has been previously inserted
   ///  at the some point (the default behavior for InsertText).
-  bool InsertTextAfter(SourceLocation Loc, StringRef Str) {
+  bool InsertTextAfter(SourceLocation Loc, llvm::StringRef Str) {
     return InsertText(Loc, Str);
   }
 
   /// Insert the specified string after the token in the
   /// specified location.
-  bool InsertTextAfterToken(SourceLocation Loc, StringRef Str);
+  bool InsertTextAfterToken(SourceLocation Loc, llvm::StringRef Str);
 
   /// InsertText - Insert the specified string at the specified location in the
   /// original buffer.  This method returns true (and does nothing) if the input
   /// location was not rewritable, false otherwise.  Text is
   /// inserted before any other text that has been previously inserted
   /// at the some point.
-  bool InsertTextBefore(SourceLocation Loc, StringRef Str) {
+  bool InsertTextBefore(SourceLocation Loc, llvm::StringRef Str) {
     return InsertText(Loc, Str, false);
   }
 
@@ -156,19 +156,19 @@ public:
   /// buffer with a new string.  This is effectively a combined "remove/insert"
   /// operation.
   bool ReplaceText(SourceLocation Start, unsigned OrigLength,
-                   StringRef NewStr);
+                   llvm::StringRef NewStr);
 
   /// ReplaceText - This method replaces a range of characters in the input
   /// buffer with a new string.  This is effectively a combined "remove/insert"
   /// operation.
-  bool ReplaceText(CharSourceRange range, StringRef NewStr) {
+  bool ReplaceText(CharSourceRange range, llvm::StringRef NewStr) {
     return ReplaceText(range.getBegin(), getRangeSize(range), NewStr);
   }
 
   /// ReplaceText - This method replaces a range of characters in the input
   /// buffer with a new string.  This is effectively a combined "remove/insert"
   /// operation.
-  bool ReplaceText(SourceRange range, StringRef NewStr) {
+  bool ReplaceText(SourceRange range, llvm::StringRef NewStr) {
     return ReplaceText(range.getBegin(), getRangeSize(range), NewStr);
   }
 

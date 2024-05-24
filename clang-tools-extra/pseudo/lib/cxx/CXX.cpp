@@ -96,7 +96,7 @@ unsigned numKind(const Token &Tok) {
 // RHS is expected to contain a single terminal.
 // Returns the corresponding token.
 const Token &onlyToken(tok::TokenKind Kind,
-                       const ArrayRef<const ForestNode *> RHS,
+                       const llvm::ArrayRef<const ForestNode *> RHS,
                        const TokenStream &Tokens) {
   assert(RHS.size() == 1 && RHS.front()->symbol() == tokenSymbol(Kind));
   return Tokens.tokens()[RHS.front()->startTokenIndex()];
@@ -104,7 +104,7 @@ const Token &onlyToken(tok::TokenKind Kind,
 // RHS is expected to contain a single symbol.
 // Returns the corresponding ForestNode.
 const ForestNode &onlySymbol(SymbolID Kind,
-                             const ArrayRef<const ForestNode *> RHS,
+                             const llvm::ArrayRef<const ForestNode *> RHS,
                              const TokenStream &Tokens) {
   assert(RHS.size() == 1 && RHS.front()->symbol() == Kind);
   return *RHS.front();

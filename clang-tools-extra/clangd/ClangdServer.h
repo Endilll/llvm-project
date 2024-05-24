@@ -217,7 +217,7 @@ public:
   /// constructor will receive onDiagnosticsReady callback.
   /// Version identifies this snapshot and is propagated to ASTs, preambles,
   /// diagnostics etc built from it. If empty, a version number is generated.
-  void addDocument(PathRef File, StringRef Contents,
+  void addDocument(PathRef File, llvm::StringRef Contents,
                    llvm::StringRef Version = "null",
                    WantDiagnostics WD = WantDiagnostics::Auto,
                    bool ForceRebuild = false);
@@ -293,15 +293,15 @@ public:
                   Callback<std::vector<InlayHint>>);
 
   /// Retrieve the top symbols from the workspace matching a query.
-  void workspaceSymbols(StringRef Query, int Limit,
+  void workspaceSymbols(llvm::StringRef Query, int Limit,
                         Callback<std::vector<SymbolInformation>> CB);
 
   /// Retrieve the symbols within the specified file.
-  void documentSymbols(StringRef File,
+  void documentSymbols(llvm::StringRef File,
                        Callback<std::vector<DocumentSymbol>> CB);
 
   /// Retrieve ranges that can be used to fold code within the specified file.
-  void foldingRanges(StringRef File, Callback<std::vector<FoldingRange>> CB);
+  void foldingRanges(llvm::StringRef File, Callback<std::vector<FoldingRange>> CB);
 
   /// Retrieve implementations for virtual method.
   void findImplementations(PathRef File, Position Pos,
@@ -322,7 +322,7 @@ public:
 
   /// Run formatting after \p TriggerText was typed at \p Pos in \p File with
   /// content \p Code.
-  void formatOnType(PathRef File, Position Pos, StringRef TriggerText,
+  void formatOnType(PathRef File, Position Pos, llvm::StringRef TriggerText,
                     Callback<std::vector<TextEdit>> CB);
 
   /// Test the validity of a rename operation.
@@ -393,7 +393,7 @@ public:
                   Callback<CodeActionResult> CB);
 
   /// Apply the code tweak with a specified \p ID.
-  void applyTweak(PathRef File, Range Sel, StringRef ID,
+  void applyTweak(PathRef File, Range Sel, llvm::StringRef ID,
                   Callback<Tweak::Effect> CB);
 
   /// Called when an event occurs for a watched file in the workspace.

@@ -372,7 +372,7 @@ void OMPOrderedClause::setLoopNumIterations(unsigned NumLoop,
   getTrailingObjects<Expr *>()[NumLoop] = NumIterations;
 }
 
-ArrayRef<Expr *> OMPOrderedClause::getLoopNumIterations() const {
+llvm::ArrayRef<Expr *> OMPOrderedClause::getLoopNumIterations() const {
   return llvm::ArrayRef(getTrailingObjects<Expr *>(), NumberOfLoops);
 }
 
@@ -424,7 +424,7 @@ OMPUpdateClause *OMPUpdateClause::CreateEmpty(const ASTContext &C,
   return Clause;
 }
 
-void OMPPrivateClause::setPrivateCopies(ArrayRef<Expr *> VL) {
+void OMPPrivateClause::setPrivateCopies(llvm::ArrayRef<Expr *> VL) {
   assert(VL.size() == varlist_size() &&
          "Number of private copies is not the same as the preallocated buffer");
   std::copy(VL.begin(), VL.end(), varlist_end());
@@ -433,7 +433,7 @@ void OMPPrivateClause::setPrivateCopies(ArrayRef<Expr *> VL) {
 OMPPrivateClause *
 OMPPrivateClause::Create(const ASTContext &C, SourceLocation StartLoc,
                          SourceLocation LParenLoc, SourceLocation EndLoc,
-                         ArrayRef<Expr *> VL, ArrayRef<Expr *> PrivateVL) {
+                         llvm::ArrayRef<Expr *> VL, llvm::ArrayRef<Expr *> PrivateVL) {
   // Allocate space for private variables and initializer expressions.
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(2 * VL.size()));
   OMPPrivateClause *Clause =
@@ -449,13 +449,13 @@ OMPPrivateClause *OMPPrivateClause::CreateEmpty(const ASTContext &C,
   return new (Mem) OMPPrivateClause(N);
 }
 
-void OMPFirstprivateClause::setPrivateCopies(ArrayRef<Expr *> VL) {
+void OMPFirstprivateClause::setPrivateCopies(llvm::ArrayRef<Expr *> VL) {
   assert(VL.size() == varlist_size() &&
          "Number of private copies is not the same as the preallocated buffer");
   std::copy(VL.begin(), VL.end(), varlist_end());
 }
 
-void OMPFirstprivateClause::setInits(ArrayRef<Expr *> VL) {
+void OMPFirstprivateClause::setInits(llvm::ArrayRef<Expr *> VL) {
   assert(VL.size() == varlist_size() &&
          "Number of inits is not the same as the preallocated buffer");
   std::copy(VL.begin(), VL.end(), getPrivateCopies().end());
@@ -464,8 +464,8 @@ void OMPFirstprivateClause::setInits(ArrayRef<Expr *> VL) {
 OMPFirstprivateClause *
 OMPFirstprivateClause::Create(const ASTContext &C, SourceLocation StartLoc,
                               SourceLocation LParenLoc, SourceLocation EndLoc,
-                              ArrayRef<Expr *> VL, ArrayRef<Expr *> PrivateVL,
-                              ArrayRef<Expr *> InitVL, Stmt *PreInit) {
+                              llvm::ArrayRef<Expr *> VL, llvm::ArrayRef<Expr *> PrivateVL,
+                              llvm::ArrayRef<Expr *> InitVL, Stmt *PreInit) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(3 * VL.size()));
   OMPFirstprivateClause *Clause =
       new (Mem) OMPFirstprivateClause(StartLoc, LParenLoc, EndLoc, VL.size());
@@ -482,27 +482,27 @@ OMPFirstprivateClause *OMPFirstprivateClause::CreateEmpty(const ASTContext &C,
   return new (Mem) OMPFirstprivateClause(N);
 }
 
-void OMPLastprivateClause::setPrivateCopies(ArrayRef<Expr *> PrivateCopies) {
+void OMPLastprivateClause::setPrivateCopies(llvm::ArrayRef<Expr *> PrivateCopies) {
   assert(PrivateCopies.size() == varlist_size() &&
          "Number of private copies is not the same as the preallocated buffer");
   std::copy(PrivateCopies.begin(), PrivateCopies.end(), varlist_end());
 }
 
-void OMPLastprivateClause::setSourceExprs(ArrayRef<Expr *> SrcExprs) {
+void OMPLastprivateClause::setSourceExprs(llvm::ArrayRef<Expr *> SrcExprs) {
   assert(SrcExprs.size() == varlist_size() && "Number of source expressions is "
                                               "not the same as the "
                                               "preallocated buffer");
   std::copy(SrcExprs.begin(), SrcExprs.end(), getPrivateCopies().end());
 }
 
-void OMPLastprivateClause::setDestinationExprs(ArrayRef<Expr *> DstExprs) {
+void OMPLastprivateClause::setDestinationExprs(llvm::ArrayRef<Expr *> DstExprs) {
   assert(DstExprs.size() == varlist_size() && "Number of destination "
                                               "expressions is not the same as "
                                               "the preallocated buffer");
   std::copy(DstExprs.begin(), DstExprs.end(), getSourceExprs().end());
 }
 
-void OMPLastprivateClause::setAssignmentOps(ArrayRef<Expr *> AssignmentOps) {
+void OMPLastprivateClause::setAssignmentOps(llvm::ArrayRef<Expr *> AssignmentOps) {
   assert(AssignmentOps.size() == varlist_size() &&
          "Number of assignment expressions is not the same as the preallocated "
          "buffer");
@@ -512,8 +512,8 @@ void OMPLastprivateClause::setAssignmentOps(ArrayRef<Expr *> AssignmentOps) {
 
 OMPLastprivateClause *OMPLastprivateClause::Create(
     const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-    SourceLocation EndLoc, ArrayRef<Expr *> VL, ArrayRef<Expr *> SrcExprs,
-    ArrayRef<Expr *> DstExprs, ArrayRef<Expr *> AssignmentOps,
+    SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL, llvm::ArrayRef<Expr *> SrcExprs,
+    llvm::ArrayRef<Expr *> DstExprs, llvm::ArrayRef<Expr *> AssignmentOps,
     OpenMPLastprivateModifier LPKind, SourceLocation LPKindLoc,
     SourceLocation ColonLoc, Stmt *PreInit, Expr *PostUpdate) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(5 * VL.size()));
@@ -538,7 +538,7 @@ OMPSharedClause *OMPSharedClause::Create(const ASTContext &C,
                                          SourceLocation StartLoc,
                                          SourceLocation LParenLoc,
                                          SourceLocation EndLoc,
-                                         ArrayRef<Expr *> VL) {
+                                         llvm::ArrayRef<Expr *> VL) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(VL.size()));
   OMPSharedClause *Clause =
       new (Mem) OMPSharedClause(StartLoc, LParenLoc, EndLoc, VL.size());
@@ -551,31 +551,31 @@ OMPSharedClause *OMPSharedClause::CreateEmpty(const ASTContext &C, unsigned N) {
   return new (Mem) OMPSharedClause(N);
 }
 
-void OMPLinearClause::setPrivates(ArrayRef<Expr *> PL) {
+void OMPLinearClause::setPrivates(llvm::ArrayRef<Expr *> PL) {
   assert(PL.size() == varlist_size() &&
          "Number of privates is not the same as the preallocated buffer");
   std::copy(PL.begin(), PL.end(), varlist_end());
 }
 
-void OMPLinearClause::setInits(ArrayRef<Expr *> IL) {
+void OMPLinearClause::setInits(llvm::ArrayRef<Expr *> IL) {
   assert(IL.size() == varlist_size() &&
          "Number of inits is not the same as the preallocated buffer");
   std::copy(IL.begin(), IL.end(), getPrivates().end());
 }
 
-void OMPLinearClause::setUpdates(ArrayRef<Expr *> UL) {
+void OMPLinearClause::setUpdates(llvm::ArrayRef<Expr *> UL) {
   assert(UL.size() == varlist_size() &&
          "Number of updates is not the same as the preallocated buffer");
   std::copy(UL.begin(), UL.end(), getInits().end());
 }
 
-void OMPLinearClause::setFinals(ArrayRef<Expr *> FL) {
+void OMPLinearClause::setFinals(llvm::ArrayRef<Expr *> FL) {
   assert(FL.size() == varlist_size() &&
          "Number of final updates is not the same as the preallocated buffer");
   std::copy(FL.begin(), FL.end(), getUpdates().end());
 }
 
-void OMPLinearClause::setUsedExprs(ArrayRef<Expr *> UE) {
+void OMPLinearClause::setUsedExprs(llvm::ArrayRef<Expr *> UE) {
   assert(
       UE.size() == varlist_size() + 1 &&
       "Number of used expressions is not the same as the preallocated buffer");
@@ -586,8 +586,8 @@ OMPLinearClause *OMPLinearClause::Create(
     const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
     OpenMPLinearClauseKind Modifier, SourceLocation ModifierLoc,
     SourceLocation ColonLoc, SourceLocation StepModifierLoc,
-    SourceLocation EndLoc, ArrayRef<Expr *> VL, ArrayRef<Expr *> PL,
-    ArrayRef<Expr *> IL, Expr *Step, Expr *CalcStep, Stmt *PreInit,
+    SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL, llvm::ArrayRef<Expr *> PL,
+    llvm::ArrayRef<Expr *> IL, Expr *Step, Expr *CalcStep, Stmt *PreInit,
     Expr *PostUpdate) {
   // Allocate space for 5 lists (Vars, Inits, Updates, Finals), 2 expressions
   // (Step and CalcStep), list of used expression + step.
@@ -632,7 +632,7 @@ OMPClause::child_range OMPLinearClause::used_children() {
 OMPAlignedClause *
 OMPAlignedClause::Create(const ASTContext &C, SourceLocation StartLoc,
                          SourceLocation LParenLoc, SourceLocation ColonLoc,
-                         SourceLocation EndLoc, ArrayRef<Expr *> VL, Expr *A) {
+                         SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL, Expr *A) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(VL.size() + 1));
   OMPAlignedClause *Clause = new (Mem)
       OMPAlignedClause(StartLoc, LParenLoc, ColonLoc, EndLoc, VL.size());
@@ -654,21 +654,21 @@ OMPAlignClause *OMPAlignClause::Create(const ASTContext &C, Expr *A,
   return new (C) OMPAlignClause(A, StartLoc, LParenLoc, EndLoc);
 }
 
-void OMPCopyinClause::setSourceExprs(ArrayRef<Expr *> SrcExprs) {
+void OMPCopyinClause::setSourceExprs(llvm::ArrayRef<Expr *> SrcExprs) {
   assert(SrcExprs.size() == varlist_size() && "Number of source expressions is "
                                               "not the same as the "
                                               "preallocated buffer");
   std::copy(SrcExprs.begin(), SrcExprs.end(), varlist_end());
 }
 
-void OMPCopyinClause::setDestinationExprs(ArrayRef<Expr *> DstExprs) {
+void OMPCopyinClause::setDestinationExprs(llvm::ArrayRef<Expr *> DstExprs) {
   assert(DstExprs.size() == varlist_size() && "Number of destination "
                                               "expressions is not the same as "
                                               "the preallocated buffer");
   std::copy(DstExprs.begin(), DstExprs.end(), getSourceExprs().end());
 }
 
-void OMPCopyinClause::setAssignmentOps(ArrayRef<Expr *> AssignmentOps) {
+void OMPCopyinClause::setAssignmentOps(llvm::ArrayRef<Expr *> AssignmentOps) {
   assert(AssignmentOps.size() == varlist_size() &&
          "Number of assignment expressions is not the same as the preallocated "
          "buffer");
@@ -678,8 +678,8 @@ void OMPCopyinClause::setAssignmentOps(ArrayRef<Expr *> AssignmentOps) {
 
 OMPCopyinClause *OMPCopyinClause::Create(
     const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-    SourceLocation EndLoc, ArrayRef<Expr *> VL, ArrayRef<Expr *> SrcExprs,
-    ArrayRef<Expr *> DstExprs, ArrayRef<Expr *> AssignmentOps) {
+    SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL, llvm::ArrayRef<Expr *> SrcExprs,
+    llvm::ArrayRef<Expr *> DstExprs, llvm::ArrayRef<Expr *> AssignmentOps) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(4 * VL.size()));
   OMPCopyinClause *Clause =
       new (Mem) OMPCopyinClause(StartLoc, LParenLoc, EndLoc, VL.size());
@@ -695,21 +695,21 @@ OMPCopyinClause *OMPCopyinClause::CreateEmpty(const ASTContext &C, unsigned N) {
   return new (Mem) OMPCopyinClause(N);
 }
 
-void OMPCopyprivateClause::setSourceExprs(ArrayRef<Expr *> SrcExprs) {
+void OMPCopyprivateClause::setSourceExprs(llvm::ArrayRef<Expr *> SrcExprs) {
   assert(SrcExprs.size() == varlist_size() && "Number of source expressions is "
                                               "not the same as the "
                                               "preallocated buffer");
   std::copy(SrcExprs.begin(), SrcExprs.end(), varlist_end());
 }
 
-void OMPCopyprivateClause::setDestinationExprs(ArrayRef<Expr *> DstExprs) {
+void OMPCopyprivateClause::setDestinationExprs(llvm::ArrayRef<Expr *> DstExprs) {
   assert(DstExprs.size() == varlist_size() && "Number of destination "
                                               "expressions is not the same as "
                                               "the preallocated buffer");
   std::copy(DstExprs.begin(), DstExprs.end(), getSourceExprs().end());
 }
 
-void OMPCopyprivateClause::setAssignmentOps(ArrayRef<Expr *> AssignmentOps) {
+void OMPCopyprivateClause::setAssignmentOps(llvm::ArrayRef<Expr *> AssignmentOps) {
   assert(AssignmentOps.size() == varlist_size() &&
          "Number of assignment expressions is not the same as the preallocated "
          "buffer");
@@ -719,8 +719,8 @@ void OMPCopyprivateClause::setAssignmentOps(ArrayRef<Expr *> AssignmentOps) {
 
 OMPCopyprivateClause *OMPCopyprivateClause::Create(
     const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-    SourceLocation EndLoc, ArrayRef<Expr *> VL, ArrayRef<Expr *> SrcExprs,
-    ArrayRef<Expr *> DstExprs, ArrayRef<Expr *> AssignmentOps) {
+    SourceLocation EndLoc, llvm::ArrayRef<Expr *> VL, llvm::ArrayRef<Expr *> SrcExprs,
+    llvm::ArrayRef<Expr *> DstExprs, llvm::ArrayRef<Expr *> AssignmentOps) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(4 * VL.size()));
   OMPCopyprivateClause *Clause =
       new (Mem) OMPCopyprivateClause(StartLoc, LParenLoc, EndLoc, VL.size());
@@ -737,34 +737,34 @@ OMPCopyprivateClause *OMPCopyprivateClause::CreateEmpty(const ASTContext &C,
   return new (Mem) OMPCopyprivateClause(N);
 }
 
-void OMPReductionClause::setPrivates(ArrayRef<Expr *> Privates) {
+void OMPReductionClause::setPrivates(llvm::ArrayRef<Expr *> Privates) {
   assert(Privates.size() == varlist_size() &&
          "Number of private copies is not the same as the preallocated buffer");
   std::copy(Privates.begin(), Privates.end(), varlist_end());
 }
 
-void OMPReductionClause::setLHSExprs(ArrayRef<Expr *> LHSExprs) {
+void OMPReductionClause::setLHSExprs(llvm::ArrayRef<Expr *> LHSExprs) {
   assert(
       LHSExprs.size() == varlist_size() &&
       "Number of LHS expressions is not the same as the preallocated buffer");
   std::copy(LHSExprs.begin(), LHSExprs.end(), getPrivates().end());
 }
 
-void OMPReductionClause::setRHSExprs(ArrayRef<Expr *> RHSExprs) {
+void OMPReductionClause::setRHSExprs(llvm::ArrayRef<Expr *> RHSExprs) {
   assert(
       RHSExprs.size() == varlist_size() &&
       "Number of RHS expressions is not the same as the preallocated buffer");
   std::copy(RHSExprs.begin(), RHSExprs.end(), getLHSExprs().end());
 }
 
-void OMPReductionClause::setReductionOps(ArrayRef<Expr *> ReductionOps) {
+void OMPReductionClause::setReductionOps(llvm::ArrayRef<Expr *> ReductionOps) {
   assert(ReductionOps.size() == varlist_size() && "Number of reduction "
                                                   "expressions is not the same "
                                                   "as the preallocated buffer");
   std::copy(ReductionOps.begin(), ReductionOps.end(), getRHSExprs().end());
 }
 
-void OMPReductionClause::setInscanCopyOps(ArrayRef<Expr *> Ops) {
+void OMPReductionClause::setInscanCopyOps(llvm::ArrayRef<Expr *> Ops) {
   assert(Modifier == OMPC_REDUCTION_inscan && "Expected inscan reduction.");
   assert(Ops.size() == varlist_size() && "Number of copy "
                                          "expressions is not the same "
@@ -773,7 +773,7 @@ void OMPReductionClause::setInscanCopyOps(ArrayRef<Expr *> Ops) {
 }
 
 void OMPReductionClause::setInscanCopyArrayTemps(
-    ArrayRef<Expr *> CopyArrayTemps) {
+    llvm::ArrayRef<Expr *> CopyArrayTemps) {
   assert(Modifier == OMPC_REDUCTION_inscan && "Expected inscan reduction.");
   assert(CopyArrayTemps.size() == varlist_size() &&
          "Number of copy temp expressions is not the same as the preallocated "
@@ -782,7 +782,7 @@ void OMPReductionClause::setInscanCopyArrayTemps(
 }
 
 void OMPReductionClause::setInscanCopyArrayElems(
-    ArrayRef<Expr *> CopyArrayElems) {
+    llvm::ArrayRef<Expr *> CopyArrayElems) {
   assert(Modifier == OMPC_REDUCTION_inscan && "Expected inscan reduction.");
   assert(CopyArrayElems.size() == varlist_size() &&
          "Number of copy temp expressions is not the same as the preallocated "
@@ -793,12 +793,12 @@ void OMPReductionClause::setInscanCopyArrayElems(
 OMPReductionClause *OMPReductionClause::Create(
     const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
     SourceLocation ModifierLoc, SourceLocation EndLoc, SourceLocation ColonLoc,
-    OpenMPReductionClauseModifier Modifier, ArrayRef<Expr *> VL,
+    OpenMPReductionClauseModifier Modifier, llvm::ArrayRef<Expr *> VL,
     NestedNameSpecifierLoc QualifierLoc, const DeclarationNameInfo &NameInfo,
-    ArrayRef<Expr *> Privates, ArrayRef<Expr *> LHSExprs,
-    ArrayRef<Expr *> RHSExprs, ArrayRef<Expr *> ReductionOps,
-    ArrayRef<Expr *> CopyOps, ArrayRef<Expr *> CopyArrayTemps,
-    ArrayRef<Expr *> CopyArrayElems, Stmt *PreInit, Expr *PostUpdate) {
+    llvm::ArrayRef<Expr *> Privates, llvm::ArrayRef<Expr *> LHSExprs,
+    llvm::ArrayRef<Expr *> RHSExprs, llvm::ArrayRef<Expr *> ReductionOps,
+    llvm::ArrayRef<Expr *> CopyOps, llvm::ArrayRef<Expr *> CopyArrayTemps,
+    llvm::ArrayRef<Expr *> CopyArrayElems, Stmt *PreInit, Expr *PostUpdate) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(
       (Modifier == OMPC_REDUCTION_inscan ? 8 : 5) * VL.size()));
   auto *Clause = new (Mem)
@@ -836,27 +836,27 @@ OMPReductionClause::CreateEmpty(const ASTContext &C, unsigned N,
   return Clause;
 }
 
-void OMPTaskReductionClause::setPrivates(ArrayRef<Expr *> Privates) {
+void OMPTaskReductionClause::setPrivates(llvm::ArrayRef<Expr *> Privates) {
   assert(Privates.size() == varlist_size() &&
          "Number of private copies is not the same as the preallocated buffer");
   std::copy(Privates.begin(), Privates.end(), varlist_end());
 }
 
-void OMPTaskReductionClause::setLHSExprs(ArrayRef<Expr *> LHSExprs) {
+void OMPTaskReductionClause::setLHSExprs(llvm::ArrayRef<Expr *> LHSExprs) {
   assert(
       LHSExprs.size() == varlist_size() &&
       "Number of LHS expressions is not the same as the preallocated buffer");
   std::copy(LHSExprs.begin(), LHSExprs.end(), getPrivates().end());
 }
 
-void OMPTaskReductionClause::setRHSExprs(ArrayRef<Expr *> RHSExprs) {
+void OMPTaskReductionClause::setRHSExprs(llvm::ArrayRef<Expr *> RHSExprs) {
   assert(
       RHSExprs.size() == varlist_size() &&
       "Number of RHS expressions is not the same as the preallocated buffer");
   std::copy(RHSExprs.begin(), RHSExprs.end(), getLHSExprs().end());
 }
 
-void OMPTaskReductionClause::setReductionOps(ArrayRef<Expr *> ReductionOps) {
+void OMPTaskReductionClause::setReductionOps(llvm::ArrayRef<Expr *> ReductionOps) {
   assert(ReductionOps.size() == varlist_size() && "Number of task reduction "
                                                   "expressions is not the same "
                                                   "as the preallocated buffer");
@@ -865,10 +865,10 @@ void OMPTaskReductionClause::setReductionOps(ArrayRef<Expr *> ReductionOps) {
 
 OMPTaskReductionClause *OMPTaskReductionClause::Create(
     const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-    SourceLocation EndLoc, SourceLocation ColonLoc, ArrayRef<Expr *> VL,
+    SourceLocation EndLoc, SourceLocation ColonLoc, llvm::ArrayRef<Expr *> VL,
     NestedNameSpecifierLoc QualifierLoc, const DeclarationNameInfo &NameInfo,
-    ArrayRef<Expr *> Privates, ArrayRef<Expr *> LHSExprs,
-    ArrayRef<Expr *> RHSExprs, ArrayRef<Expr *> ReductionOps, Stmt *PreInit,
+    llvm::ArrayRef<Expr *> Privates, llvm::ArrayRef<Expr *> LHSExprs,
+    llvm::ArrayRef<Expr *> RHSExprs, llvm::ArrayRef<Expr *> ReductionOps, Stmt *PreInit,
     Expr *PostUpdate) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(5 * VL.size()));
   OMPTaskReductionClause *Clause = new (Mem) OMPTaskReductionClause(
@@ -889,27 +889,27 @@ OMPTaskReductionClause *OMPTaskReductionClause::CreateEmpty(const ASTContext &C,
   return new (Mem) OMPTaskReductionClause(N);
 }
 
-void OMPInReductionClause::setPrivates(ArrayRef<Expr *> Privates) {
+void OMPInReductionClause::setPrivates(llvm::ArrayRef<Expr *> Privates) {
   assert(Privates.size() == varlist_size() &&
          "Number of private copies is not the same as the preallocated buffer");
   std::copy(Privates.begin(), Privates.end(), varlist_end());
 }
 
-void OMPInReductionClause::setLHSExprs(ArrayRef<Expr *> LHSExprs) {
+void OMPInReductionClause::setLHSExprs(llvm::ArrayRef<Expr *> LHSExprs) {
   assert(
       LHSExprs.size() == varlist_size() &&
       "Number of LHS expressions is not the same as the preallocated buffer");
   std::copy(LHSExprs.begin(), LHSExprs.end(), getPrivates().end());
 }
 
-void OMPInReductionClause::setRHSExprs(ArrayRef<Expr *> RHSExprs) {
+void OMPInReductionClause::setRHSExprs(llvm::ArrayRef<Expr *> RHSExprs) {
   assert(
       RHSExprs.size() == varlist_size() &&
       "Number of RHS expressions is not the same as the preallocated buffer");
   std::copy(RHSExprs.begin(), RHSExprs.end(), getLHSExprs().end());
 }
 
-void OMPInReductionClause::setReductionOps(ArrayRef<Expr *> ReductionOps) {
+void OMPInReductionClause::setReductionOps(llvm::ArrayRef<Expr *> ReductionOps) {
   assert(ReductionOps.size() == varlist_size() && "Number of in reduction "
                                                   "expressions is not the same "
                                                   "as the preallocated buffer");
@@ -917,7 +917,7 @@ void OMPInReductionClause::setReductionOps(ArrayRef<Expr *> ReductionOps) {
 }
 
 void OMPInReductionClause::setTaskgroupDescriptors(
-    ArrayRef<Expr *> TaskgroupDescriptors) {
+    llvm::ArrayRef<Expr *> TaskgroupDescriptors) {
   assert(TaskgroupDescriptors.size() == varlist_size() &&
          "Number of in reduction descriptors is not the same as the "
          "preallocated buffer");
@@ -927,11 +927,11 @@ void OMPInReductionClause::setTaskgroupDescriptors(
 
 OMPInReductionClause *OMPInReductionClause::Create(
     const ASTContext &C, SourceLocation StartLoc, SourceLocation LParenLoc,
-    SourceLocation EndLoc, SourceLocation ColonLoc, ArrayRef<Expr *> VL,
+    SourceLocation EndLoc, SourceLocation ColonLoc, llvm::ArrayRef<Expr *> VL,
     NestedNameSpecifierLoc QualifierLoc, const DeclarationNameInfo &NameInfo,
-    ArrayRef<Expr *> Privates, ArrayRef<Expr *> LHSExprs,
-    ArrayRef<Expr *> RHSExprs, ArrayRef<Expr *> ReductionOps,
-    ArrayRef<Expr *> TaskgroupDescriptors, Stmt *PreInit, Expr *PostUpdate) {
+    llvm::ArrayRef<Expr *> Privates, llvm::ArrayRef<Expr *> LHSExprs,
+    llvm::ArrayRef<Expr *> RHSExprs, llvm::ArrayRef<Expr *> ReductionOps,
+    llvm::ArrayRef<Expr *> TaskgroupDescriptors, Stmt *PreInit, Expr *PostUpdate) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(6 * VL.size()));
   OMPInReductionClause *Clause = new (Mem) OMPInReductionClause(
       StartLoc, LParenLoc, EndLoc, ColonLoc, VL.size(), QualifierLoc, NameInfo);
@@ -956,7 +956,7 @@ OMPSizesClause *OMPSizesClause::Create(const ASTContext &C,
                                        SourceLocation StartLoc,
                                        SourceLocation LParenLoc,
                                        SourceLocation EndLoc,
-                                       ArrayRef<Expr *> Sizes) {
+                                       llvm::ArrayRef<Expr *> Sizes) {
   OMPSizesClause *Clause = CreateEmpty(C, Sizes.size());
   Clause->setLocStart(StartLoc);
   Clause->setLParenLoc(LParenLoc);
@@ -1005,7 +1005,7 @@ OMPAllocateClause *
 OMPAllocateClause::Create(const ASTContext &C, SourceLocation StartLoc,
                           SourceLocation LParenLoc, Expr *Allocator,
                           SourceLocation ColonLoc, SourceLocation EndLoc,
-                          ArrayRef<Expr *> VL) {
+                          llvm::ArrayRef<Expr *> VL) {
   // Allocate space for private variables and initializer expressions.
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(VL.size()));
   auto *Clause = new (Mem) OMPAllocateClause(StartLoc, LParenLoc, Allocator,
@@ -1024,7 +1024,7 @@ OMPFlushClause *OMPFlushClause::Create(const ASTContext &C,
                                        SourceLocation StartLoc,
                                        SourceLocation LParenLoc,
                                        SourceLocation EndLoc,
-                                       ArrayRef<Expr *> VL) {
+                                       llvm::ArrayRef<Expr *> VL) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(VL.size() + 1));
   OMPFlushClause *Clause =
       new (Mem) OMPFlushClause(StartLoc, LParenLoc, EndLoc, VL.size());
@@ -1055,7 +1055,7 @@ OMPDependClause *
 OMPDependClause::Create(const ASTContext &C, SourceLocation StartLoc,
                         SourceLocation LParenLoc, SourceLocation EndLoc,
                         DependDataTy Data, Expr *DepModifier,
-                        ArrayRef<Expr *> VL, unsigned NumLoops) {
+                        llvm::ArrayRef<Expr *> VL, unsigned NumLoops) {
   void *Mem = C.Allocate(
       totalSizeToAlloc<Expr *>(VL.size() + /*depend-modifier*/ 1 + NumLoops),
       alignof(OMPDependClause));
@@ -1124,7 +1124,7 @@ unsigned OMPClauseMappableExprCommon::getComponentsTotalNumber(
 }
 
 unsigned OMPClauseMappableExprCommon::getUniqueDeclarationsTotalNumber(
-    ArrayRef<const ValueDecl *> Declarations) {
+    llvm::ArrayRef<const ValueDecl *> Declarations) {
   unsigned TotalNum = 0u;
   llvm::SmallPtrSet<const ValueDecl *, 8> Cache;
   for (const ValueDecl *D : Declarations) {
@@ -1138,11 +1138,11 @@ unsigned OMPClauseMappableExprCommon::getUniqueDeclarationsTotalNumber(
 }
 
 OMPMapClause *OMPMapClause::Create(
-    const ASTContext &C, const OMPVarListLocTy &Locs, ArrayRef<Expr *> Vars,
-    ArrayRef<ValueDecl *> Declarations,
-    MappableExprComponentListsRef ComponentLists, ArrayRef<Expr *> UDMapperRefs,
-    Expr *IteratorModifier, ArrayRef<OpenMPMapModifierKind> MapModifiers,
-    ArrayRef<SourceLocation> MapModifiersLoc,
+    const ASTContext &C, const OMPVarListLocTy &Locs, llvm::ArrayRef<Expr *> Vars,
+    llvm::ArrayRef<ValueDecl *> Declarations,
+    MappableExprComponentListsRef ComponentLists, llvm::ArrayRef<Expr *> UDMapperRefs,
+    Expr *IteratorModifier, llvm::ArrayRef<OpenMPMapModifierKind> MapModifiers,
+    llvm::ArrayRef<SourceLocation> MapModifiersLoc,
     NestedNameSpecifierLoc UDMQualifierLoc, DeclarationNameInfo MapperId,
     OpenMPMapClauseKind Type, bool TypeIsImplicit, SourceLocation TypeLoc) {
   OMPMappableExprListSizeTy Sizes;
@@ -1195,11 +1195,11 @@ OMPMapClause::CreateEmpty(const ASTContext &C,
 }
 
 OMPToClause *OMPToClause::Create(
-    const ASTContext &C, const OMPVarListLocTy &Locs, ArrayRef<Expr *> Vars,
-    ArrayRef<ValueDecl *> Declarations,
-    MappableExprComponentListsRef ComponentLists, ArrayRef<Expr *> UDMapperRefs,
-    ArrayRef<OpenMPMotionModifierKind> MotionModifiers,
-    ArrayRef<SourceLocation> MotionModifiersLoc,
+    const ASTContext &C, const OMPVarListLocTy &Locs, llvm::ArrayRef<Expr *> Vars,
+    llvm::ArrayRef<ValueDecl *> Declarations,
+    MappableExprComponentListsRef ComponentLists, llvm::ArrayRef<Expr *> UDMapperRefs,
+    llvm::ArrayRef<OpenMPMotionModifierKind> MotionModifiers,
+    llvm::ArrayRef<SourceLocation> MotionModifiersLoc,
     NestedNameSpecifierLoc UDMQualifierLoc, DeclarationNameInfo MapperId) {
   OMPMappableExprListSizeTy Sizes;
   Sizes.NumVars = Vars.size();
@@ -1245,11 +1245,11 @@ OMPToClause *OMPToClause::CreateEmpty(const ASTContext &C,
 }
 
 OMPFromClause *OMPFromClause::Create(
-    const ASTContext &C, const OMPVarListLocTy &Locs, ArrayRef<Expr *> Vars,
-    ArrayRef<ValueDecl *> Declarations,
-    MappableExprComponentListsRef ComponentLists, ArrayRef<Expr *> UDMapperRefs,
-    ArrayRef<OpenMPMotionModifierKind> MotionModifiers,
-    ArrayRef<SourceLocation> MotionModifiersLoc,
+    const ASTContext &C, const OMPVarListLocTy &Locs, llvm::ArrayRef<Expr *> Vars,
+    llvm::ArrayRef<ValueDecl *> Declarations,
+    MappableExprComponentListsRef ComponentLists, llvm::ArrayRef<Expr *> UDMapperRefs,
+    llvm::ArrayRef<OpenMPMotionModifierKind> MotionModifiers,
+    llvm::ArrayRef<SourceLocation> MotionModifiersLoc,
     NestedNameSpecifierLoc UDMQualifierLoc, DeclarationNameInfo MapperId) {
   OMPMappableExprListSizeTy Sizes;
   Sizes.NumVars = Vars.size();
@@ -1296,22 +1296,22 @@ OMPFromClause::CreateEmpty(const ASTContext &C,
   return new (Mem) OMPFromClause(Sizes);
 }
 
-void OMPUseDevicePtrClause::setPrivateCopies(ArrayRef<Expr *> VL) {
+void OMPUseDevicePtrClause::setPrivateCopies(llvm::ArrayRef<Expr *> VL) {
   assert(VL.size() == varlist_size() &&
          "Number of private copies is not the same as the preallocated buffer");
   std::copy(VL.begin(), VL.end(), varlist_end());
 }
 
-void OMPUseDevicePtrClause::setInits(ArrayRef<Expr *> VL) {
+void OMPUseDevicePtrClause::setInits(llvm::ArrayRef<Expr *> VL) {
   assert(VL.size() == varlist_size() &&
          "Number of inits is not the same as the preallocated buffer");
   std::copy(VL.begin(), VL.end(), getPrivateCopies().end());
 }
 
 OMPUseDevicePtrClause *OMPUseDevicePtrClause::Create(
-    const ASTContext &C, const OMPVarListLocTy &Locs, ArrayRef<Expr *> Vars,
-    ArrayRef<Expr *> PrivateVars, ArrayRef<Expr *> Inits,
-    ArrayRef<ValueDecl *> Declarations,
+    const ASTContext &C, const OMPVarListLocTy &Locs, llvm::ArrayRef<Expr *> Vars,
+    llvm::ArrayRef<Expr *> PrivateVars, llvm::ArrayRef<Expr *> Inits,
+    llvm::ArrayRef<ValueDecl *> Declarations,
     MappableExprComponentListsRef ComponentLists) {
   OMPMappableExprListSizeTy Sizes;
   Sizes.NumVars = Vars.size();
@@ -1359,8 +1359,8 @@ OMPUseDevicePtrClause::CreateEmpty(const ASTContext &C,
 
 OMPUseDeviceAddrClause *
 OMPUseDeviceAddrClause::Create(const ASTContext &C, const OMPVarListLocTy &Locs,
-                               ArrayRef<Expr *> Vars,
-                               ArrayRef<ValueDecl *> Declarations,
+                               llvm::ArrayRef<Expr *> Vars,
+                               llvm::ArrayRef<ValueDecl *> Declarations,
                                MappableExprComponentListsRef ComponentLists) {
   OMPMappableExprListSizeTy Sizes;
   Sizes.NumVars = Vars.size();
@@ -1406,8 +1406,8 @@ OMPUseDeviceAddrClause::CreateEmpty(const ASTContext &C,
 
 OMPIsDevicePtrClause *
 OMPIsDevicePtrClause::Create(const ASTContext &C, const OMPVarListLocTy &Locs,
-                             ArrayRef<Expr *> Vars,
-                             ArrayRef<ValueDecl *> Declarations,
+                             llvm::ArrayRef<Expr *> Vars,
+                             llvm::ArrayRef<ValueDecl *> Declarations,
                              MappableExprComponentListsRef ComponentLists) {
   OMPMappableExprListSizeTy Sizes;
   Sizes.NumVars = Vars.size();
@@ -1453,8 +1453,8 @@ OMPIsDevicePtrClause::CreateEmpty(const ASTContext &C,
 
 OMPHasDeviceAddrClause *
 OMPHasDeviceAddrClause::Create(const ASTContext &C, const OMPVarListLocTy &Locs,
-                               ArrayRef<Expr *> Vars,
-                               ArrayRef<ValueDecl *> Declarations,
+                               llvm::ArrayRef<Expr *> Vars,
+                               llvm::ArrayRef<ValueDecl *> Declarations,
                                MappableExprComponentListsRef ComponentLists) {
   OMPMappableExprListSizeTy Sizes;
   Sizes.NumVars = Vars.size();
@@ -1502,7 +1502,7 @@ OMPNontemporalClause *OMPNontemporalClause::Create(const ASTContext &C,
                                                    SourceLocation StartLoc,
                                                    SourceLocation LParenLoc,
                                                    SourceLocation EndLoc,
-                                                   ArrayRef<Expr *> VL) {
+                                                   llvm::ArrayRef<Expr *> VL) {
   // Allocate space for nontemporal variables + private references.
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(2 * VL.size()));
   auto *Clause =
@@ -1517,7 +1517,7 @@ OMPNontemporalClause *OMPNontemporalClause::CreateEmpty(const ASTContext &C,
   return new (Mem) OMPNontemporalClause(N);
 }
 
-void OMPNontemporalClause::setPrivateRefs(ArrayRef<Expr *> VL) {
+void OMPNontemporalClause::setPrivateRefs(llvm::ArrayRef<Expr *> VL) {
   assert(VL.size() == varlist_size() && "Number of private references is not "
                                         "the same as the preallocated buffer");
   std::copy(VL.begin(), VL.end(), varlist_end());
@@ -1527,7 +1527,7 @@ OMPInclusiveClause *OMPInclusiveClause::Create(const ASTContext &C,
                                                SourceLocation StartLoc,
                                                SourceLocation LParenLoc,
                                                SourceLocation EndLoc,
-                                               ArrayRef<Expr *> VL) {
+                                               llvm::ArrayRef<Expr *> VL) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(VL.size()));
   auto *Clause =
       new (Mem) OMPInclusiveClause(StartLoc, LParenLoc, EndLoc, VL.size());
@@ -1545,7 +1545,7 @@ OMPExclusiveClause *OMPExclusiveClause::Create(const ASTContext &C,
                                                SourceLocation StartLoc,
                                                SourceLocation LParenLoc,
                                                SourceLocation EndLoc,
-                                               ArrayRef<Expr *> VL) {
+                                               llvm::ArrayRef<Expr *> VL) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(VL.size()));
   auto *Clause =
       new (Mem) OMPExclusiveClause(StartLoc, LParenLoc, EndLoc, VL.size());
@@ -1560,7 +1560,7 @@ OMPExclusiveClause *OMPExclusiveClause::CreateEmpty(const ASTContext &C,
 }
 
 void OMPUsesAllocatorsClause::setAllocatorsData(
-    ArrayRef<OMPUsesAllocatorsClause::Data> Data) {
+    llvm::ArrayRef<OMPUsesAllocatorsClause::Data> Data) {
   assert(Data.size() == NumOfAllocators &&
          "Size of allocators data is not the same as the preallocated buffer.");
   for (unsigned I = 0, E = Data.size(); I < E; ++I) {
@@ -1605,7 +1605,7 @@ OMPUsesAllocatorsClause::getAllocatorData(unsigned I) const {
 OMPUsesAllocatorsClause *
 OMPUsesAllocatorsClause::Create(const ASTContext &C, SourceLocation StartLoc,
                                 SourceLocation LParenLoc, SourceLocation EndLoc,
-                                ArrayRef<OMPUsesAllocatorsClause::Data> Data) {
+                                llvm::ArrayRef<OMPUsesAllocatorsClause::Data> Data) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *, SourceLocation>(
       static_cast<int>(ExprOffsets::Total) * Data.size(),
       static_cast<int>(ParenLocsOffsets::Total) * Data.size()));
@@ -1627,7 +1627,7 @@ OMPAffinityClause *
 OMPAffinityClause::Create(const ASTContext &C, SourceLocation StartLoc,
                           SourceLocation LParenLoc, SourceLocation ColonLoc,
                           SourceLocation EndLoc, Expr *Modifier,
-                          ArrayRef<Expr *> Locators) {
+                          llvm::ArrayRef<Expr *> Locators) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(Locators.size() + 1));
   auto *Clause = new (Mem)
       OMPAffinityClause(StartLoc, LParenLoc, ColonLoc, EndLoc, Locators.size());
@@ -1680,7 +1680,7 @@ OMPDoacrossClause::Create(const ASTContext &C, SourceLocation StartLoc,
                           SourceLocation LParenLoc, SourceLocation EndLoc,
                           OpenMPDoacrossClauseModifier DepType,
                           SourceLocation DepLoc, SourceLocation ColonLoc,
-                          ArrayRef<Expr *> VL, unsigned NumLoops) {
+                          llvm::ArrayRef<Expr *> VL, unsigned NumLoops) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(VL.size() + NumLoops),
                          alignof(OMPDoacrossClause));
   OMPDoacrossClause *Clause = new (Mem)
@@ -2311,7 +2311,7 @@ void OMPClausePrinter::VisitOMPDependClause(OMPDependClause *Node) {
 }
 
 template <typename T>
-static void PrintMapper(raw_ostream &OS, T *Node,
+static void PrintMapper(llvm::raw_ostream &OS, T *Node,
                         const PrintingPolicy &Policy) {
   OS << '(';
   NestedNameSpecifier *MapperNNS =
@@ -2322,7 +2322,7 @@ static void PrintMapper(raw_ostream &OS, T *Node,
 }
 
 template <typename T>
-static void PrintIterator(raw_ostream &OS, T *Node,
+static void PrintIterator(llvm::raw_ostream &OS, T *Node,
                           const PrintingPolicy &Policy) {
   if (Expr *IteratorModifier = Node->getIteratorModifier())
     IteratorModifier->printPretty(OS, nullptr, Policy);
@@ -2700,7 +2700,7 @@ std::string OMPTraitInfo::getMangledName() const {
   return MangledName;
 }
 
-OMPTraitInfo::OMPTraitInfo(StringRef MangledName) {
+OMPTraitInfo::OMPTraitInfo(llvm::StringRef MangledName) {
   unsigned long U;
   do {
     if (!MangledName.consume_front("$S"))
@@ -2723,7 +2723,7 @@ OMPTraitInfo::OMPTraitInfo(StringRef MangledName) {
           break;
         Selector.Properties.push_back(OMPTraitProperty());
         OMPTraitProperty &Property = Selector.Properties.back();
-        std::pair<StringRef, StringRef> PropRestPair = MangledName.split('$');
+        std::pair<llvm::StringRef, llvm::StringRef> PropRestPair = MangledName.split('$');
         Property.RawString = PropRestPair.first;
         Property.Kind = getOpenMPContextTraitPropertyKind(
             Set.Kind, Selector.Kind, PropRestPair.first);
@@ -2746,12 +2746,12 @@ llvm::raw_ostream &clang::operator<<(llvm::raw_ostream &OS,
 }
 
 TargetOMPContext::TargetOMPContext(
-    ASTContext &ASTCtx, std::function<void(StringRef)> &&DiagUnknownTrait,
+    ASTContext &ASTCtx, std::function<void(llvm::StringRef)> &&DiagUnknownTrait,
     const FunctionDecl *CurrentFunctionDecl,
-    ArrayRef<llvm::omp::TraitProperty> ConstructTraits)
+    llvm::ArrayRef<llvm::omp::TraitProperty> ConstructTraits)
     : OMPContext(ASTCtx.getLangOpts().OpenMPIsTargetDevice,
                  ASTCtx.getTargetInfo().getTriple()),
-      FeatureValidityCheck([&](StringRef FeatureName) {
+      FeatureValidityCheck([&](llvm::StringRef FeatureName) {
         return ASTCtx.getTargetInfo().isValidFeatureName(FeatureName);
       }),
       DiagUnknownTrait(std::move(DiagUnknownTrait)) {
@@ -2761,7 +2761,7 @@ TargetOMPContext::TargetOMPContext(
     addTrait(Property);
 }
 
-bool TargetOMPContext::matchesISATrait(StringRef RawString) const {
+bool TargetOMPContext::matchesISATrait(llvm::StringRef RawString) const {
   auto It = FeatureMap.find(RawString);
   if (It != FeatureMap.end())
     return It->second;

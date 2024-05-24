@@ -24,7 +24,7 @@ namespace clang::tidy::abseil {
 class StringFindStartswithCheck : public ClangTidyCheck {
 public:
   using ClangTidyCheck::ClangTidyCheck;
-  StringFindStartswithCheck(StringRef Name, ClangTidyContext *Context);
+  StringFindStartswithCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
@@ -36,9 +36,9 @@ public:
   }
 
 private:
-  const std::vector<StringRef> StringLikeClasses;
+  const std::vector<llvm::StringRef> StringLikeClasses;
   utils::IncludeInserter IncludeInserter;
-  const StringRef AbseilStringsMatchHeader;
+  const llvm::StringRef AbseilStringsMatchHeader;
 };
 
 } // namespace clang::tidy::abseil

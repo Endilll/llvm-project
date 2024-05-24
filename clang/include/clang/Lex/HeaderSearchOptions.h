@@ -79,7 +79,7 @@ public:
     LLVM_PREFERRED_TYPE(bool)
     unsigned IgnoreSysRoot : 1;
 
-    Entry(StringRef path, frontend::IncludeDirGroup group, bool isFramework,
+    Entry(llvm::StringRef path, frontend::IncludeDirGroup group, bool isFramework,
           bool ignoreSysRoot)
         : Path(path), Group(group), IsFramework(isFramework),
           IgnoreSysRoot(ignoreSysRoot) {}
@@ -93,7 +93,7 @@ public:
     /// headers.
     bool IsSystemHeader;
 
-    SystemHeaderPrefix(StringRef Prefix, bool IsSystemHeader)
+    SystemHeaderPrefix(llvm::StringRef Prefix, bool IsSystemHeader)
         : Prefix(Prefix), IsSystemHeader(IsSystemHeader) {}
   };
 
@@ -271,7 +271,7 @@ public:
   LLVM_PREFERRED_TYPE(bool)
   unsigned ModulesIncludeVFSUsage : 1;
 
-  HeaderSearchOptions(StringRef _Sysroot = "/")
+  HeaderSearchOptions(llvm::StringRef _Sysroot = "/")
       : Sysroot(_Sysroot), ModuleFormat("raw"), DisableModuleHash(false),
         ImplicitModuleMaps(false), ModuleMapFileHomeIsCwd(false),
         ModuleFileHomeIsCwd(false), EnablePrebuiltImplicitModules(false),
@@ -289,7 +289,7 @@ public:
         ModulesStrictContextHash(false), ModulesIncludeVFSUsage(false) {}
 
   /// AddPath - Add the \p Path path to the specified \p Group list.
-  void AddPath(StringRef Path, frontend::IncludeDirGroup Group,
+  void AddPath(llvm::StringRef Path, frontend::IncludeDirGroup Group,
                bool IsFramework, bool IgnoreSysRoot) {
     UserEntries.emplace_back(Path, Group, IsFramework, IgnoreSysRoot);
   }
@@ -297,15 +297,15 @@ public:
   /// AddSystemHeaderPrefix - Override whether \#include directives naming a
   /// path starting with \p Prefix should be considered as naming a system
   /// header.
-  void AddSystemHeaderPrefix(StringRef Prefix, bool IsSystemHeader) {
+  void AddSystemHeaderPrefix(llvm::StringRef Prefix, bool IsSystemHeader) {
     SystemHeaderPrefixes.emplace_back(Prefix, IsSystemHeader);
   }
 
-  void AddVFSOverlayFile(StringRef Name) {
+  void AddVFSOverlayFile(llvm::StringRef Name) {
     VFSOverlayFiles.push_back(std::string(Name));
   }
 
-  void AddPrebuiltModulePath(StringRef Name) {
+  void AddPrebuiltModulePath(llvm::StringRef Name) {
     PrebuiltModulePaths.push_back(std::string(Name));
   }
 };

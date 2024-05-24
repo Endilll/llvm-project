@@ -20,7 +20,7 @@ namespace clang::tidy::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/objc/missing-hash.html
 class MissingHashCheck : public ClangTidyCheck {
 public:
-  MissingHashCheck(StringRef Name, ClangTidyContext *Context)
+  MissingHashCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC;

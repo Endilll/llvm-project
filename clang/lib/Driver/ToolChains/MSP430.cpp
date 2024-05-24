@@ -23,30 +23,30 @@ using namespace clang::driver::tools;
 using namespace clang;
 using namespace llvm::opt;
 
-static bool isSupportedMCU(const StringRef MCU) {
+static bool isSupportedMCU(const llvm::StringRef MCU) {
   return llvm::StringSwitch<bool>(MCU)
 #define MSP430_MCU(NAME) .Case(NAME, true)
 #include "clang/Basic/MSP430Target.def"
       .Default(false);
 }
 
-static StringRef getSupportedHWMult(const Arg *MCU) {
+static llvm::StringRef getSupportedHWMult(const Arg *MCU) {
   if (!MCU)
     return "none";
 
-  return llvm::StringSwitch<StringRef>(MCU->getValue())
+  return llvm::StringSwitch<llvm::StringRef>(MCU->getValue())
 #define MSP430_MCU_FEAT(NAME, HWMULT) .Case(NAME, HWMULT)
 #include "clang/Basic/MSP430Target.def"
       .Default("none");
 }
 
-static StringRef getHWMultLib(const ArgList &Args) {
-  StringRef HWMult = Args.getLastArgValue(options::OPT_mhwmult_EQ, "auto");
+static llvm::StringRef getHWMultLib(const ArgList &Args) {
+  llvm::StringRef HWMult = Args.getLastArgValue(options::OPT_mhwmult_EQ, "auto");
   if (HWMult == "auto") {
     HWMult = getSupportedHWMult(Args.getLastArg(options::OPT_mmcu_EQ));
   }
 
-  return llvm::StringSwitch<StringRef>(HWMult)
+  return llvm::StringSwitch<llvm::StringRef>(HWMult)
       .Case("16bit", "-lmul_16")
       .Case("32bit", "-lmul_32")
       .Case("f5series", "-lmul_f5")
@@ -54,7 +54,7 @@ static StringRef getHWMultLib(const ArgList &Args) {
 }
 
 void msp430::getMSP430TargetFeatures(const Driver &D, const ArgList &Args,
-                                     std::vector<StringRef> &Features) {
+                                     std::vector<llvm::StringRef> &Features) {
   const Arg *MCU = Args.getLastArg(options::OPT_mmcu_EQ);
   if (MCU && !isSupportedMCU(MCU->getValue())) {
     D.Diag(diag::err_drv_clang_unsupported) << MCU->getValue();
@@ -65,8 +65,8 @@ void msp430::getMSP430TargetFeatures(const Driver &D, const ArgList &Args,
   if (!MCU && !HWMultArg)
     return;
 
-  StringRef HWMult = HWMultArg ? HWMultArg->getValue() : "auto";
-  StringRef SupportedHWMult = getSupportedHWMult(MCU);
+  llvm::StringRef HWMult = HWMultArg ? HWMultArg->getValue() : "auto";
+  llvm::StringRef SupportedHWMult = getSupportedHWMult(MCU);
 
   if (HWMult == "auto") {
     // 'auto' - deduce hw multiplier support based on mcu name provided.
@@ -110,24 +110,24 @@ MSP430ToolChain::MSP430ToolChain(const Driver &D, const llvm::Triple &Triple,
                                  const ArgList &Args)
     : Generic_ELF(D, Triple, Args) {
 
-  StringRef MultilibSuf = "";
+  llvm::StringRef MultilibSuf = "";
 
   GCCInstallation.init(Triple, Args);
   if (GCCInstallation.isValid()) {
     MultilibSuf = GCCInstallation.getMultilib().gccSuffix();
 
-    SmallString<128> GCCBinPath;
+    llvm::SmallString<128> GCCBinPath;
     llvm::sys::path::append(GCCBinPath,
                             GCCInstallation.getParentLibPath(), "..", "bin");
     addPathIfExists(D, GCCBinPath, getProgramPaths());
 
-    SmallString<128> GCCRtPath;
+    llvm::SmallString<128> GCCRtPath;
     llvm::sys::path::append(GCCRtPath,
                             GCCInstallation.getInstallPath(), MultilibSuf);
     addPathIfExists(D, GCCRtPath, getFilePaths());
   }
 
-  SmallString<128> SysRootDir(computeSysRoot());
+  llvm::SmallString<128> SysRootDir(computeSysRoot());
   llvm::sys::path::append(SysRootDir, "msp430-elf", "lib", MultilibSuf);
   addPathIfExists(D, SysRootDir, getFilePaths());
 }
@@ -136,7 +136,7 @@ std::string MSP430ToolChain::computeSysRoot() const {
   if (!getDriver().SysRoot.empty())
     return getDriver().SysRoot;
 
-  SmallString<128> Dir;
+  llvm::SmallString<128> Dir;
   if (GCCInstallation.isValid())
     llvm::sys::path::append(Dir, GCCInstallation.getParentLibPath(), "..");
   else
@@ -151,7 +151,7 @@ void MSP430ToolChain::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
       DriverArgs.hasArg(options::OPT_nostdlibinc))
     return;
 
-  SmallString<128> Dir(computeSysRoot());
+  llvm::SmallString<128> Dir(computeSysRoot());
   llvm::sys::path::append(Dir, "msp430-elf", "include");
   addSystemInclude(DriverArgs, CC1Args, Dir.str());
 }
@@ -165,7 +165,7 @@ void MSP430ToolChain::addClangTargetOptions(const ArgList &DriverArgs,
   if (!MCUArg)
     return;
 
-  const StringRef MCU = MCUArg->getValue();
+  const llvm::StringRef MCU = MCUArg->getValue();
   if (MCU.starts_with("msp430i")) {
     // 'i' should be in lower case as it's defined in TI MSP430-GCC headers
     CC1Args.push_back(DriverArgs.MakeArgString(
@@ -252,12 +252,12 @@ static void AddImplicitLinkerScript(const std::string SysRoot,
   if (!MCUArg)
     return;
 
-  SmallString<128> MCULinkerScriptPath(SysRoot);
+  llvm::SmallString<128> MCULinkerScriptPath(SysRoot);
   llvm::sys::path::append(MCULinkerScriptPath, "include");
   // -L because <mcu>.ld INCLUDEs <mcu>_symbols.ld
   CmdArgs.push_back(Args.MakeArgString("-L" + MCULinkerScriptPath));
   CmdArgs.push_back(
-      Args.MakeArgString("-T" + StringRef(MCUArg->getValue()) + ".ld"));
+      Args.MakeArgString("-T" + llvm::StringRef(MCUArg->getValue()) + ".ld"));
 }
 
 void msp430::Linker::ConstructJob(Compilation &C, const JobAction &JA,

@@ -26,6 +26,7 @@
 #include "clang/Serialization/ASTReader.h"
 #include "clang/Serialization/ASTWriter.h"
 #include "clang/Serialization/ModuleFile.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/MemoryBuffer.h"
@@ -60,7 +61,7 @@ void EnsureSemaIsCreated(CompilerInstance &CI, FrontendAction &Action) {
 //===----------------------------------------------------------------------===//
 
 std::unique_ptr<ASTConsumer>
-InitOnlyAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+InitOnlyAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   return std::make_unique<ASTConsumer>();
 }
 
@@ -84,7 +85,7 @@ void ReadPCHAndPreprocessAction::ExecuteAction() {
 
 std::unique_ptr<ASTConsumer>
 ReadPCHAndPreprocessAction::CreateASTConsumer(CompilerInstance &CI,
-                                              StringRef InFile) {
+                                              llvm::StringRef InFile) {
   return std::make_unique<ASTConsumer>();
 }
 
@@ -93,15 +94,15 @@ ReadPCHAndPreprocessAction::CreateASTConsumer(CompilerInstance &CI,
 //===----------------------------------------------------------------------===//
 
 std::unique_ptr<ASTConsumer>
-ASTPrintAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
-  if (std::unique_ptr<raw_ostream> OS =
+ASTPrintAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
+  if (std::unique_ptr<llvm::raw_ostream> OS =
           CI.createDefaultOutputFile(false, InFile))
     return CreateASTPrinter(std::move(OS), CI.getFrontendOpts().ASTDumpFilter);
   return nullptr;
 }
 
 std::unique_ptr<ASTConsumer>
-ASTDumpAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+ASTDumpAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   const FrontendOptions &Opts = CI.getFrontendOpts();
   return CreateASTDumper(nullptr /*Dump to stdout.*/, Opts.ASTDumpFilter,
                          Opts.ASTDumpDecls, Opts.ASTDumpAll,
@@ -110,23 +111,23 @@ ASTDumpAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
 }
 
 std::unique_ptr<ASTConsumer>
-ASTDeclListAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+ASTDeclListAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   return CreateASTDeclNodeLister();
 }
 
 std::unique_ptr<ASTConsumer>
-ASTViewAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+ASTViewAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   return CreateASTViewer();
 }
 
 std::unique_ptr<ASTConsumer>
-GeneratePCHAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+GeneratePCHAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   std::string Sysroot;
   if (!ComputeASTConsumerArguments(CI, /*ref*/ Sysroot))
     return nullptr;
 
   std::string OutputFile;
-  std::unique_ptr<raw_pwrite_stream> OS =
+  std::unique_ptr<llvm::raw_pwrite_stream> OS =
       CreateOutputFile(CI, InFile, /*ref*/ OutputFile);
   if (!OS)
     return nullptr;
@@ -161,10 +162,10 @@ bool GeneratePCHAction::ComputeASTConsumerArguments(CompilerInstance &CI,
 }
 
 std::unique_ptr<llvm::raw_pwrite_stream>
-GeneratePCHAction::CreateOutputFile(CompilerInstance &CI, StringRef InFile,
+GeneratePCHAction::CreateOutputFile(CompilerInstance &CI, llvm::StringRef InFile,
                                     std::string &OutputFile) {
   // Because this is exposed via libclang we must disable RemoveFileOnSignal.
-  std::unique_ptr<raw_pwrite_stream> OS = CI.createDefaultOutputFile(
+  std::unique_ptr<llvm::raw_pwrite_stream> OS = CI.createDefaultOutputFile(
       /*Binary=*/true, InFile, /*Extension=*/"", /*RemoveFileOnSignal=*/false);
   if (!OS)
     return nullptr;
@@ -186,8 +187,8 @@ bool GeneratePCHAction::BeginSourceFileAction(CompilerInstance &CI) {
 
 std::vector<std::unique_ptr<ASTConsumer>>
 GenerateModuleAction::CreateMultiplexConsumer(CompilerInstance &CI,
-                                              StringRef InFile) {
-  std::unique_ptr<raw_pwrite_stream> OS = CreateOutputFile(CI, InFile);
+                                              llvm::StringRef InFile) {
+  std::unique_ptr<llvm::raw_pwrite_stream> OS = CreateOutputFile(CI, InFile);
   if (!OS)
     return {};
 
@@ -215,7 +216,7 @@ GenerateModuleAction::CreateMultiplexConsumer(CompilerInstance &CI,
 
 std::unique_ptr<ASTConsumer>
 GenerateModuleAction::CreateASTConsumer(CompilerInstance &CI,
-                                        StringRef InFile) {
+                                        llvm::StringRef InFile) {
   std::vector<std::unique_ptr<ASTConsumer>> Consumers =
       CreateMultiplexConsumer(CI, InFile);
   if (Consumers.empty())
@@ -239,13 +240,13 @@ bool GenerateModuleFromModuleMapAction::BeginSourceFileAction(
   return GenerateModuleAction::BeginSourceFileAction(CI);
 }
 
-std::unique_ptr<raw_pwrite_stream>
+std::unique_ptr<llvm::raw_pwrite_stream>
 GenerateModuleFromModuleMapAction::CreateOutputFile(CompilerInstance &CI,
-                                                    StringRef InFile) {
+                                                    llvm::StringRef InFile) {
   // If no output file was provided, figure out where this module would go
   // in the module cache.
   if (CI.getFrontendOpts().OutputFile.empty()) {
-    StringRef ModuleMapFile = CI.getFrontendOpts().OriginalModuleMap;
+    llvm::StringRef ModuleMapFile = CI.getFrontendOpts().OriginalModuleMap;
     if (ModuleMapFile.empty())
       ModuleMapFile = InFile;
 
@@ -271,7 +272,7 @@ bool GenerateModuleInterfaceAction::BeginSourceFileAction(
 
 std::unique_ptr<ASTConsumer>
 GenerateModuleInterfaceAction::CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) {
+                                                 llvm::StringRef InFile) {
   std::vector<std::unique_ptr<ASTConsumer>> Consumers;
   Consumers.push_back(std::make_unique<CXX20ModulesGenerator>(
       CI.getPreprocessor(), CI.getModuleCache(),
@@ -287,15 +288,15 @@ GenerateModuleInterfaceAction::CreateASTConsumer(CompilerInstance &CI,
   return std::make_unique<MultiplexConsumer>(std::move(Consumers));
 }
 
-std::unique_ptr<raw_pwrite_stream>
+std::unique_ptr<llvm::raw_pwrite_stream>
 GenerateModuleInterfaceAction::CreateOutputFile(CompilerInstance &CI,
-                                                StringRef InFile) {
+                                                llvm::StringRef InFile) {
   return CI.createDefaultOutputFile(/*Binary=*/true, InFile, "pcm");
 }
 
 std::unique_ptr<ASTConsumer>
 GenerateReducedModuleInterfaceAction::CreateASTConsumer(CompilerInstance &CI,
-                                                        StringRef InFile) {
+                                                        llvm::StringRef InFile) {
   return std::make_unique<ReducedBMIGenerator>(CI.getPreprocessor(),
                                                CI.getModuleCache(),
                                                CI.getFrontendOpts().OutputFile);
@@ -310,9 +311,9 @@ bool GenerateHeaderUnitAction::BeginSourceFileAction(CompilerInstance &CI) {
   return GenerateModuleAction::BeginSourceFileAction(CI);
 }
 
-std::unique_ptr<raw_pwrite_stream>
+std::unique_ptr<llvm::raw_pwrite_stream>
 GenerateHeaderUnitAction::CreateOutputFile(CompilerInstance &CI,
-                                           StringRef InFile) {
+                                           llvm::StringRef InFile) {
   return CI.createDefaultOutputFile(/*Binary=*/true, InFile, "pcm");
 }
 
@@ -320,18 +321,18 @@ SyntaxOnlyAction::~SyntaxOnlyAction() {
 }
 
 std::unique_ptr<ASTConsumer>
-SyntaxOnlyAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+SyntaxOnlyAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   return std::make_unique<ASTConsumer>();
 }
 
 std::unique_ptr<ASTConsumer>
 DumpModuleInfoAction::CreateASTConsumer(CompilerInstance &CI,
-                                        StringRef InFile) {
+                                        llvm::StringRef InFile) {
   return std::make_unique<ASTConsumer>();
 }
 
 std::unique_ptr<ASTConsumer>
-VerifyPCHAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+VerifyPCHAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   return std::make_unique<ASTConsumer>();
 }
 
@@ -575,7 +576,7 @@ private:
 } // namespace
 
 std::unique_ptr<ASTConsumer>
-TemplightDumpAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+TemplightDumpAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   return std::make_unique<ASTConsumer>();
 }
 
@@ -605,7 +606,7 @@ namespace {
 #define DUMP_BOOLEAN(Value, Text)                       \
     Out.indent(4) << Text << ": " << (Value? "Yes" : "No") << "\n"
 
-    bool ReadFullVersionInformation(StringRef FullVersion) override {
+    bool ReadFullVersionInformation(llvm::StringRef FullVersion) override {
       Out.indent(2)
         << "Generated by "
         << (FullVersion == getClangFullRepositoryVersion()? "this"
@@ -614,10 +615,10 @@ namespace {
       return ASTReaderListener::ReadFullVersionInformation(FullVersion);
     }
 
-    void ReadModuleName(StringRef ModuleName) override {
+    void ReadModuleName(llvm::StringRef ModuleName) override {
       Out.indent(2) << "Module name: " << ModuleName << "\n";
     }
-    void ReadModuleMapFile(StringRef ModuleMapPath) override {
+    void ReadModuleMapFile(llvm::StringRef ModuleMapPath) override {
       Out.indent(2) << "Module map file: " << ModuleMapPath << "\n";
     }
 
@@ -637,7 +638,7 @@ namespace {
 
       if (!LangOpts.ModuleFeatures.empty()) {
         Out.indent(4) << "Module features:\n";
-        for (StringRef Feature : LangOpts.ModuleFeatures)
+        for (llvm::StringRef Feature : LangOpts.ModuleFeatures)
           Out.indent(6) << Feature << "\n";
       }
 
@@ -663,7 +664,7 @@ namespace {
       return false;
     }
 
-    bool ReadDiagnosticOptions(IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts,
+    bool ReadDiagnosticOptions(llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts,
                                bool Complain) override {
       Out.indent(2) << "Diagnostic options:\n";
 #define DIAGOPT(Name, Bits, Default) DUMP_BOOLEAN(DiagOpts->Name, #Name);
@@ -683,7 +684,7 @@ namespace {
     }
 
     bool ReadHeaderSearchOptions(const HeaderSearchOptions &HSOpts,
-                                 StringRef SpecificModuleCachePath,
+                                 llvm::StringRef SpecificModuleCachePath,
                                  bool Complain) override {
       Out.indent(2) << "Header search options:\n";
       Out.indent(4) << "System root [-isysroot=]: '" << HSOpts.Sysroot << "'\n";
@@ -766,7 +767,7 @@ namespace {
     /// Indicates that the AST file contains particular input file.
     ///
     /// \returns true to continue receiving the next input file, false to stop.
-    bool visitInputFile(StringRef Filename, bool isSystem,
+    bool visitInputFile(llvm::StringRef Filename, bool isSystem,
                         bool isOverridden, bool isExplicitModule) override {
 
       Out.indent(2) << "Input file: " << Filename;
@@ -800,7 +801,7 @@ namespace {
 
     /// If needsImportVisitation returns \c true, this is called for each
     /// AST file imported by this AST file.
-    void visitImport(StringRef ModuleName, StringRef Filename) override {
+    void visitImport(llvm::StringRef ModuleName, llvm::StringRef Filename) override {
       Out.indent(2) << "Imports module '" << ModuleName
                     << "': " << Filename.str() << "\n";
     }
@@ -815,7 +816,7 @@ bool DumpModuleInfoAction::BeginInvocation(CompilerInstance &CI) {
   return true;
 }
 
-static StringRef ModuleKindName(Module::ModuleKind MK) {
+static llvm::StringRef ModuleKindName(Module::ModuleKind MK) {
   switch (MK) {
   case Module::ModuleMapModule:
     return "Module Map Module";
@@ -843,7 +844,7 @@ void DumpModuleInfoAction::ExecuteAction() {
   assert(isCurrentFileAST() && "dumping non-AST?");
   // Set up the output file.
   CompilerInstance &CI = getCompilerInstance();
-  StringRef OutputFileName = CI.getFrontendOpts().OutputFile;
+  llvm::StringRef OutputFileName = CI.getFrontendOpts().OutputFile;
   if (!OutputFileName.empty() && OutputFileName != "-") {
     std::error_code EC;
     OutputStream.reset(new llvm::raw_fd_ostream(
@@ -854,7 +855,7 @@ void DumpModuleInfoAction::ExecuteAction() {
   Out << "Information for module file '" << getCurrentFile() << "':\n";
   auto &FileMgr = CI.getFileManager();
   auto Buffer = FileMgr.getBufferForFile(getCurrentFile());
-  StringRef Magic = (*Buffer)->getMemBufferRef().getBuffer();
+  llvm::StringRef Magic = (*Buffer)->getMemBufferRef().getBuffer();
   bool IsRaw = Magic.starts_with("CPCH");
   Out << "  Module format: " << (IsRaw ? "raw" : "obj") << "\n";
 
@@ -1056,7 +1057,7 @@ void PrintPreprocessedAction::ExecuteAction() {
     }
   }
 
-  std::unique_ptr<raw_ostream> OS =
+  std::unique_ptr<llvm::raw_ostream> OS =
       CI.createDefaultOutputFile(BinaryMode, getCurrentFileOrBufferName());
   if (!OS) return;
 
@@ -1114,12 +1115,12 @@ void PrintPreambleAction::ExecuteAction() {
 
 void DumpCompilerOptionsAction::ExecuteAction() {
   CompilerInstance &CI = getCompilerInstance();
-  std::unique_ptr<raw_ostream> OSP =
+  std::unique_ptr<llvm::raw_ostream> OSP =
       CI.createDefaultOutputFile(false, getCurrentFile());
   if (!OSP)
     return;
 
-  raw_ostream &OS = *OSP;
+  llvm::raw_ostream &OS = *OSP;
   const Preprocessor &PP = CI.getPreprocessor();
   const LangOptions &LangOpts = PP.getLangOpts();
 
@@ -1197,7 +1198,7 @@ void GetDependenciesByModuleNameAction::ExecuteAction() {
   SourceManager &SM = PP.getSourceManager();
   FileID MainFileID = SM.getMainFileID();
   SourceLocation FileStart = SM.getLocForStartOfFile(MainFileID);
-  SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> Path;
+  llvm::SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> Path;
   IdentifierInfo *ModuleID = PP.getIdentifierInfo(ModuleName);
   Path.push_back(std::make_pair(ModuleID, FileStart));
   auto ModResult = CI.loadModule(FileStart, Path, Module::Hidden, false);

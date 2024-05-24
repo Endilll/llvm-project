@@ -77,9 +77,9 @@ namespace llvm {
 
 class StringRef {
  public:
-  StringRef();
-  StringRef(const char*);
-  StringRef(const std::string&);
+  llvm::StringRef();
+  llvm::StringRef(const char*);
+  llvm::StringRef(const std::string&);
 };
 
 }  // namespace llvm

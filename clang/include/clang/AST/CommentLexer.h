@@ -95,23 +95,23 @@ public:
   unsigned getLength() const LLVM_READONLY { return Length; }
   void setLength(unsigned L) { Length = L; }
 
-  StringRef getText() const LLVM_READONLY {
+  llvm::StringRef getText() const LLVM_READONLY {
     assert(is(tok::text));
-    return StringRef(TextPtr, IntVal);
+    return llvm::StringRef(TextPtr, IntVal);
   }
 
-  void setText(StringRef Text) {
+  void setText(llvm::StringRef Text) {
     assert(is(tok::text));
     TextPtr = Text.data();
     IntVal = Text.size();
   }
 
-  StringRef getUnknownCommandName() const LLVM_READONLY {
+  llvm::StringRef getUnknownCommandName() const LLVM_READONLY {
     assert(is(tok::unknown_command));
-    return StringRef(TextPtr, IntVal);
+    return llvm::StringRef(TextPtr, IntVal);
   }
 
-  void setUnknownCommandName(StringRef Name) {
+  void setUnknownCommandName(llvm::StringRef Name) {
     assert(is(tok::unknown_command));
     TextPtr = Name.data();
     IntVal = Name.size();
@@ -137,12 +137,12 @@ public:
     IntVal = ID;
   }
 
-  StringRef getVerbatimBlockText() const LLVM_READONLY {
+  llvm::StringRef getVerbatimBlockText() const LLVM_READONLY {
     assert(is(tok::verbatim_block_line));
-    return StringRef(TextPtr, IntVal);
+    return llvm::StringRef(TextPtr, IntVal);
   }
 
-  void setVerbatimBlockText(StringRef Text) {
+  void setVerbatimBlockText(llvm::StringRef Text) {
     assert(is(tok::verbatim_block_line));
     TextPtr = Text.data();
     IntVal = Text.size();
@@ -158,56 +158,56 @@ public:
     IntVal = ID;
   }
 
-  StringRef getVerbatimLineText() const LLVM_READONLY {
+  llvm::StringRef getVerbatimLineText() const LLVM_READONLY {
     assert(is(tok::verbatim_line_text));
-    return StringRef(TextPtr, IntVal);
+    return llvm::StringRef(TextPtr, IntVal);
   }
 
-  void setVerbatimLineText(StringRef Text) {
+  void setVerbatimLineText(llvm::StringRef Text) {
     assert(is(tok::verbatim_line_text));
     TextPtr = Text.data();
     IntVal = Text.size();
   }
 
-  StringRef getHTMLTagStartName() const LLVM_READONLY {
+  llvm::StringRef getHTMLTagStartName() const LLVM_READONLY {
     assert(is(tok::html_start_tag));
-    return StringRef(TextPtr, IntVal);
+    return llvm::StringRef(TextPtr, IntVal);
   }
 
-  void setHTMLTagStartName(StringRef Name) {
+  void setHTMLTagStartName(llvm::StringRef Name) {
     assert(is(tok::html_start_tag));
     TextPtr = Name.data();
     IntVal = Name.size();
   }
 
-  StringRef getHTMLIdent() const LLVM_READONLY {
+  llvm::StringRef getHTMLIdent() const LLVM_READONLY {
     assert(is(tok::html_ident));
-    return StringRef(TextPtr, IntVal);
+    return llvm::StringRef(TextPtr, IntVal);
   }
 
-  void setHTMLIdent(StringRef Name) {
+  void setHTMLIdent(llvm::StringRef Name) {
     assert(is(tok::html_ident));
     TextPtr = Name.data();
     IntVal = Name.size();
   }
 
-  StringRef getHTMLQuotedString() const LLVM_READONLY {
+  llvm::StringRef getHTMLQuotedString() const LLVM_READONLY {
     assert(is(tok::html_quoted_string));
-    return StringRef(TextPtr, IntVal);
+    return llvm::StringRef(TextPtr, IntVal);
   }
 
-  void setHTMLQuotedString(StringRef Str) {
+  void setHTMLQuotedString(llvm::StringRef Str) {
     assert(is(tok::html_quoted_string));
     TextPtr = Str.data();
     IntVal = Str.size();
   }
 
-  StringRef getHTMLTagEndName() const LLVM_READONLY {
+  llvm::StringRef getHTMLTagEndName() const LLVM_READONLY {
     assert(is(tok::html_end_tag));
-    return StringRef(TextPtr, IntVal);
+    return llvm::StringRef(TextPtr, IntVal);
   }
 
-  void setHTMLTagEndName(StringRef Name) {
+  void setHTMLTagEndName(llvm::StringRef Name) {
     assert(is(tok::html_end_tag));
     TextPtr = Name.data();
     IntVal = Name.size();
@@ -284,23 +284,23 @@ private:
 
   /// If State is LS_VerbatimBlock, contains the name of verbatim end
   /// command, including command marker.
-  SmallString<16> VerbatimBlockEndCommandName;
+  llvm::SmallString<16> VerbatimBlockEndCommandName;
 
   /// Given a character reference name (e.g., "lt"), return the character that
   /// it stands for (e.g., "<").
-  StringRef resolveHTMLNamedCharacterReference(StringRef Name) const;
+  llvm::StringRef resolveHTMLNamedCharacterReference(llvm::StringRef Name) const;
 
   /// Given a Unicode codepoint as base-10 integer, return the character.
-  StringRef resolveHTMLDecimalCharacterReference(StringRef Name) const;
+  llvm::StringRef resolveHTMLDecimalCharacterReference(llvm::StringRef Name) const;
 
   /// Given a Unicode codepoint as base-16 integer, return the character.
-  StringRef resolveHTMLHexCharacterReference(StringRef Name) const;
+  llvm::StringRef resolveHTMLHexCharacterReference(llvm::StringRef Name) const;
 
   void formTokenWithChars(Token &Result, const char *TokEnd,
                           tok::TokenKind Kind);
 
   void formTextToken(Token &Result, const char *TokEnd) {
-    StringRef Text(BufferPtr, TokEnd - BufferPtr);
+    llvm::StringRef Text(BufferPtr, TokEnd - BufferPtr);
     formTokenWithChars(Result, TokEnd, tok::text);
     Result.setText(Text);
   }
@@ -356,7 +356,7 @@ public:
 
   void lex(Token &T);
 
-  StringRef getSpelling(const Token &Tok, const SourceManager &SourceMgr) const;
+  llvm::StringRef getSpelling(const Token &Tok, const SourceManager &SourceMgr) const;
 };
 
 } // end namespace comments

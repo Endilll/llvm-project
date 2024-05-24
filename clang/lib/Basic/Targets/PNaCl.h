@@ -48,11 +48,11 @@ public:
     getArchDefines(Opts, Builder);
   }
 
-  bool hasFeature(StringRef Feature) const override {
+  bool hasFeature(llvm::StringRef Feature) const override {
     return Feature == "pnacl";
   }
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override {
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override {
     return std::nullopt;
   }
 
@@ -60,9 +60,9 @@ public:
     return TargetInfo::PNaClABIBuiltinVaList;
   }
 
-  ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
 
   bool validateAsmConstraint(const char *&Name,
                              TargetInfo::ConstraintInfo &Info) const override {

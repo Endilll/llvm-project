@@ -118,7 +118,7 @@ class RAIIMutexDescriptor {
   }
 
 public:
-  RAIIMutexDescriptor(StringRef GuardName) : GuardName(GuardName) {}
+  RAIIMutexDescriptor(llvm::StringRef GuardName) : GuardName(GuardName) {}
   [[nodiscard]] bool matches(const CallEvent &Call, bool IsLock) const {
     initIdentifierInfo(Call);
     if (IsLock) {

@@ -32,7 +32,7 @@ struct DetectedMultilibs {
 };
 
 bool findMIPSMultilibs(const Driver &D, const llvm::Triple &TargetTriple,
-                       StringRef Path, const llvm::opt::ArgList &Args,
+                       llvm::StringRef Path, const llvm::opt::ArgList &Args,
                        DetectedMultilibs &Result);
 
 namespace tools {
@@ -172,9 +172,9 @@ public:
     /// Any textual suffix on the patch number.
     std::string PatchSuffix;
 
-    static GCCVersion Parse(StringRef VersionText);
+    static GCCVersion Parse(llvm::StringRef VersionText);
     bool isOlderThan(int RHSMajor, int RHSMinor, int RHSPatch,
-                     StringRef RHSPatchSuffix = StringRef()) const;
+                     llvm::StringRef RHSPatchSuffix = llvm::StringRef()) const;
     bool operator<(const GCCVersion &RHS) const {
       return isOlderThan(RHS.Major, RHS.Minor, RHS.Patch, RHS.PatchSuffix);
     }
@@ -227,10 +227,10 @@ public:
     const llvm::Triple &getTriple() const { return GCCTriple; }
 
     /// Get the detected GCC installation path.
-    StringRef getInstallPath() const { return GCCInstallPath; }
+    llvm::StringRef getInstallPath() const { return GCCInstallPath; }
 
     /// Get the detected GCC parent lib path.
-    StringRef getParentLibPath() const { return GCCParentLibPath; }
+    llvm::StringRef getParentLibPath() const { return GCCParentLibPath; }
 
     /// Get the detected Multilib
     const Multilib &getMultilib() const { return SelectedMultilib; }
@@ -246,41 +246,41 @@ public:
     const GCCVersion &getVersion() const { return Version; }
 
     /// Print information about the detected GCC installation.
-    void print(raw_ostream &OS) const;
+    void print(llvm::raw_ostream &OS) const;
 
   private:
     static void
     CollectLibDirsAndTriples(const llvm::Triple &TargetTriple,
                              const llvm::Triple &BiarchTriple,
-                             SmallVectorImpl<StringRef> &LibDirs,
-                             SmallVectorImpl<StringRef> &TripleAliases,
-                             SmallVectorImpl<StringRef> &BiarchLibDirs,
-                             SmallVectorImpl<StringRef> &BiarchTripleAliases);
+                             llvm::SmallVectorImpl<llvm::StringRef> &LibDirs,
+                             llvm::SmallVectorImpl<llvm::StringRef> &TripleAliases,
+                             llvm::SmallVectorImpl<llvm::StringRef> &BiarchLibDirs,
+                             llvm::SmallVectorImpl<llvm::StringRef> &BiarchTripleAliases);
 
     void AddDefaultGCCPrefixes(const llvm::Triple &TargetTriple,
-                               SmallVectorImpl<std::string> &Prefixes,
-                               StringRef SysRoot);
+                               llvm::SmallVectorImpl<std::string> &Prefixes,
+                               llvm::StringRef SysRoot);
 
     bool ScanGCCForMultilibs(const llvm::Triple &TargetTriple,
                              const llvm::opt::ArgList &Args,
-                             StringRef Path,
+                             llvm::StringRef Path,
                              bool NeedsBiarchSuffix = false);
 
     void ScanLibDirForGCCTriple(const llvm::Triple &TargetArch,
                                 const llvm::opt::ArgList &Args,
                                 const std::string &LibDir,
-                                StringRef CandidateTriple,
+                                llvm::StringRef CandidateTriple,
                                 bool NeedsBiarchSuffix, bool GCCDirExists,
                                 bool GCCCrossDirExists);
 
     bool ScanGentooConfigs(const llvm::Triple &TargetTriple,
                            const llvm::opt::ArgList &Args,
-                           const SmallVectorImpl<StringRef> &CandidateTriples,
-                           const SmallVectorImpl<StringRef> &BiarchTriples);
+                           const llvm::SmallVectorImpl<llvm::StringRef> &CandidateTriples,
+                           const llvm::SmallVectorImpl<llvm::StringRef> &BiarchTriples);
 
     bool ScanGentooGccConfig(const llvm::Triple &TargetTriple,
                              const llvm::opt::ArgList &Args,
-                             StringRef CandidateTriple,
+                             llvm::StringRef CandidateTriple,
                              bool NeedsBiarchSuffix = false);
   };
 
@@ -294,7 +294,7 @@ public:
               const llvm::opt::ArgList &Args);
   ~Generic_GCC() override;
 
-  void printVerboseInfo(raw_ostream &OS) const override;
+  void printVerboseInfo(llvm::raw_ostream &OS) const override;
 
   UnwindTableLevel
   getDefaultUnwindTableLevel(const llvm::opt::ArgList &Args) const override;
@@ -303,7 +303,7 @@ public:
   bool isPICDefaultForced() const override;
   bool IsIntegratedAssemblerDefault() const override;
   llvm::opt::DerivedArgList *
-  TranslateArgs(const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+  TranslateArgs(const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
                 Action::OffloadKind DeviceOffloadKind) const override;
 
 protected:
@@ -345,10 +345,10 @@ protected:
 
   bool addGCCLibStdCxxIncludePaths(const llvm::opt::ArgList &DriverArgs,
                                    llvm::opt::ArgStringList &CC1Args,
-                                   StringRef DebianMultiarch) const;
+                                   llvm::StringRef DebianMultiarch) const;
 
-  bool addLibStdCXXIncludePaths(Twine IncludeDir, StringRef Triple,
-                                Twine IncludeSuffix,
+  bool addLibStdCXXIncludePaths(llvm::Twine IncludeDir, llvm::StringRef Triple,
+                                llvm::Twine IncludeSuffix,
                                 const llvm::opt::ArgList &DriverArgs,
                                 llvm::opt::ArgStringList &CC1Args,
                                 bool DetectDebian = false) const;

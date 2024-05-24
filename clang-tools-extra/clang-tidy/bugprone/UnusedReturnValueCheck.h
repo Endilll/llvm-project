@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/unused-return-value.html
 class UnusedReturnValueCheck : public ClangTidyCheck {
 public:
-  UnusedReturnValueCheck(StringRef Name, ClangTidyContext *Context);
+  UnusedReturnValueCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
@@ -29,15 +29,15 @@ public:
   }
 
 private:
-  const std::vector<StringRef> CheckedFunctions;
-  const std::vector<StringRef> CheckedReturnTypes;
+  const std::vector<llvm::StringRef> CheckedFunctions;
+  const std::vector<llvm::StringRef> CheckedReturnTypes;
 
 protected:
-  UnusedReturnValueCheck(StringRef Name, ClangTidyContext *Context,
-                         std::vector<StringRef> CheckedFunctions);
-  UnusedReturnValueCheck(StringRef Name, ClangTidyContext *Context,
-                         std::vector<StringRef> CheckedFunctions,
-                         std::vector<StringRef> CheckedReturnTypes,
+  UnusedReturnValueCheck(llvm::StringRef Name, ClangTidyContext *Context,
+                         std::vector<llvm::StringRef> CheckedFunctions);
+  UnusedReturnValueCheck(llvm::StringRef Name, ClangTidyContext *Context,
+                         std::vector<llvm::StringRef> CheckedFunctions,
+                         std::vector<llvm::StringRef> CheckedReturnTypes,
                          bool AllowCastToVoid);
   bool AllowCastToVoid;
 };

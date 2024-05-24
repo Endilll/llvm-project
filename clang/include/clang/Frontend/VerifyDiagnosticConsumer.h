@@ -45,7 +45,7 @@ public:
     static std::unique_ptr<Directive>
     create(bool RegexKind, SourceLocation DirectiveLoc,
            SourceLocation DiagnosticLoc, bool MatchAnyFileAndLine,
-           bool MatchAnyLine, StringRef Text, unsigned Min, unsigned Max);
+           bool MatchAnyLine, llvm::StringRef Text, unsigned Min, unsigned Max);
 
   public:
     /// Constant representing n or more matches.
@@ -67,11 +67,11 @@ public:
     virtual bool isValid(std::string &Error) = 0;
 
     // Returns true on match.
-    virtual bool match(StringRef S) = 0;
+    virtual bool match(llvm::StringRef S) = 0;
 
   protected:
     Directive(SourceLocation DirectiveLoc, SourceLocation DiagnosticLoc,
-              bool MatchAnyFileAndLine, bool MatchAnyLine, StringRef Text,
+              bool MatchAnyFileAndLine, bool MatchAnyLine, llvm::StringRef Text,
               unsigned Min, unsigned Max)
         : DirectiveLoc(DirectiveLoc), DiagnosticLoc(DiagnosticLoc), Text(Text),
           Min(Min), Max(Max), MatchAnyLine(MatchAnyLine || MatchAnyFileAndLine),

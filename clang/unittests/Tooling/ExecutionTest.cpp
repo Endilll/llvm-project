@@ -65,7 +65,7 @@ public:
 protected:
   std::unique_ptr<clang::ASTConsumer>
   CreateASTConsumer(clang::CompilerInstance &compiler,
-                    StringRef /* dummy */) override {
+                    llvm::StringRef /* dummy */) override {
     std::unique_ptr<clang::ASTConsumer> ast_consumer{
         new ASTConsumerWithResult(Context)};
     return ast_consumer;
@@ -95,7 +95,7 @@ public:
   TestToolExecutor(CommonOptionsParser Options)
       : OptionsParser(std::move(Options)) {}
 
-  StringRef getExecutorName() const override { return ExecutorName; }
+  llvm::StringRef getExecutorName() const override { return ExecutorName; }
 
   llvm::Error
   execute(llvm::ArrayRef<std::pair<std::unique_ptr<FrontendActionFactory>,
@@ -111,7 +111,7 @@ public:
     return OptionsParser.getSourcePathList();
   }
 
-  void mapVirtualFile(StringRef FilePath, StringRef Content) override {
+  void mapVirtualFile(llvm::StringRef FilePath, llvm::StringRef Content) override {
     VFS[std::string(FilePath)] = std::string(Content);
   }
 
@@ -222,18 +222,18 @@ TEST(StandaloneToolTest, SimpleActionWithResult) {
   EXPECT_EQ("::/1", KVs[0].second);
 
   Executor.getToolResults()->forEachResult(
-      [](StringRef, StringRef Value) { EXPECT_EQ("::/1", Value); });
+      [](llvm::StringRef, llvm::StringRef Value) { EXPECT_EQ("::/1", Value); });
 }
 
 class FixedCompilationDatabaseWithFiles : public CompilationDatabase {
 public:
-  FixedCompilationDatabaseWithFiles(Twine Directory,
-                                    ArrayRef<std::string> Files,
-                                    ArrayRef<std::string> CommandLine)
+  FixedCompilationDatabaseWithFiles(llvm::Twine Directory,
+                                    llvm::ArrayRef<std::string> Files,
+                                    llvm::ArrayRef<std::string> CommandLine)
       : FixedCompilations(Directory, CommandLine), Files(Files) {}
 
   std::vector<CompileCommand>
-  getCompileCommands(StringRef FilePath) const override {
+  getCompileCommands(llvm::StringRef FilePath) const override {
     return FixedCompilations.getCompileCommands(FilePath);
   }
 
@@ -289,7 +289,7 @@ TEST(AllTUsToolTest, ManyFiles) {
   ASSERT_TRUE(!Err);
   std::vector<std::string> Results;
   Executor.getToolResults()->forEachResult(
-      [&](StringRef Name, StringRef) { Results.push_back(std::string(Name)); });
+      [&](llvm::StringRef Name, llvm::StringRef) { Results.push_back(std::string(Name)); });
   EXPECT_THAT(ExpectedSymbols, ::testing::UnorderedElementsAreArray(Results));
 }
 

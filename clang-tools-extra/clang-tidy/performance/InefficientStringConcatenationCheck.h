@@ -21,7 +21,7 @@ namespace clang::tidy::performance {
 /// http://clang.llvm.org/extra/clang-tidy/checks/performance/inefficient-string-concatenation.html
 class InefficientStringConcatenationCheck : public ClangTidyCheck {
 public:
-  InefficientStringConcatenationCheck(StringRef Name,
+  InefficientStringConcatenationCheck(llvm::StringRef Name,
                                       ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

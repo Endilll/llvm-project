@@ -76,7 +76,7 @@ FrontendActionFactory::~FrontendActionFactory() = default;
 /// Builds a clang driver initialized for running clang tools.
 static driver::Driver *
 newDriver(DiagnosticsEngine *Diagnostics, const char *BinaryName,
-          IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
+          llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
   driver::Driver *CompilerDriver =
       new driver::Driver(BinaryName, llvm::sys::getDefaultTargetTriple(),
                          *Diagnostics, "clang LLVM compiler", std::move(VFS));
@@ -95,7 +95,7 @@ static bool ignoreExtraCC1Commands(const driver::Compilation *Compilation) {
   // injected -fsyntax-only or not. Try to handle both cases here.
 
   for (const auto &Job : Jobs)
-    if (StringRef(Job.getExecutable()) == "clang-offload-bundler")
+    if (llvm::StringRef(Job.getExecutable()) == "clang-offload-bundler")
       OffloadCompilation = true;
 
   if (Jobs.size() > 1) {
@@ -135,7 +135,7 @@ getCC1Arguments(DiagnosticsEngine *Diagnostics,
   const driver::JobList &Jobs = Compilation->getJobs();
 
   auto IsCC1Command = [](const driver::Command &Cmd) {
-    return StringRef(Cmd.getCreator().getName()) == "clang";
+    return llvm::StringRef(Cmd.getCreator().getName()) == "clang";
   };
 
   auto IsSrcFile = [](const driver::InputInfo &II) {
@@ -156,7 +156,7 @@ getCC1Arguments(DiagnosticsEngine *Diagnostics,
 
   if (CC1Jobs.empty() ||
       (CC1Jobs.size() > 1 && !ignoreExtraCC1Commands(Compilation))) {
-    SmallString<256> error_msg;
+    llvm::SmallString<256> error_msg;
     llvm::raw_svector_ostream error_stream(error_msg);
     Jobs.Print(error_stream, "; ", true);
     Diagnostics->Report(diag::err_fe_expected_compiler_job)
@@ -169,7 +169,7 @@ getCC1Arguments(DiagnosticsEngine *Diagnostics,
 
 /// Returns a clang build invocation initialized from the CC1 flags.
 CompilerInvocation *newInvocation(DiagnosticsEngine *Diagnostics,
-                                  ArrayRef<const char *> CC1Args,
+                                  llvm::ArrayRef<const char *> CC1Args,
                                   const char *const BinaryName) {
   assert(!CC1Args.empty() && "Must at least contain the program name!");
   CompilerInvocation *Invocation = new CompilerInvocation;
@@ -181,7 +181,7 @@ CompilerInvocation *newInvocation(DiagnosticsEngine *Diagnostics,
 }
 
 bool runToolOnCode(std::unique_ptr<FrontendAction> ToolAction,
-                   const Twine &Code, const Twine &FileName,
+                   const llvm::Twine &Code, const llvm::Twine &FileName,
                    std::shared_ptr<PCHContainerOperations> PCHContainerOps) {
   return runToolOnCodeWithArgs(std::move(ToolAction), Code,
                                std::vector<std::string>(), FileName,
@@ -192,9 +192,9 @@ bool runToolOnCode(std::unique_ptr<FrontendAction> ToolAction,
 } // namespace clang
 
 static std::vector<std::string>
-getSyntaxOnlyToolArgs(const Twine &ToolName,
+getSyntaxOnlyToolArgs(const llvm::Twine &ToolName,
                       const std::vector<std::string> &ExtraArgs,
-                      StringRef FileName) {
+                      llvm::StringRef FileName) {
   std::vector<std::string> Args;
   Args.push_back(ToolName.str());
   Args.push_back("-fsyntax-only");
@@ -207,13 +207,13 @@ namespace clang {
 namespace tooling {
 
 bool runToolOnCodeWithArgs(
-    std::unique_ptr<FrontendAction> ToolAction, const Twine &Code,
+    std::unique_ptr<FrontendAction> ToolAction, const llvm::Twine &Code,
     llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
-    const std::vector<std::string> &Args, const Twine &FileName,
-    const Twine &ToolName,
+    const std::vector<std::string> &Args, const llvm::Twine &FileName,
+    const llvm::Twine &ToolName,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps) {
-  SmallString<16> FileNameStorage;
-  StringRef FileNameRef = FileName.toNullTerminatedStringRef(FileNameStorage);
+  llvm::SmallString<16> FileNameStorage;
+  llvm::StringRef FileNameRef = FileName.toNullTerminatedStringRef(FileNameStorage);
 
   llvm::IntrusiveRefCntPtr<FileManager> Files(
       new FileManager(FileSystemOptions(), VFS));
@@ -225,9 +225,9 @@ bool runToolOnCodeWithArgs(
 }
 
 bool runToolOnCodeWithArgs(
-    std::unique_ptr<FrontendAction> ToolAction, const Twine &Code,
-    const std::vector<std::string> &Args, const Twine &FileName,
-    const Twine &ToolName,
+    std::unique_ptr<FrontendAction> ToolAction, const llvm::Twine &Code,
+    const std::vector<std::string> &Args, const llvm::Twine &FileName,
+    const llvm::Twine &ToolName,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
     const FileContentMappings &VirtualMappedFiles) {
   llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFileSystem(
@@ -236,7 +236,7 @@ bool runToolOnCodeWithArgs(
       new llvm::vfs::InMemoryFileSystem);
   OverlayFileSystem->pushOverlay(InMemoryFileSystem);
 
-  SmallString<1024> CodeStorage;
+  llvm::SmallString<1024> CodeStorage;
   InMemoryFileSystem->addFile(FileName, 0,
                               llvm::MemoryBuffer::getMemBuffer(
                                   Code.toNullTerminatedStringRef(CodeStorage)));
@@ -252,36 +252,36 @@ bool runToolOnCodeWithArgs(
 }
 
 llvm::Expected<std::string> getAbsolutePath(llvm::vfs::FileSystem &FS,
-                                            StringRef File) {
-  StringRef RelativePath(File);
+                                            llvm::StringRef File) {
+  llvm::StringRef RelativePath(File);
   // FIXME: Should '.\\' be accepted on Win32?
   RelativePath.consume_front("./");
 
-  SmallString<1024> AbsolutePath = RelativePath;
+  llvm::SmallString<1024> AbsolutePath = RelativePath;
   if (auto EC = FS.makeAbsolute(AbsolutePath))
     return llvm::errorCodeToError(EC);
   llvm::sys::path::native(AbsolutePath);
   return std::string(AbsolutePath);
 }
 
-std::string getAbsolutePath(StringRef File) {
+std::string getAbsolutePath(llvm::StringRef File) {
   return llvm::cantFail(getAbsolutePath(*llvm::vfs::getRealFileSystem(), File));
 }
 
 void addTargetAndModeForProgramName(std::vector<std::string> &CommandLine,
-                                    StringRef InvokedAs) {
+                                    llvm::StringRef InvokedAs) {
   if (CommandLine.empty() || InvokedAs.empty())
     return;
   const auto &Table = driver::getDriverOptTable();
   // --target=X
-  StringRef TargetOPT =
+  llvm::StringRef TargetOPT =
       Table.getOption(driver::options::OPT_target).getPrefixedName();
   // -target X
-  StringRef TargetOPTLegacy =
+  llvm::StringRef TargetOPTLegacy =
       Table.getOption(driver::options::OPT_target_legacy_spelling)
           .getPrefixedName();
   // --driver-mode=X
-  StringRef DriverModeOPT =
+  llvm::StringRef DriverModeOPT =
       Table.getOption(driver::options::OPT_driver_mode).getPrefixedName();
   auto TargetMode =
       driver::ToolChain::getTargetAndModeFromProgramName(InvokedAs);
@@ -291,7 +291,7 @@ void addTargetAndModeForProgramName(std::vector<std::string> &CommandLine,
   // Skip CommandLine[0].
   for (auto Token = ++CommandLine.begin(); Token != CommandLine.end();
        ++Token) {
-    StringRef TokenRef(*Token);
+    llvm::StringRef TokenRef(*Token);
     ShouldAddTarget = ShouldAddTarget && !TokenRef.starts_with(TargetOPT) &&
                       TokenRef != TargetOPTLegacy;
     ShouldAddMode = ShouldAddMode && !TokenRef.starts_with(DriverModeOPT);
@@ -377,7 +377,7 @@ bool ToolInvocation::run() {
 
   // Parse diagnostic options from the driver command-line only if none were
   // explicitly set.
-  IntrusiveRefCntPtr<DiagnosticOptions> ParsedDiagOpts;
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> ParsedDiagOpts;
   DiagnosticOptions *DiagOpts = this->DiagOpts;
   if (!DiagOpts) {
     ParsedDiagOpts = CreateAndPopulateDiagOpts(Argv);
@@ -385,7 +385,7 @@ bool ToolInvocation::run() {
   }
 
   TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), DiagOpts);
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diagnostics =
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diagnostics =
       CompilerInstance::createDiagnostics(
           &*DiagOpts, DiagConsumer ? DiagConsumer : &DiagnosticPrinter, false);
   // Although `Diagnostics` are used only for command-line parsing, the custom
@@ -395,7 +395,7 @@ bool ToolInvocation::run() {
 
   // We already have a cc1, just create an invocation.
   if (CommandLine.size() >= 2 && CommandLine[1] == "-cc1") {
-    ArrayRef<const char *> CC1Args = ArrayRef(Argv).drop_front();
+    llvm::ArrayRef<const char *> CC1Args = llvm::ArrayRef(Argv).drop_front();
     std::unique_ptr<CompilerInvocation> Invocation(
         newInvocation(&*Diagnostics, CC1Args, BinaryName));
     if (Diagnostics->hasErrorOccurred())
@@ -469,10 +469,10 @@ bool FrontendActionFactory::runInvocation(
 }
 
 ClangTool::ClangTool(const CompilationDatabase &Compilations,
-                     ArrayRef<std::string> SourcePaths,
+                     llvm::ArrayRef<std::string> SourcePaths,
                      std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-                     IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS,
-                     IntrusiveRefCntPtr<FileManager> Files)
+                     llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS,
+                     llvm::IntrusiveRefCntPtr<FileManager> Files)
     : Compilations(Compilations), SourcePaths(SourcePaths),
       PCHContainerOps(std::move(PCHContainerOps)),
       OverlayFileSystem(new llvm::vfs::OverlayFileSystem(std::move(BaseFS))),
@@ -489,7 +489,7 @@ ClangTool::ClangTool(const CompilationDatabase &Compilations,
 
 ClangTool::~ClangTool() = default;
 
-void ClangTool::mapVirtualFile(StringRef FilePath, StringRef Content) {
+void ClangTool::mapVirtualFile(llvm::StringRef FilePath, llvm::StringRef Content) {
   MappedFileContents.push_back(std::make_pair(FilePath, Content));
 }
 
@@ -504,7 +504,7 @@ void ClangTool::clearArgumentsAdjusters() {
 static void injectResourceDir(CommandLineArguments &Args, const char *Argv0,
                               void *MainAddr) {
   // Allow users to override the resource dir.
-  for (StringRef Arg : Args)
+  for (llvm::StringRef Arg : Args)
     if (Arg.starts_with("-resource-dir"))
       return;
 
@@ -582,7 +582,7 @@ int ClangTool::run(ToolAction *Action) {
       if (OverlayFileSystem->setCurrentWorkingDirectory(
               CompileCommand.Directory))
         llvm::report_fatal_error("Cannot chdir into \"" +
-                                 Twine(CompileCommand.Directory) + "\"!");
+                                 llvm::Twine(CompileCommand.Directory) + "\"!");
 
       // Now fill the in-memory VFS with the relative file mappings so it will
       // have the correct relative paths. We never remove mappings but that
@@ -679,15 +679,15 @@ namespace clang {
 namespace tooling {
 
 std::unique_ptr<ASTUnit>
-buildASTFromCode(StringRef Code, StringRef FileName,
+buildASTFromCode(llvm::StringRef Code, llvm::StringRef FileName,
                  std::shared_ptr<PCHContainerOperations> PCHContainerOps) {
   return buildASTFromCodeWithArgs(Code, std::vector<std::string>(), FileName,
                                   "clang-tool", std::move(PCHContainerOps));
 }
 
 std::unique_ptr<ASTUnit> buildASTFromCodeWithArgs(
-    StringRef Code, const std::vector<std::string> &Args, StringRef FileName,
-    StringRef ToolName, std::shared_ptr<PCHContainerOperations> PCHContainerOps,
+    llvm::StringRef Code, const std::vector<std::string> &Args, llvm::StringRef FileName,
+    llvm::StringRef ToolName, std::shared_ptr<PCHContainerOperations> PCHContainerOps,
     ArgumentsAdjuster Adjuster, const FileContentMappings &VirtualMappedFiles,
     DiagnosticConsumer *DiagConsumer) {
   std::vector<std::unique_ptr<ASTUnit>> ASTs;

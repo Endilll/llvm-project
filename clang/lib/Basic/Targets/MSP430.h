@@ -50,20 +50,20 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override {
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override {
     // FIXME: Implement.
     return std::nullopt;
   }
 
   bool allowsLargerPreferedTypeAlignment() const override { return false; }
 
-  bool hasFeature(StringRef Feature) const override {
+  bool hasFeature(llvm::StringRef Feature) const override {
     return Feature == "msp430";
   }
 
-  ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     // Make r0 - r3 be recognized by llc (f.e., in clobber list)
     static const TargetInfo::GCCRegAlias GCCRegAliases[] = {
         {{"r0"}, "pc"},

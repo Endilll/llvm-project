@@ -62,7 +62,7 @@ PragmaHandler::~PragmaHandler() = default;
 // EmptyPragmaHandler Implementation.
 //===----------------------------------------------------------------------===//
 
-EmptyPragmaHandler::EmptyPragmaHandler(StringRef Name) : PragmaHandler(Name) {}
+EmptyPragmaHandler::EmptyPragmaHandler(llvm::StringRef Name) : PragmaHandler(Name) {}
 
 void EmptyPragmaHandler::HandlePragma(Preprocessor &PP,
                                       PragmaIntroducer Introducer,
@@ -76,14 +76,14 @@ void EmptyPragmaHandler::HandlePragma(Preprocessor &PP,
 /// specified name.  If not, return the handler for the null identifier if it
 /// exists, otherwise return null.  If IgnoreNull is true (the default) then
 /// the null handler isn't returned on failure to match.
-PragmaHandler *PragmaNamespace::FindHandler(StringRef Name,
+PragmaHandler *PragmaNamespace::FindHandler(llvm::StringRef Name,
                                             bool IgnoreNull) const {
   auto I = Handlers.find(Name);
   if (I != Handlers.end())
     return I->getValue().get();
   if (IgnoreNull)
     return nullptr;
-  I = Handlers.find(StringRef());
+  I = Handlers.find(llvm::StringRef());
   if (I != Handlers.end())
     return I->getValue().get();
   return nullptr;
@@ -113,7 +113,7 @@ void PragmaNamespace::HandlePragma(Preprocessor &PP,
   // Get the handler for this token.  If there is no handler, ignore the pragma.
   PragmaHandler *Handler
     = FindHandler(Tok.getIdentifierInfo() ? Tok.getIdentifierInfo()->getName()
-                                          : StringRef(),
+                                          : llvm::StringRef(),
                   /*IgnoreNull=*/false);
   if (!Handler) {
     PP.Diag(Tok, diag::warn_pragma_ignored);
@@ -135,7 +135,7 @@ namespace {
 struct TokenCollector {
   Preprocessor &Self;
   bool Collect;
-  SmallVector<Token, 3> Tokens;
+  llvm::SmallVector<Token, 3> Tokens;
   Token &Tok;
 
   void lex() {
@@ -262,9 +262,9 @@ void Preprocessor::Handle_Pragma(Token &Tok) {
 
   SourceLocation RParenLoc = Tok.getLocation();
   bool Invalid = false;
-  SmallString<64> StrVal;
+  llvm::SmallString<64> StrVal;
   StrVal.resize(StrTok.getLength());
-  StringRef StrValRef = getSpelling(StrTok, StrVal, &Invalid);
+  llvm::StringRef StrValRef = getSpelling(StrTok, StrVal, &Invalid);
   if (Invalid) {
     Diag(PragmaLoc, diag::err__Pragma_malformed);
     return;
@@ -303,7 +303,7 @@ void Preprocessor::Handle_Pragma(Token &Tok) {
   return Lex(Tok);
 }
 
-void clang::prepare_PragmaString(SmallVectorImpl<char> &StrVal) {
+void clang::prepare_PragmaString(llvm::SmallVectorImpl<char> &StrVal) {
   if (StrVal[0] == 'L' || StrVal[0] == 'U' ||
       (StrVal[0] == 'u' && StrVal[1] != '8'))
     StrVal.erase(StrVal.begin());
@@ -371,7 +371,7 @@ void Preprocessor::HandleMicrosoft__pragma(Token &Tok) {
   }
 
   // Get the tokens enclosed within the __pragma(), as well as the final ')'.
-  SmallVector<Token, 32> PragmaToks;
+  llvm::SmallVector<Token, 32> PragmaToks;
   int NumParens = 0;
   Toks.lex();
   while (Tok.isNot(tok::eof)) {
@@ -432,7 +432,7 @@ void Preprocessor::HandlePragmaOnce(Token &OnceTok) {
 void Preprocessor::HandlePragmaMark(Token &MarkTok) {
   assert(CurPPLexer && "No current lexer?");
 
-  SmallString<64> Buffer;
+  llvm::SmallString<64> Buffer;
   CurLexer->ReadToEndOfLine(&Buffer);
   if (Callbacks)
     Callbacks->PragmaMark(MarkTok.getLocation(), Buffer);
@@ -525,9 +525,9 @@ void Preprocessor::HandlePragmaDependency(Token &DependencyTok) {
   }
 
   // Reserve a buffer to get the spelling.
-  SmallString<128> FilenameBuffer;
+  llvm::SmallString<128> FilenameBuffer;
   bool Invalid = false;
-  StringRef Filename = getSpelling(FilenameTok, FilenameBuffer, &Invalid);
+  llvm::StringRef Filename = getSpelling(FilenameTok, FilenameBuffer, &Invalid);
   if (Invalid)
     return;
 
@@ -612,7 +612,7 @@ IdentifierInfo *Preprocessor::ParsePragmaPushOrPopMacro(Token &Tok) {
   Token MacroTok;
   MacroTok.startToken();
   MacroTok.setKind(tok::raw_identifier);
-  CreateString(StringRef(&StrVal[1], StrVal.size() - 2), MacroTok);
+  CreateString(llvm::StringRef(&StrVal[1], StrVal.size() - 2), MacroTok);
 
   // Get the IdentifierInfo of MacroToPushTok.
   return LookUpIdentifierInfo(MacroTok);
@@ -700,8 +700,8 @@ void Preprocessor::HandlePragmaIncludeAlias(Token &Tok) {
   if (LexHeaderName(SourceFilenameTok))
     return;
 
-  StringRef SourceFileName;
-  SmallString<128> FileNameBuffer;
+  llvm::StringRef SourceFileName;
+  llvm::SmallString<128> FileNameBuffer;
   if (SourceFilenameTok.is(tok::header_name)) {
     SourceFileName = getSpelling(SourceFilenameTok, FileNameBuffer);
   } else {
@@ -721,7 +721,7 @@ void Preprocessor::HandlePragmaIncludeAlias(Token &Tok) {
   if (LexHeaderName(ReplaceFilenameTok))
     return;
 
-  StringRef ReplaceFileName;
+  llvm::StringRef ReplaceFileName;
   if (ReplaceFilenameTok.is(tok::header_name)) {
     ReplaceFileName = getSpelling(ReplaceFilenameTok, FileNameBuffer);
   } else {
@@ -738,7 +738,7 @@ void Preprocessor::HandlePragmaIncludeAlias(Token &Tok) {
 
   // Now that we have the source and target filenames, we need to make sure
   // they're both of the same type (angled vs non-angled)
-  StringRef OriginalSource = SourceFileName;
+  llvm::StringRef OriginalSource = SourceFileName;
 
   bool SourceIsAngled =
     GetIncludeFilenameSpelling(SourceFilenameTok.getLocation(),
@@ -820,7 +820,7 @@ void Preprocessor::HandlePragmaModuleBuild(Token &Tok) {
 
   CurLexer->LexingRawMode = true;
 
-  auto TryConsumeIdentifier = [&](StringRef Ident) -> bool {
+  auto TryConsumeIdentifier = [&](llvm::StringRef Ident) -> bool {
     if (Tok.getKind() != tok::raw_identifier ||
         Tok.getRawIdentifier() != Ident)
       return false;
@@ -875,7 +875,7 @@ void Preprocessor::HandlePragmaModuleBuild(Token &Tok) {
          End <= CurLexer->getBuffer().end() &&
          "module source range not contained within same file buffer");
   TheModuleLoader.createModuleFromSource(Loc, ModuleName->getName(),
-                                         StringRef(Start, End - Start));
+                                         llvm::StringRef(Start, End - Start));
 }
 
 void Preprocessor::HandlePragmaHdrstop(Token &Tok) {
@@ -912,7 +912,7 @@ void Preprocessor::HandlePragmaHdrstop(Token &Tok) {
 /// AddPragmaHandler - Add the specified pragma handler to the preprocessor.
 /// If 'Namespace' is non-null, then it is a token required to exist on the
 /// pragma line before the pragma string starts, e.g. "STDC" or "GCC".
-void Preprocessor::AddPragmaHandler(StringRef Namespace,
+void Preprocessor::AddPragmaHandler(llvm::StringRef Namespace,
                                     PragmaHandler *Handler) {
   PragmaNamespace *InsertNS = PragmaHandlers.get();
 
@@ -943,7 +943,7 @@ void Preprocessor::AddPragmaHandler(StringRef Namespace,
 /// preprocessor. If \arg Namespace is non-null, then it should be the
 /// namespace that \arg Handler was added to. It is an error to remove
 /// a handler that has not been registered.
-void Preprocessor::RemovePragmaHandler(StringRef Namespace,
+void Preprocessor::RemovePragmaHandler(llvm::StringRef Namespace,
                                        PragmaHandler *Handler) {
   PragmaNamespace *NS = PragmaHandlers.get();
 
@@ -1222,7 +1222,7 @@ struct PragmaDebugHandler : public PragmaHandler {
     }
 
     SourceLocation NameLoc = Tok.getLocation();
-    MutableArrayRef<Token> Toks(
+    llvm::MutableArrayRef<Token> Toks(
         PP.getPreprocessorAllocator().Allocate<Token>(1), 1);
     Toks[0].startToken();
     Toks[0].setKind(tok::annot_pragma_captured);
@@ -1347,7 +1347,7 @@ public:
 
     diag::Flavor Flavor = WarningName[1] == 'W' ? diag::Flavor::WarningOrError
                                                 : diag::Flavor::Remark;
-    StringRef Group = StringRef(WarningName).substr(2);
+    llvm::StringRef Group = llvm::StringRef(WarningName).substr(2);
     bool unknownDiag = false;
     if (Group == "everything") {
       // Special handling for pragma clang diagnostic ... "-Weverything".
@@ -1475,7 +1475,7 @@ struct PragmaWarningHandler : public PragmaHandler {
         }
 
         // Collect the warning ids.
-        SmallVector<int, 4> Ids;
+        llvm::SmallVector<int, 4> Ids;
         PP.Lex(Tok);
         while (Tok.is(tok::numeric_constant)) {
           uint64_t Value;
@@ -1613,7 +1613,7 @@ struct PragmaIncludeAliasHandler : public PragmaHandler {
 struct PragmaMessageHandler : public PragmaHandler {
 private:
   const PPCallbacks::PragmaMessageKind Kind;
-  const StringRef Namespace;
+  const llvm::StringRef Namespace;
 
   static const char* PragmaKind(PPCallbacks::PragmaMessageKind Kind,
                                 bool PragmaNameOnly = false) {
@@ -1630,7 +1630,7 @@ private:
 
 public:
   PragmaMessageHandler(PPCallbacks::PragmaMessageKind Kind,
-                       StringRef Namespace = StringRef())
+                       llvm::StringRef Namespace = llvm::StringRef())
       : PragmaHandler(PragmaKind(Kind, true)), Kind(Kind),
         Namespace(Namespace) {}
 
@@ -1741,7 +1741,7 @@ struct PragmaModuleBeginHandler : public PragmaHandler {
       PP.Diag(Tok, diag::ext_pp_extra_tokens_at_eol) << "pragma";
 
     // We can only enter submodules of the current module.
-    StringRef Current = PP.getLangOpts().CurrentModule;
+    llvm::StringRef Current = PP.getLangOpts().CurrentModule;
     if (ModuleName.front().first->getName() != Current) {
       PP.Diag(ModuleName.front().second, diag::err_pp_module_begin_wrong_module)
         << ModuleName.front().first << (ModuleName.size() > 1)

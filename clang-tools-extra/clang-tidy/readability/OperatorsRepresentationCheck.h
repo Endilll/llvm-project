@@ -21,7 +21,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/operators-representation.html
 class OperatorsRepresentationCheck : public ClangTidyCheck {
 public:
-  OperatorsRepresentationCheck(StringRef Name, ClangTidyContext *Context);
+  OperatorsRepresentationCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;

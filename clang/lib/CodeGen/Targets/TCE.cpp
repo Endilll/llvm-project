@@ -50,7 +50,7 @@ void TCETargetCodeGenInfo::setTargetAttributes(
             M.getModule().getOrInsertNamedMetadata(
                 "opencl.kernel_wg_size_info");
 
-        SmallVector<llvm::Metadata *, 5> Operands;
+        llvm::SmallVector<llvm::Metadata *, 5> Operands;
         Operands.push_back(llvm::ConstantAsMetadata::get(F));
 
         Operands.push_back(

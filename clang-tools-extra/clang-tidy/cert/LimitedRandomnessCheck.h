@@ -22,7 +22,7 @@ namespace clang::tidy::cert {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cert/msc50-cpp.html
 class LimitedRandomnessCheck : public ClangTidyCheck {
 public:
-  LimitedRandomnessCheck(StringRef Name, ClangTidyContext *Context)
+  LimitedRandomnessCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

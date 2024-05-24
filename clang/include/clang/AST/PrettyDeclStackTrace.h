@@ -37,7 +37,7 @@ public:
                             const char *Msg)
     : Context(Ctx), TheDecl(D), Loc(Loc), Message(Msg) {}
 
-  void print(raw_ostream &OS) const override;
+  void print(llvm::raw_ostream &OS) const override;
 };
 
 }

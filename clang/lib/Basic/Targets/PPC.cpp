@@ -354,7 +354,7 @@ void PPCTargetInfo::getTargetDefines(const LangOptions &Opts,
     Builder.defineMacro("__STRUCT_PARM_ALIGN__", "16");
 
   if (ArchDefs & ArchDefineName)
-    Builder.defineMacro(Twine("_ARCH_", StringRef(CPU).upper()));
+    Builder.defineMacro(llvm::Twine("_ARCH_", llvm::StringRef(CPU).upper()));
   if (ArchDefs & ArchDefinePpcgr)
     Builder.defineMacro("_ARCH_PPCGR");
   if (ArchDefs & ArchDefinePpcsq)
@@ -489,7 +489,7 @@ static bool ppcUserFeaturesCheck(DiagnosticsEngine &Diags,
   if (!llvm::is_contained(FeaturesVec, "-vsx"))
     return true;
 
-  auto FindVSXSubfeature = [&](StringRef Feature, StringRef Option) {
+  auto FindVSXSubfeature = [&](llvm::StringRef Feature, llvm::StringRef Option) {
     if (llvm::is_contained(FeaturesVec, Feature)) {
       Diags.Report(diag::err_opt_not_valid_with_opt) << Option << "-mno-vsx";
       return true;
@@ -510,7 +510,7 @@ static bool ppcUserFeaturesCheck(DiagnosticsEngine &Diags,
 }
 
 bool PPCTargetInfo::initFeatureMap(
-    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, StringRef CPU,
+    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, llvm::StringRef CPU,
     const std::vector<std::string> &FeaturesVec) const {
   Features["altivec"] = llvm::StringSwitch<bool>(CPU)
                             .Case("7400", true)
@@ -698,7 +698,7 @@ void PPCTargetInfo::addP10SpecificFeatures(
 void PPCTargetInfo::addFutureSpecificFeatures(
     llvm::StringMap<bool> &Features) const {}
 
-bool PPCTargetInfo::hasFeature(StringRef Feature) const {
+bool PPCTargetInfo::hasFeature(llvm::StringRef Feature) const {
   return llvm::StringSwitch<bool>(Feature)
       .Case("powerpc", true)
       .Case("altivec", HasAltivec)
@@ -732,7 +732,7 @@ bool PPCTargetInfo::hasFeature(StringRef Feature) const {
 }
 
 void PPCTargetInfo::setFeatureEnabled(llvm::StringMap<bool> &Features,
-                                      StringRef Name, bool Enabled) const {
+                                      llvm::StringRef Name, bool Enabled) const {
   if (Enabled) {
     if (Name == "efpu2")
       Features["spe"] = true;
@@ -803,7 +803,7 @@ const char *const PPCTargetInfo::GCCRegNames[] = {
     "v31", "vrsave", "vscr", "spe_acc", "spefscr", "sfp"
 };
 
-ArrayRef<const char *> PPCTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> PPCTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
@@ -834,7 +834,7 @@ const TargetInfo::GCCRegAlias PPCTargetInfo::GCCRegAliases[] = {
     {{"fr31"}, "f31"}, {{"cc"}, "cr0"},
 };
 
-ArrayRef<TargetInfo::GCCRegAlias> PPCTargetInfo::getGCCRegAliases() const {
+llvm::ArrayRef<TargetInfo::GCCRegAlias> PPCTargetInfo::getGCCRegAliases() const {
   return llvm::ArrayRef(GCCRegAliases);
 }
 
@@ -862,7 +862,7 @@ const TargetInfo::AddlRegName GCCAddlRegNames[] = {
     {{"vs60"}, 105}, {{"vs61"}, 106}, {{"vs62"}, 107}, {{"vs63"}, 108},
 };
 
-ArrayRef<TargetInfo::AddlRegName> PPCTargetInfo::getGCCAddlRegNames() const {
+llvm::ArrayRef<TargetInfo::AddlRegName> PPCTargetInfo::getGCCAddlRegNames() const {
   return llvm::ArrayRef(GCCAddlRegNames);
 }
 
@@ -879,11 +879,11 @@ static constexpr llvm::StringLiteral ValidCPUNames[] = {
     {"powerpc"},     {"ppc"},     {"ppc32"},  {"powerpc64"}, {"ppc64"},
     {"powerpc64le"}, {"ppc64le"}, {"future"}};
 
-bool PPCTargetInfo::isValidCPUName(StringRef Name) const {
+bool PPCTargetInfo::isValidCPUName(llvm::StringRef Name) const {
   return llvm::is_contained(ValidCPUNames, Name);
 }
 
-void PPCTargetInfo::fillValidCPUList(SmallVectorImpl<StringRef> &Values) const {
+void PPCTargetInfo::fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   Values.append(std::begin(ValidCPUNames), std::end(ValidCPUNames));
 }
 
@@ -901,12 +901,12 @@ void PPCTargetInfo::adjust(DiagnosticsEngine &Diags, LangOptions &Opts) {
     MaxAtomicInlineWidth = 128;
 }
 
-ArrayRef<Builtin::Info> PPCTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> PPCTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo,
                         clang::PPC::LastTSBuiltin - Builtin::FirstTSBuiltin);
 }
 
-bool PPCTargetInfo::validateCpuSupports(StringRef FeatureStr) const {
+bool PPCTargetInfo::validateCpuSupports(llvm::StringRef FeatureStr) const {
   llvm::Triple Triple = getTriple();
   if (Triple.isOSAIX()) {
 #define PPC_AIX_FEATURE(NAME, DESC, SUPPORT_METHOD, INDEX, MASK, COMP_OP,      \
@@ -926,7 +926,7 @@ bool PPCTargetInfo::validateCpuSupports(StringRef FeatureStr) const {
       .Default(false);
 }
 
-bool PPCTargetInfo::validateCpuIs(StringRef CPUName) const {
+bool PPCTargetInfo::validateCpuIs(llvm::StringRef CPUName) const {
   llvm::Triple Triple = getTriple();
   if (Triple.isOSAIX()) {
 #define PPC_AIX_CPU(NAME, SUPPORT_METHOD, INDEX, OP, VALUE) .Case(NAME, true)

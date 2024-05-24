@@ -34,7 +34,7 @@ struct IgnoresFileNotFound : public llvm::ErrorInfo<IgnoresFileNotFound> {
   std::string Path;
   static char ID;
 
-  explicit IgnoresFileNotFound(StringRef Path) : Path(Path) {}
+  explicit IgnoresFileNotFound(llvm::StringRef Path) : Path(Path) {}
 
   virtual void log(llvm::raw_ostream &os) const override;
 

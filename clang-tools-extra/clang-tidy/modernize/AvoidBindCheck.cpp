@@ -65,7 +65,7 @@ struct BindArgument {
   CaptureExpr CE = CE_None;
 
   // The exact spelling of this argument in the source code.
-  StringRef SourceTokens;
+  llvm::StringRef SourceTokens;
 
   // The identifier of the variable within the capture list.  This may be
   // different from UsageIdentifier for example in the expression *d, where the
@@ -91,18 +91,18 @@ struct CallableInfo {
   CallableMaterializationKind Materialization = CMK_Other;
   CaptureMode CM = CM_None;
   CaptureExpr CE = CE_None;
-  StringRef SourceTokens;
+  llvm::StringRef SourceTokens;
   std::string CaptureIdentifier;
   std::string UsageIdentifier;
-  StringRef CaptureInitializer;
+  llvm::StringRef CaptureInitializer;
   const FunctionDecl *Decl = nullptr;
   bool DoesReturn = false;
 };
 
 struct LambdaProperties {
   CallableInfo Callable;
-  SmallVector<BindArgument, 4> BindArguments;
-  StringRef BindNamespace;
+  llvm::SmallVector<BindArgument, 4> BindArguments;
+  llvm::StringRef BindNamespace;
   bool IsFixitSupported = false;
 };
 
@@ -136,14 +136,14 @@ static const Expr *ignoreTemporariesAndConstructors(const Expr *E) {
   return E;
 }
 
-static StringRef getSourceTextForExpr(const MatchFinder::MatchResult &Result,
+static llvm::StringRef getSourceTextForExpr(const MatchFinder::MatchResult &Result,
                                       const Expr *E) {
   return Lexer::getSourceText(
       CharSourceRange::getTokenRange(E->getBeginLoc(), E->getEndLoc()),
       *Result.SourceManager, Result.Context->getLangOpts());
 }
 
-static bool isCallExprNamed(const Expr *E, StringRef Name) {
+static bool isCallExprNamed(const Expr *E, llvm::StringRef Name) {
   const auto *CE = dyn_cast<CallExpr>(E->IgnoreImplicit());
   if (!CE)
     return false;
@@ -251,10 +251,10 @@ static bool tryCaptureAsMemberVariable(const MatchFinder::MatchResult &Result,
   return false;
 }
 
-static SmallVector<BindArgument, 4>
+static llvm::SmallVector<BindArgument, 4>
 buildBindArguments(const MatchFinder::MatchResult &Result,
                    const CallableInfo &Callable) {
-  SmallVector<BindArgument, 4> BindArguments;
+  llvm::SmallVector<BindArgument, 4> BindArguments;
   static llvm::Regex MatchPlaceholder("^_([0-9]+)$");
 
   const auto *BindCall = Result.Nodes.getNodeAs<CallExpr>("bind");
@@ -278,7 +278,7 @@ buildBindArguments(const MatchFinder::MatchResult &Result,
         IsObjectPtr)
       B.IsUsed = true;
 
-    SmallVector<StringRef, 2> Matches;
+    llvm::SmallVector<llvm::StringRef, 2> Matches;
     const auto *DRE = dyn_cast<DeclRefExpr>(E);
     if (MatchPlaceholder.match(B.SourceTokens, &Matches) ||
         // Check for match with qualifiers removed.
@@ -318,7 +318,7 @@ buildBindArguments(const MatchFinder::MatchResult &Result,
   return BindArguments;
 }
 
-static int findPositionOfPlaceholderUse(ArrayRef<BindArgument> Args,
+static int findPositionOfPlaceholderUse(llvm::ArrayRef<BindArgument> Args,
                                         size_t PlaceholderIndex) {
   for (size_t I = 0; I < Args.size(); ++I)
     if (Args[I].PlaceHolderIndex == PlaceholderIndex)
@@ -331,7 +331,7 @@ static void addPlaceholderArgs(const LambdaProperties &LP,
                                llvm::raw_ostream &Stream,
                                bool PermissiveParameterList) {
 
-  ArrayRef<BindArgument> Args = LP.BindArguments;
+  llvm::ArrayRef<BindArgument> Args = LP.BindArguments;
 
   const auto *MaxPlaceholderIt =
       std::max_element(Args.begin(), Args.end(),
@@ -346,7 +346,7 @@ static void addPlaceholderArgs(const LambdaProperties &LP,
 
   size_t PlaceholderCount = MaxPlaceholderIt->PlaceHolderIndex;
   Stream << "(";
-  StringRef Delimiter = "";
+  llvm::StringRef Delimiter = "";
   for (size_t I = 1; I <= PlaceholderCount; ++I) {
     Stream << Delimiter << "auto &&";
 
@@ -361,9 +361,9 @@ static void addPlaceholderArgs(const LambdaProperties &LP,
   Stream << ")";
 }
 
-static void addFunctionCallArgs(ArrayRef<BindArgument> Args,
+static void addFunctionCallArgs(llvm::ArrayRef<BindArgument> Args,
                                 llvm::raw_ostream &Stream) {
-  StringRef Delimiter = "";
+  llvm::StringRef Delimiter = "";
 
   for (const BindArgument &B : Args) {
     Stream << Delimiter;
@@ -380,7 +380,7 @@ static void addFunctionCallArgs(ArrayRef<BindArgument> Args,
   }
 }
 
-static bool isPlaceHolderIndexRepeated(const ArrayRef<BindArgument> Args) {
+static bool isPlaceHolderIndexRepeated(const llvm::ArrayRef<BindArgument> Args) {
   llvm::SmallSet<size_t, 4> PlaceHolderIndices;
   for (const BindArgument &B : Args) {
     if (B.PlaceHolderIndex) {
@@ -428,7 +428,7 @@ findCandidateCallOperators(const CXXRecordDecl *RecordDecl, size_t NumArgs) {
 }
 
 static bool isFixitSupported(const CallableInfo &Callee,
-                             ArrayRef<BindArgument> Args) {
+                             llvm::ArrayRef<BindArgument> Args) {
   // Do not attempt to create fixits for nested std::bind or std::ref.
   // Supporting nested std::bind will be more difficult due to placeholder
   // sharing between outer and inner std::bind invocations, and std::ref
@@ -582,9 +582,9 @@ getLambdaProperties(const MatchFinder::MatchResult &Result) {
   return LP;
 }
 
-static bool emitCapture(llvm::StringSet<> &CaptureSet, StringRef Delimiter,
-                        CaptureMode CM, CaptureExpr CE, StringRef Identifier,
-                        StringRef InitExpression, raw_ostream &Stream) {
+static bool emitCapture(llvm::StringSet<> &CaptureSet, llvm::StringRef Delimiter,
+                        CaptureMode CM, CaptureExpr CE, llvm::StringRef Identifier,
+                        llvm::StringRef InitExpression, llvm::raw_ostream &Stream) {
   if (CM == CM_None)
     return false;
 
@@ -606,7 +606,7 @@ static bool emitCapture(llvm::StringSet<> &CaptureSet, StringRef Delimiter,
 
 static void emitCaptureList(const LambdaProperties &LP,
                             const MatchFinder::MatchResult &Result,
-                            raw_ostream &Stream) {
+                            llvm::raw_ostream &Stream) {
   llvm::StringSet<> CaptureSet;
   bool AnyCapturesEmitted = false;
 
@@ -618,7 +618,7 @@ static void emitCaptureList(const LambdaProperties &LP,
     if (B.CM == CM_None || !B.IsUsed)
       continue;
 
-    StringRef Delimiter = AnyCapturesEmitted ? ", " : "";
+    llvm::StringRef Delimiter = AnyCapturesEmitted ? ", " : "";
 
     if (emitCapture(CaptureSet, Delimiter, B.CM, B.CE, B.CaptureIdentifier,
                     B.SourceTokens, Stream))
@@ -626,15 +626,15 @@ static void emitCaptureList(const LambdaProperties &LP,
   }
 }
 
-static ArrayRef<BindArgument>
+static llvm::ArrayRef<BindArgument>
 getForwardedArgumentList(const LambdaProperties &P) {
-  ArrayRef<BindArgument> Args = ArrayRef(P.BindArguments);
+  llvm::ArrayRef<BindArgument> Args = llvm::ArrayRef(P.BindArguments);
   if (P.Callable.Type != CT_MemberFunction)
     return Args;
 
   return Args.drop_front();
 }
-AvoidBindCheck::AvoidBindCheck(StringRef Name, ClangTidyContext *Context)
+AvoidBindCheck::AvoidBindCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       PermissiveParameterList(Options.get("PermissiveParameterList", false)) {}
 
@@ -673,7 +673,7 @@ void AvoidBindCheck::check(const MatchFinder::MatchResult &Result) {
   emitCaptureList(LP, Result, Stream);
   Stream << "]";
 
-  ArrayRef<BindArgument> FunctionCallArgs = ArrayRef(LP.BindArguments);
+  llvm::ArrayRef<BindArgument> FunctionCallArgs = llvm::ArrayRef(LP.BindArguments);
 
   addPlaceholderArgs(LP, Stream, PermissiveParameterList);
 
@@ -684,7 +684,7 @@ void AvoidBindCheck::check(const MatchFinder::MatchResult &Result) {
   }
 
   if (LP.Callable.Type == CT_Function) {
-    StringRef SourceTokens = LP.Callable.SourceTokens;
+    llvm::StringRef SourceTokens = LP.Callable.SourceTokens;
     SourceTokens.consume_front("&");
     Stream << SourceTokens;
   } else if (LP.Callable.Type == CT_MemberFunction) {

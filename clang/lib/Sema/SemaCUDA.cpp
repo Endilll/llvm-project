@@ -319,7 +319,7 @@ bool SemaCUDA::isImplicitHostDeviceFunction(const FunctionDecl *D) {
 
 void SemaCUDA::EraseUnwantedMatches(
     const FunctionDecl *Caller,
-    SmallVectorImpl<std::pair<DeclAccessPair, FunctionDecl *>> &Matches) {
+    llvm::SmallVectorImpl<std::pair<DeclAccessPair, FunctionDecl *>> &Matches) {
   if (Matches.size() <= 1)
     return;
 

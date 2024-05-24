@@ -500,7 +500,7 @@ public:
 
     // All other expression nodes that propagate a record prvalue should have
     // exactly one child.
-    SmallVector<Stmt *, 1> Children(E->child_begin(), E->child_end());
+    llvm::SmallVector<Stmt *, 1> Children(E->child_begin(), E->child_end());
     LLVM_DEBUG({
       if (Children.size() != 1)
         E->dump();
@@ -656,7 +656,7 @@ Environment Environment::pushCall(const CXXConstructExpr *Call) const {
 }
 
 void Environment::pushCallInternal(const FunctionDecl *FuncDecl,
-                                   ArrayRef<const Expr *> Args) {
+                                   llvm::ArrayRef<const Expr *> Args) {
   // Canonicalize to the definition of the function. This ensures that we're
   // putting arguments into the same `ParamVarDecl`s` that the callee will later
   // be retrieving them from.
@@ -1165,7 +1165,7 @@ bool Environment::allows(const Formula &F) const {
   return DACtx->flowConditionAllows(FlowConditionToken, F);
 }
 
-void Environment::dump(raw_ostream &OS) const {
+void Environment::dump(llvm::raw_ostream &OS) const {
   llvm::DenseMap<const StorageLocation *, std::string> LocToName;
   if (LocForRecordReturnVal != nullptr)
     LocToName[LocForRecordReturnVal] = "(returned record)";

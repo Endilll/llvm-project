@@ -71,9 +71,9 @@ namespace {
 /// table.
 class IdentifierIndexReaderTrait {
 public:
-  typedef StringRef external_key_type;
-  typedef StringRef internal_key_type;
-  typedef SmallVector<unsigned, 2> data_type;
+  typedef llvm::StringRef external_key_type;
+  typedef llvm::StringRef internal_key_type;
+  typedef llvm::SmallVector<unsigned, 2> data_type;
   typedef unsigned hash_value_type;
   typedef unsigned offset_type;
 
@@ -100,7 +100,7 @@ public:
   GetExternalKey(const internal_key_type& x) { return x; }
 
   static internal_key_type ReadKey(const unsigned char* d, unsigned n) {
-    return StringRef((const char *)d, n);
+    return llvm::StringRef((const char *)d, n);
   }
 
   static data_type ReadData(const internal_key_type& k,
@@ -140,7 +140,7 @@ GlobalModuleIndex::GlobalModuleIndex(
   bool Done = false;
   while (!Done) {
     llvm::BitstreamEntry Entry;
-    if (Expected<llvm::BitstreamEntry> Res = Cursor.advance())
+    if (llvm::Expected<llvm::BitstreamEntry> Res = Cursor.advance())
       Entry = Res.get();
     else
       Fail(Res.takeError());
@@ -175,9 +175,9 @@ GlobalModuleIndex::GlobalModuleIndex(
       continue;
     }
 
-    SmallVector<uint64_t, 64> Record;
-    StringRef Blob;
-    Expected<unsigned> MaybeIndexRecord =
+    llvm::SmallVector<uint64_t, 64> Record;
+    llvm::StringRef Blob;
+    llvm::Expected<unsigned> MaybeIndexRecord =
         Cursor.readRecord(Entry.ID, Record, &Blob);
     if (!MaybeIndexRecord)
       Fail(MaybeIndexRecord.takeError());
@@ -224,7 +224,7 @@ GlobalModuleIndex::GlobalModuleIndex(
       // Record this module as an unresolved module.
       // FIXME: this doesn't work correctly for module names containing path
       // separators.
-      StringRef ModuleName = llvm::sys::path::stem(Modules[ID].FileName);
+      llvm::StringRef ModuleName = llvm::sys::path::stem(Modules[ID].FileName);
       // Remove the -<hash of ModuleMapPath>
       ModuleName = ModuleName.rsplit('-').first;
       UnresolvedModules[ModuleName] = ID;
@@ -249,7 +249,7 @@ GlobalModuleIndex::~GlobalModuleIndex() {
 }
 
 std::pair<GlobalModuleIndex *, llvm::Error>
-GlobalModuleIndex::readIndex(StringRef Path) {
+GlobalModuleIndex::readIndex(llvm::StringRef Path) {
   // Load the index file, if it's there.
   llvm::SmallString<128> IndexPath;
   IndexPath += Path;
@@ -267,7 +267,7 @@ GlobalModuleIndex::readIndex(StringRef Path) {
 
   // Sniff for the signature.
   for (unsigned char C : {'B', 'C', 'G', 'I'}) {
-    if (Expected<llvm::SimpleBitstreamCursor::word_t> Res = Cursor.Read(8)) {
+    if (llvm::Expected<llvm::SimpleBitstreamCursor::word_t> Res = Cursor.Read(8)) {
       if (Res.get() != C)
         return std::make_pair(
             nullptr, llvm::createStringError(std::errc::illegal_byte_sequence,
@@ -282,7 +282,7 @@ GlobalModuleIndex::readIndex(StringRef Path) {
 
 void GlobalModuleIndex::getModuleDependencies(
        ModuleFile *File,
-       SmallVectorImpl<ModuleFile *> &Dependencies) {
+       llvm::SmallVectorImpl<ModuleFile *> &Dependencies) {
   // Look for information about this module file.
   llvm::DenseMap<ModuleFile *, unsigned>::iterator Known
     = ModulesByFile.find(File);
@@ -291,14 +291,14 @@ void GlobalModuleIndex::getModuleDependencies(
 
   // Record dependencies.
   Dependencies.clear();
-  ArrayRef<unsigned> StoredDependencies = Modules[Known->second].Dependencies;
+  llvm::ArrayRef<unsigned> StoredDependencies = Modules[Known->second].Dependencies;
   for (unsigned I = 0, N = StoredDependencies.size(); I != N; ++I) {
     if (ModuleFile *MF = Modules[I].File)
       Dependencies.push_back(MF);
   }
 }
 
-bool GlobalModuleIndex::lookupIdentifier(StringRef Name, HitSet &Hits) {
+bool GlobalModuleIndex::lookupIdentifier(llvm::StringRef Name, HitSet &Hits) {
   Hits.clear();
 
   // If there's no identifier index, there is nothing we can do.
@@ -314,7 +314,7 @@ bool GlobalModuleIndex::lookupIdentifier(StringRef Name, HitSet &Hits) {
     return false;
   }
 
-  SmallVector<unsigned, 2> ModuleIDs = *Known;
+  llvm::SmallVector<unsigned, 2> ModuleIDs = *Known;
   for (unsigned I = 0, N = ModuleIDs.size(); I != N; ++I) {
     if (ModuleFile *MF = Modules[ModuleIDs[I]].File)
       Hits.insert(MF);
@@ -326,7 +326,7 @@ bool GlobalModuleIndex::lookupIdentifier(StringRef Name, HitSet &Hits) {
 
 bool GlobalModuleIndex::loadedModuleFile(ModuleFile *File) {
   // Look for the module in the global module index based on the module name.
-  StringRef Name = File->ModuleName;
+  llvm::StringRef Name = File->ModuleName;
   llvm::StringMap<unsigned>::iterator Known = UnresolvedModules.find(Name);
   if (Known == UnresolvedModules.end()) {
     return true;
@@ -386,7 +386,7 @@ namespace {
 
     /// The set of modules on which this module depends. Each entry is
     /// a module ID.
-    SmallVector<unsigned, 4> Dependencies;
+    llvm::SmallVector<unsigned, 4> Dependencies;
     ASTFileSignature Signature;
   };
 
@@ -419,7 +419,7 @@ namespace {
 
     /// Mapping from identifiers to the list of module file IDs that
     /// consider this identifier to be interesting.
-    typedef llvm::StringMap<SmallVector<unsigned, 2> > InterestingIdentifierMap;
+    typedef llvm::StringMap<llvm::SmallVector<unsigned, 2> > InterestingIdentifierMap;
 
     /// A mapping from all interesting identifiers to the set of module
     /// files in which those identifiers are considered interesting.
@@ -456,7 +456,7 @@ namespace {
 
 static void emitBlockID(unsigned ID, const char *Name,
                         llvm::BitstreamWriter &Stream,
-                        SmallVectorImpl<uint64_t> &Record) {
+                        llvm::SmallVectorImpl<uint64_t> &Record) {
   Record.clear();
   Record.push_back(ID);
   Stream.EmitRecord(llvm::bitc::BLOCKINFO_CODE_SETBID, Record);
@@ -471,7 +471,7 @@ static void emitBlockID(unsigned ID, const char *Name,
 
 static void emitRecordID(unsigned ID, const char *Name,
                          llvm::BitstreamWriter &Stream,
-                         SmallVectorImpl<uint64_t> &Record) {
+                         llvm::SmallVectorImpl<uint64_t> &Record) {
   Record.clear();
   Record.push_back(ID);
   while (*Name)
@@ -481,7 +481,7 @@ static void emitRecordID(unsigned ID, const char *Name,
 
 void
 GlobalModuleIndexBuilder::emitBlockInfoBlock(llvm::BitstreamWriter &Stream) {
-  SmallVector<uint64_t, 64> Record;
+  llvm::SmallVector<uint64_t, 64> Record;
   Stream.EnterBlockInfoBlock();
 
 #define BLOCK(X) emitBlockID(X ## _ID, #X, Stream, Record)
@@ -502,7 +502,7 @@ namespace {
 
   public:
     /// The identifier and whether it is "interesting".
-    typedef std::pair<StringRef, bool> data_type;
+    typedef std::pair<llvm::StringRef, bool> data_type;
 
     data_type ReadData(const internal_key_type& k,
                        const unsigned char* d,
@@ -530,7 +530,7 @@ llvm::Error GlobalModuleIndexBuilder::loadModuleFile(FileEntryRef File) {
 
   // Sniff for the signature.
   for (unsigned char C : {'C', 'P', 'C', 'H'})
-    if (Expected<llvm::SimpleBitstreamCursor::word_t> Res = InStream.Read(8)) {
+    if (llvm::Expected<llvm::SimpleBitstreamCursor::word_t> Res = InStream.Read(8)) {
       if (Res.get() != C)
         return llvm::createStringError(std::errc::illegal_byte_sequence,
                                        "expected signature CPCH");
@@ -545,7 +545,7 @@ llvm::Error GlobalModuleIndexBuilder::loadModuleFile(FileEntryRef File) {
   enum { Other, ControlBlock, ASTBlock, DiagnosticOptionsBlock } State = Other;
   bool Done = false;
   while (!Done) {
-    Expected<llvm::BitstreamEntry> MaybeEntry = InStream.advance();
+    llvm::Expected<llvm::BitstreamEntry> MaybeEntry = InStream.advance();
     if (!MaybeEntry)
       return MaybeEntry.takeError();
     llvm::BitstreamEntry Entry = MaybeEntry.get();
@@ -606,9 +606,9 @@ llvm::Error GlobalModuleIndexBuilder::loadModuleFile(FileEntryRef File) {
     }
 
     // Read the given record.
-    SmallVector<uint64_t, 64> Record;
-    StringRef Blob;
-    Expected<unsigned> MaybeCode = InStream.readRecord(Entry.ID, Record, &Blob);
+    llvm::SmallVector<uint64_t, 64> Record;
+    llvm::StringRef Blob;
+    llvm::Expected<unsigned> MaybeCode = InStream.readRecord(Entry.ID, Record, &Blob);
     if (!MaybeCode)
       return MaybeCode.takeError();
     unsigned Code = MaybeCode.get();
@@ -646,7 +646,7 @@ llvm::Error GlobalModuleIndexBuilder::loadModuleFile(FileEntryRef File) {
 
         // Retrieve the imported file name.
         unsigned Length = Record[Idx++];
-        SmallString<128> ImportedFile(Record.begin() + Idx,
+        llvm::SmallString<128> ImportedFile(Record.begin() + Idx,
                                       Record.begin() + Idx + Length);
         Idx += Length;
 
@@ -686,7 +686,7 @@ llvm::Error GlobalModuleIndexBuilder::loadModuleFile(FileEntryRef File) {
       for (InterestingIdentifierTable::data_iterator D = Table->data_begin(),
                                                      DEnd = Table->data_end();
            D != DEnd; ++D) {
-        std::pair<StringRef, bool> Ident = *D;
+        std::pair<llvm::StringRef, bool> Ident = *D;
         if (Ident.second)
           InterestingIdentifiers[Ident.first].push_back(ID);
         else
@@ -714,10 +714,10 @@ namespace {
 /// table.
 class IdentifierIndexWriterTrait {
 public:
-  typedef StringRef key_type;
-  typedef StringRef key_type_ref;
-  typedef SmallVector<unsigned, 2> data_type;
-  typedef const SmallVector<unsigned, 2> &data_type_ref;
+  typedef llvm::StringRef key_type;
+  typedef llvm::StringRef key_type_ref;
+  typedef llvm::SmallVector<unsigned, 2> data_type;
+  typedef const llvm::SmallVector<unsigned, 2> &data_type_ref;
   typedef unsigned hash_value_type;
   typedef unsigned offset_type;
 
@@ -726,7 +726,7 @@ public:
   }
 
   std::pair<unsigned,unsigned>
-  EmitKeyDataLength(raw_ostream& Out, key_type_ref Key, data_type_ref Data) {
+  EmitKeyDataLength(llvm::raw_ostream& Out, key_type_ref Key, data_type_ref Data) {
     using namespace llvm::support;
     endian::Writer LE(Out, llvm::endianness::little);
     unsigned KeyLen = Key.size();
@@ -736,11 +736,11 @@ public:
     return std::make_pair(KeyLen, DataLen);
   }
 
-  void EmitKey(raw_ostream& Out, key_type_ref Key, unsigned KeyLen) {
+  void EmitKey(llvm::raw_ostream& Out, key_type_ref Key, unsigned KeyLen) {
     Out.write(Key.data(), KeyLen);
   }
 
-  void EmitData(raw_ostream& Out, key_type_ref Key, data_type_ref Data,
+  void EmitData(llvm::raw_ostream& Out, key_type_ref Key, data_type_ref Data,
                 unsigned DataLen) {
     using namespace llvm::support;
     for (unsigned I = 0, N = Data.size(); I != N; ++I)
@@ -780,7 +780,7 @@ bool GlobalModuleIndexBuilder::writeIndex(llvm::BitstreamWriter &Stream) {
   Stream.EnterSubblock(GLOBAL_INDEX_BLOCK_ID, 3);
 
   // Write the metadata.
-  SmallVector<uint64_t, 2> Record;
+  llvm::SmallVector<uint64_t, 2> Record;
   Record.push_back(CurrentVersion);
   Stream.EmitRecord(INDEX_METADATA, Record);
 
@@ -794,7 +794,7 @@ bool GlobalModuleIndexBuilder::writeIndex(llvm::BitstreamWriter &Stream) {
     Record.push_back(M->first.getModificationTime());
 
     // File name
-    StringRef Name(M->first.getName());
+    llvm::StringRef Name(M->first.getName());
     Record.push_back(Name.size());
     Record.append(Name.begin(), Name.end());
 
@@ -817,7 +817,7 @@ bool GlobalModuleIndexBuilder::writeIndex(llvm::BitstreamWriter &Stream) {
     }
 
     // Create the on-disk hash table in a buffer.
-    SmallString<4096> IdentifierTable;
+    llvm::SmallString<4096> IdentifierTable;
     uint32_t BucketOffset;
     {
       using namespace llvm::support;
@@ -846,7 +846,7 @@ bool GlobalModuleIndexBuilder::writeIndex(llvm::BitstreamWriter &Stream) {
 llvm::Error
 GlobalModuleIndex::writeIndex(FileManager &FileMgr,
                               const PCHContainerReader &PCHContainerRdr,
-                              StringRef Path) {
+                              llvm::StringRef Path) {
   llvm::SmallString<128> IndexPath;
   IndexPath += Path;
   llvm::sys::path::append(IndexPath, IndexFileName);
@@ -900,7 +900,7 @@ GlobalModuleIndex::writeIndex(FileManager &FileMgr,
   }
 
   // The output buffer, into which the global index will be written.
-  SmallString<16> OutputBuffer;
+  llvm::SmallString<16> OutputBuffer;
   {
     llvm::BitstreamWriter OutputStream(OutputBuffer);
     if (Builder.writeIndex(OutputStream))
@@ -928,11 +928,11 @@ namespace {
       End = Idx.key_end();
     }
 
-    StringRef Next() override {
+    llvm::StringRef Next() override {
       if (Current == End)
-        return StringRef();
+        return llvm::StringRef();
 
-      StringRef Result = *Current;
+      llvm::StringRef Result = *Current;
       ++Current;
       return Result;
     }

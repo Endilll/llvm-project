@@ -113,7 +113,7 @@ static const NoteTag *getNoteTag(CheckerContext &C,
 
   return C.getNoteTag(
       [=]() -> std::string {
-        SmallString<128> Msg;
+        llvm::SmallString<128> Msg;
         llvm::raw_svector_ostream Out(Msg);
 
         if (!IsKnownCast)
@@ -137,14 +137,14 @@ static const NoteTag *getNoteTag(CheckerContext &C,
 }
 
 static const NoteTag *getNoteTag(CheckerContext &C,
-                                 SmallVector<QualType, 4> CastToTyVec,
+                                 llvm::SmallVector<QualType, 4> CastToTyVec,
                                  const Expr *Object,
                                  bool IsKnownCast) {
   Object = Object->IgnoreParenImpCasts();
 
   return C.getNoteTag(
       [=]() -> std::string {
-        SmallString<128> Msg;
+        llvm::SmallString<128> Msg;
         llvm::raw_svector_ostream Out(Msg);
 
         if (!IsKnownCast)
@@ -262,7 +262,7 @@ static void addInstanceOfTransition(const CallEvent &Call,
                                     bool IsInstanceOf) {
   const FunctionDecl *FD = Call.getDecl()->getAsFunction();
   QualType CastFromTy = Call.parameters()[0]->getType();
-  SmallVector<QualType, 4> CastToTyVec;
+  llvm::SmallVector<QualType, 4> CastToTyVec;
   for (unsigned idx = 0; idx < FD->getTemplateSpecializationArgs()->size() - 1;
        ++idx) {
     TemplateArgument CastToTempArg =

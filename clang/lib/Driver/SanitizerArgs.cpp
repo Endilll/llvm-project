@@ -187,7 +187,7 @@ static void addDefaultIgnorelists(const Driver &D, SanitizerMask Kinds,
     if (!(Kinds & BL.Mask))
       continue;
 
-    clang::SmallString<64> Path(D.ResourceDir);
+    llvm::SmallString<64> Path(D.ResourceDir);
     llvm::sys::path::append(Path, "share", BL.File);
     if (D.getVFS().exists(Path))
       IgnorelistFiles.push_back(std::string(Path));
@@ -392,7 +392,7 @@ SanitizerArgs::SanitizerArgs(const ToolChain &TC,
       }
 
       if (llvm::opt::Arg *A = Args.getLastArg(options::OPT_mcmodel_EQ)) {
-        StringRef CM = A->getValue();
+        llvm::StringRef CM = A->getValue();
         if (CM != "small" &&
             (Add & SanitizerKind::Function & ~DiagnosedKinds)) {
           if (DiagnoseErrors)
@@ -688,7 +688,7 @@ SanitizerArgs::SanitizerArgs(const ToolChain &TC,
                             options::OPT_fno_sanitize_memory_track_origins)) {
       if (!A->getOption().matches(
               options::OPT_fno_sanitize_memory_track_origins)) {
-        StringRef S = A->getValue();
+        llvm::StringRef S = A->getValue();
         if (S.getAsInteger(0, MsanTrackOrigins) || MsanTrackOrigins < 0 ||
             MsanTrackOrigins > 2) {
           if (DiagnoseErrors)
@@ -714,7 +714,7 @@ SanitizerArgs::SanitizerArgs(const ToolChain &TC,
   }
 
   if (AllAddedKinds & SanitizerKind::MemTag) {
-    StringRef S =
+    llvm::StringRef S =
         Args.getLastArgValue(options::OPT_fsanitize_memtag_mode_EQ, "sync");
     if (S == "async" || S == "sync") {
       MemtagMode = S.str();
@@ -791,7 +791,7 @@ SanitizerArgs::SanitizerArgs(const ToolChain &TC,
     if (Arg->getOption().matches(options::OPT_fsanitize_coverage)) {
       int LegacySanitizeCoverage;
       if (Arg->getNumValues() == 1 &&
-          !StringRef(Arg->getValue(0))
+          !llvm::StringRef(Arg->getValue(0))
                .getAsInteger(0, LegacySanitizeCoverage)) {
         CoverageFeatures = 0;
         Arg->claim();
@@ -920,7 +920,7 @@ SanitizerArgs::SanitizerArgs(const ToolChain &TC,
     NeedPIE |= TC.getTriple().isOSFuchsia();
     if (Arg *A =
             Args.getLastArg(options::OPT_fsanitize_address_field_padding)) {
-      StringRef S = A->getValue();
+      llvm::StringRef S = A->getValue();
       // Legal values are 0 and 1, 2, but in future we may add more levels.
       if ((S.getAsInteger(0, AsanFieldPadding) || AsanFieldPadding < 0 ||
            AsanFieldPadding > 2) &&
@@ -1091,7 +1091,7 @@ static void addSpecialCaseListOpt(const llvm::opt::ArgList &Args,
                                   const char *SCLOptFlag,
                                   const std::vector<std::string> &SCLFiles) {
   for (const auto &SCLPath : SCLFiles) {
-    SmallString<64> SCLOpt(SCLOptFlag);
+    llvm::SmallString<64> SCLOpt(SCLOptFlag);
     SCLOpt += SCLPath;
     CmdArgs.push_back(Args.MakeArgString(SCLOpt));
   }
@@ -1100,8 +1100,8 @@ static void addSpecialCaseListOpt(const llvm::opt::ArgList &Args,
 static void addIncludeLinkerOption(const ToolChain &TC,
                                    const llvm::opt::ArgList &Args,
                                    llvm::opt::ArgStringList &CmdArgs,
-                                   StringRef SymbolName) {
-  SmallString<64> LinkerOptionFlag;
+                                   llvm::StringRef SymbolName) {
+  llvm::SmallString<64> LinkerOptionFlag;
   LinkerOptionFlag = "--linker-option=/include:";
   if (TC.getTriple().getArch() == llvm::Triple::x86) {
     // Win32 mangles C function names with a '_' prefix.
@@ -1114,10 +1114,10 @@ static void addIncludeLinkerOption(const ToolChain &TC,
 static bool hasTargetFeatureMTE(const llvm::opt::ArgStringList &CmdArgs) {
   for (auto Start = CmdArgs.begin(), End = CmdArgs.end(); Start != End;
        ++Start) {
-    auto It = std::find(Start, End, StringRef("+mte"));
+    auto It = std::find(Start, End, llvm::StringRef("+mte"));
     if (It == End)
       break;
-    if (It > Start && *std::prev(It) == StringRef("-target-feature"))
+    if (It > Start && *std::prev(It) == llvm::StringRef("-target-feature"))
       return true;
     Start = It;
   }
@@ -1240,7 +1240,7 @@ void SanitizerArgs::addArgs(const ToolChain &TC, const llvm::opt::ArgList &Args,
 
   if (MsanTrackOrigins)
     CmdArgs.push_back(Args.MakeArgString("-fsanitize-memory-track-origins=" +
-                                         Twine(MsanTrackOrigins)));
+                                         llvm::Twine(MsanTrackOrigins)));
 
   if (MsanUseAfterDtor)
     CmdArgs.push_back("-fsanitize-memory-use-after-dtor");
@@ -1289,7 +1289,7 @@ void SanitizerArgs::addArgs(const ToolChain &TC, const llvm::opt::ArgList &Args,
 
   if (AsanFieldPadding)
     CmdArgs.push_back(Args.MakeArgString("-fsanitize-address-field-padding=" +
-                                         Twine(AsanFieldPadding)));
+                                         llvm::Twine(AsanFieldPadding)));
 
   if (AsanUseAfterScope)
     CmdArgs.push_back("-fsanitize-address-use-after-scope");

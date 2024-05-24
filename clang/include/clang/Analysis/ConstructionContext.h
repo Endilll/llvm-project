@@ -46,7 +46,7 @@ public:
     INITIALIZER_KIND_END = InitializerKind
   };
 
-  LLVM_DUMP_METHOD static StringRef getKindAsString(ItemKind K) {
+  LLVM_DUMP_METHOD static llvm::StringRef getKindAsString(ItemKind K) {
     switch (K) {
       case VariableKind:            return "construct into local variable";
       case NewAllocatorKind:        return "construct into new-allocator";
@@ -135,7 +135,7 @@ public:
 
   ItemKind getKind() const { return Kind; }
 
-  LLVM_DUMP_METHOD StringRef getKindAsString() const {
+  LLVM_DUMP_METHOD llvm::StringRef getKindAsString() const {
     return getKindAsString(getKind());
   }
 

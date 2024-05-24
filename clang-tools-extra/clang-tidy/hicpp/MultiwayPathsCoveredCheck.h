@@ -21,7 +21,7 @@ namespace clang::tidy::hicpp {
 /// http://clang.llvm.org/extra/clang-tidy/checks/hicpp/multiway-paths-covered.html
 class MultiwayPathsCoveredCheck : public ClangTidyCheck {
 public:
-  MultiwayPathsCoveredCheck(StringRef Name, ClangTidyContext *Context)
+  MultiwayPathsCoveredCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         WarnOnMissingElse(Options.get("WarnOnMissingElse", false)) {}
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;

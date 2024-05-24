@@ -21,6 +21,7 @@
 #include "clang/Driver/Types.h"
 #include "clang/Driver/Util.h"
 #include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
@@ -47,7 +48,7 @@ namespace clang {
 
 namespace driver {
 
-typedef SmallVector<InputInfo, 4> InputInfoList;
+typedef llvm::SmallVector<InputInfo, 4> InputInfoList;
 
 class Command;
 class Compilation;
@@ -77,7 +78,7 @@ enum ModuleHeaderMode {
 class Driver {
   DiagnosticsEngine &Diags;
 
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS;
 
   enum DriverMode {
     GCCMode,
@@ -173,7 +174,7 @@ public:
   /// functionality.
   /// FIXME: This type of customization should be removed in favor of the
   /// universal driver when it is ready.
-  typedef SmallVector<std::string, 4> prefix_list;
+  typedef llvm::SmallVector<std::string, 4> prefix_list;
   prefix_list PrefixDirs;
 
   /// sysroot, if present
@@ -207,7 +208,7 @@ public:
   using InputTy = std::pair<types::ID, const llvm::opt::Arg *>;
 
   /// A list of inputs and their types for the given arguments.
-  using InputList = SmallVector<InputTy, 16>;
+  using InputList = llvm::SmallVector<InputTy, 16>;
 
   /// Whether the driver should follow g++ like behavior.
   bool CCCIsCXX() const { return Mode == GXXMode; }
@@ -278,7 +279,7 @@ public:
   /// shortcut for executing the -cc1 command-line directly, in the same
   /// process.
   using CC1ToolFunc =
-      llvm::function_ref<int(SmallVectorImpl<const char *> &ArgV)>;
+      llvm::function_ref<int(llvm::SmallVectorImpl<const char *> &ArgV)>;
   CC1ToolFunc CC1Main = nullptr;
 
 private:
@@ -358,8 +359,8 @@ private:
   // Before executing jobs, sets up response files for commands that need them.
   void setUpResponseFiles(Compilation &C, Command &Cmd);
 
-  void generatePrefixedToolNames(StringRef Tool, const ToolChain &TC,
-                                 SmallVectorImpl<std::string> &Names) const;
+  void generatePrefixedToolNames(llvm::StringRef Tool, const ToolChain &TC,
+                                 llvm::SmallVectorImpl<std::string> &Names) const;
 
   /// Find the appropriate .crash diagonostic file for the child crash
   /// under this driver and copy it out to a temporary destination with the
@@ -372,19 +373,19 @@ private:
   ///
   /// \returns If the .crash is found and successfully copied return true,
   /// otherwise false and return the suggested directory in \p CrashDiagDir.
-  bool getCrashDiagnosticFile(StringRef ReproCrashFilename,
-                              SmallString<128> &CrashDiagDir);
+  bool getCrashDiagnosticFile(llvm::StringRef ReproCrashFilename,
+                              llvm::SmallString<128> &CrashDiagDir);
 
 public:
 
   /// Takes the path to a binary that's either in bin/ or lib/ and returns
   /// the path to clang's resource directory.
-  static std::string GetResourcesPath(StringRef BinaryPath,
-                                      StringRef CustomResourceDir = "");
+  static std::string GetResourcesPath(llvm::StringRef BinaryPath,
+                                      llvm::StringRef CustomResourceDir = "");
 
-  Driver(StringRef ClangExecutable, StringRef TargetTriple,
+  Driver(llvm::StringRef ClangExecutable, llvm::StringRef TargetTriple,
          DiagnosticsEngine &Diags, std::string Title = "clang LLVM compiler",
-         IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr);
+         llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr);
 
   /// @name Accessors
   /// @{
@@ -437,7 +438,7 @@ public:
   void setFlangF128MathLibrary(std::string name) {
     FlangF128MathLibrary = std::move(name);
   }
-  StringRef getFlangF128MathLibrary() const { return FlangF128MathLibrary; }
+  llvm::StringRef getFlangF128MathLibrary() const { return FlangF128MathLibrary; }
 
   /// Compute the desired OpenMP runtime from the flags provided.
   OpenMPRuntimeKind getOpenMPRuntime(const llvm::opt::ArgList &Args) const;
@@ -458,11 +459,11 @@ public:
   /// argument vector. A null return value does not necessarily
   /// indicate an error condition, the diagnostics should be queried
   /// to determine if an error occurred.
-  Compilation *BuildCompilation(ArrayRef<const char *> Args);
+  Compilation *BuildCompilation(llvm::ArrayRef<const char *> Args);
 
   /// ParseArgStrings - Parse the given list of strings into an
   /// ArgList.
-  llvm::opt::InputArgList ParseArgStrings(ArrayRef<const char *> Args,
+  llvm::opt::InputArgList ParseArgStrings(llvm::ArrayRef<const char *> Args,
                                           bool UseDriverMode,
                                           bool &ContainsError);
 
@@ -508,7 +509,7 @@ public:
   /// Returns the set of bound architectures active for this offload kind.
   /// If there are no bound architctures we return a set containing only the
   /// empty string. The \p SuppressError option is used to suppress errors.
-  llvm::DenseSet<StringRef>
+  llvm::DenseSet<llvm::StringRef>
   getOffloadArchs(Compilation &C, const llvm::opt::DerivedArgList &Args,
                   Action::OffloadKind Kind, const ToolChain *TC,
                   bool SuppressError = false) const;
@@ -518,7 +519,7 @@ public:
   /// If TypoCorrect is true and the file does not exist, see if it looks
   /// like a likely typo for a flag and if so print a "did you mean" blurb.
   bool DiagnoseInputExistence(const llvm::opt::DerivedArgList &Args,
-                              StringRef Value, types::ID Ty,
+                              llvm::StringRef Value, types::ID Ty,
                               bool TypoCorrect) const;
 
   /// BuildJobs - Bind actions to concrete tools and translate
@@ -534,7 +535,7 @@ public:
   /// to just running the subprocesses, for example reporting errors, setting
   /// up response files, removing temporary files, etc.
   int ExecuteCompilation(Compilation &C,
-     SmallVectorImpl< std::pair<int, const Command *> > &FailingCommands);
+     llvm::SmallVectorImpl< std::pair<int, const Command *> > &FailingCommands);
 
   /// Contains the files in the compilation diagnostic report generated by
   /// generateCompilationDiagnostics.
@@ -547,7 +548,7 @@ public:
   ///
   void generateCompilationDiagnostics(
       Compilation &C, const Command &FailingCommand,
-      StringRef AdditionalInformation = "",
+      llvm::StringRef AdditionalInformation = "",
       CompilationDiagnosticReport *GeneratedReport = nullptr);
 
   enum class CommandStatus {
@@ -565,7 +566,7 @@ public:
 
   bool maybeGenerateCompilationDiagnostics(
       CommandStatus CS, ReproLevel Level, Compilation &C,
-      const Command &FailingCommand, StringRef AdditionalInformation = "",
+      const Command &FailingCommand, llvm::StringRef AdditionalInformation = "",
       CompilationDiagnosticReport *GeneratedReport = nullptr) {
     if (static_cast<int>(CS) > static_cast<int>(Level))
       return false;
@@ -592,7 +593,7 @@ public:
   void PrintHelp(bool ShowHidden) const;
 
   /// PrintVersion - Print the driver version.
-  void PrintVersion(const Compilation &C, raw_ostream &OS) const;
+  void PrintVersion(const Compilation &C, llvm::raw_ostream &OS) const;
 
   /// GetFilePath - Lookup \p Name in the list of file search paths.
   ///
@@ -600,7 +601,7 @@ public:
   /// directories to search.
   //
   // FIXME: This should be in CompilationInfo.
-  std::string GetFilePath(StringRef Name, const ToolChain &TC) const;
+  std::string GetFilePath(llvm::StringRef Name, const ToolChain &TC) const;
 
   /// GetProgramPath - Lookup \p Name in the list of program search paths.
   ///
@@ -608,7 +609,7 @@ public:
   /// directories to search.
   //
   // FIXME: This should be in CompilationInfo.
-  std::string GetProgramPath(StringRef Name, const ToolChain &TC) const;
+  std::string GetProgramPath(llvm::StringRef Name, const ToolChain &TC) const;
 
   /// Lookup the path to the Standard library module manifest.
   ///
@@ -622,7 +623,7 @@ public:
 
   /// HandleAutocompletions - Handle --autocomplete by searching and printing
   /// possible flags, descriptions, and its arguments.
-  void HandleAutocompletions(StringRef PassedFlags) const;
+  void HandleAutocompletions(llvm::StringRef PassedFlags) const;
 
   /// HandleImmediateArgs - Handle any arguments which should be
   /// treated before building actions or binding tools.
@@ -643,7 +644,7 @@ public:
   /// return an InputInfo for the result of running \p A.  Will only construct
   /// jobs for a given (Action, ToolChain, BoundArch, DeviceKind) tuple once.
   InputInfoList BuildJobsForAction(
-      Compilation &C, const Action *A, const ToolChain *TC, StringRef BoundArch,
+      Compilation &C, const Action *A, const ToolChain *TC, llvm::StringRef BoundArch,
       bool AtTopLevel, bool MultipleArchs, const char *LinkingOutput,
       std::map<std::pair<const Action *, std::string>, InputInfoList>
           &CachedResults,
@@ -661,9 +662,9 @@ public:
   ///    2b. If \p NeedUniqueDirectory is true, the temp file is in a unique
   ///        subdiretory with random name under the temporary directory, and
   ///        the temp file itself has name $Prefix-$BoundArch.$Suffix.
-  const char *CreateTempFile(Compilation &C, StringRef Prefix, StringRef Suffix,
+  const char *CreateTempFile(Compilation &C, llvm::StringRef Prefix, llvm::StringRef Suffix,
                              bool MultipleArchs = false,
-                             StringRef BoundArch = {},
+                             llvm::StringRef BoundArch = {},
                              bool NeedUniqueDirectory = false) const;
 
   /// GetNamedOutputPath - Return the name to use for the output of
@@ -679,22 +680,22 @@ public:
   /// \param MultipleArchs - Whether multiple -arch options were supplied.
   /// \param NormalizedTriple - The normalized triple of the relevant target.
   const char *GetNamedOutputPath(Compilation &C, const JobAction &JA,
-                                 const char *BaseInput, StringRef BoundArch,
+                                 const char *BaseInput, llvm::StringRef BoundArch,
                                  bool AtTopLevel, bool MultipleArchs,
-                                 StringRef NormalizedTriple) const;
+                                 llvm::StringRef NormalizedTriple) const;
 
   /// GetTemporaryPath - Return the pathname of a temporary file to use
   /// as part of compilation; the file will have the given prefix and suffix.
   ///
   /// GCC goes to extra lengths here to be a bit more robust.
-  std::string GetTemporaryPath(StringRef Prefix, StringRef Suffix) const;
+  std::string GetTemporaryPath(llvm::StringRef Prefix, llvm::StringRef Suffix) const;
 
   /// GetTemporaryDirectory - Return the pathname of a temporary directory to
   /// use as part of compilation; the directory will have the given prefix.
-  std::string GetTemporaryDirectory(StringRef Prefix) const;
+  std::string GetTemporaryDirectory(llvm::StringRef Prefix) const;
 
   /// Return the pathname of the pch file in clang-cl mode.
-  std::string GetClPchPath(Compilation &C, StringRef BaseName) const;
+  std::string GetClPchPath(Compilation &C, llvm::StringRef BaseName) const;
 
   /// ShouldUseClangCompiler - Should the clang compiler be used to
   /// handle this action.
@@ -741,11 +742,11 @@ private:
   /// \param [in] FileName File to read.
   /// \param [in] Search and expansion options.
   /// \returns true, if error occurred while reading.
-  bool readConfigFile(StringRef FileName, llvm::cl::ExpansionContext &ExpCtx);
+  bool readConfigFile(llvm::StringRef FileName, llvm::cl::ExpansionContext &ExpCtx);
 
   /// Set the driver mode (cl, gcc, etc) from the value of the `--driver-mode`
   /// option.
-  void setDriverMode(StringRef DriverModeValue);
+  void setDriverMode(llvm::StringRef DriverModeValue);
 
   /// Set the resource directory, depending on which driver is being used.
   void setResourceDirectory();
@@ -787,7 +788,7 @@ private:
   /// jobs specifically for the given action, but will use the cache when
   /// building jobs for the Action's inputs.
   InputInfoList BuildJobsForActionNoCache(
-      Compilation &C, const Action *A, const ToolChain *TC, StringRef BoundArch,
+      Compilation &C, const Action *A, const ToolChain *TC, llvm::StringRef BoundArch,
       bool AtTopLevel, bool MultipleArchs, const char *LinkingOutput,
       std::map<std::pair<const Action *, std::string>, InputInfoList>
           &CachedResults,
@@ -804,7 +805,7 @@ public:
   /// \return True if the entire string was parsed (9.2), or all
   /// groups were parsed (10.3.5extrastuff). HadExtra is true if all
   /// groups were parsed but extra characters remain at the end.
-  static bool GetReleaseVersion(StringRef Str, unsigned &Major, unsigned &Minor,
+  static bool GetReleaseVersion(llvm::StringRef Str, unsigned &Major, unsigned &Minor,
                                 unsigned &Micro, bool &HadExtra);
 
   /// Parse digits from a string \p Str and fulfill \p Digits with
@@ -813,11 +814,11 @@ public:
   ///
   /// \return True if the entire string was parsed and there are
   /// no extra characters remaining at the end.
-  static bool GetReleaseVersion(StringRef Str,
-                                MutableArrayRef<unsigned> Digits);
+  static bool GetReleaseVersion(llvm::StringRef Str,
+                                llvm::MutableArrayRef<unsigned> Digits);
   /// Compute the default -fmodule-cache-path.
   /// \return True if the system provides a default cache directory.
-  static bool getDefaultModuleCachePath(SmallVectorImpl<char> &Result);
+  static bool getDefaultModuleCachePath(llvm::SmallVectorImpl<char> &Result);
 };
 
 /// \return True if the last defined optimization level is -Ofast.
@@ -832,10 +833,10 @@ bool willEmitRemarks(const llvm::opt::ArgList &Args);
 /// Returns empty on failure.
 /// Common values are "gcc", "g++", "cpp", "cl" and "flang". Returned value need
 /// not be one of these.
-llvm::StringRef getDriverMode(StringRef ProgName, ArrayRef<const char *> Args);
+llvm::StringRef getDriverMode(llvm::StringRef ProgName, llvm::ArrayRef<const char *> Args);
 
 /// Checks whether the value produced by getDriverMode is for CL mode.
-bool IsClangCL(StringRef DriverMode);
+bool IsClangCL(llvm::StringRef DriverMode);
 
 /// Expand response files from a clang driver or cc1 invocation.
 ///
@@ -843,16 +844,16 @@ bool IsClangCL(StringRef DriverMode);
 /// \param ClangCLMode Whether clang is in CL mode.
 /// \param Alloc Allocator for new arguments.
 /// \param FS Filesystem to use when expanding files.
-llvm::Error expandResponseFiles(SmallVectorImpl<const char *> &Args,
+llvm::Error expandResponseFiles(llvm::SmallVectorImpl<const char *> &Args,
                                 bool ClangCLMode, llvm::BumpPtrAllocator &Alloc,
                                 llvm::vfs::FileSystem *FS = nullptr);
 
 /// Apply a space separated list of edits to the input argument lists.
 /// See applyOneOverrideOption.
-void applyOverrideOptions(SmallVectorImpl<const char *> &Args,
+void applyOverrideOptions(llvm::SmallVectorImpl<const char *> &Args,
                           const char *OverrideOpts,
                           llvm::StringSet<> &SavedStrings,
-                          raw_ostream *OS = nullptr);
+                          llvm::raw_ostream *OS = nullptr);
 
 } // end namespace driver
 } // end namespace clang

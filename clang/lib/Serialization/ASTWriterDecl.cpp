@@ -51,7 +51,7 @@ namespace clang {
 
     uint64_t Emit(Decl *D) {
       if (!Code)
-        llvm::report_fatal_error(StringRef("unexpected declaration kind '") +
+        llvm::report_fatal_error(llvm::StringRef("unexpected declaration kind '") +
             D->getDeclKindName() + "'");
       return Record.Emit(Code, AbbrevToUse);
     }
@@ -206,7 +206,7 @@ namespace clang {
     decltype(T::PartialSpecializations) &getPartialSpecializations(T *Common) {
       return Common->PartialSpecializations;
     }
-    ArrayRef<Decl> getPartialSpecializations(FunctionTemplateDecl::Common *) {
+    llvm::ArrayRef<Decl> getPartialSpecializations(FunctionTemplateDecl::Common *) {
       return std::nullopt;
     }
 
@@ -223,7 +223,7 @@ namespace clang {
         assert(!Common->LazySpecializations);
       }
 
-      ArrayRef<GlobalDeclID> LazySpecializations;
+      llvm::ArrayRef<GlobalDeclID> LazySpecializations;
       if (auto *LS = Common->LazySpecializations)
         LazySpecializations = llvm::ArrayRef(LS + 1, LS[0].get());
 
@@ -412,7 +412,7 @@ void ASTDeclWriter::VisitDecl(Decl *D) {
 }
 
 void ASTDeclWriter::VisitPragmaCommentDecl(PragmaCommentDecl *D) {
-  StringRef Arg = D->getArg();
+  llvm::StringRef Arg = D->getArg();
   Record.push_back(Arg.size());
   VisitDecl(D);
   Record.AddSourceLocation(D->getBeginLoc());
@@ -423,8 +423,8 @@ void ASTDeclWriter::VisitPragmaCommentDecl(PragmaCommentDecl *D) {
 
 void ASTDeclWriter::VisitPragmaDetectMismatchDecl(
     PragmaDetectMismatchDecl *D) {
-  StringRef Name = D->getName();
-  StringRef Value = D->getValue();
+  llvm::StringRef Name = D->getName();
+  llvm::StringRef Value = D->getValue();
   Record.push_back(Name.size() + 1 + Value.size());
   VisitDecl(D);
   Record.AddSourceLocation(D->getBeginLoc());
@@ -1626,7 +1626,7 @@ void ASTDeclWriter::VisitCXXConversionDecl(CXXConversionDecl *D) {
 void ASTDeclWriter::VisitImportDecl(ImportDecl *D) {
   VisitDecl(D);
   Record.push_back(Writer.getSubmoduleID(D->getImportedModule()));
-  ArrayRef<SourceLocation> IdentifierLocs = D->getIdentifierLocs();
+  llvm::ArrayRef<SourceLocation> IdentifierLocs = D->getIdentifierLocs();
   Record.push_back(!IdentifierLocs.empty());
   if (IdentifierLocs.empty()) {
     Record.AddSourceLocation(D->getEndLoc());

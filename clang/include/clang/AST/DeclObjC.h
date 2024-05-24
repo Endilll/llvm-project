@@ -214,8 +214,8 @@ class ObjCMethodDecl : public NamedDecl, public DeclContext {
   }
 
   void setParamsAndSelLocs(ASTContext &C,
-                           ArrayRef<ParmVarDecl*> Params,
-                           ArrayRef<SourceLocation> SelLocs);
+                           llvm::ArrayRef<ParmVarDecl*> Params,
+                           llvm::ArrayRef<SourceLocation> SelLocs);
 
   /// A definition will return its interface declaration.
   /// An interface declaration will return its definition.
@@ -301,7 +301,7 @@ public:
     return getStoredSelLocs()[Index];
   }
 
-  void getSelectorLocs(SmallVectorImpl<SourceLocation> &SelLocs) const;
+  void getSelectorLocs(llvm::SmallVectorImpl<SourceLocation> &SelLocs) const;
 
   unsigned getNumSelectorLocs() const {
     if (isImplicit())
@@ -368,9 +368,9 @@ public:
     return param_begin() + getSelector().getNumArgs();
   }
 
-  // ArrayRef access to formal parameters.  This should eventually
+  // llvm::ArrayRef access to formal parameters.  This should eventually
   // replace the iterator interface above.
-  ArrayRef<ParmVarDecl*> parameters() const {
+  llvm::ArrayRef<ParmVarDecl*> parameters() const {
     return llvm::ArrayRef(const_cast<ParmVarDecl **>(getParams()), NumParams);
   }
 
@@ -385,8 +385,8 @@ public:
   /// Sets the method's parameters and selector source locations.
   /// If the method is implicit (not coming from source) \p SelLocs is
   /// ignored.
-  void setMethodParams(ASTContext &C, ArrayRef<ParmVarDecl *> Params,
-                       ArrayRef<SourceLocation> SelLocs = std::nullopt);
+  void setMethodParams(ASTContext &C, llvm::ArrayRef<ParmVarDecl *> Params,
+                       llvm::ArrayRef<SourceLocation> SelLocs = std::nullopt);
 
   // Iterator access to parameter types.
   struct GetTypeFn {
@@ -471,7 +471,7 @@ public:
   /// A method in an implementation is not considered as overriding the same
   /// method in the interface or its categories.
   void getOverriddenMethods(
-                     SmallVectorImpl<const ObjCMethodDecl *> &Overridden) const;
+                     llvm::SmallVectorImpl<const ObjCMethodDecl *> &Overridden) const;
 
   /// True if the method was a definition but its body was skipped.
   bool hasSkippedBody() const { return ObjCMethodDeclBits.HasSkippedBody; }
@@ -663,7 +663,7 @@ class ObjCTypeParamList final
   unsigned NumParams;
 
   ObjCTypeParamList(SourceLocation lAngleLoc,
-                    ArrayRef<ObjCTypeParamDecl *> typeParams,
+                    llvm::ArrayRef<ObjCTypeParamDecl *> typeParams,
                     SourceLocation rAngleLoc);
 
 public:
@@ -672,7 +672,7 @@ public:
   /// Create a new Objective-C type parameter list.
   static ObjCTypeParamList *create(ASTContext &ctx,
                                    SourceLocation lAngleLoc,
-                                   ArrayRef<ObjCTypeParamDecl *> typeParams,
+                                   llvm::ArrayRef<ObjCTypeParamDecl *> typeParams,
                                    SourceLocation rAngleLoc);
 
   /// Iterate through the type parameters in the list.
@@ -712,7 +712,7 @@ public:
 
   /// Gather the default set of type arguments to be substituted for
   /// these type parameters when dealing with an unspecialized type.
-  void gatherDefaultTypeArgs(SmallVectorImpl<QualType> &typeArgs) const;
+  void gatherDefaultTypeArgs(llvm::SmallVectorImpl<QualType> &typeArgs) const;
 };
 
 enum class ObjCPropertyQueryKind : uint8_t {
@@ -1494,7 +1494,7 @@ public:
 
   /// Produce a name to be used for class's metadata. It comes either via
   /// objc_runtime_name attribute or class name.
-  StringRef getObjCRuntimeNameAsString() const;
+  llvm::StringRef getObjCRuntimeNameAsString() const;
 
   /// Returns the designated initializers for the interface.
   ///
@@ -2271,7 +2271,7 @@ public:
 
   /// Produce a name to be used for protocol's metadata. It comes either via
   /// objc_runtime_name attribute or protocol name.
-  StringRef getObjCRuntimeNameAsString() const;
+  llvm::StringRef getObjCRuntimeNameAsString() const;
 
   SourceRange getSourceRange() const override LLVM_READONLY {
     if (isThisDeclarationADefinition())
@@ -2572,7 +2572,7 @@ public:
   static bool classofKind(Kind K) { return K == ObjCCategoryImpl;}
 };
 
-raw_ostream &operator<<(raw_ostream &OS, const ObjCCategoryImplDecl &CID);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const ObjCCategoryImplDecl &CID);
 
 /// ObjCImplementationDecl - Represents a class definition - this is where
 /// method definitions are specified. For example:
@@ -2711,23 +2711,23 @@ public:
   }
 
   /// getName - Get the name of identifier for the class interface associated
-  /// with this implementation as a StringRef.
+  /// with this implementation as a llvm::StringRef.
   //
   // FIXME: This is a bad API, we are hiding NamedDecl::getName with a different
   // meaning.
-  StringRef getName() const {
+  llvm::StringRef getName() const {
     assert(getIdentifier() && "Name is not a simple identifier");
     return getIdentifier()->getName();
   }
 
   /// Get the name of the class associated with this interface.
   //
-  // FIXME: Move to StringRef API.
+  // FIXME: Move to llvm::StringRef API.
   std::string getNameAsString() const { return std::string(getName()); }
 
   /// Produce a name to be used for class's metadata. It comes either via
   /// class's objc_runtime_name attribute or class name.
-  StringRef getObjCRuntimeNameAsString() const;
+  llvm::StringRef getObjCRuntimeNameAsString() const;
 
   const ObjCInterfaceDecl *getSuperClass() const { return SuperClass; }
   ObjCInterfaceDecl *getSuperClass() { return SuperClass; }
@@ -2765,7 +2765,7 @@ public:
   static bool classofKind(Kind K) { return K == ObjCImplementation; }
 };
 
-raw_ostream &operator<<(raw_ostream &OS, const ObjCImplementationDecl &ID);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const ObjCImplementationDecl &ID);
 
 /// ObjCCompatibleAliasDecl - Represents alias of a class. This alias is
 /// declared as \@compatibility_alias alias class.

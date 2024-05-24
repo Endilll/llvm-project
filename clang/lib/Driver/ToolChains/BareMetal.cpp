@@ -37,8 +37,8 @@ static bool findRISCVMultilibs(const Driver &D,
                                const llvm::Triple &TargetTriple,
                                const ArgList &Args, DetectedMultilibs &Result) {
   Multilib::flags_list Flags;
-  StringRef Arch = riscv::getRISCVArch(Args, TargetTriple);
-  StringRef Abi = tools::riscv::getRISCVABI(Args, TargetTriple);
+  llvm::StringRef Arch = riscv::getRISCVArch(Args, TargetTriple);
+  llvm::StringRef Abi = tools::riscv::getRISCVABI(Args, TargetTriple);
 
   if (TargetTriple.isRISCV64()) {
     MultilibBuilder Imac =
@@ -103,10 +103,10 @@ BareMetal::BareMetal(const Driver &D, const llvm::Triple &Triple,
   getProgramPaths().push_back(getDriver().Dir);
 
   findMultilibs(D, Triple, Args);
-  SmallString<128> SysRoot(computeSysRoot());
+  llvm::SmallString<128> SysRoot(computeSysRoot());
   if (!SysRoot.empty()) {
     for (const Multilib &M : getOrderedMultilibs()) {
-      SmallString<128> Dir(SysRoot);
+      llvm::SmallString<128> Dir(SysRoot);
       llvm::sys::path::append(Dir, M.osSuffix(), "lib");
       getFilePaths().push_back(std::string(Dir));
       getLibraryPaths().push_back(std::string(Dir));
@@ -170,7 +170,7 @@ static bool isPPCBareMetal(const llvm::Triple &Triple) {
 }
 
 static void findMultilibsFromYAML(const ToolChain &TC, const Driver &D,
-                                  StringRef MultilibPath, const ArgList &Args,
+                                  llvm::StringRef MultilibPath, const ArgList &Args,
                                   DetectedMultilibs &Result) {
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> MB =
       D.getVFS().getBufferForFile(MultilibPath);
@@ -199,10 +199,10 @@ static std::string computeBaseSysRoot(const Driver &D,
   if (!D.SysRoot.empty())
     return D.SysRoot;
 
-  SmallString<128> SysRootDir(D.Dir);
+  llvm::SmallString<128> SysRootDir(D.Dir);
   llvm::sys::path::append(SysRootDir, "..", "lib", "clang-runtimes");
 
-  SmallString<128> MultilibPath(SysRootDir);
+  llvm::SmallString<128> MultilibPath(SysRootDir);
   llvm::sys::path::append(MultilibPath, MultilibFilename);
 
   // New behaviour: if multilib.yaml is found then use clang-runtimes as the
@@ -265,16 +265,16 @@ void BareMetal::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> Dir(getDriver().ResourceDir);
+    llvm::SmallString<128> Dir(getDriver().ResourceDir);
     llvm::sys::path::append(Dir, "include");
     addSystemInclude(DriverArgs, CC1Args, Dir.str());
   }
 
   if (!DriverArgs.hasArg(options::OPT_nostdlibinc)) {
-    const SmallString<128> SysRoot(computeSysRoot());
+    const llvm::SmallString<128> SysRoot(computeSysRoot());
     if (!SysRoot.empty()) {
       for (const Multilib &M : getOrderedMultilibs()) {
-        SmallString<128> Dir(SysRoot);
+        llvm::SmallString<128> Dir(SysRoot);
         llvm::sys::path::append(Dir, M.includeSuffix());
         llvm::sys::path::append(Dir, "include");
         addSystemInclude(DriverArgs, CC1Args, Dir.str());
@@ -301,12 +301,12 @@ void BareMetal::AddClangCXXStdlibIncludeArgs(const ArgList &DriverArgs,
     return;
 
   for (const Multilib &M : getOrderedMultilibs()) {
-    SmallString<128> Dir(SysRoot);
+    llvm::SmallString<128> Dir(SysRoot);
     llvm::sys::path::append(Dir, M.gccSuffix());
     switch (GetCXXStdlibType(DriverArgs)) {
     case ToolChain::CST_Libcxx: {
       // First check sysroot/usr/include/c++/v1 if it exists.
-      SmallString<128> TargetDir(Dir);
+      llvm::SmallString<128> TargetDir(Dir);
       llvm::sys::path::append(TargetDir, "usr", "include", "c++", "v1");
       if (D.getVFS().exists(TargetDir)) {
         addSystemInclude(DriverArgs, CC1Args, TargetDir.str());
@@ -326,7 +326,7 @@ void BareMetal::AddClangCXXStdlibIncludeArgs(const ArgList &DriverArgs,
                LI = D.getVFS().dir_begin(Dir.str(), EC),
                LE;
            !EC && LI != LE; LI = LI.increment(EC)) {
-        StringRef VersionText = llvm::sys::path::filename(LI->path());
+        llvm::StringRef VersionText = llvm::sys::path::filename(LI->path());
         auto CandidateVersion = Generic_GCC::GCCVersion::Parse(VersionText);
         if (CandidateVersion.Major == -1)
           continue;

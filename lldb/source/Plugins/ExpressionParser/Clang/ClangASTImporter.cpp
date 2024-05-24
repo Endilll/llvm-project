@@ -1113,10 +1113,10 @@ ClangASTImporter::ASTImporterDelegate::ImportImpl(Decl *From) {
              "[ClangASTImporter] Searching for a complete definition of {0} in "
              "other modules",
              td->getName());
-    Expected<DeclContext *> dc_or_err = ImportContext(td->getDeclContext());
+    llvm::Expected<DeclContext *> dc_or_err = ImportContext(td->getDeclContext());
     if (!dc_or_err)
       return dc_or_err.takeError();
-    Expected<DeclarationName> dn_or_err = Import(td->getDeclName());
+    llvm::Expected<DeclarationName> dn_or_err = Import(td->getDeclName());
     if (!dn_or_err)
       return dn_or_err.takeError();
     DeclContext *dc = *dc_or_err;

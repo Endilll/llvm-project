@@ -457,7 +457,7 @@ private:
 constexpr int ClangdLSPServer::MessageHandler::MaxReplayCallbacks;
 
 // call(), notify(), and reply() wrap the Transport, adding logging and locking.
-void ClangdLSPServer::callMethod(StringRef Method, llvm::json::Value Params,
+void ClangdLSPServer::callMethod(llvm::StringRef Method, llvm::json::Value Params,
                                  Callback<llvm::json::Value> CB) {
   auto ID = MsgHandler->bindReply(std::move(CB));
   log("--> {0}({1})", Method, ID);
@@ -1739,7 +1739,7 @@ void ClangdLSPServer::profile(MemoryTree &MT) const {
 }
 
 std::optional<ClangdServer::DiagRef>
-ClangdLSPServer::getDiagRef(StringRef File, const clangd::Diagnostic &D) {
+ClangdLSPServer::getDiagRef(llvm::StringRef File, const clangd::Diagnostic &D) {
   std::lock_guard<std::mutex> Lock(DiagRefMutex);
   auto DiagToDiagRefIter = DiagRefMap.find(File);
   if (DiagToDiagRefIter == DiagRefMap.end())

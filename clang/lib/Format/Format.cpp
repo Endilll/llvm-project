@@ -800,11 +800,11 @@ template <> struct MappingTraits<FormatStyle> {
     // When reading, read the language first, we need it for getPredefinedStyle.
     IO.mapOptional("Language", Style.Language);
 
-    StringRef BasedOnStyle;
+    llvm::StringRef BasedOnStyle;
     if (IO.outputting()) {
-      StringRef Styles[] = {"LLVM",   "Google", "Chromium",  "Mozilla",
+      llvm::StringRef Styles[] = {"LLVM",   "Google", "Chromium",  "Mozilla",
                             "WebKit", "GNU",    "Microsoft", "clang-format"};
-      for (StringRef StyleName : Styles) {
+      for (llvm::StringRef StyleName : Styles) {
         FormatStyle PredefinedStyle;
         if (getPredefinedStyle(StyleName, Style.Language, &PredefinedStyle) &&
             Style == PredefinedStyle) {
@@ -819,7 +819,7 @@ template <> struct MappingTraits<FormatStyle> {
         FormatStyle::LanguageKind Language =
             ((FormatStyle *)IO.getContext())->Language;
         if (!getPredefinedStyle(BasedOnStyle, Language, &Style)) {
-          IO.setError(Twine("Unknown value for BasedOnStyle: ", BasedOnStyle));
+          IO.setError(llvm::Twine("Unknown value for BasedOnStyle: ", BasedOnStyle));
           return;
         }
         Style.Language = OldLanguage;
@@ -1235,7 +1235,7 @@ std::error_code make_error_code(ParseError e) {
   return std::error_code(static_cast<int>(e), getParseCategory());
 }
 
-inline llvm::Error make_string_error(const Twine &Message) {
+inline llvm::Error make_string_error(const llvm::Twine &Message) {
   return llvm::make_error<llvm::StringError>(Message,
                                              llvm::inconvertibleErrorCode());
 }
@@ -1932,7 +1932,7 @@ FormatStyle getNoStyle() {
   return NoStyle;
 }
 
-bool getPredefinedStyle(StringRef Name, FormatStyle::LanguageKind Language,
+bool getPredefinedStyle(llvm::StringRef Name, FormatStyle::LanguageKind Language,
                         FormatStyle *Style) {
   if (Name.equals_insensitive("llvm"))
     *Style = getLLVMStyle(Language);
@@ -2113,7 +2113,7 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override {
     AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
     tooling::Replacements Result;
@@ -2122,7 +2122,7 @@ public:
   }
 
 private:
-  void removeParens(SmallVectorImpl<AnnotatedLine *> &Lines,
+  void removeParens(llvm::SmallVectorImpl<AnnotatedLine *> &Lines,
                     tooling::Replacements &Result) {
     const auto &SourceMgr = Env.getSourceManager();
     for (auto *Line : Lines) {
@@ -2157,7 +2157,7 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override {
     AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
     tooling::Replacements Result;
@@ -2166,7 +2166,7 @@ public:
   }
 
 private:
-  void insertBraces(SmallVectorImpl<AnnotatedLine *> &Lines,
+  void insertBraces(llvm::SmallVectorImpl<AnnotatedLine *> &Lines,
                     tooling::Replacements &Result) {
     const auto &SourceMgr = Env.getSourceManager();
     int OpeningBraceSurplus = 0;
@@ -2210,7 +2210,7 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override {
     AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
     tooling::Replacements Result;
@@ -2219,7 +2219,7 @@ public:
   }
 
 private:
-  void removeBraces(SmallVectorImpl<AnnotatedLine *> &Lines,
+  void removeBraces(llvm::SmallVectorImpl<AnnotatedLine *> &Lines,
                     tooling::Replacements &Result) {
     const auto &SourceMgr = Env.getSourceManager();
     const auto End = Lines.end();
@@ -2261,7 +2261,7 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override {
     AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
     tooling::Replacements Result;
@@ -2271,7 +2271,7 @@ public:
 
 private:
   void removeSemi(TokenAnnotator &Annotator,
-                  SmallVectorImpl<AnnotatedLine *> &Lines,
+                  llvm::SmallVectorImpl<AnnotatedLine *> &Lines,
                   tooling::Replacements &Result) {
     auto PrecededByFunctionRBrace = [](const FormatToken &Tok) {
       const auto *Prev = Tok.Previous;
@@ -2321,7 +2321,7 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override {
     AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
     tooling::Replacements Result;
@@ -2332,7 +2332,7 @@ public:
 private:
   // Replaces double/single-quoted string literal as appropriate, re-escaping
   // the contents in the process.
-  void requoteJSStringLiteral(SmallVectorImpl<AnnotatedLine *> &Lines,
+  void requoteJSStringLiteral(llvm::SmallVectorImpl<AnnotatedLine *> &Lines,
                               tooling::Replacements &Result) {
     for (AnnotatedLine *Line : Lines) {
       requoteJSStringLiteral(Line->Children, Result);
@@ -2340,7 +2340,7 @@ private:
         continue;
       for (FormatToken *FormatTok = Line->First; FormatTok;
            FormatTok = FormatTok->Next) {
-        StringRef Input = FormatTok->TokenText;
+        llvm::StringRef Input = FormatTok->TokenText;
         if (FormatTok->Finalized || !FormatTok->isStringLiteral() ||
             // NB: testing for not starting with a double quote to avoid
             // breaking `template strings`.
@@ -2355,7 +2355,7 @@ private:
         bool IsSingle = Style.JavaScriptQuotes == FormatStyle::JSQS_Single;
         SourceLocation Start = FormatTok->Tok.getLocation();
         auto Replace = [&](SourceLocation Start, unsigned Length,
-                           StringRef ReplacementText) {
+                           llvm::StringRef ReplacementText) {
           auto Err = Result.add(tooling::Replacement(
               Env.getSourceManager(), Start, Length, ReplacementText));
           // FIXME: handle error. For now, print error message and skip the
@@ -2410,7 +2410,7 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override {
     tooling::Replacements Result;
     deriveLocalStyle(AnnotatedLines);
@@ -2447,7 +2447,7 @@ public:
 
 private:
   bool
-  hasCpp03IncompatibleFormat(const SmallVectorImpl<AnnotatedLine *> &Lines) {
+  hasCpp03IncompatibleFormat(const llvm::SmallVectorImpl<AnnotatedLine *> &Lines) {
     for (const AnnotatedLine *Line : Lines) {
       if (hasCpp03IncompatibleFormat(Line->Children))
         return true;
@@ -2465,7 +2465,7 @@ private:
     return false;
   }
 
-  int countVariableAlignments(const SmallVectorImpl<AnnotatedLine *> &Lines) {
+  int countVariableAlignments(const llvm::SmallVectorImpl<AnnotatedLine *> &Lines) {
     int AlignmentDiff = 0;
     for (const AnnotatedLine *Line : Lines) {
       AlignmentDiff += countVariableAlignments(Line->Children);
@@ -2496,7 +2496,7 @@ private:
   }
 
   void
-  deriveLocalStyle(const SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
+  deriveLocalStyle(const llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
     bool HasBinPackedFunction = false;
     bool HasOnePerLineFunction = false;
     for (AnnotatedLine *Line : AnnotatedLines) {
@@ -2551,7 +2551,7 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override {
     AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
     tooling::Replacements Result;
@@ -2562,7 +2562,7 @@ public:
 private:
   /// Inserts trailing commas in [] and {} initializers if they wrap over
   /// multiple lines.
-  void insertTrailingCommas(SmallVectorImpl<AnnotatedLine *> &Lines,
+  void insertTrailingCommas(llvm::SmallVectorImpl<AnnotatedLine *> &Lines,
                             tooling::Replacements &Result) {
     for (AnnotatedLine *Line : Lines) {
       insertTrailingCommas(Line->Children, Result);
@@ -2614,7 +2614,7 @@ public:
   // FIXME: eliminate unused parameters.
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override {
     // FIXME: in the current implementation the granularity of affected range
     // is an annotated line. However, this is not sufficient. Furthermore,
@@ -2657,7 +2657,7 @@ private:
   }
 
   // Iterate through all lines and remove any empty (nested) namespaces.
-  void checkEmptyNamespace(SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
+  void checkEmptyNamespace(llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
     std::set<unsigned> DeletedLines;
     for (unsigned i = 0, e = AnnotatedLines.size(); i != e; ++i) {
       auto &Line = *AnnotatedLines[i];
@@ -2678,7 +2678,7 @@ private:
   // its nested namespaces are empty and delete them if they are empty. It also
   // sets \p NewLine to the last line checked.
   // Returns true if the current namespace is empty.
-  bool checkEmptyNamespace(SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+  bool checkEmptyNamespace(llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
                            unsigned CurrentLine, unsigned &NewLine,
                            std::set<unsigned> &DeletedLines) {
     unsigned InitLine = CurrentLine, End = AnnotatedLines.size();
@@ -2783,7 +2783,7 @@ private:
 
   tooling::Replacements generateFixes() {
     tooling::Replacements Fixes;
-    SmallVector<FormatToken *> Tokens;
+    llvm::SmallVector<FormatToken *> Tokens;
     std::copy(DeletedTokens.begin(), DeletedTokens.end(),
               std::back_inserter(Tokens));
 
@@ -2835,7 +2835,7 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override {
     assert(Style.Language == FormatStyle::LK_Cpp);
     IsObjC = guessIsObjC(Env.getSourceManager(), AnnotatedLines,
@@ -2849,7 +2849,7 @@ public:
 private:
   static bool
   guessIsObjC(const SourceManager &SourceManager,
-              const SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+              const llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
               const AdditionalKeywords &Keywords) {
     // Keep this array sorted, since we are binary searching over it.
     static constexpr llvm::StringLiteral FoundationIdentifiers[] = {
@@ -2972,25 +2972,25 @@ private:
 };
 
 struct IncludeDirective {
-  StringRef Filename;
-  StringRef Text;
+  llvm::StringRef Filename;
+  llvm::StringRef Text;
   unsigned Offset;
   int Category;
   int Priority;
 };
 
 struct JavaImportDirective {
-  StringRef Identifier;
-  StringRef Text;
+  llvm::StringRef Identifier;
+  llvm::StringRef Text;
   unsigned Offset;
-  SmallVector<StringRef> AssociatedCommentLines;
+  llvm::SmallVector<llvm::StringRef> AssociatedCommentLines;
   bool IsStatic;
 };
 
 } // end anonymous namespace
 
 // Determines whether 'Ranges' intersects with ('Start', 'End').
-static bool affectsRange(ArrayRef<tooling::Range> Ranges, unsigned Start,
+static bool affectsRange(llvm::ArrayRef<tooling::Range> Ranges, unsigned Start,
                          unsigned End) {
   for (const auto &Range : Ranges) {
     if (Range.getOffset() < End &&
@@ -3009,8 +3009,8 @@ static bool affectsRange(ArrayRef<tooling::Range> Ranges, unsigned Start,
 // its current line.
 // If `Cursor` is not on any #include, `Index` will be UINT_MAX.
 static std::pair<unsigned, unsigned>
-FindCursorIndex(const SmallVectorImpl<IncludeDirective> &Includes,
-                const SmallVectorImpl<unsigned> &Indices, unsigned Cursor) {
+FindCursorIndex(const llvm::SmallVectorImpl<IncludeDirective> &Includes,
+                const llvm::SmallVectorImpl<unsigned> &Indices, unsigned Cursor) {
   unsigned CursorIndex = UINT_MAX;
   unsigned OffsetToEOL = 0;
   for (int i = 0, e = Includes.size(); i != e; ++i) {
@@ -3059,9 +3059,9 @@ std::string replaceCRLF(const std::string &Code) {
 // provided and put on a deleted #include, it will be moved to the remaining
 // #include in the duplicate #includes.
 static void sortCppIncludes(const FormatStyle &Style,
-                            const SmallVectorImpl<IncludeDirective> &Includes,
-                            ArrayRef<tooling::Range> Ranges, StringRef FileName,
-                            StringRef Code, tooling::Replacements &Replaces,
+                            const llvm::SmallVectorImpl<IncludeDirective> &Includes,
+                            llvm::ArrayRef<tooling::Range> Ranges, llvm::StringRef FileName,
+                            llvm::StringRef Code, tooling::Replacements &Replaces,
                             unsigned *Cursor) {
   tooling::IncludeCategoryManager Categories(Style.IncludeStyle, FileName);
   const unsigned IncludesBeginOffset = Includes.front().Offset;
@@ -3070,7 +3070,7 @@ static void sortCppIncludes(const FormatStyle &Style,
   const unsigned IncludesBlockSize = IncludesEndOffset - IncludesBeginOffset;
   if (!affectsRange(Ranges, IncludesBeginOffset, IncludesEndOffset))
     return;
-  SmallVector<unsigned, 16> Indices =
+  llvm::SmallVector<unsigned, 16> Indices =
       llvm::to_vector<16>(llvm::seq<unsigned>(0, Includes.size()));
 
   if (Style.SortIncludes == FormatStyle::SI_CaseInsensitive) {
@@ -3159,17 +3159,17 @@ static void sortCppIncludes(const FormatStyle &Style,
   }
 }
 
-tooling::Replacements sortCppIncludes(const FormatStyle &Style, StringRef Code,
-                                      ArrayRef<tooling::Range> Ranges,
-                                      StringRef FileName,
+tooling::Replacements sortCppIncludes(const FormatStyle &Style, llvm::StringRef Code,
+                                      llvm::ArrayRef<tooling::Range> Ranges,
+                                      llvm::StringRef FileName,
                                       tooling::Replacements &Replaces,
                                       unsigned *Cursor) {
   unsigned Prev = llvm::StringSwitch<size_t>(Code)
                       .StartsWith("\xEF\xBB\xBF", 3) // UTF-8 BOM
                       .Default(0);
   unsigned SearchFrom = 0;
-  SmallVector<StringRef, 4> Matches;
-  SmallVector<IncludeDirective, 16> IncludesInBlock;
+  llvm::SmallVector<llvm::StringRef, 4> Matches;
+  llvm::SmallVector<IncludeDirective, 16> IncludesInBlock;
 
   // In compiled files, consider the first #include to be the main #include of
   // the file if it is not a system #include. This ensures that the header
@@ -3186,15 +3186,15 @@ tooling::Replacements sortCppIncludes(const FormatStyle &Style, StringRef Code,
   // '[' must be the first and '-' the last character inside [...].
   llvm::Regex RawStringRegex(
       "R\"([][A-Za-z0-9_{}#<>%:;.?*+/^&\\$|~!=,'-]*)\\(");
-  SmallVector<StringRef, 2> RawStringMatches;
+  llvm::SmallVector<llvm::StringRef, 2> RawStringMatches;
   std::string RawStringTermination = ")\"";
 
   for (;;) {
     auto Pos = Code.find('\n', SearchFrom);
-    StringRef Line =
-        Code.substr(Prev, (Pos != StringRef::npos ? Pos : Code.size()) - Prev);
+    llvm::StringRef Line =
+        Code.substr(Prev, (Pos != llvm::StringRef::npos ? Pos : Code.size()) - Prev);
 
-    StringRef Trimmed = Line.trim();
+    llvm::StringRef Trimmed = Line.trim();
 
     // #includes inside raw string literals need to be ignored.
     // or we will sort the contents of the string.
@@ -3222,7 +3222,7 @@ tooling::Replacements sortCppIncludes(const FormatStyle &Style, StringRef Code,
     bool MergeWithNextLine = Trimmed.ends_with("\\");
     if (!FormattingOff && !MergeWithNextLine) {
       if (tooling::HeaderIncludes::IncludeRegex.match(Line, &Matches)) {
-        StringRef IncludeName = Matches[2];
+        llvm::StringRef IncludeName = Matches[2];
         if (Line.contains("/*") && !Line.contains("*/")) {
           // #include with a start of a block comment, but without the end.
           // Need to keep all the lines until the end of the comment together.
@@ -3230,7 +3230,7 @@ tooling::Replacements sortCppIncludes(const FormatStyle &Style, StringRef Code,
           // correctly if there are multiple comments on a line.
           Pos = Code.find("*/", SearchFrom);
           Line = Code.substr(
-              Prev, (Pos != StringRef::npos ? Pos + 2 : Code.size()) - Prev);
+              Prev, (Pos != llvm::StringRef::npos ? Pos + 2 : Code.size()) - Prev);
         }
         int Category = Categories.getIncludePriority(
             IncludeName,
@@ -3251,7 +3251,7 @@ tooling::Replacements sortCppIncludes(const FormatStyle &Style, StringRef Code,
           FirstIncludeBlock = false;
       }
     }
-    if (Pos == StringRef::npos || Pos + 1 == Code.size())
+    if (Pos == llvm::StringRef::npos || Pos + 1 == Code.size())
       break;
 
     if (!MergeWithNextLine)
@@ -3268,7 +3268,7 @@ tooling::Replacements sortCppIncludes(const FormatStyle &Style, StringRef Code,
 // Returns group number to use as a first order sort on imports. Gives UINT_MAX
 // if the import does not match any given groups.
 static unsigned findJavaImportGroup(const FormatStyle &Style,
-                                    StringRef ImportIdentifier) {
+                                    llvm::StringRef ImportIdentifier) {
   unsigned LongestMatchIndex = UINT_MAX;
   unsigned LongestMatchLength = 0;
   for (unsigned I = 0; I < Style.JavaImportGroups.size(); I++) {
@@ -3288,9 +3288,9 @@ static unsigned findJavaImportGroup(const FormatStyle &Style,
 // import group, a newline is inserted, and within each import group, a
 // lexicographic sort based on ASCII value is performed.
 static void sortJavaImports(const FormatStyle &Style,
-                            const SmallVectorImpl<JavaImportDirective> &Imports,
-                            ArrayRef<tooling::Range> Ranges, StringRef FileName,
-                            StringRef Code, tooling::Replacements &Replaces) {
+                            const llvm::SmallVectorImpl<JavaImportDirective> &Imports,
+                            llvm::ArrayRef<tooling::Range> Ranges, llvm::StringRef FileName,
+                            llvm::StringRef Code, tooling::Replacements &Replaces) {
   unsigned ImportsBeginOffset = Imports.front().Offset;
   unsigned ImportsEndOffset =
       Imports.back().Offset + Imports.back().Text.size();
@@ -3298,9 +3298,9 @@ static void sortJavaImports(const FormatStyle &Style,
   if (!affectsRange(Ranges, ImportsBeginOffset, ImportsEndOffset))
     return;
 
-  SmallVector<unsigned, 16> Indices =
+  llvm::SmallVector<unsigned, 16> Indices =
       llvm::to_vector<16>(llvm::seq<unsigned>(0, Imports.size()));
-  SmallVector<unsigned, 16> JavaImportGroups;
+  llvm::SmallVector<unsigned, 16> JavaImportGroups;
   JavaImportGroups.reserve(Imports.size());
   for (const JavaImportDirective &Import : Imports)
     JavaImportGroups.push_back(findJavaImportGroup(Style, Import.Identifier));
@@ -3336,7 +3336,7 @@ static void sortJavaImports(const FormatStyle &Style,
         result += "\n";
       }
     }
-    for (StringRef CommentLine : Imports[Index].AssociatedCommentLines) {
+    for (llvm::StringRef CommentLine : Imports[Index].AssociatedCommentLines) {
       result += CommentLine;
       result += "\n";
     }
@@ -3369,25 +3369,25 @@ const char JavaImportRegexPattern[] =
 
 } // anonymous namespace
 
-tooling::Replacements sortJavaImports(const FormatStyle &Style, StringRef Code,
-                                      ArrayRef<tooling::Range> Ranges,
-                                      StringRef FileName,
+tooling::Replacements sortJavaImports(const FormatStyle &Style, llvm::StringRef Code,
+                                      llvm::ArrayRef<tooling::Range> Ranges,
+                                      llvm::StringRef FileName,
                                       tooling::Replacements &Replaces) {
   unsigned Prev = 0;
   unsigned SearchFrom = 0;
   llvm::Regex ImportRegex(JavaImportRegexPattern);
-  SmallVector<StringRef, 4> Matches;
-  SmallVector<JavaImportDirective, 16> ImportsInBlock;
-  SmallVector<StringRef> AssociatedCommentLines;
+  llvm::SmallVector<llvm::StringRef, 4> Matches;
+  llvm::SmallVector<JavaImportDirective, 16> ImportsInBlock;
+  llvm::SmallVector<llvm::StringRef> AssociatedCommentLines;
 
   bool FormattingOff = false;
 
   for (;;) {
     auto Pos = Code.find('\n', SearchFrom);
-    StringRef Line =
-        Code.substr(Prev, (Pos != StringRef::npos ? Pos : Code.size()) - Prev);
+    llvm::StringRef Line =
+        Code.substr(Prev, (Pos != llvm::StringRef::npos ? Pos : Code.size()) - Prev);
 
-    StringRef Trimmed = Line.trim();
+    llvm::StringRef Trimmed = Line.trim();
     if (isClangFormatOff(Trimmed))
       FormattingOff = true;
     else if (isClangFormatOn(Trimmed))
@@ -3399,8 +3399,8 @@ tooling::Replacements sortJavaImports(const FormatStyle &Style, StringRef Code,
         // formatting entirely.
         return Replaces;
       }
-      StringRef Static = Matches[1];
-      StringRef Identifier = Matches[2];
+      llvm::StringRef Static = Matches[1];
+      llvm::StringRef Identifier = Matches[2];
       bool IsStatic = false;
       if (Static.contains("static"))
         IsStatic = true;
@@ -3412,7 +3412,7 @@ tooling::Replacements sortJavaImports(const FormatStyle &Style, StringRef Code,
       AssociatedCommentLines.push_back(Line);
     }
     Prev = Pos + 1;
-    if (Pos == StringRef::npos || Pos + 1 == Code.size())
+    if (Pos == llvm::StringRef::npos || Pos + 1 == Code.size())
       break;
     SearchFrom = Pos + 1;
   }
@@ -3421,18 +3421,18 @@ tooling::Replacements sortJavaImports(const FormatStyle &Style, StringRef Code,
   return Replaces;
 }
 
-bool isMpegTS(StringRef Code) {
+bool isMpegTS(llvm::StringRef Code) {
   // MPEG transport streams use the ".ts" file extension. clang-format should
   // not attempt to format those. MPEG TS' frame format starts with 0x47 every
   // 189 bytes - detect that and return.
   return Code.size() > 188 && Code[0] == 0x47 && Code[188] == 0x47;
 }
 
-bool isLikelyXml(StringRef Code) { return Code.ltrim().starts_with("<"); }
+bool isLikelyXml(llvm::StringRef Code) { return Code.ltrim().starts_with("<"); }
 
-tooling::Replacements sortIncludes(const FormatStyle &Style, StringRef Code,
-                                   ArrayRef<tooling::Range> Ranges,
-                                   StringRef FileName, unsigned *Cursor) {
+tooling::Replacements sortIncludes(const FormatStyle &Style, llvm::StringRef Code,
+                                   llvm::ArrayRef<tooling::Range> Ranges,
+                                   llvm::StringRef FileName, unsigned *Cursor) {
   tooling::Replacements Replaces;
   if (!Style.SortIncludes || Style.DisableFormat)
     return Replaces;
@@ -3451,8 +3451,8 @@ tooling::Replacements sortIncludes(const FormatStyle &Style, StringRef Code,
 }
 
 template <typename T>
-static Expected<tooling::Replacements>
-processReplacements(T ProcessFunc, StringRef Code,
+static llvm::Expected<tooling::Replacements>
+processReplacements(T ProcessFunc, llvm::StringRef Code,
                     const tooling::Replacements &Replaces,
                     const FormatStyle &Style) {
   if (Replaces.empty())
@@ -3462,7 +3462,7 @@ processReplacements(T ProcessFunc, StringRef Code,
   if (!NewCode)
     return NewCode.takeError();
   std::vector<tooling::Range> ChangedRanges = Replaces.getAffectedRanges();
-  StringRef FileName = Replaces.begin()->getFilePath();
+  llvm::StringRef FileName = Replaces.begin()->getFilePath();
 
   tooling::Replacements FormatReplaces =
       ProcessFunc(Style, *NewCode, ChangedRanges, FileName);
@@ -3470,14 +3470,14 @@ processReplacements(T ProcessFunc, StringRef Code,
   return Replaces.merge(FormatReplaces);
 }
 
-Expected<tooling::Replacements>
-formatReplacements(StringRef Code, const tooling::Replacements &Replaces,
+llvm::Expected<tooling::Replacements>
+formatReplacements(llvm::StringRef Code, const tooling::Replacements &Replaces,
                    const FormatStyle &Style) {
   // We need to use lambda function here since there are two versions of
   // `sortIncludes`.
-  auto SortIncludes = [](const FormatStyle &Style, StringRef Code,
+  auto SortIncludes = [](const FormatStyle &Style, llvm::StringRef Code,
                          std::vector<tooling::Range> Ranges,
-                         StringRef FileName) -> tooling::Replacements {
+                         llvm::StringRef FileName) -> tooling::Replacements {
     return sortIncludes(Style, Code, Ranges, FileName);
   };
   auto SortedReplaces =
@@ -3487,9 +3487,9 @@ formatReplacements(StringRef Code, const tooling::Replacements &Replaces,
 
   // We need to use lambda function here since there are two versions of
   // `reformat`.
-  auto Reformat = [](const FormatStyle &Style, StringRef Code,
+  auto Reformat = [](const FormatStyle &Style, llvm::StringRef Code,
                      std::vector<tooling::Range> Ranges,
-                     StringRef FileName) -> tooling::Replacements {
+                     llvm::StringRef FileName) -> tooling::Replacements {
     return reformat(Style, Code, Ranges, FileName);
   };
   return processReplacements(Reformat, Code, *SortedReplaces, Style);
@@ -3509,13 +3509,13 @@ inline bool isHeaderDeletion(const tooling::Replacement &Replace) {
 
 // FIXME: insert empty lines between newly created blocks.
 tooling::Replacements
-fixCppIncludeInsertions(StringRef Code, const tooling::Replacements &Replaces,
+fixCppIncludeInsertions(llvm::StringRef Code, const tooling::Replacements &Replaces,
                         const FormatStyle &Style) {
   if (!Style.isCpp())
     return Replaces;
 
   tooling::Replacements HeaderInsertions;
-  std::set<StringRef> HeadersToDelete;
+  std::set<llvm::StringRef> HeadersToDelete;
   tooling::Replacements Result;
   for (const auto &R : Replaces) {
     if (isHeaderInsertion(R)) {
@@ -3535,7 +3535,7 @@ fixCppIncludeInsertions(StringRef Code, const tooling::Replacements &Replaces,
   if (HeaderInsertions.empty() && HeadersToDelete.empty())
     return Replaces;
 
-  StringRef FileName = Replaces.begin()->getFilePath();
+  llvm::StringRef FileName = Replaces.begin()->getFilePath();
   tooling::HeaderIncludes Includes(FileName, Code, Style.IncludeStyle);
 
   for (const auto &Header : HeadersToDelete) {
@@ -3551,7 +3551,7 @@ fixCppIncludeInsertions(StringRef Code, const tooling::Replacements &Replaces,
     }
   }
 
-  SmallVector<StringRef, 4> Matches;
+  llvm::SmallVector<llvm::StringRef, 4> Matches;
   for (const auto &R : HeaderInsertions) {
     auto IncludeDirective = R.getReplacementText();
     bool Matched =
@@ -3580,14 +3580,14 @@ fixCppIncludeInsertions(StringRef Code, const tooling::Replacements &Replaces,
 
 } // anonymous namespace
 
-Expected<tooling::Replacements>
-cleanupAroundReplacements(StringRef Code, const tooling::Replacements &Replaces,
+llvm::Expected<tooling::Replacements>
+cleanupAroundReplacements(llvm::StringRef Code, const tooling::Replacements &Replaces,
                           const FormatStyle &Style) {
   // We need to use lambda function here since there are two versions of
   // `cleanup`.
-  auto Cleanup = [](const FormatStyle &Style, StringRef Code,
-                    ArrayRef<tooling::Range> Ranges,
-                    StringRef FileName) -> tooling::Replacements {
+  auto Cleanup = [](const FormatStyle &Style, llvm::StringRef Code,
+                    llvm::ArrayRef<tooling::Range> Ranges,
+                    llvm::StringRef FileName) -> tooling::Replacements {
     return cleanup(Style, Code, Ranges, FileName);
   };
   // Make header insertion replacements insert new headers into correct blocks.
@@ -3598,9 +3598,9 @@ cleanupAroundReplacements(StringRef Code, const tooling::Replacements &Replaces,
 
 namespace internal {
 std::pair<tooling::Replacements, unsigned>
-reformat(const FormatStyle &Style, StringRef Code,
-         ArrayRef<tooling::Range> Ranges, unsigned FirstStartColumn,
-         unsigned NextStartColumn, unsigned LastStartColumn, StringRef FileName,
+reformat(const FormatStyle &Style, llvm::StringRef Code,
+         llvm::ArrayRef<tooling::Range> Ranges, unsigned FirstStartColumn,
+         unsigned NextStartColumn, unsigned LastStartColumn, llvm::StringRef FileName,
          FormattingAttemptStatus *Status) {
   FormatStyle Expanded = Style;
   expandPresetsBraceWrapping(Expanded);
@@ -3654,7 +3654,7 @@ reformat(const FormatStyle &Style, StringRef Code,
       const Environment &)>
       AnalyzerPass;
 
-  SmallVector<AnalyzerPass, 16> Passes;
+  llvm::SmallVector<AnalyzerPass, 16> Passes;
 
   Passes.emplace_back([&](const Environment &Env) {
     return IntegerLiteralSeparatorFixer().process(Env, Expanded);
@@ -3746,7 +3746,7 @@ reformat(const FormatStyle &Style, StringRef Code,
   for (size_t I = 0, E = Passes.size(); I < E; ++I) {
     std::pair<tooling::Replacements, unsigned> PassFixes = Passes[I](*Env);
     auto NewCode = applyAllReplacements(
-        CurrentCode ? StringRef(*CurrentCode) : Code, PassFixes.first);
+        CurrentCode ? llvm::StringRef(*CurrentCode) : Code, PassFixes.first);
     if (NewCode) {
       Fixes = Fixes.merge(PassFixes.first);
       Penalty += PassFixes.second;
@@ -3768,7 +3768,7 @@ reformat(const FormatStyle &Style, StringRef Code,
     // `volatile const` and then a later pass changes it back again.
     tooling::Replacements NonNoOpFixes;
     for (const tooling::Replacement &Fix : Fixes) {
-      StringRef OriginalCode = Code.substr(Fix.getOffset(), Fix.getLength());
+      llvm::StringRef OriginalCode = Code.substr(Fix.getOffset(), Fix.getLength());
       if (OriginalCode != Fix.getReplacementText()) {
         auto Err = NonNoOpFixes.add(Fix);
         if (Err) {
@@ -3784,9 +3784,9 @@ reformat(const FormatStyle &Style, StringRef Code,
 }
 } // namespace internal
 
-tooling::Replacements reformat(const FormatStyle &Style, StringRef Code,
-                               ArrayRef<tooling::Range> Ranges,
-                               StringRef FileName,
+tooling::Replacements reformat(const FormatStyle &Style, llvm::StringRef Code,
+                               llvm::ArrayRef<tooling::Range> Ranges,
+                               llvm::StringRef FileName,
                                FormattingAttemptStatus *Status) {
   return internal::reformat(Style, Code, Ranges,
                             /*FirstStartColumn=*/0,
@@ -3795,9 +3795,9 @@ tooling::Replacements reformat(const FormatStyle &Style, StringRef Code,
       .first;
 }
 
-tooling::Replacements cleanup(const FormatStyle &Style, StringRef Code,
-                              ArrayRef<tooling::Range> Ranges,
-                              StringRef FileName) {
+tooling::Replacements cleanup(const FormatStyle &Style, llvm::StringRef Code,
+                              llvm::ArrayRef<tooling::Range> Ranges,
+                              llvm::StringRef FileName) {
   // cleanups only apply to C++ (they mostly concern ctor commas etc.)
   if (Style.Language != FormatStyle::LK_Cpp)
     return tooling::Replacements();
@@ -3807,9 +3807,9 @@ tooling::Replacements cleanup(const FormatStyle &Style, StringRef Code,
   return Cleaner(*Env, Style).process().first;
 }
 
-tooling::Replacements reformat(const FormatStyle &Style, StringRef Code,
-                               ArrayRef<tooling::Range> Ranges,
-                               StringRef FileName, bool *IncompleteFormat) {
+tooling::Replacements reformat(const FormatStyle &Style, llvm::StringRef Code,
+                               llvm::ArrayRef<tooling::Range> Ranges,
+                               llvm::StringRef FileName, bool *IncompleteFormat) {
   FormattingAttemptStatus Status;
   auto Result = reformat(Style, Code, Ranges, FileName, &Status);
   if (!Status.FormatComplete)
@@ -3818,9 +3818,9 @@ tooling::Replacements reformat(const FormatStyle &Style, StringRef Code,
 }
 
 tooling::Replacements fixNamespaceEndComments(const FormatStyle &Style,
-                                              StringRef Code,
-                                              ArrayRef<tooling::Range> Ranges,
-                                              StringRef FileName) {
+                                              llvm::StringRef Code,
+                                              llvm::ArrayRef<tooling::Range> Ranges,
+                                              llvm::StringRef FileName) {
   auto Env = Environment::make(Code, FileName, Ranges);
   if (!Env)
     return {};
@@ -3828,9 +3828,9 @@ tooling::Replacements fixNamespaceEndComments(const FormatStyle &Style,
 }
 
 tooling::Replacements sortUsingDeclarations(const FormatStyle &Style,
-                                            StringRef Code,
-                                            ArrayRef<tooling::Range> Ranges,
-                                            StringRef FileName) {
+                                            llvm::StringRef Code,
+                                            llvm::ArrayRef<tooling::Range> Ranges,
+                                            llvm::StringRef FileName) {
   auto Env = Environment::make(Code, FileName, Ranges);
   if (!Env)
     return {};
@@ -3881,7 +3881,7 @@ const char *StyleOptionHelpDescription =
     "4. \"{key: value, ...}\" to set specific parameters, e.g.:\n"
     "   --style=\"{BasedOnStyle: llvm, IndentWidth: 8}\"";
 
-static FormatStyle::LanguageKind getLanguageByFileName(StringRef FileName) {
+static FormatStyle::LanguageKind getLanguageByFileName(llvm::StringRef FileName) {
   if (FileName.ends_with(".java"))
     return FormatStyle::LK_Java;
   if (FileName.ends_with_insensitive(".js") ||
@@ -3920,7 +3920,7 @@ static FormatStyle::LanguageKind getLanguageByFileName(StringRef FileName) {
   return FormatStyle::LK_Cpp;
 }
 
-FormatStyle::LanguageKind guessLanguage(StringRef FileName, StringRef Code) {
+FormatStyle::LanguageKind guessLanguage(llvm::StringRef FileName, llvm::StringRef Code) {
   const auto GuessedLanguage = getLanguageByFileName(FileName);
   if (GuessedLanguage == FormatStyle::LK_Cpp) {
     auto Extension = llvm::sys::path::extension(FileName);
@@ -3944,7 +3944,7 @@ const char *DefaultFormatStyle = "file";
 const char *DefaultFallbackStyle = "LLVM";
 
 llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
-loadAndParseConfigFile(StringRef ConfigFile, llvm::vfs::FileSystem *FS,
+loadAndParseConfigFile(llvm::StringRef ConfigFile, llvm::vfs::FileSystem *FS,
                        FormatStyle *Style, bool AllowUnknownOptions) {
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> Text =
       FS->getBufferForFile(ConfigFile.str());
@@ -3955,8 +3955,8 @@ loadAndParseConfigFile(StringRef ConfigFile, llvm::vfs::FileSystem *FS,
   return Text;
 }
 
-Expected<FormatStyle> getStyle(StringRef StyleName, StringRef FileName,
-                               StringRef FallbackStyleName, StringRef Code,
+llvm::Expected<FormatStyle> getStyle(llvm::StringRef StyleName, llvm::StringRef FileName,
+                               llvm::StringRef FallbackStyleName, llvm::StringRef Code,
                                llvm::vfs::FileSystem *FS,
                                bool AllowUnknownOptions) {
   FormatStyle Style = getLLVMStyle(guessLanguage(FileName, Code));
@@ -3964,11 +3964,11 @@ Expected<FormatStyle> getStyle(StringRef StyleName, StringRef FileName,
   if (!getPredefinedStyle(FallbackStyleName, Style.Language, &FallbackStyle))
     return make_string_error("Invalid fallback style: " + FallbackStyleName);
 
-  SmallVector<std::unique_ptr<llvm::MemoryBuffer>, 1> ChildFormatTextToApply;
+  llvm::SmallVector<std::unique_ptr<llvm::MemoryBuffer>, 1> ChildFormatTextToApply;
 
   if (StyleName.starts_with("{")) {
     // Parse YAML/JSON style from the command line.
-    StringRef Source = "<command-line>";
+    llvm::StringRef Source = "<command-line>";
     if (std::error_code ec =
             parseConfiguration(llvm::MemoryBufferRef(StyleName, Source), &Style,
                                AllowUnknownOptions)) {
@@ -4019,7 +4019,7 @@ Expected<FormatStyle> getStyle(StringRef StyleName, StringRef FileName,
       return Style;
   }
 
-  SmallString<128> Path(FileName);
+  llvm::SmallString<128> Path(FileName);
   if (std::error_code EC = FS->makeAbsolute(Path))
     return make_string_error(EC.message());
 
@@ -4039,12 +4039,12 @@ Expected<FormatStyle> getStyle(StringRef StyleName, StringRef FileName,
   };
 
   // Look for .clang-format/_clang-format file in the file's parent directories.
-  SmallVector<std::string, 2> FilesToLookFor;
+  llvm::SmallVector<std::string, 2> FilesToLookFor;
   FilesToLookFor.push_back(".clang-format");
   FilesToLookFor.push_back("_clang-format");
 
-  SmallString<128> UnsuitableConfigFiles;
-  for (StringRef Directory = Path; !Directory.empty();
+  llvm::SmallString<128> UnsuitableConfigFiles;
+  for (llvm::StringRef Directory = Path; !Directory.empty();
        Directory = llvm::sys::path::parent_path(Directory)) {
     auto Status = FS->status(Directory);
     if (!Status ||
@@ -4053,7 +4053,7 @@ Expected<FormatStyle> getStyle(StringRef StyleName, StringRef FileName,
     }
 
     for (const auto &F : FilesToLookFor) {
-      SmallString<128> ConfigFile(Directory);
+      llvm::SmallString<128> ConfigFile(Directory);
 
       llvm::sys::path::append(ConfigFile, F);
       LLVM_DEBUG(llvm::dbgs() << "Trying " << ConfigFile << "...\n");
@@ -4118,7 +4118,7 @@ Expected<FormatStyle> getStyle(StringRef StyleName, StringRef FileName,
   return FallbackStyle;
 }
 
-static bool isClangFormatOnOff(StringRef Comment, bool On) {
+static bool isClangFormatOnOff(llvm::StringRef Comment, bool On) {
   if (Comment == (On ? "/* clang-format on */" : "/* clang-format off */"))
     return true;
 
@@ -4130,11 +4130,11 @@ static bool isClangFormatOnOff(StringRef Comment, bool On) {
          (Comment.size() == Size || Comment[Size] == ':');
 }
 
-bool isClangFormatOn(StringRef Comment) {
+bool isClangFormatOn(llvm::StringRef Comment) {
   return isClangFormatOnOff(Comment, /*On=*/true);
 }
 
-bool isClangFormatOff(StringRef Comment) {
+bool isClangFormatOff(llvm::StringRef Comment) {
   return isClangFormatOnOff(Comment, /*On=*/false);
 }
 

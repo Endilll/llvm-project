@@ -312,7 +312,7 @@ static bool LocPropertyAttribute( ASTContext &Context, const char *attrName,
   std::pair<FileID, unsigned> locInfo = SM.getDecomposedLoc(LParenLoc);
   // Try to load the file buffer.
   bool invalidTemp = false;
-  StringRef file = SM.getBufferData(locInfo.first, &invalidTemp);
+  llvm::StringRef file = SM.getBufferData(locInfo.first, &invalidTemp);
   if (invalidTemp)
     return false;
   const char *tokenBegin = file.data() + locInfo.second;
@@ -874,14 +874,14 @@ SelectPropertyForSynthesisFromProtocols(Sema &S, SourceLocation AtLoc,
   struct MismatchingProperty {
     const ObjCPropertyDecl *Prop;
     MismatchKind Kind;
-    StringRef AttributeName;
+    llvm::StringRef AttributeName;
   };
-  SmallVector<MismatchingProperty, 4> Mismatches;
+  llvm::SmallVector<MismatchingProperty, 4> Mismatches;
   for (ObjCPropertyDecl *Prop : Properties) {
     // Verify the property attributes.
     unsigned Attr = Prop->getPropertyAttributesAsWritten();
     if (Attr != OriginalAttributes) {
-      auto Diag = [&](bool OriginalHasAttribute, StringRef AttributeName) {
+      auto Diag = [&](bool OriginalHasAttribute, llvm::StringRef AttributeName) {
         MismatchKind Kind = OriginalHasAttribute ? HasNoExpectedAttribute
                                                  : HasUnexpectedAttribute;
         Mismatches.push_back({Prop, Kind, AttributeName});
@@ -1047,7 +1047,7 @@ RedeclarePropertyAccessor(ASTContext &Context, ObjCImplementationDecl *Impl,
     ImplDecl->setAttrs(Decl->getAttrs());
   ImplDecl->setSelfDecl(Decl->getSelfDecl());
   ImplDecl->setCmdDecl(Decl->getCmdDecl());
-  SmallVector<SourceLocation, 1> SelLocs;
+  llvm::SmallVector<SourceLocation, 1> SelLocs;
   Decl->getSelectorLocs(SelLocs);
   ImplDecl->setMethodParams(Context, Decl->parameters(), SelLocs);
   ImplDecl->setLexicalDeclContext(Impl);
@@ -1916,7 +1916,7 @@ void SemaObjC::DefaultSynthesizeProperties(Scope *S, ObjCImplDecl *IMPDecl,
           << Prop << Proto;
         Diag(Prop->getLocation(), diag::note_property_declare);
         std::string FixIt =
-            (Twine("@synthesize ") + Prop->getName() + ";\n\n").str();
+            (llvm::Twine("@synthesize ") + Prop->getName() + ";\n\n").str();
         Diag(AtEnd, diag::note_add_synthesize_directive)
             << FixItHint::CreateInsertion(AtEnd, FixIt);
       }
@@ -2215,7 +2215,7 @@ void SemaObjC::AtomicPropertySetterGetterRules(ObjCImplDecl *IMPDecl,
           // @property () ... case.
           SourceLocation AfterLParen =
               SemaRef.getLocForEndOfToken(Property->getLParenLoc());
-          StringRef NonatomicStr = AttributesAsWritten? "nonatomic, "
+          llvm::StringRef NonatomicStr = AttributesAsWritten? "nonatomic, "
                                                       : "nonatomic";
           Diag(Property->getLocation(),
                diag::note_atomic_property_fixup_suggest)
@@ -2278,15 +2278,15 @@ void SemaObjC::DiagnoseOwningPropertyGetterSynthesis(
           PP.getIdentifierInfo("none"), tok::r_paren,
           tok::r_paren, tok::r_paren
         };
-        StringRef spelling = "__attribute__((objc_method_family(none)))";
-        StringRef macroName = PP.getLastMacroWithSpelling(noteLoc, tokens);
+        llvm::StringRef spelling = "__attribute__((objc_method_family(none)))";
+        llvm::StringRef macroName = PP.getLastMacroWithSpelling(noteLoc, tokens);
         if (!macroName.empty())
           spelling = macroName;
 
         auto noteDiag = Diag(noteLoc, diag::note_cocoa_naming_declare_family)
             << method->getDeclName() << spelling;
         if (fixItLoc.isValid()) {
-          SmallString<64> fixItText(" ");
+          llvm::SmallString<64> fixItText(" ");
           fixItText += spelling;
           noteDiag << FixItHint::CreateInsertion(fixItLoc, fixItText);
         }
@@ -2307,9 +2307,9 @@ void SemaObjC::DiagnoseMissingDesignatedInitOverrides(
     if (I->getMethodFamily() == OMF_init)
       InitSelSet.insert(I->getSelector());
 
-  SmallVector<const ObjCMethodDecl *, 8> DesignatedInits;
+  llvm::SmallVector<const ObjCMethodDecl *, 8> DesignatedInits;
   SuperD->getDesignatedInitializers(DesignatedInits);
-  for (SmallVector<const ObjCMethodDecl *, 8>::iterator
+  for (llvm::SmallVector<const ObjCMethodDecl *, 8>::iterator
          I = DesignatedInits.begin(), E = DesignatedInits.end(); I != E; ++I) {
     const ObjCMethodDecl *MD = *I;
     if (!InitSelSet.count(MD->getSelector())) {

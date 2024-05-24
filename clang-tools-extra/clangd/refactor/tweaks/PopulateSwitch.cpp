@@ -50,7 +50,7 @@ namespace {
 class PopulateSwitch : public Tweak {
   const char *id() const override;
   bool prepare(const Selection &Sel) override;
-  Expected<Effect> apply(const Selection &Sel) override;
+  llvm::Expected<Effect> apply(const Selection &Sel) override;
   std::string title() const override { return "Populate switch"; }
   llvm::StringLiteral kind() const override {
     return CodeAction::QUICKFIX_KIND;
@@ -187,7 +187,7 @@ bool PopulateSwitch::prepare(const Selection &Sel) {
                        [](auto &Pair) { return Pair.second.isCovered(); });
 }
 
-Expected<Tweak::Effect> PopulateSwitch::apply(const Selection &Sel) {
+llvm::Expected<Tweak::Effect> PopulateSwitch::apply(const Selection &Sel) {
   ASTContext &Ctx = Sel.AST->getASTContext();
 
   SourceLocation Loc = Body->getRBracLoc();

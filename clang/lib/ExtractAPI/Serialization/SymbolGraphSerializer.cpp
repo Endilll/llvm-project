@@ -37,7 +37,7 @@ namespace {
 
 /// Helper function to inject a JSON object \p Obj into another object \p Paren
 /// at position \p Key.
-void serializeObject(Object &Paren, StringRef Key,
+void serializeObject(Object &Paren, llvm::StringRef Key,
                      std::optional<Object> &&Obj) {
   if (Obj)
     Paren[Key] = std::move(*Obj);
@@ -45,7 +45,7 @@ void serializeObject(Object &Paren, StringRef Key,
 
 /// Helper function to inject a JSON array \p Array into object \p Paren at
 /// position \p Key.
-void serializeArray(Object &Paren, StringRef Key,
+void serializeArray(Object &Paren, llvm::StringRef Key,
                     std::optional<Array> &&Array) {
   if (Array)
     Paren[Key] = std::move(*Array);
@@ -54,11 +54,11 @@ void serializeArray(Object &Paren, StringRef Key,
 /// Helper function to inject a JSON array composed of the values in \p C into
 /// object \p Paren at position \p Key.
 template <typename ContainerTy>
-void serializeArray(Object &Paren, StringRef Key, ContainerTy &&C) {
+void serializeArray(Object &Paren, llvm::StringRef Key, ContainerTy &&C) {
   Paren[Key] = Array(C);
 }
 
-/// Serialize a \c VersionTuple \p V with the Symbol Graph semantic version
+/// Serialize a \c llvm::VersionTuple \p V with the Symbol Graph semantic version
 /// format.
 ///
 /// A semantic version object contains three numeric fields, representing the
@@ -74,7 +74,7 @@ void serializeArray(Object &Paren, StringRef Key, ContainerTy &&C) {
 ///
 /// \returns \c std::nullopt if the version \p V is empty, or an \c Object
 /// containing the semantic version representation of \p V.
-std::optional<Object> serializeSemanticVersion(const VersionTuple &V) {
+std::optional<Object> serializeSemanticVersion(const llvm::VersionTuple &V) {
   if (V.empty())
     return std::nullopt;
 
@@ -192,7 +192,7 @@ std::optional<Array> serializeAvailability(const AvailabilityInfo &Avail) {
 }
 
 /// Get the language name string for interface language references.
-StringRef getLanguageName(Language Lang) {
+llvm::StringRef getLanguageName(Language Lang) {
   switch (Lang) {
   case Language::C:
     return "c";
@@ -348,7 +348,7 @@ Object serializeNames(const APIRecord *Record) {
 }
 
 Object serializeSymbolKind(APIRecord::RecordKind RK, Language Lang) {
-  auto AddLangPrefix = [&Lang](StringRef S) -> std::string {
+  auto AddLangPrefix = [&Lang](llvm::StringRef S) -> std::string {
     return (getLanguageName(Lang) + "." + S).str();
   };
 
@@ -582,7 +582,7 @@ void serializeTemplateMixin(Object &Paren, const RecordTy &Record) {
   serializeObject(Paren, "swiftGenerics", Generics);
 }
 
-Array generateParentContexts(const SmallVectorImpl<SymbolReference> &Parents,
+Array generateParentContexts(const llvm::SmallVectorImpl<SymbolReference> &Parents,
                              Language Lang) {
   Array ParentContexts;
 
@@ -604,14 +604,14 @@ Array generateParentContexts(const SmallVectorImpl<SymbolReference> &Parents,
 
 /// Walk the records parent information in reverse to generate a hierarchy
 /// suitable for serialization.
-SmallVector<SymbolReference, 8>
+llvm::SmallVector<SymbolReference, 8>
 generateHierarchyFromRecord(const APIRecord *Record) {
-  SmallVector<SymbolReference, 8> ReverseHierarchy;
+  llvm::SmallVector<SymbolReference, 8> ReverseHierarchy;
   for (const auto *Current = Record; Current != nullptr;
        Current = Current->Parent.Record)
     ReverseHierarchy.emplace_back(Current);
 
-  return SmallVector<SymbolReference, 8>(
+  return llvm::SmallVector<SymbolReference, 8>(
       std::make_move_iterator(ReverseHierarchy.rbegin()),
       std::make_move_iterator(ReverseHierarchy.rend()));
 }
@@ -641,7 +641,7 @@ void ExtendedModule::addRelationship(Object &&Relationship) {
 }
 
 /// Defines the format version emitted by SymbolGraphSerializer.
-const VersionTuple SymbolGraphSerializer::FormatVersion{0, 5, 3};
+const llvm::VersionTuple SymbolGraphSerializer::FormatVersion{0, 5, 3};
 
 Object SymbolGraphSerializer::serializeMetadata() const {
   Object Metadata;
@@ -652,7 +652,7 @@ Object SymbolGraphSerializer::serializeMetadata() const {
 }
 
 Object
-SymbolGraphSerializer::serializeModuleObject(StringRef ModuleName) const {
+SymbolGraphSerializer::serializeModuleObject(llvm::StringRef ModuleName) const {
   Object Module;
   Module["name"] = ModuleName;
   serializeObject(Module, "platform", serializePlatform(API.getTarget()));
@@ -699,7 +699,7 @@ Array SymbolGraphSerializer::serializePathComponents(
   return Array(map_range(Hierarchy, [](auto Elt) { return Elt.Name; }));
 }
 
-StringRef SymbolGraphSerializer::getRelationshipString(RelationshipKind Kind) {
+llvm::StringRef SymbolGraphSerializer::getRelationshipString(RelationshipKind Kind) {
   switch (Kind) {
   case RelationshipKind::MemberOf:
     return "memberOf";
@@ -718,7 +718,7 @@ void SymbolGraphSerializer::serializeRelationship(RelationshipKind Kind,
                                                   const SymbolReference &Target,
                                                   ExtendedModule &Into) {
   Object Relationship;
-  SmallString<64> TestRelLabel;
+  llvm::SmallString<64> TestRelLabel;
   if (EmitSymbolLabelsForTesting) {
     llvm::raw_svector_ostream OS(TestRelLabel);
     OS << SymbolGraphSerializer::getRelationshipString(Kind) << " $ "
@@ -740,7 +740,7 @@ void SymbolGraphSerializer::serializeRelationship(RelationshipKind Kind,
     Into.addRelationship(std::move(Relationship));
 }
 
-StringRef SymbolGraphSerializer::getConstraintString(ConstraintKind Kind) {
+llvm::StringRef SymbolGraphSerializer::getConstraintString(ConstraintKind Kind) {
   switch (Kind) {
   case ConstraintKind::Conformance:
     return "conformance";
@@ -1019,7 +1019,7 @@ void SymbolGraphSerializer::serializeSingleRecord(const APIRecord *Record) {
   }
 }
 
-Object SymbolGraphSerializer::serializeGraph(StringRef ModuleName,
+Object SymbolGraphSerializer::serializeGraph(llvm::StringRef ModuleName,
                                              ExtendedModule &&EM) {
   Object Root;
   serializeObject(Root, "metadata", serializeMetadata());
@@ -1032,7 +1032,7 @@ Object SymbolGraphSerializer::serializeGraph(StringRef ModuleName,
 }
 
 void SymbolGraphSerializer::serializeGraphToStream(
-    raw_ostream &OS, SymbolGraphSerializerOption Options, StringRef ModuleName,
+    llvm::raw_ostream &OS, SymbolGraphSerializerOption Options, llvm::StringRef ModuleName,
     ExtendedModule &&EM) {
   Object Root = serializeGraph(ModuleName, std::move(EM));
   if (Options.Compact)
@@ -1042,7 +1042,7 @@ void SymbolGraphSerializer::serializeGraphToStream(
 }
 
 void SymbolGraphSerializer::serializeMainSymbolGraph(
-    raw_ostream &OS, const APISet &API, const APIIgnoresList &IgnoresList,
+    llvm::raw_ostream &OS, const APISet &API, const APIIgnoresList &IgnoresList,
     SymbolGraphSerializerOption Options) {
   SymbolGraphSerializer Serializer(
       API, IgnoresList, Options.EmitSymbolLabelsForTesting,
@@ -1056,9 +1056,9 @@ void SymbolGraphSerializer::serializeMainSymbolGraph(
 }
 
 void SymbolGraphSerializer::serializeWithExtensionGraphs(
-    raw_ostream &MainOutput, const APISet &API,
+    llvm::raw_ostream &MainOutput, const APISet &API,
     const APIIgnoresList &IgnoresList,
-    llvm::function_ref<std::unique_ptr<llvm::raw_pwrite_stream>(Twine BaseName)>
+    llvm::function_ref<std::unique_ptr<llvm::raw_pwrite_stream>(llvm::Twine BaseName)>
         CreateOutputStream,
     SymbolGraphSerializerOption Options) {
   SymbolGraphSerializer Serializer(API, IgnoresList,
@@ -1078,7 +1078,7 @@ void SymbolGraphSerializer::serializeWithExtensionGraphs(
 }
 
 std::optional<Object>
-SymbolGraphSerializer::serializeSingleSymbolSGF(StringRef USR,
+SymbolGraphSerializer::serializeSingleSymbolSGF(llvm::StringRef USR,
                                                 const APISet &API) {
   APIRecord *Record = API.findRecordForUSR(USR);
   if (!Record)

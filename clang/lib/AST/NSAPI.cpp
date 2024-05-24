@@ -486,13 +486,13 @@ bool NSAPI::isObjCNSUIntegerType(QualType T) const {
   return isObjCTypedef(T, "NSUInteger", NSUIntegerId);
 }
 
-StringRef NSAPI::GetNSIntegralKind(QualType T) const {
+llvm::StringRef NSAPI::GetNSIntegralKind(QualType T) const {
   if (!Ctx.getLangOpts().ObjC || T.isNull())
-    return StringRef();
+    return llvm::StringRef();
 
   while (const TypedefType *TDT = T->getAs<TypedefType>()) {
-    StringRef NSIntegralResust =
-      llvm::StringSwitch<StringRef>(
+    llvm::StringRef NSIntegralResust =
+      llvm::StringSwitch<llvm::StringRef>(
         TDT->getDecl()->getDeclName().getAsIdentifierInfo()->getName())
     .Case("int8_t", "int8_t")
     .Case("int16_t", "int16_t")
@@ -504,15 +504,15 @@ StringRef NSAPI::GetNSIntegralKind(QualType T) const {
     .Case("uint32_t", "uint32_t")
     .Case("NSUInteger", "NSUInteger")
     .Case("uint64_t", "uint64_t")
-    .Default(StringRef());
+    .Default(llvm::StringRef());
     if (!NSIntegralResust.empty())
       return NSIntegralResust;
     T = TDT->desugar();
   }
-  return StringRef();
+  return llvm::StringRef();
 }
 
-bool NSAPI::isMacroDefined(StringRef Id) const {
+bool NSAPI::isMacroDefined(llvm::StringRef Id) const {
   // FIXME: Check whether the relevant module macros are visible.
   return Ctx.Idents.get(Id).hasMacroDefinition();
 }
@@ -538,7 +538,7 @@ bool NSAPI::isSubclassOfNSClass(ObjCInterfaceDecl *InterfaceDecl,
 }
 
 bool NSAPI::isObjCTypedef(QualType T,
-                          StringRef name, IdentifierInfo *&II) const {
+                          llvm::StringRef name, IdentifierInfo *&II) const {
   if (!Ctx.getLangOpts().ObjC)
     return false;
   if (T.isNull())
@@ -557,7 +557,7 @@ bool NSAPI::isObjCTypedef(QualType T,
 }
 
 bool NSAPI::isObjCEnumerator(const Expr *E,
-                             StringRef name, IdentifierInfo *&II) const {
+                             llvm::StringRef name, IdentifierInfo *&II) const {
   if (!Ctx.getLangOpts().ObjC)
     return false;
   if (!E)
@@ -574,11 +574,11 @@ bool NSAPI::isObjCEnumerator(const Expr *E,
   return false;
 }
 
-Selector NSAPI::getOrInitSelector(ArrayRef<StringRef> Ids,
+Selector NSAPI::getOrInitSelector(llvm::ArrayRef<llvm::StringRef> Ids,
                                   Selector &Sel) const {
   if (Sel.isNull()) {
-    SmallVector<const IdentifierInfo *, 4> Idents;
-    for (ArrayRef<StringRef>::const_iterator
+    llvm::SmallVector<const IdentifierInfo *, 4> Idents;
+    for (llvm::ArrayRef<llvm::StringRef>::const_iterator
            I = Ids.begin(), E = Ids.end(); I != E; ++I)
       Idents.push_back(&Ctx.Idents.get(*I));
     Sel = Ctx.Selectors.getSelector(Idents.size(), Idents.data());
@@ -586,7 +586,7 @@ Selector NSAPI::getOrInitSelector(ArrayRef<StringRef> Ids,
   return Sel;
 }
 
-Selector NSAPI::getOrInitNullarySelector(StringRef Id, Selector &Sel) const {
+Selector NSAPI::getOrInitNullarySelector(llvm::StringRef Id, Selector &Sel) const {
   if (Sel.isNull()) {
     const IdentifierInfo *Ident = &Ctx.Idents.get(Id);
     Sel = Ctx.Selectors.getSelector(0, &Ident);

@@ -120,7 +120,7 @@ class VariantMatcher {
     /// return std::nullopt if it fails to do so.
     std::optional<DynTypedMatcher>
     constructVariadicOperator(DynTypedMatcher::VariadicOperator Op,
-                              ArrayRef<VariantMatcher> InnerMatchers) const;
+                              llvm::ArrayRef<VariantMatcher> InnerMatchers) const;
 
   private:
     ASTNodeKind NodeKind;
@@ -263,7 +263,7 @@ public:
   VariantValue(bool Boolean);
   VariantValue(double Double);
   VariantValue(unsigned Unsigned);
-  VariantValue(StringRef String);
+  VariantValue(llvm::StringRef String);
   VariantValue(ASTNodeKind NodeKind);
   VariantValue(const VariantMatcher &Matchers);
 
@@ -292,7 +292,7 @@ public:
   /// String value functions.
   bool isString() const;
   const std::string &getString() const;
-  void setString(StringRef String);
+  void setString(llvm::StringRef String);
 
   bool isNodeKind() const;
   const ASTNodeKind &getNodeKind() const;
@@ -319,7 +319,7 @@ public:
   /// \param Specificity value corresponding to the "specificity" of the
   ///   conversion. It is the maximum specificity of all the possible
   ///   conversions.
-  bool isConvertibleTo(ArrayRef<ArgKind> Kinds, unsigned *Specificity) const;
+  bool isConvertibleTo(llvm::ArrayRef<ArgKind> Kinds, unsigned *Specificity) const;
 
   /// String representation of the type of the value.
   std::string getTypeAsString() const;

@@ -35,7 +35,7 @@ typedef basic_string_view<wchar_t> wstring_view;
 }  // namespace std
 
 namespace llvm {
-struct StringRef {
+struct llvm::StringRef {
   int find(const char *) const;
 };
 }  // namespace llvm
@@ -117,7 +117,7 @@ void StringFind() {
   sr.find("x");
   // CHECK-MESSAGES-CUSTOM: [[@LINE-1]]:11: warning: 'find' called with a string literal
   // CHECK-FIXES-CUSTOM: sr.find('x');
-  NotStringRef nsr;
+  Notllvm::StringRef nsr;
   nsr.find("x");
 }
 

@@ -90,7 +90,7 @@ QualType clang::desugarForDiagnostic(ASTContext &Context, QualType QT,
       }
 
       bool DesugarArgument = false;
-      SmallVector<QualType, 4> Args;
+      llvm::SmallVector<QualType, 4> Args;
       const FunctionProtoType *FPT = dyn_cast<FunctionProtoType>(FT);
       if (FPT) {
         for (QualType SugarPT : FPT->param_types()) {
@@ -118,7 +118,7 @@ QualType clang::desugarForDiagnostic(ASTContext &Context, QualType QT,
             dyn_cast<TemplateSpecializationType>(Ty)) {
       if (!TST->isTypeAlias()) {
         bool DesugarArgument = false;
-        SmallVector<TemplateArgument, 4> Args;
+        llvm::SmallVector<TemplateArgument, 4> Args;
         for (const TemplateArgument &Arg : TST->template_arguments()) {
           if (Arg.getKind() == TemplateArgument::Type)
             Args.push_back(desugarForDiagnostic(Context, Arg.getAsType(),
@@ -262,8 +262,8 @@ break; \
 /// diagnostic message
 static std::string
 ConvertTypeToDiagnosticString(ASTContext &Context, QualType Ty,
-                            ArrayRef<DiagnosticsEngine::ArgumentValue> PrevArgs,
-                            ArrayRef<intptr_t> QualTypeVals) {
+                            llvm::ArrayRef<DiagnosticsEngine::ArgumentValue> PrevArgs,
+                            llvm::ArrayRef<intptr_t> QualTypeVals) {
   // FIXME: Playing with std::string is really slow.
   bool ForceAKA = false;
   QualType CanTy = Ty.getCanonicalType();
@@ -351,17 +351,17 @@ ConvertTypeToDiagnosticString(ASTContext &Context, QualType Ty,
 static bool FormatTemplateTypeDiff(ASTContext &Context, QualType FromType,
                                    QualType ToType, bool PrintTree,
                                    bool PrintFromType, bool ElideType,
-                                   bool ShowColors, raw_ostream &OS);
+                                   bool ShowColors, llvm::raw_ostream &OS);
 
 void clang::FormatASTNodeDiagnosticArgument(
     DiagnosticsEngine::ArgumentKind Kind,
     intptr_t Val,
-    StringRef Modifier,
-    StringRef Argument,
-    ArrayRef<DiagnosticsEngine::ArgumentValue> PrevArgs,
-    SmallVectorImpl<char> &Output,
+    llvm::StringRef Modifier,
+    llvm::StringRef Argument,
+    llvm::ArrayRef<DiagnosticsEngine::ArgumentValue> PrevArgs,
+    llvm::SmallVectorImpl<char> &Output,
     void *Cookie,
-    ArrayRef<intptr_t> QualTypeVals) {
+    llvm::ArrayRef<intptr_t> QualTypeVals) {
   ASTContext &Context = *static_cast<ASTContext*>(Cookie);
 
   size_t OldEnd = Output.size();
@@ -422,8 +422,8 @@ void clang::FormatASTNodeDiagnosticArgument(
       // Attempting to do a template diff on non-templates.  Set the variables
       // and continue with regular type printing of the appropriate type.
       Val = TDT.PrintFromType ? TDT.FromType : TDT.ToType;
-      Modifier = StringRef();
-      Argument = StringRef();
+      Modifier = llvm::StringRef();
+      Argument = llvm::StringRef();
       // Fall through
       [[fallthrough]];
     }
@@ -548,7 +548,7 @@ class TemplateDiff {
   QualType ToTemplateType;
 
   /// OS - The stream used to construct the output strings.
-  raw_ostream &OS;
+  llvm::raw_ostream &OS;
 
   /// IsBold - Keeps track of the bold formatting for the output string.
   bool IsBold;
@@ -623,7 +623,7 @@ class TemplateDiff {
     };
 
     /// FlatTree - A flattened tree used to store the DiffNodes.
-    SmallVector<DiffNode, 16> FlatTree;
+    llvm::SmallVector<DiffNode, 16> FlatTree;
 
     /// CurrentNode - The index of the current node being used.
     unsigned CurrentNode;
@@ -1393,7 +1393,7 @@ class TemplateDiff {
 
   /// makeTemplateList - Dump every template alias into the vector.
   static void makeTemplateList(
-      SmallVectorImpl<const TemplateSpecializationType *> &TemplateList,
+      llvm::SmallVectorImpl<const TemplateSpecializationType *> &TemplateList,
       const TemplateSpecializationType *TST) {
     while (TST) {
       TemplateList.push_back(TST);
@@ -1422,13 +1422,13 @@ class TemplateDiff {
       return true;
 
     // Create vectors of template aliases.
-    SmallVector<const TemplateSpecializationType*, 1> FromTemplateList,
+    llvm::SmallVector<const TemplateSpecializationType*, 1> FromTemplateList,
                                                       ToTemplateList;
 
     makeTemplateList(FromTemplateList, FromTST);
     makeTemplateList(ToTemplateList, ToTST);
 
-    SmallVectorImpl<const TemplateSpecializationType *>::reverse_iterator
+    llvm::SmallVectorImpl<const TemplateSpecializationType *>::reverse_iterator
         FromIter = FromTemplateList.rbegin(), FromEnd = FromTemplateList.rend(),
         ToIter = ToTemplateList.rbegin(), ToEnd = ToTemplateList.rend();
 
@@ -2066,7 +2066,7 @@ class TemplateDiff {
 
 public:
 
-  TemplateDiff(raw_ostream &OS, ASTContext &Context, QualType FromType,
+  TemplateDiff(llvm::raw_ostream &OS, ASTContext &Context, QualType FromType,
                QualType ToType, bool PrintTree, bool PrintFromType,
                bool ElideType, bool ShowColor)
     : Context(Context),
@@ -2133,7 +2133,7 @@ public:
 static bool FormatTemplateTypeDiff(ASTContext &Context, QualType FromType,
                                    QualType ToType, bool PrintTree,
                                    bool PrintFromType, bool ElideType,
-                                   bool ShowColors, raw_ostream &OS) {
+                                   bool ShowColors, llvm::raw_ostream &OS) {
   if (PrintTree)
     PrintFromType = true;
   TemplateDiff TD(OS, Context, FromType, ToType, PrintTree, PrintFromType,

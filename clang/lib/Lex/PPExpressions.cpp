@@ -266,7 +266,7 @@ static bool EvaluateValue(PPValue &Result, Token &PeekTok, DefinedTracker &DT,
                                    PeekTok.getLocation())) {
             const std::vector<std::string> UndefPrefixes =
                 DiagEngine.getDiagnosticOptions().UndefPrefixes;
-            const StringRef IdentifierName = II->getName();
+            const llvm::StringRef IdentifierName = II->getName();
             if (llvm::any_of(UndefPrefixes,
                              [&IdentifierName](const std::string &Prefix) {
                                return IdentifierName.starts_with(Prefix);
@@ -292,9 +292,9 @@ static bool EvaluateValue(PPValue &Result, Token &PeekTok, DefinedTracker &DT,
     PP.Diag(PeekTok, diag::err_pp_expected_value_in_expr);
     return true;
   case tok::numeric_constant: {
-    SmallString<64> IntegerBuffer;
+    llvm::SmallString<64> IntegerBuffer;
     bool NumberInvalid = false;
-    StringRef Spelling = PP.getSpelling(PeekTok, IntegerBuffer,
+    llvm::StringRef Spelling = PP.getSpelling(PeekTok, IntegerBuffer,
                                               &NumberInvalid);
     if (NumberInvalid)
       return true; // a diagnostic was already reported
@@ -380,9 +380,9 @@ static bool EvaluateValue(PPValue &Result, Token &PeekTok, DefinedTracker &DT,
     if (PeekTok.hasUDSuffix())
       PP.Diag(PeekTok, diag::err_pp_invalid_udl) << /*character*/0;
 
-    SmallString<32> CharBuffer;
+    llvm::SmallString<32> CharBuffer;
     bool CharInvalid = false;
-    StringRef ThisTok = PP.getSpelling(PeekTok, CharBuffer, &CharInvalid);
+    llvm::StringRef ThisTok = PP.getSpelling(PeekTok, CharBuffer, &CharInvalid);
     if (CharInvalid)
       return true;
 
@@ -871,7 +871,7 @@ static bool EvaluateDirectiveSubExpr(PPValue &LHS, unsigned MinPrec,
 /// to "!defined(X)" return X in IfNDefMacro.
 Preprocessor::DirectiveEvalResult
 Preprocessor::EvaluateDirectiveExpression(IdentifierInfo *&IfNDefMacro) {
-  SaveAndRestore PPDir(ParsingIfOrElifDirective, true);
+  llvm::SaveAndRestore PPDir(ParsingIfOrElifDirective, true);
   // Save the current state of 'DisableMacroExpansion' and reset it to false. If
   // 'DisableMacroExpansion' is true, then we must be in a macro argument list
   // in which case a directive is undefined behavior.  We want macros to be able

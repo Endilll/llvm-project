@@ -200,8 +200,8 @@ namespace clang {
            const IdentifierInfo *Name, OverloadedOperatorKind OperatorKind,
            ParsedTemplateTy OpaqueTemplateName, TemplateNameKind TemplateKind,
            SourceLocation LAngleLoc, SourceLocation RAngleLoc,
-           ArrayRef<ParsedTemplateArgument> TemplateArgs, bool ArgsInvalid,
-           SmallVectorImpl<TemplateIdAnnotation *> &CleanupList) {
+           llvm::ArrayRef<ParsedTemplateArgument> TemplateArgs, bool ArgsInvalid,
+           llvm::SmallVectorImpl<TemplateIdAnnotation *> &CleanupList) {
       TemplateIdAnnotation *TemplateId = new (llvm::safe_malloc(
           totalSizeToAlloc<ParsedTemplateArgument>(TemplateArgs.size())))
           TemplateIdAnnotation(TemplateKWLoc, TemplateNameLoc, Name,
@@ -242,7 +242,7 @@ namespace clang {
                          ParsedTemplateTy OpaqueTemplateName,
                          TemplateNameKind TemplateKind,
                          SourceLocation LAngleLoc, SourceLocation RAngleLoc,
-                         ArrayRef<ParsedTemplateArgument> TemplateArgs,
+                         llvm::ArrayRef<ParsedTemplateArgument> TemplateArgs,
                          bool ArgsInvalid) noexcept
         : TemplateKWLoc(TemplateKWLoc), TemplateNameLoc(TemplateNameLoc),
           Name(Name), Operator(OperatorKind), Template(OpaqueTemplateName),

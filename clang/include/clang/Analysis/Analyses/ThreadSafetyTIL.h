@@ -138,10 +138,10 @@ const TIL_CastOpcode   CAST_Min = CAST_none;
 const TIL_CastOpcode   CAST_Max = CAST_toInt;
 
 /// Return the name of a unary opcode.
-StringRef getUnaryOpcodeString(TIL_UnaryOpcode Op);
+llvm::StringRef getUnaryOpcodeString(TIL_UnaryOpcode Op);
 
 /// Return the name of a binary opcode.
-StringRef getBinaryOpcodeString(TIL_BinaryOpcode Op);
+llvm::StringRef getBinaryOpcodeString(TIL_BinaryOpcode Op);
 
 /// ValueTypes are data types that can actually be held in registers.
 /// All variables and expressions must have a value type.
@@ -263,8 +263,8 @@ inline ValueType ValueType::getValueType<long double>() {
 }
 
 template<>
-inline ValueType ValueType::getValueType<StringRef>() {
-  return ValueType(BT_String, getSizeType(sizeof(StringRef)), false, 0);
+inline ValueType ValueType::getValueType<llvm::StringRef>() {
+  return ValueType(BT_String, getSizeType(sizeof(llvm::StringRef)), false, 0);
 }
 
 template<>
@@ -365,7 +365,7 @@ public:
     VK_SFun
   };
 
-  Variable(StringRef s, SExpr *D = nullptr)
+  Variable(llvm::StringRef s, SExpr *D = nullptr)
       : SExpr(COP_Variable), Name(s), Definition(D) {
     Flags = VK_Let;
   }
@@ -387,7 +387,7 @@ public:
   VariableKind kind() const { return static_cast<VariableKind>(Flags); }
 
   /// Return the name of the variable, if any.
-  StringRef name() const { return Name; }
+  llvm::StringRef name() const { return Name; }
 
   /// Return the clang declaration for this variable, if any.
   const ValueDecl *clangDecl() const { return Cvdecl; }
@@ -398,7 +398,7 @@ public:
   SExpr *definition() { return Definition; }
   const SExpr *definition() const { return Definition; }
 
-  void setName(StringRef S)    { Name = S;  }
+  void setName(llvm::StringRef S)    { Name = S;  }
   void setKind(VariableKind K) { Flags = K; }
   void setDefinition(SExpr *E) { Definition = E; }
   void setClangDecl(const ValueDecl *VD) { Cvdecl = VD; }
@@ -421,7 +421,7 @@ private:
   friend class SFunction;
 
   // The name of the variable.
-  StringRef Name;
+  llvm::StringRef Name;
 
   // The TIL type or definition.
   SExpr *Definition;
@@ -629,7 +629,7 @@ typename V::R_SExpr Literal::traverse(V &Vs, typename V::R_Ctx Ctx) {
     }
   }
   case ValueType::BT_String:
-    return Vs.reduceLiteralT(as<StringRef>());
+    return Vs.reduceLiteralT(as<llvm::StringRef>());
   case ValueType::BT_Pointer:
     return Vs.reduceLiteralT(as<void*>());
   case ValueType::BT_ValueRef:
@@ -939,7 +939,7 @@ public:
     else Flags &= 0xFFFE;
   }
 
-  StringRef slotName() const {
+  llvm::StringRef slotName() const {
     if (Cvdecl->getDeclName().isIdentifier())
       return Cvdecl->getName();
     if (!SlotName) {
@@ -1363,9 +1363,9 @@ public:
   }
 
   /// Return the list of basic blocks that this terminator can branch to.
-  ArrayRef<BasicBlock *> successors();
+  llvm::ArrayRef<BasicBlock *> successors();
 
-  ArrayRef<BasicBlock *> successors() const {
+  llvm::ArrayRef<BasicBlock *> successors() const {
     return const_cast<Terminator*>(this)->successors();
   }
 };
@@ -1391,7 +1391,7 @@ public:
   unsigned index() const { return Index; }
 
   /// Return the list of basic blocks that this terminator can branch to.
-  ArrayRef<BasicBlock *> successors() { return TargetBlock; }
+  llvm::ArrayRef<BasicBlock *> successors() { return TargetBlock; }
 
   template <class V>
   typename V::R_SExpr traverse(V &Vs, typename V::R_Ctx Ctx) {
@@ -1439,7 +1439,7 @@ public:
   BasicBlock *elseBlock() { return Branches[1]; }
 
   /// Return the list of basic blocks that this terminator can branch to.
-  ArrayRef<BasicBlock *> successors() { return llvm::ArrayRef(Branches); }
+  llvm::ArrayRef<BasicBlock *> successors() { return llvm::ArrayRef(Branches); }
 
   template <class V>
   typename V::R_SExpr traverse(V &Vs, typename V::R_Ctx Ctx) {
@@ -1470,7 +1470,7 @@ public:
   static bool classof(const SExpr *E) { return E->opcode() == COP_Return; }
 
   /// Return an empty list.
-  ArrayRef<BasicBlock *> successors() { return std::nullopt; }
+  llvm::ArrayRef<BasicBlock *> successors() { return std::nullopt; }
 
   SExpr *returnValue() { return Retval; }
   const SExpr *returnValue() const { return Retval; }
@@ -1490,7 +1490,7 @@ private:
   SExpr* Retval;
 };
 
-inline ArrayRef<BasicBlock*> Terminator::successors() {
+inline llvm::ArrayRef<BasicBlock*> Terminator::successors() {
   switch (opcode()) {
     case COP_Goto:   return cast<Goto>(this)->successors();
     case COP_Branch: return cast<Branch>(this)->successors();
@@ -1570,8 +1570,8 @@ public:
   BlockArray &predecessors() { return Predecessors; }
   const BlockArray &predecessors() const { return Predecessors; }
 
-  ArrayRef<BasicBlock*> successors() { return TermInstr->successors(); }
-  ArrayRef<BasicBlock*> successors() const { return TermInstr->successors(); }
+  llvm::ArrayRef<BasicBlock*> successors() { return TermInstr->successors(); }
+  llvm::ArrayRef<BasicBlock*> successors() const { return TermInstr->successors(); }
 
   const Terminator *terminator() const { return TermInstr; }
   Terminator *terminator() { return TermInstr; }
@@ -1793,12 +1793,12 @@ private:
 /// This is a pseduo-term; it will be lowered to a variable or projection.
 class Identifier : public SExpr {
 public:
-  Identifier(StringRef Id): SExpr(COP_Identifier), Name(Id) {}
+  Identifier(llvm::StringRef Id): SExpr(COP_Identifier), Name(Id) {}
   Identifier(const Identifier &) = default;
 
   static bool classof(const SExpr *E) { return E->opcode() == COP_Identifier; }
 
-  StringRef name() const { return Name; }
+  llvm::StringRef name() const { return Name; }
 
   template <class V>
   typename V::R_SExpr traverse(V &Vs, typename V::R_Ctx Ctx) {
@@ -1811,7 +1811,7 @@ public:
   }
 
 private:
-  StringRef Name;
+  llvm::StringRef Name;
 };
 
 /// An if-then-else expression.

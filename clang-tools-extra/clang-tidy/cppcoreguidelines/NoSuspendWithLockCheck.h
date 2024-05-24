@@ -20,7 +20,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/no-suspend-with-lock.html
 class NoSuspendWithLockCheck : public ClangTidyCheck {
 public:
-  NoSuspendWithLockCheck(StringRef Name, ClangTidyContext *Context)
+  NoSuspendWithLockCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         LockGuards(Options.get("LockGuards",
                                "::std::unique_lock;::std::scoped_lock;::"
@@ -36,7 +36,7 @@ private:
   /// Semicolon-separated list of fully qualified names of lock guard template
   /// types. Defaults to
   /// `::std::unique_lock;::std::scoped_lock;::std::shared_lock;::std::lock_guard`.
-  const StringRef LockGuards;
+  const llvm::StringRef LockGuards;
 };
 
 } // namespace clang::tidy::cppcoreguidelines

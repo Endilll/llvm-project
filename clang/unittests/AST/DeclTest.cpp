@@ -71,7 +71,7 @@ TEST(Decl, CleansUpAPValues) {
 
 TEST(Decl, AsmLabelAttr) {
   // Create two method decls: `f` and `g`.
-  StringRef Code = R"(
+  llvm::StringRef Code = R"(
     struct S {
       void f() {}
       void g() {}
@@ -80,7 +80,7 @@ TEST(Decl, AsmLabelAttr) {
   auto AST =
       tooling::buildASTFromCodeWithArgs(Code, {"-target", "i386-apple-darwin"});
   ASTContext &Ctx = AST->getASTContext();
-  assert(Ctx.getTargetInfo().getUserLabelPrefix() == StringRef("_") &&
+  assert(Ctx.getTargetInfo().getUserLabelPrefix() == llvm::StringRef("_") &&
          "Expected target to have a global prefix");
   DiagnosticsEngine &Diags = AST->getDiagnostics();
 
@@ -109,7 +109,7 @@ TEST(Decl, AsmLabelAttr) {
 }
 
 TEST(Decl, MangleDependentSizedArray) {
-  StringRef Code = R"(
+  llvm::StringRef Code = R"(
     template <int ...N>
     int A[] = {N...};
 
@@ -121,7 +121,7 @@ TEST(Decl, MangleDependentSizedArray) {
   auto AST =
       tooling::buildASTFromCodeWithArgs(Code, {"-target", "i386-apple-darwin"});
   ASTContext &Ctx = AST->getASTContext();
-  assert(Ctx.getTargetInfo().getUserLabelPrefix() == StringRef("_") &&
+  assert(Ctx.getTargetInfo().getUserLabelPrefix() == llvm::StringRef("_") &&
          "Expected target to have a global prefix");
   DiagnosticsEngine &Diags = AST->getDiagnostics();
 

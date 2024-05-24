@@ -26,7 +26,7 @@ class FileMatchTrieNode;
 struct PathComparator {
   virtual ~PathComparator() = default;
 
-  virtual bool equivalent(StringRef FileA, StringRef FileB) const = 0;
+  virtual bool equivalent(llvm::StringRef FileA, llvm::StringRef FileB) const = 0;
 };
 
 /// A trie to efficiently match against the entries of the compilation
@@ -65,17 +65,17 @@ public:
   ~FileMatchTrie();
 
   /// Insert a new absolute path. Relative paths are ignored.
-  void insert(StringRef NewPath);
+  void insert(llvm::StringRef NewPath);
 
   /// Finds the corresponding file in this trie.
   ///
   /// Returns file name stored in this trie that is equivalent to 'FileName'
   /// according to 'Comparator', if it can be uniquely identified. If there
-  /// are no matches an empty \c StringRef is returned. If there are ambiguous
-  /// matches, an empty \c StringRef is returned and a corresponding message
+  /// are no matches an empty \c llvm::StringRef is returned. If there are ambiguous
+  /// matches, an empty \c llvm::StringRef is returned and a corresponding message
   /// written to 'Error'.
-  StringRef findEquivalent(StringRef FileName,
-                           raw_ostream &Error) const;
+  llvm::StringRef findEquivalent(llvm::StringRef FileName,
+                           llvm::raw_ostream &Error) const;
 
 private:
   FileMatchTrieNode *Root;

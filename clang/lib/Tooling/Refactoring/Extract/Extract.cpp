@@ -66,7 +66,7 @@ const RefactoringDescriptor &ExtractFunction::describe() {
   return Descriptor;
 }
 
-Expected<ExtractFunction>
+llvm::Expected<ExtractFunction>
 ExtractFunction::initiate(RefactoringRuleContext &Context,
                           CodeRangeASTSelection Code,
                           std::optional<std::string> DeclName) {
@@ -96,7 +96,7 @@ ExtractFunction::initiate(RefactoringRuleContext &Context,
 
 // FIXME: Support C++ method extraction.
 // FIXME: Support Objective-C method extraction.
-Expected<AtomicChanges>
+llvm::Expected<AtomicChanges>
 ExtractFunction::createSourceReplacements(RefactoringRuleContext &Context) {
   const Decl *ParentDecl = Code.getFunctionLikeNearestParent();
   assert(ParentDecl && "missing parent");

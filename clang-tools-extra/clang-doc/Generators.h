@@ -28,7 +28,7 @@ public:
   // Write out the decl info for the objects in the given map in the specified
   // format.
   virtual llvm::Error
-  generateDocs(StringRef RootDir,
+  generateDocs(llvm::StringRef RootDir,
                llvm::StringMap<std::unique_ptr<doc::Info>> Infos,
                const ClangDocContext &CDCtx) = 0;
 

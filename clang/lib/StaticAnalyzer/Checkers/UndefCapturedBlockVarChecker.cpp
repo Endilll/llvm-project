@@ -71,7 +71,7 @@ UndefCapturedBlockVarChecker::checkPostStmt(const BlockExpr *BE,
             state->getSVal(Var.getOriginalRegion()).getAs<UndefinedVal>()) {
       if (ExplodedNode *N = C.generateErrorNode()) {
         // Generate a bug report.
-        SmallString<128> buf;
+        llvm::SmallString<128> buf;
         llvm::raw_svector_ostream os(buf);
 
         os << "Variable '" << VD->getName()

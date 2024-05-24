@@ -21,7 +21,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/inc-dec-in-conditions.html
 class IncDecInConditionsCheck : public ClangTidyCheck {
 public:
-  IncDecInConditionsCheck(StringRef Name, ClangTidyContext *Context)
+  IncDecInConditionsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

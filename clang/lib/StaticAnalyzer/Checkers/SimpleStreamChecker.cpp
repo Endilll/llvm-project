@@ -26,7 +26,7 @@ using namespace clang;
 using namespace ento;
 
 namespace {
-typedef SmallVector<SymbolRef, 2> SymbolVector;
+typedef llvm::SmallVector<SymbolRef, 2> SymbolVector;
 
 struct StreamState {
 private:
@@ -64,7 +64,7 @@ class SimpleStreamChecker : public Checker<check::PostCall,
                          const CallEvent &Call,
                          CheckerContext &C) const;
 
-  void reportLeaks(ArrayRef<SymbolRef> LeakedStreams, CheckerContext &C,
+  void reportLeaks(llvm::ArrayRef<SymbolRef> LeakedStreams, CheckerContext &C,
                    ExplodedNode *ErrNode) const;
 
   bool guaranteedNotToCloseFile(const CallEvent &Call) const;
@@ -181,7 +181,7 @@ void SimpleStreamChecker::reportDoubleClose(SymbolRef FileDescSym,
   C.emitReport(std::move(R));
 }
 
-void SimpleStreamChecker::reportLeaks(ArrayRef<SymbolRef> LeakedStreams,
+void SimpleStreamChecker::reportLeaks(llvm::ArrayRef<SymbolRef> LeakedStreams,
                                       CheckerContext &C,
                                       ExplodedNode *ErrNode) const {
   // Attach bug reports to the leak node.

@@ -31,7 +31,7 @@ namespace clang::tidy::cppcoreguidelines {
 ///     multiple in-class initializer fixits for the same  member.
 class ProTypeMemberInitCheck : public ClangTidyCheck {
 public:
-  ProTypeMemberInitCheck(StringRef Name, ClangTidyContext *Context);
+  ProTypeMemberInitCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

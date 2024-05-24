@@ -42,7 +42,7 @@ namespace {
 // For now, inlay hints are always anchored at the left or right of their range.
 enum class HintSide { Left, Right };
 
-void stripLeadingUnderscores(StringRef &Name) { Name = Name.ltrim('_'); }
+void stripLeadingUnderscores(llvm::StringRef &Name) { Name = Name.ltrim('_'); }
 
 // getDeclForType() returns the decl responsible for Type's spelling.
 // This is the inverse of ASTContext::getTypeDeclType().
@@ -365,8 +365,8 @@ static FunctionProtoTypeLoc getPrototypeLoc(Expr *Fn) {
   return {};
 }
 
-ArrayRef<const ParmVarDecl *>
-maybeDropCxxExplicitObjectParameters(ArrayRef<const ParmVarDecl *> Params) {
+llvm::ArrayRef<const ParmVarDecl *>
+maybeDropCxxExplicitObjectParameters(llvm::ArrayRef<const ParmVarDecl *> Params) {
   if (!Params.empty() && Params.front()->isExplicitObjectParameter())
     Params = Params.drop_front(1);
   return Params;
@@ -391,7 +391,7 @@ public:
     bool Invalid = false;
     llvm::StringRef Buf =
         AST.getSourceManager().getBufferData(MainFileID, &Invalid);
-    MainFileBuf = Invalid ? StringRef{} : Buf;
+    MainFileBuf = Invalid ? llvm::StringRef{} : Buf;
 
     TypeHintPolicy.SuppressScope = true; // keep type names short
     TypeHintPolicy.AnonymousTagLocations =
@@ -707,7 +707,7 @@ public:
   // FIXME: Handle RecoveryExpr to try to hint some invalid calls.
 
 private:
-  using NameVec = SmallVector<StringRef, 8>;
+  using NameVec = llvm::SmallVector<llvm::StringRef, 8>;
 
   void processCall(Callee Callee, llvm::ArrayRef<const Expr *> Args) {
     assert(Callee.Decl || Callee.Loc);
@@ -721,9 +721,9 @@ private:
         if (Ctor->isCopyOrMoveConstructor())
           return;
 
-    ArrayRef<const ParmVarDecl *> Params, ForwardedParams;
+    llvm::ArrayRef<const ParmVarDecl *> Params, ForwardedParams;
     // Resolve parameter packs to their forwarded parameter
-    SmallVector<const ParmVarDecl *> ForwardedParamsStorage;
+    llvm::SmallVector<const ParmVarDecl *> ForwardedParamsStorage;
     if (Callee.Decl) {
       Params = maybeDropCxxExplicitObjectParameters(Callee.Decl->parameters());
       ForwardedParamsStorage = resolveForwardingParameters(Callee.Decl);
@@ -751,7 +751,7 @@ private:
         break;
       }
 
-      StringRef Name = ParameterNames[I];
+      llvm::StringRef Name = ParameterNames[I];
       bool NameHint = shouldHintName(Args[I], Name);
       bool ReferenceHint = shouldHintReference(Params[I], ForwardedParams[I]);
 
@@ -767,7 +767,7 @@ private:
     if (ParamNames.size() != 1)
       return false;
 
-    StringRef Name = getSimpleName(*Callee);
+    llvm::StringRef Name = getSimpleName(*Callee);
     if (!Name.starts_with_insensitive("set"))
       return false;
 
@@ -782,7 +782,7 @@ private:
     //   void setExceptionHandler(EHFunc exception_handler);
     // We could improve this by replacing `equals_insensitive` with some
     // `sloppy_equals` which ignores case and also skips underscores.
-    StringRef WhatItIsSetting = Name.substr(3).ltrim("_");
+    llvm::StringRef WhatItIsSetting = Name.substr(3).ltrim("_");
     return WhatItIsSetting.equals_insensitive(ParamNames[0]);
   }
 
@@ -801,7 +801,7 @@ private:
     }
   }
 
-  bool shouldHintName(const Expr *Arg, StringRef ParamName) {
+  bool shouldHintName(const Expr *Arg, llvm::StringRef ParamName) {
     if (ParamName.empty())
       return false;
 
@@ -852,14 +852,14 @@ private:
   // Checks if "E" is spelled in the main file and preceded by a C-style comment
   // whose contents match ParamName (allowing for whitespace and an optional "="
   // at the end.
-  bool isPrecededByParamNameComment(const Expr *E, StringRef ParamName) {
+  bool isPrecededByParamNameComment(const Expr *E, llvm::StringRef ParamName) {
     auto &SM = AST.getSourceManager();
     auto FileLoc = SM.getFileLoc(E->getBeginLoc());
     auto Decomposed = SM.getDecomposedLoc(FileLoc);
     if (Decomposed.first != MainFileID)
       return false;
 
-    StringRef SourcePrefix = MainFileBuf.substr(0, Decomposed.second);
+    llvm::StringRef SourcePrefix = MainFileBuf.substr(0, Decomposed.second);
     // Allow whitespace between comment and expression.
     SourcePrefix = SourcePrefix.rtrim();
     // Check for comment ending.
@@ -879,7 +879,7 @@ private:
 
   // If "E" spells a single unqualified identifier, return that name.
   // Otherwise, return an empty string.
-  static StringRef getSpelledIdentifier(const Expr *E) {
+  static llvm::StringRef getSpelledIdentifier(const Expr *E) {
     E = E->IgnoreUnlessSpelledInSource();
 
     if (auto *DRE = dyn_cast<DeclRefExpr>(E))
@@ -893,7 +893,7 @@ private:
     return {};
   }
 
-  NameVec chooseParameterNames(ArrayRef<const ParmVarDecl *> Parameters) {
+  NameVec chooseParameterNames(llvm::ArrayRef<const ParmVarDecl *> Parameters) {
     NameVec ParameterNames;
     for (const auto *P : Parameters) {
       if (isExpandedFromParameterPack(P)) {
@@ -1026,8 +1026,8 @@ private:
            TypeName.size() < Cfg.InlayHints.TypeNameLimit;
   }
 
-  void addBlockEndHint(SourceRange BraceRange, StringRef DeclPrefix,
-                       StringRef Name, StringRef OptionalPunctuation) {
+  void addBlockEndHint(SourceRange BraceRange, llvm::StringRef DeclPrefix,
+                       llvm::StringRef Name, llvm::StringRef OptionalPunctuation) {
     auto HintRange = computeBlockEndHintRange(BraceRange, OptionalPunctuation);
     if (!HintRange)
       return;
@@ -1052,7 +1052,7 @@ private:
   // `OptionalPunctuation`, say ";". The range of "} ... ;" is returned.
   // Otherwise, the hint shouldn't be shown.
   std::optional<Range> computeBlockEndHintRange(SourceRange BraceRange,
-                                                StringRef OptionalPunctuation) {
+                                                llvm::StringRef OptionalPunctuation) {
     constexpr unsigned HintMinLineLimit = 2;
 
     auto &SM = AST.getSourceManager();
@@ -1068,11 +1068,11 @@ private:
     if (BlockBeginFileId != MainFileID || RBraceFileId != MainFileID)
       return std::nullopt;
 
-    StringRef RestOfLine = MainFileBuf.substr(RBraceOffset).split('\n').first;
+    llvm::StringRef RestOfLine = MainFileBuf.substr(RBraceOffset).split('\n').first;
     if (!RestOfLine.starts_with("}"))
       return std::nullopt;
 
-    StringRef TrimmedTrailingText = RestOfLine.drop_front().trim();
+    llvm::StringRef TrimmedTrailingText = RestOfLine.drop_front().trim();
     if (!TrimmedTrailingText.empty() &&
         TrimmedTrailingText != OptionalPunctuation)
       return std::nullopt;
@@ -1085,7 +1085,7 @@ private:
       return std::nullopt;
 
     // This is what we attach the hint to, usually "}" or "};".
-    StringRef HintRangeText = RestOfLine.take_front(
+    llvm::StringRef HintRangeText = RestOfLine.take_front(
         TrimmedTrailingText.empty()
             ? 1
             : TrimmedTrailingText.bytes_end() - RestOfLine.bytes_begin());
@@ -1108,7 +1108,7 @@ private:
   const Config &Cfg;
   std::optional<Range> RestrictRange;
   FileID MainFileID;
-  StringRef MainFileBuf;
+  llvm::StringRef MainFileBuf;
   const HeuristicResolver *Resolver;
   PrintingPolicy TypeHintPolicy;
 };

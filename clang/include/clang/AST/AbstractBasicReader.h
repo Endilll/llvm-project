@@ -54,7 +54,7 @@ template <class T> inline T *makePointerFromOptional(std::optional<T *> value) {
 //     Reads an optional value from the current property.
 //
 //   template <class ValueType>
-//   ArrayRef<ValueType> readArray(llvm::SmallVectorImpl<ValueType> &buffer);
+//   llvm::ArrayRef<ValueType> readArray(llvm::SmallVectorImpl<ValueType> &buffer);
 //
 //     Reads an array of values from the current property.
 //
@@ -189,7 +189,7 @@ public:
   }
 
   APValue::LValuePathSerializationHelper readLValuePathSerializationHelper(
-      SmallVectorImpl<APValue::LValuePathEntry> &path) {
+      llvm::SmallVectorImpl<APValue::LValuePathEntry> &path) {
     auto origTy = asImpl().readQualType();
     auto elemTy = origTy;
     unsigned pathLength = asImpl().readUInt32();

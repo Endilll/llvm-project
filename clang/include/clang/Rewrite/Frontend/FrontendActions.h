@@ -23,7 +23,7 @@ class FixItOptions;
 class HTMLPrintAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 };
 
 class FixItAction : public ASTFrontendAction {
@@ -32,7 +32,7 @@ protected:
   std::unique_ptr<FixItOptions> FixItOpts;
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
   bool BeginSourceFileAction(CompilerInstance &CI) override;
 
@@ -59,7 +59,7 @@ protected:
 class RewriteObjCAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 };
 
 class RewriteMacrosAction : public PreprocessorFrontendAction {
@@ -73,7 +73,7 @@ protected:
 };
 
 class RewriteIncludesAction : public PreprocessorFrontendAction {
-  std::shared_ptr<raw_ostream> OutputStream;
+  std::shared_ptr<llvm::raw_ostream> OutputStream;
   class RewriteImportsListener;
 protected:
   bool BeginSourceFileAction(CompilerInstance &CI) override;

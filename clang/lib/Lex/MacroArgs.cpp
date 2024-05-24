@@ -22,7 +22,7 @@ using namespace clang;
 
 /// MacroArgs ctor function - This destroys the vector passed in.
 MacroArgs *MacroArgs::create(const MacroInfo *MI,
-                             ArrayRef<Token> UnexpArgTokens,
+                             llvm::ArrayRef<Token> UnexpArgTokens,
                              bool VarargsElided, Preprocessor &PP) {
   assert(MI->isFunctionLike() &&
          "Can't have args for an object-like macro!");
@@ -169,7 +169,7 @@ const std::vector<Token> &MacroArgs::getPreExpArgument(unsigned Arg,
   std::vector<Token> &Result = PreExpArgTokens[Arg];
   if (!Result.empty()) return Result;
 
-  SaveAndRestore PreExpandingMacroArgs(PP.InMacroArgPreExpansion, true);
+  llvm::SaveAndRestore PreExpandingMacroArgs(PP.InMacroArgPreExpansion, true);
 
   const Token *AT = getUnexpArgument(Arg);
   unsigned NumToks = getArgLength(AT)+1;  // Include the EOF.
@@ -216,7 +216,7 @@ Token MacroArgs::StringifyArgument(const Token *ArgToks,
   const Token *ArgTokStart = ArgToks;
 
   // Stringify all the tokens.
-  SmallString<128> Result;
+  llvm::SmallString<128> Result;
   Result += "\"";
 
   bool isFirst = true;

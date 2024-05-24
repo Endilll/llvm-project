@@ -134,7 +134,7 @@ public:
     return ParsedRegions;
   }
 
-  void addParsedRegions(ArrayRef<PPRegion> Regions) {
+  void addParsedRegions(llvm::ArrayRef<PPRegion> Regions) {
     std::lock_guard<std::mutex> MG(Mutex);
     ParsedRegions.insert(Regions.begin(), Regions.end());
   }
@@ -153,7 +153,7 @@ class ParsedSrcLocationsTracker {
   /// constructed.
   llvm::DenseSet<PPRegion> ParsedRegionsSnapshot;
   /// Regions that were queried during this instance lifetime.
-  SmallVector<PPRegion, 32> NewParsedRegions;
+  llvm::SmallVector<PPRegion, 32> NewParsedRegions;
 
   /// Caching the last queried region.
   PPRegion LastRegion;
@@ -258,10 +258,10 @@ public:
   }
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override {
     bool isImport = (IncludeTok.is(tok::identifier) &&
@@ -317,7 +317,7 @@ public:
 //===----------------------------------------------------------------------===//
 
 class CaptureDiagnosticConsumer : public DiagnosticConsumer {
-  SmallVector<StoredDiagnostic, 4> Errors;
+  llvm::SmallVector<StoredDiagnostic, 4> Errors;
 public:
 
   void HandleDiagnostic(DiagnosticsEngine::Level level,
@@ -345,7 +345,7 @@ public:
       : DataConsumer(std::move(dataConsumer)), Opts(Opts), SKData(skData) {}
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override {
+                                                 llvm::StringRef InFile) override {
     PreprocessorOptions &PPOpts = CI.getPreprocessorOpts();
 
     if (!PPOpts.ImplicitPCHInclude.empty()) {
@@ -443,7 +443,7 @@ static CXErrorCode clang_indexSourceFile_Impl(
     IndexerCallbacks *client_index_callbacks, unsigned index_callbacks_size,
     unsigned index_options, const char *source_filename,
     const char *const *command_line_args, int num_command_line_args,
-    ArrayRef<CXUnsavedFile> unsaved_files, CXTranslationUnit *out_TU,
+    llvm::ArrayRef<CXUnsavedFile> unsaved_files, CXTranslationUnit *out_TU,
     unsigned TU_options) {
   if (out_TU)
     *out_TU = nullptr;
@@ -479,7 +479,7 @@ static CXErrorCode clang_indexSourceFile_Impl(
     CaptureDiag = new CaptureDiagnosticConsumer();
 
   // Configure the diagnostics.
-  IntrusiveRefCntPtr<DiagnosticsEngine>
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine>
     Diags(CompilerInstance::createDiagnostics(new DiagnosticOptions,
                                               CaptureDiag,
                                               /*ShouldOwnClient=*/true));
@@ -526,7 +526,7 @@ static CXErrorCode clang_indexSourceFile_Impl(
   if (CInvok->getFrontendOpts().Inputs.empty())
     return CXError_Failure;
 
-  typedef SmallVector<std::unique_ptr<llvm::MemoryBuffer>, 8> MemBufferOwner;
+  typedef llvm::SmallVector<std::unique_ptr<llvm::MemoryBuffer>, 8> MemBufferOwner;
   std::unique_ptr<MemBufferOwner> BufOwner(new MemBufferOwner);
 
   // Recover resources if we crash before exiting this method.
@@ -873,7 +873,7 @@ int clang_indexSourceFile(CXIndexAction idxAction,
                           unsigned num_unsaved_files,
                           CXTranslationUnit *out_TU,
                           unsigned TU_options) {
-  SmallVector<const char *, 4> Args;
+  llvm::SmallVector<const char *, 4> Args;
   Args.push_back("clang");
   Args.append(command_line_args, command_line_args + num_command_line_args);
   return clang_indexSourceFileFullArgv(

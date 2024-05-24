@@ -343,7 +343,7 @@ private:
       return HeaderPath.IsPrivateHeader ? CachedSpelling->PrivateHeader
                                         : CachedSpelling->PublicHeader;
     }
-    SmallString<256> UmbrellaPath(HeaderPath.HeadersParentDir);
+    llvm::SmallString<256> UmbrellaPath(HeaderPath.HeadersParentDir);
     llvm::sys::path::append(UmbrellaPath, "Headers", Framework + ".h");
 
     llvm::vfs::Status Status;
@@ -790,7 +790,7 @@ bool SymbolCollector::handleMacroOccurrence(const IdentifierInfo *Name,
 
 void SymbolCollector::processRelations(
     const NamedDecl &ND, const SymbolID &ID,
-    ArrayRef<index::SymbolRelation> Relations) {
+    llvm::ArrayRef<index::SymbolRelation> Relations) {
   for (const auto &R : Relations) {
     auto RKind = indexableRelation(R);
     if (!RKind)

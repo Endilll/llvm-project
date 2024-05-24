@@ -20,7 +20,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/prefer-member-initializer.html
 class PreferMemberInitializerCheck : public ClangTidyCheck {
 public:
-  PreferMemberInitializerCheck(StringRef Name, ClangTidyContext *Context);
+  PreferMemberInitializerCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

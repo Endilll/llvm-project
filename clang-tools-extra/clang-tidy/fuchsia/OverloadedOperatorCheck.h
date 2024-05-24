@@ -19,7 +19,7 @@ namespace clang::tidy::fuchsia {
 /// http://clang.llvm.org/extra/clang-tidy/checks/fuchsia/overloaded-operator.html
 class OverloadedOperatorCheck : public ClangTidyCheck {
 public:
-  OverloadedOperatorCheck(StringRef Name, ClangTidyContext *Context)
+  OverloadedOperatorCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

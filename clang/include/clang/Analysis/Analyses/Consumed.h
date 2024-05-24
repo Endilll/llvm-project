@@ -49,7 +49,7 @@ namespace consumed {
     CS_Consumed
   };
 
-  using OptionalNotes = SmallVector<PartialDiagnosticAt, 1>;
+  using OptionalNotes = llvm::SmallVector<PartialDiagnosticAt, 1>;
   using DelayedDiag = std::pair<PartialDiagnosticAt, OptionalNotes>;
   using DiagList = std::list<DelayedDiag>;
 
@@ -68,7 +68,7 @@ namespace consumed {
     /// \param VariableName -- The name of the variable that has a mismatched
     /// state.
     virtual void warnLoopStateMismatch(SourceLocation Loc,
-                                       StringRef VariableName) {}
+                                       llvm::StringRef VariableName) {}
 
     /// Warn about parameter typestate mismatches upon return.
     ///
@@ -80,14 +80,14 @@ namespace consumed {
     /// \param ObservedState -- The state the return value was observed to be
     /// in.
     virtual void warnParamReturnTypestateMismatch(SourceLocation Loc,
-                                                  StringRef VariableName,
-                                                  StringRef ExpectedState,
-                                                  StringRef ObservedState) {}
+                                                  llvm::StringRef VariableName,
+                                                  llvm::StringRef ExpectedState,
+                                                  llvm::StringRef ObservedState) {}
 
     // FIXME: Add documentation.
     virtual void warnParamTypestateMismatch(SourceLocation LOC,
-                                            StringRef ExpectedState,
-                                            StringRef ObservedState) {}
+                                            llvm::StringRef ExpectedState,
+                                            llvm::StringRef ObservedState) {}
 
     // FIXME: This can be removed when the attr propagation fix for templated
     //        classes lands.
@@ -97,7 +97,7 @@ namespace consumed {
     ///
     /// \param TypeName -- The name of the unconsumable type.
     virtual void warnReturnTypestateForUnconsumableType(SourceLocation Loc,
-                                                        StringRef TypeName) {}
+                                                        llvm::StringRef TypeName) {}
 
     /// Warn about return typestate mismatches.
     ///
@@ -109,8 +109,8 @@ namespace consumed {
     /// \param ObservedState -- The state the return value was observed to be
     /// in.
     virtual void warnReturnTypestateMismatch(SourceLocation Loc,
-                                             StringRef ExpectedState,
-                                             StringRef ObservedState) {}
+                                             llvm::StringRef ExpectedState,
+                                             llvm::StringRef ObservedState) {}
 
     /// Warn about use-while-consumed errors.
     /// \param MethodName -- The name of the method that was incorrectly
@@ -119,8 +119,8 @@ namespace consumed {
     /// \param State -- The state the object was used in.
     ///
     /// \param Loc -- The SourceLocation of the method invocation.
-    virtual void warnUseOfTempInInvalidState(StringRef MethodName,
-                                             StringRef State,
+    virtual void warnUseOfTempInInvalidState(llvm::StringRef MethodName,
+                                             llvm::StringRef State,
                                              SourceLocation Loc) {}
 
     /// Warn about use-while-consumed errors.
@@ -133,9 +133,9 @@ namespace consumed {
     /// value.
     ///
     /// \param Loc -- The SourceLocation of the method invocation.
-    virtual void warnUseInInvalidState(StringRef MethodName,
-                                       StringRef VariableName,
-                                       StringRef State,
+    virtual void warnUseInInvalidState(llvm::StringRef MethodName,
+                                       llvm::StringRef VariableName,
+                                       llvm::StringRef State,
                                        SourceLocation Loc) {}
   };
 

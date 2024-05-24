@@ -311,13 +311,13 @@ public:
   /// loop nest goes out of scope) or a second loop in the same level in which
   /// case it would be ambiguous into which of the two (or more) loops the loop
   /// nest would extend.
-  SmallVector<llvm::CanonicalLoopInfo *, 4> OMPLoopNestStack;
+  llvm::SmallVector<llvm::CanonicalLoopInfo *, 4> OMPLoopNestStack;
 
   /// Stack to track the Logical Operator recursion nest for MC/DC.
-  SmallVector<const BinaryOperator *, 16> MCDCLogOpStack;
+  llvm::SmallVector<const BinaryOperator *, 16> MCDCLogOpStack;
 
   /// Stack to track the controlled convergence tokens.
-  SmallVector<llvm::IntrinsicInst *, 4> ConvergenceTokenStack;
+  llvm::SmallVector<llvm::IntrinsicInst *, 4> ConvergenceTokenStack;
 
   /// Number of nested loop to be consumed by the last surrounding
   /// loop-associated directive.
@@ -394,8 +394,8 @@ public:
   // Function signature is:
   // <type> __await_suspend_wrapper_<name>(ptr %awaiter, ptr %hdl)
   // where type is one of (void, i1, ptr)
-  llvm::Function *generateAwaitSuspendWrapper(Twine const &CoroName,
-                                              Twine const &SuspendPointName,
+  llvm::Function *generateAwaitSuspendWrapper(llvm::Twine const &CoroName,
+                                              llvm::Twine const &SuspendPointName,
                                               CoroutineSuspendExpr const &S);
 
   /// CurGD - The GlobalDecl for the current function being compiled.
@@ -509,7 +509,7 @@ public:
     }
 
     /// Get the name of the capture helper.
-    virtual StringRef getHelperName() const { return "__captured_stmt"; }
+    virtual llvm::StringRef getHelperName() const { return "__captured_stmt"; }
 
     /// Get the CaptureFields
     llvm::SmallDenseMap<const VarDecl *, FieldDecl *> getCaptureFields() {
@@ -753,7 +753,7 @@ public:
   /// A stack of exception code slots. Entering an __except block pushes a slot
   /// on the stack and leaving pops one. The __exception_code() intrinsic loads
   /// a value from the top of the stack.
-  SmallVector<Address, 1> SEHCodeSlotStack;
+  llvm::SmallVector<Address, 1> SEHCodeSlotStack;
 
   /// Value returned by __exception_info intrinsic.
   llvm::Value *SEHInfo = nullptr;
@@ -813,7 +813,7 @@ public:
 public:
   /// ObjCEHValueStack - Stack of Objective-C exception values, used for
   /// rethrows.
-  SmallVector<llvm::Value*, 8> ObjCEHValueStack;
+  llvm::SmallVector<llvm::Value*, 8> ObjCEHValueStack;
 
   /// A class controlling the emission of a finally block.
   class FinallyInfo {
@@ -1028,7 +1028,7 @@ public:
 
   class LexicalScope : public RunCleanupsScope {
     SourceRange Range;
-    SmallVector<const LabelDecl*, 4> Labels;
+    llvm::SmallVector<const LabelDecl*, 4> Labels;
     LexicalScope *ParentScope;
 
     LexicalScope(const LexicalScope &) = delete;
@@ -1254,7 +1254,7 @@ public:
   /// The given basic block lies in the current EH scope, but may be a
   /// target of a potentially scope-crossing jump; get a stable handle
   /// to which we can perform this jump later.
-  JumpDest getJumpDestInCurrentScope(StringRef Name = StringRef()) {
+  JumpDest getJumpDestInCurrentScope(llvm::StringRef Name = llvm::StringRef()) {
     return getJumpDestInCurrentScope(createBasicBlock(Name));
   }
 
@@ -1532,7 +1532,7 @@ private:
     JumpDest BreakBlock;
     JumpDest ContinueBlock;
   };
-  SmallVector<BreakContinue, 8> BreakContinueStack;
+  llvm::SmallVector<BreakContinue, 8> BreakContinueStack;
 
   /// Handles cancellation exit points in OpenMP-related constructs.
   class OpenMPCancelExitStack {
@@ -1551,7 +1551,7 @@ private:
       JumpDest ContBlock;
     };
 
-    SmallVector<CancelExit, 8> Stack;
+    llvm::SmallVector<CancelExit, 8> Stack;
 
   public:
     OpenMPCancelExitStack() : Stack(1) {}
@@ -1621,7 +1621,7 @@ private:
   /// Calculate branch weights appropriate for PGO data
   llvm::MDNode *createProfileWeights(uint64_t TrueCount,
                                      uint64_t FalseCount) const;
-  llvm::MDNode *createProfileWeights(ArrayRef<uint64_t> Weights) const;
+  llvm::MDNode *createProfileWeights(llvm::ArrayRef<uint64_t> Weights) const;
   llvm::MDNode *createProfileWeightsForLoop(const Stmt *Cond,
                                             uint64_t LoopCount) const;
 
@@ -1706,10 +1706,10 @@ private:
   /// current context is not in a switch.
   llvm::SwitchInst *SwitchInsn = nullptr;
   /// The branch weights of SwitchInsn when doing instrumentation based PGO.
-  SmallVector<uint64_t, 16> *SwitchWeights = nullptr;
+  llvm::SmallVector<uint64_t, 16> *SwitchWeights = nullptr;
 
   /// The likelihood attributes of the SwitchCase.
-  SmallVector<Stmt::Likelihood, 16> *SwitchLikelihood = nullptr;
+  llvm::SmallVector<Stmt::Likelihood, 16> *SwitchLikelihood = nullptr;
 
   /// CaseRangeBlock - This block holds if condition check for last case
   /// statement range in current switch instruction.
@@ -1922,9 +1922,9 @@ public:
     ///        parts of the name.
     /// \param Separator separator used between all of the rest consecutinve
     ///        parts of the name
-    static std::string getNameWithSeparators(ArrayRef<StringRef> Parts,
-                                             StringRef FirstSeparator = ".",
-                                             StringRef Separator = ".");
+    static std::string getNameWithSeparators(llvm::ArrayRef<llvm::StringRef> Parts,
+                                             llvm::StringRef FirstSeparator = ".",
+                                             llvm::StringRef Separator = ".");
     /// Emit the Finalization for an OMP region
     /// \param CGF	The Codegen function this belongs to
     /// \param IP	Insertion point for generating the finalization code.
@@ -1955,11 +1955,11 @@ public:
                                          const Stmt *RegionBodyStmt,
                                          InsertPointTy AllocaIP,
                                          InsertPointTy CodeGenIP,
-                                         Twine RegionName);
+                                         llvm::Twine RegionName);
 
     static void EmitCaptureStmt(CodeGenFunction &CGF, InsertPointTy CodeGenIP,
                                 llvm::BasicBlock &FiniBB, llvm::Function *Fn,
-                                ArrayRef<llvm::Value *> Args) {
+                                llvm::ArrayRef<llvm::Value *> Args) {
       llvm::BasicBlock *CodeGenIPBB = CodeGenIP.getBlock();
       if (llvm::Instruction *CodeGenIPBBTI = CodeGenIPBB->getTerminator())
         CodeGenIPBBTI->eraseFromParent();
@@ -1987,7 +1987,7 @@ public:
                                           const Stmt *RegionBodyStmt,
                                           InsertPointTy AllocaIP,
                                           InsertPointTy CodeGenIP,
-                                          Twine RegionName);
+                                          llvm::Twine RegionName);
 
     /// RAII for preserving necessary info during Outlined region body codegen.
     class OutlinedRegionBodyRAII {
@@ -2592,7 +2592,7 @@ public:
   }
 
   /// createBasicBlock - Create an LLVM basic block.
-  llvm::BasicBlock *createBasicBlock(const Twine &name = "",
+  llvm::BasicBlock *createBasicBlock(const llvm::Twine &name = "",
                                      llvm::Function *parent = nullptr,
                                      llvm::BasicBlock *before = nullptr) {
     return llvm::BasicBlock::Create(getLLVMContext(), name, parent, before);
@@ -2802,14 +2802,14 @@ public:
   ///
   /// The cast is not performaed in CreateTempAllocaWithoutCast. This is
   /// more efficient if the caller knows that the address will not be exposed.
-  llvm::AllocaInst *CreateTempAlloca(llvm::Type *Ty, const Twine &Name = "tmp",
+  llvm::AllocaInst *CreateTempAlloca(llvm::Type *Ty, const llvm::Twine &Name = "tmp",
                                      llvm::Value *ArraySize = nullptr);
   RawAddress CreateTempAlloca(llvm::Type *Ty, CharUnits align,
-                              const Twine &Name = "tmp",
+                              const llvm::Twine &Name = "tmp",
                               llvm::Value *ArraySize = nullptr,
                               RawAddress *Alloca = nullptr);
   RawAddress CreateTempAllocaWithoutCast(llvm::Type *Ty, CharUnits align,
-                                         const Twine &Name = "tmp",
+                                         const llvm::Twine &Name = "tmp",
                                          llvm::Value *ArraySize = nullptr);
 
   /// CreateDefaultAlignedTempAlloca - This creates an alloca with the
@@ -2823,7 +2823,7 @@ public:
   /// do not pass it as an argument to a function that might expect a
   /// properly ABI-aligned value.
   RawAddress CreateDefaultAlignTempAlloca(llvm::Type *Ty,
-                                          const Twine &Name = "tmp");
+                                          const llvm::Twine &Name = "tmp");
 
   /// CreateIRTemp - Create a temporary IR object of the given type, with
   /// appropriate alignment. This routine should only be used when an temporary
@@ -2833,26 +2833,26 @@ public:
   ///
   /// That is, this is exactly equivalent to CreateMemTemp, but calling
   /// ConvertType instead of ConvertTypeForMem.
-  RawAddress CreateIRTemp(QualType T, const Twine &Name = "tmp");
+  RawAddress CreateIRTemp(QualType T, const llvm::Twine &Name = "tmp");
 
   /// CreateMemTemp - Create a temporary memory object of the given type, with
   /// appropriate alignmen and cast it to the default address space. Returns
   /// the original alloca instruction by \p Alloca if it is not nullptr.
-  RawAddress CreateMemTemp(QualType T, const Twine &Name = "tmp",
+  RawAddress CreateMemTemp(QualType T, const llvm::Twine &Name = "tmp",
                            RawAddress *Alloca = nullptr);
   RawAddress CreateMemTemp(QualType T, CharUnits Align,
-                           const Twine &Name = "tmp",
+                           const llvm::Twine &Name = "tmp",
                            RawAddress *Alloca = nullptr);
 
   /// CreateMemTemp - Create a temporary memory object of the given type, with
   /// appropriate alignmen without casting it to the default address space.
-  RawAddress CreateMemTempWithoutCast(QualType T, const Twine &Name = "tmp");
+  RawAddress CreateMemTempWithoutCast(QualType T, const llvm::Twine &Name = "tmp");
   RawAddress CreateMemTempWithoutCast(QualType T, CharUnits Align,
-                                      const Twine &Name = "tmp");
+                                      const llvm::Twine &Name = "tmp");
 
   /// CreateAggTemp - Create a temporary memory object for the given
   /// aggregate type.
-  AggValueSlot CreateAggTemp(QualType T, const Twine &Name = "tmp",
+  AggValueSlot CreateAggTemp(QualType T, const llvm::Twine &Name = "tmp",
                              RawAddress *Alloca = nullptr) {
     return AggValueSlot::forAddr(
         CreateMemTemp(T, Name, Alloca), T.getQualifiers(),
@@ -3512,7 +3512,7 @@ public:
   /// This function may clear the current insertion point; callers should use
   /// EnsureInsertPoint if they wish to subsequently generate code without first
   /// calling EmitBlock, EmitBranch, or EmitStmt.
-  void EmitStmt(const Stmt *S, ArrayRef<const Attr *> Attrs = std::nullopt);
+  void EmitStmt(const Stmt *S, llvm::ArrayRef<const Attr *> Attrs = std::nullopt);
 
   /// EmitSimpleStmt - Try to emit a "simple" statement which does not
   /// necessarily require an insertion point or debug information; typically
@@ -3520,7 +3520,7 @@ public:
   /// statements.
   ///
   /// \return True if the statement was handled.
-  bool EmitSimpleStmt(const Stmt *S, ArrayRef<const Attr *> Attrs);
+  bool EmitSimpleStmt(const Stmt *S, llvm::ArrayRef<const Attr *> Attrs);
 
   Address EmitCompoundStmt(const CompoundStmt &S, bool GetLast = false,
                            AggValueSlot AVS = AggValueSlot::ignored());
@@ -3540,18 +3540,18 @@ public:
   void EmitIfStmt(const IfStmt &S);
 
   void EmitWhileStmt(const WhileStmt &S,
-                     ArrayRef<const Attr *> Attrs = std::nullopt);
-  void EmitDoStmt(const DoStmt &S, ArrayRef<const Attr *> Attrs = std::nullopt);
+                     llvm::ArrayRef<const Attr *> Attrs = std::nullopt);
+  void EmitDoStmt(const DoStmt &S, llvm::ArrayRef<const Attr *> Attrs = std::nullopt);
   void EmitForStmt(const ForStmt &S,
-                   ArrayRef<const Attr *> Attrs = std::nullopt);
+                   llvm::ArrayRef<const Attr *> Attrs = std::nullopt);
   void EmitReturnStmt(const ReturnStmt &S);
   void EmitDeclStmt(const DeclStmt &S);
   void EmitBreakStmt(const BreakStmt &S);
   void EmitContinueStmt(const ContinueStmt &S);
   void EmitSwitchStmt(const SwitchStmt &S);
-  void EmitDefaultStmt(const DefaultStmt &S, ArrayRef<const Attr *> Attrs);
-  void EmitCaseStmt(const CaseStmt &S, ArrayRef<const Attr *> Attrs);
-  void EmitCaseStmtRange(const CaseStmt &S, ArrayRef<const Attr *> Attrs);
+  void EmitDefaultStmt(const DefaultStmt &S, llvm::ArrayRef<const Attr *> Attrs);
+  void EmitCaseStmt(const CaseStmt &S, llvm::ArrayRef<const Attr *> Attrs);
+  void EmitCaseStmtRange(const CaseStmt &S, llvm::ArrayRef<const Attr *> Attrs);
   void EmitAsmStmt(const AsmStmt &S);
 
   void EmitObjCForCollectionStmt(const ObjCForCollectionStmt &S);
@@ -3620,7 +3620,7 @@ public:
                                     llvm::Value *ParentFP);
 
   void EmitCXXForRangeStmt(const CXXForRangeStmt &S,
-                           ArrayRef<const Attr *> Attrs = std::nullopt);
+                           llvm::ArrayRef<const Attr *> Attrs = std::nullopt);
 
   /// Controls insertion of cancellation exit blocks in worksharing constructs.
   class OMPCancelStackRAII {
@@ -3644,7 +3644,7 @@ public:
   llvm::Function *GenerateOpenMPCapturedStmtFunction(const CapturedStmt &S,
                                                      SourceLocation Loc);
   void GenerateOpenMPCapturedVars(const CapturedStmt &S,
-                                  SmallVectorImpl<llvm::Value *> &CapturedVars);
+                                  llvm::SmallVectorImpl<llvm::Value *> &CapturedVars);
   void emitOMPSimpleStore(LValue LVal, RValue RVal, QualType RValTy,
                           SourceLocation Loc);
   /// Perform element by element copying of arrays with type \a
@@ -3889,53 +3889,53 @@ public:
 
   /// Emit device code for the target directive.
   static void EmitOMPTargetDeviceFunction(CodeGenModule &CGM,
-                                          StringRef ParentName,
+                                          llvm::StringRef ParentName,
                                           const OMPTargetDirective &S);
   static void
-  EmitOMPTargetParallelDeviceFunction(CodeGenModule &CGM, StringRef ParentName,
+  EmitOMPTargetParallelDeviceFunction(CodeGenModule &CGM, llvm::StringRef ParentName,
                                       const OMPTargetParallelDirective &S);
   /// Emit device code for the target parallel for directive.
   static void EmitOMPTargetParallelForDeviceFunction(
-      CodeGenModule &CGM, StringRef ParentName,
+      CodeGenModule &CGM, llvm::StringRef ParentName,
       const OMPTargetParallelForDirective &S);
   /// Emit device code for the target parallel for simd directive.
   static void EmitOMPTargetParallelForSimdDeviceFunction(
-      CodeGenModule &CGM, StringRef ParentName,
+      CodeGenModule &CGM, llvm::StringRef ParentName,
       const OMPTargetParallelForSimdDirective &S);
   /// Emit device code for the target teams directive.
   static void
-  EmitOMPTargetTeamsDeviceFunction(CodeGenModule &CGM, StringRef ParentName,
+  EmitOMPTargetTeamsDeviceFunction(CodeGenModule &CGM, llvm::StringRef ParentName,
                                    const OMPTargetTeamsDirective &S);
   /// Emit device code for the target teams distribute directive.
   static void EmitOMPTargetTeamsDistributeDeviceFunction(
-      CodeGenModule &CGM, StringRef ParentName,
+      CodeGenModule &CGM, llvm::StringRef ParentName,
       const OMPTargetTeamsDistributeDirective &S);
   /// Emit device code for the target teams distribute simd directive.
   static void EmitOMPTargetTeamsDistributeSimdDeviceFunction(
-      CodeGenModule &CGM, StringRef ParentName,
+      CodeGenModule &CGM, llvm::StringRef ParentName,
       const OMPTargetTeamsDistributeSimdDirective &S);
   /// Emit device code for the target simd directive.
   static void EmitOMPTargetSimdDeviceFunction(CodeGenModule &CGM,
-                                              StringRef ParentName,
+                                              llvm::StringRef ParentName,
                                               const OMPTargetSimdDirective &S);
   /// Emit device code for the target teams distribute parallel for simd
   /// directive.
   static void EmitOMPTargetTeamsDistributeParallelForSimdDeviceFunction(
-      CodeGenModule &CGM, StringRef ParentName,
+      CodeGenModule &CGM, llvm::StringRef ParentName,
       const OMPTargetTeamsDistributeParallelForSimdDirective &S);
 
   /// Emit device code for the target teams loop directive.
   static void EmitOMPTargetTeamsGenericLoopDeviceFunction(
-      CodeGenModule &CGM, StringRef ParentName,
+      CodeGenModule &CGM, llvm::StringRef ParentName,
       const OMPTargetTeamsGenericLoopDirective &S);
 
   /// Emit device code for the target parallel loop directive.
   static void EmitOMPTargetParallelGenericLoopDeviceFunction(
-      CodeGenModule &CGM, StringRef ParentName,
+      CodeGenModule &CGM, llvm::StringRef ParentName,
       const OMPTargetParallelGenericLoopDirective &S);
 
   static void EmitOMPTargetTeamsDistributeParallelForDeviceFunction(
-      CodeGenModule &CGM, StringRef ParentName,
+      CodeGenModule &CGM, llvm::StringRef ParentName,
       const OMPTargetTeamsDistributeParallelForDirective &S);
 
   /// Emit the Stmt \p S and return its topmost canonical loop, if any.
@@ -4366,32 +4366,32 @@ public:
   void checkTargetFeatures(SourceLocation Loc, const FunctionDecl *TargetDecl);
 
   llvm::CallInst *EmitRuntimeCall(llvm::FunctionCallee callee,
-                                  const Twine &name = "");
+                                  const llvm::Twine &name = "");
   llvm::CallInst *EmitRuntimeCall(llvm::FunctionCallee callee,
-                                  ArrayRef<llvm::Value *> args,
-                                  const Twine &name = "");
+                                  llvm::ArrayRef<llvm::Value *> args,
+                                  const llvm::Twine &name = "");
   llvm::CallInst *EmitNounwindRuntimeCall(llvm::FunctionCallee callee,
-                                          const Twine &name = "");
+                                          const llvm::Twine &name = "");
   llvm::CallInst *EmitNounwindRuntimeCall(llvm::FunctionCallee callee,
-                                          ArrayRef<Address> args,
-                                          const Twine &name = "");
+                                          llvm::ArrayRef<Address> args,
+                                          const llvm::Twine &name = "");
   llvm::CallInst *EmitNounwindRuntimeCall(llvm::FunctionCallee callee,
-                                          ArrayRef<llvm::Value *> args,
-                                          const Twine &name = "");
+                                          llvm::ArrayRef<llvm::Value *> args,
+                                          const llvm::Twine &name = "");
 
-  SmallVector<llvm::OperandBundleDef, 1>
+  llvm::SmallVector<llvm::OperandBundleDef, 1>
   getBundlesForFunclet(llvm::Value *Callee);
 
   llvm::CallBase *EmitCallOrInvoke(llvm::FunctionCallee Callee,
-                                   ArrayRef<llvm::Value *> Args,
-                                   const Twine &Name = "");
+                                   llvm::ArrayRef<llvm::Value *> Args,
+                                   const llvm::Twine &Name = "");
   llvm::CallBase *EmitRuntimeCallOrInvoke(llvm::FunctionCallee callee,
-                                          ArrayRef<llvm::Value *> args,
-                                          const Twine &name = "");
+                                          llvm::ArrayRef<llvm::Value *> args,
+                                          const llvm::Twine &name = "");
   llvm::CallBase *EmitRuntimeCallOrInvoke(llvm::FunctionCallee callee,
-                                          const Twine &name = "");
+                                          const llvm::Twine &name = "");
   void EmitNoreturnRuntimeCallOrInvoke(llvm::FunctionCallee callee,
-                                       ArrayRef<llvm::Value *> args);
+                                       llvm::ArrayRef<llvm::Value *> args);
 
   CGCallee BuildAppleKextVirtualCall(const CXXMethodDecl *MD,
                                      NestedNameSpecifier *Qual,
@@ -4518,7 +4518,7 @@ public:
                                          const char *NameHint,
                                          unsigned Modifier,
                                          const CallExpr *E,
-                                         SmallVectorImpl<llvm::Value *> &Ops,
+                                         llvm::SmallVectorImpl<llvm::Value *> &Ops,
                                          Address PtrOp0, Address PtrOp1,
                                          llvm::Triple::ArchType Arch);
 
@@ -4526,7 +4526,7 @@ public:
                                           unsigned Modifier, llvm::Type *ArgTy,
                                           const CallExpr *E);
   llvm::Value *EmitNeonCall(llvm::Function *F,
-                            SmallVectorImpl<llvm::Value*> &O,
+                            llvm::SmallVectorImpl<llvm::Value*> &O,
                             const char *name,
                             unsigned shift = 0, bool rightshift = false);
   llvm::Value *EmitNeonSplat(llvm::Value *V, llvm::Constant *Idx,
@@ -4542,18 +4542,18 @@ public:
   /// pointer operand.
   llvm::Type *SVEBuiltinMemEltTy(const SVETypeFlags &TypeFlags);
 
-  SmallVector<llvm::Type *, 2>
+  llvm::SmallVector<llvm::Type *, 2>
   getSVEOverloadTypes(const SVETypeFlags &TypeFlags, llvm::Type *ReturnType,
-                      ArrayRef<llvm::Value *> Ops);
+                      llvm::ArrayRef<llvm::Value *> Ops);
   llvm::Type *getEltType(const SVETypeFlags &TypeFlags);
   llvm::ScalableVectorType *getSVEType(const SVETypeFlags &TypeFlags);
   llvm::ScalableVectorType *getSVEPredType(const SVETypeFlags &TypeFlags);
   llvm::Value *EmitSVETupleSetOrGet(const SVETypeFlags &TypeFlags,
                                     llvm::Type *ReturnType,
-                                    ArrayRef<llvm::Value *> Ops);
+                                    llvm::ArrayRef<llvm::Value *> Ops);
   llvm::Value *EmitSVETupleCreate(const SVETypeFlags &TypeFlags,
                                   llvm::Type *ReturnType,
-                                  ArrayRef<llvm::Value *> Ops);
+                                  llvm::ArrayRef<llvm::Value *> Ops);
   llvm::Value *EmitSVEAllTruePred(const SVETypeFlags &TypeFlags);
   llvm::Value *EmitSVEDupX(llvm::Value *Scalar);
   llvm::Value *EmitSVEDupX(llvm::Value *Scalar, llvm::Type *Ty);
@@ -4573,22 +4573,22 @@ public:
                                    llvm::SmallVectorImpl<llvm::Value *> &Ops,
                                    unsigned IntID);
   llvm::Value *EmitSVEMaskedLoad(const CallExpr *, llvm::Type *ReturnTy,
-                                 SmallVectorImpl<llvm::Value *> &Ops,
+                                 llvm::SmallVectorImpl<llvm::Value *> &Ops,
                                  unsigned BuiltinID, bool IsZExtReturn);
   llvm::Value *EmitSVEMaskedStore(const CallExpr *,
-                                  SmallVectorImpl<llvm::Value *> &Ops,
+                                  llvm::SmallVectorImpl<llvm::Value *> &Ops,
                                   unsigned BuiltinID);
   llvm::Value *EmitSVEPrefetchLoad(const SVETypeFlags &TypeFlags,
-                                   SmallVectorImpl<llvm::Value *> &Ops,
+                                   llvm::SmallVectorImpl<llvm::Value *> &Ops,
                                    unsigned BuiltinID);
   llvm::Value *EmitSVEGatherPrefetch(const SVETypeFlags &TypeFlags,
-                                     SmallVectorImpl<llvm::Value *> &Ops,
+                                     llvm::SmallVectorImpl<llvm::Value *> &Ops,
                                      unsigned IntID);
   llvm::Value *EmitSVEStructLoad(const SVETypeFlags &TypeFlags,
-                                 SmallVectorImpl<llvm::Value *> &Ops,
+                                 llvm::SmallVectorImpl<llvm::Value *> &Ops,
                                  unsigned IntID);
   llvm::Value *EmitSVEStructStore(const SVETypeFlags &TypeFlags,
-                                  SmallVectorImpl<llvm::Value *> &Ops,
+                                  llvm::SmallVectorImpl<llvm::Value *> &Ops,
                                   unsigned IntID);
   /// FormSVEBuiltinResult - Returns the struct of scalable vectors as a wider
   /// vector. It extracts the scalable vector from the struct and inserts into
@@ -4612,7 +4612,7 @@ public:
                              unsigned IntID);
 
   void GetAArch64SVEProcessedOperands(unsigned BuiltinID, const CallExpr *E,
-                                      SmallVectorImpl<llvm::Value *> &Ops,
+                                      llvm::SmallVectorImpl<llvm::Value *> &Ops,
                                       SVETypeFlags TypeFlags);
 
   llvm::Value *EmitAArch64SMEBuiltinExpr(unsigned BuiltinID, const CallExpr *E);
@@ -4621,7 +4621,7 @@ public:
                                       llvm::Triple::ArchType Arch);
   llvm::Value *EmitBPFBuiltinExpr(unsigned BuiltinID, const CallExpr *E);
 
-  llvm::Value *BuildVector(ArrayRef<llvm::Value*> Ops);
+  llvm::Value *BuildVector(llvm::ArrayRef<llvm::Value*> Ops);
   llvm::Value *EmitX86BuiltinExpr(unsigned BuiltinID, const CallExpr *E);
   llvm::Value *EmitPPCBuiltinExpr(unsigned BuiltinID, const CallExpr *E);
   llvm::Value *EmitAMDGPUBuiltinExpr(unsigned BuiltinID, const CallExpr *E);
@@ -4642,7 +4642,7 @@ public:
   enum class MSVCIntrin;
   llvm::Value *EmitMSVCBuiltinExpr(MSVCIntrin BuiltinID, const CallExpr *E);
 
-  llvm::Value *EmitBuiltinAvailable(const VersionTuple &Version);
+  llvm::Value *EmitBuiltinAvailable(const llvm::VersionTuple &Version);
 
   llvm::Value *EmitObjCProtocolExpr(const ObjCProtocolExpr *E);
   llvm::Value *EmitObjCStringLiteral(const ObjCStringLiteral *E);
@@ -4718,9 +4718,9 @@ public:
   llvm::Value *EmitARCRetainAutoreleaseScalarExpr(const Expr *expr);
   llvm::Value *EmitARCUnsafeUnretainedScalarExpr(const Expr *expr);
 
-  void EmitARCIntrinsicUse(ArrayRef<llvm::Value*> values);
+  void EmitARCIntrinsicUse(llvm::ArrayRef<llvm::Value*> values);
 
-  void EmitARCNoopIntrinsicUse(ArrayRef<llvm::Value *> values);
+  void EmitARCNoopIntrinsicUse(llvm::ArrayRef<llvm::Value *> values);
 
   static Destroyer destroyARCStrongImprecise;
   static Destroyer destroyARCStrongPrecise;
@@ -4859,14 +4859,14 @@ public:
   /// variables.
   void
   GenerateCXXGlobalInitFunc(llvm::Function *Fn,
-                            ArrayRef<llvm::Function *> CXXThreadLocals,
+                            llvm::ArrayRef<llvm::Function *> CXXThreadLocals,
                             ConstantAddress Guard = ConstantAddress::invalid());
 
   /// GenerateCXXGlobalCleanUpFunc - Generates code for cleaning up global
   /// variables.
   void GenerateCXXGlobalCleanUpFunc(
       llvm::Function *Fn,
-      ArrayRef<std::tuple<llvm::FunctionType *, llvm::WeakTrackingVH,
+      llvm::ArrayRef<std::tuple<llvm::FunctionType *, llvm::WeakTrackingVH,
                           llvm::Constant *>>
           DtorsOrStermFinalizers);
 
@@ -4890,7 +4890,7 @@ public:
   /// Emit an annotation call (intrinsic).
   llvm::Value *EmitAnnotationCall(llvm::Function *AnnotationFn,
                                   llvm::Value *AnnotatedVal,
-                                  StringRef AnnotationStr,
+                                  llvm::StringRef AnnotationStr,
                                   SourceLocation Location,
                                   const AnnotateAttr *Attr);
 
@@ -4973,16 +4973,16 @@ public:
   /// \p IsSubtraction indicates whether the expression used to form the GEP
   /// is a subtraction.
   llvm::Value *EmitCheckedInBoundsGEP(llvm::Type *ElemTy, llvm::Value *Ptr,
-                                      ArrayRef<llvm::Value *> IdxList,
+                                      llvm::ArrayRef<llvm::Value *> IdxList,
                                       bool SignedIndices,
                                       bool IsSubtraction,
                                       SourceLocation Loc,
-                                      const Twine &Name = "");
+                                      const llvm::Twine &Name = "");
 
-  Address EmitCheckedInBoundsGEP(Address Addr, ArrayRef<llvm::Value *> IdxList,
+  Address EmitCheckedInBoundsGEP(Address Addr, llvm::ArrayRef<llvm::Value *> IdxList,
                                  llvm::Type *elementType, bool SignedIndices,
                                  bool IsSubtraction, SourceLocation Loc,
-                                 CharUnits Align, const Twine &Name = "");
+                                 CharUnits Align, const llvm::Twine &Name = "");
 
   /// Specifies which type of sanitizer check to apply when handling a
   /// particular builtin.
@@ -5008,20 +5008,20 @@ public:
   llvm::Constant *EmitCheckSourceLocation(SourceLocation Loc);
 
   void EmitKCFIOperandBundle(const CGCallee &Callee,
-                             SmallVectorImpl<llvm::OperandBundleDef> &Bundles);
+                             llvm::SmallVectorImpl<llvm::OperandBundleDef> &Bundles);
 
   /// Create a basic block that will either trap or call a handler function in
   /// the UBSan runtime with the provided arguments, and create a conditional
   /// branch to it.
-  void EmitCheck(ArrayRef<std::pair<llvm::Value *, SanitizerMask>> Checked,
-                 SanitizerHandler Check, ArrayRef<llvm::Constant *> StaticArgs,
-                 ArrayRef<llvm::Value *> DynamicArgs);
+  void EmitCheck(llvm::ArrayRef<std::pair<llvm::Value *, SanitizerMask>> Checked,
+                 SanitizerHandler Check, llvm::ArrayRef<llvm::Constant *> StaticArgs,
+                 llvm::ArrayRef<llvm::Value *> DynamicArgs);
 
   /// Emit a slow path cross-DSO CFI check which calls __cfi_slowpath
   /// if Cond if false.
   void EmitCfiSlowPathCheck(SanitizerMask Kind, llvm::Value *Cond,
                             llvm::ConstantInt *TypeId, llvm::Value *Ptr,
-                            ArrayRef<llvm::Constant *> StaticArgs);
+                            llvm::ArrayRef<llvm::Constant *> StaticArgs);
 
   /// Emit a reached-unreachable diagnostic if \p Loc is valid and runtime
   /// checking is enabled. Otherwise, just emit an unreachable instruction.
@@ -5128,7 +5128,7 @@ private:
   /// Ty, into individual arguments on the provided vector \arg IRCallArgs,
   /// starting at index \arg IRCallArgPos. See ABIArgInfo::Expand.
   void ExpandTypeToArgs(QualType Ty, CallArg Arg, llvm::FunctionType *IRFuncTy,
-                        SmallVectorImpl<llvm::Value *> &IRCallArgs,
+                        llvm::SmallVectorImpl<llvm::Value *> &IRCallArgs,
                         unsigned &IRCallArgPos);
 
   std::pair<llvm::Value *, llvm::Type *>
@@ -5221,15 +5221,15 @@ public:
   struct MultiVersionResolverOption {
     llvm::Function *Function;
     struct Conds {
-      StringRef Architecture;
-      llvm::SmallVector<StringRef, 8> Features;
+      llvm::StringRef Architecture;
+      llvm::SmallVector<llvm::StringRef, 8> Features;
 
-      Conds(StringRef Arch, ArrayRef<StringRef> Feats)
+      Conds(llvm::StringRef Arch, llvm::ArrayRef<llvm::StringRef> Feats)
           : Architecture(Arch), Features(Feats.begin(), Feats.end()) {}
     } Conditions;
 
-    MultiVersionResolverOption(llvm::Function *F, StringRef Arch,
-                               ArrayRef<StringRef> Feats)
+    MultiVersionResolverOption(llvm::Function *F, llvm::StringRef Arch,
+                               llvm::ArrayRef<llvm::StringRef> Feats)
         : Function(F), Conditions(Arch, Feats) {}
   };
 
@@ -5237,13 +5237,13 @@ public:
   // options are already sorted in the proper order, with the 'default' option
   // last (if it exists).
   void EmitMultiVersionResolver(llvm::Function *Resolver,
-                                ArrayRef<MultiVersionResolverOption> Options);
+                                llvm::ArrayRef<MultiVersionResolverOption> Options);
   void
   EmitX86MultiVersionResolver(llvm::Function *Resolver,
-                              ArrayRef<MultiVersionResolverOption> Options);
+                              llvm::ArrayRef<MultiVersionResolverOption> Options);
   void
   EmitAArch64MultiVersionResolver(llvm::Function *Resolver,
-                                  ArrayRef<MultiVersionResolverOption> Options);
+                                  llvm::ArrayRef<MultiVersionResolverOption> Options);
 
 private:
   QualType getVarArgType(const Expr *Arg);
@@ -5257,9 +5257,9 @@ private:
 
   llvm::Value *GetValueForARMHint(unsigned BuiltinID);
   llvm::Value *EmitX86CpuIs(const CallExpr *E);
-  llvm::Value *EmitX86CpuIs(StringRef CPUStr);
+  llvm::Value *EmitX86CpuIs(llvm::StringRef CPUStr);
   llvm::Value *EmitX86CpuSupports(const CallExpr *E);
-  llvm::Value *EmitX86CpuSupports(ArrayRef<StringRef> FeatureStrs);
+  llvm::Value *EmitX86CpuSupports(llvm::ArrayRef<llvm::StringRef> FeatureStrs);
   llvm::Value *EmitX86CpuSupports(std::array<uint32_t, 4> FeatureMask);
   llvm::Value *EmitX86CpuInit();
   llvm::Value *FormX86ResolverCondition(const MultiVersionResolverOption &RO);
@@ -5267,7 +5267,7 @@ private:
   llvm::Value *
   FormAArch64ResolverCondition(const MultiVersionResolverOption &RO);
   llvm::Value *EmitAArch64CpuSupports(const CallExpr *E);
-  llvm::Value *EmitAArch64CpuSupports(ArrayRef<StringRef> FeatureStrs);
+  llvm::Value *EmitAArch64CpuSupports(llvm::ArrayRef<llvm::StringRef> FeatureStrs);
 };
 
 inline DominatingLLVMValue::saved_type

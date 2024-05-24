@@ -503,7 +503,7 @@ struct CanProxyAdaptor<FunctionProtoType>
   LLVM_CLANG_CANPROXY_SIMPLE_ACCESSOR(unsigned, getNumParams)
   LLVM_CLANG_CANPROXY_SIMPLE_ACCESSOR(bool, hasExtParameterInfos)
   LLVM_CLANG_CANPROXY_SIMPLE_ACCESSOR(
-            ArrayRef<FunctionProtoType::ExtParameterInfo>, getExtParameterInfos)
+            llvm::ArrayRef<FunctionProtoType::ExtParameterInfo>, getExtParameterInfos)
 
   CanQualType getParamType(unsigned i) const {
     return CanQualType::CreateUnsafe(this->getTypePtr()->getParamType(i));

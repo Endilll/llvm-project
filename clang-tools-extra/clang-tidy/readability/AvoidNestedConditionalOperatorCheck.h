@@ -19,7 +19,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/avoid-nested-conditional-operator.html
 class AvoidNestedConditionalOperatorCheck : public ClangTidyCheck {
 public:
-  AvoidNestedConditionalOperatorCheck(StringRef Name, ClangTidyContext *Context)
+  AvoidNestedConditionalOperatorCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

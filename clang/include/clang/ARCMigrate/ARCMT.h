@@ -42,7 +42,7 @@ checkForManualIssues(CompilerInvocation &CI, const FrontendInputFile &Input,
                      std::shared_ptr<PCHContainerOperations> PCHContainerOps,
                      DiagnosticConsumer *DiagClient,
                      bool emitPremigrationARCErrors = false,
-                     StringRef plistOut = StringRef());
+                     llvm::StringRef plistOut = llvm::StringRef());
 
 /// Works similar to checkForManualIssues but instead of checking, it
 /// applies automatic modifications to source files to conform to ARC.
@@ -68,15 +68,15 @@ applyTransformations(CompilerInvocation &origCI,
 bool migrateWithTemporaryFiles(
     CompilerInvocation &origCI, const FrontendInputFile &Input,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-    DiagnosticConsumer *DiagClient, StringRef outputDir,
-    bool emitPremigrationARCErrors, StringRef plistOut);
+    DiagnosticConsumer *DiagClient, llvm::StringRef outputDir,
+    bool emitPremigrationARCErrors, llvm::StringRef plistOut);
 
 /// Get the set of file remappings from the \p outputDir path that
 /// migrateWithTemporaryFiles produced.
 ///
 /// \returns false if no error is produced, true otherwise.
 bool getFileRemappings(std::vector<std::pair<std::string,std::string> > &remap,
-                       StringRef outputDir,
+                       llvm::StringRef outputDir,
                        DiagnosticConsumer *DiagClient);
 
 /// Get the set of file remappings from a list of files with remapping
@@ -85,7 +85,7 @@ bool getFileRemappings(std::vector<std::pair<std::string,std::string> > &remap,
 /// \returns false if no error is produced, true otherwise.
 bool getFileRemappingsFromFileList(
                         std::vector<std::pair<std::string,std::string> > &remap,
-                        ArrayRef<StringRef> remapFiles,
+                        llvm::ArrayRef<llvm::StringRef> remapFiles,
                         DiagnosticConsumer *DiagClient);
 
 typedef void (*TransformFn)(MigrationPass &pass);
@@ -105,7 +105,7 @@ public:
   MigrationProcess(CompilerInvocation &CI,
                    std::shared_ptr<PCHContainerOperations> PCHContainerOps,
                    DiagnosticConsumer *diagClient,
-                   StringRef outputDir = StringRef());
+                   llvm::StringRef outputDir = llvm::StringRef());
 
   class RewriteListener {
   public:
@@ -114,7 +114,7 @@ public:
     virtual void start(ASTContext &Ctx) { }
     virtual void finish() { }
 
-    virtual void insert(SourceLocation loc, StringRef text) { }
+    virtual void insert(SourceLocation loc, llvm::StringRef text) { }
     virtual void remove(CharSourceRange range) { }
   };
 

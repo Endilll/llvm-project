@@ -130,7 +130,7 @@ namespace clang {
       return Record.readString();
     }
 
-    void readDeclIDList(SmallVectorImpl<GlobalDeclID> &IDs) {
+    void readDeclIDList(llvm::SmallVectorImpl<GlobalDeclID> &IDs) {
       for (unsigned I = 0, Size = Record.readInt(); I != Size; ++I)
         IDs.push_back(readDeclID());
     }
@@ -263,7 +263,7 @@ namespace clang {
 
     template <typename T>
     static void AddLazySpecializations(T *D,
-                                       SmallVectorImpl<GlobalDeclID> &IDs) {
+                                       llvm::SmallVectorImpl<GlobalDeclID> &IDs) {
       if (IDs.empty())
         return;
 
@@ -314,7 +314,7 @@ namespace clang {
     void ReadFunctionDefinition(FunctionDecl *FD);
     void Visit(Decl *D);
 
-    void UpdateDecl(Decl *D, SmallVectorImpl<GlobalDeclID> &);
+    void UpdateDecl(Decl *D, llvm::SmallVectorImpl<GlobalDeclID> &);
 
     static void setNextObjCCategory(ObjCCategoryDecl *Cat,
                                     ObjCCategoryDecl *Next) {
@@ -959,7 +959,7 @@ void ASTDeclReader::VisitFunctionDecl(FunctionDecl *FD) {
     auto TSK = (TemplateSpecializationKind)Record.readInt();
 
     // Template arguments.
-    SmallVector<TemplateArgument, 8> TemplArgs;
+    llvm::SmallVector<TemplateArgument, 8> TemplArgs;
     Record.readTemplateArgumentList(TemplArgs, /*Canonicalize*/ true);
 
     // Template args as written.
@@ -1110,7 +1110,7 @@ void ASTDeclReader::VisitFunctionDecl(FunctionDecl *FD) {
           HasMessage ? cast<StringLiteral>(Record.readExpr()) : nullptr;
 
       unsigned NumLookups = Record.readInt();
-      SmallVector<DeclAccessPair, 8> Lookups;
+      llvm::SmallVector<DeclAccessPair, 8> Lookups;
       for (unsigned I = 0; I != NumLookups; ++I) {
         NamedDecl *ND = Record.readDeclAs<NamedDecl>();
         AccessSpecifier AS = (AccessSpecifier)Record.readInt();
@@ -1152,7 +1152,7 @@ void ASTDeclReader::VisitFunctionDecl(FunctionDecl *FD) {
 
   // Read in the parameters.
   unsigned NumParams = Record.readInt();
-  SmallVector<ParmVarDecl *, 16> Params;
+  llvm::SmallVector<ParmVarDecl *, 16> Params;
   Params.reserve(NumParams);
   for (unsigned I = 0; I != NumParams; ++I)
     Params.push_back(readDeclAs<ParmVarDecl>());
@@ -1190,14 +1190,14 @@ void ASTDeclReader::VisitObjCMethodDecl(ObjCMethodDecl *MD) {
   MD->setReturnTypeSourceInfo(readTypeSourceInfo());
   MD->DeclEndLoc = readSourceLocation();
   unsigned NumParams = Record.readInt();
-  SmallVector<ParmVarDecl *, 16> Params;
+  llvm::SmallVector<ParmVarDecl *, 16> Params;
   Params.reserve(NumParams);
   for (unsigned I = 0; I != NumParams; ++I)
     Params.push_back(readDeclAs<ParmVarDecl>());
 
   MD->setSelLocsKind((SelectorLocationsKind)Record.readInt());
   unsigned NumStoredSelLocs = Record.readInt();
-  SmallVector<SourceLocation, 16> SelLocs;
+  llvm::SmallVector<SourceLocation, 16> SelLocs;
   SelLocs.reserve(NumStoredSelLocs);
   for (unsigned i = 0; i != NumStoredSelLocs; ++i)
     SelLocs.push_back(readSourceLocation());
@@ -1225,7 +1225,7 @@ ObjCTypeParamList *ASTDeclReader::ReadObjCTypeParamList() {
   if (numParams == 0)
     return nullptr;
 
-  SmallVector<ObjCTypeParamDecl *, 4> typeParams;
+  llvm::SmallVector<ObjCTypeParamDecl *, 4> typeParams;
   typeParams.reserve(numParams);
   for (unsigned i = 0; i != numParams; ++i) {
     auto *typeParam = readDeclAs<ObjCTypeParamDecl>();
@@ -1254,11 +1254,11 @@ void ASTDeclReader::ReadObjCDefinitionData(
 
   // Read the directly referenced protocols and their SourceLocations.
   unsigned NumProtocols = Record.readInt();
-  SmallVector<ObjCProtocolDecl *, 16> Protocols;
+  llvm::SmallVector<ObjCProtocolDecl *, 16> Protocols;
   Protocols.reserve(NumProtocols);
   for (unsigned I = 0; I != NumProtocols; ++I)
     Protocols.push_back(readDeclAs<ObjCProtocolDecl>());
-  SmallVector<SourceLocation, 16> ProtoLocs;
+  llvm::SmallVector<SourceLocation, 16> ProtoLocs;
   ProtoLocs.reserve(NumProtocols);
   for (unsigned I = 0; I != NumProtocols; ++I)
     ProtoLocs.push_back(readSourceLocation());
@@ -1372,11 +1372,11 @@ void ASTDeclReader::VisitObjCIvarDecl(ObjCIvarDecl *IVD) {
 void ASTDeclReader::ReadObjCDefinitionData(
          struct ObjCProtocolDecl::DefinitionData &Data) {
     unsigned NumProtoRefs = Record.readInt();
-    SmallVector<ObjCProtocolDecl *, 16> ProtoRefs;
+    llvm::SmallVector<ObjCProtocolDecl *, 16> ProtoRefs;
     ProtoRefs.reserve(NumProtoRefs);
     for (unsigned I = 0; I != NumProtoRefs; ++I)
       ProtoRefs.push_back(readDeclAs<ObjCProtocolDecl>());
-    SmallVector<SourceLocation, 16> ProtoLocs;
+    llvm::SmallVector<SourceLocation, 16> ProtoLocs;
     ProtoLocs.reserve(NumProtoRefs);
     for (unsigned I = 0; I != NumProtoRefs; ++I)
       ProtoLocs.push_back(readSourceLocation());
@@ -1448,11 +1448,11 @@ void ASTDeclReader::VisitObjCCategoryDecl(ObjCCategoryDecl *CD) {
   CD->ClassInterface = readDeclAs<ObjCInterfaceDecl>();
   CD->TypeParamList = ReadObjCTypeParamList();
   unsigned NumProtoRefs = Record.readInt();
-  SmallVector<ObjCProtocolDecl *, 16> ProtoRefs;
+  llvm::SmallVector<ObjCProtocolDecl *, 16> ProtoRefs;
   ProtoRefs.reserve(NumProtoRefs);
   for (unsigned I = 0; I != NumProtoRefs; ++I)
     ProtoRefs.push_back(readDeclAs<ObjCProtocolDecl>());
-  SmallVector<SourceLocation, 16> ProtoLocs;
+  llvm::SmallVector<SourceLocation, 16> ProtoLocs;
   ProtoLocs.reserve(NumProtoRefs);
   for (unsigned I = 0; I != NumProtoRefs; ++I)
     ProtoLocs.push_back(readSourceLocation());
@@ -1773,7 +1773,7 @@ void ASTDeclReader::VisitBlockDecl(BlockDecl *BD) {
   BD->setBody(cast_or_null<CompoundStmt>(Record.readStmt()));
   BD->setSignatureAsWritten(readTypeSourceInfo());
   unsigned NumParams = Record.readInt();
-  SmallVector<ParmVarDecl *, 16> Params;
+  llvm::SmallVector<ParmVarDecl *, 16> Params;
   Params.reserve(NumParams);
   for (unsigned I = 0; I != NumParams; ++I)
     Params.push_back(readDeclAs<ParmVarDecl>());
@@ -1787,7 +1787,7 @@ void ASTDeclReader::VisitBlockDecl(BlockDecl *BD) {
 
   bool capturesCXXThis = Record.readInt();
   unsigned numCaptures = Record.readInt();
-  SmallVector<BlockDecl::Capture, 16> captures;
+  llvm::SmallVector<BlockDecl::Capture, 16> captures;
   captures.reserve(numCaptures);
   for (unsigned i = 0; i != numCaptures; ++i) {
     auto *decl = readDeclAs<VarDecl>();
@@ -2454,7 +2454,7 @@ void ASTDeclReader::VisitClassTemplateDecl(ClassTemplateDecl *D) {
   if (ThisDeclID == Redecl.getFirstID()) {
     // This ClassTemplateDecl owns a CommonPtr; read it to keep track of all of
     // the specializations.
-    SmallVector<GlobalDeclID, 32> SpecIDs;
+    llvm::SmallVector<GlobalDeclID, 32> SpecIDs;
     readDeclIDList(SpecIDs);
     ASTDeclReader::AddLazySpecializations(D, SpecIDs);
   }
@@ -2482,7 +2482,7 @@ void ASTDeclReader::VisitVarTemplateDecl(VarTemplateDecl *D) {
   if (ThisDeclID == Redecl.getFirstID()) {
     // This VarTemplateDecl owns a CommonPtr; read it to keep track of all of
     // the specializations.
-    SmallVector<GlobalDeclID, 32> SpecIDs;
+    llvm::SmallVector<GlobalDeclID, 32> SpecIDs;
     readDeclIDList(SpecIDs);
     ASTDeclReader::AddLazySpecializations(D, SpecIDs);
   }
@@ -2498,7 +2498,7 @@ ASTDeclReader::VisitClassTemplateSpecializationDeclImpl(
     if (auto *CTD = dyn_cast<ClassTemplateDecl>(InstD)) {
       D->SpecializedTemplate = CTD;
     } else {
-      SmallVector<TemplateArgument, 8> TemplArgs;
+      llvm::SmallVector<TemplateArgument, 8> TemplArgs;
       Record.readTemplateArgumentList(TemplArgs);
       TemplateArgumentList *ArgList
         = TemplateArgumentList::CreateCopy(C, TemplArgs);
@@ -2512,7 +2512,7 @@ ASTDeclReader::VisitClassTemplateSpecializationDeclImpl(
     }
   }
 
-  SmallVector<TemplateArgument, 8> TemplArgs;
+  llvm::SmallVector<TemplateArgument, 8> TemplArgs;
   Record.readTemplateArgumentList(TemplArgs, /*Canonicalize*/ true);
   D->TemplateArgs = TemplateArgumentList::CreateCopy(C, TemplArgs);
   D->PointOfInstantiation = readSourceLocation();
@@ -2584,7 +2584,7 @@ void ASTDeclReader::VisitFunctionTemplateDecl(FunctionTemplateDecl *D) {
 
   if (ThisDeclID == Redecl.getFirstID()) {
     // This FunctionTemplateDecl owns a CommonPtr; read it.
-    SmallVector<GlobalDeclID, 32> SpecIDs;
+    llvm::SmallVector<GlobalDeclID, 32> SpecIDs;
     readDeclIDList(SpecIDs);
     ASTDeclReader::AddLazySpecializations(D, SpecIDs);
   }
@@ -2603,7 +2603,7 @@ ASTDeclReader::VisitVarTemplateSpecializationDeclImpl(
     if (auto *VTD = dyn_cast<VarTemplateDecl>(InstD)) {
       D->SpecializedTemplate = VTD;
     } else {
-      SmallVector<TemplateArgument, 8> TemplArgs;
+      llvm::SmallVector<TemplateArgument, 8> TemplArgs;
       Record.readTemplateArgumentList(TemplArgs);
       TemplateArgumentList *ArgList = TemplateArgumentList::CreateCopy(
           C, TemplArgs);
@@ -2628,7 +2628,7 @@ ASTDeclReader::VisitVarTemplateSpecializationDeclImpl(
   if (Record.readBool())
     D->setTemplateArgsAsWritten(Record.readASTTemplateArgumentListInfo());
 
-  SmallVector<TemplateArgument, 8> TemplArgs;
+  llvm::SmallVector<TemplateArgument, 8> TemplArgs;
   Record.readTemplateArgumentList(TemplArgs, /*Canonicalize*/ true);
   D->TemplateArgs = TemplateArgumentList::CreateCopy(C, TemplArgs);
   D->PointOfInstantiation = readSourceLocation();
@@ -3133,7 +3133,7 @@ public:
     return Reader.readIdentifier();
   }
 
-  VersionTuple readVersionTuple() {
+  llvm::VersionTuple readVersionTuple() {
     return Reader.readVersionTuple();
   }
 
@@ -3805,7 +3805,7 @@ Decl *ASTReader::ReadDeclRecord(GlobalDeclID ID) {
   Deserializing ADecl(this);
 
   auto Fail = [](const char *what, llvm::Error &&Err) {
-    llvm::report_fatal_error(Twine("ASTReader::readDeclRecord failed ") + what +
+    llvm::report_fatal_error(llvm::Twine("ASTReader::readDeclRecord failed ") + what +
                              ": " + toString(std::move(Err)));
   };
 
@@ -3813,17 +3813,17 @@ Decl *ASTReader::ReadDeclRecord(GlobalDeclID ID) {
     Fail("jumping", std::move(JumpFailed));
   ASTRecordReader Record(*this, *Loc.F);
   ASTDeclReader Reader(*this, Record, Loc, ID, DeclLoc);
-  Expected<unsigned> MaybeCode = DeclsCursor.ReadCode();
+  llvm::Expected<unsigned> MaybeCode = DeclsCursor.ReadCode();
   if (!MaybeCode)
     Fail("reading code", MaybeCode.takeError());
   unsigned Code = MaybeCode.get();
 
   ASTContext &Context = getContext();
   Decl *D = nullptr;
-  Expected<unsigned> MaybeDeclCode = Record.readRecord(DeclsCursor, Code);
+  llvm::Expected<unsigned> MaybeDeclCode = Record.readRecord(DeclsCursor, Code);
   if (!MaybeDeclCode)
     llvm::report_fatal_error(
-        Twine("ASTReader::readDeclRecord failed reading decl code: ") +
+        llvm::Twine("ASTReader::readDeclRecord failed reading decl code: ") +
         toString(MaybeDeclCode.takeError()));
 
   switch ((DeclCode)MaybeDeclCode.get()) {
@@ -4180,7 +4180,7 @@ void ASTReader::PassInterestingDeclsToConsumer() {
 
   // Guard variable to avoid recursively redoing the process of passing
   // decls to consumer.
-  SaveAndRestore GuardPassingDeclsToConsumer(PassingDeclsToConsumer, true);
+  llvm::SaveAndRestore GuardPassingDeclsToConsumer(PassingDeclsToConsumer, true);
 
   // Ensure that we've loaded all potentially-interesting declarations
   // that need to be eagerly loaded.
@@ -4228,7 +4228,7 @@ void ASTReader::loadDeclUpdateRecords(PendingUpdateRecord &Record) {
   ProcessingUpdatesRAIIObj ProcessingUpdates(*this);
   DeclUpdateOffsetsMap::iterator UpdI = DeclUpdateOffsets.find(ID);
 
-  SmallVector<GlobalDeclID, 8> PendingLazySpecializationIDs;
+  llvm::SmallVector<GlobalDeclID, 8> PendingLazySpecializationIDs;
 
   if (UpdI != DeclUpdateOffsets.end()) {
     auto UpdateOffsets = std::move(UpdI->second);
@@ -4247,21 +4247,21 @@ void ASTReader::loadDeclUpdateRecords(PendingUpdateRecord &Record) {
       if (llvm::Error JumpFailed = Cursor.JumpToBit(Offset))
         // FIXME don't do a fatal error.
         llvm::report_fatal_error(
-            Twine("ASTReader::loadDeclUpdateRecords failed jumping: ") +
+            llvm::Twine("ASTReader::loadDeclUpdateRecords failed jumping: ") +
             toString(std::move(JumpFailed)));
-      Expected<unsigned> MaybeCode = Cursor.ReadCode();
+      llvm::Expected<unsigned> MaybeCode = Cursor.ReadCode();
       if (!MaybeCode)
         llvm::report_fatal_error(
-            Twine("ASTReader::loadDeclUpdateRecords failed reading code: ") +
+            llvm::Twine("ASTReader::loadDeclUpdateRecords failed reading code: ") +
             toString(MaybeCode.takeError()));
       unsigned Code = MaybeCode.get();
       ASTRecordReader Record(*this, *F);
-      if (Expected<unsigned> MaybeRecCode = Record.readRecord(Cursor, Code))
+      if (llvm::Expected<unsigned> MaybeRecCode = Record.readRecord(Cursor, Code))
         assert(MaybeRecCode.get() == DECL_UPDATES &&
                "Expected DECL_UPDATES record!");
       else
         llvm::report_fatal_error(
-            Twine("ASTReader::loadDeclUpdateRecords failed reading rec code: ") +
+            llvm::Twine("ASTReader::loadDeclUpdateRecords failed reading rec code: ") +
             toString(MaybeCode.takeError()));
 
       ASTDeclReader Reader(*this, Record, RecordLocation(F, Offset), ID,
@@ -4326,22 +4326,22 @@ void ASTReader::loadPendingDeclChain(Decl *FirstLocal, uint64_t LocalOffset) {
   SavedStreamPosition SavedPosition(Cursor);
   if (llvm::Error JumpFailed = Cursor.JumpToBit(LocalOffset))
     llvm::report_fatal_error(
-        Twine("ASTReader::loadPendingDeclChain failed jumping: ") +
+        llvm::Twine("ASTReader::loadPendingDeclChain failed jumping: ") +
         toString(std::move(JumpFailed)));
 
   RecordData Record;
-  Expected<unsigned> MaybeCode = Cursor.ReadCode();
+  llvm::Expected<unsigned> MaybeCode = Cursor.ReadCode();
   if (!MaybeCode)
     llvm::report_fatal_error(
-        Twine("ASTReader::loadPendingDeclChain failed reading code: ") +
+        llvm::Twine("ASTReader::loadPendingDeclChain failed reading code: ") +
         toString(MaybeCode.takeError()));
   unsigned Code = MaybeCode.get();
-  if (Expected<unsigned> MaybeRecCode = Cursor.readRecord(Code, Record))
+  if (llvm::Expected<unsigned> MaybeRecCode = Cursor.readRecord(Code, Record))
     assert(MaybeRecCode.get() == LOCAL_REDECLARATIONS &&
            "expected LOCAL_REDECLARATIONS record!");
   else
     llvm::report_fatal_error(
-        Twine("ASTReader::loadPendingDeclChain failed reading rec code: ") +
+        llvm::Twine("ASTReader::loadPendingDeclChain failed reading rec code: ") +
         toString(MaybeCode.takeError()));
 
   // FIXME: We have several different dispatches on decl kind here; maybe
@@ -4640,7 +4640,7 @@ void ASTDeclReader::UpdateDecl(
         if (Record.readInt()) {
           auto *PartialSpec =
               readDeclAs<ClassTemplatePartialSpecializationDecl>();
-          SmallVector<TemplateArgument, 8> TemplArgs;
+          llvm::SmallVector<TemplateArgument, 8> TemplArgs;
           Record.readTemplateArgumentList(TemplArgs);
           auto *TemplArgList = TemplateArgumentList::CreateCopy(
               Reader.getContext(), TemplArgs);
@@ -4684,7 +4684,7 @@ void ASTDeclReader::UpdateDecl(
     }
 
     case UPD_CXX_RESOLVED_EXCEPTION_SPEC: {
-      SmallVector<QualType, 8> ExceptionStorage;
+      llvm::SmallVector<QualType, 8> ExceptionStorage;
       auto ESI = Record.readExceptionSpecInfo(ExceptionStorage);
 
       // Update this declaration's exception specification, if needed.

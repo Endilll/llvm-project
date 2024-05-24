@@ -36,7 +36,7 @@ class CachedGlobList;
 ///
 /// FIXME: Make Diagnostics flexible enough to support this directly.
 struct ClangTidyError : tooling::Diagnostic {
-  ClangTidyError(StringRef CheckName, Level DiagLevel, StringRef BuildDirectory,
+  ClangTidyError(llvm::StringRef CheckName, Level DiagLevel, llvm::StringRef BuildDirectory,
                  bool IsWarningAsError);
 
   bool IsWarningAsError;
@@ -86,18 +86,18 @@ public:
   /// This is still under heavy development and will likely change towards using
   /// tablegen'd diagnostic IDs.
   /// FIXME: Figure out a way to manage ID spaces.
-  DiagnosticBuilder diag(StringRef CheckName, SourceLocation Loc,
-                         StringRef Description,
+  DiagnosticBuilder diag(llvm::StringRef CheckName, SourceLocation Loc,
+                         llvm::StringRef Description,
                          DiagnosticIDs::Level Level = DiagnosticIDs::Warning);
 
-  DiagnosticBuilder diag(StringRef CheckName, StringRef Description,
+  DiagnosticBuilder diag(llvm::StringRef CheckName, llvm::StringRef Description,
                          DiagnosticIDs::Level Level = DiagnosticIDs::Warning);
 
   DiagnosticBuilder diag(const tooling::Diagnostic &Error);
 
   /// Report any errors to do with reading the configuration using this method.
   DiagnosticBuilder
-  configurationDiag(StringRef Message,
+  configurationDiag(llvm::StringRef Message,
                     DiagnosticIDs::Level Level = DiagnosticIDs::Warning);
 
   /// Check whether a given diagnostic should be suppressed due to the presence
@@ -117,7 +117,7 @@ public:
   bool
   shouldSuppressDiagnostic(DiagnosticsEngine::Level DiagLevel,
                            const Diagnostic &Info,
-                           SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
+                           llvm::SmallVectorImpl<tooling::Diagnostic> &NoLintErrors,
                            bool AllowIO = true, bool EnableNoLintBlocks = true);
 
   /// Sets the \c SourceManager of the used \c DiagnosticsEngine.
@@ -126,10 +126,10 @@ public:
   void setSourceManager(SourceManager *SourceMgr);
 
   /// Should be called when starting to process new translation unit.
-  void setCurrentFile(StringRef File);
+  void setCurrentFile(llvm::StringRef File);
 
   /// Returns the main file name of the current translation unit.
-  StringRef getCurrentFile() const { return CurrentFile; }
+  llvm::StringRef getCurrentFile() const { return CurrentFile; }
 
   /// Sets ASTContext for the current translation unit.
   void setASTContext(ASTContext *Context);
@@ -144,11 +144,11 @@ public:
   /// Returns \c true if the check is enabled for the \c CurrentFile.
   ///
   /// The \c CurrentFile can be changed using \c setCurrentFile.
-  bool isCheckEnabled(StringRef CheckName) const;
+  bool isCheckEnabled(llvm::StringRef CheckName) const;
 
   /// Returns \c true if the check should be upgraded to error for the
   /// \c CurrentFile.
-  bool treatAsError(StringRef CheckName) const;
+  bool treatAsError(llvm::StringRef CheckName) const;
 
   /// Returns global options.
   const ClangTidyGlobalOptions &getGlobalOptions() const;
@@ -160,7 +160,7 @@ public:
 
   /// Returns options for \c File. Does not change or depend on
   /// \c CurrentFile.
-  ClangTidyOptions getOptionsForFile(StringRef File) const;
+  ClangTidyOptions getOptionsForFile(llvm::StringRef File) const;
 
   const FileExtensionsSet &getHeaderFileExtensions() const {
     return HeaderFileExtensions;
@@ -179,12 +179,12 @@ public:
   bool getEnableProfiling() const { return Profile; }
 
   /// Control storage of profile date.
-  void setProfileStoragePrefix(StringRef ProfilePrefix);
+  void setProfileStoragePrefix(llvm::StringRef ProfilePrefix);
   std::optional<ClangTidyProfiling::StorageParams>
   getProfileStorageParams() const;
 
   /// Should be called when starting to process new translation unit.
-  void setCurrentBuildDirectory(StringRef BuildDirectory) {
+  void setCurrentBuildDirectory(llvm::StringRef BuildDirectory) {
     CurrentBuildDirectory = std::string(BuildDirectory);
   }
 
@@ -302,7 +302,7 @@ private:
   /// Updates \c LastErrorRelatesToUserCode and LastErrorPassesLineFilter
   /// according to the diagnostic \p Location.
   void checkFilters(SourceLocation Location, const SourceManager &Sources);
-  bool passesLineFilter(StringRef FileName, unsigned LineNumber) const;
+  bool passesLineFilter(llvm::StringRef FileName, unsigned LineNumber) const;
 
   void forwardDiagnostic(const Diagnostic &Info);
 

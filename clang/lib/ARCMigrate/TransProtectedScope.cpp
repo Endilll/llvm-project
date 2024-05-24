@@ -24,10 +24,10 @@ using namespace trans;
 namespace {
 
 class LocalRefsCollector : public RecursiveASTVisitor<LocalRefsCollector> {
-  SmallVectorImpl<DeclRefExpr *> &Refs;
+  llvm::SmallVectorImpl<DeclRefExpr *> &Refs;
 
 public:
-  LocalRefsCollector(SmallVectorImpl<DeclRefExpr *> &refs)
+  LocalRefsCollector(llvm::SmallVectorImpl<DeclRefExpr *> &refs)
     : Refs(refs) { }
 
   bool VisitDeclRefExpr(DeclRefExpr *E) {
@@ -54,10 +54,10 @@ struct CaseInfo {
 
 class CaseCollector : public RecursiveASTVisitor<CaseCollector> {
   ParentMap &PMap;
-  SmallVectorImpl<CaseInfo> &Cases;
+  llvm::SmallVectorImpl<CaseInfo> &Cases;
 
 public:
-  CaseCollector(ParentMap &PMap, SmallVectorImpl<CaseInfo> &Cases)
+  CaseCollector(ParentMap &PMap, llvm::SmallVectorImpl<CaseInfo> &Cases)
     : PMap(PMap), Cases(Cases) { }
 
   bool VisitSwitchStmt(SwitchStmt *S) {
@@ -96,8 +96,8 @@ public:
 class ProtectedScopeFixer {
   MigrationPass &Pass;
   SourceManager &SM;
-  SmallVector<CaseInfo, 16> Cases;
-  SmallVector<DeclRefExpr *, 16> LocalRefs;
+  llvm::SmallVector<CaseInfo, 16> Cases;
+  llvm::SmallVector<DeclRefExpr *, 16> LocalRefs;
 
 public:
   ProtectedScopeFixer(BodyContext &BodyCtx)
@@ -112,9 +112,9 @@ public:
     const CapturedDiagList &DiagList = Pass.getDiags();
     // Copy the diagnostics so we don't have to worry about invaliding iterators
     // from the diagnostic list.
-    SmallVector<StoredDiagnostic, 16> StoredDiags;
+    llvm::SmallVector<StoredDiagnostic, 16> StoredDiags;
     StoredDiags.append(DiagList.begin(), DiagList.end());
-    SmallVectorImpl<StoredDiagnostic>::iterator
+    llvm::SmallVectorImpl<StoredDiagnostic>::iterator
         I = StoredDiags.begin(), E = StoredDiags.end();
     while (I != E) {
       if (I->getID() == diag::err_switch_into_protected_scope &&
@@ -127,8 +127,8 @@ public:
   }
 
   void handleProtectedScopeError(
-                             SmallVectorImpl<StoredDiagnostic>::iterator &DiagI,
-                             SmallVectorImpl<StoredDiagnostic>::iterator DiagE){
+                             llvm::SmallVectorImpl<StoredDiagnostic>::iterator &DiagI,
+                             llvm::SmallVectorImpl<StoredDiagnostic>::iterator DiagE){
     Transaction Trans(Pass.TA);
     assert(DiagI->getID() == diag::err_switch_into_protected_scope);
     SourceLocation ErrLoc = DiagI->getLocation();

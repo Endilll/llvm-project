@@ -77,24 +77,24 @@ public:
   /// Get the path of the clang resource files.
   const std::string &getClangResourcesPath();
 
-  StringRef getClangToolchainPath();
+  llvm::StringRef getClangToolchainPath();
 
   void setStorePreamblesInMemory(bool StoreInMemory) {
     StorePreamblesInMemory = StoreInMemory;
   }
   bool getStorePreamblesInMemory() const { return StorePreamblesInMemory; }
 
-  void setPreambleStoragePath(StringRef Str) {
+  void setPreambleStoragePath(llvm::StringRef Str) {
     PreambleStoragePath = Str.str();
   }
 
-  StringRef getPreambleStoragePath() const { return PreambleStoragePath; }
+  llvm::StringRef getPreambleStoragePath() const { return PreambleStoragePath; }
 
-  void setInvocationEmissionPath(StringRef Str) {
+  void setInvocationEmissionPath(llvm::StringRef Str) {
     InvocationEmissionPath = std::string(Str);
   }
 
-  StringRef getInvocationEmissionPath() const { return InvocationEmissionPath; }
+  llvm::StringRef getInvocationEmissionPath() const { return InvocationEmissionPath; }
 };
 
 /// Logs information about a particular libclang operation like parsing to

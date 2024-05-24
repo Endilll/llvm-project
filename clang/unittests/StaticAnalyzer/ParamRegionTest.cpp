@@ -72,7 +72,7 @@ public:
 class ParamRegionTestAction : public ASTFrontendAction {
 public:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &Compiler,
-                                                 StringRef File) override {
+                                                 llvm::StringRef File) override {
     return std::make_unique<ParamRegionTestConsumer>(Compiler);
   }
 };

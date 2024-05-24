@@ -106,7 +106,7 @@ public:
   /// Write a single modified source file.
   ///
   /// \returns true if there was an error, false otherwise.
-  bool WriteFixedFile(FileID ID, raw_ostream &OS);
+  bool WriteFixedFile(FileID ID, llvm::raw_ostream &OS);
 
   /// Write the modified source files.
   ///

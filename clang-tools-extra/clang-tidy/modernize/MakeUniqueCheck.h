@@ -24,7 +24,7 @@ namespace clang::tidy::modernize {
 /// \endcode
 class MakeUniqueCheck : public MakeSmartPtrCheck {
 public:
-  MakeUniqueCheck(StringRef Name, ClangTidyContext *Context);
+  MakeUniqueCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
 protected:
   SmartPtrTypeMatcher getSmartPointerTypeMatcher() const override;

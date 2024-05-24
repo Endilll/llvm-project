@@ -74,11 +74,11 @@ private:
   CharUnits ConstValue;
   CharUnits Size; // size of the data, not including the header bytes
   unsigned Flags = 0;
-  StringRef MaskType;
+  llvm::StringRef MaskType;
 
 public:
   OSLogBufferItem(Kind kind, const Expr *expr, CharUnits size, unsigned flags,
-                  StringRef maskType = StringRef())
+                  llvm::StringRef maskType = llvm::StringRef())
       : TheKind(kind), TheExpr(expr), Size(size), Flags(flags),
         MaskType(maskType) {
     assert(((Flags == 0) || (Flags == IsPrivate) || (Flags == IsPublic) ||
@@ -105,12 +105,12 @@ public:
   CharUnits getConstValue() const { return ConstValue; }
   CharUnits size() const { return Size; }
 
-  StringRef getMaskType() const { return MaskType; }
+  llvm::StringRef getMaskType() const { return MaskType; }
 };
 
 class OSLogBufferLayout {
 public:
-  SmallVector<OSLogBufferItem, 4> Items;
+  llvm::SmallVector<OSLogBufferItem, 4> Items;
 
   enum Flags { HasPrivateItems = 1, HasNonScalarItems = 1 << 1 };
 

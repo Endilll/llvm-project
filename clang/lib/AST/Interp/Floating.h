@@ -72,7 +72,7 @@ public:
   APValue toAPValue() const { return APValue(F); }
   void print(llvm::raw_ostream &OS) const {
     // Can't use APFloat::print() since it appends a newline.
-    SmallVector<char, 16> Buffer;
+    llvm::SmallVector<char, 16> Buffer;
     F.toString(Buffer);
     OS << Buffer;
   }

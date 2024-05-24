@@ -163,7 +163,7 @@ bool ConversionFixItGenerator::tryToFixConversion(const Expr *FullExpr,
   return false;
 }
 
-static bool isMacroDefined(const Sema &S, SourceLocation Loc, StringRef Name) {
+static bool isMacroDefined(const Sema &S, SourceLocation Loc, llvm::StringRef Name) {
   return (bool)S.PP.getMacroDefinitionAtLoc(&S.getASTContext().Idents.get(Name),
                                             Loc);
 }

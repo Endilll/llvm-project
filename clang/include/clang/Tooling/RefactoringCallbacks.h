@@ -77,7 +77,7 @@ private:
 /// \c ToText.
 class ReplaceStmtWithText : public RefactoringCallback {
 public:
-  ReplaceStmtWithText(StringRef FromId, StringRef ToText);
+  ReplaceStmtWithText(llvm::StringRef FromId, llvm::StringRef ToText);
   void run(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
@@ -94,7 +94,7 @@ private:
 class ReplaceNodeWithTemplate : public RefactoringCallback {
 public:
   static llvm::Expected<std::unique_ptr<ReplaceNodeWithTemplate>>
-  create(StringRef FromId, StringRef ToTemplate);
+  create(llvm::StringRef FromId, llvm::StringRef ToTemplate);
   void run(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
@@ -112,7 +112,7 @@ private:
 /// the statement bound to \c ToId.
 class ReplaceStmtWithStmt : public RefactoringCallback {
 public:
-  ReplaceStmtWithStmt(StringRef FromId, StringRef ToId);
+  ReplaceStmtWithStmt(llvm::StringRef FromId, llvm::StringRef ToId);
   void run(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
@@ -125,7 +125,7 @@ private:
 /// \c PickTrueBranch is true.
 class ReplaceIfStmtWithItsBody : public RefactoringCallback {
 public:
-  ReplaceIfStmtWithItsBody(StringRef Id, bool PickTrueBranch);
+  ReplaceIfStmtWithItsBody(llvm::StringRef Id, bool PickTrueBranch);
   void run(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:

@@ -25,7 +25,7 @@ void TextDiagnosticBuffer::HandleDiagnostic(DiagnosticsEngine::Level Level,
   // Default implementation (Warnings/errors count).
   DiagnosticConsumer::HandleDiagnostic(Level, Info);
 
-  SmallString<100> Buf;
+  llvm::SmallString<100> Buf;
   Info.FormatDiagnostic(Buf);
   switch (Level) {
   default: llvm_unreachable(

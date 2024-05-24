@@ -24,7 +24,7 @@ namespace clang::tidy::google::build {
 /// http://clang.llvm.org/extra/clang-tidy/checks/google/build-namespaces.html
 class UnnamedNamespaceInHeaderCheck : public ClangTidyCheck {
 public:
-  UnnamedNamespaceInHeaderCheck(StringRef Name, ClangTidyContext *Context);
+  UnnamedNamespaceInHeaderCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

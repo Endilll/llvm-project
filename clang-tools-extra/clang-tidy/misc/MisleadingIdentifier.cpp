@@ -120,7 +120,7 @@ static bool isR(llvm::UTF32 CP) {
          (0x1ECC0 <= CP && CP <= 0x1ECFF) || (0x1ED50 <= CP && CP <= 0x1EDFF);
 }
 
-static bool hasRTLCharacters(StringRef Buffer) {
+static bool hasRTLCharacters(llvm::StringRef Buffer) {
   const char *CurPtr = Buffer.begin();
   const char *EndPtr = Buffer.end();
   while (CurPtr < EndPtr) {
@@ -136,7 +136,7 @@ static bool hasRTLCharacters(StringRef Buffer) {
   return false;
 }
 
-MisleadingIdentifierCheck::MisleadingIdentifierCheck(StringRef Name,
+MisleadingIdentifierCheck::MisleadingIdentifierCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context) {}
 
@@ -147,7 +147,7 @@ void MisleadingIdentifierCheck::check(
   if (const auto *ND = Result.Nodes.getNodeAs<NamedDecl>("nameddecl")) {
     IdentifierInfo *II = ND->getIdentifier();
     if (II) {
-      StringRef NDName = II->getName();
+      llvm::StringRef NDName = II->getName();
       if (hasRTLCharacters(NDName))
         diag(ND->getBeginLoc(), "identifier has right-to-left codepoints");
     }

@@ -19,7 +19,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/make-member-function-const.html
 class MakeMemberFunctionConstCheck : public ClangTidyCheck {
 public:
-  MakeMemberFunctionConstCheck(StringRef Name, ClangTidyContext *Context)
+  MakeMemberFunctionConstCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

@@ -93,7 +93,7 @@ void EnumCastOutOfRangeChecker::reportWarning(CheckerContext &C,
     if (ConcreteValue) {
       ValueStr = formatv(" '{0}'", ConcreteValue->getValue());
     }
-    if (StringRef EnumName{E->getName()}; !EnumName.empty()) {
+    if (llvm::StringRef EnumName{E->getName()}; !EnumName.empty()) {
       NameStr = formatv("'{0}'", EnumName);
     }
 

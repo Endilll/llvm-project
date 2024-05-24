@@ -21,7 +21,7 @@ class NewDeleteOverloadsCheck : public ClangTidyCheck {
       Overloads;
 
 public:
-  NewDeleteOverloadsCheck(StringRef Name, ClangTidyContext *Context)
+  NewDeleteOverloadsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

@@ -28,7 +28,7 @@ std::unique_ptr<Generator> getHTMLGenerator() {
 
 ClangDocContext
 getClangDocContext(std::vector<std::string> UserStylesheets = {},
-                   StringRef RepositoryUrl = "") {
+                   llvm::StringRef RepositoryUrl = "") {
   ClangDocContext CDCtx{
       {}, "test-project", {}, {}, {}, RepositoryUrl, UserStylesheets, {}};
   CDCtx.UserStylesheets.insert(
@@ -151,7 +151,7 @@ TEST(HTMLGeneratorTest, emitRecordHTML) {
   I.DefLoc = Location(10, llvm::SmallString<16>{"dir/test.cpp"}, true);
   I.Loc.emplace_back(12, llvm::SmallString<16>{"test.cpp"});
 
-  SmallString<16> PathTo;
+  llvm::SmallString<16> PathTo;
   llvm::sys::path::native("path/to", PathTo);
   I.Members.emplace_back(TypeInfo("int"), "X", AccessSpecifier::AS_private);
   I.TagType = TagTypeKind::Class;
@@ -271,7 +271,7 @@ TEST(HTMLGeneratorTest, emitFunctionHTML) {
 
   I.Access = AccessSpecifier::AS_none;
 
-  SmallString<16> PathTo;
+  llvm::SmallString<16> PathTo;
   llvm::sys::path::native("path/to", PathTo);
   I.ReturnType = TypeInfo(
       Reference(EmptySID, "float", InfoType::IT_default, "float", PathTo));

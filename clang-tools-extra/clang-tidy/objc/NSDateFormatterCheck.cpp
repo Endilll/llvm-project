@@ -35,7 +35,7 @@ static char ValidDatePatternChars[] = {
 // A string pattern is valid if all the letters(a-z, A-Z) in it belong to the
 // set of reserved characters. See:
 // https://www.unicode.org/reports/tr35/tr35.html#Invalid_Patterns
-bool isValidDatePattern(StringRef Pattern) {
+bool isValidDatePattern(llvm::StringRef Pattern) {
   return llvm::all_of(Pattern, [](const auto &PatternChar) {
     return !isalpha(PatternChar) ||
            llvm::is_contained(ValidDatePatternChars, PatternChar);
@@ -49,7 +49,7 @@ void NSDateFormatterCheck::check(const MatchFinder::MatchResult &Result) {
   // Callback implementation.
   const auto *StrExpr = Result.Nodes.getNodeAs<ObjCStringLiteral>("str_lit");
   const StringLiteral *SL = cast<ObjCStringLiteral>(StrExpr)->getString();
-  StringRef SR = SL->getString();
+  llvm::StringRef SR = SL->getString();
 
   if (!isValidDatePattern(SR)) {
     diag(StrExpr->getExprLoc(), "invalid date format specifier");

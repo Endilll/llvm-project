@@ -210,15 +210,15 @@ public:
   // EvalMethod `source` is not supported for targets with `NoSSE` feature.
   bool supportSourceEvalMethod() const override { return SSELevel > NoSSE; }
 
-  ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     return std::nullopt;
   }
 
-  ArrayRef<TargetInfo::AddlRegName> getGCCAddlRegNames() const override;
+  llvm::ArrayRef<TargetInfo::AddlRegName> getGCCAddlRegNames() const override;
 
-  bool isSPRegName(StringRef RegName) const override {
+  bool isSPRegName(llvm::StringRef RegName) const override {
     return RegName == "esp" || RegName == "rsp";
   }
 
@@ -226,24 +226,24 @@ public:
   bool supportsCpuIs() const override { return true; }
   bool supportsCpuInit() const override { return true; }
 
-  bool validateCpuSupports(StringRef FeatureStr) const override;
+  bool validateCpuSupports(llvm::StringRef FeatureStr) const override;
 
-  bool validateCpuIs(StringRef FeatureStr) const override;
+  bool validateCpuIs(llvm::StringRef FeatureStr) const override;
 
-  bool validateCPUSpecificCPUDispatch(StringRef Name) const override;
+  bool validateCPUSpecificCPUDispatch(llvm::StringRef Name) const override;
 
-  char CPUSpecificManglingCharacter(StringRef Name) const override;
+  char CPUSpecificManglingCharacter(llvm::StringRef Name) const override;
 
   void getCPUSpecificCPUDispatchFeatures(
-      StringRef Name,
-      llvm::SmallVectorImpl<StringRef> &Features) const override;
+      llvm::StringRef Name,
+      llvm::SmallVectorImpl<llvm::StringRef> &Features) const override;
 
   std::optional<unsigned> getCPUCacheLineSize() const override;
 
   bool validateAsmConstraint(const char *&Name,
                              TargetInfo::ConstraintInfo &info) const override;
 
-  bool validateGlobalRegisterVariable(StringRef RegName, unsigned RegSize,
+  bool validateGlobalRegisterVariable(llvm::StringRef RegName, unsigned RegSize,
                                       bool &HasSizeMismatch) const override {
     // esp and ebp are the only 32-bit registers the x86 backend can currently
     // handle.
@@ -257,10 +257,10 @@ public:
   }
 
   bool validateOutputSize(const llvm::StringMap<bool> &FeatureMap,
-                          StringRef Constraint, unsigned Size) const override;
+                          llvm::StringRef Constraint, unsigned Size) const override;
 
   bool validateInputSize(const llvm::StringMap<bool> &FeatureMap,
-                         StringRef Constraint, unsigned Size) const override;
+                         llvm::StringRef Constraint, unsigned Size) const override;
 
   bool
   checkCFProtectionReturnSupported(DiagnosticsEngine &Diags) const override {
@@ -277,16 +277,16 @@ public:
   };
 
   virtual bool validateOperandSize(const llvm::StringMap<bool> &FeatureMap,
-                                   StringRef Constraint, unsigned Size) const;
+                                   llvm::StringRef Constraint, unsigned Size) const;
 
   std::string convertConstraint(const char *&Constraint) const override;
   std::string_view getClobbers() const override {
     return "~{dirflag},~{fpsr},~{flags}";
   }
 
-  StringRef getConstraintRegister(StringRef Constraint,
-                                  StringRef Expression) const override {
-    StringRef::iterator I, E;
+  llvm::StringRef getConstraintRegister(llvm::StringRef Constraint,
+                                  llvm::StringRef Expression) const override {
+    llvm::StringRef::iterator I, E;
     for (I = Constraint.begin(), E = Constraint.end(); I != E; ++I) {
       if (isalpha(*I) || *I == '@')
         break;
@@ -328,22 +328,22 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  void setFeatureEnabled(llvm::StringMap<bool> &Features, StringRef Name,
+  void setFeatureEnabled(llvm::StringMap<bool> &Features, llvm::StringRef Name,
                          bool Enabled) const final;
 
   bool
   initFeatureMap(llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags,
-                 StringRef CPU,
+                 llvm::StringRef CPU,
                  const std::vector<std::string> &FeaturesVec) const override;
 
-  bool isValidFeatureName(StringRef Name) const override;
+  bool isValidFeatureName(llvm::StringRef Name) const override;
 
-  bool hasFeature(StringRef Feature) const final;
+  bool hasFeature(llvm::StringRef Feature) const final;
 
   bool handleTargetFeatures(std::vector<std::string> &Features,
                             DiagnosticsEngine &Diags) override;
 
-  StringRef getABI() const override {
+  llvm::StringRef getABI() const override {
     if (getTriple().getArch() == llvm::Triple::x86_64 && SSELevel >= AVX512F)
       return "avx512";
     if (getTriple().getArch() == llvm::Triple::x86_64 && SSELevel >= AVX)
@@ -358,12 +358,12 @@ public:
     return true;
   }
 
-  bool isValidCPUName(StringRef Name) const override {
+  bool isValidCPUName(llvm::StringRef Name) const override {
     bool Only64Bit = getTriple().getArch() != llvm::Triple::x86;
     return llvm::X86::parseArchX86(Name, Only64Bit) != llvm::X86::CK_None;
   }
 
-  bool isValidTuneCPUName(StringRef Name) const override {
+  bool isValidTuneCPUName(llvm::StringRef Name) const override {
     if (Name == "generic")
       return true;
 
@@ -373,8 +373,8 @@ public:
     return llvm::X86::parseTuneCPU(Name) != llvm::X86::CK_None;
   }
 
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
-  void fillValidTuneCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
+  void fillValidTuneCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
 
   bool setCPU(const std::string &Name) override {
     bool Only64Bit = getTriple().getArch() != llvm::Triple::x86;
@@ -382,9 +382,9 @@ public:
     return CPU != llvm::X86::CK_None;
   }
 
-  unsigned multiVersionSortPriority(StringRef Name) const override;
+  unsigned multiVersionSortPriority(llvm::StringRef Name) const override;
 
-  bool setFPMath(StringRef Name) override;
+  bool setFPMath(llvm::StringRef Name) override;
 
   bool supportsExtendIntArgs() const override {
     return getTriple().getArch() != llvm::Triple::x86;
@@ -480,7 +480,7 @@ public:
   }
 
   bool validateOperandSize(const llvm::StringMap<bool> &FeatureMap,
-                           StringRef Constraint, unsigned Size) const override {
+                           llvm::StringRef Constraint, unsigned Size) const override {
     switch (Constraint[0]) {
     default:
       break;
@@ -506,7 +506,7 @@ public:
       MaxAtomicInlineWidth = 64;
   }
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
   bool hasBitIntType() const override { return true; }
   size_t getMaxBitIntWidth() const override {
@@ -521,9 +521,9 @@ public:
       : NetBSDTargetInfo<X86_32TargetInfo>(Triple, Opts) {}
 
   LangOptions::FPEvalMethodKind getFPEvalMethod() const override {
-    VersionTuple OsVersion = getTriple().getOSVersion();
+    llvm::VersionTuple OsVersion = getTriple().getOSVersion();
     // New NetBSD uses the default rounding mode.
-    if (OsVersion >= VersionTuple(6, 99, 26) || OsVersion.getMajor() == 0)
+    if (OsVersion >= llvm::VersionTuple(6, 99, 26) || OsVersion.getMajor() == 0)
       return X86_32TargetInfo::getFPEvalMethod();
     // NetBSD before 6.99.26 defaults to "double" rounding.
     return LangOptions::FPEvalMethodKind::FEM_Double;
@@ -799,7 +799,7 @@ public:
 
   unsigned getRegisterWidth() const override { return 64; }
 
-  bool validateGlobalRegisterVariable(StringRef RegName, unsigned RegSize,
+  bool validateGlobalRegisterVariable(llvm::StringRef RegName, unsigned RegSize,
                                       bool &HasSizeMismatch) const override {
     // rsp and rbp are the only 64-bit registers the x86 backend can currently
     // handle.
@@ -819,7 +819,7 @@ public:
       MaxAtomicInlineWidth = 128;
   }
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
   bool hasBitIntType() const override { return true; }
   size_t getMaxBitIntWidth() const override {

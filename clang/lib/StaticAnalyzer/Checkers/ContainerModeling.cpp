@@ -51,10 +51,10 @@ class ContainerModeling
   void handleEraseAfter(CheckerContext &C, SVal Cont, SVal Iter) const;
   void handleEraseAfter(CheckerContext &C, SVal Cont, SVal Iter1,
                         SVal Iter2) const;
-  const NoteTag *getChangeTag(CheckerContext &C, StringRef Text,
+  const NoteTag *getChangeTag(CheckerContext &C, llvm::StringRef Text,
                               const MemRegion *ContReg,
                               const Expr *ContE) const;
-  void printState(raw_ostream &Out, ProgramStateRef State, const char *NL,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State, const char *NL,
                   const char *Sep) const override;
 
 public:
@@ -698,10 +698,10 @@ void ContainerModeling::handleEraseAfter(CheckerContext &C, SVal Cont,
 }
 
 const NoteTag *ContainerModeling::getChangeTag(CheckerContext &C,
-                                               StringRef Text,
+                                               llvm::StringRef Text,
                                                const MemRegion *ContReg,
                                                const Expr *ContE) const {
-  StringRef Name;
+  llvm::StringRef Name;
   // First try to get the name of the variable from the region
   if (const auto *DR = dyn_cast<DeclRegion>(ContReg)) {
     Name = DR->getDecl()->getName();
@@ -716,7 +716,7 @@ const NoteTag *ContainerModeling::getChangeTag(CheckerContext &C,
         if (!BR.isInteresting(ContReg))
           return "";
 
-        SmallString<256> Msg;
+        llvm::SmallString<256> Msg;
         llvm::raw_svector_ostream Out(Msg);
         Out << "Container " << (!Name.empty() ? ("'" + Name.str() + "' ") : "" )
             << Text;
@@ -724,7 +724,7 @@ const NoteTag *ContainerModeling::getChangeTag(CheckerContext &C,
       });
 }
 
-void ContainerModeling::printState(raw_ostream &Out, ProgramStateRef State,
+void ContainerModeling::printState(llvm::raw_ostream &Out, ProgramStateRef State,
                                   const char *NL, const char *Sep) const {
   auto ContMap = State->get<ContainerMap>();
 

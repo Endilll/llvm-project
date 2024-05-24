@@ -181,7 +181,7 @@ static inline CXTranslationUnit GetTU(CXType CT) {
   return static_cast<CXTranslationUnit>(CT.data[1]);
 }
 
-static std::optional<ArrayRef<TemplateArgument>>
+static std::optional<llvm::ArrayRef<TemplateArgument>>
 GetTemplateArguments(QualType Type) {
   assert(!Type.isNull());
   if (const auto *Specialization = Type->getAs<TemplateSpecializationType>())
@@ -205,7 +205,7 @@ TemplateArgumentToQualType(const TemplateArgument &A) {
 }
 
 static std::optional<QualType>
-FindTemplateArgumentTypeAt(ArrayRef<TemplateArgument> TA, unsigned index) {
+FindTemplateArgumentTypeAt(llvm::ArrayRef<TemplateArgument> TA, unsigned index) {
   unsigned current = 0;
   for (const auto &A : TA) {
     if (A.getKind() == TemplateArgument::Pack) {
@@ -302,7 +302,7 @@ CXString clang_getTypeSpelling(CXType CT) {
     return cxstring::createEmpty();
 
   CXTranslationUnit TU = GetTU(CT);
-  SmallString<64> Str;
+  llvm::SmallString<64> Str;
   llvm::raw_svector_ostream OS(Str);
   PrintingPolicy PP(cxtu::getASTUnit(TU)->getASTContext().getLangOpts());
 
@@ -1143,7 +1143,7 @@ CXString clang_getDeclObjCTypeEncoding(CXCursor C) {
   return cxstring::createDup(encoding);
 }
 
-static unsigned GetTemplateArgumentArraySize(ArrayRef<TemplateArgument> TA) {
+static unsigned GetTemplateArgumentArraySize(llvm::ArrayRef<TemplateArgument> TA) {
   unsigned size = TA.size();
   for (const auto &Arg : TA)
     if (Arg.getKind() == TemplateArgument::Pack)
@@ -1237,7 +1237,7 @@ CXType clang_Type_getObjCTypeArg(CXType CT, unsigned i) {
   if (!OT)
     return MakeCXType(QualType(), GetTU(CT));
 
-  const ArrayRef<QualType> TA = OT->getTypeArgs();
+  const llvm::ArrayRef<QualType> TA = OT->getTypeArgs();
   if ((size_t)i >= TA.size())
     return MakeCXType(QualType(), GetTU(CT));
 

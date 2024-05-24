@@ -50,7 +50,7 @@ class SwiftAggLowering {
       return End - Begin;
     }
   };
-  SmallVector<StorageEntry, 4> Entries;
+  llvm::SmallVector<StorageEntry, 4> Entries;
   bool Finished = false;
 
 public:
@@ -121,7 +121,7 @@ private:
 /// Should an aggregate which expands to the given type sequence
 /// be passed/returned indirectly under swiftcall?
 bool shouldPassIndirectly(CodeGenModule &CGM,
-                          ArrayRef<llvm::Type*> types,
+                          llvm::ArrayRef<llvm::Type*> types,
                           bool asReturnValue);
 
 /// Return the maximum voluntary integer size for the current target.

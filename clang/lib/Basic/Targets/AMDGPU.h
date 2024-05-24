@@ -119,9 +119,9 @@ public:
 
   std::string_view getClobbers() const override { return ""; }
 
-  ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     return std::nullopt;
   }
 
@@ -160,7 +160,7 @@ public:
       break;
     }
 
-    StringRef S(Name);
+    llvm::StringRef S(Name);
 
     if (S == "DA" || S == "DB") {
       Name++;
@@ -225,7 +225,7 @@ public:
   // constraint is longer than one character.
   std::string convertConstraint(const char *&Constraint) const override {
 
-    StringRef S(Constraint);
+    llvm::StringRef S(Constraint);
     if (S == "DA" || S == "DB") {
       return std::string("^") + std::string(Constraint++, 2);
     }
@@ -241,10 +241,10 @@ public:
 
   bool
   initFeatureMap(llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags,
-                 StringRef CPU,
+                 llvm::StringRef CPU,
                  const std::vector<std::string> &FeatureVec) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
   bool useFP16ConversionIntrinsics() const override { return false; }
 
@@ -255,13 +255,13 @@ public:
     return TargetInfo::CharPtrBuiltinVaList;
   }
 
-  bool isValidCPUName(StringRef Name) const override {
+  bool isValidCPUName(llvm::StringRef Name) const override {
     if (getTriple().getArch() == llvm::Triple::amdgcn)
       return llvm::AMDGPU::parseArchAMDGCN(Name) != llvm::AMDGPU::GK_NONE;
     return llvm::AMDGPU::parseArchR600(Name) != llvm::AMDGPU::GK_NONE;
   }
 
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
 
   bool setCPU(const std::string &Name) override {
     if (getTriple().getArch() == llvm::Triple::amdgcn) {
@@ -441,7 +441,7 @@ public:
       else if (F == "+image-insts")
         HasImage = true;
       bool IsOn = F.front() == '+';
-      StringRef Name = StringRef(F).drop_front();
+      llvm::StringRef Name = llvm::StringRef(F).drop_front();
       if (!llvm::is_contained(TargetIDFeatures, Name))
         continue;
       assert(!OffloadArchFeatures.contains(Name));

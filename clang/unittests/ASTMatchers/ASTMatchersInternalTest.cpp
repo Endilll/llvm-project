@@ -56,8 +56,8 @@ TEST(MatcherCrashDeathTest, CrashOnMatcherDump) {
 
 template <typename MatcherT>
 static void crashTestNodeDump(MatcherT Matcher,
-                              ArrayRef<StringRef> MatchedNodes,
-                              StringRef Against, StringRef Code) {
+                              llvm::ArrayRef<llvm::StringRef> MatchedNodes,
+                              llvm::StringRef Against, llvm::StringRef Code) {
   llvm::EnablePrettyStackTrace();
   MatchFinder Finder;
 
@@ -66,7 +66,7 @@ static void crashTestNodeDump(MatcherT Matcher,
     std::optional<TraversalKind> getCheckTraversalKind() const override {
       return TK_IgnoreUnlessSpelledInSource;
     }
-    StringRef getID() const override { return "CrashTester"; }
+    llvm::StringRef getID() const override { return "CrashTester"; }
   } Callback;
   Finder.addMatcher(std::move(Matcher), &Callback);
   if (MatchedNodes.empty()) {
@@ -205,7 +205,7 @@ TEST(MatchFinder, CheckProfiling) {
 
   struct NamedCallback : public MatchFinder::MatchCallback {
     void run(const MatchFinder::MatchResult &Result) override {}
-    StringRef getID() const override { return "MyID"; }
+    llvm::StringRef getID() const override { return "MyID"; }
   } Callback;
   Finder.addMatcher(decl(), &Callback);
   std::unique_ptr<FrontendActionFactory> Factory(

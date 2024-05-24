@@ -38,7 +38,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/replace-disallow-copy-and-assign-macro.html
 class ReplaceDisallowCopyAndAssignMacroCheck : public ClangTidyCheck {
 public:
-  ReplaceDisallowCopyAndAssignMacroCheck(StringRef Name,
+  ReplaceDisallowCopyAndAssignMacroCheck(llvm::StringRef Name,
                                          ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
@@ -47,10 +47,10 @@ public:
                            Preprocessor *ModuleExpanderPP) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
 
-  const StringRef &getMacroName() const { return MacroName; }
+  const llvm::StringRef &getMacroName() const { return MacroName; }
 
 private:
-  const StringRef MacroName;
+  const llvm::StringRef MacroName;
 };
 
 } // namespace clang::tidy::modernize

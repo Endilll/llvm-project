@@ -86,7 +86,7 @@ struct FormatStyle;
 class BreakableToken {
 public:
   /// Contains starting character index and length of split.
-  typedef std::pair<StringRef::size_type, unsigned> Split;
+  typedef std::pair<llvm::StringRef::size_type, unsigned> Split;
 
   virtual ~BreakableToken() {}
 
@@ -102,7 +102,7 @@ public:
   /// \p StartColumn is the column at which the text starts in the formatted
   ///    file, needed to compute tab stops correctly.
   virtual unsigned getRangeLength(unsigned LineIndex, unsigned Offset,
-                                  StringRef::size_type Length,
+                                  llvm::StringRef::size_type Length,
                                   unsigned StartColumn) const = 0;
 
   /// Returns the number of columns required to format the text following
@@ -116,10 +116,10 @@ public:
   ///    file, needed to compute tab stops correctly.
   ///
   /// For breakable tokens that never use extra space at the end of a line, this
-  /// is equivalent to getRangeLength with a Length of StringRef::npos.
+  /// is equivalent to getRangeLength with a Length of llvm::StringRef::npos.
   virtual unsigned getRemainingLength(unsigned LineIndex, unsigned Offset,
                                       unsigned StartColumn) const {
-    return getRangeLength(LineIndex, Offset, StringRef::npos, StartColumn);
+    return getRangeLength(LineIndex, Offset, llvm::StringRef::npos, StartColumn);
   }
 
   /// Returns the column at which content in line \p LineIndex starts,
@@ -179,7 +179,7 @@ public:
   /// LineIndex such that the content of that line is reflown to the end of the
   /// previous one.
   ///
-  /// Returning (StringRef::npos, 0) indicates reflowing is not possible.
+  /// Returning (llvm::StringRef::npos, 0) indicates reflowing is not possible.
   ///
   /// The range will include any whitespace preceding the specified line's
   /// content.
@@ -188,7 +188,7 @@ public:
   /// line comments, returns (0, <length>).
   virtual Split getReflowSplit(unsigned LineIndex,
                                const llvm::Regex &CommentPragmasRegex) const {
-    return Split(StringRef::npos, 0);
+    return Split(llvm::StringRef::npos, 0);
   }
 
   /// Reflows the current line into the end of the previous one.
@@ -207,10 +207,10 @@ public:
   /// the last line that needs to be reformatted after the last line has been
   /// reformatted.
   ///
-  /// A result having offset == StringRef::npos means that no reformat is
+  /// A result having offset == llvm::StringRef::npos means that no reformat is
   /// necessary.
   virtual Split getSplitAfterLastLine(unsigned TailOffset) const {
-    return Split(StringRef::npos, 0);
+    return Split(llvm::StringRef::npos, 0);
   }
 
   /// Replaces the whitespace from \p SplitAfterLastLine on the last line
@@ -251,7 +251,7 @@ public:
   /// \p StartColumn specifies the column in which the token will start
   /// after formatting.
   BreakableStringLiteral(const FormatToken &Tok, unsigned StartColumn,
-                         StringRef Prefix, StringRef Postfix,
+                         llvm::StringRef Prefix, llvm::StringRef Postfix,
                          unsigned UnbreakableTailLength, bool InPPDirective,
                          encoding::Encoding Encoding, const FormatStyle &Style);
 
@@ -265,7 +265,7 @@ public:
                           WhitespaceManager &Whitespaces) const override {}
   unsigned getLineCount() const override;
   unsigned getRangeLength(unsigned LineIndex, unsigned Offset,
-                          StringRef::size_type Length,
+                          llvm::StringRef::size_type Length,
                           unsigned StartColumn) const override;
   unsigned getRemainingLength(unsigned LineIndex, unsigned Offset,
                               unsigned StartColumn) const override;
@@ -275,11 +275,11 @@ protected:
   // The column in which the token starts.
   unsigned StartColumn;
   // The prefix a line needs after a break in the token.
-  StringRef Prefix;
+  llvm::StringRef Prefix;
   // The postfix a line needs before introducing a break.
-  StringRef Postfix;
+  llvm::StringRef Postfix;
   // The token text excluding the prefix and postfix.
-  StringRef Line;
+  llvm::StringRef Line;
   // Length of the sequence of tokens after this string literal that cannot
   // contain line breaks.
   unsigned UnbreakableTailLength;
@@ -317,8 +317,8 @@ protected:
   QuoteStyleType QuoteStyle;
   // The braces or parentheses along with the first character which they
   // replace, either a quote or at sign.
-  StringRef LeftBraceQuote;
-  StringRef RightBraceQuote;
+  llvm::StringRef LeftBraceQuote;
+  llvm::StringRef RightBraceQuote;
   // Width added to the left due to the added brace or parenthesis. Does not
   // apply to the first line.
   int ContinuationIndent;
@@ -357,17 +357,17 @@ protected:
   // In case of a block comments, excludes the leading /* in the first line and
   // trailing */ in the last line. In case of line comments, excludes the
   // leading // and spaces.
-  SmallVector<StringRef, 16> Lines;
+  llvm::SmallVector<llvm::StringRef, 16> Lines;
 
   // Contains the text of the lines excluding all leading and trailing
   // whitespace between the lines. Note that the decoration (if present) is also
   // not considered part of the text.
-  SmallVector<StringRef, 16> Content;
+  llvm::SmallVector<llvm::StringRef, 16> Content;
 
   // Tokens[i] contains a reference to the token containing Lines[i] if the
   // whitespace range before that token is managed by this block.
   // Otherwise, Tokens[i] is a null pointer.
-  SmallVector<FormatToken *, 16> Tokens;
+  llvm::SmallVector<FormatToken *, 16> Tokens;
 
   // ContentColumn[i] is the target column at which Content[i] should be.
   // Note that this excludes a leading "* " or "*" in case of block comments
@@ -379,7 +379,7 @@ protected:
   // correct indentation of comments in \c WhitespaceManager. Thus they can be
   // negative as well (in case the first line needs to be unindented more than
   // there's actual whitespace in another line).
-  SmallVector<int, 16> ContentColumn;
+  llvm::SmallVector<int, 16> ContentColumn;
 
   // The intended start column of the first line of text from this section.
   unsigned StartColumn;
@@ -392,7 +392,7 @@ protected:
   // // comment 1 comment 2
   // and not:
   // // comment 1comment 2
-  StringRef ReflowPrefix = " ";
+  llvm::StringRef ReflowPrefix = " ";
 };
 
 class BreakableBlockComment : public BreakableComment {
@@ -406,7 +406,7 @@ public:
                  unsigned ContentStartColumn,
                  const llvm::Regex &CommentPragmasRegex) const override;
   unsigned getRangeLength(unsigned LineIndex, unsigned Offset,
-                          StringRef::size_type Length,
+                          llvm::StringRef::size_type Length,
                           unsigned StartColumn) const override;
   unsigned getRemainingLength(unsigned LineIndex, unsigned Offset,
                               unsigned StartColumn) const override;
@@ -459,7 +459,7 @@ private:
   bool LastLineNeedsDecoration;
 
   // Either "* " if all lines begin with a "*", or empty.
-  StringRef Decoration;
+  llvm::StringRef Decoration;
 
   // If this block comment has decorations, this is the column of the start of
   // the decorations.
@@ -481,7 +481,7 @@ public:
                               const FormatStyle &Style);
 
   unsigned getRangeLength(unsigned LineIndex, unsigned Offset,
-                          StringRef::size_type Length,
+                          llvm::StringRef::size_type Length,
                           unsigned StartColumn) const override;
   unsigned getContentStartColumn(unsigned LineIndex, bool Break) const override;
   void insertBreak(unsigned LineIndex, unsigned TailOffset, Split Split,
@@ -504,7 +504,7 @@ private:
   // For example, if the line is:
   // // content
   // then the original prefix is "// ".
-  SmallVector<StringRef, 16> OriginalPrefix;
+  llvm::SmallVector<llvm::StringRef, 16> OriginalPrefix;
 
   /// Prefix[i] + SpacesToAdd[i] contains the intended leading "//" with
   /// trailing spaces to account for the indentation of content within the
@@ -518,11 +518,11 @@ private:
   /// // content
   /// And we want to remove the spaces the OriginalPrefix[i] is "// " and
   /// Prefix[i] is "//".
-  SmallVector<std::string, 16> Prefix;
+  llvm::SmallVector<std::string, 16> Prefix;
 
   /// How many spaces are added or removed from the OriginalPrefix to form
   /// Prefix.
-  SmallVector<int, 16> PrefixSpaceChange;
+  llvm::SmallVector<int, 16> PrefixSpaceChange;
 
   /// The token to which the last line of this breakable token belongs
   /// to; nullptr if that token is the initial token.

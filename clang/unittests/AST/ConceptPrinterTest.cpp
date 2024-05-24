@@ -21,7 +21,7 @@ using namespace tooling;
 
 namespace {
 
-static void PrintConceptReference(raw_ostream &Out, const ASTContext *Context,
+static void PrintConceptReference(llvm::raw_ostream &Out, const ASTContext *Context,
                                   const ConceptSpecializationExpr *T,
                                   PrintingPolicyAdjuster PolicyAdjuster) {
   assert(T && T->getConceptReference() &&
@@ -34,9 +34,9 @@ static void PrintConceptReference(raw_ostream &Out, const ASTContext *Context,
 }
 
 ::testing::AssertionResult
-PrintedConceptMatches(StringRef Code, const std::vector<std::string> &Args,
+PrintedConceptMatches(llvm::StringRef Code, const std::vector<std::string> &Args,
                       const StatementMatcher &NodeMatch,
-                      StringRef ExpectedPrinted) {
+                      llvm::StringRef ExpectedPrinted) {
   return PrintedNodeMatches<ConceptSpecializationExpr>(
       Code, Args, NodeMatch, ExpectedPrinted, "", PrintConceptReference);
 }

@@ -72,7 +72,7 @@ struct Param {
   std::optional<bool> NoEscape = false;
   std::optional<NullabilityKind> Nullability;
   std::optional<RetainCountConventionKind> RetainCountConvention;
-  StringRef Type;
+  llvm::StringRef Type;
 };
 
 typedef std::vector<Param> ParamsSeq;
@@ -121,7 +121,7 @@ template <> struct MappingTraits<Param> {
     IO.mapOptional("Nullability", P.Nullability, std::nullopt);
     IO.mapOptional("RetainCountConvention", P.RetainCountConvention);
     IO.mapOptional("NoEscape", P.NoEscape);
-    IO.mapOptional("Type", P.Type, StringRef(""));
+    IO.mapOptional("Type", P.Type, llvm::StringRef(""));
   }
 };
 } // namespace yaml
@@ -132,7 +132,7 @@ typedef std::vector<NullabilityKind> NullabilitySeq;
 
 struct AvailabilityItem {
   APIAvailability Mode = APIAvailability::Available;
-  StringRef Msg;
+  llvm::StringRef Msg;
 };
 
 /// Old attribute deprecated in favor of SwiftName.
@@ -146,7 +146,7 @@ enum class FactoryAsInitKind {
 };
 
 struct Method {
-  StringRef Selector;
+  llvm::StringRef Selector;
   MethodKind Kind;
   ParamsSeq Params;
   NullabilitySeq Nullability;
@@ -154,11 +154,11 @@ struct Method {
   std::optional<RetainCountConventionKind> RetainCountConvention;
   AvailabilityItem Availability;
   std::optional<bool> SwiftPrivate;
-  StringRef SwiftName;
+  llvm::StringRef SwiftName;
   FactoryAsInitKind FactoryAsInit = FactoryAsInitKind::Infer;
   bool DesignatedInit = false;
   bool Required = false;
-  StringRef ResultType;
+  llvm::StringRef ResultType;
 };
 
 typedef std::vector<Method> MethodsSeq;
@@ -186,13 +186,13 @@ template <> struct MappingTraits<Method> {
     IO.mapOptional("RetainCountConvention", M.RetainCountConvention);
     IO.mapOptional("Availability", M.Availability.Mode,
                    APIAvailability::Available);
-    IO.mapOptional("AvailabilityMsg", M.Availability.Msg, StringRef(""));
+    IO.mapOptional("AvailabilityMsg", M.Availability.Msg, llvm::StringRef(""));
     IO.mapOptional("SwiftPrivate", M.SwiftPrivate);
-    IO.mapOptional("SwiftName", M.SwiftName, StringRef(""));
+    IO.mapOptional("SwiftName", M.SwiftName, llvm::StringRef(""));
     IO.mapOptional("FactoryAsInit", M.FactoryAsInit, FactoryAsInitKind::Infer);
     IO.mapOptional("DesignatedInit", M.DesignatedInit, false);
     IO.mapOptional("Required", M.Required, false);
-    IO.mapOptional("ResultType", M.ResultType, StringRef(""));
+    IO.mapOptional("ResultType", M.ResultType, llvm::StringRef(""));
   }
 };
 } // namespace yaml
@@ -200,14 +200,14 @@ template <> struct MappingTraits<Method> {
 
 namespace {
 struct Property {
-  StringRef Name;
+  llvm::StringRef Name;
   std::optional<MethodKind> Kind;
   std::optional<NullabilityKind> Nullability;
   AvailabilityItem Availability;
   std::optional<bool> SwiftPrivate;
-  StringRef SwiftName;
+  llvm::StringRef SwiftName;
   std::optional<bool> SwiftImportAsAccessors;
-  StringRef Type;
+  llvm::StringRef Type;
 };
 
 typedef std::vector<Property> PropertiesSeq;
@@ -224,11 +224,11 @@ template <> struct MappingTraits<Property> {
     IO.mapOptional("Nullability", P.Nullability, std::nullopt);
     IO.mapOptional("Availability", P.Availability.Mode,
                    APIAvailability::Available);
-    IO.mapOptional("AvailabilityMsg", P.Availability.Msg, StringRef(""));
+    IO.mapOptional("AvailabilityMsg", P.Availability.Msg, llvm::StringRef(""));
     IO.mapOptional("SwiftPrivate", P.SwiftPrivate);
-    IO.mapOptional("SwiftName", P.SwiftName, StringRef(""));
+    IO.mapOptional("SwiftName", P.SwiftName, llvm::StringRef(""));
     IO.mapOptional("SwiftImportAsAccessors", P.SwiftImportAsAccessors);
-    IO.mapOptional("Type", P.Type, StringRef(""));
+    IO.mapOptional("Type", P.Type, llvm::StringRef(""));
   }
 };
 } // namespace yaml
@@ -236,13 +236,13 @@ template <> struct MappingTraits<Property> {
 
 namespace {
 struct Class {
-  StringRef Name;
+  llvm::StringRef Name;
   bool AuditedForNullability = false;
   AvailabilityItem Availability;
   std::optional<bool> SwiftPrivate;
-  StringRef SwiftName;
-  std::optional<StringRef> SwiftBridge;
-  std::optional<StringRef> NSErrorDomain;
+  llvm::StringRef SwiftName;
+  std::optional<llvm::StringRef> SwiftBridge;
+  std::optional<llvm::StringRef> NSErrorDomain;
   std::optional<bool> SwiftImportAsNonGeneric;
   std::optional<bool> SwiftObjCMembers;
   MethodsSeq Methods;
@@ -262,9 +262,9 @@ template <> struct MappingTraits<Class> {
     IO.mapOptional("AuditedForNullability", C.AuditedForNullability, false);
     IO.mapOptional("Availability", C.Availability.Mode,
                    APIAvailability::Available);
-    IO.mapOptional("AvailabilityMsg", C.Availability.Msg, StringRef(""));
+    IO.mapOptional("AvailabilityMsg", C.Availability.Msg, llvm::StringRef(""));
     IO.mapOptional("SwiftPrivate", C.SwiftPrivate);
-    IO.mapOptional("SwiftName", C.SwiftName, StringRef(""));
+    IO.mapOptional("SwiftName", C.SwiftName, llvm::StringRef(""));
     IO.mapOptional("SwiftBridge", C.SwiftBridge);
     IO.mapOptional("NSErrorDomain", C.NSErrorDomain);
     IO.mapOptional("SwiftImportAsNonGeneric", C.SwiftImportAsNonGeneric);
@@ -278,16 +278,16 @@ template <> struct MappingTraits<Class> {
 
 namespace {
 struct Function {
-  StringRef Name;
+  llvm::StringRef Name;
   ParamsSeq Params;
   NullabilitySeq Nullability;
   std::optional<NullabilityKind> NullabilityOfRet;
   std::optional<api_notes::RetainCountConventionKind> RetainCountConvention;
   AvailabilityItem Availability;
   std::optional<bool> SwiftPrivate;
-  StringRef SwiftName;
-  StringRef Type;
-  StringRef ResultType;
+  llvm::StringRef SwiftName;
+  llvm::StringRef Type;
+  llvm::StringRef ResultType;
 };
 
 typedef std::vector<Function> FunctionsSeq;
@@ -306,10 +306,10 @@ template <> struct MappingTraits<Function> {
     IO.mapOptional("RetainCountConvention", F.RetainCountConvention);
     IO.mapOptional("Availability", F.Availability.Mode,
                    APIAvailability::Available);
-    IO.mapOptional("AvailabilityMsg", F.Availability.Msg, StringRef(""));
+    IO.mapOptional("AvailabilityMsg", F.Availability.Msg, llvm::StringRef(""));
     IO.mapOptional("SwiftPrivate", F.SwiftPrivate);
-    IO.mapOptional("SwiftName", F.SwiftName, StringRef(""));
-    IO.mapOptional("ResultType", F.ResultType, StringRef(""));
+    IO.mapOptional("SwiftName", F.SwiftName, llvm::StringRef(""));
+    IO.mapOptional("ResultType", F.ResultType, llvm::StringRef(""));
   }
 };
 } // namespace yaml
@@ -317,12 +317,12 @@ template <> struct MappingTraits<Function> {
 
 namespace {
 struct GlobalVariable {
-  StringRef Name;
+  llvm::StringRef Name;
   std::optional<NullabilityKind> Nullability;
   AvailabilityItem Availability;
   std::optional<bool> SwiftPrivate;
-  StringRef SwiftName;
-  StringRef Type;
+  llvm::StringRef SwiftName;
+  llvm::StringRef Type;
 };
 
 typedef std::vector<GlobalVariable> GlobalVariablesSeq;
@@ -338,10 +338,10 @@ template <> struct MappingTraits<GlobalVariable> {
     IO.mapOptional("Nullability", GV.Nullability, std::nullopt);
     IO.mapOptional("Availability", GV.Availability.Mode,
                    APIAvailability::Available);
-    IO.mapOptional("AvailabilityMsg", GV.Availability.Msg, StringRef(""));
+    IO.mapOptional("AvailabilityMsg", GV.Availability.Msg, llvm::StringRef(""));
     IO.mapOptional("SwiftPrivate", GV.SwiftPrivate);
-    IO.mapOptional("SwiftName", GV.SwiftName, StringRef(""));
-    IO.mapOptional("Type", GV.Type, StringRef(""));
+    IO.mapOptional("SwiftName", GV.SwiftName, llvm::StringRef(""));
+    IO.mapOptional("Type", GV.Type, llvm::StringRef(""));
   }
 };
 } // namespace yaml
@@ -349,10 +349,10 @@ template <> struct MappingTraits<GlobalVariable> {
 
 namespace {
 struct EnumConstant {
-  StringRef Name;
+  llvm::StringRef Name;
   AvailabilityItem Availability;
   std::optional<bool> SwiftPrivate;
-  StringRef SwiftName;
+  llvm::StringRef SwiftName;
 };
 
 typedef std::vector<EnumConstant> EnumConstantsSeq;
@@ -367,9 +367,9 @@ template <> struct MappingTraits<EnumConstant> {
     IO.mapRequired("Name", EC.Name);
     IO.mapOptional("Availability", EC.Availability.Mode,
                    APIAvailability::Available);
-    IO.mapOptional("AvailabilityMsg", EC.Availability.Msg, StringRef(""));
+    IO.mapOptional("AvailabilityMsg", EC.Availability.Msg, llvm::StringRef(""));
     IO.mapOptional("SwiftPrivate", EC.SwiftPrivate);
-    IO.mapOptional("SwiftName", EC.SwiftName, StringRef(""));
+    IO.mapOptional("SwiftName", EC.SwiftName, llvm::StringRef(""));
   }
 };
 } // namespace yaml
@@ -407,12 +407,12 @@ template <> struct ScalarEnumerationTraits<EnumConvenienceAliasKind> {
 
 namespace {
 struct Tag {
-  StringRef Name;
+  llvm::StringRef Name;
   AvailabilityItem Availability;
-  StringRef SwiftName;
+  llvm::StringRef SwiftName;
   std::optional<bool> SwiftPrivate;
-  std::optional<StringRef> SwiftBridge;
-  std::optional<StringRef> NSErrorDomain;
+  std::optional<llvm::StringRef> SwiftBridge;
+  std::optional<llvm::StringRef> NSErrorDomain;
   std::optional<std::string> SwiftImportAs;
   std::optional<std::string> SwiftRetainOp;
   std::optional<std::string> SwiftReleaseOp;
@@ -442,9 +442,9 @@ template <> struct MappingTraits<Tag> {
     IO.mapRequired("Name", T.Name);
     IO.mapOptional("Availability", T.Availability.Mode,
                    APIAvailability::Available);
-    IO.mapOptional("AvailabilityMsg", T.Availability.Msg, StringRef(""));
+    IO.mapOptional("AvailabilityMsg", T.Availability.Msg, llvm::StringRef(""));
     IO.mapOptional("SwiftPrivate", T.SwiftPrivate);
-    IO.mapOptional("SwiftName", T.SwiftName, StringRef(""));
+    IO.mapOptional("SwiftName", T.SwiftName, llvm::StringRef(""));
     IO.mapOptional("SwiftBridge", T.SwiftBridge);
     IO.mapOptional("NSErrorDomain", T.NSErrorDomain);
     IO.mapOptional("SwiftImportAs", T.SwiftImportAs);
@@ -461,12 +461,12 @@ template <> struct MappingTraits<Tag> {
 
 namespace {
 struct Typedef {
-  StringRef Name;
+  llvm::StringRef Name;
   AvailabilityItem Availability;
-  StringRef SwiftName;
+  llvm::StringRef SwiftName;
   std::optional<bool> SwiftPrivate;
-  std::optional<StringRef> SwiftBridge;
-  std::optional<StringRef> NSErrorDomain;
+  std::optional<llvm::StringRef> SwiftBridge;
+  std::optional<llvm::StringRef> NSErrorDomain;
   std::optional<SwiftNewTypeKind> SwiftType;
 };
 
@@ -490,9 +490,9 @@ template <> struct MappingTraits<Typedef> {
     IO.mapRequired("Name", T.Name);
     IO.mapOptional("Availability", T.Availability.Mode,
                    APIAvailability::Available);
-    IO.mapOptional("AvailabilityMsg", T.Availability.Msg, StringRef(""));
+    IO.mapOptional("AvailabilityMsg", T.Availability.Msg, llvm::StringRef(""));
     IO.mapOptional("SwiftPrivate", T.SwiftPrivate);
-    IO.mapOptional("SwiftName", T.SwiftName, StringRef(""));
+    IO.mapOptional("SwiftName", T.SwiftName, llvm::StringRef(""));
     IO.mapOptional("SwiftBridge", T.SwiftBridge);
     IO.mapOptional("NSErrorDomain", T.NSErrorDomain);
     IO.mapOptional("SwiftWrapper", T.SwiftType);
@@ -534,9 +534,9 @@ static void mapTopLevelItems(IO &IO, TopLevelItems &TLI) {
 
 namespace {
 struct Namespace {
-  StringRef Name;
+  llvm::StringRef Name;
   AvailabilityItem Availability;
-  StringRef SwiftName;
+  llvm::StringRef SwiftName;
   std::optional<bool> SwiftPrivate;
   TopLevelItems Items;
 };
@@ -551,9 +551,9 @@ template <> struct MappingTraits<Namespace> {
     IO.mapRequired("Name", T.Name);
     IO.mapOptional("Availability", T.Availability.Mode,
                    APIAvailability::Available);
-    IO.mapOptional("AvailabilityMsg", T.Availability.Msg, StringRef(""));
+    IO.mapOptional("AvailabilityMsg", T.Availability.Msg, llvm::StringRef(""));
     IO.mapOptional("SwiftPrivate", T.SwiftPrivate);
-    IO.mapOptional("SwiftName", T.SwiftName, StringRef(""));
+    IO.mapOptional("SwiftName", T.SwiftName, llvm::StringRef(""));
     mapTopLevelItems(IO, T.Items);
   }
 };
@@ -562,7 +562,7 @@ template <> struct MappingTraits<Namespace> {
 
 namespace {
 struct Versioned {
-  VersionTuple Version;
+  llvm::VersionTuple Version;
   TopLevelItems Items;
 };
 
@@ -584,7 +584,7 @@ template <> struct MappingTraits<Versioned> {
 
 namespace {
 struct Module {
-  StringRef Name;
+  llvm::StringRef Name;
   AvailabilityItem Availability;
   TopLevelItems TopLevel;
   VersionedSeq SwiftVersions;
@@ -604,7 +604,7 @@ template <> struct MappingTraits<Module> {
     IO.mapRequired("Name", M.Name);
     IO.mapOptional("Availability", M.Availability.Mode,
                    APIAvailability::Available);
-    IO.mapOptional("AvailabilityMsg", M.Availability.Msg, StringRef(""));
+    IO.mapOptional("AvailabilityMsg", M.Availability.Msg, llvm::StringRef(""));
     IO.mapOptional("SwiftInferImportAsMember", M.SwiftInferImportAsMember);
     mapTopLevelItems(IO, M.TopLevel);
     IO.mapOptional("SwiftVersions", M.SwiftVersions);
@@ -621,7 +621,7 @@ LLVM_DUMP_METHOD void Module::dump() {
 #endif
 
 namespace {
-bool parseAPINotes(StringRef YI, Module &M, llvm::SourceMgr::DiagHandlerTy Diag,
+bool parseAPINotes(llvm::StringRef YI, Module &M, llvm::SourceMgr::DiagHandlerTy Diag,
                    void *DiagContext) {
   llvm::yaml::Input IS(YI, nullptr, Diag, DiagContext);
   IS >> M;
@@ -629,7 +629,7 @@ bool parseAPINotes(StringRef YI, Module &M, llvm::SourceMgr::DiagHandlerTy Diag,
 }
 } // namespace
 
-bool clang::api_notes::parseAndDumpAPINotes(StringRef YI,
+bool clang::api_notes::parseAndDumpAPINotes(llvm::StringRef YI,
                                             llvm::raw_ostream &OS) {
   Module M;
   if (parseAPINotes(YI, M, nullptr, nullptr))
@@ -724,7 +724,7 @@ public:
   /// Convert the common parts of an entity from YAML.
   template <typename T>
   void convertCommonEntity(const T &Common, CommonEntityInfo &Info,
-                           StringRef APIName) {
+                           llvm::StringRef APIName) {
     convertAvailability(Common.Availability, Info, APIName);
     Info.setSwiftPrivate(Common.SwiftPrivate);
     Info.SwiftName = std::string(Common.SwiftName);
@@ -733,7 +733,7 @@ public:
   /// Convert the common parts of a type entity from YAML.
   template <typename T>
   void convertCommonType(const T &Common, CommonTypeInfo &Info,
-                         StringRef APIName) {
+                         llvm::StringRef APIName) {
     convertCommonEntity(Common, Info, APIName);
     if (Common.SwiftBridge)
       Info.setSwiftBridge(std::string(*Common.SwiftBridge));
@@ -741,8 +741,8 @@ public:
   }
 
   // Translate from Method into ObjCMethodInfo and write it out.
-  void convertMethod(const Method &M, ContextID ClassID, StringRef ClassName,
-                     VersionTuple SwiftVersion) {
+  void convertMethod(const Method &M, ContextID ClassID, llvm::StringRef ClassName,
+                     llvm::VersionTuple SwiftVersion) {
     ObjCMethodInfo MI;
     convertCommonEntity(M, MI, M.Selector);
 
@@ -750,7 +750,7 @@ public:
     bool takesArguments = M.Selector.ends_with(":");
 
     // Split the selector into pieces.
-    llvm::SmallVector<StringRef, 4> Args;
+    llvm::SmallVector<llvm::StringRef, 4> Args;
     M.Selector.split(Args, ":", /*MaxSplit*/ -1, /*KeepEmpty*/ false);
     if (!takesArguments && Args.size() > 1) {
       emitError("selector '" + M.Selector + "' is missing a ':' at the end");
@@ -784,7 +784,7 @@ public:
   }
 
   void convertContext(std::optional<ContextID> ParentContextID, const Class &C,
-                      ContextKind Kind, VersionTuple SwiftVersion) {
+                      ContextKind Kind, llvm::VersionTuple SwiftVersion) {
     // Write the class.
     ObjCContextInfo CI;
     convertCommonType(C, CI, C.Name);
@@ -861,7 +861,7 @@ public:
 
   void convertNamespaceContext(std::optional<ContextID> ParentContextID,
                                const Namespace &TheNamespace,
-                               VersionTuple SwiftVersion) {
+                               llvm::VersionTuple SwiftVersion) {
     // Write the namespace.
     ObjCContextInfo CI;
     convertCommonEntity(TheNamespace, CI, TheNamespace.Name);
@@ -876,7 +876,7 @@ public:
 
   void convertTopLevelItems(std::optional<Context> Ctx,
                             const TopLevelItems &TLItems,
-                            VersionTuple SwiftVersion) {
+                            llvm::VersionTuple SwiftVersion) {
     std::optional<ContextID> CtxID =
         Ctx ? std::optional(Ctx->id) : std::nullopt;
 
@@ -1073,7 +1073,7 @@ public:
   bool convertModule() {
     // Write the top-level items.
     convertTopLevelItems(/* context */ std::nullopt, M.TopLevel,
-                         VersionTuple());
+                         llvm::VersionTuple());
 
     // Convert the versioned information.
     for (const auto &Versioned : M.SwiftVersions)
@@ -1101,7 +1101,7 @@ static void printDiagnostic(const llvm::SMDiagnostic &Diag, void *Context) {
   Diag.print(nullptr, llvm::errs());
 }
 
-bool api_notes::compileAPINotes(StringRef YAMLInput,
+bool api_notes::compileAPINotes(llvm::StringRef YAMLInput,
                                 const FileEntry *SourceFile,
                                 llvm::raw_ostream &OS,
                                 llvm::SourceMgr::DiagHandlerTy DiagHandler,

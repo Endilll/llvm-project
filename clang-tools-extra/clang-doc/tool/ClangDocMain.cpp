@@ -220,10 +220,10 @@ Example usage for a project using a compile commands database:
   // In ToolResults, the Key is the hashed USR and the value is the
   // bitcode-encoded representation of the Info object.
   llvm::outs() << "Collecting infos...\n";
-  llvm::StringMap<std::vector<StringRef>> USRToBitcode;
+  llvm::StringMap<std::vector<llvm::StringRef>> USRToBitcode;
   Executor->get()->getToolResults()->forEachResult(
-      [&](StringRef Key, StringRef Value) {
-        auto R = USRToBitcode.try_emplace(Key, std::vector<StringRef>());
+      [&](llvm::StringRef Key, llvm::StringRef Value) {
+        auto R = USRToBitcode.try_emplace(Key, std::vector<llvm::StringRef>());
         R.first->second.emplace_back(Value);
       });
 

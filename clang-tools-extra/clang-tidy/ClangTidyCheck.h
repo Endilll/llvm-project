@@ -28,7 +28,7 @@ namespace tidy {
 /// to and from an \ref llvm::StringRef.
 template <class T> struct OptionEnumMapping {
   // Specializations of this struct must implement this function.
-  static ArrayRef<std::pair<T, StringRef>> getEnumMapping() = delete;
+  static llvm::ArrayRef<std::pair<T, llvm::StringRef>> getEnumMapping() = delete;
 };
 
 /// Base class for all clang-tidy checks.
@@ -57,7 +57,7 @@ public:
   /// Derived classes must implement the constructor with this signature or
   /// delegate it. If a check needs to read options, it can do this in the
   /// constructor using the Options.get() methods below.
-  ClangTidyCheck(StringRef CheckName, ClangTidyContext *Context);
+  ClangTidyCheck(llvm::StringRef CheckName, ClangTidyContext *Context);
 
   /// Override this to disable registering matchers and PP callbacks if an
   /// invalid language version is being used.
@@ -112,16 +112,16 @@ public:
   virtual void check(const ast_matchers::MatchFinder::MatchResult &Result) {}
 
   /// Add a diagnostic with the check's name.
-  DiagnosticBuilder diag(SourceLocation Loc, StringRef Description,
+  DiagnosticBuilder diag(SourceLocation Loc, llvm::StringRef Description,
                          DiagnosticIDs::Level Level = DiagnosticIDs::Warning);
 
   /// Add a diagnostic with the check's name.
-  DiagnosticBuilder diag(StringRef Description,
+  DiagnosticBuilder diag(llvm::StringRef Description,
                          DiagnosticIDs::Level Level = DiagnosticIDs::Warning);
 
   /// Adds a diagnostic to report errors in the check's configuration.
   DiagnosticBuilder
-  configurationDiag(StringRef Description,
+  configurationDiag(llvm::StringRef Description,
                     DiagnosticIDs::Level Level = DiagnosticIDs::Warning) const;
 
   /// Should store all options supported by this check with their
@@ -137,16 +137,16 @@ public:
   /// Methods of this class prepend ``CheckName + "."`` to translate check-local
   /// option names to global option names.
   class OptionsView {
-    void diagnoseBadIntegerOption(const Twine &Lookup,
-                                  StringRef Unparsed) const;
-    void diagnoseBadBooleanOption(const Twine &Lookup,
-                                  StringRef Unparsed) const;
-    void diagnoseBadEnumOption(const Twine &Lookup, StringRef Unparsed,
-                               StringRef Suggestion = StringRef()) const;
+    void diagnoseBadIntegerOption(const llvm::Twine &Lookup,
+                                  llvm::StringRef Unparsed) const;
+    void diagnoseBadBooleanOption(const llvm::Twine &Lookup,
+                                  llvm::StringRef Unparsed) const;
+    void diagnoseBadEnumOption(const llvm::Twine &Lookup, llvm::StringRef Unparsed,
+                               llvm::StringRef Suggestion = llvm::StringRef()) const;
 
   public:
     /// Initializes the instance using \p CheckName + "." as a prefix.
-    OptionsView(StringRef CheckName,
+    OptionsView(llvm::StringRef CheckName,
                 const ClangTidyOptions::OptionMap &CheckOptions,
                 ClangTidyContext *Context);
 
@@ -155,14 +155,14 @@ public:
     /// Reads the option with the check-local name \p LocalName from the
     /// ``CheckOptions``. If the corresponding key is not present, return
     /// ``std::nullopt``.
-    std::optional<StringRef> get(StringRef LocalName) const;
+    std::optional<llvm::StringRef> get(llvm::StringRef LocalName) const;
 
     /// Read a named option from the ``Context``.
     ///
     /// Reads the option with the check-local name \p LocalName from the
     /// ``CheckOptions``. If the corresponding key is not present, returns
     /// \p Default.
-    StringRef get(StringRef LocalName, StringRef Default) const;
+    llvm::StringRef get(llvm::StringRef LocalName, llvm::StringRef Default) const;
 
     /// Read a named option from the ``Context``.
     ///
@@ -170,7 +170,7 @@ public:
     /// global ``CheckOptions``. Gets local option first. If local is not
     /// present, falls back to get global option. If global option is not
     /// present either, return ``std::nullopt``.
-    std::optional<StringRef> getLocalOrGlobal(StringRef LocalName) const;
+    std::optional<llvm::StringRef> getLocalOrGlobal(llvm::StringRef LocalName) const;
 
     /// Read a named option from the ``Context``.
     ///
@@ -178,7 +178,7 @@ public:
     /// global ``CheckOptions``. Gets local option first. If local is not
     /// present, falls back to get global option. If global option is not
     /// present either, returns \p Default.
-    StringRef getLocalOrGlobal(StringRef LocalName, StringRef Default) const;
+    llvm::StringRef getLocalOrGlobal(llvm::StringRef LocalName, llvm::StringRef Default) const;
 
     /// Read a named option from the ``Context`` and parse it as an
     /// integral type ``T``.
@@ -191,10 +191,10 @@ public:
     /// diagnostic and return ``std::nullopt``.
     template <typename T>
     std::enable_if_t<std::is_integral_v<T>, std::optional<T>>
-    get(StringRef LocalName) const {
-      if (std::optional<StringRef> Value = get(LocalName)) {
+    get(llvm::StringRef LocalName) const {
+      if (std::optional<llvm::StringRef> Value = get(LocalName)) {
         T Result{};
-        if (!StringRef(*Value).getAsInteger(10, Result))
+        if (!llvm::StringRef(*Value).getAsInteger(10, Result))
           return Result;
         diagnoseBadIntegerOption(NamePrefix + LocalName, *Value);
       }
@@ -213,13 +213,13 @@ public:
     /// diagnostic and return \p Default.
     template <typename T>
     std::enable_if_t<std::is_integral_v<T>, std::optional<T>>
-    get(StringRef LocalName, std::optional<T> Default) const {
-      if (std::optional<StringRef> Value = get(LocalName)) {
+    get(llvm::StringRef LocalName, std::optional<T> Default) const {
+      if (std::optional<llvm::StringRef> Value = get(LocalName)) {
         if (Value == "" || Value == "none" || Value == "null" ||
             (std::is_unsigned_v<T> && Value == "-1"))
           return std::nullopt;
         T Result{};
-        if (!StringRef(*Value).getAsInteger(10, Result))
+        if (!llvm::StringRef(*Value).getAsInteger(10, Result))
           return Result;
         diagnoseBadIntegerOption(NamePrefix + LocalName, *Value);
       }
@@ -236,7 +236,7 @@ public:
     /// If the corresponding key can't be parsed as a ``T``, emit a
     /// diagnostic and return \p Default.
     template <typename T>
-    std::enable_if_t<std::is_integral_v<T>, T> get(StringRef LocalName,
+    std::enable_if_t<std::is_integral_v<T>, T> get(llvm::StringRef LocalName,
                                                    T Default) const {
       return get<T>(LocalName).value_or(Default);
     }
@@ -253,8 +253,8 @@ public:
     /// diagnostic and return ``std::nullopt``.
     template <typename T>
     std::enable_if_t<std::is_integral_v<T>, std::optional<T>>
-    getLocalOrGlobal(StringRef LocalName) const {
-      std::optional<StringRef> ValueOr = get(LocalName);
+    getLocalOrGlobal(llvm::StringRef LocalName) const {
+      std::optional<llvm::StringRef> ValueOr = get(LocalName);
       bool IsGlobal = false;
       if (!ValueOr) {
         IsGlobal = true;
@@ -263,10 +263,10 @@ public:
           return std::nullopt;
       }
       T Result{};
-      if (!StringRef(*ValueOr).getAsInteger(10, Result))
+      if (!llvm::StringRef(*ValueOr).getAsInteger(10, Result))
         return Result;
       diagnoseBadIntegerOption(
-          IsGlobal ? Twine(LocalName) : NamePrefix + LocalName, *ValueOr);
+          IsGlobal ? llvm::Twine(LocalName) : NamePrefix + LocalName, *ValueOr);
       return std::nullopt;
     }
 
@@ -283,8 +283,8 @@ public:
     /// diagnostic and return \p Default.
     template <typename T>
     std::enable_if_t<std::is_integral_v<T>, std::optional<T>>
-    getLocalOrGlobal(StringRef LocalName, std::optional<T> Default) const {
-      std::optional<StringRef> ValueOr = get(LocalName);
+    getLocalOrGlobal(llvm::StringRef LocalName, std::optional<T> Default) const {
+      std::optional<llvm::StringRef> ValueOr = get(LocalName);
       bool IsGlobal = false;
       if (!ValueOr) {
         IsGlobal = true;
@@ -296,10 +296,10 @@ public:
       if (ValueOr == "" || ValueOr == "none" || ValueOr == "null" ||
           (std::is_unsigned_v<T> && ValueOr == "-1"))
         return std::nullopt;
-      if (!StringRef(*ValueOr).getAsInteger(10, Result))
+      if (!llvm::StringRef(*ValueOr).getAsInteger(10, Result))
         return Result;
       diagnoseBadIntegerOption(
-          IsGlobal ? Twine(LocalName) : NamePrefix + LocalName, *ValueOr);
+          IsGlobal ? llvm::Twine(LocalName) : NamePrefix + LocalName, *ValueOr);
       return Default;
     }
 
@@ -315,7 +315,7 @@ public:
     /// diagnostic and return \p Default.
     template <typename T>
     std::enable_if_t<std::is_integral_v<T>, T>
-    getLocalOrGlobal(StringRef LocalName, T Default) const {
+    getLocalOrGlobal(llvm::StringRef LocalName, T Default) const {
       return getLocalOrGlobal<T>(LocalName).value_or(Default);
     }
 
@@ -333,7 +333,7 @@ public:
     /// supply the mapping required to convert between ``T`` and a string.
     template <typename T>
     std::enable_if_t<std::is_enum_v<T>, std::optional<T>>
-    get(StringRef LocalName, bool IgnoreCase = false) const {
+    get(llvm::StringRef LocalName, bool IgnoreCase = false) const {
       if (std::optional<int64_t> ValueOr =
               getEnumInt(LocalName, typeEraseMapping<T>(), false, IgnoreCase))
         return static_cast<T>(*ValueOr);
@@ -353,7 +353,7 @@ public:
     /// \ref clang::tidy::OptionEnumMapping must be specialized for ``T`` to
     /// supply the mapping required to convert between ``T`` and a string.
     template <typename T>
-    std::enable_if_t<std::is_enum_v<T>, T> get(StringRef LocalName, T Default,
+    std::enable_if_t<std::is_enum_v<T>, T> get(llvm::StringRef LocalName, T Default,
                                                bool IgnoreCase = false) const {
       return get<T>(LocalName, IgnoreCase).value_or(Default);
     }
@@ -373,7 +373,7 @@ public:
     /// supply the mapping required to convert between ``T`` and a string.
     template <typename T>
     std::enable_if_t<std::is_enum_v<T>, std::optional<T>>
-    getLocalOrGlobal(StringRef LocalName, bool IgnoreCase = false) const {
+    getLocalOrGlobal(llvm::StringRef LocalName, bool IgnoreCase = false) const {
       if (std::optional<int64_t> ValueOr =
               getEnumInt(LocalName, typeEraseMapping<T>(), true, IgnoreCase))
         return static_cast<T>(*ValueOr);
@@ -395,21 +395,21 @@ public:
     /// supply the mapping required to convert between ``T`` and a string.
     template <typename T>
     std::enable_if_t<std::is_enum_v<T>, T>
-    getLocalOrGlobal(StringRef LocalName, T Default,
+    getLocalOrGlobal(llvm::StringRef LocalName, T Default,
                      bool IgnoreCase = false) const {
       return getLocalOrGlobal<T>(LocalName, IgnoreCase).value_or(Default);
     }
 
     /// Stores an option with the check-local name \p LocalName with
     /// string value \p Value to \p Options.
-    void store(ClangTidyOptions::OptionMap &Options, StringRef LocalName,
-               StringRef Value) const;
+    void store(ClangTidyOptions::OptionMap &Options, llvm::StringRef LocalName,
+               llvm::StringRef Value) const;
 
     /// Stores an option with the check-local name \p LocalName with
     /// integer value \p Value to \p Options.
     template <typename T>
     std::enable_if_t<std::is_integral_v<T>>
-    store(ClangTidyOptions::OptionMap &Options, StringRef LocalName,
+    store(ClangTidyOptions::OptionMap &Options, llvm::StringRef LocalName,
           T Value) const {
       if constexpr (std::is_signed_v<T>)
         storeInt(Options, LocalName, Value);
@@ -422,7 +422,7 @@ public:
     /// stores ``
     template <typename T>
     std::enable_if_t<std::is_integral_v<T>>
-    store(ClangTidyOptions::OptionMap &Options, StringRef LocalName,
+    store(ClangTidyOptions::OptionMap &Options, llvm::StringRef LocalName,
           std::optional<T> Value) const {
       if (Value)
         store(Options, LocalName, *Value);
@@ -437,12 +437,12 @@ public:
     /// supply the mapping required to convert between ``T`` and a string.
     template <typename T>
     std::enable_if_t<std::is_enum_v<T>>
-    store(ClangTidyOptions::OptionMap &Options, StringRef LocalName,
+    store(ClangTidyOptions::OptionMap &Options, llvm::StringRef LocalName,
           T Value) const {
-      ArrayRef<std::pair<T, StringRef>> Mapping =
+      llvm::ArrayRef<std::pair<T, llvm::StringRef>> Mapping =
           OptionEnumMapping<T>::getEnumMapping();
       auto Iter = llvm::find_if(
-          Mapping, [&](const std::pair<T, StringRef> &NameAndEnum) {
+          Mapping, [&](const std::pair<T, llvm::StringRef> &NameAndEnum) {
             return NameAndEnum.first == Value;
           });
       assert(Iter != Mapping.end() && "Unknown Case Value");
@@ -450,16 +450,16 @@ public:
     }
 
   private:
-    using NameAndValue = std::pair<int64_t, StringRef>;
+    using NameAndValue = std::pair<int64_t, llvm::StringRef>;
 
-    std::optional<int64_t> getEnumInt(StringRef LocalName,
-                                      ArrayRef<NameAndValue> Mapping,
+    std::optional<int64_t> getEnumInt(llvm::StringRef LocalName,
+                                      llvm::ArrayRef<NameAndValue> Mapping,
                                       bool CheckGlobal, bool IgnoreCase) const;
 
     template <typename T>
     std::enable_if_t<std::is_enum_v<T>, std::vector<NameAndValue>>
     typeEraseMapping() const {
-      ArrayRef<std::pair<T, StringRef>> Mapping =
+      llvm::ArrayRef<std::pair<T, llvm::StringRef>> Mapping =
           OptionEnumMapping<T>::getEnumMapping();
       std::vector<NameAndValue> Result;
       Result.reserve(Mapping.size());
@@ -470,11 +470,11 @@ public:
       return Result;
     }
 
-    void storeInt(ClangTidyOptions::OptionMap &Options, StringRef LocalName,
+    void storeInt(ClangTidyOptions::OptionMap &Options, llvm::StringRef LocalName,
                   int64_t Value) const;
 
     void storeUnsigned(ClangTidyOptions::OptionMap &Options,
-                       StringRef LocalName, uint64_t Value) const;
+                       llvm::StringRef LocalName, uint64_t Value) const;
 
     std::string NamePrefix;
     const ClangTidyOptions::OptionMap &CheckOptions;
@@ -489,7 +489,7 @@ private:
 protected:
   OptionsView Options;
   /// Returns the main file name of the current translation unit.
-  StringRef getCurrentMainFile() const { return Context->getCurrentFile(); }
+  llvm::StringRef getCurrentMainFile() const { return Context->getCurrentFile(); }
   /// Returns the language options from the context.
   const LangOptions &getLangOpts() const { return Context->getLangOpts(); }
   /// Returns true when the check is run in a use case when only 1 fix will be
@@ -497,7 +497,7 @@ protected:
   bool areDiagsSelfContained() const {
     return Context->areDiagsSelfContained();
   }
-  StringRef getID() const override { return CheckName; }
+  llvm::StringRef getID() const override { return CheckName; }
 };
 
 /// Read a named option from the ``Context`` and parse it as a bool.
@@ -510,7 +510,7 @@ protected:
 /// diagnostic and return ``std::nullopt``.
 template <>
 std::optional<bool>
-ClangTidyCheck::OptionsView::get<bool>(StringRef LocalName) const;
+ClangTidyCheck::OptionsView::get<bool>(llvm::StringRef LocalName) const;
 
 /// Read a named option from the ``Context`` and parse it as a bool.
 ///
@@ -522,13 +522,13 @@ ClangTidyCheck::OptionsView::get<bool>(StringRef LocalName) const;
 /// diagnostic and return \p Default.
 template <>
 std::optional<bool>
-ClangTidyCheck::OptionsView::getLocalOrGlobal<bool>(StringRef LocalName) const;
+ClangTidyCheck::OptionsView::getLocalOrGlobal<bool>(llvm::StringRef LocalName) const;
 
 /// Stores an option with the check-local name \p LocalName with
 /// bool value \p Value to \p Options.
 template <>
 void ClangTidyCheck::OptionsView::store<bool>(
-    ClangTidyOptions::OptionMap &Options, StringRef LocalName,
+    ClangTidyOptions::OptionMap &Options, llvm::StringRef LocalName,
     bool Value) const;
 
 

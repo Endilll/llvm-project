@@ -20,7 +20,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/redundant-casting.html
 class RedundantCastingCheck : public ClangTidyCheck {
 public:
-  RedundantCastingCheck(StringRef Name, ClangTidyContext *Context);
+  RedundantCastingCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;

@@ -57,7 +57,7 @@ void CodeGenFunction::EmitStopPoint(const Stmt *S) {
   }
 }
 
-void CodeGenFunction::EmitStmt(const Stmt *S, ArrayRef<const Attr *> Attrs) {
+void CodeGenFunction::EmitStmt(const Stmt *S, llvm::ArrayRef<const Attr *> Attrs) {
   assert(S && "Null statement?");
   PGO.setCurrentStmt(S);
 
@@ -446,7 +446,7 @@ void CodeGenFunction::EmitStmt(const Stmt *S, ArrayRef<const Attr *> Attrs) {
 }
 
 bool CodeGenFunction::EmitSimpleStmt(const Stmt *S,
-                                     ArrayRef<const Attr *> Attrs) {
+                                     llvm::ArrayRef<const Attr *> Attrs) {
   switch (S->getStmtClass()) {
   default:
     return false;
@@ -683,7 +683,7 @@ void CodeGenFunction::LexicalScope::rescopeLabels() {
     = CGF.EHStack.getInnermostNormalCleanup();
 
   // Change the scope depth of all the labels.
-  for (SmallVectorImpl<const LabelDecl*>::const_iterator
+  for (llvm::SmallVectorImpl<const LabelDecl*>::const_iterator
          i = Labels.begin(), e = Labels.end(); i != e; ++i) {
     assert(CGF.LabelMap.count(*i));
     JumpDest &dest = CGF.LabelMap.find(*i)->second;
@@ -743,10 +743,10 @@ void CodeGenFunction::EmitAttributedStmt(const AttributedStmt &S) {
     } break;
     }
   }
-  SaveAndRestore save_nomerge(InNoMergeAttributedStmt, nomerge);
-  SaveAndRestore save_noinline(InNoInlineAttributedStmt, noinline);
-  SaveAndRestore save_alwaysinline(InAlwaysInlineAttributedStmt, alwaysinline);
-  SaveAndRestore save_musttail(MustTailCall, musttail);
+  llvm::SaveAndRestore save_nomerge(InNoMergeAttributedStmt, nomerge);
+  llvm::SaveAndRestore save_noinline(InNoInlineAttributedStmt, noinline);
+  llvm::SaveAndRestore save_alwaysinline(InAlwaysInlineAttributedStmt, alwaysinline);
+  llvm::SaveAndRestore save_musttail(MustTailCall, musttail);
   EmitStmt(S.getSubStmt(), S.getAttrs());
 }
 
@@ -972,7 +972,7 @@ template <typename LoopStmt> static bool hasEmptyLoopBody(const LoopStmt &S) {
 }
 
 void CodeGenFunction::EmitWhileStmt(const WhileStmt &S,
-                                    ArrayRef<const Attr *> WhileAttrs) {
+                                    llvm::ArrayRef<const Attr *> WhileAttrs) {
   // Emit the header for the loop, which will also become
   // the continue target.
   JumpDest LoopHeader = getJumpDestInCurrentScope("while.cond");
@@ -1089,7 +1089,7 @@ void CodeGenFunction::EmitWhileStmt(const WhileStmt &S,
 }
 
 void CodeGenFunction::EmitDoStmt(const DoStmt &S,
-                                 ArrayRef<const Attr *> DoAttrs) {
+                                 llvm::ArrayRef<const Attr *> DoAttrs) {
   JumpDest LoopExit = getJumpDestInCurrentScope("do.end");
   JumpDest LoopCond = getJumpDestInCurrentScope("do.cond");
 
@@ -1169,7 +1169,7 @@ void CodeGenFunction::EmitDoStmt(const DoStmt &S,
 }
 
 void CodeGenFunction::EmitForStmt(const ForStmt &S,
-                                  ArrayRef<const Attr *> ForAttrs) {
+                                  llvm::ArrayRef<const Attr *> ForAttrs) {
   JumpDest LoopExit = getJumpDestInCurrentScope("for.end");
 
   LexicalScope ForScope(*this, S.getSourceRange());
@@ -1305,7 +1305,7 @@ void CodeGenFunction::EmitForStmt(const ForStmt &S,
 
 void
 CodeGenFunction::EmitCXXForRangeStmt(const CXXForRangeStmt &S,
-                                     ArrayRef<const Attr *> ForAttrs) {
+                                     llvm::ArrayRef<const Attr *> ForAttrs) {
   JumpDest LoopExit = getJumpDestInCurrentScope("for.end");
 
   LexicalScope ForScope(*this, S.getSourceRange());
@@ -1597,7 +1597,7 @@ void CodeGenFunction::EmitContinueStmt(const ContinueStmt &S) {
 /// add multiple cases to switch instruction, one for each value within
 /// the range. If range is too big then emit "if" condition check.
 void CodeGenFunction::EmitCaseStmtRange(const CaseStmt &S,
-                                        ArrayRef<const Attr *> Attrs) {
+                                        llvm::ArrayRef<const Attr *> Attrs) {
   assert(S.getRHS() && "Expected RHS value in CaseStmt");
 
   llvm::APSInt LHS = S.getLHS()->EvaluateKnownConstInt(getContext());
@@ -1682,7 +1682,7 @@ void CodeGenFunction::EmitCaseStmtRange(const CaseStmt &S,
 }
 
 void CodeGenFunction::EmitCaseStmt(const CaseStmt &S,
-                                   ArrayRef<const Attr *> Attrs) {
+                                   llvm::ArrayRef<const Attr *> Attrs) {
   // If there is no enclosing switch instance that we're aware of, then this
   // case statement and its block can be elided.  This situation only happens
   // when we've constant-folded the switch, are emitting the constant case,
@@ -1797,7 +1797,7 @@ void CodeGenFunction::EmitCaseStmt(const CaseStmt &S,
 }
 
 void CodeGenFunction::EmitDefaultStmt(const DefaultStmt &S,
-                                      ArrayRef<const Attr *> Attrs) {
+                                      llvm::ArrayRef<const Attr *> Attrs) {
   // If there is no enclosing switch instance that we're aware of, then this
   // default statement can be elided. This situation only happens when we've
   // constant-folded the switch.
@@ -1845,7 +1845,7 @@ enum CSFC_Result { CSFC_Failure, CSFC_FallThrough, CSFC_Success };
 static CSFC_Result CollectStatementsForCase(const Stmt *S,
                                             const SwitchCase *Case,
                                             bool &FoundCase,
-                              SmallVectorImpl<const Stmt*> &ResultStmts) {
+                              llvm::SmallVectorImpl<const Stmt*> &ResultStmts) {
   // If this is a null statement, just succeed.
   if (!S)
     return Case ? CSFC_Success : CSFC_FallThrough;
@@ -1999,7 +1999,7 @@ static CSFC_Result CollectStatementsForCase(const Stmt *S,
 /// for more details.
 static bool FindCaseStatementsForValue(const SwitchStmt &S,
                                        const llvm::APSInt &ConstantCondValue,
-                                SmallVectorImpl<const Stmt*> &ResultStmts,
+                                llvm::SmallVectorImpl<const Stmt*> &ResultStmts,
                                        ASTContext &C,
                                        const SwitchCase *&ResultCase) {
   // First step, find the switch case that is being branched to.  We can do this
@@ -2050,8 +2050,8 @@ static bool FindCaseStatementsForValue(const SwitchStmt &S,
          FoundCase;
 }
 
-static std::optional<SmallVector<uint64_t, 16>>
-getLikelihoodWeights(ArrayRef<Stmt::Likelihood> Likelihoods) {
+static std::optional<llvm::SmallVector<uint64_t, 16>>
+getLikelihoodWeights(llvm::ArrayRef<Stmt::Likelihood> Likelihoods) {
   // Are there enough branches to weight them?
   if (Likelihoods.size() <= 1)
     return std::nullopt;
@@ -2087,7 +2087,7 @@ getLikelihoodWeights(ArrayRef<Stmt::Likelihood> Likelihoods) {
   const uint64_t None = Likely / (NumNone + 1);
   const uint64_t Unlikely = 0;
 
-  SmallVector<uint64_t, 16> Result;
+  llvm::SmallVector<uint64_t, 16> Result;
   Result.reserve(Likelihoods.size());
   for (const auto LH : Likelihoods) {
     switch (LH) {
@@ -2109,15 +2109,15 @@ getLikelihoodWeights(ArrayRef<Stmt::Likelihood> Likelihoods) {
 void CodeGenFunction::EmitSwitchStmt(const SwitchStmt &S) {
   // Handle nested switch statements.
   llvm::SwitchInst *SavedSwitchInsn = SwitchInsn;
-  SmallVector<uint64_t, 16> *SavedSwitchWeights = SwitchWeights;
-  SmallVector<Stmt::Likelihood, 16> *SavedSwitchLikelihood = SwitchLikelihood;
+  llvm::SmallVector<uint64_t, 16> *SavedSwitchWeights = SwitchWeights;
+  llvm::SmallVector<Stmt::Likelihood, 16> *SavedSwitchLikelihood = SwitchLikelihood;
   llvm::BasicBlock *SavedCRBlock = CaseRangeBlock;
 
   // See if we can constant fold the condition of the switch and therefore only
   // emit the live case statement (if any) of the switch.
   llvm::APSInt ConstantCondValue;
   if (ConstantFoldsToSimpleInteger(S.getCond(), ConstantCondValue)) {
-    SmallVector<const Stmt*, 4> CaseStmts;
+    llvm::SmallVector<const Stmt*, 4> CaseStmts;
     const SwitchCase *Case = nullptr;
     if (FindCaseStatementsForValue(S, ConstantCondValue, CaseStmts,
                                    getContext(), Case)) {
@@ -2180,13 +2180,13 @@ void CodeGenFunction::EmitSwitchStmt(const SwitchStmt &S) {
         DefaultCount = getProfileCount(Case);
       NumCases += 1;
     }
-    SwitchWeights = new SmallVector<uint64_t, 16>();
+    SwitchWeights = new llvm::SmallVector<uint64_t, 16>();
     SwitchWeights->reserve(NumCases);
     // The default needs to be first. We store the edge count, so we already
     // know the right weight.
     SwitchWeights->push_back(DefaultCount);
   } else if (CGM.getCodeGenOpts().OptimizationLevel) {
-    SwitchLikelihood = new SmallVector<Stmt::Likelihood, 16>();
+    SwitchLikelihood = new llvm::SmallVector<Stmt::Likelihood, 16>();
     // Initialize the default case.
     SwitchLikelihood->push_back(Stmt::LH_None);
   }
@@ -2257,7 +2257,7 @@ void CodeGenFunction::EmitSwitchStmt(const SwitchStmt &S) {
   } else if (SwitchLikelihood) {
     assert(SwitchLikelihood->size() == 1 + SwitchInsn->getNumCases() &&
            "switch likelihoods do not match switch cases");
-    std::optional<SmallVector<uint64_t, 16>> LHW =
+    std::optional<llvm::SmallVector<uint64_t, 16>> LHW =
         getLikelihoodWeights(*SwitchLikelihood);
     if (LHW) {
       llvm::MDBuilder MDHelper(CGM.getLLVMContext());
@@ -2274,7 +2274,7 @@ void CodeGenFunction::EmitSwitchStmt(const SwitchStmt &S) {
 
 static std::string
 SimplifyConstraint(const char *Constraint, const TargetInfo &Target,
-                 SmallVectorImpl<TargetInfo::ConstraintInfo> *OutCons=nullptr) {
+                 llvm::SmallVectorImpl<TargetInfo::ConstraintInfo> *OutCons=nullptr) {
   std::string Result;
 
   while (*Constraint) {
@@ -2342,7 +2342,7 @@ AddVariableConstraints(const std::string &Constraint, const Expr &AsmExpr,
   AsmLabelAttr *Attr = Variable->getAttr<AsmLabelAttr>();
   if (!Attr)
     return Constraint;
-  StringRef Register = Attr->getLabel();
+  llvm::StringRef Register = Attr->getLabel();
   assert(Target.isValidGCCRegisterName(Register));
   // We're using validateOutputConstraint here because we only care if
   // this is a register constraint.
@@ -2422,11 +2422,11 @@ CodeGenFunction::EmitAsmInput(const TargetInfo::ConstraintInfo &Info,
 /// asm.
 static llvm::MDNode *getAsmSrcLocInfo(const StringLiteral *Str,
                                       CodeGenFunction &CGF) {
-  SmallVector<llvm::Metadata *, 8> Locs;
+  llvm::SmallVector<llvm::Metadata *, 8> Locs;
   // Add the location of the first line to the MDNode.
   Locs.push_back(llvm::ConstantAsMetadata::get(llvm::ConstantInt::get(
       CGF.Int64Ty, Str->getBeginLoc().getRawEncoding())));
-  StringRef StrVal = Str->getString();
+  llvm::StringRef StrVal = Str->getString();
   if (!StrVal.empty()) {
     const SourceManager &SM = CGF.CGM.getContext().getSourceManager();
     const LangOptions &LangOpts = CGF.CGM.getLangOpts();
@@ -2597,7 +2597,7 @@ static void EmitHipStdParUnsupportedAsm(CodeGenFunction *CGF,
                                         const AsmStmt &S) {
   constexpr auto Name = "__ASM__hipstdpar_unsupported";
 
-  StringRef Asm;
+  llvm::StringRef Asm;
   if (auto GCCAsm = dyn_cast<GCCAsmStmt>(&S))
     Asm = GCCAsm->getAsmString()->getString();
 
@@ -2619,13 +2619,13 @@ void CodeGenFunction::EmitAsmStmt(const AsmStmt &S) {
   std::string AsmString = S.generateAsmString(getContext());
 
   // Get all the output and input constraints together.
-  SmallVector<TargetInfo::ConstraintInfo, 4> OutputConstraintInfos;
-  SmallVector<TargetInfo::ConstraintInfo, 4> InputConstraintInfos;
+  llvm::SmallVector<TargetInfo::ConstraintInfo, 4> OutputConstraintInfos;
+  llvm::SmallVector<TargetInfo::ConstraintInfo, 4> InputConstraintInfos;
 
   bool IsHipStdPar = getLangOpts().HIPStdPar && getLangOpts().CUDAIsDevice;
   bool IsValidTargetAsm = true;
   for (unsigned i = 0, e = S.getNumOutputs(); i != e && IsValidTargetAsm; i++) {
-    StringRef Name;
+    llvm::StringRef Name;
     if (const GCCAsmStmt *GAS = dyn_cast<GCCAsmStmt>(&S))
       Name = GAS->getOutputName(i);
     TargetInfo::ConstraintInfo Info(S.getOutputConstraint(i), Name);
@@ -2638,7 +2638,7 @@ void CodeGenFunction::EmitAsmStmt(const AsmStmt &S) {
   }
 
   for (unsigned i = 0, e = S.getNumInputs(); i != e && IsValidTargetAsm; i++) {
-    StringRef Name;
+    llvm::StringRef Name;
     if (const GCCAsmStmt *GAS = dyn_cast<GCCAsmStmt>(&S))
       Name = GAS->getInputName(i);
     TargetInfo::ConstraintInfo Info(S.getInputConstraint(i), Name);
@@ -2918,7 +2918,7 @@ void CodeGenFunction::EmitAsmStmt(const AsmStmt &S) {
   Constraints += InOutConstraints;
 
   // Labels
-  SmallVector<llvm::BasicBlock *, 16> Transfer;
+  llvm::SmallVector<llvm::BasicBlock *, 16> Transfer;
   llvm::BasicBlock *Fallthrough = nullptr;
   bool IsGCCAsmGoto = false;
   if (const auto *GS = dyn_cast<GCCAsmStmt>(&S)) {
@@ -2939,7 +2939,7 @@ void CodeGenFunction::EmitAsmStmt(const AsmStmt &S) {
 
   // Clobbers
   for (unsigned i = 0, e = S.getNumClobbers(); i != e; i++) {
-    StringRef Clobber = S.getClobber(i);
+    llvm::StringRef Clobber = S.getClobber(i);
 
     if (Clobber == "memory")
       ReadOnly = ReadNone = false;
@@ -3016,7 +3016,7 @@ void CodeGenFunction::EmitAsmStmt(const AsmStmt &S) {
       /* IsAlignStack */ false, AsmDialect, HasUnwindClobber);
   std::vector<llvm::Value*> RegResults;
   llvm::CallBrInst *CBR;
-  llvm::DenseMap<llvm::BasicBlock *, SmallVector<llvm::Value *, 4>>
+  llvm::DenseMap<llvm::BasicBlock *, llvm::SmallVector<llvm::Value *, 4>>
       CBRRegResults;
   if (IsGCCAsmGoto) {
     CBR = Builder.CreateCallBr(IA, Fallthrough, Transfer, Args);

@@ -826,7 +826,7 @@ Parser::DeclGroupPtrTy Parser::ParseUsingDeclaration(
     return nullptr;
   }
 
-  SmallVector<Decl *, 8> DeclsInGroup;
+  llvm::SmallVector<Decl *, 8> DeclsInGroup;
   while (true) {
     // Parse (optional) attributes.
     MaybeParseAttributes(PAKM_GNU | PAKM_CXX11, Attrs);
@@ -2344,7 +2344,7 @@ void Parser::ParseBaseClause(Decl *ClassDecl) {
   ConsumeToken();
 
   // Build up an array of parsed base specifiers.
-  SmallVector<CXXBaseSpecifier *, 8> BaseInfo;
+  llvm::SmallVector<CXXBaseSpecifier *, 8> BaseInfo;
 
   while (true) {
     // Parse a base-specifier.
@@ -2727,7 +2727,7 @@ void Parser::MaybeParseAndDiagnoseDeclSpecAfterCXX11VirtSpecifierSeq(
   if (D.isFunctionDeclarator()) {
     auto &Function = D.getFunctionTypeInfo();
     if (DS.getTypeQualifiers() != DeclSpec::TQ_unspecified) {
-      auto DeclSpecCheck = [&](DeclSpec::TQ TypeQual, StringRef FixItName,
+      auto DeclSpecCheck = [&](DeclSpec::TQ TypeQual, llvm::StringRef FixItName,
                                SourceLocation SpecLoc) {
         FixItHint Insertion;
         auto &MQ = Function.getOrCreateMethodQualifiers();
@@ -3019,7 +3019,7 @@ Parser::DeclGroupPtrTy Parser::ParseCXXClassMemberDeclaration(
       return false;
 
     auto &Zero = NextToken();
-    SmallString<8> Buffer;
+    llvm::SmallString<8> Buffer;
     if (Zero.isNot(tok::numeric_constant) ||
         PP.getSpelling(Zero, Buffer) != "0")
       return false;
@@ -3035,7 +3035,7 @@ Parser::DeclGroupPtrTy Parser::ParseCXXClassMemberDeclaration(
     return true;
   };
 
-  SmallVector<Decl *, 8> DeclsInGroup;
+  llvm::SmallVector<Decl *, 8> DeclsInGroup;
   ExprResult BitfieldSize;
   ExprResult TrailingRequiresClause;
   bool ExpectSemi = true;
@@ -3888,7 +3888,7 @@ void Parser::ParseConstructorInitializer(Decl *ConstructorDecl) {
   PoisonSEHIdentifiersRAIIObject PoisonSEHIdentifiers(*this, true);
   SourceLocation ColonLoc = ConsumeToken();
 
-  SmallVector<CXXCtorInitializer *, 4> MemInitializers;
+  llvm::SmallVector<CXXCtorInitializer *, 4> MemInitializers;
   bool AnyErrors = false;
 
   do {
@@ -4064,8 +4064,8 @@ MemInitResult Parser::ParseMemInitializer(Decl *ConstructorDecl) {
 ///         'noexcept' '(' constant-expression ')'
 ExceptionSpecificationType Parser::tryParseExceptionSpecification(
     bool Delayed, SourceRange &SpecificationRange,
-    SmallVectorImpl<ParsedType> &DynamicExceptions,
-    SmallVectorImpl<SourceRange> &DynamicExceptionRanges,
+    llvm::SmallVectorImpl<ParsedType> &DynamicExceptions,
+    llvm::SmallVectorImpl<SourceRange> &DynamicExceptionRanges,
     ExprResult &NoexceptExpr, CachedTokens *&ExceptionSpecTokens) {
   ExceptionSpecificationType Result = EST_None;
   ExceptionSpecTokens = nullptr;
@@ -4193,8 +4193,8 @@ static void diagnoseDynamicExceptionSpecification(Parser &P, SourceRange Range,
 ///         type-id-list ',' type-id ... [opt]
 ///
 ExceptionSpecificationType Parser::ParseDynamicExceptionSpecification(
-    SourceRange &SpecificationRange, SmallVectorImpl<ParsedType> &Exceptions,
-    SmallVectorImpl<SourceRange> &Ranges) {
+    SourceRange &SpecificationRange, llvm::SmallVectorImpl<ParsedType> &Exceptions,
+    llvm::SmallVectorImpl<SourceRange> &Ranges) {
   assert(Tok.is(tok::kw_throw) && "expected throw");
 
   SpecificationRange.setBegin(ConsumeToken());
@@ -4429,10 +4429,10 @@ IdentifierInfo *Parser::TryParseCXX11AttributeIdentifier(
     // corresponds to the predefined __clang__ macro. If it does, warn the user
     // and recover by pretending they said _Clang instead.
     if (Tok.getLocation().isMacroID()) {
-      SmallString<8> ExpansionBuf;
+      llvm::SmallString<8> ExpansionBuf;
       SourceLocation ExpansionLoc =
           PP.getSourceManager().getExpansionLoc(Tok.getLocation());
-      StringRef Spelling = PP.getSpelling(ExpansionLoc, ExpansionBuf);
+      llvm::StringRef Spelling = PP.getSpelling(ExpansionLoc, ExpansionBuf);
       if (Spelling == "__clang__") {
         SourceRange TokRange(
             ExpansionLoc,
@@ -4459,10 +4459,10 @@ IdentifierInfo *Parser::TryParseCXX11AttributeIdentifier(
   case tok::exclaimequal: // 'not_eq'
     // Alternative tokens do not have identifier info, but their spelling
     // starts with an alphabetical character.
-    SmallString<8> SpellingBuf;
+    llvm::SmallString<8> SpellingBuf;
     SourceLocation SpellingLoc =
         PP.getSourceManager().getSpellingLoc(Tok.getLocation());
-    StringRef Spelling = PP.getSpelling(SpellingLoc, SpellingBuf);
+    llvm::StringRef Spelling = PP.getSpelling(SpellingLoc, SpellingBuf);
     if (isLetter(Spelling[0])) {
       Loc = ConsumeToken();
       return &PP.getIdentifierTable().get(Spelling);
@@ -4990,7 +4990,7 @@ void Parser::ParseMicrosoftUuidAttributeArgs(ParsedAttributes &Attrs) {
     // quotes in the parens. Just append the spelling of all tokens encountered
     // until the closing paren.
 
-    SmallString<42> StrBuffer; // 2 "", 36 bytes UUID, 2 optional {}, 1 nul
+    llvm::SmallString<42> StrBuffer; // 2 "", 36 bytes UUID, 2 optional {}, 1 nul
     StrBuffer += "\"";
 
     // Since none of C++'s keywords match [a-f]+, accepting just tok::l_brace,
@@ -5007,10 +5007,10 @@ void Parser::ParseMicrosoftUuidAttributeArgs(ParsedAttributes &Attrs) {
         SkipUntil(tok::r_paren, StopAtSemi);
         return;
       }
-      SmallString<16> SpellingBuffer;
+      llvm::SmallString<16> SpellingBuffer;
       SpellingBuffer.resize(Tok.getLength() + 1);
       bool Invalid = false;
-      StringRef TokSpelling = PP.getSpelling(Tok, SpellingBuffer, &Invalid);
+      llvm::StringRef TokSpelling = PP.getSpelling(Tok, SpellingBuffer, &Invalid);
       if (Invalid) {
         SkipUntil(tok::r_paren, StopAtSemi);
         return;

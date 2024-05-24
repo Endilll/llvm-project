@@ -241,7 +241,7 @@ struct CodeCompletion {
   // Serialize this to an LSP completion item. This is a lossy operation.
   CompletionItem render(const CodeCompleteOptions &) const;
 };
-raw_ostream &operator<<(raw_ostream &, const CodeCompletion &);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &, const CodeCompletion &);
 struct CodeCompleteResult {
   std::vector<CodeCompletion> Completions;
   bool HasMore = false;
@@ -255,7 +255,7 @@ struct CodeCompleteResult {
   // But heuristics may be used instead if e.g. the preamble is not ready.
   bool RanParser = true;
 };
-raw_ostream &operator<<(raw_ostream &, const CodeCompleteResult &);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &, const CodeCompleteResult &);
 
 /// A speculative and asynchronous fuzzy find index request (based on cached
 /// request) that can be sent before parsing sema. This would reduce completion

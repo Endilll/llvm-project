@@ -23,7 +23,7 @@ namespace clang::tidy::cert {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cert/msc51-cpp.html
 class ProperlySeededRandomGeneratorCheck : public ClangTidyCheck {
 public:
-  ProperlySeededRandomGeneratorCheck(StringRef Name, ClangTidyContext *Context);
+  ProperlySeededRandomGeneratorCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
@@ -34,7 +34,7 @@ private:
                  const T *Func);
 
   std::string RawDisallowedSeedTypes;
-  SmallVector<StringRef, 5> DisallowedSeedTypes;
+  llvm::SmallVector<llvm::StringRef, 5> DisallowedSeedTypes;
 };
 
 } // namespace clang::tidy::cert

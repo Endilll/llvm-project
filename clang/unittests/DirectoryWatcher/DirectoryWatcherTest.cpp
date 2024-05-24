@@ -51,7 +51,7 @@ struct DirectoryWatcherTestFixture {
   std::string TestWatchedDir;
 
   DirectoryWatcherTestFixture() {
-    SmallString<128> pathBuf;
+    llvm::SmallString<128> pathBuf;
 #ifndef NDEBUG
     std::error_code UniqDirRes =
 #endif
@@ -69,15 +69,15 @@ struct DirectoryWatcherTestFixture {
 
   ~DirectoryWatcherTestFixture() { remove_directories(TestRootDir); }
 
-  SmallString<128> getPathInWatched(const std::string &testFile) {
-    SmallString<128> pathBuf;
+  llvm::SmallString<128> getPathInWatched(const std::string &testFile) {
+    llvm::SmallString<128> pathBuf;
     pathBuf = TestWatchedDir;
     path::append(pathBuf, testFile);
     return pathBuf;
   }
 
   void addFile(const std::string &testFile) {
-    Expected<file_t> ft = openNativeFileForWrite(getPathInWatched(testFile),
+    llvm::Expected<file_t> ft = openNativeFileForWrite(getPathInWatched(testFile),
                                                  CD_CreateNew, OF_None);
     if (ft) {
       closeFile(*ft);

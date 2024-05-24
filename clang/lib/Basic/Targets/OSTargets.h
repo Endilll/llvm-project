@@ -35,8 +35,8 @@ public:
 };
 
 void getDarwinDefines(MacroBuilder &Builder, const LangOptions &Opts,
-                      const llvm::Triple &Triple, StringRef &PlatformName,
-                      VersionTuple &PlatformMinVersion);
+                      const llvm::Triple &Triple, llvm::StringRef &PlatformName,
+                      llvm::VersionTuple &PlatformMinVersion);
 
 template <typename Target>
 class LLVM_LIBRARY_VISIBILITY DarwinTargetInfo : public OSTargetInfo<Target> {
@@ -187,8 +187,8 @@ protected:
     if (CCVersion == 0U)
       CCVersion = Release * 100000U + 1U;
 
-    Builder.defineMacro("__FreeBSD__", Twine(Release));
-    Builder.defineMacro("__FreeBSD_cc_version", Twine(CCVersion));
+    Builder.defineMacro("__FreeBSD__", llvm::Twine(Release));
+    Builder.defineMacro("__FreeBSD_cc_version", llvm::Twine(CCVersion));
     Builder.defineMacro("__KPRINTF_ATTRIBUTE__");
     DefineStd(Builder, "unix", Opts);
     if (this->HasFloat128)
@@ -323,7 +323,7 @@ protected:
       this->PlatformMinVersion = Triple.getEnvironmentVersion();
       const unsigned Maj = this->PlatformMinVersion.getMajor();
       if (Maj) {
-        Builder.defineMacro("__ANDROID_MIN_SDK_VERSION__", Twine(Maj));
+        Builder.defineMacro("__ANDROID_MIN_SDK_VERSION__", llvm::Twine(Maj));
         // This historical but ambiguous name for the minSdkVersion macro. Keep
         // defined for compatibility.
         Builder.defineMacro("__ANDROID_API__", "__ANDROID_MIN_SDK_VERSION__");
@@ -657,31 +657,31 @@ protected:
     if (Opts.EnableAIXExtendedAltivecABI)
       Builder.defineMacro("__EXTABI__");
 
-    VersionTuple OsVersion = Triple.getOSVersion();
+    llvm::VersionTuple OsVersion = Triple.getOSVersion();
 
     // Define AIX OS-Version Macros.
     // Includes logic for legacy versions of AIX; no specific intent to support.
-    if (OsVersion >= VersionTuple(3, 2))
+    if (OsVersion >= llvm::VersionTuple(3, 2))
       Builder.defineMacro("_AIX32");
-    if (OsVersion >= VersionTuple(4, 1))
+    if (OsVersion >= llvm::VersionTuple(4, 1))
       Builder.defineMacro("_AIX41");
-    if (OsVersion >= VersionTuple(4, 3))
+    if (OsVersion >= llvm::VersionTuple(4, 3))
       Builder.defineMacro("_AIX43");
-    if (OsVersion >= VersionTuple(5, 0))
+    if (OsVersion >= llvm::VersionTuple(5, 0))
       Builder.defineMacro("_AIX50");
-    if (OsVersion >= VersionTuple(5, 1))
+    if (OsVersion >= llvm::VersionTuple(5, 1))
       Builder.defineMacro("_AIX51");
-    if (OsVersion >= VersionTuple(5, 2))
+    if (OsVersion >= llvm::VersionTuple(5, 2))
       Builder.defineMacro("_AIX52");
-    if (OsVersion >= VersionTuple(5, 3))
+    if (OsVersion >= llvm::VersionTuple(5, 3))
       Builder.defineMacro("_AIX53");
-    if (OsVersion >= VersionTuple(6, 1))
+    if (OsVersion >= llvm::VersionTuple(6, 1))
       Builder.defineMacro("_AIX61");
-    if (OsVersion >= VersionTuple(7, 1))
+    if (OsVersion >= llvm::VersionTuple(7, 1))
       Builder.defineMacro("_AIX71");
-    if (OsVersion >= VersionTuple(7, 2))
+    if (OsVersion >= llvm::VersionTuple(7, 2))
       Builder.defineMacro("_AIX72");
-    if (OsVersion >= VersionTuple(7, 3))
+    if (OsVersion >= llvm::VersionTuple(7, 3))
       Builder.defineMacro("_AIX73");
 
     // FIXME: Do not define _LONG_LONG when -fno-long-long is specified.
@@ -860,9 +860,9 @@ protected:
     // Required by the libc++ locale support.
     if (Opts.CPlusPlus)
       Builder.defineMacro("_GNU_SOURCE");
-    Builder.defineMacro("__Fuchsia_API_level__", Twine(Opts.FuchsiaAPILevel));
+    Builder.defineMacro("__Fuchsia_API_level__", llvm::Twine(Opts.FuchsiaAPILevel));
     this->PlatformName = "fuchsia";
-    this->PlatformMinVersion = VersionTuple(Opts.FuchsiaAPILevel);
+    this->PlatformMinVersion = llvm::VersionTuple(Opts.FuchsiaAPILevel);
   }
 
 public:
@@ -956,11 +956,11 @@ protected:
       auto Version = Triple.getEnvironmentVersion();
       this->PlatformName = "ohos";
       this->PlatformMinVersion = Version;
-      Builder.defineMacro("__OHOS_Major__", Twine(Version.getMajor()));
+      Builder.defineMacro("__OHOS_Major__", llvm::Twine(Version.getMajor()));
       if (auto Minor = Version.getMinor())
-        Builder.defineMacro("__OHOS_Minor__", Twine(*Minor));
+        Builder.defineMacro("__OHOS_Minor__", llvm::Twine(*Minor));
       if (auto Subminor = Version.getSubminor())
-        Builder.defineMacro("__OHOS_Micro__", Twine(*Subminor));
+        Builder.defineMacro("__OHOS_Micro__", llvm::Twine(*Subminor));
     }
 
     if (Triple.isOpenHOS())

@@ -105,7 +105,7 @@ public:
   ///  `Li` must not be `NullLit`.
   ///
   ///  All literals in the input that are not `NullLit` must be distinct.
-  void addClause(ArrayRef<Literal> lits);
+  void addClause(llvm::ArrayRef<Literal> lits);
 
   /// Returns whether the formula is known to be contradictory.
   /// This is the case if any of the clauses is empty.

@@ -19,7 +19,7 @@ namespace clang::tidy::cert {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cert/dcl50-cpp.html
 class VariadicFunctionDefCheck : public ClangTidyCheck {
 public:
-  VariadicFunctionDefCheck(StringRef Name, ClangTidyContext *Context)
+  VariadicFunctionDefCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

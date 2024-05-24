@@ -350,7 +350,7 @@ TEST(BulletList, Render) {
   Document &DeepDoc = InnerList.addItem();
   DeepDoc.addParagraph().appendText("baz");
   DeepDoc.addParagraph().appendText("baz");
-  StringRef ExpectedMarkdown = R"md(- foo
+  llvm::StringRef ExpectedMarkdown = R"md(- foo
 - bar
 - foo  
   baz  
@@ -358,7 +358,7 @@ TEST(BulletList, Render) {
     - baz  
       baz)md";
   EXPECT_EQ(L.asMarkdown(), ExpectedMarkdown);
-  StringRef ExpectedPlainText = R"pt(- foo
+  llvm::StringRef ExpectedPlainText = R"pt(- foo
 - bar
 - foo
   baz

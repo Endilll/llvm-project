@@ -63,10 +63,10 @@ namespace find_all_symbols {
 
 class YamlReporter : public SymbolReporter {
 public:
-  void reportSymbols(StringRef FileName,
+  void reportSymbols(llvm::StringRef FileName,
                      const SymbolInfo::SignalMap &Symbols) override {
     int FD;
-    SmallString<128> ResultPath;
+    llvm::SmallString<128> ResultPath;
     llvm::sys::fs::createUniqueFile(
         OutputDir + "/" + llvm::sys::path::filename(FileName) + "-%%%%%%.yaml",
         FD, ResultPath);
@@ -79,7 +79,7 @@ bool Merge(llvm::StringRef MergeDir, llvm::StringRef OutputFile) {
   std::error_code EC;
   SymbolInfo::SignalMap Symbols;
   std::mutex SymbolMutex;
-  auto AddSymbols = [&](ArrayRef<SymbolAndSignals> NewSymbols) {
+  auto AddSymbols = [&](llvm::ArrayRef<SymbolAndSignals> NewSymbols) {
     // Synchronize set accesses.
     std::unique_lock<std::mutex> LockGuard(SymbolMutex);
     for (const auto &Symbol : NewSymbols) {

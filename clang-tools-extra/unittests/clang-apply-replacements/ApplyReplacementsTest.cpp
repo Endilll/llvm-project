@@ -18,10 +18,10 @@ namespace clang {
 namespace tooling {
 
 static TUDiagnostics
-makeTUDiagnostics(const std::string &MainSourceFile, StringRef DiagnosticName,
+makeTUDiagnostics(const std::string &MainSourceFile, llvm::StringRef DiagnosticName,
                   const DiagnosticMessage &Message,
                   const StringMap<Replacements> &Replacements,
-                  StringRef BuildDirectory) {
+                  llvm::StringRef BuildDirectory) {
   TUDiagnostics TUs;
   TUs.push_back(
       {MainSourceFile,
@@ -32,9 +32,9 @@ makeTUDiagnostics(const std::string &MainSourceFile, StringRef DiagnosticName,
 // Test to ensure diagnostics with no fixes, will be merged correctly
 // before applying.
 TEST(ApplyReplacementsTest, mergeDiagnosticsWithNoFixes) {
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(new DiagnosticOptions());
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(new DiagnosticOptions());
   DiagnosticsEngine Diagnostics(
-      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), DiagOpts.get());
+      llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), DiagOpts.get());
   FileManager Files((FileSystemOptions()));
   SourceManager SM(Diagnostics, Files);
   TUReplacements TURs;

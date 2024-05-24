@@ -20,7 +20,7 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::cppcoreguidelines {
 
 SpecialMemberFunctionsCheck::SpecialMemberFunctionsCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context), AllowMissingMoveFunctions(Options.get(
                                          "AllowMissingMoveFunctions", false)),
       AllowSoleDefaultDtor(Options.get("AllowSoleDefaultDtor", false)),
@@ -92,7 +92,7 @@ toString(SpecialMemberFunctionsCheck::SpecialMemberFunctionKind K) {
 }
 
 static std::string
-join(ArrayRef<SpecialMemberFunctionsCheck::SpecialMemberFunctionKind> SMFS,
+join(llvm::ArrayRef<SpecialMemberFunctionsCheck::SpecialMemberFunctionKind> SMFS,
      llvm::StringRef AndOr) {
 
   assert(!SMFS.empty() &&

@@ -28,7 +28,7 @@ static SourceLocation advanceBeyondCurrentLine(const SourceManager &SM,
 
 namespace {
 
-using FileList = SmallVector<StringRef>;
+using FileList = llvm::SmallVector<llvm::StringRef>;
 
 class DuplicateIncludeCallbacks : public PPCallbacks {
 public:
@@ -44,10 +44,10 @@ public:
                    FileID PrevFID) override;
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
 
@@ -59,7 +59,7 @@ public:
 
 private:
   // A list of included files is kept for each file we enter.
-  SmallVector<FileList> Files;
+  llvm::SmallVector<FileList> Files;
   DuplicateIncludeCheck &Check;
   const SourceManager &SM;
 };
@@ -75,9 +75,9 @@ void DuplicateIncludeCallbacks::FileChanged(SourceLocation Loc,
 }
 
 void DuplicateIncludeCallbacks::InclusionDirective(
-    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    SourceLocation HashLoc, const Token &IncludeTok, llvm::StringRef FileName,
     bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
-    StringRef SearchPath, StringRef RelativePath, const Module *SuggestedModule,
+    llvm::StringRef SearchPath, llvm::StringRef RelativePath, const Module *SuggestedModule,
     bool ModuleImported, SrcMgr::CharacteristicKind FileType) {
   // Skip includes behind macros
   if (FilenameRange.getBegin().isMacroID() ||

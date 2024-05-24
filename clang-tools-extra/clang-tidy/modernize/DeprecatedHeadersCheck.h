@@ -32,7 +32,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/deprecated-headers.html
 class DeprecatedHeadersCheck : public ClangTidyCheck {
 public:
-  DeprecatedHeadersCheck(StringRef Name, ClangTidyContext *Context);
+  DeprecatedHeadersCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }
@@ -45,7 +45,7 @@ public:
 
   struct IncludeMarker {
     std::string Replacement;
-    StringRef FileName;
+    llvm::StringRef FileName;
     SourceRange ReplacementRange;
     SourceLocation DiagLoc;
   };

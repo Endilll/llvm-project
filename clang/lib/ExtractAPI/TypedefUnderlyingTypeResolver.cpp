@@ -48,10 +48,10 @@ SymbolReference
 TypedefUnderlyingTypeResolver::getSymbolReferenceForType(QualType Type,
                                                          APISet &API) const {
   std::string TypeName = Type.getAsString();
-  SmallString<128> TypeUSR;
+  llvm::SmallString<128> TypeUSR;
   const NamedDecl *TypeDecl = getUnderlyingTypeDecl(Type);
   const TypedefType *TypedefTy = Type->getAs<TypedefType>();
-  StringRef OwningModuleName;
+  llvm::StringRef OwningModuleName;
 
   if (TypeDecl) {
     if (!TypedefTy)
@@ -68,7 +68,7 @@ TypedefUnderlyingTypeResolver::getSymbolReferenceForType(QualType Type,
 }
 
 std::string TypedefUnderlyingTypeResolver::getUSRForType(QualType Type) const {
-  SmallString<128> TypeUSR;
+  llvm::SmallString<128> TypeUSR;
   const NamedDecl *TypeDecl = getUnderlyingTypeDecl(Type);
 
   if (TypeDecl)

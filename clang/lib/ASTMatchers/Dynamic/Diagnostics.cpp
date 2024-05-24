@@ -21,14 +21,14 @@ Diagnostics::ArgStream Diagnostics::pushContextFrame(ContextType Type,
 }
 
 Diagnostics::Context::Context(ConstructMatcherEnum, Diagnostics *Error,
-                              StringRef MatcherName,
+                              llvm::StringRef MatcherName,
                               SourceRange MatcherRange)
     : Error(Error) {
   Error->pushContextFrame(CT_MatcherConstruct, MatcherRange) << MatcherName;
 }
 
 Diagnostics::Context::Context(MatcherArgEnum, Diagnostics *Error,
-                              StringRef MatcherName,
+                              llvm::StringRef MatcherName,
                               SourceRange MatcherRange,
                               unsigned ArgNumber)
     : Error(Error) {
@@ -57,7 +57,7 @@ void Diagnostics::OverloadContext::revertErrors() {
   Error->Errors.resize(BeginIndex);
 }
 
-Diagnostics::ArgStream &Diagnostics::ArgStream::operator<<(const Twine &Arg) {
+Diagnostics::ArgStream &Diagnostics::ArgStream::operator<<(const llvm::Twine &Arg) {
   Out->push_back(Arg.str());
   return *this;
 }
@@ -73,7 +73,7 @@ Diagnostics::ArgStream Diagnostics::addError(SourceRange Range,
   return ArgStream(&Last.Messages.back().Args);
 }
 
-static StringRef contextTypeToFormatString(Diagnostics::ContextType Type) {
+static llvm::StringRef contextTypeToFormatString(Diagnostics::ContextType Type) {
   switch (Type) {
     case Diagnostics::CT_MatcherConstruct:
       return "Error building matcher $0.";
@@ -83,7 +83,7 @@ static StringRef contextTypeToFormatString(Diagnostics::ContextType Type) {
   llvm_unreachable("Unknown ContextType value.");
 }
 
-static StringRef errorTypeToFormatString(Diagnostics::ErrorType Type) {
+static llvm::StringRef errorTypeToFormatString(Diagnostics::ErrorType Type) {
   switch (Type) {
   case Diagnostics::ET_RegistryMatcherNotFound:
     return "Matcher not found: $0";
@@ -138,11 +138,11 @@ static StringRef errorTypeToFormatString(Diagnostics::ErrorType Type) {
   llvm_unreachable("Unknown ErrorType value.");
 }
 
-static void formatErrorString(StringRef FormatString,
-                              ArrayRef<std::string> Args,
+static void formatErrorString(llvm::StringRef FormatString,
+                              llvm::ArrayRef<std::string> Args,
                               llvm::raw_ostream &OS) {
   while (!FormatString.empty()) {
-    std::pair<StringRef, StringRef> Pieces = FormatString.split("$");
+    std::pair<llvm::StringRef, llvm::StringRef> Pieces = FormatString.split("$");
     OS << Pieces.first.str();
     if (Pieces.second.empty()) break;
 
@@ -174,7 +174,7 @@ static void printContextFrameToStream(const Diagnostics::ContextFrame &Frame,
 
 static void
 printMessageToStream(const Diagnostics::ErrorContent::Message &Message,
-                     const Twine Prefix, llvm::raw_ostream &OS) {
+                     const llvm::Twine Prefix, llvm::raw_ostream &OS) {
   maybeAddLineAndColumn(Message.Range, OS);
   OS << Prefix;
   formatErrorString(errorTypeToFormatString(Message.Type), Message.Args, OS);
@@ -188,7 +188,7 @@ static void printErrorContentToStream(const Diagnostics::ErrorContent &Content,
     for (size_t i = 0, e = Content.Messages.size(); i != e; ++i) {
       if (i != 0) OS << "\n";
       printMessageToStream(Content.Messages[i],
-                           "Candidate " + Twine(i + 1) + ": ", OS);
+                           "Candidate " + llvm::Twine(i + 1) + ": ", OS);
     }
   }
 }

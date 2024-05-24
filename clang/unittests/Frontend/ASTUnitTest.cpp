@@ -29,7 +29,7 @@ protected:
   int FD;
   llvm::SmallString<256> InputFileName;
   std::unique_ptr<ToolOutputFile> input_file;
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags;
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags;
   std::shared_ptr<CompilerInvocation> CInvok;
   std::shared_ptr<PCHContainerOperations> PCHContainerOps;
 
@@ -184,7 +184,7 @@ TEST_F(ASTUnitTest, LoadFromCommandLineWorkingDirectory) {
   auto Input = std::make_unique<ToolOutputFile>(InputFileName, FD);
   Input->os() << "";
 
-  SmallString<128> WorkingDir;
+  llvm::SmallString<128> WorkingDir;
   ASSERT_FALSE(sys::fs::createUniqueDirectory("foo", WorkingDir));
   const char *Args[] = {"clang", "-working-directory", WorkingDir.c_str(),
                         InputFileName.c_str()};

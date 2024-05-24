@@ -128,7 +128,7 @@ Parser::DeclGroupPtrTy Parser::ParseTemplateDeclarationOrSpecialization(
 
     // Parse the '<' template-parameter-list '>'
     SourceLocation LAngleLoc, RAngleLoc;
-    SmallVector<NamedDecl*, 4> TemplateParams;
+    llvm::SmallVector<NamedDecl*, 4> TemplateParams;
     if (ParseTemplateParameters(TemplateParamScopes,
                                 CurTemplateDepthTracker.getDepth(),
                                 TemplateParams, LAngleLoc, RAngleLoc)) {
@@ -355,7 +355,7 @@ Parser::ParseConceptDefinition(const ParsedTemplateInfo &TemplateInfo,
 /// \returns true if an error occurred, false otherwise.
 bool Parser::ParseTemplateParameters(
     MultiParseScope &TemplateScopes, unsigned Depth,
-    SmallVectorImpl<NamedDecl *> &TemplateParams, SourceLocation &LAngleLoc,
+    llvm::SmallVectorImpl<NamedDecl *> &TemplateParams, SourceLocation &LAngleLoc,
     SourceLocation &RAngleLoc) {
   // Get the template parameter list.
   if (!TryConsumeToken(tok::less, LAngleLoc)) {
@@ -397,7 +397,7 @@ bool Parser::ParseTemplateParameters(
 ///         template-parameter-list ',' template-parameter
 bool
 Parser::ParseTemplateParameterList(const unsigned Depth,
-                             SmallVectorImpl<NamedDecl*> &TemplateParams) {
+                             llvm::SmallVectorImpl<NamedDecl*> &TemplateParams) {
   while (true) {
 
     if (NamedDecl *TmpParam
@@ -789,7 +789,7 @@ NamedDecl *Parser::ParseTemplateTemplateParameter(unsigned Depth,
 
   // Handle the template <...> part.
   SourceLocation TemplateLoc = ConsumeToken();
-  SmallVector<NamedDecl*,8> TemplateParams;
+  llvm::SmallVector<NamedDecl*,8> TemplateParams;
   SourceLocation LAngleLoc, RAngleLoc;
   ExprResult OptionalRequiresClauseConstraintER;
   {
@@ -1622,7 +1622,7 @@ void Parser::ParseLateTemplatedFuncDef(LateParsedTemplate &LPT) {
   MultiParseScope Scopes(*this);
 
   // Get the list of DeclContexts to reenter.
-  SmallVector<DeclContext*, 4> DeclContextsToReenter;
+  llvm::SmallVector<DeclContext*, 4> DeclContextsToReenter;
   for (DeclContext *DC = FunD; DC && !DC->isTranslationUnit();
        DC = DC->getLexicalParent())
     DeclContextsToReenter.push_back(DC);

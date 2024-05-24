@@ -213,7 +213,7 @@ public:
   uint64_t ASTBlockStartOffset = 0;
 
   /// The serialized bitstream data for this file.
-  StringRef Data;
+  llvm::StringRef Data;
 
   /// The main bitstream cursor for the main block.
   llvm::BitstreamCursor Stream;
@@ -241,7 +241,7 @@ public:
 
   /// The module offset map data for this file. If non-empty, the various
   /// ContinuousRangeMaps described below have not yet been populated.
-  StringRef ModuleOffsetMap;
+  llvm::StringRef ModuleOffsetMap;
 
   // === Input Files ===
 
@@ -482,7 +482,7 @@ public:
 
   /// The Objective-C category lists for categories known to this
   /// module.
-  SmallVector<uint64_t, 1> ObjCCategories;
+  llvm::SmallVector<uint64_t, 1> ObjCCategories;
 
   // === Types ===
 
@@ -503,7 +503,7 @@ public:
   // === Miscellaneous ===
 
   /// Diagnostic IDs and their mappings that the user changed.
-  SmallVector<uint64_t, 8> PragmaDiagMappings;
+  llvm::SmallVector<uint64_t, 8> PragmaDiagMappings;
 
   /// List of modules which depend on this module
   llvm::SetVector<ModuleFile *> ImportedBy;

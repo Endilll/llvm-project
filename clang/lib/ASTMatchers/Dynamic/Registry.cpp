@@ -50,7 +50,7 @@ public:
   const ConstructorMap &constructors() const { return Constructors; }
 
 private:
-  void registerMatcher(StringRef MatcherName,
+  void registerMatcher(llvm::StringRef MatcherName,
                        std::unique_ptr<MatcherDescriptor> Callback);
 
   ConstructorMap Constructors;
@@ -59,7 +59,7 @@ private:
 } // namespace
 
 void RegistryMaps::registerMatcher(
-    StringRef MatcherName, std::unique_ptr<MatcherDescriptor> Callback) {
+    llvm::StringRef MatcherName, std::unique_ptr<MatcherDescriptor> Callback) {
   assert(!Constructors.contains(MatcherName));
   Constructors[MatcherName] = std::move(Callback);
 }
@@ -631,13 +631,13 @@ bool Registry::isBuilderMatcher(MatcherCtor Ctor) {
 
 internal::MatcherDescriptorPtr
 Registry::buildMatcherCtor(MatcherCtor Ctor, SourceRange NameRange,
-                           ArrayRef<ParserValue> Args, Diagnostics *Error) {
+                           llvm::ArrayRef<ParserValue> Args, Diagnostics *Error) {
   return internal::MatcherDescriptorPtr(
       Ctor->buildMatcherCtor(NameRange, Args, Error).release());
 }
 
 // static
-std::optional<MatcherCtor> Registry::lookupMatcherCtor(StringRef MatcherName) {
+std::optional<MatcherCtor> Registry::lookupMatcherCtor(llvm::StringRef MatcherName) {
   auto it = RegistryData->constructors().find(MatcherName);
   return it == RegistryData->constructors().end() ? std::optional<MatcherCtor>()
                                                   : it->second.get();
@@ -660,7 +660,7 @@ static llvm::raw_ostream &operator<<(llvm::raw_ostream &OS,
 }
 
 std::vector<ArgKind> Registry::getAcceptedCompletionTypes(
-    ArrayRef<std::pair<MatcherCtor, unsigned>> Context) {
+    llvm::ArrayRef<std::pair<MatcherCtor, unsigned>> Context) {
   ASTNodeKind InitialTypes[] = {
       ASTNodeKind::getFromNodeKind<Decl>(),
       ASTNodeKind::getFromNodeKind<QualType>(),
@@ -693,13 +693,13 @@ std::vector<ArgKind> Registry::getAcceptedCompletionTypes(
 }
 
 std::vector<MatcherCompletion>
-Registry::getMatcherCompletions(ArrayRef<ArgKind> AcceptedTypes) {
+Registry::getMatcherCompletions(llvm::ArrayRef<ArgKind> AcceptedTypes) {
   std::vector<MatcherCompletion> Completions;
 
   // Search the registry for acceptable matchers.
   for (const auto &M : RegistryData->constructors()) {
     const MatcherDescriptor& Matcher = *M.getValue();
-    StringRef Name = M.getKey();
+    llvm::StringRef Name = M.getKey();
 
     std::set<ASTNodeKind> RetKinds;
     unsigned NumArgs = Matcher.isVariadic() ? 1 : Matcher.getNumArgs();
@@ -800,15 +800,15 @@ Registry::getMatcherCompletions(ArrayRef<ArgKind> AcceptedTypes) {
 
 VariantMatcher Registry::constructMatcher(MatcherCtor Ctor,
                                           SourceRange NameRange,
-                                          ArrayRef<ParserValue> Args,
+                                          llvm::ArrayRef<ParserValue> Args,
                                           Diagnostics *Error) {
   return Ctor->create(NameRange, Args, Error);
 }
 
 VariantMatcher Registry::constructBoundMatcher(MatcherCtor Ctor,
                                                SourceRange NameRange,
-                                               StringRef BindID,
-                                               ArrayRef<ParserValue> Args,
+                                               llvm::StringRef BindID,
+                                               llvm::ArrayRef<ParserValue> Args,
                                                Diagnostics *Error) {
   VariantMatcher Out = constructMatcher(Ctor, NameRange, Args, Error);
   if (Out.isNull()) return Out;

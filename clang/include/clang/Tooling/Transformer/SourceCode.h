@@ -49,11 +49,11 @@ CharSourceRange getExtendedRange(const T &Node, tok::TokenKind Next,
 CharSourceRange getAssociatedRange(const Decl &D, ASTContext &Context);
 
 /// Returns the source-code text in the specified range.
-StringRef getText(CharSourceRange Range, const ASTContext &Context);
+llvm::StringRef getText(CharSourceRange Range, const ASTContext &Context);
 
 /// Returns the source-code text corresponding to \p Node.
 template <typename T>
-StringRef getText(const T &Node, const ASTContext &Context) {
+llvm::StringRef getText(const T &Node, const ASTContext &Context) {
   return getText(CharSourceRange::getTokenRange(Node.getSourceRange()),
                  Context);
 }
@@ -81,7 +81,7 @@ StringRef getText(const T &Node, const ASTContext &Context) {
 ///     = getText(S2, Context) = "{ return 3; }"
 /// \endcode
 template <typename T>
-StringRef getExtendedText(const T &Node, tok::TokenKind Next,
+llvm::StringRef getExtendedText(const T &Node, tok::TokenKind Next,
                           ASTContext &Context) {
   return getText(getExtendedRange(Node, Next, Context), Context);
 }

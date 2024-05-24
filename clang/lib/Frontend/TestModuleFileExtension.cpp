@@ -32,7 +32,7 @@ void TestModuleFileExtension::Writer::writeExtensionContents(
   auto Abbrev = Stream.EmitAbbrev(std::move(Abv));
 
   // Write a message into the extension block.
-  SmallString<64> Message;
+  llvm::SmallString<64> Message;
   {
     auto Ext = static_cast<TestModuleFileExtension *>(getExtension());
     raw_svector_ostream OS(Message);
@@ -48,7 +48,7 @@ TestModuleFileExtension::Reader::Reader(ModuleFileExtension *Ext,
   : ModuleFileExtensionReader(Ext), Stream(InStream)
 {
   // Read the extension block.
-  SmallVector<uint64_t, 4> Record;
+  llvm::SmallVector<uint64_t, 4> Record;
   while (true) {
     llvm::Expected<llvm::BitstreamEntry> MaybeEntry =
         Stream.advanceSkippingSubblocks();
@@ -67,15 +67,15 @@ TestModuleFileExtension::Reader::Reader(ModuleFileExtension *Ext,
     }
 
     Record.clear();
-    StringRef Blob;
-    Expected<unsigned> MaybeRecCode =
+    llvm::StringRef Blob;
+    llvm::Expected<unsigned> MaybeRecCode =
         Stream.readRecord(Entry.ID, Record, &Blob);
     if (!MaybeRecCode)
       fprintf(stderr, "Failed reading rec code: %s\n",
               toString(MaybeRecCode.takeError()).c_str());
     switch (MaybeRecCode.get()) {
     case FIRST_EXTENSION_RECORD_ID: {
-      StringRef Message = Blob.substr(0, Record[0]);
+      llvm::StringRef Message = Blob.substr(0, Record[0]);
       fprintf(stderr, "Read extension block message: %s\n",
               Message.str().c_str());
       break;

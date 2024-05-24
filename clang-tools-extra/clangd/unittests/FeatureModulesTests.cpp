@@ -28,7 +28,7 @@ TEST(FeatureModulesTest, ContributesTweak) {
     struct ModuleTweak final : public Tweak {
       const char *id() const override { return TweakID; }
       bool prepare(const Selection &Sel) override { return true; }
-      Expected<Effect> apply(const Selection &Sel) override {
+      llvm::Expected<Effect> apply(const Selection &Sel) override {
         return error("not implemented");
       }
       std::string title() const override { return id(); }

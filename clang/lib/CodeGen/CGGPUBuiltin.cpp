@@ -190,7 +190,7 @@ RValue CodeGenFunction::EmitAMDGPUDevicePrintfCallExpr(const CallExpr *E) {
                E->arguments(), E->getDirectCallee(),
                /* ParamsToSkip = */ 0);
 
-  SmallVector<llvm::Value *, 8> Args;
+  llvm::SmallVector<llvm::Value *, 8> Args;
   for (const auto &A : CallArgs) {
     // We don't know how to emit non-scalar varargs.
     if (!A.getRValue(*this).isScalar()) {

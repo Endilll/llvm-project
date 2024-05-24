@@ -27,7 +27,7 @@ const char DeclWithNewId[] = "decl_new";
 const char DeclWithCastId[] = "decl_cast";
 const char DeclWithTemplateCastId[] = "decl_template";
 
-size_t getTypeNameLength(bool RemoveStars, StringRef Text) {
+size_t getTypeNameLength(bool RemoveStars, llvm::StringRef Text) {
   enum CharType { Space, Alpha, Punctuation };
   CharType LastChar = Space, BeforeSpace = Punctuation;
   size_t NumChars = 0;
@@ -120,7 +120,7 @@ AST_MATCHER_P(QualType, isSugarFor, Matcher<QualType>, SugarMatcher) {
 ///
 /// namedDecl(hasStdIteratorName()) matches \c I and \c CI.
 Matcher<NamedDecl> hasStdIteratorName() {
-  static const StringRef IteratorNames[] = {"iterator", "reverse_iterator",
+  static const llvm::StringRef IteratorNames[] = {"iterator", "reverse_iterator",
                                             "const_iterator",
                                             "const_reverse_iterator"};
   return hasAnyName(IteratorNames);
@@ -139,7 +139,7 @@ Matcher<NamedDecl> hasStdIteratorName() {
 /// recordDecl(hasStdContainerName()) matches \c vector and \c forward_list
 /// but not \c my_vec.
 Matcher<NamedDecl> hasStdContainerName() {
-  static StringRef ContainerNames[] = {"array",         "deque",
+  static llvm::StringRef ContainerNames[] = {"array",         "deque",
                                        "forward_list",  "list",
                                        "vector",
 
@@ -270,7 +270,7 @@ StatementMatcher makeCombinedMatcher() {
 
 } // namespace
 
-UseAutoCheck::UseAutoCheck(StringRef Name, ClangTidyContext *Context)
+UseAutoCheck::UseAutoCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       MinTypeNameLength(Options.get("MinTypeNameLength", 5)),
       RemoveStars(Options.get("RemoveStars", false)) {}
@@ -356,7 +356,7 @@ static bool isMutliLevelPointerToTypeLocClasses(
 
 void UseAutoCheck::replaceExpr(
     const DeclStmt *D, ASTContext *Context,
-    llvm::function_ref<QualType(const Expr *)> GetType, StringRef Message) {
+    llvm::function_ref<QualType(const Expr *)> GetType, llvm::StringRef Message) {
   const auto *FirstDecl = dyn_cast<VarDecl>(*D->decl_begin());
   // Ensure that there is at least one VarDecl within the DeclStmt.
   if (!FirstDecl)

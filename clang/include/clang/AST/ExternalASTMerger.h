@@ -147,7 +147,7 @@ public:
   void
   FindExternalLexicalDecls(const DeclContext *DC,
                            llvm::function_ref<bool(Decl::Kind)> IsKindWeWant,
-                           SmallVectorImpl<Decl *> &Result) override;
+                           llvm::SmallVectorImpl<Decl *> &Result) override;
 
   /// Implementation of the ExternalASTSource API.
   void CompleteType(TagDecl *Tag) override;

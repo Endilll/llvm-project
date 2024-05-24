@@ -44,7 +44,7 @@ template <typename IDRange>
 llvm::Expected<llvm::DenseSet<SymbolID>> getIDs(IDRange IDs) {
   llvm::DenseSet<SymbolID> Result;
   for (const auto &ID : IDs) {
-    auto SID = SymbolID::fromStr(StringRef(ID));
+    auto SID = SymbolID::fromStr(llvm::StringRef(ID));
     if (!SID)
       return SID.takeError();
     Result.insert(*SID);

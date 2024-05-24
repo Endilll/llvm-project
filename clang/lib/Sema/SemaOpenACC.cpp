@@ -254,7 +254,7 @@ bool doesClauseApplyToDirective(OpenACCDirectiveKind DirectiveKind,
 }
 
 bool checkAlreadyHasClauseOfKind(
-    SemaOpenACC &S, ArrayRef<const OpenACCClause *> ExistingClauses,
+    SemaOpenACC &S, llvm::ArrayRef<const OpenACCClause *> ExistingClauses,
     SemaOpenACC::OpenACCParsedClause &Clause) {
   const auto *Itr = llvm::find_if(ExistingClauses, [&](const OpenACCClause *C) {
     return C->getClauseKind() == Clause.getClauseKind();
@@ -299,7 +299,7 @@ bool checkValidAfterDeviceType(
 SemaOpenACC::SemaOpenACC(Sema &S) : SemaBase(S) {}
 
 OpenACCClause *
-SemaOpenACC::ActOnClause(ArrayRef<const OpenACCClause *> ExistingClauses,
+SemaOpenACC::ActOnClause(llvm::ArrayRef<const OpenACCClause *> ExistingClauses,
                          OpenACCParsedClause &Clause) {
   if (Clause.getClauseKind() == OpenACCClauseKind::Invalid)
     return nullptr;
@@ -761,7 +761,7 @@ SemaOpenACC::ActOnClause(ArrayRef<const OpenACCClause *> ExistingClauses,
       }
     }
 
-    SmallVector<Expr *> ValidVars;
+    llvm::SmallVector<Expr *> ValidVars;
 
     for (Expr *Var : Clause.getVarList()) {
       ExprResult Res = CheckReductionVar(Var);
@@ -1151,7 +1151,7 @@ ExprResult SemaOpenACC::ActOnArraySectionExpr(Expr *Base, SourceLocation LBLoc,
     // Fill in a dummy 'length' so that when we instantiate this we don't
     // double-diagnose here.
     ExprResult Recovery = SemaRef.CreateRecoveryExpr(
-        ColonLoc, SourceLocation(), ArrayRef<Expr *>{std::nullopt},
+        ColonLoc, SourceLocation(), llvm::ArrayRef<Expr *>{std::nullopt},
         Context.IntTy);
     Length = Recovery.isUsable() ? Recovery.get() : nullptr;
   }
@@ -1266,7 +1266,7 @@ bool SemaOpenACC::ActOnStartStmtDirective(OpenACCDirectiveKind K,
 StmtResult SemaOpenACC::ActOnEndStmtDirective(OpenACCDirectiveKind K,
                                               SourceLocation StartLoc,
                                               SourceLocation EndLoc,
-                                              ArrayRef<OpenACCClause *> Clauses,
+                                              llvm::ArrayRef<OpenACCClause *> Clauses,
                                               StmtResult AssocStmt) {
   switch (K) {
   default:

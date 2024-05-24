@@ -41,7 +41,7 @@
 using namespace clang;
 using namespace serialization;
 
-ModuleFile *ModuleManager::lookupByFileName(StringRef Name) const {
+ModuleFile *ModuleManager::lookupByFileName(llvm::StringRef Name) const {
   auto Entry = FileMgr.getFile(Name, /*OpenFile=*/false,
                                /*CacheFailure=*/false);
   if (Entry)
@@ -50,7 +50,7 @@ ModuleFile *ModuleManager::lookupByFileName(StringRef Name) const {
   return nullptr;
 }
 
-ModuleFile *ModuleManager::lookupByModuleName(StringRef Name) const {
+ModuleFile *ModuleManager::lookupByModuleName(llvm::StringRef Name) const {
   if (const Module *Mod = HeaderSearchInfo.getModuleMap().findModule(Name))
     if (OptionalFileEntryRef File = Mod->getASTFile())
       return lookup(*File);
@@ -63,7 +63,7 @@ ModuleFile *ModuleManager::lookup(const FileEntry *File) const {
 }
 
 std::unique_ptr<llvm::MemoryBuffer>
-ModuleManager::lookupBuffer(StringRef Name) {
+ModuleManager::lookupBuffer(llvm::StringRef Name) {
   auto Entry = FileMgr.getFile(Name, /*OpenFile=*/false,
                                /*CacheFailure=*/false);
   if (!Entry)
@@ -96,7 +96,7 @@ static void updateModuleImports(ModuleFile &MF, ModuleFile *ImportedBy,
 }
 
 ModuleManager::AddModuleResult
-ModuleManager::addModule(StringRef FileName, ModuleKind Type,
+ModuleManager::addModule(llvm::StringRef FileName, ModuleKind Type,
                          SourceLocation ImportLoc, ModuleFile *ImportedBy,
                          unsigned Generation,
                          off_t ExpectedSize, time_t ExpectedModTime,
@@ -277,7 +277,7 @@ void ModuleManager::removeModules(ModuleIterator First) {
 }
 
 void
-ModuleManager::addInMemoryBuffer(StringRef FileName,
+ModuleManager::addInMemoryBuffer(llvm::StringRef FileName,
                                  std::unique_ptr<llvm::MemoryBuffer> Buffer) {
   const FileEntry *Entry =
       FileMgr.getVirtualFile(FileName, Buffer->getBufferSize(), 0);
@@ -341,7 +341,7 @@ void ModuleManager::visit(llvm::function_ref<bool(ModuleFile &M)> Visitor,
     // Record the number of incoming edges for each module. When we
     // encounter a module with no incoming edges, push it into the queue
     // to seed the queue.
-    SmallVector<ModuleFile *, 4> Queue;
+    llvm::SmallVector<ModuleFile *, 4> Queue;
     Queue.reserve(N);
     llvm::SmallVector<unsigned, 4> UnusedIncomingEdges;
     UnusedIncomingEdges.resize(size());
@@ -431,7 +431,7 @@ void ModuleManager::visit(llvm::function_ref<bool(ModuleFile &M)> Visitor,
   returnVisitState(std::move(State));
 }
 
-bool ModuleManager::lookupModuleFile(StringRef FileName, off_t ExpectedSize,
+bool ModuleManager::lookupModuleFile(llvm::StringRef FileName, off_t ExpectedSize,
                                      time_t ExpectedModTime,
                                      OptionalFileEntryRef &File) {
   if (FileName == "-") {

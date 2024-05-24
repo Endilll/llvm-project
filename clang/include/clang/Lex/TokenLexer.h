@@ -181,7 +181,7 @@ private:
   ///
   /// \returns If this returns true, the caller should immediately return the
   /// token.
-  bool pasteTokens(Token &LHSTok, ArrayRef<Token> TokenStream,
+  bool pasteTokens(Token &LHSTok, llvm::ArrayRef<Token> TokenStream,
                    unsigned int &CurIdx);
 
   /// Calls pasteTokens above, passing in the '*this' object's Tokens and
@@ -202,7 +202,7 @@ private:
   /// \param[in] VCtx - contains relevant contextual information about the
   /// state of the tokens around and including the __VA_OPT__ token, necessary
   /// for stringification.
-  void stringifyVAOPTContents(SmallVectorImpl<Token> &ResultToks,
+  void stringifyVAOPTContents(llvm::SmallVectorImpl<Token> &ResultToks,
                               const VAOptExpansionContext &VCtx,
                               SourceLocation VAOPTClosingParenLoc);
 
@@ -232,7 +232,7 @@ private:
 
   /// Remove comma ahead of __VA_ARGS__, if present, according to compiler
   /// dialect settings.  Returns true if the comma is removed.
-  bool MaybeRemoveCommaBeforeVaArgs(SmallVectorImpl<Token> &ResultToks,
+  bool MaybeRemoveCommaBeforeVaArgs(llvm::SmallVectorImpl<Token> &ResultToks,
                                     bool HasPasteOperator,
                                     MacroInfo *Macro, unsigned MacroArgNo,
                                     Preprocessor &PP);

@@ -333,18 +333,18 @@ public:
     return createConstGEP2_32<false>(Addr, Idx0, Idx1, Name);
   }
 
-  Address CreateGEP(Address Addr, ArrayRef<llvm::Value *> IdxList,
+  Address CreateGEP(Address Addr, llvm::ArrayRef<llvm::Value *> IdxList,
                     llvm::Type *ElementType, CharUnits Align,
-                    const Twine &Name = "") {
+                    const llvm::Twine &Name = "") {
     llvm::Value *Ptr = emitRawPointerFromAddress(Addr);
     return RawAddress(CreateGEP(Addr.getElementType(), Ptr, IdxList, Name),
                       ElementType, Align);
   }
 
   using CGBuilderBaseTy::CreateInBoundsGEP;
-  Address CreateInBoundsGEP(Address Addr, ArrayRef<llvm::Value *> IdxList,
+  Address CreateInBoundsGEP(Address Addr, llvm::ArrayRef<llvm::Value *> IdxList,
                             llvm::Type *ElementType, CharUnits Align,
-                            const Twine &Name = "") {
+                            const llvm::Twine &Name = "") {
     return RawAddress(CreateInBoundsGEP(Addr.getElementType(),
                                         emitRawPointerFromAddress(Addr),
                                         IdxList, Name),
@@ -352,7 +352,7 @@ public:
   }
 
   using CGBuilderBaseTy::CreateIsNull;
-  llvm::Value *CreateIsNull(Address Addr, const Twine &Name = "") {
+  llvm::Value *CreateIsNull(Address Addr, const llvm::Twine &Name = "") {
     if (!Addr.hasOffset())
       return CreateIsNull(Addr.getBasePointer(), Name);
     // The pointer isn't null if Addr has an offset since offsets can always

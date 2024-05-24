@@ -32,7 +32,7 @@ using namespace CodeGen;
 CodeGenVTables::CodeGenVTables(CodeGenModule &CGM)
     : CGM(CGM), VTContext(CGM.getContext().getVTableContext()) {}
 
-llvm::Constant *CodeGenModule::GetAddrOfThunk(StringRef Name, llvm::Type *FnTy,
+llvm::Constant *CodeGenModule::GetAddrOfThunk(llvm::StringRef Name, llvm::Type *FnTy,
                                               GlobalDecl GD) {
   return GetOrCreateLLVMFunction(Name, FnTy, GD, /*ForVTable=*/true,
                                  /*DontDefer=*/true, /*IsThunk=*/true);
@@ -406,7 +406,7 @@ void CodeGenFunction::EmitMustTailThunk(GlobalDecl GD,
   // to translate AST arguments into LLVM IR arguments.  For thunks, we know
   // that the caller prototype more or less matches the callee prototype with
   // the exception of 'this'.
-  SmallVector<llvm::Value *, 8> Args(llvm::make_pointer_range(CurFn->args()));
+  llvm::SmallVector<llvm::Value *, 8> Args(llvm::make_pointer_range(CurFn->args()));
 
   // Set the adjusted 'this' pointer.
   const ABIArgInfo &ThisAI = CurFnInfo->arg_begin()->info;
@@ -501,7 +501,7 @@ llvm::Constant *CodeGenVTables::maybeEmitThunk(GlobalDecl GD,
   // First, get a declaration. Compute the mangled name. Don't worry about
   // getting the function prototype right, since we may only need this
   // declaration to fill in a vtable slot.
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   MangleContext &MCtx = CGM.getCXXABI().getMangleContext();
   llvm::raw_svector_ostream Out(Name);
   if (const CXXDestructorDecl *DD = dyn_cast<CXXDestructorDecl>(MD))
@@ -533,7 +533,7 @@ llvm::Constant *CodeGenVTables::maybeEmitThunk(GlobalDecl GD,
     assert(OldThunkFn->isDeclaration() && "Shouldn't replace non-declaration");
 
     // Remove the name from the old thunk function and get a new thunk.
-    OldThunkFn->setName(StringRef());
+    OldThunkFn->setName(llvm::StringRef());
     ThunkFn = llvm::Function::Create(ThunkFnTy, llvm::Function::ExternalLinkage,
                                      Name.str(), &CGM.getModule());
     CGM.SetLLVMFunctionAttributes(MD, FnInfo, ThunkFn, /*IsThunk=*/false);
@@ -770,7 +770,7 @@ void CodeGenVTables::addVTableComponent(ConstantArrayBuilder &builder,
       // Method is acceptable, continue processing as usual.
     }
 
-    auto getSpecialVirtualFn = [&](StringRef name) -> llvm::Constant * {
+    auto getSpecialVirtualFn = [&](llvm::StringRef name) -> llvm::Constant * {
       // FIXME(PR43094): When merging comdat groups, lld can select a local
       // symbol as the signature symbol even though it cannot be accessed
       // outside that symbol's TU. The relative vtables ABI would make
@@ -856,7 +856,7 @@ void CodeGenVTables::addVTableComponent(ConstantArrayBuilder &builder,
 }
 
 llvm::Type *CodeGenVTables::getVTableType(const VTableLayout &layout) {
-  SmallVector<llvm::Type *, 4> tys;
+  llvm::SmallVector<llvm::Type *, 4> tys;
   llvm::Type *componentType = getVTableComponentType();
   for (unsigned i = 0, e = layout.getNumVTables(); i != e; ++i)
     tys.push_back(llvm::ArrayType::get(componentType, layout.getVTableSize(i)));
@@ -903,12 +903,12 @@ llvm::GlobalVariable *CodeGenVTables::GenerateConstructionVTable(
   AddressPoints = VTLayout->getAddressPoints();
 
   // Get the mangled construction vtable name.
-  SmallString<256> OutName;
+  llvm::SmallString<256> OutName;
   llvm::raw_svector_ostream Out(OutName);
   cast<ItaniumMangleContext>(CGM.getCXXABI().getMangleContext())
       .mangleCXXCtorVTable(RD, Base.getBaseOffset().getQuantity(),
                            Base.getBase(), Out);
-  SmallString<256> Name(OutName);
+  llvm::SmallString<256> Name(OutName);
 
   bool UsingRelativeLayout = getItaniumVTableContext().isRelativeLayout();
   bool VTableAliasExists =
@@ -1342,7 +1342,7 @@ void CodeGenModule::EmitVTableTypeMetadata(const CXXRecordDecl *RD,
   // Sort the address points for determinism.
   llvm::sort(AddressPoints);
 
-  ArrayRef<VTableComponent> Comps = VTLayout.vtable_components();
+  llvm::ArrayRef<VTableComponent> Comps = VTLayout.vtable_components();
   for (auto AP : AddressPoints) {
     // Create type metadata for the address point.
     AddVTableTypeMetadata(VTable, ComponentWidth * AP.Offset, AP.Base);

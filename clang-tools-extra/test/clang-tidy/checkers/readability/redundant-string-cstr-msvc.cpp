@@ -17,9 +17,9 @@ struct basic_string {
 typedef basic_string<char, std::char_traits<char>, std::allocator<char>> string;
 }
 namespace llvm {
-struct StringRef {
-  StringRef(const char *p);
-  StringRef(const std::string &);
+struct llvm::StringRef {
+  llvm::StringRef(const char *p);
+  llvm::StringRef(const std::string &);
 };
 }
 

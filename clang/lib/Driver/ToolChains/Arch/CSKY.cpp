@@ -77,7 +77,7 @@ csky::FloatABI csky::getCSKYFloatABI(const Driver &D, const ArgList &Args) {
 // Handle -mfpu=.
 static llvm::CSKY::CSKYFPUKind
 getCSKYFPUFeatures(const Driver &D, const Arg *A, const ArgList &Args,
-                   StringRef FPU, std::vector<StringRef> &Features) {
+                   llvm::StringRef FPU, std::vector<llvm::StringRef> &Features) {
 
   llvm::CSKY::CSKYFPUKind FPUID =
       llvm::StringSwitch<llvm::CSKY::CSKYFPUKind>(FPU)
@@ -96,7 +96,7 @@ getCSKYFPUFeatures(const Driver &D, const Arg *A, const ArgList &Args,
   }
 
   auto RemoveTargetFPUFeature =
-      [&Features](ArrayRef<const char *> FPUFeatures) {
+      [&Features](llvm::ArrayRef<const char *> FPUFeatures) {
         for (auto FPUFeature : FPUFeatures) {
           auto it = llvm::find(Features, FPUFeature);
           if (it != Features.end())

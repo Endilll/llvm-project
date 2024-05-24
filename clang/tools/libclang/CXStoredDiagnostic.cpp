@@ -51,11 +51,11 @@ CXString CXStoredDiagnostic::getSpelling() const {
 
 CXString CXStoredDiagnostic::getDiagnosticOption(CXString *Disable) const {
   unsigned ID = Diag.getID();
-  StringRef Option = DiagnosticIDs::getWarningOptionForDiag(ID);
+  llvm::StringRef Option = DiagnosticIDs::getWarningOptionForDiag(ID);
   if (!Option.empty()) {
     if (Disable)
-      *Disable = cxstring::createDup((Twine("-Wno-") + Option).str());
-    return cxstring::createDup((Twine("-W") + Option).str());
+      *Disable = cxstring::createDup((llvm::Twine("-Wno-") + Option).str());
+    return cxstring::createDup((llvm::Twine("-W") + Option).str());
   }
   
   if (ID == diag::fatal_too_many_errors) {

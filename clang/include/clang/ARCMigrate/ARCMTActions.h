@@ -37,7 +37,7 @@ class MigrateSourceAction : public ASTFrontendAction {
 protected:
   bool BeginInvocation(CompilerInstance &CI) override;
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 };
 
 class MigrateAction : public WrapperFrontendAction {
@@ -49,8 +49,8 @@ protected:
 
 public:
   MigrateAction(std::unique_ptr<FrontendAction> WrappedAction,
-                StringRef migrateDir,
-                StringRef plistOut,
+                llvm::StringRef migrateDir,
+                llvm::StringRef plistOut,
                 bool emitPremigrationARCErrors);
 };
 
@@ -62,11 +62,11 @@ class ObjCMigrateAction : public WrapperFrontendAction {
   CompilerInstance *CompInst;
 public:
   ObjCMigrateAction(std::unique_ptr<FrontendAction> WrappedAction,
-                    StringRef migrateDir, unsigned migrateAction);
+                    llvm::StringRef migrateDir, unsigned migrateAction);
 
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
   bool BeginInvocation(CompilerInstance &CI) override;
 };
 

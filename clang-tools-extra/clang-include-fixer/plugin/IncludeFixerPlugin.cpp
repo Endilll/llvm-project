@@ -37,7 +37,7 @@ public:
                                               /*GenerateDiagnostics=*/true)) {}
 
   std::unique_ptr<clang::ASTConsumer>
-  CreateASTConsumer(clang::CompilerInstance &CI, StringRef InFile) override {
+  CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile) override {
     CI.setExternalSemaSource(SemaSource);
     SemaSource->setFilePath(InFile);
     SemaSource->setCompilerInstance(&CI);
@@ -48,12 +48,12 @@ public:
 
   bool ParseArgs(const CompilerInstance &CI,
                  const std::vector<std::string> &Args) override {
-    StringRef DB = "yaml";
-    StringRef Input;
+    llvm::StringRef DB = "yaml";
+    llvm::StringRef Input;
 
     // Parse the extra command line args.
     // FIXME: This is very limited at the moment.
-    for (StringRef Arg : Args) {
+    for (llvm::StringRef Arg : Args) {
       if (Arg.starts_with("-db="))
         DB = Arg.substr(strlen("-db="));
       else if (Arg.starts_with("-input="))
@@ -71,8 +71,8 @@ public:
         } else {
           // If we don't have any input file, look in the directory of the first
           // file and its parents.
-          SmallString<128> AbsolutePath(tooling::getAbsolutePath(InputFile));
-          StringRef Directory = llvm::sys::path::parent_path(AbsolutePath);
+          llvm::SmallString<128> AbsolutePath(tooling::getAbsolutePath(InputFile));
+          llvm::StringRef Directory = llvm::sys::path::parent_path(AbsolutePath);
           SymbolIdx = include_fixer::YamlSymbolIndex::createFromDirectory(
               Directory, "find_all_symbols_db.yaml");
         }
@@ -86,7 +86,7 @@ public:
 
 private:
   std::shared_ptr<SymbolIndexManager> SymbolIndexMgr;
-  IntrusiveRefCntPtr<IncludeFixerSemaSource> SemaSource;
+  llvm::IntrusiveRefCntPtr<IncludeFixerSemaSource> SemaSource;
 };
 } // namespace include_fixer
 } // namespace clang

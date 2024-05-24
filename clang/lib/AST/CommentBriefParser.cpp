@@ -39,7 +39,7 @@ void cleanupBrief(std::string &S) {
   S.resize(O - S.begin());
 }
 
-bool isWhitespace(StringRef Text) {
+bool isWhitespace(llvm::StringRef Text) {
   return llvm::all_of(Text, clang::isWhitespace);
 }
 } // unnamed namespace

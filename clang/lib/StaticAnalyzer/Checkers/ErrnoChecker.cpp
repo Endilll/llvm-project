@@ -39,8 +39,8 @@ public:
   ProgramStateRef
   checkRegionChanges(ProgramStateRef State,
                      const InvalidatedSymbols *Invalidated,
-                     ArrayRef<const MemRegion *> ExplicitRegions,
-                     ArrayRef<const MemRegion *> Regions,
+                     llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+                     llvm::ArrayRef<const MemRegion *> Regions,
                      const LocationContext *LCtx, const CallEvent *Call) const;
   void checkBranchCondition(const Stmt *Condition, CheckerContext &Ctx) const;
 
@@ -112,7 +112,7 @@ void ErrnoChecker::generateErrnoNotCheckedBug(
     CheckerContext &C, ProgramStateRef State, const MemRegion *ErrnoRegion,
     const CallEvent *CallMayChangeErrno) const {
   if (ExplodedNode *N = C.generateNonFatalErrorNode(State)) {
-    SmallString<100> StrBuf;
+    llvm::SmallString<100> StrBuf;
     llvm::raw_svector_ostream OS(StrBuf);
     if (CallMayChangeErrno) {
       OS << "Value of 'errno' was not checked and may be overwritten by "
@@ -217,8 +217,8 @@ void ErrnoChecker::checkPreCall(const CallEvent &Call,
 
 ProgramStateRef ErrnoChecker::checkRegionChanges(
     ProgramStateRef State, const InvalidatedSymbols *Invalidated,
-    ArrayRef<const MemRegion *> ExplicitRegions,
-    ArrayRef<const MemRegion *> Regions, const LocationContext *LCtx,
+    llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+    llvm::ArrayRef<const MemRegion *> Regions, const LocationContext *LCtx,
     const CallEvent *Call) const {
   std::optional<ento::Loc> ErrnoLoc = getErrnoLoc(State);
   if (!ErrnoLoc)

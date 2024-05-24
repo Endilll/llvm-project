@@ -365,7 +365,7 @@ public:
     return UnpaddedCoerceAndExpandType;
   }
 
-  ArrayRef<llvm::Type *>getCoerceAndExpandTypeSequence() const {
+  llvm::ArrayRef<llvm::Type *>getCoerceAndExpandTypeSequence() const {
     assert(isCoerceAndExpand());
     if (auto structTy =
           dyn_cast<llvm::StructType>(UnpaddedCoerceAndExpandType)) {
@@ -639,8 +639,8 @@ public:
   static CGFunctionInfo *
   create(unsigned llvmCC, bool instanceMethod, bool chainCall,
          bool delegateCall, const FunctionType::ExtInfo &extInfo,
-         ArrayRef<ExtParameterInfo> paramInfos, CanQualType resultType,
-         ArrayRef<CanQualType> argTypes, RequiredArgs required);
+         llvm::ArrayRef<ExtParameterInfo> paramInfos, CanQualType resultType,
+         llvm::ArrayRef<CanQualType> argTypes, RequiredArgs required);
   void operator delete(void *p) { ::operator delete(p); }
 
   // Friending class TrailingObjects is apparently not good enough for MSVC,
@@ -656,11 +656,11 @@ public:
   typedef const ArgInfo *const_arg_iterator;
   typedef ArgInfo *arg_iterator;
 
-  MutableArrayRef<ArgInfo> arguments() {
-    return MutableArrayRef<ArgInfo>(arg_begin(), NumArgs);
+  llvm::MutableArrayRef<ArgInfo> arguments() {
+    return llvm::MutableArrayRef<ArgInfo>(arg_begin(), NumArgs);
   }
-  ArrayRef<ArgInfo> arguments() const {
-    return ArrayRef<ArgInfo>(arg_begin(), NumArgs);
+  llvm::ArrayRef<ArgInfo> arguments() const {
+    return llvm::ArrayRef<ArgInfo>(arg_begin(), NumArgs);
   }
 
   const_arg_iterator arg_begin() const { return getArgsBuffer() + 1; }
@@ -730,7 +730,7 @@ public:
   ABIArgInfo &getReturnInfo() { return getArgsBuffer()[0].info; }
   const ABIArgInfo &getReturnInfo() const { return getArgsBuffer()[0].info; }
 
-  ArrayRef<ExtParameterInfo> getExtParameterInfos() const {
+  llvm::ArrayRef<ExtParameterInfo> getExtParameterInfos() const {
     if (!HasExtParameterInfos) return {};
     return llvm::ArrayRef(getExtParameterInfosBuffer(), NumArgs);
   }
@@ -789,9 +789,9 @@ public:
   static void Profile(llvm::FoldingSetNodeID &ID, bool InstanceMethod,
                       bool ChainCall, bool IsDelegateCall,
                       const FunctionType::ExtInfo &info,
-                      ArrayRef<ExtParameterInfo> paramInfos,
+                      llvm::ArrayRef<ExtParameterInfo> paramInfos,
                       RequiredArgs required, CanQualType resultType,
-                      ArrayRef<CanQualType> argTypes) {
+                      llvm::ArrayRef<CanQualType> argTypes) {
     ID.AddInteger(info.getCC());
     ID.AddBoolean(InstanceMethod);
     ID.AddBoolean(ChainCall);
@@ -810,7 +810,7 @@ public:
         ID.AddInteger(paramInfo.getOpaqueValue());
     }
     resultType.Profile(ID);
-    for (ArrayRef<CanQualType>::iterator
+    for (llvm::ArrayRef<CanQualType>::iterator
            i = argTypes.begin(), e = argTypes.end(); i != e; ++i) {
       i->Profile(ID);
     }

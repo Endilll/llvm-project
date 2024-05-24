@@ -31,10 +31,10 @@ std::error_code IgnoresFileNotFound::convertToErrorCode() const {
   return llvm::inconvertibleErrorCode();
 }
 
-Expected<APIIgnoresList>
+llvm::Expected<APIIgnoresList>
 APIIgnoresList::create(const FilePathList &IgnoresFilePathList,
                        FileManager &FM) {
-  SmallVector<StringRef, 32> Lines;
+  llvm::SmallVector<llvm::StringRef, 32> Lines;
   BufferList symbolBufferList;
 
   for (const auto &CurrentIgnoresFilePath : IgnoresFilePathList) {
@@ -51,12 +51,12 @@ APIIgnoresList::create(const FilePathList &IgnoresFilePathList,
 
   // Symbol names don't have spaces in them, let's just remove these in case
   // the input is slighlty malformed.
-  transform(Lines, Lines.begin(), [](StringRef Line) { return Line.trim(); });
+  transform(Lines, Lines.begin(), [](llvm::StringRef Line) { return Line.trim(); });
   sort(Lines);
   return APIIgnoresList(std::move(Lines), std::move(symbolBufferList));
 }
 
-bool APIIgnoresList::shouldIgnore(StringRef SymbolName) const {
+bool APIIgnoresList::shouldIgnore(llvm::StringRef SymbolName) const {
   auto It = lower_bound(SymbolsToIgnore, SymbolName);
   return (It != SymbolsToIgnore.end()) && (*It == SymbolName);
 }

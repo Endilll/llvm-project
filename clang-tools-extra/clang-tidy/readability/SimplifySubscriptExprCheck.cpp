@@ -20,7 +20,7 @@ static const char KDefaultTypes[] =
     "std::span";
 
 SimplifySubscriptExprCheck::SimplifySubscriptExprCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context), Types(utils::options::parseStringList(
                                          Options.get("Types", KDefaultTypes))) {
 }

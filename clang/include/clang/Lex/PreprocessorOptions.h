@@ -195,7 +195,7 @@ public:
   /// Enables a client to cache the directives for a file and provide them
   /// across multiple compiler invocations.
   /// FIXME: Allow returning an error.
-  std::function<std::optional<ArrayRef<dependency_directives_scan::Directive>>(
+  std::function<std::optional<llvm::ArrayRef<dependency_directives_scan::Directive>>(
       FileEntryRef)>
       DependencyDirectivesForFile;
 
@@ -211,18 +211,18 @@ public:
 public:
   PreprocessorOptions() : PrecompiledPreambleBytes(0, false) {}
 
-  void addMacroDef(StringRef Name) {
+  void addMacroDef(llvm::StringRef Name) {
     Macros.emplace_back(std::string(Name), false);
   }
-  void addMacroUndef(StringRef Name) {
+  void addMacroUndef(llvm::StringRef Name) {
     Macros.emplace_back(std::string(Name), true);
   }
 
-  void addRemappedFile(StringRef From, StringRef To) {
+  void addRemappedFile(llvm::StringRef From, llvm::StringRef To) {
     RemappedFiles.emplace_back(std::string(From), std::string(To));
   }
 
-  void addRemappedFile(StringRef From, llvm::MemoryBuffer *To) {
+  void addRemappedFile(llvm::StringRef From, llvm::MemoryBuffer *To) {
     RemappedFileBuffers.emplace_back(std::string(From), To);
   }
 

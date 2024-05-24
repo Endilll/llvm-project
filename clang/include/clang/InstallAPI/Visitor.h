@@ -69,7 +69,7 @@ private:
   std::optional<HeaderType> getAccessForDecl(const NamedDecl *D) const;
   void recordObjCInstanceVariables(
       const ASTContext &ASTCtx, llvm::MachO::ObjCContainerRecord *Record,
-      StringRef SuperClass,
+      llvm::StringRef SuperClass,
       const llvm::iterator_range<
           DeclContext::specific_decl_iterator<ObjCIvarDecl>>
           Ivars);
@@ -80,7 +80,7 @@ private:
   SourceManager &SrcMgr;
   Preprocessor &PP;
   std::unique_ptr<clang::ItaniumMangleContext> MC;
-  StringRef Layout;
+  llvm::StringRef Layout;
 };
 
 } // namespace installapi

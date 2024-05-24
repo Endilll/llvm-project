@@ -25,7 +25,7 @@ namespace clang::tidy::google::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/google/objc-function-naming.html
 class FunctionNamingCheck : public ClangTidyCheck {
 public:
-  FunctionNamingCheck(StringRef Name, ClangTidyContext *Context)
+  FunctionNamingCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC;

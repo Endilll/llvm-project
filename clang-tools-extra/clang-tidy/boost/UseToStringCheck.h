@@ -21,7 +21,7 @@ namespace clang::tidy::boost {
 /// http://clang.llvm.org/extra/clang-tidy/checks/boost/use-to-string.html
 class UseToStringCheck : public ClangTidyCheck {
 public:
-  UseToStringCheck(StringRef Name, ClangTidyContext *Context)
+  UseToStringCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

@@ -82,10 +82,10 @@ class Compilation {
   /// architecture, and device offload kind.
   struct TCArgsKey final {
     const ToolChain *TC = nullptr;
-    StringRef BoundArch;
+    llvm::StringRef BoundArch;
     Action::OffloadKind DeviceOffloadKind = Action::OFK_None;
 
-    TCArgsKey(const ToolChain *TC, StringRef BoundArch,
+    TCArgsKey(const ToolChain *TC, llvm::StringRef BoundArch,
               Action::OffloadKind DeviceOffloadKind)
         : TC(TC), BoundArch(BoundArch), DeviceOffloadKind(DeviceOffloadKind) {}
 
@@ -116,7 +116,7 @@ class Compilation {
   ArgStringMap TimeTraceFiles;
 
   /// Optional redirection for stdin, stdout, stderr.
-  std::vector<std::optional<StringRef>> Redirects;
+  std::vector<std::optional<llvm::StringRef>> Redirects;
 
   /// Callback called after compilation job has been finished.
   /// Arguments of the callback are the compilation job as an instance of
@@ -237,7 +237,7 @@ public:
   }
 
   /// Returns the sysroot path.
-  StringRef getSysRoot() const;
+  llvm::StringRef getSysRoot() const;
 
   /// getArgsForToolChain - Return the derived argument list for the
   /// tool chain \p TC (or the default tool chain, if TC is not specified).
@@ -248,7 +248,7 @@ public:
   /// \param DeviceOffloadKind - The offload device kind that should be used in
   /// the translation, if any.
   const llvm::opt::DerivedArgList &
-  getArgsForToolChain(const ToolChain *TC, StringRef BoundArch,
+  getArgsForToolChain(const ToolChain *TC, llvm::StringRef BoundArch,
                       Action::OffloadKind DeviceOffloadKind);
 
   /// addTempFile - Add a file to remove on exit, and returns its
@@ -321,7 +321,7 @@ public:
   /// execute it.
   void
   ExecuteJobs(const JobList &Jobs,
-              SmallVectorImpl<std::pair<int, const Command *>> &FailingCommands,
+              llvm::SmallVectorImpl<std::pair<int, const Command *>> &FailingCommands,
               bool LogOnly = false) const;
 
   /// initCompilationForDiagnostics - Remove stale state and suppress output
@@ -344,7 +344,7 @@ public:
   /// \param Redirects - array of optional paths. The array should have a size
   /// of three. The inferior process's stdin(0), stdout(1), and stderr(2) will
   /// be redirected to the corresponding paths, if provided (not std::nullopt).
-  void Redirect(ArrayRef<std::optional<StringRef>> Redirects);
+  void Redirect(llvm::ArrayRef<std::optional<llvm::StringRef>> Redirects);
 };
 
 } // namespace driver

@@ -45,11 +45,11 @@ const TargetInfo::AddlRegName GCCAddlRegNames[] = {
     {{"v9"}, 28}, {{"v11"}, 29}, {{"v13"}, 30}, {{"v15"}, 31}
 };
 
-ArrayRef<const char *> SystemZTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> SystemZTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
-ArrayRef<TargetInfo::AddlRegName> SystemZTargetInfo::getGCCAddlRegNames() const {
+llvm::ArrayRef<TargetInfo::AddlRegName> SystemZTargetInfo::getGCCAddlRegNames() const {
   return llvm::ArrayRef(GCCAddlRegNames);
 }
 
@@ -107,7 +107,7 @@ static constexpr ISANameRevision ISARevisions[] = {
   {{"arch14"}, 14}, {{"z16"}, 14},
 };
 
-int SystemZTargetInfo::getISARevision(StringRef Name) const {
+int SystemZTargetInfo::getISARevision(llvm::StringRef Name) const {
   const auto Rev =
       llvm::find_if(ISARevisions, [Name](const ISANameRevision &CR) {
         return CR.Name == Name;
@@ -118,12 +118,12 @@ int SystemZTargetInfo::getISARevision(StringRef Name) const {
 }
 
 void SystemZTargetInfo::fillValidCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   for (const ISANameRevision &Rev : ISARevisions)
     Values.push_back(Rev.Name);
 }
 
-bool SystemZTargetInfo::hasFeature(StringRef Feature) const {
+bool SystemZTargetInfo::hasFeature(llvm::StringRef Feature) const {
   return llvm::StringSwitch<bool>(Feature)
       .Case("systemz", true)
       .Case("arch8", ISARevision >= 8)
@@ -155,7 +155,7 @@ void SystemZTargetInfo::getTargetDefines(const LangOptions &Opts,
   Builder.defineMacro("__zarch__");
   Builder.defineMacro("__LONG_DOUBLE_128__");
 
-  Builder.defineMacro("__ARCH__", Twine(ISARevision));
+  Builder.defineMacro("__ARCH__", llvm::Twine(ISARevision));
 
   Builder.defineMacro("__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1");
   Builder.defineMacro("__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2");
@@ -170,7 +170,7 @@ void SystemZTargetInfo::getTargetDefines(const LangOptions &Opts,
     Builder.defineMacro("__VEC__", "10304");
 }
 
-ArrayRef<Builtin::Info> SystemZTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> SystemZTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo, clang::SystemZ::LastTSBuiltin -
                                          Builtin::FirstTSBuiltin);
 }

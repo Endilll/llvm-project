@@ -40,7 +40,7 @@ NVPTXTargetInfo::NVPTXTargetInfo(const llvm::Triple &Triple,
          "NVPTX only supports 32- and 64-bit modes.");
 
   PTXVersion = 32;
-  for (const StringRef Feature : Opts.FeaturesAsWritten) {
+  for (const llvm::StringRef Feature : Opts.FeaturesAsWritten) {
     int PTXV;
     if (!Feature.starts_with("+ptx") ||
         Feature.drop_front(4).getAsInteger(10, PTXV))
@@ -159,11 +159,11 @@ NVPTXTargetInfo::NVPTXTargetInfo(const llvm::Triple &Triple,
   //   do the same.
 }
 
-ArrayRef<const char *> NVPTXTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> NVPTXTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
-bool NVPTXTargetInfo::hasFeature(StringRef Feature) const {
+bool NVPTXTargetInfo::hasFeature(llvm::StringRef Feature) const {
   return llvm::StringSwitch<bool>(Feature)
       .Cases("ptx", "nvptx", true)
       .Default(false);
@@ -283,7 +283,7 @@ void NVPTXTargetInfo::getTargetDefines(const LangOptions &Opts,
   }
 }
 
-ArrayRef<Builtin::Info> NVPTXTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> NVPTXTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo,
                         clang::NVPTX::LastTSBuiltin - Builtin::FirstTSBuiltin);
 }

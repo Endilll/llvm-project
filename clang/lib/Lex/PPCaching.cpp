@@ -154,7 +154,7 @@ bool Preprocessor::IsPreviousCachedToken(const Token &Tok) const {
   return true;
 }
 
-void Preprocessor::ReplacePreviousCachedToken(ArrayRef<Token> NewToks) {
+void Preprocessor::ReplacePreviousCachedToken(llvm::ArrayRef<Token> NewToks) {
   assert(CachedLexPos != 0 && "Expected to have some cached tokens");
   CachedTokens.insert(CachedTokens.begin() + CachedLexPos - 1, NewToks.begin(),
                       NewToks.end());

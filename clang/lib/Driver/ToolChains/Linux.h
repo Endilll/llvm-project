@@ -25,7 +25,7 @@ public:
 
   std::string getMultiarchTriple(const Driver &D,
                                  const llvm::Triple &TargetTriple,
-                                 StringRef SysRoot) const override;
+                                 llvm::StringRef SysRoot) const override;
 
   void
   AddClangSystemIncludeArgs(const llvm::opt::ArgList &DriverArgs,

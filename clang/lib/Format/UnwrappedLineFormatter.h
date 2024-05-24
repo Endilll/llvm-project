@@ -35,7 +35,7 @@ public:
         Keywords(Keywords), SourceMgr(SourceMgr), Status(Status) {}
 
   /// Format the current block and return the penalty.
-  unsigned format(const SmallVectorImpl<AnnotatedLine *> &Lines,
+  unsigned format(const llvm::SmallVectorImpl<AnnotatedLine *> &Lines,
                   bool DryRun = false, int AdditionalIndent = 0,
                   bool FixBadIndentation = false, unsigned FirstStartColumn = 0,
                   unsigned NextStartColumn = 0, unsigned LastStartColumn = 0);
@@ -46,7 +46,7 @@ private:
   void formatFirstToken(const AnnotatedLine &Line,
                         const AnnotatedLine *PreviousLine,
                         const AnnotatedLine *PrevPrevLine,
-                        const SmallVectorImpl<AnnotatedLine *> &Lines,
+                        const llvm::SmallVectorImpl<AnnotatedLine *> &Lines,
                         unsigned Indent, unsigned NewlineIndent);
 
   /// Returns the column limit for a line, taking into account whether we
@@ -57,7 +57,7 @@ private:
   // Cache to store the penalty of formatting a vector of AnnotatedLines
   // starting from a specific additional offset. Improves performance if there
   // are many nested blocks.
-  std::map<std::pair<const SmallVectorImpl<AnnotatedLine *> *, unsigned>,
+  std::map<std::pair<const llvm::SmallVectorImpl<AnnotatedLine *> *, unsigned>,
            unsigned>
       PenaltyCache;
 

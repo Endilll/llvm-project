@@ -473,23 +473,23 @@ std::string MemRegion::getString() const {
   return s;
 }
 
-void MemRegion::dumpToStream(raw_ostream &os) const {
+void MemRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "<Unknown Region>";
 }
 
-void AllocaRegion::dumpToStream(raw_ostream &os) const {
+void AllocaRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "alloca{S" << Ex->getID(getContext()) << ',' << Cnt << '}';
 }
 
-void FunctionCodeRegion::dumpToStream(raw_ostream &os) const {
+void FunctionCodeRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "code{" << getDecl()->getDeclName().getAsString() << '}';
 }
 
-void BlockCodeRegion::dumpToStream(raw_ostream &os) const {
+void BlockCodeRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "block_code{" << static_cast<const void *>(this) << '}';
 }
 
-void BlockDataRegion::dumpToStream(raw_ostream &os) const {
+void BlockDataRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "block_data{" << BC;
   os << "; ";
   for (auto Var : referenced_vars())
@@ -498,17 +498,17 @@ void BlockDataRegion::dumpToStream(raw_ostream &os) const {
   os << '}';
 }
 
-void CompoundLiteralRegion::dumpToStream(raw_ostream &os) const {
+void CompoundLiteralRegion::dumpToStream(llvm::raw_ostream &os) const {
   // FIXME: More elaborate pretty-printing.
   os << "{ S" << CL->getID(getContext()) <<  " }";
 }
 
-void CXXTempObjectRegion::dumpToStream(raw_ostream &os) const {
+void CXXTempObjectRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "temp_object{" << getValueType() << ", "
      << "S" << Ex->getID(getContext()) << '}';
 }
 
-void CXXLifetimeExtendedObjectRegion::dumpToStream(raw_ostream &os) const {
+void CXXLifetimeExtendedObjectRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "lifetime_extended_object{" << getValueType() << ", ";
   if (const IdentifierInfo *ID = ExD->getIdentifier())
     os << ID->getName();
@@ -518,48 +518,48 @@ void CXXLifetimeExtendedObjectRegion::dumpToStream(raw_ostream &os) const {
      << "S" << Ex->getID(getContext()) << '}';
 }
 
-void CXXBaseObjectRegion::dumpToStream(raw_ostream &os) const {
+void CXXBaseObjectRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "Base{" << superRegion << ',' << getDecl()->getName() << '}';
 }
 
-void CXXDerivedObjectRegion::dumpToStream(raw_ostream &os) const {
+void CXXDerivedObjectRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "Derived{" << superRegion << ',' << getDecl()->getName() << '}';
 }
 
-void CXXThisRegion::dumpToStream(raw_ostream &os) const {
+void CXXThisRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "this";
 }
 
-void ElementRegion::dumpToStream(raw_ostream &os) const {
+void ElementRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "Element{" << superRegion << ',' << Index << ',' << getElementType()
      << '}';
 }
 
-void FieldRegion::dumpToStream(raw_ostream &os) const {
+void FieldRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << superRegion << "." << *getDecl();
 }
 
-void ObjCIvarRegion::dumpToStream(raw_ostream &os) const {
+void ObjCIvarRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "Ivar{" << superRegion << ',' << *getDecl() << '}';
 }
 
-void StringRegion::dumpToStream(raw_ostream &os) const {
+void StringRegion::dumpToStream(llvm::raw_ostream &os) const {
   assert(Str != nullptr && "Expecting non-null StringLiteral");
   Str->printPretty(os, nullptr, PrintingPolicy(getContext().getLangOpts()));
 }
 
-void ObjCStringRegion::dumpToStream(raw_ostream &os) const {
+void ObjCStringRegion::dumpToStream(llvm::raw_ostream &os) const {
   assert(Str != nullptr && "Expecting non-null ObjCStringLiteral");
   Str->printPretty(os, nullptr, PrintingPolicy(getContext().getLangOpts()));
 }
 
-void SymbolicRegion::dumpToStream(raw_ostream &os) const {
+void SymbolicRegion::dumpToStream(llvm::raw_ostream &os) const {
   if (isa<HeapSpaceRegion>(getSuperRegion()))
     os << "Heap";
   os << "SymRegion{" << sym << '}';
 }
 
-void NonParamVarRegion::dumpToStream(raw_ostream &os) const {
+void NonParamVarRegion::dumpToStream(llvm::raw_ostream &os) const {
   if (const IdentifierInfo *ID = VD->getIdentifier())
     os << ID->getName();
   else
@@ -570,47 +570,47 @@ LLVM_DUMP_METHOD void RegionRawOffset::dump() const {
   dumpToStream(llvm::errs());
 }
 
-void RegionRawOffset::dumpToStream(raw_ostream &os) const {
+void RegionRawOffset::dumpToStream(llvm::raw_ostream &os) const {
   os << "raw_offset{" << getRegion() << ',' << getOffset().getQuantity() << '}';
 }
 
-void CodeSpaceRegion::dumpToStream(raw_ostream &os) const {
+void CodeSpaceRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "CodeSpaceRegion";
 }
 
-void StaticGlobalSpaceRegion::dumpToStream(raw_ostream &os) const {
+void StaticGlobalSpaceRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "StaticGlobalsMemSpace{" << CR << '}';
 }
 
-void GlobalInternalSpaceRegion::dumpToStream(raw_ostream &os) const {
+void GlobalInternalSpaceRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "GlobalInternalSpaceRegion";
 }
 
-void GlobalSystemSpaceRegion::dumpToStream(raw_ostream &os) const {
+void GlobalSystemSpaceRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "GlobalSystemSpaceRegion";
 }
 
-void GlobalImmutableSpaceRegion::dumpToStream(raw_ostream &os) const {
+void GlobalImmutableSpaceRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "GlobalImmutableSpaceRegion";
 }
 
-void HeapSpaceRegion::dumpToStream(raw_ostream &os) const {
+void HeapSpaceRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "HeapSpaceRegion";
 }
 
-void UnknownSpaceRegion::dumpToStream(raw_ostream &os) const {
+void UnknownSpaceRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "UnknownSpaceRegion";
 }
 
-void StackArgumentsSpaceRegion::dumpToStream(raw_ostream &os) const {
+void StackArgumentsSpaceRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "StackArgumentsSpaceRegion";
 }
 
-void StackLocalsSpaceRegion::dumpToStream(raw_ostream &os) const {
+void StackLocalsSpaceRegion::dumpToStream(llvm::raw_ostream &os) const {
   os << "StackLocalsSpaceRegion";
 }
 
-void ParamVarRegion::dumpToStream(raw_ostream &os) const {
+void ParamVarRegion::dumpToStream(llvm::raw_ostream &os) const {
   const ParmVarDecl *PVD = getDecl();
   assert(PVD &&
          "`ParamVarRegion` support functions without `Decl` not implemented"
@@ -630,26 +630,26 @@ bool MemRegion::canPrintPrettyAsExpr() const {
   return false;
 }
 
-void MemRegion::printPretty(raw_ostream &os) const {
+void MemRegion::printPretty(llvm::raw_ostream &os) const {
   assert(canPrintPretty() && "This region cannot be printed pretty.");
   os << "'";
   printPrettyAsExpr(os);
   os << "'";
 }
 
-void MemRegion::printPrettyAsExpr(raw_ostream &) const {
+void MemRegion::printPrettyAsExpr(llvm::raw_ostream &) const {
   llvm_unreachable("This region cannot be printed pretty.");
 }
 
 bool NonParamVarRegion::canPrintPrettyAsExpr() const { return true; }
 
-void NonParamVarRegion::printPrettyAsExpr(raw_ostream &os) const {
+void NonParamVarRegion::printPrettyAsExpr(llvm::raw_ostream &os) const {
   os << getDecl()->getName();
 }
 
 bool ParamVarRegion::canPrintPrettyAsExpr() const { return true; }
 
-void ParamVarRegion::printPrettyAsExpr(raw_ostream &os) const {
+void ParamVarRegion::printPrettyAsExpr(llvm::raw_ostream &os) const {
   assert(getDecl() &&
          "`ParamVarRegion` support functions without `Decl` not implemented"
          " yet.");
@@ -660,7 +660,7 @@ bool ObjCIvarRegion::canPrintPrettyAsExpr() const {
   return true;
 }
 
-void ObjCIvarRegion::printPrettyAsExpr(raw_ostream &os) const {
+void ObjCIvarRegion::printPrettyAsExpr(llvm::raw_ostream &os) const {
   os << getDecl()->getName();
 }
 
@@ -672,13 +672,13 @@ bool FieldRegion::canPrintPrettyAsExpr() const {
   return superRegion->canPrintPrettyAsExpr();
 }
 
-void FieldRegion::printPrettyAsExpr(raw_ostream &os) const {
+void FieldRegion::printPrettyAsExpr(llvm::raw_ostream &os) const {
   assert(canPrintPrettyAsExpr());
   superRegion->printPrettyAsExpr(os);
   os << "." << getDecl()->getName();
 }
 
-void FieldRegion::printPretty(raw_ostream &os) const {
+void FieldRegion::printPretty(llvm::raw_ostream &os) const {
   if (canPrintPrettyAsExpr()) {
     os << "\'";
     printPrettyAsExpr(os);
@@ -692,7 +692,7 @@ bool CXXBaseObjectRegion::canPrintPrettyAsExpr() const {
   return superRegion->canPrintPrettyAsExpr();
 }
 
-void CXXBaseObjectRegion::printPrettyAsExpr(raw_ostream &os) const {
+void CXXBaseObjectRegion::printPrettyAsExpr(llvm::raw_ostream &os) const {
   superRegion->printPrettyAsExpr(os);
 }
 
@@ -700,7 +700,7 @@ bool CXXDerivedObjectRegion::canPrintPrettyAsExpr() const {
   return superRegion->canPrintPrettyAsExpr();
 }
 
-void CXXDerivedObjectRegion::printPrettyAsExpr(raw_ostream &os) const {
+void CXXDerivedObjectRegion::printPrettyAsExpr(llvm::raw_ostream &os) const {
   superRegion->printPrettyAsExpr(os);
 }
 
@@ -708,7 +708,7 @@ std::string MemRegion::getDescriptiveName(bool UseQuotes) const {
   std::string VariableName;
   std::string ArrayIndices;
   const MemRegion *R = this;
-  SmallString<50> buf;
+  llvm::SmallString<50> buf;
   llvm::raw_svector_ostream os(buf);
 
   // Obtain array indices to add them to the variable name.

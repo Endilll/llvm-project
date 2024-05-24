@@ -66,7 +66,7 @@ struct CXXBasePathElement {
 /// structure, which captures both the link from a derived class to one of its
 /// direct bases and identification describing which base class
 /// subobject is being used.
-class CXXBasePath : public SmallVector<CXXBasePathElement, 4> {
+class CXXBasePath : public llvm::SmallVector<CXXBasePathElement, 4> {
 public:
   /// The access along this inheritance path.  This is only
   /// calculated when recording paths.  AS_none is a special value
@@ -79,7 +79,7 @@ public:
   DeclContext::lookup_iterator Decls;
 
   void clear() {
-    SmallVectorImpl<CXXBasePathElement>::clear();
+    llvm::SmallVectorImpl<CXXBasePathElement>::clear();
     Access = AS_public;
   }
 };
@@ -267,7 +267,7 @@ struct UniqueVirtualMethod {
 /// pair is the virtual method that overrides it (including the
 /// subobject in which that virtual function occurs).
 class OverridingMethods {
-  using ValuesT = SmallVector<UniqueVirtualMethod, 4>;
+  using ValuesT = llvm::SmallVector<UniqueVirtualMethod, 4>;
   using MapType = llvm::MapVector<unsigned, ValuesT>;
 
   MapType Overrides;
@@ -286,9 +286,9 @@ public:
   // Iterate over the set of overriding virtual methods in a given
   // subobject.
   using overriding_iterator =
-      SmallVectorImpl<UniqueVirtualMethod>::iterator;
+      llvm::SmallVectorImpl<UniqueVirtualMethod>::iterator;
   using overriding_const_iterator =
-      SmallVectorImpl<UniqueVirtualMethod>::const_iterator;
+      llvm::SmallVectorImpl<UniqueVirtualMethod>::const_iterator;
 
   // Add a new overriding method for a particular subobject.
   void add(unsigned OverriddenSubobject, UniqueVirtualMethod Overriding);

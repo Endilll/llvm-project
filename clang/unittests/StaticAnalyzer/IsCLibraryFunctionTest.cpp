@@ -19,7 +19,7 @@ class IsCLibraryFunctionTest : public testing::Test {
 public:
   const FunctionDecl *getFunctionDecl() const { return Result; }
 
-  testing::AssertionResult buildAST(StringRef Code) {
+  testing::AssertionResult buildAST(llvm::StringRef Code) {
     ASTUnitP = tooling::buildASTFromCode(Code);
     if (!ASTUnitP)
       return testing::AssertionFailure() << "AST construction failed";

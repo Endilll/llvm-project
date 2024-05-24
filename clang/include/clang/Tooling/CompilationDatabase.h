@@ -43,8 +43,8 @@ namespace tooling {
 /// Specifies the working directory and command of a compilation.
 struct CompileCommand {
   CompileCommand() = default;
-  CompileCommand(const Twine &Directory, const Twine &Filename,
-                 std::vector<std::string> CommandLine, const Twine &Output)
+  CompileCommand(const llvm::Twine &Directory, const llvm::Twine &Filename,
+                 std::vector<std::string> CommandLine, const llvm::Twine &Output)
       : Directory(Directory.str()), Filename(Filename.str()),
         CommandLine(std::move(CommandLine)), Output(Output.str()) {}
 
@@ -101,21 +101,21 @@ public:
   /// are named 'compile_commands.json' in the given directory. Extend this
   /// for other build types (like ninja build files).
   static std::unique_ptr<CompilationDatabase>
-  loadFromDirectory(StringRef BuildDirectory, std::string &ErrorMessage);
+  loadFromDirectory(llvm::StringRef BuildDirectory, std::string &ErrorMessage);
 
   /// Tries to detect a compilation database location and load it.
   ///
   /// Looks for a compilation database in all parent paths of file 'SourceFile'
   /// by calling loadFromDirectory.
   static std::unique_ptr<CompilationDatabase>
-  autoDetectFromSource(StringRef SourceFile, std::string &ErrorMessage);
+  autoDetectFromSource(llvm::StringRef SourceFile, std::string &ErrorMessage);
 
   /// Tries to detect a compilation database location and load it.
   ///
   /// Looks for a compilation database in directory 'SourceDir' and all
   /// its parent paths by calling loadFromDirectory.
   static std::unique_ptr<CompilationDatabase>
-  autoDetectFromDirectory(StringRef SourceDir, std::string &ErrorMessage);
+  autoDetectFromDirectory(llvm::StringRef SourceDir, std::string &ErrorMessage);
 
   /// Returns all compile commands in which the specified file was
   /// compiled.
@@ -127,7 +127,7 @@ public:
   /// A compilation database representing the project would return both command
   /// lines for a.cc and b.cc and only the first command line for t.cc.
   virtual std::vector<CompileCommand> getCompileCommands(
-      StringRef FilePath) const = 0;
+      llvm::StringRef FilePath) const = 0;
 
   /// Returns the list of all files available in the compilation database.
   ///
@@ -182,22 +182,22 @@ public:
   /// \param Directory The base directory used in the FixedCompilationDatabase.
   static std::unique_ptr<FixedCompilationDatabase>
   loadFromCommandLine(int &Argc, const char *const *Argv, std::string &ErrorMsg,
-                      const Twine &Directory = ".");
+                      const llvm::Twine &Directory = ".");
 
   /// Reads flags from the given file, one-per-line.
   /// Returns nullptr and sets ErrorMessage if we can't read the file.
   static std::unique_ptr<FixedCompilationDatabase>
-  loadFromFile(StringRef Path, std::string &ErrorMsg);
+  loadFromFile(llvm::StringRef Path, std::string &ErrorMsg);
 
   /// Reads flags from the given buffer, one-per-line.
   /// Directory is the command CWD, typically the parent of compile_flags.txt.
   static std::unique_ptr<FixedCompilationDatabase>
-  loadFromBuffer(StringRef Directory, StringRef Data, std::string &ErrorMsg);
+  loadFromBuffer(llvm::StringRef Directory, llvm::StringRef Data, std::string &ErrorMsg);
 
   /// Constructs a compilation data base from a specified directory
   /// and command line.
-  FixedCompilationDatabase(const Twine &Directory,
-                           ArrayRef<std::string> CommandLine);
+  FixedCompilationDatabase(const llvm::Twine &Directory,
+                           llvm::ArrayRef<std::string> CommandLine);
 
   /// Returns the given compile command.
   ///
@@ -205,7 +205,7 @@ public:
   /// and command line specified at construction with "clang-tool" as argv[0]
   /// and 'FilePath' as positional argument.
   std::vector<CompileCommand>
-  getCompileCommands(StringRef FilePath) const override;
+  getCompileCommands(llvm::StringRef FilePath) const override;
 
 private:
   /// This is built up to contain a single entry vector to be returned from
@@ -219,7 +219,7 @@ private:
 ///
 /// The output command will always end in {"--", Filename}.
 tooling::CompileCommand transferCompileCommand(tooling::CompileCommand,
-                                               StringRef Filename);
+                                               llvm::StringRef Filename);
 
 /// Returns a wrapped CompilationDatabase that defers to the provided one,
 /// but getCompileCommands() will infer commands for unknown files.

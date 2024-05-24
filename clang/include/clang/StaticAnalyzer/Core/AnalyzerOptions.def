@@ -72,7 +72,7 @@ define both 'ANALYZER_OPTION' and 'ANALYZER_OPTION_DEPENDS_ON_USER_MODE' macros!
 //===----------------------------------------------------------------------===//
 
 ANALYZER_OPTION(
-    StringRef, UserMode, "mode",
+    llvm::StringRef, UserMode, "mode",
     "(string) Controls the high-level analyzer mode, which influences the "
     "default settings for some of the lower-level config options (such as "
     "IPAMode). Value: \"deep\", \"shallow\".",
@@ -433,10 +433,10 @@ ANALYZER_OPTION(
 // String analyzer options.
 //===----------------------------------------------------------------------===//
 
-ANALYZER_OPTION(StringRef, CTUDir, "ctu-dir",
+ANALYZER_OPTION(llvm::StringRef, CTUDir, "ctu-dir",
                 "The directory containing the CTU related files.", "")
 
-ANALYZER_OPTION(StringRef, CTUIndexName, "ctu-index-name",
+ANALYZER_OPTION(llvm::StringRef, CTUIndexName, "ctu-index-name",
                 "The name of the file containing the CTU index of definitions. "
                 "The index file maps USR-names to identifiers. An identifier "
                 "can end with an '.ast' suffix, indicating the indentifier is "
@@ -447,7 +447,7 @@ ANALYZER_OPTION(StringRef, CTUIndexName, "ctu-index-name",
                 "externalDefMap.txt")
 
 ANALYZER_OPTION(
-    StringRef, CTUInvocationList, "ctu-invocation-list",
+    llvm::StringRef, CTUInvocationList, "ctu-invocation-list",
     "The path to the YAML format file containing a mapping from source file "
     "paths to command-line invocations represented as a list of arguments. "
     "This invocation is used produce the source-file's AST in case on-demand "
@@ -456,14 +456,14 @@ ANALYZER_OPTION(
     "invocations.yaml")
 
 ANALYZER_OPTION(
-    StringRef, ModelPath, "model-path",
+    llvm::StringRef, ModelPath, "model-path",
     "The analyzer can inline an alternative implementation written in C at the "
     "call site if the called function's body is not available. This is a path "
     "where to look for those alternative implementations (called models).",
     "")
 
 ANALYZER_OPTION(
-    StringRef, CTUPhase1InliningMode, "ctu-phase1-inlining",
+    llvm::StringRef, CTUPhase1InliningMode, "ctu-phase1-inlining",
     "Controls which functions will be inlined during the first phase of the ctu "
     "analysis. "
     "If the value is set to 'all' then all foreign functions are inlinied "
@@ -479,26 +479,26 @@ ANALYZER_OPTION(
     "small")
 
 ANALYZER_OPTION(
-    StringRef, CXXMemberInliningMode, "c++-inlining",
+    llvm::StringRef, CXXMemberInliningMode, "c++-inlining",
     "Controls which C++ member functions will be considered for inlining. "
     "Value: \"constructors\", \"destructors\", \"methods\".",
     "destructors")
 
 ANALYZER_OPTION(
-    StringRef, ExplorationStrategy, "exploration_strategy",
+    llvm::StringRef, ExplorationStrategy, "exploration_strategy",
     "Value: \"dfs\", \"bfs\", \"unexplored_first\", "
     "\"unexplored_first_queue\", \"unexplored_first_location_queue\", "
     "\"bfs_block_dfs_contents\".",
     "unexplored_first_queue")
 
 ANALYZER_OPTION(
-    StringRef, RawSilencedCheckersAndPackages, "silence-checkers",
+    llvm::StringRef, RawSilencedCheckersAndPackages, "silence-checkers",
     "A semicolon separated list of checker and package names to silence. "
     "Silenced checkers will not emit reports, but the modeling remain enabled.",
     "")
 
 ANALYZER_OPTION_DEPENDS_ON_USER_MODE(
-    StringRef, IPAMode, "ipa",
+    llvm::StringRef, IPAMode, "ipa",
     "Controls the mode of inter-procedural analysis. Value: \"none\", "
     "\"basic-inlining\", \"inlining\", \"dynamic\", \"dynamic-bifurcate\".",
     /* SHALLOW_VAL */ "inlining", /* DEEP_VAL */ "dynamic-bifurcate")

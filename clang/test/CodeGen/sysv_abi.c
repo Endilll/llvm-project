@@ -7,14 +7,14 @@
 
 // Make sure we coerce structs according to the SysV rules instead of passing
 // them indirectly as we would for Win64.
-struct StringRef {
+struct llvm::StringRef {
   char *Str;
   __SIZE_TYPE__ Size;
 };
 extern volatile char gc;
-void SYSV_CC take_stringref(struct StringRef s);
+void SYSV_CC take_stringref(struct llvm::StringRef s);
 void callit(void) {
-  struct StringRef s = {"asdf", 4};
+  struct llvm::StringRef s = {"asdf", 4};
   take_stringref(s);
 }
 // CHECK: define {{(dso_local )?}}void @callit()

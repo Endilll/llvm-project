@@ -45,7 +45,7 @@ using namespace clang::driver::tools;
 using namespace clang;
 using namespace llvm::opt;
 
-static bool canExecute(llvm::vfs::FileSystem &VFS, StringRef Path) {
+static bool canExecute(llvm::vfs::FileSystem &VFS, llvm::StringRef Path) {
   auto Status = VFS.status(Path);
   if (!Status)
     return false;
@@ -59,7 +59,7 @@ static bool canExecute(llvm::vfs::FileSystem &VFS, StringRef Path) {
 static std::string FindVisualStudioExecutable(const ToolChain &TC,
                                               const char *Exe) {
   const auto &MSVC = static_cast<const toolchains::MSVCToolChain &>(TC);
-  SmallString<128> FilePath(
+  llvm::SmallString<128> FilePath(
       MSVC.getSubDirectoryPath(llvm::SubDirectoryType::Bin));
   llvm::sys::path::append(FilePath, Exe);
   return std::string(canExecute(TC.getVFS(), FilePath) ? FilePath.str() : Exe);
@@ -107,16 +107,16 @@ void visualstudio::Linker::ConstructJob(Compilation &C, const JobAction &JA,
     // The DIA SDK always uses the legacy vc arch, even in new MSVC versions.
     llvm::sys::path::append(DIAPath, "lib",
                             llvm::archToLegacyVCArch(TC.getArch()));
-    CmdArgs.push_back(Args.MakeArgString(Twine("-libpath:") + DIAPath));
+    CmdArgs.push_back(Args.MakeArgString(llvm::Twine("-libpath:") + DIAPath));
   }
   if (!llvm::sys::Process::GetEnv("LIB") ||
       Args.getLastArg(options::OPT__SLASH_vctoolsdir,
                       options::OPT__SLASH_winsysroot)) {
     CmdArgs.push_back(Args.MakeArgString(
-        Twine("-libpath:") +
+        llvm::Twine("-libpath:") +
         TC.getSubDirectoryPath(llvm::SubDirectoryType::Lib)));
     CmdArgs.push_back(Args.MakeArgString(
-        Twine("-libpath:") +
+        llvm::Twine("-libpath:") +
         TC.getSubDirectoryPath(llvm::SubDirectoryType::Lib, "atlmfc")));
   }
   if (!llvm::sys::Process::GetEnv("LIB") ||
@@ -126,7 +126,7 @@ void visualstudio::Linker::ConstructJob(Compilation &C, const JobAction &JA,
       std::string UniversalCRTLibPath;
       if (TC.getUniversalCRTLibraryPath(Args, UniversalCRTLibPath))
         CmdArgs.push_back(
-            Args.MakeArgString(Twine("-libpath:") + UniversalCRTLibPath));
+            Args.MakeArgString(llvm::Twine("-libpath:") + UniversalCRTLibPath));
     }
     std::string WindowsSdkLibPath;
     if (TC.getWindowsSDKLibraryPath(Args, WindowsSdkLibPath))
@@ -182,7 +182,7 @@ void visualstudio::Linker::ConstructJob(Compilation &C, const JobAction &JA,
   if (DLL) {
     CmdArgs.push_back(Args.MakeArgString("-dll"));
 
-    SmallString<128> ImplibName(Output.getFilename());
+    llvm::SmallString<128> ImplibName(Output.getFilename());
     llvm::sys::path::replace_extension(ImplibName, "lib");
     CmdArgs.push_back(Args.MakeArgString(std::string("-implib:") + ImplibName));
   }
@@ -233,7 +233,7 @@ void visualstudio::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 
   // Control Flow Guard checks
   for (const Arg *A : Args.filtered(options::OPT__SLASH_guard)) {
-    StringRef GuardArgs = A->getValue();
+    llvm::StringRef GuardArgs = A->getValue();
     if (GuardArgs.equals_insensitive("cf") ||
         GuardArgs.equals_insensitive("cf,nochecks")) {
       // MSVC doesn't yet support the "nochecks" modifier.
@@ -274,7 +274,7 @@ void visualstudio::Linker::ConstructJob(Compilation &C, const JobAction &JA,
     AddRunTimeLibs(TC, TC.getDriver(), CmdArgs, Args);
   }
 
-  StringRef Linker =
+  llvm::StringRef Linker =
       Args.getLastArgValue(options::OPT_fuse_ld_EQ, CLANG_DEFAULT_LINKER);
   if (Linker.empty())
     Linker = "link";
@@ -290,7 +290,7 @@ void visualstudio::Linker::ConstructJob(Compilation &C, const JobAction &JA,
     if (C.getDriver().isUsingLTO() &&
         Args.hasFlag(options::OPT_gsplit_dwarf, options::OPT_gno_split_dwarf,
                      false))
-      CmdArgs.push_back(Args.MakeArgString(Twine("/dwodir:") +
+      CmdArgs.push_back(Args.MakeArgString(llvm::Twine("/dwodir:") +
                                            Output.getFilename() + "_dwo"));
   }
 
@@ -305,7 +305,7 @@ void visualstudio::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 
     // Render -l options differently for the MSVC linker.
     if (A.getOption().matches(options::OPT_l)) {
-      StringRef Lib = A.getValue();
+      llvm::StringRef Lib = A.getValue();
       const char *LinkLibArg;
       if (Lib.ends_with(".lib"))
         LinkLibArg = Args.MakeArgString(Lib);
@@ -508,12 +508,12 @@ void MSVCToolChain::AddHIPIncludeArgs(const ArgList &DriverArgs,
 
 void MSVCToolChain::AddHIPRuntimeLibArgs(const ArgList &Args,
                                          ArgStringList &CmdArgs) const {
-  CmdArgs.append({Args.MakeArgString(StringRef("-libpath:") +
+  CmdArgs.append({Args.MakeArgString(llvm::StringRef("-libpath:") +
                                      RocmInstallation->getLibPath()),
                   "amdhip64.lib"});
 }
 
-void MSVCToolChain::printVerboseInfo(raw_ostream &OS) const {
+void MSVCToolChain::printVerboseInfo(llvm::raw_ostream &OS) const {
   CudaInstallation->print(OS);
   RocmInstallation->print(OS);
 }
@@ -581,7 +581,7 @@ bool MSVCToolChain::getUniversalCRTLibraryPath(const ArgList &Args,
       WinSdkVersion.has_value())
     UCRTVersion = *WinSdkVersion;
 
-  StringRef ArchName = llvm::archToWindowsSDKArch(getArch());
+  llvm::StringRef ArchName = llvm::archToWindowsSDKArch(getArch());
   if (ArchName.empty())
     return false;
 
@@ -592,10 +592,10 @@ bool MSVCToolChain::getUniversalCRTLibraryPath(const ArgList &Args,
   return true;
 }
 
-static VersionTuple getMSVCVersionFromExe(const std::string &BinDir) {
-  VersionTuple Version;
+static llvm::VersionTuple getMSVCVersionFromExe(const std::string &BinDir) {
+  llvm::VersionTuple Version;
 #ifdef _WIN32
-  SmallString<128> ClExe(BinDir);
+  llvm::SmallString<128> ClExe(BinDir);
   llvm::sys::path::append(ClExe, "cl.exe");
 
   std::wstring ClExeWide;
@@ -607,7 +607,7 @@ static VersionTuple getMSVCVersionFromExe(const std::string &BinDir) {
   if (VersionSize == 0)
     return Version;
 
-  SmallVector<uint8_t, 4 * 1024> VersionBlock(VersionSize);
+  llvm::SmallVector<uint8_t, 4 * 1024> VersionBlock(VersionSize);
   if (!::GetFileVersionInfoW(ClExeWide.c_str(), 0, VersionSize,
                              VersionBlock.data()))
     return Version;
@@ -623,15 +623,15 @@ static VersionTuple getMSVCVersionFromExe(const std::string &BinDir) {
   const unsigned Minor = (FileInfo->dwFileVersionMS      ) & 0xFFFF;
   const unsigned Micro = (FileInfo->dwFileVersionLS >> 16) & 0xFFFF;
 
-  Version = VersionTuple(Major, Minor, Micro);
+  Version = llvm::VersionTuple(Major, Minor, Micro);
 #endif
   return Version;
 }
 
 void MSVCToolChain::AddSystemIncludeWithSubfolder(
     const ArgList &DriverArgs, ArgStringList &CC1Args,
-    const std::string &folder, const Twine &subfolder1, const Twine &subfolder2,
-    const Twine &subfolder3) const {
+    const std::string &folder, const llvm::Twine &subfolder1, const llvm::Twine &subfolder2,
+    const llvm::Twine &subfolder3) const {
   llvm::SmallString<128> path(folder);
   llvm::sys::path::append(path, subfolder1, subfolder2, subfolder3);
   addSystemInclude(DriverArgs, CC1Args, path);
@@ -651,10 +651,10 @@ void MSVCToolChain::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
   for (const auto &Path : DriverArgs.getAllArgValues(options::OPT__SLASH_imsvc))
     addSystemInclude(DriverArgs, CC1Args, Path);
 
-  auto AddSystemIncludesFromEnv = [&](StringRef Var) -> bool {
+  auto AddSystemIncludesFromEnv = [&](llvm::StringRef Var) -> bool {
     if (auto Val = llvm::sys::Process::GetEnv(Var)) {
-      SmallVector<StringRef, 8> Dirs;
-      StringRef(*Val).split(Dirs, ";", /*MaxSplit=*/-1, /*KeepEmpty=*/false);
+      llvm::SmallVector<llvm::StringRef, 8> Dirs;
+      llvm::StringRef(*Val).split(Dirs, ";", /*MaxSplit=*/-1, /*KeepEmpty=*/false);
       if (!Dirs.empty()) {
         addSystemIncludes(DriverArgs, CC1Args, Dirs);
         return true;
@@ -762,7 +762,7 @@ void MSVCToolChain::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
 #if defined(_WIN32)
   // As a fallback, select default install paths.
   // FIXME: Don't guess drives and paths like this on Windows.
-  const StringRef Paths[] = {
+  const llvm::StringRef Paths[] = {
     "C:/Program Files/Microsoft Visual Studio 10.0/VC/include",
     "C:/Program Files/Microsoft Visual Studio 9.0/VC/include",
     "C:/Program Files/Microsoft Visual Studio 9.0/VC/PlatformSDK/Include",
@@ -778,10 +778,10 @@ void MSVCToolChain::AddClangCXXStdlibIncludeArgs(const ArgList &DriverArgs,
   // FIXME: There should probably be logic here to find libc++ on Windows.
 }
 
-VersionTuple MSVCToolChain::computeMSVCVersion(const Driver *D,
+llvm::VersionTuple MSVCToolChain::computeMSVCVersion(const Driver *D,
                                                const ArgList &Args) const {
   bool IsWindowsMSVC = getTriple().isWindowsMSVCEnvironment();
-  VersionTuple MSVT = ToolChain::computeMSVCVersion(D, Args);
+  llvm::VersionTuple MSVT = ToolChain::computeMSVCVersion(D, Args);
   if (MSVT.empty())
     MSVT = getTriple().getEnvironmentVersion();
   if (MSVT.empty() && IsWindowsMSVC)
@@ -794,7 +794,7 @@ VersionTuple MSVCToolChain::computeMSVCVersion(const Driver *D,
     // NOTE: when changing this value, also update
     // clang/docs/CommandGuide/clang.rst and clang/docs/UsersManual.rst
     // accordingly.
-    MSVT = VersionTuple(19, 33);
+    MSVT = llvm::VersionTuple(19, 33);
   }
   return MSVT;
 }
@@ -804,20 +804,20 @@ MSVCToolChain::ComputeEffectiveClangTriple(const ArgList &Args,
                                            types::ID InputType) const {
   // The MSVC version doesn't care about the architecture, even though it
   // may look at the triple internally.
-  VersionTuple MSVT = computeMSVCVersion(/*D=*/nullptr, Args);
-  MSVT = VersionTuple(MSVT.getMajor(), MSVT.getMinor().value_or(0),
+  llvm::VersionTuple MSVT = computeMSVCVersion(/*D=*/nullptr, Args);
+  MSVT = llvm::VersionTuple(MSVT.getMajor(), MSVT.getMinor().value_or(0),
                       MSVT.getSubminor().value_or(0));
 
   // For the rest of the triple, however, a computed architecture name may
   // be needed.
   llvm::Triple Triple(ToolChain::ComputeEffectiveClangTriple(Args, InputType));
   if (Triple.getEnvironment() == llvm::Triple::MSVC) {
-    StringRef ObjFmt = Triple.getEnvironmentName().split('-').second;
+    llvm::StringRef ObjFmt = Triple.getEnvironmentName().split('-').second;
     if (ObjFmt.empty())
-      Triple.setEnvironmentName((Twine("msvc") + MSVT.getAsString()).str());
+      Triple.setEnvironmentName((llvm::Twine("msvc") + MSVT.getAsString()).str());
     else
       Triple.setEnvironmentName(
-          (Twine("msvc") + MSVT.getAsString() + Twine('-') + ObjFmt).str());
+          (llvm::Twine("msvc") + MSVT.getAsString() + llvm::Twine('-') + ObjFmt).str());
   }
   return Triple.getTriple();
 }
@@ -838,7 +838,7 @@ static void TranslateOptArg(Arg *A, llvm::opt::DerivedArgList &DAL,
                             const char *ExpandChar, const OptTable &Opts) {
   assert(A->getOption().matches(options::OPT__SLASH_O));
 
-  StringRef OptStr = A->getValue();
+  llvm::StringRef OptStr = A->getValue();
   for (size_t I = 0, E = OptStr.size(); I != E; ++I) {
     const char &OptChar = *(OptStr.data() + I);
     switch (OptChar) {
@@ -933,9 +933,9 @@ static void TranslateDArg(Arg *A, llvm::opt::DerivedArgList &DAL,
                           const OptTable &Opts) {
   assert(A->getOption().matches(options::OPT_D));
 
-  StringRef Val = A->getValue();
+  llvm::StringRef Val = A->getValue();
   size_t Hash = Val.find('#');
-  if (Hash == StringRef::npos || Hash > Val.find('=')) {
+  if (Hash == llvm::StringRef::npos || Hash > Val.find('=')) {
     DAL.append(A);
     return;
   }
@@ -959,7 +959,7 @@ static void TranslatePermissiveMinus(Arg *A, llvm::opt::DerivedArgList &DAL,
 
 llvm::opt::DerivedArgList *
 MSVCToolChain::TranslateArgs(const llvm::opt::DerivedArgList &Args,
-                             StringRef BoundArch,
+                             llvm::StringRef BoundArch,
                              Action::OffloadKind OFK) const {
   DerivedArgList *DAL = new DerivedArgList(Args.getBaseArgs());
   const OptTable &Opts = getDriver().getOpts();
@@ -978,7 +978,7 @@ MSVCToolChain::TranslateArgs(const llvm::opt::DerivedArgList &Args,
   // First step is to search for the character we'd like to expand.
   const char *ExpandChar = nullptr;
   for (Arg *A : Args.filtered(options::OPT__SLASH_O)) {
-    StringRef OptStr = A->getValue();
+    llvm::StringRef OptStr = A->getValue();
     for (size_t I = 0, E = OptStr.size(); I != E; ++I) {
       char OptChar = OptStr[I];
       char PrevChar = I > 0 ? OptStr[I - 1] : '0';

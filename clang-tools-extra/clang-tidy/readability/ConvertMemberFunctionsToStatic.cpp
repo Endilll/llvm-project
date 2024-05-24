@@ -95,7 +95,7 @@ void ConvertMemberFunctionsToStatic::registerMatchers(MatchFinder *Finder) {
 }
 
 /// Obtain the original source code text from a SourceRange.
-static StringRef getStringFromRange(SourceManager &SourceMgr,
+static llvm::StringRef getStringFromRange(SourceManager &SourceMgr,
                                     const LangOptions &LangOpts,
                                     SourceRange Range) {
   if (SourceMgr.getFileID(Range.getBegin()) !=
@@ -117,9 +117,9 @@ static SourceRange getLocationOfConst(const TypeSourceInfo *TSI,
                     FTL.getLocalRangeEnd()};
   // Inside Range, there might be other keywords and trailing return types.
   // Find the exact position of "const".
-  StringRef Text = getStringFromRange(SourceMgr, LangOpts, Range);
+  llvm::StringRef Text = getStringFromRange(SourceMgr, LangOpts, Range);
   size_t Offset = Text.find("const");
-  if (Offset == StringRef::npos)
+  if (Offset == llvm::StringRef::npos)
     return {};
 
   SourceLocation Start = Range.getBegin().getLocWithOffset(Offset);

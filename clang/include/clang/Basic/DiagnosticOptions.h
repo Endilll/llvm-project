@@ -64,10 +64,10 @@ inline DiagnosticLevelMask operator&(DiagnosticLevelMask LHS,
     static_cast<UT>(LHS) & static_cast<UT>(RHS));
 }
 
-raw_ostream& operator<<(raw_ostream& Out, DiagnosticLevelMask M);
+llvm::raw_ostream& operator<<(llvm::raw_ostream& Out, DiagnosticLevelMask M);
 
 /// Options for controlling the compiler diagnostics engine.
-class DiagnosticOptions : public RefCountedBase<DiagnosticOptions>{
+class DiagnosticOptions : public llvm::RefCountedBase<DiagnosticOptions>{
   friend bool ParseDiagnosticArgs(DiagnosticOptions &, llvm::opt::ArgList &,
                                   clang::DiagnosticsEngine *, bool);
 

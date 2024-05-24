@@ -16,17 +16,17 @@ llvm::Regex HeaderFile::getFrameworkIncludeRule() {
   return llvm::Regex("/(.+)\\.framework/(.+)?Headers/(.+)");
 }
 
-std::optional<std::string> createIncludeHeaderName(const StringRef FullPath) {
+std::optional<std::string> createIncludeHeaderName(const llvm::StringRef FullPath) {
   // Headers in usr(/local)*/include.
   std::string Pattern = "/include/";
   auto PathPrefix = FullPath.find(Pattern);
-  if (PathPrefix != StringRef::npos) {
+  if (PathPrefix != llvm::StringRef::npos) {
     PathPrefix += Pattern.size();
     return FullPath.drop_front(PathPrefix).str();
   }
 
   // Framework Headers.
-  SmallVector<StringRef, 4> Matches;
+  llvm::SmallVector<llvm::StringRef, 4> Matches;
   HeaderFile::getFrameworkIncludeRule().match(FullPath, &Matches);
   // Returned matches are always in stable order.
   if (Matches.size() != 4)
@@ -36,13 +36,13 @@ std::optional<std::string> createIncludeHeaderName(const StringRef FullPath) {
          Matches[3].str();
 }
 
-bool isHeaderFile(StringRef Path) {
+bool isHeaderFile(llvm::StringRef Path) {
   return StringSwitch<bool>(sys::path::extension(Path))
       .Cases(".h", ".H", ".hh", ".hpp", ".hxx", true)
       .Default(false);
 }
 
-llvm::Expected<PathSeq> enumerateFiles(FileManager &FM, StringRef Directory) {
+llvm::Expected<PathSeq> enumerateFiles(FileManager &FM, llvm::StringRef Directory) {
   PathSeq Files;
   std::error_code EC;
   auto &FS = FM.getVirtualFileSystem();
@@ -55,7 +55,7 @@ llvm::Expected<PathSeq> enumerateFiles(FileManager &FM, StringRef Directory) {
     if (FS.status(i->path()) == std::errc::no_such_file_or_directory)
       continue;
 
-    StringRef Path = i->path();
+    llvm::StringRef Path = i->path();
     if (isHeaderFile(Path))
       Files.emplace_back(Path);
   }
@@ -63,7 +63,7 @@ llvm::Expected<PathSeq> enumerateFiles(FileManager &FM, StringRef Directory) {
   return Files;
 }
 
-HeaderGlob::HeaderGlob(StringRef GlobString, Regex &&Rule, HeaderType Type)
+HeaderGlob::HeaderGlob(llvm::StringRef GlobString, Regex &&Rule, HeaderType Type)
     : GlobString(GlobString), Rule(std::move(Rule)), Type(Type) {}
 
 bool HeaderGlob::match(const HeaderFile &Header) {
@@ -76,7 +76,7 @@ bool HeaderGlob::match(const HeaderFile &Header) {
   return Match;
 }
 
-Expected<std::unique_ptr<HeaderGlob>> HeaderGlob::create(StringRef GlobString,
+llvm::Expected<std::unique_ptr<HeaderGlob>> HeaderGlob::create(llvm::StringRef GlobString,
                                                          HeaderType Type) {
   auto Rule = MachO::createRegexFromGlob(GlobString);
   if (!Rule)

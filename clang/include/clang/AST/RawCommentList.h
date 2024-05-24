@@ -95,7 +95,7 @@ public:
   }
 
   /// Returns raw comment text with comment markers.
-  StringRef getRawText(const SourceManager &SourceMgr) const {
+  llvm::StringRef getRawText(const SourceManager &SourceMgr) const {
     if (RawTextValid)
       return RawText;
 
@@ -118,7 +118,7 @@ public:
   bool hasUnsupportedSplice(const SourceManager &SourceMgr) const {
     if (!isInvalid())
       return false;
-    StringRef Text = getRawText(SourceMgr);
+    llvm::StringRef Text = getRawText(SourceMgr);
     if (Text.size() < 6 || Text[0] != '/')
       return false;
     if (Text[1] == '*')
@@ -155,7 +155,7 @@ public:
     PresumedLoc Begin;
     PresumedLoc End;
 
-    CommentLine(StringRef Text, PresumedLoc Begin, PresumedLoc End)
+    CommentLine(llvm::StringRef Text, PresumedLoc Begin, PresumedLoc End)
         : Text(Text), Begin(Begin), End(End) {}
   };
 
@@ -172,7 +172,7 @@ public:
 private:
   SourceRange Range;
 
-  mutable StringRef RawText;
+  mutable llvm::StringRef RawText;
   mutable const char *BriefText = nullptr;
 
   LLVM_PREFERRED_TYPE(bool)
@@ -200,7 +200,7 @@ private:
     IsAlmostTrailingComment(IsAlmostTrailingComment)
   { }
 
-  StringRef getRawTextSlow(const SourceManager &SourceMgr) const;
+  llvm::StringRef getRawTextSlow(const SourceManager &SourceMgr) const;
 
   const char *extractBriefText(const ASTContext &Context) const;
 

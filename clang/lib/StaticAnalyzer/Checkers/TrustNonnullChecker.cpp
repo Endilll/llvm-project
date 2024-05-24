@@ -193,7 +193,7 @@ private:
 
   /// \return Whether \p ID has a superclass by the name \p ClassName.
   bool interfaceHasSuperclass(const ObjCInterfaceDecl *ID,
-                         StringRef ClassName) const {
+                         llvm::StringRef ClassName) const {
     if (ID->getIdentifier()->getName() == ClassName)
       return true;
 

@@ -56,11 +56,11 @@ private:
   }
 
 public:
-  static Kind getKind(StringRef Name) { return getABIMap().lookup(Name); }
+  static Kind getKind(llvm::StringRef Name) { return getABIMap().lookup(Name); }
   static const auto &getSpelling(Kind ABIKind) {
     return getSpellingMap().find(ABIKind)->second;
   }
-  static bool isABI(StringRef Name) { return getABIMap().contains(Name); }
+  static bool isABI(llvm::StringRef Name) { return getABIMap().contains(Name); }
 
   // Return true if this target should use the relative vtables C++ ABI by
   // default.

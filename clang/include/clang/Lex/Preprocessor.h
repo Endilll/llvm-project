@@ -316,9 +316,9 @@ private:
   SourceLocation ModuleImportLoc;
 
   /// The import path for named module that we're currently processing.
-  SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> NamedModuleImportPath;
+  llvm::SmallVector<std::pair<IdentifierInfo *, SourceLocation>, 2> NamedModuleImportPath;
 
-  llvm::DenseMap<FileID, SmallVector<const char *>> CheckPoints;
+  llvm::DenseMap<FileID, llvm::SmallVector<const char *>> CheckPoints;
   unsigned CheckPointCounter = 0;
 
   /// Whether the import is an `@import` or a standard c++ modules import.
@@ -583,12 +583,12 @@ private:
       return State == NamedModuleImplementation && !getName().contains(':');
     }
 
-    StringRef getName() const {
+    llvm::StringRef getName() const {
       assert(isNamedModule() && "Can't get name from a non named module");
       return Name;
     }
 
-    StringRef getPrimaryName() const {
+    llvm::StringRef getPrimaryName() const {
       assert(isNamedModule() && "Can't get name from a non named module");
       return getName().split(':').first;
     }
@@ -707,7 +707,7 @@ private:
     bool isRecording() const { return ConditionalStackState == Recording; }
     bool isReplaying() const { return ConditionalStackState == Replaying; }
 
-    ArrayRef<PPConditionalInfo> getStack() const {
+    llvm::ArrayRef<PPConditionalInfo> getStack() const {
       return ConditionalStack;
     }
 
@@ -716,7 +716,7 @@ private:
       ConditionalStackState = Off;
     }
 
-    void setStack(ArrayRef<PPConditionalInfo> s) {
+    void setStack(llvm::ArrayRef<PPConditionalInfo> s) {
       if (!isRecording() && !isReplaying())
         return;
       ConditionalStack.clear();
@@ -732,7 +732,7 @@ private:
     std::optional<PreambleSkipInfo> SkipInfo;
 
   private:
-    SmallVector<PPConditionalInfo, 4> ConditionalStack;
+    llvm::SmallVector<PPConditionalInfo, 4> ConditionalStack;
     State ConditionalStackState = Off;
   } PreambleConditionalStack;
 
@@ -806,7 +806,7 @@ private:
     MacroExpandsInfo(Token Tok, MacroDefinition MD, SourceRange Range)
         : Tok(Tok), MD(MD), Range(Range) {}
   };
-  SmallVector<MacroExpandsInfo, 2> DelayedMacroExpandsCallbacks;
+  llvm::SmallVector<MacroExpandsInfo, 2> DelayedMacroExpandsCallbacks;
 
   /// Information about a name that has been used to define a module macro.
   struct ModuleMacroInfo {
@@ -896,7 +896,7 @@ private:
       return Info ? Info->IsAmbiguous : false;
     }
 
-    ArrayRef<ModuleMacro *>
+    llvm::ArrayRef<ModuleMacro *>
     getActiveModuleMacros(Preprocessor &PP, const IdentifierInfo *II) const {
       if (auto *Info = getModuleInfo(PP, II))
         return Info->ActiveModuleMacros;
@@ -921,14 +921,14 @@ private:
       }
     }
 
-    ArrayRef<ModuleMacro*> getOverriddenMacros() const {
+    llvm::ArrayRef<ModuleMacro*> getOverriddenMacros() const {
       if (auto *Info = State.dyn_cast<ModuleMacroInfo*>())
         return Info->OverriddenMacros;
       return std::nullopt;
     }
 
     void setOverriddenMacros(Preprocessor &PP,
-                             ArrayRef<ModuleMacro *> Overrides) {
+                             llvm::ArrayRef<ModuleMacro *> Overrides) {
       auto *Info = State.dyn_cast<ModuleMacroInfo*>();
       if (!Info) {
         if (Overrides.empty())
@@ -977,7 +977,7 @@ private:
           OuterSubmoduleState(OuterSubmoduleState),
           OuterPendingModuleMacroNames(OuterPendingModuleMacroNames) {}
   };
-  SmallVector<BuildingSubmoduleInfo, 8> BuildingSubmoduleStack;
+  llvm::SmallVector<BuildingSubmoduleInfo, 8> BuildingSubmoduleStack;
 
   /// Information about a submodule's preprocessor state.
   struct SubmoduleState {
@@ -1119,7 +1119,7 @@ private:
   /// Works like a stack; a TokenLexer adds the macro expanded tokens that is
   /// going to lex in the cache and when it finishes the tokens are removed
   /// from the end of the cache.
-  SmallVector<Token, 16> MacroExpandedTokens;
+  llvm::SmallVector<Token, 16> MacroExpandedTokens;
   std::vector<std::pair<TokenLexer *, size_t>> MacroExpandingLexersStack;
 
   /// A record of the macro definitions and expansions that
@@ -1130,7 +1130,7 @@ private:
   PreprocessingRecord *Record = nullptr;
 
   /// Cached tokens state.
-  using CachedTokensTy = SmallVector<Token, 1>;
+  using CachedTokensTy = llvm::SmallVector<Token, 1>;
 
   /// Cached tokens are stored here when we do backtracking or
   /// lookahead. They are "lexed" by the CachingLex() method.
@@ -1330,7 +1330,7 @@ public:
 
   void setPreprocessToken(bool Preprocess) { PreprocessToken = Preprocess; }
 
-  bool isMacroDefined(StringRef Id) {
+  bool isMacroDefined(llvm::StringRef Id) {
     return isMacroDefined(&Identifiers.get(Id));
   }
   bool isMacroDefined(const IdentifierInfo *II) {
@@ -1434,11 +1434,11 @@ public:
   /// Register an exported macro for a module and identifier.
   ModuleMacro *addModuleMacro(Module *Mod, IdentifierInfo *II,
                               MacroInfo *Macro,
-                              ArrayRef<ModuleMacro *> Overrides, bool &IsNew);
+                              llvm::ArrayRef<ModuleMacro *> Overrides, bool &IsNew);
   ModuleMacro *getModuleMacro(Module *Mod, const IdentifierInfo *II);
 
   /// Get the list of leaf (non-overridden) module macros for a name.
-  ArrayRef<ModuleMacro*> getLeafModuleMacros(const IdentifierInfo *II) const {
+  llvm::ArrayRef<ModuleMacro*> getLeafModuleMacros(const IdentifierInfo *II) const {
     if (II->isOutOfDate())
       updateOutOfDateIdentifier(*II);
     auto I = LeafModuleMacros.find(II);
@@ -1448,7 +1448,7 @@ public:
   }
 
   /// Get the list of submodules that we're currently building.
-  ArrayRef<BuildingSubmoduleInfo> getBuildingSubmodules() const {
+  llvm::ArrayRef<BuildingSubmoduleInfo> getBuildingSubmodules() const {
     return BuildingSubmoduleStack;
   }
 
@@ -1507,8 +1507,8 @@ public:
   /// Return the name of the macro defined before \p Loc that has
   /// spelling \p Tokens.  If there are multiple macros with same spelling,
   /// return the last one defined.
-  StringRef getLastMacroWithSpelling(SourceLocation Loc,
-                                     ArrayRef<TokenValue> Tokens) const;
+  llvm::StringRef getLastMacroWithSpelling(SourceLocation Loc,
+                                     llvm::ArrayRef<TokenValue> Tokens) const;
 
   /// Get the predefines for this processor.
   /// Used by some third-party tools to inspect and add predefines (see
@@ -1522,7 +1522,7 @@ public:
 
   /// Return information about the specified preprocessor
   /// identifier token.
-  IdentifierInfo *getIdentifierInfo(StringRef Name) const {
+  IdentifierInfo *getIdentifierInfo(llvm::StringRef Name) const {
     return &Identifiers.get(Name);
   }
 
@@ -1530,9 +1530,9 @@ public:
   ///
   /// If \p Namespace is non-null, then it is a token required to exist on the
   /// pragma line before the pragma string starts, e.g. "STDC" or "GCC".
-  void AddPragmaHandler(StringRef Namespace, PragmaHandler *Handler);
+  void AddPragmaHandler(llvm::StringRef Namespace, PragmaHandler *Handler);
   void AddPragmaHandler(PragmaHandler *Handler) {
-    AddPragmaHandler(StringRef(), Handler);
+    AddPragmaHandler(llvm::StringRef(), Handler);
   }
 
   /// Remove the specific pragma handler from this preprocessor.
@@ -1540,9 +1540,9 @@ public:
   /// If \p Namespace is non-null, then it should be the namespace that
   /// \p Handler was added to. It is an error to remove a handler that
   /// has not been registered.
-  void RemovePragmaHandler(StringRef Namespace, PragmaHandler *Handler);
+  void RemovePragmaHandler(llvm::StringRef Namespace, PragmaHandler *Handler);
   void RemovePragmaHandler(PragmaHandler *Handler) {
-    RemovePragmaHandler(StringRef(), Handler);
+    RemovePragmaHandler(llvm::StringRef(), Handler);
   }
 
   /// Install empty handlers for all pragmas (making them ignored).
@@ -1600,7 +1600,7 @@ public:
   }
 
   /// Get the code completion token for filtering purposes.
-  StringRef getCodeCompletionFilter() {
+  llvm::StringRef getCodeCompletionFilter() {
     if (CodeCompletionII)
       return CodeCompletionII->getName();
     return {};
@@ -1687,7 +1687,7 @@ public:
                      IsReinject);
   }
 
-  void EnterTokenStream(ArrayRef<Token> Toks, bool DisableMacroExpansion,
+  void EnterTokenStream(llvm::ArrayRef<Token> Toks, bool DisableMacroExpansion,
                         bool IsReinject) {
     EnterTokenStream(Toks.data(), Toks.size(), DisableMacroExpansion, false,
                      IsReinject);
@@ -1735,7 +1735,7 @@ public:
   bool LexHeaderName(Token &Result, bool AllowMacroExpansion = true);
 
   bool LexAfterModuleImport(Token &Result);
-  void CollectPpImportSuffix(SmallVectorImpl<Token> &Toks);
+  void CollectPpImportSuffix(llvm::SmallVectorImpl<Token> &Toks);
 
   void makeModuleVisible(Module *M, SourceLocation Loc);
 
@@ -1884,7 +1884,7 @@ public:
   ///
   /// Useful when a token needs to be split in smaller ones and CachedTokens
   /// most recent token must to be updated to reflect that.
-  void ReplacePreviousCachedToken(ArrayRef<Token> NewToks);
+  void ReplacePreviousCachedToken(llvm::ArrayRef<Token> NewToks);
 
   /// Replace the last token with an annotation token.
   ///
@@ -2054,8 +2054,8 @@ public:
   /// \param buffer A buffer which will be used only if the token requires
   ///   "cleaning", e.g. if it contains trigraphs or escaped newlines
   /// \param invalid If non-null, will be set \c true if an error occurs.
-  StringRef getSpelling(SourceLocation loc,
-                        SmallVectorImpl<char> &buffer,
+  llvm::StringRef getSpelling(SourceLocation loc,
+                        llvm::SmallVectorImpl<char> &buffer,
                         bool *invalid = nullptr) const {
     return Lexer::getSpelling(loc, buffer, SourceMgr, LangOpts, invalid);
   }
@@ -2089,12 +2089,12 @@ public:
     return Lexer::getSpelling(Tok, Buffer, SourceMgr, LangOpts, Invalid);
   }
 
-  /// Get the spelling of a token into a SmallVector.
+  /// Get the spelling of a token into a llvm::SmallVector.
   ///
-  /// Note that the returned StringRef may not point to the
+  /// Note that the returned llvm::StringRef may not point to the
   /// supplied buffer if a copy can be avoided.
-  StringRef getSpelling(const Token &Tok,
-                        SmallVectorImpl<char> &Buffer,
+  llvm::StringRef getSpelling(const Token &Tok,
+                        llvm::SmallVectorImpl<char> &Buffer,
                         bool *Invalid = nullptr) const;
 
   /// Relex the token at the specified location.
@@ -2127,10 +2127,10 @@ public:
   /// This routine starts from a source location, and finds the name of the
   /// macro responsible for its immediate expansion. It looks through any
   /// intervening macro argument expansions to compute this. It returns a
-  /// StringRef that refers to the SourceManager-owned buffer of the source
+  /// llvm::StringRef that refers to the SourceManager-owned buffer of the source
   /// where that macro name is spelled. Thus, the result shouldn't out-live
   /// the SourceManager.
-  StringRef getImmediateMacroName(SourceLocation Loc) {
+  llvm::StringRef getImmediateMacroName(SourceLocation Loc) {
     return Lexer::getImmediateMacroName(Loc, SourceMgr, getLangOpts());
   }
 
@@ -2139,7 +2139,7 @@ public:
   ///
   /// If specified, the source location provides a location of the expansion
   /// point of the token.
-  void CreateString(StringRef Str, Token &Tok,
+  void CreateString(llvm::StringRef Str, Token &Tok,
                     SourceLocation ExpansionLocStart = SourceLocation(),
                     SourceLocation ExpansionLocEnd = SourceLocation());
 
@@ -2375,7 +2375,7 @@ public:
 
   /// Get the named module name we're preprocessing.
   /// Requires we're preprocessing a named module.
-  StringRef getNamedModuleName() const { return ModuleDeclState.getName(); }
+  llvm::StringRef getNamedModuleName() const { return ModuleDeclState.getName(); }
 
   /// If we are implementing an implementation module unit.
   /// Note that the module implementation partition is not considered as an
@@ -2404,17 +2404,17 @@ public:
   ///
   /// \returns true if the input filename was in <>'s or false if it was
   /// in ""'s.
-  bool GetIncludeFilenameSpelling(SourceLocation Loc,StringRef &Buffer);
+  bool GetIncludeFilenameSpelling(SourceLocation Loc,llvm::StringRef &Buffer);
 
   /// Given a "foo" or \<foo> reference, look up the indicated file.
   ///
   /// Returns std::nullopt on failure.  \p isAngled indicates whether the file
   /// reference is for system \#include's or not (i.e. using <> instead of "").
   OptionalFileEntryRef
-  LookupFile(SourceLocation FilenameLoc, StringRef Filename, bool isAngled,
+  LookupFile(SourceLocation FilenameLoc, llvm::StringRef Filename, bool isAngled,
              ConstSearchDirIterator FromDir, const FileEntry *FromFile,
-             ConstSearchDirIterator *CurDir, SmallVectorImpl<char> *SearchPath,
-             SmallVectorImpl<char> *RelativePath,
+             ConstSearchDirIterator *CurDir, llvm::SmallVectorImpl<char> *SearchPath,
+             llvm::SmallVectorImpl<char> *RelativePath,
              ModuleMap::KnownHeader *SuggestedModule, bool *IsMapped,
              bool *IsFrameworkFound, bool SkipCache = false,
              bool OpenFile = true, bool CacheFailures = true);
@@ -2506,7 +2506,7 @@ private:
   ///
   /// \param Tok - Token that represents the directive
   /// \param Directive - String reference for the directive name
-  void SuggestTypoedDirective(const Token &Tok, StringRef Directive) const;
+  void SuggestTypoedDirective(const Token &Tok, llvm::StringRef Directive) const;
 
   /// We just read a \#if or related directive and decided that the
   /// subsequent tokens are in the \#if'd out portion of the
@@ -2572,7 +2572,7 @@ private:
   /// going to lex in the cache and when it finishes the tokens are removed
   /// from the end of the cache.
   Token *cacheMacroExpandedTokens(TokenLexer *tokLexer,
-                                  ArrayRef<Token> tokens);
+                                  llvm::ArrayRef<Token> tokens);
 
   void removeCachedMacroExpandedTokensOfLastLexer();
 
@@ -2679,12 +2679,12 @@ private:
   };
 
   OptionalFileEntryRef LookupHeaderIncludeOrImport(
-      ConstSearchDirIterator *CurDir, StringRef &Filename,
+      ConstSearchDirIterator *CurDir, llvm::StringRef &Filename,
       SourceLocation FilenameLoc, CharSourceRange FilenameRange,
       const Token &FilenameTok, bool &IsFrameworkFound, bool IsImportDecl,
       bool &IsMapped, ConstSearchDirIterator LookupFrom,
-      const FileEntry *LookupFromFile, StringRef &LookupFilename,
-      SmallVectorImpl<char> &RelativePath, SmallVectorImpl<char> &SearchPath,
+      const FileEntry *LookupFromFile, llvm::StringRef &LookupFilename,
+      llvm::SmallVectorImpl<char> &RelativePath, llvm::SmallVectorImpl<char> &SearchPath,
       ModuleMap::KnownHeader &SuggestedModule, bool isAngled);
 
   // File inclusion.
@@ -2740,16 +2740,16 @@ public:
     return PreambleConditionalStack.hasRecordedPreamble();
   }
 
-  ArrayRef<PPConditionalInfo> getPreambleConditionalStack() const {
+  llvm::ArrayRef<PPConditionalInfo> getPreambleConditionalStack() const {
       return PreambleConditionalStack.getStack();
   }
 
-  void setRecordedPreambleConditionalStack(ArrayRef<PPConditionalInfo> s) {
+  void setRecordedPreambleConditionalStack(llvm::ArrayRef<PPConditionalInfo> s) {
     PreambleConditionalStack.setStack(s);
   }
 
   void setReplayablePreambleConditionalStack(
-      ArrayRef<PPConditionalInfo> s, std::optional<PreambleSkipInfo> SkipInfo) {
+      llvm::ArrayRef<PPConditionalInfo> s, std::optional<PreambleSkipInfo> SkipInfo) {
     PreambleConditionalStack.startReplaying();
     PreambleConditionalStack.setStack(s);
     PreambleConditionalStack.SkipInfo = SkipInfo;
@@ -2857,11 +2857,11 @@ public:
     }
   }
 
-  static void processPathForFileMacro(SmallVectorImpl<char> &Path,
+  static void processPathForFileMacro(llvm::SmallVectorImpl<char> &Path,
                                       const LangOptions &LangOpts,
                                       const TargetInfo &TI);
 
-  static void processPathToFileName(SmallVectorImpl<char> &FileName,
+  static void processPathToFileName(llvm::SmallVectorImpl<char> &FileName,
                                     const PresumedLoc &PLoc,
                                     const LangOptions &LangOpts,
                                     const TargetInfo &TI);
@@ -2887,7 +2887,7 @@ private:
   // translation unit. Each region is represented by a pair of start and end
   // locations.  A region is "open" if its' start and end locations are
   // identical.
-  SmallVector<std::pair<SourceLocation, SourceLocation>, 8> SafeBufferOptOutMap;
+  llvm::SmallVector<std::pair<SourceLocation, SourceLocation>, 8> SafeBufferOptOutMap;
 
 public:
   /// \return true iff the given `Loc` is in a "-Wunsafe-buffer-usage" opt-out

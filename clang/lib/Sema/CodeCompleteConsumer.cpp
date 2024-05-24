@@ -91,7 +91,7 @@ bool CodeCompletionContext::wantConstructorResults() const {
   llvm_unreachable("Invalid CodeCompletionContext::Kind!");
 }
 
-StringRef clang::getCompletionKindString(CodeCompletionContext::Kind Kind) {
+llvm::StringRef clang::getCompletionKindString(CodeCompletionContext::Kind Kind) {
   using CCKind = CodeCompletionContext::Kind;
   switch (Kind) {
   case CCKind::CCC_Other:
@@ -289,7 +289,7 @@ CodeCompletionString::Chunk CodeCompletionString::Chunk::CreateCurrentParameter(
 CodeCompletionString::CodeCompletionString(
     const Chunk *Chunks, unsigned NumChunks, unsigned Priority,
     CXAvailabilityKind Availability, const char **Annotations,
-    unsigned NumAnnotations, StringRef ParentName, const char *BriefComment)
+    unsigned NumAnnotations, llvm::StringRef ParentName, const char *BriefComment)
     : NumChunks(NumChunks), NumAnnotations(NumAnnotations), Priority(Priority),
       Availability(Availability), ParentName(ParentName),
       BriefComment(BriefComment) {
@@ -361,10 +361,10 @@ std::string CodeCompletionString::getAllTypedText() const {
   return Res;
 }
 
-const char *CodeCompletionAllocator::CopyString(const Twine &String) {
-  SmallString<128> Data;
-  StringRef Ref = String.toStringRef(Data);
-  // FIXME: It would be more efficient to teach Twine to tell us its size and
+const char *CodeCompletionAllocator::CopyString(const llvm::Twine &String) {
+  llvm::SmallString<128> Data;
+  llvm::StringRef Ref = String.toStringRef(Data);
+  // FIXME: It would be more efficient to teach llvm::Twine to tell us its size and
   // then add a routine there to fill in an allocated char* with the contents
   // of the string.
   char *Mem = (char *)Allocate(Ref.size() + 1, 1);
@@ -373,12 +373,12 @@ const char *CodeCompletionAllocator::CopyString(const Twine &String) {
   return Mem;
 }
 
-StringRef CodeCompletionTUInfo::getParentName(const DeclContext *DC) {
+llvm::StringRef CodeCompletionTUInfo::getParentName(const DeclContext *DC) {
   if (!isa<NamedDecl>(DC))
     return {};
 
   // Check whether we've already cached the parent name.
-  StringRef &CachedParentName = ParentNames[DC];
+  llvm::StringRef &CachedParentName = ParentNames[DC];
   if (!CachedParentName.empty())
     return CachedParentName;
 
@@ -388,7 +388,7 @@ StringRef CodeCompletionTUInfo::getParentName(const DeclContext *DC) {
     return {};
 
   // Find the interesting names.
-  SmallVector<const DeclContext *, 2> Contexts;
+  llvm::SmallVector<const DeclContext *, 2> Contexts;
   while (DC && !DC->isFunctionOrMethod()) {
     if (const auto *ND = dyn_cast<NamedDecl>(DC)) {
       if (ND->getIdentifier())
@@ -399,7 +399,7 @@ StringRef CodeCompletionTUInfo::getParentName(const DeclContext *DC) {
   }
 
   {
-    SmallString<128> S;
+    llvm::SmallString<128> S;
     llvm::raw_svector_ostream OS(S);
     bool First = true;
     for (const DeclContext *CurDC : llvm::reverse(Contexts)) {
@@ -415,9 +415,9 @@ StringRef CodeCompletionTUInfo::getParentName(const DeclContext *DC) {
       if (const auto *Cat = dyn_cast<ObjCCategoryDecl>(CurDC)) {
         const ObjCInterfaceDecl *Interface = Cat->getClassInterface();
         if (!Interface) {
-          // Assign an empty StringRef but with non-null data to distinguish
+          // Assign an empty llvm::StringRef but with non-null data to distinguish
           // between empty because we didn't process the DeclContext yet.
-          CachedParentName = StringRef((const char *)(uintptr_t)~0U, 0);
+          CachedParentName = llvm::StringRef((const char *)(uintptr_t)~0U, 0);
           return {};
         }
 
@@ -492,7 +492,7 @@ void CodeCompletionBuilder::addParentContext(const DeclContext *DC) {
   ParentName = getCodeCompletionTUInfo().getParentName(DC);
 }
 
-void CodeCompletionBuilder::addBriefComment(StringRef Comment) {
+void CodeCompletionBuilder::addBriefComment(llvm::StringRef Comment) {
   BriefComment = Allocator.CopyString(Comment);
 }
 
@@ -627,19 +627,19 @@ CodeCompleteConsumer::OverloadCandidate::getParamDecl(unsigned N) const {
 CodeCompleteConsumer::~CodeCompleteConsumer() = default;
 
 bool PrintingCodeCompleteConsumer::isResultFilteredOut(
-    StringRef Filter, CodeCompletionResult Result) {
+    llvm::StringRef Filter, CodeCompletionResult Result) {
   switch (Result.Kind) {
   case CodeCompletionResult::RK_Declaration:
     return !(
         Result.Declaration->getIdentifier() &&
         Result.Declaration->getIdentifier()->getName().starts_with(Filter));
   case CodeCompletionResult::RK_Keyword:
-    return !StringRef(Result.Keyword).starts_with(Filter);
+    return !llvm::StringRef(Result.Keyword).starts_with(Filter);
   case CodeCompletionResult::RK_Macro:
     return !Result.Macro->getName().starts_with(Filter);
   case CodeCompletionResult::RK_Pattern:
     return !(Result.Pattern->getTypedText() &&
-             StringRef(Result.Pattern->getTypedText()).starts_with(Filter));
+             llvm::StringRef(Result.Pattern->getTypedText()).starts_with(Filter));
   }
   llvm_unreachable("Unknown code completion result Kind.");
 }
@@ -652,7 +652,7 @@ void PrintingCodeCompleteConsumer::ProcessCodeCompleteResults(
   if (!Context.getPreferredType().isNull())
     OS << "PREFERRED-TYPE: " << Context.getPreferredType() << '\n';
 
-  StringRef Filter = SemaRef.getPreprocessor().getCodeCompletionFilter();
+  llvm::StringRef Filter = SemaRef.getPreprocessor().getCodeCompletionFilter();
   // Print the completions.
   for (unsigned I = 0; I != NumResults; ++I) {
     if (!Filter.empty() && isResultFilteredOut(Filter, Results[I]))
@@ -833,8 +833,8 @@ void CodeCompletionResult::computeCursorKindAndAvailability(bool Accessible) {
 /// Retrieve the name that should be used to order a result.
 ///
 /// If the name needs to be constructed as a string, that string will be
-/// saved into Saved and the returned StringRef will refer to it.
-StringRef CodeCompletionResult::getOrderedName(std::string &Saved) const {
+/// saved into Saved and the returned llvm::StringRef will refer to it.
+llvm::StringRef CodeCompletionResult::getOrderedName(std::string &Saved) const {
   switch (Kind) {
   case RK_Keyword:
     return Keyword;
@@ -865,8 +865,8 @@ StringRef CodeCompletionResult::getOrderedName(std::string &Saved) const {
 bool clang::operator<(const CodeCompletionResult &X,
                       const CodeCompletionResult &Y) {
   std::string XSaved, YSaved;
-  StringRef XStr = X.getOrderedName(XSaved);
-  StringRef YStr = Y.getOrderedName(YSaved);
+  llvm::StringRef XStr = X.getOrderedName(XSaved);
+  llvm::StringRef YStr = Y.getOrderedName(YSaved);
   int cmp = XStr.compare_insensitive(YStr);
   if (cmp)
     return cmp < 0;

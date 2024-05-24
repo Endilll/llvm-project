@@ -31,11 +31,11 @@ using MatchResult = MatchFinder::MatchResult;
 
 const char transformer::RootID[] = "___root___";
 
-static Expected<SmallVector<transformer::Edit, 1>>
-translateEdits(const MatchResult &Result, ArrayRef<ASTEdit> ASTEdits) {
-  SmallVector<transformer::Edit, 1> Edits;
+static llvm::Expected<llvm::SmallVector<transformer::Edit, 1>>
+translateEdits(const MatchResult &Result, llvm::ArrayRef<ASTEdit> ASTEdits) {
+  llvm::SmallVector<transformer::Edit, 1> Edits;
   for (const auto &E : ASTEdits) {
-    Expected<CharSourceRange> Range = E.TargetRange(Result);
+    llvm::Expected<CharSourceRange> Range = E.TargetRange(Result);
     if (!Range)
       return Range.takeError();
     std::optional<CharSourceRange> EditRange =
@@ -48,7 +48,7 @@ translateEdits(const MatchResult &Result, ArrayRef<ASTEdit> ASTEdits) {
     // equivalent to `flatten(edit(A), edit(B))`. The former will abort if `A`
     // produces a bad range, whereas the latter will simply ignore A.
     if (!EditRange)
-      return SmallVector<Edit, 0>();
+      return llvm::SmallVector<Edit, 0>();
     transformer::Edit T;
     T.Kind = E.Kind;
     T.Range = *EditRange;
@@ -75,7 +75,7 @@ translateEdits(const MatchResult &Result, ArrayRef<ASTEdit> ASTEdits) {
   return Edits;
 }
 
-EditGenerator transformer::editList(SmallVector<ASTEdit, 1> Edits) {
+EditGenerator transformer::editList(llvm::SmallVector<ASTEdit, 1> Edits) {
   return [Edits = std::move(Edits)](const MatchResult &Result) {
     return translateEdits(Result, Edits);
   };
@@ -89,8 +89,8 @@ EditGenerator transformer::edit(ASTEdit Edit) {
 
 EditGenerator transformer::noopEdit(RangeSelector Anchor) {
   return [Anchor = std::move(Anchor)](const MatchResult &Result)
-             -> Expected<SmallVector<transformer::Edit, 1>> {
-    Expected<CharSourceRange> Range = Anchor(Result);
+             -> llvm::Expected<llvm::SmallVector<transformer::Edit, 1>> {
+    llvm::Expected<CharSourceRange> Range = Anchor(Result);
     if (!Range)
       return Range.takeError();
     // In case the range is inside a macro expansion, map the location back to a
@@ -101,20 +101,20 @@ EditGenerator transformer::noopEdit(RangeSelector Anchor) {
     // Implicitly, leave `E.Replacement` as the empty string.
     E.Kind = EditKind::Range;
     E.Range = CharSourceRange::getCharRange(Begin, Begin);
-    return SmallVector<Edit, 1>{E};
+    return llvm::SmallVector<Edit, 1>{E};
   };
 }
 
 EditGenerator
-transformer::flattenVector(SmallVector<EditGenerator, 2> Generators) {
+transformer::flattenVector(llvm::SmallVector<EditGenerator, 2> Generators) {
   if (Generators.size() == 1)
     return std::move(Generators[0]);
   return
       [Gs = std::move(Generators)](
-          const MatchResult &Result) -> llvm::Expected<SmallVector<Edit, 1>> {
-        SmallVector<Edit, 1> AllEdits;
+          const MatchResult &Result) -> llvm::Expected<llvm::SmallVector<Edit, 1>> {
+        llvm::SmallVector<Edit, 1> AllEdits;
         for (const auto &G : Gs) {
-          llvm::Expected<SmallVector<Edit, 1>> Edits = G(Result);
+          llvm::Expected<llvm::SmallVector<Edit, 1>> Edits = G(Result);
           if (!Edits)
             return Edits.takeError();
           AllEdits.append(Edits->begin(), Edits->end());
@@ -163,7 +163,7 @@ ASTEdit transformer::remove(RangeSelector S) {
   return change(std::move(S), makeText(""));
 }
 
-static std::string formatHeaderPath(StringRef Header, IncludeFormat Format) {
+static std::string formatHeaderPath(llvm::StringRef Header, IncludeFormat Format) {
   switch (Format) {
   case transformer::IncludeFormat::Quoted:
     return Header.str();
@@ -173,7 +173,7 @@ static std::string formatHeaderPath(StringRef Header, IncludeFormat Format) {
   llvm_unreachable("Unknown transformer::IncludeFormat enum");
 }
 
-ASTEdit transformer::addInclude(RangeSelector Target, StringRef Header,
+ASTEdit transformer::addInclude(RangeSelector Target, llvm::StringRef Header,
                                 IncludeFormat Format) {
   ASTEdit E;
   E.Kind = EditKind::AddInclude;
@@ -291,12 +291,12 @@ public:
   RewriteRule Rule;
 
   // Initialize to a non-error state.
-  Expected<SmallVector<Edit, 1>> Edits = SmallVector<Edit, 1>();
+  llvm::Expected<llvm::SmallVector<Edit, 1>> Edits = llvm::SmallVector<Edit, 1>();
 };
 } // namespace
 
 template <typename T>
-llvm::Expected<SmallVector<clang::transformer::Edit, 1>>
+llvm::Expected<llvm::SmallVector<clang::transformer::Edit, 1>>
 rewriteDescendantsImpl(const T &Node, RewriteRule Rule,
                        const MatchResult &Result) {
   ApplyRuleCallback Callback(std::move(Rule));
@@ -306,25 +306,25 @@ rewriteDescendantsImpl(const T &Node, RewriteRule Rule,
   return std::move(Callback.Edits);
 }
 
-llvm::Expected<SmallVector<clang::transformer::Edit, 1>>
+llvm::Expected<llvm::SmallVector<clang::transformer::Edit, 1>>
 transformer::detail::rewriteDescendants(const Decl &Node, RewriteRule Rule,
                                         const MatchResult &Result) {
   return rewriteDescendantsImpl(Node, std::move(Rule), Result);
 }
 
-llvm::Expected<SmallVector<clang::transformer::Edit, 1>>
+llvm::Expected<llvm::SmallVector<clang::transformer::Edit, 1>>
 transformer::detail::rewriteDescendants(const Stmt &Node, RewriteRule Rule,
                                         const MatchResult &Result) {
   return rewriteDescendantsImpl(Node, std::move(Rule), Result);
 }
 
-llvm::Expected<SmallVector<clang::transformer::Edit, 1>>
+llvm::Expected<llvm::SmallVector<clang::transformer::Edit, 1>>
 transformer::detail::rewriteDescendants(const TypeLoc &Node, RewriteRule Rule,
                                         const MatchResult &Result) {
   return rewriteDescendantsImpl(Node, std::move(Rule), Result);
 }
 
-llvm::Expected<SmallVector<clang::transformer::Edit, 1>>
+llvm::Expected<llvm::SmallVector<clang::transformer::Edit, 1>>
 transformer::detail::rewriteDescendants(const DynTypedNode &DNode,
                                         RewriteRule Rule,
                                         const MatchResult &Result) {
@@ -345,7 +345,7 @@ EditGenerator transformer::rewriteDescendants(std::string NodeId,
                                               RewriteRule Rule) {
   return [NodeId = std::move(NodeId),
           Rule = std::move(Rule)](const MatchResult &Result)
-             -> llvm::Expected<SmallVector<clang::transformer::Edit, 1>> {
+             -> llvm::Expected<llvm::SmallVector<clang::transformer::Edit, 1>> {
     const ast_matchers::BoundNodes::IDToNodeMap &NodesMap =
         Result.Nodes.getMap();
     auto It = NodesMap.find(NodeId);
@@ -356,7 +356,7 @@ EditGenerator transformer::rewriteDescendants(std::string NodeId,
   };
 }
 
-void transformer::addInclude(RewriteRuleBase &Rule, StringRef Header,
+void transformer::addInclude(RewriteRuleBase &Rule, llvm::StringRef Header,
                              IncludeFormat Format) {
   for (auto &Case : Rule.Cases)
     Case.Edits = flatten(std::move(Case.Edits), addInclude(Header, Format));
@@ -376,13 +376,13 @@ static bool hasValidKind(const DynTypedMatcher &M) {
 // their traversal kind explicitly set, either based on a pre-set kind or to the
 // provided `DefaultTraversalKind`.
 static std::vector<DynTypedMatcher> taggedMatchers(
-    StringRef TagBase,
-    const SmallVectorImpl<std::pair<size_t, RewriteRule::Case>> &Cases,
+    llvm::StringRef TagBase,
+    const llvm::SmallVectorImpl<std::pair<size_t, RewriteRule::Case>> &Cases,
     TraversalKind DefaultTraversalKind) {
   std::vector<DynTypedMatcher> Matchers;
   Matchers.reserve(Cases.size());
   for (const auto &Case : Cases) {
-    std::string Tag = (TagBase + Twine(Case.first)).str();
+    std::string Tag = (TagBase + llvm::Twine(Case.first)).str();
     // HACK: Many matchers are not bindable, so ensure that tryBind will work.
     DynTypedMatcher BoundMatcher(Case.second.Matcher);
     BoundMatcher.setAllowBind(true);
@@ -399,7 +399,7 @@ static std::vector<DynTypedMatcher> taggedMatchers(
 // registration.
 template <>
 RewriteRuleWith<void>
-transformer::applyFirst(ArrayRef<RewriteRuleWith<void>> Rules) {
+transformer::applyFirst(llvm::ArrayRef<RewriteRuleWith<void>> Rules) {
   RewriteRule R;
   for (auto &Rule : Rules)
     R.Cases.append(Rule.Cases.begin(), Rule.Cases.end());
@@ -413,9 +413,9 @@ transformer::detail::buildMatchers(const RewriteRuleBase &Rule) {
   // case is paired with an identifying number that is converted to a string id
   // in `taggedMatchers`.
   std::map<ASTNodeKind,
-           SmallVector<std::pair<size_t, RewriteRuleBase::Case>, 1>>
+           llvm::SmallVector<std::pair<size_t, RewriteRuleBase::Case>, 1>>
       Buckets;
-  const SmallVectorImpl<RewriteRule::Case> &Cases = Rule.Cases;
+  const llvm::SmallVectorImpl<RewriteRule::Case> &Cases = Rule.Cases;
   for (int I = 0, N = Cases.size(); I < N; ++I) {
     assert(hasValidKind(Cases[I].Matcher) &&
            "Matcher must be non-(Qual)Type node matcher");
@@ -469,7 +469,7 @@ size_t transformer::detail::findSelectedCase(const MatchResult &Result,
 
   auto &NodesMap = Result.Nodes.getMap();
   for (size_t i = 0, N = Rule.Cases.size(); i < N; ++i) {
-    std::string Tag = ("Tag" + Twine(i)).str();
+    std::string Tag = ("Tag" + llvm::Twine(i)).str();
     if (NodesMap.find(Tag) != NodesMap.end())
       return i;
   }

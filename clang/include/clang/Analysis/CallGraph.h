@@ -101,7 +101,7 @@ public:
   using nodes_iterator = llvm::SetVector<CallGraphNode *>::iterator;
   using const_nodes_iterator = llvm::SetVector<CallGraphNode *>::const_iterator;
 
-  void print(raw_ostream &os) const;
+  void print(llvm::raw_ostream &os) const;
   void dump() const;
   void viewGraph() const;
 
@@ -165,13 +165,13 @@ private:
   Decl *FD;
 
   /// The list of functions called from this node.
-  SmallVector<CallRecord, 5> CalledFunctions;
+  llvm::SmallVector<CallRecord, 5> CalledFunctions;
 
 public:
   CallGraphNode(Decl *D) : FD(D) {}
 
-  using iterator = SmallVectorImpl<CallRecord>::iterator;
-  using const_iterator = SmallVectorImpl<CallRecord>::const_iterator;
+  using iterator = llvm::SmallVectorImpl<CallRecord>::iterator;
+  using const_iterator = llvm::SmallVectorImpl<CallRecord>::const_iterator;
 
   /// Iterators through all the callees/children of the node.
   iterator begin() { return CalledFunctions.begin(); }
@@ -198,7 +198,7 @@ public:
     return getDecl()->getAsFunction()->getDefinition();
   }
 
-  void print(raw_ostream &os) const;
+  void print(llvm::raw_ostream &os) const;
   void dump() const;
 };
 

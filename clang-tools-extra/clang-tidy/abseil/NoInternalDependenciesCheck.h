@@ -20,7 +20,7 @@ namespace clang::tidy::abseil {
 /// http://clang.llvm.org/extra/clang-tidy/checks/abseil/no-internal-dependencies.html
 class NoInternalDependenciesCheck : public ClangTidyCheck {
 public:
-  NoInternalDependenciesCheck(StringRef Name, ClangTidyContext *Context)
+  NoInternalDependenciesCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

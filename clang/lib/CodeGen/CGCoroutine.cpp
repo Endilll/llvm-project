@@ -109,7 +109,7 @@ static void createCoroData(CodeGenFunction &CGF,
 }
 
 // Synthesize a pretty name for a suspend point.
-static SmallString<32> buildSuspendPrefixStr(CGCoroData &Coro, AwaitKind Kind) {
+static llvm::SmallString<32> buildSuspendPrefixStr(CGCoroData &Coro, AwaitKind Kind) {
   unsigned No = 0;
   switch (Kind) {
   case AwaitKind::Init:
@@ -122,9 +122,9 @@ static SmallString<32> buildSuspendPrefixStr(CGCoroData &Coro, AwaitKind Kind) {
     No = ++Coro.YieldNum;
     break;
   }
-  SmallString<32> Prefix(AwaitKindStr[static_cast<unsigned>(Kind)]);
+  llvm::SmallString<32> Prefix(AwaitKindStr[static_cast<unsigned>(Kind)]);
   if (No > 1) {
-    Twine(No).toVector(Prefix);
+    llvm::Twine(No).toVector(Prefix);
   }
   return Prefix;
 }
@@ -231,9 +231,9 @@ static LValueOrRValue emitSuspendExpression(CodeGenFunction &CGF, CGCoroData &Co
       llvm::make_scope_exit([&] { CommonBinder.unbind(CGF); });
 
   auto Prefix = buildSuspendPrefixStr(Coro, Kind);
-  BasicBlock *ReadyBlock = CGF.createBasicBlock(Prefix + Twine(".ready"));
-  BasicBlock *SuspendBlock = CGF.createBasicBlock(Prefix + Twine(".suspend"));
-  BasicBlock *CleanupBlock = CGF.createBasicBlock(Prefix + Twine(".cleanup"));
+  BasicBlock *ReadyBlock = CGF.createBasicBlock(Prefix + llvm::Twine(".ready"));
+  BasicBlock *SuspendBlock = CGF.createBasicBlock(Prefix + llvm::Twine(".suspend"));
+  BasicBlock *CleanupBlock = CGF.createBasicBlock(Prefix + llvm::Twine(".cleanup"));
 
   // If expression is ready, no need to suspend.
   CGF.EmitBranchOnBoolExpr(S.getReadyExpr(), ReadyBlock, SuspendBlock, 0);
@@ -254,7 +254,7 @@ static LValueOrRValue emitSuspendExpression(CodeGenFunction &CGF, CGCoroData &Co
   assert(CGF.CurCoro.Data && CGF.CurCoro.Data->CoroBegin &&
          "expected to be called in coroutine context");
 
-  SmallVector<llvm::Value *, 3> SuspendIntrinsicCallArgs;
+  llvm::SmallVector<llvm::Value *, 3> SuspendIntrinsicCallArgs;
   SuspendIntrinsicCallArgs.push_back(
       CGF.getOrCreateOpaqueLValueMapping(S.getOpaqueValue()).getPointer(CGF));
 
@@ -305,7 +305,7 @@ static LValueOrRValue emitSuspendExpression(CodeGenFunction &CGF, CGCoroData &Co
 
     // Veto suspension if requested by bool returning await_suspend.
     BasicBlock *RealSuspendBlock =
-        CGF.createBasicBlock(Prefix + Twine(".suspend.bool"));
+        CGF.createBasicBlock(Prefix + llvm::Twine(".suspend.bool"));
     CGF.Builder.CreateCondBr(SuspendRet, RealSuspendBlock, ReadyBlock);
     CGF.EmitBlock(RealSuspendBlock);
     break;
@@ -341,7 +341,7 @@ static LValueOrRValue emitSuspendExpression(CodeGenFunction &CGF, CGCoroData &Co
   if (Coro.ExceptionHandler && Kind == AwaitKind::Init &&
       StmtCanThrow(S.getResumeExpr())) {
     Coro.ResumeEHVar =
-        CGF.CreateTempAlloca(Builder.getInt1Ty(), Prefix + Twine("resume.eh"));
+        CGF.CreateTempAlloca(Builder.getInt1Ty(), Prefix + llvm::Twine("resume.eh"));
     Builder.CreateFlagStore(true, Coro.ResumeEHVar);
 
     auto Loc = S.getResumeExpr()->getExprLoc();
@@ -411,8 +411,8 @@ static QualType getCoroutineSuspendExprReturnType(const ASTContext &Ctx,
 #endif
 
 llvm::Function *
-CodeGenFunction::generateAwaitSuspendWrapper(Twine const &CoroName,
-                                             Twine const &SuspendPointName,
+CodeGenFunction::generateAwaitSuspendWrapper(llvm::Twine const &CoroName,
+                                             llvm::Twine const &SuspendPointName,
                                              CoroutineSuspendExpr const &S) {
   std::string FuncName =
       (CoroName + ".__await_suspend_wrapper__" + SuspendPointName).str();
@@ -553,9 +553,9 @@ namespace {
 
 // For WinEH exception representation backend needs to know what funclet coro.end
 // belongs to. That information is passed in a funclet bundle.
-static SmallVector<llvm::OperandBundleDef, 1>
+static llvm::SmallVector<llvm::OperandBundleDef, 1>
 getBundlesForCoroEnd(CodeGenFunction &CGF) {
-  SmallVector<llvm::OperandBundleDef, 1> BundleList;
+  llvm::SmallVector<llvm::OperandBundleDef, 1> BundleList;
 
   if (llvm::Instruction *EHPad = CGF.CurrentFuncletPad)
     BundleList.emplace_back("funclet", EHPad);
@@ -957,7 +957,7 @@ void CodeGenFunction::EmitCoroutineBody(const CoroutineBodyStmt &S) {
 // Emit coroutine intrinsic and patch up arguments of the token type.
 RValue CodeGenFunction::EmitCoroutineIntrinsic(const CallExpr *E,
                                                unsigned int IID) {
-  SmallVector<llvm::Value *, 8> Args;
+  llvm::SmallVector<llvm::Value *, 8> Args;
   switch (IID) {
   default:
     break;

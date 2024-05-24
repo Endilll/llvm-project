@@ -25,7 +25,7 @@ typedef std::function<std::pair<tooling::Replacements, unsigned>(
     AnalyzerPass;
 
 void addQualifierAlignmentFixerPasses(const FormatStyle &Style,
-                                      SmallVectorImpl<AnalyzerPass> &Passes);
+                                      llvm::SmallVectorImpl<AnalyzerPass> &Passes);
 
 void prepareLeftRightOrderingForQualifierAlignmentFixer(
     const std::vector<std::string> &Order, std::vector<std::string> &LeftOrder,
@@ -44,7 +44,7 @@ bool isPossibleMacro(const FormatToken *Tok);
 class LeftRightQualifierAlignmentFixer : public TokenAnalyzer {
   std::string Qualifier;
   bool RightAlign;
-  SmallVector<tok::TokenKind, 8> QualifierTokens;
+  llvm::SmallVector<tok::TokenKind, 8> QualifierTokens;
   std::vector<tok::TokenKind> ConfiguredQualifierTokens;
 
 public:
@@ -56,12 +56,12 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override;
 
   static tok::TokenKind getTokenFromQualifier(const std::string &Qualifier);
 
-  void fixQualifierAlignment(SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+  void fixQualifierAlignment(llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
                              FormatTokenLexer &Tokens,
                              tooling::Replacements &Fixes);
 

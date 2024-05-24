@@ -25,7 +25,7 @@ namespace clang::tidy::performance {
 /// http://clang.llvm.org/extra/clang-tidy/checks/performance/type-promotion-in-math-fn.html
 class TypePromotionInMathFnCheck : public ClangTidyCheck {
 public:
-  TypePromotionInMathFnCheck(StringRef Name, ClangTidyContext *Context);
+  TypePromotionInMathFnCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;

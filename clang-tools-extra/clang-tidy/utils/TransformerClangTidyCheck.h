@@ -25,7 +25,7 @@ namespace clang::tidy::utils {
 //
 // class MyCheck : public TransformerClangTidyCheck {
 //  public:
-//   MyCheck(StringRef Name, ClangTidyContext *Context)
+//   MyCheck(llvm::StringRef Name, ClangTidyContext *Context)
 //       : TransformerClangTidyCheck(MyCheckAsRewriteRule, Name, Context) {}
 // };
 //
@@ -37,7 +37,7 @@ namespace clang::tidy::utils {
 //      includes.
 class TransformerClangTidyCheck : public ClangTidyCheck {
 public:
-  TransformerClangTidyCheck(StringRef Name, ClangTidyContext *Context);
+  TransformerClangTidyCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   /// DEPRECATED: prefer the two argument constructor in conjunction with
   /// \c setRule.
@@ -51,12 +51,12 @@ public:
       std::function<std::optional<transformer::RewriteRuleWith<std::string>>(
           const LangOptions &, const OptionsView &)>
           MakeRule,
-      StringRef Name, ClangTidyContext *Context);
+      llvm::StringRef Name, ClangTidyContext *Context);
 
   /// Convenience overload of the constructor when the rule doesn't have any
   /// dependencies.
   TransformerClangTidyCheck(transformer::RewriteRuleWith<std::string> R,
-                            StringRef Name, ClangTidyContext *Context);
+                            llvm::StringRef Name, ClangTidyContext *Context);
 
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;

@@ -21,7 +21,7 @@
 using namespace llvm;
 
 void clang::EmitClangCommentCommandInfo(RecordKeeper &Records,
-                                        raw_ostream &OS) {
+                                        llvm::raw_ostream &OS) {
   emitSourceFileHeader("A list of commands useable in documentation comments",
                        OS, Records);
 
@@ -71,13 +71,13 @@ void clang::EmitClangCommentCommandInfo(RecordKeeper &Records,
   }
 
   OS << "const CommandInfo *CommandTraits::getBuiltinCommandInfo(\n"
-     << "                                         StringRef Name) {\n";
+     << "                                         llvm::StringRef Name) {\n";
   StringMatcher("Name", Matches, OS).Emit();
   OS << "  return nullptr;\n"
      << "}\n\n";
 }
 
-static std::string MangleName(StringRef Str) {
+static std::string MangleName(llvm::StringRef Str) {
   std::string Mangled;
   for (unsigned i = 0, e = Str.size(); i != e; ++i) {
     switch (Str[i]) {
@@ -114,7 +114,7 @@ static std::string MangleName(StringRef Str) {
 }
 
 void clang::EmitClangCommentCommandList(RecordKeeper &Records,
-                                        raw_ostream &OS) {
+                                        llvm::raw_ostream &OS) {
   emitSourceFileHeader("A list of commands useable in documentation comments",
                        OS, Records);
 

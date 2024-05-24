@@ -79,20 +79,20 @@ void MisplacedOperatorInStrlenInAllocCheck::check(
   const auto *StrLen = Result.Nodes.getNodeAs<CallExpr>("StrLen");
   const auto *BinOp = Result.Nodes.getNodeAs<BinaryOperator>("BinOp");
 
-  const StringRef StrLenText = Lexer::getSourceText(
+  const llvm::StringRef StrLenText = Lexer::getSourceText(
       CharSourceRange::getTokenRange(StrLen->getSourceRange()),
       *Result.SourceManager, getLangOpts());
-  const StringRef Arg0Text = Lexer::getSourceText(
+  const llvm::StringRef Arg0Text = Lexer::getSourceText(
       CharSourceRange::getTokenRange(StrLen->getArg(0)->getSourceRange()),
       *Result.SourceManager, getLangOpts());
-  const StringRef StrLenBegin = StrLenText.substr(0, StrLenText.find(Arg0Text));
-  const StringRef StrLenEnd = StrLenText.substr(
+  const llvm::StringRef StrLenBegin = StrLenText.substr(0, StrLenText.find(Arg0Text));
+  const llvm::StringRef StrLenEnd = StrLenText.substr(
       StrLenText.find(Arg0Text) + Arg0Text.size(), StrLenText.size());
 
-  const StringRef LHSText = Lexer::getSourceText(
+  const llvm::StringRef LHSText = Lexer::getSourceText(
       CharSourceRange::getTokenRange(BinOp->getLHS()->getSourceRange()),
       *Result.SourceManager, getLangOpts());
-  const StringRef RHSText = Lexer::getSourceText(
+  const llvm::StringRef RHSText = Lexer::getSourceText(
       CharSourceRange::getTokenRange(BinOp->getRHS()->getSourceRange()),
       *Result.SourceManager, getLangOpts());
 

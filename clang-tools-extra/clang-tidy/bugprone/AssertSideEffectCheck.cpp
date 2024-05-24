@@ -87,14 +87,14 @@ AST_MATCHER_P2(Expr, hasSideEffect, bool, CheckFunctionCalls,
 
 } // namespace
 
-AssertSideEffectCheck::AssertSideEffectCheck(StringRef Name,
+AssertSideEffectCheck::AssertSideEffectCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       CheckFunctionCalls(Options.get("CheckFunctionCalls", false)),
       RawAssertList(Options.get("AssertMacros", "assert,NSAssert,NSCAssert")),
       IgnoredFunctions(utils::options::parseListPair(
           "__builtin_expect;", Options.get("IgnoredFunctions", ""))) {
-  StringRef(RawAssertList).split(AssertMacros, ",", -1, false);
+  llvm::StringRef(RawAssertList).split(AssertMacros, ",", -1, false);
 }
 
 // The options are explained in AssertSideEffectCheck.h.
@@ -130,9 +130,9 @@ void AssertSideEffectCheck::check(const MatchFinder::MatchResult &Result) {
   const LangOptions LangOpts = getLangOpts();
   SourceLocation Loc = Result.Nodes.getNodeAs<Stmt>("condStmt")->getBeginLoc();
 
-  StringRef AssertMacroName;
+  llvm::StringRef AssertMacroName;
   while (Loc.isValid() && Loc.isMacroID()) {
-    StringRef MacroName = Lexer::getImmediateMacroName(Loc, SM, LangOpts);
+    llvm::StringRef MacroName = Lexer::getImmediateMacroName(Loc, SM, LangOpts);
     Loc = SM.getImmediateMacroCallerLoc(Loc);
 
     // Check if this macro is an assert.

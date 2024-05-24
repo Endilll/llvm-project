@@ -172,7 +172,7 @@ void CodeGenFunction::CGFPOptionsRAII::ConstructorHelper(FPOptions FPFeatures) {
            NewRoundingBehavior == llvm::RoundingMode::NearestTiesToEven)) &&
          "FPConstrained should be enabled on entire function");
 
-  auto mergeFnAttrValue = [&](StringRef Name, bool Value) {
+  auto mergeFnAttrValue = [&](llvm::StringRef Name, bool Value) {
     auto OldValue =
         CGF.CurFn->getFnAttribute(Name).getValueAsBool();
     auto NewValue = OldValue & Value;
@@ -442,7 +442,7 @@ void CodeGenFunction::FinishFunction(SourceLocation EndLoc) {
   if (!EscapedLocals.empty()) {
     // Invert the map from local to index into a simple vector. There should be
     // no holes.
-    SmallVector<llvm::Value *, 4> EscapeArgs;
+    llvm::SmallVector<llvm::Value *, 4> EscapeArgs;
     EscapeArgs.resize(EscapedLocals.size());
     for (auto &Pair : EscapedLocals)
       EscapeArgs[Pair.second] = Pair.first;
@@ -2135,7 +2135,7 @@ CodeGenFunction::EmitNullInitialization(Address DestPtr, QualType Ty) {
       new llvm::GlobalVariable(CGM.getModule(), NullConstant->getType(),
                                /*isConstant=*/true,
                                llvm::GlobalVariable::PrivateLinkage,
-                               NullConstant, Twine());
+                               NullConstant, llvm::Twine());
     CharUnits NullAlign = DestPtr.getAlignment();
     NullVariable->setAlignment(NullAlign.getAsAlign());
     Address SrcPtr(NullVariable, Builder.getInt8Ty(), NullAlign);
@@ -2213,7 +2213,7 @@ llvm::Value *CodeGenFunction::emitArrayLength(const ArrayType *origArrayType,
   // We have some number of constant-length arrays, so addr should
   // have LLVM type [M x [N x [...]]]*.  Build a GEP that walks
   // down to the first element of addr.
-  SmallVector<llvm::Value*, 8> gepIndices;
+  llvm::SmallVector<llvm::Value*, 8> gepIndices;
 
   // GEP down to the array type.
   llvm::ConstantInt *zero = Builder.getInt32(0);
@@ -2574,10 +2574,10 @@ void CodeGenFunction::emitAlignmentAssumption(llvm::Value *PtrValue,
 
 llvm::Value *CodeGenFunction::EmitAnnotationCall(llvm::Function *AnnotationFn,
                                                  llvm::Value *AnnotatedVal,
-                                                 StringRef AnnotationStr,
+                                                 llvm::StringRef AnnotationStr,
                                                  SourceLocation Location,
                                                  const AnnotateAttr *Attr) {
-  SmallVector<llvm::Value *, 5> Args = {
+  llvm::SmallVector<llvm::Value *, 5> Args = {
       AnnotatedVal,
       CGM.EmitAnnotationString(AnnotationStr),
       CGM.EmitAnnotationUnit(Location),
@@ -2702,7 +2702,7 @@ void CodeGenFunction::checkTargetFeatures(SourceLocation Loc,
   // referenced by an accelerator executable function, we emit an error.
   bool IsHipStdPar = getLangOpts().HIPStdPar && getLangOpts().CUDAIsDevice;
   if (BuiltinID) {
-    StringRef FeatureList(CGM.getContext().BuiltinInfo.getRequiredFeatures(BuiltinID));
+    llvm::StringRef FeatureList(CGM.getContext().BuiltinInfo.getRequiredFeatures(BuiltinID));
     if (!Builtin::evaluateRequiredTargetFeatures(
         FeatureList, CallerFeatureMap) && !IsHipStdPar) {
       CGM.getDiags().Report(Loc, diag::err_builtin_needs_feature)
@@ -2717,13 +2717,13 @@ void CodeGenFunction::checkTargetFeatures(SourceLocation Loc,
     ParsedTargetAttr ParsedAttr =
         CGM.getContext().filterFunctionTargetAttrs(TD);
 
-    SmallVector<StringRef, 1> ReqFeatures;
+    llvm::SmallVector<llvm::StringRef, 1> ReqFeatures;
     llvm::StringMap<bool> CalleeFeatureMap;
     CGM.getContext().getFunctionFeatureMap(CalleeFeatureMap, TargetDecl);
 
     for (const auto &F : ParsedAttr.Features) {
       if (F[0] == '+' && CalleeFeatureMap.lookup(F.substr(1)))
-        ReqFeatures.push_back(StringRef(F).substr(1));
+        ReqFeatures.push_back(llvm::StringRef(F).substr(1));
     }
 
     for (const auto &F : CalleeFeatureMap) {
@@ -2731,7 +2731,7 @@ void CodeGenFunction::checkTargetFeatures(SourceLocation Loc,
       if (F.getValue())
         ReqFeatures.push_back(F.getKey());
     }
-    if (!llvm::all_of(ReqFeatures, [&](StringRef Feature) {
+    if (!llvm::all_of(ReqFeatures, [&](llvm::StringRef Feature) {
       if (!CallerFeatureMap.lookup(Feature)) {
         MissingFeature = Feature.str();
         return false;
@@ -2764,7 +2764,7 @@ void CodeGenFunction::EmitSanitizerStatReport(llvm::SanitizerStatKind SSK) {
 }
 
 void CodeGenFunction::EmitKCFIOperandBundle(
-    const CGCallee &Callee, SmallVectorImpl<llvm::OperandBundleDef> &Bundles) {
+    const CGCallee &Callee, llvm::SmallVectorImpl<llvm::OperandBundleDef> &Bundles) {
   const FunctionProtoType *FP =
       Callee.getAbstractInfo().getCalleeFunctionProtoType();
   if (FP)
@@ -2773,8 +2773,8 @@ void CodeGenFunction::EmitKCFIOperandBundle(
 
 llvm::Value *CodeGenFunction::FormAArch64ResolverCondition(
     const MultiVersionResolverOption &RO) {
-  llvm::SmallVector<StringRef, 8> CondFeatures;
-  for (const StringRef &Feature : RO.Conditions.Features) {
+  llvm::SmallVector<llvm::StringRef, 8> CondFeatures;
+  for (const llvm::StringRef &Feature : RO.Conditions.Features) {
     // Optimize the Function Multi Versioning resolver by creating conditions
     // only for features that are not enabled in the target. The exception is
     // for features whose extension instructions are executed as NOP on targets
@@ -2795,7 +2795,7 @@ llvm::Value *CodeGenFunction::FormX86ResolverCondition(
   llvm::Value *Condition = nullptr;
 
   if (!RO.Conditions.Architecture.empty()) {
-    StringRef Arch = RO.Conditions.Architecture;
+    llvm::StringRef Arch = RO.Conditions.Architecture;
     // If arch= specifies an x86-64 micro-architecture level, test the feature
     // with __builtin_cpu_supports, otherwise use __builtin_cpu_is.
     if (Arch.starts_with("x86-64"))
@@ -2835,7 +2835,7 @@ static void CreateMultiVersionResolverReturn(CodeGenModule &CGM,
 }
 
 void CodeGenFunction::EmitMultiVersionResolver(
-    llvm::Function *Resolver, ArrayRef<MultiVersionResolverOption> Options) {
+    llvm::Function *Resolver, llvm::ArrayRef<MultiVersionResolverOption> Options) {
 
   llvm::Triple::ArchType ArchType =
       getContext().getTargetInfo().getTriple().getArch();
@@ -2855,7 +2855,7 @@ void CodeGenFunction::EmitMultiVersionResolver(
 }
 
 void CodeGenFunction::EmitAArch64MultiVersionResolver(
-    llvm::Function *Resolver, ArrayRef<MultiVersionResolverOption> Options) {
+    llvm::Function *Resolver, llvm::ArrayRef<MultiVersionResolverOption> Options) {
   assert(!Options.empty() && "No multiversion resolver options found");
   assert(Options.back().Conditions.Features.size() == 0 &&
          "Default case must be last");
@@ -2901,7 +2901,7 @@ void CodeGenFunction::EmitAArch64MultiVersionResolver(
 }
 
 void CodeGenFunction::EmitX86MultiVersionResolver(
-    llvm::Function *Resolver, ArrayRef<MultiVersionResolverOption> Options) {
+    llvm::Function *Resolver, llvm::ArrayRef<MultiVersionResolverOption> Options) {
 
   bool SupportsIFunc = getContext().getTargetInfo().supportsIFunc();
 

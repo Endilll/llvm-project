@@ -179,7 +179,7 @@ void ExprEngine::removeDeadOnEndOfFunction(NodeBuilderContext& BC,
   // point will be associated. However, we only want to use LastStmt as a
   // reference for what to clean up if it's a ReturnStmt; otherwise, everything
   // is dead.
-  SaveAndRestore<const NodeBuilderContext *> NodeContextRAII(currBldrCtx, &BC);
+  llvm::SaveAndRestore<const NodeBuilderContext *> NodeContextRAII(currBldrCtx, &BC);
   const LocationContext *LCtx = Pred->getLocationContext();
   removeDead(Pred, Dst, dyn_cast<ReturnStmt>(LastSt), LCtx,
              LCtx->getAnalysisDeclContext()->getBody(),
@@ -390,8 +390,8 @@ void ExprEngine::processCallExit(ExplodedNode *CEBNode) {
     // result onto the work list.
     // CEENode -> Dst -> WorkList
     NodeBuilderContext Ctx(Engine, calleeCtx->getCallSiteBlock(), CEENode);
-    SaveAndRestore<const NodeBuilderContext *> NBCSave(currBldrCtx, &Ctx);
-    SaveAndRestore CBISave(currStmtIdx, calleeCtx->getIndex());
+    llvm::SaveAndRestore<const NodeBuilderContext *> NBCSave(currBldrCtx, &Ctx);
+    llvm::SaveAndRestore CBISave(currStmtIdx, calleeCtx->getIndex());
 
     CallEventRef<> UpdatedCall = Call.cloneWithState(CEEState);
 
@@ -706,7 +706,7 @@ void ExprEngine::evalCall(ExplodedNodeSet &Dst, ExplodedNode *Pred,
   // point.
 
   // Run pointerEscape callback with the newly conjured symbols.
-  SmallVector<std::pair<SVal, SVal>, 8> Escaped;
+  llvm::SmallVector<std::pair<SVal, SVal>, 8> Escaped;
   for (ExplodedNode *I : dstPostCall) {
     NodeBuilder B(I, Dst, *currBldrCtx);
     ProgramStateRef State = I->getState();
@@ -965,7 +965,7 @@ ExprEngine::mayInlineCallKind(const CallEvent &Call, const ExplodedNode *Pred,
 
 /// Returns true if the given C++ class contains a member with the given name.
 static bool hasMember(const ASTContext &Ctx, const CXXRecordDecl *RD,
-                      StringRef Name) {
+                      llvm::StringRef Name) {
   const IdentifierInfo &II = Ctx.Idents.get(Name);
   return RD->hasMemberName(Ctx.DeclarationNames.getIdentifier(&II));
 }

@@ -214,7 +214,7 @@ static bool checkTemplatedDecl(const NestedNameSpecifier *NNS,
   return false;
 }
 
-TypeTraitsCheck::TypeTraitsCheck(StringRef Name, ClangTidyContext *Context)
+TypeTraitsCheck::TypeTraitsCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreMacros(Options.getLocalOrGlobal("IgnoreMacros", false)) {}
 

@@ -22,7 +22,7 @@ void NamedParameterCheck::registerMatchers(ast_matchers::MatchFinder *Finder) {
 void NamedParameterCheck::check(const MatchFinder::MatchResult &Result) {
   const SourceManager &SM = *Result.SourceManager;
   const auto *Function = Result.Nodes.getNodeAs<FunctionDecl>("decl");
-  SmallVector<std::pair<const FunctionDecl *, unsigned>, 4> UnnamedParams;
+  llvm::SmallVector<std::pair<const FunctionDecl *, unsigned>, 4> UnnamedParams;
 
   // Ignore declarations without a definition if we're not dealing with an
   // overriden method.
@@ -68,7 +68,7 @@ void NamedParameterCheck::check(const MatchFinder::MatchResult &Result) {
     // void foo(int /*unused*/)
     const char *Begin = SM.getCharacterData(Parm->getBeginLoc());
     const char *End = SM.getCharacterData(Parm->getLocation());
-    StringRef Data(Begin, End - Begin);
+    llvm::StringRef Data(Begin, End - Begin);
     if (Data.contains("/*"))
       continue;
 
@@ -84,7 +84,7 @@ void NamedParameterCheck::check(const MatchFinder::MatchResult &Result) {
 
     for (auto P : UnnamedParams) {
       // Fallback to an unused marker.
-      StringRef NewName = "unused";
+      llvm::StringRef NewName = "unused";
 
       // If the method is overridden, try to copy the name from the base method
       // into the overrider.
@@ -92,7 +92,7 @@ void NamedParameterCheck::check(const MatchFinder::MatchResult &Result) {
       if (M && M->size_overridden_methods() > 0) {
         const ParmVarDecl *OtherParm =
             (*M->begin_overridden_methods())->getParamDecl(P.second);
-        StringRef Name = OtherParm->getName();
+        llvm::StringRef Name = OtherParm->getName();
         if (!Name.empty())
           NewName = Name;
       }
@@ -100,7 +100,7 @@ void NamedParameterCheck::check(const MatchFinder::MatchResult &Result) {
       // If the definition has a named parameter use that name.
       if (Definition) {
         const ParmVarDecl *DefParm = Definition->getParamDecl(P.second);
-        StringRef Name = DefParm->getName();
+        llvm::StringRef Name = DefParm->getName();
         if (!Name.empty())
           NewName = Name;
       }

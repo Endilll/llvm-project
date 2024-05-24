@@ -34,7 +34,7 @@
 
 using namespace clang;
 
-Module::Module(StringRef Name, SourceLocation DefinitionLoc, Module *Parent,
+Module::Module(llvm::StringRef Name, SourceLocation DefinitionLoc, Module *Parent,
                bool IsFramework, bool IsExplicit, unsigned VisibilityID)
     : Name(Name), DefinitionLoc(DefinitionLoc), Parent(Parent),
       VisibilityID(VisibilityID), IsUnimportable(false),
@@ -64,25 +64,25 @@ Module::~Module() {
   }
 }
 
-static bool isPlatformEnvironment(const TargetInfo &Target, StringRef Feature) {
-  StringRef Platform = Target.getPlatformName();
-  StringRef Env = Target.getTriple().getEnvironmentName();
+static bool isPlatformEnvironment(const TargetInfo &Target, llvm::StringRef Feature) {
+  llvm::StringRef Platform = Target.getPlatformName();
+  llvm::StringRef Env = Target.getTriple().getEnvironmentName();
 
   // Attempt to match platform and environment.
   if (Platform == Feature || Target.getTriple().getOSName() == Feature ||
       Env == Feature)
     return true;
 
-  auto CmpPlatformEnv = [](StringRef LHS, StringRef RHS) {
+  auto CmpPlatformEnv = [](llvm::StringRef LHS, llvm::StringRef RHS) {
     auto Pos = LHS.find('-');
-    if (Pos == StringRef::npos)
+    if (Pos == llvm::StringRef::npos)
       return false;
-    SmallString<128> NewLHS = LHS.slice(0, Pos);
+    llvm::SmallString<128> NewLHS = LHS.slice(0, Pos);
     NewLHS += LHS.slice(Pos+1, LHS.size());
     return NewLHS == RHS;
   };
 
-  SmallString<128> PlatformEnv = Target.getTriple().getOSAndEnvironmentName();
+  llvm::SmallString<128> PlatformEnv = Target.getTriple().getOSAndEnvironmentName();
   // Darwin has different but equivalent variants for simulators, example:
   //   1. x86_64-apple-ios-simulator
   //   2. x86_64-apple-iossimulator
@@ -97,7 +97,7 @@ static bool isPlatformEnvironment(const TargetInfo &Target, StringRef Feature) {
 
 /// Determine whether a translation unit built using the current
 /// language options has the given feature.
-static bool hasFeature(StringRef Feature, const LangOptions &LangOpts,
+static bool hasFeature(llvm::StringRef Feature, const LangOptions &LangOpts,
                        const TargetInfo &Target) {
   bool HasFeature = llvm::StringSwitch<bool>(Feature)
                         .Case("altivec", LangOpts.AltiVec)
@@ -158,8 +158,8 @@ bool Module::isUnimportable(const LangOptions &LangOpts,
 // products containing the module map or avoid finding the system installed
 // modulemap for that library.
 bool Module::isForBuilding(const LangOptions &LangOpts) const {
-  StringRef TopLevelName = getTopLevelModuleName();
-  StringRef CurrentModule = LangOpts.CurrentModule;
+  llvm::StringRef TopLevelName = getTopLevelModuleName();
+  llvm::StringRef CurrentModule = LangOpts.CurrentModule;
 
   // When building the implementation of framework Foo, we want to make sure
   // that Foo *and* Foo_Private are textually included and no modules are built
@@ -211,21 +211,21 @@ const Module *Module::getTopLevelModule() const {
   return Result;
 }
 
-static StringRef getModuleNameFromComponent(
+static llvm::StringRef getModuleNameFromComponent(
     const std::pair<std::string, SourceLocation> &IdComponent) {
   return IdComponent.first;
 }
 
-static StringRef getModuleNameFromComponent(StringRef R) { return R; }
+static llvm::StringRef getModuleNameFromComponent(llvm::StringRef R) { return R; }
 
 template<typename InputIter>
-static void printModuleId(raw_ostream &OS, InputIter Begin, InputIter End,
+static void printModuleId(llvm::raw_ostream &OS, InputIter Begin, InputIter End,
                           bool AllowStringLiterals = true) {
   for (InputIter It = Begin; It != End; ++It) {
     if (It != Begin)
       OS << ".";
 
-    StringRef Name = getModuleNameFromComponent(*It);
+    llvm::StringRef Name = getModuleNameFromComponent(*It);
     if (!AllowStringLiterals || isValidAsciiIdentifier(Name))
       OS << Name;
     else {
@@ -237,12 +237,12 @@ static void printModuleId(raw_ostream &OS, InputIter Begin, InputIter End,
 }
 
 template<typename Container>
-static void printModuleId(raw_ostream &OS, const Container &C) {
+static void printModuleId(llvm::raw_ostream &OS, const Container &C) {
   return printModuleId(OS, C.begin(), C.end());
 }
 
 std::string Module::getFullModuleName(bool AllowStringLiterals) const {
-  SmallVector<StringRef, 2> Names;
+  llvm::SmallVector<llvm::StringRef, 2> Names;
 
   // Build up the set of module names (from innermost to outermost).
   for (const Module *M = this; M; M = M->Parent)
@@ -257,7 +257,7 @@ std::string Module::getFullModuleName(bool AllowStringLiterals) const {
   return Result;
 }
 
-bool Module::fullModuleNameIs(ArrayRef<StringRef> nameParts) const {
+bool Module::fullModuleNameIs(llvm::ArrayRef<llvm::StringRef> nameParts) const {
   for (const Module *M = this; M; M = M->Parent) {
     if (nameParts.empty() || M->Name != nameParts.back())
       return false;
@@ -279,9 +279,9 @@ void Module::addTopHeader(FileEntryRef File) {
   TopHeaders.insert(File);
 }
 
-ArrayRef<FileEntryRef> Module::getTopHeaders(FileManager &FileMgr) {
+llvm::ArrayRef<FileEntryRef> Module::getTopHeaders(FileManager &FileMgr) {
   if (!TopHeaderNames.empty()) {
-    for (StringRef TopHeaderName : TopHeaderNames)
+    for (llvm::StringRef TopHeaderName : TopHeaderNames)
       if (auto FE = FileMgr.getOptionalFileRef(TopHeaderName))
         TopHeaders.insert(*FE);
     TopHeaderNames.clear();
@@ -316,7 +316,7 @@ bool Module::directlyUses(const Module *Requested) {
   return false;
 }
 
-void Module::addRequirement(StringRef Feature, bool RequiredState,
+void Module::addRequirement(llvm::StringRef Feature, bool RequiredState,
                             const LangOptions &LangOpts,
                             const TargetInfo &Target) {
   Requirements.push_back(Requirement{std::string(Feature), RequiredState});
@@ -336,7 +336,7 @@ void Module::markUnavailable(bool Unimportable) {
   if (!needUpdate(this))
     return;
 
-  SmallVector<Module *, 2> Stack;
+  llvm::SmallVector<Module *, 2> Stack;
   Stack.push_back(this);
   while (!Stack.empty()) {
     Module *Current = Stack.back();
@@ -354,7 +354,7 @@ void Module::markUnavailable(bool Unimportable) {
   }
 }
 
-Module *Module::findSubmodule(StringRef Name) const {
+Module *Module::findSubmodule(llvm::StringRef Name) const {
   llvm::StringMap<unsigned>::const_iterator Pos = SubModuleIndex.find(Name);
   if (Pos == SubModuleIndex.end())
     return nullptr;
@@ -362,7 +362,7 @@ Module *Module::findSubmodule(StringRef Name) const {
   return SubModules[Pos->getValue()];
 }
 
-Module *Module::findOrInferSubmodule(StringRef Name) {
+Module *Module::findOrInferSubmodule(llvm::StringRef Name) {
   llvm::StringMap<unsigned>::const_iterator Pos = SubModuleIndex.find(Name);
   if (Pos != SubModuleIndex.end())
     return SubModules[Pos->getValue()];
@@ -399,7 +399,7 @@ Module *Module::getPrivateModuleFragment() const {
   return nullptr;
 }
 
-void Module::getExportedModules(SmallVectorImpl<Module *> &Exported) const {
+void Module::getExportedModules(llvm::SmallVectorImpl<Module *> &Exported) const {
   // All non-explicit submodules are exported.
   for (std::vector<Module *>::const_iterator I = SubModules.begin(),
                                              E = SubModules.end();
@@ -412,7 +412,7 @@ void Module::getExportedModules(SmallVectorImpl<Module *> &Exported) const {
   // Find re-exported modules by filtering the list of imported modules.
   bool AnyWildcard = false;
   bool UnrestrictedWildcard = false;
-  SmallVector<Module *, 4> WildcardRestrictions;
+  llvm::SmallVector<Module *, 4> WildcardRestrictions;
   for (unsigned I = 0, N = Exports.size(); I != N; ++I) {
     Module *Mod = Exports[I].getPointer();
     if (!Exports[I].getInt()) {
@@ -469,7 +469,7 @@ void Module::buildVisibleModulesCache() const {
   VisibleModulesCache.insert(this);
 
   // Every imported module is visible.
-  SmallVector<Module *, 16> Stack(Imports.begin(), Imports.end());
+  llvm::SmallVector<Module *, 16> Stack(Imports.begin(), Imports.end());
   while (!Stack.empty()) {
     Module *CurrModule = Stack.pop_back_val();
 
@@ -479,7 +479,7 @@ void Module::buildVisibleModulesCache() const {
   }
 }
 
-void Module::print(raw_ostream &OS, unsigned Indent, bool Dump) const {
+void Module::print(llvm::raw_ostream &OS, unsigned Indent, bool Dump) const {
   OS.indent(Indent);
   if (IsFramework)
     OS << "framework ";
@@ -537,7 +537,7 @@ void Module::print(raw_ostream &OS, unsigned Indent, bool Dump) const {
   }
 
   struct {
-    StringRef Prefix;
+    llvm::StringRef Prefix;
     HeaderKind Kind;
   } Kinds[] = {{"", HK_Normal},
                {"textual ", HK_Textual},
@@ -705,7 +705,7 @@ void VisibleModuleSet::setVisible(Module *M, SourceLocation Loc,
     Vis(V.M);
 
     // Make any exported modules visible.
-    SmallVector<Module *, 16> Exports;
+    llvm::SmallVector<Module *, 16> Exports;
     V.M->getExportedModules(Exports);
     for (Module *E : Exports) {
       // Don't import non-importable modules.

@@ -24,7 +24,7 @@ using namespace llvm::opt;
 
 static void addMultilibsFilePaths(const Driver &D, const MultilibSet &Multilibs,
                                   const Multilib &Multilib,
-                                  StringRef InstallPath,
+                                  llvm::StringRef InstallPath,
                                   ToolChain::path_list &Paths) {
   if (const auto &PathsCallback = Multilibs.filePathsCallback())
     for (const auto &Path : PathsCallback(Multilib))
@@ -40,7 +40,7 @@ bool RISCVToolChain::hasGCCToolchain(const Driver &D,
   if (Args.getLastArg(options::OPT_gcc_toolchain))
     return true;
 
-  SmallString<128> GCCDir;
+  llvm::SmallString<128> GCCDir;
   llvm::sys::path::append(GCCDir, D.Dir, "..", D.getTargetTriple(),
                           "lib/crt0.o");
   return llvm::sys::fs::exists(GCCDir);
@@ -62,7 +62,7 @@ RISCVToolChain::RISCVToolChain(const Driver &D, const llvm::Triple &Triple,
     ToolChain::path_list &PPaths = getProgramPaths();
     // Multilib cross-compiler GCC installations put ld in a triple-prefixed
     // directory off of the parent of the GCC installation.
-    PPaths.push_back(Twine(GCCInstallation.getParentLibPath() + "/../" +
+    PPaths.push_back(llvm::Twine(GCCInstallation.getParentLibPath() + "/../" +
                            GCCInstallation.getTriple().str() + "/bin")
                          .str());
     PPaths.push_back((GCCInstallation.getParentLibPath() + "/../bin").str());
@@ -104,13 +104,13 @@ void RISCVToolChain::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> Dir(getDriver().ResourceDir);
+    llvm::SmallString<128> Dir(getDriver().ResourceDir);
     llvm::sys::path::append(Dir, "include");
     addSystemInclude(DriverArgs, CC1Args, Dir.str());
   }
 
   if (!DriverArgs.hasArg(options::OPT_nostdlibinc)) {
-    SmallString<128> Dir(computeSysRoot());
+    llvm::SmallString<128> Dir(computeSysRoot());
     llvm::sys::path::append(Dir, "include");
     addSystemInclude(DriverArgs, CC1Args, Dir.str());
   }
@@ -120,7 +120,7 @@ void RISCVToolChain::addLibStdCxxIncludePaths(
     const llvm::opt::ArgList &DriverArgs,
     llvm::opt::ArgStringList &CC1Args) const {
   const GCCVersion &Version = GCCInstallation.getVersion();
-  StringRef TripleStr = GCCInstallation.getTriple().str();
+  llvm::StringRef TripleStr = GCCInstallation.getTriple().str();
   const Multilib &Multilib = GCCInstallation.getMultilib();
   addLibStdCXXIncludePaths(computeSysRoot() + "/include/c++/" + Version.Text,
                            TripleStr, Multilib.includeSuffix(), DriverArgs,
@@ -131,10 +131,10 @@ std::string RISCVToolChain::computeSysRoot() const {
   if (!getDriver().SysRoot.empty())
     return getDriver().SysRoot;
 
-  SmallString<128> SysRootDir;
+  llvm::SmallString<128> SysRootDir;
   if (GCCInstallation.isValid()) {
-    StringRef LibDir = GCCInstallation.getParentLibPath();
-    StringRef TripleStr = GCCInstallation.getTriple().str();
+    llvm::StringRef LibDir = GCCInstallation.getParentLibPath();
+    llvm::StringRef TripleStr = GCCInstallation.getTriple().str();
     llvm::sys::path::append(SysRootDir, LibDir, "..", TripleStr);
   } else {
     // Use the triple as provided to the driver. Unlike the parsed triple

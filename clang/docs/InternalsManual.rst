@@ -694,7 +694,7 @@ use them to construct the ``-cc1`` job:
       // ...
 
   +   for (const Arg *A : Args.filtered(OPT_fpass_plugin_EQ)) {
-  +     CmdArgs.push_back(Args.MakeArgString(Twine("-fpass-plugin=") + A->getValue()));
+  +     CmdArgs.push_back(Args.MakeArgString(llvm::Twine("-fpass-plugin=") + A->getValue()));
   +     A->claim();
   +   }
     }
@@ -738,7 +738,7 @@ resort to parsing/serializing the command line arguments manually:
     }
 
     static void GenerateCodeGenArgs(const CodeGenOptions &Opts,
-                                    SmallVectorImpl<const char *> &Args,
+                                    llvm::SmallVectorImpl<const char *> &Args,
                                     CompilerInvocation::StringAllocator SA /*...*/) {
       // ...
 
@@ -836,7 +836,7 @@ command line:
   }
 
   void CompilerInvocation::GenerateLangArgs(LangOptions *LangOpts,
-                                            SmallVectorImpl<const char *> &Args,
+                                            llvm::SmallVectorImpl<const char *> &Args,
                                             StringAllocator SA) {
   #define LANG_OPTION_WITH_MARSHALLING(                                          \
       PREFIX_TYPE, NAME, ID, KIND, GROUP, ALIAS, ALIASARGS, FLAGS, PARAM,        \

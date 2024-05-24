@@ -51,7 +51,7 @@ private:
 
   void diagnoseCallArguments(const CallEvent &CE, CheckerContext &C) const;
 
-  void reportUseAfterDealloc(SymbolRef Sym, StringRef Desc, const Stmt *S,
+  void reportUseAfterDealloc(SymbolRef Sym, llvm::StringRef Desc, const Stmt *S,
                              CheckerContext &C) const;
 };
 
@@ -94,12 +94,12 @@ void ObjCSuperDeallocChecker::checkPreObjCMessage(const ObjCMethodCall &M,
   if (!AlreadyCalled)
     return;
 
-  StringRef Desc;
+  llvm::StringRef Desc;
 
   if (isSuperDeallocMessage(M)) {
     Desc = "[super dealloc] should not be called multiple times";
   } else {
-    Desc = StringRef();
+    Desc = llvm::StringRef();
   }
 
   reportUseAfterDealloc(ReceiverSymbol, Desc, M.getOriginExpr(), C);
@@ -156,7 +156,7 @@ void ObjCSuperDeallocChecker::checkLocation(SVal L, bool IsLoad, const Stmt *S,
     }
   }
 
-  StringRef Desc = StringRef();
+  llvm::StringRef Desc = llvm::StringRef();
   auto *IvarRegion = dyn_cast_or_null<ObjCIvarRegion>(PriorSubRegion);
 
   std::string Buf;
@@ -174,7 +174,7 @@ void ObjCSuperDeallocChecker::checkLocation(SVal L, bool IsLoad, const Stmt *S,
 /// Desc will be used to describe the error; otherwise,
 /// a default warning will be used.
 void ObjCSuperDeallocChecker::reportUseAfterDealloc(SymbolRef Sym,
-                                                    StringRef Desc,
+                                                    llvm::StringRef Desc,
                                                     const Stmt *S,
                                                     CheckerContext &C) const {
   // We have a use of self after free.
@@ -208,7 +208,7 @@ void ObjCSuperDeallocChecker::diagnoseCallArguments(const CallEvent &CE,
       continue;
 
     if (State->contains<CalledSuperDealloc>(Sym)) {
-      reportUseAfterDealloc(Sym, StringRef(), CE.getArgExpr(I), C);
+      reportUseAfterDealloc(Sym, llvm::StringRef(), CE.getArgExpr(I), C);
       return;
     }
   }

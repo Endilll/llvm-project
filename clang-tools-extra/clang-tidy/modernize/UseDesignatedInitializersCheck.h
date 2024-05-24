@@ -20,7 +20,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-designated-initializers.html
 class UseDesignatedInitializersCheck : public ClangTidyCheck {
 public:
-  UseDesignatedInitializersCheck(StringRef Name, ClangTidyContext *Context);
+  UseDesignatedInitializersCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;

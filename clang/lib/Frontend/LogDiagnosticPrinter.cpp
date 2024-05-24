@@ -18,12 +18,12 @@ using namespace clang;
 using namespace markup;
 
 LogDiagnosticPrinter::LogDiagnosticPrinter(
-    raw_ostream &os, DiagnosticOptions *diags,
-    std::unique_ptr<raw_ostream> StreamOwner)
+    llvm::raw_ostream &os, DiagnosticOptions *diags,
+    std::unique_ptr<llvm::raw_ostream> StreamOwner)
     : OS(os), StreamOwner(std::move(StreamOwner)), LangOpts(nullptr),
       DiagOpts(diags) {}
 
-static StringRef getLevelName(DiagnosticsEngine::Level Level) {
+static llvm::StringRef getLevelName(DiagnosticsEngine::Level Level) {
   switch (Level) {
   case DiagnosticsEngine::Ignored: return "ignored";
   case DiagnosticsEngine::Remark:  return "remark";
@@ -84,7 +84,7 @@ void LogDiagnosticPrinter::EndSourceFile() {
     return;
 
   // Write to a temporary string to ensure atomic write of diagnostic object.
-  SmallString<512> Msg;
+  llvm::SmallString<512> Msg;
   llvm::raw_svector_ostream OS(Msg);
 
   OS << "<dict>\n";
@@ -132,7 +132,7 @@ void LogDiagnosticPrinter::HandleDiagnostic(DiagnosticsEngine::Level Level,
       std::string(DiagnosticIDs::getWarningOptionForDiag(DE.DiagnosticID));
 
   // Format the message.
-  SmallString<100> MessageStr;
+  llvm::SmallString<100> MessageStr;
   Info.FormatDiagnostic(MessageStr);
   DE.Message = std::string(MessageStr);
 

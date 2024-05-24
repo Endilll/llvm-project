@@ -122,7 +122,7 @@ class IteratorModeling
   void assignToContainer(CheckerContext &C, const Expr *CE, SVal RetVal,
                          const MemRegion *Cont) const;
   bool noChangeInAdvance(CheckerContext &C, SVal Iter, const Expr *CE) const;
-  void printState(raw_ostream &Out, ProgramStateRef State, const char *NL,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State, const char *NL,
                   const char *Sep) const override;
 
   // std::advance, std::prev & std::next
@@ -723,7 +723,7 @@ bool IteratorModeling::noChangeInAdvance(CheckerContext &C, SVal Iter,
   return PosBefore->getOffset() == PosAfter->getOffset();
 }
 
-void IteratorModeling::printState(raw_ostream &Out, ProgramStateRef State,
+void IteratorModeling::printState(llvm::raw_ostream &Out, ProgramStateRef State,
                                   const char *NL, const char *Sep) const {
   auto SymbolMap = State->get<IteratorSymbolMap>();
   auto RegionMap = State->get<IteratorRegionMap>();

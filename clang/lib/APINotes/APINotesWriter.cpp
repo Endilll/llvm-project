@@ -59,7 +59,7 @@ class APINotesWriter::Implementation {
   /// instance property.
   llvm::DenseMap<
       std::tuple<unsigned, unsigned, char>,
-      llvm::SmallVector<std::pair<VersionTuple, ObjCPropertyInfo>, 1>>
+      llvm::SmallVector<std::pair<llvm::VersionTuple, ObjCPropertyInfo>, 1>>
       ObjCProperties;
 
   /// Information about Objective-C methods.
@@ -67,7 +67,7 @@ class APINotesWriter::Implementation {
   /// Indexed by the context ID, selector ID, and Boolean (stored as a char)
   /// indicating whether this is a class or instance method.
   llvm::DenseMap<std::tuple<unsigned, unsigned, char>,
-                 llvm::SmallVector<std::pair<VersionTuple, ObjCMethodInfo>, 1>>
+                 llvm::SmallVector<std::pair<llvm::VersionTuple, ObjCMethodInfo>, 1>>
       ObjCMethods;
 
   /// Mapping from selectors to selector ID.
@@ -78,7 +78,7 @@ class APINotesWriter::Implementation {
   /// Indexed by the context ID, contextKind, identifier ID.
   llvm::DenseMap<
       ContextTableKey,
-      llvm::SmallVector<std::pair<VersionTuple, GlobalVariableInfo>, 1>>
+      llvm::SmallVector<std::pair<llvm::VersionTuple, GlobalVariableInfo>, 1>>
       GlobalVariables;
 
   /// Information about global functions.
@@ -86,32 +86,32 @@ class APINotesWriter::Implementation {
   /// Indexed by the context ID, contextKind, identifier ID.
   llvm::DenseMap<
       ContextTableKey,
-      llvm::SmallVector<std::pair<VersionTuple, GlobalFunctionInfo>, 1>>
+      llvm::SmallVector<std::pair<llvm::VersionTuple, GlobalFunctionInfo>, 1>>
       GlobalFunctions;
 
   /// Information about enumerators.
   ///
   /// Indexed by the identifier ID.
   llvm::DenseMap<
-      unsigned, llvm::SmallVector<std::pair<VersionTuple, EnumConstantInfo>, 1>>
+      unsigned, llvm::SmallVector<std::pair<llvm::VersionTuple, EnumConstantInfo>, 1>>
       EnumConstants;
 
   /// Information about tags.
   ///
   /// Indexed by the context ID, contextKind, identifier ID.
   llvm::DenseMap<ContextTableKey,
-                 llvm::SmallVector<std::pair<VersionTuple, TagInfo>, 1>>
+                 llvm::SmallVector<std::pair<llvm::VersionTuple, TagInfo>, 1>>
       Tags;
 
   /// Information about typedefs.
   ///
   /// Indexed by the context ID, contextKind, identifier ID.
   llvm::DenseMap<ContextTableKey,
-                 llvm::SmallVector<std::pair<VersionTuple, TypedefInfo>, 1>>
+                 llvm::SmallVector<std::pair<llvm::VersionTuple, TypedefInfo>, 1>>
       Typedefs;
 
   /// Retrieve the ID for the given identifier.
-  IdentifierID getIdentifier(StringRef Identifier) {
+  IdentifierID getIdentifier(llvm::StringRef Identifier) {
     if (Identifier.empty())
       return 0;
 
@@ -281,7 +281,7 @@ namespace {
 /// Used to serialize the on-disk identifier table.
 class IdentifierTableInfo {
 public:
-  using key_type = StringRef;
+  using key_type = llvm::StringRef;
   using key_type_ref = key_type;
   using data_type = IdentifierID;
   using data_type_ref = const data_type &;
@@ -291,7 +291,7 @@ public:
   hash_value_type ComputeHash(key_type_ref Key) { return llvm::djbHash(Key); }
 
   std::pair<unsigned, unsigned>
-  EmitKeyDataLength(raw_ostream &OS, key_type_ref Key, data_type_ref) {
+  EmitKeyDataLength(llvm::raw_ostream &OS, key_type_ref Key, data_type_ref) {
     uint32_t KeyLength = Key.size();
     uint32_t DataLength = sizeof(uint32_t);
 
@@ -301,9 +301,9 @@ public:
     return {KeyLength, DataLength};
   }
 
-  void EmitKey(raw_ostream &OS, key_type_ref Key, unsigned) { OS << Key; }
+  void EmitKey(llvm::raw_ostream &OS, key_type_ref Key, unsigned) { OS << Key; }
 
-  void EmitData(raw_ostream &OS, key_type_ref, data_type_ref Data, unsigned) {
+  void EmitData(llvm::raw_ostream &OS, key_type_ref, data_type_ref Data, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint32_t>(Data);
   }
@@ -350,7 +350,7 @@ public:
     return static_cast<size_t>(Key.hashValue());
   }
 
-  std::pair<unsigned, unsigned> EmitKeyDataLength(raw_ostream &OS, key_type_ref,
+  std::pair<unsigned, unsigned> EmitKeyDataLength(llvm::raw_ostream &OS, key_type_ref,
                                                   data_type_ref) {
     uint32_t KeyLength = sizeof(uint32_t) + sizeof(uint8_t) + sizeof(uint32_t);
     uint32_t DataLength = sizeof(uint32_t);
@@ -361,14 +361,14 @@ public:
     return {KeyLength, DataLength};
   }
 
-  void EmitKey(raw_ostream &OS, key_type_ref Key, unsigned) {
+  void EmitKey(llvm::raw_ostream &OS, key_type_ref Key, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint32_t>(Key.parentContextID);
     writer.write<uint8_t>(Key.contextKind);
     writer.write<uint32_t>(Key.contextID);
   }
 
-  void EmitData(raw_ostream &OS, key_type_ref, data_type_ref Data, unsigned) {
+  void EmitData(llvm::raw_ostream &OS, key_type_ref, data_type_ref Data, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint32_t>(Data);
   }
@@ -378,9 +378,9 @@ public:
 /// deduction.
 template <typename T> struct MakeDependent { typedef T Type; };
 
-/// Retrieve the serialized size of the given VersionTuple, for use in
+/// Retrieve the serialized size of the given llvm::VersionTuple, for use in
 /// on-disk hash tables.
-unsigned getVersionTupleSize(const VersionTuple &VT) {
+unsigned getVersionTupleSize(const llvm::VersionTuple &VT) {
   unsigned size = sizeof(uint8_t) + /*major*/ sizeof(uint32_t);
   if (VT.getMinor())
     size += sizeof(uint32_t);
@@ -406,7 +406,7 @@ unsigned getVersionedInfoSize(
 }
 
 /// Emit a serialized representation of a version tuple.
-void emitVersionTuple(raw_ostream &OS, const VersionTuple &VT) {
+void emitVersionTuple(llvm::raw_ostream &OS, const llvm::VersionTuple &VT) {
   llvm::support::endian::Writer writer(OS, llvm::endianness::little);
 
   // First byte contains the number of components beyond the 'major' component.
@@ -434,13 +434,13 @@ void emitVersionTuple(raw_ostream &OS, const VersionTuple &VT) {
 /// Emit versioned information.
 template <typename T>
 void emitVersionedInfo(
-    raw_ostream &OS, llvm::SmallVectorImpl<std::pair<VersionTuple, T>> &VI,
-    llvm::function_ref<void(raw_ostream &,
+    llvm::raw_ostream &OS, llvm::SmallVectorImpl<std::pair<llvm::VersionTuple, T>> &VI,
+    llvm::function_ref<void(llvm::raw_ostream &,
                             const typename MakeDependent<T>::Type &)>
         emitInfo) {
   std::sort(VI.begin(), VI.end(),
-            [](const std::pair<VersionTuple, T> &LHS,
-               const std::pair<VersionTuple, T> &RHS) -> bool {
+            [](const std::pair<llvm::VersionTuple, T> &LHS,
+               const std::pair<llvm::VersionTuple, T> &RHS) -> bool {
               assert((&LHS == &RHS || LHS.first != RHS.first) &&
                      "two entries for the same version");
               return LHS.first < RHS.first;
@@ -473,7 +473,7 @@ public:
   using offset_type = unsigned;
 
   std::pair<unsigned, unsigned>
-  EmitKeyDataLength(raw_ostream &OS, key_type_ref Key, data_type_ref Data) {
+  EmitKeyDataLength(llvm::raw_ostream &OS, key_type_ref Key, data_type_ref Data) {
     uint32_t KeyLength = asDerived().getKeyLength(Key);
     uint32_t DataLength =
         getVersionedInfoSize(Data, [this](const UnversionedDataType &UI) {
@@ -486,7 +486,7 @@ public:
     return {KeyLength, DataLength};
   }
 
-  void EmitData(raw_ostream &OS, key_type_ref, data_type_ref Data, unsigned) {
+  void EmitData(llvm::raw_ostream &OS, key_type_ref, data_type_ref Data, unsigned) {
     emitVersionedInfo(
         OS, Data, [this](llvm::raw_ostream &OS, const UnversionedDataType &UI) {
           asDerived().emitUnversionedInfo(OS, UI);
@@ -495,7 +495,7 @@ public:
 };
 
 /// Emit a serialized representation of the common entity information.
-void emitCommonEntityInfo(raw_ostream &OS, const CommonEntityInfo &CEI) {
+void emitCommonEntityInfo(llvm::raw_ostream &OS, const CommonEntityInfo &CEI) {
   llvm::support::endian::Writer writer(OS, llvm::endianness::little);
 
   uint8_t payload = 0;
@@ -533,7 +533,7 @@ unsigned getCommonTypeInfoSize(const CommonTypeInfo &CTI) {
 }
 
 /// Emit a serialized representation of the common type information.
-void emitCommonTypeInfo(raw_ostream &OS, const CommonTypeInfo &CTI) {
+void emitCommonTypeInfo(llvm::raw_ostream &OS, const CommonTypeInfo &CTI) {
   emitCommonEntityInfo(OS, CTI);
 
   llvm::support::endian::Writer writer(OS, llvm::endianness::little);
@@ -558,7 +558,7 @@ class ObjCContextInfoTableInfo
 public:
   unsigned getKeyLength(key_type_ref) { return sizeof(uint32_t); }
 
-  void EmitKey(raw_ostream &OS, key_type_ref Key, unsigned) {
+  void EmitKey(llvm::raw_ostream &OS, key_type_ref Key, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint32_t>(Key);
   }
@@ -571,7 +571,7 @@ public:
     return getCommonTypeInfoSize(OCI) + 1;
   }
 
-  void emitUnversionedInfo(raw_ostream &OS, const ObjCContextInfo &OCI) {
+  void emitUnversionedInfo(llvm::raw_ostream &OS, const ObjCContextInfo &OCI) {
     emitCommonTypeInfo(OS, OCI);
 
     uint8_t payload = 0;
@@ -644,7 +644,7 @@ unsigned getVariableInfoSize(const VariableInfo &VI) {
 }
 
 /// Emit a serialized representation of the variable information.
-void emitVariableInfo(raw_ostream &OS, const VariableInfo &VI) {
+void emitVariableInfo(llvm::raw_ostream &OS, const VariableInfo &VI) {
   emitCommonEntityInfo(OS, VI);
 
   uint8_t bytes[2] = {0, 0};
@@ -672,7 +672,7 @@ public:
     return sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint8_t);
   }
 
-  void EmitKey(raw_ostream &OS, key_type_ref Key, unsigned) {
+  void EmitKey(llvm::raw_ostream &OS, key_type_ref Key, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint32_t>(std::get<0>(Key));
     writer.write<uint32_t>(std::get<1>(Key));
@@ -687,7 +687,7 @@ public:
     return getVariableInfoSize(OPI) + 1;
   }
 
-  void emitUnversionedInfo(raw_ostream &OS, const ObjCPropertyInfo &OPI) {
+  void emitUnversionedInfo(llvm::raw_ostream &OS, const ObjCPropertyInfo &OPI) {
     emitVariableInfo(OS, OPI);
 
     uint8_t flags = 0;
@@ -741,7 +741,7 @@ public:
     return sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint8_t);
   }
 
-  void EmitKey(raw_ostream &OS, key_type_ref Key, unsigned) {
+  void EmitKey(llvm::raw_ostream &OS, key_type_ref Key, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint32_t>(std::get<0>(Key));
     writer.write<uint32_t>(std::get<1>(Key));
@@ -756,7 +756,7 @@ public:
     return getFunctionInfoSize(OMI) + 1;
   }
 
-  void emitUnversionedInfo(raw_ostream &OS, const ObjCMethodInfo &OMI) {
+  void emitUnversionedInfo(llvm::raw_ostream &OS, const ObjCMethodInfo &OMI) {
     uint8_t flags = 0;
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     flags = (flags << 1) | OMI.DesignatedInit;
@@ -811,7 +811,7 @@ public:
   }
 
   std::pair<unsigned, unsigned>
-  EmitKeyDataLength(raw_ostream &OS, key_type_ref Key, data_type_ref) {
+  EmitKeyDataLength(llvm::raw_ostream &OS, key_type_ref Key, data_type_ref) {
     uint32_t KeyLength =
         sizeof(uint16_t) + sizeof(uint32_t) * Key.Identifiers.size();
     uint32_t DataLength = sizeof(uint32_t);
@@ -822,14 +822,14 @@ public:
     return {KeyLength, DataLength};
   }
 
-  void EmitKey(raw_ostream &OS, key_type_ref Key, unsigned) {
+  void EmitKey(llvm::raw_ostream &OS, key_type_ref Key, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint16_t>(Key.NumArgs);
     for (auto Identifier : Key.Identifiers)
       writer.write<uint32_t>(Identifier);
   }
 
-  void EmitData(raw_ostream &OS, key_type_ref, data_type_ref Data, unsigned) {
+  void EmitData(llvm::raw_ostream &OS, key_type_ref, data_type_ref Data, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint32_t>(Data);
   }
@@ -873,7 +873,7 @@ public:
     return sizeof(uint32_t) + sizeof(uint8_t) + sizeof(uint32_t);
   }
 
-  void EmitKey(raw_ostream &OS, key_type_ref Key, unsigned) {
+  void EmitKey(llvm::raw_ostream &OS, key_type_ref Key, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint32_t>(Key.parentContextID);
     writer.write<uint8_t>(Key.contextKind);
@@ -888,7 +888,7 @@ public:
     return getVariableInfoSize(GVI);
   }
 
-  void emitUnversionedInfo(raw_ostream &OS, const GlobalVariableInfo &GVI) {
+  void emitUnversionedInfo(llvm::raw_ostream &OS, const GlobalVariableInfo &GVI) {
     emitVariableInfo(OS, GVI);
   }
 };
@@ -926,7 +926,7 @@ unsigned getParamInfoSize(const ParamInfo &PI) {
   return getVariableInfoSize(PI) + 1;
 }
 
-void emitParamInfo(raw_ostream &OS, const ParamInfo &PI) {
+void emitParamInfo(llvm::raw_ostream &OS, const ParamInfo &PI) {
   emitVariableInfo(OS, PI);
 
   uint8_t flags = 0;
@@ -955,7 +955,7 @@ unsigned getFunctionInfoSize(const FunctionInfo &FI) {
 }
 
 /// Emit a serialized representation of the function information.
-void emitFunctionInfo(raw_ostream &OS, const FunctionInfo &FI) {
+void emitFunctionInfo(llvm::raw_ostream &OS, const FunctionInfo &FI) {
   emitCommonEntityInfo(OS, FI);
 
   uint8_t flags = 0;
@@ -975,7 +975,7 @@ void emitFunctionInfo(raw_ostream &OS, const FunctionInfo &FI) {
     emitParamInfo(OS, PI);
 
   writer.write<uint16_t>(FI.ResultType.size());
-  writer.write(ArrayRef<char>{FI.ResultType.data(), FI.ResultType.size()});
+  writer.write(llvm::ArrayRef<char>{FI.ResultType.data(), FI.ResultType.size()});
 }
 
 /// Used to serialize the on-disk global function table.
@@ -987,7 +987,7 @@ public:
     return sizeof(uint32_t) + sizeof(uint8_t) + sizeof(uint32_t);
   }
 
-  void EmitKey(raw_ostream &OS, key_type_ref Key, unsigned) {
+  void EmitKey(llvm::raw_ostream &OS, key_type_ref Key, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint32_t>(Key.parentContextID);
     writer.write<uint8_t>(Key.contextKind);
@@ -1002,7 +1002,7 @@ public:
     return getFunctionInfoSize(GFI);
   }
 
-  void emitUnversionedInfo(raw_ostream &OS, const GlobalFunctionInfo &GFI) {
+  void emitUnversionedInfo(llvm::raw_ostream &OS, const GlobalFunctionInfo &GFI) {
     emitFunctionInfo(OS, GFI);
   }
 };
@@ -1043,7 +1043,7 @@ class EnumConstantTableInfo
 public:
   unsigned getKeyLength(key_type_ref) { return sizeof(uint32_t); }
 
-  void EmitKey(raw_ostream &OS, key_type_ref Key, unsigned) {
+  void EmitKey(llvm::raw_ostream &OS, key_type_ref Key, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint32_t>(Key);
   }
@@ -1056,7 +1056,7 @@ public:
     return getCommonEntityInfoSize(ECI);
   }
 
-  void emitUnversionedInfo(raw_ostream &OS, const EnumConstantInfo &ECI) {
+  void emitUnversionedInfo(llvm::raw_ostream &OS, const EnumConstantInfo &ECI) {
     emitCommonEntityInfo(OS, ECI);
   }
 };
@@ -1101,7 +1101,7 @@ public:
     return sizeof(uint32_t) + sizeof(uint8_t) + sizeof(IdentifierID);
   }
 
-  void EmitKey(raw_ostream &OS, key_type_ref Key, unsigned) {
+  void EmitKey(llvm::raw_ostream &OS, key_type_ref Key, unsigned) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
     writer.write<uint32_t>(Key.parentContextID);
     writer.write<uint8_t>(Key.contextKind);
@@ -1116,7 +1116,7 @@ public:
     return getCommonTypeInfoSize(UDT);
   }
 
-  void emitUnversionedInfo(raw_ostream &OS, const UnversionedDataType &UDT) {
+  void emitUnversionedInfo(llvm::raw_ostream &OS, const UnversionedDataType &UDT) {
     emitCommonTypeInfo(OS, UDT);
   }
 };
@@ -1131,7 +1131,7 @@ public:
            2 + getCommonTypeInfoSize(TI);
   }
 
-  void emitUnversionedInfo(raw_ostream &OS, const TagInfo &TI) {
+  void emitUnversionedInfo(llvm::raw_ostream &OS, const TagInfo &TI) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
 
     uint8_t Flags = 0;
@@ -1211,7 +1211,7 @@ public:
     return 1 + getCommonTypeInfoSize(TI);
   }
 
-  void emitUnversionedInfo(raw_ostream &OS, const TypedefInfo &TI) {
+  void emitUnversionedInfo(llvm::raw_ostream &OS, const TypedefInfo &TI) {
     llvm::support::endian::Writer writer(OS, llvm::endianness::little);
 
     uint8_t Flags = 0;
@@ -1264,9 +1264,9 @@ void APINotesWriter::writeToStream(llvm::raw_ostream &OS) {
 }
 
 ContextID APINotesWriter::addObjCContext(std::optional<ContextID> ParentCtxID,
-                                         StringRef Name, ContextKind Kind,
+                                         llvm::StringRef Name, ContextKind Kind,
                                          const ObjCContextInfo &Info,
-                                         VersionTuple SwiftVersion) {
+                                         llvm::VersionTuple SwiftVersion) {
   IdentifierID NameID = Implementation->getIdentifier(Name);
 
   uint32_t RawParentCtxID = ParentCtxID ? ParentCtxID->Value : -1;
@@ -1302,10 +1302,10 @@ ContextID APINotesWriter::addObjCContext(std::optional<ContextID> ParentCtxID,
   return ContextID(Known->second.first);
 }
 
-void APINotesWriter::addObjCProperty(ContextID CtxID, StringRef Name,
+void APINotesWriter::addObjCProperty(ContextID CtxID, llvm::StringRef Name,
                                      bool IsInstanceProperty,
                                      const ObjCPropertyInfo &Info,
-                                     VersionTuple SwiftVersion) {
+                                     llvm::VersionTuple SwiftVersion) {
   IdentifierID NameID = Implementation->getIdentifier(Name);
   Implementation
       ->ObjCProperties[std::make_tuple(CtxID.Value, NameID, IsInstanceProperty)]
@@ -1315,7 +1315,7 @@ void APINotesWriter::addObjCProperty(ContextID CtxID, StringRef Name,
 void APINotesWriter::addObjCMethod(ContextID CtxID, ObjCSelectorRef Selector,
                                    bool IsInstanceMethod,
                                    const ObjCMethodInfo &Info,
-                                   VersionTuple SwiftVersion) {
+                                   llvm::VersionTuple SwiftVersion) {
   SelectorID SelID = Implementation->getSelector(Selector);
   auto Key = std::tuple<unsigned, unsigned, char>{CtxID.Value, SelID,
                                                   IsInstanceMethod};
@@ -1350,7 +1350,7 @@ void APINotesWriter::addObjCMethod(ContextID CtxID, ObjCSelectorRef Selector,
 void APINotesWriter::addGlobalVariable(std::optional<Context> Ctx,
                                        llvm::StringRef Name,
                                        const GlobalVariableInfo &Info,
-                                       VersionTuple SwiftVersion) {
+                                       llvm::VersionTuple SwiftVersion) {
   IdentifierID VariableID = Implementation->getIdentifier(Name);
   ContextTableKey Key(Ctx, VariableID);
   Implementation->GlobalVariables[Key].push_back({SwiftVersion, Info});
@@ -1359,7 +1359,7 @@ void APINotesWriter::addGlobalVariable(std::optional<Context> Ctx,
 void APINotesWriter::addGlobalFunction(std::optional<Context> Ctx,
                                        llvm::StringRef Name,
                                        const GlobalFunctionInfo &Info,
-                                       VersionTuple SwiftVersion) {
+                                       llvm::VersionTuple SwiftVersion) {
   IdentifierID NameID = Implementation->getIdentifier(Name);
   ContextTableKey Key(Ctx, NameID);
   Implementation->GlobalFunctions[Key].push_back({SwiftVersion, Info});
@@ -1367,13 +1367,13 @@ void APINotesWriter::addGlobalFunction(std::optional<Context> Ctx,
 
 void APINotesWriter::addEnumConstant(llvm::StringRef Name,
                                      const EnumConstantInfo &Info,
-                                     VersionTuple SwiftVersion) {
+                                     llvm::VersionTuple SwiftVersion) {
   IdentifierID EnumConstantID = Implementation->getIdentifier(Name);
   Implementation->EnumConstants[EnumConstantID].push_back({SwiftVersion, Info});
 }
 
 void APINotesWriter::addTag(std::optional<Context> Ctx, llvm::StringRef Name,
-                            const TagInfo &Info, VersionTuple SwiftVersion) {
+                            const TagInfo &Info, llvm::VersionTuple SwiftVersion) {
   IdentifierID TagID = Implementation->getIdentifier(Name);
   ContextTableKey Key(Ctx, TagID);
   Implementation->Tags[Key].push_back({SwiftVersion, Info});
@@ -1381,7 +1381,7 @@ void APINotesWriter::addTag(std::optional<Context> Ctx, llvm::StringRef Name,
 
 void APINotesWriter::addTypedef(std::optional<Context> Ctx,
                                 llvm::StringRef Name, const TypedefInfo &Info,
-                                VersionTuple SwiftVersion) {
+                                llvm::VersionTuple SwiftVersion) {
   IdentifierID TypedefID = Implementation->getIdentifier(Name);
   ContextTableKey Key(Ctx, TypedefID);
   Implementation->Typedefs[Key].push_back({SwiftVersion, Info});

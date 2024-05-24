@@ -20,6 +20,7 @@
 #include "clang/Tooling/Syntax/TokenBufferTokenManager.h"
 #include "clang/Tooling/Syntax/Tokens.h"
 #include "clang/Tooling/Syntax/Tree.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ScopedPrinter.h"
 #include "llvm/Testing/Annotations/Annotations.h"
@@ -32,7 +33,7 @@ class SyntaxTreeTest : public ::testing::Test,
                        public ::testing::WithParamInterface<TestClangConfig> {
 protected:
   // Build a syntax tree for the code.
-  TranslationUnit *buildTree(StringRef Code,
+  TranslationUnit *buildTree(llvm::StringRef Code,
                              const TestClangConfig &ClangConfig);
 
   /// Finds the deepest node in the tree that covers exactly \p R.
@@ -40,14 +41,14 @@ protected:
   syntax::Node *nodeByRange(llvm::Annotations::Range R, syntax::Node *Root);
 
   // Data fields.
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
       new DiagnosticsEngine(new DiagnosticIDs, DiagOpts.get());
-  IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> FS =
+  llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> FS =
       new llvm::vfs::InMemoryFileSystem;
-  IntrusiveRefCntPtr<FileManager> FileMgr =
+  llvm::IntrusiveRefCntPtr<FileManager> FileMgr =
       new FileManager(FileSystemOptions(), FS);
-  IntrusiveRefCntPtr<SourceManager> SourceMgr =
+  llvm::IntrusiveRefCntPtr<SourceManager> SourceMgr =
       new SourceManager(*Diags, *FileMgr);
   std::shared_ptr<CompilerInvocation> Invocation;
   // Set after calling buildTree().

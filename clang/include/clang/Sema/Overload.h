@@ -442,7 +442,7 @@ class Sema;
   /// Represents an ambiguous user-defined conversion sequence.
   struct AmbiguousConversionSequence {
     using ConversionSet =
-        SmallVector<std::pair<NamedDecl *, FunctionDecl *>, 4>;
+        llvm::SmallVector<std::pair<NamedDecl *, FunctionDecl *>, 4>;
 
     void *FromTypePtr;
     void *ToTypePtr;
@@ -1065,12 +1065,12 @@ class Sema;
       /// Determine whether we should add a rewritten candidate for \p FD with
       /// reversed parameter order.
       /// \param OriginalArgs are the original non reversed arguments.
-      bool shouldAddReversed(Sema &S, ArrayRef<Expr *> OriginalArgs,
+      bool shouldAddReversed(Sema &S, llvm::ArrayRef<Expr *> OriginalArgs,
                              FunctionDecl *FD);
     };
 
   private:
-    SmallVector<OverloadCandidate, 16> Candidates;
+    llvm::SmallVector<OverloadCandidate, 16> Candidates;
     llvm::SmallPtrSet<uintptr_t, 16> Functions;
 
     // Allocator for ConversionSequenceLists. We store the first few of these
@@ -1130,7 +1130,7 @@ class Sema;
     OperatorRewriteInfo getRewriteInfo() const { return RewriteInfo; }
 
     /// Whether diagnostics should be deferred.
-    bool shouldDeferDiags(Sema &S, ArrayRef<Expr *> Args, SourceLocation OpLoc);
+    bool shouldDeferDiags(Sema &S, llvm::ArrayRef<Expr *> Args, SourceLocation OpLoc);
 
     /// Determine when this overload candidate will be new to the
     /// overload set.
@@ -1150,7 +1150,7 @@ class Sema;
     /// Clear out all of the candidates.
     void clear(CandidateSetKind CSK);
 
-    using iterator = SmallVectorImpl<OverloadCandidate>::iterator;
+    using iterator = llvm::SmallVectorImpl<OverloadCandidate>::iterator;
 
     iterator begin() { return Candidates.begin(); }
     iterator end() { return Candidates.end(); }
@@ -1192,22 +1192,22 @@ class Sema;
     OverloadingResult BestViableFunction(Sema &S, SourceLocation Loc,
                                          OverloadCandidateSet::iterator& Best);
 
-    SmallVector<OverloadCandidate *, 32> CompleteCandidates(
-        Sema &S, OverloadCandidateDisplayKind OCD, ArrayRef<Expr *> Args,
+    llvm::SmallVector<OverloadCandidate *, 32> CompleteCandidates(
+        Sema &S, OverloadCandidateDisplayKind OCD, llvm::ArrayRef<Expr *> Args,
         SourceLocation OpLoc = SourceLocation(),
         llvm::function_ref<bool(OverloadCandidate &)> Filter =
             [](OverloadCandidate &) { return true; });
 
     void NoteCandidates(
         PartialDiagnosticAt PA, Sema &S, OverloadCandidateDisplayKind OCD,
-        ArrayRef<Expr *> Args, StringRef Opc = "",
+        llvm::ArrayRef<Expr *> Args, llvm::StringRef Opc = "",
         SourceLocation Loc = SourceLocation(),
         llvm::function_ref<bool(OverloadCandidate &)> Filter =
             [](OverloadCandidate &) { return true; });
 
-    void NoteCandidates(Sema &S, ArrayRef<Expr *> Args,
-                        ArrayRef<OverloadCandidate *> Cands,
-                        StringRef Opc = "",
+    void NoteCandidates(Sema &S, llvm::ArrayRef<Expr *> Args,
+                        llvm::ArrayRef<OverloadCandidate *> Cands,
+                        llvm::StringRef Opc = "",
                         SourceLocation OpLoc = SourceLocation());
 
     LangAS getDestAS() { return DestAS; }

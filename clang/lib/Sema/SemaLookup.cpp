@@ -97,7 +97,7 @@ namespace {
   class UnqualUsingDirectiveSet {
     Sema &SemaRef;
 
-    typedef SmallVector<UnqualUsingEntry, 8> ListTy;
+    typedef llvm::SmallVector<UnqualUsingEntry, 8> ListTy;
 
     ListTy list;
     llvm::SmallPtrSet<DeclContext*, 8> visited;
@@ -158,7 +158,7 @@ namespace {
     // by its using directives, transitively) as if they appeared in
     // the given effective context.
     void addUsingDirectives(DeclContext *DC, DeclContext *EffectiveDC) {
-      SmallVector<DeclContext*, 4> queue;
+      llvm::SmallVector<DeclContext*, 4> queue;
       while (true) {
         for (auto *UD : DC->using_directives()) {
           DeclContext *NS = UD->getNominatedNamespace();
@@ -677,7 +677,7 @@ void LookupResult::setAmbiguousBaseSubobjectTypes(CXXBasePaths &P) {
   setAmbiguous(AmbiguousBaseSubobjectTypes);
 }
 
-void LookupResult::print(raw_ostream &Out) {
+void LookupResult::print(llvm::raw_ostream &Out) {
   Out << Decls.size() << " result(s)";
   if (isAmbiguous()) Out << ", ambiguous";
   if (Paths) Out << ", base paths present";
@@ -742,8 +742,8 @@ static QualType getOpenCLTypedefType(Sema &S, llvm::StringRef Name) {
 ///        of (vector sizes) x (types) .
 static void GetQualTypesForOpenCLBuiltin(
     Sema &S, const OpenCLBuiltinStruct &OpenCLBuiltin, unsigned &GenTypeMaxCnt,
-    SmallVector<QualType, 1> &RetTypes,
-    SmallVector<SmallVector<QualType, 1>, 5> &ArgTypes) {
+    llvm::SmallVector<QualType, 1> &RetTypes,
+    llvm::SmallVector<llvm::SmallVector<QualType, 1>, 5> &ArgTypes) {
   // Get the QualType instances of the return types.
   unsigned Sig = SignatureTable[OpenCLBuiltin.SigTableIndex];
   OCL2Qual(S, TypeTable[Sig], RetTypes);
@@ -752,7 +752,7 @@ static void GetQualTypesForOpenCLBuiltin(
   // Get the QualType instances of the arguments.
   // First type is the return type, skip it.
   for (unsigned Index = 1; Index < OpenCLBuiltin.NumTypes; Index++) {
-    SmallVector<QualType, 1> Ty;
+    llvm::SmallVector<QualType, 1> Ty;
     OCL2Qual(S, TypeTable[SignatureTable[OpenCLBuiltin.SigTableIndex + Index]],
              Ty);
     GenTypeMaxCnt = (Ty.size() > GenTypeMaxCnt) ? Ty.size() : GenTypeMaxCnt;
@@ -771,8 +771,8 @@ static void GetQualTypesForOpenCLBuiltin(
 /// \param ArgTypes (in) List of the possible types for the arguments.
 static void GetOpenCLBuiltinFctOverloads(
     ASTContext &Context, unsigned GenTypeMaxCnt,
-    std::vector<QualType> &FunctionList, SmallVector<QualType, 1> &RetTypes,
-    SmallVector<SmallVector<QualType, 1>, 5> &ArgTypes) {
+    std::vector<QualType> &FunctionList, llvm::SmallVector<QualType, 1> &RetTypes,
+    llvm::SmallVector<llvm::SmallVector<QualType, 1>, 5> &ArgTypes) {
   FunctionProtoType::ExtProtoInfo PI(
       Context.getDefaultCallingConvention(false, false, true));
   PI.Variadic = false;
@@ -784,7 +784,7 @@ static void GetOpenCLBuiltinFctOverloads(
 
   // Create FunctionTypes for each (gen)type.
   for (unsigned IGenType = 0; IGenType < GenTypeMaxCnt; IGenType++) {
-    SmallVector<QualType, 5> ArgList;
+    llvm::SmallVector<QualType, 5> ArgList;
 
     for (unsigned A = 0; A < ArgTypes.size(); A++) {
       // Bail out if there is an argument that has no available types.
@@ -840,12 +840,12 @@ static void InsertOCLBuiltinDeclarationsFromTable(Sema &S, LookupResult &LR,
     // Ignore this builtin function if it carries an extension macro that is
     // not defined. This indicates that the extension is not supported by the
     // target, so the builtin function should not be available.
-    StringRef Extensions = FunctionExtensionTable[OpenCLBuiltin.Extension];
+    llvm::StringRef Extensions = FunctionExtensionTable[OpenCLBuiltin.Extension];
     if (!Extensions.empty()) {
-      SmallVector<StringRef, 2> ExtVec;
+      llvm::SmallVector<llvm::StringRef, 2> ExtVec;
       Extensions.split(ExtVec, " ");
       bool AllExtensionsDefined = true;
-      for (StringRef Ext : ExtVec) {
+      for (llvm::StringRef Ext : ExtVec) {
         if (!S.getPreprocessor().isMacroDefined(Ext)) {
           AllExtensionsDefined = false;
           break;
@@ -855,8 +855,8 @@ static void InsertOCLBuiltinDeclarationsFromTable(Sema &S, LookupResult &LR,
         continue;
     }
 
-    SmallVector<QualType, 1> RetTypes;
-    SmallVector<SmallVector<QualType, 1>, 5> ArgTypes;
+    llvm::SmallVector<QualType, 1> RetTypes;
+    llvm::SmallVector<llvm::SmallVector<QualType, 1>, 5> ArgTypes;
 
     // Obtain QualType lists for the function signature.
     GetQualTypesForOpenCLBuiltin(S, OpenCLBuiltin, GenTypeMaxCnt, RetTypes,
@@ -884,7 +884,7 @@ static void InsertOCLBuiltinDeclarationsFromTable(Sema &S, LookupResult &LR,
       // Create Decl objects for each parameter, adding them to the
       // FunctionDecl.
       const auto *FP = cast<FunctionProtoType>(FTy);
-      SmallVector<ParmVarDecl *, 4> ParmList;
+      llvm::SmallVector<ParmVarDecl *, 4> ParmList;
       for (unsigned IParm = 0, e = FP->getNumParams(); IParm != e; ++IParm) {
         ParmVarDecl *Parm = ParmVarDecl::Create(
             Context, NewOpenCLBuiltin, SourceLocation(), SourceLocation(),
@@ -2337,7 +2337,7 @@ static bool LookupQualifiedNameInUsingDirectives(Sema &S, LookupResult &R,
 
   // We have not yet looked into these namespaces, much less added
   // their "using-children" to the queue.
-  SmallVector<NamespaceDecl*, 8> Queue;
+  llvm::SmallVector<NamespaceDecl*, 8> Queue;
 
   // We have at least added all these contexts to the queue.
   llvm::SmallPtrSet<DeclContext*, 8> Visited;
@@ -3107,7 +3107,7 @@ addAssociatedClassesAndNamespaces(AssociatedLookup &Result,
 
   // Add direct and indirect base classes along with their associated
   // namespaces.
-  SmallVector<CXXRecordDecl *, 32> Bases;
+  llvm::SmallVector<CXXRecordDecl *, 32> Bases;
   Bases.push_back(Class);
   while (!Bases.empty()) {
     // Pop this class off the stack.
@@ -3154,7 +3154,7 @@ addAssociatedClassesAndNamespaces(AssociatedLookup &Result, QualType Ty) {
   //   the types do not contribute to this set. The sets of namespaces
   //   and classes are determined in the following way:
 
-  SmallVector<const Type *, 16> Queue;
+  llvm::SmallVector<const Type *, 16> Queue;
   const Type *T = Ty->getCanonicalTypeInternal().getTypePtr();
 
   while (true) {
@@ -3316,7 +3316,7 @@ addAssociatedClassesAndNamespaces(AssociatedLookup &Result, QualType Ty) {
 /// namespaces searched by argument-dependent lookup
 /// (C++ [basic.lookup.argdep]) for a given set of arguments.
 void Sema::FindAssociatedClassesAndNamespaces(
-    SourceLocation InstantiationLoc, ArrayRef<Expr *> Args,
+    SourceLocation InstantiationLoc, llvm::ArrayRef<Expr *> Args,
     AssociatedNamespaceSet &AssociatedNamespaces,
     AssociatedClassSet &AssociatedClasses) {
   AssociatedNamespaces.clear();
@@ -3541,7 +3541,7 @@ Sema::LookupSpecialMember(CXXRecordDecl *RD, CXXSpecialMemberKind SM,
 
   // Copy the candidates as our processing of them may load new declarations
   // from an external source and invalidate lookup_result.
-  SmallVector<NamedDecl *, 8> Candidates(R.begin(), R.end());
+  llvm::SmallVector<NamedDecl *, 8> Candidates(R.begin(), R.end());
 
   for (NamedDecl *CandDecl : Candidates) {
     if (CandDecl->isInvalidDecl())
@@ -3709,7 +3709,7 @@ CXXDestructorDecl *Sema::LookupDestructor(CXXRecordDecl *Class) {
 /// and filter the results to the appropriate set for the given argument types.
 Sema::LiteralOperatorLookupResult
 Sema::LookupLiteralOperator(Scope *S, LookupResult &R,
-                            ArrayRef<QualType> ArgTys, bool AllowRaw,
+                            llvm::ArrayRef<QualType> ArgTys, bool AllowRaw,
                             bool AllowTemplate, bool AllowStringTemplatePack,
                             bool DiagnoseMissing, StringLiteral *StringLit) {
   LookupName(R, S);
@@ -3772,7 +3772,7 @@ Sema::LookupLiteralOperator(Scope *S, LookupResult &R,
         // is a well-formed template argument for the template parameter.
         if (StringLit) {
           SFINAETrap Trap(*this);
-          SmallVector<TemplateArgument, 1> SugaredChecked, CanonicalChecked;
+          llvm::SmallVector<TemplateArgument, 1> SugaredChecked, CanonicalChecked;
           TemplateArgumentLoc Arg(TemplateArgument(StringLit), StringLit);
           if (CheckTemplateArgument(
                   Params->getParam(0), Arg, FD, R.getNameLoc(), R.getNameLoc(),
@@ -3891,7 +3891,7 @@ void ADLResult::insert(NamedDecl *New) {
 }
 
 void Sema::ArgumentDependentLookup(DeclarationName Name, SourceLocation Loc,
-                                   ArrayRef<Expr *> Args, ADLResult &Result) {
+                                   llvm::ArrayRef<Expr *> Args, ADLResult &Result) {
   // Find all of the associated namespaces and classes based on the
   // arguments we have.
   AssociatedNamespaceSet AssociatedNamespaces;
@@ -4191,7 +4191,7 @@ private:
         if (IdentifierInfoLookup *External =
                 Idents.getExternalIdentifierLookup()) {
           std::unique_ptr<IdentifierIterator> Iter(External->getIdentifiers());
-          for (StringRef Name = Iter->Next(); !Name.empty();
+          for (llvm::StringRef Name = Iter->Next(); !Name.empty();
                Name = Iter->Next())
             Idents.get(Name);
         }
@@ -4375,7 +4375,7 @@ private:
       FindLocalExternScope FindLocals(Result);
       // Walk through the declarations in this Scope. The consumer might add new
       // decls to the scope as part of deserialization, so make a copy first.
-      SmallVector<Decl *, 8> ScopeDecls(S->decls().begin(), S->decls().end());
+      llvm::SmallVector<Decl *, 8> ScopeDecls(S->decls().begin(), S->decls().end());
       for (Decl *D : ScopeDecls) {
         if (NamedDecl *ND = dyn_cast<NamedDecl>(D))
           if ((ND = Result.getAcceptableDecl(ND))) {
@@ -4570,7 +4570,7 @@ static void checkCorrectionVisibility(Sema &SemaRef, TypoCorrection &TC) {
 // fill the vector with the IdentifierInfo pointers for "foo" and "bar").
 static void getNestedNameSpecifierIdentifiers(
     NestedNameSpecifier *NNS,
-    SmallVectorImpl<const IdentifierInfo*> &Identifiers) {
+    llvm::SmallVectorImpl<const IdentifierInfo*> &Identifiers) {
   if (NestedNameSpecifier *Prefix = NNS->getPrefix())
     getNestedNameSpecifierIdentifiers(Prefix, Identifiers);
   else
@@ -4628,23 +4628,23 @@ void TypoCorrectionConsumer::FoundDecl(NamedDecl *ND, NamedDecl *Hiding,
   FoundName(Name->getName());
 }
 
-void TypoCorrectionConsumer::FoundName(StringRef Name) {
+void TypoCorrectionConsumer::FoundName(llvm::StringRef Name) {
   // Compute the edit distance between the typo and the name of this
   // entity, and add the identifier to the list of results.
   addName(Name, nullptr);
 }
 
-void TypoCorrectionConsumer::addKeywordResult(StringRef Keyword) {
+void TypoCorrectionConsumer::addKeywordResult(llvm::StringRef Keyword) {
   // Compute the edit distance between the typo and this keyword,
   // and add the keyword to the list of results.
   addName(Keyword, nullptr, nullptr, true);
 }
 
-void TypoCorrectionConsumer::addName(StringRef Name, NamedDecl *ND,
+void TypoCorrectionConsumer::addName(llvm::StringRef Name, NamedDecl *ND,
                                      NestedNameSpecifier *NNS, bool isKeyword) {
   // Use a simple length-based heuristic to determine the minimum possible
   // edit distance. If the minimum isn't good enough, bail out early.
-  StringRef TypoStr = Typo->getName();
+  llvm::StringRef TypoStr = Typo->getName();
   unsigned MinED = abs((int)Name.size() - (int)TypoStr.size());
   if (MinED && TypoStr.size() / MinED < 3)
     return;
@@ -4664,8 +4664,8 @@ void TypoCorrectionConsumer::addName(StringRef Name, NamedDecl *ND,
 static const unsigned MaxTypoDistanceResultSets = 5;
 
 void TypoCorrectionConsumer::addCorrection(TypoCorrection Correction) {
-  StringRef TypoStr = Typo->getName();
-  StringRef Name = Correction.getCorrectionAsIdentifierInfo()->getName();
+  llvm::StringRef TypoStr = Typo->getName();
+  llvm::StringRef Name = Correction.getCorrectionAsIdentifierInfo()->getName();
 
   // For very short typos, ignore potential corrections that have a different
   // base identifier from the typo or which have a normalized edit distance
@@ -4996,7 +4996,7 @@ void TypoCorrectionConsumer::NamespaceSpecifierSet::addNameSpecifier(
     if (llvm::is_contained(CurNameSpecifierIdentifiers, Name)) {
       std::string NewNameSpecifier;
       llvm::raw_string_ostream SpecifierOStream(NewNameSpecifier);
-      SmallVector<const IdentifierInfo *, 4> NewNameSpecifierIdentifiers;
+      llvm::SmallVector<const IdentifierInfo *, 4> NewNameSpecifierIdentifiers;
       getNestedNameSpecifierIdentifiers(NNS, NewNameSpecifierIdentifiers);
       NNS->print(SpecifierOStream, Context.getPrintingPolicy());
       SpecifierOStream.flush();
@@ -5015,7 +5015,7 @@ void TypoCorrectionConsumer::NamespaceSpecifierSet::addNameSpecifier(
   // would need to be changed as the edit distance instead of the number
   // of components in the built NestedNameSpecifier.
   if (NNS && !CurNameSpecifierIdentifiers.empty()) {
-    SmallVector<const IdentifierInfo*, 4> NewNameSpecifierIdentifiers;
+    llvm::SmallVector<const IdentifierInfo*, 4> NewNameSpecifierIdentifiers;
     getNestedNameSpecifierIdentifiers(NNS, NewNameSpecifierIdentifiers);
     NumSpecifiers =
         llvm::ComputeEditDistance(llvm::ArrayRef(CurNameSpecifierIdentifiers),
@@ -5343,7 +5343,7 @@ std::unique_ptr<TypoCorrectionConsumer> Sema::makeTypoCorrectionConsumer(
                             = Context.Idents.getExternalIdentifierLookup()) {
       std::unique_ptr<IdentifierIterator> Iter(External->getIdentifiers());
       do {
-        StringRef Name = Iter->Next();
+        llvm::StringRef Name = Iter->Next();
         if (Name.empty())
           break;
 
@@ -5361,7 +5361,7 @@ std::unique_ptr<TypoCorrectionConsumer> Sema::makeTypoCorrectionConsumer(
   if (SearchNamespaces) {
     // Load any externally-known namespaces.
     if (ExternalSource && !LoadedExternalKnownNamespaces) {
-      SmallVector<NamespaceDecl *, 4> ExternalKnownNamespaces;
+      llvm::SmallVector<NamespaceDecl *, 4> ExternalKnownNamespaces;
       LoadedExternalKnownNamespaces = true;
       ExternalSource->ReadKnownNamespaces(ExternalKnownNamespaces);
       for (auto *N : ExternalKnownNamespaces)
@@ -5760,7 +5760,7 @@ static std::string getHeaderNameForHeader(Preprocessor &PP, FileEntryRef E,
 
 void Sema::diagnoseMissingImport(SourceLocation UseLoc, const NamedDecl *Decl,
                                  SourceLocation DeclLoc,
-                                 ArrayRef<Module *> Modules,
+                                 llvm::ArrayRef<Module *> Modules,
                                  MissingImportKind MIK, bool Recover) {
   assert(!Modules.empty());
 

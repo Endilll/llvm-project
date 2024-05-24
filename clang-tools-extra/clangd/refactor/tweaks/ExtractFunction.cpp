@@ -806,7 +806,7 @@ class ExtractFunction : public Tweak {
 public:
   const char *id() const final;
   bool prepare(const Selection &Inputs) override;
-  Expected<Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Effect> apply(const Selection &Inputs) override;
   std::string title() const override { return "Extract to function"; }
   llvm::StringLiteral kind() const override {
     return CodeAction::REFACTOR_KIND;
@@ -887,7 +887,7 @@ bool ExtractFunction::prepare(const Selection &Inputs) {
   return true;
 }
 
-Expected<Tweak::Effect> ExtractFunction::apply(const Selection &Inputs) {
+llvm::Expected<Tweak::Effect> ExtractFunction::apply(const Selection &Inputs) {
   const SourceManager &SM = Inputs.AST->getSourceManager();
   const LangOptions &LangOpts = Inputs.AST->getLangOpts();
   auto ExtractedFunc = getExtractedFunction(ExtZone, SM, LangOpts);

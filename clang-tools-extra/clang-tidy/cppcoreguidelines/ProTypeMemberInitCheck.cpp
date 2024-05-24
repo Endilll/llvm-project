@@ -82,9 +82,9 @@ void removeFieldsInitializedInBody(
     removeFieldInitialized(Match.getNodeAs<FieldDecl>("fieldDecl"), FieldDecls);
 }
 
-StringRef getName(const FieldDecl *Field) { return Field->getName(); }
+llvm::StringRef getName(const FieldDecl *Field) { return Field->getName(); }
 
-StringRef getName(const RecordDecl *Record) {
+llvm::StringRef getName(const RecordDecl *Record) {
   // Get the typedef name if this is a C-style anonymous struct and typedef.
   if (const TypedefNameDecl *Typedef = Record->getTypedefNameForAnonDecl())
     return Typedef->getName();
@@ -97,7 +97,7 @@ template <typename R, typename T>
 std::string
 toCommaSeparatedString(const R &OrderedDecls,
                        const SmallPtrSetImpl<const T *> &DeclsToInit) {
-  SmallVector<StringRef, 16> Names;
+  llvm::SmallVector<llvm::StringRef, 16> Names;
   for (const T *Decl : OrderedDecls) {
     if (DeclsToInit.count(Decl))
       Names.emplace_back(getName(Decl));
@@ -184,7 +184,7 @@ struct InitializerInsertion {
 
   InitializerPlacement Placement;
   const CXXCtorInitializer *Where;
-  SmallVector<std::string, 4> Initializers;
+  llvm::SmallVector<std::string, 4> Initializers;
 };
 
 // Convenience utility to get a RecordDecl from a QualType.
@@ -195,11 +195,11 @@ const RecordDecl *getCanonicalRecordDecl(const QualType &Type) {
 }
 
 template <typename R, typename T>
-SmallVector<InitializerInsertion, 16>
+llvm::SmallVector<InitializerInsertion, 16>
 computeInsertions(const CXXConstructorDecl::init_const_range &Inits,
                   const R &OrderedDecls,
                   const SmallPtrSetImpl<const T *> &DeclsToInit) {
-  SmallVector<InitializerInsertion, 16> Insertions;
+  llvm::SmallVector<InitializerInsertion, 16> Insertions;
   Insertions.emplace_back(InitializerPlacement::New, nullptr);
 
   typename R::const_iterator Decl = std::begin(OrderedDecls);
@@ -240,7 +240,7 @@ computeInsertions(const CXXConstructorDecl::init_const_range &Inits,
 // Gets the list of bases and members that could possibly be initialized, in
 // order as they appear in the class declaration.
 void getInitializationsInOrder(const CXXRecordDecl &ClassDecl,
-                               SmallVectorImpl<const NamedDecl *> &Decls) {
+                               llvm::SmallVectorImpl<const NamedDecl *> &Decls) {
   Decls.clear();
   for (const auto &Base : ClassDecl.bases()) {
     // Decl may be null if the base class is a template parameter.
@@ -260,7 +260,7 @@ void fixInitializerList(const ASTContext &Context, DiagnosticBuilder &Diag,
   if (Ctor->getBeginLoc().isMacroID())
     return;
 
-  SmallVector<const NamedDecl *, 16> OrderedDecls;
+  llvm::SmallVector<const NamedDecl *, 16> OrderedDecls;
   getInitializationsInOrder(*Ctor->getParent(), OrderedDecls);
 
   for (const auto &Insertion :
@@ -273,7 +273,7 @@ void fixInitializerList(const ASTContext &Context, DiagnosticBuilder &Diag,
 
 } // anonymous namespace
 
-ProTypeMemberInitCheck::ProTypeMemberInitCheck(StringRef Name,
+ProTypeMemberInitCheck::ProTypeMemberInitCheck(llvm::StringRef Name,
                                                ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreArrays(Options.get("IgnoreArrays", false)),
@@ -466,7 +466,7 @@ void ProTypeMemberInitCheck::checkMissingMemberInitializer(
 
   // Collect all fields in order, both direct fields and indirect fields from
   // anonymous record types.
-  SmallVector<const FieldDecl *, 16> OrderedFields;
+  llvm::SmallVector<const FieldDecl *, 16> OrderedFields;
   forEachField(ClassDecl, ClassDecl.fields(),
                [&](const FieldDecl *F) { OrderedFields.push_back(F); });
 
@@ -534,7 +534,7 @@ void ProTypeMemberInitCheck::checkMissingBaseClassInitializer(
     const CXXConstructorDecl *Ctor) {
 
   // Gather any base classes that need to be initialized.
-  SmallVector<const RecordDecl *, 4> AllBases;
+  llvm::SmallVector<const RecordDecl *, 4> AllBases;
   SmallPtrSet<const RecordDecl *, 4> BasesToInit;
   for (const CXXBaseSpecifier &Base : ClassDecl.bases()) {
     if (const auto *BaseClassDecl = getCanonicalRecordDecl(Base.getType())) {

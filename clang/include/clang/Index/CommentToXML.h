@@ -10,6 +10,7 @@
 #define LLVM_CLANG_INDEX_COMMENTTOXML_H
 
 #include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace clang {
 class ASTContext;
@@ -26,15 +27,15 @@ public:
   ~CommentToXMLConverter();
 
   void convertCommentToHTML(const comments::FullComment *FC,
-                            SmallVectorImpl<char> &HTML,
+                            llvm::SmallVectorImpl<char> &HTML,
                             const ASTContext &Context);
 
   void convertHTMLTagNodeToText(const comments::HTMLTagComment *HTC,
-                                SmallVectorImpl<char> &Text,
+                                llvm::SmallVectorImpl<char> &Text,
                                 const ASTContext &Context);
 
   void convertCommentToXML(const comments::FullComment *FC,
-                           SmallVectorImpl<char> &XML,
+                           llvm::SmallVectorImpl<char> &XML,
                            const ASTContext &Context);
 };
 

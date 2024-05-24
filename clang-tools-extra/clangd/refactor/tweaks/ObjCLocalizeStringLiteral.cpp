@@ -35,7 +35,7 @@ public:
   }
 
   bool prepare(const Selection &Inputs) override;
-  Expected<Tweak::Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Tweak::Effect> apply(const Selection &Inputs) override;
   std::string title() const override;
 
 private:
@@ -58,7 +58,7 @@ bool ObjCLocalizeStringLiteral::prepare(const Selection &Inputs) {
   return Str;
 }
 
-Expected<Tweak::Effect>
+llvm::Expected<Tweak::Effect>
 ObjCLocalizeStringLiteral::apply(const Selection &Inputs) {
   auto *AST = Inputs.AST;
   auto &SM = AST->getSourceManager();

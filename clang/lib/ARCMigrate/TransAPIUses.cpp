@@ -56,7 +56,7 @@ public:
     if (E->isInstanceMessage() &&
         E->getReceiverInterface() &&
         E->getReceiverInterface()->getName() == "NSInvocation") {
-      StringRef selName;
+      llvm::StringRef selName;
       if (E->getSelector() == getReturnValueSel)
         selName = "getReturnValue";
       else if (E->getSelector() == setReturnValueSel)

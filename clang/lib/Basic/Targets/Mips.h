@@ -23,7 +23,7 @@ namespace targets {
 
 class LLVM_LIBRARY_VISIBILITY MipsTargetInfo : public TargetInfo {
   void setDataLayout() {
-    StringRef Layout;
+    llvm::StringRef Layout;
 
     if (ABI == "o32")
       Layout = "m:m-p:32:32-i8:8:32-i16:16:32-i64:64-n32-S64";
@@ -98,7 +98,7 @@ public:
 
   bool processorSupportsGPR64() const;
 
-  StringRef getABI() const override { return ABI; }
+  llvm::StringRef getABI() const override { return ABI; }
 
   bool setABI(const std::string &Name) override {
     if (Name == "o32") {
@@ -168,8 +168,8 @@ public:
     SizeType = UnsignedInt;
   }
 
-  bool isValidCPUName(StringRef Name) const override;
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  bool isValidCPUName(llvm::StringRef Name) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
 
   bool setCPU(const std::string &Name) override {
     CPU = Name;
@@ -179,7 +179,7 @@ public:
   const std::string &getCPU() const { return CPU; }
   bool
   initFeatureMap(llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags,
-                 StringRef CPU,
+                 llvm::StringRef CPU,
                  const std::vector<std::string> &FeaturesVec) const override {
     if (CPU.empty())
       CPU = getCPU();
@@ -197,15 +197,15 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
-  bool hasFeature(StringRef Feature) const override;
+  bool hasFeature(llvm::StringRef Feature) const override;
 
   BuiltinVaListKind getBuiltinVaListKind() const override {
     return TargetInfo::VoidPtrBuiltinVaList;
   }
 
-  ArrayRef<const char *> getGCCRegNames() const override {
+  llvm::ArrayRef<const char *> getGCCRegNames() const override {
     static const char *const GCCRegNames[] = {
         // CPU register names
         // Must match second column of GCCRegAliases
@@ -405,7 +405,7 @@ public:
 
   bool isCLZForZeroUndef() const override { return false; }
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     static const TargetInfo::GCCRegAlias O32RegAliases[] = {
         {{"at"}, "$1"},  {{"v0"}, "$2"},         {{"v1"}, "$3"},
         {{"a0"}, "$4"},  {{"a1"}, "$5"},         {{"a2"}, "$6"},

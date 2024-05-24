@@ -34,7 +34,7 @@ namespace {
     typedef RecursiveASTVisitor<CollectUnexpandedParameterPacksVisitor>
       inherited;
 
-    SmallVectorImpl<UnexpandedParameterPack> &Unexpanded;
+    llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded;
 
     bool InLambda = false;
     unsigned DepthLimit = (unsigned)-1;
@@ -61,7 +61,7 @@ namespace {
 
   public:
     explicit CollectUnexpandedParameterPacksVisitor(
-        SmallVectorImpl<UnexpandedParameterPack> &Unexpanded)
+        llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded)
         : Unexpanded(Unexpanded) {}
 
     bool shouldWalkTypesOfTypeLocs() const { return false; }
@@ -299,7 +299,7 @@ bool Sema::isUnexpandedParameterPackPermitted() {
 bool
 Sema::DiagnoseUnexpandedParameterPacks(SourceLocation Loc,
                                        UnexpandedParameterPackContext UPPC,
-                                 ArrayRef<UnexpandedParameterPack> Unexpanded) {
+                                 llvm::ArrayRef<UnexpandedParameterPack> Unexpanded) {
   if (Unexpanded.empty())
     return false;
 
@@ -308,7 +308,7 @@ Sema::DiagnoseUnexpandedParameterPacks(SourceLocation Loc,
   // parameter pack, and we are done.
   // FIXME: Store 'Unexpanded' on the lambda so we don't need to recompute it
   // later.
-  SmallVector<UnexpandedParameterPack, 4> LambdaParamPackReferences;
+  llvm::SmallVector<UnexpandedParameterPack, 4> LambdaParamPackReferences;
   if (auto *LSI = getEnclosingLambda()) {
     for (auto &Pack : Unexpanded) {
       auto DeclaresThisPack = [&](NamedDecl *LocalPack) {
@@ -358,8 +358,8 @@ Sema::DiagnoseUnexpandedParameterPacks(SourceLocation Loc,
     }
   }
 
-  SmallVector<SourceLocation, 4> Locations;
-  SmallVector<IdentifierInfo *, 4> Names;
+  llvm::SmallVector<SourceLocation, 4> Locations;
+  llvm::SmallVector<IdentifierInfo *, 4> Names;
   llvm::SmallPtrSet<IdentifierInfo *, 4> NamesKnown;
 
   for (unsigned I = 0, N = Unexpanded.size(); I != N; ++I) {
@@ -396,7 +396,7 @@ bool Sema::DiagnoseUnexpandedParameterPack(SourceLocation Loc,
   if (!T->getType()->containsUnexpandedParameterPack())
     return false;
 
-  SmallVector<UnexpandedParameterPack, 2> Unexpanded;
+  llvm::SmallVector<UnexpandedParameterPack, 2> Unexpanded;
   CollectUnexpandedParameterPacksVisitor(Unexpanded).TraverseTypeLoc(
                                                               T->getTypeLoc());
   assert(!Unexpanded.empty() && "Unable to find unexpanded parameter packs");
@@ -418,7 +418,7 @@ bool Sema::DiagnoseUnexpandedParameterPack(Expr *E,
   if (isa<FunctionParmPackExpr>(E) && getEnclosingLambda())
     return false;
 
-  SmallVector<UnexpandedParameterPack, 2> Unexpanded;
+  llvm::SmallVector<UnexpandedParameterPack, 2> Unexpanded;
   CollectUnexpandedParameterPacksVisitor(Unexpanded).TraverseStmt(E);
   assert(!Unexpanded.empty() && "Unable to find unexpanded parameter packs");
   return DiagnoseUnexpandedParameterPacks(E->getBeginLoc(), UPPC, Unexpanded);
@@ -428,7 +428,7 @@ bool Sema::DiagnoseUnexpandedParameterPackInRequiresExpr(RequiresExpr *RE) {
   if (!RE->containsUnexpandedParameterPack())
     return false;
 
-  SmallVector<UnexpandedParameterPack, 2> Unexpanded;
+  llvm::SmallVector<UnexpandedParameterPack, 2> Unexpanded;
   CollectUnexpandedParameterPacksVisitor(Unexpanded).TraverseStmt(RE);
   assert(!Unexpanded.empty() && "Unable to find unexpanded parameter packs");
 
@@ -436,7 +436,7 @@ bool Sema::DiagnoseUnexpandedParameterPackInRequiresExpr(RequiresExpr *RE) {
   // parameter packs.
   auto Parms = RE->getLocalParameters();
   llvm::SmallPtrSet<NamedDecl*, 8> ParmSet(Parms.begin(), Parms.end());
-  SmallVector<UnexpandedParameterPack, 2> UnexpandedParms;
+  llvm::SmallVector<UnexpandedParameterPack, 2> UnexpandedParms;
   for (auto Parm : Unexpanded)
     if (ParmSet.contains(Parm.first.dyn_cast<NamedDecl *>()))
       UnexpandedParms.push_back(Parm);
@@ -456,7 +456,7 @@ bool Sema::DiagnoseUnexpandedParameterPack(const CXXScopeSpec &SS,
       !SS.getScopeRep()->containsUnexpandedParameterPack())
     return false;
 
-  SmallVector<UnexpandedParameterPack, 2> Unexpanded;
+  llvm::SmallVector<UnexpandedParameterPack, 2> Unexpanded;
   CollectUnexpandedParameterPacksVisitor(Unexpanded)
     .TraverseNestedNameSpecifier(SS.getScopeRep());
   assert(!Unexpanded.empty() && "Unable to find unexpanded parameter packs");
@@ -493,7 +493,7 @@ bool Sema::DiagnoseUnexpandedParameterPack(const DeclarationNameInfo &NameInfo,
     break;
   }
 
-  SmallVector<UnexpandedParameterPack, 2> Unexpanded;
+  llvm::SmallVector<UnexpandedParameterPack, 2> Unexpanded;
   CollectUnexpandedParameterPacksVisitor(Unexpanded)
     .TraverseType(NameInfo.getName().getCXXNameType());
   assert(!Unexpanded.empty() && "Unable to find unexpanded parameter packs");
@@ -507,7 +507,7 @@ bool Sema::DiagnoseUnexpandedParameterPack(SourceLocation Loc,
   if (Template.isNull() || !Template.containsUnexpandedParameterPack())
     return false;
 
-  SmallVector<UnexpandedParameterPack, 2> Unexpanded;
+  llvm::SmallVector<UnexpandedParameterPack, 2> Unexpanded;
   CollectUnexpandedParameterPacksVisitor(Unexpanded)
     .TraverseTemplateName(Template);
   assert(!Unexpanded.empty() && "Unable to find unexpanded parameter packs");
@@ -520,7 +520,7 @@ bool Sema::DiagnoseUnexpandedParameterPack(TemplateArgumentLoc Arg,
       !Arg.getArgument().containsUnexpandedParameterPack())
     return false;
 
-  SmallVector<UnexpandedParameterPack, 2> Unexpanded;
+  llvm::SmallVector<UnexpandedParameterPack, 2> Unexpanded;
   CollectUnexpandedParameterPacksVisitor(Unexpanded)
     .TraverseTemplateArgumentLoc(Arg);
   assert(!Unexpanded.empty() && "Unable to find unexpanded parameter packs");
@@ -528,37 +528,37 @@ bool Sema::DiagnoseUnexpandedParameterPack(TemplateArgumentLoc Arg,
 }
 
 void Sema::collectUnexpandedParameterPacks(TemplateArgument Arg,
-                   SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
+                   llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
   CollectUnexpandedParameterPacksVisitor(Unexpanded)
     .TraverseTemplateArgument(Arg);
 }
 
 void Sema::collectUnexpandedParameterPacks(TemplateArgumentLoc Arg,
-                   SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
+                   llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
   CollectUnexpandedParameterPacksVisitor(Unexpanded)
     .TraverseTemplateArgumentLoc(Arg);
 }
 
 void Sema::collectUnexpandedParameterPacks(QualType T,
-                   SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
+                   llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
   CollectUnexpandedParameterPacksVisitor(Unexpanded).TraverseType(T);
 }
 
 void Sema::collectUnexpandedParameterPacks(TypeLoc TL,
-                   SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
+                   llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
   CollectUnexpandedParameterPacksVisitor(Unexpanded).TraverseTypeLoc(TL);
 }
 
 void Sema::collectUnexpandedParameterPacks(
     NestedNameSpecifierLoc NNS,
-    SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
+    llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
   CollectUnexpandedParameterPacksVisitor(Unexpanded)
       .TraverseNestedNameSpecifierLoc(NNS);
 }
 
 void Sema::collectUnexpandedParameterPacks(
     const DeclarationNameInfo &NameInfo,
-    SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
+    llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded) {
   CollectUnexpandedParameterPacksVisitor(Unexpanded)
     .TraverseDeclarationNameInfo(NameInfo);
 }
@@ -685,7 +685,7 @@ ExprResult Sema::CheckPackExpansion(Expr *Pattern, SourceLocation EllipsisLoc,
 
 bool Sema::CheckParameterPacksForExpansion(
     SourceLocation EllipsisLoc, SourceRange PatternRange,
-    ArrayRef<UnexpandedParameterPack> Unexpanded,
+    llvm::ArrayRef<UnexpandedParameterPack> Unexpanded,
     const MultiLevelTemplateArgumentList &TemplateArgs, bool &ShouldExpand,
     bool &RetainExpansion, std::optional<unsigned> &NumExpansions) {
   ShouldExpand = true;
@@ -821,7 +821,7 @@ bool Sema::CheckParameterPacksForExpansion(
 std::optional<unsigned> Sema::getNumArgumentsInExpansion(
     QualType T, const MultiLevelTemplateArgumentList &TemplateArgs) {
   QualType Pattern = cast<PackExpansionType>(T)->getPattern();
-  SmallVector<UnexpandedParameterPack, 2> Unexpanded;
+  llvm::SmallVector<UnexpandedParameterPack, 2> Unexpanded;
   CollectUnexpandedParameterPacksVisitor(Unexpanded).TraverseType(Pattern);
 
   std::optional<unsigned> Result;
@@ -1104,7 +1104,7 @@ ExprResult Sema::ActOnPackIndexingExpr(Scope *S, Expr *PackExpression,
 ExprResult
 Sema::BuildPackIndexingExpr(Expr *PackExpression, SourceLocation EllipsisLoc,
                             Expr *IndexExpr, SourceLocation RSquareLoc,
-                            ArrayRef<Expr *> ExpandedExprs, bool EmptyPack) {
+                            llvm::ArrayRef<Expr *> ExpandedExprs, bool EmptyPack) {
 
   std::optional<int64_t> Index;
   if (!IndexExpr->isInstantiationDependent()) {

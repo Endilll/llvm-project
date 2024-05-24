@@ -39,7 +39,7 @@ void VETargetInfo::getTargetDefines(const LangOptions &Opts,
   Builder.defineMacro("__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8");
 }
 
-ArrayRef<Builtin::Info> VETargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> VETargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo,
                         clang::VE::LastTSBuiltin - Builtin::FirstTSBuiltin);
 }

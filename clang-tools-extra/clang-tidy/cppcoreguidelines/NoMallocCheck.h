@@ -23,7 +23,7 @@ namespace clang::tidy::cppcoreguidelines {
 class NoMallocCheck : public ClangTidyCheck {
 public:
   /// Construct Checker and read in configuration for function names.
-  NoMallocCheck(StringRef Name, ClangTidyContext *Context)
+  NoMallocCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         AllocList(Options.get("Allocations", "::malloc;::calloc")),
         ReallocList(Options.get("Reallocations", "::realloc")),
@@ -45,13 +45,13 @@ public:
 private:
   /// Semicolon-separated list of fully qualified names of memory allocation
   /// functions the check warns about. Defaults to `::malloc;::calloc`.
-  const StringRef AllocList;
+  const llvm::StringRef AllocList;
   /// Semicolon-separated list of fully qualified names of memory reallocation
   /// functions the check warns about. Defaults to `::realloc`.
-  const StringRef ReallocList;
+  const llvm::StringRef ReallocList;
   /// Semicolon-separated list of fully qualified names of memory deallocation
   /// functions the check warns about. Defaults to `::free`.
-  const StringRef DeallocList;
+  const llvm::StringRef DeallocList;
 };
 
 } // namespace clang::tidy::cppcoreguidelines

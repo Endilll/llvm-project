@@ -61,14 +61,14 @@ public:
   };
 
   SymbolOccurrence(const SymbolName &Name, OccurrenceKind Kind,
-                   ArrayRef<SourceLocation> Locations);
+                   llvm::ArrayRef<SourceLocation> Locations);
 
   SymbolOccurrence(SymbolOccurrence &&) = default;
   SymbolOccurrence &operator=(SymbolOccurrence &&) = default;
 
   OccurrenceKind getKind() const { return Kind; }
 
-  ArrayRef<SourceRange> getNameRanges() const {
+  llvm::ArrayRef<SourceRange> getNameRanges() const {
     if (MultipleRanges)
       return llvm::ArrayRef(MultipleRanges.get(), NumRanges);
     return SingleRange;

@@ -29,7 +29,7 @@ enum class LiteralSize {
 // precedence rules of C++.  Optionally exclude comma operator expressions.
 class IntegralLiteralExpressionMatcher {
 public:
-  IntegralLiteralExpressionMatcher(ArrayRef<Token> Tokens, bool CommaAllowed)
+  IntegralLiteralExpressionMatcher(llvm::ArrayRef<Token> Tokens, bool CommaAllowed)
       : Current(Tokens.begin()), End(Tokens.end()), CommaAllowed(CommaAllowed) {
   }
 
@@ -65,8 +65,8 @@ private:
   bool commaExpr();
   bool expr();
 
-  ArrayRef<Token>::iterator Current;
-  ArrayRef<Token>::iterator End;
+  llvm::ArrayRef<Token>::iterator Current;
+  llvm::ArrayRef<Token>::iterator End;
   LiteralSize LargestSize{LiteralSize::Unknown};
   bool CommaAllowed;
 };

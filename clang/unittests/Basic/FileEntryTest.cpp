@@ -20,30 +20,30 @@ class FileEntryTestHelper {
   StringMap<llvm::ErrorOr<FileEntryRef::MapValue>> Files;
   StringMap<llvm::ErrorOr<DirectoryEntry &>> Dirs;
 
-  SmallVector<std::unique_ptr<FileEntry>, 5> FEs;
-  SmallVector<std::unique_ptr<DirectoryEntry>, 5> DEs;
+  llvm::SmallVector<std::unique_ptr<FileEntry>, 5> FEs;
+  llvm::SmallVector<std::unique_ptr<DirectoryEntry>, 5> DEs;
   DirectoryEntryRef DR;
 
 public:
   FileEntryTestHelper() : DR(addDirectory("dir")) {}
 
-  DirectoryEntryRef addDirectory(StringRef Name) {
+  DirectoryEntryRef addDirectory(llvm::StringRef Name) {
     DEs.emplace_back(new DirectoryEntry());
     return DirectoryEntryRef(*Dirs.insert({Name, *DEs.back()}).first);
   }
-  DirectoryEntryRef addDirectoryAlias(StringRef Name, DirectoryEntryRef Base) {
+  DirectoryEntryRef addDirectoryAlias(llvm::StringRef Name, DirectoryEntryRef Base) {
     return DirectoryEntryRef(
         *Dirs.insert({Name, const_cast<DirectoryEntry &>(Base.getDirEntry())})
              .first);
   }
 
-  FileEntryRef addFile(StringRef Name) {
+  FileEntryRef addFile(llvm::StringRef Name) {
     FEs.emplace_back(new FileEntry());
     return FileEntryRef(
         *Files.insert({Name, FileEntryRef::MapValue(*FEs.back().get(), DR)})
              .first);
   }
-  FileEntryRef addFileAlias(StringRef Name, FileEntryRef Base) {
+  FileEntryRef addFileAlias(llvm::StringRef Name, FileEntryRef Base) {
     return FileEntryRef(
         *Files
              .insert(
@@ -51,7 +51,7 @@ public:
                             const_cast<FileEntry &>(Base.getFileEntry()), DR)})
              .first);
   }
-  FileEntryRef addFileRedirect(StringRef Name, FileEntryRef Base) {
+  FileEntryRef addFileRedirect(llvm::StringRef Name, FileEntryRef Base) {
     auto Dir = addDirectory(llvm::sys::path::parent_path(Name));
 
     return FileEntryRef(

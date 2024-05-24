@@ -507,7 +507,7 @@ PrintExprResult printExprValue(const SelectionTree::Node *N,
                          /*Node=*/N};
 }
 
-std::optional<StringRef> fieldName(const Expr *E) {
+std::optional<llvm::StringRef> fieldName(const Expr *E) {
   const auto *ME = llvm::dyn_cast<MemberExpr>(E->IgnoreCasts());
   if (!ME || !llvm::isa<CXXThisExpr>(ME->getBase()->IgnoreCasts()))
     return std::nullopt;
@@ -518,7 +518,7 @@ std::optional<StringRef> fieldName(const Expr *E) {
 }
 
 // If CMD is of the form T foo() { return FieldName; } then returns "FieldName".
-std::optional<StringRef> getterVariableName(const CXXMethodDecl *CMD) {
+std::optional<llvm::StringRef> getterVariableName(const CXXMethodDecl *CMD) {
   assert(CMD->hasBody());
   if (CMD->getNumParams() != 0 || CMD->isVariadic())
     return std::nullopt;
@@ -537,7 +537,7 @@ std::optional<StringRef> getterVariableName(const CXXMethodDecl *CMD) {
 //   void foo(T arg) { FieldName = std::move(arg); }
 //   R foo(T arg) { FieldName = std::move(arg); return *this; }
 // then returns "FieldName"
-std::optional<StringRef> setterVariableName(const CXXMethodDecl *CMD) {
+std::optional<llvm::StringRef> setterVariableName(const CXXMethodDecl *CMD) {
   assert(CMD->hasBody());
   if (CMD->isConst() || CMD->getNumParams() != 1 || CMD->isVariadic())
     return std::nullopt;
@@ -772,7 +772,7 @@ HoverInfo getHoverContents(const DefinedMacro &Macro, const syntax::Token &Tok,
   if (SM.getPresumedLoc(EndLoc, /*UseLineDirectives=*/false).isValid()) {
     EndLoc = Lexer::getLocForEndOfToken(EndLoc, 0, SM, AST.getLangOpts());
     bool Invalid;
-    StringRef Buffer = SM.getBufferData(SM.getFileID(StartLoc), &Invalid);
+    llvm::StringRef Buffer = SM.getBufferData(SM.getFileID(StartLoc), &Invalid);
     if (!Invalid) {
       unsigned StartOffset = SM.getFileOffset(StartLoc);
       unsigned EndOffset = SM.getFileOffset(EndLoc);

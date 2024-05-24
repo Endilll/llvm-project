@@ -176,7 +176,7 @@ public:
       return false;
     auto NamespaceName = safeGetName(NsDecl);
     auto ClsNameStr = safeGetName(D);
-    StringRef ClsName = ClsNameStr; // FIXME: Make safeGetName return StringRef.
+    llvm::StringRef ClsName = ClsNameStr; // FIXME: Make safeGetName return llvm::StringRef.
     return NamespaceName == "WTF" &&
            (ClsName.ends_with("RefCounted") ||
             ClsName == "ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr");
@@ -189,7 +189,7 @@ public:
     assert(BaseSpec);
     assert(ProblematicBaseClass);
 
-    SmallString<100> Buf;
+    llvm::SmallString<100> Buf;
     llvm::raw_svector_ostream Os(Buf);
 
     Os << (ProblematicBaseClass->isClass() ? "Class" : "Struct") << " ";

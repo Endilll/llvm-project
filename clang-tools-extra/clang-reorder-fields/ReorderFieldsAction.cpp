@@ -33,7 +33,7 @@ using llvm::SmallSetVector;
 /// Finds the definition of a record by name.
 ///
 /// \returns nullptr if the name is ambiguous or not found.
-static const RecordDecl *findDefinition(StringRef RecordName,
+static const RecordDecl *findDefinition(llvm::StringRef RecordName,
                                         ASTContext &Context) {
   auto Results =
       match(recordDecl(hasName(RecordName), isDefinition()).bind("recordDecl"),
@@ -53,9 +53,9 @@ static const RecordDecl *findDefinition(StringRef RecordName,
 /// Calculates the new order of fields.
 ///
 /// \returns empty vector if the list of fields doesn't match the definition.
-static SmallVector<unsigned, 4>
+static llvm::SmallVector<unsigned, 4>
 getNewFieldsOrder(const RecordDecl *Definition,
-                  ArrayRef<std::string> DesiredFieldsOrder) {
+                  llvm::ArrayRef<std::string> DesiredFieldsOrder) {
   assert(Definition && "Definition is null");
 
   llvm::StringMap<unsigned> NameToIndex;
@@ -66,7 +66,7 @@ getNewFieldsOrder(const RecordDecl *Definition,
     llvm::errs() << "Number of provided fields doesn't match definition.\n";
     return {};
   }
-  SmallVector<unsigned, 4> NewFieldsOrder;
+  llvm::SmallVector<unsigned, 4> NewFieldsOrder;
   for (const auto &Name : DesiredFieldsOrder) {
     if (!NameToIndex.count(Name)) {
       llvm::errs() << "Field " << Name << " not found in definition.\n";
@@ -83,7 +83,7 @@ getNewFieldsOrder(const RecordDecl *Definition,
 static void
 addReplacement(SourceRange Old, SourceRange New, const ASTContext &Context,
                std::map<std::string, tooling::Replacements> &Replacements) {
-  StringRef NewText =
+  llvm::StringRef NewText =
       Lexer::getSourceText(CharSourceRange::getTokenRange(New),
                            Context.getSourceManager(), Context.getLangOpts());
   tooling::Replacement R(Context.getSourceManager(),
@@ -122,12 +122,12 @@ findMembersUsedInInitExpr(const CXXCtorInitializer *Initializer,
 /// different accesses (public/protected/private) is not supported.
 /// \returns true on success.
 static bool reorderFieldsInDefinition(
-    const RecordDecl *Definition, ArrayRef<unsigned> NewFieldsOrder,
+    const RecordDecl *Definition, llvm::ArrayRef<unsigned> NewFieldsOrder,
     const ASTContext &Context,
     std::map<std::string, tooling::Replacements> &Replacements) {
   assert(Definition && "Definition is null");
 
-  SmallVector<const FieldDecl *, 10> Fields;
+  llvm::SmallVector<const FieldDecl *, 10> Fields;
   for (const auto *Field : Definition->fields())
     Fields.push_back(Field);
 
@@ -158,7 +158,7 @@ static bool reorderFieldsInDefinition(
 /// fields. Thus, we need to ensure that we reorder just the initializers that
 /// are present.
 static void reorderFieldsInConstructor(
-    const CXXConstructorDecl *CtorDecl, ArrayRef<unsigned> NewFieldsOrder,
+    const CXXConstructorDecl *CtorDecl, llvm::ArrayRef<unsigned> NewFieldsOrder,
     ASTContext &Context,
     std::map<std::string, tooling::Replacements> &Replacements) {
   assert(CtorDecl && "Constructor declaration is null");
@@ -170,12 +170,12 @@ static void reorderFieldsInConstructor(
   // Thus this assert needs to be after the previous checks.
   assert(CtorDecl->isThisDeclarationADefinition() && "Not a definition");
 
-  SmallVector<unsigned, 10> NewFieldsPositions(NewFieldsOrder.size());
+  llvm::SmallVector<unsigned, 10> NewFieldsPositions(NewFieldsOrder.size());
   for (unsigned i = 0, e = NewFieldsOrder.size(); i < e; ++i)
     NewFieldsPositions[NewFieldsOrder[i]] = i;
 
-  SmallVector<const CXXCtorInitializer *, 10> OldWrittenInitializersOrder;
-  SmallVector<const CXXCtorInitializer *, 10> NewWrittenInitializersOrder;
+  llvm::SmallVector<const CXXCtorInitializer *, 10> OldWrittenInitializersOrder;
+  llvm::SmallVector<const CXXCtorInitializer *, 10> NewWrittenInitializersOrder;
   for (const auto *Initializer : CtorDecl->inits()) {
     if (!Initializer->isMemberInitializer() || !Initializer->isWritten())
       continue;
@@ -221,7 +221,7 @@ static void reorderFieldsInConstructor(
 /// At the moment partial initialization is not supported.
 /// \returns true on success
 static bool reorderFieldsInInitListExpr(
-    const InitListExpr *InitListEx, ArrayRef<unsigned> NewFieldsOrder,
+    const InitListExpr *InitListEx, llvm::ArrayRef<unsigned> NewFieldsOrder,
     const ASTContext &Context,
     std::map<std::string, tooling::Replacements> &Replacements) {
   assert(InitListEx && "Init list expression is null");
@@ -250,13 +250,13 @@ static bool reorderFieldsInInitListExpr(
 
 namespace {
 class ReorderingConsumer : public ASTConsumer {
-  StringRef RecordName;
-  ArrayRef<std::string> DesiredFieldsOrder;
+  llvm::StringRef RecordName;
+  llvm::ArrayRef<std::string> DesiredFieldsOrder;
   std::map<std::string, tooling::Replacements> &Replacements;
 
 public:
-  ReorderingConsumer(StringRef RecordName,
-                     ArrayRef<std::string> DesiredFieldsOrder,
+  ReorderingConsumer(llvm::StringRef RecordName,
+                     llvm::ArrayRef<std::string> DesiredFieldsOrder,
                      std::map<std::string, tooling::Replacements> &Replacements)
       : RecordName(RecordName), DesiredFieldsOrder(DesiredFieldsOrder),
         Replacements(Replacements) {}
@@ -268,7 +268,7 @@ public:
     const RecordDecl *RD = findDefinition(RecordName, Context);
     if (!RD)
       return;
-    SmallVector<unsigned, 4> NewFieldsOrder =
+    llvm::SmallVector<unsigned, 4> NewFieldsOrder =
         getNewFieldsOrder(RD, DesiredFieldsOrder);
     if (NewFieldsOrder.empty())
       return;

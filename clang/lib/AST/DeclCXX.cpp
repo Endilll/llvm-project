@@ -175,7 +175,7 @@ CXXRecordDecl *CXXRecordDecl::CreateDeserialized(const ASTContext &C,
 /// handle virtual bases.
 static bool hasRepeatedBaseClass(const CXXRecordDecl *StartRD) {
   llvm::SmallPtrSet<const CXXRecordDecl*, 8> SeenBaseTypes;
-  SmallVector<const CXXRecordDecl*, 8> WorkList = {StartRD};
+  llvm::SmallVector<const CXXRecordDecl*, 8> WorkList = {StartRD};
   while (!WorkList.empty()) {
     const CXXRecordDecl *RD = WorkList.pop_back_val();
     if (RD->getTypeForDecl()->isDependentType())
@@ -215,7 +215,7 @@ CXXRecordDecl::setBases(CXXBaseSpecifier const * const *Bases,
   llvm::SmallPtrSet<CanQualType, 8> SeenVBaseTypes;
 
   // The virtual bases of this class.
-  SmallVector<const CXXBaseSpecifier *, 8> VBases;
+  llvm::SmallVector<const CXXBaseSpecifier *, 8> VBases;
 
   data().Bases = new(C) CXXBaseSpecifier [NumBases];
   data().NumBases = NumBases;
@@ -616,7 +616,7 @@ bool CXXRecordDecl::hasSubobjectAtOffsetZeroOfEmptyBaseType(
 
   llvm::SmallPtrSet<const CXXRecordDecl*, 8> Bases;
   llvm::SmallPtrSet<const CXXRecordDecl*, 8> M;
-  SmallVector<const CXXRecordDecl*, 8> WorkList;
+  llvm::SmallVector<const CXXRecordDecl*, 8> WorkList;
 
   // Visit a type that we have determined is an element of M(S).
   auto Visit = [&](const CXXRecordDecl *RD) -> bool {
@@ -1512,7 +1512,7 @@ void CXXRecordDecl::LambdaDefinitionData::AddCaptureList(ASTContext &Ctx,
 }
 
 void CXXRecordDecl::setCaptures(ASTContext &Context,
-                                ArrayRef<LambdaCapture> Captures) {
+                                llvm::ArrayRef<LambdaCapture> Captures) {
   CXXRecordDecl::LambdaDefinitionData &Data = getLambdaData();
 
   // Copy captures.
@@ -1667,7 +1667,7 @@ CXXRecordDecl::getGenericLambdaTemplateParameterList() const {
   return nullptr;
 }
 
-ArrayRef<NamedDecl *>
+llvm::ArrayRef<NamedDecl *>
 CXXRecordDecl::getLambdaExplicitTemplateParameters() const {
   TemplateParameterList *List = getGenericLambdaTemplateParameterList();
   if (!List)
@@ -2376,7 +2376,7 @@ CXXMethodDecl *CXXMethodDecl::getDevirtualizedMethod(const Expr *Base,
 }
 
 bool CXXMethodDecl::isUsualDeallocationFunction(
-    SmallVectorImpl<const FunctionDecl *> &PreventedBy) const {
+    llvm::SmallVectorImpl<const FunctionDecl *> &PreventedBy) const {
   assert(PreventedBy.empty() && "PreventedBy is expected to be empty");
   if (getOverloadedOperator() != OO_Delete &&
       getOverloadedOperator() != OO_Array_Delete)
@@ -3216,7 +3216,7 @@ void UsingPackDecl::anchor() {}
 
 UsingPackDecl *UsingPackDecl::Create(ASTContext &C, DeclContext *DC,
                                      NamedDecl *InstantiatedFrom,
-                                     ArrayRef<NamedDecl *> UsingDecls) {
+                                     llvm::ArrayRef<NamedDecl *> UsingDecls) {
   size_t Extra = additionalSizeToAlloc<NamedDecl *>(UsingDecls.size());
   return new (C, DC, Extra) UsingPackDecl(DC, InstantiatedFrom, UsingDecls);
 }
@@ -3362,7 +3362,7 @@ DecompositionDecl *DecompositionDecl::Create(ASTContext &C, DeclContext *DC,
                                              SourceLocation LSquareLoc,
                                              QualType T, TypeSourceInfo *TInfo,
                                              StorageClass SC,
-                                             ArrayRef<BindingDecl *> Bindings) {
+                                             llvm::ArrayRef<BindingDecl *> Bindings) {
   size_t Extra = additionalSizeToAlloc<BindingDecl *>(Bindings.size());
   return new (C, DC, Extra)
       DecompositionDecl(C, DC, StartLoc, LSquareLoc, T, TInfo, SC, Bindings);

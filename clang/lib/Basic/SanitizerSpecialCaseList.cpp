@@ -33,7 +33,7 @@ SanitizerSpecialCaseList::createOrDie(const std::vector<std::string> &Paths,
   std::string Error;
   if (auto SSCL = create(Paths, VFS, Error))
     return SSCL;
-  llvm::report_fatal_error(StringRef(Error));
+  llvm::report_fatal_error(llvm::StringRef(Error));
 }
 
 void SanitizerSpecialCaseList::createSanitizerSections() {
@@ -54,9 +54,9 @@ void SanitizerSpecialCaseList::createSanitizerSections() {
   }
 }
 
-bool SanitizerSpecialCaseList::inSection(SanitizerMask Mask, StringRef Prefix,
-                                         StringRef Query,
-                                         StringRef Category) const {
+bool SanitizerSpecialCaseList::inSection(SanitizerMask Mask, llvm::StringRef Prefix,
+                                         llvm::StringRef Query,
+                                         llvm::StringRef Category) const {
   for (auto &S : SanitizerSections)
     if ((S.Mask & Mask) &&
         SpecialCaseList::inSectionBlame(S.Entries, Prefix, Query, Category))

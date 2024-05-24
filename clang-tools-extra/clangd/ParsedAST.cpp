@@ -598,7 +598,7 @@ ParsedAST::build(llvm::StringRef Filename, const ParseInputs &Inputs,
           bool IsInsideMainFile =
               Info.hasSourceManager() &&
               isInsideMainFile(Info.getLocation(), Info.getSourceManager());
-          SmallVector<tooling::Diagnostic, 1> TidySuppressedErrors;
+          llvm::SmallVector<tooling::Diagnostic, 1> TidySuppressedErrors;
           if (IsInsideMainFile && CTContext->shouldSuppressDiagnostic(
                                       DiagLevel, Info, TidySuppressedErrors,
                                       /*AllowIO=*/false,
@@ -630,7 +630,7 @@ ParsedAST::build(llvm::StringRef Filename, const ParseInputs &Inputs,
       auto Inserter = std::make_shared<IncludeInserter>(
           Filename, Inputs.Contents, Style, BuildDir.get(),
           &Clang->getPreprocessor().getHeaderSearchInfo());
-      ArrayRef<Inclusion> MainFileIncludes;
+      llvm::ArrayRef<Inclusion> MainFileIncludes;
       if (Preamble) {
         MainFileIncludes = Preamble->Includes.MainFileIncludes;
         for (const auto &Inc : Preamble->Includes.MainFileIncludes)

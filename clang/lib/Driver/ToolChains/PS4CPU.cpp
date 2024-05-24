@@ -26,8 +26,8 @@ using namespace llvm::opt;
 // Helper to paste bits of an option together and return a saved string.
 static const char *makeArgString(const ArgList &Args, const char *Prefix,
                                  const char *Base, const char *Suffix) {
-  // Basically "Prefix + Base + Suffix" all converted to Twine then saved.
-  return Args.MakeArgString(Twine(StringRef(Prefix), Base) + Suffix);
+  // Basically "Prefix + Base + Suffix" all converted to llvm::Twine then saved.
+  return Args.MakeArgString(llvm::Twine(llvm::StringRef(Prefix), Base) + Suffix);
 }
 
 void tools::PScpu::addProfileRTArgs(const ToolChain &TC, const ArgList &Args,
@@ -158,11 +158,11 @@ void tools::PScpu::Linker::ConstructJob(Compilation &C, const JobAction &JA,
   const bool IsPS4 = TC.getTriple().isPS4();
 
   const char *PS4LTOArgs = "";
-  auto AddCodeGenFlag = [&](Twine Flag) {
+  auto AddCodeGenFlag = [&](llvm::Twine Flag) {
     if (IsPS4)
-      PS4LTOArgs = Args.MakeArgString(Twine(PS4LTOArgs) + " " + Flag);
+      PS4LTOArgs = Args.MakeArgString(llvm::Twine(PS4LTOArgs) + " " + Flag);
     else
-      CmdArgs.push_back(Args.MakeArgString(Twine("-plugin-opt=") + Flag));
+      CmdArgs.push_back(Args.MakeArgString(llvm::Twine("-plugin-opt=") + Flag));
   };
 
   if (UseLTO) {
@@ -175,14 +175,14 @@ void tools::PScpu::Linker::ConstructJob(Compilation &C, const JobAction &JA,
       AddCodeGenFlag("-enable-jmc-instrument");
 
     if (Arg *A = Args.getLastArg(options::OPT_fcrash_diagnostics_dir))
-      AddCodeGenFlag(Twine("-crash-diagnostics-dir=") + A->getValue());
+      AddCodeGenFlag(llvm::Twine("-crash-diagnostics-dir=") + A->getValue());
 
-    StringRef Parallelism = getLTOParallelism(Args, D);
+    llvm::StringRef Parallelism = getLTOParallelism(Args, D);
     if (!Parallelism.empty()) {
       if (IsPS4)
-        AddCodeGenFlag(Twine("-threads=") + Parallelism);
+        AddCodeGenFlag(llvm::Twine("-threads=") + Parallelism);
       else
-        CmdArgs.push_back(Args.MakeArgString(Twine("-plugin-opt=jobs=") + Parallelism));
+        CmdArgs.push_back(Args.MakeArgString(llvm::Twine("-plugin-opt=jobs=") + Parallelism));
     }
 
     if (IsPS4) {
@@ -194,7 +194,7 @@ void tools::PScpu::Linker::ConstructJob(Compilation &C, const JobAction &JA,
       else
         llvm_unreachable("new LTO mode?");
 
-      CmdArgs.push_back(Args.MakeArgString(Twine(Prefix) + PS4LTOArgs));
+      CmdArgs.push_back(Args.MakeArgString(llvm::Twine(Prefix) + PS4LTOArgs));
     }
   }
 
@@ -243,7 +243,7 @@ void tools::PScpu::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 }
 
 toolchains::PS4PS5Base::PS4PS5Base(const Driver &D, const llvm::Triple &Triple,
-                                   const ArgList &Args, StringRef Platform,
+                                   const ArgList &Args, llvm::StringRef Platform,
                                    const char *EnvVar)
     : Generic_ELF(D, Triple, Args) {
   if (Args.hasArg(clang::driver::options::OPT_static))
@@ -254,7 +254,7 @@ toolchains::PS4PS5Base::PS4PS5Base(const Driver &D, const llvm::Triple &Triple,
   // If -isysroot was passed, use that as the SDK base path.
   // If not, we use the EnvVar if it exists; otherwise use the driver's
   // installation path, which should be <SDK_DIR>/host_tools/bin.
-  SmallString<80> Whence;
+  llvm::SmallString<80> Whence;
   if (const Arg *A = Args.getLastArg(options::OPT_isysroot)) {
     SDKRootDir = A->getValue();
     if (!llvm::sys::fs::exists(SDKRootDir))
@@ -268,7 +268,7 @@ toolchains::PS4PS5Base::PS4PS5Base(const Driver &D, const llvm::Triple &Triple,
     Whence = "compiler's location";
   }
 
-  SmallString<512> SDKIncludeDir(SDKRootDir);
+  llvm::SmallString<512> SDKIncludeDir(SDKRootDir);
   llvm::sys::path::append(SDKIncludeDir, "target/include");
   if (!Args.hasArg(options::OPT_nostdinc) &&
       !Args.hasArg(options::OPT_nostdlibinc) &&
@@ -276,10 +276,10 @@ toolchains::PS4PS5Base::PS4PS5Base(const Driver &D, const llvm::Triple &Triple,
       !Args.hasArg(options::OPT__sysroot_EQ) &&
       !llvm::sys::fs::exists(SDKIncludeDir)) {
     D.Diag(clang::diag::warn_drv_unable_to_find_directory_expected)
-        << Twine(Platform, " system headers").str() << SDKIncludeDir << Whence;
+        << llvm::Twine(Platform, " system headers").str() << SDKIncludeDir << Whence;
   }
 
-  SmallString<512> SDKLibDir(SDKRootDir);
+  llvm::SmallString<512> SDKLibDir(SDKRootDir);
   llvm::sys::path::append(SDKLibDir, "target/lib");
   if (!Args.hasArg(options::OPT_nostdlib) &&
       !Args.hasArg(options::OPT_nodefaultlibs) &&
@@ -288,7 +288,7 @@ toolchains::PS4PS5Base::PS4PS5Base(const Driver &D, const llvm::Triple &Triple,
       !Args.hasArg(options::OPT_emit_ast) &&
       !llvm::sys::fs::exists(SDKLibDir)) {
     D.Diag(clang::diag::warn_drv_unable_to_find_directory_expected)
-        << Twine(Platform, " system libraries").str() << SDKLibDir << Whence;
+        << llvm::Twine(Platform, " system libraries").str() << SDKLibDir << Whence;
     return;
   }
   getFilePaths().push_back(std::string(SDKLibDir));
@@ -303,7 +303,7 @@ void toolchains::PS4PS5Base::AddClangSystemIncludeArgs(
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> Dir(D.ResourceDir);
+    llvm::SmallString<128> Dir(D.ResourceDir);
     llvm::sys::path::append(Dir, "include");
     addSystemInclude(DriverArgs, CC1Args, Dir.str());
   }

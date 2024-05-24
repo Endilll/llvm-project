@@ -366,7 +366,7 @@ class GLRReduce {
 
   // A sequence is the ForestNode payloads of the GSS nodes we are reducing.
   using Sequence = llvm::SmallVector<const ForestNode *, Rule::MaxElements>;
-  // Like ArrayRef<const ForestNode*>, but with the missing operator<.
+  // Like llvm::ArrayRef<const ForestNode*>, but with the missing operator<.
   // (Sequences are big to move by value as the collections gets rearranged).
   struct SequenceRef {
     SequenceRef(const Sequence &S) : S(S) {}

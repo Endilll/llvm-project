@@ -21,7 +21,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-uncaught-exceptions.html
 class UseUncaughtExceptionsCheck : public ClangTidyCheck {
 public:
-  UseUncaughtExceptionsCheck(StringRef Name, ClangTidyContext *Context)
+  UseUncaughtExceptionsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus17;

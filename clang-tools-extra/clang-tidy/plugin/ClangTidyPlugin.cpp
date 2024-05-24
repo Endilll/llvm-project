@@ -36,7 +36,7 @@ class ClangTidyPluginAction : public PluginASTAction {
 
 public:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &Compiler,
-                                                 StringRef File) override {
+                                                 llvm::StringRef File) override {
     // Create and set diagnostics engine
     auto *DiagConsumer =
         new ClangTidyDiagnosticConsumer(*Context, &Compiler.getDiagnostics());
@@ -61,7 +61,7 @@ public:
 
     // Parse the extra command line args.
     // FIXME: This is very limited at the moment.
-    for (StringRef Arg : Args)
+    for (llvm::StringRef Arg : Args)
       if (Arg.starts_with("-checks="))
         OverrideOptions.Checks = std::string(Arg.substr(strlen("-checks=")));
 

@@ -102,7 +102,7 @@ const std::string &CIndexer::getClangResourcesPath() {
   if (!ResourcesPath.empty())
     return ResourcesPath;
 
-  SmallString<128> LibClangPath;
+  llvm::SmallString<128> LibClangPath;
 
   // Find the location where this library lives (libclang.dylib).
 #ifdef _WIN32
@@ -157,10 +157,10 @@ const std::string &CIndexer::getClangResourcesPath() {
   return ResourcesPath;
 }
 
-StringRef CIndexer::getClangToolchainPath() {
+llvm::StringRef CIndexer::getClangToolchainPath() {
   if (!ToolchainPath.empty())
     return ToolchainPath;
-  StringRef ResourcePath = getClangResourcesPath();
+  llvm::StringRef ResourcePath = getClangResourcesPath();
   ToolchainPath =
       std::string(llvm::sys::path::parent_path(llvm::sys::path::parent_path(
           llvm::sys::path::parent_path(ResourcePath))));
@@ -172,12 +172,12 @@ LibclangInvocationReporter::LibclangInvocationReporter(
     llvm::ArrayRef<const char *> Args,
     llvm::ArrayRef<std::string> InvocationArgs,
     llvm::ArrayRef<CXUnsavedFile> UnsavedFiles) {
-  StringRef Path = Idx.getInvocationEmissionPath();
+  llvm::StringRef Path = Idx.getInvocationEmissionPath();
   if (Path.empty())
     return;
 
   // Create a temporary file for the invocation log.
-  SmallString<256> TempPath;
+  llvm::SmallString<256> TempPath;
   TempPath = Path;
   llvm::sys::path::append(TempPath, "libclang-%%%%%%%%%%%%");
   int FD;
@@ -188,7 +188,7 @@ LibclangInvocationReporter::LibclangInvocationReporter(
   llvm::raw_fd_ostream OS(FD, /*ShouldClose=*/true);
 
   // Write out the information about the invocation to it.
-  auto WriteStringKey = [&OS](StringRef Key, StringRef Value) {
+  auto WriteStringKey = [&OS](llvm::StringRef Key, llvm::StringRef Value) {
     OS << R"(")" << Key << R"(":")";
     OS << llvm::yaml::escape(Value) << '"';
   };
@@ -226,7 +226,7 @@ LibclangInvocationReporter::LibclangInvocationReporter(
       Hash.update(getContents(UF.value()));
       llvm::MD5::MD5Result Result;
       Hash.final(Result);
-      SmallString<32> Digest = Result.digest();
+      llvm::SmallString<32> Digest = Result.digest();
       WriteStringKey("md5", Digest);
       OS << '}';
     }

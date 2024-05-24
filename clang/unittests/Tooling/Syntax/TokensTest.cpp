@@ -63,7 +63,7 @@ using ::testing::Pointee;
 using ::testing::StartsWith;
 
 namespace {
-// Checks the passed ArrayRef<T> has the same begin() and end() iterators as the
+// Checks the passed llvm::ArrayRef<T> has the same begin() and end() iterators as the
 // argument.
 MATCHER_P(SameRange, A, "") {
   return A.begin() == arg.begin() && A.end() == arg.end();
@@ -108,7 +108,7 @@ public:
       }
 
       std::unique_ptr<ASTConsumer>
-      CreateASTConsumer(CompilerInstance &CI, StringRef InFile) override {
+      CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) override {
         return std::make_unique<ASTConsumer>();
       }
 
@@ -251,7 +251,7 @@ public:
   // Data fields.
   llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
       new DiagnosticsEngine(new DiagnosticIDs, new DiagnosticOptions);
-  IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> FS =
+  llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> FS =
       new llvm::vfs::InMemoryFileSystem;
   llvm::IntrusiveRefCntPtr<FileManager> FileMgr =
       new FileManager(FileSystemOptions(), FS);

@@ -60,9 +60,9 @@ static Attr *handleSuppressAttr(Sema &S, Stmt *St, const ParsedAttr &A,
     return nullptr;
   }
 
-  std::vector<StringRef> DiagnosticIdentifiers;
+  std::vector<llvm::StringRef> DiagnosticIdentifiers;
   for (unsigned I = 0, E = A.getNumArgs(); I != E; ++I) {
-    StringRef RuleName;
+    llvm::StringRef RuleName;
 
     if (!S.checkStringLiteralArgumentAttr(A, I, RuleName, nullptr))
       return nullptr;
@@ -81,8 +81,8 @@ static Attr *handleLoopHintAttr(Sema &S, Stmt *St, const ParsedAttr &A,
   IdentifierLoc *StateLoc = A.getArgAsIdent(2);
   Expr *ValueExpr = A.getArgAsExpr(3);
 
-  StringRef PragmaName =
-      llvm::StringSwitch<StringRef>(PragmaNameLoc->Ident->getName())
+  llvm::StringRef PragmaName =
+      llvm::StringSwitch<llvm::StringRef>(PragmaNameLoc->Ident->getName())
           .Cases("unroll", "nounroll", "unroll_and_jam", "nounroll_and_jam",
                  PragmaNameLoc->Ident->getName())
           .Default("clang loop");
@@ -381,7 +381,7 @@ static Attr *handleCodeAlignAttr(Sema &S, Stmt *St, const ParsedAttr &A) {
 // Diagnose non-identical duplicates as a 'conflicting' loop attributes
 // and suppress duplicate errors in cases where the two match.
 template <typename LoopAttrT>
-static void CheckForDuplicateLoopAttrs(Sema &S, ArrayRef<const Attr *> Attrs) {
+static void CheckForDuplicateLoopAttrs(Sema &S, llvm::ArrayRef<const Attr *> Attrs) {
   auto FindFunc = [](const Attr *A) { return isa<const LoopAttrT>(A); };
   const auto *FirstItr = std::find_if(Attrs.begin(), Attrs.end(), FindFunc);
 
@@ -435,7 +435,7 @@ static Attr *handleMSConstexprAttr(Sema &S, Stmt *St, const ParsedAttr &A,
 
 static void
 CheckForIncompatibleAttributes(Sema &S,
-                               const SmallVectorImpl<const Attr *> &Attrs) {
+                               const llvm::SmallVectorImpl<const Attr *> &Attrs) {
   // The vast majority of attributed statements will only have one attribute
   // on them, so skip all of the checking in the common case.
   if (Attrs.size() < 2)
@@ -647,7 +647,7 @@ static Attr *ProcessStmtAttribute(Sema &S, Stmt *St, const ParsedAttr &A,
 }
 
 void Sema::ProcessStmtAttributes(Stmt *S, const ParsedAttributes &InAttrs,
-                                 SmallVectorImpl<const Attr *> &OutAttrs) {
+                                 llvm::SmallVectorImpl<const Attr *> &OutAttrs) {
   for (const ParsedAttr &AL : InAttrs) {
     if (const Attr *A = ProcessStmtAttribute(*this, S, AL, InAttrs.Range))
       OutAttrs.push_back(A);
@@ -657,7 +657,7 @@ void Sema::ProcessStmtAttributes(Stmt *S, const ParsedAttributes &InAttrs,
   CheckForDuplicateLoopAttrs<CodeAlignAttr>(*this, OutAttrs);
 }
 
-bool Sema::CheckRebuiltStmtAttributes(ArrayRef<const Attr *> Attrs) {
+bool Sema::CheckRebuiltStmtAttributes(llvm::ArrayRef<const Attr *> Attrs) {
   CheckForDuplicateLoopAttrs<CodeAlignAttr>(*this, Attrs);
   return false;
 }

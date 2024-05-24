@@ -32,7 +32,7 @@ namespace clang::tidy::misc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/misc/include-cleaner.html
 class IncludeCleanerCheck : public ClangTidyCheck {
 public:
-  IncludeCleanerCheck(StringRef Name, ClangTidyContext *Context);
+  IncludeCleanerCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
@@ -44,7 +44,7 @@ private:
   include_cleaner::RecordedPP RecordedPreprocessor;
   include_cleaner::PragmaIncludes RecordedPI;
   const Preprocessor *PP = nullptr;
-  std::vector<StringRef> IgnoreHeaders;
+  std::vector<llvm::StringRef> IgnoreHeaders;
   // Whether emit only one finding per usage of a symbol.
   const bool DeduplicateFindings;
   llvm::SmallVector<llvm::Regex> IgnoreHeadersRegex;

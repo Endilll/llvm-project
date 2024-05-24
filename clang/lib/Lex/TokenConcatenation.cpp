@@ -19,7 +19,7 @@ using namespace clang;
 
 /// IsStringPrefix - Return true if Str is a string prefix.
 /// 'L', 'u', 'U', or 'u8'. Including raw versions.
-static bool IsStringPrefix(StringRef Str, bool CPlusPlus11) {
+static bool IsStringPrefix(llvm::StringRef Str, bool CPlusPlus11) {
 
   if (Str[0] == 'L' ||
       (CPlusPlus11 && (Str[0] == 'u' || Str[0] == 'U' || Str[0] == 'R'))) {
@@ -52,7 +52,7 @@ bool TokenConcatenation::IsIdentifierStringPrefix(const Token &Tok) const {
       return false;
     SourceManager &SM = PP.getSourceManager();
     const char *Ptr = SM.getCharacterData(SM.getSpellingLoc(Tok.getLocation()));
-    return IsStringPrefix(StringRef(Ptr, Tok.getLength()),
+    return IsStringPrefix(llvm::StringRef(Ptr, Tok.getLength()),
                           LangOpts.CPlusPlus11);
   }
 
@@ -60,10 +60,10 @@ bool TokenConcatenation::IsIdentifierStringPrefix(const Token &Tok) const {
     char Buffer[256];
     const char *TokPtr = Buffer;
     unsigned length = PP.getSpelling(Tok, TokPtr);
-    return IsStringPrefix(StringRef(TokPtr, length), LangOpts.CPlusPlus11);
+    return IsStringPrefix(llvm::StringRef(TokPtr, length), LangOpts.CPlusPlus11);
   }
 
-  return IsStringPrefix(StringRef(PP.getSpelling(Tok)), LangOpts.CPlusPlus11);
+  return IsStringPrefix(llvm::StringRef(PP.getSpelling(Tok)), LangOpts.CPlusPlus11);
 }
 
 TokenConcatenation::TokenConcatenation(const Preprocessor &pp) : PP(pp) {

@@ -51,7 +51,7 @@ class LangOptions;
 class TargetInfo;
 
 /// Describes the name of a module.
-using ModuleId = SmallVector<std::pair<std::string, SourceLocation>, 2>;
+using ModuleId = llvm::SmallVector<std::pair<std::string, SourceLocation>, 2>;
 
 /// The signature of a module, which is a hash of the AST content.
 struct ASTFileSignature : std::array<uint8_t, 20> {
@@ -262,7 +262,7 @@ public:
   };
 
   /// The headers that are part of this module.
-  SmallVector<Header, 2> Headers[5];
+  llvm::SmallVector<Header, 2> Headers[5];
 
   /// Stored information about a header directive that was found in the
   /// module map file but has not been resolved to a file.
@@ -278,11 +278,11 @@ public:
 
   /// Headers that are mentioned in the module map file but that we have not
   /// yet attempted to resolve to a file on the file system.
-  SmallVector<UnresolvedHeaderDirective, 1> UnresolvedHeaders;
+  llvm::SmallVector<UnresolvedHeaderDirective, 1> UnresolvedHeaders;
 
   /// Headers that are mentioned in the module map file but could not be
   /// found on the file system.
-  SmallVector<UnresolvedHeaderDirective, 1> MissingHeaders;
+  llvm::SmallVector<UnresolvedHeaderDirective, 1> MissingHeaders;
 
   struct Requirement {
     std::string FeatureName;
@@ -293,7 +293,7 @@ public:
   ///
   /// If any of these requirements are not available, the \c IsAvailable bit
   /// will be false to indicate that this (sub)module is not available.
-  SmallVector<Requirement, 2> Requirements;
+  llvm::SmallVector<Requirement, 2> Requirements;
 
   /// A module with the same name that shadows this module.
   Module *ShadowingModule = nullptr;
@@ -412,7 +412,7 @@ public:
   using ExportDecl = llvm::PointerIntPair<Module *, 1, bool>;
 
   /// The set of export declarations.
-  SmallVector<ExportDecl, 2> Exports;
+  llvm::SmallVector<ExportDecl, 2> Exports;
 
   /// Describes an exported module that has not yet been resolved
   /// (perhaps because the module it refers to has not yet been loaded).
@@ -430,13 +430,13 @@ public:
   };
 
   /// The set of export declarations that have yet to be resolved.
-  SmallVector<UnresolvedExportDecl, 2> UnresolvedExports;
+  llvm::SmallVector<UnresolvedExportDecl, 2> UnresolvedExports;
 
   /// The directly used modules.
-  SmallVector<Module *, 2> DirectUses;
+  llvm::SmallVector<Module *, 2> DirectUses;
 
   /// The set of use declarations that have yet to be resolved.
-  SmallVector<ModuleId, 2> UnresolvedDirectUses;
+  llvm::SmallVector<ModuleId, 2> UnresolvedDirectUses;
 
   /// When \c NoUndeclaredIncludes is true, the set of modules this module tried
   /// to import but didn't because they are not direct uses.
@@ -497,7 +497,7 @@ public:
   std::vector<Conflict> Conflicts;
 
   /// Construct a new module or submodule.
-  Module(StringRef Name, SourceLocation DefinitionLoc, Module *Parent,
+  Module(llvm::StringRef Name, SourceLocation DefinitionLoc, Module *Parent,
          bool IsFramework, bool IsExplicit, unsigned VisibilityID);
 
   ~Module();
@@ -628,7 +628,7 @@ public:
   bool isNamedModuleInterfaceHasInit() const { return NamedModuleHasInit; }
 
   /// Get the primary module interface name from a partition.
-  StringRef getPrimaryModuleInterfaceName() const {
+  llvm::StringRef getPrimaryModuleInterfaceName() const {
     // Technically, global module fragment belongs to global module. And global
     // module has no name: [module.unit]p6:
     //   The global module has no name, no module interface unit, and is not
@@ -640,7 +640,7 @@ public:
 
     if (isModulePartition()) {
       auto pos = Name.find(':');
-      return StringRef(Name.data(), pos);
+      return llvm::StringRef(Name.data(), pos);
     }
 
     if (isPrivateModule())
@@ -659,7 +659,7 @@ public:
   /// \p nameParts with "."s.
   ///
   /// This is more efficient than getFullModuleName().
-  bool fullModuleNameIs(ArrayRef<StringRef> nameParts) const;
+  bool fullModuleNameIs(llvm::ArrayRef<llvm::StringRef> nameParts) const;
 
   /// Retrieve the top-level module for this (sub)module, which may
   /// be this module.
@@ -673,7 +673,7 @@ public:
   const Module *getTopLevelModule() const;
 
   /// Retrieve the name of the top-level module.
-  StringRef getTopLevelModuleName() const {
+  llvm::StringRef getTopLevelModuleName() const {
     return getTopLevelModule()->Name;
   }
 
@@ -713,12 +713,12 @@ public:
   void addTopHeader(FileEntryRef File);
 
   /// Add a top-level header filename associated with this module.
-  void addTopHeaderFilename(StringRef Filename) {
+  void addTopHeaderFilename(llvm::StringRef Filename) {
     TopHeaderNames.push_back(std::string(Filename));
   }
 
   /// The top-level headers associated with this module.
-  ArrayRef<FileEntryRef> getTopHeaders(FileManager &FileMgr);
+  llvm::ArrayRef<FileEntryRef> getTopHeaders(FileManager &FileMgr);
 
   /// Determine whether this module has declared its intention to
   /// directly use another module.
@@ -738,7 +738,7 @@ public:
   ///
   /// \param Target The target options that will be used to evaluate the
   /// availability of this feature.
-  void addRequirement(StringRef Feature, bool RequiredState,
+  void addRequirement(llvm::StringRef Feature, bool RequiredState,
                       const LangOptions &LangOpts,
                       const TargetInfo &Target);
 
@@ -748,8 +748,8 @@ public:
   /// Find the submodule with the given name.
   ///
   /// \returns The submodule if found, or NULL otherwise.
-  Module *findSubmodule(StringRef Name) const;
-  Module *findOrInferSubmodule(StringRef Name);
+  Module *findSubmodule(llvm::StringRef Name) const;
+  Module *findOrInferSubmodule(llvm::StringRef Name);
 
   /// Get the Global Module Fragment (sub-module) for this module, it there is
   /// one.
@@ -791,14 +791,14 @@ public:
   ///
   /// This provides a subset of immediately imported modules (the ones that are
   /// directly exported), not the complete set of exported modules.
-  void getExportedModules(SmallVectorImpl<Module *> &Exported) const;
+  void getExportedModules(llvm::SmallVectorImpl<Module *> &Exported) const;
 
-  static StringRef getModuleInputBufferName() {
+  static llvm::StringRef getModuleInputBufferName() {
     return "<module-includes>";
   }
 
   /// Print the module map for this module to the given stream.
-  void print(raw_ostream &OS, unsigned Indent = 0, bool Dump = false) const;
+  void print(llvm::raw_ostream &OS, unsigned Indent = 0, bool Dump = false) const;
 
   /// Dump the contents of this module to the given output stream.
   void dump() const;
@@ -851,14 +851,14 @@ public:
   /// consists of a sequence of modules from the conflicting module to the one
   /// made visible, where each was exported by the next.
   using ConflictCallback =
-      llvm::function_ref<void(ArrayRef<Module *> Path, Module *Conflict,
-                         StringRef Message)>;
+      llvm::function_ref<void(llvm::ArrayRef<Module *> Path, Module *Conflict,
+                         llvm::StringRef Message)>;
 
   /// Make a specific module visible.
   void setVisible(Module *M, SourceLocation Loc,
                   VisibleCallback Vis = [](Module *) {},
-                  ConflictCallback Cb = [](ArrayRef<Module *>, Module *,
-                                           StringRef) {});
+                  ConflictCallback Cb = [](llvm::ArrayRef<Module *>, Module *,
+                                           llvm::StringRef) {});
 private:
   /// Import locations for each visible module. Indexed by the module's
   /// VisibilityID.
@@ -872,23 +872,23 @@ private:
 /// everything needed to generate debug info for an imported module
 /// or PCH.
 class ASTSourceDescriptor {
-  StringRef PCHModuleName;
-  StringRef Path;
-  StringRef ASTFile;
+  llvm::StringRef PCHModuleName;
+  llvm::StringRef Path;
+  llvm::StringRef ASTFile;
   ASTFileSignature Signature;
   Module *ClangModule = nullptr;
 
 public:
   ASTSourceDescriptor() = default;
-  ASTSourceDescriptor(StringRef Name, StringRef Path, StringRef ASTFile,
+  ASTSourceDescriptor(llvm::StringRef Name, llvm::StringRef Path, llvm::StringRef ASTFile,
                       ASTFileSignature Signature)
       : PCHModuleName(std::move(Name)), Path(std::move(Path)),
         ASTFile(std::move(ASTFile)), Signature(Signature) {}
   ASTSourceDescriptor(Module &M);
 
   std::string getModuleName() const;
-  StringRef getPath() const { return Path; }
-  StringRef getASTFile() const { return ASTFile; }
+  llvm::StringRef getPath() const { return Path; }
+  llvm::StringRef getASTFile() const { return ASTFile; }
   ASTFileSignature getSignature() const { return Signature; }
   Module *getModuleOrNull() const { return ClangModule; }
 };

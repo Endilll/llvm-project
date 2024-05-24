@@ -74,7 +74,7 @@ static const GroupRecord OptionTable[] = {
 };
 
 llvm::StringRef GroupRecord::getName() const {
-  return StringRef(DiagGroupNames + NameOffset + 1, DiagGroupNames[NameOffset]);
+  return llvm::StringRef(DiagGroupNames + NameOffset + 1, DiagGroupNames[NameOffset]);
 }
 
 GroupRecord::subgroup_iterator GroupRecord::subgroup_begin() const {

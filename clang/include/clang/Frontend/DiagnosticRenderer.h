@@ -47,7 +47,7 @@ using DiagOrStoredDiag =
 class DiagnosticRenderer {
 protected:
   const LangOptions &LangOpts;
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
 
   /// The location of the previous diagnostic if known.
   ///
@@ -75,24 +75,24 @@ protected:
 
   virtual void emitDiagnosticMessage(FullSourceLoc Loc, PresumedLoc PLoc,
                                      DiagnosticsEngine::Level Level,
-                                     StringRef Message,
-                                     ArrayRef<CharSourceRange> Ranges,
+                                     llvm::StringRef Message,
+                                     llvm::ArrayRef<CharSourceRange> Ranges,
                                      DiagOrStoredDiag Info) = 0;
 
   virtual void emitDiagnosticLoc(FullSourceLoc Loc, PresumedLoc PLoc,
                                  DiagnosticsEngine::Level Level,
-                                 ArrayRef<CharSourceRange> Ranges) = 0;
+                                 llvm::ArrayRef<CharSourceRange> Ranges) = 0;
 
   virtual void emitCodeContext(FullSourceLoc Loc,
                                DiagnosticsEngine::Level Level,
-                               SmallVectorImpl<CharSourceRange> &Ranges,
-                               ArrayRef<FixItHint> Hints) = 0;
+                               llvm::SmallVectorImpl<CharSourceRange> &Ranges,
+                               llvm::ArrayRef<FixItHint> Hints) = 0;
 
   virtual void emitIncludeLocation(FullSourceLoc Loc, PresumedLoc PLoc) = 0;
   virtual void emitImportLocation(FullSourceLoc Loc, PresumedLoc PLoc,
-                                  StringRef ModuleName) = 0;
+                                  llvm::StringRef ModuleName) = 0;
   virtual void emitBuildingModuleLocation(FullSourceLoc Loc, PresumedLoc PLoc,
-                                          StringRef ModuleName) = 0;
+                                          llvm::StringRef ModuleName) = 0;
 
   virtual void beginDiagnostic(DiagOrStoredDiag D,
                                DiagnosticsEngine::Level Level) {}
@@ -100,21 +100,21 @@ protected:
                              DiagnosticsEngine::Level Level) {}
 
 private:
-  void emitBasicNote(StringRef Message);
+  void emitBasicNote(llvm::StringRef Message);
   void emitIncludeStack(FullSourceLoc Loc, PresumedLoc PLoc,
                         DiagnosticsEngine::Level Level);
   void emitIncludeStackRecursively(FullSourceLoc Loc);
   void emitImportStack(FullSourceLoc Loc);
-  void emitImportStackRecursively(FullSourceLoc Loc, StringRef ModuleName);
+  void emitImportStackRecursively(FullSourceLoc Loc, llvm::StringRef ModuleName);
   void emitModuleBuildStack(const SourceManager &SM);
   void emitCaret(FullSourceLoc Loc, DiagnosticsEngine::Level Level,
-                 ArrayRef<CharSourceRange> Ranges, ArrayRef<FixItHint> Hints);
+                 llvm::ArrayRef<CharSourceRange> Ranges, llvm::ArrayRef<FixItHint> Hints);
   void emitSingleMacroExpansion(FullSourceLoc Loc,
                                 DiagnosticsEngine::Level Level,
-                                ArrayRef<CharSourceRange> Ranges);
+                                llvm::ArrayRef<CharSourceRange> Ranges);
   void emitMacroExpansions(FullSourceLoc Loc, DiagnosticsEngine::Level Level,
-                           ArrayRef<CharSourceRange> Ranges,
-                           ArrayRef<FixItHint> Hints);
+                           llvm::ArrayRef<CharSourceRange> Ranges,
+                           llvm::ArrayRef<FixItHint> Hints);
 
 public:
   /// Emit a diagnostic.
@@ -130,8 +130,8 @@ public:
   /// \param Ranges The underlined ranges for this code snippet.
   /// \param FixItHints The FixIt hints active for this diagnostic.
   void emitDiagnostic(FullSourceLoc Loc, DiagnosticsEngine::Level Level,
-                      StringRef Message, ArrayRef<CharSourceRange> Ranges,
-                      ArrayRef<FixItHint> FixItHints,
+                      llvm::StringRef Message, llvm::ArrayRef<CharSourceRange> Ranges,
+                      llvm::ArrayRef<FixItHint> FixItHints,
                       DiagOrStoredDiag D = (Diagnostic *)nullptr);
 
   void emitStoredDiagnostic(StoredDiagnostic &Diag);
@@ -150,12 +150,12 @@ public:
   void emitIncludeLocation(FullSourceLoc Loc, PresumedLoc PLoc) override;
 
   void emitImportLocation(FullSourceLoc Loc, PresumedLoc PLoc,
-                          StringRef ModuleName) override;
+                          llvm::StringRef ModuleName) override;
 
   void emitBuildingModuleLocation(FullSourceLoc Loc, PresumedLoc PLoc,
-                                  StringRef ModuleName) override;
+                                  llvm::StringRef ModuleName) override;
 
-  virtual void emitNote(FullSourceLoc Loc, StringRef Message) = 0;
+  virtual void emitNote(FullSourceLoc Loc, llvm::StringRef Message) = 0;
 };
 
 } // namespace clang

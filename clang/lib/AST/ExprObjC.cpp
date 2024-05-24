@@ -25,7 +25,7 @@
 
 using namespace clang;
 
-ObjCArrayLiteral::ObjCArrayLiteral(ArrayRef<Expr *> Elements, QualType T,
+ObjCArrayLiteral::ObjCArrayLiteral(llvm::ArrayRef<Expr *> Elements, QualType T,
                                    ObjCMethodDecl *Method, SourceRange SR)
     : Expr(ObjCArrayLiteralClass, T, VK_PRValue, OK_Ordinary),
       NumElements(Elements.size()), Range(SR), ArrayWithObjectsMethod(Method) {
@@ -37,7 +37,7 @@ ObjCArrayLiteral::ObjCArrayLiteral(ArrayRef<Expr *> Elements, QualType T,
 }
 
 ObjCArrayLiteral *ObjCArrayLiteral::Create(const ASTContext &C,
-                                           ArrayRef<Expr *> Elements,
+                                           llvm::ArrayRef<Expr *> Elements,
                                            QualType T, ObjCMethodDecl *Method,
                                            SourceRange SR) {
   void *Mem = C.Allocate(totalSizeToAlloc<Expr *>(Elements.size()));
@@ -50,7 +50,7 @@ ObjCArrayLiteral *ObjCArrayLiteral::CreateEmpty(const ASTContext &C,
   return new (Mem) ObjCArrayLiteral(EmptyShell(), NumElements);
 }
 
-ObjCDictionaryLiteral::ObjCDictionaryLiteral(ArrayRef<ObjCDictionaryElement> VK,
+ObjCDictionaryLiteral::ObjCDictionaryLiteral(llvm::ArrayRef<ObjCDictionaryElement> VK,
                                              bool HasPackExpansions, QualType T,
                                              ObjCMethodDecl *method,
                                              SourceRange SR)
@@ -76,7 +76,7 @@ ObjCDictionaryLiteral::ObjCDictionaryLiteral(ArrayRef<ObjCDictionaryElement> VK,
 
 ObjCDictionaryLiteral *
 ObjCDictionaryLiteral::Create(const ASTContext &C,
-                              ArrayRef<ObjCDictionaryElement> VK,
+                              llvm::ArrayRef<ObjCDictionaryElement> VK,
                               bool HasPackExpansions, QualType T,
                               ObjCMethodDecl *method, SourceRange SR) {
   void *Mem = C.Allocate(totalSizeToAlloc<KeyValuePair, ExpansionData>(
@@ -107,9 +107,9 @@ ObjCMessageExpr::ObjCMessageExpr(QualType T, ExprValueKind VK,
                                  SourceLocation LBracLoc,
                                  SourceLocation SuperLoc, bool IsInstanceSuper,
                                  QualType SuperType, Selector Sel,
-                                 ArrayRef<SourceLocation> SelLocs,
+                                 llvm::ArrayRef<SourceLocation> SelLocs,
                                  SelectorLocationsKind SelLocsK,
-                                 ObjCMethodDecl *Method, ArrayRef<Expr *> Args,
+                                 ObjCMethodDecl *Method, llvm::ArrayRef<Expr *> Args,
                                  SourceLocation RBracLoc, bool isImplicit)
     : Expr(ObjCMessageExprClass, T, VK, OK_Ordinary),
       SelectorOrMethod(
@@ -126,9 +126,9 @@ ObjCMessageExpr::ObjCMessageExpr(QualType T, ExprValueKind VK,
 ObjCMessageExpr::ObjCMessageExpr(QualType T, ExprValueKind VK,
                                  SourceLocation LBracLoc,
                                  TypeSourceInfo *Receiver, Selector Sel,
-                                 ArrayRef<SourceLocation> SelLocs,
+                                 llvm::ArrayRef<SourceLocation> SelLocs,
                                  SelectorLocationsKind SelLocsK,
-                                 ObjCMethodDecl *Method, ArrayRef<Expr *> Args,
+                                 ObjCMethodDecl *Method, llvm::ArrayRef<Expr *> Args,
                                  SourceLocation RBracLoc, bool isImplicit)
     : Expr(ObjCMessageExprClass, T, VK, OK_Ordinary),
       SelectorOrMethod(
@@ -142,9 +142,9 @@ ObjCMessageExpr::ObjCMessageExpr(QualType T, ExprValueKind VK,
 
 ObjCMessageExpr::ObjCMessageExpr(QualType T, ExprValueKind VK,
                                  SourceLocation LBracLoc, Expr *Receiver,
-                                 Selector Sel, ArrayRef<SourceLocation> SelLocs,
+                                 Selector Sel, llvm::ArrayRef<SourceLocation> SelLocs,
                                  SelectorLocationsKind SelLocsK,
-                                 ObjCMethodDecl *Method, ArrayRef<Expr *> Args,
+                                 ObjCMethodDecl *Method, llvm::ArrayRef<Expr *> Args,
                                  SourceLocation RBracLoc, bool isImplicit)
     : Expr(ObjCMessageExprClass, T, VK, OK_Ordinary),
       SelectorOrMethod(
@@ -156,8 +156,8 @@ ObjCMessageExpr::ObjCMessageExpr(QualType T, ExprValueKind VK,
   setDependence(computeDependence(this));
 }
 
-void ObjCMessageExpr::initArgsAndSelLocs(ArrayRef<Expr *> Args,
-                                         ArrayRef<SourceLocation> SelLocs,
+void ObjCMessageExpr::initArgsAndSelLocs(llvm::ArrayRef<Expr *> Args,
+                                         llvm::ArrayRef<SourceLocation> SelLocs,
                                          SelectorLocationsKind SelLocsK) {
   setNumArgs(Args.size());
   Expr **MyArgs = getArgs();
@@ -175,8 +175,8 @@ ObjCMessageExpr *
 ObjCMessageExpr::Create(const ASTContext &Context, QualType T, ExprValueKind VK,
                         SourceLocation LBracLoc, SourceLocation SuperLoc,
                         bool IsInstanceSuper, QualType SuperType, Selector Sel,
-                        ArrayRef<SourceLocation> SelLocs,
-                        ObjCMethodDecl *Method, ArrayRef<Expr *> Args,
+                        llvm::ArrayRef<SourceLocation> SelLocs,
+                        ObjCMethodDecl *Method, llvm::ArrayRef<Expr *> Args,
                         SourceLocation RBracLoc, bool isImplicit) {
   assert((!SelLocs.empty() || isImplicit) &&
          "No selector locs for non-implicit message");
@@ -194,8 +194,8 @@ ObjCMessageExpr::Create(const ASTContext &Context, QualType T, ExprValueKind VK,
 ObjCMessageExpr *
 ObjCMessageExpr::Create(const ASTContext &Context, QualType T, ExprValueKind VK,
                         SourceLocation LBracLoc, TypeSourceInfo *Receiver,
-                        Selector Sel, ArrayRef<SourceLocation> SelLocs,
-                        ObjCMethodDecl *Method, ArrayRef<Expr *> Args,
+                        Selector Sel, llvm::ArrayRef<SourceLocation> SelLocs,
+                        ObjCMethodDecl *Method, llvm::ArrayRef<Expr *> Args,
                         SourceLocation RBracLoc, bool isImplicit) {
   assert((!SelLocs.empty() || isImplicit) &&
          "No selector locs for non-implicit message");
@@ -213,8 +213,8 @@ ObjCMessageExpr::Create(const ASTContext &Context, QualType T, ExprValueKind VK,
 ObjCMessageExpr *
 ObjCMessageExpr::Create(const ASTContext &Context, QualType T, ExprValueKind VK,
                         SourceLocation LBracLoc, Expr *Receiver, Selector Sel,
-                        ArrayRef<SourceLocation> SelLocs,
-                        ObjCMethodDecl *Method, ArrayRef<Expr *> Args,
+                        llvm::ArrayRef<SourceLocation> SelLocs,
+                        ObjCMethodDecl *Method, llvm::ArrayRef<Expr *> Args,
                         SourceLocation RBracLoc, bool isImplicit) {
   assert((!SelLocs.empty() || isImplicit) &&
          "No selector locs for non-implicit message");
@@ -237,9 +237,9 @@ ObjCMessageExpr *ObjCMessageExpr::CreateEmpty(const ASTContext &Context,
 }
 
 ObjCMessageExpr *ObjCMessageExpr::alloc(const ASTContext &C,
-                                        ArrayRef<Expr *> Args,
+                                        llvm::ArrayRef<Expr *> Args,
                                         SourceLocation RBraceLoc,
-                                        ArrayRef<SourceLocation> SelLocs,
+                                        llvm::ArrayRef<SourceLocation> SelLocs,
                                         Selector Sel,
                                         SelectorLocationsKind &SelLocsK) {
   SelLocsK = hasStandardSelectorLocs(Sel, SelLocs, Args, RBraceLoc);
@@ -256,7 +256,7 @@ ObjCMessageExpr *ObjCMessageExpr::alloc(const ASTContext &C, unsigned NumArgs,
 }
 
 void ObjCMessageExpr::getSelectorLocs(
-    SmallVectorImpl<SourceLocation> &SelLocs) const {
+    llvm::SmallVectorImpl<SourceLocation> &SelLocs) const {
   for (unsigned i = 0, e = getNumSelectorLocs(); i != e; ++i)
     SelLocs.push_back(getSelectorLoc(i));
 }
@@ -338,7 +338,7 @@ Stmt::const_child_range ObjCMessageExpr::children() const {
   return const_child_range(Children.begin(), Children.end());
 }
 
-StringRef ObjCBridgedCastExpr::getBridgeKindName() const {
+llvm::StringRef ObjCBridgedCastExpr::getBridgeKindName() const {
   switch (getBridgeKind()) {
   case OBC_Bridge:
     return "__bridge";

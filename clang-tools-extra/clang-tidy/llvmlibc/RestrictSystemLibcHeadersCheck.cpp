@@ -25,28 +25,28 @@ class RestrictedIncludesPPCallbacks
 public:
   explicit RestrictedIncludesPPCallbacks(
       RestrictSystemLibcHeadersCheck &Check, const SourceManager &SM,
-      const SmallString<128> CompilerIncudeDir)
+      const llvm::SmallString<128> CompilerIncudeDir)
       : portability::RestrictedIncludesPPCallbacks(Check, SM),
         CompilerIncudeDir(CompilerIncudeDir) {}
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
 
 private:
-  const SmallString<128> CompilerIncudeDir;
+  const llvm::SmallString<128> CompilerIncudeDir;
 };
 
 } // namespace
 
 void RestrictedIncludesPPCallbacks::InclusionDirective(
-    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    SourceLocation HashLoc, const Token &IncludeTok, llvm::StringRef FileName,
     bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
-    StringRef SearchPath, StringRef RelativePath, const Module *SuggestedModule,
+    llvm::StringRef SearchPath, llvm::StringRef RelativePath, const Module *SuggestedModule,
     bool ModuleImported, SrcMgr::CharacteristicKind FileType) {
   // Compiler provided headers are allowed (e.g stddef.h).
   if (SrcMgr::isSystem(FileType) && SearchPath == CompilerIncudeDir)
@@ -58,8 +58,8 @@ void RestrictedIncludesPPCallbacks::InclusionDirective(
 
 void RestrictSystemLibcHeadersCheck::registerPPCallbacks(
     const SourceManager &SM, Preprocessor *PP, Preprocessor *ModuleExpanderPP) {
-  SmallString<128> CompilerIncudeDir =
-      StringRef(PP->getHeaderSearchInfo().getHeaderSearchOpts().ResourceDir);
+  llvm::SmallString<128> CompilerIncudeDir =
+      llvm::StringRef(PP->getHeaderSearchInfo().getHeaderSearchOpts().ResourceDir);
   llvm::sys::path::append(CompilerIncudeDir, "include");
   PP->addPPCallbacks(std::make_unique<RestrictedIncludesPPCallbacks>(
       *this, SM, CompilerIncudeDir));

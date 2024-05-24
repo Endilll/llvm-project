@@ -138,8 +138,8 @@ public:
 
   bool handleObjCMethod(const ObjCMethodDecl *D,
                         const ObjCPropertyDecl *AssociatedProp = nullptr) {
-    SmallVector<SymbolRelation, 4> Relations;
-    SmallVector<const ObjCMethodDecl*, 4> Overriden;
+    llvm::SmallVector<SymbolRelation, 4> Relations;
+    llvm::SmallVector<const ObjCMethodDecl*, 4> Overriden;
 
     D->getOverriddenMethods(Overriden);
     for(auto overridden: Overriden) {
@@ -203,7 +203,7 @@ public:
   /// non-specialized template.
   void
   gatherTemplatePseudoOverrides(const NamedDecl *D,
-                                SmallVectorImpl<SymbolRelation> &Relations) {
+                                llvm::SmallVectorImpl<SymbolRelation> &Relations) {
     if (!IndexCtx.getLangOpts().CPlusPlus)
       return;
     const auto *CTSD =
@@ -242,7 +242,7 @@ public:
 
   bool VisitFunctionDecl(const FunctionDecl *D) {
     SymbolRoleSet Roles{};
-    SmallVector<SymbolRelation, 4> Relations;
+    llvm::SmallVector<SymbolRelation, 4> Relations;
     if (auto *CXXMD = dyn_cast<CXXMethodDecl>(D)) {
       if (CXXMD->isVirtual())
         Roles |= (unsigned)SymbolRole::Dynamic;
@@ -303,7 +303,7 @@ public:
   }
 
   bool VisitVarDecl(const VarDecl *D) {
-    SmallVector<SymbolRelation, 4> Relations;
+    llvm::SmallVector<SymbolRelation, 4> Relations;
     gatherTemplatePseudoOverrides(D, Relations);
     TRY_DECL(D, IndexCtx.handleDecl(D, SymbolRoleSet(), Relations));
     handleDeclarator(D);
@@ -318,7 +318,7 @@ public:
   }
 
   bool VisitFieldDecl(const FieldDecl *D) {
-    SmallVector<SymbolRelation, 4> Relations;
+    llvm::SmallVector<SymbolRelation, 4> Relations;
     gatherTemplatePseudoOverrides(D, Relations);
     TRY_DECL(D, IndexCtx.handleDecl(D, SymbolRoleSet(), Relations));
     handleDeclarator(D);
@@ -353,7 +353,7 @@ public:
 
   bool VisitTypedefNameDecl(const TypedefNameDecl *D) {
     if (!D->isTransparentTag()) {
-      SmallVector<SymbolRelation, 4> Relations;
+      llvm::SmallVector<SymbolRelation, 4> Relations;
       gatherTemplatePseudoOverrides(D, Relations);
       TRY_DECL(D, IndexCtx.handleDecl(D, SymbolRoleSet(), Relations));
       IndexCtx.indexTypeSourceInfo(D->getTypeSourceInfo(), D);
@@ -365,11 +365,11 @@ public:
     // Non-free standing tags are handled in indexTypeSourceInfo.
     if (D->isFreeStanding()) {
       if (D->isThisDeclarationADefinition()) {
-        SmallVector<SymbolRelation, 4> Relations;
+        llvm::SmallVector<SymbolRelation, 4> Relations;
         gatherTemplatePseudoOverrides(D, Relations);
         IndexCtx.indexTagDecl(D, Relations);
       } else {
-        SmallVector<SymbolRelation, 1> Relations;
+        llvm::SmallVector<SymbolRelation, 1> Relations;
         gatherTemplatePseudoOverrides(D, Relations);
         return IndexCtx.handleDecl(D, D->getLocation(), SymbolRoleSet(),
                                    Relations, D->getLexicalDeclContext());
@@ -540,7 +540,7 @@ public:
     auto *Container = cast<ObjCImplDecl>(D->getDeclContext());
     SourceLocation Loc = D->getLocation();
     SymbolRoleSet Roles = 0;
-    SmallVector<SymbolRelation, 1> Relations;
+    llvm::SmallVector<SymbolRelation, 1> Relations;
 
     if (ObjCIvarDecl *ID = D->getPropertyIvarDecl())
       Relations.push_back({(SymbolRoleSet)SymbolRole::RelationAccessorOf, ID});

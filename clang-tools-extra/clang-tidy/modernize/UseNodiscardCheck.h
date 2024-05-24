@@ -31,14 +31,14 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-nodiscard.html
 class UseNodiscardCheck : public ClangTidyCheck {
 public:
-  UseNodiscardCheck(StringRef Name, ClangTidyContext *Context);
+  UseNodiscardCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
-  const StringRef NoDiscardMacro;
+  const llvm::StringRef NoDiscardMacro;
 };
 
 } // namespace clang::tidy::modernize

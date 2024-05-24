@@ -12,7 +12,7 @@
 
 #define DEBUG_TYPE "macro-expansion-context"
 
-static void dumpTokenInto(const clang::Preprocessor &PP, clang::raw_ostream &OS,
+static void dumpTokenInto(const clang::Preprocessor &PP, llvm::raw_ostream &OS,
                           clang::Token Tok);
 
 namespace clang {
@@ -97,7 +97,7 @@ void MacroExpansionContext::registerForPreprocessor(Preprocessor &NewPP) {
   PP->setTokenWatcher([this](const Token &Tok) { onTokenLexed(Tok); });
 }
 
-std::optional<StringRef>
+std::optional<llvm::StringRef>
 MacroExpansionContext::getExpandedText(SourceLocation MacroExpansionLoc) const {
   if (MacroExpansionLoc.isMacroID())
     return std::nullopt;
@@ -109,13 +109,13 @@ MacroExpansionContext::getExpandedText(SourceLocation MacroExpansionLoc) const {
   // There was macro expansion, but resulted in no tokens, return empty string.
   const auto It = ExpandedTokens.find_as(MacroExpansionLoc);
   if (It == ExpandedTokens.end())
-    return StringRef{""};
+    return llvm::StringRef{""};
 
   // Otherwise we have the actual token sequence as string.
   return It->getSecond().str();
 }
 
-std::optional<StringRef>
+std::optional<llvm::StringRef>
 MacroExpansionContext::getOriginalText(SourceLocation MacroExpansionLoc) const {
   if (MacroExpansionLoc.isMacroID())
     return std::nullopt;
@@ -139,7 +139,7 @@ void MacroExpansionContext::dumpExpandedTexts() const {
   dumpExpandedTextsToStream(llvm::dbgs());
 }
 
-void MacroExpansionContext::dumpExpansionRangesToStream(raw_ostream &OS) const {
+void MacroExpansionContext::dumpExpansionRangesToStream(llvm::raw_ostream &OS) const {
   std::vector<std::pair<SourceLocation, SourceLocation>> LocalExpansionRanges;
   LocalExpansionRanges.reserve(ExpansionRanges.size());
   for (const auto &Record : ExpansionRanges)
@@ -157,7 +157,7 @@ void MacroExpansionContext::dumpExpansionRangesToStream(raw_ostream &OS) const {
   }
 }
 
-void MacroExpansionContext::dumpExpandedTextsToStream(raw_ostream &OS) const {
+void MacroExpansionContext::dumpExpandedTextsToStream(llvm::raw_ostream &OS) const {
   std::vector<std::pair<SourceLocation, MacroExpansionText>>
       LocalExpandedTokens;
   LocalExpandedTokens.reserve(ExpandedTokens.size());
@@ -174,7 +174,7 @@ void MacroExpansionContext::dumpExpandedTextsToStream(raw_ostream &OS) const {
   }
 }
 
-static void dumpTokenInto(const Preprocessor &PP, raw_ostream &OS, Token Tok) {
+static void dumpTokenInto(const Preprocessor &PP, llvm::raw_ostream &OS, Token Tok) {
   assert(Tok.isNot(tok::raw_identifier));
 
   // Ignore annotation tokens like: _Pragma("pack(push, 1)")
@@ -188,7 +188,7 @@ static void dumpTokenInto(const Preprocessor &PP, raw_ostream &OS, Token Tok) {
     //              ^-^-- Space after the 'int' and 'a' identifiers.
     OS << II->getName() << ' ';
   } else if (Tok.isLiteral() && !Tok.needsCleaning() && Tok.getLiteralData()) {
-    OS << StringRef(Tok.getLiteralData(), Tok.getLength());
+    OS << llvm::StringRef(Tok.getLiteralData(), Tok.getLength());
   } else {
     char Tmp[256];
     if (Tok.getLength() < sizeof(Tmp)) {

@@ -78,7 +78,7 @@ public:
   void checkPreCall(const CallEvent &CE, CheckerContext &C) const;
   void checkPostCall(const CallEvent &CE, CheckerContext &C) const;
 
-  void printState(raw_ostream &Out, ProgramStateRef State,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State,
                   const char *NL, const char *Sep) const override;
 };
 } // end anonymous namespace
@@ -333,7 +333,7 @@ void ObjCSelfInitChecker::checkBind(SVal loc, SVal val, const Stmt *S,
   }
 }
 
-void ObjCSelfInitChecker::printState(raw_ostream &Out, ProgramStateRef State,
+void ObjCSelfInitChecker::printState(llvm::raw_ostream &Out, ProgramStateRef State,
                                      const char *NL, const char *Sep) const {
   SelfFlagTy FlagMap = State->get<SelfFlag>();
   bool DidCallInit = State->get<CalledInit>();

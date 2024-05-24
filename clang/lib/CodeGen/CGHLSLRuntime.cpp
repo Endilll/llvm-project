@@ -28,10 +28,10 @@ using namespace llvm;
 
 namespace {
 
-void addDxilValVersion(StringRef ValVersionStr, llvm::Module &M) {
+void addDxilValVersion(llvm::StringRef ValVersionStr, llvm::Module &M) {
   // The validation of ValVersionStr is done at HLSLToolChain::TranslateArgs.
   // Assume ValVersionStr is legal here.
-  VersionTuple Version;
+  llvm::VersionTuple Version;
   if (Version.tryParse(ValVersionStr) || Version.getBuild() ||
       Version.getSubminor() || !Version.getMinor()) {
     return;
@@ -44,12 +44,12 @@ void addDxilValVersion(StringRef ValVersionStr, llvm::Module &M) {
   IRBuilder<> B(M.getContext());
   MDNode *Val = MDNode::get(Ctx, {ConstantAsMetadata::get(B.getInt32(Major)),
                                   ConstantAsMetadata::get(B.getInt32(Minor))});
-  StringRef DXILValKey = "dx.valver";
+  llvm::StringRef DXILValKey = "dx.valver";
   auto *DXILValMD = M.getOrInsertNamedMetadata(DXILValKey);
   DXILValMD->addOperand(Val);
 }
 void addDisableOptimizations(llvm::Module &M) {
-  StringRef Key = "dx.disable_optimizations";
+  llvm::StringRef Key = "dx.disable_optimizations";
   M.addModuleFlag(llvm::Module::ModFlagBehavior::Override, Key, 1);
 }
 // cbuffer will be translated into global variable in special address space.
@@ -233,7 +233,7 @@ calculateElementType(const ASTContext &Context, const clang::Type *ResourceTy) {
   // that don't have a template parameter (or, indeed, an element type).
   const auto *TST = ResourceTy->getAs<TemplateSpecializationType>();
   assert(TST && "Resource types must be template specializations");
-  ArrayRef<TemplateArgument> Args = TST->template_arguments();
+  llvm::ArrayRef<TemplateArgument> Args = TST->template_arguments();
   assert(!Args.empty() && "Resource has no element type");
 
   // At this point we have a resource with an element type, so we can assume
@@ -311,11 +311,11 @@ void clang::CodeGen::CGHLSLRuntime::setHLSLEntryAttributes(
     const FunctionDecl *FD, llvm::Function *Fn) {
   const auto *ShaderAttr = FD->getAttr<HLSLShaderAttr>();
   assert(ShaderAttr && "All entry functions must have a HLSLShaderAttr");
-  const StringRef ShaderAttrKindStr = "hlsl.shader";
+  const llvm::StringRef ShaderAttrKindStr = "hlsl.shader";
   Fn->addFnAttr(ShaderAttrKindStr,
                 ShaderAttr->ConvertShaderTypeToStr(ShaderAttr->getType()));
   if (HLSLNumThreadsAttr *NumThreadsAttr = FD->getAttr<HLSLNumThreadsAttr>()) {
-    const StringRef NumThreadsKindStr = "hlsl.numthreads";
+    const llvm::StringRef NumThreadsKindStr = "hlsl.numthreads";
     std::string NumThreadsStr =
         formatv("{0},{1},{2}", NumThreadsAttr->getX(), NumThreadsAttr->getY(),
                 NumThreadsAttr->getZ());
@@ -396,7 +396,7 @@ void CGHLSLRuntime::emitEntryFunction(const FunctionDecl *FD,
   B.CreateRetVoid();
 }
 
-static void gatherFunctions(SmallVectorImpl<Function *> &Fns, llvm::Module &M,
+static void gatherFunctions(llvm::SmallVectorImpl<Function *> &Fns, llvm::Module &M,
                             bool CtorOrDtor) {
   const auto *GV =
       M.getNamedGlobal(CtorOrDtor ? "llvm.global_ctors" : "llvm.global_dtors");
@@ -425,8 +425,8 @@ static void gatherFunctions(SmallVectorImpl<Function *> &Fns, llvm::Module &M,
 
 void CGHLSLRuntime::generateGlobalCtorDtorCalls() {
   llvm::Module &M = CGM.getModule();
-  SmallVector<Function *> CtorFns;
-  SmallVector<Function *> DtorFns;
+  llvm::SmallVector<Function *> CtorFns;
+  llvm::SmallVector<Function *> DtorFns;
   gatherFunctions(CtorFns, M, true);
   gatherFunctions(DtorFns, M, false);
 

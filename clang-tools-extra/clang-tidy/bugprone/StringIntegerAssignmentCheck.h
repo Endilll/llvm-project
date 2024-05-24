@@ -19,7 +19,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/string-integer-assignment.html
 class StringIntegerAssignmentCheck : public ClangTidyCheck {
 public:
-  StringIntegerAssignmentCheck(StringRef Name, ClangTidyContext *Context)
+  StringIntegerAssignmentCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

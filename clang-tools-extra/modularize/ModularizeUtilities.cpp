@@ -133,9 +133,9 @@ std::error_code ModularizeUtilities::loadSingleHeaderListsAndDependencies(
     llvm::StringRef InputPath) {
 
   // By default, use the path component of the list file name.
-  SmallString<256> HeaderDirectory(InputPath);
+  llvm::SmallString<256> HeaderDirectory(InputPath);
   llvm::sys::path::remove_filename(HeaderDirectory);
-  SmallString<256> CurrentDirectory;
+  llvm::SmallString<256> CurrentDirectory;
   llvm::sys::fs::current_path(CurrentDirectory);
 
   // Get the prefix if we have one.
@@ -149,19 +149,19 @@ std::error_code ModularizeUtilities::loadSingleHeaderListsAndDependencies(
     return EC;
 
   // Parse the header list into strings.
-  SmallVector<StringRef, 32> Strings;
+  llvm::SmallVector<llvm::StringRef, 32> Strings;
   listBuffer.get()->getBuffer().split(Strings, "\n", -1, false);
 
   // Collect the header file names from the string list.
-  for (SmallVectorImpl<StringRef>::iterator I = Strings.begin(),
+  for (llvm::SmallVectorImpl<llvm::StringRef>::iterator I = Strings.begin(),
     E = Strings.end();
     I != E; ++I) {
-    StringRef Line = I->trim();
+    llvm::StringRef Line = I->trim();
     // Ignore comments and empty lines.
     if (Line.empty() || (Line[0] == '#'))
       continue;
-    std::pair<StringRef, StringRef> TargetAndDependents = Line.split(':');
-    SmallString<256> HeaderFileName;
+    std::pair<llvm::StringRef, llvm::StringRef> TargetAndDependents = Line.split(':');
+    llvm::SmallString<256> HeaderFileName;
     // Prepend header file name prefix if it's not absolute.
     if (llvm::sys::path::is_absolute(TargetAndDependents.first))
       llvm::sys::path::native(TargetAndDependents.first, HeaderFileName);
@@ -175,11 +175,11 @@ std::error_code ModularizeUtilities::loadSingleHeaderListsAndDependencies(
     }
     // Handle optional dependencies.
     DependentsVector Dependents;
-    SmallVector<StringRef, 4> DependentsList;
+    llvm::SmallVector<llvm::StringRef, 4> DependentsList;
     TargetAndDependents.second.split(DependentsList, " ", -1, false);
     int Count = DependentsList.size();
     for (int Index = 0; Index < Count; ++Index) {
-      SmallString<256> Dependent;
+      llvm::SmallString<256> Dependent;
       if (llvm::sys::path::is_absolute(DependentsList[Index]))
         Dependent = DependentsList[Index];
       else {
@@ -206,9 +206,9 @@ std::error_code ModularizeUtilities::loadProblemHeaderList(
   llvm::StringRef InputPath) {
 
   // By default, use the path component of the list file name.
-  SmallString<256> HeaderDirectory(InputPath);
+  llvm::SmallString<256> HeaderDirectory(InputPath);
   llvm::sys::path::remove_filename(HeaderDirectory);
-  SmallString<256> CurrentDirectory;
+  llvm::SmallString<256> CurrentDirectory;
   llvm::sys::fs::current_path(CurrentDirectory);
 
   // Get the prefix if we have one.
@@ -222,18 +222,18 @@ std::error_code ModularizeUtilities::loadProblemHeaderList(
     return EC;
 
   // Parse the header list into strings.
-  SmallVector<StringRef, 32> Strings;
+  llvm::SmallVector<llvm::StringRef, 32> Strings;
   listBuffer.get()->getBuffer().split(Strings, "\n", -1, false);
 
   // Collect the header file names from the string list.
-  for (SmallVectorImpl<StringRef>::iterator I = Strings.begin(),
+  for (llvm::SmallVectorImpl<llvm::StringRef>::iterator I = Strings.begin(),
     E = Strings.end();
     I != E; ++I) {
-    StringRef Line = I->trim();
+    llvm::StringRef Line = I->trim();
     // Ignore comments and empty lines.
     if (Line.empty() || (Line[0] == '#'))
       continue;
-    SmallString<256> HeaderFileName;
+    llvm::SmallString<256> HeaderFileName;
     // Prepend header file name prefix if it's not absolute.
     if (llvm::sys::path::is_absolute(Line))
       llvm::sys::path::native(Line, HeaderFileName);
@@ -272,7 +272,7 @@ std::error_code ModularizeUtilities::loadModuleMap(
 
   // Figure out the home directory for the module map file.
   DirectoryEntryRef Dir = ModuleMapEntry.getDir();
-  StringRef DirName(Dir.getName());
+  llvm::StringRef DirName(Dir.getName());
   if (llvm::sys::path::filename(DirName) == "Modules") {
     DirName = llvm::sys::path::parent_path(DirName);
     if (DirName.ends_with(".framework")) {
@@ -321,7 +321,7 @@ std::error_code ModularizeUtilities::loadModuleMap(
 // Walks the modules and collects referenced headers into
 // HeaderFileNames.
 bool ModularizeUtilities::collectModuleMapHeaders(clang::ModuleMap *ModMap) {
-  SmallVector<std::pair<StringRef, const clang::Module *>, 0> Vec;
+  llvm::SmallVector<std::pair<llvm::StringRef, const clang::Module *>, 0> Vec;
   for (auto &M : ModMap->modules())
     Vec.emplace_back(M.first(), M.second);
   llvm::sort(Vec, llvm::less_first());
@@ -397,10 +397,10 @@ bool ModularizeUtilities::collectModuleHeaders(const clang::Module &Mod) {
 }
 
 // Collect headers from an umbrella directory.
-bool ModularizeUtilities::collectUmbrellaHeaders(StringRef UmbrellaDirName,
+bool ModularizeUtilities::collectUmbrellaHeaders(llvm::StringRef UmbrellaDirName,
   DependentsVector &Dependents) {
   // Initialize directory name.
-  SmallString<256> Directory(UmbrellaDirName);
+  llvm::SmallString<256> Directory(UmbrellaDirName);
   // Walk the directory.
   std::error_code EC;
   for (llvm::sys::fs::directory_iterator I(Directory.str(), EC), E; I != E;
@@ -430,8 +430,8 @@ bool ModularizeUtilities::collectUmbrellaHeaders(StringRef UmbrellaDirName,
 
 // Replace .. embedded in path for purposes of having
 // a canonical path.
-static std::string replaceDotDot(StringRef Path) {
-  SmallString<128> Buffer;
+static std::string replaceDotDot(llvm::StringRef Path) {
+  llvm::SmallString<128> Buffer;
   llvm::sys::path::const_iterator B = llvm::sys::path::begin(Path),
     E = llvm::sys::path::end(Path);
   while (B != E) {
@@ -450,10 +450,10 @@ static std::string replaceDotDot(StringRef Path) {
 // The canonical form is basically just use forward slashes, and remove "./".
 // \param FilePath The file path, relative to the module map directory.
 // \returns The file path in canonical form.
-std::string ModularizeUtilities::getCanonicalPath(StringRef FilePath) {
+std::string ModularizeUtilities::getCanonicalPath(llvm::StringRef FilePath) {
   std::string Tmp(replaceDotDot(FilePath));
   std::replace(Tmp.begin(), Tmp.end(), '\\', '/');
-  StringRef Tmp2(Tmp);
+  llvm::StringRef Tmp2(Tmp);
   if (Tmp2.starts_with("./"))
     Tmp = std::string(Tmp2.substr(2));
   return Tmp;
@@ -464,8 +464,8 @@ std::string ModularizeUtilities::getCanonicalPath(StringRef FilePath) {
 // assumed to be a header.
 // \param FileName The file name.  Must not be a directory.
 // \returns true if it has a header extension or no extension.
-bool ModularizeUtilities::isHeader(StringRef FileName) {
-  StringRef Extension = llvm::sys::path::extension(FileName);
+bool ModularizeUtilities::isHeader(llvm::StringRef FileName) {
+  llvm::StringRef Extension = llvm::sys::path::extension(FileName);
   if (Extension.size() == 0)
     return true;
   if (Extension.equals_insensitive(".h"))
@@ -480,8 +480,8 @@ bool ModularizeUtilities::isHeader(StringRef FileName) {
 // relative if the given path is relative, absolute if the
 // given path is absolute, or "." if the path has no leading
 // path component.
-std::string ModularizeUtilities::getDirectoryFromPath(StringRef Path) {
-  SmallString<256> Directory(Path);
+std::string ModularizeUtilities::getDirectoryFromPath(llvm::StringRef Path) {
+  llvm::SmallString<256> Directory(Path);
   sys::path::remove_filename(Directory);
   if (Directory.size() == 0)
     return ".";

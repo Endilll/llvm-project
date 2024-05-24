@@ -45,7 +45,7 @@ void openbsd::Assembler::ConstructJob(Compilation &C, const JobAction &JA,
     break;
 
   case llvm::Triple::arm: {
-    StringRef MArch, MCPU;
+    llvm::StringRef MArch, MCPU;
     arm::getARMArchCPUFromArgs(Args, MArch, MCPU, /*FromAs*/ true);
     std::string Arch = arm::getARMTargetCPU(MCPU, MArch, Triple);
     CmdArgs.push_back(Args.MakeArgString("-mcpu=" + Arch));
@@ -67,8 +67,8 @@ void openbsd::Assembler::ConstructJob(Compilation &C, const JobAction &JA,
 
   case llvm::Triple::mips64:
   case llvm::Triple::mips64el: {
-    StringRef CPUName;
-    StringRef ABIName;
+    llvm::StringRef CPUName;
+    llvm::StringRef ABIName;
     mips::getMipsCPUAndABI(Args, Triple, CPUName, ABIName);
 
     CmdArgs.push_back("-march");
@@ -328,7 +328,7 @@ void OpenBSD::AddClangSystemIncludeArgs(
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> Dir(D.ResourceDir);
+    llvm::SmallString<128> Dir(D.ResourceDir);
     llvm::sys::path::append(Dir, "include");
     addSystemInclude(DriverArgs, CC1Args, Dir.str());
   }
@@ -337,13 +337,13 @@ void OpenBSD::AddClangSystemIncludeArgs(
     return;
 
   // Check for configure-time C include directories.
-  StringRef CIncludeDirs(C_INCLUDE_DIRS);
+  llvm::StringRef CIncludeDirs(C_INCLUDE_DIRS);
   if (CIncludeDirs != "") {
-    SmallVector<StringRef, 5> dirs;
+    llvm::SmallVector<llvm::StringRef, 5> dirs;
     CIncludeDirs.split(dirs, ":");
-    for (StringRef dir : dirs) {
-      StringRef Prefix =
-          llvm::sys::path::is_absolute(dir) ? StringRef(D.SysRoot) : "";
+    for (llvm::StringRef dir : dirs) {
+      llvm::StringRef Prefix =
+          llvm::sys::path::is_absolute(dir) ? llvm::StringRef(D.SysRoot) : "";
       addExternCSystemInclude(DriverArgs, CC1Args, Prefix + dir);
     }
     return;
@@ -370,15 +370,15 @@ void OpenBSD::AddCXXStdlibLibArgs(const ArgList &Args,
   CmdArgs.push_back(Profiling ? "-lpthread_p" : "-lpthread");
 }
 
-std::string OpenBSD::getCompilerRT(const ArgList &Args, StringRef Component,
+std::string OpenBSD::getCompilerRT(const ArgList &Args, llvm::StringRef Component,
                                    FileType Type) const {
   if (Component == "builtins") {
-    SmallString<128> Path(getDriver().SysRoot);
+    llvm::SmallString<128> Path(getDriver().SysRoot);
     llvm::sys::path::append(Path, "/usr/lib/libcompiler_rt.a");
     if (getVFS().exists(Path))
       return std::string(Path);
   }
-  SmallString<128> P(getDriver().ResourceDir);
+  llvm::SmallString<128> P(getDriver().ResourceDir);
   std::string CRTBasename =
       buildCompilerRTBasename(Args, Component, Type, /*AddArch=*/false);
   llvm::sys::path::append(P, "lib", CRTBasename);

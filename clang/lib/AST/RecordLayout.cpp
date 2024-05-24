@@ -33,7 +33,7 @@ ASTRecordLayout::ASTRecordLayout(const ASTContext &Ctx, CharUnits size,
                                  CharUnits unadjustedAlignment,
                                  CharUnits requiredAlignment,
                                  CharUnits datasize,
-                                 ArrayRef<uint64_t> fieldoffsets)
+                                 llvm::ArrayRef<uint64_t> fieldoffsets)
     : Size(size), DataSize(datasize), Alignment(alignment),
       PreferredAlignment(preferredAlignment),
       UnadjustedAlignment(unadjustedAlignment),
@@ -46,7 +46,7 @@ ASTRecordLayout::ASTRecordLayout(
     const ASTContext &Ctx, CharUnits size, CharUnits alignment,
     CharUnits preferredAlignment, CharUnits unadjustedAlignment,
     CharUnits requiredAlignment, bool hasOwnVFPtr, bool hasExtendableVFPtr,
-    CharUnits vbptroffset, CharUnits datasize, ArrayRef<uint64_t> fieldoffsets,
+    CharUnits vbptroffset, CharUnits datasize, llvm::ArrayRef<uint64_t> fieldoffsets,
     CharUnits nonvirtualsize, CharUnits nonvirtualalignment,
     CharUnits preferrednvalignment, CharUnits SizeOfLargestEmptySubobject,
     const CXXRecordDecl *PrimaryBase, bool IsPrimaryBaseVirtual,

@@ -27,7 +27,7 @@ namespace clang {
 namespace cxindex {
 
 class Logger;
-typedef IntrusiveRefCntPtr<Logger> LogRef;
+typedef llvm::IntrusiveRefCntPtr<Logger> LogRef;
 
 /// Collects logging output and writes it to stderr when it's destructed.
 /// Common use case:
@@ -36,10 +36,10 @@ typedef IntrusiveRefCntPtr<Logger> LogRef;
 ///     *Log << "stuff";
 ///   }
 /// \endcode
-class Logger : public RefCountedBase<Logger> {
+class Logger : public llvm::RefCountedBase<Logger> {
   std::string Name;
   bool Trace;
-  SmallString<64> Msg;
+  llvm::SmallString<64> Msg;
   llvm::raw_svector_ostream LogOS;
 public:
   static const char *getEnvVar() {

@@ -44,7 +44,7 @@ struct DepCollectorPPCallbacks : public PPCallbacks {
     // Dependency generation really does want to go all the way to the
     // file entry for a source location to find out what is depended on.
     // We do not want #line markers to affect dependency generation!
-    if (std::optional<StringRef> Filename =
+    if (std::optional<llvm::StringRef> Filename =
             PP.getSourceManager().getNonBuiltinFilenameForID(FID))
       DepCollector.maybeAddDependency(
           llvm::sys::path::remove_leading_dotslash(*Filename),
@@ -54,7 +54,7 @@ struct DepCollectorPPCallbacks : public PPCallbacks {
 
   void FileSkipped(const FileEntryRef &SkippedFile, const Token &FilenameTok,
                    SrcMgr::CharacteristicKind FileType) override {
-    StringRef Filename =
+    llvm::StringRef Filename =
         llvm::sys::path::remove_leading_dotslash(SkippedFile.getName());
     DepCollector.maybeAddDependency(Filename, /*FromModule=*/false,
                                     /*IsSystem=*/isSystem(FileType),
@@ -63,10 +63,10 @@ struct DepCollectorPPCallbacks : public PPCallbacks {
   }
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override {
     if (!File)
@@ -77,12 +77,12 @@ struct DepCollectorPPCallbacks : public PPCallbacks {
     // Files that actually exist are handled by FileChanged.
   }
 
-  void HasInclude(SourceLocation Loc, StringRef SpelledFilename, bool IsAngled,
+  void HasInclude(SourceLocation Loc, llvm::StringRef SpelledFilename, bool IsAngled,
                   OptionalFileEntryRef File,
                   SrcMgr::CharacteristicKind FileType) override {
     if (!File)
       return;
-    StringRef Filename =
+    llvm::StringRef Filename =
         llvm::sys::path::remove_leading_dotslash(File->getName());
     DepCollector.maybeAddDependency(Filename, /*FromModule=*/false,
                                     /*IsSystem=*/isSystem(FileType),
@@ -101,7 +101,7 @@ struct DepCollectorMMCallbacks : public ModuleMapCallbacks {
 
   void moduleMapFileRead(SourceLocation Loc, FileEntryRef Entry,
                          bool IsSystem) override {
-    StringRef Filename = Entry.getName();
+    llvm::StringRef Filename = Entry.getName();
     DepCollector.maybeAddDependency(Filename, /*FromModule*/ false,
                                     /*IsSystem*/ IsSystem,
                                     /*IsModuleFile*/ false,
@@ -118,13 +118,13 @@ struct DepCollectorASTListener : public ASTReaderListener {
   bool needsSystemInputFileVisitation() override {
     return DepCollector.needSystemDependencies();
   }
-  void visitModuleFile(StringRef Filename,
+  void visitModuleFile(llvm::StringRef Filename,
                        serialization::ModuleKind Kind) override {
     DepCollector.maybeAddDependency(Filename, /*FromModule*/ true,
                                     /*IsSystem*/ false, /*IsModuleFile*/ true,
                                     /*IsMissing*/ false);
   }
-  bool visitInputFile(StringRef Filename, bool IsSystem,
+  bool visitInputFile(llvm::StringRef Filename, bool IsSystem,
                       bool IsOverridden, bool IsExplicitModule) override {
     if (IsOverridden || IsExplicitModule)
       return true;
@@ -142,7 +142,7 @@ struct DepCollectorASTListener : public ASTReaderListener {
 };
 } // end anonymous namespace
 
-void DependencyCollector::maybeAddDependency(StringRef Filename,
+void DependencyCollector::maybeAddDependency(llvm::StringRef Filename,
                                              bool FromModule, bool IsSystem,
                                              bool IsModuleFile,
                                              bool IsMissing) {
@@ -150,8 +150,8 @@ void DependencyCollector::maybeAddDependency(StringRef Filename,
     addDependency(Filename);
 }
 
-bool DependencyCollector::addDependency(StringRef Filename) {
-  StringRef SearchPath;
+bool DependencyCollector::addDependency(llvm::StringRef Filename) {
+  llvm::StringRef SearchPath;
 #ifdef _WIN32
   // Make the search insensitive to case and separators.
   llvm::SmallString<256> TmpPath = Filename;
@@ -169,11 +169,11 @@ bool DependencyCollector::addDependency(StringRef Filename) {
   return false;
 }
 
-static bool isSpecialFilename(StringRef Filename) {
+static bool isSpecialFilename(llvm::StringRef Filename) {
   return Filename == "<built-in>";
 }
 
-bool DependencyCollector::sawDependency(StringRef Filename, bool FromModule,
+bool DependencyCollector::sawDependency(llvm::StringRef Filename, bool FromModule,
                                         bool IsSystem, bool IsModuleFile,
                                         bool IsMissing) {
   return !isSpecialFilename(Filename) &&
@@ -213,7 +213,7 @@ void DependencyFileGenerator::attachToPreprocessor(Preprocessor &PP) {
   DependencyCollector::attachToPreprocessor(PP);
 }
 
-bool DependencyFileGenerator::sawDependency(StringRef Filename, bool FromModule,
+bool DependencyFileGenerator::sawDependency(llvm::StringRef Filename, bool FromModule,
                                             bool IsSystem, bool IsModuleFile,
                                             bool IsMissing) {
   if (IsMissing) {
@@ -287,7 +287,7 @@ void DependencyFileGenerator::finishedMainFile(DiagnosticsEngine &Diags) {
 /// https://msdn.microsoft.com/en-us/library/dd9y37ha.aspx for NMake info,
 /// https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
 /// for Windows file-naming info.
-static void PrintFilename(raw_ostream &OS, StringRef Filename,
+static void PrintFilename(llvm::raw_ostream &OS, llvm::StringRef Filename,
                           DependencyOutputFormat OutputFormat) {
   // Convert filename to platform native path
   llvm::SmallString<256> NativePath;
@@ -297,7 +297,7 @@ static void PrintFilename(raw_ostream &OS, StringRef Filename,
     // Add quotes if needed. These are the characters listed as "special" to
     // NMake, that are legal in a Windows filespec, and that could cause
     // misinterpretation of the dependency string.
-    if (NativePath.find_first_of(" #${}^!") != StringRef::npos)
+    if (NativePath.find_first_of(" #${}^!") != llvm::StringRef::npos)
       OS << '\"' << NativePath << '\"';
     else
       OS << NativePath;
@@ -342,7 +342,7 @@ void DependencyFileGenerator::outputDependencyFile(llvm::raw_ostream &OS) {
   const unsigned MaxColumns = 75;
   unsigned Columns = 0;
 
-  for (StringRef Target : Targets) {
+  for (llvm::StringRef Target : Targets) {
     unsigned N = Target.size();
     if (Columns == 0) {
       Columns += N;
@@ -362,8 +362,8 @@ void DependencyFileGenerator::outputDependencyFile(llvm::raw_ostream &OS) {
 
   // Now add each dependency in the order it was seen, but avoiding
   // duplicates.
-  ArrayRef<std::string> Files = getDependencies();
-  for (StringRef File : Files) {
+  llvm::ArrayRef<std::string> Files = getDependencies();
+  for (llvm::StringRef File : Files) {
     if (File == "<stdin>")
       continue;
     // Start a new line if this would exceed the column limit. Make

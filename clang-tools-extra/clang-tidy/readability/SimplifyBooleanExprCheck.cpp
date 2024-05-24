@@ -22,13 +22,13 @@ namespace clang::tidy::readability {
 
 namespace {
 
-StringRef getText(const ASTContext &Context, SourceRange Range) {
+llvm::StringRef getText(const ASTContext &Context, SourceRange Range) {
   return Lexer::getSourceText(CharSourceRange::getTokenRange(Range),
                               Context.getSourceManager(),
                               Context.getLangOpts());
 }
 
-template <typename T> StringRef getText(const ASTContext &Context, T &Node) {
+template <typename T> llvm::StringRef getText(const ASTContext &Context, T &Node) {
   return getText(Context, Node.getSourceRange());
 }
 
@@ -56,7 +56,7 @@ static bool needsParensAfterUnaryNegation(const Expr *E) {
 static std::pair<BinaryOperatorKind, BinaryOperatorKind> Opposites[] = {
     {BO_LT, BO_GE}, {BO_GT, BO_LE}, {BO_EQ, BO_NE}};
 
-static StringRef negatedOperator(const BinaryOperator *BinOp) {
+static llvm::StringRef negatedOperator(const BinaryOperator *BinOp) {
   const BinaryOperatorKind Opcode = BinOp->getOpcode();
   for (auto NegatableOp : Opposites) {
     if (Opcode == NegatableOp.first)
@@ -67,11 +67,11 @@ static StringRef negatedOperator(const BinaryOperator *BinOp) {
   return {};
 }
 
-static std::pair<OverloadedOperatorKind, StringRef> OperatorNames[] = {
+static std::pair<OverloadedOperatorKind, llvm::StringRef> OperatorNames[] = {
     {OO_EqualEqual, "=="},   {OO_ExclaimEqual, "!="}, {OO_Less, "<"},
     {OO_GreaterEqual, ">="}, {OO_Greater, ">"},       {OO_LessEqual, "<="}};
 
-static StringRef getOperatorName(OverloadedOperatorKind OpKind) {
+static llvm::StringRef getOperatorName(OverloadedOperatorKind OpKind) {
   for (auto Name : OperatorNames) {
     if (Name.first == OpKind)
       return Name.second;
@@ -85,7 +85,7 @@ static std::pair<OverloadedOperatorKind, OverloadedOperatorKind>
                            {OO_Less, OO_GreaterEqual},
                            {OO_Greater, OO_LessEqual}};
 
-static StringRef negatedOperator(const CXXOperatorCallExpr *OpCall) {
+static llvm::StringRef negatedOperator(const CXXOperatorCallExpr *OpCall) {
   const OverloadedOperatorKind Opcode = OpCall->getOperator();
   for (auto NegatableOp : OppositeOverloads) {
     if (Opcode == NegatableOp.first)
@@ -96,7 +96,7 @@ static StringRef negatedOperator(const CXXOperatorCallExpr *OpCall) {
   return {};
 }
 
-static std::string asBool(StringRef Text, bool NeedsStaticCast) {
+static std::string asBool(llvm::StringRef Text, bool NeedsStaticCast) {
   if (NeedsStaticCast)
     return ("static_cast<bool>(" + Text + ")").str();
 
@@ -185,7 +185,7 @@ static std::string replacementExpression(const ASTContext &Context,
     if (needsZeroComparison(E))
       return compareExpressionToZero(Context, E, false);
 
-    StringRef NegatedOperator;
+    llvm::StringRef NegatedOperator;
     const Expr *LHS = nullptr;
     const Expr *RHS = nullptr;
     if (const auto *BinOp = dyn_cast<BinaryOperator>(E)) {
@@ -205,7 +205,7 @@ static std::string replacementExpression(const ASTContext &Context,
                          .str(),
                      NeedsStaticCast));
 
-    StringRef Text = getText(Context, *E);
+    llvm::StringRef Text = getText(Context, *E);
     if (!NeedsStaticCast && needsParensAfterUnaryNegation(E))
       return ("!(" + Text + ")").str();
 
@@ -586,11 +586,11 @@ public:
 private:
   bool IsProcessing = false;
   SimplifyBooleanExprCheck *Check;
-  SmallVector<Stmt *, 32> StmtStack;
+  llvm::SmallVector<Stmt *, 32> StmtStack;
   ASTContext &Context;
 };
 
-SimplifyBooleanExprCheck::SimplifyBooleanExprCheck(StringRef Name,
+SimplifyBooleanExprCheck::SimplifyBooleanExprCheck(llvm::StringRef Name,
                                                    ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreMacros(Options.get("IgnoreMacros", false)),
@@ -704,9 +704,9 @@ bool SimplifyBooleanExprCheck::canBeBypassed(const Stmt *S) const {
 
 void SimplifyBooleanExprCheck::issueDiag(const ASTContext &Context,
                                          SourceLocation Loc,
-                                         StringRef Description,
+                                         llvm::StringRef Description,
                                          SourceRange ReplacementRange,
-                                         StringRef Replacement) {
+                                         llvm::StringRef Replacement) {
   CharSourceRange CharRange =
       Lexer::makeFileCharRange(CharSourceRange::getTokenRange(ReplacementRange),
                                Context.getSourceManager(), getLangOpts());
@@ -746,7 +746,7 @@ void SimplifyBooleanExprCheck::replaceWithCondition(
 void SimplifyBooleanExprCheck::replaceWithReturnCondition(
     const ASTContext &Context, const IfStmt *If, const Expr *BoolLiteral,
     bool Negated) {
-  StringRef Terminator = isa<CompoundStmt>(If->getElse()) ? ";" : "";
+  llvm::StringRef Terminator = isa<CompoundStmt>(If->getElse()) ? ";" : "";
   std::string Condition =
       replacementExpression(Context, Negated, If->getCond());
   std::string Replacement = ("return " + Condition + Terminator).str();
@@ -771,8 +771,8 @@ void SimplifyBooleanExprCheck::replaceWithAssignment(const ASTContext &Context,
                                                      SourceLocation Loc,
                                                      bool Negated) {
   SourceRange Range = IfAssign->getSourceRange();
-  StringRef VariableName = getText(Context, *Var);
-  StringRef Terminator = isa<CompoundStmt>(IfAssign->getElse()) ? ";" : "";
+  llvm::StringRef VariableName = getText(Context, *Var);
+  llvm::StringRef Terminator = isa<CompoundStmt>(IfAssign->getElse()) ? ";" : "";
   std::string Condition =
       replacementExpression(Context, Negated, IfAssign->getCond());
   std::string Replacement =
@@ -797,7 +797,7 @@ static BinaryOperatorKind getDemorganFlippedOperator(BinaryOperatorKind BO) {
   return BO == BO_LAnd ? BO_LOr : BO_LAnd;
 }
 
-static bool flipDemorganSide(SmallVectorImpl<FixItHint> &Fixes,
+static bool flipDemorganSide(llvm::SmallVectorImpl<FixItHint> &Fixes,
                              const ASTContext &Ctx, const Expr *E,
                              std::optional<BinaryOperatorKind> OuterBO);
 
@@ -805,7 +805,7 @@ static bool flipDemorganSide(SmallVectorImpl<FixItHint> &Fixes,
 /// returns \c true if there is any issue building the Fixes, \c false
 /// otherwise.
 static bool
-flipDemorganBinaryOperator(SmallVectorImpl<FixItHint> &Fixes,
+flipDemorganBinaryOperator(llvm::SmallVectorImpl<FixItHint> &Fixes,
                            const ASTContext &Ctx, const BinaryOperator *BinOp,
                            std::optional<BinaryOperatorKind> OuterBO,
                            const ParenExpr *Parens = nullptr) {
@@ -883,7 +883,7 @@ flipDemorganBinaryOperator(SmallVectorImpl<FixItHint> &Fixes,
   return false;
 }
 
-static bool flipDemorganSide(SmallVectorImpl<FixItHint> &Fixes,
+static bool flipDemorganSide(llvm::SmallVectorImpl<FixItHint> &Fixes,
                              const ASTContext &Ctx, const Expr *E,
                              std::optional<BinaryOperatorKind> OuterBO) {
   if (isa<UnaryOperator>(E) && cast<UnaryOperator>(E)->getOpcode() == UO_LNot) {
@@ -954,7 +954,7 @@ bool SimplifyBooleanExprCheck::reportDeMorgan(const ASTContext &Context,
     return false;
   if (Outer->getOperatorLoc().isMacroID())
     return false;
-  SmallVector<FixItHint> Fixes;
+  llvm::SmallVector<FixItHint> Fixes;
   auto NewOpcode = getDemorganFlippedOperator(Inner->getOpcode());
   if (shouldRemoveParens(Parent, NewOpcode, Parens)) {
     Fixes.push_back(FixItHint::CreateRemoval(

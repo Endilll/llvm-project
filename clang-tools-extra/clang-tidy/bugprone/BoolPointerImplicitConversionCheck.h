@@ -26,7 +26,7 @@ namespace clang::tidy::bugprone {
 /// \endcode
 class BoolPointerImplicitConversionCheck : public ClangTidyCheck {
 public:
-  BoolPointerImplicitConversionCheck(StringRef Name, ClangTidyContext *Context)
+  BoolPointerImplicitConversionCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

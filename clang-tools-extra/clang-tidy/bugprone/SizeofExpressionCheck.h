@@ -19,7 +19,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/sizeof-expression.html
 class SizeofExpressionCheck : public ClangTidyCheck {
 public:
-  SizeofExpressionCheck(StringRef Name, ClangTidyContext *Context);
+  SizeofExpressionCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

@@ -89,7 +89,7 @@ class EventQueue {
 
 public:
   void push_back(const DirectoryWatcher::Event::EventKind K,
-                 StringRef Filename) {
+                 llvm::StringRef Filename) {
     {
       std::unique_lock<std::mutex> L(Mtx);
       Events.emplace(K, Filename);
@@ -295,7 +295,7 @@ void DirectoryWatcherLinux::EventReceivingLoop() {
 }
 
 DirectoryWatcherLinux::DirectoryWatcherLinux(
-    StringRef WatchedDirPath,
+    llvm::StringRef WatchedDirPath,
     std::function<void(llvm::ArrayRef<Event>, bool)> Receiver,
     bool WaitForInitialSync, int InotifyFD, int InotifyWD,
     SemaphorePipe &&InotifyPollingStopSignal)
@@ -323,7 +323,7 @@ DirectoryWatcherLinux::DirectoryWatcherLinux(
 } // namespace
 
 llvm::Expected<std::unique_ptr<DirectoryWatcher>> clang::DirectoryWatcher::create(
-    StringRef Path,
+    llvm::StringRef Path,
     std::function<void(llvm::ArrayRef<DirectoryWatcher::Event>, bool)> Receiver,
     bool WaitForInitialSync) {
   if (Path.empty())

@@ -421,7 +421,7 @@ bool Sema::CheckEquivalentExceptionSpec(FunctionDecl *Old, FunctionDecl *New) {
   }
 
   // Warn about the lack of exception specification.
-  SmallString<128> ExceptionSpecString;
+  llvm::SmallString<128> ExceptionSpecString;
   llvm::raw_svector_ostream OS(ExceptionSpecString);
   switch (OldProto->getExceptionSpecType()) {
   case EST_DynamicNone:

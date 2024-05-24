@@ -38,7 +38,7 @@ class EditedSource {
   const PPConditionalDirectiveRecord *PPRec;
 
   struct FileEdit {
-    StringRef Text;
+    llvm::StringRef Text;
     unsigned RemoveLen = 0;
 
     FileEdit() = default;
@@ -62,8 +62,8 @@ class EditedSource {
     }
   };
 
-  llvm::DenseMap<SourceLocation, SmallVector<MacroArgUse, 2>> ExpansionToArgMap;
-  SmallVector<std::pair<SourceLocation, MacroArgUse>, 2>
+  llvm::DenseMap<SourceLocation, llvm::SmallVector<MacroArgUse, 2>> ExpansionToArgMap;
+  llvm::SmallVector<std::pair<SourceLocation, MacroArgUse>, 2>
     CurrCommitMacroArgExps;
 
   IdentifierTable IdentTable;
@@ -88,18 +88,18 @@ public:
   void applyRewrites(EditsReceiver &receiver, bool adjustRemovals = true);
   void clearRewrites();
 
-  StringRef copyString(StringRef str) { return str.copy(StrAlloc); }
-  StringRef copyString(const Twine &twine);
+  llvm::StringRef copyString(llvm::StringRef str) { return str.copy(StrAlloc); }
+  llvm::StringRef copyString(const llvm::Twine &twine);
 
 private:
-  bool commitInsert(SourceLocation OrigLoc, FileOffset Offs, StringRef text,
+  bool commitInsert(SourceLocation OrigLoc, FileOffset Offs, llvm::StringRef text,
                     bool beforePreviousInsertions);
   bool commitInsertFromRange(SourceLocation OrigLoc, FileOffset Offs,
                              FileOffset InsertFromRangeOffs, unsigned Len,
                              bool beforePreviousInsertions);
   void commitRemove(SourceLocation OrigLoc, FileOffset BeginOffs, unsigned Len);
 
-  StringRef getSourceText(FileOffset BeginOffs, FileOffset EndOffs,
+  llvm::StringRef getSourceText(FileOffset BeginOffs, FileOffset EndOffs,
                           bool &Invalid);
   FileEditsTy::iterator getActionForOffset(FileOffset Offs);
   void deconstructMacroArgLoc(SourceLocation Loc,

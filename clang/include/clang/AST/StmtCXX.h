@@ -76,7 +76,7 @@ class CXXTryStmt final : public Stmt,
   size_t numTrailingObjects(OverloadToken<Stmt *>) const { return NumHandlers; }
 
   CXXTryStmt(SourceLocation tryLoc, CompoundStmt *tryBlock,
-             ArrayRef<Stmt *> handlers);
+             llvm::ArrayRef<Stmt *> handlers);
   CXXTryStmt(EmptyShell Empty, unsigned numHandlers)
     : Stmt(CXXTryStmtClass), NumHandlers(numHandlers) { }
 
@@ -85,7 +85,7 @@ class CXXTryStmt final : public Stmt,
 
 public:
   static CXXTryStmt *Create(const ASTContext &C, SourceLocation tryLoc,
-                            CompoundStmt *tryBlock, ArrayRef<Stmt *> handlers);
+                            CompoundStmt *tryBlock, llvm::ArrayRef<Stmt *> handlers);
 
   static CXXTryStmt *Create(const ASTContext &C, EmptyShell Empty,
                             unsigned numHandlers);
@@ -358,7 +358,7 @@ public:
     Expr *ReturnValue = nullptr;
     Stmt *ReturnStmt = nullptr;
     Stmt *ReturnStmtOnAllocFailure = nullptr;
-    ArrayRef<Stmt *> ParamMoves;
+    llvm::ArrayRef<Stmt *> ParamMoves;
   };
 
 private:
@@ -420,7 +420,7 @@ public:
   Stmt *getReturnStmtOnAllocFailure() const {
     return getStoredStmts()[SubStmt::ReturnStmtOnAllocFailure];
   }
-  ArrayRef<Stmt const *> getParamMoves() const {
+  llvm::ArrayRef<Stmt const *> getParamMoves() const {
     return {getStoredStmts() + SubStmt::FirstParamMove, NumParams};
   }
 

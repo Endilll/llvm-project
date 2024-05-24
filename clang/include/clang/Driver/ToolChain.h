@@ -91,7 +91,7 @@ struct ParsedClangName {
 /// ToolChain - Access to tools for a single platform.
 class ToolChain {
 public:
-  using path_list = SmallVector<std::string, 16>;
+  using path_list = llvm::SmallVector<std::string, 16>;
 
   enum CXXStdlibType {
     CST_Libcxx,
@@ -128,7 +128,7 @@ public:
   struct BitCodeLibraryInfo {
     std::string Path;
     bool ShouldInternalize;
-    BitCodeLibraryInfo(StringRef Path, bool ShouldInternalize = true)
+    BitCodeLibraryInfo(llvm::StringRef Path, bool ShouldInternalize = true)
         : Path(Path), ShouldInternalize(ShouldInternalize) {}
   };
 
@@ -190,7 +190,7 @@ private:
   }
 
   std::optional<std::string>
-  getFallbackAndroidTargetPath(StringRef BaseDir) const;
+  getFallbackAndroidTargetPath(llvm::StringRef BaseDir) const;
 
   mutable std::optional<CXXStdlibType> cxxStdlibType;
   mutable std::optional<RuntimeLibType> runtimeLibType;
@@ -205,7 +205,7 @@ protected:
 
   /// Executes the given \p Executable and returns the stdout.
   llvm::Expected<std::unique_ptr<llvm::MemoryBuffer>>
-  executeToolChainProgram(StringRef Executable) const;
+  executeToolChainProgram(llvm::StringRef Executable) const;
 
   void setTripleEnvironment(llvm::Triple::EnvironmentType Env);
 
@@ -215,33 +215,33 @@ protected:
   virtual Tool *getTool(Action::ActionClass AC) const;
 
   virtual std::string buildCompilerRTBasename(const llvm::opt::ArgList &Args,
-                                              StringRef Component,
+                                              llvm::StringRef Component,
                                               FileType Type,
                                               bool AddArch) const;
 
   /// Find the target-specific subdirectory for the current target triple under
   /// \p BaseDir, doing fallback triple searches as necessary.
   /// \return The subdirectory path if it exists.
-  std::optional<std::string> getTargetSubDirPath(StringRef BaseDir) const;
+  std::optional<std::string> getTargetSubDirPath(llvm::StringRef BaseDir) const;
 
   /// \name Utilities for implementing subclasses.
   ///@{
   static void addSystemInclude(const llvm::opt::ArgList &DriverArgs,
                                llvm::opt::ArgStringList &CC1Args,
-                               const Twine &Path);
+                               const llvm::Twine &Path);
   static void addExternCSystemInclude(const llvm::opt::ArgList &DriverArgs,
                                       llvm::opt::ArgStringList &CC1Args,
-                                      const Twine &Path);
+                                      const llvm::Twine &Path);
   static void
       addExternCSystemIncludeIfExists(const llvm::opt::ArgList &DriverArgs,
                                       llvm::opt::ArgStringList &CC1Args,
-                                      const Twine &Path);
+                                      const llvm::Twine &Path);
   static void addSystemIncludes(const llvm::opt::ArgList &DriverArgs,
                                 llvm::opt::ArgStringList &CC1Args,
-                                ArrayRef<StringRef> Paths);
+                                llvm::ArrayRef<llvm::StringRef> Paths);
 
-  static std::string concat(StringRef Path, const Twine &A, const Twine &B = "",
-                            const Twine &C = "", const Twine &D = "");
+  static std::string concat(llvm::StringRef Path, const llvm::Twine &A, const llvm::Twine &B = "",
+                            const llvm::Twine &C = "", const llvm::Twine &D = "");
   ///@}
 
 public:
@@ -266,13 +266,13 @@ public:
   virtual std::string getInputFilename(const InputInfo &Input) const;
 
   llvm::Triple::ArchType getArch() const { return Triple.getArch(); }
-  StringRef getArchName() const { return Triple.getArchName(); }
-  StringRef getPlatform() const { return Triple.getVendorName(); }
-  StringRef getOS() const { return Triple.getOSName(); }
+  llvm::StringRef getArchName() const { return Triple.getArchName(); }
+  llvm::StringRef getPlatform() const { return Triple.getVendorName(); }
+  llvm::StringRef getOS() const { return Triple.getOSName(); }
 
   /// Provide the default architecture name (as expected by -arch) for
   /// this toolchain.
-  StringRef getDefaultUniversalArchName() const;
+  llvm::StringRef getDefaultUniversalArchName() const;
 
   std::string getTripleString() const {
     return Triple.getTriple();
@@ -342,7 +342,7 @@ public:
   /// e.g., argv[0]).
   /// \return A structure of type ParsedClangName that contains the executable
   /// name parts.
-  static ParsedClangName getTargetAndModeFromProgramName(StringRef ProgName);
+  static ParsedClangName getTargetAndModeFromProgramName(llvm::StringRef ProgName);
 
   // Tool access.
 
@@ -355,7 +355,7 @@ public:
   /// \param DeviceOffloadKind - The device offload kind used for the
   /// translation.
   virtual llvm::opt::DerivedArgList *
-  TranslateArgs(const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+  TranslateArgs(const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
                 Action::OffloadKind DeviceOffloadKind) const {
     return nullptr;
   }
@@ -365,7 +365,7 @@ public:
   /// -Xopenmp-target -opt=val OR -Xopenmp-target=<triple> -opt=val
   virtual llvm::opt::DerivedArgList *TranslateOpenMPTargetArgs(
       const llvm::opt::DerivedArgList &Args, bool SameTripleAsHost,
-      SmallVectorImpl<llvm::opt::Arg *> &AllocatedArgs) const;
+      llvm::SmallVectorImpl<llvm::opt::Arg *> &AllocatedArgs) const;
 
   /// Append the argument following \p A to \p DAL assuming \p A is an Xarch
   /// argument. If \p AllocatedArgs is null pointer, synthesized arguments are
@@ -373,15 +373,15 @@ public:
   virtual void TranslateXarchArgs(
       const llvm::opt::DerivedArgList &Args, llvm::opt::Arg *&A,
       llvm::opt::DerivedArgList *DAL,
-      SmallVectorImpl<llvm::opt::Arg *> *AllocatedArgs = nullptr) const;
+      llvm::SmallVectorImpl<llvm::opt::Arg *> *AllocatedArgs = nullptr) const;
 
   /// Translate -Xarch_ arguments. If there are no such arguments, return
   /// a null pointer, otherwise return a DerivedArgList containing the
   /// translated arguments.
   virtual llvm::opt::DerivedArgList *
-  TranslateXarchArgs(const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+  TranslateXarchArgs(const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
                      Action::OffloadKind DeviceOffloadKind,
-                     SmallVectorImpl<llvm::opt::Arg *> *AllocatedArgs) const;
+                     llvm::SmallVectorImpl<llvm::opt::Arg *> *AllocatedArgs) const;
 
   /// Choose a tool to use to handle the action \p JA.
   ///
@@ -410,7 +410,7 @@ public:
   /// This is used when handling the verbose option to print detailed,
   /// toolchain-specific information useful for understanding the behavior of
   /// the driver on a specific platform.
-  virtual void printVerboseInfo(raw_ostream &OS) const {}
+  virtual void printVerboseInfo(llvm::raw_ostream &OS) const {}
 
   // Platform defaults information
 
@@ -424,7 +424,7 @@ public:
 
   /// LookupTypeForExtension - Return the default language type to use for the
   /// given extension.
-  virtual types::ID LookupTypeForExtension(StringRef Ext) const;
+  virtual types::ID LookupTypeForExtension(llvm::StringRef Ext) const;
 
   /// IsBlocksDefault - Does this tool chain enable -fblocks by default.
   virtual bool IsBlocksDefault() const { return false; }
@@ -508,15 +508,15 @@ public:
   virtual std::string getCompilerRTPath() const;
 
   virtual std::string getCompilerRT(const llvm::opt::ArgList &Args,
-                                    StringRef Component,
+                                    llvm::StringRef Component,
                                     FileType Type = ToolChain::FT_Static) const;
 
   const char *
-  getCompilerRTArgString(const llvm::opt::ArgList &Args, StringRef Component,
+  getCompilerRTArgString(const llvm::opt::ArgList &Args, llvm::StringRef Component,
                          FileType Type = ToolChain::FT_Static) const;
 
   std::string getCompilerRTBasename(const llvm::opt::ArgList &Args,
-                                    StringRef Component,
+                                    llvm::StringRef Component,
                                     FileType Type = ToolChain::FT_Static) const;
 
   // Returns the target specific runtime path if it exists.
@@ -530,7 +530,7 @@ public:
   virtual path_list getArchSpecificLibPaths() const;
 
   // Returns <OSname> part of above.
-  virtual StringRef getOSLibName() const;
+  virtual llvm::StringRef getOSLibName() const;
 
   /// needsProfileRT - returns true if instrumentation profile is on.
   static bool needsProfileRT(const llvm::opt::ArgList &Args);
@@ -619,14 +619,14 @@ public:
   virtual std::string getThreadModel() const { return "posix"; }
 
   /// isThreadModelSupported() - Does this target support a thread model?
-  virtual bool isThreadModelSupported(const StringRef Model) const;
+  virtual bool isThreadModelSupported(const llvm::StringRef Model) const;
 
   /// isBareMetal - Is this a bare metal target.
   virtual bool isBareMetal() const { return false; }
 
   virtual std::string getMultiarchTriple(const Driver &D,
                                          const llvm::Triple &TargetTriple,
-                                         StringRef SysRoot) const {
+                                         llvm::StringRef SysRoot) const {
     return TargetTriple.str();
   }
 
@@ -697,7 +697,7 @@ public:
   virtual UnwindLibType GetUnwindLibType(const llvm::opt::ArgList &Args) const;
 
   // Detect the highest available version of libc++ in include path.
-  virtual std::string detectLibcxxVersion(StringRef IncludePath) const;
+  virtual std::string detectLibcxxVersion(llvm::StringRef IncludePath) const;
 
   /// AddClangCXXStdlibIncludeArgs - Add the clang -cc1 level arguments to set
   /// the include paths to use for the given C++ standard library type.
@@ -743,7 +743,7 @@ public:
     const llvm::opt::ArgList &Args, llvm::opt::ArgStringList &CmdArgs) const;
 
   /// getSystemGPUArchs - Use a tool to detect the user's availible GPUs.
-  virtual Expected<SmallVector<std::string>>
+  virtual llvm::Expected<llvm::SmallVector<std::string>>
   getSystemGPUArchs(const llvm::opt::ArgList &Args) const;
 
   /// addProfileRTLibs - When -fprofile-instr-profile is specified, try to pass
@@ -764,7 +764,7 @@ public:
                                    llvm::opt::ArgStringList &CC1Args) const;
 
   /// On Windows, returns the MSVC compatibility version.
-  virtual VersionTuple computeMSVCVersion(const Driver *D,
+  virtual llvm::VersionTuple computeMSVCVersion(const Driver *D,
                                           const llvm::opt::ArgList &Args) const;
 
   /// Get paths for device libraries.
@@ -799,7 +799,7 @@ public:
 
   // We want to expand the shortened versions of the triples passed in to
   // the values used for the bitcode libraries.
-  static llvm::Triple getOpenMPTriple(StringRef TripleStr) {
+  static llvm::Triple getOpenMPTriple(llvm::StringRef TripleStr) {
     llvm::Triple TT(TripleStr);
     if (TT.getVendor() == llvm::Triple::UnknownVendor ||
         TT.getOS() == llvm::Triple::UnknownOS) {

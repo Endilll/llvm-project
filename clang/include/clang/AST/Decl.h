@@ -156,13 +156,13 @@ public:
   static PragmaCommentDecl *Create(const ASTContext &C, TranslationUnitDecl *DC,
                                    SourceLocation CommentLoc,
                                    PragmaMSCommentKind CommentKind,
-                                   StringRef Arg);
+                                   llvm::StringRef Arg);
   static PragmaCommentDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID,
                                                unsigned ArgSize);
 
   PragmaMSCommentKind getCommentKind() const { return CommentKind; }
 
-  StringRef getArg() const { return getTrailingObjects<char>(); }
+  llvm::StringRef getArg() const { return getTrailingObjects<char>(); }
 
   // Implement isa/cast/dyncast/etc.
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
@@ -189,13 +189,13 @@ class PragmaDetectMismatchDecl final
 public:
   static PragmaDetectMismatchDecl *Create(const ASTContext &C,
                                           TranslationUnitDecl *DC,
-                                          SourceLocation Loc, StringRef Name,
-                                          StringRef Value);
+                                          SourceLocation Loc, llvm::StringRef Name,
+                                          llvm::StringRef Value);
   static PragmaDetectMismatchDecl *
   CreateDeserialized(ASTContext &C, GlobalDeclID ID, unsigned NameValueSize);
 
-  StringRef getName() const { return getTrailingObjects<char>(); }
-  StringRef getValue() const { return getTrailingObjects<char>() + ValueStart; }
+  llvm::StringRef getName() const { return getTrailingObjects<char>(); }
+  llvm::StringRef getValue() const { return getTrailingObjects<char>() + ValueStart; }
 
   // Implement isa/cast/dyncast/etc.
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
@@ -269,11 +269,11 @@ public:
   /// Objective-C selector, etc.).
   IdentifierInfo *getIdentifier() const { return Name.getAsIdentifierInfo(); }
 
-  /// Get the name of identifier for this declaration as a StringRef.
+  /// Get the name of identifier for this declaration as a llvm::StringRef.
   ///
   /// This requires that the declaration have a name and that it be a simple
   /// identifier.
-  StringRef getName() const {
+  llvm::StringRef getName() const {
     assert(Name.isIdentifier() && "Name is not a simple identifier");
     return getIdentifier() ? getIdentifier()->getName() : "";
   }
@@ -293,9 +293,9 @@ public:
 
   /// Pretty-print the unqualified name of this declaration. Can be overloaded
   /// by derived classes to provide a more user-friendly name when appropriate.
-  virtual void printName(raw_ostream &OS, const PrintingPolicy &Policy) const;
+  virtual void printName(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const;
   /// Calls printName() with the ASTContext printing policy from the decl.
-  void printName(raw_ostream &OS) const;
+  void printName(llvm::raw_ostream &OS) const;
 
   /// Get the actual, stored name of the declaration, which may be a special
   /// name.
@@ -325,15 +325,15 @@ public:
   ///
   /// Creating this name is expensive, so it should be called only when
   /// performance doesn't matter.
-  void printQualifiedName(raw_ostream &OS) const;
-  void printQualifiedName(raw_ostream &OS, const PrintingPolicy &Policy) const;
+  void printQualifiedName(llvm::raw_ostream &OS) const;
+  void printQualifiedName(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const;
 
   /// Print only the nested name specifier part of a fully-qualified name,
   /// including the '::' at the end. E.g.
   ///    when `printQualifiedName(D)` prints "A::B::i",
   ///    this function prints "A::B::".
-  void printNestedNameSpecifier(raw_ostream &OS) const;
-  void printNestedNameSpecifier(raw_ostream &OS,
+  void printNestedNameSpecifier(llvm::raw_ostream &OS) const;
+  void printNestedNameSpecifier(llvm::raw_ostream &OS,
                                 const PrintingPolicy &Policy) const;
 
   // FIXME: Remove string version.
@@ -345,7 +345,7 @@ public:
   /// in a diagnostic.  It does not necessarily produce the same
   /// result as printName(); for example, class template
   /// specializations are printed with their template arguments.
-  virtual void getNameForDiagnostic(raw_ostream &OS,
+  virtual void getNameForDiagnostic(llvm::raw_ostream &OS,
                                     const PrintingPolicy &Policy,
                                     bool Qualified) const;
 
@@ -486,7 +486,7 @@ public:
   static bool classofKind(Kind K) { return K >= firstNamed && K <= lastNamed; }
 };
 
-inline raw_ostream &operator<<(raw_ostream &OS, const NamedDecl &ND) {
+inline llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const NamedDecl &ND) {
   ND.printName(OS);
   return OS;
 }
@@ -498,7 +498,7 @@ inline raw_ostream &operator<<(raw_ostream &OS, const NamedDecl &ND) {
 /// location is where the __label__ is.
 class LabelDecl : public NamedDecl {
   LabelStmt *TheStmt;
-  StringRef MSAsmName;
+  llvm::StringRef MSAsmName;
   bool MSAsmNameResolved = false;
 
   /// For normal labels, this is the same as the main declaration
@@ -532,8 +532,8 @@ public:
 
   bool isMSAsmLabel() const { return !MSAsmName.empty(); }
   bool isResolvedMSAsmLabel() const { return isMSAsmLabel() && MSAsmNameResolved; }
-  void setMSAsmLabel(StringRef Name);
-  StringRef getMSAsmLabel() const { return MSAsmName; }
+  void setMSAsmLabel(llvm::StringRef Name);
+  llvm::StringRef getMSAsmLabel() const { return MSAsmName; }
   void setMSAsmLabelResolved() { MSAsmNameResolved = true; }
 
   // Implement isa/cast/dyncast/etc.
@@ -762,7 +762,7 @@ struct QualifierInfo {
 
   /// Sets info about "outer" template parameter lists.
   void setTemplateParameterListsInfo(ASTContext &Context,
-                                     ArrayRef<TemplateParameterList *> TPLists);
+                                     llvm::ArrayRef<TemplateParameterList *> TPLists);
 };
 
 /// Represents a ValueDecl that came out of a declarator.
@@ -865,7 +865,7 @@ public:
   }
 
   void setTemplateParameterListsInfo(ASTContext &Context,
-                                     ArrayRef<TemplateParameterList *> TPLists);
+                                     llvm::ArrayRef<TemplateParameterList *> TPLists);
 
   SourceLocation getTypeSpecStartLoc() const;
   SourceLocation getTypeSpecEndLoc() const;
@@ -1393,7 +1393,7 @@ public:
   APValue *evaluateValue() const;
 
 private:
-  APValue *evaluateValueImpl(SmallVectorImpl<PartialDiagnosticAt> &Notes,
+  APValue *evaluateValueImpl(llvm::SmallVectorImpl<PartialDiagnosticAt> &Notes,
                              bool IsConstantInitialization) const;
 
 public:
@@ -1408,7 +1408,7 @@ public:
   /// \pre hasConstantInitialization()
   /// \return \c true if this variable has constant destruction, \c false if
   ///         not.
-  bool evaluateDestruction(SmallVectorImpl<PartialDiagnosticAt> &Notes) const;
+  bool evaluateDestruction(llvm::SmallVectorImpl<PartialDiagnosticAt> &Notes) const;
 
   /// Determine whether this variable has constant initialization.
   ///
@@ -1427,7 +1427,7 @@ public:
   /// constant initializer. Should only be called once, after completing the
   /// definition of the variable.
   bool checkForConstantInitialization(
-      SmallVectorImpl<PartialDiagnosticAt> &Notes) const;
+      llvm::SmallVectorImpl<PartialDiagnosticAt> &Notes) const;
 
   void setInitStyle(InitializationStyle Style) {
     VarDeclBits.InitStyle = Style;
@@ -2007,12 +2007,12 @@ public:
 
   public:
     static DefaultedOrDeletedFunctionInfo *
-    Create(ASTContext &Context, ArrayRef<DeclAccessPair> Lookups,
+    Create(ASTContext &Context, llvm::ArrayRef<DeclAccessPair> Lookups,
            StringLiteral *DeletedMessage = nullptr);
 
     /// Get the unqualified lookup results that should be used in this
     /// defaulted function definition.
-    ArrayRef<DeclAccessPair> getUnqualifiedLookups() const {
+    llvm::ArrayRef<DeclAccessPair> getUnqualifiedLookups() const {
       return {getTrailingObjects<DeclAccessPair>(), NumLookups};
     }
 
@@ -2108,7 +2108,7 @@ private:
   void setInstantiationOfMemberFunction(ASTContext &C, FunctionDecl *FD,
                                         TemplateSpecializationKind TSK);
 
-  void setParams(ASTContext &C, ArrayRef<ParmVarDecl *> NewParamInfo);
+  void setParams(ASTContext &C, llvm::ArrayRef<ParmVarDecl *> NewParamInfo);
 
   // This is unfortunately needed because ASTDeclWriter::VisitFunctionDecl
   // need to access this bit but we want to avoid making ASTDeclWriter
@@ -2183,7 +2183,7 @@ public:
     return DeclarationNameInfo(getDeclName(), getLocation(), DNLoc);
   }
 
-  void getNameForDiagnostic(raw_ostream &OS, const PrintingPolicy &Policy,
+  void getNameForDiagnostic(llvm::raw_ostream &OS, const PrintingPolicy &Policy,
                             bool Qualified) const override;
 
   void setRangeEnd(SourceLocation E) { EndRangeLoc = E; }
@@ -2659,8 +2659,8 @@ public:
   /// trailing-requires-clause or an empty vector.
   ///
   /// Use this instead of getTrailingRequiresClause for concepts APIs that
-  /// accept an ArrayRef of constraint expressions.
-  void getAssociatedConstraints(SmallVectorImpl<const Expr *> &AC) const {
+  /// accept an llvm::ArrayRef of constraint expressions.
+  void getAssociatedConstraints(llvm::SmallVectorImpl<const Expr *> &AC) const {
     if (auto *TRC = getTrailingRequiresClause())
       AC.push_back(TRC);
   }
@@ -2681,17 +2681,17 @@ public:
 
   unsigned getBuiltinID(bool ConsiderWrapperFunctions = false) const;
 
-  // ArrayRef interface to parameters.
-  ArrayRef<ParmVarDecl *> parameters() const {
+  // llvm::ArrayRef interface to parameters.
+  llvm::ArrayRef<ParmVarDecl *> parameters() const {
     return {ParamInfo, getNumParams()};
   }
-  MutableArrayRef<ParmVarDecl *> parameters() {
+  llvm::MutableArrayRef<ParmVarDecl *> parameters() {
     return {ParamInfo, getNumParams()};
   }
 
   // Iterator access to formal parameters.
-  using param_iterator = MutableArrayRef<ParmVarDecl *>::iterator;
-  using param_const_iterator = ArrayRef<ParmVarDecl *>::const_iterator;
+  using param_iterator = llvm::MutableArrayRef<ParmVarDecl *>::iterator;
+  using param_const_iterator = llvm::ArrayRef<ParmVarDecl *>::const_iterator;
 
   bool param_empty() const { return parameters().empty(); }
   param_iterator param_begin() { return parameters().begin(); }
@@ -2713,7 +2713,7 @@ public:
     assert(i < getNumParams() && "Illegal param #");
     return ParamInfo[i];
   }
-  void setParams(ArrayRef<ParmVarDecl *> NewParamInfo) {
+  void setParams(llvm::ArrayRef<ParmVarDecl *> NewParamInfo) {
     setParams(getASTContext(), NewParamInfo);
   }
 
@@ -3287,7 +3287,7 @@ public:
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
   static bool classofKind(Kind K) { return K >= firstField && K <= lastField; }
 
-  void printName(raw_ostream &OS, const PrintingPolicy &Policy) const override;
+  void printName(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const override;
 };
 
 /// An instance of this object exists for each enum constant
@@ -3346,7 +3346,7 @@ class IndirectFieldDecl : public ValueDecl,
 
   IndirectFieldDecl(ASTContext &C, DeclContext *DC, SourceLocation L,
                     DeclarationName N, QualType T,
-                    MutableArrayRef<NamedDecl *> CH);
+                    llvm::MutableArrayRef<NamedDecl *> CH);
 
   void anchor() override;
 
@@ -3360,9 +3360,9 @@ public:
 
   static IndirectFieldDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  using chain_iterator = ArrayRef<NamedDecl *>::const_iterator;
+  using chain_iterator = llvm::ArrayRef<NamedDecl *>::const_iterator;
 
-  ArrayRef<NamedDecl *> chain() const {
+  llvm::ArrayRef<NamedDecl *> chain() const {
     return llvm::ArrayRef(Chaining, ChainingSize);
   }
   chain_iterator chain_begin() const { return chain().begin(); }
@@ -3774,7 +3774,7 @@ public:
   ///  the struct/union/class/enum.
   TagDecl *getDefinition() const;
 
-  StringRef getKindName() const {
+  llvm::StringRef getKindName() const {
     return TypeWithKeyword::getTagTypeKindName(getTagKind());
   }
 
@@ -3845,10 +3845,10 @@ public:
   }
 
   using TypeDecl::printName;
-  void printName(raw_ostream &OS, const PrintingPolicy &Policy) const override;
+  void printName(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const override;
 
   void setTemplateParameterListsInfo(ASTContext &Context,
-                                     ArrayRef<TemplateParameterList *> TPLists);
+                                     llvm::ArrayRef<TemplateParameterList *> TPLists);
 
   // Implement isa/cast/dyncast/etc.
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
@@ -4321,7 +4321,7 @@ public:
 
   void setIsRandomized(bool V) { RecordDeclBits.IsRandomized = V; }
 
-  void reorderDecls(const SmallVectorImpl<Decl *> &Decls);
+  void reorderDecls(const llvm::SmallVectorImpl<Decl *> &Decls);
 
   /// Determines whether this declaration represents the
   /// injected class name.
@@ -4578,17 +4578,17 @@ public:
   void setSignatureAsWritten(TypeSourceInfo *Sig) { SignatureAsWritten = Sig; }
   TypeSourceInfo *getSignatureAsWritten() const { return SignatureAsWritten; }
 
-  // ArrayRef access to formal parameters.
-  ArrayRef<ParmVarDecl *> parameters() const {
+  // llvm::ArrayRef access to formal parameters.
+  llvm::ArrayRef<ParmVarDecl *> parameters() const {
     return {ParamInfo, getNumParams()};
   }
-  MutableArrayRef<ParmVarDecl *> parameters() {
+  llvm::MutableArrayRef<ParmVarDecl *> parameters() {
     return {ParamInfo, getNumParams()};
   }
 
   // Iterator access to formal parameters.
-  using param_iterator = MutableArrayRef<ParmVarDecl *>::iterator;
-  using param_const_iterator = ArrayRef<ParmVarDecl *>::const_iterator;
+  using param_iterator = llvm::MutableArrayRef<ParmVarDecl *>::iterator;
+  using param_const_iterator = llvm::ArrayRef<ParmVarDecl *>::const_iterator;
 
   bool param_empty() const { return parameters().empty(); }
   param_iterator param_begin() { return parameters().begin(); }
@@ -4608,7 +4608,7 @@ public:
     return ParamInfo[i];
   }
 
-  void setParams(ArrayRef<ParmVarDecl *> NewParamInfo);
+  void setParams(llvm::ArrayRef<ParmVarDecl *> NewParamInfo);
 
   /// True if this block (or its nested blocks) captures
   /// anything of local storage from its enclosing scopes.
@@ -4618,9 +4618,9 @@ public:
   /// Does not include an entry for 'this'.
   unsigned getNumCaptures() const { return NumCaptures; }
 
-  using capture_const_iterator = ArrayRef<Capture>::const_iterator;
+  using capture_const_iterator = llvm::ArrayRef<Capture>::const_iterator;
 
-  ArrayRef<Capture> captures() const { return {Captures, NumCaptures}; }
+  llvm::ArrayRef<Capture> captures() const { return {Captures, NumCaptures}; }
 
   capture_const_iterator capture_begin() const { return captures().begin(); }
   capture_const_iterator capture_end() const { return captures().end(); }
@@ -4656,7 +4656,7 @@ public:
 
   bool capturesVariable(const VarDecl *var) const;
 
-  void setCaptures(ASTContext &Context, ArrayRef<Capture> Captures,
+  void setCaptures(ASTContext &Context, llvm::ArrayRef<Capture> Captures,
                    bool CapturesCXXThis);
 
   unsigned getBlockManglingNumber() const { return ManglingNumber; }
@@ -4738,11 +4738,11 @@ public:
     getParams()[i] = P;
   }
 
-  // ArrayRef interface to parameters.
-  ArrayRef<ImplicitParamDecl *> parameters() const {
+  // llvm::ArrayRef interface to parameters.
+  llvm::ArrayRef<ImplicitParamDecl *> parameters() const {
     return {getParams(), getNumParams()};
   }
-  MutableArrayRef<ImplicitParamDecl *> parameters() {
+  llvm::MutableArrayRef<ImplicitParamDecl *> parameters() {
     return {getParams(), getNumParams()};
   }
 
@@ -4818,7 +4818,7 @@ class ImportDecl final : public Decl,
   llvm::PointerIntPair<ImportDecl *, 1, bool> NextLocalImportAndComplete;
 
   ImportDecl(DeclContext *DC, SourceLocation StartLoc, Module *Imported,
-             ArrayRef<SourceLocation> IdentifierLocs);
+             llvm::ArrayRef<SourceLocation> IdentifierLocs);
 
   ImportDecl(DeclContext *DC, SourceLocation StartLoc, Module *Imported,
              SourceLocation EndLoc);
@@ -4843,7 +4843,7 @@ public:
   /// Create a new module import declaration.
   static ImportDecl *Create(ASTContext &C, DeclContext *DC,
                             SourceLocation StartLoc, Module *Imported,
-                            ArrayRef<SourceLocation> IdentifierLocs);
+                            llvm::ArrayRef<SourceLocation> IdentifierLocs);
 
   /// Create a new module import declaration for an implicitly-generated
   /// import.
@@ -4863,7 +4863,7 @@ public:
   ///
   /// This will return an empty array if the locations of the individual
   /// identifiers aren't available.
-  ArrayRef<SourceLocation> getIdentifierLocs() const;
+  llvm::ArrayRef<SourceLocation> getIdentifierLocs() const;
 
   SourceRange getSourceRange() const override LLVM_READONLY;
 
@@ -5046,7 +5046,7 @@ inline bool IsEnumDeclScoped(EnumDecl *ED) {
 /// OpenMP variants are mangled early based on their OpenMP context selector.
 /// The new name looks likes this:
 ///  <name> + OpenMPVariantManglingSeparatorStr + <mangled OpenMP context>
-static constexpr StringRef getOpenMPVariantManglingSeparatorStr() {
+static constexpr llvm::StringRef getOpenMPVariantManglingSeparatorStr() {
   return "$ompvariant";
 }
 

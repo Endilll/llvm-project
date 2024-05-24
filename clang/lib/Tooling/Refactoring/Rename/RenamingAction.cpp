@@ -42,7 +42,7 @@ namespace tooling {
 
 namespace {
 
-Expected<SymbolOccurrences>
+llvm::Expected<SymbolOccurrences>
 findSymbolOccurrences(const NamedDecl *ND, RefactoringRuleContext &Context) {
   std::vector<std::string> USRs =
       getUSRsForDeclaration(ND, Context.getASTContext());
@@ -62,7 +62,7 @@ const RefactoringDescriptor &RenameOccurrences::describe() {
   return Descriptor;
 }
 
-Expected<RenameOccurrences>
+llvm::Expected<RenameOccurrences>
 RenameOccurrences::initiate(RefactoringRuleContext &Context,
                             SourceRange SelectionRange, std::string NewName) {
   const NamedDecl *ND =
@@ -76,9 +76,9 @@ RenameOccurrences::initiate(RefactoringRuleContext &Context,
 
 const NamedDecl *RenameOccurrences::getRenameDecl() const { return ND; }
 
-Expected<AtomicChanges>
+llvm::Expected<AtomicChanges>
 RenameOccurrences::createSourceReplacements(RefactoringRuleContext &Context) {
-  Expected<SymbolOccurrences> Occurrences = findSymbolOccurrences(ND, Context);
+  llvm::Expected<SymbolOccurrences> Occurrences = findSymbolOccurrences(ND, Context);
   if (!Occurrences)
     return Occurrences.takeError();
   // FIXME: Verify that the new name is valid.
@@ -87,7 +87,7 @@ RenameOccurrences::createSourceReplacements(RefactoringRuleContext &Context) {
       *Occurrences, Context.getASTContext().getSourceManager(), Name);
 }
 
-Expected<QualifiedRenameRule>
+llvm::Expected<QualifiedRenameRule>
 QualifiedRenameRule::initiate(RefactoringRuleContext &Context,
                               std::string OldQualifiedName,
                               std::string NewQualifiedName) {
@@ -133,7 +133,7 @@ For example, rename "A::Foo" to "B::Bar":
   return Descriptor;
 }
 
-Expected<AtomicChanges>
+llvm::Expected<AtomicChanges>
 QualifiedRenameRule::createSourceReplacements(RefactoringRuleContext &Context) {
   auto USRs = getUSRsForDeclaration(ND, Context.getASTContext());
   assert(!USRs.empty());
@@ -141,13 +141,13 @@ QualifiedRenameRule::createSourceReplacements(RefactoringRuleContext &Context) {
       USRs, NewQualifiedName, Context.getASTContext().getTranslationUnitDecl());
 }
 
-Expected<std::vector<AtomicChange>>
+llvm::Expected<std::vector<AtomicChange>>
 createRenameReplacements(const SymbolOccurrences &Occurrences,
                          const SourceManager &SM, const SymbolName &NewName) {
   // FIXME: A true local rename can use just one AtomicChange.
   std::vector<AtomicChange> Changes;
   for (const auto &Occurrence : Occurrences) {
-    ArrayRef<SourceRange> Ranges = Occurrence.getNameRanges();
+    llvm::ArrayRef<SourceRange> Ranges = Occurrence.getNameRanges();
     assert(NewName.getNamePieces().size() == Ranges.size() &&
            "Mismatching number of ranges and name pieces");
     AtomicChange Change(SM, Ranges[0].getBegin());
@@ -166,7 +166,7 @@ createRenameReplacements(const SymbolOccurrences &Occurrences,
 /// Takes each atomic change and inserts its replacements into the set of
 /// replacements that belong to the appropriate file.
 static void convertChangesToFileReplacements(
-    ArrayRef<AtomicChange> AtomicChanges,
+    llvm::ArrayRef<AtomicChange> AtomicChanges,
     std::map<std::string, tooling::Replacements> *FileToReplaces) {
   for (const auto &AtomicChange : AtomicChanges) {
     for (const auto &Replace : AtomicChange.getReplacements()) {
@@ -220,7 +220,7 @@ public:
     // FIXME: Support multi-piece names.
     // FIXME: better error handling (propagate error out).
     SymbolName NewNameRef(NewName);
-    Expected<std::vector<AtomicChange>> Change =
+    llvm::Expected<std::vector<AtomicChange>> Change =
         createRenameReplacements(Occurrences, SourceMgr, NewNameRef);
     if (!Change) {
       llvm::errs() << "Failed to create renaming replacements for '" << PrevName

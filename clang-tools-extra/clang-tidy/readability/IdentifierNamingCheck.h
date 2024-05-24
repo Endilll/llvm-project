@@ -32,7 +32,7 @@ enum StyleKind : int;
 /// configured.
 class IdentifierNamingCheck final : public RenamerClangTidyCheck {
 public:
-  IdentifierNamingCheck(StringRef Name, ClangTidyContext *Context);
+  IdentifierNamingCheck(llvm::StringRef Name, ClangTidyContext *Context);
   ~IdentifierNamingCheck();
 
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
@@ -70,8 +70,8 @@ public:
   struct NamingStyle {
     NamingStyle() = default;
 
-    NamingStyle(std::optional<CaseType> Case, StringRef Prefix,
-                StringRef Suffix, StringRef IgnoredRegexpStr,
+    NamingStyle(std::optional<CaseType> Case, llvm::StringRef Prefix,
+                llvm::StringRef Suffix, llvm::StringRef IgnoredRegexpStr,
                 HungarianPrefixType HPType);
     NamingStyle(const NamingStyle &O) = delete;
     NamingStyle &operator=(NamingStyle &&O) = default;
@@ -91,7 +91,7 @@ public:
   struct HungarianNotation {
   public:
     bool checkOptionValid(int StyleKindIndex) const;
-    bool isOptionEnabled(StringRef OptionKey,
+    bool isOptionEnabled(llvm::StringRef OptionKey,
                          const llvm::StringMap<std::string> &StrMap) const;
 
     size_t getAsteriskCount(const std::string &TypeName) const;
@@ -105,7 +105,7 @@ public:
         IdentifierNamingCheck::HungarianNotationOption &HNOption) const;
 
     bool removeDuplicatedPrefix(
-        SmallVector<StringRef, 8> &Words,
+        llvm::SmallVector<llvm::StringRef, 8> &Words,
         const IdentifierNamingCheck::HungarianNotationOption &HNOption) const;
 
     std::string getPrefix(
@@ -113,7 +113,7 @@ public:
         const IdentifierNamingCheck::HungarianNotationOption &HNOption) const;
 
     std::string getDataTypePrefix(
-        StringRef TypeName, const NamedDecl *ND,
+        llvm::StringRef TypeName, const NamedDecl *ND,
         const IdentifierNamingCheck::HungarianNotationOption &HNOption) const;
 
     std::string getClassPrefix(
@@ -126,14 +126,14 @@ public:
 
   struct FileStyle {
     FileStyle() : IsActive(false), IgnoreMainLikeFunctions(false) {}
-    FileStyle(SmallVectorImpl<std::optional<NamingStyle>> &&Styles,
+    FileStyle(llvm::SmallVectorImpl<std::optional<NamingStyle>> &&Styles,
               HungarianNotationOption HNOption, bool IgnoreMainLike,
               bool CheckAnonFieldInParent)
         : Styles(std::move(Styles)), HNOption(std::move(HNOption)),
           IsActive(true), IgnoreMainLikeFunctions(IgnoreMainLike),
           CheckAnonFieldInParentScope(CheckAnonFieldInParent) {}
 
-    ArrayRef<std::optional<NamingStyle>> getStyles() const {
+    llvm::ArrayRef<std::optional<NamingStyle>> getStyles() const {
       assert(IsActive);
       return Styles;
     }
@@ -151,7 +151,7 @@ public:
     }
 
   private:
-    SmallVector<std::optional<NamingStyle>, 0> Styles;
+    llvm::SmallVector<std::optional<NamingStyle>, 0> Styles;
     HungarianNotationOption HNOption;
     bool IsActive;
     bool IgnoreMainLikeFunctions;
@@ -162,32 +162,32 @@ public:
   getFileStyleFromOptions(const ClangTidyCheck::OptionsView &Options) const;
 
   bool
-  matchesStyle(StringRef Type, StringRef Name,
+  matchesStyle(llvm::StringRef Type, llvm::StringRef Name,
                const IdentifierNamingCheck::NamingStyle &Style,
                const IdentifierNamingCheck::HungarianNotationOption &HNOption,
                const NamedDecl *Decl) const;
 
   std::string
-  fixupWithCase(StringRef Type, StringRef Name, const Decl *D,
+  fixupWithCase(llvm::StringRef Type, llvm::StringRef Name, const Decl *D,
                 const IdentifierNamingCheck::NamingStyle &Style,
                 const IdentifierNamingCheck::HungarianNotationOption &HNOption,
                 IdentifierNamingCheck::CaseType Case) const;
 
   std::string
-  fixupWithStyle(StringRef Type, StringRef Name,
+  fixupWithStyle(llvm::StringRef Type, llvm::StringRef Name,
                  const IdentifierNamingCheck::NamingStyle &Style,
                  const IdentifierNamingCheck::HungarianNotationOption &HNOption,
                  const Decl *D) const;
 
   StyleKind findStyleKind(
       const NamedDecl *D,
-      ArrayRef<std::optional<IdentifierNamingCheck::NamingStyle>> NamingStyles,
+      llvm::ArrayRef<std::optional<IdentifierNamingCheck::NamingStyle>> NamingStyles,
       bool IgnoreMainLikeFunctions, bool CheckAnonFieldInParentScope) const;
 
   std::optional<RenamerClangTidyCheck::FailureInfo> getFailureInfo(
-      StringRef Type, StringRef Name, const NamedDecl *ND,
+      llvm::StringRef Type, llvm::StringRef Name, const NamedDecl *ND,
       SourceLocation Location,
-      ArrayRef<std::optional<IdentifierNamingCheck::NamingStyle>> NamingStyles,
+      llvm::ArrayRef<std::optional<IdentifierNamingCheck::NamingStyle>> NamingStyles,
       const IdentifierNamingCheck::HungarianNotationOption &HNOption,
       StyleKind SK, const SourceManager &SM, bool IgnoreFailedSplit) const;
 
@@ -204,20 +204,20 @@ private:
   DiagInfo getDiagInfo(const NamingCheckId &ID,
                        const NamingCheckFailure &Failure) const override;
 
-  const FileStyle &getStyleForFile(StringRef FileName) const;
+  const FileStyle &getStyleForFile(llvm::StringRef FileName) const;
 
   /// Find the style kind of a field in an anonymous record.
   StyleKind findStyleKindForAnonField(
       const FieldDecl *AnonField,
-      ArrayRef<std::optional<NamingStyle>> NamingStyles) const;
+      llvm::ArrayRef<std::optional<NamingStyle>> NamingStyles) const;
 
   StyleKind findStyleKindForField(
       const FieldDecl *Field, QualType Type,
-      ArrayRef<std::optional<NamingStyle>> NamingStyles) const;
+      llvm::ArrayRef<std::optional<NamingStyle>> NamingStyles) const;
 
   StyleKind
   findStyleKindForVar(const VarDecl *Var, QualType Type,
-                      ArrayRef<std::optional<NamingStyle>> NamingStyles) const;
+                      llvm::ArrayRef<std::optional<NamingStyle>> NamingStyles) const;
 
   /// Stores the style options as a vector, indexed by the specified \ref
   /// StyleKind, for a given directory.
@@ -233,7 +233,7 @@ private:
 template <>
 struct OptionEnumMapping<readability::IdentifierNamingCheck::CaseType> {
   static llvm::ArrayRef<
-      std::pair<readability::IdentifierNamingCheck::CaseType, StringRef>>
+      std::pair<readability::IdentifierNamingCheck::CaseType, llvm::StringRef>>
   getEnumMapping();
 };
 } // namespace clang::tidy

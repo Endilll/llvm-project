@@ -40,7 +40,7 @@ public:
 
   /// \returns true to continue indexing, or false to abort.
   virtual bool handleDeclOccurrence(const Decl *D, SymbolRoleSet Roles,
-                                    ArrayRef<SymbolRelation> Relations,
+                                    llvm::ArrayRef<SymbolRelation> Relations,
                                     SourceLocation Loc, ASTNodeInfo ASTNode) {
     return true;
   }

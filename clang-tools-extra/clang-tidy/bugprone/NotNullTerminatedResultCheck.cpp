@@ -136,7 +136,7 @@ static int getGivenLength(const MatchFinder::MatchResult &Result) {
 }
 
 // Returns a string representation of \p E.
-static StringRef exprToStr(const Expr *E,
+static llvm::StringRef exprToStr(const Expr *E,
                            const MatchFinder::MatchResult &Result) {
   if (!E)
     return "";
@@ -172,9 +172,9 @@ static bool isKnownDest(const MatchFinder::MatchResult &Result) {
 // True if the capacity of the destination array is based on the given length,
 // therefore we assume that it cannot overflow (e.g. 'malloc(given_length + 1)'
 static bool isDestBasedOnGivenLength(const MatchFinder::MatchResult &Result) {
-  StringRef DestCapacityExprStr =
+  llvm::StringRef DestCapacityExprStr =
       exprToStr(getDestCapacityExpr(Result), Result).trim();
-  StringRef LengthExprStr =
+  llvm::StringRef LengthExprStr =
       exprToStr(Result.Nodes.getNodeAs<Expr>(LengthExprName), Result).trim();
 
   return !DestCapacityExprStr.empty() && !LengthExprStr.empty() &&
@@ -199,7 +199,7 @@ static bool isStringDataAndLength(const MatchFinder::MatchResult &Result) {
   const auto *LengthExpr =
       Result.Nodes.getNodeAs<CXXMemberCallExpr>(WrongLengthExprName);
 
-  StringRef DestStr = "", SrcStr = "", LengthStr = "";
+  llvm::StringRef DestStr = "", SrcStr = "", LengthStr = "";
   if (DestExpr)
     if (const CXXMethodDecl *DestMD = DestExpr->getMethodDecl())
       DestStr = DestMD->getName();
@@ -267,7 +267,7 @@ static bool isDestCapacityOverflows(const MatchFinder::MatchResult &Result) {
 
   // Assume that the destination array's capacity cannot overflow if the
   // expression of the memory allocation contains '+ 1'.
-  StringRef DestCapacityExprStr = exprToStr(DestCapacityExpr, Result);
+  llvm::StringRef DestCapacityExprStr = exprToStr(DestCapacityExpr, Result);
   if (DestCapacityExprStr.contains("+1") || DestCapacityExprStr.contains("+ 1"))
     return false;
 
@@ -295,7 +295,7 @@ static void lengthExprHandle(const Expr *LengthExpr,
 
   // See whether we work with a macro.
   bool IsMacroDefinition = false;
-  StringRef LengthExprStr = exprToStr(LengthExpr, Result);
+  llvm::StringRef LengthExprStr = exprToStr(LengthExpr, Result);
   Preprocessor::macro_iterator It = PP->macro_begin();
   while (It != PP->macro_end() && !IsMacroDefinition) {
     if (It->first->getName() == LengthExprStr)
@@ -314,7 +314,7 @@ static void lengthExprHandle(const Expr *LengthExpr,
 
       const auto NewLengthFix = FixItHint::CreateReplacement(
           LengthIL->getSourceRange(),
-          (Twine(NewLength) + (isInjectUL(Result) ? "UL" : "")).str());
+          (llvm::Twine(NewLength) + (isInjectUL(Result) ? "UL" : "")).str());
       Diag << NewLengthFix;
       return;
     }
@@ -351,7 +351,7 @@ static void lengthExprHandle(const Expr *LengthExpr,
   if (NeedInnerParen)
     Diag << FixItHint::CreateInsertion(LengthExpr->getBeginLoc(), "(");
 
-  SmallString<8> Injection;
+  llvm::SmallString<8> Injection;
   if (NeedInnerParen)
     Injection += ')';
   Injection += LengthHandle == LengthHandleKind::Increase ? " + 1" : " - 1";
@@ -384,7 +384,7 @@ static bool isDestExprFix(const MatchFinder::MatchResult &Result,
     return false;
 
   std::string TempTyStr = Dest->getType().getAsString();
-  StringRef TyStr = TempTyStr;
+  llvm::StringRef TyStr = TempTyStr;
   if (TyStr.starts_with("char") || TyStr.starts_with("wchar_t"))
     return false;
 
@@ -419,7 +419,7 @@ static void removeArg(int ArgPos, const MatchFinder::MatchResult &Result,
   Diag << RemoveArgFix;
 }
 
-static void renameFunc(StringRef NewFuncName,
+static void renameFunc(llvm::StringRef NewFuncName,
                        const MatchFinder::MatchResult &Result,
                        DiagnosticBuilder &Diag) {
   const auto *FunctionExpr = Result.Nodes.getNodeAs<CallExpr>(FunctionExprName);
@@ -434,27 +434,27 @@ static void renameFunc(StringRef NewFuncName,
   Diag << FuncNameFix;
 }
 
-static void renameMemcpy(StringRef Name, bool IsCopy, bool IsSafe,
+static void renameMemcpy(llvm::StringRef Name, bool IsCopy, bool IsSafe,
                          const MatchFinder::MatchResult &Result,
                          DiagnosticBuilder &Diag) {
-  SmallString<10> NewFuncName;
+  llvm::SmallString<10> NewFuncName;
   NewFuncName = (Name[0] != 'w') ? "str" : "wcs";
   NewFuncName += IsCopy ? "cpy" : "ncpy";
   NewFuncName += IsSafe ? "_s" : "";
   renameFunc(NewFuncName, Result, Diag);
 }
 
-static void insertDestCapacityArg(bool IsOverflows, StringRef Name,
+static void insertDestCapacityArg(bool IsOverflows, llvm::StringRef Name,
                                   const MatchFinder::MatchResult &Result,
                                   DiagnosticBuilder &Diag) {
   const auto *FunctionExpr = Result.Nodes.getNodeAs<CallExpr>(FunctionExprName);
-  SmallString<64> NewSecondArg;
+  llvm::SmallString<64> NewSecondArg;
 
   if (int DestLength = getDestCapacity(Result)) {
-    NewSecondArg = Twine(IsOverflows ? DestLength + 1 : DestLength).str();
+    NewSecondArg = llvm::Twine(IsOverflows ? DestLength + 1 : DestLength).str();
   } else {
     NewSecondArg =
-        (Twine(exprToStr(getDestCapacityExpr(Result), Result)) +
+        (llvm::Twine(exprToStr(getDestCapacityExpr(Result), Result)) +
          (IsOverflows ? (!isInjectUL(Result) ? " + 1" : " + 1UL") : ""))
             .str();
   }
@@ -465,7 +465,7 @@ static void insertDestCapacityArg(bool IsOverflows, StringRef Name,
   Diag << InsertNewArgFix;
 }
 
-static void insertNullTerminatorExpr(StringRef Name,
+static void insertNullTerminatorExpr(llvm::StringRef Name,
                                      const MatchFinder::MatchResult &Result,
                                      DiagnosticBuilder &Diag) {
   const auto *FunctionExpr = Result.Nodes.getNodeAs<CallExpr>(FunctionExprName);
@@ -474,13 +474,13 @@ static void insertNullTerminatorExpr(StringRef Name,
   SourceRange SpaceRange(
       FunctionExpr->getBeginLoc().getLocWithOffset(-FuncLocStartColumn + 1),
       FunctionExpr->getBeginLoc());
-  StringRef SpaceBeforeStmtStr = Lexer::getSourceText(
+  llvm::StringRef SpaceBeforeStmtStr = Lexer::getSourceText(
       CharSourceRange::getCharRange(SpaceRange), *Result.SourceManager,
       Result.Context->getLangOpts(), nullptr);
 
-  SmallString<128> NewAddNullTermExprStr;
+  llvm::SmallString<128> NewAddNullTermExprStr;
   NewAddNullTermExprStr =
-      (Twine('\n') + SpaceBeforeStmtStr +
+      (llvm::Twine('\n') + SpaceBeforeStmtStr +
        exprToStr(Result.Nodes.getNodeAs<Expr>(DestExprName), Result) + "[" +
        exprToStr(Result.Nodes.getNodeAs<Expr>(LengthExprName), Result) +
        "] = " + ((Name[0] != 'w') ? R"('\0';)" : R"(L'\0';)"))
@@ -497,7 +497,7 @@ static void insertNullTerminatorExpr(StringRef Name,
 //===----------------------------------------------------------------------===//
 
 NotNullTerminatedResultCheck::NotNullTerminatedResultCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       WantToUseSafeFunctions(Options.get("WantToUseSafeFunctions", true)) {}
 
@@ -673,13 +673,13 @@ void NotNullTerminatedResultCheck::registerMatchers(MatchFinder *Finder) {
   //===--------------------------------------------------------------------===//
 
   struct CallContext {
-    CallContext(StringRef Name, std::optional<unsigned> DestinationPos,
+    CallContext(llvm::StringRef Name, std::optional<unsigned> DestinationPos,
                 std::optional<unsigned> SourcePos, unsigned LengthPos,
                 bool WithIncrease)
         : Name(Name), DestinationPos(DestinationPos), SourcePos(SourcePos),
           LengthPos(LengthPos), WithIncrease(WithIncrease){};
 
-    StringRef Name;
+    llvm::StringRef Name;
     std::optional<unsigned> DestinationPos;
     std::optional<unsigned> SourcePos;
     unsigned LengthPos;
@@ -804,7 +804,7 @@ void NotNullTerminatedResultCheck::check(
         if (MI) {
           const auto &T = MI->tokens().back();
           if (T.isLiteral() && T.getLiteralData()) {
-            StringRef ValueStr = StringRef(T.getLiteralData(), T.getLength());
+            llvm::StringRef ValueStr = llvm::StringRef(T.getLiteralData(), T.getLength());
             llvm::APInt IntValue;
             ValueStr.getAsInteger(10, IntValue);
             AreSafeFunctionsWanted = IntValue.getZExtValue();
@@ -819,7 +819,7 @@ void NotNullTerminatedResultCheck::check(
       UseSafeFunctions = *AreSafeFunctionsWanted;
   }
 
-  StringRef Name = FunctionExpr->getDirectCallee()->getName();
+  llvm::StringRef Name = FunctionExpr->getDirectCallee()->getName();
   if (Name.starts_with("mem") || Name.starts_with("wmem"))
     memoryHandlerFunctionFix(Name, Result);
   else if (Name == "strerror_s")
@@ -831,7 +831,7 @@ void NotNullTerminatedResultCheck::check(
 }
 
 void NotNullTerminatedResultCheck::memoryHandlerFunctionFix(
-    StringRef Name, const MatchFinder::MatchResult &Result) {
+    llvm::StringRef Name, const MatchFinder::MatchResult &Result) {
   if (isCorrectGivenLength(Result))
     return;
 
@@ -862,7 +862,7 @@ void NotNullTerminatedResultCheck::memoryHandlerFunctionFix(
 }
 
 void NotNullTerminatedResultCheck::memcpyFix(
-    StringRef Name, const MatchFinder::MatchResult &Result,
+    llvm::StringRef Name, const MatchFinder::MatchResult &Result,
     DiagnosticBuilder &Diag) {
   bool IsOverflows = isDestCapacityFix(Result, Diag);
   bool IsDestFixed = isDestExprFix(Result, Diag);
@@ -890,7 +890,7 @@ void NotNullTerminatedResultCheck::memcpyFix(
 }
 
 void NotNullTerminatedResultCheck::memcpy_sFix(
-    StringRef Name, const MatchFinder::MatchResult &Result,
+    llvm::StringRef Name, const MatchFinder::MatchResult &Result,
     DiagnosticBuilder &Diag) {
   bool IsOverflows = isDestCapacityFix(Result, Diag);
   bool IsDestFixed = isDestExprFix(Result, Diag);
@@ -916,7 +916,7 @@ void NotNullTerminatedResultCheck::memcpy_sFix(
 }
 
 void NotNullTerminatedResultCheck::memchrFix(
-    StringRef Name, const MatchFinder::MatchResult &Result) {
+    llvm::StringRef Name, const MatchFinder::MatchResult &Result) {
   const auto *FunctionExpr = Result.Nodes.getNodeAs<CallExpr>(FunctionExprName);
   if (const auto *GivenCL = dyn_cast<CharacterLiteral>(FunctionExpr->getArg(1)))
     if (GivenCL->getValue() != 0)
@@ -932,13 +932,13 @@ void NotNullTerminatedResultCheck::memchrFix(
     Diag << CastRemoveFix;
   }
 
-  StringRef NewFuncName = (Name[0] != 'w') ? "strchr" : "wcschr";
+  llvm::StringRef NewFuncName = (Name[0] != 'w') ? "strchr" : "wcschr";
   renameFunc(NewFuncName, Result, Diag);
   removeArg(2, Result, Diag);
 }
 
 void NotNullTerminatedResultCheck::memmoveFix(
-    StringRef Name, const MatchFinder::MatchResult &Result,
+    llvm::StringRef Name, const MatchFinder::MatchResult &Result,
     DiagnosticBuilder &Diag) const {
   bool IsOverflows = isDestCapacityFix(Result, Diag);
 
@@ -962,7 +962,7 @@ void NotNullTerminatedResultCheck::strerror_sFix(
 }
 
 void NotNullTerminatedResultCheck::ncmpFix(
-    StringRef Name, const MatchFinder::MatchResult &Result) {
+    llvm::StringRef Name, const MatchFinder::MatchResult &Result) {
   const auto *FunctionExpr = Result.Nodes.getNodeAs<CallExpr>(FunctionExprName);
   const Expr *FirstArgExpr = FunctionExpr->getArg(0)->IgnoreImpCasts();
   const Expr *SecondArgExpr = FunctionExpr->getArg(1)->IgnoreImpCasts();
@@ -970,9 +970,9 @@ void NotNullTerminatedResultCheck::ncmpFix(
 
   if (const CallExpr *StrlenExpr = getStrlenExpr(Result)) {
     const Expr *LengthExprArg = StrlenExpr->getArg(0);
-    StringRef FirstExprStr = exprToStr(FirstArgExpr, Result).trim();
-    StringRef SecondExprStr = exprToStr(SecondArgExpr, Result).trim();
-    StringRef LengthArgStr = exprToStr(LengthExprArg, Result).trim();
+    llvm::StringRef FirstExprStr = exprToStr(FirstArgExpr, Result).trim();
+    llvm::StringRef SecondExprStr = exprToStr(SecondArgExpr, Result).trim();
+    llvm::StringRef LengthArgStr = exprToStr(LengthExprArg, Result).trim();
     IsLengthTooLong =
         LengthArgStr == FirstExprStr || LengthArgStr == SecondExprStr;
   } else {
@@ -994,7 +994,7 @@ void NotNullTerminatedResultCheck::ncmpFix(
 }
 
 void NotNullTerminatedResultCheck::xfrmFix(
-    StringRef Name, const MatchFinder::MatchResult &Result) {
+    llvm::StringRef Name, const MatchFinder::MatchResult &Result) {
   if (!isDestCapacityOverflows(Result))
     return;
 

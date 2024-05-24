@@ -32,7 +32,7 @@ using namespace tooling;
 namespace {
 
 class PrintMatch : public MatchFinder::MatchCallback {
-  SmallString<1024> Printed;
+  llvm::SmallString<1024> Printed;
   unsigned NumFoundDecls;
   std::function<void(llvm::raw_ostream &OS, const NamedDecl *)> Printer;
 
@@ -53,7 +53,7 @@ public:
     Printer(Out, ND);
   }
 
-  StringRef getPrinted() const {
+  llvm::StringRef getPrinted() const {
     return Printed;
   }
 
@@ -63,9 +63,9 @@ public:
 };
 
 ::testing::AssertionResult PrintedDeclMatches(
-    StringRef Code, const std::vector<std::string> &Args,
-    const DeclarationMatcher &NodeMatch, StringRef ExpectedPrinted,
-    StringRef FileName,
+    llvm::StringRef Code, const std::vector<std::string> &Args,
+    const DeclarationMatcher &NodeMatch, llvm::StringRef ExpectedPrinted,
+    llvm::StringRef FileName,
     std::function<void(llvm::raw_ostream &, const NamedDecl *)> Print) {
   return PrintedNodeMatches<NamedDecl>(
       Code, Args, NodeMatch, ExpectedPrinted, FileName,
@@ -75,10 +75,10 @@ public:
 }
 
 ::testing::AssertionResult
-PrintedNamedDeclMatches(StringRef Code, const std::vector<std::string> &Args,
+PrintedNamedDeclMatches(llvm::StringRef Code, const std::vector<std::string> &Args,
                         bool SuppressUnwrittenScope,
                         const DeclarationMatcher &NodeMatch,
-                        StringRef ExpectedPrinted, StringRef FileName) {
+                        llvm::StringRef ExpectedPrinted, llvm::StringRef FileName) {
   return PrintedDeclMatches(Code, Args, NodeMatch, ExpectedPrinted, FileName,
                             [=](llvm::raw_ostream &Out, const NamedDecl *ND) {
                               auto Policy =
@@ -90,8 +90,8 @@ PrintedNamedDeclMatches(StringRef Code, const std::vector<std::string> &Args,
 }
 
 ::testing::AssertionResult
-PrintedNamedDeclCXX98Matches(StringRef Code, StringRef DeclName,
-                             StringRef ExpectedPrinted) {
+PrintedNamedDeclCXX98Matches(llvm::StringRef Code, llvm::StringRef DeclName,
+                             llvm::StringRef ExpectedPrinted) {
   std::vector<std::string> Args(1, "-std=c++98");
   return PrintedNamedDeclMatches(Code, Args,
                                  /*SuppressUnwrittenScope*/ false,
@@ -100,8 +100,8 @@ PrintedNamedDeclCXX98Matches(StringRef Code, StringRef DeclName,
 }
 
 ::testing::AssertionResult
-PrintedWrittenNamedDeclCXX11Matches(StringRef Code, StringRef DeclName,
-                                    StringRef ExpectedPrinted) {
+PrintedWrittenNamedDeclCXX11Matches(llvm::StringRef Code, llvm::StringRef DeclName,
+                                    llvm::StringRef ExpectedPrinted) {
   std::vector<std::string> Args(1, "-std=c++11");
   return PrintedNamedDeclMatches(Code, Args,
                                  /*SuppressUnwrittenScope*/ true,
@@ -110,8 +110,8 @@ PrintedWrittenNamedDeclCXX11Matches(StringRef Code, StringRef DeclName,
 }
 
 ::testing::AssertionResult
-PrintedWrittenPropertyDeclObjCMatches(StringRef Code, StringRef DeclName,
-                                   StringRef ExpectedPrinted) {
+PrintedWrittenPropertyDeclObjCMatches(llvm::StringRef Code, llvm::StringRef DeclName,
+                                   llvm::StringRef ExpectedPrinted) {
   std::vector<std::string> Args{"-std=c++11", "-xobjective-c++"};
   return PrintedNamedDeclMatches(Code, Args,
                                  /*SuppressUnwrittenScope*/ true,
@@ -120,8 +120,8 @@ PrintedWrittenPropertyDeclObjCMatches(StringRef Code, StringRef DeclName,
 }
 
 ::testing::AssertionResult
-PrintedNestedNameSpecifierMatches(StringRef Code, StringRef DeclName,
-                                  StringRef ExpectedPrinted) {
+PrintedNestedNameSpecifierMatches(llvm::StringRef Code, llvm::StringRef DeclName,
+                                  llvm::StringRef ExpectedPrinted) {
   std::vector<std::string> Args{"-std=c++11"};
   return PrintedDeclMatches(Code, Args, namedDecl(hasName(DeclName)).bind("id"),
                             ExpectedPrinted, "input.cc",

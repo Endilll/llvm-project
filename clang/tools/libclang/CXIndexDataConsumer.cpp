@@ -161,7 +161,7 @@ CXSymbolRole getSymbolRole(SymbolRoleSet Role) {
 }
 
 bool CXIndexDataConsumer::handleDeclOccurrence(
-    const Decl *D, SymbolRoleSet Roles, ArrayRef<SymbolRelation> Relations,
+    const Decl *D, SymbolRoleSet Roles, llvm::ArrayRef<SymbolRelation> Relations,
     SourceLocation Loc, ASTNodeInfo ASTNode) {
   Loc = getASTContext().getSourceManager().getFileLoc(Loc);
 
@@ -334,7 +334,7 @@ AttrListInfo::AttrListInfo(const Decl *D, CXIndexDataConsumer &IdxCtx)
     CXAttrs.push_back(&Attrs[i]);
 }
 
-IntrusiveRefCntPtr<AttrListInfo>
+llvm::IntrusiveRefCntPtr<AttrListInfo>
 AttrListInfo::create(const Decl *D, CXIndexDataConsumer &IdxCtx) {
   ScratchAlloc SA(IdxCtx);
   AttrListInfo *attrs = SA.allocate<AttrListInfo>();
@@ -399,7 +399,7 @@ SourceLocation CXIndexDataConsumer::CXXBasesListInfo::getBaseLoc(
   return Loc;
 }
 
-const char *ScratchAlloc::toCStr(StringRef Str) {
+const char *ScratchAlloc::toCStr(llvm::StringRef Str) {
   if (Str.empty())
     return "";
   if (Str.data()[Str.size()] == '\0')
@@ -407,7 +407,7 @@ const char *ScratchAlloc::toCStr(StringRef Str) {
   return copyCStr(Str);
 }
 
-const char *ScratchAlloc::copyCStr(StringRef Str) {
+const char *ScratchAlloc::copyCStr(llvm::StringRef Str) {
   char *buf = IdxCtx.StrScratch.Allocate<char>(Str.size() + 1);
   std::uninitialized_copy(Str.begin(), Str.end(), buf);
   buf[Str.size()] = '\0';
@@ -463,7 +463,7 @@ void CXIndexDataConsumer::enteredMainFile(OptionalFileEntryRef File) {
 }
 
 void CXIndexDataConsumer::ppIncludedFile(SourceLocation hashLoc,
-                                         StringRef filename,
+                                         llvm::StringRef filename,
                                          OptionalFileEntryRef File,
                                          bool isImport, bool isAngled,
                                          bool isModuleImport) {
@@ -1155,7 +1155,7 @@ void CXIndexDataConsumer::getEntityInfo(const NamedDecl *D,
     EntityInfo.name = nullptr; // anonymous tag/field/namespace.
 
   } else {
-    SmallString<256> StrBuf;
+    llvm::SmallString<256> StrBuf;
     {
       llvm::raw_svector_ostream OS(StrBuf);
       D->printName(OS);
@@ -1164,7 +1164,7 @@ void CXIndexDataConsumer::getEntityInfo(const NamedDecl *D,
   }
 
   {
-    SmallString<512> StrBuf;
+    llvm::SmallString<512> StrBuf;
     bool Ignore = getDeclCursorUSR(D, StrBuf);
     if (Ignore) {
       EntityInfo.USR = nullptr;

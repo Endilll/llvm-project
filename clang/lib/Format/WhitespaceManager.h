@@ -41,7 +41,7 @@ public:
   bool useCRLF() const { return UseCRLF; }
 
   /// Infers whether the input is using CRLF.
-  static bool inputUsesCRLF(StringRef Text, bool DefaultToCRLF);
+  static bool inputUsesCRLF(llvm::StringRef Text, bool DefaultToCRLF);
 
   /// Replaces the whitespace in front of \p Tok. Only call once for
   /// each \c AnnotatedToken.
@@ -77,8 +77,8 @@ public:
   /// used to align backslashes correctly.
   void replaceWhitespaceInToken(const FormatToken &Tok, unsigned Offset,
                                 unsigned ReplaceChars,
-                                StringRef PreviousPostfix,
-                                StringRef CurrentPrefix, bool InPPDirective,
+                                llvm::StringRef PreviousPostfix,
+                                llvm::StringRef CurrentPrefix, bool InPPDirective,
                                 unsigned Newlines, int Spaces);
 
   /// Returns all the \c Replacements created during formatting.
@@ -109,7 +109,7 @@ public:
     Change(const FormatToken &Tok, bool CreateReplacement,
            SourceRange OriginalWhitespaceRange, int Spaces,
            unsigned StartOfTokenColumn, unsigned NewlinesBefore,
-           StringRef PreviousLinePostfix, StringRef CurrentLinePrefix,
+           llvm::StringRef PreviousLinePostfix, llvm::StringRef CurrentLinePrefix,
            bool IsAligned, bool ContinuesPPDirective, bool IsInsideToken);
 
     // The kind of the token whose whitespace this change replaces, or in which
@@ -190,8 +190,8 @@ private:
   };
 
   struct CellDescriptions {
-    SmallVector<CellDescription> Cells;
-    SmallVector<unsigned> CellCounts;
+    llvm::SmallVector<CellDescription> Cells;
+    llvm::SmallVector<unsigned> CellCounts;
     unsigned InitialSpaces = 0;
 
     // Determine if every row in the array
@@ -348,7 +348,7 @@ private:
   void generateChanges();
 
   /// Stores \p Text as the replacement for the whitespace in \p Range.
-  void storeReplacement(SourceRange Range, StringRef Text);
+  void storeReplacement(SourceRange Range, llvm::StringRef Text);
   void appendNewlineText(std::string &Text, unsigned Newlines);
   void appendEscapedNewlineText(std::string &Text, unsigned Newlines,
                                 unsigned PreviousEndOfTokenColumn,
@@ -359,7 +359,7 @@ private:
   unsigned appendTabIndent(std::string &Text, unsigned Spaces,
                            unsigned Indentation);
 
-  SmallVector<Change, 16> Changes;
+  llvm::SmallVector<Change, 16> Changes;
   const SourceManager &SourceMgr;
   tooling::Replacements Replaces;
   const FormatStyle &Style;

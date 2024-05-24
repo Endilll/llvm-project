@@ -18,7 +18,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::modernize {
 
-ReplaceRandomShuffleCheck::ReplaceRandomShuffleCheck(StringRef Name,
+ReplaceRandomShuffleCheck::ReplaceRandomShuffleCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IncludeInserter(Options.getLocalOrGlobal("IncludeStyle",
@@ -80,7 +80,7 @@ void ReplaceRandomShuffleCheck::check(const MatchFinder::MatchResult &Result) {
   }();
 
   std::string NewName = "shuffle";
-  StringRef ContainerText = Lexer::getSourceText(
+  llvm::StringRef ContainerText = Lexer::getSourceText(
       CharSourceRange::getTokenRange(MatchedDecl->getSourceRange()),
       *Result.SourceManager, getLangOpts());
   if (ContainerText.starts_with("std::"))

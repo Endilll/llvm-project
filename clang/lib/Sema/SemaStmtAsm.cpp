@@ -33,7 +33,7 @@ using namespace sema;
 static void removeLValueToRValueCast(Expr *E) {
   Expr *Parent = E;
   Expr *ExprUnderCast = nullptr;
-  SmallVector<Expr *, 8> ParentsToUpdate;
+  llvm::SmallVector<Expr *, 8> ParentsToUpdate;
 
   while (true) {
     ParentsToUpdate.push_back(Parent);
@@ -113,7 +113,7 @@ static bool CheckAsmLValue(Expr *E, Sema &S) {
 /// anywhere in the decomposed asm string.
 static bool
 isOperandMentioned(unsigned OpNo,
-                   ArrayRef<GCCAsmStmt::AsmStringPiece> AsmStrPieces) {
+                   llvm::ArrayRef<GCCAsmStmt::AsmStringPiece> AsmStrPieces) {
   for (unsigned p = 0, e = AsmStrPieces.size(); p != e; ++p) {
     const GCCAsmStmt::AsmStringPiece &Piece = AsmStrPieces[p];
     if (!Piece.isOperand())
@@ -134,7 +134,7 @@ static bool CheckNakedParmReference(Expr *E, Sema &S) {
   if (!Func->hasAttr<NakedAttr>())
     return false;
 
-  SmallVector<Expr*, 4> WorkList;
+  llvm::SmallVector<Expr*, 4> WorkList;
   WorkList.push_back(E);
   while (WorkList.size()) {
     Expr *E = WorkList.pop_back_val();
@@ -191,7 +191,7 @@ static bool checkExprMemoryConstraintCompat(Sema &S, Expr *E,
 
 // Extracting the register name from the Expression value,
 // if there is no register name to extract, returns ""
-static StringRef extractRegisterName(const Expr *Expression,
+static llvm::StringRef extractRegisterName(const Expr *Expression,
                                      const TargetInfo &Target) {
   Expression = Expression->IgnoreImpCasts();
   if (const DeclRefExpr *AsmDeclRef = dyn_cast<DeclRefExpr>(Expression)) {
@@ -218,8 +218,8 @@ getClobberConflictLocation(MultiExprArg Exprs, StringLiteral **Constraints,
   // Collect all the input and output registers from the extended asm
   // statement in order to check for conflicts with the clobber list
   for (unsigned int i = 0; i < Exprs.size() - NumLabels; ++i) {
-    StringRef Constraint = Constraints[i]->getString();
-    StringRef InOutReg = Target.getConstraintRegister(
+    llvm::StringRef Constraint = Constraints[i]->getString();
+    llvm::StringRef InOutReg = Target.getConstraintRegister(
         Constraint, extractRegisterName(Exprs[i], Target));
     if (InOutReg != "")
       InOutVars.insert(InOutReg);
@@ -227,7 +227,7 @@ getClobberConflictLocation(MultiExprArg Exprs, StringLiteral **Constraints,
   // Check for each item in the clobber list if it conflicts with the input
   // or output
   for (int i = 0; i < NumClobbers; ++i) {
-    StringRef Clobber = Clobbers[i]->getString();
+    llvm::StringRef Clobber = Clobbers[i]->getString();
     // We only check registers, therefore we don't check cc and memory
     // clobbers
     if (Clobber == "cc" || Clobber == "memory" || Clobber == "unwind")
@@ -253,7 +253,7 @@ StmtResult Sema::ActOnGCCAsmStmt(SourceLocation AsmLoc, bool IsSimple,
   StringLiteral *AsmString = cast<StringLiteral>(asmString);
   StringLiteral **Clobbers = reinterpret_cast<StringLiteral**>(clobbers.data());
 
-  SmallVector<TargetInfo::ConstraintInfo, 4> OutputConstraintInfos;
+  llvm::SmallVector<TargetInfo::ConstraintInfo, 4> OutputConstraintInfos;
 
   // The parser verifies that there is a string literal here.
   assert(AsmString->isOrdinary());
@@ -266,7 +266,7 @@ StmtResult Sema::ActOnGCCAsmStmt(SourceLocation AsmLoc, bool IsSimple,
     StringLiteral *Literal = Constraints[i];
     assert(Literal->isOrdinary());
 
-    StringRef OutputName;
+    llvm::StringRef OutputName;
     if (Names[i])
       OutputName = Names[i]->getName();
 
@@ -352,13 +352,13 @@ StmtResult Sema::ActOnGCCAsmStmt(SourceLocation AsmLoc, bool IsSimple,
     }
   }
 
-  SmallVector<TargetInfo::ConstraintInfo, 4> InputConstraintInfos;
+  llvm::SmallVector<TargetInfo::ConstraintInfo, 4> InputConstraintInfos;
 
   for (unsigned i = NumOutputs, e = NumOutputs + NumInputs; i != e; i++) {
     StringLiteral *Literal = Constraints[i];
     assert(Literal->isOrdinary());
 
-    StringRef InputName;
+    llvm::StringRef InputName;
     if (Names[i])
       InputName = Names[i]->getName();
 
@@ -469,7 +469,7 @@ StmtResult Sema::ActOnGCCAsmStmt(SourceLocation AsmLoc, bool IsSimple,
     StringLiteral *Literal = Clobbers[i];
     assert(Literal->isOrdinary());
 
-    StringRef Clobber = Literal->getString();
+    llvm::StringRef Clobber = Literal->getString();
 
     if (!Context.getTargetInfo().isValidClobber(Clobber)) {
       targetDiag(Literal->getBeginLoc(), diag::err_asm_unknown_register_name)
@@ -501,7 +501,7 @@ StmtResult Sema::ActOnGCCAsmStmt(SourceLocation AsmLoc, bool IsSimple,
                              RParenLoc);
   // Validate the asm string, ensuring it makes sense given the operands we
   // have.
-  SmallVector<GCCAsmStmt::AsmStringPiece, 8> Pieces;
+  llvm::SmallVector<GCCAsmStmt::AsmStringPiece, 8> Pieces;
   unsigned DiagOffs;
   if (unsigned DiagID = NS->AnalyzeAsmString(Pieces, Context, DiagOffs)) {
     targetDiag(getLocationOfStringLiteralByte(AsmString, DiagOffs), DiagID)
@@ -563,7 +563,7 @@ StmtResult Sema::ActOnGCCAsmStmt(SourceLocation AsmLoc, bool IsSimple,
   unsigned NumAlternatives = ~0U;
   for (unsigned i = 0, e = OutputConstraintInfos.size(); i != e; ++i) {
     TargetInfo::ConstraintInfo &Info = OutputConstraintInfos[i];
-    StringRef ConstraintStr = Info.getConstraintStr();
+    llvm::StringRef ConstraintStr = Info.getConstraintStr();
     unsigned AltCount = ConstraintStr.count(',') + 1;
     if (NumAlternatives == ~0U) {
       NumAlternatives = AltCount;
@@ -574,11 +574,11 @@ StmtResult Sema::ActOnGCCAsmStmt(SourceLocation AsmLoc, bool IsSimple,
       return NS;
     }
   }
-  SmallVector<size_t, 4> InputMatchedToOutput(OutputConstraintInfos.size(),
+  llvm::SmallVector<size_t, 4> InputMatchedToOutput(OutputConstraintInfos.size(),
                                               ~0U);
   for (unsigned i = 0, e = InputConstraintInfos.size(); i != e; ++i) {
     TargetInfo::ConstraintInfo &Info = InputConstraintInfos[i];
-    StringRef ConstraintStr = Info.getConstraintStr();
+    llvm::StringRef ConstraintStr = Info.getConstraintStr();
     unsigned AltCount = ConstraintStr.count(',') + 1;
     if (NumAlternatives == ~0U) {
       NumAlternatives = AltCount;
@@ -717,8 +717,8 @@ StmtResult Sema::ActOnGCCAsmStmt(SourceLocation AsmLoc, bool IsSimple,
     targetDiag(ConstraintLoc, diag::error_inoutput_conflict_with_clobber);
 
   // Check for duplicate asm operand name between input, output and label lists.
-  typedef std::pair<StringRef , Expr *> NamedOperand;
-  SmallVector<NamedOperand, 4> NamedOperandList;
+  typedef std::pair<llvm::StringRef , Expr *> NamedOperand;
+  llvm::SmallVector<NamedOperand, 4> NamedOperandList;
   for (unsigned i = 0, e = NumOutputs + NumInputs + NumLabels; i != e; ++i)
     if (Names[i])
       NamedOperandList.emplace_back(
@@ -726,7 +726,7 @@ StmtResult Sema::ActOnGCCAsmStmt(SourceLocation AsmLoc, bool IsSimple,
   // Sort NamedOperandList.
   llvm::stable_sort(NamedOperandList, llvm::less_first());
   // Find adjacent duplicate operand.
-  SmallVector<NamedOperand, 4>::iterator Found =
+  llvm::SmallVector<NamedOperand, 4>::iterator Found =
       std::adjacent_find(begin(NamedOperandList), end(NamedOperandList),
                          [](const NamedOperand &LHS, const NamedOperand &RHS) {
                            return LHS.first == RHS.first;
@@ -820,10 +820,10 @@ ExprResult Sema::LookupInlineAsmIdentifier(CXXScopeSpec &SS,
   return Result;
 }
 
-bool Sema::LookupInlineAsmField(StringRef Base, StringRef Member,
+bool Sema::LookupInlineAsmField(llvm::StringRef Base, llvm::StringRef Member,
                                 unsigned &Offset, SourceLocation AsmLoc) {
   Offset = 0;
-  SmallVector<StringRef, 2> Members;
+  llvm::SmallVector<llvm::StringRef, 2> Members;
   Member.split(Members, ".");
 
   NamedDecl *FoundDecl = nullptr;
@@ -842,7 +842,7 @@ bool Sema::LookupInlineAsmField(StringRef Base, StringRef Member,
   if (!FoundDecl)
     return true;
 
-  for (StringRef NextMember : Members) {
+  for (llvm::StringRef NextMember : Members) {
     const RecordType *RT = nullptr;
     if (VarDecl *VD = dyn_cast<VarDecl>(FoundDecl))
       RT = VD->getType()->getAs<RecordType>();
@@ -889,7 +889,7 @@ bool Sema::LookupInlineAsmField(StringRef Base, StringRef Member,
 }
 
 ExprResult
-Sema::LookupInlineAsmVarDeclField(Expr *E, StringRef Member,
+Sema::LookupInlineAsmVarDeclField(Expr *E, llvm::StringRef Member,
                                   SourceLocation AsmLoc) {
 
   QualType T = E->getType();
@@ -930,12 +930,12 @@ Sema::LookupInlineAsmVarDeclField(Expr *E, StringRef Member,
 }
 
 StmtResult Sema::ActOnMSAsmStmt(SourceLocation AsmLoc, SourceLocation LBraceLoc,
-                                ArrayRef<Token> AsmToks,
-                                StringRef AsmString,
+                                llvm::ArrayRef<Token> AsmToks,
+                                llvm::StringRef AsmString,
                                 unsigned NumOutputs, unsigned NumInputs,
-                                ArrayRef<StringRef> Constraints,
-                                ArrayRef<StringRef> Clobbers,
-                                ArrayRef<Expr*> Exprs,
+                                llvm::ArrayRef<llvm::StringRef> Constraints,
+                                llvm::ArrayRef<llvm::StringRef> Clobbers,
+                                llvm::ArrayRef<Expr*> Exprs,
                                 SourceLocation EndLoc) {
   bool IsSimple = (NumOutputs != 0 || NumInputs != 0);
   setFunctionHasBranchProtectedScope();
@@ -967,7 +967,7 @@ StmtResult Sema::ActOnMSAsmStmt(SourceLocation AsmLoc, SourceLocation LBraceLoc,
   return NS;
 }
 
-LabelDecl *Sema::GetOrCreateMSAsmLabel(StringRef ExternalLabelName,
+LabelDecl *Sema::GetOrCreateMSAsmLabel(llvm::StringRef ExternalLabelName,
                                        SourceLocation Location,
                                        bool AlwaysCreate) {
   LabelDecl* Label = LookupOrCreateLabel(PP.getIdentifierInfo(ExternalLabelName),

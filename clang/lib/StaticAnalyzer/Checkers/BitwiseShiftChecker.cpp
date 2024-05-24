@@ -85,16 +85,16 @@ private:
   void recordAssumption(OperandSide Side, BinaryOperator::Opcode Cmp, unsigned Limit);
   const NoteTag *createNoteTag() const;
 
-  BugReportPtr createBugReport(StringRef ShortMsg, StringRef Msg) const;
+  BugReportPtr createBugReport(llvm::StringRef ShortMsg, llvm::StringRef Msg) const;
 
   BugReportPtr checkOvershift();
   BugReportPtr checkOperandNegative(OperandSide Side);
   BugReportPtr checkLeftShiftOverflow();
 
   bool isLeftShift() const { return Op->getOpcode() == BO_Shl; }
-  StringRef shiftDir() const { return isLeftShift() ? "left" : "right"; }
-  static StringRef pluralSuffix(unsigned n) { return n <= 1 ? "" : "s"; }
-  static StringRef verbSuffix(unsigned n) { return n <= 1 ? "s" : ""; }
+  llvm::StringRef shiftDir() const { return isLeftShift() ? "left" : "right"; }
+  static llvm::StringRef pluralSuffix(unsigned n) { return n <= 1 ? "" : "s"; }
+  static llvm::StringRef verbSuffix(unsigned n) { return n <= 1 ? "s" : ""; }
 };
 
 void BitwiseShiftValidator::run() {
@@ -317,7 +317,7 @@ const NoteTag *BitwiseShiftValidator::createNoteTag() const {
   if (!NonNegOperands && !UpperBoundBitCount)
     return nullptr;
 
-  SmallString<128> Buf;
+  llvm::SmallString<128> Buf;
   llvm::raw_svector_ostream Out(Buf);
   Out << "Assuming ";
   NoteTagTemplate Templ = NoteTagTemplates[NonNegOperands];
@@ -330,7 +330,7 @@ const NoteTag *BitwiseShiftValidator::createNoteTag() const {
 }
 
 std::unique_ptr<PathSensitiveBugReport>
-BitwiseShiftValidator::createBugReport(StringRef ShortMsg, StringRef Msg) const {
+BitwiseShiftValidator::createBugReport(llvm::StringRef ShortMsg, llvm::StringRef Msg) const {
   ProgramStateRef State = Ctx.getState();
   if (ExplodedNode *ErrNode = Ctx.generateErrorNode(State)) {
     auto BR =

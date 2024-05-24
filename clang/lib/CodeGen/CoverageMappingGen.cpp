@@ -336,11 +336,11 @@ public:
   /// Fills \c Mapping with the virtual file mapping needed to write out
   /// coverage and collects the necessary file information to emit source and
   /// expansion regions.
-  void gatherFileIDs(SmallVectorImpl<unsigned> &Mapping) {
+  void gatherFileIDs(llvm::SmallVectorImpl<unsigned> &Mapping) {
     FileIDMapping.clear();
 
     llvm::SmallSet<FileID, 8> Visited;
-    SmallVector<std::pair<SourceLocation, unsigned>, 8> FileLocs;
+    llvm::SmallVector<std::pair<SourceLocation, unsigned>, 8> FileLocs;
     for (auto &Region : SourceRegions) {
       SourceLocation Loc = Region.getBeginLoc();
 
@@ -599,7 +599,7 @@ struct EmptyCoverageMappingBuilder : public CoverageMappingBuilder {
 
   /// Write the mapping data to the output stream
   void write(llvm::raw_ostream &OS) {
-    SmallVector<unsigned, 16> FileIDMapping;
+    llvm::SmallVector<unsigned, 16> FileIDMapping;
     gatherFileIDs(FileIDMapping);
     emitSourceRegions(SourceRegionFilter());
 
@@ -1367,7 +1367,7 @@ struct CounterCoverageMappingBuilder
     Counter BreakCount;
     Counter ContinueCount;
   };
-  SmallVector<BreakContinue, 8> BreakContinueStack;
+  llvm::SmallVector<BreakContinue, 8> BreakContinueStack;
 
   CounterCoverageMappingBuilder(
       CoverageMappingModuleGen &CVM,
@@ -2242,9 +2242,9 @@ struct CounterCoverageMappingBuilder
 
 } // end anonymous namespace
 
-static void dump(llvm::raw_ostream &OS, StringRef FunctionName,
-                 ArrayRef<CounterExpression> Expressions,
-                 ArrayRef<CounterMappingRegion> Regions) {
+static void dump(llvm::raw_ostream &OS, llvm::StringRef FunctionName,
+                 llvm::ArrayRef<CounterExpression> Expressions,
+                 llvm::ArrayRef<CounterMappingRegion> Regions) {
   OS << FunctionName << ":\n";
   CounterMappingContext Ctx(Expressions);
   for (const auto &R : Regions) {
@@ -2308,12 +2308,12 @@ std::string CoverageMappingModuleGen::getCurrentDirname() {
   if (!CGM.getCodeGenOpts().CoverageCompilationDir.empty())
     return CGM.getCodeGenOpts().CoverageCompilationDir;
 
-  SmallString<256> CWD;
+  llvm::SmallString<256> CWD;
   llvm::sys::fs::current_path(CWD);
   return CWD.str().str();
 }
 
-std::string CoverageMappingModuleGen::normalizeFilename(StringRef Filename) {
+std::string CoverageMappingModuleGen::normalizeFilename(llvm::StringRef Filename) {
   llvm::SmallString<256> Path(Filename);
   llvm::sys::path::remove_dots(Path, /*remove_dot_dot=*/true);
 
@@ -2357,7 +2357,7 @@ void CoverageMappingModuleGen::emitFunctionMappingRecord(
 #include "llvm/ProfileData/InstrProfData.inc"
   };
   auto *FunctionRecordTy =
-      llvm::StructType::get(Ctx, ArrayRef(FunctionRecordTypes),
+      llvm::StructType::get(Ctx, llvm::ArrayRef(FunctionRecordTypes),
                             /*isPacked=*/true);
 
   // Create the function record constant.
@@ -2366,7 +2366,7 @@ void CoverageMappingModuleGen::emitFunctionMappingRecord(
       #include "llvm/ProfileData/InstrProfData.inc"
   };
   auto *FuncRecordConstant =
-      llvm::ConstantStruct::get(FunctionRecordTy, ArrayRef(FunctionRecordVals));
+      llvm::ConstantStruct::get(FunctionRecordTy, llvm::ArrayRef(FunctionRecordVals));
 
   // Create the function record global.
   auto *FuncRecord = new llvm::GlobalVariable(
@@ -2384,7 +2384,7 @@ void CoverageMappingModuleGen::emitFunctionMappingRecord(
 }
 
 void CoverageMappingModuleGen::addFunctionMappingRecord(
-    llvm::GlobalVariable *NamePtr, StringRef NameValue, uint64_t FuncHash,
+    llvm::GlobalVariable *NamePtr, llvm::StringRef NameValue, uint64_t FuncHash,
     const std::string &CoverageMapping, bool IsUsed) {
   const uint64_t NameHash = llvm::IndexedInstrProf::ComputeHash(NameValue);
   FunctionRecords.push_back({NameHash, FuncHash, CoverageMapping, IsUsed});
@@ -2399,7 +2399,7 @@ void CoverageMappingModuleGen::addFunctionMappingRecord(
     // additional minimization operations such as reducing the number of
     // expressions.
     llvm::SmallVector<std::string, 16> FilenameStrs;
-    std::vector<StringRef> Filenames;
+    std::vector<llvm::StringRef> Filenames;
     std::vector<CounterExpression> Expressions;
     std::vector<CounterMappingRegion> Regions;
     FilenameStrs.resize(FileEntries.size() + 1);
@@ -2408,7 +2408,7 @@ void CoverageMappingModuleGen::addFunctionMappingRecord(
       auto I = Entry.second;
       FilenameStrs[I] = normalizeFilename(Entry.first.getName());
     }
-    ArrayRef<std::string> FilenameRefs = llvm::ArrayRef(FilenameStrs);
+    llvm::ArrayRef<std::string> FilenameRefs = llvm::ArrayRef(FilenameStrs);
     RawCoverageMappingReader Reader(CoverageMapping, FilenameRefs, Filenames,
                                     Expressions, Regions);
     if (Reader.read())
@@ -2454,19 +2454,19 @@ void CoverageMappingModuleGen::emit() {
 #include "llvm/ProfileData/InstrProfData.inc"
   };
   auto CovDataHeaderTy =
-      llvm::StructType::get(Ctx, ArrayRef(CovDataHeaderTypes));
+      llvm::StructType::get(Ctx, llvm::ArrayRef(CovDataHeaderTypes));
   llvm::Constant *CovDataHeaderVals[] = {
 #define COVMAP_HEADER(Type, LLVMType, Name, Init) Init,
 #include "llvm/ProfileData/InstrProfData.inc"
   };
   auto CovDataHeaderVal =
-      llvm::ConstantStruct::get(CovDataHeaderTy, ArrayRef(CovDataHeaderVals));
+      llvm::ConstantStruct::get(CovDataHeaderTy, llvm::ArrayRef(CovDataHeaderVals));
 
   // Create the coverage data record
   llvm::Type *CovDataTypes[] = {CovDataHeaderTy, FilenamesVal->getType()};
-  auto CovDataTy = llvm::StructType::get(Ctx, ArrayRef(CovDataTypes));
+  auto CovDataTy = llvm::StructType::get(Ctx, llvm::ArrayRef(CovDataTypes));
   llvm::Constant *TUDataVals[] = {CovDataHeaderVal, FilenamesVal};
-  auto CovDataVal = llvm::ConstantStruct::get(CovDataTy, ArrayRef(TUDataVals));
+  auto CovDataVal = llvm::ConstantStruct::get(CovDataTy, llvm::ArrayRef(TUDataVals));
   auto CovData = new llvm::GlobalVariable(
       CGM.getModule(), CovDataTy, true, llvm::GlobalValue::PrivateLinkage,
       CovDataVal, llvm::getCoverageMappingVarName());

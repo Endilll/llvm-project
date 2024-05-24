@@ -20,11 +20,11 @@ namespace clang::tidy::misc {
 namespace {
 
 /// Much like SmallSet, with two differences:
-/// 1. It can *only* be constructed from an ArrayRef<>. If the element count
+/// 1. It can *only* be constructed from an llvm::ArrayRef<>. If the element count
 ///    is small, there is no copy and said storage *must* outlive us.
 /// 2. it is immutable, the way it was constructed it will stay.
 template <typename T, unsigned SmallSize> class ImmutableSmallSet {
-  ArrayRef<T> Vector;
+  llvm::ArrayRef<T> Vector;
   llvm::DenseSet<T> Set;
 
   static_assert(SmallSize <= 32, "N should be small");
@@ -41,7 +41,7 @@ public:
   T &operator=(ImmutableSmallSet &&) = delete;
 
   // WARNING: Storage *must* outlive us if we decide that the size is small.
-  ImmutableSmallSet(ArrayRef<T> Storage) {
+  ImmutableSmallSet(llvm::ArrayRef<T> Storage) {
     // Is size small-enough to just keep using the existing storage?
     if (Storage.size() <= SmallSize) {
       Vector = Storage;
@@ -75,7 +75,7 @@ public:
   using size_type = size_t;
 
 private:
-  SmallVector<T, SmallSize> Vector;
+  llvm::SmallVector<T, SmallSize> Vector;
   llvm::DenseSet<T> Set;
 
   static_assert(SmallSize <= 32, "N should be small");
@@ -155,7 +155,7 @@ using CallStackTy =
 // In given SCC, find *some* call stack that will be cyclic.
 // This will only find *one* such stack, it might not be the smallest one,
 // and there may be other loops.
-CallStackTy pathfindSomeCycle(ArrayRef<CallGraphNode *> SCC) {
+CallStackTy pathfindSomeCycle(llvm::ArrayRef<CallGraphNode *> SCC) {
   // We'll need to be able to performantly look up whether some CallGraphNode
   // is in SCC or not, so cache all the SCC elements in a set.
   const ImmutableSmallSet<CallGraphNode *, SmallSCCSize> SCCElts(SCC);
@@ -197,7 +197,7 @@ void NoRecursionCheck::registerMatchers(MatchFinder *Finder) {
   Finder->addMatcher(translationUnitDecl().bind("TUDecl"), this);
 }
 
-void NoRecursionCheck::handleSCC(ArrayRef<CallGraphNode *> SCC) {
+void NoRecursionCheck::handleSCC(llvm::ArrayRef<CallGraphNode *> SCC) {
   assert(!SCC.empty() && "Empty SCC does not make sense.");
 
   // First of all, call out every strongly connected function.
@@ -217,7 +217,7 @@ void NoRecursionCheck::handleSCC(ArrayRef<CallGraphNode *> SCC) {
   // pathfind the cycle, the loop does not necessarily begin at the first node
   // of the call stack, so drop front nodes of the call stack until it does.
   const auto CyclicCallStack =
-      ArrayRef<CallGraphNode::CallRecord>(EventuallyCyclicCallStack)
+      llvm::ArrayRef<CallGraphNode::CallRecord>(EventuallyCyclicCallStack)
           .drop_until([LastNode = EventuallyCyclicCallStack.back()](
                           CallGraphNode::CallRecord FrontNode) {
             return FrontNode == LastNode;

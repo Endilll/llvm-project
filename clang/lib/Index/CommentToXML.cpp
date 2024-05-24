@@ -88,11 +88,11 @@ struct FullCommentParts {
   const BlockContentComment *Brief;
   const BlockContentComment *Headerfile;
   const ParagraphComment *FirstParagraph;
-  SmallVector<const BlockCommandComment *, 4> Returns;
-  SmallVector<const ParamCommandComment *, 8> Params;
-  SmallVector<const TParamCommandComment *, 4> TParams;
+  llvm::SmallVector<const BlockCommandComment *, 4> Returns;
+  llvm::SmallVector<const ParamCommandComment *, 8> Params;
+  llvm::SmallVector<const TParamCommandComment *, 4> TParams;
   llvm::TinyPtrVector<const BlockCommandComment *> Exceptions;
-  SmallVector<const BlockContentComment *, 8> MiscBlocks;
+  llvm::SmallVector<const BlockContentComment *, 8> MiscBlocks;
 };
 
 FullCommentParts::FullCommentParts(const FullComment *C,
@@ -220,7 +220,7 @@ class CommentASTToHTMLConverter :
 public:
   /// \param Str accumulator for HTML.
   CommentASTToHTMLConverter(const FullComment *FC,
-                            SmallVectorImpl<char> &Str,
+                            llvm::SmallVectorImpl<char> &Str,
                             const CommandTraits &Traits) :
       FC(FC), Result(Str), Traits(Traits)
   { }
@@ -248,7 +248,7 @@ public:
   /// command).
   void visitNonStandaloneParagraphComment(const ParagraphComment *C);
 
-  void appendToResultWithHTMLEscaping(StringRef S);
+  void appendToResultWithHTMLEscaping(llvm::StringRef S);
 
 private:
   const FullComment *FC;
@@ -270,7 +270,7 @@ void CommentASTToHTMLConverter::visitInlineCommandComment(
     return;
 
   // Nothing to render if argument is empty.
-  StringRef Arg0 = C->getArgText(0);
+  llvm::StringRef Arg0 = C->getArgText(0);
   if (Arg0.empty())
     return;
 
@@ -496,8 +496,8 @@ void CommentASTToHTMLConverter::visitNonStandaloneParagraphComment(
   }
 }
 
-void CommentASTToHTMLConverter::appendToResultWithHTMLEscaping(StringRef S) {
-  for (StringRef::iterator I = S.begin(), E = S.end(); I != E; ++I) {
+void CommentASTToHTMLConverter::appendToResultWithHTMLEscaping(llvm::StringRef S) {
+  for (llvm::StringRef::iterator I = S.begin(), E = S.end(); I != E; ++I) {
     const char C = *I;
     switch (C) {
     case '&':
@@ -531,7 +531,7 @@ class CommentASTToXMLConverter :
 public:
   /// \param Str accumulator for XML.
   CommentASTToXMLConverter(const FullComment *FC,
-                           SmallVectorImpl<char> &Str,
+                           llvm::SmallVectorImpl<char> &Str,
                            const CommandTraits &Traits,
                            const SourceManager &SM) :
       FC(FC), Result(Str), Traits(Traits), SM(SM) { }
@@ -546,7 +546,7 @@ public:
   void visitParagraphComment(const ParagraphComment *C);
 
   void appendParagraphCommentWithKind(const ParagraphComment *C,
-                                      StringRef Kind);
+                                      llvm::StringRef Kind);
 
   void visitBlockCommandComment(const BlockCommandComment *C);
   void visitParamCommandComment(const ParamCommandComment *C);
@@ -558,11 +558,11 @@ public:
   void visitFullComment(const FullComment *C);
 
   // Helpers.
-  void appendToResultWithXMLEscaping(StringRef S);
-  void appendToResultWithCDATAEscaping(StringRef S);
+  void appendToResultWithXMLEscaping(llvm::StringRef S);
+  void appendToResultWithCDATAEscaping(llvm::StringRef S);
 
   void formatTextOfDeclaration(const DeclInfo *DI,
-                               SmallString<128> &Declaration);
+                               llvm::SmallString<128> &Declaration);
 
 private:
   const FullComment *FC;
@@ -575,7 +575,7 @@ private:
 };
 
 void getSourceTextOfDeclaration(const DeclInfo *ThisDecl,
-                                SmallVectorImpl<char> &Str) {
+                                llvm::SmallVectorImpl<char> &Str) {
   ASTContext &Context = ThisDecl->CurrentDecl->getASTContext();
   const LangOptions &LangOpts = Context.getLangOpts();
   llvm::raw_svector_ostream OS(Str);
@@ -588,9 +588,9 @@ void getSourceTextOfDeclaration(const DeclInfo *ThisDecl,
 }
 
 void CommentASTToXMLConverter::formatTextOfDeclaration(
-    const DeclInfo *DI, SmallString<128> &Declaration) {
+    const DeclInfo *DI, llvm::SmallString<128> &Declaration) {
   // Formatting API expects null terminated input string.
-  StringRef StringDecl(Declaration.c_str(), Declaration.size());
+  llvm::StringRef StringDecl(Declaration.c_str(), Declaration.size());
 
   // Formatter specific code.
   unsigned Offset = 0;
@@ -619,7 +619,7 @@ void CommentASTToXMLConverter::visitInlineCommandComment(
     return;
 
   // Nothing to render if argument is empty.
-  StringRef Arg0 = C->getArgText(0);
+  llvm::StringRef Arg0 = C->getArgText(0);
   if (Arg0.empty())
     return;
 
@@ -662,7 +662,7 @@ void CommentASTToXMLConverter::visitHTMLStartTagComment(
     Result << " isMalformed=\"1\"";
   Result << ">";
   {
-    SmallString<32> Tag;
+    llvm::SmallString<32> Tag;
     {
       llvm::raw_svector_ostream TagOS(Tag);
       printHTMLStartTagComment(C, TagOS);
@@ -682,12 +682,12 @@ CommentASTToXMLConverter::visitHTMLEndTagComment(const HTMLEndTagComment *C) {
 
 void
 CommentASTToXMLConverter::visitParagraphComment(const ParagraphComment *C) {
-  appendParagraphCommentWithKind(C, StringRef());
+  appendParagraphCommentWithKind(C, llvm::StringRef());
 }
 
 void CommentASTToXMLConverter::appendParagraphCommentWithKind(
                                   const ParagraphComment *C,
-                                  StringRef ParagraphKind) {
+                                  llvm::StringRef ParagraphKind) {
   if (C->isWhitespace())
     return;
 
@@ -705,7 +705,7 @@ void CommentASTToXMLConverter::appendParagraphCommentWithKind(
 
 void CommentASTToXMLConverter::visitBlockCommandComment(
     const BlockCommandComment *C) {
-  StringRef ParagraphKind;
+  llvm::StringRef ParagraphKind;
 
   switch (C->getCommandID()) {
   case CommandTraits::KCI_attention:
@@ -821,7 +821,7 @@ void CommentASTToXMLConverter::visitFullComment(const FullComment *C) {
   FullCommentParts Parts(C, Traits);
 
   const DeclInfo *DI = C->getDeclInfo();
-  StringRef RootEndTag;
+  llvm::StringRef RootEndTag;
   if (DI) {
     switch (DI->getKind()) {
     case DeclInfo::OtherKind:
@@ -921,7 +921,7 @@ void CommentASTToXMLConverter::visitFullComment(const FullComment *C) {
 
     {
       // Print USR.
-      SmallString<128> USR;
+      llvm::SmallString<128> USR;
       generateUSRForDecl(DI->CommentDecl, USR);
       if (!USR.empty()) {
         Result << "<USR>";
@@ -944,7 +944,7 @@ void CommentASTToXMLConverter::visitFullComment(const FullComment *C) {
   {
     // Pretty-print the declaration.
     Result << "<Declaration>";
-    SmallString<128> Declaration;
+    llvm::SmallString<128> Declaration;
     getSourceTextOfDeclaration(DI, Declaration);
     formatTextOfDeclaration(DI, Declaration);
     appendToResultWithXMLEscaping(Declaration);
@@ -1019,7 +1019,7 @@ void CommentASTToXMLConverter::visitFullComment(const FullComment *C) {
 
       // 'availability' attribute.
       Result << "<Availability";
-      StringRef Distribution;
+      llvm::StringRef Distribution;
       if (AA->getPlatform()) {
         Distribution = AvailabilityAttr::getPrettyPlatformName(
                                         AA->getPlatform()->getName());
@@ -1027,25 +1027,25 @@ void CommentASTToXMLConverter::visitFullComment(const FullComment *C) {
           Distribution = AA->getPlatform()->getName();
       }
       Result << " distribution=\"" << Distribution << "\">";
-      VersionTuple IntroducedInVersion = AA->getIntroduced();
+      llvm::VersionTuple IntroducedInVersion = AA->getIntroduced();
       if (!IntroducedInVersion.empty()) {
         Result << "<IntroducedInVersion>"
                << IntroducedInVersion.getAsString()
                << "</IntroducedInVersion>";
       }
-      VersionTuple DeprecatedInVersion = AA->getDeprecated();
+      llvm::VersionTuple DeprecatedInVersion = AA->getDeprecated();
       if (!DeprecatedInVersion.empty()) {
         Result << "<DeprecatedInVersion>"
                << DeprecatedInVersion.getAsString()
                << "</DeprecatedInVersion>";
       }
-      VersionTuple RemovedAfterVersion = AA->getObsoleted();
+      llvm::VersionTuple RemovedAfterVersion = AA->getObsoleted();
       if (!RemovedAfterVersion.empty()) {
         Result << "<RemovedAfterVersion>"
                << RemovedAfterVersion.getAsString()
                << "</RemovedAfterVersion>";
       }
-      StringRef DeprecationSummary = AA->getMessage();
+      llvm::StringRef DeprecationSummary = AA->getMessage();
       if (!DeprecationSummary.empty()) {
         Result << "<DeprecationSummary>";
         appendToResultWithXMLEscaping(DeprecationSummary);
@@ -1081,8 +1081,8 @@ void CommentASTToXMLConverter::visitFullComment(const FullComment *C) {
   Result << RootEndTag;
 }
 
-void CommentASTToXMLConverter::appendToResultWithXMLEscaping(StringRef S) {
-  for (StringRef::iterator I = S.begin(), E = S.end(); I != E; ++I) {
+void CommentASTToXMLConverter::appendToResultWithXMLEscaping(llvm::StringRef S) {
+  for (llvm::StringRef::iterator I = S.begin(), E = S.end(); I != E; ++I) {
     const char C = *I;
     switch (C) {
     case '&':
@@ -1107,7 +1107,7 @@ void CommentASTToXMLConverter::appendToResultWithXMLEscaping(StringRef S) {
   }
 }
 
-void CommentASTToXMLConverter::appendToResultWithCDATAEscaping(StringRef S) {
+void CommentASTToXMLConverter::appendToResultWithCDATAEscaping(llvm::StringRef S) {
   if (S.empty())
     return;
 
@@ -1119,7 +1119,7 @@ void CommentASTToXMLConverter::appendToResultWithCDATAEscaping(StringRef S) {
       S = S.drop_front(3);
       continue;
     }
-    if (Pos == StringRef::npos)
+    if (Pos == llvm::StringRef::npos)
       Pos = S.size();
 
     Result << S.substr(0, Pos);
@@ -1133,7 +1133,7 @@ CommentToXMLConverter::CommentToXMLConverter() {}
 CommentToXMLConverter::~CommentToXMLConverter() {}
 
 void CommentToXMLConverter::convertCommentToHTML(const FullComment *FC,
-                                                 SmallVectorImpl<char> &HTML,
+                                                 llvm::SmallVectorImpl<char> &HTML,
                                                  const ASTContext &Context) {
   CommentASTToHTMLConverter Converter(FC, HTML,
                                       Context.getCommentCommandTraits());
@@ -1141,7 +1141,7 @@ void CommentToXMLConverter::convertCommentToHTML(const FullComment *FC,
 }
 
 void CommentToXMLConverter::convertHTMLTagNodeToText(
-    const comments::HTMLTagComment *HTC, SmallVectorImpl<char> &Text,
+    const comments::HTMLTagComment *HTC, llvm::SmallVectorImpl<char> &Text,
     const ASTContext &Context) {
   CommentASTToHTMLConverter Converter(nullptr, Text,
                                       Context.getCommentCommandTraits());
@@ -1149,7 +1149,7 @@ void CommentToXMLConverter::convertHTMLTagNodeToText(
 }
 
 void CommentToXMLConverter::convertCommentToXML(const FullComment *FC,
-                                                SmallVectorImpl<char> &XML,
+                                                llvm::SmallVectorImpl<char> &XML,
                                                 const ASTContext &Context) {
   CommentASTToXMLConverter Converter(FC, XML, Context.getCommentCommandTraits(),
                                      Context.getSourceManager());

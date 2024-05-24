@@ -14,7 +14,7 @@ namespace clang::tidy {
 
 // Returns true if GlobList starts with the negative indicator ('-'), removes it
 // from the GlobList.
-static bool consumeNegativeIndicator(StringRef &GlobList) {
+static bool consumeNegativeIndicator(llvm::StringRef &GlobList) {
   GlobList = GlobList.trim();
   return GlobList.consume_front("-");
 }
@@ -22,16 +22,16 @@ static bool consumeNegativeIndicator(StringRef &GlobList) {
 // Extracts the first glob from the comma-separated list of globs,
 // removes it and the trailing comma from the GlobList and
 // returns the extracted glob.
-static llvm::StringRef extractNextGlob(StringRef &GlobList) {
-  StringRef UntrimmedGlob = GlobList.substr(0, GlobList.find_first_of(",\n"));
-  StringRef Glob = UntrimmedGlob.trim();
+static llvm::StringRef extractNextGlob(llvm::StringRef &GlobList) {
+  llvm::StringRef UntrimmedGlob = GlobList.substr(0, GlobList.find_first_of(",\n"));
+  llvm::StringRef Glob = UntrimmedGlob.trim();
   GlobList = GlobList.substr(UntrimmedGlob.size() + 1);
   return Glob;
 }
 
-static llvm::Regex createRegexFromGlob(StringRef &Glob) {
-  SmallString<128> RegexText("^");
-  StringRef MetaChars("()^$|*+?.[]\\{}");
+static llvm::Regex createRegexFromGlob(llvm::StringRef &Glob) {
+  llvm::SmallString<128> RegexText("^");
+  llvm::StringRef MetaChars("()^$|*+?.[]\\{}");
   for (char C : Glob) {
     if (C == '*')
       RegexText.push_back('.');
@@ -43,7 +43,7 @@ static llvm::Regex createRegexFromGlob(StringRef &Glob) {
   return {RegexText.str()};
 }
 
-GlobList::GlobList(StringRef Globs, bool KeepNegativeGlobs /* =true */) {
+GlobList::GlobList(llvm::StringRef Globs, bool KeepNegativeGlobs /* =true */) {
   Items.reserve(Globs.count(',') + Globs.count('\n') + 1);
   do {
     GlobListItem Item;
@@ -55,7 +55,7 @@ GlobList::GlobList(StringRef Globs, bool KeepNegativeGlobs /* =true */) {
   } while (!Globs.empty());
 }
 
-bool GlobList::contains(StringRef S) const {
+bool GlobList::contains(llvm::StringRef S) const {
   // Iterating the container backwards as the last match determins if S is in
   // the list.
   for (const GlobListItem &Item : llvm::reverse(Items)) {
@@ -65,7 +65,7 @@ bool GlobList::contains(StringRef S) const {
   return false;
 }
 
-bool CachedGlobList::contains(StringRef S) const {
+bool CachedGlobList::contains(llvm::StringRef S) const {
   auto Entry = Cache.try_emplace(S);
   bool &Value = Entry.first->getValue();
   // If the entry was just inserted, determine its required value.

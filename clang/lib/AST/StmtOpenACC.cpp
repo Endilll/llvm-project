@@ -26,7 +26,7 @@ OpenACCComputeConstruct::CreateEmpty(const ASTContext &C, unsigned NumClauses) {
 OpenACCComputeConstruct *
 OpenACCComputeConstruct::Create(const ASTContext &C, OpenACCDirectiveKind K,
                                 SourceLocation BeginLoc, SourceLocation EndLoc,
-                                ArrayRef<const OpenACCClause *> Clauses,
+                                llvm::ArrayRef<const OpenACCClause *> Clauses,
                                 Stmt *StructuredBlock) {
   void *Mem = C.Allocate(
       OpenACCComputeConstruct::totalSizeToAlloc<const OpenACCClause *>(

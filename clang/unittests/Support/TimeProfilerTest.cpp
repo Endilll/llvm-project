@@ -28,7 +28,7 @@ void setupProfiler() {
 // Should be called after `compileFromString()`.
 // Returns profiler's JSON dump.
 std::string teardownProfiler() {
-  SmallVector<char, 1024> SmallVec;
+  llvm::SmallVector<char, 1024> SmallVec;
   raw_svector_ostream OS(SmallVec);
   timeTraceProfilerWrite(OS);
   timeTraceProfilerCleanup();
@@ -37,7 +37,7 @@ std::string teardownProfiler() {
 
 // Returns true if code compiles successfully.
 // We only parse AST here. This is enough for constexpr evaluation.
-bool compileFromString(StringRef Code, StringRef Standard, StringRef FileName) {
+bool compileFromString(llvm::StringRef Code, llvm::StringRef Standard, llvm::StringRef FileName) {
   CompilerInstance Compiler;
   Compiler.createDiagnostics();
 
@@ -52,7 +52,7 @@ bool compileFromString(StringRef Code, StringRef Standard, StringRef FileName) {
   class TestFrontendAction : public ASTFrontendAction {
   private:
     std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                   StringRef InFile) override {
+                                                   llvm::StringRef InFile) override {
       return std::make_unique<ASTConsumer>();
     }
   } Action;
@@ -60,17 +60,17 @@ bool compileFromString(StringRef Code, StringRef Standard, StringRef FileName) {
 }
 
 // Returns pretty-printed trace graph.
-std::string buildTraceGraph(StringRef Json) {
+std::string buildTraceGraph(llvm::StringRef Json) {
   struct EventRecord {
     int64_t TimestampBegin;
     int64_t TimestampEnd;
-    StringRef Name;
-    StringRef Detail;
+    llvm::StringRef Name;
+    llvm::StringRef Detail;
   };
   std::vector<EventRecord> Events;
 
   // Parse `EventRecord`s from JSON dump.
-  Expected<json::Value> Root = json::parse(Json);
+  llvm::Expected<json::Value> Root = json::parse(Json);
   if (!Root)
     return "";
   for (json::Value &TraceEventValue :
@@ -80,8 +80,8 @@ std::string buildTraceGraph(StringRef Json) {
     int64_t TimestampBegin = TraceEventObj->getInteger("ts").value_or(0);
     int64_t TimestampEnd =
         TimestampBegin + TraceEventObj->getInteger("dur").value_or(0);
-    StringRef Name = TraceEventObj->getString("name").value_or("");
-    StringRef Detail = "";
+    llvm::StringRef Name = TraceEventObj->getString("name").value_or("");
+    llvm::StringRef Detail = "";
     if (json::Object *Args = TraceEventObj->getObject("args"))
       Detail = Args->getString("detail").value_or("");
 
@@ -144,7 +144,7 @@ std::string buildTraceGraph(StringRef Json) {
 } // namespace
 
 TEST(TimeProfilerTest, ConstantEvaluationCxx20) {
-  constexpr StringRef Code = R"(
+  constexpr llvm::StringRef Code = R"(
 void print(double value);
 
 namespace slow_namespace {
@@ -208,7 +208,7 @@ Frontend
 }
 
 TEST(TimeProfilerTest, ConstantEvaluationC99) {
-  constexpr StringRef Code = R"(
+  constexpr llvm::StringRef Code = R"(
 struct {
   short quantval[4]; // 3rd line
 } value;

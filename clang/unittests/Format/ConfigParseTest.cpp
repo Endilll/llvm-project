@@ -23,7 +23,7 @@ FormatStyle getGoogleStyle() { return getGoogleStyle(FormatStyle::LK_Cpp); }
       << "Style #" << i << " of " << Styles.size() << " differs from Style #0"
 
 TEST(ConfigParseTest, GetsPredefinedStyleByName) {
-  SmallVector<FormatStyle, 3> Styles;
+  llvm::SmallVector<FormatStyle, 3> Styles;
   Styles.resize(3);
 
   Styles[0] = getLLVMStyle();
@@ -74,7 +74,7 @@ TEST(ConfigParseTest, GetsPredefinedStyleByName) {
 }
 
 TEST(ConfigParseTest, GetsCorrectBasedOnStyle) {
-  SmallVector<FormatStyle, 8> Styles;
+  llvm::SmallVector<FormatStyle, 8> Styles;
   Styles.resize(2);
 
   Styles[0] = getGoogleStyle();
@@ -1424,7 +1424,7 @@ TEST(ConfigParseTest, GetStyleOfSpecificFile) {
   llvm::consumeError(Style.takeError());
 
   // Specify path to a file on the filesystem.
-  SmallString<128> FormatFilePath;
+  llvm::SmallString<128> FormatFilePath;
   std::error_code ECF = llvm::sys::fs::createTemporaryFile(
       "FormatFileTest", "tpl", FormatFilePath);
   EXPECT_FALSE((bool)ECF);
@@ -1433,7 +1433,7 @@ TEST(ConfigParseTest, GetStyleOfSpecificFile) {
   FormatFileTest << "BasedOnStyle: Google\n";
   FormatFileTest.close();
 
-  SmallString<128> TestFilePath;
+  llvm::SmallString<128> TestFilePath;
   std::error_code ECT =
       llvm::sys::fs::createTemporaryFile("CodeFileTest", "cc", TestFilePath);
   EXPECT_FALSE((bool)ECT);

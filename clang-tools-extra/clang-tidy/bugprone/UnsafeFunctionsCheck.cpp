@@ -29,19 +29,19 @@ static constexpr llvm::StringLiteral AdditionalFunctionNamesId =
 static constexpr llvm::StringLiteral DeclRefId = "DRE";
 
 static std::optional<std::string>
-getAnnexKReplacementFor(StringRef FunctionName) {
+getAnnexKReplacementFor(llvm::StringRef FunctionName) {
   return StringSwitch<std::string>(FunctionName)
       .Case("strlen", "strnlen_s")
       .Case("wcslen", "wcsnlen_s")
-      .Default((Twine{FunctionName} + "_s").str());
+      .Default((llvm::Twine{FunctionName} + "_s").str());
 }
 
-static StringRef getReplacementFor(StringRef FunctionName,
+static llvm::StringRef getReplacementFor(llvm::StringRef FunctionName,
                                    bool IsAnnexKAvailable) {
   if (IsAnnexKAvailable) {
     // Try to find a better replacement from Annex K first.
-    StringRef AnnexKReplacementFunction =
-        StringSwitch<StringRef>(FunctionName)
+    llvm::StringRef AnnexKReplacementFunction =
+        StringSwitch<llvm::StringRef>(FunctionName)
             .Cases("asctime", "asctime_r", "asctime_s")
             .Case("gets", "gets_s")
             .Default({});
@@ -51,18 +51,18 @@ static StringRef getReplacementFor(StringRef FunctionName,
 
   // FIXME: Some of these functions are available in C++ under "std::", and
   // should be matched and suggested.
-  return StringSwitch<StringRef>(FunctionName)
+  return StringSwitch<llvm::StringRef>(FunctionName)
       .Cases("asctime", "asctime_r", "strftime")
       .Case("gets", "fgets")
       .Case("rewind", "fseek")
       .Case("setbuf", "setvbuf");
 }
 
-static StringRef getReplacementForAdditional(StringRef FunctionName,
+static llvm::StringRef getReplacementForAdditional(llvm::StringRef FunctionName,
                                              bool IsAnnexKAvailable) {
   if (IsAnnexKAvailable) {
     // Try to find a better replacement from Annex K first.
-    StringRef AnnexKReplacementFunction = StringSwitch<StringRef>(FunctionName)
+    llvm::StringRef AnnexKReplacementFunction = StringSwitch<llvm::StringRef>(FunctionName)
                                               .Case("bcopy", "memcpy_s")
                                               .Case("bzero", "memset_s")
                                               .Default({});
@@ -71,7 +71,7 @@ static StringRef getReplacementForAdditional(StringRef FunctionName,
       return AnnexKReplacementFunction;
   }
 
-  return StringSwitch<StringRef>(FunctionName)
+  return StringSwitch<llvm::StringRef>(FunctionName)
       .Case("bcmp", "memcmp")
       .Case("bcopy", "memcpy")
       .Case("bzero", "memset")
@@ -81,8 +81,8 @@ static StringRef getReplacementForAdditional(StringRef FunctionName,
 
 /// \returns The rationale for replacing the function \p FunctionName with the
 /// safer alternative.
-static StringRef getRationaleFor(StringRef FunctionName) {
-  return StringSwitch<StringRef>(FunctionName)
+static llvm::StringRef getRationaleFor(llvm::StringRef FunctionName) {
+  return StringSwitch<llvm::StringRef>(FunctionName)
       .Cases("asctime", "asctime_r", "ctime",
              "is not bounds-checking and non-reentrant")
       .Cases("bcmp", "bcopy", "bzero", "is deprecated")
@@ -123,11 +123,11 @@ static bool isAnnexKAvailable(std::optional<bool> &CacheVar, Preprocessor *PP,
   if (!T.isLiteral() || !T.getLiteralData())
     return (CacheVar = false).value();
 
-  CacheVar = StringRef(T.getLiteralData(), T.getLength()) == "1";
+  CacheVar = llvm::StringRef(T.getLiteralData(), T.getLength()) == "1";
   return CacheVar.value();
 }
 
-UnsafeFunctionsCheck::UnsafeFunctionsCheck(StringRef Name,
+UnsafeFunctionsCheck::UnsafeFunctionsCheck(llvm::StringRef Name,
                                            ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       ReportMoreUnsafeFunctions(
@@ -195,7 +195,7 @@ void UnsafeFunctionsCheck::check(const MatchFinder::MatchResult &Result) {
 
   bool AnnexKIsAvailable =
       isAnnexKAvailable(IsAnnexKAvailable, PP, getLangOpts());
-  StringRef FunctionName = FuncDecl->getName();
+  llvm::StringRef FunctionName = FuncDecl->getName();
   const std::optional<std::string> ReplacementFunctionName =
       [&]() -> std::optional<std::string> {
     if (AnnexK) {

@@ -119,7 +119,7 @@ public:
 
   /// Range over argument types.
   using arg_reverse_iterator =
-      SmallVectorImpl<PrimType>::const_reverse_iterator;
+      llvm::SmallVectorImpl<PrimType>::const_reverse_iterator;
   llvm::iterator_range<arg_reverse_iterator> args_reverse() const {
     return llvm::reverse(ParamTypes);
   }

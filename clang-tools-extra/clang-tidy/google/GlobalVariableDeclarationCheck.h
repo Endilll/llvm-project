@@ -21,7 +21,7 @@ namespace clang::tidy::google::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/google/objc-global-variable-declaration.html
 class GlobalVariableDeclarationCheck : public ClangTidyCheck {
  public:
-  GlobalVariableDeclarationCheck(StringRef Name, ClangTidyContext *Context)
+  GlobalVariableDeclarationCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC;

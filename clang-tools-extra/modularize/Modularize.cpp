@@ -338,7 +338,7 @@ std::string CommandLine;
 static std::string findInputFile(const CommandLineArguments &CLArgs) {
   llvm::opt::Visibility VisibilityMask(options::CC1Option);
   unsigned MissingArgIndex, MissingArgCount;
-  SmallVector<const char *, 256> Argv;
+  llvm::SmallVector<const char *, 256> Argv;
   for (auto I = CLArgs.begin(), E = CLArgs.end(); I != E; ++I)
     Argv.push_back(I->c_str());
   InputArgList Args = getDriverOptTable().ParseArgs(
@@ -353,7 +353,7 @@ static std::string findInputFile(const CommandLineArguments &CLArgs) {
 static ArgumentsAdjuster
 getModularizeArgumentsAdjuster(DependencyMap &Dependencies) {
   return [&Dependencies](const CommandLineArguments &Args,
-                         StringRef /*unused*/) {
+                         llvm::StringRef /*unused*/) {
     std::string InputFile = findInputFile(Args);
     DependentsVector &FileDependents = Dependencies[InputFile];
     CommandLineArguments NewArgs(Args);
@@ -436,12 +436,12 @@ struct Entry {
 
   Location Loc;
 
-  StringRef getKindName() { return getKindName(Kind); }
-  static StringRef getKindName(EntryKind kind);
+  llvm::StringRef getKindName() { return getKindName(Kind); }
+  static llvm::StringRef getKindName(EntryKind kind);
 };
 
 // Return a string representing the given kind.
-StringRef Entry::getKindName(Entry::EntryKind kind) {
+llvm::StringRef Entry::getKindName(Entry::EntryKind kind) {
   switch (kind) {
   case EK_Tag:
     return "tag";
@@ -481,7 +481,7 @@ struct HeaderEntry {
 
 typedef std::vector<HeaderEntry> HeaderContents;
 
-class EntityMap : public std::map<std::string, SmallVector<Entry, 2>> {
+class EntityMap : public std::map<std::string, llvm::SmallVector<Entry, 2>> {
 public:
   DenseMap<FileEntryRef, HeaderContents> HeaderContentMismatches;
 
@@ -491,7 +491,7 @@ public:
     CurHeaderContents[*Loc.File].push_back(HE);
 
     // Check whether we've seen this entry before.
-    SmallVector<Entry, 2> &Entries = (*this)[Name];
+    llvm::SmallVector<Entry, 2> &Entries = (*this)[Name];
     for (unsigned I = 0, N = Entries.size(); I != N; ++I) {
       if (Entries[I].Kind == Kind && Entries[I].Loc == Loc)
         return;
@@ -559,7 +559,7 @@ public:
   bool TraverseTemplateArgumentLoc(const TemplateArgumentLoc &ArgLoc) {
     return true;
   }
-  bool TraverseTemplateArguments(ArrayRef<TemplateArgument>) { return true; }
+  bool TraverseTemplateArguments(llvm::ArrayRef<TemplateArgument>) { return true; }
   bool TraverseConstructorInitializer(CXXCtorInitializer *Init) { return true; }
   bool TraverseLambdaCapture(LambdaExpr *LE, const LambdaCapture *C,
                              Expr *Init) {
@@ -648,7 +648,7 @@ class CollectEntitiesConsumer : public ASTConsumer {
 public:
   CollectEntitiesConsumer(EntityMap &Entities,
                           PreprocessorTracker &preprocessorTracker,
-                          Preprocessor &PP, StringRef InFile, int &HadErrors)
+                          Preprocessor &PP, llvm::StringRef InFile, int &HadErrors)
       : Entities(Entities), PPTracker(preprocessorTracker), PP(PP),
         HadErrors(HadErrors) {
     PPTracker.handlePreprocessorEntry(PP, InFile);
@@ -695,7 +695,7 @@ public:
 
 protected:
   std::unique_ptr<clang::ASTConsumer>
-  CreateASTConsumer(CompilerInstance &CI, StringRef InFile) override {
+  CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) override {
     return std::make_unique<CollectEntitiesConsumer>(
         Entities, PPTracker, CI.getPreprocessor(), InFile, HadErrors);
   }
@@ -745,7 +745,7 @@ public:
   bool TraverseTemplateArgumentLoc(const TemplateArgumentLoc &ArgLoc) {
     return true;
   }
-  bool TraverseTemplateArguments(ArrayRef<TemplateArgument>) { return true; }
+  bool TraverseTemplateArguments(llvm::ArrayRef<TemplateArgument>) { return true; }
   bool TraverseConstructorInitializer(CXXCtorInitializer *Init) { return true; }
   bool TraverseLambdaCapture(LambdaExpr *LE, const LambdaCapture *C,
                              Expr *Init) {
@@ -783,7 +783,7 @@ public:
 
 protected:
   std::unique_ptr<clang::ASTConsumer>
-    CreateASTConsumer(CompilerInstance &CI, StringRef InFile) override {
+    CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) override {
     return std::make_unique<CompileCheckConsumer>();
   }
 };
@@ -850,11 +850,11 @@ int main(int Argc, const char **Argv) {
     return HadErrors;
 
   // Create the compilation database.
-  SmallString<256> PathBuf;
+  llvm::SmallString<256> PathBuf;
   sys::fs::current_path(PathBuf);
   std::unique_ptr<CompilationDatabase> Compilations;
   Compilations.reset(
-      new FixedCompilationDatabase(Twine(PathBuf), CC1Arguments));
+      new FixedCompilationDatabase(llvm::Twine(PathBuf), CC1Arguments));
 
   // Create preprocessor tracker, to watch for macro and conditional problems.
   std::unique_ptr<PreprocessorTracker> PPTracker(
@@ -898,8 +898,8 @@ int main(int Argc, const char **Argv) {
   HadErrors |= Tool.run(&Factory);
 
   // Create a place to save duplicate entity locations, separate bins per kind.
-  typedef SmallVector<Location, 8> LocationArray;
-  typedef SmallVector<LocationArray, Entry::EK_NumberOfKinds> EntryBinArray;
+  typedef llvm::SmallVector<Location, 8> LocationArray;
+  typedef llvm::SmallVector<LocationArray, Entry::EK_NumberOfKinds> EntryBinArray;
   EntryBinArray EntryBins;
   int KindIndex;
   for (KindIndex = 0; KindIndex < Entry::EK_NumberOfKinds; ++KindIndex) {
@@ -932,7 +932,7 @@ int main(int Argc, const char **Argv) {
       if (ECount <= 1)
         continue;
       LocationArray::iterator FI = DI->begin();
-      StringRef kindName = Entry::getKindName((Entry::EntryKind)KindIndex);
+      llvm::StringRef kindName = Entry::getKindName((Entry::EntryKind)KindIndex);
       errs() << "error: " << kindName << " '" << E->first
              << "' defined at multiple locations:\n";
       for (LocationArray::iterator FE = DI->end(); FI != FE; ++FI) {

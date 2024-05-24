@@ -323,14 +323,14 @@ public:
   /// \param ITraits information about special handling for a particular
   ///        region/symbol.
   [[nodiscard]] ProgramStateRef
-  invalidateRegions(ArrayRef<const MemRegion *> Regions, const Expr *E,
+  invalidateRegions(llvm::ArrayRef<const MemRegion *> Regions, const Expr *E,
                     unsigned BlockCount, const LocationContext *LCtx,
                     bool CausesPointerEscape, InvalidatedSymbols *IS = nullptr,
                     const CallEvent *Call = nullptr,
                     RegionAndSymbolInvalidationTraits *ITraits = nullptr) const;
 
   [[nodiscard]] ProgramStateRef
-  invalidateRegions(ArrayRef<SVal> Regions, const Expr *E, unsigned BlockCount,
+  invalidateRegions(llvm::ArrayRef<SVal> Regions, const Expr *E, unsigned BlockCount,
                     const LocationContext *LCtx, bool CausesPointerEscape,
                     InvalidatedSymbols *IS = nullptr,
                     const CallEvent *Call = nullptr,
@@ -471,11 +471,11 @@ public:
   }
 
   // Pretty-printing.
-  void printJson(raw_ostream &Out, const LocationContext *LCtx = nullptr,
+  void printJson(llvm::raw_ostream &Out, const LocationContext *LCtx = nullptr,
                  const char *NL = "\n", unsigned int Space = 0,
                  bool IsDot = false) const;
 
-  void printDOT(raw_ostream &Out, const LocationContext *LCtx = nullptr,
+  void printDOT(llvm::raw_ostream &Out, const LocationContext *LCtx = nullptr,
                 unsigned int Space = 0) const;
 
   void dump() const;
@@ -487,7 +487,7 @@ private:
   /// \sa invalidateValues()
   /// \sa invalidateRegions()
   ProgramStateRef
-  invalidateRegionsImpl(ArrayRef<SVal> Values,
+  invalidateRegionsImpl(llvm::ArrayRef<SVal> Values,
                         const Expr *E, unsigned BlockCount,
                         const LocationContext *LCtx,
                         bool ResultsInSymbolEscape,

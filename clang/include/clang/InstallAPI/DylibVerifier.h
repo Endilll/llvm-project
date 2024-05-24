@@ -12,6 +12,7 @@
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/InstallAPI/MachO.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 
 namespace clang {
 namespace installapi {
@@ -80,7 +81,7 @@ public:
   DylibVerifier(llvm::MachO::Records &&Dylib, ReexportedInterfaces &&Reexports,
                 AliasMap Aliases, DiagnosticsEngine *Diag,
                 VerificationMode Mode, bool Zippered, bool Demangle,
-                StringRef DSYMPath)
+                llvm::StringRef DSYMPath)
       : Dylib(std::move(Dylib)), Reexports(std::move(Reexports)),
         Aliases(std::move(Aliases)), Mode(Mode), Zippered(Zippered),
         Demangle(Demangle), DSYMPath(DSYMPath),
@@ -89,14 +90,14 @@ public:
   Result verify(GlobalRecord *R, const FrontendAttrs *FA);
   Result verify(ObjCInterfaceRecord *R, const FrontendAttrs *FA);
   Result verify(ObjCIVarRecord *R, const FrontendAttrs *FA,
-                const StringRef SuperClass);
+                const llvm::StringRef SuperClass);
 
   // Scan through dylib slices and report any remaining missing exports.
   Result verifyRemainingSymbols();
 
   /// Compare and report the attributes represented as
   /// load commands in the dylib to the attributes provided via options.
-  bool verifyBinaryAttrs(const ArrayRef<Target> ProvidedTargets,
+  bool verifyBinaryAttrs(const llvm::ArrayRef<Target> ProvidedTargets,
                          const BinaryAttrs &ProvidedBA,
                          const LibAttrs &ProvidedReexports,
                          const LibAttrs &ProvidedClients,
@@ -112,7 +113,7 @@ public:
   Result getState() const { return Ctx.FrontendState; }
 
   /// Set different source managers to the same diagnostics engine.
-  void setSourceManager(IntrusiveRefCntPtr<SourceManager> SourceMgr);
+  void setSourceManager(llvm::IntrusiveRefCntPtr<SourceManager> SourceMgr);
 
 private:
   /// Determine whether to compare declaration to symbol in binary.
@@ -173,7 +174,7 @@ private:
   void visitGlobal(const GlobalRecord &R) override;
   void visitObjCInterface(const ObjCInterfaceRecord &R) override;
   void visitObjCCategory(const ObjCCategoryRecord &R) override;
-  void visitObjCIVar(const ObjCIVarRecord &R, const StringRef Super);
+  void visitObjCIVar(const ObjCIVarRecord &R, const llvm::StringRef Super);
 
   /// Gather annotations for symbol for error reporting.
   std::string getAnnotatedName(const Record *R, SymbolContext &SymCtx,
@@ -204,7 +205,7 @@ private:
   bool Demangle = false;
 
   // File path to DSYM file.
-  StringRef DSYMPath;
+  llvm::StringRef DSYMPath;
 
   // Valid symbols in final text file.
   std::unique_ptr<SymbolSet> Exports = std::make_unique<SymbolSet>();
@@ -220,7 +221,7 @@ private:
   DWARFContext *DWARFCtx = nullptr;
 
   // Source manager for each unique compiler instance.
-  llvm::SmallVector<IntrusiveRefCntPtr<SourceManager>, 12> SourceManagers;
+  llvm::SmallVector<llvm::IntrusiveRefCntPtr<SourceManager>, 12> SourceManagers;
 };
 
 } // namespace installapi

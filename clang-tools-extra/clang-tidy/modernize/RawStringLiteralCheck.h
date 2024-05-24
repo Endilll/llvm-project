@@ -23,7 +23,7 @@ using CharsBitSet = std::bitset<1 << CHAR_BIT>;
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/raw-string-literal.html
 class RawStringLiteralCheck : public ClangTidyCheck {
 public:
-  RawStringLiteralCheck(StringRef Name, ClangTidyContext *Context);
+  RawStringLiteralCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
@@ -35,7 +35,7 @@ public:
 private:
   void replaceWithRawStringLiteral(
       const ast_matchers::MatchFinder::MatchResult &Result,
-      const StringLiteral *Literal, StringRef Replacement);
+      const StringLiteral *Literal, llvm::StringRef Replacement);
 
   std::string DelimiterStem;
   CharsBitSet DisallowedChars;

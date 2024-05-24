@@ -19,7 +19,7 @@ namespace clang::tidy::concurrency {
 /// http://clang.llvm.org/extra/clang-tidy/checks/concurrency/mt-unsafe.html
 class MtUnsafeCheck : public ClangTidyCheck {
 public:
-  MtUnsafeCheck(StringRef Name, ClangTidyContext *Context);
+  MtUnsafeCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

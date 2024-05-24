@@ -63,7 +63,7 @@ void outOfLineInlineUseLeftH(void (OutOfLineInline<int>::*)() = &OutOfLineInline
 
 namespace EmitDefaultedSpecialMembers {
   inline void f() {
-    SmallString<256> SS;
+    llvm::SmallString<256> SS;
   };
 }
 

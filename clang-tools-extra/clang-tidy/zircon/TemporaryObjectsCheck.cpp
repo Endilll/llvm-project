@@ -18,7 +18,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::zircon {
 
-AST_MATCHER_P(CXXRecordDecl, matchesAnyName, ArrayRef<StringRef>, Names) {
+AST_MATCHER_P(CXXRecordDecl, matchesAnyName, llvm::ArrayRef<llvm::StringRef>, Names) {
   std::string QualifiedName = Node.getQualifiedNameAsString();
   return llvm::is_contained(Names, QualifiedName);
 }

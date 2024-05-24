@@ -55,7 +55,7 @@ public:
   /// Check whether we detected a valid Cuda install.
   bool isValid() const { return IsValid; }
   /// Print information about the detected CUDA installation.
-  void print(raw_ostream &OS) const;
+  void print(llvm::raw_ostream &OS) const;
 
   /// Get the detected Cuda install's version.
   CudaVersion version() const {
@@ -63,15 +63,15 @@ public:
                                        : Version;
   }
   /// Get the detected Cuda installation path.
-  StringRef getInstallPath() const { return InstallPath; }
+  llvm::StringRef getInstallPath() const { return InstallPath; }
   /// Get the detected path to Cuda's bin directory.
-  StringRef getBinPath() const { return BinPath; }
+  llvm::StringRef getBinPath() const { return BinPath; }
   /// Get the detected Cuda Include path.
-  StringRef getIncludePath() const { return IncludePath; }
+  llvm::StringRef getIncludePath() const { return IncludePath; }
   /// Get the detected Cuda device library path.
-  StringRef getLibDevicePath() const { return LibDevicePath; }
+  llvm::StringRef getLibDevicePath() const { return LibDevicePath; }
   /// Get libdevice file for given architecture
-  std::string getLibDeviceFile(StringRef Gpu) const {
+  std::string getLibDeviceFile(llvm::StringRef Gpu) const {
     return LibDeviceMap.lookup(Gpu);
   }
   void WarnIfUnsupportedVersion();
@@ -122,7 +122,7 @@ public:
 
 void getNVPTXTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                             const llvm::opt::ArgList &Args,
-                            std::vector<StringRef> &Features);
+                            std::vector<llvm::StringRef> &Features);
 
 } // end namespace NVPTX
 } // end namespace tools
@@ -139,7 +139,7 @@ public:
                  const llvm::opt::ArgList &Args);
 
   llvm::opt::DerivedArgList *
-  TranslateArgs(const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+  TranslateArgs(const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
                 Action::OffloadKind DeviceOffloadKind) const override;
 
   void
@@ -170,7 +170,7 @@ public:
 
   /// Uses nvptx-arch tool to get arch of the system GPU. Will return error
   /// if unable to find one.
-  virtual Expected<SmallVector<std::string>>
+  virtual llvm::Expected<llvm::SmallVector<std::string>>
   getSystemGPUArchs(const llvm::opt::ArgList &Args) const override;
 
   CudaInstallationDetector CudaInstallation;
@@ -195,7 +195,7 @@ public:
   std::string getInputFilename(const InputInfo &Input) const override;
 
   llvm::opt::DerivedArgList *
-  TranslateArgs(const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+  TranslateArgs(const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
                 Action::OffloadKind DeviceOffloadKind) const override;
   void
   addClangTargetOptions(const llvm::opt::ArgList &DriverArgs,
@@ -222,7 +222,7 @@ public:
 
   SanitizerMask getSupportedSanitizers() const override;
 
-  VersionTuple
+  llvm::VersionTuple
   computeMSVCVersion(const Driver *D,
                      const llvm::opt::ArgList &Args) const override;
 

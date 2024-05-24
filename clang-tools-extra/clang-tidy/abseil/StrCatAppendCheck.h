@@ -20,7 +20,7 @@ namespace clang::tidy::abseil {
 /// http://clang.llvm.org/extra/clang-tidy/checks/abseil/str-cat-append.html
 class StrCatAppendCheck : public ClangTidyCheck {
 public:
-  StrCatAppendCheck(StringRef Name, ClangTidyContext *Context)
+  StrCatAppendCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

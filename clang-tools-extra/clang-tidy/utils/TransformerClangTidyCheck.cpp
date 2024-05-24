@@ -54,7 +54,7 @@ std::string escapeForDiagnostic(std::string ToEscape) {
   return Result;
 }
 
-TransformerClangTidyCheck::TransformerClangTidyCheck(StringRef Name,
+TransformerClangTidyCheck::TransformerClangTidyCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       Inserter(Options.getLocalOrGlobal("IncludeStyle", IncludeSorter::IS_LLVM),
@@ -69,7 +69,7 @@ TransformerClangTidyCheck::TransformerClangTidyCheck(
     std::function<std::optional<RewriteRuleWith<std::string>>(
         const LangOptions &, const OptionsView &)>
         MakeRule,
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : TransformerClangTidyCheck(Name, Context) {
   if (std::optional<RewriteRuleWith<std::string>> R =
           MakeRule(getLangOpts(), Options))
@@ -77,7 +77,7 @@ TransformerClangTidyCheck::TransformerClangTidyCheck(
 }
 
 TransformerClangTidyCheck::TransformerClangTidyCheck(
-    RewriteRuleWith<std::string> R, StringRef Name, ClangTidyContext *Context)
+    RewriteRuleWith<std::string> R, llvm::StringRef Name, ClangTidyContext *Context)
     : TransformerClangTidyCheck(Name, Context) {
   setRule(std::move(R));
 }
@@ -106,7 +106,7 @@ void TransformerClangTidyCheck::check(
     return;
 
   size_t I = transformer::detail::findSelectedCase(Result, Rule);
-  Expected<SmallVector<transformer::Edit, 1>> Edits =
+  llvm::Expected<llvm::SmallVector<transformer::Edit, 1>> Edits =
       Rule.Cases[I].Edits(Result);
   if (!Edits) {
     llvm::errs() << "Rewrite failed: " << llvm::toString(Edits.takeError())
@@ -118,7 +118,7 @@ void TransformerClangTidyCheck::check(
   if (Edits->empty())
     return;
 
-  Expected<std::string> Explanation = Rule.Metadata[I]->eval(Result);
+  llvm::Expected<std::string> Explanation = Rule.Metadata[I]->eval(Result);
   if (!Explanation) {
     llvm::errs() << "Error in explanation: "
                  << llvm::toString(Explanation.takeError()) << "\n";

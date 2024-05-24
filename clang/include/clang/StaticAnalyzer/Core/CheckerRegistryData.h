@@ -42,16 +42,16 @@ using ShouldRegisterFunction = bool (*)(const CheckerManager &);
 /// Specifies a command line option. It may either belong to a checker or a
 /// package.
 struct CmdLineOption {
-  StringRef OptionType;
-  StringRef OptionName;
-  StringRef DefaultValStr;
-  StringRef Description;
-  StringRef DevelopmentStatus;
+  llvm::StringRef OptionType;
+  llvm::StringRef OptionName;
+  llvm::StringRef DefaultValStr;
+  llvm::StringRef Description;
+  llvm::StringRef DevelopmentStatus;
   bool IsHidden;
 
-  CmdLineOption(StringRef OptionType, StringRef OptionName,
-                StringRef DefaultValStr, StringRef Description,
-                StringRef DevelopmentStatus, bool IsHidden)
+  CmdLineOption(llvm::StringRef OptionType, llvm::StringRef OptionName,
+                llvm::StringRef DefaultValStr, llvm::StringRef Description,
+                llvm::StringRef DevelopmentStatus, bool IsHidden)
       : OptionType(OptionType), OptionName(OptionName),
         DefaultValStr(DefaultValStr), Description(Description),
         DevelopmentStatus(DevelopmentStatus), IsHidden(IsHidden) {
@@ -103,9 +103,9 @@ struct CheckerInfo {
 
   RegisterCheckerFn Initialize = nullptr;
   ShouldRegisterFunction ShouldRegister = nullptr;
-  StringRef FullName;
-  StringRef Desc;
-  StringRef DocumentationUri;
+  llvm::StringRef FullName;
+  llvm::StringRef Desc;
+  llvm::StringRef DocumentationUri;
   CmdLineOptionList CmdLineOptions;
   bool IsHidden = false;
   StateFromCmdLine State = StateFromCmdLine::State_Unspecified;
@@ -127,13 +127,13 @@ struct CheckerInfo {
     return FullName == Rhs.FullName;
   }
 
-  CheckerInfo(RegisterCheckerFn Fn, ShouldRegisterFunction sfn, StringRef Name,
-              StringRef Desc, StringRef DocsUri, bool IsHidden)
+  CheckerInfo(RegisterCheckerFn Fn, ShouldRegisterFunction sfn, llvm::StringRef Name,
+              llvm::StringRef Desc, llvm::StringRef DocsUri, bool IsHidden)
       : Initialize(Fn), ShouldRegister(sfn), FullName(Name), Desc(Desc),
         DocumentationUri(DocsUri), IsHidden(IsHidden) {}
 
   // Used for lower_bound.
-  explicit CheckerInfo(StringRef FullName) : FullName(FullName) {}
+  explicit CheckerInfo(llvm::StringRef FullName) : FullName(FullName) {}
 
   LLVM_DUMP_METHOD void dump() const;
   LLVM_DUMP_METHOD void dumpToStream(llvm::raw_ostream &Out) const;
@@ -144,7 +144,7 @@ using StateFromCmdLine = CheckerInfo::StateFromCmdLine;
 /// Specifies a package. Each package option is implicitly an option for all
 /// checkers within the package.
 struct PackageInfo {
-  StringRef FullName;
+  llvm::StringRef FullName;
   CmdLineOptionList CmdLineOptions;
 
   // Since each package must have a different full name, we can identify
@@ -153,7 +153,7 @@ struct PackageInfo {
     return FullName == Rhs.FullName;
   }
 
-  explicit PackageInfo(StringRef FullName) : FullName(FullName) {}
+  explicit PackageInfo(llvm::StringRef FullName) : FullName(FullName) {}
 
   LLVM_DUMP_METHOD void dump() const;
   LLVM_DUMP_METHOD void dumpToStream(llvm::raw_ostream &Out) const;
@@ -176,7 +176,7 @@ template <class CheckerOrPackageInfoList>
 std::conditional_t<std::is_const<CheckerOrPackageInfoList>::value,
                    typename CheckerOrPackageInfoList::const_iterator,
                    typename CheckerOrPackageInfoList::iterator>
-binaryFind(CheckerOrPackageInfoList &Collection, StringRef FullName) {
+binaryFind(CheckerOrPackageInfoList &Collection, llvm::StringRef FullName) {
 
   using CheckerOrPackage = typename CheckerOrPackageInfoList::value_type;
   using CheckerOrPackageFullNameLT = FullNameLT<CheckerOrPackage>;
@@ -203,21 +203,21 @@ public:
   /// Contains all (FullName, CmdLineOption) pairs. Similarly to dependencies,
   /// we only modify the actual CheckerInfo and PackageInfo objects once all
   /// of them have been added.
-  llvm::SmallVector<std::pair<StringRef, CmdLineOption>, 0> PackageOptions;
-  llvm::SmallVector<std::pair<StringRef, CmdLineOption>, 0> CheckerOptions;
+  llvm::SmallVector<std::pair<llvm::StringRef, CmdLineOption>, 0> PackageOptions;
+  llvm::SmallVector<std::pair<llvm::StringRef, CmdLineOption>, 0> CheckerOptions;
 
-  llvm::SmallVector<std::pair<StringRef, StringRef>, 0> Dependencies;
-  llvm::SmallVector<std::pair<StringRef, StringRef>, 0> WeakDependencies;
+  llvm::SmallVector<std::pair<llvm::StringRef, llvm::StringRef>, 0> Dependencies;
+  llvm::SmallVector<std::pair<llvm::StringRef, llvm::StringRef>, 0> WeakDependencies;
 
-  CheckerInfoListRange getMutableCheckersForCmdLineArg(StringRef CmdLineArg);
+  CheckerInfoListRange getMutableCheckersForCmdLineArg(llvm::StringRef CmdLineArg);
 
   /// Prints the name and description of all checkers in this registry.
   /// This output is not intended to be machine-parseable.
-  void printCheckerWithDescList(const AnalyzerOptions &AnOpts, raw_ostream &Out,
+  void printCheckerWithDescList(const AnalyzerOptions &AnOpts, llvm::raw_ostream &Out,
                                 size_t MaxNameChars = 30) const;
-  void printEnabledCheckerList(raw_ostream &Out) const;
+  void printEnabledCheckerList(llvm::raw_ostream &Out) const;
   void printCheckerOptionList(const AnalyzerOptions &AnOpts,
-                              raw_ostream &Out) const;
+                              llvm::raw_ostream &Out) const;
 };
 
 } // namespace ento

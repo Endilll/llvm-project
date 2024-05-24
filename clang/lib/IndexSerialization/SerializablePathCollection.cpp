@@ -13,7 +13,7 @@ using namespace llvm;
 using namespace clang;
 using namespace clang::index;
 
-StringPool::StringOffsetSize StringPool::add(StringRef Str) {
+StringPool::StringOffsetSize StringPool::add(llvm::StringRef Str) {
   const std::size_t Offset = Buffer.size();
   Buffer += Str;
   return StringPool::StringOffsetSize(Offset, Str.size());
@@ -21,12 +21,12 @@ StringPool::StringOffsetSize StringPool::add(StringRef Str) {
 
 size_t PathPool::addFilePath(RootDirKind Root,
                              const StringPool::StringOffsetSize &Dir,
-                             StringRef Filename) {
+                             llvm::StringRef Filename) {
   FilePaths.emplace_back(DirPath(Root, Dir), Paths.add(Filename));
   return FilePaths.size() - 1;
 }
 
-StringPool::StringOffsetSize PathPool::addDirPath(StringRef Dir) {
+StringPool::StringOffsetSize PathPool::addDirPath(llvm::StringRef Dir) {
   return Paths.add(Dir);
 }
 
@@ -34,12 +34,12 @@ llvm::ArrayRef<PathPool::FilePath> PathPool::getFilePaths() const {
   return FilePaths;
 }
 
-StringRef PathPool::getPaths() const { return Paths.getBuffer(); }
+llvm::StringRef PathPool::getPaths() const { return Paths.getBuffer(); }
 
 SerializablePathCollection::SerializablePathCollection(
-    StringRef CurrentWorkDir, StringRef SysRoot, llvm::StringRef OutputFile)
+    llvm::StringRef CurrentWorkDir, llvm::StringRef SysRoot, llvm::StringRef OutputFile)
     : WorkDir(CurrentWorkDir),
-      SysRoot(llvm::sys::path::parent_path(SysRoot).empty() ? StringRef()
+      SysRoot(llvm::sys::path::parent_path(SysRoot).empty() ? llvm::StringRef()
                                                             : SysRoot),
       WorkDirPath(Paths.addDirPath(WorkDir)),
       SysRootPath(Paths.addDirPath(SysRoot)),
@@ -58,7 +58,7 @@ size_t SerializablePathCollection::tryStoreFilePath(FileEntryRef FE) {
   return FileIdx;
 }
 
-PathPool::DirPath SerializablePathCollection::tryStoreDirPath(StringRef Dir) {
+PathPool::DirPath SerializablePathCollection::tryStoreDirPath(llvm::StringRef Dir) {
   // We don't want to strip separator if Dir is "/" - so we check size > 1.
   while (Dir.size() > 1 && llvm::sys::path::is_separator(Dir.back()))
     Dir = Dir.drop_back();

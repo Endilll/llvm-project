@@ -16,7 +16,7 @@ namespace clang::tidy::bugprone {
 /// Checks for repeated argument with side effects in macros.
 class MacroRepeatedSideEffectsCheck : public ClangTidyCheck {
 public:
-  MacroRepeatedSideEffectsCheck(StringRef Name, ClangTidyContext *Context)
+  MacroRepeatedSideEffectsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;

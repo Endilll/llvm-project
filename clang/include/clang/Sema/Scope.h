@@ -230,7 +230,7 @@ private:
   /// entity of a function scope is a function, etc.
   DeclContext *Entity;
 
-  using UsingDirectivesTy = SmallVector<UsingDirectiveDecl *, 2>;
+  using UsingDirectivesTy = llvm::SmallVector<UsingDirectiveDecl *, 2>;
   UsingDirectivesTy UsingDirectives;
 
   /// Used to determine if errors occurred in this scope.
@@ -625,7 +625,7 @@ public:
   /// variables accordingly.
   void AddFlags(unsigned Flags);
 
-  void dumpImpl(raw_ostream &OS) const;
+  void dumpImpl(llvm::raw_ostream &OS) const;
   void dump() const;
 };
 

@@ -113,7 +113,7 @@ public:
   /// Returns NULL if there was no node bound to \c ID or if there is a node but
   /// it cannot be converted to the specified type.
   template <typename T>
-  const T *getNodeAs(StringRef ID) const {
+  const T *getNodeAs(llvm::StringRef ID) const {
     return MyBoundNodes.getNodeAs<T>(ID);
   }
 
@@ -791,7 +791,7 @@ AST_POLYMORPHIC_MATCHER_P(
                                     VarTemplateSpecializationDecl, FunctionDecl,
                                     TemplateSpecializationType),
     internal::Matcher<TemplateArgument>, InnerMatcher) {
-  ArrayRef<TemplateArgument> List =
+  llvm::ArrayRef<TemplateArgument> List =
       internal::getTemplateSpecializationArgs(Node);
   return matchesFirstInRange(InnerMatcher, List.begin(), List.end(), Finder,
                              Builder) != List.end();
@@ -1072,7 +1072,7 @@ AST_POLYMORPHIC_MATCHER_P2(
                                     VarTemplateSpecializationDecl, FunctionDecl,
                                     TemplateSpecializationType),
     unsigned, N, internal::Matcher<TemplateArgument>, InnerMatcher) {
-  ArrayRef<TemplateArgument> List =
+  llvm::ArrayRef<TemplateArgument> List =
       internal::getTemplateSpecializationArgs(Node);
   if (List.size() <= N)
     return false;
@@ -3076,7 +3076,7 @@ inline internal::BindableMatcher<Stmt> sizeOfExpr(
 /// \code
 ///   namespace a { namespace b { class X; } }
 /// \endcode
-inline internal::Matcher<NamedDecl> hasName(StringRef Name) {
+inline internal::Matcher<NamedDecl> hasName(llvm::StringRef Name) {
   return internal::Matcher<NamedDecl>(
       new internal::HasNameMatcher({std::string(Name)}));
 }
@@ -3091,7 +3091,7 @@ inline internal::Matcher<NamedDecl> hasName(StringRef Name) {
 /// \code
 ///     anyOf(hasName(a), hasName(b), hasName(c))
 /// \endcode
-extern const internal::VariadicFunction<internal::Matcher<NamedDecl>, StringRef,
+extern const internal::VariadicFunction<internal::Matcher<NamedDecl>, llvm::StringRef,
                                         internal::hasAnyNameFunc>
     hasAnyName;
 
@@ -3139,7 +3139,7 @@ inline internal::PolymorphicMatcher<
     internal::HasOverloadedOperatorNameMatcher,
     AST_POLYMORPHIC_SUPPORTED_TYPES(CXXOperatorCallExpr, FunctionDecl),
     std::vector<std::string>>
-hasOverloadedOperatorName(StringRef Name) {
+hasOverloadedOperatorName(llvm::StringRef Name) {
   return internal::PolymorphicMatcher<
       internal::HasOverloadedOperatorNameMatcher,
       AST_POLYMORPHIC_SUPPORTED_TYPES(CXXOperatorCallExpr, FunctionDecl),
@@ -3159,7 +3159,7 @@ extern const internal::VariadicFunction<
                                  AST_POLYMORPHIC_SUPPORTED_TYPES(
                                      CXXOperatorCallExpr, FunctionDecl),
                                  std::vector<std::string>>,
-    StringRef, internal::hasAnyOverloadedOperatorNameFunc>
+    llvm::StringRef, internal::hasAnyOverloadedOperatorNameFunc>
     hasAnyOverloadedOperatorName;
 
 /// Matches template-dependent, but known, member names.
@@ -3826,7 +3826,7 @@ AST_MATCHER_P(ObjCMessageExpr, hasSelector, std::string, BaseName) {
 ///     [myObj methodB:argB];
 /// \endcode
 extern const internal::VariadicFunction<internal::Matcher<ObjCMessageExpr>,
-                                        StringRef,
+                                        llvm::StringRef,
                                         internal::hasAnySelectorFunc>
                                         hasAnySelector;
 
@@ -5334,7 +5334,7 @@ AST_POLYMORPHIC_MATCHER_P(
                                     VarTemplateSpecializationDecl, FunctionDecl,
                                     TemplateSpecializationType),
     internal::Matcher<TemplateArgument>, InnerMatcher) {
-  ArrayRef<TemplateArgument> TemplateArgs =
+  llvm::ArrayRef<TemplateArgument> TemplateArgs =
       clang::ast_matchers::internal::getTemplateSpecializationArgs(Node);
   clang::ast_matchers::internal::BoundNodesTreeBuilder Result;
   bool Matched = false;
@@ -5901,7 +5901,7 @@ AST_POLYMORPHIC_MATCHER_P(
                                     CXXRewrittenBinaryOperator, CXXFoldExpr,
                                     UnaryOperator),
     std::string, Name) {
-  if (std::optional<StringRef> OpName = internal::getOpName(Node))
+  if (std::optional<llvm::StringRef> OpName = internal::getOpName(Node))
     return *OpName == Name;
   return false;
 }
@@ -5918,7 +5918,7 @@ extern const internal::VariadicFunction<
                                      BinaryOperator, CXXOperatorCallExpr,
                                      CXXRewrittenBinaryOperator, UnaryOperator),
                                  std::vector<std::string>>,
-    StringRef, internal::hasAnyOperatorNameFunc>
+    llvm::StringRef, internal::hasAnyOperatorNameFunc>
     hasAnyOperatorName;
 
 /// Matches all kinds of assignment operators.
@@ -8649,7 +8649,7 @@ AST_MATCHER_P(OMPExecutableDirective, hasStructuredBlock,
 /// ``omp parallel default(none)``.
 AST_MATCHER_P(OMPExecutableDirective, hasAnyClause,
               internal::Matcher<OMPClause>, InnerMatcher) {
-  ArrayRef<OMPClause *> Clauses = Node.clauses();
+  llvm::ArrayRef<OMPClause *> Clauses = Node.clauses();
   return matchesFirstInPointerRange(InnerMatcher, Clauses.begin(),
                                     Clauses.end(), Finder,
                                     Builder) != Clauses.end();

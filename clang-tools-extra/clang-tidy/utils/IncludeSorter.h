@@ -38,38 +38,38 @@ public:
   /// ``IncludeSorter`` constructor; takes the FileID and name of the file to be
   /// processed by the sorter.
   IncludeSorter(const SourceManager *SourceMgr, const FileID FileID,
-                StringRef FileName, IncludeStyle Style);
+                llvm::StringRef FileName, IncludeStyle Style);
 
   /// Adds the given include directive to the sorter.
-  void addInclude(StringRef FileName, bool IsAngled,
+  void addInclude(llvm::StringRef FileName, bool IsAngled,
                   SourceLocation HashLocation, SourceLocation EndLocation);
 
   /// Creates a quoted inclusion directive in the right sort order. Returns
   /// std::nullopt on error or if header inclusion directive for header already
   /// exists.
-  std::optional<FixItHint> createIncludeInsertion(StringRef FileName,
+  std::optional<FixItHint> createIncludeInsertion(llvm::StringRef FileName,
                                                   bool IsAngled);
 
 private:
-  using SourceRangeVector = SmallVector<SourceRange, 1>;
+  using SourceRangeVector = llvm::SmallVector<SourceRange, 1>;
 
   const SourceManager *SourceMgr;
   const IncludeStyle Style;
   FileID CurrentFileID;
   /// The file name stripped of common suffixes.
-  StringRef CanonicalFile;
+  llvm::StringRef CanonicalFile;
   /// Locations of visited include directives.
   SourceRangeVector SourceLocations;
   /// Mapping from file name to #include locations.
   llvm::StringMap<SourceRangeVector> IncludeLocations;
   /// Includes sorted into buckets.
-  SmallVector<std::string, 1> IncludeBucket[IK_InvalidInclude];
+  llvm::SmallVector<std::string, 1> IncludeBucket[IK_InvalidInclude];
 };
 
 } // namespace utils
 
 template <> struct OptionEnumMapping<utils::IncludeSorter::IncludeStyle> {
-  static ArrayRef<std::pair<utils::IncludeSorter::IncludeStyle, StringRef>>
+  static llvm::ArrayRef<std::pair<utils::IncludeSorter::IncludeStyle, llvm::StringRef>>
   getEnumMapping();
 };
 } // namespace clang::tidy

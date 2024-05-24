@@ -222,7 +222,7 @@ public:
 
     auto MethodName = safeGetName(Decl);
     auto ClsNameStr = safeGetName(ClassDecl);
-    StringRef ClsName = ClsNameStr; // FIXME: Make safeGetName return StringRef.
+    llvm::StringRef ClsName = ClsNameStr; // FIXME: Make safeGetName return llvm::StringRef.
     auto NamespaceName = safeGetName(NsDecl);
     // FIXME: These should be implemented via attributes.
     return NamespaceName == "WTF" &&
@@ -244,7 +244,7 @@ public:
   void reportBug(const Expr *CallArg, const ParmVarDecl *Param) const {
     assert(CallArg);
 
-    SmallString<100> Buf;
+    llvm::SmallString<100> Buf;
     llvm::raw_svector_ostream Os(Buf);
 
     const std::string paramName = safeGetName(Param);

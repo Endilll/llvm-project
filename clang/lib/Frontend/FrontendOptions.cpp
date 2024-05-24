@@ -12,7 +12,7 @@
 
 using namespace clang;
 
-InputKind FrontendOptions::getInputKindForExtension(StringRef Extension) {
+InputKind FrontendOptions::getInputKindForExtension(llvm::StringRef Extension) {
   return llvm::StringSwitch<InputKind>(Extension)
       .Cases("ast", "pcm", InputKind(Language::Unknown, InputKind::Precompiled))
       .Case("c", Language::C)

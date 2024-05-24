@@ -15,6 +15,7 @@
 
 #include "clang/Tooling/ArgumentsAdjusters.h"
 #include "clang/Tooling/Execution.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include <optional>
 
 namespace clang {
@@ -37,7 +38,7 @@ public:
   StandaloneToolExecutor(
       const CompilationDatabase &Compilations,
       llvm::ArrayRef<std::string> SourcePaths,
-      IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS =
+      llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS =
           llvm::vfs::getRealFileSystem(),
       std::shared_ptr<PCHContainerOperations> PCHContainerOps =
           std::make_shared<PCHContainerOperations>());
@@ -51,7 +52,7 @@ public:
       std::shared_ptr<PCHContainerOperations> PCHContainerOps =
           std::make_shared<PCHContainerOperations>());
 
-  StringRef getExecutorName() const override { return ExecutorName; }
+  llvm::StringRef getExecutorName() const override { return ExecutorName; }
 
   using ToolExecutor::execute;
 
@@ -73,7 +74,7 @@ public:
     return Tool.getSourcePaths();
   }
 
-  void mapVirtualFile(StringRef FilePath, StringRef Content) override {
+  void mapVirtualFile(llvm::StringRef FilePath, llvm::StringRef Content) override {
     Tool.mapVirtualFile(FilePath, Content);
   }
 

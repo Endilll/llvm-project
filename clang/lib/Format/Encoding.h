@@ -30,7 +30,7 @@ enum Encoding {
 
 /// Detects encoding of the Text. If the Text can be decoded using UTF-8,
 /// it is considered UTF8, otherwise we treat it as some 8-bit encoding.
-inline Encoding detectEncoding(StringRef Text) {
+inline Encoding detectEncoding(llvm::StringRef Text) {
   const llvm::UTF8 *Ptr = reinterpret_cast<const llvm::UTF8 *>(Text.begin());
   const llvm::UTF8 *BufEnd = reinterpret_cast<const llvm::UTF8 *>(Text.end());
   if (llvm::isLegalUTF8String(&Ptr, BufEnd))
@@ -41,7 +41,7 @@ inline Encoding detectEncoding(StringRef Text) {
 /// Returns the number of columns required to display the \p Text on a
 /// generic Unicode-capable terminal. Text is assumed to use the specified
 /// \p Encoding.
-inline unsigned columnWidth(StringRef Text, Encoding Encoding) {
+inline unsigned columnWidth(llvm::StringRef Text, Encoding Encoding) {
   if (Encoding == Encoding_UTF8) {
     int ContentWidth = llvm::sys::unicode::columnWidthUTF8(Text);
     // FIXME: Figure out the correct way to handle this in the presence of both
@@ -57,13 +57,13 @@ inline unsigned columnWidth(StringRef Text, Encoding Encoding) {
 /// Returns the number of columns required to display the \p Text,
 /// starting from the \p StartColumn on a terminal with the \p TabWidth. The
 /// text is assumed to use the specified \p Encoding.
-inline unsigned columnWidthWithTabs(StringRef Text, unsigned StartColumn,
+inline unsigned columnWidthWithTabs(llvm::StringRef Text, unsigned StartColumn,
                                     unsigned TabWidth, Encoding Encoding) {
   unsigned TotalWidth = 0;
-  StringRef Tail = Text;
+  llvm::StringRef Tail = Text;
   for (;;) {
-    StringRef::size_type TabPos = Tail.find('\t');
-    if (TabPos == StringRef::npos)
+    llvm::StringRef::size_type TabPos = Tail.find('\t');
+    if (TabPos == llvm::StringRef::npos)
       return TotalWidth + columnWidth(Tail, Encoding);
     TotalWidth += columnWidth(Tail.substr(0, TabPos), Encoding);
     if (TabWidth)
@@ -93,7 +93,7 @@ inline bool isHexDigit(char c) {
 /// Gets the length of an escape sequence inside a C++ string literal.
 /// Text should span from the beginning of the escape sequence (starting with a
 /// backslash) to the end of the string literal.
-inline unsigned getEscapeSequenceLength(StringRef Text) {
+inline unsigned getEscapeSequenceLength(llvm::StringRef Text) {
   assert(Text[0] == '\\');
   if (Text.size() < 2)
     return 1;

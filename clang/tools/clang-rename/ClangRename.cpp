@@ -217,10 +217,10 @@ int main(int argc, const char **argv) {
     // indication of which files start where, other than that we print the files
     // in the same order we see them.
     LangOptions DefaultLangOptions;
-    IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+    llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
     TextDiagnosticPrinter DiagnosticPrinter(errs(), &*DiagOpts);
     DiagnosticsEngine Diagnostics(
-        IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
+        llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
         &DiagnosticPrinter, false);
     auto &FileMgr = Tool.getFiles();
     SourceManager Sources(Diagnostics, FileMgr);

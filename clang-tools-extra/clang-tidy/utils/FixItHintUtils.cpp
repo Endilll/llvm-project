@@ -63,7 +63,7 @@ skipLParensBackwards(SourceLocation Start, const ASTContext &Context) {
 }
 
 static std::optional<FixItHint> fixIfNotDangerous(SourceLocation Loc,
-                                                  StringRef Text) {
+                                                  llvm::StringRef Text) {
   if (locDangerous(Loc))
     return std::nullopt;
   return FixItHint::CreateInsertion(Loc, Text);
@@ -284,7 +284,7 @@ std::string formatDereference(const Expr &ExprNode, const ASTContext &Context) {
           tooling::fixit::getText(*Op->getSubExpr()->IgnoreParens(), Context));
     }
   }
-  StringRef Text = tooling::fixit::getText(ExprNode, Context);
+  llvm::StringRef Text = tooling::fixit::getText(ExprNode, Context);
 
   if (Text.empty())
     return {};

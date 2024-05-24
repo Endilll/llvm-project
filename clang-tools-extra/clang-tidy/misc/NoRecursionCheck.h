@@ -25,13 +25,13 @@ namespace tidy::misc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/misc/no-recursion.html
 class NoRecursionCheck : public ClangTidyCheck {
 public:
-  NoRecursionCheck(StringRef Name, ClangTidyContext *Context)
+  NoRecursionCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
-  void handleSCC(ArrayRef<CallGraphNode *> SCC);
+  void handleSCC(llvm::ArrayRef<CallGraphNode *> SCC);
 };
 
 } // namespace tidy::misc

@@ -212,7 +212,7 @@ std::string Pointer::toDiagnosticString(const ASTContext &Ctx) const {
     return "nullptr";
 
   if (isIntegralPointer())
-    return (Twine("&(") + Twine(asIntPointer().Value + Offset) + ")").str();
+    return (llvm::Twine("&(") + llvm::Twine(asIntPointer().Value + Offset) + ")").str();
 
   return toAPValue().getAsString(Ctx, getType());
 }
@@ -443,7 +443,7 @@ std::optional<APValue> Pointer::toRValue(const Context &Ctx) const {
       QualType ElemTy = VT->getElementType();
       PrimType ElemT = *Ctx.classify(ElemTy);
 
-      SmallVector<APValue> Values;
+      llvm::SmallVector<APValue> Values;
       Values.reserve(VT->getNumElements());
       for (unsigned I = 0; I != VT->getNumElements(); ++I) {
         TYPE_SWITCH(ElemT, {

@@ -31,8 +31,8 @@ private:
 
   void InjectFileOrDirectory(const char *Path, ino_t INode, bool IsFile,
                              const char *StatPath) {
-    SmallString<128> NormalizedPath(Path);
-    SmallString<128> NormalizedStatPath;
+    llvm::SmallString<128> NormalizedPath(Path);
+    llvm::SmallString<128> NormalizedStatPath;
     if (is_style_posix(llvm::sys::path::Style::native)) {
       llvm::sys::path::native(NormalizedPath);
       Path = NormalizedPath.c_str();
@@ -70,11 +70,11 @@ public:
   }
 
   // Implement FileSystemStatCache::getStat().
-  std::error_code getStat(StringRef Path, llvm::vfs::Status &Status,
+  std::error_code getStat(llvm::StringRef Path, llvm::vfs::Status &Status,
                           bool isFile,
                           std::unique_ptr<llvm::vfs::File> *F,
                           llvm::vfs::FileSystem &FS) override {
-    SmallString<128> NormalizedPath(Path);
+    llvm::SmallString<128> NormalizedPath(Path);
     if (is_style_posix(llvm::sys::path::Style::native)) {
       llvm::sys::path::native(NormalizedPath);
       Path = NormalizedPath.c_str();
@@ -361,7 +361,7 @@ TEST_F(FileManagerTest, getFileRefEquality) {
   auto F1RedirectAgain = manager.getFileRef("dir/f1-redirect.cpp");
   auto F2 = manager.getFileRef("dir/f2.cpp");
 
-  // Check Expected<FileEntryRef> for error.
+  // Check llvm::Expected<FileEntryRef> for error.
   ASSERT_FALSE(!F1);
   ASSERT_FALSE(!F1Also);
   ASSERT_FALSE(!F1Again);
@@ -438,19 +438,19 @@ TEST_F(FileManagerTest, getVirtualFileWithDifferentName) {
 
 #endif  // !_WIN32
 
-static StringRef getSystemRoot() {
+static llvm::StringRef getSystemRoot() {
   return is_style_windows(llvm::sys::path::Style::native) ? "C:\\" : "/";
 }
 
 TEST_F(FileManagerTest, makeAbsoluteUsesVFS) {
   // FIXME: Should this be using a root path / call getSystemRoot()? For now,
   // avoiding that and leaving the test as-is.
-  SmallString<64> CustomWorkingDir =
-      is_style_windows(llvm::sys::path::Style::native) ? StringRef("C:")
-                                                       : StringRef("/");
+  llvm::SmallString<64> CustomWorkingDir =
+      is_style_windows(llvm::sys::path::Style::native) ? llvm::StringRef("C:")
+                                                       : llvm::StringRef("/");
   llvm::sys::path::append(CustomWorkingDir, "some", "weird", "path");
 
-  auto FS = IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem>(
+  auto FS = llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem>(
       new llvm::vfs::InMemoryFileSystem);
   // setCurrentworkingdirectory must finish without error.
   ASSERT_TRUE(!FS->setCurrentWorkingDirectory(CustomWorkingDir));
@@ -458,9 +458,9 @@ TEST_F(FileManagerTest, makeAbsoluteUsesVFS) {
   FileSystemOptions Opts;
   FileManager Manager(Opts, FS);
 
-  SmallString<64> Path("a/foo.cpp");
+  llvm::SmallString<64> Path("a/foo.cpp");
 
-  SmallString<64> ExpectedResult(CustomWorkingDir);
+  llvm::SmallString<64> ExpectedResult(CustomWorkingDir);
   llvm::sys::path::append(ExpectedResult, Path);
 
   ASSERT_TRUE(Manager.makeAbsolutePath(Path));
@@ -469,9 +469,9 @@ TEST_F(FileManagerTest, makeAbsoluteUsesVFS) {
 
 // getVirtualFile should always fill the real path.
 TEST_F(FileManagerTest, getVirtualFileFillsRealPathName) {
-  SmallString<64> CustomWorkingDir = getSystemRoot();
+  llvm::SmallString<64> CustomWorkingDir = getSystemRoot();
 
-  auto FS = IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem>(
+  auto FS = llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem>(
       new llvm::vfs::InMemoryFileSystem);
   // setCurrentworkingdirectory must finish without error.
   ASSERT_TRUE(!FS->setCurrentWorkingDirectory(CustomWorkingDir));
@@ -489,16 +489,16 @@ TEST_F(FileManagerTest, getVirtualFileFillsRealPathName) {
   // Check for real path.
   const FileEntry *file = Manager.getVirtualFile("/tmp/test", 123, 1);
   ASSERT_TRUE(file != nullptr);
-  SmallString<64> ExpectedResult = CustomWorkingDir;
+  llvm::SmallString<64> ExpectedResult = CustomWorkingDir;
 
   llvm::sys::path::append(ExpectedResult, "tmp", "test");
   EXPECT_EQ(file->tryGetRealPathName(), ExpectedResult);
 }
 
 TEST_F(FileManagerTest, getFileDontOpenRealPath) {
-  SmallString<64> CustomWorkingDir = getSystemRoot();
+  llvm::SmallString<64> CustomWorkingDir = getSystemRoot();
 
-  auto FS = IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem>(
+  auto FS = llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem>(
       new llvm::vfs::InMemoryFileSystem);
   // setCurrentworkingdirectory must finish without error.
   ASSERT_TRUE(!FS->setCurrentWorkingDirectory(CustomWorkingDir));
@@ -516,21 +516,21 @@ TEST_F(FileManagerTest, getFileDontOpenRealPath) {
   // Check for real path.
   auto file = Manager.getFile("/tmp/test", /*OpenFile=*/false);
   ASSERT_TRUE(file);
-  SmallString<64> ExpectedResult = CustomWorkingDir;
+  llvm::SmallString<64> ExpectedResult = CustomWorkingDir;
 
   llvm::sys::path::append(ExpectedResult, "tmp", "test");
   EXPECT_EQ((*file)->tryGetRealPathName(), ExpectedResult);
 }
 
 TEST_F(FileManagerTest, getBypassFile) {
-  SmallString<64> CustomWorkingDir;
+  llvm::SmallString<64> CustomWorkingDir;
 #ifdef _WIN32
   CustomWorkingDir = "C:/";
 #else
   CustomWorkingDir = "/";
 #endif
 
-  auto FS = IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem>(
+  auto FS = llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem>(
       new llvm::vfs::InMemoryFileSystem);
   // setCurrentworkingdirectory must finish without error.
   ASSERT_TRUE(!FS->setCurrentWorkingDirectory(CustomWorkingDir));

@@ -20,7 +20,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/avoid-unconditional-preprocessor-if.html
 class AvoidUnconditionalPreprocessorIfCheck : public ClangTidyCheck {
 public:
-  AvoidUnconditionalPreprocessorIfCheck(StringRef Name,
+  AvoidUnconditionalPreprocessorIfCheck(llvm::StringRef Name,
                                         ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,

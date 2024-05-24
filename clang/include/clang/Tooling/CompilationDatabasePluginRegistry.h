@@ -33,7 +33,7 @@ public:
   ///
   /// \see CompilationDatabase::loadFromDirectory().
   virtual std::unique_ptr<CompilationDatabase>
-  loadFromDirectory(StringRef Directory, std::string &ErrorMessage) = 0;
+  loadFromDirectory(llvm::StringRef Directory, std::string &ErrorMessage) = 0;
 };
 
 using CompilationDatabasePluginRegistry =

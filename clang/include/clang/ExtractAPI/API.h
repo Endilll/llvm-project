@@ -162,17 +162,17 @@ struct APIRecord;
 // This represents a reference to another symbol that might come from external
 /// sources.
 struct SymbolReference {
-  StringRef Name;
-  StringRef USR;
+  llvm::StringRef Name;
+  llvm::StringRef USR;
 
   /// The source project/module/product of the referred symbol.
-  StringRef Source;
+  llvm::StringRef Source;
 
   // A Pointer to the APIRecord for this reference if known
   const APIRecord *Record = nullptr;
 
   SymbolReference() = default;
-  SymbolReference(StringRef Name, StringRef USR, StringRef Source = "")
+  SymbolReference(llvm::StringRef Name, llvm::StringRef USR, llvm::StringRef Source = "")
       : Name(Name), USR(USR), Source(Source) {}
   SymbolReference(const APIRecord *R);
 
@@ -238,8 +238,8 @@ struct APIRecord {
     RK_Typedef,
   };
 
-  StringRef USR;
-  StringRef Name;
+  llvm::StringRef USR;
+  llvm::StringRef Name;
 
   SymbolReference Parent;
 
@@ -286,7 +286,7 @@ public:
 
   APIRecord() = delete;
 
-  APIRecord(RecordKind Kind, StringRef USR, StringRef Name,
+  APIRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name,
             SymbolReference Parent, PresumedLoc Location,
             AvailabilityInfo Availability, LinkageInfo Linkage,
             const DocComment &Comment, DeclarationFragments Declaration,
@@ -298,7 +298,7 @@ public:
         IsFromSystemHeader(IsFromSystemHeader), Access(std::move(Access)),
         KindForDisplay(Kind), Kind(Kind) {}
 
-  APIRecord(RecordKind Kind, StringRef USR, StringRef Name)
+  APIRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name)
       : USR(USR), Name(Name), KindForDisplay(Kind), Kind(Kind) {}
 
   // Pure virtual destructor to make APIRecord abstract
@@ -385,7 +385,7 @@ protected:
 };
 
 struct NamespaceRecord : APIRecord, RecordContext {
-  NamespaceRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  NamespaceRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                   PresumedLoc Loc, AvailabilityInfo Availability,
                   LinkageInfo Linkage, const DocComment &Comment,
                   DeclarationFragments Declaration,
@@ -405,7 +405,7 @@ struct NamespaceRecord : APIRecord, RecordContext {
 struct GlobalFunctionRecord : APIRecord {
   FunctionSignature Signature;
 
-  GlobalFunctionRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  GlobalFunctionRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                        PresumedLoc Loc, AvailabilityInfo Availability,
                        LinkageInfo Linkage, const DocComment &Comment,
                        DeclarationFragments Declaration,
@@ -416,7 +416,7 @@ struct GlobalFunctionRecord : APIRecord {
                   SubHeading, IsFromSystemHeader),
         Signature(Signature) {}
 
-  GlobalFunctionRecord(RecordKind Kind, StringRef USR, StringRef Name,
+  GlobalFunctionRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name,
                        SymbolReference Parent, PresumedLoc Loc,
                        AvailabilityInfo Availability, LinkageInfo Linkage,
                        const DocComment &Comment,
@@ -440,7 +440,7 @@ private:
 struct GlobalFunctionTemplateRecord : GlobalFunctionRecord {
   Template Templ;
 
-  GlobalFunctionTemplateRecord(StringRef USR, StringRef Name,
+  GlobalFunctionTemplateRecord(llvm::StringRef USR, llvm::StringRef Name,
                                SymbolReference Parent, PresumedLoc Loc,
                                AvailabilityInfo Availability,
                                LinkageInfo Linkage, const DocComment &Comment,
@@ -464,7 +464,7 @@ struct GlobalFunctionTemplateRecord : GlobalFunctionRecord {
 
 struct GlobalFunctionTemplateSpecializationRecord : GlobalFunctionRecord {
   GlobalFunctionTemplateSpecializationRecord(
-      StringRef USR, StringRef Name, SymbolReference Parent, PresumedLoc Loc,
+      llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent, PresumedLoc Loc,
       AvailabilityInfo Availability, LinkageInfo Linkage,
       const DocComment &Comment, DeclarationFragments Declaration,
       DeclarationFragments SubHeading, FunctionSignature Signature,
@@ -484,7 +484,7 @@ struct GlobalFunctionTemplateSpecializationRecord : GlobalFunctionRecord {
 
 /// This holds information associated with global functions.
 struct GlobalVariableRecord : APIRecord, RecordContext {
-  GlobalVariableRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  GlobalVariableRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                        PresumedLoc Loc, AvailabilityInfo Availability,
                        LinkageInfo Linkage, const DocComment &Comment,
                        DeclarationFragments Declaration,
@@ -494,7 +494,7 @@ struct GlobalVariableRecord : APIRecord, RecordContext {
                   SubHeading, IsFromSystemHeader),
         RecordContext(RK_GlobalVariable) {}
 
-  GlobalVariableRecord(RecordKind Kind, StringRef USR, StringRef Name,
+  GlobalVariableRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name,
                        SymbolReference Parent, PresumedLoc Loc,
                        AvailabilityInfo Availability, LinkageInfo Linkage,
                        const DocComment &Comment,
@@ -521,7 +521,7 @@ private:
 struct GlobalVariableTemplateRecord : GlobalVariableRecord {
   Template Templ;
 
-  GlobalVariableTemplateRecord(StringRef USR, StringRef Name,
+  GlobalVariableTemplateRecord(llvm::StringRef USR, llvm::StringRef Name,
                                SymbolReference Parent, PresumedLoc Loc,
                                AvailabilityInfo Availability,
                                LinkageInfo Linkage, const DocComment &Comment,
@@ -543,7 +543,7 @@ struct GlobalVariableTemplateRecord : GlobalVariableRecord {
 
 struct GlobalVariableTemplateSpecializationRecord : GlobalVariableRecord {
   GlobalVariableTemplateSpecializationRecord(
-      StringRef USR, StringRef Name, SymbolReference Parent, PresumedLoc Loc,
+      llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent, PresumedLoc Loc,
       AvailabilityInfo Availability, LinkageInfo Linkage,
       const DocComment &Comment, DeclarationFragments Declaration,
       DeclarationFragments SubHeading, bool IsFromSystemHeader)
@@ -565,7 +565,7 @@ struct GlobalVariableTemplatePartialSpecializationRecord
   Template Templ;
 
   GlobalVariableTemplatePartialSpecializationRecord(
-      StringRef USR, StringRef Name, SymbolReference Parent, PresumedLoc Loc,
+      llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent, PresumedLoc Loc,
       AvailabilityInfo Availability, LinkageInfo Linkage,
       const DocComment &Comment, DeclarationFragments Declaration,
       DeclarationFragments SubHeading, class Template Template,
@@ -586,7 +586,7 @@ struct GlobalVariableTemplatePartialSpecializationRecord
 
 /// This holds information associated with enum constants.
 struct EnumConstantRecord : APIRecord {
-  EnumConstantRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  EnumConstantRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                      PresumedLoc Loc, AvailabilityInfo Availability,
                      const DocComment &Comment,
                      DeclarationFragments Declaration,
@@ -605,7 +605,7 @@ private:
 };
 
 struct TagRecord : APIRecord, RecordContext {
-  TagRecord(RecordKind Kind, StringRef USR, StringRef Name,
+  TagRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name,
             SymbolReference Parent, PresumedLoc Loc,
             AvailabilityInfo Availability, const DocComment &Comment,
             DeclarationFragments Declaration, DeclarationFragments SubHeading,
@@ -631,7 +631,7 @@ struct TagRecord : APIRecord, RecordContext {
 
 /// This holds information associated with enums.
 struct EnumRecord : TagRecord {
-  EnumRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  EnumRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
              PresumedLoc Loc, AvailabilityInfo Availability,
              const DocComment &Comment, DeclarationFragments Declaration,
              DeclarationFragments SubHeading, bool IsFromSystemHeader,
@@ -653,7 +653,7 @@ private:
 
 /// This holds information associated with struct or union fields fields.
 struct RecordFieldRecord : APIRecord, RecordContext {
-  RecordFieldRecord(RecordKind Kind, StringRef USR, StringRef Name,
+  RecordFieldRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name,
                     SymbolReference Parent, PresumedLoc Loc,
                     AvailabilityInfo Availability, const DocComment &Comment,
                     DeclarationFragments Declaration,
@@ -675,7 +675,7 @@ struct RecordFieldRecord : APIRecord, RecordContext {
 
 /// This holds information associated with structs and unions.
 struct RecordRecord : TagRecord {
-  RecordRecord(RecordKind Kind, StringRef USR, StringRef Name,
+  RecordRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name,
                SymbolReference Parent, PresumedLoc Loc,
                AvailabilityInfo Availability, const DocComment &Comment,
                DeclarationFragments Declaration,
@@ -699,7 +699,7 @@ struct RecordRecord : TagRecord {
 };
 
 struct StructFieldRecord : RecordFieldRecord {
-  StructFieldRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  StructFieldRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                     PresumedLoc Loc, AvailabilityInfo Availability,
                     const DocComment &Comment, DeclarationFragments Declaration,
                     DeclarationFragments SubHeading, bool IsFromSystemHeader)
@@ -717,7 +717,7 @@ private:
 };
 
 struct StructRecord : RecordRecord {
-  StructRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  StructRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                PresumedLoc Loc, AvailabilityInfo Availability,
                const DocComment &Comment, DeclarationFragments Declaration,
                DeclarationFragments SubHeading, bool IsFromSystemHeader,
@@ -736,7 +736,7 @@ private:
 };
 
 struct UnionFieldRecord : RecordFieldRecord {
-  UnionFieldRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  UnionFieldRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                    PresumedLoc Loc, AvailabilityInfo Availability,
                    const DocComment &Comment, DeclarationFragments Declaration,
                    DeclarationFragments SubHeading, bool IsFromSystemHeader)
@@ -754,7 +754,7 @@ private:
 };
 
 struct UnionRecord : RecordRecord {
-  UnionRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  UnionRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
               PresumedLoc Loc, AvailabilityInfo Availability,
               const DocComment &Comment, DeclarationFragments Declaration,
               DeclarationFragments SubHeading, bool IsFromSystemHeader,
@@ -773,7 +773,7 @@ private:
 };
 
 struct CXXFieldRecord : APIRecord, RecordContext {
-  CXXFieldRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  CXXFieldRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                  PresumedLoc Loc, AvailabilityInfo Availability,
                  const DocComment &Comment, DeclarationFragments Declaration,
                  DeclarationFragments SubHeading, AccessControl Access,
@@ -783,7 +783,7 @@ struct CXXFieldRecord : APIRecord, RecordContext {
                   IsFromSystemHeader, std::move(Access)),
         RecordContext(RK_CXXField) {}
 
-  CXXFieldRecord(RecordKind Kind, StringRef USR, StringRef Name,
+  CXXFieldRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name,
                  SymbolReference Parent, PresumedLoc Loc,
                  AvailabilityInfo Availability, const DocComment &Comment,
                  DeclarationFragments Declaration,
@@ -808,7 +808,7 @@ private:
 struct CXXFieldTemplateRecord : CXXFieldRecord {
   Template Templ;
 
-  CXXFieldTemplateRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  CXXFieldTemplateRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                          PresumedLoc Loc, AvailabilityInfo Availability,
                          const DocComment &Comment,
                          DeclarationFragments Declaration,
@@ -830,7 +830,7 @@ struct CXXMethodRecord : APIRecord {
 
   CXXMethodRecord() = delete;
 
-  CXXMethodRecord(RecordKind Kind, StringRef USR, StringRef Name,
+  CXXMethodRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name,
                   SymbolReference Parent, PresumedLoc Loc,
                   AvailabilityInfo Availability, const DocComment &Comment,
                   DeclarationFragments Declaration,
@@ -845,7 +845,7 @@ struct CXXMethodRecord : APIRecord {
 };
 
 struct CXXConstructorRecord : CXXMethodRecord {
-  CXXConstructorRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  CXXConstructorRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                        PresumedLoc Loc, AvailabilityInfo Availability,
                        const DocComment &Comment,
                        DeclarationFragments Declaration,
@@ -866,7 +866,7 @@ private:
 };
 
 struct CXXDestructorRecord : CXXMethodRecord {
-  CXXDestructorRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  CXXDestructorRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                       PresumedLoc Loc, AvailabilityInfo Availability,
                       const DocComment &Comment,
                       DeclarationFragments Declaration,
@@ -887,7 +887,7 @@ private:
 };
 
 struct CXXStaticMethodRecord : CXXMethodRecord {
-  CXXStaticMethodRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  CXXStaticMethodRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                         PresumedLoc Loc, AvailabilityInfo Availability,
                         const DocComment &Comment,
                         DeclarationFragments Declaration,
@@ -908,7 +908,7 @@ private:
 };
 
 struct CXXInstanceMethodRecord : CXXMethodRecord {
-  CXXInstanceMethodRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  CXXInstanceMethodRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                           PresumedLoc Loc, AvailabilityInfo Availability,
                           const DocComment &Comment,
                           DeclarationFragments Declaration,
@@ -932,7 +932,7 @@ private:
 struct CXXMethodTemplateRecord : CXXMethodRecord {
   Template Templ;
 
-  CXXMethodTemplateRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  CXXMethodTemplateRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                           PresumedLoc Loc, AvailabilityInfo Availability,
                           const DocComment &Comment,
                           DeclarationFragments Declaration,
@@ -953,7 +953,7 @@ struct CXXMethodTemplateRecord : CXXMethodRecord {
 
 struct CXXMethodTemplateSpecializationRecord : CXXMethodRecord {
   CXXMethodTemplateSpecializationRecord(
-      StringRef USR, StringRef Name, SymbolReference Parent, PresumedLoc Loc,
+      llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent, PresumedLoc Loc,
       AvailabilityInfo Availability, const DocComment &Comment,
       DeclarationFragments Declaration, DeclarationFragments SubHeading,
       FunctionSignature Signature, AccessControl Access,
@@ -981,16 +981,16 @@ struct ObjCPropertyRecord : APIRecord {
   };
 
   AttributeKind Attributes;
-  StringRef GetterName;
-  StringRef SetterName;
+  llvm::StringRef GetterName;
+  llvm::StringRef SetterName;
   bool IsOptional;
 
-  ObjCPropertyRecord(RecordKind Kind, StringRef USR, StringRef Name,
+  ObjCPropertyRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name,
                      SymbolReference Parent, PresumedLoc Loc,
                      AvailabilityInfo Availability, const DocComment &Comment,
                      DeclarationFragments Declaration,
                      DeclarationFragments SubHeading, AttributeKind Attributes,
-                     StringRef GetterName, StringRef SetterName,
+                     llvm::StringRef GetterName, llvm::StringRef SetterName,
                      bool IsOptional, bool IsFromSystemHeader)
       : APIRecord(Kind, USR, Name, Parent, Loc, std::move(Availability),
                   LinkageInfo::none(), Comment, Declaration, SubHeading,
@@ -1006,10 +1006,10 @@ struct ObjCPropertyRecord : APIRecord {
 
 struct ObjCInstancePropertyRecord : ObjCPropertyRecord {
   ObjCInstancePropertyRecord(
-      StringRef USR, StringRef Name, SymbolReference Parent, PresumedLoc Loc,
+      llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent, PresumedLoc Loc,
       AvailabilityInfo Availability, const DocComment &Comment,
       DeclarationFragments Declaration, DeclarationFragments SubHeading,
-      AttributeKind Attributes, StringRef GetterName, StringRef SetterName,
+      AttributeKind Attributes, llvm::StringRef GetterName, llvm::StringRef SetterName,
       bool IsOptional, bool IsFromSystemHeader)
       : ObjCPropertyRecord(RK_ObjCInstanceProperty, USR, Name, Parent, Loc,
                            std::move(Availability), Comment, Declaration,
@@ -1026,13 +1026,13 @@ private:
 };
 
 struct ObjCClassPropertyRecord : ObjCPropertyRecord {
-  ObjCClassPropertyRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  ObjCClassPropertyRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                           PresumedLoc Loc, AvailabilityInfo Availability,
                           const DocComment &Comment,
                           DeclarationFragments Declaration,
                           DeclarationFragments SubHeading,
-                          AttributeKind Attributes, StringRef GetterName,
-                          StringRef SetterName, bool IsOptional,
+                          AttributeKind Attributes, llvm::StringRef GetterName,
+                          llvm::StringRef SetterName, bool IsOptional,
                           bool IsFromSystemHeader)
       : ObjCPropertyRecord(RK_ObjCClassProperty, USR, Name, Parent, Loc,
                            std::move(Availability), Comment, Declaration,
@@ -1050,7 +1050,7 @@ private:
 
 /// This holds information associated with Objective-C instance variables.
 struct ObjCInstanceVariableRecord : APIRecord {
-  ObjCInstanceVariableRecord(StringRef USR, StringRef Name,
+  ObjCInstanceVariableRecord(llvm::StringRef USR, llvm::StringRef Name,
                              SymbolReference Parent, PresumedLoc Loc,
                              AvailabilityInfo Availability,
                              const DocComment &Comment,
@@ -1076,7 +1076,7 @@ struct ObjCMethodRecord : APIRecord {
 
   ObjCMethodRecord() = delete;
 
-  ObjCMethodRecord(RecordKind Kind, StringRef USR, StringRef Name,
+  ObjCMethodRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name,
                    SymbolReference Parent, PresumedLoc Loc,
                    AvailabilityInfo Availability, const DocComment &Comment,
                    DeclarationFragments Declaration,
@@ -1091,7 +1091,7 @@ struct ObjCMethodRecord : APIRecord {
 };
 
 struct ObjCInstanceMethodRecord : ObjCMethodRecord {
-  ObjCInstanceMethodRecord(StringRef USR, StringRef Name,
+  ObjCInstanceMethodRecord(llvm::StringRef USR, llvm::StringRef Name,
                            SymbolReference Parent, PresumedLoc Loc,
                            AvailabilityInfo Availability,
                            const DocComment &Comment,
@@ -1111,7 +1111,7 @@ private:
 };
 
 struct ObjCClassMethodRecord : ObjCMethodRecord {
-  ObjCClassMethodRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  ObjCClassMethodRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                         PresumedLoc Loc, AvailabilityInfo Availability,
                         const DocComment &Comment,
                         DeclarationFragments Declaration,
@@ -1131,7 +1131,7 @@ private:
 };
 
 struct StaticFieldRecord : CXXFieldRecord {
-  StaticFieldRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  StaticFieldRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                     PresumedLoc Loc, AvailabilityInfo Availability,
                     LinkageInfo Linkage, const DocComment &Comment,
                     DeclarationFragments Declaration,
@@ -1150,11 +1150,11 @@ struct StaticFieldRecord : CXXFieldRecord {
 /// The base representation of an Objective-C container record. Holds common
 /// information associated with Objective-C containers.
 struct ObjCContainerRecord : APIRecord, RecordContext {
-  SmallVector<SymbolReference> Protocols;
+  llvm::SmallVector<SymbolReference> Protocols;
 
   ObjCContainerRecord() = delete;
 
-  ObjCContainerRecord(RecordKind Kind, StringRef USR, StringRef Name,
+  ObjCContainerRecord(RecordKind Kind, llvm::StringRef USR, llvm::StringRef Name,
                       SymbolReference Parent, PresumedLoc Loc,
                       AvailabilityInfo Availability, LinkageInfo Linkage,
                       const DocComment &Comment,
@@ -1169,9 +1169,9 @@ struct ObjCContainerRecord : APIRecord, RecordContext {
 };
 
 struct CXXClassRecord : RecordRecord {
-  SmallVector<SymbolReference> Bases;
+  llvm::SmallVector<SymbolReference> Bases;
 
-  CXXClassRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  CXXClassRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                  PresumedLoc Loc, AvailabilityInfo Availability,
                  const DocComment &Comment, DeclarationFragments Declaration,
                  DeclarationFragments SubHeading, RecordKind Kind,
@@ -1197,7 +1197,7 @@ private:
 struct ClassTemplateRecord : CXXClassRecord {
   Template Templ;
 
-  ClassTemplateRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  ClassTemplateRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                       PresumedLoc Loc, AvailabilityInfo Availability,
                       const DocComment &Comment,
                       DeclarationFragments Declaration,
@@ -1216,7 +1216,7 @@ struct ClassTemplateRecord : CXXClassRecord {
 
 struct ClassTemplateSpecializationRecord : CXXClassRecord {
   ClassTemplateSpecializationRecord(
-      StringRef USR, StringRef Name, SymbolReference Parent, PresumedLoc Loc,
+      llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent, PresumedLoc Loc,
       AvailabilityInfo Availability, const DocComment &Comment,
       DeclarationFragments Declaration, DeclarationFragments SubHeading,
       AccessControl Access, bool IsFromSystemHeader)
@@ -1235,7 +1235,7 @@ struct ClassTemplateSpecializationRecord : CXXClassRecord {
 struct ClassTemplatePartialSpecializationRecord : CXXClassRecord {
   Template Templ;
   ClassTemplatePartialSpecializationRecord(
-      StringRef USR, StringRef Name, SymbolReference Parent, PresumedLoc Loc,
+      llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent, PresumedLoc Loc,
       AvailabilityInfo Availability, const DocComment &Comment,
       DeclarationFragments Declaration, DeclarationFragments SubHeading,
       Template Template, AccessControl Access, bool IsFromSystemHeader)
@@ -1256,7 +1256,7 @@ struct ClassTemplatePartialSpecializationRecord : CXXClassRecord {
 struct ConceptRecord : APIRecord {
   Template Templ;
 
-  ConceptRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  ConceptRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                 PresumedLoc Loc, AvailabilityInfo Availability,
                 const DocComment &Comment, DeclarationFragments Declaration,
                 DeclarationFragments SubHeading, Template Template,
@@ -1276,7 +1276,7 @@ struct ConceptRecord : APIRecord {
 struct ObjCCategoryRecord : ObjCContainerRecord {
   SymbolReference Interface;
 
-  ObjCCategoryRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  ObjCCategoryRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                      PresumedLoc Loc, AvailabilityInfo Availability,
                      const DocComment &Comment,
                      DeclarationFragments Declaration,
@@ -1295,7 +1295,7 @@ struct ObjCCategoryRecord : ObjCContainerRecord {
 
   bool isExtendingExternalModule() const { return !Interface.Source.empty(); }
 
-  std::optional<StringRef> getExtendedExternalModule() const {
+  std::optional<llvm::StringRef> getExtendedExternalModule() const {
     if (!isExtendingExternalModule())
       return {};
     return Interface.Source;
@@ -1309,7 +1309,7 @@ private:
 struct ObjCInterfaceRecord : ObjCContainerRecord {
   SymbolReference SuperClass;
 
-  ObjCInterfaceRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  ObjCInterfaceRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                       PresumedLoc Loc, AvailabilityInfo Availability,
                       LinkageInfo Linkage, const DocComment &Comment,
                       DeclarationFragments Declaration,
@@ -1331,7 +1331,7 @@ private:
 
 /// This holds information associated with Objective-C protocols.
 struct ObjCProtocolRecord : ObjCContainerRecord {
-  ObjCProtocolRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  ObjCProtocolRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                      PresumedLoc Loc, AvailabilityInfo Availability,
                      const DocComment &Comment,
                      DeclarationFragments Declaration,
@@ -1352,7 +1352,7 @@ private:
 
 /// This holds information associated with macro definitions.
 struct MacroDefinitionRecord : APIRecord {
-  MacroDefinitionRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  MacroDefinitionRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                         PresumedLoc Loc, DeclarationFragments Declaration,
                         DeclarationFragments SubHeading,
                         bool IsFromSystemHeader)
@@ -1377,7 +1377,7 @@ private:
 struct TypedefRecord : APIRecord {
   SymbolReference UnderlyingType;
 
-  TypedefRecord(StringRef USR, StringRef Name, SymbolReference Parent,
+  TypedefRecord(llvm::StringRef USR, llvm::StringRef Name, SymbolReference Parent,
                 PresumedLoc Loc, AvailabilityInfo Availability,
                 const DocComment &Comment, DeclarationFragments Declaration,
                 DeclarationFragments SubHeading, SymbolReference UnderlyingType,
@@ -1408,15 +1408,15 @@ public:
   /// Finds the APIRecord for a given USR.
   ///
   /// \returns a pointer to the APIRecord associated with that USR or nullptr.
-  APIRecord *findRecordForUSR(StringRef USR) const;
+  APIRecord *findRecordForUSR(llvm::StringRef USR) const;
 
   /// Copy \p String into the Allocator in this APISet.
   ///
-  /// \returns a StringRef of the copied string in APISet::Allocator.
-  StringRef copyString(StringRef String);
+  /// \returns a llvm::StringRef of the copied string in APISet::Allocator.
+  llvm::StringRef copyString(llvm::StringRef String);
 
-  SymbolReference createSymbolReference(StringRef Name, StringRef USR,
-                                        StringRef Source = "");
+  SymbolReference createSymbolReference(llvm::StringRef Name, llvm::StringRef USR,
+                                        llvm::StringRef Source = "");
 
   /// Create a subclass of \p APIRecord and store it in the APISet.
   ///
@@ -1424,9 +1424,9 @@ public:
   /// matching this USR.
   template <typename RecordTy, typename... CtorArgsContTy>
   typename std::enable_if_t<std::is_base_of_v<APIRecord, RecordTy>, RecordTy> *
-  createRecord(StringRef USR, StringRef Name, CtorArgsContTy &&...CtorArgs);
+  createRecord(llvm::StringRef USR, llvm::StringRef Name, CtorArgsContTy &&...CtorArgs);
 
-  ArrayRef<const APIRecord *> getTopLevelRecords() const {
+  llvm::ArrayRef<const APIRecord *> getTopLevelRecords() const {
     return TopLevelRecords;
   }
 
@@ -1455,7 +1455,7 @@ private:
   // destroyed without calling delete operator as the memory for the record
   // lives in the BumpPtrAllocator.
   using APIRecordStoredPtr = std::unique_ptr<APIRecord, APIRecordDeleter>;
-  llvm::DenseMap<StringRef, APIRecordStoredPtr> USRBasedLookupTable;
+  llvm::DenseMap<llvm::StringRef, APIRecordStoredPtr> USRBasedLookupTable;
   std::vector<const APIRecord *> TopLevelRecords;
 
 public:
@@ -1464,7 +1464,7 @@ public:
 
 template <typename RecordTy, typename... CtorArgsContTy>
 typename std::enable_if_t<std::is_base_of_v<APIRecord, RecordTy>, RecordTy> *
-APISet::createRecord(StringRef USR, StringRef Name,
+APISet::createRecord(llvm::StringRef USR, llvm::StringRef Name,
                      CtorArgsContTy &&...CtorArgs) {
   // Ensure USR refers to a String stored in the allocator.
   auto USRString = copyString(USR);

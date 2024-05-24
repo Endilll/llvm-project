@@ -56,7 +56,7 @@ struct Parser::TokenInfo {
 
   TokenInfo() = default;
 
-  StringRef Text;
+  llvm::StringRef Text;
   TokenKind Kind = TK_Eof;
   SourceRange Range;
   VariantValue Value;
@@ -68,12 +68,12 @@ const char *const Parser::TokenInfo::ID_With = "with";
 /// Simple tokenizer for the parser.
 class Parser::CodeTokenizer {
 public:
-  explicit CodeTokenizer(StringRef &MatcherCode, Diagnostics *Error)
+  explicit CodeTokenizer(llvm::StringRef &MatcherCode, Diagnostics *Error)
       : Code(MatcherCode), StartOfLine(MatcherCode), Error(Error) {
     NextToken = getNextToken();
   }
 
-  CodeTokenizer(StringRef &MatcherCode, Diagnostics *Error,
+  CodeTokenizer(llvm::StringRef &MatcherCode, Diagnostics *Error,
                 unsigned CodeCompletionOffset)
       : Code(MatcherCode), StartOfLine(MatcherCode), Error(Error),
         CodeCompletionLocation(MatcherCode.data() + CodeCompletionOffset) {
@@ -113,7 +113,7 @@ private:
 
     if (CodeCompletionLocation && CodeCompletionLocation <= Code.data()) {
       Result.Kind = TokenInfo::TK_CodeCompletion;
-      Result.Text = StringRef(CodeCompletionLocation, 0);
+      Result.Text = llvm::StringRef(CodeCompletionLocation, 0);
       CodeCompletionLocation = nullptr;
       return Result;
     }
@@ -288,7 +288,7 @@ private:
       }
     }
 
-    StringRef ErrorText = Code;
+    llvm::StringRef ErrorText = Code;
     Code = Code.drop_front(Code.size());
     SourceRange Range;
     Range.Start = Result->Range.Start;
@@ -310,8 +310,8 @@ private:
     return Location;
   }
 
-  StringRef &Code;
-  StringRef StartOfLine;
+  llvm::StringRef &Code;
+  llvm::StringRef StartOfLine;
   unsigned Line = 1;
   Diagnostics *Error;
   TokenInfo NextToken;
@@ -591,8 +591,8 @@ bool Parser::parseMatcherBuilder(MatcherCtor Ctor, const TokenInfo &NameToken,
       Tokenizer->SkipNewlines();
 
       if (Tokenizer->nextTokenKind() != TokenInfo::TK_OpenParen) {
-        StringRef ErrTxt = Tokenizer->nextTokenKind() == TokenInfo::TK_Eof
-                               ? StringRef("EOF")
+        llvm::StringRef ErrTxt = Tokenizer->nextTokenKind() == TokenInfo::TK_Eof
+                               ? llvm::StringRef("EOF")
                                : Tokenizer->peekNextToken().Text;
         Error->addError(Tokenizer->peekNextToken().Range,
                         Error->ET_ParserNoOpenParen)
@@ -735,7 +735,7 @@ bool Parser::parseMatcherExpressionImpl(const TokenInfo &NameToken,
 // Completions minus the prefix.
 void Parser::addCompletion(const TokenInfo &CompToken,
                            const MatcherCompletion& Completion) {
-  if (StringRef(Completion.TypedText).starts_with(CompToken.Text) &&
+  if (llvm::StringRef(Completion.TypedText).starts_with(CompToken.Text) &&
       Completion.Specificity > 0) {
     Completions.emplace_back(Completion.TypedText.substr(CompToken.Text.size()),
                              Completion.MatcherDecl, Completion.Specificity);
@@ -743,7 +743,7 @@ void Parser::addCompletion(const TokenInfo &CompToken,
 }
 
 std::vector<MatcherCompletion> Parser::getNamedValueCompletions(
-    ArrayRef<ArgKind> AcceptedTypes) {
+    llvm::ArrayRef<ArgKind> AcceptedTypes) {
   if (!NamedValues) return std::vector<MatcherCompletion>();
   std::vector<MatcherCompletion> Result;
   for (const auto &Entry : *NamedValues) {
@@ -827,13 +827,13 @@ Parser::Parser(CodeTokenizer *Tokenizer, Sema *S,
 Parser::RegistrySema::~RegistrySema() = default;
 
 std::optional<MatcherCtor>
-Parser::RegistrySema::lookupMatcherCtor(StringRef MatcherName) {
+Parser::RegistrySema::lookupMatcherCtor(llvm::StringRef MatcherName) {
   return Registry::lookupMatcherCtor(MatcherName);
 }
 
 VariantMatcher Parser::RegistrySema::actOnMatcherExpression(
-    MatcherCtor Ctor, SourceRange NameRange, StringRef BindID,
-    ArrayRef<ParserValue> Args, Diagnostics *Error) {
+    MatcherCtor Ctor, SourceRange NameRange, llvm::StringRef BindID,
+    llvm::ArrayRef<ParserValue> Args, Diagnostics *Error) {
   if (BindID.empty()) {
     return Registry::constructMatcher(Ctor, NameRange, Args, Error);
   } else {
@@ -843,12 +843,12 @@ VariantMatcher Parser::RegistrySema::actOnMatcherExpression(
 }
 
 std::vector<ArgKind> Parser::RegistrySema::getAcceptedCompletionTypes(
-    ArrayRef<std::pair<MatcherCtor, unsigned>> Context) {
+    llvm::ArrayRef<std::pair<MatcherCtor, unsigned>> Context) {
   return Registry::getAcceptedCompletionTypes(Context);
 }
 
 std::vector<MatcherCompletion> Parser::RegistrySema::getMatcherCompletions(
-    ArrayRef<ArgKind> AcceptedTypes) {
+    llvm::ArrayRef<ArgKind> AcceptedTypes) {
   return Registry::getMatcherCompletions(AcceptedTypes);
 }
 
@@ -862,12 +862,12 @@ ASTNodeKind Parser::RegistrySema::nodeMatcherType(MatcherCtor Ctor) const {
 
 internal::MatcherDescriptorPtr
 Parser::RegistrySema::buildMatcherCtor(MatcherCtor Ctor, SourceRange NameRange,
-                                       ArrayRef<ParserValue> Args,
+                                       llvm::ArrayRef<ParserValue> Args,
                                        Diagnostics *Error) const {
   return Registry::buildMatcherCtor(Ctor, NameRange, Args, Error);
 }
 
-bool Parser::parseExpression(StringRef &Code, Sema *S,
+bool Parser::parseExpression(llvm::StringRef &Code, Sema *S,
                              const NamedValueMap *NamedValues,
                              VariantValue *Value, Diagnostics *Error) {
   CodeTokenizer Tokenizer(Code, Error);
@@ -883,7 +883,7 @@ bool Parser::parseExpression(StringRef &Code, Sema *S,
 }
 
 std::vector<MatcherCompletion>
-Parser::completeExpression(StringRef &Code, unsigned CompletionOffset, Sema *S,
+Parser::completeExpression(llvm::StringRef &Code, unsigned CompletionOffset, Sema *S,
                            const NamedValueMap *NamedValues) {
   Diagnostics Error;
   CodeTokenizer Tokenizer(Code, &Error, CompletionOffset);
@@ -903,7 +903,7 @@ Parser::completeExpression(StringRef &Code, unsigned CompletionOffset, Sema *S,
 }
 
 std::optional<DynTypedMatcher>
-Parser::parseMatcherExpression(StringRef &Code, Sema *S,
+Parser::parseMatcherExpression(llvm::StringRef &Code, Sema *S,
                                const NamedValueMap *NamedValues,
                                Diagnostics *Error) {
   VariantValue Value;

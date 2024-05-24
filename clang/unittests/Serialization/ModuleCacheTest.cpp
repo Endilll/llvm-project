@@ -28,7 +28,7 @@ class ModuleCacheTest : public ::testing::Test {
   void SetUp() override {
     ASSERT_FALSE(sys::fs::createUniqueDirectory("modulecache-test", TestDir));
 
-    ModuleCachePath = SmallString<256>(TestDir);
+    ModuleCachePath = llvm::SmallString<256>(TestDir);
     sys::path::append(ModuleCachePath, "mcp");
     ASSERT_FALSE(sys::fs::create_directories(ModuleCachePath));
   }
@@ -36,13 +36,13 @@ class ModuleCacheTest : public ::testing::Test {
   void TearDown() override { sys::fs::remove_directories(TestDir); }
 
 public:
-  SmallString<256> TestDir;
-  SmallString<256> ModuleCachePath;
+  llvm::SmallString<256> TestDir;
+  llvm::SmallString<256> ModuleCachePath;
 
-  void addFile(StringRef Path, StringRef Contents) {
+  void addFile(llvm::StringRef Path, llvm::StringRef Contents) {
     ASSERT_FALSE(sys::path::is_absolute(Path));
 
-    SmallString<256> AbsPath(TestDir);
+    llvm::SmallString<256> AbsPath(TestDir);
     sys::path::append(AbsPath, Path);
 
     std::error_code EC;
@@ -90,7 +90,7 @@ public:
   }
 
   std::unique_ptr<CompilerInvocation>
-  createInvocationAndEnableFree(ArrayRef<const char *> Args,
+  createInvocationAndEnableFree(llvm::ArrayRef<const char *> Args,
                                 CreateInvocationOptions Opts) {
     std::unique_ptr<CompilerInvocation> Invocation =
         createInvocation(Args, Opts);
@@ -104,9 +104,9 @@ public:
 TEST_F(ModuleCacheTest, CachedModuleNewPath) {
   addDuplicateFrameworks();
 
-  SmallString<256> MCPArg("-fmodules-cache-path=");
+  llvm::SmallString<256> MCPArg("-fmodules-cache-path=");
   MCPArg.append(ModuleCachePath);
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
       CompilerInstance::createDiagnostics(new DiagnosticOptions());
   CreateInvocationOptions CIOpts;
   CIOpts.Diags = Diags;
@@ -154,9 +154,9 @@ TEST_F(ModuleCacheTest, CachedModuleNewPath) {
 TEST_F(ModuleCacheTest, CachedModuleNewPathAllowErrors) {
   addDuplicateFrameworks();
 
-  SmallString<256> MCPArg("-fmodules-cache-path=");
+  llvm::SmallString<256> MCPArg("-fmodules-cache-path=");
   MCPArg.append(ModuleCachePath);
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
       CompilerInstance::createDiagnostics(new DiagnosticOptions());
   CreateInvocationOptions CIOpts;
   CIOpts.Diags = Diags;

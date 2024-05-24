@@ -19,7 +19,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-bool-literals.html
 class UseBoolLiteralsCheck : public ClangTidyCheck {
 public:
-  UseBoolLiteralsCheck(StringRef Name, ClangTidyContext *Context);
+  UseBoolLiteralsCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

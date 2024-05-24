@@ -213,7 +213,7 @@ static cl::opt<bool> FailOnIncompleteFormat(
 namespace clang {
 namespace format {
 
-static FileID createInMemoryFile(StringRef FileName, MemoryBufferRef Source,
+static FileID createInMemoryFile(llvm::StringRef FileName, MemoryBufferRef Source,
                                  SourceManager &Sources, FileManager &Files,
                                  llvm::vfs::InMemoryFileSystem *MemFS) {
   MemFS->addFileNoOwn(FileName, 0, Source);
@@ -224,20 +224,20 @@ static FileID createInMemoryFile(StringRef FileName, MemoryBufferRef Source,
 
 // Parses <start line>:<end line> input to a pair of line numbers.
 // Returns true on error.
-static bool parseLineRange(StringRef Input, unsigned &FromLine,
+static bool parseLineRange(llvm::StringRef Input, unsigned &FromLine,
                            unsigned &ToLine) {
-  std::pair<StringRef, StringRef> LineRange = Input.split(':');
+  std::pair<llvm::StringRef, llvm::StringRef> LineRange = Input.split(':');
   return LineRange.first.getAsInteger(0, FromLine) ||
          LineRange.second.getAsInteger(0, ToLine);
 }
 
 static bool fillRanges(MemoryBuffer *Code,
                        std::vector<tooling::Range> &Ranges) {
-  IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
+  llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
       new llvm::vfs::InMemoryFileSystem);
   FileManager Files(FileSystemOptions(), InMemoryFileSystem);
   DiagnosticsEngine Diagnostics(
-      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs),
+      llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs),
       new DiagnosticOptions);
   SourceManager Sources(Diagnostics, Files);
   FileID ID = createInMemoryFile("<irrelevant>", *Code, Sources, Files,
@@ -306,12 +306,12 @@ static bool fillRanges(MemoryBuffer *Code,
   return false;
 }
 
-static void outputReplacementXML(StringRef Text) {
+static void outputReplacementXML(llvm::StringRef Text) {
   // FIXME: When we sort includes, we need to make sure the stream is correct
   // utf-8.
   size_t From = 0;
   size_t Index;
-  while ((Index = Text.find_first_of("\n\r<&", From)) != StringRef::npos) {
+  while ((Index = Text.find_first_of("\n\r<&", From)) != llvm::StringRef::npos) {
     outs() << Text.substr(From, Index - From);
     switch (Text[Index]) {
     case '\n':
@@ -345,7 +345,7 @@ static void outputReplacementsXML(const Replacements &Replaces) {
 }
 
 static bool
-emitReplacementWarnings(const Replacements &Replaces, StringRef AssumedFileName,
+emitReplacementWarnings(const Replacements &Replaces, llvm::StringRef AssumedFileName,
                         const std::unique_ptr<llvm::MemoryBuffer> &Code) {
   if (Replaces.empty())
     return false;
@@ -398,14 +398,14 @@ class ClangFormatDiagConsumer : public DiagnosticConsumer {
   void HandleDiagnostic(DiagnosticsEngine::Level DiagLevel,
                         const Diagnostic &Info) override {
 
-    SmallVector<char, 16> vec;
+    llvm::SmallVector<char, 16> vec;
     Info.FormatDiagnostic(vec);
     errs() << "clang-format error:" << vec << "\n";
   }
 };
 
 // Returns true on error.
-static bool format(StringRef FileName, bool ErrorOnIncompleteFormat = false) {
+static bool format(llvm::StringRef FileName, bool ErrorOnIncompleteFormat = false) {
   const bool IsSTDIN = FileName == "-";
   if (!OutputXML && Inplace && IsSTDIN) {
     errs() << "error: cannot use -i when reading from stdin.\n";
@@ -425,7 +425,7 @@ static bool format(StringRef FileName, bool ErrorOnIncompleteFormat = false) {
   if (Code->getBufferSize() == 0)
     return false; // Empty files are formatted correctly.
 
-  StringRef BufStr = Code->getBuffer();
+  llvm::StringRef BufStr = Code->getBuffer();
 
   const char *InvalidBOM = SrcMgr::ContentCache::getInvalidBOM(BufStr);
 
@@ -441,13 +441,13 @@ static bool format(StringRef FileName, bool ErrorOnIncompleteFormat = false) {
   std::vector<tooling::Range> Ranges;
   if (fillRanges(Code.get(), Ranges))
     return true;
-  StringRef AssumedFileName = IsSTDIN ? AssumeFileName : FileName;
+  llvm::StringRef AssumedFileName = IsSTDIN ? AssumeFileName : FileName;
   if (AssumedFileName.empty()) {
     llvm::errs() << "error: empty filenames are not allowed\n";
     return true;
   }
 
-  Expected<FormatStyle> FormatStyle =
+  llvm::Expected<FormatStyle> FormatStyle =
       getStyle(Style, AssumedFileName, FallbackStyle, Code->getBuffer(),
                nullptr, WNoErrorList.isSet(WNoError::Unknown));
   if (!FormatStyle) {
@@ -455,7 +455,7 @@ static bool format(StringRef FileName, bool ErrorOnIncompleteFormat = false) {
     return true;
   }
 
-  StringRef QualifierAlignmentOrder = QualifierAlignment;
+  llvm::StringRef QualifierAlignmentOrder = QualifierAlignment;
 
   FormatStyle->QualifierAlignment =
       StringSwitch<FormatStyle::QualifierAlignmentStyle>(
@@ -470,7 +470,7 @@ static bool format(StringRef FileName, bool ErrorOnIncompleteFormat = false) {
     FormatStyle->QualifierOrder = {"type", "const", "volatile"};
   } else if (QualifierAlignmentOrder.contains("type")) {
     FormatStyle->QualifierAlignment = FormatStyle::QAS_Custom;
-    SmallVector<StringRef> Qualifiers;
+    llvm::SmallVector<llvm::StringRef> Qualifiers;
     QualifierAlignmentOrder.split(Qualifiers, " ", /*MaxSplit=*/-1,
                                   /*KeepEmpty=*/false);
     FormatStyle->QualifierOrder = {Qualifiers.begin(), Qualifiers.end()};
@@ -512,14 +512,14 @@ static bool format(StringRef FileName, bool ErrorOnIncompleteFormat = false) {
     else
       outputXML(Replaces, FormatChanges, Status, Cursor, CursorPosition);
   } else {
-    IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
+    llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
         new llvm::vfs::InMemoryFileSystem);
     FileManager Files(FileSystemOptions(), InMemoryFileSystem);
 
-    IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(new DiagnosticOptions());
+    llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(new DiagnosticOptions());
     ClangFormatDiagConsumer IgnoreDiagnostics;
     DiagnosticsEngine Diagnostics(
-        IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs), &*DiagOpts,
+        llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs), &*DiagOpts,
         &IgnoreDiagnostics, false);
     SourceManager Sources(Diagnostics, Files);
     FileID ID = createInMemoryFile(AssumedFileName, *Code, Sources, Files,
@@ -548,7 +548,7 @@ static bool format(StringRef FileName, bool ErrorOnIncompleteFormat = false) {
 } // namespace format
 } // namespace clang
 
-static void PrintVersion(raw_ostream &OS) {
+static void PrintVersion(llvm::raw_ostream &OS) {
   OS << clang::getClangToolFullVersion("clang-format") << '\n';
 }
 
@@ -567,7 +567,7 @@ static int dumpConfig() {
     }
     Code = std::move(CodeOrErr.get());
   }
-  Expected<clang::format::FormatStyle> FormatStyle = clang::format::getStyle(
+  llvm::Expected<clang::format::FormatStyle> FormatStyle = clang::format::getStyle(
       Style,
       FileNames.empty() || FileNames[0] == "-" ? AssumeFileName : FileNames[0],
       FallbackStyle, Code ? Code->getBuffer() : "");
@@ -580,10 +580,10 @@ static int dumpConfig() {
   return 0;
 }
 
-using String = SmallString<128>;
+using String = llvm::SmallString<128>;
 static String IgnoreDir;             // Directory of .clang-format-ignore file.
 static String PrevDir;               // Directory of previous `FilePath`.
-static SmallVector<String> Patterns; // Patterns in .clang-format-ignore file.
+static llvm::SmallVector<String> Patterns; // Patterns in .clang-format-ignore file.
 
 // Check whether `FilePath` is ignored according to the nearest
 // .clang-format-ignore file based on the rules below:
@@ -595,7 +595,7 @@ static SmallVector<String> Patterns; // Patterns in .clang-format-ignore file.
 // - A pattern is relative to the directory of the .clang-format-ignore file (or
 //   the root directory if the pattern starts with a slash).
 // - A pattern is negated if it starts with a bang (`!`).
-static bool isIgnored(StringRef FilePath) {
+static bool isIgnored(llvm::StringRef FilePath) {
   using namespace llvm::sys::fs;
   if (!is_regular_file(FilePath))
     return false;
@@ -607,7 +607,7 @@ static bool isIgnored(StringRef FilePath) {
   make_absolute(AbsPath);
   remove_dots(AbsPath, /*remove_dot_dot=*/true);
 
-  if (StringRef Dir{parent_path(AbsPath)}; PrevDir != Dir) {
+  if (llvm::StringRef Dir{parent_path(AbsPath)}; PrevDir != Dir) {
     PrevDir = Dir;
 
     for (;;) {
@@ -629,7 +629,7 @@ static bool isIgnored(StringRef FilePath) {
     Patterns.clear();
 
     for (std::string Line; std::getline(IgnoreFile, Line);) {
-      if (const auto Pattern{StringRef{Line}.trim()};
+      if (const auto Pattern{llvm::StringRef{Line}.trim()};
           // Skip empty and comment lines.
           !Pattern.empty() && Pattern[0] != '#') {
         Patterns.push_back(Pattern);
@@ -643,7 +643,7 @@ static bool isIgnored(StringRef FilePath) {
   const auto Pathname{convert_to_slash(AbsPath)};
   for (const auto &Pat : Patterns) {
     const bool IsNegated = Pat[0] == '!';
-    StringRef Pattern{Pat};
+    llvm::StringRef Pattern{Pat};
     if (IsNegated)
       Pattern = Pattern.drop_front();
 

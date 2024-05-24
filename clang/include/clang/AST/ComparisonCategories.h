@@ -17,6 +17,7 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
 #include <array>
 #include <cassert>
 #include <optional>
@@ -173,8 +174,8 @@ public:
 
 class ComparisonCategories {
 public:
-  static StringRef getCategoryString(ComparisonCategoryType Kind);
-  static StringRef getResultString(ComparisonCategoryResult Kind);
+  static llvm::StringRef getCategoryString(ComparisonCategoryType Kind);
+  static llvm::StringRef getResultString(ComparisonCategoryResult Kind);
 
   /// Return the list of results which are valid for the specified
   /// comparison category type.

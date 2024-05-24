@@ -2046,8 +2046,8 @@ template <> struct DenseMapInfo<clang::clangd::Range> {
 };
 
 template <> struct format_provider<clang::clangd::Position> {
-  static void format(const clang::clangd::Position &Pos, raw_ostream &OS,
-                     StringRef Style) {
+  static void format(const clang::clangd::Position &Pos, llvm::raw_ostream &OS,
+                     llvm::StringRef Style) {
     assert(Style.empty() && "style modifiers for this type are not supported");
     OS << Pos;
   }

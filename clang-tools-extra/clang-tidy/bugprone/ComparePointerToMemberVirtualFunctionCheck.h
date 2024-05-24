@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/compare-pointer-to-member-virtual-function.html
 class ComparePointerToMemberVirtualFunctionCheck : public ClangTidyCheck {
 public:
-  ComparePointerToMemberVirtualFunctionCheck(StringRef Name,
+  ComparePointerToMemberVirtualFunctionCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 

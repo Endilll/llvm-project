@@ -76,7 +76,7 @@ template <> struct MappingTraits<clang::tooling::Diagnostic> {
 
     std::string DiagnosticName;
     clang::tooling::DiagnosticMessage Message;
-    SmallVector<clang::tooling::DiagnosticMessage, 1> Notes;
+    llvm::SmallVector<clang::tooling::DiagnosticMessage, 1> Notes;
     clang::tooling::Diagnostic::Level DiagLevel;
     std::string BuildDirectory;
   };

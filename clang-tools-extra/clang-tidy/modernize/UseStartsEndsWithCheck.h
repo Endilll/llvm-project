@@ -22,7 +22,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-starts-ends-with.html
 class UseStartsEndsWithCheck : public ClangTidyCheck {
 public:
-  UseStartsEndsWithCheck(StringRef Name, ClangTidyContext *Context);
+  UseStartsEndsWithCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {

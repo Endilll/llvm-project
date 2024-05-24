@@ -59,7 +59,7 @@ llvm::Type *CGOpenCLRuntime::getPipeType(const PipeType *T) {
     return getPipeType(T, "opencl.pipe_wo_t", PipeWOTy);
 }
 
-llvm::Type *CGOpenCLRuntime::getPipeType(const PipeType *T, StringRef Name,
+llvm::Type *CGOpenCLRuntime::getPipeType(const PipeType *T, llvm::StringRef Name,
                                          llvm::Type *&PipeTy) {
   if (!PipeTy)
     PipeTy = getPointerType(T);

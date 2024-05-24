@@ -524,8 +524,8 @@ void Parser::ParseLexedMethodDeclaration(LateParsedMethodDeclaration &LM) {
 
     // Parse the exception-specification.
     SourceRange SpecificationRange;
-    SmallVector<ParsedType, 4> DynamicExceptions;
-    SmallVector<SourceRange, 4> DynamicExceptionRanges;
+    llvm::SmallVector<ParsedType, 4> DynamicExceptions;
+    llvm::SmallVector<SourceRange, 4> DynamicExceptionRanges;
     ExprResult NoexceptExpr;
     CachedTokens *ExceptionSpecTokens;
 

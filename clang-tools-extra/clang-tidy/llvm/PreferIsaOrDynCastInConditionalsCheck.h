@@ -48,7 +48,7 @@ namespace clang::tidy::llvm_check {
 /// http://clang.llvm.org/extra/clang-tidy/checks/llvm/prefer-isa-or-dyn-cast-in-conditionals.html
 class PreferIsaOrDynCastInConditionalsCheck : public ClangTidyCheck {
 public:
-  PreferIsaOrDynCastInConditionalsCheck(StringRef Name,
+  PreferIsaOrDynCastInConditionalsCheck(llvm::StringRef Name,
                                         ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {

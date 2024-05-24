@@ -38,7 +38,7 @@ AST_POLYMORPHIC_MATCHER_P(boolean, AST_POLYMORPHIC_SUPPORTED_TYPES(Stmt, Decl),
 } // namespace
 
 NonPrivateMemberVariablesInClassesCheck::
-    NonPrivateMemberVariablesInClassesCheck(StringRef Name,
+    NonPrivateMemberVariablesInClassesCheck(llvm::StringRef Name,
                                             ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreClassesWithAllMemberVariablesBeingPublic(

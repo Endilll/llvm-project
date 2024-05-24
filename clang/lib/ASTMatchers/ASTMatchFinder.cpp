@@ -875,7 +875,7 @@ private:
 public:
   class TraceReporter : llvm::PrettyStackTraceEntry {
     static void dumpNode(const ASTContext &Ctx, const DynTypedNode &Node,
-                         raw_ostream &OS) {
+                         llvm::raw_ostream &OS) {
       if (const auto *D = Node.get<Decl>()) {
         OS << D->getDeclKindName() << "Decl ";
         if (const auto *ND = dyn_cast<NamedDecl>(D)) {
@@ -900,7 +900,7 @@ public:
     }
 
     static void dumpNodeFromState(const ASTContext &Ctx,
-                                  const CurMatchData &State, raw_ostream &OS) {
+                                  const CurMatchData &State, llvm::raw_ostream &OS) {
       if (const DynTypedNode *MatchNode = State.getNode<DynTypedNode>()) {
         dumpNode(Ctx, *MatchNode, OS);
       } else if (const auto *QT = State.getNode<QualType>()) {
@@ -922,7 +922,7 @@ public:
 
   public:
     TraceReporter(const MatchASTVisitor &MV) : MV(MV) {}
-    void print(raw_ostream &OS) const override {
+    void print(llvm::raw_ostream &OS) const override {
       const CurMatchData &State = MV.CurMatchState;
       const MatchCallback *CB = State.getCallback();
       if (!CB) {
@@ -1165,7 +1165,7 @@ private:
     };
 
     // Loop while there's a single parent and we want to attempt memoization.
-    DynTypedNodeList Parents{ArrayRef<DynTypedNode>()}; // after loop: size != 1
+    DynTypedNodeList Parents{llvm::ArrayRef<DynTypedNode>()}; // after loop: size != 1
     for (;;) {
       // A cache key only makes sense if memoization is possible.
       if (Builder->isComparable()) {
@@ -1705,7 +1705,7 @@ void MatchFinder::registerTestCallbackAfterParsing(
   ParsingDone = NewParsingDone;
 }
 
-StringRef MatchFinder::MatchCallback::getID() const { return "<unknown>"; }
+llvm::StringRef MatchFinder::MatchCallback::getID() const { return "<unknown>"; }
 
 std::optional<TraversalKind>
 MatchFinder::MatchCallback::getCheckTraversalKind() const {

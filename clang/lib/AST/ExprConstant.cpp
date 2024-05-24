@@ -191,7 +191,7 @@ namespace {
   /// path, and find the size of the containing array, if any.
   static unsigned
   findMostDerivedSubobject(ASTContext &Ctx, APValue::LValueBase Base,
-                           ArrayRef<APValue::LValuePathEntry> Path,
+                           llvm::ArrayRef<APValue::LValuePathEntry> Path,
                            uint64_t &ArraySize, QualType &Type, bool &IsArray,
                            bool &FirstEntryIsUnsizedArray) {
     // This only accepts LValueBases from APValues, and APValues don't support
@@ -274,7 +274,7 @@ namespace {
     typedef APValue::LValuePathEntry PathEntry;
 
     /// The entries on the path from the glvalue to the designated subobject.
-    SmallVector<PathEntry, 8> Entries;
+    llvm::SmallVector<PathEntry, 8> Entries;
 
     SubobjectDesignator() : Invalid(true) {}
 
@@ -291,7 +291,7 @@ namespace {
       assert(V.isLValue() && "Non-LValue used to make an LValue designator?");
       if (!Invalid) {
         IsOnePastTheEnd = V.isLValueOnePastTheEnd();
-        ArrayRef<PathEntry> VEntries = V.getLValuePath();
+        llvm::ArrayRef<PathEntry> VEntries = V.getLValuePath();
         Entries.insert(Entries.end(), VEntries.begin(), VEntries.end());
         if (V.getLValueBase()) {
           bool IsArray = false;
@@ -563,7 +563,7 @@ namespace {
     unsigned Index;
 
     /// The stack of integers for tracking version numbers for temporaries.
-    SmallVector<unsigned, 2> TempVersionStack = {1};
+    llvm::SmallVector<unsigned, 2> TempVersionStack = {1};
     unsigned CurTempVersion = TempVersionStack.back();
 
     unsigned getTempVersion() const { return TempVersionStack.back(); }
@@ -674,7 +674,7 @@ namespace {
   // {"name":"EvaluateAsRValue","args":{"detail":"<test.cc:8:21, col:25>"}}}
   class ExprTimeTraceScope {
   public:
-    ExprTimeTraceScope(const Expr *E, const ASTContext &Ctx, StringRef Name)
+    ExprTimeTraceScope(const Expr *E, const ASTContext &Ctx, llvm::StringRef Name)
         : TimeScope(Name, [E, &Ctx] {
             return E->getSourceRange().printToString(Ctx.getSourceManager());
           }) {}
@@ -741,7 +741,7 @@ namespace {
   /// A reference to an object whose construction we are currently evaluating.
   struct ObjectUnderConstruction {
     APValue::LValueBase Base;
-    ArrayRef<APValue::LValuePathEntry> Path;
+    llvm::ArrayRef<APValue::LValuePathEntry> Path;
     friend bool operator==(const ObjectUnderConstruction &LHS,
                            const ObjectUnderConstruction &RHS) {
       return LHS.Base == RHS.Base && LHS.Path == RHS.Path;
@@ -932,7 +932,7 @@ namespace {
 
     ConstructionPhase
     isEvaluatingCtorDtor(APValue::LValueBase Base,
-                         ArrayRef<APValue::LValuePathEntry> Path) {
+                         llvm::ArrayRef<APValue::LValuePathEntry> Path) {
       return ObjectsUnderConstruction.lookup({Base, Path});
     }
 
@@ -1118,7 +1118,7 @@ namespace {
       explicit operator bool() const { return FrameIndex != 0; };
     };
 
-    StdAllocatorCaller getStdAllocatorCaller(StringRef FnName) const {
+    StdAllocatorCaller getStdAllocatorCaller(llvm::StringRef FnName) const {
       for (const CallStackFrame *Call = CurrentCall; Call != &BottomFrame;
            Call = Call->Caller) {
         const auto *MD = dyn_cast_or_null<CXXMethodDecl>(Call->Callee);
@@ -1372,7 +1372,7 @@ namespace {
     SpeculativeEvaluationRAII() = default;
 
     SpeculativeEvaluationRAII(
-        EvalInfo &Info, SmallVectorImpl<PartialDiagnosticAt> *NewDiag = nullptr)
+        EvalInfo &Info, llvm::SmallVectorImpl<PartialDiagnosticAt> *NewDiag = nullptr)
         : Info(&Info), OldStatus(Info.EvalStatus),
           OldSpeculativeEvaluationDepth(Info.SpeculativeEvaluationDepth) {
       Info.EvalStatus.Diag = NewDiag;
@@ -1793,7 +1793,7 @@ namespace {
       DeclAndIsDerivedMember.setPointer(V.getMemberPointerDecl());
       DeclAndIsDerivedMember.setInt(V.isMemberPointerToDerivedMember());
       Path.clear();
-      ArrayRef<const CXXRecordDecl*> P = V.getMemberPointerPath();
+      llvm::ArrayRef<const CXXRecordDecl*> P = V.getMemberPointerPath();
       Path.insert(Path.end(), P.begin(), P.end());
     }
 
@@ -1803,7 +1803,7 @@ namespace {
     llvm::PointerIntPair<const ValueDecl*, 1, bool> DeclAndIsDerivedMember;
     /// Path - The path of base/derived classes from the member declaration's
     /// class (exclusive) to the class type of the member pointer (inclusive).
-    SmallVector<const CXXRecordDecl*, 4> Path;
+    llvm::SmallVector<const CXXRecordDecl*, 4> Path;
 
     /// Perform a cast towards the class of the Decl (either up or down the
     /// hierarchy).
@@ -1965,7 +1965,7 @@ APValue *EvalInfo::createHeapAlloc(const Expr *E, QualType T, LValue &LV) {
 }
 
 /// Produce a string describing the given constexpr call.
-void CallStackFrame::describe(raw_ostream &Out) const {
+void CallStackFrame::describe(llvm::raw_ostream &Out) const {
   unsigned ArgIndex = 0;
   bool IsMemberCall =
       isa<CXXMethodDecl>(Callee) && !isa<CXXConstructorDecl>(Callee) &&
@@ -2223,7 +2223,7 @@ static bool CheckLValueConstantExpression(EvalInfo &Info, SourceLocation Loc,
   // are applied elsewhere.
   if (isTemplateArgument(Kind)) {
     int InvalidBaseKind = -1;
-    StringRef Ident;
+    llvm::StringRef Ident;
     if (Base.is<TypeInfoLValue>())
       InvalidBaseKind = 0;
     else if (isa_and_nonnull<StringLiteral>(BaseE))
@@ -3043,7 +3043,7 @@ static bool handleVectorVectorBinOp(EvalInfo &Info, const BinaryOperator *E,
   assert(LHSValue.getVectorLength() == NumElements &&
          RHSValue.getVectorLength() == NumElements && "Different vector sizes");
 
-  SmallVector<APValue, 4> ResultElements;
+  llvm::SmallVector<APValue, 4> ResultElements;
 
   for (unsigned EltNum = 0; EltNum < NumElements; ++EltNum) {
     APValue LHSElt = LHSValue.getVectorElt(EltNum);
@@ -5824,7 +5824,7 @@ static std::optional<DynamicType> ComputeDynamicType(EvalInfo &Info,
   // binary search here instead. But the overwhelmingly common case is that
   // we're not in the middle of a constructor, so it probably doesn't matter
   // in practice.
-  ArrayRef<APValue::LValuePathEntry> Path = This.Designator.Entries;
+  llvm::ArrayRef<APValue::LValuePathEntry> Path = This.Designator.Entries;
   for (unsigned PathLength = This.Designator.MostDerivedPathLength;
        PathLength <= Path.size(); ++PathLength) {
     switch (Info.isEvaluatingCtorDtor(This.getLValueBase(),
@@ -5921,7 +5921,7 @@ static const CXXMethodDecl *HandleVirtualDispatch(
 /// reference to a base class of the returned type.
 static bool HandleCovariantReturnAdjustment(EvalInfo &Info, const Expr *E,
                                             APValue &Result,
-                                            ArrayRef<QualType> Path) {
+                                            llvm::ArrayRef<QualType> Path) {
   assert(Result.isLValue() &&
          "unexpected kind of APValue for covariant return");
   if (Result.isNullPointer())
@@ -6237,7 +6237,7 @@ static bool EvaluateCallArg(const ParmVarDecl *PVD, const Expr *Arg,
 }
 
 /// Evaluate the arguments to a function call.
-static bool EvaluateArgs(ArrayRef<const Expr *> Args, CallRef Call,
+static bool EvaluateArgs(llvm::ArrayRef<const Expr *> Args, CallRef Call,
                          EvalInfo &Info, const FunctionDecl *Callee,
                          bool RightToLeft = false) {
   bool Success = true;
@@ -6297,7 +6297,7 @@ static bool handleTrivialCopy(EvalInfo &Info, const ParmVarDecl *Param,
 /// Evaluate a function call.
 static bool HandleFunctionCall(SourceLocation CallLoc,
                                const FunctionDecl *Callee, const LValue *This,
-                               const Expr *E, ArrayRef<const Expr *> Args,
+                               const Expr *E, llvm::ArrayRef<const Expr *> Args,
                                CallRef Call, const Stmt *Body, EvalInfo &Info,
                                APValue &Result, const LValue *ResultSlot) {
   if (!Info.CheckCallLimit(CallLoc))
@@ -6565,7 +6565,7 @@ static bool HandleConstructorCall(const Expr *E, const LValue &This,
 }
 
 static bool HandleConstructorCall(const Expr *E, const LValue &This,
-                                  ArrayRef<const Expr*> Args,
+                                  llvm::ArrayRef<const Expr*> Args,
                                   const CXXConstructorDecl *Definition,
                                   EvalInfo &Info, APValue &Result) {
   CallScopeRAII CallScope(Info);
@@ -6710,7 +6710,7 @@ static bool HandleDestructionImpl(EvalInfo &Info, SourceRange CallRange,
 
   // We don't have a good way to iterate fields in reverse, so collect all the
   // fields first and then walk them backwards.
-  SmallVector<FieldDecl*, 16> Fields(RD->fields());
+  llvm::SmallVector<FieldDecl*, 16> Fields(RD->fields());
   for (const FieldDecl *FD : llvm::reverse(Fields)) {
     if (FD->isUnnamedBitField())
       continue;
@@ -6972,7 +6972,7 @@ class BitCastBuffer {
   // FIXME: Its possible under the C++ standard for 'char' to not be 8 bits, but
   // we don't support a host or target where that is the case. Still, we should
   // use a more generic type in case we ever do.
-  SmallVector<std::optional<unsigned char>, 32> Bytes;
+  llvm::SmallVector<std::optional<unsigned char>, 32> Bytes;
 
   static_assert(std::numeric_limits<unsigned char>::digits >= 8,
                 "Need at least 8 bit unsigned char");
@@ -6985,7 +6985,7 @@ public:
         TargetIsLittleEndian(TargetIsLittleEndian) {}
 
   [[nodiscard]] bool readObject(CharUnits Offset, CharUnits Width,
-                                SmallVectorImpl<unsigned char> &Output) const {
+                                llvm::SmallVectorImpl<unsigned char> &Output) const {
     for (CharUnits I = Offset, E = Offset + Width; I != E; ++I) {
       // If a byte of an integer is uninitialized, then the whole integer is
       // uninitialized.
@@ -6998,7 +6998,7 @@ public:
     return true;
   }
 
-  void writeObject(CharUnits Offset, SmallVectorImpl<unsigned char> &Input) {
+  void writeObject(CharUnits Offset, llvm::SmallVectorImpl<unsigned char> &Input) {
     if (llvm::sys::IsLittleEndianHost != TargetIsLittleEndian)
       std::reverse(Input.begin(), Input.end());
 
@@ -7193,7 +7193,7 @@ class APValueToBufferConverter {
         Res.insertBits(EltAsInt, BigEndian ? (NElts - I - 1) : I);
       }
 
-      SmallVector<uint8_t, 8> Bytes(NElts / 8);
+      llvm::SmallVector<uint8_t, 8> Bytes(NElts / 8);
       llvm::StoreIntToMemory(Res, &*Bytes.begin(), NElts / 8);
       Buffer.writeObject(Offset, Bytes);
     } else {
@@ -7217,7 +7217,7 @@ class APValueToBufferConverter {
       AdjustedVal = AdjustedVal.extend(Width);
     }
 
-    SmallVector<uint8_t, 8> Bytes(Width / 8);
+    llvm::SmallVector<uint8_t, 8> Bytes(Width / 8);
     llvm::StoreIntToMemory(AdjustedVal, &*Bytes.begin(), Width / 8);
     Buffer.writeObject(Offset, Bytes);
     return true;
@@ -7290,7 +7290,7 @@ class BufferToAPValueConverter {
         SizeOf = NumBytes;
     }
 
-    SmallVector<uint8_t, 8> Bytes;
+    llvm::SmallVector<uint8_t, 8> Bytes;
     if (!Buffer.readObject(Offset, SizeOf, Bytes)) {
       // If this is std::byte or unsigned char, then its okay to store an
       // indeterminate value.
@@ -7443,7 +7443,7 @@ class BufferToAPValueConverter {
       return std::nullopt;
     }
 
-    SmallVector<APValue, 4> Elts;
+    llvm::SmallVector<APValue, 4> Elts;
     Elts.reserve(NElts);
     if (VTy->isExtVectorBoolType()) {
       // Special handling for OpenCL bool vectors:
@@ -7456,7 +7456,7 @@ class BufferToAPValueConverter {
       // actually need to be accessed.
       bool BigEndian = Info.Ctx.getTargetInfo().isBigEndian();
 
-      SmallVector<uint8_t, 8> Bytes;
+      llvm::SmallVector<uint8_t, 8> Bytes;
       Bytes.reserve(NElts / 8);
       if (!Buffer.readObject(Offset, CharUnits::fromQuantity(NElts / 8), Bytes))
         return std::nullopt;
@@ -7649,7 +7649,7 @@ private:
     assert(Info.checkingPotentialConstantExpression());
 
     // Speculatively evaluate both arms.
-    SmallVector<PartialDiagnosticAt, 8> Diag;
+    llvm::SmallVector<PartialDiagnosticAt, 8> Diag;
     {
       SpeculativeEvaluationRAII Speculate(Info, &Diag);
       StmtVisitorTy::Visit(E->getFalseExpr());
@@ -8072,7 +8072,7 @@ public:
         return false;
     }
 
-    SmallVector<QualType, 4> CovariantAdjustmentPath;
+    llvm::SmallVector<QualType, 4> CovariantAdjustmentPath;
     if (This) {
       auto *NamedMember = dyn_cast<CXXMethodDecl>(FD);
       if (NamedMember && NamedMember->isVirtual() && !HasQualifier) {
@@ -8170,14 +8170,14 @@ public:
       return false;
 
     if (Val.isVector()) {
-      SmallVector<uint32_t, 4> Indices;
+      llvm::SmallVector<uint32_t, 4> Indices;
       E->getEncodedElementAccess(Indices);
       if (Indices.size() == 1) {
         // Return scalar.
         return DerivedSuccess(Val.getVectorElt(Indices[0]), E);
       } else {
         // Construct new APValue vector.
-        SmallVector<APValue, 4> Elts;
+        llvm::SmallVector<APValue, 4> Elts;
         for (unsigned I = 0; I < Indices.size(); ++I) {
           Elts.push_back(Val.getVectorElt(Indices[I]));
         }
@@ -8695,8 +8695,8 @@ bool LValueExprEvaluator::VisitCallExpr(const CallExpr *E) {
 bool LValueExprEvaluator::VisitMaterializeTemporaryExpr(
     const MaterializeTemporaryExpr *E) {
   // Walk through the expression to find the materialized temporary itself.
-  SmallVector<const Expr *, 2> CommaLHSs;
-  SmallVector<SubobjectAdjustment, 2> Adjustments;
+  llvm::SmallVector<const Expr *, 2> CommaLHSs;
+  llvm::SmallVector<SubobjectAdjustment, 2> Adjustments;
   const Expr *Inner =
       E->getSubExpr()->skipRValueSubobjectAdjustments(CommaLHSs, Adjustments);
 
@@ -10187,7 +10187,7 @@ namespace {
     bool VisitBinCmp(const BinaryOperator *E);
     bool VisitCXXParenListInitExpr(const CXXParenListInitExpr *E);
     bool VisitCXXParenListOrInitListExpr(const Expr *ExprToVisit,
-                                         ArrayRef<Expr *> Args);
+                                         llvm::ArrayRef<Expr *> Args);
   };
 }
 
@@ -10310,7 +10310,7 @@ bool RecordExprEvaluator::VisitInitListExpr(const InitListExpr *E) {
 }
 
 bool RecordExprEvaluator::VisitCXXParenListOrInitListExpr(
-    const Expr *ExprToVisit, ArrayRef<Expr *> Args) {
+    const Expr *ExprToVisit, llvm::ArrayRef<Expr *> Args) {
   const RecordDecl *RD =
       ExprToVisit->getType()->castAs<RecordType>()->getDecl();
   if (RD->isInvalidDecl()) return false;
@@ -10694,7 +10694,7 @@ namespace {
     VectorExprEvaluator(EvalInfo &info, APValue &Result)
       : ExprEvaluatorBaseTy(info), Result(Result) {}
 
-    bool Success(ArrayRef<APValue> V, const Expr *E) {
+    bool Success(llvm::ArrayRef<APValue> V, const Expr *E) {
       assert(V.size() == E->getType()->castAs<VectorType>()->getNumElements());
       // FIXME: remove this APValue copy.
       Result = APValue(V.data(), V.size());
@@ -10753,7 +10753,7 @@ bool VectorExprEvaluator::VisitCastExpr(const CastExpr *E) {
     }
 
     // Splat and create vector APValue.
-    SmallVector<APValue, 4> Elts(NElts, Val);
+    llvm::SmallVector<APValue, 4> Elts(NElts, Val);
     return Success(Elts, E);
   }
   case CK_BitCast: {
@@ -10786,7 +10786,7 @@ VectorExprEvaluator::VisitInitListExpr(const InitListExpr *E) {
   unsigned NumElements = VT->getNumElements();
 
   QualType EltTy = VT->getElementType();
-  SmallVector<APValue, 4> Elements;
+  llvm::SmallVector<APValue, 4> Elements;
 
   // The number of initializers can be less than the number of
   // vector elements. For OpenCL, this can be due to nested vector
@@ -10839,7 +10839,7 @@ VectorExprEvaluator::ZeroInitialization(const Expr *E) {
     ZeroElement =
         APValue(APFloat::getZero(Info.Ctx.getFloatTypeSemantics(EltTy)));
 
-  SmallVector<APValue, 4> Elements(VT->getNumElements(), ZeroElement);
+  llvm::SmallVector<APValue, 4> Elements(VT->getNumElements(), ZeroElement);
   return Success(Elements, E);
 }
 
@@ -10958,7 +10958,7 @@ bool VectorExprEvaluator::VisitUnaryOperator(const UnaryOperator *E) {
   assert(SubExprValue.getVectorLength() == VD->getNumElements() &&
          "Vector length doesn't match type?");
 
-  SmallVector<APValue, 4> ResultElements;
+  llvm::SmallVector<APValue, 4> ResultElements;
   for (unsigned EltNum = 0; EltNum < VD->getNumElements(); ++EltNum) {
     std::optional<APValue> Elt = handleVectorUnaryOperator(
         Info.Ctx, ResultEltTy, Op, SubExprValue.getVectorElt(EltNum));
@@ -11014,7 +11014,7 @@ bool VectorExprEvaluator::VisitConvertVectorExpr(const ConvertVectorExpr *E) {
   const FPOptions FPO = E->getFPFeaturesInEffect(Info.Ctx.getLangOpts());
 
   auto SourceLen = Source.getVectorLength();
-  SmallVector<APValue, 4> ResultElements;
+  llvm::SmallVector<APValue, 4> ResultElements;
   ResultElements.reserve(SourceLen);
   for (unsigned EltNum = 0; EltNum < SourceLen; ++EltNum) {
     APValue Elt;
@@ -11073,7 +11073,7 @@ bool VectorExprEvaluator::VisitShuffleVectorExpr(const ShuffleVectorExpr *E) {
 
   auto TotalElementsInOutputVector = DestVecTy->getNumElements();
 
-  SmallVector<APValue, 4> ResultElements;
+  llvm::SmallVector<APValue, 4> ResultElements;
   ResultElements.reserve(TotalElementsInOutputVector);
   for (unsigned EltNum = 0; EltNum < TotalElementsInOutputVector; ++EltNum) {
     APValue Elt;
@@ -11148,7 +11148,7 @@ namespace {
     }
     bool VisitCXXParenListInitExpr(const CXXParenListInitExpr *E);
     bool VisitCXXParenListOrInitListExpr(const Expr *ExprToVisit,
-                                         ArrayRef<Expr *> Args,
+                                         llvm::ArrayRef<Expr *> Args,
                                          const Expr *ArrayFiller,
                                          QualType AllocType = QualType());
   };
@@ -11231,7 +11231,7 @@ bool ArrayExprEvaluator::VisitInitListExpr(const InitListExpr *E,
 }
 
 bool ArrayExprEvaluator::VisitCXXParenListOrInitListExpr(
-    const Expr *ExprToVisit, ArrayRef<Expr *> Args, const Expr *ArrayFiller,
+    const Expr *ExprToVisit, llvm::ArrayRef<Expr *> Args, const Expr *ArrayFiller,
     QualType AllocType) {
   const ConstantArrayType *CAT = Info.Ctx.getAsConstantArrayType(
       AllocType.isNull() ? ExprToVisit->getType() : AllocType);
@@ -13143,7 +13143,7 @@ class DataRecursiveIntBinOpEvaluator {
     SpeculativeEvaluationRAII SpecEvalRAII;
   };
 
-  SmallVector<Job, 16> Queue;
+  llvm::SmallVector<Job, 16> Queue;
 
   IntExprEvaluator &IntEval;
   EvalInfo &Info;
@@ -16020,7 +16020,7 @@ bool Expr::EvaluateAsConstantExpr(EvalResult &Result, const ASTContext &Ctx,
 
 bool Expr::EvaluateAsInitializer(APValue &Value, const ASTContext &Ctx,
                                  const VarDecl *VD,
-                                 SmallVectorImpl<PartialDiagnosticAt> &Notes,
+                                 llvm::SmallVectorImpl<PartialDiagnosticAt> &Notes,
                                  bool IsConstantInitialization) const {
   assert(!isValueDependent() &&
          "Expression evaluator can't be called on a dependent expression.");
@@ -16088,7 +16088,7 @@ bool Expr::EvaluateAsInitializer(APValue &Value, const ASTContext &Ctx,
 }
 
 bool VarDecl::evaluateDestruction(
-    SmallVectorImpl<PartialDiagnosticAt> &Notes) const {
+    llvm::SmallVectorImpl<PartialDiagnosticAt> &Notes) const {
   Expr::EvalStatus EStatus;
   EStatus.Diag = &Notes;
 
@@ -16127,7 +16127,7 @@ bool Expr::isEvaluatable(const ASTContext &Ctx, SideEffectsKind SEK) const {
 }
 
 APSInt Expr::EvaluateKnownConstInt(const ASTContext &Ctx,
-                    SmallVectorImpl<PartialDiagnosticAt> *Diag) const {
+                    llvm::SmallVectorImpl<PartialDiagnosticAt> *Diag) const {
   assert(!isValueDependent() &&
          "Expression evaluator can't be called on a dependent expression.");
 
@@ -16146,7 +16146,7 @@ APSInt Expr::EvaluateKnownConstInt(const ASTContext &Ctx,
 }
 
 APSInt Expr::EvaluateKnownConstIntCheckOverflow(
-    const ASTContext &Ctx, SmallVectorImpl<PartialDiagnosticAt> *Diag) const {
+    const ASTContext &Ctx, llvm::SmallVectorImpl<PartialDiagnosticAt> *Diag) const {
   assert(!isValueDependent() &&
          "Expression evaluator can't be called on a dependent expression.");
 
@@ -16729,7 +16729,7 @@ bool Expr::isCXX11ConstantExpr(const ASTContext &Ctx, APValue *Result,
 
   // Build evaluation settings.
   Expr::EvalStatus Status;
-  SmallVector<PartialDiagnosticAt, 8> Diags;
+  llvm::SmallVector<PartialDiagnosticAt, 8> Diags;
   Status.Diag = &Diags;
   EvalInfo Info(Ctx, Status, EvalInfo::EM_ConstantExpression);
 
@@ -16753,7 +16753,7 @@ bool Expr::isCXX11ConstantExpr(const ASTContext &Ctx, APValue *Result,
 
 bool Expr::EvaluateWithSubstitution(APValue &Value, ASTContext &Ctx,
                                     const FunctionDecl *Callee,
-                                    ArrayRef<const Expr*> Args,
+                                    llvm::ArrayRef<const Expr*> Args,
                                     const Expr *This) const {
   assert(!isValueDependent() &&
          "Expression evaluator can't be called on a dependent expression.");
@@ -16790,7 +16790,7 @@ bool Expr::EvaluateWithSubstitution(APValue &Value, ASTContext &Ctx,
   }
 
   CallRef Call = Info.CurrentCall->createCall(Callee);
-  for (ArrayRef<const Expr*>::iterator I = Args.begin(), E = Args.end();
+  for (llvm::ArrayRef<const Expr*>::iterator I = Args.begin(), E = Args.end();
        I != E; ++I) {
     unsigned Idx = I - Args.begin();
     if (Idx >= Callee->getNumParams())
@@ -16824,7 +16824,7 @@ bool Expr::EvaluateWithSubstitution(APValue &Value, ASTContext &Ctx,
 }
 
 bool Expr::isPotentialConstantExpr(const FunctionDecl *FD,
-                                   SmallVectorImpl<
+                                   llvm::SmallVectorImpl<
                                      PartialDiagnosticAt> &Diags) {
   // FIXME: It would be useful to check constexpr function templates, but at the
   // moment the constant expression evaluator cannot cope with the non-rigorous
@@ -16862,7 +16862,7 @@ bool Expr::isPotentialConstantExpr(const FunctionDecl *FD,
   ImplicitValueInitExpr VIE(RD ? Info.Ctx.getRecordType(RD) : Info.Ctx.IntTy);
   This.set({&VIE, Info.CurrentCall->Index});
 
-  ArrayRef<const Expr*> Args;
+  llvm::ArrayRef<const Expr*> Args;
 
   APValue Scratch;
   if (const CXXConstructorDecl *CD = dyn_cast<CXXConstructorDecl>(FD)) {
@@ -16883,7 +16883,7 @@ bool Expr::isPotentialConstantExpr(const FunctionDecl *FD,
 
 bool Expr::isPotentialConstantExprUnevaluated(Expr *E,
                                               const FunctionDecl *FD,
-                                              SmallVectorImpl<
+                                              llvm::SmallVectorImpl<
                                                 PartialDiagnosticAt> &Diags) {
   assert(!E->isValueDependent() &&
          "Expression evaluator can't be called on a dependent expression.");
@@ -16930,7 +16930,7 @@ static bool EvaluateBuiltinStrLen(const Expr *E, uint64_t &Result,
   // Fast path: if it's a string literal, search the string value.
   if (const StringLiteral *S = dyn_cast_or_null<StringLiteral>(
           String.getLValueBase().dyn_cast<const Expr *>())) {
-    StringRef Str = S->getBytes();
+    llvm::StringRef Str = S->getBytes();
     int64_t Off = String.Offset.getQuantity();
     if (Off >= 0 && (uint64_t)Off <= (uint64_t)Str.size() &&
         S->getCharByteWidth() == 1 &&
@@ -16938,8 +16938,8 @@ static bool EvaluateBuiltinStrLen(const Expr *E, uint64_t &Result,
         Info.Ctx.hasSameUnqualifiedType(CharTy, Info.Ctx.CharTy)) {
       Str = Str.substr(Off);
 
-      StringRef::size_type Pos = Str.find(0);
-      if (Pos != StringRef::npos)
+      llvm::StringRef::size_type Pos = Str.find(0);
+      if (Pos != llvm::StringRef::npos)
         Str = Str.substr(0, Pos);
 
       Result = Str.size();

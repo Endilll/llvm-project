@@ -21,7 +21,7 @@ AST_MATCHER_P(InitListExpr, initCountLeq, unsigned, N) {
 // account. This is used to match the functions names as in
 // DefaultEmplacyFunctions below without caring about the template types of the
 // containers.
-AST_MATCHER_P(NamedDecl, hasAnyNameIgnoringTemplates, std::vector<StringRef>,
+AST_MATCHER_P(NamedDecl, hasAnyNameIgnoringTemplates, std::vector<llvm::StringRef>,
               Names) {
   const std::string FullName = "::" + Node.getQualifiedNameAsString();
 
@@ -43,8 +43,8 @@ AST_MATCHER_P(NamedDecl, hasAnyNameIgnoringTemplates, std::vector<StringRef>,
   // This loop is taken from HasNameMatcher::matchesNodeFullSlow in
   // clang/lib/ASTMatchers/ASTMatchersInternal.cpp and checks whether
   // FullNameTrimmed matches any of the given Names.
-  const StringRef FullNameTrimmedRef = FullNameTrimmed;
-  for (const StringRef Pattern : Names) {
+  const llvm::StringRef FullNameTrimmedRef = FullNameTrimmed;
+  for (const llvm::StringRef Pattern : Names) {
     if (Pattern.starts_with("::")) {
       if (FullNameTrimmed == Pattern)
         return true;
@@ -92,14 +92,14 @@ auto hasTypeOrPointeeType(
 }
 
 // Matches if the node has canonical type matching any of the given names.
-auto hasWantedType(llvm::ArrayRef<StringRef> TypeNames) {
+auto hasWantedType(llvm::ArrayRef<llvm::StringRef> TypeNames) {
   return hasCanonicalType(hasDeclaration(cxxRecordDecl(hasAnyName(TypeNames))));
 }
 
 // Matches member call expressions of the named method on the listed container
 // types.
 auto cxxMemberCallExprOnContainer(
-    StringRef MethodName, llvm::ArrayRef<StringRef> ContainerNames) {
+    llvm::StringRef MethodName, llvm::ArrayRef<llvm::StringRef> ContainerNames) {
   return cxxMemberCallExpr(
       hasDeclaration(functionDecl(hasName(MethodName))),
       on(hasTypeOrPointeeType(hasWantedType(ContainerNames))));
@@ -131,7 +131,7 @@ const auto DefaultEmplacyFunctions =
     "stack::emplace; queue::emplace; priority_queue::emplace";
 } // namespace
 
-UseEmplaceCheck::UseEmplaceCheck(StringRef Name, ClangTidyContext *Context)
+UseEmplaceCheck::UseEmplaceCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context), IgnoreImplicitConstructors(Options.get(
                                          "IgnoreImplicitConstructors", false)),
       ContainersWithPushBack(utils::options::parseStringList(Options.get(
@@ -297,7 +297,7 @@ void UseEmplaceCheck::registerMatchers(MatchFinder *Finder) {
                   hasName("value_type"),
                   hasType(type(
                       hasUnqualifiedDesugaredType(recordType(hasDeclaration(
-                          cxxRecordDecl(hasAnyName(SmallVector<StringRef, 2>(
+                          cxxRecordDecl(hasAnyName(llvm::SmallVector<llvm::StringRef, 2>(
                               TupleTypes.begin(), TupleTypes.end()))))))))))))),
               has(MakeTuple), hasSameNumArgsAsDeclNumParams(),
               unless(isInTemplateInstantiation()))

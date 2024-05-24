@@ -140,7 +140,7 @@ private:
         llvm::errs() << ": ";
       }
 
-      SmallString<16> DiagText;
+      llvm::SmallString<16> DiagText;
       Info.FormatDiagnostic(DiagText);
       llvm::errs() << DiagText << '\n';
 
@@ -150,7 +150,7 @@ private:
 
       for (const CharSourceRange &Range : Info.getRanges()) {
         bool Invalid = true;
-        StringRef Ref = Lexer::getSourceText(Range, SM, *LangOpts, &Invalid);
+        llvm::StringRef Ref = Lexer::getSourceText(Range, SM, *LangOpts, &Invalid);
         if (!Invalid) {
           llvm::errs() << Ref << '\n';
         }
@@ -228,7 +228,7 @@ BuildASTContext(CompilerInstance &CI, SelectorTable &ST, Builtin::Context &BC) {
 
 std::unique_ptr<CodeGenerator> BuildCodeGen(CompilerInstance &CI,
                                             llvm::LLVMContext &LLVMCtx) {
-  StringRef ModuleName("$__module");
+  llvm::StringRef ModuleName("$__module");
   return std::unique_ptr<CodeGenerator>(CreateLLVMCodeGen(
       CI.getDiagnostics(), ModuleName, &CI.getVirtualFileSystem(),
       CI.getHeaderSearchOpts(), CI.getPreprocessorOpts(), CI.getCodeGenOpts(),

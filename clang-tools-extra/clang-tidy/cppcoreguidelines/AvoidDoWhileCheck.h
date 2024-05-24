@@ -20,7 +20,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/avoid-do-while.html
 class AvoidDoWhileCheck : public ClangTidyCheck {
 public:
-  AvoidDoWhileCheck(StringRef Name, ClangTidyContext *Context);
+  AvoidDoWhileCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

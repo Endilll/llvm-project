@@ -25,38 +25,38 @@
 
 using namespace clang;
 
-static const enum raw_ostream::Colors noteColor = raw_ostream::CYAN;
-static const enum raw_ostream::Colors remarkColor =
-  raw_ostream::BLUE;
-static const enum raw_ostream::Colors fixitColor =
-  raw_ostream::GREEN;
-static const enum raw_ostream::Colors caretColor =
-  raw_ostream::GREEN;
-static const enum raw_ostream::Colors warningColor =
-  raw_ostream::MAGENTA;
-static const enum raw_ostream::Colors templateColor =
-  raw_ostream::CYAN;
-static const enum raw_ostream::Colors errorColor = raw_ostream::RED;
-static const enum raw_ostream::Colors fatalColor = raw_ostream::RED;
+static const enum llvm::raw_ostream::Colors noteColor = llvm::raw_ostream::CYAN;
+static const enum llvm::raw_ostream::Colors remarkColor =
+  llvm::raw_ostream::BLUE;
+static const enum llvm::raw_ostream::Colors fixitColor =
+  llvm::raw_ostream::GREEN;
+static const enum llvm::raw_ostream::Colors caretColor =
+  llvm::raw_ostream::GREEN;
+static const enum llvm::raw_ostream::Colors warningColor =
+  llvm::raw_ostream::MAGENTA;
+static const enum llvm::raw_ostream::Colors templateColor =
+  llvm::raw_ostream::CYAN;
+static const enum llvm::raw_ostream::Colors errorColor = llvm::raw_ostream::RED;
+static const enum llvm::raw_ostream::Colors fatalColor = llvm::raw_ostream::RED;
 // Used for changing only the bold attribute.
-static const enum raw_ostream::Colors savedColor =
-  raw_ostream::SAVEDCOLOR;
+static const enum llvm::raw_ostream::Colors savedColor =
+  llvm::raw_ostream::SAVEDCOLOR;
 
 // Magenta is taken for 'warning'. Red is already 'error' and 'cyan'
 // is already taken for 'note'. Green is already used to underline
 // source ranges. White and black are bad because of the usual
 // terminal backgrounds. Which leaves us only with TWO options.
-static constexpr raw_ostream::Colors CommentColor = raw_ostream::YELLOW;
-static constexpr raw_ostream::Colors LiteralColor = raw_ostream::GREEN;
-static constexpr raw_ostream::Colors KeywordColor = raw_ostream::BLUE;
+static constexpr llvm::raw_ostream::Colors CommentColor = llvm::raw_ostream::YELLOW;
+static constexpr llvm::raw_ostream::Colors LiteralColor = llvm::raw_ostream::GREEN;
+static constexpr llvm::raw_ostream::Colors KeywordColor = llvm::raw_ostream::BLUE;
 
 /// Add highlights to differences in template strings.
-static void applyTemplateHighlighting(raw_ostream &OS, StringRef Str,
+static void applyTemplateHighlighting(llvm::raw_ostream &OS, llvm::StringRef Str,
                                       bool &Normal, bool Bold) {
   while (true) {
     size_t Pos = Str.find(ToggleHighlight);
     OS << Str.slice(0, Pos);
-    if (Pos == StringRef::npos)
+    if (Pos == llvm::StringRef::npos)
       break;
 
     Str = Str.substr(Pos + 1);
@@ -74,7 +74,7 @@ static void applyTemplateHighlighting(raw_ostream &OS, StringRef Str,
 /// Number of spaces to indent when word-wrapping.
 const unsigned WordWrapIndentation = 6;
 
-static int bytesSincePreviousTabOrLineBegin(StringRef SourceLine, size_t i) {
+static int bytesSincePreviousTabOrLineBegin(llvm::StringRef SourceLine, size_t i) {
   int bytes = 0;
   while (0<i) {
     if (SourceLine[--i]=='\t')
@@ -103,8 +103,8 @@ static int bytesSincePreviousTabOrLineBegin(StringRef SourceLine, size_t i) {
 /// \param TabStop used to expand tabs
 /// \return pair(printable text, 'true' iff original text was printable)
 ///
-static std::pair<SmallString<16>, bool>
-printableTextForNextCharacter(StringRef SourceLine, size_t *I,
+static std::pair<llvm::SmallString<16>, bool>
+printableTextForNextCharacter(llvm::StringRef SourceLine, size_t *I,
                               unsigned TabStop) {
   assert(I && "I must not be null");
   assert(*I < SourceLine.size() && "must point to a valid index");
@@ -118,7 +118,7 @@ printableTextForNextCharacter(StringRef SourceLine, size_t *I,
            && "Invalid computation of space amt");
     ++(*I);
 
-    SmallString<16> ExpandedTab;
+    llvm::SmallString<16> ExpandedTab;
     ExpandedTab.assign(NumSpaces, ' ');
     return std::make_pair(ExpandedTab, true);
   }
@@ -128,7 +128,7 @@ printableTextForNextCharacter(StringRef SourceLine, size_t *I,
   // Fast path for the common ASCII case.
   if (*Begin < 0x80 && llvm::sys::locale::isPrint(*Begin)) {
     ++(*I);
-    return std::make_pair(SmallString<16>(Begin, Begin + 1), true);
+    return std::make_pair(llvm::SmallString<16>(Begin, Begin + 1), true);
   }
   unsigned CharSize = llvm::getNumBytesForUTF8(*Begin);
   const unsigned char *End = Begin + CharSize;
@@ -151,10 +151,10 @@ printableTextForNextCharacter(StringRef SourceLine, size_t *I,
 
     // Valid, multi-byte, printable UTF8 character.
     if (llvm::sys::locale::isPrint(C))
-      return std::make_pair(SmallString<16>(OriginalBegin, End), true);
+      return std::make_pair(llvm::SmallString<16>(OriginalBegin, End), true);
 
     // Valid but not printable.
-    SmallString<16> Str("<U+>");
+    llvm::SmallString<16> Str("<U+>");
     while (C) {
       Str.insert(Str.begin() + 3, llvm::hexdigit(C % 16));
       C /= 16;
@@ -165,7 +165,7 @@ printableTextForNextCharacter(StringRef SourceLine, size_t *I,
   }
 
   // Otherwise, not printable since it's not valid UTF8.
-  SmallString<16> ExpandedByte("<XX>");
+  llvm::SmallString<16> ExpandedByte("<XX>");
   unsigned char Byte = SourceLine[*I];
   ExpandedByte[1] = llvm::hexdigit(Byte / 16);
   ExpandedByte[2] = llvm::hexdigit(Byte % 16);
@@ -222,9 +222,9 @@ static void expandTabs(std::string &SourceLine, unsigned TabStop) {
 ///
 ///  (\\u3042 is represented in UTF-8 by three bytes and takes two columns to
 ///   display)
-static void genColumnByteMapping(StringRef SourceLine, unsigned TabStop,
-                                 SmallVectorImpl<int> &BytesOut,
-                                 SmallVectorImpl<int> &ColumnsOut) {
+static void genColumnByteMapping(llvm::StringRef SourceLine, unsigned TabStop,
+                                 llvm::SmallVectorImpl<int> &BytesOut,
+                                 llvm::SmallVectorImpl<int> &ColumnsOut) {
   assert(BytesOut.empty());
   assert(ColumnsOut.empty());
 
@@ -254,7 +254,7 @@ static void genColumnByteMapping(StringRef SourceLine, unsigned TabStop,
 
 namespace {
 struct SourceColumnMap {
-  SourceColumnMap(StringRef SourceLine, unsigned TabStop)
+  SourceColumnMap(llvm::StringRef SourceLine, unsigned TabStop)
   : m_SourceLine(SourceLine) {
 
     genColumnByteMapping(SourceLine, TabStop, m_columnToByte, m_byteToColumn);
@@ -306,14 +306,14 @@ struct SourceColumnMap {
     return N;
   }
 
-  StringRef getSourceLine() const {
+  llvm::StringRef getSourceLine() const {
     return m_SourceLine;
   }
 
 private:
   const std::string m_SourceLine;
-  SmallVector<int,200> m_byteToColumn;
-  SmallVector<int,200> m_columnToByte;
+  llvm::SmallVector<int,200> m_byteToColumn;
+  llvm::SmallVector<int,200> m_columnToByte;
 };
 } // end anonymous namespace
 
@@ -509,7 +509,7 @@ static void selectInterestingSourceRegion(std::string &SourceLine,
 /// \returns The index of the first non-whitespace character that is
 /// greater than or equal to Idx or, if no such character exists,
 /// returns the end of the string.
-static unsigned skipWhitespace(unsigned Idx, StringRef Str, unsigned Length) {
+static unsigned skipWhitespace(unsigned Idx, llvm::StringRef Str, unsigned Length) {
   while (Idx < Length && isWhitespace(Str[Idx]))
     ++Idx;
   return Idx;
@@ -540,7 +540,7 @@ static inline char findMatchingPunctuation(char c) {
 ///
 /// \returns the index pointing one character past the end of the
 /// word.
-static unsigned findEndOfWord(unsigned Start, StringRef Str,
+static unsigned findEndOfWord(unsigned Start, llvm::StringRef Str,
                               unsigned Length, unsigned Column,
                               unsigned Columns) {
   assert(Start < Str.size() && "Invalid start position!");
@@ -562,7 +562,7 @@ static unsigned findEndOfWord(unsigned Start, StringRef Str,
 
   // We have the start of a balanced punctuation sequence (quotes,
   // parentheses, etc.). Determine the full sequence is.
-  SmallString<16> PunctuationEndStack;
+  llvm::SmallString<16> PunctuationEndStack;
   PunctuationEndStack.push_back(EndPunct);
   while (End < Length && !PunctuationEndStack.empty()) {
     if (Str[End] == PunctuationEndStack.back())
@@ -605,7 +605,7 @@ static unsigned findEndOfWord(unsigned Start, StringRef Str,
 /// \param Bold if the current text should be bold
 /// \returns true if word-wrapping was required, or false if the
 /// string fit on the first line.
-static bool printWordWrapped(raw_ostream &OS, StringRef Str, unsigned Columns,
+static bool printWordWrapped(llvm::raw_ostream &OS, llvm::StringRef Str, unsigned Columns,
                              unsigned Column, bool Bold) {
   const unsigned Length = std::min(Str.find('\n'), Str.size());
   bool TextNormal = true;
@@ -653,7 +653,7 @@ static bool printWordWrapped(raw_ostream &OS, StringRef Str, unsigned Columns,
   return Wrapped;
 }
 
-TextDiagnostic::TextDiagnostic(raw_ostream &OS, const LangOptions &LangOpts,
+TextDiagnostic::TextDiagnostic(llvm::raw_ostream &OS, const LangOptions &LangOpts,
                                DiagnosticOptions *DiagOpts,
                                const Preprocessor *PP)
     : DiagnosticRenderer(LangOpts, DiagOpts), OS(OS), PP(PP) {}
@@ -662,7 +662,7 @@ TextDiagnostic::~TextDiagnostic() {}
 
 void TextDiagnostic::emitDiagnosticMessage(
     FullSourceLoc Loc, PresumedLoc PLoc, DiagnosticsEngine::Level Level,
-    StringRef Message, ArrayRef<clang::CharSourceRange> Ranges,
+    llvm::StringRef Message, llvm::ArrayRef<clang::CharSourceRange> Ranges,
     DiagOrStoredDiag D) {
   uint64_t StartOfLocationInfo = OS.tell();
 
@@ -682,7 +682,7 @@ void TextDiagnostic::emitDiagnosticMessage(
 }
 
 /*static*/ void
-TextDiagnostic::printDiagnosticLevel(raw_ostream &OS,
+TextDiagnostic::printDiagnosticLevel(llvm::raw_ostream &OS,
                                      DiagnosticsEngine::Level Level,
                                      bool ShowColors) {
   if (ShowColors) {
@@ -713,9 +713,9 @@ TextDiagnostic::printDiagnosticLevel(raw_ostream &OS,
 }
 
 /*static*/
-void TextDiagnostic::printDiagnosticMessage(raw_ostream &OS,
+void TextDiagnostic::printDiagnosticMessage(llvm::raw_ostream &OS,
                                             bool IsSupplemental,
-                                            StringRef Message,
+                                            llvm::StringRef Message,
                                             unsigned CurrentColumn,
                                             unsigned Columns, bool ShowColors) {
   bool Bold = false;
@@ -739,9 +739,9 @@ void TextDiagnostic::printDiagnosticMessage(raw_ostream &OS,
   OS << '\n';
 }
 
-void TextDiagnostic::emitFilename(StringRef Filename, const SourceManager &SM) {
+void TextDiagnostic::emitFilename(llvm::StringRef Filename, const SourceManager &SM) {
 #ifdef _WIN32
-  SmallString<4096> TmpFilename;
+  llvm::SmallString<4096> TmpFilename;
 #endif
   if (DiagOpts->AbsolutePath) {
     auto File = SM.getFileManager().getOptionalFileRef(Filename);
@@ -765,7 +765,7 @@ void TextDiagnostic::emitFilename(StringRef Filename, const SourceManager &SM) {
       llvm::sys::fs::make_absolute(TmpFilename);
       llvm::sys::path::native(TmpFilename);
       llvm::sys::path::remove_dots(TmpFilename, /* remove_dot_dot */ true);
-      Filename = StringRef(TmpFilename.data(), TmpFilename.size());
+      Filename = llvm::StringRef(TmpFilename.data(), TmpFilename.size());
 #else
       Filename = SM.getFileManager().getCanonicalName(*File);
 #endif
@@ -783,7 +783,7 @@ void TextDiagnostic::emitFilename(StringRef Filename, const SourceManager &SM) {
 /// ranges necessary.
 void TextDiagnostic::emitDiagnosticLoc(FullSourceLoc Loc, PresumedLoc PLoc,
                                        DiagnosticsEngine::Level Level,
-                                       ArrayRef<CharSourceRange> Ranges) {
+                                       llvm::ArrayRef<CharSourceRange> Ranges) {
   if (PLoc.isInvalid()) {
     // At least print the file name if available:
     if (FileID FID = Loc.getFileID(); FID.isValid()) {
@@ -890,7 +890,7 @@ void TextDiagnostic::emitIncludeLocation(FullSourceLoc Loc, PresumedLoc PLoc) {
 }
 
 void TextDiagnostic::emitImportLocation(FullSourceLoc Loc, PresumedLoc PLoc,
-                                        StringRef ModuleName) {
+                                        llvm::StringRef ModuleName) {
   if (DiagOpts->ShowLocation && PLoc.isValid())
     OS << "In module '" << ModuleName << "' imported from "
        << PLoc.getFilename() << ':' << PLoc.getLine() << ":\n";
@@ -900,7 +900,7 @@ void TextDiagnostic::emitImportLocation(FullSourceLoc Loc, PresumedLoc PLoc,
 
 void TextDiagnostic::emitBuildingModuleLocation(FullSourceLoc Loc,
                                                 PresumedLoc PLoc,
-                                                StringRef ModuleName) {
+                                                llvm::StringRef ModuleName) {
   if (DiagOpts->ShowLocation && PLoc.isValid())
     OS << "While building module '" << ModuleName << "' imported from "
       << PLoc.getFilename() << ':' << PLoc.getLine() << ":\n";
@@ -1001,7 +1001,7 @@ static void highlightRange(const LineRange &R, const SourceColumnMap &Map,
 static std::string buildFixItInsertionLine(FileID FID,
                                            unsigned LineNo,
                                            const SourceColumnMap &map,
-                                           ArrayRef<FixItHint> Hints,
+                                           llvm::ArrayRef<FixItHint> Hints,
                                            const SourceManager &SM,
                                            const DiagnosticOptions *DiagOpts) {
   std::string FixItInsertionLine;
@@ -1019,7 +1019,7 @@ static std::string buildFixItInsertionLine(FileID FID,
         SM.getDecomposedExpansionLoc(H.RemoveRange.getBegin());
     if (FID == HintLocInfo.first &&
         LineNo == SM.getLineNumber(HintLocInfo.first, HintLocInfo.second) &&
-        StringRef(H.CodeToInsert).find_first_of("\n\r") == StringRef::npos) {
+        llvm::StringRef(H.CodeToInsert).find_first_of("\n\r") == llvm::StringRef::npos) {
       // Insert the new code into the line just below the code
       // that the user wrote.
       // Note: When modifying this function, be very careful about what is a
@@ -1075,12 +1075,12 @@ static unsigned getNumDisplayWidth(unsigned N) {
 ///
 /// For the remaining ranges, convert them to simple LineRange structs,
 /// which only cover one line at a time.
-static SmallVector<LineRange>
-prepareAndFilterRanges(const SmallVectorImpl<CharSourceRange> &Ranges,
+static llvm::SmallVector<LineRange>
+prepareAndFilterRanges(const llvm::SmallVectorImpl<CharSourceRange> &Ranges,
                        const SourceManager &SM,
                        const std::pair<unsigned, unsigned> &Lines, FileID FID,
                        const LangOptions &LangOpts) {
-  SmallVector<LineRange> LineRanges;
+  llvm::SmallVector<LineRange> LineRanges;
 
   for (const CharSourceRange &R : Ranges) {
     if (R.isInvalid())
@@ -1124,18 +1124,18 @@ prepareAndFilterRanges(const SmallVectorImpl<CharSourceRange> &Ranges,
 /// Creates syntax highlighting information in form of StyleRanges.
 ///
 /// The returned unique ptr has always exactly size
-/// (\p EndLineNumber - \p StartLineNumber + 1). Each SmallVector in there
+/// (\p EndLineNumber - \p StartLineNumber + 1). Each llvm::SmallVector in there
 /// corresponds to syntax highlighting information in one line. In each line,
 /// the StyleRanges are non-overlapping and sorted from start to end of the
 /// line.
 static std::unique_ptr<llvm::SmallVector<TextDiagnostic::StyleRange>[]>
-highlightLines(StringRef FileData, unsigned StartLineNumber,
+highlightLines(llvm::StringRef FileData, unsigned StartLineNumber,
                unsigned EndLineNumber, const Preprocessor *PP,
                const LangOptions &LangOpts, bool ShowColors, FileID FID,
                const SourceManager &SM) {
   assert(StartLineNumber <= EndLineNumber);
   auto SnippetRanges =
-      std::make_unique<SmallVector<TextDiagnostic::StyleRange>[]>(
+      std::make_unique<llvm::SmallVector<TextDiagnostic::StyleRange>[]>(
           EndLineNumber - StartLineNumber + 1);
 
   if (!PP || !ShowColors)
@@ -1162,10 +1162,10 @@ highlightLines(StringRef FileData, unsigned StartLineNumber,
 
   // Classify the given token and append it to the given vector.
   auto appendStyle =
-      [PP, &LangOpts](SmallVector<TextDiagnostic::StyleRange> &Vec,
+      [PP, &LangOpts](llvm::SmallVector<TextDiagnostic::StyleRange> &Vec,
                       const Token &T, unsigned Start, unsigned Length) -> void {
     if (T.is(tok::raw_identifier)) {
-      StringRef RawIdent = T.getRawIdentifier();
+      llvm::StringRef RawIdent = T.getRawIdentifier();
       // Special case true/false/nullptr/... literals, since they will otherwise
       // be treated as keywords.
       // FIXME: It would be good to have a programmatic way of getting this
@@ -1232,7 +1232,7 @@ highlightLines(StringRef FileData, unsigned StartLineNumber,
 
     // Simple tokens.
     if (TokenStartLine == TokenEndLine) {
-      SmallVector<TextDiagnostic::StyleRange> &LineRanges =
+      llvm::SmallVector<TextDiagnostic::StyleRange> &LineRanges =
           SnippetRanges[TokenStartLine - StartLineNumber];
       appendStyle(LineRanges, T, StartCol, T.getLength());
       continue;
@@ -1252,7 +1252,7 @@ highlightLines(StringRef FileData, unsigned StartLineNumber,
     for (unsigned I = 0; I <= Spelling.size(); ++I) {
       // This line is done.
       if (I == Spelling.size() || isVerticalWhitespace(Spelling[I])) {
-        SmallVector<TextDiagnostic::StyleRange> &LineRanges =
+        llvm::SmallVector<TextDiagnostic::StyleRange> &LineRanges =
             SnippetRanges[L - StartLineNumber];
 
         if (L >= StartLineNumber) {
@@ -1286,7 +1286,7 @@ highlightLines(StringRef FileData, unsigned StartLineNumber,
 /// \param Hints The FixIt hints active for this diagnostic.
 void TextDiagnostic::emitSnippetAndCaret(
     FullSourceLoc Loc, DiagnosticsEngine::Level Level,
-    SmallVectorImpl<CharSourceRange> &Ranges, ArrayRef<FixItHint> Hints) {
+    llvm::SmallVectorImpl<CharSourceRange> &Ranges, llvm::ArrayRef<FixItHint> Hints) {
   assert(Loc.isValid() && "must have a valid source location here");
   assert(Loc.isFileID() && "must have a file location here");
 
@@ -1307,7 +1307,7 @@ void TextDiagnostic::emitSnippetAndCaret(
 
   // Get information about the buffer it points into.
   bool Invalid = false;
-  StringRef BufData = Loc.getBufferData(&Invalid);
+  llvm::StringRef BufData = Loc.getBufferData(&Invalid);
   if (Invalid)
     return;
   const char *BufStart = BufData.data();
@@ -1348,11 +1348,11 @@ void TextDiagnostic::emitSnippetAndCaret(
 
   // Prepare source highlighting information for the lines we're about to
   // emit, starting from the first line.
-  std::unique_ptr<SmallVector<StyleRange>[]> SourceStyles =
+  std::unique_ptr<llvm::SmallVector<StyleRange>[]> SourceStyles =
       highlightLines(BufData, Lines.first, Lines.second, PP, LangOpts,
                      DiagOpts->ShowColors, FID, SM);
 
-  SmallVector<LineRange> LineRanges =
+  llvm::SmallVector<LineRange> LineRanges =
       prepareAndFilterRanges(Ranges, SM, Lines, FID, LangOpts);
 
   for (unsigned LineNo = Lines.first; LineNo != Lines.second + 1;
@@ -1447,10 +1447,10 @@ void TextDiagnostic::emitSnippetAndCaret(
   emitParseableFixits(Hints, SM);
 }
 
-void TextDiagnostic::emitSnippet(StringRef SourceLine,
+void TextDiagnostic::emitSnippet(llvm::StringRef SourceLine,
                                  unsigned MaxLineNoDisplayWidth,
                                  unsigned LineNo, unsigned DisplayLineNo,
-                                 ArrayRef<StyleRange> Styles) {
+                                 llvm::ArrayRef<StyleRange> Styles) {
   // Emit line number.
   if (MaxLineNoDisplayWidth > 0) {
     unsigned LineNoDisplayWidth = getNumDisplayWidth(DisplayLineNo);
@@ -1504,7 +1504,7 @@ void TextDiagnostic::emitSnippet(StringRef SourceLine,
   OS << '\n';
 }
 
-void TextDiagnostic::emitParseableFixits(ArrayRef<FixItHint> Hints,
+void TextDiagnostic::emitParseableFixits(llvm::ArrayRef<FixItHint> Hints,
                                          const SourceManager &SM) {
   if (!DiagOpts->ShowParseableFixits)
     return;

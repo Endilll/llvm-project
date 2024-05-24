@@ -99,7 +99,7 @@ public:
   CodeRangeASTSelection &operator=(CodeRangeASTSelection &&) = default;
 
   /// Returns the parent hierarchy (top to bottom) for the selected nodes.
-  ArrayRef<SelectedASTNode::ReferenceType> getParents() { return Parents; }
+  llvm::ArrayRef<SelectedASTNode::ReferenceType> getParents() { return Parents; }
 
   /// Returns the number of selected statements.
   size_t size() const {
@@ -136,7 +136,7 @@ public:
 
 private:
   CodeRangeASTSelection(SelectedASTNode::ReferenceType SelectedNode,
-                        ArrayRef<SelectedASTNode::ReferenceType> Parents,
+                        llvm::ArrayRef<SelectedASTNode::ReferenceType> Parents,
                         bool AreChildrenSelected)
       : SelectedNode(SelectedNode), Parents(Parents.begin(), Parents.end()),
         AreChildrenSelected(AreChildrenSelected) {}

@@ -132,7 +132,7 @@ llvm::Value *CodeGenFunction::EmitObjCCollectionLiteral(const Expr *E,
   uint64_t NumElements =
     ALE ? ALE->getNumElements() : DLE->getNumElements();
   if (NumElements == 0 && CGM.getLangOpts().ObjCRuntime.hasEmptyCollections()) {
-    StringRef ConstantName = ALE ? "__NSArray0__" : "__NSDictionary0__";
+    llvm::StringRef ConstantName = ALE ? "__NSArray0__" : "__NSDictionary0__";
     QualType IdTy(CGM.getContext().getObjCIdType());
     llvm::Constant *Constant =
         CGM.CreateRuntimeVariable(ConvertType(IdTy), ConstantName);
@@ -160,7 +160,7 @@ llvm::Value *CodeGenFunction::EmitObjCCollectionLiteral(const Expr *E,
 
   // In ARC, we may need to do extra work to keep all the keys and
   // values alive until after the call.
-  SmallVector<llvm::Value *, 16> NeededObjects;
+  llvm::SmallVector<llvm::Value *, 16> NeededObjects;
   bool TrackNeededObjects =
     (getLangOpts().ObjCAutoRefCount &&
     CGM.getCodeGenOpts().OptimizationLevel != 0);
@@ -1987,7 +1987,7 @@ void CodeGenFunction::EmitObjCForCollectionStmt(const ObjCForCollectionStmt &S){
           EmitCheckTypeDescriptor(QualType(InterfaceTy, 0))};
       EmitCheck({{IsClass, SanitizerKind::ObjCCast}},
                 SanitizerHandler::InvalidObjCCast,
-                ArrayRef<llvm::Constant *>(StaticData), CurrentItem);
+                llvm::ArrayRef<llvm::Constant *>(StaticData), CurrentItem);
     }
   }
 
@@ -2119,7 +2119,7 @@ llvm::Value *CodeGenFunction::EmitObjCExtendObjectLifetime(QualType type,
 
 /// Given a number of pointers, inform the optimizer that they're
 /// being intrinsically used up until this point in the program.
-void CodeGenFunction::EmitARCIntrinsicUse(ArrayRef<llvm::Value*> values) {
+void CodeGenFunction::EmitARCIntrinsicUse(llvm::ArrayRef<llvm::Value*> values) {
   llvm::Function *&fn = CGM.getObjCEntrypoints().clang_arc_use;
   if (!fn)
     fn = CGM.getIntrinsic(llvm::Intrinsic::objc_clang_arc_use);
@@ -2131,7 +2131,7 @@ void CodeGenFunction::EmitARCIntrinsicUse(ArrayRef<llvm::Value*> values) {
 
 /// Emit a call to "clang.arc.noop.use", which consumes the result of a call
 /// that has operand bundle "clang.arc.attachedcall".
-void CodeGenFunction::EmitARCNoopIntrinsicUse(ArrayRef<llvm::Value *> values) {
+void CodeGenFunction::EmitARCNoopIntrinsicUse(llvm::ArrayRef<llvm::Value *> values) {
   llvm::Function *&fn = CGM.getObjCEntrypoints().clang_arc_noop_use;
   if (!fn)
     fn = CGM.getIntrinsic(llvm::Intrinsic::objc_clang_arc_noop_use);
@@ -2245,7 +2245,7 @@ static llvm::Value *emitObjCValueOperation(CodeGenFunction &CGF,
                                            llvm::Value *value,
                                            llvm::Type *returnType,
                                            llvm::FunctionCallee &fn,
-                                           StringRef fnName) {
+                                           llvm::StringRef fnName) {
   if (isa<llvm::ConstantPointerNull>(value))
     return value;
 
@@ -2331,7 +2331,7 @@ static void emitAutoreleasedReturnValueMarker(CodeGenFunction &CGF) {
   llvm::InlineAsm *&marker
     = CGF.CGM.getObjCEntrypoints().retainAutoreleasedReturnValueMarker;
   if (!marker) {
-    StringRef assembly
+    llvm::StringRef assembly
       = CGF.CGM.getTargetCodeGenInfo()
            .getARCRetainAutoreleasedReturnValueMarker();
 
@@ -3128,7 +3128,7 @@ public:
 template <typename Impl, typename Result>
 Result
 ARCExprEmitter<Impl,Result>::visitPseudoObjectExpr(const PseudoObjectExpr *E) {
-  SmallVector<CodeGenFunction::OpaqueValueMappingData, 4> opaques;
+  llvm::SmallVector<CodeGenFunction::OpaqueValueMappingData, 4> opaques;
 
   // Find the result expression.
   const Expr *resultExpr = E->getResultExpr();
@@ -3723,7 +3723,7 @@ CodeGenFunction::GenerateObjCAtomicSetterCopyHelperFunction(
   SrcTy.addConst();
   SrcTy = C.getPointerType(SrcTy);
 
-  SmallVector<QualType, 2> ArgTys;
+  llvm::SmallVector<QualType, 2> ArgTys;
   ArgTys.push_back(DestTy);
   ArgTys.push_back(SrcTy);
   QualType FunctionTy = C.getFunctionType(ReturnTy, ArgTys, {});
@@ -3821,7 +3821,7 @@ llvm::Constant *CodeGenFunction::GenerateObjCAtomicGetterCopyHelperFunction(
   SrcTy.addConst();
   SrcTy = C.getPointerType(SrcTy);
 
-  SmallVector<QualType, 2> ArgTys;
+  llvm::SmallVector<QualType, 2> ArgTys;
   ArgTys.push_back(DestTy);
   ArgTys.push_back(SrcTy);
   QualType FunctionTy = C.getFunctionType(ReturnTy, ArgTys, {});
@@ -3867,7 +3867,7 @@ llvm::Constant *CodeGenFunction::GenerateObjCAtomicGetterCopyHelperFunction(
   CXXConstructExpr *CXXConstExpr =
     cast<CXXConstructExpr>(PID->getGetterCXXConstructor());
 
-  SmallVector<Expr*, 4> ConstructorArgs;
+  llvm::SmallVector<Expr*, 4> ConstructorArgs;
   ConstructorArgs.push_back(SRC);
   ConstructorArgs.append(std::next(CXXConstExpr->arg_begin()),
                          CXXConstExpr->arg_end());
@@ -3949,14 +3949,14 @@ static unsigned getBaseMachOPlatformID(const llvm::Triple &TT) {
 }
 
 static llvm::Value *emitIsPlatformVersionAtLeast(CodeGenFunction &CGF,
-                                                 const VersionTuple &Version) {
+                                                 const llvm::VersionTuple &Version) {
   CodeGenModule &CGM = CGF.CGM;
   // Note: we intend to support multi-platform version checks, so reserve
   // the room for a dual platform checking invocation that will be
   // implemented in the future.
   llvm::SmallVector<llvm::Value *, 8> Args;
 
-  auto EmitArgs = [&](const VersionTuple &Version, const llvm::Triple &TT) {
+  auto EmitArgs = [&](const llvm::VersionTuple &Version, const llvm::Triple &TT) {
     std::optional<unsigned> Min = Version.getMinor(),
                             SMin = Version.getSubminor();
     Args.push_back(
@@ -3984,7 +3984,7 @@ static llvm::Value *emitIsPlatformVersionAtLeast(CodeGenFunction &CGF,
 }
 
 llvm::Value *
-CodeGenFunction::EmitBuiltinAvailable(const VersionTuple &Version) {
+CodeGenFunction::EmitBuiltinAvailable(const llvm::VersionTuple &Version) {
   // Darwin uses the new __isPlatformVersionAtLeast family of routines.
   if (CGM.getTarget().getTriple().isOSDarwin())
     return emitIsPlatformVersionAtLeast(*this, Version);
@@ -4010,19 +4010,19 @@ CodeGenFunction::EmitBuiltinAvailable(const VersionTuple &Version) {
 }
 
 static bool isFoundationNeededForDarwinAvailabilityCheck(
-    const llvm::Triple &TT, const VersionTuple &TargetVersion) {
-  VersionTuple FoundationDroppedInVersion;
+    const llvm::Triple &TT, const llvm::VersionTuple &TargetVersion) {
+  llvm::VersionTuple FoundationDroppedInVersion;
   switch (TT.getOS()) {
   case llvm::Triple::IOS:
   case llvm::Triple::TvOS:
-    FoundationDroppedInVersion = VersionTuple(/*Major=*/13);
+    FoundationDroppedInVersion = llvm::VersionTuple(/*Major=*/13);
     break;
   case llvm::Triple::WatchOS:
-    FoundationDroppedInVersion = VersionTuple(/*Major=*/6);
+    FoundationDroppedInVersion = llvm::VersionTuple(/*Major=*/6);
     break;
   case llvm::Triple::Darwin:
   case llvm::Triple::MacOSX:
-    FoundationDroppedInVersion = VersionTuple(/*Major=*/10, /*Minor=*/15);
+    FoundationDroppedInVersion = llvm::VersionTuple(/*Major=*/10, /*Minor=*/15);
     break;
   case llvm::Triple::XROS:
     // XROS doesn't need Foundation.

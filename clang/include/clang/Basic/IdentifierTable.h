@@ -230,7 +230,7 @@ public:
            memcmp(getNameStart(), Str, StrLen-1) == 0;
   }
 
-  /// Return true if this is the identifier for the specified StringRef.
+  /// Return true if this is the identifier for the specified llvm::StringRef.
   bool isStr(llvm::StringRef Str) const {
     llvm::StringRef ThisStr(getNameStart(), getLength());
     return ThisStr == Str;
@@ -244,8 +244,8 @@ public:
   unsigned getLength() const { return Entry->getKeyLength(); }
 
   /// Return the actual identifier string.
-  StringRef getName() const {
-    return StringRef(getNameStart(), getLength());
+  llvm::StringRef getName() const {
+    return llvm::StringRef(getNameStart(), getLength());
   }
 
   /// Return true if this identifier is \#defined to some other value.
@@ -549,7 +549,7 @@ public:
 
   /// If the identifier is an "uglified" reserved name, return a cleaned form.
   /// e.g. _Foo => Foo. Otherwise, just returns the name.
-  StringRef deuglifiedName() const;
+  llvm::StringRef deuglifiedName() const;
   bool isPlaceholder() const {
     return getLength() == 1 && getNameStart()[0] == '_';
   }
@@ -618,8 +618,8 @@ public:
   /// advances the iterator for the following string.
   ///
   /// \returns The next string in the identifier table. If there is
-  /// no such string, returns an empty \c StringRef.
-  virtual StringRef Next() = 0;
+  /// no such string, returns an empty \c llvm::StringRef.
+  virtual llvm::StringRef Next() = 0;
 };
 
 /// Provides lookups to, and iteration over, IdentiferInfo objects.
@@ -632,7 +632,7 @@ public:
   /// Unlike the version in IdentifierTable, this returns a pointer instead
   /// of a reference.  If the pointer is null then the IdentifierInfo cannot
   /// be found.
-  virtual IdentifierInfo* get(StringRef Name) = 0;
+  virtual IdentifierInfo* get(llvm::StringRef Name) = 0;
 
   /// Retrieve an iterator into the set of all identifiers
   /// known to this identifier lookup source.
@@ -685,7 +685,7 @@ public:
 
   /// Return the identifier token info for the specified named
   /// identifier.
-  IdentifierInfo &get(StringRef Name) {
+  IdentifierInfo &get(llvm::StringRef Name) {
     auto &Entry = *HashTable.try_emplace(Name, nullptr).first;
 
     IdentifierInfo *&II = Entry.second;
@@ -709,7 +709,7 @@ public:
     return *II;
   }
 
-  IdentifierInfo &get(StringRef Name, tok::TokenKind TokenCode) {
+  IdentifierInfo &get(llvm::StringRef Name, tok::TokenKind TokenCode) {
     IdentifierInfo &II = get(Name);
     II.TokenID = TokenCode;
     assert(II.TokenID == (unsigned) TokenCode && "TokenCode too large");
@@ -722,7 +722,7 @@ public:
   /// This is a version of get() meant for external sources that want to
   /// introduce or modify an identifier. If they called get(), they would
   /// likely end up in a recursion.
-  IdentifierInfo &getOwn(StringRef Name) {
+  IdentifierInfo &getOwn(llvm::StringRef Name) {
     auto &Entry = *HashTable.insert(std::make_pair(Name, nullptr)).first;
 
     IdentifierInfo *&II = Entry.second;
@@ -751,7 +751,7 @@ public:
   iterator end() const   { return HashTable.end(); }
   unsigned size() const  { return HashTable.size(); }
 
-  iterator find(StringRef Name) const { return HashTable.find(Name); }
+  iterator find(llvm::StringRef Name) const { return HashTable.find(Name); }
 
   /// Print some statistics to stderr that indicate how well the
   /// hashing is doing.
@@ -1056,10 +1056,10 @@ public:
   bool isUnarySelector() const { return InfoPtr.getInt() == ZeroArg; }
 
   /// If this selector is the specific keyword selector described by Names.
-  bool isKeywordSelector(ArrayRef<StringRef> Names) const;
+  bool isKeywordSelector(llvm::ArrayRef<llvm::StringRef> Names) const;
 
   /// If this selector is the specific unary selector described by Name.
-  bool isUnarySelector(StringRef Name) const;
+  bool isUnarySelector(llvm::StringRef Name) const;
 
   unsigned getNumArgs() const;
 
@@ -1086,7 +1086,7 @@ public:
   ///
   /// \returns the name for this slot, which may be the empty string if no
   /// name was supplied.
-  StringRef getNameForSlot(unsigned argIndex) const;
+  llvm::StringRef getNameForSlot(unsigned argIndex) const;
 
   /// Derive the full selector name (e.g. "foo:bar:") and return
   /// it as an std::string.
@@ -1150,7 +1150,7 @@ public:
   ///
   /// This is "set" + \p Name where the initial character of \p Name
   /// has been capitalized.
-  static SmallString<64> constructSetterName(StringRef Name);
+  static llvm::SmallString<64> constructSetterName(llvm::StringRef Name);
 
   /// Return the default setter selector for the given identifier.
   ///

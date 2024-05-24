@@ -102,9 +102,9 @@ public:
     return MemoryBuffer::MemoryBuffer_Malloc;
   }
 
-  StringRef getBufferIdentifier() const override { return Name; }
+  llvm::StringRef getBufferIdentifier() const override { return Name; }
 
-  SharedStringBuffer(std::shared_ptr<const std::string> Data, StringRef Name)
+  SharedStringBuffer(std::shared_ptr<const std::string> Data, llvm::StringRef Name)
       : BufferContents(std::move(Data)), Name(Name) {
     assert(BufferContents && "Can't create from empty shared_ptr");
     MemoryBuffer::init(BufferContents->c_str(),

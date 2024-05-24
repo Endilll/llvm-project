@@ -47,7 +47,7 @@ void StaticDefinitionInAnonymousNamespaceCheck::check(
          !Lexer::getRawToken(Loc, Tok, *Result.SourceManager, getLangOpts(),
                              true)) {
     SourceRange TokenRange(Tok.getLocation(), Tok.getEndLoc());
-    StringRef SourceText =
+    llvm::StringRef SourceText =
         Lexer::getSourceText(CharSourceRange::getTokenRange(TokenRange),
                              *Result.SourceManager, getLangOpts());
     if (SourceText == "static") {

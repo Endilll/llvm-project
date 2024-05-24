@@ -105,7 +105,7 @@ int main(int argc, const char **argv) {
                  OptionsParser->getSourcePathList());
 
   if (UseColor.getNumOccurrences() > 0) {
-    ArgumentsAdjuster colorAdjustor = [](const CommandLineArguments &Args, StringRef /*unused*/) {
+    ArgumentsAdjuster colorAdjustor = [](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
       CommandLineArguments AdjustedArgs = Args;
       if (UseColor)
         AdjustedArgs.push_back("-fdiagnostics-color");
@@ -152,7 +152,7 @@ int main(int argc, const char **argv) {
         return 1;
     }
     LineEditor LE("clang-query");
-    LE.setListCompleter([&QS](StringRef Line, size_t Pos) {
+    LE.setListCompleter([&QS](llvm::StringRef Line, size_t Pos) {
       return QueryParser::complete(Line, Pos, QS);
     });
     while (std::optional<std::string> Line = LE.readLine()) {

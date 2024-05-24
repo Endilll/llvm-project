@@ -30,8 +30,8 @@ class CapturedDiagList {
 public:
   void push_back(const StoredDiagnostic &diag) { List.push_back(diag); }
 
-  bool clearDiagnostic(ArrayRef<unsigned> IDs, SourceRange range);
-  bool hasDiagnostic(ArrayRef<unsigned> IDs, SourceRange range) const;
+  bool clearDiagnostic(llvm::ArrayRef<unsigned> IDs, SourceRange range);
+  bool hasDiagnostic(llvm::ArrayRef<unsigned> IDs, SourceRange range) const;
 
   void reportDiagnostics(DiagnosticsEngine &diags) const;
 
@@ -43,7 +43,7 @@ public:
 };
 
 void writeARCDiagsToPlist(const std::string &outPath,
-                          ArrayRef<StoredDiagnostic> diags,
+                          llvm::ArrayRef<StoredDiagnostic> diags,
                           SourceManager &SM, const LangOptions &LangOpts);
 
 class TransformActions {
@@ -60,19 +60,19 @@ public:
   bool commitTransaction();
   void abortTransaction();
 
-  void insert(SourceLocation loc, StringRef text);
-  void insertAfterToken(SourceLocation loc, StringRef text);
+  void insert(SourceLocation loc, llvm::StringRef text);
+  void insertAfterToken(SourceLocation loc, llvm::StringRef text);
   void remove(SourceRange range);
   void removeStmt(Stmt *S);
-  void replace(SourceRange range, StringRef text);
+  void replace(SourceRange range, llvm::StringRef text);
   void replace(SourceRange range, SourceRange replacementRange);
-  void replaceStmt(Stmt *S, StringRef text);
-  void replaceText(SourceLocation loc, StringRef text,
-                   StringRef replacementText);
+  void replaceStmt(Stmt *S, llvm::StringRef text);
+  void replaceText(SourceLocation loc, llvm::StringRef text,
+                   llvm::StringRef replacementText);
   void increaseIndentation(SourceRange range,
                            SourceLocation parentIndent);
 
-  bool clearDiagnostic(ArrayRef<unsigned> IDs, SourceRange range);
+  bool clearDiagnostic(llvm::ArrayRef<unsigned> IDs, SourceRange range);
   bool clearAllDiagnostics(SourceRange range) {
     return clearDiagnostic(std::nullopt, range);
   }
@@ -97,11 +97,11 @@ public:
 
   DiagnosticBuilder report(SourceLocation loc, unsigned diagId,
                            SourceRange range = SourceRange());
-  void reportError(StringRef error, SourceLocation loc,
+  void reportError(llvm::StringRef error, SourceLocation loc,
                    SourceRange range = SourceRange());
-  void reportWarning(StringRef warning, SourceLocation loc,
+  void reportWarning(llvm::StringRef warning, SourceLocation loc,
                    SourceRange range = SourceRange());
-  void reportNote(StringRef note, SourceLocation loc,
+  void reportNote(llvm::StringRef note, SourceLocation loc,
                   SourceRange range = SourceRange());
 
   bool hasReportedErrors() const {
@@ -112,7 +112,7 @@ public:
   public:
     virtual ~RewriteReceiver();
 
-    virtual void insert(SourceLocation loc, StringRef text) = 0;
+    virtual void insert(SourceLocation loc, llvm::StringRef text) = 0;
     virtual void remove(CharSourceRange range) = 0;
     virtual void increaseIndentation(CharSourceRange range,
                                      SourceLocation parentIndent) = 0;
@@ -169,7 +169,7 @@ public:
   bool CFBridgingFunctionsDefined();
 };
 
-static inline StringRef getARCMTMacroName() {
+static inline llvm::StringRef getARCMTMacroName() {
   return "__IMPL_ARCMT_REMOVED_EXPR__";
 }
 

@@ -36,7 +36,7 @@ template <class TypeMap>
 ProgramStateRef
 removeInformationStoredForDeadInstances(const CallEvent &Call,
                                         ProgramStateRef State,
-                                        ArrayRef<const MemRegion *> Regions) {
+                                        llvm::ArrayRef<const MemRegion *> Regions) {
   // If we do not know anything about the call we shall not continue.
   // If the call is happens within a system header it is implementation detail.
   // We should not take it into consideration.

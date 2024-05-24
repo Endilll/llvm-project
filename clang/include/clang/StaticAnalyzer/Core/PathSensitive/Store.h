@@ -200,7 +200,7 @@ public:
   /// associated with the object is recycled.
   virtual void decrementReferenceCount(Store store) {}
 
-  using InvalidatedRegions = SmallVector<const MemRegion *, 8>;
+  using InvalidatedRegions = llvm::SmallVector<const MemRegion *, 8>;
 
   /// invalidateRegions - Clears out the specified regions from the store,
   ///  marking their values as unknown. Depending on the store, this may also
@@ -226,7 +226,7 @@ public:
   ///   even if they do not currently have bindings. Pass \c NULL if this
   ///   information will not be used.
   virtual StoreRef invalidateRegions(
-      Store store, ArrayRef<SVal> Values, const Expr *Ex, unsigned Count,
+      Store store, llvm::ArrayRef<SVal> Values, const Expr *Ex, unsigned Count,
       const LocationContext *LCtx, const CallEvent *Call,
       InvalidatedSymbols &IS, RegionAndSymbolInvalidationTraits &ITraits,
       InvalidatedRegions *TopLevelRegions, InvalidatedRegions *Invalidated) = 0;
@@ -243,7 +243,7 @@ public:
   virtual bool scanReachableSymbols(Store S, const MemRegion *R,
                                     ScanReachableSymbols &Visitor) = 0;
 
-  virtual void printJson(raw_ostream &Out, Store S, const char *NL,
+  virtual void printJson(llvm::raw_ostream &Out, Store S, const char *NL,
                          unsigned int Space, bool IsDot) const = 0;
 
   class BindingsHandler {

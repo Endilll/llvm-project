@@ -565,7 +565,7 @@ TEST(Matcher, HasReceiver) {
 }
 
 TEST(Matcher, MatchesMethodsOnLambda) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 struct A {
   ~A() {}
 };
@@ -646,7 +646,7 @@ struct coroutine_handle {
 };
 } // namespace std
 )cpp"));
-  StringRef CoReturnCode = R"cpp(
+  llvm::StringRef CoReturnCode = R"cpp(
 #include <coro_header>
 void check_match_co_return() {
   co_return 1;
@@ -655,7 +655,7 @@ void check_match_co_return() {
   EXPECT_TRUE(matchesConditionally(CoReturnCode,
                                    coreturnStmt(isExpansionInMainFile()), true,
                                    {"-std=c++20", "-I/"}, M));
-  StringRef CoAwaitCode = R"cpp(
+  llvm::StringRef CoAwaitCode = R"cpp(
 #include <coro_header>
 void check_match_co_await() {
   co_await a;
@@ -664,7 +664,7 @@ void check_match_co_await() {
   EXPECT_TRUE(matchesConditionally(CoAwaitCode,
                                    coawaitExpr(isExpansionInMainFile()), true,
                                    {"-std=c++20", "-I/"}, M));
-  StringRef CoYieldCode = R"cpp(
+  llvm::StringRef CoYieldCode = R"cpp(
 #include <coro_header>
 void check_match_co_yield() {
   co_yield 1.0;
@@ -674,7 +674,7 @@ void check_match_co_yield() {
                                    coyieldExpr(isExpansionInMainFile()), true,
                                    {"-std=c++20", "-I/"}, M));
 
-  StringRef NonCoroCode = R"cpp(
+  llvm::StringRef NonCoroCode = R"cpp(
 #include <coro_header>
 void non_coro_function() {
 }
@@ -690,7 +690,7 @@ void non_coro_function() {
   EXPECT_FALSE(matchesConditionally(NonCoroCode, coroutineBodyStmt(), true,
                                     {"-std=c++20", "-I/"}, M));
 
-  StringRef CoroWithDeclCode = R"cpp(
+  llvm::StringRef CoroWithDeclCode = R"cpp(
 #include <coro_header>
 void coro() {
   int thevar;
@@ -703,7 +703,7 @@ void coro() {
           has(declStmt(containsDeclaration(0, varDecl(hasName("thevar")))))))),
       true, {"-std=c++20", "-I/"}, M));
 
-  StringRef CoroWithTryCatchDeclCode = R"cpp(
+  llvm::StringRef CoroWithTryCatchDeclCode = R"cpp(
 #include <coro_header>
 void coro() try {
   int thevar;
@@ -787,13 +787,13 @@ TEST(Matcher, isInstanceMethod) {
 }
 
 TEST(MatcherCXXMemberCallExpr, On) {
-  StringRef Snippet1 = R"cc(
+  llvm::StringRef Snippet1 = R"cc(
         struct Y {
           void m();
         };
         void z(Y y) { y.m(); }
       )cc";
-  StringRef Snippet2 = R"cc(
+  llvm::StringRef Snippet2 = R"cc(
         struct Y {
           void m();
         };
@@ -808,7 +808,7 @@ TEST(MatcherCXXMemberCallExpr, On) {
   EXPECT_TRUE(matches(Snippet2, MatchesX));
 
   // Parens are ignored.
-  StringRef Snippet3 = R"cc(
+  llvm::StringRef Snippet3 = R"cc(
     struct Y {
       void m();
     };
@@ -820,13 +820,13 @@ TEST(MatcherCXXMemberCallExpr, On) {
 }
 
 TEST(MatcherCXXMemberCallExpr, OnImplicitObjectArgument) {
-  StringRef Snippet1 = R"cc(
+  llvm::StringRef Snippet1 = R"cc(
     struct Y {
       void m();
     };
     void z(Y y) { y.m(); }
   )cc";
-  StringRef Snippet2 = R"cc(
+  llvm::StringRef Snippet2 = R"cc(
     struct Y {
       void m();
     };
@@ -843,7 +843,7 @@ TEST(MatcherCXXMemberCallExpr, OnImplicitObjectArgument) {
   EXPECT_TRUE(notMatches(Snippet2, MatchesX));
 
   // Parens are not ignored.
-  StringRef Snippet3 = R"cc(
+  llvm::StringRef Snippet3 = R"cc(
     struct Y {
       void m();
     };
@@ -856,13 +856,13 @@ TEST(MatcherCXXMemberCallExpr, OnImplicitObjectArgument) {
 }
 
 TEST(Matcher, HasObjectExpr) {
-  StringRef Snippet1 = R"cc(
+  llvm::StringRef Snippet1 = R"cc(
         struct X {
           int m;
           int f(X x) { return x.m; }
         };
       )cc";
-  StringRef Snippet2 = R"cc(
+  llvm::StringRef Snippet2 = R"cc(
         struct X {
           int m;
           int f(X x) { return m; }
@@ -990,7 +990,7 @@ TEST_P(ASTMatchersTest,
   StatementMatcher CallExpr =
       callExpr(forEachArgumentWithParam(DeclRef, SelfParam));
 
-  StringRef S = R"cpp(
+  llvm::StringRef S = R"cpp(
   struct A {
     int operator()(this const A &self);
   };
@@ -1153,7 +1153,7 @@ TEST(ForEachArgumentWithParamType, MatchesMemberFunctionPtrCalls) {
   StatementMatcher CallExpr =
       callExpr(forEachArgumentWithParamType(ArgumentY, IntType));
 
-  StringRef S = "struct A {\n"
+  llvm::StringRef S = "struct A {\n"
                 "  int f(int i) { return i + 1; }\n"
                 "  int (A::*x)(int);\n"
                 "};\n"
@@ -1176,7 +1176,7 @@ TEST(ForEachArgumentWithParamType, MatchesVariadicFunctionPtrCalls) {
   StatementMatcher CallExpr =
       callExpr(forEachArgumentWithParamType(ArgumentY, IntType));
 
-  StringRef S = R"cpp(
+  llvm::StringRef S = R"cpp(
     void fcntl(int fd, int cmd, ...) {}
 
     template <typename Func>
@@ -1205,7 +1205,7 @@ TEST_P(ASTMatchersTest,
   StatementMatcher CallExpr =
       callExpr(forEachArgumentWithParamType(DeclRef, SelfTy));
 
-  StringRef S = R"cpp(
+  llvm::StringRef S = R"cpp(
   struct A {
     int operator()(this const A &self);
   };
@@ -1645,7 +1645,7 @@ TEST(MatchBinaryOperator, HasLHSAndHasRHS) {
   EXPECT_TRUE(matches("void x() { 1[\"abc\"]; }", OperatorIntPointer));
   EXPECT_TRUE(notMatches("void x() { \"abc\"[1]; }", OperatorIntPointer));
 
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 struct HasOpEqMem
 {
     bool operator==(const HasOpEqMem& other) const
@@ -1872,7 +1872,7 @@ TEST(MatchUnaryOperator, HasUnaryOperand) {
   EXPECT_TRUE(matches("void x() { !false; }", OperatorOnFalse));
   EXPECT_TRUE(notMatches("void x() { !true; }", OperatorOnFalse));
 
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 struct HasOpBangMem
 {
     bool operator!() const
@@ -2512,7 +2512,7 @@ TEST(IgnoringImplicit, MatchesImplicit) {
 }
 
 TEST(IgnoringImplicit, MatchesNestedImplicit) {
-  StringRef Code = R"(
+  llvm::StringRef Code = R"(
 
 struct OtherType;
 
@@ -2555,7 +2555,7 @@ TEST(IgnoringImplicit, DoesNotMatchIncorrectly) {
 
 TEST(Traversal, traverseMatcher) {
 
-  StringRef VarDeclCode = R"cpp(
+  llvm::StringRef VarDeclCode = R"cpp(
 void foo()
 {
   int i = 3.0;
@@ -2616,7 +2616,7 @@ void foo()
       matches(VarDeclCode, functionDecl(traverse(TK_IgnoreUnlessSpelledInSource,
                                                  hasAnyName("foo", "bar")))));
 
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void foo(int a)
 {
   int i = 3.0 + a;
@@ -3166,7 +3166,7 @@ void foo()
 }
 
 TEST(Traversal, traverseNoImplicit) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 struct NonTrivial {
     NonTrivial() {}
     NonTrivial(const NonTrivial&) {}
@@ -3731,7 +3731,7 @@ A::A() = default;
 }
 
 template <typename MatcherT>
-bool matcherTemplateWithBinding(StringRef Code, const MatcherT &M) {
+bool matcherTemplateWithBinding(llvm::StringRef Code, const MatcherT &M) {
   return matchAndVerifyResultTrue(
       Code, M.bind("matchedStmt"),
       std::make_unique<VerifyIdIsBoundTo<ReturnStmt>>("matchedStmt", 1));
@@ -3754,7 +3754,7 @@ int foo()
 
 TEST(Traversal, traverseMatcherNesting) {
 
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 float bar(int i)
 {
   return i;
@@ -3779,7 +3779,7 @@ void foo()
 }
 
 TEST(Traversal, traverseMatcherThroughImplicit) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 struct S {
   S(int x);
 };
@@ -3798,7 +3798,7 @@ void constructImplicit() {
 
 TEST(Traversal, traverseMatcherThroughMemoization) {
 
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void foo()
 {
   int i = 3.0;
@@ -3823,7 +3823,7 @@ void foo()
 
 TEST(Traversal, traverseUnlessSpelledInSource) {
 
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 
 struct A
 {
@@ -4197,7 +4197,7 @@ void binop()
         matchesConditionally(Code, traverse(TK_IgnoreUnlessSpelledInSource, M),
                              true, {"-std=c++20"}));
   }
-  auto withDescendants = [](StringRef lName, StringRef rName) {
+  auto withDescendants = [](llvm::StringRef lName, llvm::StringRef rName) {
     return stmt(hasDescendant(declRefExpr(to(varDecl(hasName(lName))))),
                 hasDescendant(declRefExpr(to(varDecl(hasName(rName))))));
   };
@@ -4305,7 +4305,7 @@ void binop()
         return;
 }
 )cpp";
-  auto withArgs = [](StringRef lName, StringRef rName) {
+  auto withArgs = [](llvm::StringRef lName, llvm::StringRef rName) {
     return cxxOperatorCallExpr(
         hasArgument(0, declRefExpr(to(varDecl(hasName(lName))))),
         hasArgument(1, declRefExpr(to(varDecl(hasName(rName))))));
@@ -4679,7 +4679,7 @@ void binop()
 TEST(IgnoringImpCasts, PathologicalLambda) {
 
   // Test that deeply nested lambdas are not a performance penalty
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void f() {
   [] {
   [] {
@@ -5136,7 +5136,7 @@ TEST(ForEach, BindsRecursiveCombinations) {
 }
 
 TEST(ForEach, DoesNotIgnoreImplicit) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void foo()
 {
     int i = 0;
@@ -5738,7 +5738,7 @@ TEST(NNS, BindsNestedNameSpecifierLocs) {
 }
 
 TEST(NNS, DescendantsOfNestedNameSpecifiers) {
-  StringRef Fragment =
+  llvm::StringRef Fragment =
       "namespace a { struct A { struct B { struct C {}; }; }; };"
       "void f() { a::A::B::C c; }";
   EXPECT_TRUE(matches(
@@ -5767,7 +5767,7 @@ TEST(NNS, DescendantsOfNestedNameSpecifiers) {
 }
 
 TEST(NNS, NestedNameSpecifiersAsDescendants) {
-  StringRef Fragment =
+  llvm::StringRef Fragment =
       "namespace a { struct A { struct B { struct C {}; }; }; };"
       "void f() { a::A::B::C c; }";
   EXPECT_TRUE(matches(
@@ -5783,7 +5783,7 @@ TEST(NNS, NestedNameSpecifiersAsDescendants) {
 }
 
 TEST(NNSLoc, DescendantsOfNestedNameSpecifierLocs) {
-  StringRef Fragment =
+  llvm::StringRef Fragment =
       "namespace a { struct A { struct B { struct C {}; }; }; };"
       "void f() { a::A::B::C c; }";
   EXPECT_TRUE(matches(
@@ -5810,7 +5810,7 @@ TEST(NNSLoc, DescendantsOfNestedNameSpecifierLocs) {
 }
 
 TEST(NNSLoc, NestedNameSpecifierLocsAsDescendants) {
-  StringRef Fragment =
+  llvm::StringRef Fragment =
       "namespace a { struct A { struct B { struct C {}; }; }; };"
       "void f() { a::A::B::C c; }";
   EXPECT_TRUE(matches(
@@ -5826,7 +5826,7 @@ TEST(NNSLoc, NestedNameSpecifierLocsAsDescendants) {
 }
 
 TEST(Attr, AttrsAsDescendants) {
-  StringRef Fragment = "namespace a { struct [[clang::warn_unused_result]] "
+  llvm::StringRef Fragment = "namespace a { struct [[clang::warn_unused_result]] "
                        "F{}; [[noreturn]] void foo(); }";
   EXPECT_TRUE(matches(Fragment, namespaceDecl(hasDescendant(attr()))));
   EXPECT_TRUE(matchAndVerifyResultTrue(
@@ -5837,15 +5837,15 @@ TEST(Attr, AttrsAsDescendants) {
 }
 
 TEST(Attr, ParentsOfAttrs) {
-  StringRef Fragment =
+  llvm::StringRef Fragment =
       "namespace a { struct [[clang::warn_unused_result]] F{}; }";
   EXPECT_TRUE(matches(Fragment, attr(hasAncestor(namespaceDecl()))));
 }
 
 template <typename T> class VerifyMatchOnNode : public BoundNodesCallback {
 public:
-  VerifyMatchOnNode(StringRef Id, const internal::Matcher<T> &InnerMatcher,
-                    StringRef InnerId)
+  VerifyMatchOnNode(llvm::StringRef Id, const internal::Matcher<T> &InnerMatcher,
+                    llvm::StringRef InnerId)
     : Id(Id), InnerMatcher(InnerMatcher), InnerId(InnerId) {
   }
 
@@ -5905,13 +5905,13 @@ TEST(StatementMatcher, HasReturnValue) {
 }
 
 TEST(StatementMatcher, ForFunction) {
-  StringRef CppString1 = "struct PosVec {"
+  llvm::StringRef CppString1 = "struct PosVec {"
                          "  PosVec& operator=(const PosVec&) {"
                          "    auto x = [] { return 1; };"
                          "    return *this;"
                          "  }"
                          "};";
-  StringRef CppString2 = "void F() {"
+  llvm::StringRef CppString2 = "void F() {"
                          "  struct S {"
                          "    void F2() {"
                          "       return;"
@@ -5939,13 +5939,13 @@ TEST(StatementMatcher, ForFunction) {
 
 TEST(StatementMatcher, ForCallable) {
   // These tests are copied over from the forFunction() test above.
-  StringRef CppString1 = "struct PosVec {"
+  llvm::StringRef CppString1 = "struct PosVec {"
                          "  PosVec& operator=(const PosVec&) {"
                          "    auto x = [] { return 1; };"
                          "    return *this;"
                          "  }"
                          "};";
-  StringRef CppString2 = "void F() {"
+  llvm::StringRef CppString2 = "void F() {"
                          "  struct S {"
                          "    void F2() {"
                          "       return;"
@@ -5974,7 +5974,7 @@ TEST(StatementMatcher, ForCallable) {
                          returnStmt(forCallable(functionDecl(hasName("F"))))));
 
   // These tests are specific to forCallable().
-  StringRef ObjCString1 = "@interface I"
+  llvm::StringRef ObjCString1 = "@interface I"
                           "-(void) foo;"
                           "@end"
                           "@implementation I"
@@ -5993,7 +5993,7 @@ TEST(StatementMatcher, ForCallable) {
       ObjCString1,
       binaryOperator(forCallable(objcMethodDecl()))));
 
-  StringRef ObjCString2 = "@interface I"
+  llvm::StringRef ObjCString2 = "@interface I"
                           "-(void) foo;"
                           "@end"
                           "@implementation I"
@@ -6059,7 +6059,7 @@ TEST(Matcher, ForEachOverriden) {
 }
 
 TEST(Matcher, HasAnyDeclaration) {
-  StringRef Fragment = "void foo(int p1);"
+  llvm::StringRef Fragment = "void foo(int p1);"
                        "void foo(int *p2);"
                        "void bar(int p3);"
                        "template <typename T> void baz(T t) { foo(t); }";
@@ -6078,7 +6078,7 @@ TEST(Matcher, HasAnyDeclaration) {
 }
 
 TEST(SubstTemplateTypeParmType, HasReplacementType) {
-  StringRef Fragment = "template<typename T>"
+  llvm::StringRef Fragment = "template<typename T>"
                        "double F(T t);"
                        "int i;"
                        "double j = F(i);";

@@ -38,7 +38,7 @@ class FalsePositiveGenerator : public Checker<eval::Call> {
   };
 
   bool report(CheckerContext &C, ProgramStateRef State,
-              StringRef Description) const {
+              llvm::StringRef Description) const {
     ExplodedNode *Node = C.generateNonFatalErrorNode(State);
     if (!Node)
       return false;

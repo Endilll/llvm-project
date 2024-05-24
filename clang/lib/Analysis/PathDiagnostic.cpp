@@ -50,9 +50,9 @@
 using namespace clang;
 using namespace ento;
 
-static StringRef StripTrailingDots(StringRef s) { return s.rtrim('.'); }
+static llvm::StringRef StripTrailingDots(llvm::StringRef s) { return s.rtrim('.'); }
 
-PathDiagnosticPiece::PathDiagnosticPiece(StringRef s,
+PathDiagnosticPiece::PathDiagnosticPiece(llvm::StringRef s,
                                          Kind k, DisplayHint hint)
     : str(StripTrailingDots(s)), kind(k), Hint(hint) {}
 
@@ -112,8 +112,8 @@ void PathPieces::flattenTo(PathPieces &Primary, PathPieces &Current,
 PathDiagnostic::~PathDiagnostic() = default;
 
 PathDiagnostic::PathDiagnostic(
-    StringRef CheckerName, const Decl *declWithIssue, StringRef bugtype,
-    StringRef verboseDesc, StringRef shortDesc, StringRef category,
+    llvm::StringRef CheckerName, const Decl *declWithIssue, llvm::StringRef bugtype,
+    llvm::StringRef verboseDesc, llvm::StringRef shortDesc, llvm::StringRef category,
     PathDiagnosticLocation LocationToUnique, const Decl *DeclToUnique,
     const Decl *AnalysisEntryPoint,
     std::unique_ptr<FilesToLineNumsMap> ExecutedLines)
@@ -151,9 +151,9 @@ void PathDiagnosticConsumer::HandlePathDiagnostic(
     // Verify that the entire path is from the same FileID.
     FileID FID;
     const SourceManager &SMgr = D->path.front()->getLocation().getManager();
-    SmallVector<const PathPieces *, 5> WorkList;
+    llvm::SmallVector<const PathPieces *, 5> WorkList;
     WorkList.push_back(&D->path);
-    SmallString<128> buf;
+    llvm::SmallString<128> buf;
     llvm::raw_svector_ostream warning(buf);
     warning << "warning: Path diagnostic report is not generated. Current "
             << "output format does not support diagnostics that cross file "
@@ -175,7 +175,7 @@ void PathDiagnosticConsumer::HandlePathDiagnostic(
         }
 
         // Check the source ranges.
-        ArrayRef<SourceRange> Ranges = piece->getRanges();
+        llvm::ArrayRef<SourceRange> Ranges = piece->getRanges();
         for (const auto &I : Ranges) {
           SourceLocation L = SMgr.getExpansionLoc(I.getBegin());
           if (!L.isFileID() || SMgr.getFileID(L) != FID) {
@@ -437,8 +437,8 @@ PathDiagnosticConsumer::FilesMade::~FilesMade() {
 }
 
 void PathDiagnosticConsumer::FilesMade::addDiagnostic(const PathDiagnostic &PD,
-                                                      StringRef ConsumerName,
-                                                      StringRef FileName) {
+                                                      llvm::StringRef ConsumerName,
+                                                      llvm::StringRef FileName) {
   llvm::FoldingSetNodeID NodeID;
   NodeID.Add(PD);
   void *InsertPos;
@@ -454,7 +454,7 @@ void PathDiagnosticConsumer::FilesMade::addDiagnostic(const PathDiagnostic &PD,
   memcpy(FileName_cstr, FileName.data(), FileName.size());
 
   Entry->files.push_back(std::make_pair(ConsumerName,
-                                        StringRef(FileName_cstr,
+                                        llvm::StringRef(FileName_cstr,
                                                   FileName.size())));
 }
 
@@ -887,13 +887,13 @@ void PathDiagnosticCallPiece::setCallee(const CallEnter &CE,
         CalleeCtx->getAnalysisDeclContext()->isBodyAutosynthesized());
 }
 
-static void describeTemplateParameters(raw_ostream &Out,
-                                       const ArrayRef<TemplateArgument> TAList,
+static void describeTemplateParameters(llvm::raw_ostream &Out,
+                                       const llvm::ArrayRef<TemplateArgument> TAList,
                                        const LangOptions &LO,
-                                       StringRef Prefix = StringRef(),
-                                       StringRef Postfix = StringRef());
+                                       llvm::StringRef Prefix = llvm::StringRef(),
+                                       llvm::StringRef Postfix = llvm::StringRef());
 
-static void describeTemplateParameter(raw_ostream &Out,
+static void describeTemplateParameter(llvm::raw_ostream &Out,
                                       const TemplateArgument &TArg,
                                       const LangOptions &LO) {
 
@@ -904,10 +904,10 @@ static void describeTemplateParameter(raw_ostream &Out,
   }
 }
 
-static void describeTemplateParameters(raw_ostream &Out,
-                                       const ArrayRef<TemplateArgument> TAList,
+static void describeTemplateParameters(llvm::raw_ostream &Out,
+                                       const llvm::ArrayRef<TemplateArgument> TAList,
                                        const LangOptions &LO,
-                                       StringRef Prefix, StringRef Postfix) {
+                                       llvm::StringRef Prefix, llvm::StringRef Postfix) {
   if (TAList.empty())
     return;
 
@@ -920,8 +920,8 @@ static void describeTemplateParameters(raw_ostream &Out,
   Out << Postfix;
 }
 
-static void describeClass(raw_ostream &Out, const CXXRecordDecl *D,
-                          StringRef Prefix = StringRef()) {
+static void describeClass(llvm::raw_ostream &Out, const CXXRecordDecl *D,
+                          llvm::StringRef Prefix = llvm::StringRef()) {
   if (!D->getIdentifier())
     return;
   Out << Prefix << '\'' << *D;
@@ -932,9 +932,9 @@ static void describeClass(raw_ostream &Out, const CXXRecordDecl *D,
   Out << '\'';
 }
 
-static bool describeCodeDecl(raw_ostream &Out, const Decl *D,
+static bool describeCodeDecl(llvm::raw_ostream &Out, const Decl *D,
                              bool ExtendedDescription,
-                             StringRef Prefix = StringRef()) {
+                             llvm::StringRef Prefix = llvm::StringRef()) {
   if (!D)
     return false;
 
@@ -1009,7 +1009,7 @@ PathDiagnosticCallPiece::getCallEnterEvent() const {
   if (!Callee || IsCalleeAnAutosynthesizedPropertyAccessor)
     return nullptr;
 
-  SmallString<256> buf;
+  llvm::SmallString<256> buf;
   llvm::raw_svector_ostream Out(buf);
 
   Out << "Calling ";
@@ -1029,7 +1029,7 @@ PathDiagnosticCallPiece::getCallEnterWithinCallerEvent() const {
     if (MD->isDefaulted())
       return nullptr;
 
-  SmallString<256> buf;
+  llvm::SmallString<256> buf;
   llvm::raw_svector_ostream Out(buf);
 
   Out << "Entered call";
@@ -1047,7 +1047,7 @@ PathDiagnosticCallPiece::getCallExitEvent() const {
   if (NoExit || IsCalleeAnAutosynthesizedPropertyAccessor)
     return nullptr;
 
-  SmallString<256> buf;
+  llvm::SmallString<256> buf;
   llvm::raw_svector_ostream Out(buf);
 
   if (!CallStackMessage.empty()) {
@@ -1095,7 +1095,7 @@ void PathDiagnosticPiece::Profile(llvm::FoldingSetNodeID &ID) const {
   ID.AddString(str);
   // FIXME: Add profiling support for code hints.
   ID.AddInteger((unsigned) getDisplayHint());
-  ArrayRef<SourceRange> Ranges = getRanges();
+  llvm::ArrayRef<SourceRange> Ranges = getRanges();
   for (const auto &I : Ranges) {
     ID.Add(I.getBegin());
     ID.Add(I.getEnd());

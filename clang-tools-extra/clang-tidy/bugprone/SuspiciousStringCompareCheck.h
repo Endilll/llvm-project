@@ -19,7 +19,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/suspicious-string-compare.html
 class SuspiciousStringCompareCheck : public ClangTidyCheck {
 public:
-  SuspiciousStringCompareCheck(StringRef Name, ClangTidyContext *Context);
+  SuspiciousStringCompareCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
@@ -27,7 +27,7 @@ public:
 private:
   const bool WarnOnImplicitComparison;
   const bool WarnOnLogicalNotComparison;
-  const StringRef StringCompareLikeFunctions;
+  const llvm::StringRef StringCompareLikeFunctions;
 };
 
 } // namespace clang::tidy::bugprone

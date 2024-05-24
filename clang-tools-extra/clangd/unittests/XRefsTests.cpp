@@ -1495,7 +1495,7 @@ int [[bar_not_preamble]];
 
   // Make the compilation paths appear as ../src/foo.cpp in the compile
   // commands.
-  SmallString<32> RelPathPrefix("..");
+  llvm::SmallString<32> RelPathPrefix("..");
   llvm::sys::path::append(RelPathPrefix, "src");
   std::string BuildDir = testPath("build");
   MockCompilationDatabase CDB(BuildDir, RelPathPrefix);
@@ -1815,7 +1815,7 @@ TEST(FindImplementations, Inheritance) {
   auto TU = TestTU::withCode(Code.code());
   auto AST = TU.build();
   auto Index = TU.index();
-  for (StringRef Label : {"0", "1", "2", "3", "4", "5", "6", "7"}) {
+  for (llvm::StringRef Label : {"0", "1", "2", "3", "4", "5", "6", "7"}) {
     for (const auto &Point : Code.points(Label)) {
       EXPECT_THAT(findImplementations(AST, Point, Index.get()),
                   UnorderedPointwise(declRange(), Code.ranges(Label)))
@@ -2484,7 +2484,7 @@ TEST(FindReferences, NoQueryForLocalSymbols) {
   };
 
   struct Test {
-    StringRef AnnotatedCode;
+    llvm::StringRef AnnotatedCode;
     bool WantQuery;
   } Tests[] = {
       {"int ^x;", true},

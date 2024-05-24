@@ -1196,7 +1196,7 @@ StmtResult Parser::ParseCompoundStatementBody(bool isStmtExpr) {
   while (Tok.is(tok::kw___label__)) {
     SourceLocation LabelLoc = ConsumeToken();
 
-    SmallVector<Decl *, 8> DeclsInGroup;
+    llvm::SmallVector<Decl *, 8> DeclsInGroup;
     while (true) {
       if (Tok.isNot(tok::identifier)) {
         Diag(Tok, diag::err_expected) << tok::identifier;
@@ -1423,7 +1423,7 @@ struct MisleadingIndentationChecker {
     std::pair<FileID, unsigned> FIDAndOffset = SM.getDecomposedLoc(Loc);
 
     bool Invalid;
-    StringRef BufData = SM.getBufferData(FIDAndOffset.first, &Invalid);
+    llvm::StringRef BufData = SM.getBufferData(FIDAndOffset.first, &Invalid);
     if (Invalid)
       return 0;
 

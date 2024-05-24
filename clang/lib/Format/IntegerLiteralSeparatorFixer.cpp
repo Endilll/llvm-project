@@ -19,7 +19,7 @@ namespace format {
 
 enum class Base { Binary, Decimal, Hex, Other };
 
-static Base getBase(const StringRef IntegerLiteral) {
+static Base getBase(const llvm::StringRef IntegerLiteral) {
   assert(IntegerLiteral.size() > 1);
 
   if (IntegerLiteral[0] > '0') {
@@ -91,7 +91,7 @@ IntegerLiteralSeparatorFixer::process(const Environment &Env,
     if (Length < 2)
       continue;
     auto Location = Tok.getLocation();
-    auto Text = StringRef(SourceMgr.getCharacterData(Location), Length);
+    auto Text = llvm::StringRef(SourceMgr.getCharacterData(Location), Length);
     if (Tok.is(tok::comment)) {
       if (isClangFormatOff(Text))
         Skip = true;
@@ -114,21 +114,21 @@ IntegerLiteralSeparatorFixer::process(const Environment &Env,
     }
     if (Style.isCpp()) {
       // Hex alpha digits a-f/A-F must be at the end of the string literal.
-      StringRef Suffixes = "_himnsuyd";
+      llvm::StringRef Suffixes = "_himnsuyd";
       if (const auto Pos =
               Text.find_first_of(IsBase16 ? Suffixes.drop_back() : Suffixes);
-          Pos != StringRef::npos) {
+          Pos != llvm::StringRef::npos) {
         Text = Text.substr(0, Pos);
         Length = Pos;
       }
     }
-    if ((IsBase10 && Text.find_last_of(".eEfFdDmM") != StringRef::npos) ||
-        (IsBase16 && Text.find_last_of(".pP") != StringRef::npos)) {
+    if ((IsBase10 && Text.find_last_of(".eEfFdDmM") != llvm::StringRef::npos) ||
+        (IsBase16 && Text.find_last_of(".pP") != llvm::StringRef::npos)) {
       continue;
     }
     const auto Start = Text[0] == '0' ? 2 : 0;
     auto End = Text.find_first_of("uUlLzZn", Start);
-    if (End == StringRef::npos)
+    if (End == llvm::StringRef::npos)
       End = Length;
     if (Start > 0 || End < Length) {
       Length = End - Start;
@@ -165,7 +165,7 @@ IntegerLiteralSeparatorFixer::process(const Environment &Env,
 }
 
 bool IntegerLiteralSeparatorFixer::checkSeparator(
-    const StringRef IntegerLiteral, int DigitsPerGroup) const {
+    const llvm::StringRef IntegerLiteral, int DigitsPerGroup) const {
   assert(DigitsPerGroup > 0);
 
   int I = 0;
@@ -184,7 +184,7 @@ bool IntegerLiteralSeparatorFixer::checkSeparator(
   return true;
 }
 
-std::string IntegerLiteralSeparatorFixer::format(const StringRef IntegerLiteral,
+std::string IntegerLiteralSeparatorFixer::format(const llvm::StringRef IntegerLiteral,
                                                  int DigitsPerGroup,
                                                  int DigitCount,
                                                  bool RemoveSeparator) const {

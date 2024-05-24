@@ -99,7 +99,7 @@ ASTNodeKind ASTNodeKind::getCladeKind() const {
   return NKI_None;
 }
 
-StringRef ASTNodeKind::asStringRef() const { return AllKindInfo[KindId].Name; }
+llvm::StringRef ASTNodeKind::asStringRef() const { return AllKindInfo[KindId].Name; }
 
 ASTNodeKind ASTNodeKind::getMostDerivedType(ASTNodeKind Kind1,
                                             ASTNodeKind Kind2) {

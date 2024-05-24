@@ -15,7 +15,7 @@ namespace clang::tidy::modernize {
 
 class UseAutoCheck : public ClangTidyCheck {
 public:
-  UseAutoCheck(StringRef Name, ClangTidyContext *Context);
+  UseAutoCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }
@@ -27,7 +27,7 @@ private:
   void replaceIterators(const DeclStmt *D, ASTContext *Context);
   void replaceExpr(const DeclStmt *D, ASTContext *Context,
                    llvm::function_ref<QualType(const Expr *)> GetType,
-                   StringRef Message);
+                   llvm::StringRef Message);
 
   const unsigned int MinTypeNameLength;
   const bool RemoveStars;

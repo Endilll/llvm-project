@@ -150,11 +150,11 @@ struct EffectiveContext {
     return Inner;
   }
 
-  typedef SmallVectorImpl<CXXRecordDecl*>::const_iterator record_iterator;
+  typedef llvm::SmallVectorImpl<CXXRecordDecl*>::const_iterator record_iterator;
 
   DeclContext *Inner;
-  SmallVector<FunctionDecl*, 4> Functions;
-  SmallVector<CXXRecordDecl*, 4> Records;
+  llvm::SmallVector<FunctionDecl*, 4> Functions;
+  llvm::SmallVector<CXXRecordDecl*, 4> Records;
   bool Dependent;
 };
 
@@ -312,7 +312,7 @@ static AccessResult IsDerivedFromInclusive(const CXXRecordDecl *Derived,
     return AR_dependent;
 
   AccessResult OnFailure = AR_inaccessible;
-  SmallVector<const CXXRecordDecl*, 8> Queue; // actually a stack
+  llvm::SmallVector<const CXXRecordDecl*, 8> Queue; // actually a stack
 
   while (true) {
     if (Derived->isDependentContext() && !Derived->hasDefinition() &&
@@ -466,7 +466,7 @@ static AccessResult MatchesFriend(Sema &S,
 
   // Check whether the friend is the template of a class in the
   // context chain.
-  for (SmallVectorImpl<CXXRecordDecl*>::const_iterator
+  for (llvm::SmallVectorImpl<CXXRecordDecl*>::const_iterator
          I = EC.Records.begin(), E = EC.Records.end(); I != E; ++I) {
     CXXRecordDecl *Record = *I;
 
@@ -517,7 +517,7 @@ static AccessResult MatchesFriend(Sema &S,
                                   FunctionDecl *Friend) {
   AccessResult OnFailure = AR_inaccessible;
 
-  for (SmallVectorImpl<FunctionDecl*>::const_iterator
+  for (llvm::SmallVectorImpl<FunctionDecl*>::const_iterator
          I = EC.Functions.begin(), E = EC.Functions.end(); I != E; ++I) {
     if (Friend == *I)
       return AR_accessible;
@@ -538,7 +538,7 @@ static AccessResult MatchesFriend(Sema &S,
 
   AccessResult OnFailure = AR_inaccessible;
 
-  for (SmallVectorImpl<FunctionDecl*>::const_iterator
+  for (llvm::SmallVectorImpl<FunctionDecl*>::const_iterator
          I = EC.Functions.begin(), E = EC.Functions.end(); I != E; ++I) {
 
     FunctionTemplateDecl *FTD = (*I)->getPrimaryTemplate();
@@ -626,7 +626,7 @@ struct ProtectedFriendContext {
   bool EverDependent;
 
   /// The path down to the current base class.
-  SmallVector<const CXXRecordDecl*, 20> CurPath;
+  llvm::SmallVector<const CXXRecordDecl*, 20> CurPath;
 
   ProtectedFriendContext(Sema &S, const EffectiveContext &EC,
                          const CXXRecordDecl *InstanceContext,
@@ -1693,7 +1693,7 @@ Sema::AccessResult Sema::CheckConstructorAccess(SourceLocation UseLoc,
   }
 
   case InitializedEntity::EK_LambdaCapture: {
-    StringRef VarName = Entity.getCapturedVarName();
+    llvm::StringRef VarName = Entity.getCapturedVarName();
     PD = PDiag(diag::err_access_lambda_capture);
     PD << VarName << Entity.getType()
        << llvm::to_underlying(getSpecialMember(Constructor));
@@ -1828,7 +1828,7 @@ Sema::AccessResult Sema::CheckMemberOperatorAccess(SourceLocation OpLoc,
 
 Sema::AccessResult Sema::CheckMemberOperatorAccess(SourceLocation OpLoc,
                                                    Expr *ObjectExpr,
-                                                   ArrayRef<Expr *> ArgExprs,
+                                                   llvm::ArrayRef<Expr *> ArgExprs,
                                                    DeclAccessPair FoundDecl) {
   SourceRange R;
   if (!ArgExprs.empty()) {

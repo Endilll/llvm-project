@@ -68,7 +68,7 @@ class ClangASTNodesEmitter {
 
   void deriveChildTree();
 
-  std::pair<ASTNode, ASTNode> EmitNode(raw_ostream& OS, ASTNode Base);
+  std::pair<ASTNode, ASTNode> EmitNode(llvm::raw_ostream& OS, ASTNode Base);
 public:
   explicit ClangASTNodesEmitter(RecordKeeper &R, const std::string &N,
                                 const std::string &S,
@@ -83,7 +83,7 @@ public:
   }
 
   // run - Output the .inc file contents
-  void run(raw_ostream &OS);
+  void run(llvm::raw_ostream &OS);
 };
 } // end anonymous namespace
 
@@ -93,7 +93,7 @@ public:
 
 // Returns the first and last non-abstract subrecords
 // Called recursively to ensure that nodes remain contiguous
-std::pair<ASTNode, ASTNode> ClangASTNodesEmitter::EmitNode(raw_ostream &OS,
+std::pair<ASTNode, ASTNode> ClangASTNodesEmitter::EmitNode(llvm::raw_ostream &OS,
                                                            ASTNode Base) {
   std::string BaseName = macroName(std::string(Base.getName()));
 
@@ -177,18 +177,18 @@ void ClangASTNodesEmitter::deriveChildTree() {
       Tree.insert(std::make_pair(B, R));
     else if (Root)
       PrintFatalError(R->getLoc(),
-                      Twine("multiple root nodes in \"") + NodeClassName
+                      llvm::Twine("multiple root nodes in \"") + NodeClassName
                         + "\" hierarchy");
     else
       Root = R;
   }
 
   if (!Root)
-    PrintFatalError(Twine("didn't find root node in \"") + NodeClassName
+    PrintFatalError(llvm::Twine("didn't find root node in \"") + NodeClassName
                       + "\" hierarchy");
 }
 
-void ClangASTNodesEmitter::run(raw_ostream &OS) {
+void ClangASTNodesEmitter::run(llvm::raw_ostream &OS) {
   deriveChildTree();
 
   emitSourceFileHeader("List of AST nodes of a particular kind", OS, Records);
@@ -217,14 +217,14 @@ void ClangASTNodesEmitter::run(raw_ostream &OS) {
   OS << "#undef ABSTRACT_" << macroHierarchyName() << "\n";
 }
 
-void clang::EmitClangASTNodes(RecordKeeper &RK, raw_ostream &OS,
+void clang::EmitClangASTNodes(RecordKeeper &RK, llvm::raw_ostream &OS,
                               const std::string &N, const std::string &S,
                               std::string_view PriorizeIfSubclassOf) {
   ClangASTNodesEmitter(RK, N, S, PriorizeIfSubclassOf).run(OS);
 }
 
 void printDeclContext(const std::multimap<Record *, Record *> &Tree,
-                      Record *DeclContext, raw_ostream &OS) {
+                      Record *DeclContext, llvm::raw_ostream &OS) {
   if (!DeclContext->getValueAsBit(AbstractFieldName))
     OS << "DECL_CONTEXT(" << DeclContext->getName() << ")\n";
   auto i = Tree.lower_bound(DeclContext);
@@ -236,7 +236,7 @@ void printDeclContext(const std::multimap<Record *, Record *> &Tree,
 
 // Emits and addendum to a .inc file to enumerate the clang declaration
 // contexts.
-void clang::EmitClangDeclContext(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitClangDeclContext(RecordKeeper &Records, llvm::raw_ostream &OS) {
   // FIXME: Find a .td file format to allow for this to be represented better.
 
   emitSourceFileHeader("List of AST Decl nodes", OS, Records);

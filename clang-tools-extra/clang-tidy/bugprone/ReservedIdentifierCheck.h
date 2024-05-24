@@ -30,11 +30,11 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/reserved-identifier.html
 class ReservedIdentifierCheck final : public RenamerClangTidyCheck {
   const bool Invert;
-  const std::vector<StringRef> AllowedIdentifiersRaw;
+  const std::vector<llvm::StringRef> AllowedIdentifiersRaw;
   const llvm::SmallVector<llvm::Regex> AllowedIdentifiers;
 
 public:
-  ReservedIdentifierCheck(StringRef Name, ClangTidyContext *Context);
+  ReservedIdentifierCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
 

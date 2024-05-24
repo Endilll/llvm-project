@@ -31,7 +31,7 @@ public:
   };
   using SourceRangeSet = std::set<SourceRange, SourceRangeLessThan>;
 
-  LambdaFunctionNameCheck(StringRef Name, ClangTidyContext *Context);
+  LambdaFunctionNameCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

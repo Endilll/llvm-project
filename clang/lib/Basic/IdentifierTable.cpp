@@ -53,7 +53,7 @@ namespace {
 /// empty sequence of identifiers.
 class EmptyLookupIterator : public IdentifierIterator {
 public:
-  StringRef Next() override { return StringRef(); }
+  llvm::StringRef Next() override { return llvm::StringRef(); }
 };
 
 } // namespace
@@ -249,7 +249,7 @@ static KeywordStatus getKeywordStatus(const LangOptions &LangOpts,
 /// AddKeyword - This method is used to associate a token ID with specific
 /// identifiers because they are language keywords.  This causes the lexer to
 /// automatically map matching identifiers to specialized token codes.
-static void AddKeyword(StringRef Keyword,
+static void AddKeyword(llvm::StringRef Keyword,
                        tok::TokenKind TokenCode, unsigned Flags,
                        const LangOptions &LangOpts, IdentifierTable &Table) {
   KeywordStatus AddResult = getKeywordStatus(LangOpts, Flags);
@@ -265,7 +265,7 @@ static void AddKeyword(StringRef Keyword,
 
 /// AddCXXOperatorKeyword - Register a C++ operator keyword alternative
 /// representations.
-static void AddCXXOperatorKeyword(StringRef Keyword,
+static void AddCXXOperatorKeyword(llvm::StringRef Keyword,
                                   tok::TokenKind TokenCode,
                                   IdentifierTable &Table) {
   IdentifierInfo &Info = Table.get(Keyword, TokenCode);
@@ -274,13 +274,13 @@ static void AddCXXOperatorKeyword(StringRef Keyword,
 
 /// AddObjCKeyword - Register an Objective-C \@keyword like "class" "selector"
 /// or "property".
-static void AddObjCKeyword(StringRef Name,
+static void AddObjCKeyword(llvm::StringRef Name,
                            tok::ObjCKeywordKind ObjCID,
                            IdentifierTable &Table) {
   Table.get(Name).setObjCKeywordID(ObjCID);
 }
 
-static void AddNotableIdentifier(StringRef Name,
+static void AddNotableIdentifier(llvm::StringRef Name,
                                  tok::NotableIdentifierKind BTID,
                                  IdentifierTable &Table) {
   // Don't add 'not_notable' identifier.
@@ -295,19 +295,19 @@ static void AddNotableIdentifier(StringRef Name,
 void IdentifierTable::AddKeywords(const LangOptions &LangOpts) {
   // Add keywords and tokens for the current language.
 #define KEYWORD(NAME, FLAGS) \
-  AddKeyword(StringRef(#NAME), tok::kw_ ## NAME,  \
+  AddKeyword(llvm::StringRef(#NAME), tok::kw_ ## NAME,  \
              FLAGS, LangOpts, *this);
 #define ALIAS(NAME, TOK, FLAGS) \
-  AddKeyword(StringRef(NAME), tok::kw_ ## TOK,  \
+  AddKeyword(llvm::StringRef(NAME), tok::kw_ ## TOK,  \
              FLAGS, LangOpts, *this);
 #define CXX_KEYWORD_OPERATOR(NAME, ALIAS) \
   if (LangOpts.CXXOperatorNames)          \
-    AddCXXOperatorKeyword(StringRef(#NAME), tok::ALIAS, *this);
+    AddCXXOperatorKeyword(llvm::StringRef(#NAME), tok::ALIAS, *this);
 #define OBJC_AT_KEYWORD(NAME)  \
   if (LangOpts.ObjC)           \
-    AddObjCKeyword(StringRef(#NAME), tok::objc_##NAME, *this);
+    AddObjCKeyword(llvm::StringRef(#NAME), tok::objc_##NAME, *this);
 #define NOTABLE_IDENTIFIER(NAME)                                               \
-  AddNotableIdentifier(StringRef(#NAME), tok::NAME, *this);
+  AddNotableIdentifier(llvm::StringRef(#NAME), tok::NAME, *this);
 
 #define TESTING_KEYWORD(NAME, FLAGS)
 #include "clang/Basic/TokenKinds.def"
@@ -367,7 +367,7 @@ bool IdentifierInfo::isCPlusPlusKeyword(const LangOptions &LangOpts) const {
 
 ReservedIdentifierStatus
 IdentifierInfo::isReserved(const LangOptions &LangOpts) const {
-  StringRef Name = getName();
+  llvm::StringRef Name = getName();
 
   // '_' is a reserved identifier, but its use is so common (e.g. to store
   // ignored values) that we don't warn on it.
@@ -400,7 +400,7 @@ IdentifierInfo::isReserved(const LangOptions &LangOpts) const {
 
 ReservedLiteralSuffixIdStatus
 IdentifierInfo::isReservedLiteralSuffixId() const {
-  StringRef Name = getName();
+  llvm::StringRef Name = getName();
 
   if (Name[0] != '_')
     return ReservedLiteralSuffixIdStatus::NotStartsWithUnderscore;
@@ -411,8 +411,8 @@ IdentifierInfo::isReservedLiteralSuffixId() const {
   return ReservedLiteralSuffixIdStatus::NotReserved;
 }
 
-StringRef IdentifierInfo::deuglifiedName() const {
-  StringRef Name = getName();
+llvm::StringRef IdentifierInfo::deuglifiedName() const {
+  llvm::StringRef Name = getName();
   if (Name.size() >= 2 && Name.front() == '_' &&
       (Name[1] == '_' || (Name[1] >= 'A' && Name[1] <= 'Z')))
     return Name.ltrim('_');
@@ -515,7 +515,7 @@ unsigned llvm::DenseMapInfo<clang::Selector>::getHashValue(clang::Selector S) {
   return DenseMapInfo<void*>::getHashValue(S.getAsOpaquePtr());
 }
 
-bool Selector::isKeywordSelector(ArrayRef<StringRef> Names) const {
+bool Selector::isKeywordSelector(llvm::ArrayRef<llvm::StringRef> Names) const {
   assert(!Names.empty() && "must have >= 1 selector slots");
   if (getNumArgs() != Names.size())
     return false;
@@ -526,7 +526,7 @@ bool Selector::isKeywordSelector(ArrayRef<StringRef> Names) const {
   return true;
 }
 
-bool Selector::isUnarySelector(StringRef Name) const {
+bool Selector::isUnarySelector(llvm::StringRef Name) const {
   return isUnarySelector() && getNameForSlot(0) == Name;
 }
 
@@ -553,13 +553,13 @@ Selector::getIdentifierInfoForSlot(unsigned argIndex) const {
   return SI->getIdentifierInfoForSlot(argIndex);
 }
 
-StringRef Selector::getNameForSlot(unsigned int argIndex) const {
+llvm::StringRef Selector::getNameForSlot(unsigned int argIndex) const {
   const IdentifierInfo *II = getIdentifierInfoForSlot(argIndex);
-  return II ? II->getName() : StringRef();
+  return II ? II->getName() : llvm::StringRef();
 }
 
 std::string MultiKeywordSelector::getName() const {
-  SmallString<256> Str;
+  llvm::SmallString<256> Str;
   llvm::raw_svector_ostream OS(Str);
   for (keyword_iterator I = keyword_begin(), E = keyword_end(); I != E; ++I) {
     if (*I)
@@ -602,7 +602,7 @@ LLVM_DUMP_METHOD void Selector::dump() const { print(llvm::errs()); }
 /// Interpreting the given string using the normal CamelCase
 /// conventions, determine whether the given string starts with the
 /// given "word", which is assumed to end in a lowercase letter.
-static bool startsWithWord(StringRef name, StringRef word) {
+static bool startsWithWord(llvm::StringRef name, llvm::StringRef word) {
   if (name.size() < word.size()) return false;
   return ((name.size() == word.size() || !isLowercase(name[word.size()])) &&
           name.starts_with(word));
@@ -612,7 +612,7 @@ ObjCMethodFamily Selector::getMethodFamilyImpl(Selector sel) {
   const IdentifierInfo *first = sel.getIdentifierInfoForSlot(0);
   if (!first) return OMF_None;
 
-  StringRef name = first->getName();
+  llvm::StringRef name = first->getName();
   if (sel.isUnarySelector()) {
     if (name == "autorelease") return OMF_autorelease;
     if (name == "dealloc") return OMF_dealloc;
@@ -659,7 +659,7 @@ ObjCInstanceTypeFamily Selector::getInstTypeMethodFamily(Selector sel) {
   const IdentifierInfo *first = sel.getIdentifierInfoForSlot(0);
   if (!first) return OIT_None;
 
-  StringRef name = first->getName();
+  llvm::StringRef name = first->getName();
 
   if (name.empty()) return OIT_None;
   switch (name.front()) {
@@ -687,7 +687,7 @@ ObjCStringFormatFamily Selector::getStringFormatFamilyImpl(Selector sel) {
   const IdentifierInfo *first = sel.getIdentifierInfoForSlot(0);
   if (!first) return SFF_None;
 
-  StringRef name = first->getName();
+  llvm::StringRef name = first->getName();
 
   switch (name.front()) {
     case 'a':
@@ -723,9 +723,9 @@ static SelectorTableImpl &getSelectorTableImpl(void *P) {
   return *static_cast<SelectorTableImpl*>(P);
 }
 
-SmallString<64>
-SelectorTable::constructSetterName(StringRef Name) {
-  SmallString<64> SetterName("set");
+llvm::SmallString<64>
+SelectorTable::constructSetterName(llvm::StringRef Name) {
+  llvm::SmallString<64> SetterName("set");
   SetterName += Name;
   SetterName[3] = toUppercase(SetterName[3]);
   return SetterName;
@@ -741,9 +741,9 @@ SelectorTable::constructSetterSelector(IdentifierTable &Idents,
 }
 
 std::string SelectorTable::getPropertyNameFromSetterSelector(Selector Sel) {
-  StringRef Name = Sel.getNameForSlot(0);
+  llvm::StringRef Name = Sel.getNameForSlot(0);
   assert(Name.starts_with("set") && "invalid setter name");
-  return (Twine(toLowercase(Name[3])) + Name.drop_front(4)).str();
+  return (llvm::Twine(toLowercase(Name[3])) + Name.drop_front(4)).str();
 }
 
 size_t SelectorTable::getTotalMemory() const {
@@ -800,7 +800,7 @@ const char *clang::getOperatorSpelling(OverloadedOperatorKind Operator) {
   llvm_unreachable("Invalid OverloadedOperatorKind!");
 }
 
-StringRef clang::getNullabilitySpelling(NullabilityKind kind,
+llvm::StringRef clang::getNullabilitySpelling(NullabilityKind kind,
                                         bool isContextSensitive) {
   switch (kind) {
   case NullabilityKind::NonNull:

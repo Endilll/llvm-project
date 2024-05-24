@@ -42,9 +42,9 @@ public:
 
   /// Returns the name of the subcommand that's used by clang-refactor for this
   /// action.
-  virtual StringRef getCommand() const = 0;
+  virtual llvm::StringRef getCommand() const = 0;
 
-  virtual StringRef getDescription() const = 0;
+  virtual llvm::StringRef getDescription() const = 0;
 
   RefactoringActionRules createActiveActionRules();
 

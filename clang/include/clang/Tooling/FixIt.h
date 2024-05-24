@@ -26,7 +26,7 @@ namespace tooling {
 namespace fixit {
 
 namespace internal {
-StringRef getText(CharSourceRange Range, const ASTContext &Context);
+llvm::StringRef getText(CharSourceRange Range, const ASTContext &Context);
 
 /// Returns the token CharSourceRange corresponding to \p Range.
 inline CharSourceRange getSourceRange(const SourceRange &Range) {
@@ -47,7 +47,7 @@ template <typename T> CharSourceRange getSourceRange(const T &Node) {
 
 /// Returns a textual representation of \p Node.
 template <typename T>
-StringRef getText(const T &Node, const ASTContext &Context) {
+llvm::StringRef getText(const T &Node, const ASTContext &Context) {
   return internal::getText(internal::getSourceRange(Node), Context);
 }
 
@@ -67,7 +67,7 @@ FixItHint createReplacement(const D &Destination, const S &Source,
 
 // Returns a FixItHint to replace \p Destination by \p Source.
 template <typename D>
-FixItHint createReplacement(const D &Destination, StringRef Source) {
+FixItHint createReplacement(const D &Destination, llvm::StringRef Source) {
   return FixItHint::CreateReplacement(internal::getSourceRange(Destination),
                                       Source);
 }

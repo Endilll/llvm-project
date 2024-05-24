@@ -291,9 +291,9 @@ static void DiagnoseObjCImplementedDeprecations(Sema &S, const NamedDecl *ND,
   if (!ND)
     return;
   bool IsCategory = false;
-  StringRef RealizedPlatform;
+  llvm::StringRef RealizedPlatform;
   AvailabilityResult Availability = ND->getAvailability(
-      /*Message=*/nullptr, /*EnclosingVersion=*/VersionTuple(),
+      /*Message=*/nullptr, /*EnclosingVersion=*/llvm::VersionTuple(),
       &RealizedPlatform);
   if (Availability != AR_Deprecated) {
     if (isa<ObjCMethodDecl>(ND)) {
@@ -554,7 +554,7 @@ void SemaObjC::ActOnSuperClassOfClassInterface(
     Scope *S, SourceLocation AtInterfaceLoc, ObjCInterfaceDecl *IDecl,
     IdentifierInfo *ClassName, SourceLocation ClassLoc,
     IdentifierInfo *SuperName, SourceLocation SuperLoc,
-    ArrayRef<ParsedType> SuperTypeArgs, SourceRange SuperTypeArgsRange) {
+    llvm::ArrayRef<ParsedType> SuperTypeArgs, SourceRange SuperTypeArgsRange) {
   ASTContext &Context = getASTContext();
   // Check if a different kind of symbol declared in this scope.
   NamedDecl *PrevDecl = SemaRef.LookupSingleName(
@@ -768,11 +768,11 @@ DeclResult SemaObjC::actOnObjCTypeParam(
 
 ObjCTypeParamList *
 SemaObjC::actOnObjCTypeParamList(Scope *S, SourceLocation lAngleLoc,
-                                 ArrayRef<Decl *> typeParamsIn,
+                                 llvm::ArrayRef<Decl *> typeParamsIn,
                                  SourceLocation rAngleLoc) {
   ASTContext &Context = getASTContext();
   // We know that the array only contains Objective-C type parameters.
-  ArrayRef<ObjCTypeParamDecl *>
+  llvm::ArrayRef<ObjCTypeParamDecl *>
     typeParams(
       reinterpret_cast<ObjCTypeParamDecl * const *>(typeParamsIn.data()),
       typeParamsIn.size());
@@ -888,7 +888,7 @@ static bool checkTypeParamListConsistency(Sema &S,
 
           case ObjCTypeParamVariance::Covariant:
           case ObjCTypeParamVariance::Contravariant: {
-            StringRef newVarianceStr
+            llvm::StringRef newVarianceStr
                = prevTypeParam->getVariance() == ObjCTypeParamVariance::Covariant
                    ? "__covariant"
                    : "__contravariant";
@@ -976,7 +976,7 @@ ObjCInterfaceDecl *SemaObjC::ActOnStartClassInterface(
     Scope *S, SourceLocation AtInterfaceLoc, IdentifierInfo *ClassName,
     SourceLocation ClassLoc, ObjCTypeParamList *typeParamList,
     IdentifierInfo *SuperName, SourceLocation SuperLoc,
-    ArrayRef<ParsedType> SuperTypeArgs, SourceRange SuperTypeArgsRange,
+    llvm::ArrayRef<ParsedType> SuperTypeArgs, SourceRange SuperTypeArgsRange,
     Decl *const *ProtoRefs, unsigned NumProtoRefs,
     const SourceLocation *ProtoLocs, SourceLocation EndProtoLoc,
     const ParsedAttributesView &AttrList, SkipBodyInfo *SkipBody) {
@@ -1030,7 +1030,7 @@ ObjCInterfaceDecl *SemaObjC::ActOnStartClassInterface(
           << ClassName;
 
         // Clone the type parameter list.
-        SmallVector<ObjCTypeParamDecl *, 4> clonedTypeParams;
+        llvm::SmallVector<ObjCTypeParamDecl *, 4> clonedTypeParams;
         for (auto *typeParam : *prevTypeParamList) {
           clonedTypeParams.push_back(ObjCTypeParamDecl::Create(
               Context, SemaRef.CurContext, typeParam->getVariance(),
@@ -1114,8 +1114,8 @@ ObjCInterfaceDecl *SemaObjC::ActOnStartClassInterface(
 /// typedef'ed use for a qualified super class and adds them to the list
 /// of the protocols.
 void SemaObjC::ActOnTypedefedProtocols(
-    SmallVectorImpl<Decl *> &ProtocolRefs,
-    SmallVectorImpl<SourceLocation> &ProtocolLocs, IdentifierInfo *SuperName,
+    llvm::SmallVectorImpl<Decl *> &ProtocolRefs,
+    llvm::SmallVectorImpl<SourceLocation> &ProtocolLocs, IdentifierInfo *SuperName,
     SourceLocation SuperLoc) {
   if (!SuperName)
     return;
@@ -1311,8 +1311,8 @@ static bool NestedProtocolHasNoDefinition(ObjCProtocolDecl *PDecl,
 /// protocol declarations in its 'Protocols' argument.
 void SemaObjC::FindProtocolDeclaration(bool WarnOnDeclarations,
                                        bool ForObjCContainer,
-                                       ArrayRef<IdentifierLocPair> ProtocolId,
-                                       SmallVectorImpl<Decl *> &Protocols) {
+                                       llvm::ArrayRef<IdentifierLocPair> ProtocolId,
+                                       llvm::SmallVectorImpl<Decl *> &Protocols) {
   for (const IdentifierLocPair &Pair : ProtocolId) {
     ObjCProtocolDecl *PDecl = LookupProtocol(Pair.first, Pair.second);
     if (!PDecl) {
@@ -1426,11 +1426,11 @@ void SemaObjC::DiagnoseTypeArgsAndProtocols(IdentifierInfo *ProtocolId,
 
 void SemaObjC::actOnObjCTypeArgsOrProtocolQualifiers(
     Scope *S, ParsedType baseType, SourceLocation lAngleLoc,
-    ArrayRef<IdentifierInfo *> identifiers,
-    ArrayRef<SourceLocation> identifierLocs, SourceLocation rAngleLoc,
-    SourceLocation &typeArgsLAngleLoc, SmallVectorImpl<ParsedType> &typeArgs,
+    llvm::ArrayRef<IdentifierInfo *> identifiers,
+    llvm::ArrayRef<SourceLocation> identifierLocs, SourceLocation rAngleLoc,
+    SourceLocation &typeArgsLAngleLoc, llvm::SmallVectorImpl<ParsedType> &typeArgs,
     SourceLocation &typeArgsRAngleLoc, SourceLocation &protocolLAngleLoc,
-    SmallVectorImpl<Decl *> &protocols, SourceLocation &protocolRAngleLoc,
+    llvm::SmallVectorImpl<Decl *> &protocols, SourceLocation &protocolRAngleLoc,
     bool warnOnIncompleteProtocols) {
   ASTContext &Context = getASTContext();
   // Local function that updates the declaration specifiers with
@@ -1550,7 +1550,7 @@ void SemaObjC::actOnObjCTypeArgsOrProtocolQualifiers(
   // but is probably something like \c NSArray<NSView *> missing the
   // \c*.
   typedef llvm::PointerUnion<TypeDecl *, ObjCInterfaceDecl *> TypeOrClassDecl;
-  SmallVector<TypeOrClassDecl, 4> typeDecls;
+  llvm::SmallVector<TypeOrClassDecl, 4> typeDecls;
   unsigned numTypeDeclsResolved = 0;
   for (unsigned i = 0, n = identifiers.size(); i != n; ++i) {
     NamedDecl *decl = SemaRef.LookupSingleName(
@@ -1786,10 +1786,10 @@ void SemaObjC::DiagnoseClassExtensionDupMethods(ObjCCategoryDecl *CAT,
 
 /// ActOnForwardProtocolDeclaration - Handle \@protocol foo;
 SemaObjC::DeclGroupPtrTy SemaObjC::ActOnForwardProtocolDeclaration(
-    SourceLocation AtProtocolLoc, ArrayRef<IdentifierLocPair> IdentList,
+    SourceLocation AtProtocolLoc, llvm::ArrayRef<IdentifierLocPair> IdentList,
     const ParsedAttributesView &attrList) {
   ASTContext &Context = getASTContext();
-  SmallVector<Decl *, 8> DeclsInGroup;
+  llvm::SmallVector<Decl *, 8> DeclsInGroup;
   for (const IdentifierLocPair &IdentPair : IdentList) {
     IdentifierInfo *Ident = IdentPair.first;
     ObjCProtocolDecl *PrevDecl = LookupProtocol(
@@ -2118,8 +2118,8 @@ ObjCImplementationDecl *SemaObjC::ActOnStartClassImplementation(
 
 SemaObjC::DeclGroupPtrTy
 SemaObjC::ActOnFinishObjCImplementation(Decl *ObjCImpDecl,
-                                        ArrayRef<Decl *> Decls) {
-  SmallVector<Decl *, 64> DeclsInGroup;
+                                        llvm::ArrayRef<Decl *> Decls) {
+  llvm::SmallVector<Decl *, 64> DeclsInGroup;
   DeclsInGroup.reserve(Decls.size() + 1);
 
   for (unsigned i = 0, e = Decls.size(); i != e; ++i) {
@@ -3062,10 +3062,10 @@ void SemaObjC::ImplMethodsVsClassMethods(Scope *S, ObjCImplDecl *IMPDecl,
 
 SemaObjC::DeclGroupPtrTy SemaObjC::ActOnForwardClassDeclaration(
     SourceLocation AtClassLoc, IdentifierInfo **IdentList,
-    SourceLocation *IdentLocs, ArrayRef<ObjCTypeParamList *> TypeParamLists,
+    SourceLocation *IdentLocs, llvm::ArrayRef<ObjCTypeParamList *> TypeParamLists,
     unsigned NumElts) {
   ASTContext &Context = getASTContext();
-  SmallVector<Decl *, 8> DeclsInGroup;
+  llvm::SmallVector<Decl *, 8> DeclsInGroup;
   for (unsigned i = 0; i != NumElts; ++i) {
     // Check for another declaration kind with the same name.
     NamedDecl *PrevDecl = SemaRef.LookupSingleName(
@@ -3515,7 +3515,7 @@ static bool FilterMethodsByTypeBound(ObjCMethodDecl *Method,
 /// We first select the type of the method: Instance or Factory, then collect
 /// all methods with that type.
 bool SemaObjC::CollectMultipleMethodsInGlobalPool(
-    Selector Sel, SmallVectorImpl<ObjCMethodDecl *> &Methods,
+    Selector Sel, llvm::SmallVectorImpl<ObjCMethodDecl *> &Methods,
     bool InstanceFirst, bool CheckTheOther, const ObjCObjectType *TypeBound) {
   if (SemaRef.ExternalSource)
     ReadMethodPool(Sel);
@@ -3554,9 +3554,9 @@ bool SemaObjC::CollectMultipleMethodsInGlobalPool(
 
 bool SemaObjC::AreMultipleMethodsInGlobalPool(
     Selector Sel, ObjCMethodDecl *BestMethod, SourceRange R,
-    bool receiverIdOrClass, SmallVectorImpl<ObjCMethodDecl *> &Methods) {
+    bool receiverIdOrClass, llvm::SmallVectorImpl<ObjCMethodDecl *> &Methods) {
   // Diagnose finding more than one method in global pool.
-  SmallVector<ObjCMethodDecl *, 4> FilteredMethods;
+  llvm::SmallVector<ObjCMethodDecl *, 4> FilteredMethods;
   FilteredMethods.push_back(BestMethod);
 
   for (auto *M : Methods)
@@ -3589,7 +3589,7 @@ ObjCMethodDecl *SemaObjC::LookupMethodInGlobalPool(Selector Sel, SourceRange R,
 
   // Gather the non-hidden methods.
   ObjCMethodList &MethList = instance ? Pos->second.first : Pos->second.second;
-  SmallVector<ObjCMethodDecl *, 4> Methods;
+  llvm::SmallVector<ObjCMethodDecl *, 4> Methods;
   for (ObjCMethodList *M = &MethList; M; M = M->getNext()) {
     if (M->getMethod() && M->getMethod()->isUnconditionallyVisible())
       return M->getMethod();
@@ -3598,7 +3598,7 @@ ObjCMethodDecl *SemaObjC::LookupMethodInGlobalPool(Selector Sel, SourceRange R,
 }
 
 void SemaObjC::DiagnoseMultipleMethodInGlobalPool(
-    SmallVectorImpl<ObjCMethodDecl *> &Methods, Selector Sel, SourceRange R,
+    llvm::SmallVectorImpl<ObjCMethodDecl *> &Methods, Selector Sel, SourceRange R,
     bool receiverIdOrClass) {
   // We found multiple methods, so we may have to complain.
   bool issueDiagnostic = false, issueError = false;
@@ -3676,8 +3676,8 @@ ObjCMethodDecl *SemaObjC::LookupImplementedMethodInGlobalPool(Selector Sel) {
 
 static void
 HelperSelectorsForTypoCorrection(
-                      SmallVectorImpl<const ObjCMethodDecl *> &BestMethod,
-                      StringRef Typo, const ObjCMethodDecl * Method) {
+                      llvm::SmallVectorImpl<const ObjCMethodDecl *> &BestMethod,
+                      llvm::StringRef Typo, const ObjCMethodDecl * Method) {
   const unsigned MaxEditDistance = 1;
   unsigned BestEditDistance = MaxEditDistance + 1;
   std::string MethodName = Method->getSelector().getAsString();
@@ -3711,7 +3711,7 @@ static bool HelperIsMethodInObjCType(Sema &S, Selector Sel,
 const ObjCMethodDecl *
 SemaObjC::SelectorsForTypoCorrection(Selector Sel, QualType ObjectType) {
   unsigned NumArgs = Sel.getNumArgs();
-  SmallVector<const ObjCMethodDecl *, 8> Methods;
+  llvm::SmallVector<const ObjCMethodDecl *, 8> Methods;
   bool ObjectIsId = true, ObjectIsClass = true;
   if (ObjectType.isNull())
     ObjectIsId = ObjectIsClass = false;
@@ -3757,7 +3757,7 @@ SemaObjC::SelectorsForTypoCorrection(Selector Sel, QualType ObjectType) {
       }
   }
 
-  SmallVector<const ObjCMethodDecl *, 8> SelectedMethods;
+  llvm::SmallVector<const ObjCMethodDecl *, 8> SelectedMethods;
   for (unsigned i = 0, e = Methods.size(); i < e; i++) {
     HelperSelectorsForTypoCorrection(SelectedMethods,
                                      Sel.getAsString(), Methods[i]);
@@ -3984,8 +3984,8 @@ static void DiagnoseCategoryDirectMembersProtocolConformance(
 
 // Note: For class/category implementations, allMethods is always null.
 Decl *SemaObjC::ActOnAtEnd(Scope *S, SourceRange AtEnd,
-                           ArrayRef<Decl *> allMethods,
-                           ArrayRef<DeclGroupPtrTy> allTUVars) {
+                           llvm::ArrayRef<Decl *> allMethods,
+                           llvm::ArrayRef<DeclGroupPtrTy> allTUVars) {
   ASTContext &Context = getASTContext();
   if (getObjCContainerKind() == SemaObjC::OCK_None)
     return nullptr;
@@ -4656,11 +4656,11 @@ static void checkObjCMethodX86VectorTypes(Sema &SemaRef,
   // Vector parameters/return values are not supported by objc_msgSend on x86 in
   // iOS < 9 and macOS < 10.11.
   const auto &Triple = SemaRef.getASTContext().getTargetInfo().getTriple();
-  VersionTuple AcceptedInVersion;
+  llvm::VersionTuple AcceptedInVersion;
   if (Triple.getOS() == llvm::Triple::IOS)
-    AcceptedInVersion = VersionTuple(/*Major=*/9);
+    AcceptedInVersion = llvm::VersionTuple(/*Major=*/9);
   else if (Triple.isMacOSX())
-    AcceptedInVersion = VersionTuple(/*Major=*/10, /*Minor=*/11);
+    AcceptedInVersion = llvm::VersionTuple(/*Major=*/10, /*Minor=*/11);
   else
     return;
   if (SemaRef.getASTContext().getTargetInfo().getPlatformMinVersion() >=
@@ -4731,7 +4731,7 @@ static void checkObjCDirectMethodClashes(Sema &S, ObjCInterfaceDecl *IDecl,
 Decl *SemaObjC::ActOnMethodDeclaration(
     Scope *S, SourceLocation MethodLoc, SourceLocation EndLoc,
     tok::TokenKind MethodType, ObjCDeclSpec &ReturnQT, ParsedType ReturnType,
-    ArrayRef<SourceLocation> SelectorLocs, Selector Sel,
+    llvm::ArrayRef<SourceLocation> SelectorLocs, Selector Sel,
     // optional arguments. The number of types/arguments is obtained
     // from the Sel.getNumArgs().
     ObjCArgInfo *ArgInfo, DeclaratorChunk::ParamInfo *CParamInfo,
@@ -4775,7 +4775,7 @@ Decl *SemaObjC::ActOnMethodDeclaration(
           : ObjCImplementationControl::Required,
       HasRelatedResultType);
 
-  SmallVector<ParmVarDecl*, 16> Params;
+  llvm::SmallVector<ParmVarDecl*, 16> Params;
 
   for (unsigned i = 0, e = Sel.getNumArgs(); i != e; ++i) {
     QualType ArgType;
@@ -5115,7 +5115,7 @@ bool SemaObjC::CheckObjCDeclScope(Decl *D) {
 /// instance variables of ClassName into Decls.
 void SemaObjC::ActOnDefs(Scope *S, Decl *TagD, SourceLocation DeclStart,
                          const IdentifierInfo *ClassName,
-                         SmallVectorImpl<Decl *> &Decls) {
+                         llvm::SmallVectorImpl<Decl *> &Decls) {
   ASTContext &Context = getASTContext();
   // Check that ClassName is a valid class
   ObjCInterfaceDecl *Class = getObjCInterfaceDecl(ClassName, DeclStart);
@@ -5129,7 +5129,7 @@ void SemaObjC::ActOnDefs(Scope *S, Decl *TagD, SourceLocation DeclStart,
   }
 
   // Collect the instance variables
-  SmallVector<const ObjCIvarDecl*, 32> Ivars;
+  llvm::SmallVector<const ObjCIvarDecl*, 32> Ivars;
   Context.DeepCollectObjCIvars(Class, true, Ivars);
   // For each ivar, create a fresh ObjCAtDefsFieldDecl.
   for (unsigned i = 0; i < Ivars.size(); i++) {
@@ -5144,7 +5144,7 @@ void SemaObjC::ActOnDefs(Scope *S, Decl *TagD, SourceLocation DeclStart,
   }
 
   // Introduce all of these fields into the appropriate scope.
-  for (SmallVectorImpl<Decl*>::iterator D = Decls.begin();
+  for (llvm::SmallVectorImpl<Decl*>::iterator D = Decls.begin();
        D != Decls.end(); ++D) {
     FieldDecl *FD = cast<FieldDecl>(*D);
     if (getLangOpts().CPlusPlus)
@@ -5261,7 +5261,7 @@ Decl *SemaObjC::ActOnObjCExceptionDecl(Scope *S, Declarator &D) {
 /// CollectIvarsToConstructOrDestruct - Collect those ivars which require
 /// initialization.
 void SemaObjC::CollectIvarsToConstructOrDestruct(
-    ObjCInterfaceDecl *OI, SmallVectorImpl<ObjCIvarDecl *> &Ivars) {
+    ObjCInterfaceDecl *OI, llvm::SmallVectorImpl<ObjCIvarDecl *> &Ivars) {
   ASTContext &Context = getASTContext();
   for (ObjCIvarDecl *Iv = OI->all_declared_ivar_begin(); Iv;
        Iv= Iv->getNextIvar()) {
@@ -5275,7 +5275,7 @@ void SemaObjC::DiagnoseUseOfUnimplementedSelectors() {
   ASTContext &Context = getASTContext();
   // Load referenced selectors from the external source.
   if (SemaRef.ExternalSource) {
-    SmallVector<std::pair<Selector, SourceLocation>, 4> Sels;
+    llvm::SmallVector<std::pair<Selector, SourceLocation>, 4> Sels;
     SemaRef.ExternalSource->ReadReferencedSelectors(Sels);
     for (unsigned I = 0, N = Sels.size(); I != N; ++I)
       ReferencedSelectors[Sels[I].first] = Sels[I].second;
@@ -5505,11 +5505,11 @@ void SemaObjC::SetIvarInitializers(ObjCImplementationDecl *ObjCImplementation) {
     return;
   if (ObjCInterfaceDecl *OID = ObjCImplementation->getClassInterface()) {
     ASTContext &Context = getASTContext();
-    SmallVector<ObjCIvarDecl *, 8> ivars;
+    llvm::SmallVector<ObjCIvarDecl *, 8> ivars;
     CollectIvarsToConstructOrDestruct(OID, ivars);
     if (ivars.empty())
       return;
-    SmallVector<CXXCtorInitializer *, 32> AllToInit;
+    llvm::SmallVector<CXXCtorInitializer *, 32> AllToInit;
     for (unsigned i = 0; i < ivars.size(); i++) {
       FieldDecl *Field = ivars[i];
       if (Field->isInvalidDecl())

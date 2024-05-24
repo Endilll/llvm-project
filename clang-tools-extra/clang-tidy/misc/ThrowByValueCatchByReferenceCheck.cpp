@@ -16,7 +16,7 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::misc {
 
 ThrowByValueCatchByReferenceCheck::ThrowByValueCatchByReferenceCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       CheckAnonymousTemporaries(Options.get("CheckThrowTemporaries", true)),
       WarnOnLargeObject(Options.get("WarnOnLargeObject", false)),

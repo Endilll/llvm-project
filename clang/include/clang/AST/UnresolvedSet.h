@@ -59,7 +59,7 @@ public:
 
 /// A set of unresolved declarations.
 class UnresolvedSetImpl {
-  using DeclsTy = SmallVectorImpl<DeclAccessPair>;
+  using DeclsTy = llvm::SmallVectorImpl<DeclAccessPair>;
 
   // Don't allow direct construction, and only permit subclassing by
   // UnresolvedSet.
@@ -86,7 +86,7 @@ public:
   const_iterator begin() const { return const_iterator(decls().begin()); }
   const_iterator end() const { return const_iterator(decls().end()); }
 
-  ArrayRef<DeclAccessPair> pairs() const { return decls(); }
+  llvm::ArrayRef<DeclAccessPair> pairs() const { return decls(); }
 
   void addDecl(NamedDecl *D) {
     addDecl(D, AS_none);
@@ -155,7 +155,7 @@ private:
 /// A set of unresolved declarations.
 template <unsigned InlineCapacity> class UnresolvedSet :
     public UnresolvedSetImpl {
-  SmallVector<DeclAccessPair, InlineCapacity> Decls;
+  llvm::SmallVector<DeclAccessPair, InlineCapacity> Decls;
 };
 
 

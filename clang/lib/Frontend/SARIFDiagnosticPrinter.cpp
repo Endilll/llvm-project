@@ -25,7 +25,7 @@
 
 namespace clang {
 
-SARIFDiagnosticPrinter::SARIFDiagnosticPrinter(raw_ostream &OS,
+SARIFDiagnosticPrinter::SARIFDiagnosticPrinter(llvm::raw_ostream &OS,
                                                DiagnosticOptions *Diags)
     : OS(OS), DiagOpts(Diags) {}
 
@@ -57,7 +57,7 @@ void SARIFDiagnosticPrinter::HandleDiagnostic(DiagnosticsEngine::Level Level,
 
   // Render the diagnostic message into a temporary buffer eagerly. We'll use
   // this later as we add the diagnostic to the SARIF object.
-  SmallString<100> OutStr;
+  llvm::SmallString<100> OutStr;
   Info.FormatDiagnostic(OutStr);
 
   llvm::raw_svector_ostream DiagMessageStream(OutStr);

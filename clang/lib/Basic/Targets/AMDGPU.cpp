@@ -173,12 +173,12 @@ const char *const AMDGPUTargetInfo::GCCRegNames[] = {
   "a252", "a253", "a254", "a255"
 };
 
-ArrayRef<const char *> AMDGPUTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> AMDGPUTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
 bool AMDGPUTargetInfo::initFeatureMap(
-    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, StringRef CPU,
+    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, llvm::StringRef CPU,
     const std::vector<std::string> &FeatureVec) const {
 
   using namespace llvm::AMDGPU;
@@ -197,7 +197,7 @@ bool AMDGPUTargetInfo::initFeatureMap(
 }
 
 void AMDGPUTargetInfo::fillValidCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   if (isAMDGCN(getTriple()))
     llvm::AMDGPU::fillValidArchListAMDGCN(Values);
   else
@@ -260,7 +260,7 @@ void AMDGPUTargetInfo::adjust(DiagnosticsEngine &Diags, LangOptions &Opts) {
                      !isAMDGCN(getTriple()));
 }
 
-ArrayRef<Builtin::Info> AMDGPUTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> AMDGPUTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo,
                         clang::AMDGPU::LastTSBuiltin - Builtin::FirstTSBuiltin);
 }
@@ -291,25 +291,25 @@ void AMDGPUTargetInfo::getTargetDefines(const LangOptions &Opts,
     std::replace(CanonName.begin(), CanonName.end(), '-', '_');
   }
 
-  Builder.defineMacro(Twine("__") + Twine(CanonName) + Twine("__"));
+  Builder.defineMacro(llvm::Twine("__") + llvm::Twine(CanonName) + llvm::Twine("__"));
   // Emit macros for gfx family e.g. gfx906 -> __GFX9__, gfx1030 -> __GFX10___
   if (isAMDGCN(getTriple()) && !IsHIPHost) {
-    assert(StringRef(CanonName).starts_with("gfx") &&
+    assert(llvm::StringRef(CanonName).starts_with("gfx") &&
            "Invalid amdgcn canonical name");
-    StringRef CanonFamilyName = getArchFamilyNameAMDGCN(GPUKind);
-    Builder.defineMacro(Twine("__") + Twine(CanonFamilyName.upper()) +
-                        Twine("__"));
+    llvm::StringRef CanonFamilyName = getArchFamilyNameAMDGCN(GPUKind);
+    Builder.defineMacro(llvm::Twine("__") + llvm::Twine(CanonFamilyName.upper()) +
+                        llvm::Twine("__"));
     Builder.defineMacro("__amdgcn_processor__",
-                        Twine("\"") + Twine(CanonName) + Twine("\""));
+                        llvm::Twine("\"") + llvm::Twine(CanonName) + llvm::Twine("\""));
     Builder.defineMacro("__amdgcn_target_id__",
-                        Twine("\"") + Twine(*getTargetID()) + Twine("\""));
+                        llvm::Twine("\"") + llvm::Twine(*getTargetID()) + llvm::Twine("\""));
     for (auto F : getAllPossibleTargetIDFeatures(getTriple(), CanonName)) {
       auto Loc = OffloadArchFeatures.find(F);
       if (Loc != OffloadArchFeatures.end()) {
         std::string NewF = F.str();
         std::replace(NewF.begin(), NewF.end(), '-', '_');
-        Builder.defineMacro(Twine("__amdgcn_feature_") + Twine(NewF) +
-                                Twine("__"),
+        Builder.defineMacro(llvm::Twine("__amdgcn_feature_") + llvm::Twine(NewF) +
+                                llvm::Twine("__"),
                             Loc->second ? "1" : "0");
       }
     }
@@ -331,10 +331,10 @@ void AMDGPUTargetInfo::getTargetDefines(const LangOptions &Opts,
   if (hasFastFMA())
     Builder.defineMacro("FP_FAST_FMA");
 
-  Builder.defineMacro("__AMDGCN_WAVEFRONT_SIZE__", Twine(WavefrontSize));
+  Builder.defineMacro("__AMDGCN_WAVEFRONT_SIZE__", llvm::Twine(WavefrontSize));
   // ToDo: deprecate this macro for naming consistency.
-  Builder.defineMacro("__AMDGCN_WAVEFRONT_SIZE", Twine(WavefrontSize));
-  Builder.defineMacro("__AMDGCN_CUMODE__", Twine(CUMode));
+  Builder.defineMacro("__AMDGCN_WAVEFRONT_SIZE", llvm::Twine(WavefrontSize));
+  Builder.defineMacro("__AMDGCN_CUMODE__", llvm::Twine(CUMode));
 }
 
 void AMDGPUTargetInfo::setAuxTarget(const TargetInfo *Aux) {

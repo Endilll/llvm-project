@@ -115,7 +115,7 @@ enum FloatingRank {
 
 /// \returns The locations that are relevant when searching for Doc comments
 /// related to \p D.
-static SmallVector<SourceLocation, 2>
+static llvm::SmallVector<SourceLocation, 2>
 getDeclLocsForCommentSearch(const Decl *D, SourceManager &SourceMgr) {
   assert(D);
 
@@ -168,7 +168,7 @@ getDeclLocsForCommentSearch(const Decl *D, SourceManager &SourceMgr) {
       isa<TemplateTemplateParmDecl>(D))
     return {};
 
-  SmallVector<SourceLocation, 2> Locations;
+  llvm::SmallVector<SourceLocation, 2> Locations;
   // Find declaration location.
   // For Objective-C declarations we generally don't expect to have multiple
   // declarators, thus use declaration starting location as the "declaration
@@ -279,12 +279,12 @@ RawComment *ASTContext::getRawCommentForDeclNoCacheImpl(
     return nullptr;
 
   // Extract text between the comment and declaration.
-  StringRef Text(Buffer + CommentEndOffset,
+  llvm::StringRef Text(Buffer + CommentEndOffset,
                  DeclLocDecomp.second - CommentEndOffset);
 
   // There should be no other declarations or preprocessor directives between
   // comment and declaration.
-  if (Text.find_last_of(";{}#@") != StringRef::npos)
+  if (Text.find_last_of(";{}#@") != llvm::StringRef::npos)
     return nullptr;
 
   return CommentBeforeDecl;
@@ -477,7 +477,7 @@ void ASTContext::cacheRawCommentForDecl(const Decl &OriginalD,
 }
 
 static void addRedeclaredMethods(const ObjCMethodDecl *ObjCMethod,
-                   SmallVectorImpl<const NamedDecl *> &Redeclared) {
+                   llvm::SmallVectorImpl<const NamedDecl *> &Redeclared) {
   const DeclContext *DC = ObjCMethod->getDeclContext();
   if (const auto *IMD = dyn_cast<ObjCImplDecl>(DC)) {
     const ObjCInterfaceDecl *ID = IMD->getClassInterface();
@@ -493,7 +493,7 @@ static void addRedeclaredMethods(const ObjCMethodDecl *ObjCMethod,
   }
 }
 
-void ASTContext::attachCommentsToJustParsedDecls(ArrayRef<Decl *> Decls,
+void ASTContext::attachCommentsToJustParsedDecls(llvm::ArrayRef<Decl *> Decls,
                                                  const Preprocessor *PP) {
   if (Comments.empty() || Decls.empty())
     return;
@@ -600,7 +600,7 @@ comments::FullComment *ASTContext::getCommentForDecl(
   const RawComment *RC = getRawCommentForAnyRedecl(D, &OriginalDecl);
   if (!RC) {
     if (isa<ObjCMethodDecl>(D) || isa<FunctionDecl>(D)) {
-      SmallVector<const NamedDecl*, 8> Overridden;
+      llvm::SmallVector<const NamedDecl*, 8> Overridden;
       const auto *OMD = dyn_cast<ObjCMethodDecl>(D);
       if (OMD && OMD->isPropertyAccessor())
         if (const ObjCPropertyDecl *PDecl = OMD->findPropertyDecl())
@@ -743,7 +743,7 @@ ASTContext::getCanonicalTemplateTemplateParmDecl(
 
   // Build a canonical template parameter list.
   TemplateParameterList *Params = TTP->getTemplateParameters();
-  SmallVector<NamedDecl *, 4> CanonParams;
+  llvm::SmallVector<NamedDecl *, 4> CanonParams;
   CanonParams.reserve(Params->size());
   for (TemplateParameterList::const_iterator P = Params->begin(),
                                           PEnd = Params->end();
@@ -764,8 +764,8 @@ ASTContext::getCanonicalTemplateTemplateParmDecl(
       TypeSourceInfo *TInfo = getTrivialTypeSourceInfo(T);
       NonTypeTemplateParmDecl *Param;
       if (NTTP->isExpandedParameterPack()) {
-        SmallVector<QualType, 2> ExpandedTypes;
-        SmallVector<TypeSourceInfo *, 2> ExpandedTInfos;
+        llvm::SmallVector<QualType, 2> ExpandedTypes;
+        llvm::SmallVector<TypeSourceInfo *, 2> ExpandedTInfos;
         for (unsigned I = 0, N = NTTP->getNumExpansionTypes(); I != N; ++I) {
           ExpandedTypes.push_back(getCanonicalType(NTTP->getExpansionType(I)));
           ExpandedTInfos.push_back(
@@ -944,7 +944,7 @@ void ASTContext::AddDeallocation(void (*Callback)(void *), void *Data) const {
 }
 
 void
-ASTContext::setExternalSource(IntrusiveRefCntPtr<ExternalASTSource> Source) {
+ASTContext::setExternalSource(llvm::IntrusiveRefCntPtr<ExternalASTSource> Source) {
   ExternalSource = std::move(Source);
 }
 
@@ -1031,7 +1031,7 @@ void ASTContext::deduplicateMergedDefinitonsFor(NamedDecl *ND) {
   llvm::erase(Merged, nullptr);
 }
 
-ArrayRef<Module *>
+llvm::ArrayRef<Module *>
 ASTContext::getModulesWithMergedDefinition(const NamedDecl *Def) {
   auto MergedIt =
       MergedDefModules.find(cast<NamedDecl>(Def->getCanonicalDecl()));
@@ -1084,7 +1084,7 @@ void ASTContext::addModuleInitializer(Module *M, Decl *D) {
 }
 
 void ASTContext::addLazyModuleInitializers(Module *M,
-                                           ArrayRef<GlobalDeclID> IDs) {
+                                           llvm::ArrayRef<GlobalDeclID> IDs) {
   auto *&Inits = ModuleInitializers[M];
   if (!Inits)
     Inits = new (*this) PerModuleInitializers;
@@ -1092,7 +1092,7 @@ void ASTContext::addLazyModuleInitializers(Module *M,
                                  IDs.begin(), IDs.end());
 }
 
-ArrayRef<Decl *> ASTContext::getModuleInitializers(Module *M) {
+llvm::ArrayRef<Decl *> ASTContext::getModuleInitializers(Module *M) {
   auto It = ModuleInitializers.find(M);
   if (It == ModuleInitializers.end())
     return std::nullopt;
@@ -1143,7 +1143,7 @@ ASTContext::getTypePackElementDecl() const {
   return TypePackElementDecl;
 }
 
-RecordDecl *ASTContext::buildImplicitRecord(StringRef Name,
+RecordDecl *ASTContext::buildImplicitRecord(llvm::StringRef Name,
                                             RecordDecl::TagKind TK) const {
   SourceLocation Loc;
   RecordDecl *NewDecl;
@@ -1160,7 +1160,7 @@ RecordDecl *ASTContext::buildImplicitRecord(StringRef Name,
 }
 
 TypedefDecl *ASTContext::buildImplicitTypedef(QualType T,
-                                              StringRef Name) const {
+                                              llvm::StringRef Name) const {
   TypeSourceInfo *TInfo = getTrivialTypeSourceInfo(T);
   TypedefDecl *NewDecl = TypedefDecl::Create(
       const_cast<ASTContext &>(*this), getTranslationUnitDecl(),
@@ -1568,7 +1568,7 @@ void ASTContext::addOverriddenMethod(const CXXMethodDecl *Method,
 
 void ASTContext::getOverriddenMethods(
                       const NamedDecl *D,
-                      SmallVectorImpl<const NamedDecl *> &Overridden) const {
+                      llvm::SmallVectorImpl<const NamedDecl *> &Overridden) const {
   assert(D);
 
   if (const auto *CXXMethod = dyn_cast<CXXMethodDecl>(D)) {
@@ -1581,7 +1581,7 @@ void ASTContext::getOverriddenMethods(
   if (!Method)
     return;
 
-  SmallVector<const ObjCMethodDecl *, 8> OverDecls;
+  llvm::SmallVector<const ObjCMethodDecl *, 8> OverDecls;
   Method->getOverriddenMethods(OverDecls);
   Overridden.append(OverDecls.begin(), OverDecls.end());
 }
@@ -2549,7 +2549,7 @@ CharUnits ASTContext::getOffsetOfBaseWithVBPtr(const CXXRecordDecl *RD) const {
 CharUnits ASTContext::getMemberPointerPathAdjustment(const APValue &MP) const {
   const ValueDecl *MPD = MP.getMemberPointerDecl();
   CharUnits ThisAdjustment = CharUnits::Zero();
-  ArrayRef<const CXXRecordDecl*> Path = MP.getMemberPointerPath();
+  llvm::ArrayRef<const CXXRecordDecl*> Path = MP.getMemberPointerPath();
   bool DerivedMember = MP.isMemberPointerToDerivedMember();
   const CXXRecordDecl *RD = cast<CXXRecordDecl>(MPD->getDeclContext());
   for (unsigned I = 0, N = Path.size(); I != N; ++I) {
@@ -2572,7 +2572,7 @@ CharUnits ASTContext::getMemberPointerPathAdjustment(const APValue &MP) const {
 /// when all ivars, declared and synthesized are known.
 void ASTContext::DeepCollectObjCIvars(const ObjCInterfaceDecl *OI,
                                       bool leafClass,
-                            SmallVectorImpl<const ObjCIvarDecl*> &Ivars) const {
+                            llvm::SmallVectorImpl<const ObjCIvarDecl*> &Ivars) const {
   if (const ObjCInterfaceDecl *SuperClass = OI->getSuperClass())
     DeepCollectObjCIvars(SuperClass, false, Ivars);
   if (!leafClass) {
@@ -2735,7 +2735,7 @@ structHasUniqueObjectRepresentations(const ASTContext &Context,
     if (ClassDecl->isDynamicClass())
       return std::nullopt;
 
-    SmallVector<CXXRecordDecl *, 4> Bases;
+    llvm::SmallVector<CXXRecordDecl *, 4> Bases;
     for (const auto &Base : ClassDecl->bases()) {
       // Empty types can be inherited from, and non-empty types can potentially
       // have tail padding, so just make sure there isn't an error.
@@ -2983,9 +2983,9 @@ ASTContext::getASTObjCImplementationLayout(
 }
 
 static auto getCanonicalTemplateArguments(const ASTContext &C,
-                                          ArrayRef<TemplateArgument> Args,
+                                          llvm::ArrayRef<TemplateArgument> Args,
                                           bool &AnyNonCanonArgs) {
-  SmallVector<TemplateArgument, 16> CanonArgs(Args);
+  llvm::SmallVector<TemplateArgument, 16> CanonArgs(Args);
   for (auto &Arg : CanonArgs) {
     TemplateArgument OrigArg = Arg;
     Arg = C.getCanonicalTemplateArgument(Arg);
@@ -3128,7 +3128,7 @@ QualType ASTContext::removePtrSizeAddrSpace(QualType T) const {
 
 QualType ASTContext::getCountAttributedType(
     QualType WrappedTy, Expr *CountExpr, bool CountInBytes, bool OrNull,
-    ArrayRef<TypeCoupledDeclRefInfo> DependentDecls) const {
+    llvm::ArrayRef<TypeCoupledDeclRefInfo> DependentDecls) const {
   assert(WrappedTy->isPointerType() || WrappedTy->isArrayType());
 
   llvm::FoldingSetNodeID ID;
@@ -3229,7 +3229,7 @@ bool ASTContext::hasSameFunctionTypeIgnoringExceptionSpec(QualType T,
 QualType ASTContext::getFunctionTypeWithoutPtrSizes(QualType T) {
   if (const auto *Proto = T->getAs<FunctionProtoType>()) {
     QualType RetTy = removePtrSizeAddrSpace(Proto->getReturnType());
-    SmallVector<QualType, 16> Args(Proto->param_types().size());
+    llvm::SmallVector<QualType, 16> Args(Proto->param_types().size());
     for (unsigned i = 0, n = Args.size(); i != n; ++i)
       Args[i] = removePtrSizeAddrSpace(Proto->param_types()[i]);
     return getFunctionType(RetTy, Args, Proto->getExtProtoInfo());
@@ -4437,7 +4437,7 @@ static bool isCanonicalExceptionSpecification(
 }
 
 QualType ASTContext::getFunctionTypeInternal(
-    QualType ResultTy, ArrayRef<QualType> ArgArray,
+    QualType ResultTy, llvm::ArrayRef<QualType> ArgArray,
     const FunctionProtoType::ExtProtoInfo &EPI, bool OnlyWantCanonical) const {
   size_t NumArgs = ArgArray.size();
 
@@ -4490,7 +4490,7 @@ QualType ASTContext::getFunctionTypeInternal(
   // already have it. The exception spec is only partially part of the
   // canonical type, and only in C++17 onwards.
   if (!isCanonical && Canonical.isNull()) {
-    SmallVector<QualType, 16> CanonicalArgs;
+    llvm::SmallVector<QualType, 16> CanonicalArgs;
     CanonicalArgs.reserve(NumArgs);
     for (unsigned i = 0; i != NumArgs; ++i)
       CanonicalArgs.push_back(getCanonicalParamType(ArgArray[i]));
@@ -4977,12 +4977,12 @@ ASTContext::getTemplateSpecializationTypeInfo(TemplateName Name,
 
 QualType
 ASTContext::getTemplateSpecializationType(TemplateName Template,
-                                          ArrayRef<TemplateArgumentLoc> Args,
+                                          llvm::ArrayRef<TemplateArgumentLoc> Args,
                                           QualType Underlying) const {
   assert(!Template.getAsDependentTemplateName() &&
          "No dependent template names here!");
 
-  SmallVector<TemplateArgument, 4> ArgVec;
+  llvm::SmallVector<TemplateArgument, 4> ArgVec;
   ArgVec.reserve(Args.size());
   for (const TemplateArgumentLoc &Arg : Args)
     ArgVec.push_back(Arg.getArgument());
@@ -4991,7 +4991,7 @@ ASTContext::getTemplateSpecializationType(TemplateName Template,
 }
 
 #ifndef NDEBUG
-static bool hasAnyPackExpansions(ArrayRef<TemplateArgument> Args) {
+static bool hasAnyPackExpansions(llvm::ArrayRef<TemplateArgument> Args) {
   for (const TemplateArgument &Arg : Args)
     if (Arg.isPackExpansion())
       return true;
@@ -5002,7 +5002,7 @@ static bool hasAnyPackExpansions(ArrayRef<TemplateArgument> Args) {
 
 QualType
 ASTContext::getTemplateSpecializationType(TemplateName Template,
-                                          ArrayRef<TemplateArgument> Args,
+                                          llvm::ArrayRef<TemplateArgument> Args,
                                           QualType Underlying) const {
   assert(!Template.getAsDependentTemplateName() &&
          "No dependent template names here!");
@@ -5040,7 +5040,7 @@ ASTContext::getTemplateSpecializationType(TemplateName Template,
 }
 
 QualType ASTContext::getCanonicalTemplateSpecializationType(
-    TemplateName Template, ArrayRef<TemplateArgument> Args) const {
+    TemplateName Template, llvm::ArrayRef<TemplateArgument> Args) const {
   assert(!Template.getAsDependentTemplateName() &&
          "No dependent template names here!");
 
@@ -5176,9 +5176,9 @@ QualType ASTContext::getDependentNameType(ElaboratedTypeKeyword Keyword,
 
 QualType ASTContext::getDependentTemplateSpecializationType(
     ElaboratedTypeKeyword Keyword, NestedNameSpecifier *NNS,
-    const IdentifierInfo *Name, ArrayRef<TemplateArgumentLoc> Args) const {
+    const IdentifierInfo *Name, llvm::ArrayRef<TemplateArgumentLoc> Args) const {
   // TODO: avoid this copy
-  SmallVector<TemplateArgument, 16> ArgCopy;
+  llvm::SmallVector<TemplateArgument, 16> ArgCopy;
   for (unsigned I = 0, E = Args.size(); I != E; ++I)
     ArgCopy.push_back(Args[I].getArgument());
   return getDependentTemplateSpecializationType(Keyword, NNS, Name, ArgCopy);
@@ -5189,7 +5189,7 @@ ASTContext::getDependentTemplateSpecializationType(
                                  ElaboratedTypeKeyword Keyword,
                                  NestedNameSpecifier *NNS,
                                  const IdentifierInfo *Name,
-                                 ArrayRef<TemplateArgument> Args) const {
+                                 llvm::ArrayRef<TemplateArgument> Args) const {
   assert((!NNS || NNS->isDependent()) &&
          "nested-name-specifier must be dependent");
 
@@ -5276,7 +5276,7 @@ TemplateArgument ASTContext::getInjectedTemplateArg(NamedDecl *Param) {
 
 void
 ASTContext::getInjectedTemplateArgs(const TemplateParameterList *Params,
-                                    SmallVectorImpl<TemplateArgument> &Args) {
+                                    llvm::SmallVectorImpl<TemplateArgument> &Args) {
   Args.reserve(Args.size() + Params->size());
 
   for (NamedDecl *Param : *Params)
@@ -5321,7 +5321,7 @@ static int CmpProtocolNames(ObjCProtocolDecl *const *LHS,
   return DeclarationName::compare((*LHS)->getDeclName(), (*RHS)->getDeclName());
 }
 
-static bool areSortedAndUniqued(ArrayRef<ObjCProtocolDecl *> Protocols) {
+static bool areSortedAndUniqued(llvm::ArrayRef<ObjCProtocolDecl *> Protocols) {
   if (Protocols.empty()) return true;
 
   if (Protocols[0]->getCanonicalDecl() != Protocols[0])
@@ -5335,7 +5335,7 @@ static bool areSortedAndUniqued(ArrayRef<ObjCProtocolDecl *> Protocols) {
 }
 
 static void
-SortAndUniqueProtocols(SmallVectorImpl<ObjCProtocolDecl *> &Protocols) {
+SortAndUniqueProtocols(llvm::SmallVectorImpl<ObjCProtocolDecl *> &Protocols) {
   // Sort protocols, keyed by name.
   llvm::array_pod_sort(Protocols.begin(), Protocols.end(), CmpProtocolNames);
 
@@ -5358,8 +5358,8 @@ QualType ASTContext::getObjCObjectType(QualType BaseType,
 
 QualType ASTContext::getObjCObjectType(
            QualType baseType,
-           ArrayRef<QualType> typeArgs,
-           ArrayRef<ObjCProtocolDecl *> protocols,
+           llvm::ArrayRef<QualType> typeArgs,
+           llvm::ArrayRef<ObjCProtocolDecl *> protocols,
            bool isKindOf) const {
   // If the base type is an interface and there aren't any protocols or
   // type arguments to add, then the interface type will do just fine.
@@ -5377,7 +5377,7 @@ QualType ASTContext::getObjCObjectType(
   // Determine the type arguments to be used for canonicalization,
   // which may be explicitly specified here or written on the base
   // type.
-  ArrayRef<QualType> effectiveTypeArgs = typeArgs;
+  llvm::ArrayRef<QualType> effectiveTypeArgs = typeArgs;
   if (effectiveTypeArgs.empty()) {
     if (const auto *baseObject = baseType->getAs<ObjCObjectType>())
       effectiveTypeArgs = baseObject->getTypeArgs();
@@ -5392,8 +5392,8 @@ QualType ASTContext::getObjCObjectType(
   bool protocolsSorted = areSortedAndUniqued(protocols);
   if (!typeArgsAreCanonical || !protocolsSorted || !baseType.isCanonical()) {
     // Determine the canonical type arguments.
-    ArrayRef<QualType> canonTypeArgs;
-    SmallVector<QualType, 4> canonTypeArgsVec;
+    llvm::ArrayRef<QualType> canonTypeArgs;
+    llvm::SmallVector<QualType, 4> canonTypeArgsVec;
     if (!typeArgsAreCanonical) {
       canonTypeArgsVec.reserve(effectiveTypeArgs.size());
       for (auto typeArg : effectiveTypeArgs)
@@ -5403,8 +5403,8 @@ QualType ASTContext::getObjCObjectType(
       canonTypeArgs = effectiveTypeArgs;
     }
 
-    ArrayRef<ObjCProtocolDecl *> canonProtocols;
-    SmallVector<ObjCProtocolDecl*, 8> canonProtocolsVec;
+    llvm::ArrayRef<ObjCProtocolDecl *> canonProtocols;
+    llvm::SmallVector<ObjCProtocolDecl*, 8> canonProtocolsVec;
     if (!protocolsSorted) {
       canonProtocolsVec.append(protocols.begin(), protocols.end());
       SortAndUniqueProtocols(canonProtocolsVec);
@@ -5438,7 +5438,7 @@ QualType ASTContext::getObjCObjectType(
 /// protocol qualifiers on the ObjCObjectPointerType.
 QualType
 ASTContext::applyObjCProtocolQualifiers(QualType type,
-                  ArrayRef<ObjCProtocolDecl *> protocols, bool &hasError,
+                  llvm::ArrayRef<ObjCProtocolDecl *> protocols, bool &hasError,
                   bool allowOnPointerType) const {
   hasError = false;
 
@@ -5452,11 +5452,11 @@ ASTContext::applyObjCProtocolQualifiers(QualType type,
             dyn_cast<ObjCObjectPointerType>(type.getTypePtr())) {
       const ObjCObjectType *objT = objPtr->getObjectType();
       // Merge protocol lists and construct ObjCObjectType.
-      SmallVector<ObjCProtocolDecl*, 8> protocolsVec;
+      llvm::SmallVector<ObjCProtocolDecl*, 8> protocolsVec;
       protocolsVec.append(objT->qual_begin(),
                           objT->qual_end());
       protocolsVec.append(protocols.begin(), protocols.end());
-      ArrayRef<ObjCProtocolDecl *> protocols = protocolsVec;
+      llvm::ArrayRef<ObjCProtocolDecl *> protocols = protocolsVec;
       type = getObjCObjectType(
              objT->getBaseType(),
              objT->getTypeArgsAsWritten(),
@@ -5509,7 +5509,7 @@ ASTContext::applyObjCProtocolQualifiers(QualType type,
 
 QualType
 ASTContext::getObjCTypeParamType(const ObjCTypeParamDecl *Decl,
-                                 ArrayRef<ObjCProtocolDecl *> protocols) const {
+                                 llvm::ArrayRef<ObjCProtocolDecl *> protocols) const {
   // Look in the folding set for an existing type.
   llvm::FoldingSetNodeID ID;
   ObjCTypeParamType::Profile(ID, Decl, Decl->getUnderlyingType(), protocols);
@@ -5543,7 +5543,7 @@ void ASTContext::adjustObjCTypeParamBoundType(const ObjCTypeParamDecl *Orig,
   New->setTypeSourceInfo(getTrivialTypeSourceInfo(Orig->getUnderlyingType()));
   // Update TypeForDecl after updating TypeSourceInfo.
   auto NewTypeParamTy = cast<ObjCTypeParamType>(New->getTypeForDecl());
-  SmallVector<ObjCProtocolDecl *, 8> protocols;
+  llvm::SmallVector<ObjCProtocolDecl *, 8> protocols;
   protocols.append(NewTypeParamTy->qual_begin(), NewTypeParamTy->qual_end());
   QualType UpdatedTy = getObjCTypeParamType(New, protocols);
   New->setTypeForDecl(UpdatedTy.getTypePtr());
@@ -5778,7 +5778,7 @@ QualType ASTContext::getDecltypeType(Expr *e, QualType UnderlyingType) const {
 
 QualType ASTContext::getPackIndexingType(QualType Pattern, Expr *IndexExpr,
                                          bool FullySubstituted,
-                                         ArrayRef<QualType> Expansions,
+                                         llvm::ArrayRef<QualType> Expansions,
                                          int Index) const {
   QualType Canonical;
   if (FullySubstituted && Index != -1) {
@@ -5846,7 +5846,7 @@ QualType ASTContext::getUnaryTransformType(QualType BaseType,
 QualType ASTContext::getAutoTypeInternal(
     QualType DeducedType, AutoTypeKeyword Keyword, bool IsDependent,
     bool IsPack, ConceptDecl *TypeConstraintConcept,
-    ArrayRef<TemplateArgument> TypeConstraintArgs, bool IsCanon) const {
+    llvm::ArrayRef<TemplateArgument> TypeConstraintArgs, bool IsCanon) const {
   if (DeducedType.isNull() && Keyword == AutoTypeKeyword::Auto &&
       !TypeConstraintConcept && !IsDependent)
     return getAutoDeductType();
@@ -5901,7 +5901,7 @@ QualType
 ASTContext::getAutoType(QualType DeducedType, AutoTypeKeyword Keyword,
                         bool IsDependent, bool IsPack,
                         ConceptDecl *TypeConstraintConcept,
-                        ArrayRef<TemplateArgument> TypeConstraintArgs) const {
+                        llvm::ArrayRef<TemplateArgument> TypeConstraintArgs) const {
   assert((!IsPack || IsDependent) && "only use IsPack for a dependent pack");
   assert((!IsDependent || DeducedType.isNull()) &&
          "A dependent auto should be undeduced");
@@ -8287,7 +8287,7 @@ static bool hasTemplateSpecializationInEncodedString(const Type *T,
   return false;
 }
 
-// FIXME: Use SmallString for accumulating string.
+// FIXME: Use llvm::SmallString for accumulating string.
 void ASTContext::getObjCEncodingForTypeImpl(QualType T, std::string &S,
                                             const ObjCEncOptions Options,
                                             const FieldDecl *FD,
@@ -8357,7 +8357,7 @@ void ASTContext::getObjCEncodingForTypeImpl(QualType T, std::string &S,
       // Another legacy compatibility encoding. Some ObjC qualifier and type
       // combinations need to be rearranged.
       // Rewrite "in const" from "nr" to "rn"
-      if (StringRef(S).ends_with("nr"))
+      if (llvm::StringRef(S).ends_with("nr"))
         S.replace(S.end()-2, S.end(), "rn");
     }
 
@@ -8532,7 +8532,7 @@ void ASTContext::getObjCEncodingForTypeImpl(QualType T, std::string &S,
     S += OI->getObjCRuntimeNameAsString();
     if (Options.ExpandStructures()) {
       S += '=';
-      SmallVector<const ObjCIvarDecl*, 32> Ivars;
+      llvm::SmallVector<const ObjCIvarDecl*, 32> Ivars;
       DeepCollectObjCIvars(OI, true, Ivars);
       for (unsigned i = 0, e = Ivars.size(); i != e; ++i) {
         const FieldDecl *Field = Ivars[i];
@@ -8847,7 +8847,7 @@ ObjCInterfaceDecl *ASTContext::getObjCProtocolDecl() const {
 //===----------------------------------------------------------------------===//
 
 static TypedefDecl *CreateCharPtrNamedVaListDecl(const ASTContext *Context,
-                                                 StringRef Name) {
+                                                 llvm::StringRef Name) {
   // typedef char* __builtin[_ms]_va_list;
   QualType T = Context->getPointerType(Context->CharTy);
   return Context->buildImplicitTypedef(T, Name);
@@ -10023,7 +10023,7 @@ void getIntersectionOfProtocols(ASTContext &Context,
                                 const ObjCInterfaceDecl *CommonBase,
                                 const ObjCObjectPointerType *LHSOPT,
                                 const ObjCObjectPointerType *RHSOPT,
-      SmallVectorImpl<ObjCProtocolDecl *> &IntersectionSet) {
+      llvm::SmallVectorImpl<ObjCProtocolDecl *> &IntersectionSet) {
 
   const ObjCObjectType* LHS = LHSOPT->getObjectType();
   const ObjCObjectType* RHS = RHSOPT->getObjectType();
@@ -10102,8 +10102,8 @@ static bool canAssignObjCObjectTypes(ASTContext &ctx, QualType lhs,
 // Check that the given Objective-C type argument lists are equivalent.
 static bool sameObjCTypeArgs(ASTContext &ctx,
                              const ObjCInterfaceDecl *iface,
-                             ArrayRef<QualType> lhsArgs,
-                             ArrayRef<QualType> rhsArgs,
+                             llvm::ArrayRef<QualType> lhsArgs,
+                             llvm::ArrayRef<QualType> rhsArgs,
                              bool stripKindOf) {
   if (lhsArgs.size() != rhsArgs.size())
     return false;
@@ -10167,7 +10167,7 @@ QualType ASTContext::areCommonBaseCompatible(
 
     if (declaresSameEntity(LHS->getInterface(), RDecl)) {
       // Get the type arguments.
-      ArrayRef<QualType> LHSTypeArgs = LHS->getTypeArgsAsWritten();
+      llvm::ArrayRef<QualType> LHSTypeArgs = LHS->getTypeArgsAsWritten();
       bool anyChanges = false;
       if (LHS->isSpecialized() && RHS->isSpecialized()) {
         // Both have type arguments, compare them.
@@ -10183,7 +10183,7 @@ QualType ASTContext::areCommonBaseCompatible(
       }
 
       // Compute the intersection of protocols.
-      SmallVector<ObjCProtocolDecl *, 8> Protocols;
+      llvm::SmallVector<ObjCProtocolDecl *, 8> Protocols;
       getIntersectionOfProtocols(*this, LHS->getInterface(), Lptr, Rptr,
                                  Protocols);
       if (!Protocols.empty())
@@ -10218,7 +10218,7 @@ QualType ASTContext::areCommonBaseCompatible(
       LHS = KnownLHS->second;
 
       // Get the type arguments.
-      ArrayRef<QualType> RHSTypeArgs = RHS->getTypeArgsAsWritten();
+      llvm::ArrayRef<QualType> RHSTypeArgs = RHS->getTypeArgsAsWritten();
       bool anyChanges = false;
       if (LHS->isSpecialized() && RHS->isSpecialized()) {
         // Both have type arguments, compare them.
@@ -10234,7 +10234,7 @@ QualType ASTContext::areCommonBaseCompatible(
       }
 
       // Compute the intersection of protocols.
-      SmallVector<ObjCProtocolDecl *, 8> Protocols;
+      llvm::SmallVector<ObjCProtocolDecl *, 8> Protocols;
       getIntersectionOfProtocols(*this, RHS->getInterface(), Lptr, Rptr,
                                  Protocols);
       if (!Protocols.empty())
@@ -10514,7 +10514,7 @@ QualType ASTContext::mergeFunctionTypes(QualType lhs, QualType rhs,
     if (lproto->getMethodQuals() != rproto->getMethodQuals())
       return {};
 
-    SmallVector<FunctionProtoType::ExtParameterInfo, 4> newParamInfos;
+    llvm::SmallVector<FunctionProtoType::ExtParameterInfo, 4> newParamInfos;
     bool canUseLeft, canUseRight;
     if (!mergeExtParameterInfo(lproto, rproto, canUseLeft, canUseRight,
                                newParamInfos))
@@ -10526,7 +10526,7 @@ QualType ASTContext::mergeFunctionTypes(QualType lhs, QualType rhs,
       allRTypes = false;
 
     // Check parameter type compatibility
-    SmallVector<QualType, 10> types;
+    llvm::SmallVector<QualType, 10> types;
     for (unsigned i = 0, n = lproto->getNumParams(); i < n; i++) {
       QualType lParamType = lproto->getParamType(i).getUnqualifiedType();
       QualType rParamType = rproto->getParamType(i).getUnqualifiedType();
@@ -10990,7 +10990,7 @@ QualType ASTContext::mergeTypes(QualType LHS, QualType RHS, bool OfBlockPointer,
 bool ASTContext::mergeExtParameterInfo(
     const FunctionProtoType *FirstFnType, const FunctionProtoType *SecondFnType,
     bool &CanUseFirst, bool &CanUseSecond,
-    SmallVectorImpl<FunctionProtoType::ExtParameterInfo> &NewParamInfos) {
+    llvm::SmallVectorImpl<FunctionProtoType::ExtParameterInfo> &NewParamInfos) {
   assert(NewParamInfos.empty() && "param info list not empty");
   CanUseFirst = CanUseSecond = true;
   bool FirstHasInfo = FirstFnType->hasExtParameterInfos();
@@ -11659,7 +11659,7 @@ QualType ASTContext::GetBuiltinType(unsigned Id,
     return {};
   }
 
-  SmallVector<QualType, 8> ArgTypes;
+  llvm::SmallVector<QualType, 8> ArgTypes;
 
   bool RequiresICE = false;
   Error = GE_None;
@@ -12367,7 +12367,7 @@ QualType ASTContext::getStringLiteralArrayType(QualType EltTy,
 }
 
 StringLiteral *
-ASTContext::getPredefinedStringLiteralFromCache(StringRef Key) const {
+ASTContext::getPredefinedStringLiteralFromCache(llvm::StringRef Key) const {
   StringLiteral *&Result = StringLiteralCache[Key];
   if (!Result)
     Result = StringLiteral::Create(
@@ -12561,10 +12561,10 @@ getCommonTemplateNameChecked(ASTContext &Ctx, TemplateName X, TemplateName Y) {
   return R;
 }
 
-static auto getCommonTypes(ASTContext &Ctx, ArrayRef<QualType> Xs,
-                           ArrayRef<QualType> Ys, bool Unqualified = false) {
+static auto getCommonTypes(ASTContext &Ctx, llvm::ArrayRef<QualType> Xs,
+                           llvm::ArrayRef<QualType> Ys, bool Unqualified = false) {
   assert(Xs.size() == Ys.size());
-  SmallVector<QualType, 8> Rs(Xs.size());
+  llvm::SmallVector<QualType, 8> Rs(Xs.size());
   for (size_t I = 0; I < Rs.size(); ++I)
     Rs[I] = Ctx.getCommonSugaredType(Xs[I], Ys[I], Unqualified);
   return Rs;
@@ -12623,9 +12623,9 @@ static TemplateArgument getCommonTemplateArgument(ASTContext &Ctx,
 }
 
 static bool getCommonTemplateArguments(ASTContext &Ctx,
-                                       SmallVectorImpl<TemplateArgument> &R,
-                                       ArrayRef<TemplateArgument> Xs,
-                                       ArrayRef<TemplateArgument> Ys) {
+                                       llvm::SmallVectorImpl<TemplateArgument> &R,
+                                       llvm::ArrayRef<TemplateArgument> Xs,
+                                       llvm::ArrayRef<TemplateArgument> Ys) {
   if (Xs.size() != Ys.size())
     return true;
   R.resize(Xs.size());
@@ -12638,9 +12638,9 @@ static bool getCommonTemplateArguments(ASTContext &Ctx,
 }
 
 static auto getCommonTemplateArguments(ASTContext &Ctx,
-                                       ArrayRef<TemplateArgument> Xs,
-                                       ArrayRef<TemplateArgument> Ys) {
-  SmallVector<TemplateArgument, 8> R;
+                                       llvm::ArrayRef<TemplateArgument> Xs,
+                                       llvm::ArrayRef<TemplateArgument> Ys) {
+  llvm::SmallVector<TemplateArgument, 8> R;
   bool Different = getCommonTemplateArguments(Ctx, R, Xs, Ys);
   assert(!Different);
   (void)Different;
@@ -12705,8 +12705,8 @@ static auto getCommonIndexTypeCVRQualifiers(const ArrayType *X,
 // each type (in a canonical sense) only once, in the order they appear
 // from X to Y. If they occur in both X and Y, the result will contain
 // the common sugared type between them.
-static void mergeTypeLists(ASTContext &Ctx, SmallVectorImpl<QualType> &Out,
-                           ArrayRef<QualType> X, ArrayRef<QualType> Y) {
+static void mergeTypeLists(ASTContext &Ctx, llvm::SmallVectorImpl<QualType> &Out,
+                           llvm::ArrayRef<QualType> X, llvm::ArrayRef<QualType> Y) {
   llvm::DenseMap<QualType, unsigned> Found;
   for (auto Ts : {X, Y}) {
     for (QualType T : Ts) {
@@ -12724,7 +12724,7 @@ static void mergeTypeLists(ASTContext &Ctx, SmallVectorImpl<QualType> &Out,
 FunctionProtoType::ExceptionSpecInfo
 ASTContext::mergeExceptionSpecs(FunctionProtoType::ExceptionSpecInfo ESI1,
                                 FunctionProtoType::ExceptionSpecInfo ESI2,
-                                SmallVectorImpl<QualType> &ExceptionTypeStorage,
+                                llvm::SmallVectorImpl<QualType> &ExceptionTypeStorage,
                                 bool AcceptDependent) {
   ExceptionSpecificationType EST1 = ESI1.Type, EST2 = ESI2.Type;
 
@@ -12962,7 +12962,7 @@ static QualType getCommonNonSugarTypeNode(ASTContext &Ctx, const Type *X,
     auto P = getCommonTypes(Ctx, FX->param_types(), FY->param_types(),
                             /*Unqualified=*/true);
 
-    SmallVector<QualType, 8> Exceptions;
+    llvm::SmallVector<QualType, 8> Exceptions;
     EPIX.ExceptionSpec = Ctx.mergeExceptionSpecs(
         EPIX.ExceptionSpec, EPIY.ExceptionSpec, Exceptions, true);
     return Ctx.getFunctionType(R, P, EPIX);
@@ -13211,7 +13211,7 @@ static QualType getCommonSugarTypeNode(ASTContext &Ctx, const Type *X,
 
     ConceptDecl *CD = ::getCommonDecl(AX->getTypeConstraintConcept(),
                                       AY->getTypeConstraintConcept());
-    SmallVector<TemplateArgument, 8> As;
+    llvm::SmallVector<TemplateArgument, 8> As;
     if (CD &&
         getCommonTemplateArguments(Ctx, As, AX->getTypeConstraintArguments(),
                                    AY->getTypeConstraintArguments())) {
@@ -13275,7 +13275,7 @@ static QualType getCommonSugarTypeNode(ASTContext &Ctx, const Type *X,
                                                TY->getTemplateName());
     if (!CTN.getAsVoidPointer())
       return QualType();
-    SmallVector<TemplateArgument, 8> Args;
+    llvm::SmallVector<TemplateArgument, 8> Args;
     if (getCommonTemplateArguments(Ctx, Args, TX->template_arguments(),
                                    TY->template_arguments()))
       return QualType();
@@ -13355,7 +13355,7 @@ static QualType getCommonSugarTypeNode(ASTContext &Ctx, const Type *X,
 }
 
 static auto unwrapSugar(SplitQualType &T, Qualifiers &QTotal) {
-  SmallVector<SplitQualType, 8> R;
+  llvm::SmallVector<SplitQualType, 8> R;
   while (true) {
     QTotal.addConsistentQualifiers(T.Quals);
     QualType NT = T.Ty->getLocallyUnqualifiedSingleStepDesugaredType();
@@ -13670,7 +13670,7 @@ QualType ASTContext::getCorrespondingSignedFixedPointType(QualType Ty) const {
 std::vector<std::string> ASTContext::filterFunctionTargetVersionAttrs(
     const TargetVersionAttr *TV) const {
   assert(TV != nullptr);
-  llvm::SmallVector<StringRef, 8> Feats;
+  llvm::SmallVector<llvm::StringRef, 8> Feats;
   std::vector<std::string> ResFeats;
   TV->getFeatures(Feats);
   for (auto &Feature : Feats)
@@ -13686,7 +13686,7 @@ ASTContext::filterFunctionTargetAttrs(const TargetAttr *TD) const {
   ParsedTargetAttr ParsedAttr = Target->parseTargetAttr(TD->getFeaturesStr());
 
   llvm::erase_if(ParsedAttr.Features, [&](const std::string &Feat) {
-    return !Target->isValidFeatureName(StringRef{Feat}.substr(1));
+    return !Target->isValidFeatureName(llvm::StringRef{Feat}.substr(1));
   });
   return ParsedAttr;
 }
@@ -13705,7 +13705,7 @@ void ASTContext::getFunctionFeatureMap(llvm::StringMap<bool> &FeatureMap,
 // passed in function.
 void ASTContext::getFunctionFeatureMap(llvm::StringMap<bool> &FeatureMap,
                                        GlobalDecl GD) const {
-  StringRef TargetCPU = Target->getTargetOpts().CPU;
+  llvm::StringRef TargetCPU = Target->getTargetOpts().CPU;
   const FunctionDecl *FD = GD.getDecl()->getAsFunction();
   if (const auto *TD = FD->getAttr<TargetAttr>()) {
     ParsedTargetAttr ParsedAttr = filterFunctionTargetAttrs(TD);
@@ -13727,7 +13727,7 @@ void ASTContext::getFunctionFeatureMap(llvm::StringMap<bool> &FeatureMap,
     Target->initFeatureMap(FeatureMap, getDiagnostics(), TargetCPU,
                            ParsedAttr.Features);
   } else if (const auto *SD = FD->getAttr<CPUSpecificAttr>()) {
-    llvm::SmallVector<StringRef, 32> FeaturesTmp;
+    llvm::SmallVector<llvm::StringRef, 32> FeaturesTmp;
     Target->getCPUSpecificCPUDispatchFeatures(
         SD->getCPUName(GD.getMultiVersionIndex())->getName(), FeaturesTmp);
     std::vector<std::string> Features(FeaturesTmp.begin(), FeaturesTmp.end());
@@ -13739,9 +13739,9 @@ void ASTContext::getFunctionFeatureMap(llvm::StringMap<bool> &FeatureMap,
     std::vector<std::string> Features;
     if (Target->getTriple().isAArch64()) {
       // TargetClones for AArch64
-      llvm::SmallVector<StringRef, 8> Feats;
+      llvm::SmallVector<llvm::StringRef, 8> Feats;
       TC->getFeatures(Feats, GD.getMultiVersionIndex());
-      for (StringRef Feat : Feats)
+      for (llvm::StringRef Feat : Feats)
         if (Target->validateCpuSupports(Feat.str()))
           // Use '?' to mark features that came from AArch64 TargetClones.
           Features.push_back("?" + Feat.str());
@@ -13749,11 +13749,11 @@ void ASTContext::getFunctionFeatureMap(llvm::StringMap<bool> &FeatureMap,
                       Target->getTargetOpts().FeaturesAsWritten.begin(),
                       Target->getTargetOpts().FeaturesAsWritten.end());
     } else {
-      StringRef VersionStr = TC->getFeatureStr(GD.getMultiVersionIndex());
+      llvm::StringRef VersionStr = TC->getFeatureStr(GD.getMultiVersionIndex());
       if (VersionStr.starts_with("arch="))
         TargetCPU = VersionStr.drop_front(sizeof("arch=") - 1);
       else if (VersionStr != "default")
-        Features.push_back((StringRef{"+"} + VersionStr).str());
+        Features.push_back((llvm::StringRef{"+"} + VersionStr).str());
     }
     Target->initFeatureMap(FeatureMap, getDiagnostics(), TargetCPU, Features);
   } else if (const auto *TV = FD->getAttr<TargetVersionAttr>()) {
@@ -13804,11 +13804,11 @@ bool ASTContext::shouldExternalize(const Decl *D) const {
           CUDADeviceVarODRUsedByHost.count(cast<VarDecl>(D)));
 }
 
-StringRef ASTContext::getCUIDHash() const {
+llvm::StringRef ASTContext::getCUIDHash() const {
   if (!CUIDHash.empty())
     return CUIDHash;
   if (LangOpts.CUID.empty())
-    return StringRef();
+    return llvm::StringRef();
   CUIDHash = llvm::utohexstr(llvm::MD5Hash(LangOpts.CUID), /*LowerCase=*/true);
   return CUIDHash;
 }

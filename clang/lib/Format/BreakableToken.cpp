@@ -25,7 +25,7 @@
 namespace clang {
 namespace format {
 
-static constexpr StringRef Blanks = " \t\v\f\r";
+static constexpr llvm::StringRef Blanks = " \t\v\f\r";
 static bool IsBlank(char C) {
   switch (C) {
   case ' ':
@@ -39,22 +39,22 @@ static bool IsBlank(char C) {
   }
 }
 
-static StringRef getLineCommentIndentPrefix(StringRef Comment,
+static llvm::StringRef getLineCommentIndentPrefix(llvm::StringRef Comment,
                                             const FormatStyle &Style) {
-  static constexpr StringRef KnownCStylePrefixes[] = {"///<", "//!<", "///",
+  static constexpr llvm::StringRef KnownCStylePrefixes[] = {"///<", "//!<", "///",
                                                       "//!",  "//:",  "//"};
-  static constexpr StringRef KnownTextProtoPrefixes[] = {"####", "###", "##",
+  static constexpr llvm::StringRef KnownTextProtoPrefixes[] = {"####", "###", "##",
                                                          "//", "#"};
-  ArrayRef<StringRef> KnownPrefixes(KnownCStylePrefixes);
+  llvm::ArrayRef<llvm::StringRef> KnownPrefixes(KnownCStylePrefixes);
   if (Style.Language == FormatStyle::LK_TextProto)
     KnownPrefixes = KnownTextProtoPrefixes;
 
   assert(
-      llvm::is_sorted(KnownPrefixes, [](StringRef Lhs, StringRef Rhs) noexcept {
+      llvm::is_sorted(KnownPrefixes, [](llvm::StringRef Lhs, llvm::StringRef Rhs) noexcept {
         return Lhs.size() > Rhs.size();
       }));
 
-  for (StringRef KnownPrefix : KnownPrefixes) {
+  for (llvm::StringRef KnownPrefix : KnownPrefixes) {
     if (Comment.starts_with(KnownPrefix)) {
       const auto PrefixLength =
           Comment.find_first_not_of(' ', KnownPrefix.size());
@@ -65,7 +65,7 @@ static StringRef getLineCommentIndentPrefix(StringRef Comment,
 }
 
 static BreakableToken::Split
-getCommentSplit(StringRef Text, unsigned ContentStartColumn,
+getCommentSplit(llvm::StringRef Text, unsigned ContentStartColumn,
                 unsigned ColumnLimit, unsigned TabWidth,
                 encoding::Encoding Encoding, const FormatStyle &Style,
                 bool DecorationEndsWithStar = false) {
@@ -73,7 +73,7 @@ getCommentSplit(StringRef Text, unsigned ContentStartColumn,
                           << "\", Column limit: " << ColumnLimit
                           << ", Content start: " << ContentStartColumn << "\n");
   if (ColumnLimit <= ContentStartColumn + 1)
-    return BreakableToken::Split(StringRef::npos, 0);
+    return BreakableToken::Split(llvm::StringRef::npos, 0);
 
   unsigned MaxSplit = ColumnLimit - ContentStartColumn + 1;
   unsigned MaxSplitBytes = 0;
@@ -92,28 +92,28 @@ getCommentSplit(StringRef Text, unsigned ContentStartColumn,
   // these comments will fail to understand the comment if followed by a line
   // break. So avoid ever breaking before a {.
   if (Style.isJavaScript()) {
-    StringRef::size_type SpaceOffset =
+    llvm::StringRef::size_type SpaceOffset =
         Text.find_first_of(Blanks, MaxSplitBytes);
-    if (SpaceOffset != StringRef::npos && SpaceOffset + 1 < Text.size() &&
+    if (SpaceOffset != llvm::StringRef::npos && SpaceOffset + 1 < Text.size() &&
         Text[SpaceOffset + 1] == '{') {
       MaxSplitBytes = SpaceOffset + 1;
     }
   }
 
-  StringRef::size_type SpaceOffset = Text.find_last_of(Blanks, MaxSplitBytes);
+  llvm::StringRef::size_type SpaceOffset = Text.find_last_of(Blanks, MaxSplitBytes);
 
   static const auto kNumberedListRegexp = llvm::Regex("^[1-9][0-9]?\\.");
   // Some spaces are unacceptable to break on, rewind past them.
-  while (SpaceOffset != StringRef::npos) {
+  while (SpaceOffset != llvm::StringRef::npos) {
     // If a line-comment ends with `\`, the next line continues the comment,
     // whether or not it starts with `//`. This is confusing and triggers
     // -Wcomment.
     // Avoid introducing multiline comments by not allowing a break right
     // after '\'.
     if (Style.isCpp()) {
-      StringRef::size_type LastNonBlank =
+      llvm::StringRef::size_type LastNonBlank =
           Text.find_last_not_of(Blanks, SpaceOffset);
-      if (LastNonBlank != StringRef::npos && Text[LastNonBlank] == '\\') {
+      if (LastNonBlank != llvm::StringRef::npos && Text[LastNonBlank] == '\\') {
         SpaceOffset = Text.find_last_of(Blanks, LastNonBlank);
         continue;
       }
@@ -136,50 +136,50 @@ getCommentSplit(StringRef Text, unsigned ContentStartColumn,
     break;
   }
 
-  if (SpaceOffset == StringRef::npos ||
+  if (SpaceOffset == llvm::StringRef::npos ||
       // Don't break at leading whitespace.
-      Text.find_last_not_of(Blanks, SpaceOffset) == StringRef::npos) {
+      Text.find_last_not_of(Blanks, SpaceOffset) == llvm::StringRef::npos) {
     // Make sure that we don't break at leading whitespace that
     // reaches past MaxSplit.
-    StringRef::size_type FirstNonWhitespace = Text.find_first_not_of(Blanks);
-    if (FirstNonWhitespace == StringRef::npos) {
+    llvm::StringRef::size_type FirstNonWhitespace = Text.find_first_not_of(Blanks);
+    if (FirstNonWhitespace == llvm::StringRef::npos) {
       // If the comment is only whitespace, we cannot split.
-      return BreakableToken::Split(StringRef::npos, 0);
+      return BreakableToken::Split(llvm::StringRef::npos, 0);
     }
     SpaceOffset = Text.find_first_of(
         Blanks, std::max<unsigned>(MaxSplitBytes, FirstNonWhitespace));
   }
-  if (SpaceOffset != StringRef::npos && SpaceOffset != 0) {
+  if (SpaceOffset != llvm::StringRef::npos && SpaceOffset != 0) {
     // adaptStartOfLine will break after lines starting with /** if the comment
     // is broken anywhere. Avoid emitting this break twice here.
     // Example: in /** longtextcomesherethatbreaks */ (with ColumnLimit 20) will
     // insert a break after /**, so this code must not insert the same break.
     if (SpaceOffset == 1 && Text[SpaceOffset - 1] == '*')
-      return BreakableToken::Split(StringRef::npos, 0);
-    StringRef BeforeCut = Text.substr(0, SpaceOffset).rtrim(Blanks);
-    StringRef AfterCut = Text.substr(SpaceOffset);
+      return BreakableToken::Split(llvm::StringRef::npos, 0);
+    llvm::StringRef BeforeCut = Text.substr(0, SpaceOffset).rtrim(Blanks);
+    llvm::StringRef AfterCut = Text.substr(SpaceOffset);
     // Don't trim the leading blanks if it would create a */ after the break.
     if (!DecorationEndsWithStar || AfterCut.size() <= 1 || AfterCut[1] != '/')
       AfterCut = AfterCut.ltrim(Blanks);
     return BreakableToken::Split(BeforeCut.size(),
                                  AfterCut.begin() - BeforeCut.end());
   }
-  return BreakableToken::Split(StringRef::npos, 0);
+  return BreakableToken::Split(llvm::StringRef::npos, 0);
 }
 
 static BreakableToken::Split
-getStringSplit(StringRef Text, unsigned UsedColumns, unsigned ColumnLimit,
+getStringSplit(llvm::StringRef Text, unsigned UsedColumns, unsigned ColumnLimit,
                unsigned TabWidth, encoding::Encoding Encoding) {
   // FIXME: Reduce unit test case.
   if (Text.empty())
-    return BreakableToken::Split(StringRef::npos, 0);
+    return BreakableToken::Split(llvm::StringRef::npos, 0);
   if (ColumnLimit <= UsedColumns)
-    return BreakableToken::Split(StringRef::npos, 0);
+    return BreakableToken::Split(llvm::StringRef::npos, 0);
   unsigned MaxSplit = ColumnLimit - UsedColumns;
-  StringRef::size_type SpaceOffset = 0;
-  StringRef::size_type SlashOffset = 0;
-  StringRef::size_type WordStartOffset = 0;
-  StringRef::size_type SplitPoint = 0;
+  llvm::StringRef::size_type SpaceOffset = 0;
+  llvm::StringRef::size_type SlashOffset = 0;
+  llvm::StringRef::size_type WordStartOffset = 0;
+  llvm::StringRef::size_type SplitPoint = 0;
   for (unsigned Chars = 0;;) {
     unsigned Advance;
     if (Text[0] == '\\') {
@@ -213,13 +213,13 @@ getStringSplit(StringRef Text, unsigned UsedColumns, unsigned ColumnLimit,
     return BreakableToken::Split(WordStartOffset + 1, 0);
   if (SplitPoint != 0)
     return BreakableToken::Split(SplitPoint, 0);
-  return BreakableToken::Split(StringRef::npos, 0);
+  return BreakableToken::Split(llvm::StringRef::npos, 0);
 }
 
 bool switchesFormatting(const FormatToken &Token) {
   assert((Token.is(TT_BlockComment) || Token.is(TT_LineComment)) &&
          "formatting regions are switched by comment tokens");
-  StringRef Content = Token.TokenText.substr(2).ltrim();
+  llvm::StringRef Content = Token.TokenText.substr(2).ltrim();
   return Content.starts_with("clang-format on") ||
          Content.starts_with("clang-format off");
 }
@@ -245,7 +245,7 @@ unsigned BreakableStringLiteral::getLineCount() const { return 1; }
 
 unsigned BreakableStringLiteral::getRangeLength(unsigned LineIndex,
                                                 unsigned Offset,
-                                                StringRef::size_type Length,
+                                                llvm::StringRef::size_type Length,
                                                 unsigned StartColumn) const {
   llvm_unreachable("Getting the length of a part of the string literal "
                    "indicates that the code tries to reflow it.");
@@ -265,8 +265,8 @@ unsigned BreakableStringLiteral::getContentStartColumn(unsigned LineIndex,
 }
 
 BreakableStringLiteral::BreakableStringLiteral(
-    const FormatToken &Tok, unsigned StartColumn, StringRef Prefix,
-    StringRef Postfix, unsigned UnbreakableTailLength, bool InPPDirective,
+    const FormatToken &Tok, unsigned StartColumn, llvm::StringRef Prefix,
+    llvm::StringRef Postfix, unsigned UnbreakableTailLength, bool InPPDirective,
     encoding::Encoding Encoding, const FormatStyle &Style)
     : BreakableToken(Tok, InPPDirective, Encoding, Style),
       StartColumn(StartColumn), Prefix(Prefix), Postfix(Postfix),
@@ -421,7 +421,7 @@ BreakableComment::getSplit(unsigned LineIndex, unsigned TailOffset,
                            const llvm::Regex &CommentPragmasRegex) const {
   // Don't break lines matching the comment pragmas regex.
   if (CommentPragmasRegex.match(Content[LineIndex]))
-    return Split(StringRef::npos, 0);
+    return Split(llvm::StringRef::npos, 0);
   return getCommentSplit(Content[LineIndex].substr(TailOffset),
                          ContentStartColumn, ColumnLimit, Style.TabWidth,
                          Encoding, Style);
@@ -430,7 +430,7 @@ BreakableComment::getSplit(unsigned LineIndex, unsigned TailOffset,
 void BreakableComment::compressWhitespace(
     unsigned LineIndex, unsigned TailOffset, Split Split,
     WhitespaceManager &Whitespaces) const {
-  StringRef Text = Content[LineIndex].substr(TailOffset);
+  llvm::StringRef Text = Content[LineIndex].substr(TailOffset);
   // Text is relative to the content line, but Whitespaces operates relative to
   // the start of the corresponding token, so compute the start of the Split
   // that needs to be compressed into a single space relative to the start of
@@ -447,12 +447,12 @@ const FormatToken &BreakableComment::tokenAt(unsigned LineIndex) const {
   return Tokens[LineIndex] ? *Tokens[LineIndex] : Tok;
 }
 
-static bool mayReflowContent(StringRef Content) {
+static bool mayReflowContent(llvm::StringRef Content) {
   Content = Content.trim(Blanks);
   // Lines starting with '@' or '\' commonly have special meaning.
   // Lines starting with '-', '-#', '+' or '*' are bulleted/numbered lists.
   bool hasSpecialMeaningPrefix = false;
-  for (StringRef Prefix :
+  for (llvm::StringRef Prefix :
        {"@", "\\", "TODO", "FIXME", "XXX", "-# ", "- ", "+ ", "* "}) {
     if (Content.starts_with(Prefix)) {
       hasSpecialMeaningPrefix = true;
@@ -487,7 +487,7 @@ BreakableBlockComment::BreakableBlockComment(
   assert(Tok.is(TT_BlockComment) &&
          "block comment section must start with a block comment");
 
-  StringRef TokenText(Tok.TokenText);
+  llvm::StringRef TokenText(Tok.TokenText);
   assert(TokenText.starts_with("/*") && TokenText.ends_with("*/"));
   TokenText.substr(2, TokenText.size() - 4)
       .split(Lines, UseCRLF ? "\r\n" : "\n");
@@ -526,7 +526,7 @@ BreakableBlockComment::BreakableBlockComment(
     Decoration = "";
   }
   for (size_t i = 1, e = Content.size(); i < e && !Decoration.empty(); ++i) {
-    const StringRef &Text = Content[i];
+    const llvm::StringRef &Text = Content[i];
     if (i + 1 == e) {
       // If the last line is empty, the closing "*/" will have a star.
       if (Text.empty())
@@ -609,7 +609,7 @@ BreakableToken::Split BreakableBlockComment::getSplit(
     unsigned ContentStartColumn, const llvm::Regex &CommentPragmasRegex) const {
   // Don't break lines matching the comment pragmas regex.
   if (CommentPragmasRegex.match(Content[LineIndex]))
-    return Split(StringRef::npos, 0);
+    return Split(llvm::StringRef::npos, 0);
   return getCommentSplit(Content[LineIndex].substr(TailOffset),
                          ContentStartColumn, ColumnLimit, Style.TabWidth,
                          Encoding, Style, Decoration.ends_with("*"));
@@ -629,16 +629,16 @@ void BreakableBlockComment::adjustWhitespace(unsigned LineIndex,
   // Calculate the end of the non-whitespace text in the previous line.
   EndOfPreviousLine =
       Lines[LineIndex - 1].find_last_not_of(Blanks, EndOfPreviousLine);
-  if (EndOfPreviousLine == StringRef::npos)
+  if (EndOfPreviousLine == llvm::StringRef::npos)
     EndOfPreviousLine = 0;
   else
     ++EndOfPreviousLine;
   // Calculate the start of the non-whitespace text in the current line.
   size_t StartOfLine = Lines[LineIndex].find_first_not_of(Blanks);
-  if (StartOfLine == StringRef::npos)
+  if (StartOfLine == llvm::StringRef::npos)
     StartOfLine = Lines[LineIndex].size();
 
-  StringRef Whitespace = Lines[LineIndex].substr(0, StartOfLine);
+  llvm::StringRef Whitespace = Lines[LineIndex].substr(0, StartOfLine);
   // Adjust Lines to only contain relevant text.
   size_t PreviousContentOffset =
       Content[LineIndex - 1].data() - Lines[LineIndex - 1].data();
@@ -654,7 +654,7 @@ void BreakableBlockComment::adjustWhitespace(unsigned LineIndex,
 
 unsigned BreakableBlockComment::getRangeLength(unsigned LineIndex,
                                                unsigned Offset,
-                                               StringRef::size_type Length,
+                                               llvm::StringRef::size_type Length,
                                                unsigned StartColumn) const {
   return encoding::columnWidthWithTabs(
       Content[LineIndex].substr(Offset, Length), StartColumn, Style.TabWidth,
@@ -666,7 +666,7 @@ unsigned BreakableBlockComment::getRemainingLength(unsigned LineIndex,
                                                    unsigned StartColumn) const {
   unsigned LineLength =
       UnbreakableTailLength +
-      getRangeLength(LineIndex, Offset, StringRef::npos, StartColumn);
+      getRangeLength(LineIndex, Offset, llvm::StringRef::npos, StartColumn);
   if (LineIndex + 1 == Lines.size()) {
     LineLength += 2;
     // We never need a decoration when breaking just the trailing "*/" postfix.
@@ -699,10 +699,10 @@ unsigned BreakableBlockComment::getContentIndent(unsigned LineIndex) const {
   // The content at LineIndex 0 of a comment like:
   // /** line 0 */
   // is "* line 0", so we need to skip over the decoration in that case.
-  StringRef ContentWithNoDecoration = Content[LineIndex];
+  llvm::StringRef ContentWithNoDecoration = Content[LineIndex];
   if (LineIndex == 0 && ContentWithNoDecoration.starts_with("*"))
     ContentWithNoDecoration = ContentWithNoDecoration.substr(1).ltrim(Blanks);
-  StringRef FirstWord = ContentWithNoDecoration.substr(
+  llvm::StringRef FirstWord = ContentWithNoDecoration.substr(
       0, ContentWithNoDecoration.find_first_of(Blanks));
   if (ContentIndentingJavadocAnnotations.contains(FirstWord))
     return Style.ContinuationIndentWidth;
@@ -712,8 +712,8 @@ unsigned BreakableBlockComment::getContentIndent(unsigned LineIndex) const {
 void BreakableBlockComment::insertBreak(unsigned LineIndex, unsigned TailOffset,
                                         Split Split, unsigned ContentIndent,
                                         WhitespaceManager &Whitespaces) const {
-  StringRef Text = Content[LineIndex].substr(TailOffset);
-  StringRef Prefix = Decoration;
+  llvm::StringRef Text = Content[LineIndex].substr(TailOffset);
+  llvm::StringRef Prefix = Decoration;
   // We need this to account for the case when we have a decoration "* " for all
   // the lines except for the last one, where the star in "*/" acts as a
   // decoration.
@@ -743,31 +743,31 @@ void BreakableBlockComment::insertBreak(unsigned LineIndex, unsigned TailOffset,
 BreakableToken::Split BreakableBlockComment::getReflowSplit(
     unsigned LineIndex, const llvm::Regex &CommentPragmasRegex) const {
   if (!mayReflow(LineIndex, CommentPragmasRegex))
-    return Split(StringRef::npos, 0);
+    return Split(llvm::StringRef::npos, 0);
 
   // If we're reflowing into a line with content indent, only reflow the next
   // line if its starting whitespace matches the content indent.
   size_t Trimmed = Content[LineIndex].find_first_not_of(Blanks);
   if (LineIndex) {
     unsigned PreviousContentIndent = getContentIndent(LineIndex - 1);
-    if (PreviousContentIndent && Trimmed != StringRef::npos &&
+    if (PreviousContentIndent && Trimmed != llvm::StringRef::npos &&
         Trimmed != PreviousContentIndent) {
-      return Split(StringRef::npos, 0);
+      return Split(llvm::StringRef::npos, 0);
     }
   }
 
-  return Split(0, Trimmed != StringRef::npos ? Trimmed : 0);
+  return Split(0, Trimmed != llvm::StringRef::npos ? Trimmed : 0);
 }
 
 bool BreakableBlockComment::introducesBreakBeforeToken() const {
   // A break is introduced when we want delimiters on newline.
   return DelimitersOnNewline &&
-         Lines[0].substr(1).find_first_not_of(Blanks) != StringRef::npos;
+         Lines[0].substr(1).find_first_not_of(Blanks) != llvm::StringRef::npos;
 }
 
 void BreakableBlockComment::reflow(unsigned LineIndex,
                                    WhitespaceManager &Whitespaces) const {
-  StringRef TrimmedContent = Content[LineIndex].ltrim(Blanks);
+  llvm::StringRef TrimmedContent = Content[LineIndex].ltrim(Blanks);
   // Here we need to reflow.
   assert(Tokens[LineIndex - 1] == Tokens[LineIndex] &&
          "Reflowing whitespace within a token");
@@ -795,7 +795,7 @@ void BreakableBlockComment::adaptStartOfLine(
       // Note: this works because getCommentSplit is careful never to split at
       // the beginning of a line.
       size_t BreakLength = Lines[0].substr(1).find_first_not_of(Blanks);
-      if (BreakLength != StringRef::npos) {
+      if (BreakLength != llvm::StringRef::npos) {
         insertBreak(LineIndex, 0, Split(1, BreakLength), /*ContentIndent=*/0,
                     Whitespaces);
       }
@@ -804,7 +804,7 @@ void BreakableBlockComment::adaptStartOfLine(
   }
   // Here no reflow with the previous line will happen.
   // Fix the decoration of the line at LineIndex.
-  StringRef Prefix = Decoration;
+  llvm::StringRef Prefix = Decoration;
   if (Content[LineIndex].empty()) {
     if (LineIndex + 1 == Lines.size()) {
       if (!LastLineNeedsDecoration) {
@@ -840,19 +840,19 @@ BreakableBlockComment::getSplitAfterLastLine(unsigned TailOffset) const {
     // Replace the trailing whitespace of the last line with a newline.
     // In case the last line is empty, the ending '*/' is already on its own
     // line.
-    StringRef Line = Content.back().substr(TailOffset);
-    StringRef TrimmedLine = Line.rtrim(Blanks);
+    llvm::StringRef Line = Content.back().substr(TailOffset);
+    llvm::StringRef TrimmedLine = Line.rtrim(Blanks);
     if (!TrimmedLine.empty())
       return Split(TrimmedLine.size(), Line.size() - TrimmedLine.size());
   }
-  return Split(StringRef::npos, 0);
+  return Split(llvm::StringRef::npos, 0);
 }
 
 bool BreakableBlockComment::mayReflow(
     unsigned LineIndex, const llvm::Regex &CommentPragmasRegex) const {
   // Content[LineIndex] may exclude the indent after the '*' decoration. In that
   // case, we compute the start of the comment pragma manually.
-  StringRef IndentContent = Content[LineIndex];
+  llvm::StringRef IndentContent = Content[LineIndex];
   if (Lines[LineIndex].ltrim(Blanks).starts_with("*"))
     IndentContent = Lines[LineIndex].ltrim(Blanks).substr(1);
   return LineIndex > 0 && !CommentPragmasRegex.match(IndentContent) &&
@@ -875,7 +875,7 @@ BreakableLineCommentSection::BreakableLineCommentSection(
        CurrentTok && CurrentTok->is(TT_LineComment);
        CurrentTok = CurrentTok->Next) {
     LastLineTok = LineTok;
-    StringRef TokenText(CurrentTok->TokenText);
+    llvm::StringRef TokenText(CurrentTok->TokenText);
     assert((TokenText.starts_with("//") || TokenText.starts_with("#")) &&
            "unsupported line comment prefix, '//' and '#' are supported");
     size_t FirstLineIndex = Lines.size();
@@ -888,7 +888,7 @@ BreakableLineCommentSection::BreakableLineCommentSection(
     OriginalPrefix.resize(Lines.size());
     for (size_t i = FirstLineIndex, e = Lines.size(); i < e; ++i) {
       Lines[i] = Lines[i].ltrim(Blanks);
-      StringRef IndentPrefix = getLineCommentIndentPrefix(Lines[i], Style);
+      llvm::StringRef IndentPrefix = getLineCommentIndentPrefix(Lines[i], Style);
       OriginalPrefix[i] = IndentPrefix;
       const int SpacesInPrefix = llvm::count(IndentPrefix, ' ');
 
@@ -981,7 +981,7 @@ BreakableLineCommentSection::BreakableLineCommentSection(
 
       // Calculate the end of the non-whitespace text in this line.
       size_t EndOfLine = Content[i].find_last_not_of(Blanks);
-      if (EndOfLine == StringRef::npos)
+      if (EndOfLine == llvm::StringRef::npos)
         EndOfLine = Content[i].size();
       else
         ++EndOfLine;
@@ -1010,7 +1010,7 @@ BreakableLineCommentSection::BreakableLineCommentSection(
 
 unsigned
 BreakableLineCommentSection::getRangeLength(unsigned LineIndex, unsigned Offset,
-                                            StringRef::size_type Length,
+                                            llvm::StringRef::size_type Length,
                                             unsigned StartColumn) const {
   return encoding::columnWidthWithTabs(
       Content[LineIndex].substr(Offset, Length), StartColumn, Style.TabWidth,
@@ -1026,7 +1026,7 @@ BreakableLineCommentSection::getContentStartColumn(unsigned LineIndex,
 void BreakableLineCommentSection::insertBreak(
     unsigned LineIndex, unsigned TailOffset, Split Split,
     unsigned ContentIndent, WhitespaceManager &Whitespaces) const {
-  StringRef Text = Content[LineIndex].substr(TailOffset);
+  llvm::StringRef Text = Content[LineIndex].substr(TailOffset);
   // Compute the offset of the split relative to the beginning of the token
   // text.
   unsigned BreakOffsetInToken =
@@ -1041,7 +1041,7 @@ void BreakableLineCommentSection::insertBreak(
 BreakableComment::Split BreakableLineCommentSection::getReflowSplit(
     unsigned LineIndex, const llvm::Regex &CommentPragmasRegex) const {
   if (!mayReflow(LineIndex, CommentPragmasRegex))
-    return Split(StringRef::npos, 0);
+    return Split(llvm::StringRef::npos, 0);
 
   size_t Trimmed = Content[LineIndex].find_first_not_of(Blanks);
 
@@ -1049,7 +1049,7 @@ BreakableComment::Split BreakableLineCommentSection::getReflowSplit(
   // split we replace all whitespace before the current line comment token
   // (which does not need to be included in the split), plus the start of the
   // line up to where the content starts.
-  return Split(0, Trimmed != StringRef::npos ? Trimmed : 0);
+  return Split(0, Trimmed != llvm::StringRef::npos ? Trimmed : 0);
 }
 
 void BreakableLineCommentSection::reflow(unsigned LineIndex,
@@ -1151,7 +1151,7 @@ bool BreakableLineCommentSection::mayReflow(
     unsigned LineIndex, const llvm::Regex &CommentPragmasRegex) const {
   // Line comments have the indent as part of the prefix, so we need to
   // recompute the start of the line.
-  StringRef IndentContent = Content[LineIndex];
+  llvm::StringRef IndentContent = Content[LineIndex];
   if (Lines[LineIndex].starts_with("//"))
     IndentContent = Lines[LineIndex].substr(2);
   // FIXME: Decide whether we want to reflow non-regular indents:

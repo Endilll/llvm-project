@@ -19,7 +19,7 @@ void PPCFreeBSDToolChain::AddClangSystemIncludeArgs(
   if (!DriverArgs.hasArg(clang::driver::options::OPT_nostdinc) &&
       !DriverArgs.hasArg(options::OPT_nobuiltininc)) {
     const Driver &D = getDriver();
-    SmallString<128> P(D.ResourceDir);
+    llvm::SmallString<128> P(D.ResourceDir);
     llvm::sys::path::append(P, "include", "ppc_wrappers");
     addSystemInclude(DriverArgs, CC1Args, P);
   }

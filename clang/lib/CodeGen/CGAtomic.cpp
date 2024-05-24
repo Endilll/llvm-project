@@ -313,7 +313,7 @@ Address AtomicInfo::CreateTempAlloca() const {
 }
 
 static RValue emitAtomicLibcall(CodeGenFunction &CGF,
-                                StringRef fnName,
+                                llvm::StringRef fnName,
                                 QualType resultType,
                                 CallArgList &args) {
   const CGFunctionInfo &fnInfo =
@@ -1194,7 +1194,7 @@ RValue CodeGenFunction::EmitAtomicExpr(AtomicExpr *E) {
 
     if (E->isOpenCL()) {
       LibCallName =
-          std::string("__opencl") + StringRef(LibCallName).drop_front(1).str();
+          std::string("__opencl") + llvm::StringRef(LibCallName).drop_front(1).str();
     }
     // By default, assume we return a value of the atomic type.
     if (!HaveRetTy) {

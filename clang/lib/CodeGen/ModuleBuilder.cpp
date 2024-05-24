@@ -33,7 +33,7 @@ namespace {
   class CodeGeneratorImpl : public CodeGenerator {
     DiagnosticsEngine &Diags;
     ASTContext *Ctx;
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS; // Only used for debug info.
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS; // Only used for debug info.
     const HeaderSearchOptions &HeaderSearchOpts; // Only used for debug info.
     const PreprocessorOptions &PreprocessorOpts; // Only used for debug info.
     const CodeGenOptions &CodeGenOpts;
@@ -65,7 +65,7 @@ namespace {
     std::unique_ptr<CodeGen::CodeGenModule> Builder;
 
   private:
-    SmallVector<FunctionDecl *, 8> DeferredInlineMemberFuncDefs;
+    llvm::SmallVector<FunctionDecl *, 8> DeferredInlineMemberFuncDefs;
 
     static llvm::StringRef ExpandModuleName(llvm::StringRef ModuleName,
                                             const CodeGenOptions &CGO) {
@@ -76,7 +76,7 @@ namespace {
 
   public:
     CodeGeneratorImpl(DiagnosticsEngine &diags, llvm::StringRef ModuleName,
-                      IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS,
+                      llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS,
                       const HeaderSearchOptions &HSO,
                       const PreprocessorOptions &PPO, const CodeGenOptions &CGO,
                       llvm::LLVMContext &C,
@@ -110,7 +110,7 @@ namespace {
       return M.release();
     }
 
-    const Decl *GetDeclForMangledName(StringRef MangledName) {
+    const Decl *GetDeclForMangledName(llvm::StringRef MangledName) {
       GlobalDecl Result;
       if (!Builder->lookupRepresentativeDecl(MangledName, Result))
         return nullptr;
@@ -362,7 +362,7 @@ llvm::Module *CodeGenerator::StartModule(llvm::StringRef ModuleName,
 
 CodeGenerator *
 clang::CreateLLVMCodeGen(DiagnosticsEngine &Diags, llvm::StringRef ModuleName,
-                         IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS,
+                         llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS,
                          const HeaderSearchOptions &HeaderSearchOpts,
                          const PreprocessorOptions &PreprocessorOpts,
                          const CodeGenOptions &CGO, llvm::LLVMContext &C,

@@ -335,7 +335,7 @@ public:
   bool notTrue(CType ct) { return !ct; }
 
   bool compareIntegers(unsigned i, unsigned j) { return i == j; }
-  bool compareStrings (StringRef s, StringRef r) { return s == r; }
+  bool compareStrings (llvm::StringRef s, llvm::StringRef r) { return s == r; }
   bool comparePointers(const void* P, const void* Q) { return P == Q; }
 
   bool compare(const SExpr *E1, const SExpr* E2) {
@@ -369,7 +369,7 @@ public:
   bool notTrue(CType ct) { return !ct; }
 
   bool compareIntegers(unsigned i, unsigned j) { return i == j; }
-  bool compareStrings (StringRef s, StringRef r) { return s == r; }
+  bool compareStrings (llvm::StringRef s, llvm::StringRef r) { return s == r; }
   bool comparePointers(const void *P, const void *Q) { return P == Q; }
 
   bool compare(const SExpr *E1, const SExpr *E2) {
@@ -396,7 +396,7 @@ public:
   }
 };
 
-// inline std::ostream& operator<<(std::ostream& SS, StringRef R) {
+// inline std::ostream& operator<<(std::ostream& SS, llvm::StringRef R) {
 //   return SS.write(R.data(), R.size());
 // }
 
@@ -608,7 +608,7 @@ protected:
         break;
       case ValueType::BT_String:
         SS << "\"";
-        printLiteralT(&E->as<StringRef>(), SS);
+        printLiteralT(&E->as<llvm::StringRef>(), SS);
         SS << "\"";
         return;
       case ValueType::BT_Pointer:

@@ -44,19 +44,19 @@ static const char * const InvalidLocation = "";
 
 Replacement::Replacement() : FilePath(InvalidLocation) {}
 
-Replacement::Replacement(StringRef FilePath, unsigned Offset, unsigned Length,
-                         StringRef ReplacementText)
+Replacement::Replacement(llvm::StringRef FilePath, unsigned Offset, unsigned Length,
+                         llvm::StringRef ReplacementText)
     : FilePath(std::string(FilePath)), ReplacementRange(Offset, Length),
       ReplacementText(std::string(ReplacementText)) {}
 
 Replacement::Replacement(const SourceManager &Sources, SourceLocation Start,
-                         unsigned Length, StringRef ReplacementText) {
+                         unsigned Length, llvm::StringRef ReplacementText) {
   setFromSourceLocation(Sources, Start, Length, ReplacementText);
 }
 
 Replacement::Replacement(const SourceManager &Sources,
                          const CharSourceRange &Range,
-                         StringRef ReplacementText,
+                         llvm::StringRef ReplacementText,
                          const LangOptions &LangOpts) {
   setFromSourceRange(Sources, Range, ReplacementText, LangOpts);
 }
@@ -119,7 +119,7 @@ bool operator==(const Replacement &LHS, const Replacement &RHS) {
 
 void Replacement::setFromSourceLocation(const SourceManager &Sources,
                                         SourceLocation Start, unsigned Length,
-                                        StringRef ReplacementText) {
+                                        llvm::StringRef ReplacementText) {
   const std::pair<FileID, unsigned> DecomposedLocation =
       Sources.getDecomposedLoc(Start);
   OptionalFileEntryRef Entry =
@@ -147,7 +147,7 @@ static int getRangeSize(const SourceManager &Sources,
 
 void Replacement::setFromSourceRange(const SourceManager &Sources,
                                      const CharSourceRange &Range,
-                                     StringRef ReplacementText,
+                                     llvm::StringRef ReplacementText,
                                      const LangOptions &LangOpts) {
   setFromSourceLocation(Sources, Sources.getSpellingLoc(Range.getBegin()),
                         getRangeSize(Sources, Range, LangOpts),
@@ -385,15 +385,15 @@ public:
         Length += REnd - End;
         MergeSecond = false;
       }
-      StringRef TextRef = Text;
-      StringRef Head = TextRef.substr(0, R.getOffset() + Delta - Offset);
-      StringRef Tail = TextRef.substr(REnd - Offset);
+      llvm::StringRef TextRef = Text;
+      llvm::StringRef Head = TextRef.substr(0, R.getOffset() + Delta - Offset);
+      llvm::StringRef Tail = TextRef.substr(REnd - Offset);
       Text = (Head + R.getReplacementText() + Tail).str();
       Delta += R.getReplacementText().size() - R.getLength();
     } else {
       unsigned End = Offset + Length;
-      StringRef RText = R.getReplacementText();
-      StringRef Tail = RText.substr(End - R.getOffset());
+      llvm::StringRef RText = R.getReplacementText();
+      llvm::StringRef Tail = RText.substr(End - R.getOffset());
       Text = (Text + Tail).str();
       if (R.getOffset() + RText.size() > End) {
         Length = R.getOffset() + R.getLength() - Offset;
@@ -433,7 +433,7 @@ private:
 
   // Data of the actually merged replacement. FilePath and Offset aren't changed
   // as the element is only extended to the right.
-  const StringRef FilePath;
+  const llvm::StringRef FilePath;
   const unsigned Offset;
   unsigned Length;
   std::string Text;
@@ -577,16 +577,16 @@ bool applyAllReplacements(const Replacements &Replaces, Rewriter &Rewrite) {
   return Result;
 }
 
-llvm::Expected<std::string> applyAllReplacements(StringRef Code,
+llvm::Expected<std::string> applyAllReplacements(llvm::StringRef Code,
                                                 const Replacements &Replaces) {
   if (Replaces.empty())
     return Code.str();
 
-  IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
+  llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
       new llvm::vfs::InMemoryFileSystem);
   FileManager Files(FileSystemOptions(), InMemoryFileSystem);
   DiagnosticsEngine Diagnostics(
-      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs),
+      llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs),
       new DiagnosticOptions);
   SourceManager SourceMgr(Diagnostics, Files);
   Rewriter Rewrite(SourceMgr, LangOptions());

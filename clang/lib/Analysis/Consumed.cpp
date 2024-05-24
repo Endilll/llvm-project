@@ -245,7 +245,7 @@ static ConsumedState mapSetTypestateAttrState(const SetTypestateAttr *STAttr) {
   llvm_unreachable("invalid_enum");
 }
 
-static StringRef stateToString(ConsumedState State) {
+static llvm::StringRef stateToString(ConsumedState State) {
   switch (State) {
   case consumed::CS_None:
     return "none";

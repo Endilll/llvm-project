@@ -29,7 +29,7 @@ class SarifDocumentWriter;
 
 class SARIFDiagnosticPrinter : public DiagnosticConsumer {
 public:
-  SARIFDiagnosticPrinter(raw_ostream &OS, DiagnosticOptions *Diags);
+  SARIFDiagnosticPrinter(llvm::raw_ostream &OS, DiagnosticOptions *Diags);
   ~SARIFDiagnosticPrinter() = default;
 
   SARIFDiagnosticPrinter &operator=(const SARIFDiagnosticPrinter &&) = delete;
@@ -59,8 +59,8 @@ public:
                         const Diagnostic &Info) override;
 
 private:
-  raw_ostream &OS;
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
+  llvm::raw_ostream &OS;
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
 
   /// Handle to the currently active SARIF diagnostic emitter.
   std::unique_ptr<SARIFDiagnostic> SARIFDiag;

@@ -137,7 +137,7 @@ public:
 
   bool
   handleDeclOccurrence(const Decl *D, index::SymbolRoleSet Roles,
-                       ArrayRef<index::SymbolRelation> Relations,
+                       llvm::ArrayRef<index::SymbolRelation> Relations,
                        SourceLocation Loc,
                        index::IndexDataConsumer::ASTNodeInfo ASTNode) override;
 
@@ -163,7 +163,7 @@ private:
                                bool IsMainFileSymbol);
   void addDefinition(const NamedDecl &, const Symbol &DeclSymbol);
   void processRelations(const NamedDecl &ND, const SymbolID &ID,
-                        ArrayRef<index::SymbolRelation> Relations);
+                        llvm::ArrayRef<index::SymbolRelation> Relations);
 
   std::optional<SymbolLocation> getTokenLocation(SourceLocation TokLoc);
 

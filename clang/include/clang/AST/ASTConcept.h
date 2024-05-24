@@ -43,11 +43,11 @@ public:
   ConstraintSatisfaction() = default;
 
   ConstraintSatisfaction(const NamedDecl *ConstraintOwner,
-                         ArrayRef<TemplateArgument> TemplateArgs) :
+                         llvm::ArrayRef<TemplateArgument> TemplateArgs) :
       ConstraintOwner(ConstraintOwner), TemplateArgs(TemplateArgs.begin(),
                                                      TemplateArgs.end()) { }
 
-  using SubstitutionDiagnostic = std::pair<SourceLocation, StringRef>;
+  using SubstitutionDiagnostic = std::pair<SourceLocation, llvm::StringRef>;
   using Detail = llvm::PointerUnion<Expr *, SubstitutionDiagnostic *>;
 
   bool IsSatisfied = false;
@@ -65,7 +65,7 @@ public:
 
   static void Profile(llvm::FoldingSetNodeID &ID, const ASTContext &C,
                       const NamedDecl *ConstraintOwner,
-                      ArrayRef<TemplateArgument> TemplateArgs);
+                      llvm::ArrayRef<TemplateArgument> TemplateArgs);
 
   bool HasSubstitutionFailure() {
     for (const auto &Detail : Details)
@@ -82,7 +82,7 @@ public:
 using UnsatisfiedConstraintRecord =
     std::pair<const Expr *,
               llvm::PointerUnion<Expr *,
-                                 std::pair<SourceLocation, StringRef> *>>;
+                                 std::pair<SourceLocation, llvm::StringRef> *>>;
 
 /// \brief The result of a constraint satisfaction check, containing the
 /// necessary information to diagnose an unsatisfied constraint.

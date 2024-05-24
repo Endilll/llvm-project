@@ -18,19 +18,19 @@ DEF_DIAGTOOL("find-diagnostic-id", "Print the id of the given diagnostic",
 using namespace clang;
 using namespace diagtool;
 
-static StringRef getNameFromID(StringRef Name) {
+static llvm::StringRef getNameFromID(llvm::StringRef Name) {
   int DiagID;
   if(!Name.getAsInteger(0, DiagID)) {
     const DiagnosticRecord &Diag = getDiagnosticForID(DiagID);
     return Diag.getName();
   }
-  return StringRef();
+  return llvm::StringRef();
 }
 
 static std::optional<DiagnosticRecord>
-findDiagnostic(ArrayRef<DiagnosticRecord> Diagnostics, StringRef Name) {
+findDiagnostic(llvm::ArrayRef<DiagnosticRecord> Diagnostics, llvm::StringRef Name) {
   for (const auto &Diag : Diagnostics) {
-    StringRef DiagName = Diag.getName();
+    llvm::StringRef DiagName = Diag.getName();
     if (DiagName == Name)
       return Diag;
   }
@@ -55,7 +55,7 @@ int FindDiagnosticID::run(unsigned int argc, char **argv,
   llvm::cl::ParseCommandLineOptions((int)Args.size(), Args.data(),
                                     "Diagnostic ID mapping utility");
 
-  ArrayRef<DiagnosticRecord> AllDiagnostics = getBuiltinDiagnosticsByName();
+  llvm::ArrayRef<DiagnosticRecord> AllDiagnostics = getBuiltinDiagnosticsByName();
   std::optional<DiagnosticRecord> Diag =
       findDiagnostic(AllDiagnostics, DiagnosticName);
   if (!Diag) {

@@ -15,7 +15,7 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::modernize {
 
 UseTransparentFunctorsCheck::UseTransparentFunctorsCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context), SafeMode(Options.get("SafeMode", false)) {}
 
 void UseTransparentFunctorsCheck::storeOptions(
@@ -62,7 +62,7 @@ void UseTransparentFunctorsCheck::registerMatchers(MatchFinder *Finder) {
                      this);
 }
 
-static const StringRef Message = "prefer transparent functors '%0<>'";
+static const llvm::StringRef Message = "prefer transparent functors '%0<>'";
 
 template <typename T> static T getInnerTypeLocAs(TypeLoc Loc) {
   T Result;

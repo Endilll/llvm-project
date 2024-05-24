@@ -129,7 +129,7 @@ public:
       : RM(Data) {}
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &Compiler,
-                                                 StringRef File) override {
+                                                 llvm::StringRef File) override {
     return std::make_unique<CallDescriptionConsumer<MatchedExprT>>(Compiler,
                                                                    RM);
   }
@@ -164,7 +164,7 @@ TEST(CallDescription, LackOfRequiredArguments) {
       "void foo(int); void foo(int, int); void bar() { foo(1); }"));
 }
 
-constexpr StringRef MockStdStringHeader = R"code(
+constexpr llvm::StringRef MockStdStringHeader = R"code(
   namespace std { inline namespace __1 {
     template<typename T> class basic_string {
       class Allocator {};
@@ -180,13 +180,13 @@ constexpr StringRef MockStdStringHeader = R"code(
 )code";
 
 TEST(CallDescription, QualifiedNames) {
-  constexpr StringRef AdditionalCode = R"code(
+  constexpr llvm::StringRef AdditionalCode = R"code(
     void foo() {
       using namespace std;
       basic_string<char> s;
       s.c_str();
     })code";
-  const std::string Code = (Twine{MockStdStringHeader} + AdditionalCode).str();
+  const std::string Code = (llvm::Twine{MockStdStringHeader} + AdditionalCode).str();
   EXPECT_TRUE(tooling::runToolOnCode(
       std::unique_ptr<FrontendAction>(new CallDescriptionAction<>({
           {{CDM::CXXMethod, {"std", "basic_string", "c_str"}}, true},
@@ -195,12 +195,12 @@ TEST(CallDescription, QualifiedNames) {
 }
 
 TEST(CallDescription, MatchConstructor) {
-  constexpr StringRef AdditionalCode = R"code(
+  constexpr llvm::StringRef AdditionalCode = R"code(
     void foo() {
       using namespace std;
       basic_string<char> s("hello");
     })code";
-  const std::string Code = (Twine{MockStdStringHeader} + AdditionalCode).str();
+  const std::string Code = (llvm::Twine{MockStdStringHeader} + AdditionalCode).str();
   EXPECT_TRUE(tooling::runToolOnCode(
       std::unique_ptr<FrontendAction>(
           new CallDescriptionAction<CXXConstructExpr>({
@@ -217,7 +217,7 @@ TEST(CallDescription, MatchConstructor) {
 //        the implicit destructor events.
 
 TEST(CallDescription, MatchConversionOperator) {
-  constexpr StringRef Code = R"code(
+  constexpr llvm::StringRef Code = R"code(
     namespace aaa {
     namespace bbb {
     struct Bar {
@@ -347,7 +347,7 @@ TEST(CallDescription, SkipAnonimousNamespaces) {
 }
 
 TEST(CallDescription, AliasNames) {
-  constexpr StringRef AliasNamesCode = R"code(
+  constexpr llvm::StringRef AliasNamesCode = R"code(
   namespace std {
     struct container {
       const char *data() const;
@@ -356,20 +356,20 @@ TEST(CallDescription, AliasNames) {
   } // std
 )code";
 
-  constexpr StringRef UseAliasInSpelling = R"code(
+  constexpr llvm::StringRef UseAliasInSpelling = R"code(
     void foo() {
       std::cont v;
       v.data();
     })code";
-  constexpr StringRef UseStructNameInSpelling = R"code(
+  constexpr llvm::StringRef UseStructNameInSpelling = R"code(
     void foo() {
       std::container v;
       v.data();
     })code";
   const std::string UseAliasInSpellingCode =
-      (Twine{AliasNamesCode} + UseAliasInSpelling).str();
+      (llvm::Twine{AliasNamesCode} + UseAliasInSpelling).str();
   const std::string UseStructNameInSpellingCode =
-      (Twine{AliasNamesCode} + UseStructNameInSpelling).str();
+      (llvm::Twine{AliasNamesCode} + UseStructNameInSpelling).str();
 
   // Test if the code spells the alias, wile we match against the struct name,
   // and again matching against the alias.
@@ -419,7 +419,7 @@ TEST(CallDescription, AliasNames) {
 }
 
 TEST(CallDescription, AliasSingleNamespace) {
-  constexpr StringRef Code = R"code(
+  constexpr llvm::StringRef Code = R"code(
     namespace aaa {
     namespace bbb {
     namespace ccc {
@@ -450,7 +450,7 @@ TEST(CallDescription, AliasSingleNamespace) {
 }
 
 TEST(CallDescription, AliasMultipleNamespaces) {
-  constexpr StringRef Code = R"code(
+  constexpr llvm::StringRef Code = R"code(
     namespace aaa {
     namespace bbb {
     namespace ccc {
@@ -635,7 +635,7 @@ void addCallDescChecker(AnalysisASTConsumer &AnalysisConsumer,
 TEST(CallDescription, CheckCallExprMatching) {
   // Imprecise matching shouldn't catch the call to bar, because its obscured
   // by a function pointer.
-  constexpr StringRef FnPtrCode = R"code(
+  constexpr llvm::StringRef FnPtrCode = R"code(
     void bar();
     void foo() {
       void (*fnptr)() = bar;
@@ -648,7 +648,7 @@ TEST(CallDescription, CheckCallExprMatching) {
 
   // This should be caught properly by imprecise matching, as the call is done
   // purely through syntactic means.
-  constexpr StringRef Code = R"code(
+  constexpr llvm::StringRef Code = R"code(
     void bar();
     void foo() {
       bar();

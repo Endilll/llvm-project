@@ -17,7 +17,7 @@
 #include <optional>
 using namespace clang;
 
-void LoopHintAttr::printPrettyPragma(raw_ostream &OS,
+void LoopHintAttr::printPrettyPragma(llvm::raw_ostream &OS,
                                      const PrintingPolicy &Policy) const {
   unsigned SpellingIndex = getAttributeSpellingListIndex();
   // For "#pragma unroll" and "#pragma nounroll" the string "unroll" or
@@ -84,7 +84,7 @@ LoopHintAttr::getDiagnosticName(const PrintingPolicy &Policy) const {
 }
 
 void OMPDeclareSimdDeclAttr::printPrettyPragma(
-    raw_ostream &OS, const PrintingPolicy &Policy) const {
+    llvm::raw_ostream &OS, const PrintingPolicy &Policy) const {
   if (getBranchState() != BS_Undefined)
     OS << ' ' << ConvertBranchStateTyToStr(getBranchState());
   if (auto *E = getSimdlen()) {
@@ -94,7 +94,7 @@ void OMPDeclareSimdDeclAttr::printPrettyPragma(
   }
   if (uniforms_size() > 0) {
     OS << " uniform";
-    StringRef Sep = "(";
+    llvm::StringRef Sep = "(";
     for (auto *E : uniforms()) {
       OS << Sep;
       E->printPretty(OS, nullptr, Policy);
@@ -134,7 +134,7 @@ void OMPDeclareSimdDeclAttr::printPrettyPragma(
 }
 
 void OMPDeclareTargetDeclAttr::printPrettyPragma(
-    raw_ostream &OS, const PrintingPolicy &Policy) const {
+    llvm::raw_ostream &OS, const PrintingPolicy &Policy) const {
   // Use fake syntax because it is for testing and debugging purpose only.
   if (getDevType() != DT_Any)
     OS << " device_type(" << ConvertDevTypeTyToStr(getDevType()) << ")";
@@ -198,7 +198,7 @@ llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const OMPTraitInfo *TI);
 }
 
 void OMPDeclareVariantAttr::printPrettyPragma(
-    raw_ostream &OS, const PrintingPolicy &Policy) const {
+    llvm::raw_ostream &OS, const PrintingPolicy &Policy) const {
   if (const Expr *E = getVariantFuncRef()) {
     OS << "(";
     E->printPretty(OS, nullptr, Policy);

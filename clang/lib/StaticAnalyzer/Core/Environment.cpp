@@ -214,7 +214,7 @@ EnvironmentManager::removeDeadBindings(Environment Env,
   return NewEnv;
 }
 
-void Environment::printJson(raw_ostream &Out, const ASTContext &Ctx,
+void Environment::printJson(llvm::raw_ostream &Out, const ASTContext &Ctx,
                             const LocationContext *LCtx, const char *NL,
                             unsigned int Space, bool IsDot) const {
   Indent(Out, Space, IsDot) << "\"environment\": ";

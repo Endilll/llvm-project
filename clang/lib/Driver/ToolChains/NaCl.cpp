@@ -257,7 +257,7 @@ void NaClToolChain::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> P(D.ResourceDir);
+    llvm::SmallString<128> P(D.ResourceDir);
     llvm::sys::path::append(P, "include");
     addSystemInclude(DriverArgs, CC1Args, P.str());
   }
@@ -265,7 +265,7 @@ void NaClToolChain::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
   if (DriverArgs.hasArg(options::OPT_nostdlibinc))
     return;
 
-  SmallString<128> P(D.Dir + "/../");
+  llvm::SmallString<128> P(D.Dir + "/../");
   switch (getTriple().getArch()) {
   case llvm::Triple::x86:
     // x86 is special because multilib style uses x86_64-nacl/include for libc
@@ -314,7 +314,7 @@ void NaClToolChain::addLibCxxIncludePaths(
     llvm::opt::ArgStringList &CC1Args) const {
   const Driver &D = getDriver();
 
-  SmallString<128> P(D.Dir + "/../");
+  llvm::SmallString<128> P(D.Dir + "/../");
   switch (getTriple().getArch()) {
   default:
     break;
@@ -340,7 +340,7 @@ void NaClToolChain::addLibCxxIncludePaths(
 ToolChain::CXXStdlibType
 NaClToolChain::GetCXXStdlibType(const ArgList &Args) const {
   if (Arg *A = Args.getLastArg(options::OPT_stdlib_EQ)) {
-    StringRef Value = A->getValue();
+    llvm::StringRef Value = A->getValue();
     if (Value == "libc++")
       return ToolChain::CST_Libcxx;
     getDriver().Diag(clang::diag::err_drv_invalid_stdlib_name)

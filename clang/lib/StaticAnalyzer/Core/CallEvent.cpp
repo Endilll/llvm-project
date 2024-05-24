@@ -141,7 +141,7 @@ bool CallEvent::hasVoidPointerToNonConstArg() const {
   return hasNonNullArgumentsWithType(isVoidPointerToNonConst);
 }
 
-bool CallEvent::isGlobalCFunction(StringRef FunctionName) const {
+bool CallEvent::isGlobalCFunction(llvm::StringRef FunctionName) const {
   const auto *FD = dyn_cast_or_null<FunctionDecl>(getDecl());
   if (!FD)
     return false;
@@ -239,7 +239,7 @@ ProgramStateRef CallEvent::invalidateRegions(unsigned BlockCount,
     if (callee->hasAttr<PureAttr>() || callee->hasAttr<ConstAttr>())
       return Result;
 
-  SmallVector<SVal, 8> ValuesToInvalidate;
+  llvm::SmallVector<SVal, 8> ValuesToInvalidate;
   RegionAndSymbolInvalidationTraits ETraits;
 
   getExtraInvalidatedValues(ValuesToInvalidate, &ETraits);
@@ -328,7 +328,7 @@ SVal CallEvent::getReturnValue() const {
 
 LLVM_DUMP_METHOD void CallEvent::dump() const { dump(llvm::errs()); }
 
-void CallEvent::dump(raw_ostream &Out) const {
+void CallEvent::dump(llvm::raw_ostream &Out) const {
   ASTContext &Ctx = getState()->getStateManager().getContext();
   if (const Expr *E = getOriginExpr()) {
     E->printPretty(Out, nullptr, Ctx.getPrintingPolicy());
@@ -462,14 +462,14 @@ static void addParameterValuesToBindings(const StackFrameContext *CalleeCtx,
                                          CallEvent::BindingsTy &Bindings,
                                          SValBuilder &SVB,
                                          const CallEvent &Call,
-                                         ArrayRef<ParmVarDecl*> parameters) {
+                                         llvm::ArrayRef<ParmVarDecl*> parameters) {
   MemRegionManager &MRMgr = SVB.getRegionManager();
 
   // If the function has fewer parameters than the call has arguments, we simply
   // do not bind any values to them.
   unsigned NumArgs = Call.getNumArgs();
   unsigned Idx = 0;
-  ArrayRef<ParmVarDecl*>::iterator I = parameters.begin(), E = parameters.end();
+  llvm::ArrayRef<ParmVarDecl*>::iterator I = parameters.begin(), E = parameters.end();
   for (; I != E && Idx < NumArgs; ++I, ++Idx) {
     assert(*I && "Formal parameter has no decl?");
 
@@ -550,7 +550,7 @@ std::optional<SVal> CallEvent::getReturnValueUnderConstruction() const {
   return RetVal;
 }
 
-ArrayRef<ParmVarDecl*> AnyFunctionCall::parameters() const {
+llvm::ArrayRef<ParmVarDecl*> AnyFunctionCall::parameters() const {
   const FunctionDecl *D = getDecl();
   if (!D)
     return std::nullopt;
@@ -655,7 +655,7 @@ bool AnyFunctionCall::argumentsMayEscape() const {
   if (II->isStr("__cxa_demangle"))
     return true;
 
-  StringRef FName = II->getName();
+  llvm::StringRef FName = II->getName();
 
   // - CoreFoundation functions that end with "NoCopy" can free a passed-in
   //   buffer even if it is const.
@@ -670,12 +670,12 @@ bool AnyFunctionCall::argumentsMayEscape() const {
   // - Many CF containers allow objects to escape through custom
   //   allocators/deallocators upon container construction. (PR12101)
   if (FName.starts_with("CF") || FName.starts_with("CG")) {
-    return StrInStrNoCase(FName, "InsertValue")  != StringRef::npos ||
-           StrInStrNoCase(FName, "AddValue")     != StringRef::npos ||
-           StrInStrNoCase(FName, "SetValue")     != StringRef::npos ||
-           StrInStrNoCase(FName, "WithData")     != StringRef::npos ||
-           StrInStrNoCase(FName, "AppendValue")  != StringRef::npos ||
-           StrInStrNoCase(FName, "SetAttribute") != StringRef::npos;
+    return StrInStrNoCase(FName, "InsertValue")  != llvm::StringRef::npos ||
+           StrInStrNoCase(FName, "AddValue")     != llvm::StringRef::npos ||
+           StrInStrNoCase(FName, "SetValue")     != llvm::StringRef::npos ||
+           StrInStrNoCase(FName, "WithData")     != llvm::StringRef::npos ||
+           StrInStrNoCase(FName, "AppendValue")  != llvm::StringRef::npos ||
+           StrInStrNoCase(FName, "SetAttribute") != llvm::StringRef::npos;
   }
 
   return false;
@@ -880,7 +880,7 @@ const BlockDataRegion *BlockCall::getBlockRegion() const {
   return dyn_cast_or_null<BlockDataRegion>(DataReg);
 }
 
-ArrayRef<ParmVarDecl*> BlockCall::parameters() const {
+llvm::ArrayRef<ParmVarDecl*> BlockCall::parameters() const {
   const BlockDecl *D = getDecl();
   if (!D)
     return std::nullopt;
@@ -897,7 +897,7 @@ void BlockCall::getExtraInvalidatedValues(ValueList &Values,
 void BlockCall::getInitialStackFrameContents(const StackFrameContext *CalleeCtx,
                                              BindingsTy &Bindings) const {
   SValBuilder &SVB = getState()->getStateManager().getSValBuilder();
-  ArrayRef<ParmVarDecl*> Params;
+  llvm::ArrayRef<ParmVarDecl*> Params;
   if (isConversionFromLambda()) {
     auto *LambdaOperatorDecl = cast<CXXMethodDecl>(CalleeCtx->getDecl());
     Params = LambdaOperatorDecl->parameters();
@@ -969,7 +969,7 @@ RuntimeDefinition CXXDestructorCall::getRuntimeDefinition() const {
   return CXXInstanceCall::getRuntimeDefinition();
 }
 
-ArrayRef<ParmVarDecl*> ObjCMethodCall::parameters() const {
+llvm::ArrayRef<ParmVarDecl*> ObjCMethodCall::parameters() const {
   const ObjCMethodDecl *D = getDecl();
   if (!D)
     return std::nullopt;

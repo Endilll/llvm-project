@@ -122,7 +122,7 @@ void MultiplexExternalSemaSource::completeVisibleDeclsMap(const DeclContext *DC)
 
 void MultiplexExternalSemaSource::FindExternalLexicalDecls(
     const DeclContext *DC, llvm::function_ref<bool(Decl::Kind)> IsKindWeWant,
-    SmallVectorImpl<Decl *> &Result) {
+    llvm::SmallVectorImpl<Decl *> &Result) {
   for(size_t i = 0; i < Sources.size(); ++i)
     Sources[i]->FindExternalLexicalDecls(DC, IsKindWeWant, Result);
 }
@@ -130,7 +130,7 @@ void MultiplexExternalSemaSource::FindExternalLexicalDecls(
 void MultiplexExternalSemaSource::FindFileRegionDecls(FileID File,
                                                       unsigned Offset,
                                                       unsigned Length,
-                                                SmallVectorImpl<Decl *> &Decls){
+                                                llvm::SmallVectorImpl<Decl *> &Decls){
   for(size_t i = 0; i < Sources.size(); ++i)
     Sources[i]->FindFileRegionDecls(File, Offset, Length, Decls);
 }
@@ -223,7 +223,7 @@ void MultiplexExternalSemaSource::updateOutOfDateSelector(Selector Sel) {
 }
 
 void MultiplexExternalSemaSource::ReadKnownNamespaces(
-                                   SmallVectorImpl<NamespaceDecl*> &Namespaces){
+                                   llvm::SmallVectorImpl<NamespaceDecl*> &Namespaces){
   for(size_t i = 0; i < Sources.size(); ++i)
     Sources[i]->ReadKnownNamespaces(Namespaces);
 }
@@ -250,25 +250,25 @@ bool MultiplexExternalSemaSource::LookupUnqualified(LookupResult &R, Scope *S){
 }
 
 void MultiplexExternalSemaSource::ReadTentativeDefinitions(
-                                     SmallVectorImpl<VarDecl*> &TentativeDefs) {
+                                     llvm::SmallVectorImpl<VarDecl*> &TentativeDefs) {
   for(size_t i = 0; i < Sources.size(); ++i)
     Sources[i]->ReadTentativeDefinitions(TentativeDefs);
 }
 
 void MultiplexExternalSemaSource::ReadUnusedFileScopedDecls(
-                                SmallVectorImpl<const DeclaratorDecl*> &Decls) {
+                                llvm::SmallVectorImpl<const DeclaratorDecl*> &Decls) {
   for(size_t i = 0; i < Sources.size(); ++i)
     Sources[i]->ReadUnusedFileScopedDecls(Decls);
 }
 
 void MultiplexExternalSemaSource::ReadDelegatingConstructors(
-                                  SmallVectorImpl<CXXConstructorDecl*> &Decls) {
+                                  llvm::SmallVectorImpl<CXXConstructorDecl*> &Decls) {
   for(size_t i = 0; i < Sources.size(); ++i)
     Sources[i]->ReadDelegatingConstructors(Decls);
 }
 
 void MultiplexExternalSemaSource::ReadExtVectorDecls(
-                                     SmallVectorImpl<TypedefNameDecl*> &Decls) {
+                                     llvm::SmallVectorImpl<TypedefNameDecl*> &Decls) {
   for(size_t i = 0; i < Sources.size(); ++i)
     Sources[i]->ReadExtVectorDecls(Decls);
 }
@@ -286,25 +286,25 @@ void MultiplexExternalSemaSource::ReadUnusedLocalTypedefNameCandidates(
 }
 
 void MultiplexExternalSemaSource::ReadReferencedSelectors(
-                  SmallVectorImpl<std::pair<Selector, SourceLocation> > &Sels) {
+                  llvm::SmallVectorImpl<std::pair<Selector, SourceLocation> > &Sels) {
   for(size_t i = 0; i < Sources.size(); ++i)
     Sources[i]->ReadReferencedSelectors(Sels);
 }
 
 void MultiplexExternalSemaSource::ReadWeakUndeclaredIdentifiers(
-                   SmallVectorImpl<std::pair<IdentifierInfo*, WeakInfo> > &WI) {
+                   llvm::SmallVectorImpl<std::pair<IdentifierInfo*, WeakInfo> > &WI) {
   for(size_t i = 0; i < Sources.size(); ++i)
     Sources[i]->ReadWeakUndeclaredIdentifiers(WI);
 }
 
 void MultiplexExternalSemaSource::ReadUsedVTables(
-                                  SmallVectorImpl<ExternalVTableUse> &VTables) {
+                                  llvm::SmallVectorImpl<ExternalVTableUse> &VTables) {
   for(size_t i = 0; i < Sources.size(); ++i)
     Sources[i]->ReadUsedVTables(VTables);
 }
 
 void MultiplexExternalSemaSource::ReadPendingInstantiations(
-                                           SmallVectorImpl<std::pair<ValueDecl*,
+                                           llvm::SmallVectorImpl<std::pair<ValueDecl*,
                                                    SourceLocation> > &Pending) {
   for(size_t i = 0; i < Sources.size(); ++i)
     Sources[i]->ReadPendingInstantiations(Pending);

@@ -33,7 +33,7 @@ void Merger::ConstructJob(Compilation &C, const JobAction &JA,
   // stdout stream is given as the output file (ie `-o -`), that is the one
   // exception where we will just append to the same filestream as the normal
   // output.
-  SmallString<128> OutputFilename(Output.getFilename());
+  llvm::SmallString<128> OutputFilename(Output.getFilename());
   if (OutputFilename != "-") {
     if (Args.hasArg(options::OPT_shared))
       llvm::sys::path::replace_extension(OutputFilename,
@@ -49,7 +49,7 @@ void Merger::ConstructJob(Compilation &C, const JobAction &JA,
   for (const auto &Input : Inputs) {
     if (!Input.isFilename())
       continue;
-    SmallString<128> InputFilename(Input.getFilename());
+    llvm::SmallString<128> InputFilename(Input.getFilename());
     if (Input.getType() == types::TY_Object)
       llvm::sys::path::replace_extension(InputFilename, ".ifs");
     CmdArgs.push_back(Args.MakeArgString(InputFilename.c_str()));

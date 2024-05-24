@@ -24,7 +24,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-emplace.html
 class UseEmplaceCheck : public ClangTidyCheck {
 public:
-  UseEmplaceCheck(StringRef Name, ClangTidyContext *Context);
+  UseEmplaceCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
   }
@@ -34,13 +34,13 @@ public:
 
 private:
   const bool IgnoreImplicitConstructors;
-  const std::vector<StringRef> ContainersWithPushBack;
-  const std::vector<StringRef> ContainersWithPush;
-  const std::vector<StringRef> ContainersWithPushFront;
-  const std::vector<StringRef> SmartPointers;
-  const std::vector<StringRef> TupleTypes;
-  const std::vector<StringRef> TupleMakeFunctions;
-  const std::vector<StringRef> EmplacyFunctions;
+  const std::vector<llvm::StringRef> ContainersWithPushBack;
+  const std::vector<llvm::StringRef> ContainersWithPush;
+  const std::vector<llvm::StringRef> ContainersWithPushFront;
+  const std::vector<llvm::StringRef> SmartPointers;
+  const std::vector<llvm::StringRef> TupleTypes;
+  const std::vector<llvm::StringRef> TupleMakeFunctions;
+  const std::vector<llvm::StringRef> EmplacyFunctions;
 };
 
 } // namespace clang::tidy::modernize

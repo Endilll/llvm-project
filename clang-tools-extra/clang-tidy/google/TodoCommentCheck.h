@@ -21,7 +21,7 @@ namespace clang::tidy::google::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/google/readability-todo.html
 class TodoCommentCheck : public ClangTidyCheck {
 public:
-  TodoCommentCheck(StringRef Name, ClangTidyContext *Context);
+  TodoCommentCheck(llvm::StringRef Name, ClangTidyContext *Context);
   ~TodoCommentCheck();
 
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,

@@ -21,19 +21,19 @@
 namespace clang {
 namespace tooling {
 
-static StringRef getDriverMode(const CommandLineArguments &Args) {
+static llvm::StringRef getDriverMode(const CommandLineArguments &Args) {
   for (const auto &Arg : Args) {
-    StringRef ArgRef = Arg;
+    llvm::StringRef ArgRef = Arg;
     if (ArgRef.consume_front("--driver-mode=")) {
       return ArgRef;
     }
   }
-  return StringRef();
+  return llvm::StringRef();
 }
 
 /// Add -fsyntax-only option and drop options that triggers output generation.
 ArgumentsAdjuster getClangSyntaxOnlyAdjuster() {
-  return [](const CommandLineArguments &Args, StringRef /*unused*/) {
+  return [](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
     CommandLineArguments AdjustedArgs;
     bool HasSyntaxOnly = false;
     constexpr llvm::StringRef OutputCommands[] = {
@@ -42,7 +42,7 @@ ArgumentsAdjuster getClangSyntaxOnlyAdjuster() {
         "--save-temps",
     };
     for (size_t i = 0, e = Args.size(); i < e; ++i) {
-      StringRef Arg = Args[i];
+      llvm::StringRef Arg = Args[i];
       // Skip output commands.
       if (llvm::any_of(OutputCommands, [&Arg](llvm::StringRef OutputCommand) {
             return Arg.starts_with(OutputCommand);
@@ -69,10 +69,10 @@ ArgumentsAdjuster getClangSyntaxOnlyAdjuster() {
 }
 
 ArgumentsAdjuster getClangStripOutputAdjuster() {
-  return [](const CommandLineArguments &Args, StringRef /*unused*/) {
+  return [](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
     CommandLineArguments AdjustedArgs;
     for (size_t i = 0, e = Args.size(); i < e; ++i) {
-      StringRef Arg = Args[i];
+      llvm::StringRef Arg = Args[i];
       if (!Arg.starts_with("-o"))
         AdjustedArgs.push_back(Args[i]);
 
@@ -87,12 +87,12 @@ ArgumentsAdjuster getClangStripOutputAdjuster() {
 }
 
 ArgumentsAdjuster getClangStripDependencyFileAdjuster() {
-  return [](const CommandLineArguments &Args, StringRef /*unused*/) {
+  return [](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
     auto UsingClDriver = (getDriverMode(Args) == "cl");
 
     CommandLineArguments AdjustedArgs;
     for (size_t i = 0, e = Args.size(); i < e; ++i) {
-      StringRef Arg = Args[i];
+      llvm::StringRef Arg = Args[i];
 
       // These flags take an argument: -MX foo. Skip the next argument also.
       if (!UsingClDriver && (Arg == "-MF" || Arg == "-MT" || Arg == "-MQ")) {
@@ -117,7 +117,7 @@ ArgumentsAdjuster getClangStripDependencyFileAdjuster() {
 
 ArgumentsAdjuster getInsertArgumentAdjuster(const CommandLineArguments &Extra,
                                             ArgumentInsertPosition Pos) {
-  return [Extra, Pos](const CommandLineArguments &Args, StringRef /*unused*/) {
+  return [Extra, Pos](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
     CommandLineArguments Return(Args);
 
     CommandLineArguments::iterator I;
@@ -144,13 +144,13 @@ ArgumentsAdjuster combineAdjusters(ArgumentsAdjuster First,
     return Second;
   if (!Second)
     return First;
-  return [First, Second](const CommandLineArguments &Args, StringRef File) {
+  return [First, Second](const CommandLineArguments &Args, llvm::StringRef File) {
     return Second(First(Args, File), File);
   };
 }
 
 ArgumentsAdjuster getStripPluginsAdjuster() {
-  return [](const CommandLineArguments &Args, StringRef /*unused*/) {
+  return [](const CommandLineArguments &Args, llvm::StringRef /*unused*/) {
     CommandLineArguments AdjustedArgs;
     for (size_t I = 0, E = Args.size(); I != E; I++) {
       // According to https://clang.llvm.org/docs/ClangPlugins.html

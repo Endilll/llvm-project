@@ -51,7 +51,7 @@ static constexpr llvm::StringRef ComparisonOperators[] = {
     "operator>",  "operator<=", "operator>="};
 
 NonTrivialTypesLibcMemoryCallsCheck::NonTrivialTypesLibcMemoryCallsCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       MemSetNames(Options.get("MemSetNames", "")),
       MemCpyNames(Options.get("MemCpyNames", "")),

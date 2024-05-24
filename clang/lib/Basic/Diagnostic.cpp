@@ -59,18 +59,18 @@ const StreamingDiagnostic &clang::operator<<(const StreamingDiagnostic &DB,
 }
 
 static void DummyArgToStringFn(DiagnosticsEngine::ArgumentKind AK, intptr_t QT,
-                            StringRef Modifier, StringRef Argument,
-                            ArrayRef<DiagnosticsEngine::ArgumentValue> PrevArgs,
-                            SmallVectorImpl<char> &Output,
+                            llvm::StringRef Modifier, llvm::StringRef Argument,
+                            llvm::ArrayRef<DiagnosticsEngine::ArgumentValue> PrevArgs,
+                            llvm::SmallVectorImpl<char> &Output,
                             void *Cookie,
-                            ArrayRef<intptr_t> QualTypeVals) {
-  StringRef Str = "<can't format argument>";
+                            llvm::ArrayRef<intptr_t> QualTypeVals) {
+  llvm::StringRef Str = "<can't format argument>";
   Output.append(Str.begin(), Str.end());
 }
 
 DiagnosticsEngine::DiagnosticsEngine(
-    IntrusiveRefCntPtr<DiagnosticIDs> diags,
-    IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts, DiagnosticConsumer *client,
+    llvm::IntrusiveRefCntPtr<DiagnosticIDs> diags,
+    llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts, DiagnosticConsumer *client,
     bool ShouldOwnClient)
     : Diags(std::move(diags)), DiagOpts(std::move(DiagOpts)) {
   setClient(client, ShouldOwnClient);
@@ -89,7 +89,7 @@ void DiagnosticsEngine::dump() const {
   DiagStatesByLoc.dump(*SourceMgr);
 }
 
-void DiagnosticsEngine::dump(StringRef DiagName) const {
+void DiagnosticsEngine::dump(llvm::StringRef DiagName) const {
   DiagStatesByLoc.dump(*SourceMgr, DiagName);
 }
 
@@ -143,8 +143,8 @@ void DiagnosticsEngine::Reset(bool soft /*=false*/) {
   }
 }
 
-void DiagnosticsEngine::SetDelayedDiagnostic(unsigned DiagID, StringRef Arg1,
-                                             StringRef Arg2, StringRef Arg3) {
+void DiagnosticsEngine::SetDelayedDiagnostic(unsigned DiagID, llvm::StringRef Arg1,
+                                             llvm::StringRef Arg2, llvm::StringRef Arg3) {
   if (DelayedDiagID)
     return;
 
@@ -255,7 +255,7 @@ DiagnosticsEngine::DiagStateMap::getFile(SourceManager &SrcMgr,
 }
 
 void DiagnosticsEngine::DiagStateMap::dump(SourceManager &SrcMgr,
-                                           StringRef DiagName) const {
+                                           llvm::StringRef DiagName) const {
   llvm::errs() << "diagnostic state at ";
   CurDiagStateLoc.print(llvm::errs(), SrcMgr);
   llvm::errs() << ": " << CurDiagState << "\n";
@@ -308,7 +308,7 @@ void DiagnosticsEngine::DiagStateMap::dump(SourceManager &SrcMgr,
         PrintInnerHeading();
 
       for (auto &Mapping : *Transition.State) {
-        StringRef Option =
+        llvm::StringRef Option =
             DiagnosticIDs::getWarningOptionForDiag(Mapping.first);
         if (!DiagName.empty() && DiagName != Option)
           continue;
@@ -399,10 +399,10 @@ void DiagnosticsEngine::setSeverity(diag::kind Diag, diag::Severity Map,
 }
 
 bool DiagnosticsEngine::setSeverityForGroup(diag::Flavor Flavor,
-                                            StringRef Group, diag::Severity Map,
+                                            llvm::StringRef Group, diag::Severity Map,
                                             SourceLocation Loc) {
   // Get the diagnostics in this group.
-  SmallVector<diag::kind, 256> GroupDiags;
+  llvm::SmallVector<diag::kind, 256> GroupDiags;
   if (Diags->getDiagnosticsInGroup(Flavor, Group, GroupDiags))
     return true;
 
@@ -421,7 +421,7 @@ bool DiagnosticsEngine::setSeverityForGroup(diag::Flavor Flavor,
                              Map, Loc);
 }
 
-bool DiagnosticsEngine::setDiagnosticGroupWarningAsError(StringRef Group,
+bool DiagnosticsEngine::setDiagnosticGroupWarningAsError(llvm::StringRef Group,
                                                          bool Enabled) {
   // If we are enabling this feature, just set the diagnostic mappings to map to
   // errors.
@@ -433,7 +433,7 @@ bool DiagnosticsEngine::setDiagnosticGroupWarningAsError(StringRef Group,
   // potentially downgrade anything already mapped to be a warning.
 
   // Get the diagnostics in this group.
-  SmallVector<diag::kind, 8> GroupDiags;
+  llvm::SmallVector<diag::kind, 8> GroupDiags;
   if (Diags->getDiagnosticsInGroup(diag::Flavor::WarningOrError, Group,
                                    GroupDiags))
     return true;
@@ -452,7 +452,7 @@ bool DiagnosticsEngine::setDiagnosticGroupWarningAsError(StringRef Group,
   return false;
 }
 
-bool DiagnosticsEngine::setDiagnosticGroupErrorAsFatal(StringRef Group,
+bool DiagnosticsEngine::setDiagnosticGroupErrorAsFatal(llvm::StringRef Group,
                                                        bool Enabled) {
   // If we are enabling this feature, just set the diagnostic mappings to map to
   // fatal errors.
@@ -464,7 +464,7 @@ bool DiagnosticsEngine::setDiagnosticGroupErrorAsFatal(StringRef Group,
   // and potentially downgrade anything already mapped to be a fatal error.
 
   // Get the diagnostics in this group.
-  SmallVector<diag::kind, 8> GroupDiags;
+  llvm::SmallVector<diag::kind, 8> GroupDiags;
   if (Diags->getDiagnosticsInGroup(diag::Flavor::WarningOrError, Group,
                                    GroupDiags))
     return true;
@@ -609,7 +609,7 @@ static const char *ScanFormat(const char *I, const char *E, char Target) {
 /// This is very useful for certain classes of variant diagnostics.
 static void HandleSelectModifier(const Diagnostic &DInfo, unsigned ValNo,
                                  const char *Argument, unsigned ArgumentLen,
-                                 SmallVectorImpl<char> &OutStr) {
+                                 llvm::SmallVectorImpl<char> &OutStr) {
   const char *ArgumentEnd = Argument+ArgumentLen;
 
   // Skip over 'ValNo' |'s.
@@ -632,7 +632,7 @@ static void HandleSelectModifier(const Diagnostic &DInfo, unsigned ValNo,
 /// letter 's' to the string if the value is not 1.  This is used in cases like
 /// this:  "you idiot, you have %4 parameter%s4!".
 static void HandleIntegerSModifier(unsigned ValNo,
-                                   SmallVectorImpl<char> &OutStr) {
+                                   llvm::SmallVectorImpl<char> &OutStr) {
   if (ValNo != 1)
     OutStr.push_back('s');
 }
@@ -642,7 +642,7 @@ static void HandleIntegerSModifier(unsigned ValNo,
 /// to the first ordinal.  Currently this is hard-coded to use the
 /// English form.
 static void HandleOrdinalModifier(unsigned ValNo,
-                                  SmallVectorImpl<char> &OutStr) {
+                                  llvm::SmallVectorImpl<char> &OutStr) {
   assert(ValNo != 0 && "ValNo must be strictly positive!");
 
   llvm::raw_svector_ostream Out(OutStr);
@@ -750,7 +750,7 @@ static bool EvalPluralExpr(unsigned ValNo, const char *Start, const char *End) {
 /// {1:form0|%100=[10,20]:form2|%10=[2,4]:form1|:form2}
 static void HandlePluralModifier(const Diagnostic &DInfo, unsigned ValNo,
                                  const char *Argument, unsigned ArgumentLen,
-                                 SmallVectorImpl<char> &OutStr) {
+                                 llvm::SmallVectorImpl<char> &OutStr) {
   const char *ArgumentEnd = Argument + ArgumentLen;
   while (true) {
     assert(Argument < ArgumentEnd && "Plural expression didn't match.");
@@ -788,13 +788,13 @@ static const char *getTokenDescForDiagnostic(tok::TokenKind Kind) {
 /// formal arguments into the %0 slots.  The result is appended onto the Str
 /// array.
 void Diagnostic::
-FormatDiagnostic(SmallVectorImpl<char> &OutStr) const {
+FormatDiagnostic(llvm::SmallVectorImpl<char> &OutStr) const {
   if (StoredDiagMessage.has_value()) {
     OutStr.append(StoredDiagMessage->begin(), StoredDiagMessage->end());
     return;
   }
 
-  StringRef Diag =
+  llvm::StringRef Diag =
     getDiags()->getDiagnosticIDs()->getDescription(getID());
 
   FormatDiagnostic(Diag.begin(), Diag.end(), OutStr);
@@ -802,8 +802,8 @@ FormatDiagnostic(SmallVectorImpl<char> &OutStr) const {
 
 /// EscapeStringForDiagnostic - Append Str to the diagnostic buffer,
 /// escaping non-printable characters and ill-formed code unit sequences.
-void clang::EscapeStringForDiagnostic(StringRef Str,
-                                      SmallVectorImpl<char> &OutStr) {
+void clang::EscapeStringForDiagnostic(llvm::StringRef Str,
+                                      llvm::SmallVectorImpl<char> &OutStr) {
   OutStr.reserve(OutStr.size() + Str.size());
   auto *Begin = reinterpret_cast<const unsigned char *>(Str.data());
   llvm::raw_svector_ostream OutStream(OutStr);
@@ -847,11 +847,11 @@ void clang::EscapeStringForDiagnostic(StringRef Str,
 
 void Diagnostic::
 FormatDiagnostic(const char *DiagStr, const char *DiagEnd,
-                 SmallVectorImpl<char> &OutStr) const {
+                 llvm::SmallVectorImpl<char> &OutStr) const {
   // When the diagnostic string is only "%0", the entire string is being given
   // by an outside source.  Remove unprintable characters from this string
   // and skip all the other string processing.
-  if (DiagEnd - DiagStr == 2 && StringRef(DiagStr, DiagEnd - DiagStr) == "%0" &&
+  if (DiagEnd - DiagStr == 2 && llvm::StringRef(DiagStr, DiagEnd - DiagStr) == "%0" &&
       getArgKind(0) == DiagnosticsEngine::ak_std_string) {
     const std::string &S = getArgStdStr(0);
     EscapeStringForDiagnostic(S, OutStr);
@@ -862,12 +862,12 @@ FormatDiagnostic(const char *DiagStr, const char *DiagEnd,
   /// ConvertArgToString and pass them into subsequent calls to
   /// ConvertArgToString, allowing the implementation to avoid redundancies in
   /// obvious cases.
-  SmallVector<DiagnosticsEngine::ArgumentValue, 8> FormattedArgs;
+  llvm::SmallVector<DiagnosticsEngine::ArgumentValue, 8> FormattedArgs;
 
   /// QualTypeVals - Pass a vector of arrays so that QualType names can be
   /// compared to see if more information is needed to be printed.
-  SmallVector<intptr_t, 2> QualTypeVals;
-  SmallString<64> Tree;
+  llvm::SmallVector<intptr_t, 2> QualTypeVals;
+  llvm::SmallString<64> Tree;
 
   for (unsigned i = 0, e = getNumArgs(); i < e; ++i)
     if (getArgKind(i) == DiagnosticsEngine::ak_qualtype)
@@ -1058,8 +1058,8 @@ FormatDiagnostic(const char *DiagStr, const char *DiagEnd,
     case DiagnosticsEngine::ak_declcontext:
     case DiagnosticsEngine::ak_attr:
       getDiags()->ConvertArgToString(Kind, getRawArg(ArgNo),
-                                     StringRef(Modifier, ModifierLen),
-                                     StringRef(Argument, ArgumentLen),
+                                     llvm::StringRef(Modifier, ModifierLen),
+                                     llvm::StringRef(Argument, ArgumentLen),
                                      FormattedArgs,
                                      OutStr, QualTypeVals);
       break;
@@ -1082,8 +1082,8 @@ FormatDiagnostic(const char *DiagStr, const char *DiagEnd,
         TDT.PrintFromType = true;
         TDT.PrintTree = true;
         getDiags()->ConvertArgToString(Kind, val,
-                                       StringRef(Modifier, ModifierLen),
-                                       StringRef(Argument, ArgumentLen),
+                                       llvm::StringRef(Modifier, ModifierLen),
+                                       llvm::StringRef(Argument, ArgumentLen),
                                        FormattedArgs,
                                        Tree, QualTypeVals);
         // If there is no tree information, fall back to regular printing.
@@ -1105,8 +1105,8 @@ FormatDiagnostic(const char *DiagStr, const char *DiagEnd,
       TDT.PrintTree = false;
       TDT.PrintFromType = true;
       getDiags()->ConvertArgToString(Kind, val,
-                                     StringRef(Modifier, ModifierLen),
-                                     StringRef(Argument, ArgumentLen),
+                                     llvm::StringRef(Modifier, ModifierLen),
+                                     llvm::StringRef(Argument, ArgumentLen),
                                      FormattedArgs,
                                      OutStr, QualTypeVals);
       if (!TDT.TemplateDiffUsed)
@@ -1119,8 +1119,8 @@ FormatDiagnostic(const char *DiagStr, const char *DiagEnd,
       // Append second type
       TDT.PrintFromType = false;
       getDiags()->ConvertArgToString(Kind, val,
-                                     StringRef(Modifier, ModifierLen),
-                                     StringRef(Argument, ArgumentLen),
+                                     llvm::StringRef(Modifier, ModifierLen),
+                                     llvm::StringRef(Argument, ArgumentLen),
                                      FormattedArgs,
                                      OutStr, QualTypeVals);
       if (!TDT.TemplateDiffUsed)
@@ -1150,7 +1150,7 @@ FormatDiagnostic(const char *DiagStr, const char *DiagEnd,
 }
 
 StoredDiagnostic::StoredDiagnostic(DiagnosticsEngine::Level Level, unsigned ID,
-                                   StringRef Message)
+                                   llvm::StringRef Message)
     : ID(ID), Level(Level), Message(Message) {}
 
 StoredDiagnostic::StoredDiagnostic(DiagnosticsEngine::Level Level,
@@ -1160,7 +1160,7 @@ StoredDiagnostic::StoredDiagnostic(DiagnosticsEngine::Level Level,
        "Valid source location without setting a source manager for diagnostic");
   if (Info.getLocation().isValid())
     Loc = FullSourceLoc(Info.getLocation(), Info.getSourceManager());
-  SmallString<64> Message;
+  llvm::SmallString<64> Message;
   Info.FormatDiagnostic(Message);
   this->Message.assign(Message.begin(), Message.end());
   this->Ranges.assign(Info.getRanges().begin(), Info.getRanges().end());
@@ -1168,9 +1168,9 @@ StoredDiagnostic::StoredDiagnostic(DiagnosticsEngine::Level Level,
 }
 
 StoredDiagnostic::StoredDiagnostic(DiagnosticsEngine::Level Level, unsigned ID,
-                                   StringRef Message, FullSourceLoc Loc,
-                                   ArrayRef<CharSourceRange> Ranges,
-                                   ArrayRef<FixItHint> FixIts)
+                                   llvm::StringRef Message, FullSourceLoc Loc,
+                                   llvm::ArrayRef<CharSourceRange> Ranges,
+                                   llvm::ArrayRef<FixItHint> FixIts)
     : ID(ID), Level(Level), Loc(Loc), Message(Message),
       Ranges(Ranges.begin(), Ranges.end()), FixIts(FixIts.begin(), FixIts.end())
 {

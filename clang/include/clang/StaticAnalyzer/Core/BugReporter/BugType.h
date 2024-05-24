@@ -35,25 +35,25 @@ private:
   virtual void anchor();
 
 public:
-  BugType(CheckerNameRef CheckerName, StringRef Desc,
-          StringRef Cat = categories::LogicError, bool SuppressOnSink = false)
+  BugType(CheckerNameRef CheckerName, llvm::StringRef Desc,
+          llvm::StringRef Cat = categories::LogicError, bool SuppressOnSink = false)
       : CheckerName(CheckerName), Description(Desc), Category(Cat),
         Checker(nullptr), SuppressOnSink(SuppressOnSink) {}
-  BugType(const CheckerBase *Checker, StringRef Desc,
-          StringRef Cat = categories::LogicError, bool SuppressOnSink = false)
+  BugType(const CheckerBase *Checker, llvm::StringRef Desc,
+          llvm::StringRef Cat = categories::LogicError, bool SuppressOnSink = false)
       : CheckerName(Checker->getCheckerName()), Description(Desc),
         Category(Cat), Checker(Checker), SuppressOnSink(SuppressOnSink) {}
   virtual ~BugType() = default;
 
-  StringRef getDescription() const { return Description; }
-  StringRef getCategory() const { return Category; }
-  StringRef getCheckerName() const {
+  llvm::StringRef getDescription() const { return Description; }
+  llvm::StringRef getCategory() const { return Category; }
+  llvm::StringRef getCheckerName() const {
     // FIXME: This is a workaround to ensure that the correct checerk name is
     // used. The checker names are set after the constructors are run.
     // In case the BugType object is initialized in the checker's ctor
     // the CheckerName field will be empty. To circumvent this problem we use
     // CheckerBase whenever it is possible.
-    StringRef Ret = Checker ? Checker->getCheckerName() : CheckerName;
+    llvm::StringRef Ret = Checker ? Checker->getCheckerName() : CheckerName;
     assert(!Ret.empty() && "Checker name is not set properly.");
     return Ret;
   }

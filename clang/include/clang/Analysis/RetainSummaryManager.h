@@ -604,12 +604,12 @@ class RetainSummaryManager {
 
   /// Return a summary for OSObject, or nullptr if not found.
   const RetainSummary *getSummaryForOSObject(const FunctionDecl *FD,
-                                             StringRef FName, QualType RetTy);
+                                             llvm::StringRef FName, QualType RetTy);
 
   /// Return a summary for Objective-C or CF object, or nullptr if not found.
   const RetainSummary *getSummaryForObjCOrCFObject(
     const FunctionDecl *FD,
-    StringRef FName,
+    llvm::StringRef FName,
     QualType RetTy,
     const FunctionType *FT,
     bool &AllowAnnotations);

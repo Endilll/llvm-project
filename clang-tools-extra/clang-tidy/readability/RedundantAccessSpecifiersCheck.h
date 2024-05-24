@@ -19,7 +19,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/redundant-access-specifiers.html
 class RedundantAccessSpecifiersCheck : public ClangTidyCheck {
 public:
-  RedundantAccessSpecifiersCheck(StringRef Name, ClangTidyContext *Context)
+  RedundantAccessSpecifiersCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         CheckFirstDeclaration(
             Options.getLocalOrGlobal("CheckFirstDeclaration", false)) {}

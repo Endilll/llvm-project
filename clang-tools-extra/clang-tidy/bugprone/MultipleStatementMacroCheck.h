@@ -21,7 +21,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/multiple-statement-macro.html
 class MultipleStatementMacroCheck : public ClangTidyCheck {
 public:
-  MultipleStatementMacroCheck(StringRef Name, ClangTidyContext *Context)
+  MultipleStatementMacroCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

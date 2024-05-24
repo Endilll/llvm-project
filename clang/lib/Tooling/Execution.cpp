@@ -19,7 +19,7 @@ llvm::cl::opt<std::string>
     ExecutorName("executor", llvm::cl::desc("The name of the executor to use."),
                  llvm::cl::init("standalone"));
 
-void InMemoryToolResults::addResult(StringRef Key, StringRef Value) {
+void InMemoryToolResults::addResult(llvm::StringRef Key, llvm::StringRef Value) {
   KVResults.push_back({Strings.save(Key), Strings.save(Value)});
 }
 
@@ -29,13 +29,13 @@ InMemoryToolResults::AllKVResults() {
 }
 
 void InMemoryToolResults::forEachResult(
-    llvm::function_ref<void(StringRef Key, StringRef Value)> Callback) {
+    llvm::function_ref<void(llvm::StringRef Key, llvm::StringRef Value)> Callback) {
   for (const auto &KV : KVResults) {
     Callback(KV.first, KV.second);
   }
 }
 
-void ExecutionContext::reportResult(StringRef Key, StringRef Value) {
+void ExecutionContext::reportResult(llvm::StringRef Key, llvm::StringRef Value) {
   Results->addResult(Key, Value);
 }
 

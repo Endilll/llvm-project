@@ -9,11 +9,11 @@ namespace {
 
 class SortImportsTestJava : public testing::Test {
 protected:
-  std::vector<tooling::Range> GetCodeRange(StringRef Code) {
+  std::vector<tooling::Range> GetCodeRange(llvm::StringRef Code) {
     return std::vector<tooling::Range>(1, tooling::Range(0, Code.size()));
   }
 
-  std::string sort(StringRef Code, std::vector<tooling::Range> Ranges) {
+  std::string sort(llvm::StringRef Code, std::vector<tooling::Range> Ranges) {
     auto Replaces = sortIncludes(FmtStyle, Code, Ranges, "input.java");
     Ranges = tooling::calculateRangesAfterReplacements(Replaces, Ranges);
     auto Sorted = applyAllReplacements(Code, Replaces);
@@ -24,7 +24,7 @@ protected:
     return *Result;
   }
 
-  std::string sort(StringRef Code) { return sort(Code, GetCodeRange(Code)); }
+  std::string sort(llvm::StringRef Code) { return sort(Code, GetCodeRange(Code)); }
 
   FormatStyle FmtStyle;
 

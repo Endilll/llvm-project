@@ -37,13 +37,13 @@ public:
     LeakAtReturn,
   };
   RefCountBug(CheckerNameRef Checker, RefCountBugKind BT);
-  StringRef getDescription() const;
+  llvm::StringRef getDescription() const;
 
   RefCountBugKind getBugType() const { return BT; }
 
 private:
   RefCountBugKind BT;
-  static StringRef bugTypeToName(RefCountBugKind BT);
+  static llvm::StringRef bugTypeToName(RefCountBugKind BT);
 };
 
 class RefCountReport : public PathSensitiveBugReport {
@@ -58,9 +58,9 @@ public:
 
   RefCountReport(const RefCountBug &D, const LangOptions &LOpts,
               ExplodedNode *n, SymbolRef sym,
-              StringRef endText);
+              llvm::StringRef endText);
 
-  ArrayRef<SourceRange> getRanges() const override {
+  llvm::ArrayRef<SourceRange> getRanges() const override {
     if (!isLeak)
       return PathSensitiveBugReport::getRanges();
     return {};

@@ -57,15 +57,15 @@ private:
   void EmitStackError(CheckerContext &C, const MemRegion *R,
                       const Expr *RetE) const;
   bool isSemaphoreCaptured(const BlockDecl &B) const;
-  static SourceRange genName(raw_ostream &os, const MemRegion *R,
+  static SourceRange genName(llvm::raw_ostream &os, const MemRegion *R,
                              ASTContext &Ctx);
-  static SmallVector<const MemRegion *, 4>
+  static llvm::SmallVector<const MemRegion *, 4>
   getCapturedStackRegions(const BlockDataRegion &B, CheckerContext &C);
   static bool isNotInCurrentFrame(const MemRegion *R, CheckerContext &C);
 };
 } // namespace
 
-SourceRange StackAddrEscapeChecker::genName(raw_ostream &os, const MemRegion *R,
+SourceRange StackAddrEscapeChecker::genName(llvm::raw_ostream &os, const MemRegion *R,
                                             ASTContext &Ctx) {
   // Get the base region, stripping away fields and elements.
   R = R->getBaseRegion();
@@ -134,10 +134,10 @@ bool StackAddrEscapeChecker::isSemaphoreCaptured(const BlockDecl &B) const {
   return false;
 }
 
-SmallVector<const MemRegion *, 4>
+llvm::SmallVector<const MemRegion *, 4>
 StackAddrEscapeChecker::getCapturedStackRegions(const BlockDataRegion &B,
                                                 CheckerContext &C) {
-  SmallVector<const MemRegion *, 4> Regions;
+  llvm::SmallVector<const MemRegion *, 4> Regions;
   for (auto Var : B.referenced_vars()) {
     SVal Val = C.getState()->getSVal(Var.getCapturedRegion());
     const MemRegion *Region = Val.getAsRegion();
@@ -158,7 +158,7 @@ void StackAddrEscapeChecker::EmitStackError(CheckerContext &C,
         CheckNames[CK_StackAddrEscapeChecker],
         "Return of address to stack-allocated memory");
   // Generate a report for this bug.
-  SmallString<128> buf;
+  llvm::SmallString<128> buf;
   llvm::raw_svector_ostream os(buf);
   SourceRange range = genName(os, R, C.getASTContext());
   os << " returned to caller";
@@ -197,7 +197,7 @@ void StackAddrEscapeChecker::checkAsyncExecutedBlockCaptures(
       BT_capturedstackasync = std::make_unique<BugType>(
           CheckNames[CK_StackAddrAsyncEscapeChecker],
           "Address of stack-allocated memory is captured");
-    SmallString<128> Buf;
+    llvm::SmallString<128> Buf;
     llvm::raw_svector_ostream Out(Buf);
     SourceRange Range = genName(Out, Region, C.getASTContext());
     Out << " is captured by an asynchronously-executed block";
@@ -221,7 +221,7 @@ void StackAddrEscapeChecker::checkReturnedBlockCaptures(
       BT_capturedstackret = std::make_unique<BugType>(
           CheckNames[CK_StackAddrEscapeChecker],
           "Address of stack-allocated memory is captured");
-    SmallString<128> Buf;
+    llvm::SmallString<128> Buf;
     llvm::raw_svector_ostream Out(Buf);
     SourceRange Range = genName(Out, Region, C.getASTContext());
     Out << " is captured by a returned block";
@@ -329,7 +329,7 @@ void StackAddrEscapeChecker::checkEndFunction(const ReturnStmt *RS,
     }
 
   public:
-    SmallVector<std::pair<const MemRegion *, const MemRegion *>, 10> V;
+    llvm::SmallVector<std::pair<const MemRegion *, const MemRegion *>, 10> V;
 
     CallBack(CheckerContext &CC) : Ctx(CC), PoppedFrame(CC.getStackFrame()) {}
 
@@ -373,9 +373,9 @@ void StackAddrEscapeChecker::checkEndFunction(const ReturnStmt *RS,
     const MemRegion *Referred = P.second;
 
     // Generate a report for this bug.
-    const StringRef CommonSuffix =
+    const llvm::StringRef CommonSuffix =
         "upon returning to the caller.  This will be a dangling reference";
-    SmallString<128> Buf;
+    llvm::SmallString<128> Buf;
     llvm::raw_svector_ostream Out(Buf);
     const SourceRange Range = genName(Out, Referred, Ctx.getASTContext());
 
@@ -390,7 +390,7 @@ void StackAddrEscapeChecker::checkEndFunction(const ReturnStmt *RS,
       return;
     }
 
-    const StringRef ReferrerMemorySpace = [](const MemSpaceRegion *Space) {
+    const llvm::StringRef ReferrerMemorySpace = [](const MemSpaceRegion *Space) {
       if (isa<StaticGlobalSpaceRegion>(Space))
         return "static";
       if (isa<GlobalsSpaceRegion>(Space))

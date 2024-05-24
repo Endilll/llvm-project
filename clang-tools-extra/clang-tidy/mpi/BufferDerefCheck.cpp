@@ -32,8 +32,8 @@ void BufferDerefCheck::check(const MatchFinder::MatchResult &Result) {
     return;
 
   // These containers are used, to capture the type and expression of a buffer.
-  SmallVector<const Type *, 1> BufferTypes;
-  SmallVector<const Expr *, 1> BufferExprs;
+  llvm::SmallVector<const Type *, 1> BufferTypes;
+  llvm::SmallVector<const Expr *, 1> BufferExprs;
 
   // Adds the type and expression of a buffer that is used in the MPI call
   // expression to the captured containers.
@@ -78,8 +78,8 @@ void BufferDerefCheck::check(const MatchFinder::MatchResult &Result) {
   checkBuffers(BufferTypes, BufferExprs);
 }
 
-void BufferDerefCheck::checkBuffers(ArrayRef<const Type *> BufferTypes,
-                                    ArrayRef<const Expr *> BufferExprs) {
+void BufferDerefCheck::checkBuffers(llvm::ArrayRef<const Type *> BufferTypes,
+                                    llvm::ArrayRef<const Expr *> BufferExprs) {
   for (size_t I = 0; I < BufferTypes.size(); ++I) {
     unsigned IndirectionCount = 0;
     const Type *BufferType = BufferTypes[I];

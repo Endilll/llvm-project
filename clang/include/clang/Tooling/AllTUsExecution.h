@@ -43,7 +43,7 @@ public:
                      std::shared_ptr<PCHContainerOperations> PCHContainerOps =
                          std::make_shared<PCHContainerOperations>());
 
-  StringRef getExecutorName() const override { return ExecutorName; }
+  llvm::StringRef getExecutorName() const override { return ExecutorName; }
 
   using ToolExecutor::execute;
 
@@ -56,7 +56,7 @@ public:
 
   ToolResults *getToolResults() override { return Results.get(); }
 
-  void mapVirtualFile(StringRef FilePath, StringRef Content) override {
+  void mapVirtualFile(llvm::StringRef FilePath, llvm::StringRef Content) override {
     OverlayFiles[FilePath] = std::string(Content);
   }
 

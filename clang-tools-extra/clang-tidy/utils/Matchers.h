@@ -72,7 +72,7 @@ AST_MATCHER(Expr, hasUnevaluatedContext) {
 class MatchesAnyListedNameMatcher
     : public ast_matchers::internal::MatcherInterface<NamedDecl> {
 public:
-  explicit MatchesAnyListedNameMatcher(llvm::ArrayRef<StringRef> NameList) {
+  explicit MatchesAnyListedNameMatcher(llvm::ArrayRef<llvm::StringRef> NameList) {
     std::transform(
         NameList.begin(), NameList.end(), std::back_inserter(NameMatchers),
         [](const llvm::StringRef Name) { return NameMatcher(Name); });
@@ -135,7 +135,7 @@ private:
 // expressions. If a regular expression contains starts ':' the NamedDecl's
 // qualified name will be used for matching, otherwise its name will be used.
 inline ::clang::ast_matchers::internal::Matcher<NamedDecl>
-matchesAnyListedName(llvm::ArrayRef<StringRef> NameList) {
+matchesAnyListedName(llvm::ArrayRef<llvm::StringRef> NameList) {
   return ::clang::ast_matchers::internal::makeMatcher(
       new MatchesAnyListedNameMatcher(NameList));
 }
@@ -163,7 +163,7 @@ AST_MATCHER_P(Stmt, isStatementIdenticalToBoundNode, std::string, ID) {
 class MatchesAnyListedTypeNameMatcher
     : public ast_matchers::internal::MatcherInterface<QualType> {
 public:
-  explicit MatchesAnyListedTypeNameMatcher(llvm::ArrayRef<StringRef> NameList);
+  explicit MatchesAnyListedTypeNameMatcher(llvm::ArrayRef<llvm::StringRef> NameList);
   ~MatchesAnyListedTypeNameMatcher() override;
   bool matches(
       const QualType &Node, ast_matchers::internal::ASTMatchFinder *Finder,
@@ -175,7 +175,7 @@ private:
 
 // Returns a matcher that matches QualType against a list of provided regular.
 inline ::clang::ast_matchers::internal::Matcher<QualType>
-matchesAnyListedTypeName(llvm::ArrayRef<StringRef> NameList) {
+matchesAnyListedTypeName(llvm::ArrayRef<llvm::StringRef> NameList) {
   return ::clang::ast_matchers::internal::makeMatcher(
       new MatchesAnyListedTypeNameMatcher(NameList));
 }

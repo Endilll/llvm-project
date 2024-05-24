@@ -23,14 +23,14 @@ namespace clang::tidy::android {
 /// TEMP_FAILURE_RETRY is a macro provided by both glibc and Bionic.
 class ComparisonInTempFailureRetryCheck : public ClangTidyCheck {
 public:
-  ComparisonInTempFailureRetryCheck(StringRef Name, ClangTidyContext *Context);
+  ComparisonInTempFailureRetryCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
-  const StringRef RawRetryList;
-  SmallVector<StringRef, 5> RetryMacros;
+  const llvm::StringRef RawRetryList;
+  llvm::SmallVector<llvm::StringRef, 5> RetryMacros;
 };
 
 } // namespace clang::tidy::android

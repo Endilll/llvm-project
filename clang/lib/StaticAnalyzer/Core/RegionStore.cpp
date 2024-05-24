@@ -122,7 +122,7 @@ BindingKey BindingKey::Make(const MemRegion *R, Kind k) {
 }
 
 namespace llvm {
-static inline raw_ostream &operator<<(raw_ostream &Out, BindingKey K) {
+static inline llvm::raw_ostream &operator<<(llvm::raw_ostream &Out, BindingKey K) {
   Out << "\"kind\": \"" << (K.isDirect() ? "Direct" : "Default")
       << "\", \"offset\": ";
 
@@ -230,7 +230,7 @@ public:
     return IsMainAnalysis;
   }
 
-  void printJson(raw_ostream &Out, const char *NL = "\n",
+  void printJson(llvm::raw_ostream &Out, const char *NL = "\n",
                  unsigned int Space = 0, bool IsDot = false) const {
     for (iterator I = begin(), E = end(); I != E; ++I) {
       // TODO: We might need a .printJson for I.getKey() as well.
@@ -364,7 +364,7 @@ private:
   /// A helper used to populate the work list with the given set of
   /// regions.
   void populateWorkList(InvalidateRegionsWorker &W,
-                        ArrayRef<SVal> Values,
+                        llvm::ArrayRef<SVal> Values,
                         InvalidatedRegions *TopLevelRegions);
 
 public:
@@ -413,7 +413,7 @@ public:
                                            InvalidatedRegions *Invalidated);
 
   StoreRef invalidateRegions(Store store,
-                             ArrayRef<SVal> Values,
+                             llvm::ArrayRef<SVal> Values,
                              const Expr *E, unsigned Count,
                              const LocationContext *LCtx,
                              const CallEvent *Call,
@@ -432,7 +432,7 @@ public:
                                           const ElementRegion *R);
   std::optional<SVal>
   getSValFromInitListExpr(const InitListExpr *ILE,
-                          const SmallVector<uint64_t, 2> &ConcreteOffsets,
+                          const llvm::SmallVector<uint64_t, 2> &ConcreteOffsets,
                           QualType ElemT);
   SVal getSValFromStringLiteral(const StringLiteral *SL, uint64_t Offset,
                                 QualType ElemT);
@@ -641,7 +641,7 @@ public: // Part of public interface to class.
         Ptr.getInt());
   }
 
-  void printJson(raw_ostream &Out, Store S, const char *NL = "\n",
+  void printJson(llvm::raw_ostream &Out, Store S, const char *NL = "\n",
                  unsigned int Space = 0, bool IsDot = false) const override;
 
   void iterBindings(Store store, BindingsHandler& f) override {
@@ -692,7 +692,7 @@ class ClusterAnalysis  {
 protected:
   typedef llvm::DenseMap<const MemRegion *, const ClusterBindings *> ClusterMap;
   typedef const MemRegion * WorkListElement;
-  typedef SmallVector<WorkListElement, 10> WorkList;
+  typedef llvm::SmallVector<WorkListElement, 10> WorkList;
 
   llvm::SmallPtrSet<const ClusterBindings *, 16> Visited;
 
@@ -802,7 +802,7 @@ static inline bool isUnionField(const FieldRegion *FR) {
   return FR->getDecl()->getParent()->isUnion();
 }
 
-typedef SmallVector<const FieldDecl *, 8> FieldVector;
+typedef llvm::SmallVector<const FieldDecl *, 8> FieldVector;
 
 static void getSymbolicOffsetFields(BindingKey K, FieldVector &Fields) {
   assert(K.hasSymbolicOffset() && "Not implemented for concrete offset keys");
@@ -848,7 +848,7 @@ static bool isCompatibleWithFields(BindingKey K, const FieldVector &Fields) {
 /// default bindings that may extend beyond \p Top itself, e.g. if \p Top is
 /// an aggregate within a larger aggregate with a default binding.
 static void
-collectSubRegionBindings(SmallVectorImpl<BindingPair> &Bindings,
+collectSubRegionBindings(llvm::SmallVectorImpl<BindingPair> &Bindings,
                          SValBuilder &SVB, const ClusterBindings &Cluster,
                          const SubRegion *Top, BindingKey TopKey,
                          bool IncludeAllDefaultBindings) {
@@ -919,7 +919,7 @@ collectSubRegionBindings(SmallVectorImpl<BindingPair> &Bindings,
 }
 
 static void
-collectSubRegionBindings(SmallVectorImpl<BindingPair> &Bindings,
+collectSubRegionBindings(llvm::SmallVectorImpl<BindingPair> &Bindings,
                          SValBuilder &SVB, const ClusterBindings &Cluster,
                          const SubRegion *Top, bool IncludeAllDefaultBindings) {
   collectSubRegionBindings(Bindings, SVB, Cluster, Top,
@@ -949,7 +949,7 @@ RegionStoreManager::removeSubRegionBindings(RegionBindingsConstRef B,
     return B;
   }
 
-  SmallVector<BindingPair, 32> Bindings;
+  llvm::SmallVector<BindingPair, 32> Bindings;
   collectSubRegionBindings(Bindings, svalBuilder, *Cluster, Top, TopKey,
                            /*IncludeAllDefaultBindings=*/false);
 
@@ -1278,7 +1278,7 @@ RegionStoreManager::invalidateGlobalRegion(MemRegion::Kind K,
 }
 
 void RegionStoreManager::populateWorkList(InvalidateRegionsWorker &W,
-                                          ArrayRef<SVal> Values,
+                                          llvm::ArrayRef<SVal> Values,
                                           InvalidatedRegions *TopLevelRegions) {
   for (SVal V : Values) {
     if (auto LCS = V.getAs<nonloc::LazyCompoundVal>()) {
@@ -1300,7 +1300,7 @@ void RegionStoreManager::populateWorkList(InvalidateRegionsWorker &W,
 
 StoreRef
 RegionStoreManager::invalidateRegions(Store store,
-                                     ArrayRef<SVal> Values,
+                                     llvm::ArrayRef<SVal> Values,
                                      const Expr *Ex, unsigned Count,
                                      const LocationContext *LCtx,
                                      const CallEvent *Call,
@@ -1550,7 +1550,7 @@ getExistingLazyBinding(SValBuilder &SVB, RegionBindingsConstRef B,
   if (!AllowSubregionBindings) {
     // If there are any other bindings within this region, we shouldn't reuse
     // the top-level binding.
-    SmallVector<BindingPair, 16> Bindings;
+    llvm::SmallVector<BindingPair, 16> Bindings;
     collectSubRegionBindings(Bindings, SVB, *B.lookup(R->getBaseRegion()), R,
                              /*IncludeAllDefaultBindings=*/true);
     if (Bindings.size() > 1)
@@ -1607,11 +1607,11 @@ RegionStoreManager::findLazyBinding(RegionBindingsConstRef B,
 /// Return an array of extents of the declared array type.
 ///
 /// E.g. for `int x[1][2][3];` returns { 1, 2, 3 }.
-static SmallVector<uint64_t, 2>
+static llvm::SmallVector<uint64_t, 2>
 getConstantArrayExtents(const ConstantArrayType *CAT) {
   assert(CAT && "ConstantArrayType should not be null");
   CAT = cast<ConstantArrayType>(CAT->getCanonicalTypeInternal());
-  SmallVector<uint64_t, 2> Extents;
+  llvm::SmallVector<uint64_t, 2> Extents;
   do {
     Extents.push_back(CAT->getZExtSize());
   } while ((CAT = dyn_cast<ConstantArrayType>(CAT->getElementType())));
@@ -1632,11 +1632,11 @@ getConstantArrayExtents(const ConstantArrayType *CAT) {
 /// arr[1][2][3] -> { 3, 2, 1 }. This helps to provide complexity O(n), where n
 /// is a number of indirections. It may not affect performance in real-life
 /// code, though.
-static std::pair<SmallVector<SVal, 2>, const MemRegion *>
+static std::pair<llvm::SmallVector<SVal, 2>, const MemRegion *>
 getElementRegionOffsetsWithBase(const ElementRegion *ER) {
   assert(ER && "ConstantArrayType should not be null");
   const MemRegion *Base;
-  SmallVector<SVal, 2> SValOffsets;
+  llvm::SmallVector<SVal, 2> SValOffsets;
   do {
     SValOffsets.push_back(ER->getIndex());
     Base = ER->getSuperRegion();
@@ -1667,9 +1667,9 @@ getElementRegionOffsetsWithBase(const ElementRegion *ER) {
 ///   int x2 = arr[42][5][-6]; // returns UndefinedVal
 ///   int x3 = arr[4][5][x2];  // returns UnknownVal
 static std::optional<SVal>
-convertOffsetsFromSvalToUnsigneds(const SmallVector<SVal, 2> &SrcOffsets,
-                                  const SmallVector<uint64_t, 2> ArrayExtents,
-                                  SmallVector<uint64_t, 2> &DstOffsets) {
+convertOffsetsFromSvalToUnsigneds(const llvm::SmallVector<SVal, 2> &SrcOffsets,
+                                  const llvm::SmallVector<uint64_t, 2> ArrayExtents,
+                                  llvm::SmallVector<uint64_t, 2> &DstOffsets) {
   // Check offsets for being out of bounds.
   // C++20 [expr.add] 7.6.6.4 (excerpt):
   //   If P points to an array element i of an array object x with n
@@ -1714,7 +1714,7 @@ std::optional<SVal> RegionStoreManager::getConstantValFromConstArrayInitializer(
   assert(R && "ElementRegion should not be null");
 
   // Treat an n-dimensional array.
-  SmallVector<SVal, 2> SValOffsets;
+  llvm::SmallVector<SVal, 2> SValOffsets;
   const MemRegion *Base;
   std::tie(SValOffsets, Base) = getElementRegionOffsetsWithBase(R);
   const VarRegion *VR = dyn_cast<VarRegion>(Base);
@@ -1754,7 +1754,7 @@ std::optional<SVal> RegionStoreManager::getConstantValFromConstArrayInitializer(
     return std::nullopt;
 
   // Get array extents.
-  SmallVector<uint64_t, 2> Extents = getConstantArrayExtents(CAT);
+  llvm::SmallVector<uint64_t, 2> Extents = getConstantArrayExtents(CAT);
 
   // The number of offsets should equal to the numbers of extents,
   // otherwise wrong type punning occurred. For instance:
@@ -1765,7 +1765,7 @@ std::optional<SVal> RegionStoreManager::getConstantValFromConstArrayInitializer(
   if (SValOffsets.size() != Extents.size())
     return std::nullopt;
 
-  SmallVector<uint64_t, 2> ConcreteOffsets;
+  llvm::SmallVector<uint64_t, 2> ConcreteOffsets;
   if (std::optional<SVal> V = convertOffsetsFromSvalToUnsigneds(
           SValOffsets, Extents, ConcreteOffsets))
     return *V;
@@ -1806,7 +1806,7 @@ std::optional<SVal> RegionStoreManager::getConstantValFromConstArrayInitializer(
 /// for the given initialization list. Otherwise SVal can be an equivalent to 0
 /// or lead to assertion.
 std::optional<SVal> RegionStoreManager::getSValFromInitListExpr(
-    const InitListExpr *ILE, const SmallVector<uint64_t, 2> &Offsets,
+    const InitListExpr *ILE, const llvm::SmallVector<uint64_t, 2> &Offsets,
     QualType ElemT) {
   assert(ILE && "InitListExpr should not be null");
 
@@ -2265,7 +2265,7 @@ RegionStoreManager::getInterestingValues(nonloc::LazyCompoundVal LCV) {
   if (!Cluster)
     return (LazyBindingsMap[LCV.getCVData()] = std::move(List));
 
-  SmallVector<BindingPair, 32> Bindings;
+  llvm::SmallVector<BindingPair, 32> Bindings;
   collectSubRegionBindings(Bindings, svalBuilder, *Cluster, LazyR,
                            /*IncludeAllDefaultBindings=*/true);
   for (SVal V : llvm::make_second_range(Bindings)) {
@@ -2738,7 +2738,7 @@ RegionStoreManager::bindAggregate(RegionBindingsConstRef B,
 namespace {
 class RemoveDeadBindingsWorker
     : public ClusterAnalysis<RemoveDeadBindingsWorker> {
-  SmallVector<const SymbolicRegion *, 12> Postponed;
+  llvm::SmallVector<const SymbolicRegion *, 12> Postponed;
   SymbolReaper &SymReaper;
   const StackFrameContext *CurrentLCtx;
 
@@ -2902,7 +2902,7 @@ StoreRef RegionStoreManager::removeDeadBindings(Store store,
 // Utility methods.
 //===----------------------------------------------------------------------===//
 
-void RegionStoreManager::printJson(raw_ostream &Out, Store S, const char *NL,
+void RegionStoreManager::printJson(llvm::raw_ostream &Out, Store S, const char *NL,
                                    unsigned int Space, bool IsDot) const {
   RegionBindingsRef Bindings = getRegionBindings(S);
 

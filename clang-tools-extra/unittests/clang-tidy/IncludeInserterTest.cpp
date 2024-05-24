@@ -28,7 +28,7 @@ namespace {
 
 class IncludeInserterCheckBase : public ClangTidyCheck {
 public:
-  IncludeInserterCheckBase(StringRef CheckName, ClangTidyContext *Context,
+  IncludeInserterCheckBase(llvm::StringRef CheckName, ClangTidyContext *Context,
                            utils::IncludeSorter::IncludeStyle Style =
                                utils::IncludeSorter::IS_Google,
                            bool SelfContainedDiags = false)
@@ -47,125 +47,125 @@ public:
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override {
     auto Diag = diag(Result.Nodes.getNodeAs<DeclStmt>("stmt")->getBeginLoc(),
                      "foo, bar");
-    for (StringRef Header : headersToInclude()) {
+    for (llvm::StringRef Header : headersToInclude()) {
       Diag << Inserter.createMainFileIncludeInsertion(Header);
     }
   }
 
-  virtual std::vector<StringRef> headersToInclude() const = 0;
+  virtual std::vector<llvm::StringRef> headersToInclude() const = 0;
 
   utils::IncludeInserter Inserter;
 };
 
 class NonSystemHeaderInserterCheck : public IncludeInserterCheckBase {
 public:
-  NonSystemHeaderInserterCheck(StringRef CheckName, ClangTidyContext *Context)
+  NonSystemHeaderInserterCheck(llvm::StringRef CheckName, ClangTidyContext *Context)
       : IncludeInserterCheckBase(CheckName, Context) {}
 
-  std::vector<StringRef> headersToInclude() const override {
+  std::vector<llvm::StringRef> headersToInclude() const override {
     return {"path/to/header.h"};
   }
 };
 
 class EarlyInAlphabetHeaderInserterCheck : public IncludeInserterCheckBase {
 public:
-  EarlyInAlphabetHeaderInserterCheck(StringRef CheckName, ClangTidyContext *Context)
+  EarlyInAlphabetHeaderInserterCheck(llvm::StringRef CheckName, ClangTidyContext *Context)
       : IncludeInserterCheckBase(CheckName, Context) {}
 
-  std::vector<StringRef> headersToInclude() const override {
+  std::vector<llvm::StringRef> headersToInclude() const override {
     return {"a/header.h"};
   }
 };
 
 class MultipleHeaderInserterCheck : public IncludeInserterCheckBase {
 public:
-  MultipleHeaderInserterCheck(StringRef CheckName, ClangTidyContext *Context)
+  MultipleHeaderInserterCheck(llvm::StringRef CheckName, ClangTidyContext *Context)
       : IncludeInserterCheckBase(CheckName, Context) {}
 
-  std::vector<StringRef> headersToInclude() const override {
+  std::vector<llvm::StringRef> headersToInclude() const override {
     return {"path/to/header.h", "path/to/header2.h", "path/to/header.h"};
   }
 };
 
 class MultipleHeaderSingleInserterCheck : public IncludeInserterCheckBase {
 public:
-  MultipleHeaderSingleInserterCheck(StringRef CheckName,
+  MultipleHeaderSingleInserterCheck(llvm::StringRef CheckName,
                                     ClangTidyContext *Context)
       : IncludeInserterCheckBase(CheckName, Context,
                                  utils::IncludeSorter::IS_Google,
                                  /*SelfContainedDiags=*/true) {}
 
-  std::vector<StringRef> headersToInclude() const override {
+  std::vector<llvm::StringRef> headersToInclude() const override {
     return {"path/to/header.h", "path/to/header2.h", "path/to/header.h"};
   }
 };
 
 class CSystemIncludeInserterCheck : public IncludeInserterCheckBase {
 public:
-  CSystemIncludeInserterCheck(StringRef CheckName, ClangTidyContext *Context)
+  CSystemIncludeInserterCheck(llvm::StringRef CheckName, ClangTidyContext *Context)
       : IncludeInserterCheckBase(CheckName, Context) {}
 
-  std::vector<StringRef> headersToInclude() const override {
+  std::vector<llvm::StringRef> headersToInclude() const override {
     return {"<stdlib.h>"};
   }
 };
 
 class CXXSystemIncludeInserterCheck : public IncludeInserterCheckBase {
 public:
-  CXXSystemIncludeInserterCheck(StringRef CheckName, ClangTidyContext *Context)
+  CXXSystemIncludeInserterCheck(llvm::StringRef CheckName, ClangTidyContext *Context)
       : IncludeInserterCheckBase(CheckName, Context) {}
 
-  std::vector<StringRef> headersToInclude() const override { return {"<set>"}; }
+  std::vector<llvm::StringRef> headersToInclude() const override { return {"<set>"}; }
 };
 
 class InvalidIncludeInserterCheck : public IncludeInserterCheckBase {
 public:
-  InvalidIncludeInserterCheck(StringRef CheckName, ClangTidyContext *Context)
+  InvalidIncludeInserterCheck(llvm::StringRef CheckName, ClangTidyContext *Context)
       : IncludeInserterCheckBase(CheckName, Context) {}
 
-  std::vector<StringRef> headersToInclude() const override {
+  std::vector<llvm::StringRef> headersToInclude() const override {
     return {"a.h", "<stdlib.h", "cstdlib>", "b.h", "<c.h>", "<d>"};
   }
 };
 
 class ObjCEarlyInAlphabetHeaderInserterCheck : public IncludeInserterCheckBase {
 public:
-  ObjCEarlyInAlphabetHeaderInserterCheck(StringRef CheckName,
+  ObjCEarlyInAlphabetHeaderInserterCheck(llvm::StringRef CheckName,
                                          ClangTidyContext *Context)
       : IncludeInserterCheckBase(CheckName, Context,
                                  utils::IncludeSorter::IS_Google_ObjC) {}
 
-  std::vector<StringRef> headersToInclude() const override {
+  std::vector<llvm::StringRef> headersToInclude() const override {
     return {"a/header.h"};
   }
 };
 
 class ObjCCategoryHeaderInserterCheck : public IncludeInserterCheckBase {
 public:
-  ObjCCategoryHeaderInserterCheck(StringRef CheckName,
+  ObjCCategoryHeaderInserterCheck(llvm::StringRef CheckName,
                                   ClangTidyContext *Context)
       : IncludeInserterCheckBase(CheckName, Context,
                                  utils::IncludeSorter::IS_Google_ObjC) {}
 
-  std::vector<StringRef> headersToInclude() const override {
+  std::vector<llvm::StringRef> headersToInclude() const override {
     return {"top_level_test_header+foo.h"};
   }
 };
 
 class ObjCGeneratedHeaderInserterCheck : public IncludeInserterCheckBase {
 public:
-  ObjCGeneratedHeaderInserterCheck(StringRef CheckName,
+  ObjCGeneratedHeaderInserterCheck(llvm::StringRef CheckName,
                                    ClangTidyContext *Context)
       : IncludeInserterCheckBase(CheckName, Context,
                                  utils::IncludeSorter::IS_Google_ObjC) {}
 
-  std::vector<StringRef> headersToInclude() const override {
+  std::vector<llvm::StringRef> headersToInclude() const override {
     return {"clang_tidy/tests/generated_file.proto.h"};
   }
 };
 
 template <typename Check>
-std::string runCheckOnCode(StringRef Code, StringRef Filename) {
+std::string runCheckOnCode(llvm::StringRef Code, llvm::StringRef Filename) {
   std::vector<ClangTidyError> Errors;
   return test::runCheckOnCode<Check>(Code, &Errors, Filename, std::nullopt,
                                      ClangTidyOptions(),

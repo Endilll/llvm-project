@@ -65,7 +65,7 @@ public:
 /// A location roughly corresponds to a cursor location in an editor, while
 /// the optional range corresponds to the selection range in an editor.
 void findSelectedASTNodesWithRange(
-    StringRef Source, FileLocation Location,
+    llvm::StringRef Source, FileLocation Location,
     std::optional<FileRange> SelectionRange,
     llvm::function_ref<void(SourceRange SelectionRange,
                             std::optional<SelectedASTNode>)>
@@ -77,7 +77,7 @@ void findSelectedASTNodesWithRange(
 }
 
 void findSelectedASTNodes(
-    StringRef Source, FileLocation Location,
+    llvm::StringRef Source, FileLocation Location,
     std::optional<FileRange> SelectionRange,
     llvm::function_ref<void(std::optional<SelectedASTNode>)> Consumer,
     SelectionFinderVisitor::Language Language =
@@ -97,7 +97,7 @@ void checkNodeImpl(bool IsTypeMatched, const SelectedASTNode &Node,
   ASSERT_EQ(Node.SelectionKind, SelectionKind);
 }
 
-void checkDeclName(const SelectedASTNode &Node, StringRef Name) {
+void checkDeclName(const SelectedASTNode &Node, llvm::StringRef Name) {
   const auto *ND = Node.Node.get<NamedDecl>();
   EXPECT_TRUE(!!ND);
   ASSERT_EQ(ND->getName(), Name);
@@ -117,7 +117,7 @@ checkNode(const SelectedASTNode &StmtNode, SourceSelectionKind SelectionKind,
 template <typename T>
 const SelectedASTNode &
 checkNode(const SelectedASTNode &DeclNode, SourceSelectionKind SelectionKind,
-          unsigned NumChildren = 0, StringRef Name = "",
+          unsigned NumChildren = 0, llvm::StringRef Name = "",
           std::enable_if_t<std::is_base_of_v<Decl, T>, T> *DeclOverloadChecker =
               nullptr) {
   checkNodeImpl(isa<T>(DeclNode.Node.get<Decl>()), DeclNode, SelectionKind,
@@ -196,7 +196,7 @@ TEST(ASTSelectionFinder, EmptyRangeFallbackToCursor) {
 }
 
 TEST(ASTSelectionFinder, WholeFunctionSelection) {
-  StringRef Source = "int f(int x) { return x;\n}\nvoid f2() { }";
+  llvm::StringRef Source = "int f(int x) { return x;\n}\nvoid f2() { }";
   // From 'int' until just after '}':
 
   findSelectedASTNodes(
@@ -275,7 +275,7 @@ TEST(ASTSelectionFinder, WholeFunctionSelection) {
 }
 
 TEST(ASTSelectionFinder, MultipleFunctionSelection) {
-  StringRef Source = R"(void f0() {
+  llvm::StringRef Source = R"(void f0() {
 }
 void f1() { }
 void f2() { }
@@ -299,7 +299,7 @@ void f3() { }
 }
 
 TEST(ASTSelectionFinder, MultipleStatementSelection) {
-  StringRef Source = R"(void f(int x, int y) {
+  llvm::StringRef Source = R"(void f(int x, int y) {
   int z = x;
   f(2, 3);
   if (x == 0) {
@@ -379,7 +379,7 @@ TEST(ASTSelectionFinder, MultipleStatementSelection) {
 }
 
 TEST(ASTSelectionFinder, SelectionInFunctionInObjCImplementation) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 @interface I
 @end
 @implementation I
@@ -469,7 +469,7 @@ void outerFunction() { }
 }
 
 TEST(ASTSelectionFinder, FunctionInObjCImplementationCarefulWithEarlyExit) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 @interface I
 @end
 @implementation I
@@ -498,7 +498,7 @@ void selected() {
 }
 
 TEST(ASTSelectionFinder, AvoidImplicitDeclarations) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 struct Copy {
   int x;
 };
@@ -522,7 +522,7 @@ void foo() {
 }
 
 TEST(ASTSelectionFinder, CorrectEndForObjectiveCImplementation) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 @interface I
 @end
 @implementation I
@@ -541,7 +541,7 @@ TEST(ASTSelectionFinder, CorrectEndForObjectiveCImplementation) {
 }
 
 const SelectedASTNode &checkFnBody(const std::optional<SelectedASTNode> &Node,
-                                   StringRef Name) {
+                                   llvm::StringRef Name) {
   EXPECT_TRUE(Node);
   EXPECT_EQ(Node->Children.size(), 1u);
   const auto &Fn = checkNode<FunctionDecl>(
@@ -553,7 +553,7 @@ const SelectedASTNode &checkFnBody(const std::optional<SelectedASTNode> &Node,
 }
 
 TEST(ASTSelectionFinder, SelectObjectiveCPseudoObjectExprs) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 @interface I
 @property(readwrite) int prop;
 @end
@@ -677,7 +677,7 @@ void selectSubscript(NSMutableArray *array, I *i) {
 }
 
 TEST(ASTSelectionFinder, SimpleCodeRangeASTSelection) {
-  StringRef Source = R"(void f(int x, int y) {
+  llvm::StringRef Source = R"(void f(int x, int y) {
   int z = x;
   f(2, 3);
   if (x == 0) {
@@ -726,7 +726,7 @@ void f2() {
         EXPECT_TRUE(SelectedCode);
         EXPECT_EQ(SelectedCode->size(), 1u);
         EXPECT_TRUE(isa<DeclStmt>((*SelectedCode)[0]));
-        ArrayRef<SelectedASTNode::ReferenceType> Parents =
+        llvm::ArrayRef<SelectedASTNode::ReferenceType> Parents =
             SelectedCode->getParents();
         EXPECT_EQ(Parents.size(), 3u);
         EXPECT_TRUE(
@@ -747,7 +747,7 @@ void f2() {
         EXPECT_EQ(SelectedCode->size(), 2u);
         EXPECT_TRUE(isa<CallExpr>((*SelectedCode)[0]));
         EXPECT_TRUE(isa<IfStmt>((*SelectedCode)[1]));
-        ArrayRef<SelectedASTNode::ReferenceType> Parents =
+        llvm::ArrayRef<SelectedASTNode::ReferenceType> Parents =
             SelectedCode->getParents();
         EXPECT_EQ(Parents.size(), 3u);
         EXPECT_TRUE(
@@ -788,7 +788,7 @@ void f2() {
 }
 
 TEST(ASTSelectionFinder, OutOfBodyCodeRange) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 int codeRange = 2 + 3;
 )";
   // '2+3' expression.
@@ -801,7 +801,7 @@ int codeRange = 2 + 3;
         EXPECT_TRUE(SelectedCode);
         EXPECT_EQ(SelectedCode->size(), 1u);
         EXPECT_TRUE(isa<BinaryOperator>((*SelectedCode)[0]));
-        ArrayRef<SelectedASTNode::ReferenceType> Parents =
+        llvm::ArrayRef<SelectedASTNode::ReferenceType> Parents =
             SelectedCode->getParents();
         EXPECT_EQ(Parents.size(), 2u);
         EXPECT_TRUE(
@@ -812,7 +812,7 @@ int codeRange = 2 + 3;
 }
 
 TEST(ASTSelectionFinder, SelectVarDeclStmt) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 void f() {
    {
        int a;
@@ -829,7 +829,7 @@ void f() {
         EXPECT_TRUE(SelectedCode);
         EXPECT_EQ(SelectedCode->size(), 1u);
         EXPECT_TRUE(isa<DeclStmt>((*SelectedCode)[0]));
-        ArrayRef<SelectedASTNode::ReferenceType> Parents =
+        llvm::ArrayRef<SelectedASTNode::ReferenceType> Parents =
             SelectedCode->getParents();
         EXPECT_EQ(Parents.size(), 4u);
         EXPECT_TRUE(
@@ -844,7 +844,7 @@ void f() {
 }
 
 TEST(ASTSelectionFinder, SelectEntireDeclStmtRange) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 void f(int x, int y) {
    int a = x * y;
 }
@@ -859,7 +859,7 @@ void f(int x, int y) {
         EXPECT_TRUE(SelectedCode);
         EXPECT_EQ(SelectedCode->size(), 1u);
         EXPECT_TRUE(isa<DeclStmt>((*SelectedCode)[0]));
-        ArrayRef<SelectedASTNode::ReferenceType> Parents =
+        llvm::ArrayRef<SelectedASTNode::ReferenceType> Parents =
             SelectedCode->getParents();
         EXPECT_EQ(Parents.size(), 3u);
         EXPECT_TRUE(
@@ -872,7 +872,7 @@ void f(int x, int y) {
 }
 
 TEST(ASTSelectionFinder, SelectEntireDeclStmtRangeWithMultipleDecls) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 void f(int x, int y) {
    int a = x * y, b = x - y;
 }
@@ -887,7 +887,7 @@ void f(int x, int y) {
         EXPECT_TRUE(SelectedCode);
         EXPECT_EQ(SelectedCode->size(), 1u);
         EXPECT_TRUE(isa<DeclStmt>((*SelectedCode)[0]));
-        ArrayRef<SelectedASTNode::ReferenceType> Parents =
+        llvm::ArrayRef<SelectedASTNode::ReferenceType> Parents =
             SelectedCode->getParents();
         EXPECT_EQ(Parents.size(), 3u);
         EXPECT_TRUE(
@@ -900,7 +900,7 @@ void f(int x, int y) {
 }
 
 TEST(ASTSelectionFinder, SimpleCodeRangeASTSelectionInObjCMethod) {
-  StringRef Source = R"(@interface I @end
+  llvm::StringRef Source = R"(@interface I @end
 @implementation I
 - (void) f:(int)x with:(int) y {
   int z = x;
@@ -936,7 +936,7 @@ TEST(ASTSelectionFinder, SimpleCodeRangeASTSelectionInObjCMethod) {
         EXPECT_TRUE(SelectedCode);
         EXPECT_EQ(SelectedCode->size(), 1u);
         EXPECT_TRUE(isa<DeclStmt>((*SelectedCode)[0]));
-        ArrayRef<SelectedASTNode::ReferenceType> Parents =
+        llvm::ArrayRef<SelectedASTNode::ReferenceType> Parents =
             SelectedCode->getParents();
         EXPECT_EQ(Parents.size(), 4u);
         EXPECT_TRUE(
@@ -960,7 +960,7 @@ TEST(ASTSelectionFinder, SimpleCodeRangeASTSelectionInObjCMethod) {
         EXPECT_EQ(SelectedCode->size(), 2u);
         EXPECT_TRUE(isa<ObjCMessageExpr>((*SelectedCode)[0]));
         EXPECT_TRUE(isa<IfStmt>((*SelectedCode)[1]));
-        ArrayRef<SelectedASTNode::ReferenceType> Parents =
+        llvm::ArrayRef<SelectedASTNode::ReferenceType> Parents =
             SelectedCode->getParents();
         EXPECT_EQ(Parents.size(), 4u);
         EXPECT_TRUE(
@@ -976,7 +976,7 @@ TEST(ASTSelectionFinder, SimpleCodeRangeASTSelectionInObjCMethod) {
 }
 
 TEST(ASTSelectionFinder, CanonicalizeObjCStringLiteral) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 void foo() {
   (void)@"test";
 }
@@ -1008,7 +1008,7 @@ void foo() {
 }
 
 TEST(ASTSelectionFinder, CanonicalizeMemberCalleeToCall) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 class AClass { public:
   void method();
   int afield;
@@ -1060,7 +1060,7 @@ void dontSelectArgument(AClass &a) {
 }
 
 TEST(ASTSelectionFinder, CanonicalizeFuncCalleeToCall) {
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 void function();
 
 void test() {

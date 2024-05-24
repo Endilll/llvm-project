@@ -23,7 +23,7 @@ bool isBinaryOrTernary(const Expr *E);
 /// <needed-flag> or <flag> | <needed-flag> | ...
 bool exprHasBitFlagWithSpelling(const Expr *Flags, const SourceManager &SM,
                                 const LangOptions &LangOpts,
-                                StringRef FlagName);
+                                llvm::StringRef FlagName);
 
 // Check if the range is entirely contained within a macro argument.
 bool rangeIsEntirelyWithinMacroArgument(SourceRange Range,

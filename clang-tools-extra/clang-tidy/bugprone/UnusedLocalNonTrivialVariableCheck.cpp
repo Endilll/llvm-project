@@ -22,7 +22,7 @@ using namespace clang::tidy::matchers;
 namespace clang::tidy::bugprone {
 
 namespace {
-static constexpr StringRef DefaultIncludeTypeRegex =
+static constexpr llvm::StringRef DefaultIncludeTypeRegex =
     "::std::.*mutex;::std::future;::std::basic_string;::std::basic_regex;"
     "::std::basic_istringstream;::std::basic_stringstream;::std::bitset;"
     "::std::filesystem::path";
@@ -37,7 +37,7 @@ AST_MATCHER(QualType, isTrivial) {
 } // namespace
 
 UnusedLocalNonTrivialVariableCheck::UnusedLocalNonTrivialVariableCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IncludeTypes(utils::options::parseStringList(
           Options.get("IncludeTypes", DefaultIncludeTypeRegex))),

@@ -22,7 +22,7 @@ namespace clang::tidy::performance {
 /// http://clang.llvm.org/extra/clang-tidy/checks/performance/unnecessary-value-param.html
 class UnnecessaryValueParamCheck : public ClangTidyCheck {
 public:
-  UnnecessaryValueParamCheck(StringRef Name, ClangTidyContext *Context);
+  UnnecessaryValueParamCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }
@@ -39,7 +39,7 @@ private:
 
   ExprMutationAnalyzer::Memoized MutationAnalyzerCache;
   utils::IncludeInserter Inserter;
-  const std::vector<StringRef> AllowedTypes;
+  const std::vector<llvm::StringRef> AllowedTypes;
 };
 
 } // namespace clang::tidy::performance

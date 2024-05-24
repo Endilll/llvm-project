@@ -116,7 +116,7 @@ void NonNullParamChecker::checkPreCall(const CallEvent &Call,
   unsigned NumArgs = Call.getNumArgs();
 
   ProgramStateRef state = C.getState();
-  ArrayRef<ParmVarDecl *> parms = Call.parameters();
+  llvm::ArrayRef<ParmVarDecl *> parms = Call.parameters();
 
   for (unsigned idx = 0; idx < NumArgs; ++idx) {
     // For vararg functions, a corresponding parameter decl may not exist.

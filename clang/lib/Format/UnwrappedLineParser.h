@@ -99,7 +99,7 @@ class UnwrappedLineParser {
 public:
   UnwrappedLineParser(SourceManager &SourceMgr, const FormatStyle &Style,
                       const AdditionalKeywords &Keywords,
-                      unsigned FirstStartColumn, ArrayRef<FormatToken *> Tokens,
+                      unsigned FirstStartColumn, llvm::ArrayRef<FormatToken *> Tokens,
                       UnwrappedLineConsumer &Callback,
                       llvm::SpecificBumpPtrAllocator<FormatToken> &Allocator,
                       IdentifierTable &IdentTable);
@@ -225,7 +225,7 @@ private:
   // NextTok specifies the next token. A null pointer NextTok is supported, and
   // signifies either the absence of a next token, or that the next token
   // shouldn't be taken into account for the analysis.
-  void distributeComments(const SmallVectorImpl<FormatToken *> &Comments,
+  void distributeComments(const llvm::SmallVectorImpl<FormatToken *> &Comments,
                           const FormatToken *NextTok);
 
   // Adds the comment preceding the next token to unwrapped lines.
@@ -268,12 +268,12 @@ private:
   // step.
   // ExpandedLines will be reset every time we create a new LineAndExpansion
   // instance once a line containing macro calls has been parsed.
-  SmallVector<UnwrappedLine, 8> CurrentExpandedLines;
+  llvm::SmallVector<UnwrappedLine, 8> CurrentExpandedLines;
 
   // Maps from the first token of a top-level UnwrappedLine that contains
   // a macro call to the replacement UnwrappedLines expanded from the macro
   // call.
-  llvm::DenseMap<FormatToken *, SmallVector<UnwrappedLine, 8>> ExpandedLines;
+  llvm::DenseMap<FormatToken *, llvm::SmallVector<UnwrappedLine, 8>> ExpandedLines;
 
   // Map from the macro identifier to a line containing the full unexpanded
   // macro call.
@@ -292,23 +292,23 @@ private:
   // line as the previous token, or not. If not, they belong to the next token.
   // Since the next token might already be in a new unwrapped line, we need to
   // store the comments belonging to that token.
-  SmallVector<FormatToken *, 1> CommentsBeforeNextToken;
+  llvm::SmallVector<FormatToken *, 1> CommentsBeforeNextToken;
   FormatToken *FormatTok = nullptr;
   bool MustBreakBeforeNextToken;
 
   // The parsed lines. Only added to through \c CurrentLines.
-  SmallVector<UnwrappedLine, 8> Lines;
+  llvm::SmallVector<UnwrappedLine, 8> Lines;
 
   // Preprocessor directives are parsed out-of-order from other unwrapped lines.
   // Thus, we need to keep a list of preprocessor directives to be reported
   // after an unwrapped line that has been started was finished.
-  SmallVector<UnwrappedLine, 4> PreprocessorDirectives;
+  llvm::SmallVector<UnwrappedLine, 4> PreprocessorDirectives;
 
   // New unwrapped lines are added via CurrentLines.
   // Usually points to \c &Lines. While parsing a preprocessor directive when
   // there is an unfinished previous unwrapped line, will point to
   // \c &PreprocessorDirectives.
-  SmallVectorImpl<UnwrappedLine> *CurrentLines;
+  llvm::SmallVectorImpl<UnwrappedLine> *CurrentLines;
 
   // We store for each line whether it must be a declaration depending on
   // whether we are in a compound statement or not.
@@ -324,15 +324,15 @@ private:
   FormatTokenSource *Tokens;
   UnwrappedLineConsumer &Callback;
 
-  ArrayRef<FormatToken *> AllTokens;
+  llvm::ArrayRef<FormatToken *> AllTokens;
 
   // Keeps a stack of the states of nested control statements (true if the
   // statement contains more than some predefined number of nested statements).
-  SmallVector<bool, 8> NestedTooDeep;
+  llvm::SmallVector<bool, 8> NestedTooDeep;
 
   // Keeps a stack of the states of nested lambdas (true if the return type of
   // the lambda is `decltype(auto)`).
-  SmallVector<bool, 4> NestedLambdas;
+  llvm::SmallVector<bool, 4> NestedLambdas;
 
   // Whether the parser is parsing the body of a function whose return type is
   // `decltype(auto)`.
@@ -352,7 +352,7 @@ private:
   };
 
   // Keeps a stack of currently active preprocessor branching directives.
-  SmallVector<PPBranch, 16> PPStack;
+  llvm::SmallVector<PPBranch, 16> PPStack;
 
   // The \c UnwrappedLineParser re-parses the code for each combination
   // of preprocessor branches that can be taken.
@@ -364,10 +364,10 @@ private:
 
   // Contains the current branch (#if, #else or one of the #elif branches)
   // for each nesting level.
-  SmallVector<int, 8> PPLevelBranchIndex;
+  llvm::SmallVector<int, 8> PPLevelBranchIndex;
 
   // Contains the maximum number of branches at each nesting level.
-  SmallVector<int, 8> PPLevelBranchCount;
+  llvm::SmallVector<int, 8> PPLevelBranchCount;
 
   // Contains the number of branches per nesting level we are currently
   // in while parsing a preprocessor branch sequence.
@@ -410,7 +410,7 @@ struct UnwrappedLineNode {
       : Tok(Tok), Children(Children.begin(), Children.end()) {}
 
   FormatToken *Tok;
-  SmallVector<UnwrappedLine, 0> Children;
+  llvm::SmallVector<UnwrappedLine, 0> Children;
 };
 
 std::ostream &operator<<(std::ostream &Stream, const UnwrappedLine &Line);

@@ -109,7 +109,7 @@ public:
     return 13;
   }
 
-  StringRef getARCRetainAutoreleasedReturnValueMarker() const override {
+  llvm::StringRef getARCRetainAutoreleasedReturnValueMarker() const override {
     return "mov\tr7, r7\t\t// marker for objc_retainAutoreleaseReturnValue";
   }
 
@@ -142,8 +142,8 @@ public:
           CGM.getTarget().parseTargetAttr(TA->getFeaturesStr());
       if (!Attr.BranchProtection.empty()) {
         TargetInfo::BranchProtectionInfo BPI;
-        StringRef DiagMsg;
-        StringRef Arch =
+        llvm::StringRef DiagMsg;
+        llvm::StringRef Arch =
             Attr.CPU.empty() ? CGM.getTarget().getTargetOpts().CPU : Attr.CPU;
         if (!CGM.getTarget().validateBranchProtection(Attr.BranchProtection,
                                                       Arch, BPI, DiagMsg)) {

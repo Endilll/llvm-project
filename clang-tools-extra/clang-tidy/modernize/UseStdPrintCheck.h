@@ -19,7 +19,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-std-print.html
 class UseStdPrintCheck : public ClangTidyCheck {
 public:
-  UseStdPrintCheck(StringRef Name, ClangTidyContext *Context);
+  UseStdPrintCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     if (ReplacementPrintFunction == "std::print" ||
         ReplacementPrintlnFunction == "std::println")
@@ -37,12 +37,12 @@ public:
 
 private:
   bool StrictMode;
-  std::vector<StringRef> PrintfLikeFunctions;
-  std::vector<StringRef> FprintfLikeFunctions;
-  StringRef ReplacementPrintFunction;
-  StringRef ReplacementPrintlnFunction;
+  std::vector<llvm::StringRef> PrintfLikeFunctions;
+  std::vector<llvm::StringRef> FprintfLikeFunctions;
+  llvm::StringRef ReplacementPrintFunction;
+  llvm::StringRef ReplacementPrintlnFunction;
   utils::IncludeInserter IncludeInserter;
-  std::optional<StringRef> MaybeHeaderToInclude;
+  std::optional<llvm::StringRef> MaybeHeaderToInclude;
 };
 
 } // namespace clang::tidy::modernize

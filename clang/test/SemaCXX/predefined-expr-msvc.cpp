@@ -3,11 +3,11 @@
 
 // expected-no-diagnostics
 
-struct StringRef {
-  StringRef(const char *);
+struct llvm::StringRef {
+  llvm::StringRef(const char *);
 };
 template <typename T>
-StringRef getTypeName() {
-  StringRef s = __func__;
+llvm::StringRef getTypeName() {
+  llvm::StringRef s = __func__;
 }
 

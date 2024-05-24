@@ -20,8 +20,8 @@ namespace {
 using find_all_symbols::SymbolInfo;
 using find_all_symbols::SymbolAndSignals;
 
-static bool runOnCode(tooling::ToolAction *ToolAction, StringRef Code,
-                      StringRef FileName,
+static bool runOnCode(tooling::ToolAction *ToolAction, llvm::StringRef Code,
+                      llvm::StringRef FileName,
                       const std::vector<std::string> &ExtraArgs) {
   llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
       new llvm::vfs::InMemoryFileSystem);
@@ -51,7 +51,7 @@ static bool runOnCode(tooling::ToolAction *ToolAction, StringRef Code,
 }
 
 static std::string runIncludeFixer(
-    StringRef Code,
+    llvm::StringRef Code,
     const std::vector<std::string> &ExtraArgs = std::vector<std::string>()) {
   std::vector<SymbolAndSignals> Symbols = {
       {SymbolInfo("string", SymbolInfo::SymbolKind::Class, "<string>",

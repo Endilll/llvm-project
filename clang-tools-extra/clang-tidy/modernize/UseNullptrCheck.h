@@ -15,7 +15,7 @@ namespace clang::tidy::modernize {
 
 class UseNullptrCheck : public ClangTidyCheck {
 public:
-  UseNullptrCheck(StringRef Name, ClangTidyContext *Context);
+  UseNullptrCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     // FIXME this should be CPlusPlus11 but that causes test cases to
     // erroneously fail.
@@ -26,9 +26,9 @@ public:
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
-  const StringRef NullMacrosStr;
-  SmallVector<StringRef, 1> NullMacros;
-  std::vector<StringRef> IgnoredTypes;
+  const llvm::StringRef NullMacrosStr;
+  llvm::SmallVector<llvm::StringRef, 1> NullMacros;
+  std::vector<llvm::StringRef> IgnoredTypes;
 };
 
 } // namespace clang::tidy::modernize

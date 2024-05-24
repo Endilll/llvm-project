@@ -28,7 +28,7 @@ using namespace clang;
 using llvm::errc;
 using llvm::StringError;
 
-StringRef clang::tooling::getText(CharSourceRange Range,
+llvm::StringRef clang::tooling::getText(CharSourceRange Range,
                                   const ASTContext &Context) {
   return Lexer::getSourceText(Range, Context.getSourceManager(),
                               Context.getLangOpts());
@@ -449,7 +449,7 @@ CharSourceRange tooling::getAssociatedRange(const Decl &Decl,
             SM, skipWhitespaceAndNewline(SM, Comment->getEndLoc(), LangOpts),
             LangOpts) &&
         atOrBeforeSeparation(SM, Range.getEnd(), LangOpts)) {
-      const StringRef CommentText = Comment->getRawText(SM);
+      const llvm::StringRef CommentText = Comment->getRawText(SM);
       if (!CommentText.contains("LINT.IfChange") &&
           !CommentText.contains("LINT.ThenChange"))
         Range.setBegin(Comment->getBeginLoc());
@@ -464,7 +464,7 @@ CharSourceRange tooling::getAssociatedRange(const Decl &Decl,
     // Extend to the left '[[' or '__attribute((' if we saw the attribute,
     // unless it is not a valid location.
     bool Invalid;
-    StringRef Source =
+    llvm::StringRef Source =
         SM.getBufferData(SM.getFileID(Range.getBegin()), &Invalid);
     if (Invalid)
       continue;

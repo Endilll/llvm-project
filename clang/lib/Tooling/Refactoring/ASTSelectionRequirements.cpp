@@ -13,10 +13,10 @@
 using namespace clang;
 using namespace tooling;
 
-Expected<SelectedASTNode>
+llvm::Expected<SelectedASTNode>
 ASTSelectionRequirement::evaluate(RefactoringRuleContext &Context) const {
   // FIXME: Memoize so that selection is evaluated only once.
-  Expected<SourceRange> Range =
+  llvm::Expected<SourceRange> Range =
       SourceRangeSelectionRequirement::evaluate(Context);
   if (!Range)
     return Range.takeError();
@@ -29,10 +29,10 @@ ASTSelectionRequirement::evaluate(RefactoringRuleContext &Context) const {
   return std::move(*Selection);
 }
 
-Expected<CodeRangeASTSelection> CodeRangeASTSelectionRequirement::evaluate(
+llvm::Expected<CodeRangeASTSelection> CodeRangeASTSelectionRequirement::evaluate(
     RefactoringRuleContext &Context) const {
   // FIXME: Memoize so that selection is evaluated only once.
-  Expected<SelectedASTNode> ASTSelection =
+  llvm::Expected<SelectedASTNode> ASTSelection =
       ASTSelectionRequirement::evaluate(Context);
   if (!ASTSelection)
     return ASTSelection.takeError();

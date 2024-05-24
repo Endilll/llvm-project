@@ -107,7 +107,7 @@ namespace tidy::readability {
 
 using utils::isBinaryOrTernary;
 
-ContainerSizeEmptyCheck::ContainerSizeEmptyCheck(StringRef Name,
+ContainerSizeEmptyCheck::ContainerSizeEmptyCheck(llvm::StringRef Name,
                                                  ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       ExcludedComparisonTypes(utils::options::parseStringList(

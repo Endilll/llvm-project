@@ -146,9 +146,9 @@ class Reporter {
     unsigned Offset;
     RefType Type;
     Symbol Sym;
-    SmallVector<SymbolLocation> Locations = {};
-    SmallVector<Header> Headers = {};
-    SmallVector<const Include *> Includes = {};
+    llvm::SmallVector<SymbolLocation> Locations = {};
+    llvm::SmallVector<Header> Headers = {};
+    llvm::SmallVector<const Include *> Includes = {};
     bool Satisfied = false;  // Is the include present?
     std::string Insert = {}; // If we had no includes, what would we insert?
   };

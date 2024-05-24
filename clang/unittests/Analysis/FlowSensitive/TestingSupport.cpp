@@ -226,7 +226,7 @@ const IndirectFieldDecl *test::findIndirectFieldDecl(ASTContext &ASTCtx,
   return Result;
 }
 
-std::vector<const Formula *> test::parseFormulas(Arena &A, StringRef Lines) {
+std::vector<const Formula *> test::parseFormulas(Arena &A, llvm::StringRef Lines) {
   std::vector<const Formula *> Result;
   while (!Lines.empty()) {
     auto [First, Rest] = Lines.split('\n');

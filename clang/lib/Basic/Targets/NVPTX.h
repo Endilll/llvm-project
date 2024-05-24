@@ -73,11 +73,11 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
   bool
   initFeatureMap(llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags,
-                 StringRef CPU,
+                 llvm::StringRef CPU,
                  const std::vector<std::string> &FeaturesVec) const override {
     if (GPU != CudaArch::UNUSED)
       Features[CudaArchToString(GPU)] = true;
@@ -85,11 +85,11 @@ public:
     return TargetInfo::initFeatureMap(Features, Diags, CPU, FeaturesVec);
   }
 
-  bool hasFeature(StringRef Feature) const override;
+  bool hasFeature(llvm::StringRef Feature) const override;
 
-  ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     // No aliases.
     return std::nullopt;
   }
@@ -120,11 +120,11 @@ public:
     return TargetInfo::CharPtrBuiltinVaList;
   }
 
-  bool isValidCPUName(StringRef Name) const override {
+  bool isValidCPUName(llvm::StringRef Name) const override {
     return StringToCudaArch(Name) != CudaArch::UNKNOWN;
   }
 
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override {
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override {
     for (int i = static_cast<int>(CudaArch::SM_20);
          i < static_cast<int>(CudaArch::Generic); ++i)
       Values.emplace_back(CudaArchToString(static_cast<CudaArch>(i)));

@@ -19,7 +19,7 @@ namespace clang::tidy::android {
 /// http://clang.llvm.org/extra/clang-tidy/checks/android/cloexec-inotify-init1.html
 class CloexecInotifyInit1Check : public CloexecCheck {
 public:
-  CloexecInotifyInit1Check(StringRef Name, ClangTidyContext *Context)
+  CloexecInotifyInit1Check(llvm::StringRef Name, ClangTidyContext *Context)
       : CloexecCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

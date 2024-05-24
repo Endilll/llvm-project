@@ -71,7 +71,7 @@ Nullability getNullabilityAnnotation(QualType Type);
 /// simple expressions that consist of an optional minus sign token and then a
 /// token for an integer. If we cannot parse the value then std::nullopt is
 /// returned.
-std::optional<int> tryExpandAsInteger(StringRef Macro, const Preprocessor &PP);
+std::optional<int> tryExpandAsInteger(llvm::StringRef Macro, const Preprocessor &PP);
 
 class OperatorKind {
   union {

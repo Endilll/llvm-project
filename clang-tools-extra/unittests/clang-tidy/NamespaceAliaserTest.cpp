@@ -21,7 +21,7 @@ namespace utils {
 // (e.g. with one SourceManager).
 class InsertAliasCheck : public ClangTidyCheck {
 public:
-  InsertAliasCheck(StringRef Name, ClangTidyContext *Context)
+  InsertAliasCheck(llvm::StringRef Name, ClangTidyContext *Context)
       :ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override {
     Finder->addMatcher(ast_matchers::callExpr().bind("foo"), this);
@@ -47,8 +47,8 @@ private:
 };
 
 template <typename Check>
-std::string runChecker(StringRef Code, unsigned ExpectedWarningCount) {
-  std::map<StringRef, StringRef> AdditionalFileContents = {{"foo.h",
+std::string runChecker(llvm::StringRef Code, unsigned ExpectedWarningCount) {
+  std::map<llvm::StringRef, llvm::StringRef> AdditionalFileContents = {{"foo.h",
                                                             "namespace foo {\n"
                                                             "namespace bar {\n"
                                                             "}\n"

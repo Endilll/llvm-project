@@ -79,7 +79,7 @@ public:
   /// target-specific metadata for the given globals.
   virtual void emitTargetMetadata(
       CodeGen::CodeGenModule &CGM,
-      const llvm::MapVector<GlobalDecl, StringRef> &MangledDeclNames) const {}
+      const llvm::MapVector<GlobalDecl, llvm::StringRef> &MangledDeclNames) const {}
 
   /// Provides a convenient hook to handle extra target-specific globals.
   virtual void emitTargetGlobals(CodeGen::CodeGenModule &CGM) const {}
@@ -169,7 +169,7 @@ public:
   /// \returns A pointer to a new LLVM type, possibly the same as the original
   /// on success; 0 on failure.
   virtual llvm::Type *adjustInlineAsmType(CodeGen::CodeGenFunction &CGF,
-                                          StringRef Constraint,
+                                          llvm::StringRef Constraint,
                                           llvm::Type *Ty) const {
     return Ty;
   }
@@ -203,7 +203,7 @@ public:
   /// a particular instruction sequence.  This functions returns
   /// that instruction sequence in inline assembly, which will be
   /// empty if none is required.
-  virtual StringRef getARCRetainAutoreleasedReturnValueMarker() const {
+  virtual llvm::StringRef getARCRetainAutoreleasedReturnValueMarker() const {
     return "";
   }
 
@@ -336,7 +336,7 @@ public:
   /// Interface class for filling custom fields of a block literal for OpenCL.
   class TargetOpenCLBlockHelper {
   public:
-    typedef std::pair<llvm::Value *, StringRef> ValueTy;
+    typedef std::pair<llvm::Value *, llvm::StringRef> ValueTy;
     TargetOpenCLBlockHelper() {}
     virtual ~TargetOpenCLBlockHelper() {}
     /// Get the custom field types for OpenCL blocks.
@@ -414,7 +414,7 @@ public:
   }
 
 protected:
-  static std::string qualifyWindowsLibrary(StringRef Lib);
+  static std::string qualifyWindowsLibrary(llvm::StringRef Lib);
 
   void addStackProbeTargetAttributes(const Decl *D, llvm::GlobalValue *GV,
                                      CodeGen::CodeGenModule &CGM) const;

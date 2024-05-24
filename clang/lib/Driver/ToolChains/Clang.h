@@ -93,13 +93,13 @@ private:
                       llvm::opt::ArgStringList &CmdArgs) const;
 
   mutable std::unique_ptr<llvm::raw_fd_ostream> CompilationDatabase = nullptr;
-  void DumpCompilationDatabase(Compilation &C, StringRef Filename,
-                               StringRef Target,
+  void DumpCompilationDatabase(Compilation &C, llvm::StringRef Filename,
+                               llvm::StringRef Target,
                                const InputInfo &Output, const InputInfo &Input,
                                const llvm::opt::ArgList &Args) const;
 
   void DumpCompilationDatabaseFragmentToDir(
-      StringRef Dir, Compilation &C, StringRef Target, const InputInfo &Output,
+      llvm::StringRef Dir, Compilation &C, llvm::StringRef Target, const InputInfo &Output,
       const InputInfo &Input, const llvm::opt::ArgList &Args) const;
 
 public:

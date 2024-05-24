@@ -16,7 +16,7 @@
 #include "clang/Frontend/FrontendDiagnostic.h"
 #include "clang/Frontend/Utils.h"
 #include "clang/Lex/HeaderSearchOptions.h"
-#include "llvm/ADT/SmallSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Analysis/AliasAnalysis.h"
@@ -138,11 +138,11 @@ class EmitAssemblyHelper {
   const clang::TargetOptions &TargetOpts;
   const LangOptions &LangOpts;
   llvm::Module *TheModule;
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS;
 
   Timer CodeGenerationTime;
 
-  std::unique_ptr<raw_pwrite_stream> OS;
+  std::unique_ptr<llvm::raw_pwrite_stream> OS;
 
   Triple TargetTriple;
 
@@ -167,9 +167,9 @@ class EmitAssemblyHelper {
   ///
   /// \return True on success.
   bool AddEmitPasses(legacy::PassManager &CodeGenPasses, BackendAction Action,
-                     raw_pwrite_stream &OS, raw_pwrite_stream *DwoOS);
+                     llvm::raw_pwrite_stream &OS, llvm::raw_pwrite_stream *DwoOS);
 
-  std::unique_ptr<llvm::ToolOutputFile> openOutputFile(StringRef Path) {
+  std::unique_ptr<llvm::ToolOutputFile> openOutputFile(llvm::StringRef Path) {
     std::error_code EC;
     auto F = std::make_unique<llvm::ToolOutputFile>(Path, EC,
                                                      llvm::sys::fs::OF_None);
@@ -181,10 +181,10 @@ class EmitAssemblyHelper {
   }
 
   void RunOptimizationPipeline(
-      BackendAction Action, std::unique_ptr<raw_pwrite_stream> &OS,
+      BackendAction Action, std::unique_ptr<llvm::raw_pwrite_stream> &OS,
       std::unique_ptr<llvm::ToolOutputFile> &ThinLinkOS, BackendConsumer *BC);
   void RunCodegenPipeline(BackendAction Action,
-                          std::unique_ptr<raw_pwrite_stream> &OS,
+                          std::unique_ptr<llvm::raw_pwrite_stream> &OS,
                           std::unique_ptr<llvm::ToolOutputFile> &DwoOS);
 
   /// Check whether we should emit a module summary for regular LTO.
@@ -211,7 +211,7 @@ public:
                      const CodeGenOptions &CGOpts,
                      const clang::TargetOptions &TOpts,
                      const LangOptions &LOpts, llvm::Module *M,
-                     IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS)
+                     llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS)
       : Diags(_Diags), HSOpts(HeaderSearchOpts), CodeGenOpts(CGOpts),
         TargetOpts(TOpts), LangOpts(LOpts), TheModule(M), VFS(std::move(VFS)),
         CodeGenerationTime("codegen", "Code Generation Time"),
@@ -225,7 +225,7 @@ public:
   std::unique_ptr<TargetMachine> TM;
 
   // Emit output using the new pass manager for the optimization pipeline.
-  void EmitAssembly(BackendAction Action, std::unique_ptr<raw_pwrite_stream> OS,
+  void EmitAssembly(BackendAction Action, std::unique_ptr<llvm::raw_pwrite_stream> OS,
                     BackendConsumer *BC);
 };
 } // namespace
@@ -522,7 +522,7 @@ getInstrProfOptions(const CodeGenOptions &CodeGenOpts,
 }
 
 static void setCommandLineOpts(const CodeGenOptions &CodeGenOpts) {
-  SmallVector<const char *, 16> BackendArgs;
+  llvm::SmallVector<const char *, 16> BackendArgs;
   BackendArgs.push_back("clang"); // Fake program name.
   if (!CodeGenOpts.DebugPass.empty()) {
     BackendArgs.push_back("-debug-pass");
@@ -576,8 +576,8 @@ void EmitAssemblyHelper::CreateTargetMachine(bool MustCreateTM) {
 
 bool EmitAssemblyHelper::AddEmitPasses(legacy::PassManager &CodeGenPasses,
                                        BackendAction Action,
-                                       raw_pwrite_stream &OS,
-                                       raw_pwrite_stream *DwoOS) {
+                                       llvm::raw_pwrite_stream &OS,
+                                       llvm::raw_pwrite_stream *DwoOS) {
   // Add LibraryInfo.
   std::unique_ptr<TargetLibraryInfoImpl> TLII(
       llvm::driver::createTLII(TargetTriple, CodeGenOpts.getVecLib()));
@@ -769,7 +769,7 @@ static void addSanitizers(const Triple &TargetTriple,
 }
 
 void EmitAssemblyHelper::RunOptimizationPipeline(
-    BackendAction Action, std::unique_ptr<raw_pwrite_stream> &OS,
+    BackendAction Action, std::unique_ptr<llvm::raw_pwrite_stream> &OS,
     std::unique_ptr<llvm::ToolOutputFile> &ThinLinkOS, BackendConsumer *BC) {
   std::optional<PGOOptions> PGOOpt;
 
@@ -1107,7 +1107,7 @@ void EmitAssemblyHelper::RunOptimizationPipeline(
   // Print a textual, '-passes=' compatible, representation of pipeline if
   // requested.
   if (PrintPipelinePasses) {
-    MPM.printPipeline(outs(), [&PIC](StringRef ClassName) {
+    MPM.printPipeline(outs(), [&PIC](llvm::StringRef ClassName) {
       auto PassName = PIC.getPassNameForClassName(ClassName);
       return PassName.empty() ? ClassName : PassName;
     });
@@ -1128,7 +1128,7 @@ void EmitAssemblyHelper::RunOptimizationPipeline(
 }
 
 void EmitAssemblyHelper::RunCodegenPipeline(
-    BackendAction Action, std::unique_ptr<raw_pwrite_stream> &OS,
+    BackendAction Action, std::unique_ptr<llvm::raw_pwrite_stream> &OS,
     std::unique_ptr<llvm::ToolOutputFile> &DwoOS) {
   // We still use the legacy PM to run the codegen pipeline since the new PM
   // does not work with the codegen pipeline.
@@ -1171,7 +1171,7 @@ void EmitAssemblyHelper::RunCodegenPipeline(
 }
 
 void EmitAssemblyHelper::EmitAssembly(BackendAction Action,
-                                      std::unique_ptr<raw_pwrite_stream> OS,
+                                      std::unique_ptr<llvm::raw_pwrite_stream> OS,
                                       BackendConsumer *BC) {
   TimeRegion Region(CodeGenOpts.TimePasses ? &CodeGenerationTime : nullptr);
   setCommandLineOpts(CodeGenOpts);
@@ -1201,10 +1201,10 @@ static void runThinLTOBackend(
     DiagnosticsEngine &Diags, ModuleSummaryIndex *CombinedIndex,
     llvm::Module *M, const HeaderSearchOptions &HeaderOpts,
     const CodeGenOptions &CGOpts, const clang::TargetOptions &TOpts,
-    const LangOptions &LOpts, std::unique_ptr<raw_pwrite_stream> OS,
+    const LangOptions &LOpts, std::unique_ptr<llvm::raw_pwrite_stream> OS,
     std::string SampleProfile, std::string ProfileRemapping,
     BackendAction Action) {
-  DenseMap<StringRef, DenseMap<GlobalValue::GUID, GlobalValueSummary *>>
+  DenseMap<llvm::StringRef, DenseMap<GlobalValue::GUID, GlobalValueSummary *>>
       ModuleToDefinedGVSummaries;
   CombinedIndex->collectDefinedGVSummariesPerModule(ModuleToDefinedGVSummaries);
 
@@ -1217,7 +1217,7 @@ static void runThinLTOBackend(
   if (!lto::initImportList(*M, *CombinedIndex, ImportList))
     return;
 
-  auto AddStream = [&](size_t Task, const Twine &ModuleName) {
+  auto AddStream = [&](size_t Task, const llvm::Twine &ModuleName) {
     return std::make_unique<CachedFileStream>(std::move(OS),
                                               CGOpts.ObjectFilenameForDebug);
   };
@@ -1305,9 +1305,9 @@ static void runThinLTOBackend(
 void clang::EmitBackendOutput(
     DiagnosticsEngine &Diags, const HeaderSearchOptions &HeaderOpts,
     const CodeGenOptions &CGOpts, const clang::TargetOptions &TOpts,
-    const LangOptions &LOpts, StringRef TDesc, llvm::Module *M,
-    BackendAction Action, IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
-    std::unique_ptr<raw_pwrite_stream> OS, BackendConsumer *BC) {
+    const LangOptions &LOpts, llvm::StringRef TDesc, llvm::Module *M,
+    BackendAction Action, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
+    std::unique_ptr<llvm::raw_pwrite_stream> OS, BackendConsumer *BC) {
 
   llvm::TimeTraceScope TimeScope("Backend");
 
@@ -1382,7 +1382,7 @@ void clang::EmbedObject(llvm::Module *M, const CodeGenOptions &CGOpts,
   if (CGOpts.OffloadObjects.empty())
     return;
 
-  for (StringRef OffloadObject : CGOpts.OffloadObjects) {
+  for (llvm::StringRef OffloadObject : CGOpts.OffloadObjects) {
     llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> ObjectOrErr =
         llvm::MemoryBuffer::getFileOrSTDIN(OffloadObject);
     if (ObjectOrErr.getError()) {

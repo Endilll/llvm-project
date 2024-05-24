@@ -522,7 +522,7 @@ bool ExternalASTMerger::FindExternalVisibleDeclsByName(const DeclContext *DC,
 
 void ExternalASTMerger::FindExternalLexicalDecls(
     const DeclContext *DC, llvm::function_ref<bool(Decl::Kind)> IsKindWeWant,
-    SmallVectorImpl<Decl *> &Result) {
+    llvm::SmallVectorImpl<Decl *> &Result) {
   ForEachMatchingDC(DC, [&](ASTImporter &Forward, ASTImporter &Reverse,
                             Source<const DeclContext *> SourceDC) -> bool {
     for (const Decl *SourceDecl : SourceDC.get()->decls()) {

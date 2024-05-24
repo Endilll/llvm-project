@@ -41,11 +41,11 @@ public:
   void checkPreStmt(const CallExpr *CE, CheckerContext &C) const;
 
   void CheckDispatchOnce(CheckerContext &C, const CallExpr *CE,
-                         StringRef FName) const;
+                         llvm::StringRef FName) const;
 
   typedef void (MacOSXAPIChecker::*SubChecker)(CheckerContext &,
                                                const CallExpr *,
-                                               StringRef FName) const;
+                                               llvm::StringRef FName) const;
 };
 } //end anonymous namespace
 
@@ -65,7 +65,7 @@ MacOSXAPIChecker::getParentIvarRegion(const MemRegion *R) {
 }
 
 void MacOSXAPIChecker::CheckDispatchOnce(CheckerContext &C, const CallExpr *CE,
-                                         StringRef FName) const {
+                                         llvm::StringRef FName) const {
   if (CE->getNumArgs() < 1)
     return;
 
@@ -86,12 +86,12 @@ void MacOSXAPIChecker::CheckDispatchOnce(CheckerContext &C, const CallExpr *CE,
   // _dispatch_once is then a function which then calls the real dispatch_once.
   // Users do not care; they just want the warning at the top-level call.
   if (CE->getBeginLoc().isMacroID()) {
-    StringRef TrimmedFName = FName.ltrim('_');
+    llvm::StringRef TrimmedFName = FName.ltrim('_');
     if (TrimmedFName != FName)
       FName = TrimmedFName;
   }
 
-  SmallString<256> S;
+  llvm::SmallString<256> S;
   llvm::raw_svector_ostream os(S);
   bool SuggestStatic = false;
   os << "Call to '" << FName << "' uses";
@@ -150,7 +150,7 @@ void MacOSXAPIChecker::CheckDispatchOnce(CheckerContext &C, const CallExpr *CE,
 
 void MacOSXAPIChecker::checkPreStmt(const CallExpr *CE,
                                     CheckerContext &C) const {
-  StringRef Name = C.getCalleeName(CE);
+  llvm::StringRef Name = C.getCalleeName(CE);
   if (Name.empty())
     return;
 

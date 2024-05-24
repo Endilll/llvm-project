@@ -19,7 +19,7 @@ namespace {
 
 class UsingDeclarationsSorterTest : public testing::Test {
 protected:
-  std::string sortUsingDeclarations(StringRef Code,
+  std::string sortUsingDeclarations(llvm::StringRef Code,
                                     const std::vector<tooling::Range> &Ranges,
                                     const FormatStyle &Style = getLLVMStyle()) {
     LLVM_DEBUG(llvm::errs() << "---\n");
@@ -32,7 +32,7 @@ protected:
     return *Result;
   }
 
-  std::string sortUsingDeclarations(StringRef Code,
+  std::string sortUsingDeclarations(llvm::StringRef Code,
                                     const FormatStyle &Style = getLLVMStyle()) {
     return sortUsingDeclarations(Code,
                                  /*Ranges=*/{1, tooling::Range(0, Code.size())},

@@ -19,7 +19,7 @@ namespace clang::tidy::fuchsia {
 /// http://clang.llvm.org/extra/clang-tidy/checks/fuchsia/default-arguments-declarations.html
 class DefaultArgumentsDeclarationsCheck : public ClangTidyCheck {
 public:
-  DefaultArgumentsDeclarationsCheck(StringRef Name, ClangTidyContext *Context)
+  DefaultArgumentsDeclarationsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

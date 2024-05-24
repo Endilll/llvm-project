@@ -244,7 +244,7 @@ ASTUnit *getCursorASTUnit(CXCursor Cursor);
 CXTranslationUnit getCursorTU(CXCursor Cursor);
 
 void getOverriddenCursors(CXCursor cursor,
-                          SmallVectorImpl<CXCursor> &overridden);
+                          llvm::SmallVectorImpl<CXCursor> &overridden);
 
 /// Create an opaque pool used for fast generation of overridden
 /// CXCursor arrays.
@@ -277,7 +277,7 @@ CXCursor getTypeRefCursor(CXCursor cursor);
 /// Generate a USR for \arg D and put it in \arg Buf.
 /// \returns true if no USR was computed or the result should be ignored,
 /// false otherwise.
-bool getDeclCursorUSR(const Decl *D, SmallVectorImpl<char> &Buf);
+bool getDeclCursorUSR(const Decl *D, llvm::SmallVectorImpl<char> &Buf);
 
 bool operator==(CXCursor X, CXCursor Y);
 

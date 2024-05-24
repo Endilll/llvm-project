@@ -135,7 +135,7 @@ TEST(DiagnosticTest, storedDiagEmptyWarning) {
 
   class CaptureDiagnosticConsumer : public DiagnosticConsumer {
   public:
-    SmallVector<StoredDiagnostic> StoredDiags;
+    llvm::SmallVector<StoredDiagnostic> StoredDiags;
 
     void HandleDiagnostic(DiagnosticsEngine::Level level,
                           const Diagnostic &Info) override {

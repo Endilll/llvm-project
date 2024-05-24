@@ -18,7 +18,7 @@ namespace format {
 
 class FormatTestTableGen : public testing::Test {
 protected:
-  static std::string format(StringRef Code, unsigned Offset, unsigned Length,
+  static std::string format(llvm::StringRef Code, unsigned Offset, unsigned Length,
                             const FormatStyle &Style) {
     LLVM_DEBUG(llvm::errs() << "---\n");
     LLVM_DEBUG(llvm::errs() << Code << "\n\n");
@@ -30,22 +30,22 @@ protected:
     return *Result;
   }
 
-  static std::string format(StringRef Code) {
+  static std::string format(llvm::StringRef Code) {
     FormatStyle Style = getGoogleStyle(FormatStyle::LK_TableGen);
     Style.ColumnLimit = 60; // To make writing tests easier.
     return format(Code, 0, Code.size(), Style);
   }
 
-  static void verifyFormat(StringRef Code) {
+  static void verifyFormat(llvm::StringRef Code) {
     EXPECT_EQ(Code.str(), format(Code)) << "Expected code is not stable";
     EXPECT_EQ(Code.str(), format(test::messUp(Code)));
   }
 
-  static void verifyFormat(StringRef Result, StringRef MessedUp) {
+  static void verifyFormat(llvm::StringRef Result, llvm::StringRef MessedUp) {
     EXPECT_EQ(Result, format(MessedUp));
   }
 
-  static void verifyFormat(StringRef Code, const FormatStyle &Style) {
+  static void verifyFormat(llvm::StringRef Code, const FormatStyle &Style) {
     EXPECT_EQ(Code.str(), format(Code, 0, Code.size(), Style))
         << "Expected code is not stable";
     auto MessUp = test::messUp(Code);
@@ -122,7 +122,7 @@ TEST_F(FormatTestTableGen, SimpleValue1_SingleLiterals) {
 TEST_F(FormatTestTableGen, SimpleValue1_MultilineString) {
   // test::messUp does not understand multiline TableGen code-literals.
   // We have to give the result and the strings to format manually.
-  StringRef DefWithCode =
+  llvm::StringRef DefWithCode =
       "def SimpleValueCode {\n"
       "  let Code =\n"
       "      [{ A TokCode is  nothing more than a multi-line string literal "
@@ -130,7 +130,7 @@ TEST_F(FormatTestTableGen, SimpleValue1_MultilineString) {
       "breaks are retained in the string. \n"
       "(https://llvm.org/docs/TableGen/ProgRef.html#grammar-token-TokCode)}];\n"
       "}";
-  StringRef DefWithCodeMessedUp =
+  llvm::StringRef DefWithCodeMessedUp =
       "def SimpleValueCode {  let  \n"
       "Code=       \n"
       "               [{ A TokCode is  nothing more than a multi-line string "

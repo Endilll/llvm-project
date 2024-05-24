@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/throw-keyword-missing.html
 class ThrowKeywordMissingCheck : public ClangTidyCheck {
 public:
-  ThrowKeywordMissingCheck(StringRef Name, ClangTidyContext *Context)
+  ThrowKeywordMissingCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

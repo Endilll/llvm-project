@@ -21,7 +21,7 @@ namespace clang::tidy::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/objc/nsinvocation-argument-lifetime.html
 class NSInvocationArgumentLifetimeCheck : public ClangTidyCheck {
 public:
-  NSInvocationArgumentLifetimeCheck(StringRef Name, ClangTidyContext *Context)
+  NSInvocationArgumentLifetimeCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC && LangOpts.ObjCAutoRefCount;

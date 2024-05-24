@@ -16,7 +16,7 @@
 using namespace clang;
 
 /// Parse a simple identifier.
-static std::string parseName(StringRef S) {
+static std::string parseName(llvm::StringRef S) {
   if (S.empty() || !isAsciiIdentifierStart(S[0]))
     return "";
 
@@ -28,7 +28,7 @@ static std::string parseName(StringRef S) {
 }
 
 /// Parse an unsigned integer and move S to the next non-digit character.
-static bool parseUnsigned(StringRef &S, unsigned long long &ULL) {
+static bool parseUnsigned(llvm::StringRef &S, unsigned long long &ULL) {
   if (S.empty() || !isDigit(S[0]))
     return false;
   unsigned Idx = 1;
@@ -39,7 +39,7 @@ static bool parseUnsigned(StringRef &S, unsigned long long &ULL) {
   return true;
 }
 
-LayoutOverrideSource::LayoutOverrideSource(StringRef Filename) {
+LayoutOverrideSource::LayoutOverrideSource(llvm::StringRef Filename) {
   std::ifstream Input(Filename.str().c_str());
   if (!Input.is_open())
     return;
@@ -53,7 +53,7 @@ LayoutOverrideSource::LayoutOverrideSource(StringRef Filename) {
     std::string Line;
     getline(Input, Line);
 
-    StringRef LineStr(Line);
+    llvm::StringRef LineStr(Line);
 
     // Determine whether the following line will start a
     if (LineStr.contains("*** Dumping AST Record Layout")) {
@@ -70,12 +70,12 @@ LayoutOverrideSource::LayoutOverrideSource(StringRef Filename) {
     if (ExpectingType) {
       ExpectingType = false;
 
-      StringRef::size_type Pos;
-      if ((Pos = LineStr.find("struct ")) != StringRef::npos)
+      llvm::StringRef::size_type Pos;
+      if ((Pos = LineStr.find("struct ")) != llvm::StringRef::npos)
         LineStr = LineStr.substr(Pos + strlen("struct "));
-      else if ((Pos = LineStr.find("class ")) != StringRef::npos)
+      else if ((Pos = LineStr.find("class ")) != llvm::StringRef::npos)
         LineStr = LineStr.substr(Pos + strlen("class "));
-      else if ((Pos = LineStr.find("union ")) != StringRef::npos)
+      else if ((Pos = LineStr.find("union ")) != llvm::StringRef::npos)
         LineStr = LineStr.substr(Pos + strlen("union "));
       else
         continue;
@@ -87,8 +87,8 @@ LayoutOverrideSource::LayoutOverrideSource(StringRef Filename) {
     }
 
     // Check for the size of the type.
-    StringRef::size_type Pos = LineStr.find(" Size:");
-    if (Pos != StringRef::npos) {
+    llvm::StringRef::size_type Pos = LineStr.find(" Size:");
+    if (Pos != llvm::StringRef::npos) {
       // Skip past the " Size:" prefix.
       LineStr = LineStr.substr(Pos + strlen(" Size:"));
 
@@ -100,7 +100,7 @@ LayoutOverrideSource::LayoutOverrideSource(StringRef Filename) {
 
     // Check for the alignment of the type.
     Pos = LineStr.find("Alignment:");
-    if (Pos != StringRef::npos) {
+    if (Pos != llvm::StringRef::npos) {
       // Skip past the "Alignment:" prefix.
       LineStr = LineStr.substr(Pos + strlen("Alignment:"));
 
@@ -113,7 +113,7 @@ LayoutOverrideSource::LayoutOverrideSource(StringRef Filename) {
     // Check for the size/alignment of the type. The number follows "size=" or
     // "align=" indicates number of bytes.
     Pos = LineStr.find("sizeof=");
-    if (Pos != StringRef::npos) {
+    if (Pos != llvm::StringRef::npos) {
       /* Skip past the sizeof= prefix. */
       LineStr = LineStr.substr(Pos + strlen("sizeof="));
 
@@ -123,7 +123,7 @@ LayoutOverrideSource::LayoutOverrideSource(StringRef Filename) {
         CurrentLayout.Size = Size * 8;
 
       Pos = LineStr.find("align=");
-      if (Pos != StringRef::npos) {
+      if (Pos != llvm::StringRef::npos) {
         /* Skip past the align= prefix. */
         LineStr = LineStr.substr(Pos + strlen("align="));
 
@@ -138,7 +138,7 @@ LayoutOverrideSource::LayoutOverrideSource(StringRef Filename) {
 
     // Check for the field offsets of the type.
     Pos = LineStr.find("FieldOffsets: [");
-    if (Pos != StringRef::npos) {
+    if (Pos != llvm::StringRef::npos) {
       LineStr = LineStr.substr(Pos + strlen("FieldOffsets: ["));
       while (!LineStr.empty() && isDigit(LineStr[0])) {
         unsigned long long Offset = 0;
@@ -153,7 +153,7 @@ LayoutOverrideSource::LayoutOverrideSource(StringRef Filename) {
 
     // Check for the virtual base offsets.
     Pos = LineStr.find("VBaseOffsets: [");
-    if (Pos != StringRef::npos) {
+    if (Pos != llvm::StringRef::npos) {
       LineStr = LineStr.substr(Pos + strlen("VBaseOffsets: ["));
       while (!LineStr.empty() && isDigit(LineStr[0])) {
         unsigned long long Offset = 0;
@@ -169,7 +169,7 @@ LayoutOverrideSource::LayoutOverrideSource(StringRef Filename) {
 
     // Check for the base offsets.
     Pos = LineStr.find("BaseOffsets: [");
-    if (Pos != StringRef::npos) {
+    if (Pos != llvm::StringRef::npos) {
       LineStr = LineStr.substr(Pos + strlen("BaseOffsets: ["));
       while (!LineStr.empty() && isDigit(LineStr[0])) {
         unsigned long long Offset = 0;
@@ -243,7 +243,7 @@ LayoutOverrideSource::layoutRecordType(const RecordDecl *Record,
 }
 
 LLVM_DUMP_METHOD void LayoutOverrideSource::dump() {
-  raw_ostream &OS = llvm::errs();
+  llvm::raw_ostream &OS = llvm::errs();
   for (llvm::StringMap<Layout>::iterator L = Layouts.begin(),
                                       LEnd = Layouts.end();
        L != LEnd; ++L) {

@@ -46,22 +46,22 @@ CXString createRef(const char *String);
 /// \p String can be changed or freed by the caller.
 CXString createDup(const char *String);
 
-/// Create a CXString object from a StringRef.  New CXString may
+/// Create a CXString object from a llvm::StringRef.  New CXString may
 /// contain a pointer to the undrelying data of \p String.
 ///
 /// \p String should not be changed by the caller afterwards.
-CXString createRef(StringRef String);
+CXString createRef(llvm::StringRef String);
 
-/// Create a CXString object from a StringRef.  New CXString will
+/// Create a CXString object from a llvm::StringRef.  New CXString will
 /// contain a copy of \p String.
 ///
 /// \p String can be changed or freed by the caller.
-CXString createDup(StringRef String);
+CXString createDup(llvm::StringRef String);
 
 // Usually std::string is intended to be used as backing storage for CXString.
 // In this case, call \c createRef(String.c_str()).
 //
-// If you need to make a copy, call \c createDup(StringRef(String)).
+// If you need to make a copy, call \c createDup(llvm::StringRef(String)).
 CXString createRef(std::string String) = delete;
 
 /// Create a CXString object that is backed by a string buffer.
@@ -83,7 +83,7 @@ private:
 };
 
 struct CXStringBuf {
-  SmallString<128> Data;
+  llvm::SmallString<128> Data;
   CXTranslationUnit TU;
 
   CXStringBuf(CXTranslationUnit TU) : TU(TU) {}
@@ -99,8 +99,8 @@ bool isManagedByPool(CXString str);
 
 }
 
-static inline StringRef getContents(const CXUnsavedFile &UF) {
-  return StringRef(UF.Contents, UF.Length);
+static inline llvm::StringRef getContents(const CXUnsavedFile &UF) {
+  return llvm::StringRef(UF.Contents, UF.Length);
 }
 }
 

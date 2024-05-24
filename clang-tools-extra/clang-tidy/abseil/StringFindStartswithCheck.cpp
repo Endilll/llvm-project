@@ -22,7 +22,7 @@ namespace clang::tidy::abseil {
 const auto DefaultStringLikeClasses =
     "::std::basic_string;::std::basic_string_view";
 
-StringFindStartswithCheck::StringFindStartswithCheck(StringRef Name,
+StringFindStartswithCheck::StringFindStartswithCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StringLikeClasses(utils::options::parseStringList(
@@ -99,10 +99,10 @@ void StringFindStartswithCheck::check(const MatchFinder::MatchResult &Result) {
 
   // Get the source code blocks (as characters) for both the string object
   // and the search expression
-  const StringRef NeedleExprCode = Lexer::getSourceText(
+  const llvm::StringRef NeedleExprCode = Lexer::getSourceText(
       CharSourceRange::getTokenRange(Needle->getSourceRange()), Source,
       Context.getLangOpts());
-  const StringRef HaystackExprCode = Lexer::getSourceText(
+  const llvm::StringRef HaystackExprCode = Lexer::getSourceText(
       CharSourceRange::getTokenRange(Haystack->getSourceRange()), Source,
       Context.getLangOpts());
 

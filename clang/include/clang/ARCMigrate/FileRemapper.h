@@ -43,38 +43,38 @@ public:
   FileRemapper();
   ~FileRemapper();
 
-  bool initFromDisk(StringRef outputDir, DiagnosticsEngine &Diag,
+  bool initFromDisk(llvm::StringRef outputDir, DiagnosticsEngine &Diag,
                     bool ignoreIfFilesChanged);
-  bool initFromFile(StringRef filePath, DiagnosticsEngine &Diag,
+  bool initFromFile(llvm::StringRef filePath, DiagnosticsEngine &Diag,
                     bool ignoreIfFilesChanged);
-  bool flushToDisk(StringRef outputDir, DiagnosticsEngine &Diag);
-  bool flushToFile(StringRef outputPath, DiagnosticsEngine &Diag);
+  bool flushToDisk(llvm::StringRef outputDir, DiagnosticsEngine &Diag);
+  bool flushToFile(llvm::StringRef outputPath, DiagnosticsEngine &Diag);
 
   bool overwriteOriginal(DiagnosticsEngine &Diag,
-                         StringRef outputDir = StringRef());
+                         llvm::StringRef outputDir = llvm::StringRef());
 
-  void remap(StringRef filePath, std::unique_ptr<llvm::MemoryBuffer> memBuf);
+  void remap(llvm::StringRef filePath, std::unique_ptr<llvm::MemoryBuffer> memBuf);
 
   void applyMappings(PreprocessorOptions &PPOpts) const;
 
   /// Iterate through all the mappings.
   void forEachMapping(
-      llvm::function_ref<void(StringRef, StringRef)> CaptureFile,
-      llvm::function_ref<void(StringRef, const llvm::MemoryBufferRef &)>
+      llvm::function_ref<void(llvm::StringRef, llvm::StringRef)> CaptureFile,
+      llvm::function_ref<void(llvm::StringRef, const llvm::MemoryBufferRef &)>
           CaptureBuffer) const;
 
-  void clear(StringRef outputDir = StringRef());
+  void clear(llvm::StringRef outputDir = llvm::StringRef());
 
 private:
   void remap(FileEntryRef file, std::unique_ptr<llvm::MemoryBuffer> memBuf);
   void remap(FileEntryRef file, FileEntryRef newfile);
 
-  OptionalFileEntryRef getOriginalFile(StringRef filePath);
+  OptionalFileEntryRef getOriginalFile(llvm::StringRef filePath);
   void resetTarget(Target &targ);
 
-  bool report(const Twine &err, DiagnosticsEngine &Diag);
+  bool report(const llvm::Twine &err, DiagnosticsEngine &Diag);
 
-  std::string getRemapInfoFile(StringRef outputDir);
+  std::string getRemapInfoFile(llvm::StringRef outputDir);
 };
 
 } // end namespace arcmt

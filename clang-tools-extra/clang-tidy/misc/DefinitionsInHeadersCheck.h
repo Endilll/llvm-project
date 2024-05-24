@@ -25,7 +25,7 @@ namespace clang::tidy::misc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/misc/definitions-in-headers.html
 class DefinitionsInHeadersCheck : public ClangTidyCheck {
 public:
-  DefinitionsInHeadersCheck(StringRef Name, ClangTidyContext *Context);
+  DefinitionsInHeadersCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
   }

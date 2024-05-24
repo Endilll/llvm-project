@@ -73,9 +73,9 @@ bool TokenStream::isFinalized() const {
 void TokenStream::print(llvm::raw_ostream &OS) const {
   bool FirstToken = true;
   unsigned LastLine = -1;
-  StringRef LastText;
+  llvm::StringRef LastText;
   for (const auto &T : tokens()) {
-    StringRef Text = T.text();
+    llvm::StringRef Text = T.text();
     if (FirstToken) {
       FirstToken = false;
     } else if (T.Line == LastLine) {

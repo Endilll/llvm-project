@@ -20,7 +20,7 @@ namespace clang::tidy::hicpp {
 /// http://clang.llvm.org/extra/clang-tidy/checks/hicpp/signed-bitwise.html
 class SignedBitwiseCheck : public ClangTidyCheck {
 public:
-  SignedBitwiseCheck(StringRef Name, ClangTidyContext *Context);
+  SignedBitwiseCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;

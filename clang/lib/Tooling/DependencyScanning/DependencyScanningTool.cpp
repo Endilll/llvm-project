@@ -30,7 +30,7 @@ public:
     this->Opts = std::make_unique<DependencyOutputOptions>(Opts);
   }
 
-  void handleFileDependency(StringRef File) override {
+  void handleFileDependency(llvm::StringRef File) override {
     Dependencies.push_back(std::string(File));
   }
 
@@ -48,7 +48,7 @@ public:
     class DependencyPrinter : public DependencyFileGenerator {
     public:
       DependencyPrinter(DependencyOutputOptions &Opts,
-                        ArrayRef<std::string> Dependencies)
+                        llvm::ArrayRef<std::string> Dependencies)
           : DependencyFileGenerator(Opts) {
         for (const auto &Dep : Dependencies)
           addDependency(Dep);
@@ -71,7 +71,7 @@ protected:
 } // anonymous namespace
 
 llvm::Expected<std::string> DependencyScanningTool::getDependencyFile(
-    const std::vector<std::string> &CommandLine, StringRef CWD) {
+    const std::vector<std::string> &CommandLine, llvm::StringRef CWD) {
   MakeDependencyPrinterConsumer Consumer;
   CallbackActionController Controller(nullptr);
   auto Result =
@@ -84,7 +84,7 @@ llvm::Expected<std::string> DependencyScanningTool::getDependencyFile(
 }
 
 llvm::Expected<P1689Rule> DependencyScanningTool::getP1689ModuleDependencyFile(
-    const CompileCommand &Command, StringRef CWD, std::string &MakeformatOutput,
+    const CompileCommand &Command, llvm::StringRef CWD, std::string &MakeformatOutput,
     std::string &MakeformatOutputPath) {
   class P1689ModuleDependencyPrinterConsumer
       : public MakeDependencyPrinterConsumer {
@@ -104,14 +104,14 @@ llvm::Expected<P1689Rule> DependencyScanningTool::getP1689ModuleDependencyFile(
       Rule.Requires = Requires;
     }
 
-    StringRef getMakeFormatDependencyOutputPath() {
+    llvm::StringRef getMakeFormatDependencyOutputPath() {
       if (Opts->OutputFormat != DependencyOutputFormat::Make)
         return {};
       return Opts->OutputFile;
     }
 
   private:
-    StringRef Filename;
+    llvm::StringRef Filename;
     P1689Rule &Rule;
   };
 
@@ -140,7 +140,7 @@ llvm::Expected<P1689Rule> DependencyScanningTool::getP1689ModuleDependencyFile(
 
 llvm::Expected<TranslationUnitDeps>
 DependencyScanningTool::getTranslationUnitDependencies(
-    const std::vector<std::string> &CommandLine, StringRef CWD,
+    const std::vector<std::string> &CommandLine, llvm::StringRef CWD,
     const llvm::DenseSet<ModuleID> &AlreadySeen,
     LookupModuleOutputCallback LookupModuleOutput) {
   FullDependencyConsumer Consumer(AlreadySeen);
@@ -153,8 +153,8 @@ DependencyScanningTool::getTranslationUnitDependencies(
 }
 
 llvm::Expected<ModuleDepsGraph> DependencyScanningTool::getModuleDependencies(
-    StringRef ModuleName, const std::vector<std::string> &CommandLine,
-    StringRef CWD, const llvm::DenseSet<ModuleID> &AlreadySeen,
+    llvm::StringRef ModuleName, const std::vector<std::string> &CommandLine,
+    llvm::StringRef CWD, const llvm::DenseSet<ModuleID> &AlreadySeen,
     LookupModuleOutputCallback LookupModuleOutput) {
   FullDependencyConsumer Consumer(AlreadySeen);
   CallbackActionController Controller(LookupModuleOutput);

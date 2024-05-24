@@ -15,7 +15,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::modernize {
 
-UseBoolLiteralsCheck::UseBoolLiteralsCheck(StringRef Name,
+UseBoolLiteralsCheck::UseBoolLiteralsCheck(llvm::StringRef Name,
                                            ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreMacros(Options.getLocalOrGlobal("IgnoreMacros", true)) {}

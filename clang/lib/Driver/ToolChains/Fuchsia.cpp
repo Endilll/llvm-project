@@ -257,7 +257,7 @@ Fuchsia::Fuchsia(const Driver &D, const llvm::Triple &Triple,
   getProgramPaths().push_back(getDriver().Dir);
 
   if (!D.SysRoot.empty()) {
-    SmallString<128> P(D.SysRoot);
+    llvm::SmallString<128> P(D.SysRoot);
     llvm::sys::path::append(P, "lib");
     getFilePaths().push_back(std::string(P));
   }
@@ -265,7 +265,7 @@ Fuchsia::Fuchsia(const Driver &D, const llvm::Triple &Triple,
   auto FilePaths = [&](const Multilib &M) -> std::vector<std::string> {
     std::vector<std::string> FP;
     if (std::optional<std::string> Path = getStdlibPath()) {
-      SmallString<128> P(*Path);
+      llvm::SmallString<128> P(*Path);
       llvm::sys::path::append(P, M.gccSuffix());
       FP.push_back(std::string(P));
     }
@@ -354,7 +354,7 @@ Tool *Fuchsia::buildStaticLibTool() const {
 ToolChain::RuntimeLibType Fuchsia::GetRuntimeLibType(
     const ArgList &Args) const {
   if (Arg *A = Args.getLastArg(clang::driver::options::OPT_rtlib_EQ)) {
-    StringRef Value = A->getValue();
+    llvm::StringRef Value = A->getValue();
     if (Value != "compiler-rt")
       getDriver().Diag(clang::diag::err_drv_invalid_rtlib_name)
           << A->getAsString(Args);
@@ -366,7 +366,7 @@ ToolChain::RuntimeLibType Fuchsia::GetRuntimeLibType(
 ToolChain::CXXStdlibType
 Fuchsia::GetCXXStdlibType(const ArgList &Args) const {
   if (Arg *A = Args.getLastArg(options::OPT_stdlib_EQ)) {
-    StringRef Value = A->getValue();
+    llvm::StringRef Value = A->getValue();
     if (Value != "libc++")
       getDriver().Diag(diag::err_drv_invalid_stdlib_name)
         << A->getAsString(Args);
@@ -391,7 +391,7 @@ void Fuchsia::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> P(D.ResourceDir);
+    llvm::SmallString<128> P(D.ResourceDir);
     llvm::sys::path::append(P, "include");
     addSystemInclude(DriverArgs, CC1Args, P);
   }
@@ -400,20 +400,20 @@ void Fuchsia::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   // Check for configure-time C include directories.
-  StringRef CIncludeDirs(C_INCLUDE_DIRS);
+  llvm::StringRef CIncludeDirs(C_INCLUDE_DIRS);
   if (CIncludeDirs != "") {
-    SmallVector<StringRef, 5> dirs;
+    llvm::SmallVector<llvm::StringRef, 5> dirs;
     CIncludeDirs.split(dirs, ":");
-    for (StringRef dir : dirs) {
-      StringRef Prefix =
-          llvm::sys::path::is_absolute(dir) ? "" : StringRef(D.SysRoot);
+    for (llvm::StringRef dir : dirs) {
+      llvm::StringRef Prefix =
+          llvm::sys::path::is_absolute(dir) ? "" : llvm::StringRef(D.SysRoot);
       addExternCSystemInclude(DriverArgs, CC1Args, Prefix + dir);
     }
     return;
   }
 
   if (!D.SysRoot.empty()) {
-    SmallString<128> P(D.SysRoot);
+    llvm::SmallString<128> P(D.SysRoot);
     llvm::sys::path::append(P, "include");
     addExternCSystemInclude(DriverArgs, CC1Args, P.str());
   }
@@ -428,26 +428,26 @@ void Fuchsia::AddClangCXXStdlibIncludeArgs(const ArgList &DriverArgs,
   const Driver &D = getDriver();
   std::string Target = getTripleString();
 
-  auto AddCXXIncludePath = [&](StringRef Path) {
+  auto AddCXXIncludePath = [&](llvm::StringRef Path) {
     std::string Version = detectLibcxxVersion(Path);
     if (Version.empty())
       return;
 
     // First add the per-target include path.
-    SmallString<128> TargetDir(Path);
+    llvm::SmallString<128> TargetDir(Path);
     llvm::sys::path::append(TargetDir, Target, "c++", Version);
     if (getVFS().exists(TargetDir))
       addSystemInclude(DriverArgs, CC1Args, TargetDir);
 
     // Second add the generic one.
-    SmallString<128> Dir(Path);
+    llvm::SmallString<128> Dir(Path);
     llvm::sys::path::append(Dir, "c++", Version);
     addSystemInclude(DriverArgs, CC1Args, Dir);
   };
 
   switch (GetCXXStdlibType(DriverArgs)) {
   case ToolChain::CST_Libcxx: {
-    SmallString<128> P(D.Dir);
+    llvm::SmallString<128> P(D.Dir);
     llvm::sys::path::append(P, "..", "include");
     AddCXXIncludePath(P);
     break;

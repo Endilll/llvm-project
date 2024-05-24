@@ -306,7 +306,7 @@ const DeclContext *Decl::getParentFunctionOrMethod(bool LexicalParent) const {
 // PrettyStackTraceDecl Implementation
 //===----------------------------------------------------------------------===//
 
-void PrettyStackTraceDecl::print(raw_ostream &OS) const {
+void PrettyStackTraceDecl::print(llvm::raw_ostream &OS) const {
   SourceLocation TheLoc = Loc;
   if (TheLoc.isInvalid() && TheDecl)
     TheLoc = TheDecl->getLocation();
@@ -600,15 +600,15 @@ const Attr *Decl::getDefiningAttr() const {
   return nullptr;
 }
 
-static StringRef getRealizedPlatform(const AvailabilityAttr *A,
+static llvm::StringRef getRealizedPlatform(const AvailabilityAttr *A,
                                      const ASTContext &Context) {
   // Check if this is an App Extension "platform", and if so chop off
   // the suffix for matching with the actual platform.
-  StringRef RealizedPlatform = A->getPlatform()->getName();
+  llvm::StringRef RealizedPlatform = A->getPlatform()->getName();
   if (!Context.getLangOpts().AppExt)
     return RealizedPlatform;
   size_t suffix = RealizedPlatform.rfind("_app_extension");
-  if (suffix != StringRef::npos)
+  if (suffix != llvm::StringRef::npos)
     return RealizedPlatform.slice(0, suffix);
   return RealizedPlatform;
 }
@@ -625,21 +625,21 @@ static StringRef getRealizedPlatform(const AvailabilityAttr *A,
 static AvailabilityResult CheckAvailability(ASTContext &Context,
                                             const AvailabilityAttr *A,
                                             std::string *Message,
-                                            VersionTuple EnclosingVersion) {
+                                            llvm::VersionTuple EnclosingVersion) {
   if (EnclosingVersion.empty())
     EnclosingVersion = Context.getTargetInfo().getPlatformMinVersion();
 
   if (EnclosingVersion.empty())
     return AR_Available;
 
-  StringRef ActualPlatform = A->getPlatform()->getName();
-  StringRef TargetPlatform = Context.getTargetInfo().getPlatformName();
+  llvm::StringRef ActualPlatform = A->getPlatform()->getName();
+  llvm::StringRef TargetPlatform = Context.getTargetInfo().getPlatformName();
 
   // Match the platform name.
   if (getRealizedPlatform(A, Context) != TargetPlatform)
     return AR_Available;
 
-  StringRef PrettyPlatformName
+  llvm::StringRef PrettyPlatformName
     = AvailabilityAttr::getPrettyPlatformName(ActualPlatform);
 
   if (PrettyPlatformName.empty())
@@ -667,15 +667,15 @@ static AvailabilityResult CheckAvailability(ASTContext &Context,
   if (!A->getIntroduced().empty() &&
       EnclosingVersion < A->getIntroduced()) {
     IdentifierInfo *IIEnv = A->getEnvironment();
-    StringRef TargetEnv =
+    llvm::StringRef TargetEnv =
         Context.getTargetInfo().getTriple().getEnvironmentName();
-    StringRef EnvName = AvailabilityAttr::getPrettyEnviromentName(TargetEnv);
+    llvm::StringRef EnvName = AvailabilityAttr::getPrettyEnviromentName(TargetEnv);
     // Matching environment or no environment on attribute
     if (!IIEnv || (!TargetEnv.empty() && IIEnv->getName() == TargetEnv)) {
       if (Message) {
         Message->clear();
         llvm::raw_string_ostream Out(*Message);
-        VersionTuple VTI(A->getIntroduced());
+        llvm::VersionTuple VTI(A->getIntroduced());
         Out << "introduced in " << PrettyPlatformName << " " << VTI << " "
             << EnvName << HintMessage;
       }
@@ -698,7 +698,7 @@ static AvailabilityResult CheckAvailability(ASTContext &Context,
     if (Message) {
       Message->clear();
       llvm::raw_string_ostream Out(*Message);
-      VersionTuple VTO(A->getObsoleted());
+      llvm::VersionTuple VTO(A->getObsoleted());
       Out << "obsoleted in " << PrettyPlatformName << ' '
           << VTO << HintMessage;
     }
@@ -711,7 +711,7 @@ static AvailabilityResult CheckAvailability(ASTContext &Context,
     if (Message) {
       Message->clear();
       llvm::raw_string_ostream Out(*Message);
-      VersionTuple VTD(A->getDeprecated());
+      llvm::VersionTuple VTD(A->getDeprecated());
       Out << "first deprecated in " << PrettyPlatformName << ' '
           << VTD << HintMessage;
     }
@@ -723,8 +723,8 @@ static AvailabilityResult CheckAvailability(ASTContext &Context,
 }
 
 AvailabilityResult Decl::getAvailability(std::string *Message,
-                                         VersionTuple EnclosingVersion,
-                                         StringRef *RealizedPlatform) const {
+                                         llvm::VersionTuple EnclosingVersion,
+                                         llvm::StringRef *RealizedPlatform) const {
   if (auto *FTD = dyn_cast<FunctionTemplateDecl>(this))
     return FTD->getTemplatedDecl()->getAvailability(Message, EnclosingVersion,
                                                     RealizedPlatform);
@@ -774,9 +774,9 @@ AvailabilityResult Decl::getAvailability(std::string *Message,
   return Result;
 }
 
-VersionTuple Decl::getVersionIntroduced() const {
+llvm::VersionTuple Decl::getVersionIntroduced() const {
   const ASTContext &Context = getASTContext();
-  StringRef TargetPlatform = Context.getTargetInfo().getPlatformName();
+  llvm::StringRef TargetPlatform = Context.getTargetInfo().getPlatformName();
   for (const auto *A : attrs()) {
     if (const auto *Availability = dyn_cast<AvailabilityAttr>(A)) {
       if (getRealizedPlatform(Availability, Context) != TargetPlatform)
@@ -828,7 +828,7 @@ bool Decl::isWeakImported() const {
 
     if (const auto *Availability = dyn_cast<AvailabilityAttr>(A)) {
       if (CheckAvailability(getASTContext(), Availability, nullptr,
-                            VersionTuple()) == AR_NotYetIntroduced)
+                            llvm::VersionTuple()) == AR_NotYetIntroduced)
         return true;
     }
   }
@@ -1449,14 +1449,14 @@ DeclContext *DeclContext::getPrimaryContext() {
 }
 
 template <typename T>
-void collectAllContextsImpl(T *Self, SmallVectorImpl<DeclContext *> &Contexts) {
+void collectAllContextsImpl(T *Self, llvm::SmallVectorImpl<DeclContext *> &Contexts) {
   for (T *D = Self->getMostRecentDecl(); D; D = D->getPreviousDecl())
     Contexts.push_back(D);
 
   std::reverse(Contexts.begin(), Contexts.end());
 }
 
-void DeclContext::collectAllContexts(SmallVectorImpl<DeclContext *> &Contexts) {
+void DeclContext::collectAllContexts(llvm::SmallVectorImpl<DeclContext *> &Contexts) {
   Contexts.clear();
 
   Decl::Kind Kind = getDeclKind();
@@ -1470,7 +1470,7 @@ void DeclContext::collectAllContexts(SmallVectorImpl<DeclContext *> &Contexts) {
 }
 
 std::pair<Decl *, Decl *>
-DeclContext::BuildDeclChain(ArrayRef<Decl *> Decls,
+DeclContext::BuildDeclChain(llvm::ArrayRef<Decl *> Decls,
                             bool FieldsAlreadyLoaded) {
   // Build up a chain of declarations via the Decl::NextInContextAndBits field.
   Decl *FirstNewDecl = nullptr;
@@ -1513,7 +1513,7 @@ DeclContext::LoadLexicalDeclsFromExternalStorage() const {
   ExternalASTSource::Deserializing ADeclContext(Source);
 
   // Load the external declarations, if any.
-  SmallVector<Decl*, 64> Decls;
+  llvm::SmallVector<Decl*, 64> Decls;
   setHasExternalLexicalStorage(false);
   Source->FindExternalLexicalDecls(this, Decls);
 
@@ -1556,7 +1556,7 @@ ExternalASTSource::SetNoExternalVisibleDeclsForName(const DeclContext *DC,
 DeclContext::lookup_result
 ExternalASTSource::SetExternalVisibleDeclsForName(const DeclContext *DC,
                                                   DeclarationName Name,
-                                                  ArrayRef<NamedDecl*> Decls) {
+                                                  llvm::ArrayRef<NamedDecl*> Decls) {
   ASTContext &Context = DC->getParentASTContext();
   StoredDeclsMap *Map;
   if (!(Map = DC->LookupPtr))
@@ -1743,7 +1743,7 @@ StoredDeclsMap *DeclContext::buildLookup() {
       !hasLazyExternalLexicalLookups())
     return LookupPtr;
 
-  SmallVector<DeclContext *, 2> Contexts;
+  llvm::SmallVector<DeclContext *, 2> Contexts;
   collectAllContexts(Contexts);
 
   if (hasLazyExternalLexicalLookups()) {
@@ -1888,7 +1888,7 @@ DeclContext::noload_lookup(DeclarationName Name) {
 // some missing from the external visible lookups.
 void DeclContext::loadLazyLocalLexicalLookups() {
   if (hasLazyLocalLexicalLookups()) {
-    SmallVector<DeclContext *, 2> Contexts;
+    llvm::SmallVector<DeclContext *, 2> Contexts;
     collectAllContexts(Contexts);
     for (auto *Context : Contexts)
       buildLookupImpl(Context, hasExternalVisibleStorage());
@@ -1897,7 +1897,7 @@ void DeclContext::loadLazyLocalLexicalLookups() {
 }
 
 void DeclContext::localUncachedLookup(DeclarationName Name,
-                                      SmallVectorImpl<NamedDecl *> &Results) {
+                                      llvm::SmallVectorImpl<NamedDecl *> &Results) {
   Results.clear();
 
   // If there's no external storage, just perform a normal lookup and copy

@@ -60,7 +60,7 @@ class TemplateDeductionInfo {
 
   /// Warnings (and follow-on notes) that were suppressed due to
   /// SFINAE while performing template argument deduction.
-  SmallVector<PartialDiagnosticAt, 4> SuppressedDiagnostics;
+  llvm::SmallVector<PartialDiagnosticAt, 4> SuppressedDiagnostics;
 
 public:
   TemplateDeductionInfo(SourceLocation Loc, unsigned DeducedDepth = 0)
@@ -166,7 +166,7 @@ public:
   }
 
   /// Iterator over the set of suppressed diagnostics.
-  using diag_iterator = SmallVectorImpl<PartialDiagnosticAt>::const_iterator;
+  using diag_iterator = llvm::SmallVectorImpl<PartialDiagnosticAt>::const_iterator;
 
   /// Returns an iterator at the beginning of the sequence of suppressed
   /// diagnostics.
@@ -245,7 +245,7 @@ public:
   /// Information on packs that we're currently expanding.
   ///
   /// FIXME: This should be kept internal to SemaTemplateDeduction.
-  SmallVector<DeducedPack *, 8> PendingDeducedPacks;
+  llvm::SmallVector<DeducedPack *, 8> PendingDeducedPacks;
 
   /// \brief The constraint satisfaction details resulting from the associated
   /// constraints satisfaction tests.
@@ -336,7 +336,7 @@ struct TemplateSpecCandidate {
 /// TODO: In the future, we may need to unify/generalize this with
 /// OverloadCandidateSet.
 class TemplateSpecCandidateSet {
-  SmallVector<TemplateSpecCandidate, 16> Candidates;
+  llvm::SmallVector<TemplateSpecCandidate, 16> Candidates;
   SourceLocation Loc;
 
   // Stores whether we're taking the address of these candidates. This helps us
@@ -360,7 +360,7 @@ public:
   /// TODO: This may be unnecessary.
   void clear();
 
-  using iterator = SmallVector<TemplateSpecCandidate, 16>::iterator;
+  using iterator = llvm::SmallVector<TemplateSpecCandidate, 16>::iterator;
 
   iterator begin() { return Candidates.begin(); }
   iterator end() { return Candidates.end(); }

@@ -21,7 +21,7 @@
 namespace clang {
 namespace ast_matchers {
 
-void createVirtualFileIfNeeded(ASTUnit *ToAST, StringRef FileName,
+void createVirtualFileIfNeeded(ASTUnit *ToAST, llvm::StringRef FileName,
                                std::unique_ptr<llvm::MemoryBuffer> &&Buffer) {
   assert(ToAST);
   ASTContext &ToCtx = ToAST->getASTContext();
@@ -32,13 +32,13 @@ void createVirtualFileIfNeeded(ASTUnit *ToAST, StringRef FileName,
   MFS->addFile(FileName, 0, std::move(Buffer));
 }
 
-void createVirtualFileIfNeeded(ASTUnit *ToAST, StringRef FileName,
-                               StringRef Code) {
+void createVirtualFileIfNeeded(ASTUnit *ToAST, llvm::StringRef FileName,
+                               llvm::StringRef Code) {
   return createVirtualFileIfNeeded(ToAST, FileName,
                                    llvm::MemoryBuffer::getMemBuffer(Code));
 }
 
-ASTImporterTestBase::TU::TU(StringRef Code, StringRef FileName,
+ASTImporterTestBase::TU::TU(llvm::StringRef Code, llvm::StringRef FileName,
                             std::vector<std::string> Args,
                             ImporterConstructor C,
                             ASTImporter::ODRHandlingType ODRHandling)
@@ -114,8 +114,8 @@ void ASTImporterTestBase::lazyInitSharedState(TranslationUnitDecl *ToTU) {
 }
 
 void ASTImporterTestBase::lazyInitToAST(TestLanguage ToLang,
-                                        StringRef ToSrcCode,
-                                        StringRef FileName) {
+                                        llvm::StringRef ToSrcCode,
+                                        llvm::StringRef FileName) {
   if (ToAST)
     return;
   std::vector<std::string> ToArgs = getCommandLineArgsForLanguage(ToLang);
@@ -139,8 +139,8 @@ ASTImporterTestBase::TU *ASTImporterTestBase::findFromTU(Decl *From) {
 }
 
 std::tuple<Decl *, Decl *> ASTImporterTestBase::getImportedDecl(
-    StringRef FromSrcCode, TestLanguage FromLang, StringRef ToSrcCode,
-    TestLanguage ToLang, StringRef Identifier) {
+    llvm::StringRef FromSrcCode, TestLanguage FromLang, llvm::StringRef ToSrcCode,
+    TestLanguage ToLang, llvm::StringRef Identifier) {
   std::vector<std::string> FromArgs = getCommandLineArgsForLanguage(FromLang);
   std::vector<std::string> ToArgs = getCommandLineArgsForLanguage(ToLang);
 
@@ -157,7 +157,7 @@ std::tuple<Decl *, Decl *> ASTImporterTestBase::getImportedDecl(
   assert(ImportedII && "Declaration with the given identifier "
                        "should be specified in test!");
   DeclarationName ImportDeclName(ImportedII);
-  SmallVector<NamedDecl *, 1> FoundDecls;
+  llvm::SmallVector<NamedDecl *, 1> FoundDecls;
   FromCtx.getTranslationUnitDecl()->localUncachedLookup(ImportDeclName,
                                                         FoundDecls);
 
@@ -170,9 +170,9 @@ std::tuple<Decl *, Decl *> ASTImporterTestBase::getImportedDecl(
   return std::make_tuple(*FoundDecls.begin(), Imported);
 }
 
-TranslationUnitDecl *ASTImporterTestBase::getTuDecl(StringRef SrcCode,
+TranslationUnitDecl *ASTImporterTestBase::getTuDecl(llvm::StringRef SrcCode,
                                                     TestLanguage Lang,
-                                                    StringRef FileName) {
+                                                    llvm::StringRef FileName) {
   assert(llvm::find_if(FromTUs, [FileName](const TU &E) {
            return E.FileName == FileName;
          }) == FromTUs.end());
@@ -184,7 +184,7 @@ TranslationUnitDecl *ASTImporterTestBase::getTuDecl(StringRef SrcCode,
   return Tu.TUDecl;
 }
 
-TranslationUnitDecl *ASTImporterTestBase::getToTuDecl(StringRef ToSrcCode,
+TranslationUnitDecl *ASTImporterTestBase::getToTuDecl(llvm::StringRef ToSrcCode,
                                                       TestLanguage ToLang) {
   std::vector<std::string> ToArgs = getCommandLineArgsForLanguage(ToLang);
   assert(!ToAST);

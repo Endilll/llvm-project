@@ -16,7 +16,7 @@ namespace clang {
 /// A PCHContainerWriter implementation that uses LLVM to
 /// wraps Clang modules inside a COFF, ELF, or Mach-O container.
 class ObjectFilePCHContainerWriter : public PCHContainerWriter {
-  StringRef getFormat() const override { return "obj"; }
+  llvm::StringRef getFormat() const override { return "obj"; }
 
   /// Return an ASTConsumer that can be chained with a
   /// PCHGenerator that produces a wrapper file format
@@ -32,10 +32,10 @@ class ObjectFilePCHContainerWriter : public PCHContainerWriter {
 /// A PCHContainerReader implementation that uses LLVM to
 /// wraps Clang modules inside a COFF, ELF, or Mach-O container.
 class ObjectFilePCHContainerReader : public PCHContainerReader {
-  ArrayRef<StringRef> getFormats() const override;
+  llvm::ArrayRef<llvm::StringRef> getFormats() const override;
 
   /// Returns the serialized AST inside the PCH container Buffer.
-  StringRef ExtractPCH(llvm::MemoryBufferRef Buffer) const override;
+  llvm::StringRef ExtractPCH(llvm::MemoryBufferRef Buffer) const override;
 };
 }
 

@@ -27,7 +27,7 @@ namespace clang::tidy::misc {
 /// be `std::unique_ptr<Foo>*`.
 class UniqueptrResetReleaseCheck : public ClangTidyCheck {
 public:
-  UniqueptrResetReleaseCheck(StringRef Name, ClangTidyContext *Context);
+  UniqueptrResetReleaseCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     // Only register the matchers for C++11; the functionality currently does

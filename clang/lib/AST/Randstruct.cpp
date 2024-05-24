@@ -38,13 +38,13 @@ enum { CACHE_LINE = 64 };
 // The Bucket class holds the struct fields we're trying to fill to a
 // cache-line.
 class Bucket {
-  SmallVector<FieldDecl *, 64> Fields;
+  llvm::SmallVector<FieldDecl *, 64> Fields;
   int Size = 0;
 
 public:
   virtual ~Bucket() = default;
 
-  SmallVector<FieldDecl *, 64> &fields() { return Fields; }
+  llvm::SmallVector<FieldDecl *, 64> &fields() { return Fields; }
   void addField(FieldDecl *Field, int FieldSize);
   virtual bool canFit(int FieldSize) const {
     return Size + FieldSize <= CACHE_LINE;
@@ -67,7 +67,7 @@ void randomizeStructureLayoutImpl(const ASTContext &Context,
                                   llvm::SmallVectorImpl<FieldDecl *> &FieldsOut,
                                   std::mt19937 &RNG) {
   // All of the Buckets produced by best-effort cache-line algorithm.
-  SmallVector<std::unique_ptr<Bucket>, 16> Buckets;
+  llvm::SmallVector<std::unique_ptr<Bucket>, 16> Buckets;
 
   // The current bucket of fields that we are trying to fill to a cache-line.
   std::unique_ptr<Bucket> CurrentBucket;
@@ -155,7 +155,7 @@ void randomizeStructureLayoutImpl(const ASTContext &Context,
   std::shuffle(std::begin(Buckets), std::end(Buckets), RNG);
 
   // Produce the new ordering of the elements from the Buckets.
-  SmallVector<FieldDecl *, 16> FinalOrder;
+  llvm::SmallVector<FieldDecl *, 16> FinalOrder;
   for (const std::unique_ptr<Bucket> &B : Buckets) {
     llvm::SmallVectorImpl<FieldDecl *> &RandFields = B->fields();
     if (!B->isBitfieldRun())
@@ -173,9 +173,9 @@ namespace clang {
 namespace randstruct {
 
 bool randomizeStructureLayout(const ASTContext &Context, RecordDecl *RD,
-                              SmallVectorImpl<Decl *> &FinalOrdering) {
-  SmallVector<FieldDecl *, 64> RandomizedFields;
-  SmallVector<Decl *, 8> PostRandomizedFields;
+                              llvm::SmallVectorImpl<Decl *> &FinalOrdering) {
+  llvm::SmallVector<FieldDecl *, 64> RandomizedFields;
+  llvm::SmallVector<Decl *, 8> PostRandomizedFields;
 
   unsigned TotalNumFields = 0;
   for (Decl *D : RD->decls()) {

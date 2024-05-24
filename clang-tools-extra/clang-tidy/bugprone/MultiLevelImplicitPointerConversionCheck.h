@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/multi-level-implicit-pointer-conversion.html
 class MultiLevelImplicitPointerConversionCheck : public ClangTidyCheck {
 public:
-  MultiLevelImplicitPointerConversionCheck(StringRef Name,
+  MultiLevelImplicitPointerConversionCheck(llvm::StringRef Name,
                                            ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

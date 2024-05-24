@@ -16,7 +16,7 @@ namespace clang::tidy::bugprone {
 /// Finds potentially swapped arguments by looking at implicit conversions.
 class SwappedArgumentsCheck : public ClangTidyCheck {
 public:
-  SwappedArgumentsCheck(StringRef Name, ClangTidyContext *Context)
+  SwappedArgumentsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

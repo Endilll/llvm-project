@@ -335,8 +335,8 @@ StmtResult SemaObjC::ActOnObjCAutoreleasePoolStmt(SourceLocation AtLoc,
 }
 
 TypeResult SemaObjC::actOnObjCProtocolQualifierType(
-    SourceLocation lAngleLoc, ArrayRef<Decl *> protocols,
-    ArrayRef<SourceLocation> protocolLocs, SourceLocation rAngleLoc) {
+    SourceLocation lAngleLoc, llvm::ArrayRef<Decl *> protocols,
+    llvm::ArrayRef<SourceLocation> protocolLocs, SourceLocation rAngleLoc) {
   ASTContext &Context = getASTContext();
   // Form id<protocol-list>.
   QualType Result = Context.getObjCObjectType(
@@ -373,9 +373,9 @@ TypeResult SemaObjC::actOnObjCProtocolQualifierType(
 
 TypeResult SemaObjC::actOnObjCTypeArgsAndProtocolQualifiers(
     Scope *S, SourceLocation Loc, ParsedType BaseType,
-    SourceLocation TypeArgsLAngleLoc, ArrayRef<ParsedType> TypeArgs,
+    SourceLocation TypeArgsLAngleLoc, llvm::ArrayRef<ParsedType> TypeArgs,
     SourceLocation TypeArgsRAngleLoc, SourceLocation ProtocolLAngleLoc,
-    ArrayRef<Decl *> Protocols, ArrayRef<SourceLocation> ProtocolLocs,
+    llvm::ArrayRef<Decl *> Protocols, llvm::ArrayRef<SourceLocation> ProtocolLocs,
     SourceLocation ProtocolRAngleLoc) {
   ASTContext &Context = getASTContext();
   TypeSourceInfo *BaseTypeInfo = nullptr;
@@ -388,7 +388,7 @@ TypeResult SemaObjC::actOnObjCTypeArgsAndProtocolQualifiers(
     BaseTypeInfo = Context.getTrivialTypeSourceInfo(T, Loc);
 
   // Extract type arguments.
-  SmallVector<TypeSourceInfo *, 4> ActualTypeArgInfos;
+  llvm::SmallVector<TypeSourceInfo *, 4> ActualTypeArgInfos;
   for (unsigned i = 0, n = TypeArgs.size(); i != n; ++i) {
     TypeSourceInfo *TypeArgInfo = nullptr;
     QualType TypeArg = SemaRef.GetTypeFromParser(TypeArgs[i], &TypeArgInfo);
@@ -480,8 +480,8 @@ TypeResult SemaObjC::actOnObjCTypeArgsAndProtocolQualifiers(
 
 QualType SemaObjC::BuildObjCTypeParamType(
     const ObjCTypeParamDecl *Decl, SourceLocation ProtocolLAngleLoc,
-    ArrayRef<ObjCProtocolDecl *> Protocols,
-    ArrayRef<SourceLocation> ProtocolLocs, SourceLocation ProtocolRAngleLoc,
+    llvm::ArrayRef<ObjCProtocolDecl *> Protocols,
+    llvm::ArrayRef<SourceLocation> ProtocolLocs, SourceLocation ProtocolRAngleLoc,
     bool FailOnError) {
   ASTContext &Context = getASTContext();
   QualType Result = QualType(Decl->getTypeForDecl(), 0);
@@ -503,7 +503,7 @@ QualType SemaObjC::BuildObjCTypeParamType(
 
 /// Apply Objective-C type arguments to the given type.
 static QualType applyObjCTypeArgs(Sema &S, SourceLocation loc, QualType type,
-                                  ArrayRef<TypeSourceInfo *> typeArgs,
+                                  llvm::ArrayRef<TypeSourceInfo *> typeArgs,
                                   SourceRange typeArgsRange, bool failOnError,
                                   bool rebuilding) {
   // We can only apply type arguments to an Objective-C class type.
@@ -541,7 +541,7 @@ static QualType applyObjCTypeArgs(Sema &S, SourceLocation loc, QualType type,
   }
 
   // Check the type arguments.
-  SmallVector<QualType, 4> finalTypeArgs;
+  llvm::SmallVector<QualType, 4> finalTypeArgs;
   unsigned numTypeParams = typeParams->size();
   bool anyPackExpansions = false;
   for (unsigned i = 0, n = typeArgs.size(); i != n; ++i) {
@@ -707,9 +707,9 @@ static QualType applyObjCTypeArgs(Sema &S, SourceLocation loc, QualType type,
 
 QualType SemaObjC::BuildObjCObjectType(
     QualType BaseType, SourceLocation Loc, SourceLocation TypeArgsLAngleLoc,
-    ArrayRef<TypeSourceInfo *> TypeArgs, SourceLocation TypeArgsRAngleLoc,
-    SourceLocation ProtocolLAngleLoc, ArrayRef<ObjCProtocolDecl *> Protocols,
-    ArrayRef<SourceLocation> ProtocolLocs, SourceLocation ProtocolRAngleLoc,
+    llvm::ArrayRef<TypeSourceInfo *> TypeArgs, SourceLocation TypeArgsRAngleLoc,
+    SourceLocation ProtocolLAngleLoc, llvm::ArrayRef<ObjCProtocolDecl *> Protocols,
+    llvm::ArrayRef<SourceLocation> ProtocolLocs, SourceLocation ProtocolRAngleLoc,
     bool FailOnError, bool Rebuilding) {
   ASTContext &Context = getASTContext();
   QualType Result = BaseType;
@@ -973,7 +973,7 @@ static bool isSetterLikeSelector(Selector sel) {
   if (sel.isUnarySelector())
     return false;
 
-  StringRef str = sel.getNameForSlot(0);
+  llvm::StringRef str = sel.getNameForSlot(0);
   str = str.ltrim('_');
   if (str.starts_with("set"))
     str = str.substr(3);
@@ -1113,7 +1113,7 @@ void SemaObjC::CheckObjCCircularContainer(ObjCMessageExpr *Message) {
       if (ArgRE->isObjCSelfExpr()) {
         Diag(Message->getSourceRange().getBegin(),
              diag::warn_objc_circular_container)
-            << ArgRE->getDecl() << StringRef("'super'");
+            << ArgRE->getDecl() << llvm::StringRef("'super'");
       }
     }
   } else {
@@ -1222,9 +1222,9 @@ bool SemaObjC::CheckObjCString(Expr *Arg) {
   }
 
   if (Literal->containsNonAsciiOrNull()) {
-    StringRef String = Literal->getString();
+    llvm::StringRef String = Literal->getString();
     unsigned NumBytes = String.size();
-    SmallVector<llvm::UTF16, 128> ToBuf(NumBytes);
+    llvm::SmallVector<llvm::UTF16, 128> ToBuf(NumBytes);
     const llvm::UTF8 *FromPtr = (const llvm::UTF8 *)String.data();
     llvm::UTF16 *ToPtr = &ToBuf[0];
 
@@ -1240,7 +1240,7 @@ bool SemaObjC::CheckObjCString(Expr *Arg) {
 }
 
 bool SemaObjC::CheckObjCMethodCall(ObjCMethodDecl *Method, SourceLocation lbrac,
-                                   ArrayRef<const Expr *> Args) {
+                                   llvm::ArrayRef<const Expr *> Args) {
   Sema::VariadicCallType CallType =
       Method->isVariadic() ? Sema::VariadicMethod : Sema::VariadicDoesNotApply;
 
@@ -1405,7 +1405,7 @@ SemaObjC::ObjCSubscriptKind SemaObjC::CheckSubscriptingKind(Expr *FromE) {
   // Look for a conversion to an integral, enumeration type, or
   // objective-C pointer type.
   int NoIntegrals = 0, NoObjCIdPointers = 0;
-  SmallVector<CXXConversionDecl *, 4> ConversionDecls;
+  llvm::SmallVector<CXXConversionDecl *, 4> ConversionDecls;
 
   for (NamedDecl *D : cast<CXXRecordDecl>(RecordTy->getDecl())
                           ->getVisibleConversionFunctions()) {

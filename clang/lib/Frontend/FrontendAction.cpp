@@ -162,7 +162,7 @@ Module *FrontendAction::getCurrentModule() const {
 
 std::unique_ptr<ASTConsumer>
 FrontendAction::CreateWrappedASTConsumer(CompilerInstance &CI,
-                                         StringRef InFile) {
+                                         llvm::StringRef InFile) {
   std::unique_ptr<ASTConsumer> Consumer = CreateASTConsumer(CI, InFile);
   if (!Consumer)
     return nullptr;
@@ -303,14 +303,14 @@ static SourceLocation ReadOriginalFileName(CompilerInstance &CI,
   return T.getLocation();
 }
 
-static SmallVectorImpl<char> &
-operator+=(SmallVectorImpl<char> &Includes, StringRef RHS) {
+static llvm::SmallVectorImpl<char> &
+operator+=(llvm::SmallVectorImpl<char> &Includes, llvm::StringRef RHS) {
   Includes.append(RHS.begin(), RHS.end());
   return Includes;
 }
 
-static void addHeaderInclude(StringRef HeaderName,
-                             SmallVectorImpl<char> &Includes,
+static void addHeaderInclude(llvm::StringRef HeaderName,
+                             llvm::SmallVectorImpl<char> &Includes,
                              const LangOptions &LangOpts,
                              bool IsExternC) {
   if (IsExternC && LangOpts.CPlusPlus)
@@ -336,7 +336,7 @@ static void addHeaderInclude(StringRef HeaderName,
 /// needed to load all of the named headers.
 static std::error_code collectModuleHeaderIncludes(
     const LangOptions &LangOpts, FileManager &FileMgr, DiagnosticsEngine &Diag,
-    ModuleMap &ModMap, clang::Module *Module, SmallVectorImpl<char> &Includes) {
+    ModuleMap &ModMap, clang::Module *Module, llvm::SmallVectorImpl<char> &Includes) {
   // Don't collect any headers for unavailable modules.
   if (!Module->isAvailable())
     return std::error_code();
@@ -381,11 +381,11 @@ static std::error_code collectModuleHeaderIncludes(
                  Module->getUmbrellaDirAsWritten()) {
     // Add all of the headers we find in this subdirectory.
     std::error_code EC;
-    SmallString<128> DirNative;
+    llvm::SmallString<128> DirNative;
     llvm::sys::path::native(UmbrellaDir->Entry.getName(), DirNative);
 
     llvm::vfs::FileSystem &FS = FileMgr.getVirtualFileSystem();
-    SmallVector<std::pair<std::string, FileEntryRef>, 8> Headers;
+    llvm::SmallVector<std::pair<std::string, FileEntryRef>, 8> Headers;
     for (llvm::vfs::recursive_directory_iterator Dir(FS, DirNative, EC), End;
          Dir != End && !EC; Dir.increment(EC)) {
       // Check whether this entry has an extension typically associated with
@@ -407,11 +407,11 @@ static std::error_code collectModuleHeaderIncludes(
         continue;
 
       // Compute the relative path from the directory to this file.
-      SmallVector<StringRef, 16> Components;
+      llvm::SmallVector<llvm::StringRef, 16> Components;
       auto PathIt = llvm::sys::path::rbegin(Dir->path());
       for (int I = 0; I != Dir.level() + 1; ++I, ++PathIt)
         Components.push_back(*PathIt);
-      SmallString<128> RelativeHeader(
+      llvm::SmallString<128> RelativeHeader(
           UmbrellaDir->PathRelativeToRootModuleDirectory);
       for (auto It = Components.rbegin(), End = Components.rend(); It != End;
            ++It)
@@ -475,7 +475,7 @@ static bool loadModuleMapForModuleBuild(CompilerInstance &CI, bool IsSystem,
 
   // Infer framework module if possible.
   if (HS.getModuleMap().canInferFrameworkModule(ModuleMap->getDir())) {
-    SmallString<128> InferredFrameworkPath = ModuleMap->getDir().getName();
+    llvm::SmallString<128> InferredFrameworkPath = ModuleMap->getDir().getName();
     llvm::sys::path::append(InferredFrameworkPath,
                             CI.getLangOpts().ModuleName + ".framework");
     if (auto Dir =
@@ -487,7 +487,7 @@ static bool loadModuleMapForModuleBuild(CompilerInstance &CI, bool IsSystem,
 }
 
 static Module *prepareToBuildModule(CompilerInstance &CI,
-                                    StringRef ModuleMapFilename) {
+                                    llvm::StringRef ModuleMapFilename) {
   if (CI.getLangOpts().CurrentModule.empty()) {
     CI.getDiagnostics().Report(diag::err_missing_module_name);
 
@@ -522,7 +522,7 @@ static Module *prepareToBuildModule(CompilerInstance &CI,
   // umbrella module definition), track that fact.
   // FIXME: It would be preferable to fill this in as part of processing
   // the module map, rather than adding it after the fact.
-  StringRef OriginalModuleMapName = CI.getFrontendOpts().OriginalModuleMap;
+  llvm::StringRef OriginalModuleMapName = CI.getFrontendOpts().OriginalModuleMap;
   if (!OriginalModuleMapName.empty()) {
     auto OriginalModuleMap =
         CI.getFileManager().getOptionalFileRef(OriginalModuleMapName,
@@ -562,7 +562,7 @@ getInputBufferForModule(CompilerInstance &CI, Module *M) {
   FileManager &FileMgr = CI.getFileManager();
 
   // Collect the set of #includes we need to build the module.
-  SmallString<256> HeaderContents;
+  llvm::SmallString<256> HeaderContents;
   std::error_code Err = std::error_code();
   if (std::optional<Module::Header> UmbrellaHeader =
           M->getUmbrellaHeaderAsWritten())
@@ -613,16 +613,16 @@ bool FrontendAction::BeginSourceFile(CompilerInstance &CI,
   // If we're replaying the build of an AST file, import it and set up
   // the initial state from its build.
   if (ReplayASTFile) {
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags(&CI.getDiagnostics());
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(&CI.getDiagnostics());
 
     // The AST unit populates its own diagnostics engine rather than ours.
-    IntrusiveRefCntPtr<DiagnosticsEngine> ASTDiags(
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> ASTDiags(
         new DiagnosticsEngine(Diags->getDiagnosticIDs(),
                               &Diags->getDiagnosticOptions()));
     ASTDiags->setClient(Diags->getClient(), /*OwnsClient*/false);
 
     // FIXME: What if the input is a memory buffer?
-    StringRef InputFile = Input.getFile();
+    llvm::StringRef InputFile = Input.getFile();
 
     std::unique_ptr<ASTUnit> AST = ASTUnit::LoadFromASTFile(
         std::string(InputFile), CI.getPCHContainerReader(),
@@ -687,10 +687,10 @@ bool FrontendAction::BeginSourceFile(CompilerInstance &CI,
     assert(hasASTFileSupport() &&
            "This action does not have AST file support!");
 
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags(&CI.getDiagnostics());
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(&CI.getDiagnostics());
 
     // FIXME: What if the input is a memory buffer?
-    StringRef InputFile = Input.getFile();
+    llvm::StringRef InputFile = Input.getFile();
 
     std::unique_ptr<ASTUnit> AST = ASTUnit::LoadFromASTFile(
         std::string(InputFile), CI.getPCHContainerReader(),
@@ -784,11 +784,11 @@ bool FrontendAction::BeginSourceFile(CompilerInstance &CI,
   if (!CI.getPreprocessorOpts().ImplicitPCHInclude.empty()) {
     FileManager &FileMgr = CI.getFileManager();
     PreprocessorOptions &PPOpts = CI.getPreprocessorOpts();
-    StringRef PCHInclude = PPOpts.ImplicitPCHInclude;
+    llvm::StringRef PCHInclude = PPOpts.ImplicitPCHInclude;
     std::string SpecificModuleCachePath = CI.getSpecificModuleCachePath();
     if (auto PCHDir = FileMgr.getOptionalDirectoryRef(PCHInclude)) {
       std::error_code EC;
-      SmallString<128> DirNative;
+      llvm::SmallString<128> DirNative;
       llvm::sys::path::native(PCHDir->getName(), DirNative);
       bool Found = false;
       llvm::vfs::FileSystem &FS = FileMgr.getVirtualFileSystem();
@@ -830,7 +830,7 @@ bool FrontendAction::BeginSourceFile(CompilerInstance &CI,
   // passed by the driver might therefore be incomplete until that look-up).
   if (CI.getLangOpts().CPlusPlusModules && Input.getKind().isHeaderUnit() &&
       !Input.getKind().isPreprocessed()) {
-    StringRef FileName = Input.getFile();
+    llvm::StringRef FileName = Input.getFile();
     InputKind Kind = Input.getKind();
     if (Kind.getHeaderUnitKind() != InputKind::HeaderUnit_Abs) {
       assert(CI.hasPreprocessor() &&
@@ -838,7 +838,7 @@ bool FrontendAction::BeginSourceFile(CompilerInstance &CI,
       HeaderSearch &HS = CI.getPreprocessor().getHeaderSearchInfo();
       // Relative searches begin from CWD.
       auto Dir = CI.getFileManager().getOptionalDirectoryRef(".");
-      SmallVector<std::pair<OptionalFileEntryRef, DirectoryEntryRef>, 1> CWD;
+      llvm::SmallVector<std::pair<OptionalFileEntryRef, DirectoryEntryRef>, 1> CWD;
       CWD.push_back({std::nullopt, *Dir});
       OptionalFileEntryRef FE =
           HS.LookupFile(FileName, SourceLocation(),
@@ -965,7 +965,7 @@ bool FrontendAction::BeginSourceFile(CompilerInstance &CI,
 
     if (!CI.getPreprocessorOpts().ChainedIncludes.empty()) {
       // Convert headers to PCH and chain them.
-      IntrusiveRefCntPtr<ExternalSemaSource> source, FinalReader;
+      llvm::IntrusiveRefCntPtr<ExternalSemaSource> source, FinalReader;
       source = createChainedIncludesSource(CI, FinalReader);
       if (!source)
         return false;
@@ -1045,7 +1045,7 @@ bool FrontendAction::BeginSourceFile(CompilerInstance &CI,
   // provides the layouts from that file.
   if (!CI.getFrontendOpts().OverrideRecordLayoutsFile.empty() &&
       CI.hasASTContext() && !CI.getASTContext().getExternalSource()) {
-    IntrusiveRefCntPtr<ExternalASTSource>
+    llvm::IntrusiveRefCntPtr<ExternalASTSource>
       Override(new LayoutOverrideSource(
                      CI.getFrontendOpts().OverrideRecordLayoutsFile));
     CI.getASTContext().setExternalSource(Override);
@@ -1053,11 +1053,11 @@ bool FrontendAction::BeginSourceFile(CompilerInstance &CI,
 
   // Setup HLSL External Sema Source
   if (CI.getLangOpts().HLSL && CI.hasASTContext()) {
-    IntrusiveRefCntPtr<ExternalSemaSource> HLSLSema(
+    llvm::IntrusiveRefCntPtr<ExternalSemaSource> HLSLSema(
         new HLSLExternalSemaSource());
     if (auto *SemaSource = dyn_cast_if_present<ExternalSemaSource>(
             CI.getASTContext().getExternalSource())) {
-      IntrusiveRefCntPtr<ExternalSemaSource> MultiSema(
+      llvm::IntrusiveRefCntPtr<ExternalSemaSource> MultiSema(
           new MultiplexExternalSemaSource(SemaSource, HLSLSema.get()));
       CI.getASTContext().setExternalSource(MultiSema);
     } else
@@ -1081,7 +1081,7 @@ llvm::Error FrontendAction::Execute() {
   // there were any module-build failures.
   if (CI.shouldBuildGlobalModuleIndex() && CI.hasFileManager() &&
       CI.hasPreprocessor()) {
-    StringRef Cache =
+    llvm::StringRef Cache =
         CI.getPreprocessor().getHeaderSearchInfo().getModuleCachePath();
     if (!Cache.empty()) {
       if (llvm::Error Err = GlobalModuleIndex::writeIndex(
@@ -1197,7 +1197,7 @@ void PluginASTAction::anchor() { }
 
 std::unique_ptr<ASTConsumer>
 PreprocessorFrontendAction::CreateASTConsumer(CompilerInstance &CI,
-                                              StringRef InFile) {
+                                              llvm::StringRef InFile) {
   llvm_unreachable("Invalid CreateASTConsumer on preprocessor action!");
 }
 
@@ -1206,7 +1206,7 @@ bool WrapperFrontendAction::PrepareToExecuteAction(CompilerInstance &CI) {
 }
 std::unique_ptr<ASTConsumer>
 WrapperFrontendAction::CreateASTConsumer(CompilerInstance &CI,
-                                         StringRef InFile) {
+                                         llvm::StringRef InFile) {
   return WrappedAction->CreateASTConsumer(CI, InFile);
 }
 bool WrapperFrontendAction::BeginInvocation(CompilerInstance &CI) {

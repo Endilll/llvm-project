@@ -57,7 +57,7 @@ AST_MATCHER_P(NamedDecl, hasSameNameAsBoundNode, std::string, BindingID) {
   IdentifierInfo *II = Node.getIdentifier();
   if (nullptr == II)
     return false;
-  StringRef Name = II->getName();
+  llvm::StringRef Name = II->getName();
 
   return Builder->removeBindings(
       [this, Name](const ast_matchers::internal::BoundNodesMap &Nodes) {

@@ -23,7 +23,7 @@ namespace clang::tidy::performance {
 /// http://clang.llvm.org/extra/clang-tidy/checks/performance/inefficient-vector-operation.html
 class InefficientVectorOperationCheck : public ClangTidyCheck {
 public:
-  InefficientVectorOperationCheck(StringRef Name, ClangTidyContext *Context);
+  InefficientVectorOperationCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override{
     return LangOpts.CPlusPlus;
   }
@@ -33,10 +33,10 @@ public:
 
 private:
   void addMatcher(const ast_matchers::DeclarationMatcher &TargetRecordDecl,
-                  StringRef VarDeclName, StringRef VarDeclStmtName,
+                  llvm::StringRef VarDeclName, llvm::StringRef VarDeclStmtName,
                   const ast_matchers::DeclarationMatcher &AppendMethodDecl,
-                  StringRef AppendCallName, ast_matchers::MatchFinder *Finder);
-  const std::vector<StringRef> VectorLikeClasses;
+                  llvm::StringRef AppendCallName, ast_matchers::MatchFinder *Finder);
+  const std::vector<llvm::StringRef> VectorLikeClasses;
 
   // If true, also check inefficient operations for proto repeated fields.
   bool EnableProto;

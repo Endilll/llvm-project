@@ -74,7 +74,7 @@ bool tooling::isKnownPointerLikeType(QualType Ty, ASTContext &Context) {
 
 std::optional<std::string> tooling::buildParens(const Expr &E,
                                                 const ASTContext &Context) {
-  StringRef Text = getText(E, Context);
+  llvm::StringRef Text = getText(E, Context);
   if (Text.empty())
     return std::nullopt;
   if (mayEverNeedParens(E))
@@ -87,14 +87,14 @@ tooling::buildDereference(const Expr &E, const ASTContext &Context) {
   if (const auto *Op = dyn_cast<UnaryOperator>(&E))
     if (Op->getOpcode() == UO_AddrOf) {
       // Strip leading '&'.
-      StringRef Text =
+      llvm::StringRef Text =
           getText(*Op->getSubExpr()->IgnoreParenImpCasts(), Context);
       if (Text.empty())
         return std::nullopt;
       return Text.str();
     }
 
-  StringRef Text = getText(E, Context);
+  llvm::StringRef Text = getText(E, Context);
   if (Text.empty())
     return std::nullopt;
   // Add leading '*'.
@@ -110,14 +110,14 @@ std::optional<std::string> tooling::buildAddressOf(const Expr &E,
   if (const auto *Op = dyn_cast<UnaryOperator>(&E))
     if (Op->getOpcode() == UO_Deref) {
       // Strip leading '*'.
-      StringRef Text =
+      llvm::StringRef Text =
           getText(*Op->getSubExpr()->IgnoreParenImpCasts(), Context);
       if (Text.empty())
         return std::nullopt;
       return Text.str();
     }
   // Add leading '&'.
-  StringRef Text = getText(E, Context);
+  llvm::StringRef Text = getText(E, Context);
   if (Text.empty())
     return std::nullopt;
   if (needParensAfterUnaryOperator(E)) {
@@ -134,7 +134,7 @@ buildAccessForValue(const Expr &E, const ASTContext &Context) {
     if (Op->getOpcode() == UO_Deref) {
       // Strip leading '*', add following '->'.
       const Expr *SubExpr = Op->getSubExpr()->IgnoreParenImpCasts();
-      StringRef DerefText = getText(*SubExpr, Context);
+      llvm::StringRef DerefText = getText(*SubExpr, Context);
       if (DerefText.empty())
         return std::nullopt;
       if (needParensBeforeDotOrArrow(*SubExpr))
@@ -143,7 +143,7 @@ buildAccessForValue(const Expr &E, const ASTContext &Context) {
     }
 
   // Add following '.'.
-  StringRef Text = getText(E, Context);
+  llvm::StringRef Text = getText(E, Context);
   if (Text.empty())
     return std::nullopt;
   if (needParensBeforeDotOrArrow(E)) {
@@ -160,7 +160,7 @@ buildAccessForPointer(const Expr &E, const ASTContext &Context) {
     if (Op->getOpcode() == UO_AddrOf) {
       // Strip leading '&', add following '.'.
       const Expr *SubExpr = Op->getSubExpr()->IgnoreParenImpCasts();
-      StringRef DerefText = getText(*SubExpr, Context);
+      llvm::StringRef DerefText = getText(*SubExpr, Context);
       if (DerefText.empty())
         return std::nullopt;
       if (needParensBeforeDotOrArrow(*SubExpr))
@@ -169,7 +169,7 @@ buildAccessForPointer(const Expr &E, const ASTContext &Context) {
     }
 
   // Add following '->'.
-  StringRef Text = getText(E, Context);
+  llvm::StringRef Text = getText(E, Context);
   if (Text.empty())
     return std::nullopt;
   if (needParensBeforeDotOrArrow(E))

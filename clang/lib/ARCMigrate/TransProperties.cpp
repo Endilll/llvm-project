@@ -64,7 +64,7 @@ class PropertiesRewriter {
       : PropD(propD), IvarD(nullptr), ImplD(nullptr) {}
   };
 
-  typedef SmallVector<PropData, 2> PropsTy;
+  typedef llvm::SmallVector<PropData, 2> PropsTy;
   typedef std::map<SourceLocation, PropsTy> AtPropDeclsTy;
   AtPropDeclsTy AtProps;
   llvm::DenseMap<IdentifierInfo *, PropActionKind> ActionOnProp;
@@ -153,7 +153,7 @@ private:
     case PropAction_None:
       return;
     case PropAction_RetainReplacedWithStrong: {
-      StringRef toAttr = "strong";
+      llvm::StringRef toAttr = "strong";
       MigrateCtx.rewritePropertyAttribute("retain", toAttr, atLoc);
       return;
     }
@@ -268,16 +268,16 @@ private:
     }
   }
 
-  bool removeAttribute(StringRef fromAttr, SourceLocation atLoc) const {
+  bool removeAttribute(llvm::StringRef fromAttr, SourceLocation atLoc) const {
     return MigrateCtx.removePropertyAttribute(fromAttr, atLoc);
   }
 
-  bool rewriteAttribute(StringRef fromAttr, StringRef toAttr,
+  bool rewriteAttribute(llvm::StringRef fromAttr, llvm::StringRef toAttr,
                         SourceLocation atLoc) const {
     return MigrateCtx.rewritePropertyAttribute(fromAttr, toAttr, atLoc);
   }
 
-  bool addAttribute(StringRef attr, SourceLocation atLoc) const {
+  bool addAttribute(llvm::StringRef attr, SourceLocation atLoc) const {
     return MigrateCtx.addPropertyAttribute(attr, atLoc);
   }
 

@@ -46,29 +46,29 @@ bool isLegalShaderModel(Triple &T) {
   case Triple::EnvironmentType::Geometry:
   case Triple::EnvironmentType::Pixel:
   case Triple::EnvironmentType::Compute: {
-    VersionTuple MinVer(4, 0);
+    llvm::VersionTuple MinVer(4, 0);
     return MinVer <= Version;
   } break;
   case Triple::EnvironmentType::Library: {
-    VersionTuple SM6x(6, OfflineLibMinor);
+    llvm::VersionTuple SM6x(6, OfflineLibMinor);
     if (Version == SM6x)
       return true;
 
-    VersionTuple MinVer(6, 3);
+    llvm::VersionTuple MinVer(6, 3);
     return MinVer <= Version;
   } break;
   case Triple::EnvironmentType::Amplification:
   case Triple::EnvironmentType::Mesh: {
-    VersionTuple MinVer(6, 5);
+    llvm::VersionTuple MinVer(6, 5);
     return MinVer <= Version;
   } break;
   }
   return false;
 }
 
-std::optional<std::string> tryParseProfile(StringRef Profile) {
+std::optional<std::string> tryParseProfile(llvm::StringRef Profile) {
   // [ps|vs|gs|hs|ds|cs|ms|as]_[major]_[minor]
-  SmallVector<StringRef, 3> Parts;
+  llvm::SmallVector<llvm::StringRef, 3> Parts;
   Profile.split(Parts, "_");
   if (Parts.size() != 3)
     return std::nullopt;
@@ -142,7 +142,7 @@ std::optional<std::string> tryParseProfile(StringRef Profile) {
   }
   T.setArch(Triple::ArchType::dxil, SubArch);
   T.setOSName(Triple::getOSTypeName(Triple::OSType::ShaderModel).str() +
-              VersionTuple(Major, Minor).getAsString());
+              llvm::VersionTuple(Major, Minor).getAsString());
   T.setEnvironment(Kind);
   if (isLegalShaderModel(T))
     return T.getTriple();
@@ -150,8 +150,8 @@ std::optional<std::string> tryParseProfile(StringRef Profile) {
     return std::nullopt;
 }
 
-bool isLegalValidatorVersion(StringRef ValVersionStr, const Driver &D) {
-  VersionTuple Version;
+bool isLegalValidatorVersion(llvm::StringRef ValVersionStr, const Driver &D) {
+  llvm::VersionTuple Version;
   if (Version.tryParse(ValVersionStr) || Version.getBuild() ||
       Version.getSubminor() || !Version.getMinor()) {
     D.Diag(diag::err_drv_invalid_format_dxil_validator_version)
@@ -165,7 +165,7 @@ bool isLegalValidatorVersion(StringRef ValVersionStr, const Driver &D) {
     D.Diag(diag::err_drv_invalid_empty_dxil_validator_version) << ValVersionStr;
     return false;
   }
-  VersionTuple MinVer(1, 0);
+  llvm::VersionTuple MinVer(1, 0);
   if (Version < MinVer) {
     D.Diag(diag::err_drv_invalid_range_dxil_validator_version) << ValVersionStr;
     return false;
@@ -221,12 +221,12 @@ Tool *clang::driver::toolchains::HLSLToolChain::getTool(
 
 std::optional<std::string>
 clang::driver::toolchains::HLSLToolChain::parseTargetProfile(
-    StringRef TargetProfile) {
+    llvm::StringRef TargetProfile) {
   return tryParseProfile(TargetProfile);
 }
 
 DerivedArgList *
-HLSLToolChain::TranslateArgs(const DerivedArgList &Args, StringRef BoundArch,
+HLSLToolChain::TranslateArgs(const DerivedArgList &Args, llvm::StringRef BoundArch,
                              Action::OffloadKind DeviceOffloadKind) const {
   DerivedArgList *DAL = new DerivedArgList(Args.getBaseArgs());
 
@@ -234,7 +234,7 @@ HLSLToolChain::TranslateArgs(const DerivedArgList &Args, StringRef BoundArch,
 
   for (Arg *A : Args) {
     if (A->getOption().getID() == options::OPT_dxil_validator_version) {
-      StringRef ValVerStr = A->getValue();
+      llvm::StringRef ValVerStr = A->getValue();
       std::string ErrorMsg;
       if (!isLegalValidatorVersion(ValVerStr, getDriver()))
         continue;
@@ -246,7 +246,7 @@ HLSLToolChain::TranslateArgs(const DerivedArgList &Args, StringRef BoundArch,
       continue;
     }
     if (A->getOption().getID() == options::OPT__SLASH_O) {
-      StringRef OStr = A->getValue();
+      llvm::StringRef OStr = A->getValue();
       if (OStr == "d") {
         DAL->AddFlagArg(nullptr, Opts.getOption(options::OPT_O0));
         A->claim();
@@ -286,7 +286,7 @@ HLSLToolChain::TranslateArgs(const DerivedArgList &Args, StringRef BoundArch,
   // Add default validator version if not set.
   // TODO: remove this once read validator version from validator.
   if (!DAL->hasArg(options::OPT_dxil_validator_version)) {
-    const StringRef DefaultValidatorVer = "1.7";
+    const llvm::StringRef DefaultValidatorVer = "1.7";
     DAL->AddSeparateArg(nullptr,
                         Opts.getOption(options::OPT_dxil_validator_version),
                         DefaultValidatorVer);

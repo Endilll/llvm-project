@@ -128,7 +128,7 @@ int main(int argc, const char **argv) {
   llvm::SmallString<128> InitialDirectory;
   if (std::error_code EC = llvm::sys::fs::current_path(InitialDirectory))
     llvm::report_fatal_error("Cannot detect current path: " +
-                             Twine(EC.message()));
+                             llvm::Twine(EC.message()));
 
   move::ClangMoveContext Context{Spec, Tool.getReplacements(),
                                  std::string(InitialDirectory), Style,
@@ -176,10 +176,10 @@ int main(int argc, const char **argv) {
     }
   }
 
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(new DiagnosticOptions());
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(new DiagnosticOptions());
   clang::TextDiagnosticPrinter DiagnosticPrinter(errs(), &*DiagOpts);
   DiagnosticsEngine Diagnostics(
-      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
+      llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
       &DiagnosticPrinter, false);
   auto &FileMgr = Tool.getFiles();
   SourceManager SM(Diagnostics, FileMgr);

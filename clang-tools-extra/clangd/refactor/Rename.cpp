@@ -212,7 +212,7 @@ enum class ReasonToReject {
 };
 
 std::optional<ReasonToReject> renameable(const NamedDecl &RenameDecl,
-                                         StringRef MainFilePath,
+                                         llvm::StringRef MainFilePath,
                                          const SymbolIndex *Index,
                                          const RenameOptions &Opts) {
   trace::Span Tracer("Renameable");
@@ -312,7 +312,7 @@ std::vector<SourceLocation> findOccurrencesWithinFile(ParsedAST &AST,
 // Detect name conflict with othter DeclStmts in the same enclosing scope.
 const NamedDecl *lookupSiblingWithinEnclosingScope(ASTContext &Ctx,
                                                    const NamedDecl &RenamedDecl,
-                                                   StringRef NewName) {
+                                                   llvm::StringRef NewName) {
   // Store Parents list outside of GetSingleParent, so that returned pointer is
   // not invalidated.
   DynTypedNodeList Storage(DynTypedNode::create(RenamedDecl));
@@ -332,7 +332,7 @@ const NamedDecl *lookupSiblingWithinEnclosingScope(ASTContext &Ctx,
   // The following helpers check corresponding AST nodes for variable
   // declarations with the name collision.
   auto CheckDeclStmt = [&](const DeclStmt *DS,
-                           StringRef Name) -> const NamedDecl * {
+                           llvm::StringRef Name) -> const NamedDecl * {
     if (!DS)
       return nullptr;
     for (const auto &Child : DS->getDeclGroup())
@@ -343,7 +343,7 @@ const NamedDecl *lookupSiblingWithinEnclosingScope(ASTContext &Ctx,
     return nullptr;
   };
   auto CheckCompoundStmt = [&](const Stmt *S,
-                               StringRef Name) -> const NamedDecl * {
+                               llvm::StringRef Name) -> const NamedDecl * {
     if (const auto *CS = dyn_cast_or_null<CompoundStmt>(S))
       for (const auto *Node : CS->children())
         if (const auto *Result = CheckDeclStmt(dyn_cast<DeclStmt>(Node), Name))
@@ -351,7 +351,7 @@ const NamedDecl *lookupSiblingWithinEnclosingScope(ASTContext &Ctx,
     return nullptr;
   };
   auto CheckConditionVariable = [&](const auto *Scope,
-                                    StringRef Name) -> const NamedDecl * {
+                                    llvm::StringRef Name) -> const NamedDecl * {
     if (!Scope)
       return nullptr;
     return CheckDeclStmt(Scope->getConditionVariableDeclStmt(), Name);
@@ -717,7 +717,7 @@ std::vector<SymbolRange> collectRenameIdentifierRanges(
       // Check if we can find all the relevant selector peices starting from
       // this token
       auto SelectorRanges =
-          findAllSelectorPieces(ArrayRef(Tokens).slice(Index), SM, *Selector,
+          findAllSelectorPieces(llvm::ArrayRef(Tokens).slice(Index), SM, *Selector,
                                 Closes.empty() ? tok::l_brace : Closes.back());
       if (SelectorRanges)
         Ranges.emplace_back(std::move(*SelectorRanges));
@@ -987,8 +987,8 @@ bool impliesSimpleEdit(const Position &LHS, const Position &RHS) {
 //   - each indexed -> lexed occurrences mapping correspondence may change the
 //     *line* or *column*, but not both (increases chance of a robust mapping)
 void findNearMiss(
-    std::vector<size_t> &PartialMatch, ArrayRef<Range> IndexedRest,
-    ArrayRef<SymbolRange> LexedRest, int LexedIndex, int &Fuel,
+    std::vector<size_t> &PartialMatch, llvm::ArrayRef<Range> IndexedRest,
+    llvm::ArrayRef<SymbolRange> LexedRest, int LexedIndex, int &Fuel,
     llvm::function_ref<void(const std::vector<size_t> &)> MatchedCB) {
   if (--Fuel < 0)
     return;
@@ -1251,7 +1251,7 @@ adjustRenameRanges(llvm::StringRef DraftCode, llvm::StringRef Identifier,
 }
 
 std::optional<std::vector<SymbolRange>>
-getMappedRanges(ArrayRef<Range> Indexed, ArrayRef<SymbolRange> Lexed) {
+getMappedRanges(llvm::ArrayRef<Range> Indexed, llvm::ArrayRef<SymbolRange> Lexed) {
   trace::Span Tracer("GetMappedRanges");
   assert(!Indexed.empty());
   assert(llvm::is_sorted(Indexed));
@@ -1318,9 +1318,9 @@ getMappedRanges(ArrayRef<Range> Indexed, ArrayRef<SymbolRange> Lexed) {
 //   diff[0]: line + 1  <- insert a line before edit 0.
 //   diff[1]: column + 1 <- remove a line between edits 0 and 1, and insert a
 //   character on edit 1.
-size_t renameRangeAdjustmentCost(ArrayRef<Range> Indexed,
-                                 ArrayRef<SymbolRange> Lexed,
-                                 ArrayRef<size_t> MappedIndex) {
+size_t renameRangeAdjustmentCost(llvm::ArrayRef<Range> Indexed,
+                                 llvm::ArrayRef<SymbolRange> Lexed,
+                                 llvm::ArrayRef<size_t> MappedIndex) {
   assert(Indexed.size() == MappedIndex.size());
   assert(llvm::is_sorted(Indexed));
   assert(llvm::is_sorted(Lexed));

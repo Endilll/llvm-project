@@ -39,7 +39,7 @@ getLastTemplateParameterList(const FunctionDecl *FuncDecl) {
 
 } // namespace
 
-InlineFunctionDeclCheck::InlineFunctionDeclCheck(StringRef Name,
+InlineFunctionDeclCheck::InlineFunctionDeclCheck(llvm::StringRef Name,
                                                  ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       HeaderFileExtensions(Context->getHeaderFileExtensions()) {}

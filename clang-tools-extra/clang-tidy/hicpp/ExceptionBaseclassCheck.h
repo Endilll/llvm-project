@@ -19,7 +19,7 @@ namespace clang::tidy::hicpp {
 /// http://clang.llvm.org/extra/clang-tidy/checks/hicpp/exception-baseclass.html
 class ExceptionBaseclassCheck : public ClangTidyCheck {
 public:
-  ExceptionBaseclassCheck(StringRef Name, ClangTidyContext *Context)
+  ExceptionBaseclassCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

@@ -275,7 +275,7 @@ public:
   ///
   /// We assume that storage for the template arguments provided
   /// outlives the TemplateArgument itself.
-  explicit TemplateArgument(ArrayRef<TemplateArgument> Args) {
+  explicit TemplateArgument(llvm::ArrayRef<TemplateArgument> Args) {
     this->Args.Kind = Pack;
     this->Args.IsDefaulted = false;
     this->Args.Args = Args.data();
@@ -289,7 +289,7 @@ public:
   /// Create a new template argument pack by copying the given set of
   /// template arguments.
   static TemplateArgument CreatePackCopy(ASTContext &Context,
-                                         ArrayRef<TemplateArgument> Args);
+                                         llvm::ArrayRef<TemplateArgument> Args);
 
   /// Return the kind of stored template argument.
   ArgKind getKind() const { return (ArgKind)TypeOrValue.Kind; }
@@ -369,7 +369,7 @@ public:
       return APSInt(APInt(Integer.BitWidth, Integer.VAL), Integer.IsUnsigned);
 
     unsigned NumWords = APInt::getNumWords(Integer.BitWidth);
-    return APSInt(APInt(Integer.BitWidth, ArrayRef(Integer.pVal, NumWords)),
+    return APSInt(APInt(Integer.BitWidth, llvm::ArrayRef(Integer.pVal, NumWords)),
                   Integer.IsUnsigned);
   }
 
@@ -429,7 +429,7 @@ public:
 
   /// Iterator range referencing all of the elements of a template
   /// argument pack.
-  ArrayRef<TemplateArgument> pack_elements() const {
+  llvm::ArrayRef<TemplateArgument> pack_elements() const {
     return llvm::ArrayRef(pack_begin(), pack_end());
   }
 
@@ -441,7 +441,7 @@ public:
   }
 
   /// Return the array of arguments in this template argument pack.
-  ArrayRef<TemplateArgument> getPackAsArray() const {
+  llvm::ArrayRef<TemplateArgument> getPackAsArray() const {
     assert(getKind() == Pack);
     return llvm::ArrayRef(Args.Args, Args.NumArgs);
   }
@@ -455,11 +455,11 @@ public:
   TemplateArgument getPackExpansionPattern() const;
 
   /// Print this template argument to the given output stream.
-  void print(const PrintingPolicy &Policy, raw_ostream &Out,
+  void print(const PrintingPolicy &Policy, llvm::raw_ostream &Out,
              bool IncludeType) const;
 
   /// Debugging aid that dumps the template argument.
-  void dump(raw_ostream &Out) const;
+  void dump(llvm::raw_ostream &Out) const;
 
   /// Debugging aid that dumps the template argument to standard error.
   void dump() const;
@@ -630,7 +630,7 @@ public:
 /// A convenient class for passing around template argument
 /// information.  Designed to be passed by reference.
 class TemplateArgumentListInfo {
-  SmallVector<TemplateArgumentLoc, 8> Arguments;
+  llvm::SmallVector<TemplateArgumentLoc, 8> Arguments;
   SourceLocation LAngleLoc;
   SourceLocation RAngleLoc;
 

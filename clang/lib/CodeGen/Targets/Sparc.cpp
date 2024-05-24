@@ -128,7 +128,7 @@ private:
   struct CoerceBuilder {
     llvm::LLVMContext &Context;
     const llvm::DataLayout &DL;
-    SmallVector<llvm::Type*, 8> Elems;
+    llvm::SmallVector<llvm::Type*, 8> Elems;
     uint64_t Size;
     bool InReg;
 

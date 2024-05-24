@@ -56,7 +56,7 @@ using MatcherCtor = const internal::MatcherDescriptor *;
 
 struct MatcherCompletion {
   MatcherCompletion() = default;
-  MatcherCompletion(StringRef TypedText, StringRef MatcherDecl,
+  MatcherCompletion(llvm::StringRef TypedText, llvm::StringRef MatcherDecl,
                     unsigned Specificity)
       : TypedText(TypedText), MatcherDecl(MatcherDecl),
         Specificity(Specificity) {}
@@ -89,13 +89,13 @@ public:
 
   static internal::MatcherDescriptorPtr
   buildMatcherCtor(MatcherCtor, SourceRange NameRange,
-                   ArrayRef<ParserValue> Args, Diagnostics *Error);
+                   llvm::ArrayRef<ParserValue> Args, Diagnostics *Error);
 
   /// Look up a matcher in the registry by name,
   ///
   /// \return An opaque value which may be used to refer to the matcher
   /// constructor, or std::optional<MatcherCtor>() if not found.
-  static std::optional<MatcherCtor> lookupMatcherCtor(StringRef MatcherName);
+  static std::optional<MatcherCtor> lookupMatcherCtor(llvm::StringRef MatcherName);
 
   /// Compute the list of completion types for \p Context.
   ///
@@ -118,7 +118,7 @@ public:
   /// The matcher constructed from the return of \c lookupMatcherCtor()
   /// should be convertible to some type in \p AcceptedTypes.
   static std::vector<MatcherCompletion>
-  getMatcherCompletions(ArrayRef<ArgKind> AcceptedTypes);
+  getMatcherCompletions(llvm::ArrayRef<ArgKind> AcceptedTypes);
 
   /// Construct a matcher from the registry.
   ///
@@ -137,7 +137,7 @@ public:
   ///   the error.
   static VariantMatcher constructMatcher(MatcherCtor Ctor,
                                          SourceRange NameRange,
-                                         ArrayRef<ParserValue> Args,
+                                         llvm::ArrayRef<ParserValue> Args,
                                          Diagnostics *Error);
 
   /// Construct a matcher from the registry and bind it.
@@ -148,8 +148,8 @@ public:
   /// a null matcher.
   static VariantMatcher constructBoundMatcher(MatcherCtor Ctor,
                                               SourceRange NameRange,
-                                              StringRef BindID,
-                                              ArrayRef<ParserValue> Args,
+                                              llvm::StringRef BindID,
+                                              llvm::ArrayRef<ParserValue> Args,
                                               Diagnostics *Error);
 };
 

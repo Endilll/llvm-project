@@ -165,10 +165,10 @@ public:
                         SrcMgr::CharacteristicKind FileType, FileID PrevFID,
                         SourceLocation Loc) override;
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
   void moduleImport(SourceLocation ImportLoc, ModuleIdPath Path,
@@ -276,9 +276,9 @@ private:
   bool isPrebuiltModule(const Module *M);
 
   /// Adds \p Path to \c FileDeps, making it absolute if necessary.
-  void addFileDep(StringRef Path);
+  void addFileDep(llvm::StringRef Path);
   /// Adds \p Path to \c MD.FileDeps, making it absolute if necessary.
-  void addFileDep(ModuleDeps &MD, StringRef Path);
+  void addFileDep(ModuleDeps &MD, llvm::StringRef Path);
 
   /// Get a Clang invocation adjusted to build the given modular dependency.
   /// This excludes paths that are yet-to-be-provided by the build system.
@@ -288,16 +288,16 @@ private:
 
   /// Collect module map files for given modules.
   llvm::DenseSet<const FileEntry *>
-  collectModuleMapFiles(ArrayRef<ModuleID> ClangModuleDeps) const;
+  collectModuleMapFiles(llvm::ArrayRef<ModuleID> ClangModuleDeps) const;
 
   /// Add module map files to the invocation, if needed.
   void addModuleMapFiles(CompilerInvocation &CI,
-                         ArrayRef<ModuleID> ClangModuleDeps) const;
+                         llvm::ArrayRef<ModuleID> ClangModuleDeps) const;
   /// Add module files (pcm) to the invocation, if needed.
   void addModuleFiles(CompilerInvocation &CI,
-                      ArrayRef<ModuleID> ClangModuleDeps) const;
+                      llvm::ArrayRef<ModuleID> ClangModuleDeps) const;
   void addModuleFiles(CowCompilerInvocation &CI,
-                      ArrayRef<ModuleID> ClangModuleDeps) const;
+                      llvm::ArrayRef<ModuleID> ClangModuleDeps) const;
 
   /// Add paths that require looking up outputs to the given dependencies.
   void addOutputPaths(CowCompilerInvocation &CI, ModuleDeps &Deps);

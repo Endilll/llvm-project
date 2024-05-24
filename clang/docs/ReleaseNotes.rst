@@ -101,8 +101,8 @@ AST Dumping Potentially Breaking Changes
 Clang Frontend Potentially Breaking Changes
 -------------------------------------------
 - Removed support for constructing on-stack ``TemplateArgumentList``\ s; interfaces should instead
-  use ``ArrayRef<TemplateArgument>`` to pass template arguments. Transitioning internal uses to
-  ``ArrayRef<TemplateArgument>`` reduces AST memory usage by 0.4% when compiling clang, and is
+  use ``llvm::ArrayRef<TemplateArgument>`` to pass template arguments. Transitioning internal uses to
+  ``llvm::ArrayRef<TemplateArgument>`` reduces AST memory usage by 0.4% when compiling clang, and is
   expected to show similar improvements on other workloads.
 
 - The ``-Wgnu-binary-literal`` diagnostic group no longer controls any

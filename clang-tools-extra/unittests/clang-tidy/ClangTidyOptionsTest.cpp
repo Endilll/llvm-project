@@ -14,13 +14,13 @@ namespace tidy {
 enum class Colours { Red, Orange, Yellow, Green, Blue, Indigo, Violet };
 
 template <> struct OptionEnumMapping<Colours> {
-  static llvm::ArrayRef<std::pair<Colours, StringRef>> getEnumMapping() {
-    static constexpr std::pair<Colours, StringRef> Mapping[] = {
+  static llvm::ArrayRef<std::pair<Colours, llvm::StringRef>> getEnumMapping() {
+    static constexpr std::pair<Colours, llvm::StringRef> Mapping[] = {
         {Colours::Red, "Red"},       {Colours::Orange, "Orange"},
         {Colours::Yellow, "Yellow"}, {Colours::Green, "Green"},
         {Colours::Blue, "Blue"},     {Colours::Indigo, "Indigo"},
         {Colours::Violet, "Violet"}};
-    return ArrayRef(Mapping);
+    return llvm::ArrayRef(Mapping);
   }
 };
 

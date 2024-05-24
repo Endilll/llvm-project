@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/dangling-handle.html
 class DanglingHandleCheck : public ClangTidyCheck {
 public:
-  DanglingHandleCheck(StringRef Name, ClangTidyContext *Context);
+  DanglingHandleCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
@@ -29,7 +29,7 @@ private:
   void registerMatchersForVariables(ast_matchers::MatchFinder *Finder);
   void registerMatchersForReturn(ast_matchers::MatchFinder *Finder);
 
-  const std::vector<StringRef> HandleClasses;
+  const std::vector<llvm::StringRef> HandleClasses;
   const ast_matchers::internal::Matcher<RecordDecl> IsAHandle;
 };
 

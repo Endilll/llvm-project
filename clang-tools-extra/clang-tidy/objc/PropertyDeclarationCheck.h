@@ -23,7 +23,7 @@ namespace clang::tidy::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/objc/property-declaration.html
 class PropertyDeclarationCheck : public ClangTidyCheck {
 public:
-  PropertyDeclarationCheck(StringRef Name, ClangTidyContext *Context)
+  PropertyDeclarationCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC;

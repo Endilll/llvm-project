@@ -89,7 +89,7 @@ bool isStdVariant(const Type *Type) {
 
 } // end of namespace clang::ento::tagged_union_modeling
 
-static std::optional<ArrayRef<TemplateArgument>>
+static std::optional<llvm::ArrayRef<TemplateArgument>>
 getTemplateArgsFromVariant(const Type *VariantType) {
   const auto *TempSpecType = VariantType->getAs<TemplateSpecializationType>();
   if (!TempSpecType)
@@ -100,7 +100,7 @@ getTemplateArgsFromVariant(const Type *VariantType) {
 
 static std::optional<QualType>
 getNthTemplateTypeArgFromVariant(const Type *varType, unsigned i) {
-  std::optional<ArrayRef<TemplateArgument>> VariantTemplates =
+  std::optional<llvm::ArrayRef<TemplateArgument>> VariantTemplates =
       getTemplateArgsFromVariant(varType);
   if (!VariantTemplates)
     return {};
@@ -140,8 +140,8 @@ class StdVariantChecker : public Checker<eval::Call, check::RegionChanges> {
 public:
   ProgramStateRef checkRegionChanges(ProgramStateRef State,
                                      const InvalidatedSymbols *,
-                                     ArrayRef<const MemRegion *>,
-                                     ArrayRef<const MemRegion *> Regions,
+                                     llvm::ArrayRef<const MemRegion *>,
+                                     llvm::ArrayRef<const MemRegion *> Regions,
                                      const LocationContext *,
                                      const CallEvent *Call) const {
     if (!Call)

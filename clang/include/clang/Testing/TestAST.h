@@ -33,7 +33,7 @@ namespace clang {
 /// Specifies a virtual source file to be parsed as part of a test.
 struct TestInputs {
   TestInputs() = default;
-  TestInputs(StringRef Code) : Code(Code) {}
+  TestInputs(llvm::StringRef Code) : Code(Code) {}
 
   /// The source code of the input file to be parsed.
   std::string Code;
@@ -73,7 +73,7 @@ public:
   /// unit test failures with ADD_FAILURE() and produce an empty ASTContext,
   /// Sema etc. This frees the test code from handling these explicitly.
   TestAST(const TestInputs &);
-  TestAST(StringRef Code) : TestAST(TestInputs(Code)) {}
+  TestAST(llvm::StringRef Code) : TestAST(TestInputs(Code)) {}
   TestAST(TestAST &&M);
   TestAST &operator=(TestAST &&);
   ~TestAST();

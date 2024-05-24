@@ -85,7 +85,7 @@ public:
   IncludeSorter::IncludeStyle getStyle() const { return Style; }
 
 private:
-  void addInclude(StringRef FileName, bool IsAngled,
+  void addInclude(llvm::StringRef FileName, bool IsAngled,
                   SourceLocation HashLocation, SourceLocation EndLocation);
 
   IncludeSorter &getOrCreate(FileID FileID);

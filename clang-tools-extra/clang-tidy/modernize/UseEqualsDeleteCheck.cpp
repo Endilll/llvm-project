@@ -44,7 +44,7 @@ AST_MATCHER(CXXMethodDecl, isSpecialFunction) {
 static const char SpecialFunction[] = "SpecialFunction";
 static const char DeletedNotPublic[] = "DeletedNotPublic";
 
-UseEqualsDeleteCheck::UseEqualsDeleteCheck(StringRef Name,
+UseEqualsDeleteCheck::UseEqualsDeleteCheck(llvm::StringRef Name,
                                            ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreMacros(Options.getLocalOrGlobal("IgnoreMacros", true)) {}

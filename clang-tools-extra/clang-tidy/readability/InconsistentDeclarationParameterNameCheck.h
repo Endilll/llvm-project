@@ -22,7 +22,7 @@ namespace clang::tidy::readability {
 ///
 class InconsistentDeclarationParameterNameCheck : public ClangTidyCheck {
 public:
-  InconsistentDeclarationParameterNameCheck(StringRef Name,
+  InconsistentDeclarationParameterNameCheck(llvm::StringRef Name,
                                             ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         IgnoreMacros(Options.getLocalOrGlobal("IgnoreMacros", true)),

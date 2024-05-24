@@ -104,7 +104,7 @@ void RedundantInlineSpecifierCheck::registerMatchers(MatchFinder *Finder) {
 template <typename T>
 void RedundantInlineSpecifierCheck::handleMatchedDecl(
     const T *MatchedDecl, const SourceManager &Sources,
-    const MatchFinder::MatchResult &Result, StringRef Message) {
+    const MatchFinder::MatchResult &Result, llvm::StringRef Message) {
   SourceLocation Loc = getInlineTokenLocation(
       MatchedDecl->getSourceRange(), Sources, Result.Context->getLangOpts());
   if (Loc.isValid())

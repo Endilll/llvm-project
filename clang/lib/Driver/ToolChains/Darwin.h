@@ -28,8 +28,8 @@ class MachO;
 namespace tools {
 
 namespace darwin {
-llvm::Triple::ArchType getArchTypeForMachOArchName(StringRef Str);
-void setTripleTypeForMachOArchName(llvm::Triple &T, StringRef Str,
+llvm::Triple::ArchType getArchTypeForMachOArchName(llvm::StringRef Str);
+void setTripleTypeForMachOArchName(llvm::Triple &T, llvm::StringRef Str,
                                    const llvm::opt::ArgList &Args);
 
 class LLVM_LIBRARY_VISIBILITY MachOTool : public Tool {
@@ -65,7 +65,7 @@ class LLVM_LIBRARY_VISIBILITY Linker : public MachOTool {
   bool NeedsTempPath(const InputInfoList &Inputs) const;
   void AddLinkArgs(Compilation &C, const llvm::opt::ArgList &Args,
                    llvm::opt::ArgStringList &CmdArgs,
-                   const InputInfoList &Inputs, VersionTuple Version,
+                   const InputInfoList &Inputs, llvm::VersionTuple Version,
                    bool LinkerIsLLD, bool UsePlatformVersion) const;
 
 public:
@@ -150,7 +150,7 @@ private:
   mutable std::unique_ptr<tools::darwin::VerifyDebug> VerifyDebug;
 
   /// The version of the linker known to be available in the tool chain.
-  mutable std::optional<VersionTuple> LinkerVersion;
+  mutable std::optional<llvm::VersionTuple> LinkerVersion;
 
 public:
   MachO(const Driver &D, const llvm::Triple &Triple,
@@ -162,11 +162,11 @@ public:
 
   /// Get the "MachO" arch name for a particular compiler invocation. For
   /// example, Apple treats different ARM variations as distinct architectures.
-  StringRef getMachOArchName(const llvm::opt::ArgList &Args) const;
+  llvm::StringRef getMachOArchName(const llvm::opt::ArgList &Args) const;
 
   /// Get the version of the linker known to be available for a particular
   /// compiler invocation (via the `-mlinker-version=` arg).
-  VersionTuple getLinkerVersion(const llvm::opt::ArgList &Args) const;
+  llvm::VersionTuple getLinkerVersion(const llvm::opt::ArgList &Args) const;
 
   /// Add the linker arguments to link the ARC runtime library.
   virtual void AddLinkARCArgs(const llvm::opt::ArgList &Args,
@@ -212,7 +212,7 @@ public:
 
   /// Add a runtime library to the list of items to link.
   void AddLinkRuntimeLib(const llvm::opt::ArgList &Args,
-                         llvm::opt::ArgStringList &CmdArgs, StringRef Component,
+                         llvm::opt::ArgStringList &CmdArgs, llvm::StringRef Component,
                          RuntimeLinkOptions Opts = RuntimeLinkOptions(),
                          bool IsShared = false) const;
 
@@ -227,12 +227,12 @@ public:
   /// @name ToolChain Implementation
   /// {
 
-  types::ID LookupTypeForExtension(StringRef Ext) const override;
+  types::ID LookupTypeForExtension(llvm::StringRef Ext) const override;
 
   bool HasNativeLLVMSupport() const override;
 
   llvm::opt::DerivedArgList *
-  TranslateArgs(const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+  TranslateArgs(const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
                 Action::OffloadKind DeviceOffloadKind) const override;
 
   bool IsBlocksDefault() const override {
@@ -273,7 +273,7 @@ public:
     return llvm::ExceptionHandling::None;
   }
 
-  virtual StringRef getOSLibraryNameSuffix(bool IgnoreSim = false) const {
+  virtual llvm::StringRef getOSLibraryNameSuffix(bool IgnoreSim = false) const {
     return "";
   }
 
@@ -312,9 +312,9 @@ public:
   mutable DarwinEnvironmentKind TargetEnvironment;
 
   /// The native OS version we are targeting.
-  mutable VersionTuple TargetVersion;
+  mutable llvm::VersionTuple TargetVersion;
   /// The OS version we are targeting as specified in the triple.
-  mutable VersionTuple OSTargetVersion;
+  mutable llvm::VersionTuple OSTargetVersion;
 
   /// The information about the darwin SDK that was used.
   mutable std::optional<DarwinSDKInfo> SDKInfo;
@@ -365,26 +365,26 @@ protected:
   // for these targets and put version in constructor.
   void setTarget(DarwinPlatformKind Platform, DarwinEnvironmentKind Environment,
                  unsigned Major, unsigned Minor, unsigned Micro,
-                 VersionTuple NativeTargetVersion) const {
+                 llvm::VersionTuple NativeTargetVersion) const {
     // FIXME: For now, allow reinitialization as long as values don't
     // change. This will go away when we move away from argument translation.
     if (TargetInitialized && TargetPlatform == Platform &&
         TargetEnvironment == Environment &&
         (Environment == MacCatalyst ? OSTargetVersion : TargetVersion) ==
-            VersionTuple(Major, Minor, Micro))
+            llvm::VersionTuple(Major, Minor, Micro))
       return;
 
     assert(!TargetInitialized && "Target already initialized!");
     TargetInitialized = true;
     TargetPlatform = Platform;
     TargetEnvironment = Environment;
-    TargetVersion = VersionTuple(Major, Minor, Micro);
+    TargetVersion = llvm::VersionTuple(Major, Minor, Micro);
     if (Environment == Simulator)
       const_cast<Darwin *>(this)->setTripleEnvironment(llvm::Triple::Simulator);
     else if (Environment == MacCatalyst) {
       const_cast<Darwin *>(this)->setTripleEnvironment(llvm::Triple::MacABI);
       TargetVersion = NativeTargetVersion;
-      OSTargetVersion = VersionTuple(Major, Minor, Micro);
+      OSTargetVersion = llvm::VersionTuple(Major, Minor, Micro);
     }
   }
 
@@ -476,7 +476,7 @@ public:
   /// triple. It might be different from the actual target OS on which the
   /// program will run, e.g. MacCatalyst code runs on a macOS target, but its
   /// target triple is iOS.
-  VersionTuple getTripleTargetVersion() const {
+  llvm::VersionTuple getTripleTargetVersion() const {
     assert(TargetInitialized && "Target not initialized!");
     return isTargetMacCatalyst() ? OSTargetVersion : TargetVersion;
   }
@@ -484,7 +484,7 @@ public:
   bool isIPhoneOSVersionLT(unsigned V0, unsigned V1 = 0,
                            unsigned V2 = 0) const {
     assert(isTargetIOSBased() && "Unexpected call for non iOS target!");
-    return TargetVersion < VersionTuple(V0, V1, V2);
+    return TargetVersion < llvm::VersionTuple(V0, V1, V2);
   }
 
   /// Returns true if the minimum supported macOS version for the slice that's
@@ -497,12 +497,12 @@ public:
            "Unexpected call for non OS X target!");
     // The effective triple might not be initialized yet, so construct a
     // pseudo-effective triple to get the minimum supported OS version.
-    VersionTuple MinVers =
+    llvm::VersionTuple MinVers =
         llvm::Triple(getTriple().getArchName(), "apple", "macos")
             .getMinimumSupportedOSVersion();
     return (!MinVers.empty() && MinVers > TargetVersion
                 ? MinVers
-                : TargetVersion) < VersionTuple(V0, V1, V2);
+                : TargetVersion) < llvm::VersionTuple(V0, V1, V2);
   }
 
 protected:
@@ -523,11 +523,11 @@ protected:
       const llvm::opt::ArgList &Args,
       llvm::opt::ArgStringList &CC1ASArgs) const override;
 
-  StringRef getPlatformFamily() const;
-  StringRef getOSLibraryNameSuffix(bool IgnoreSim = false) const override;
+  llvm::StringRef getPlatformFamily() const;
+  llvm::StringRef getOSLibraryNameSuffix(bool IgnoreSim = false) const override;
 
 public:
-  static StringRef getSDKName(StringRef isysroot);
+  static llvm::StringRef getSDKName(llvm::StringRef isysroot);
 
   /// }
   /// @name ToolChain Implementation
@@ -539,7 +539,7 @@ public:
   bool isCrossCompiling() const override { return false; }
 
   llvm::opt::DerivedArgList *
-  TranslateArgs(const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+  TranslateArgs(const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
                 Action::OffloadKind DeviceOffloadKind) const override;
 
   CXXStdlibType GetDefaultCXXStdlibType() const override;
@@ -582,7 +582,7 @@ public:
 
   SanitizerMask getSupportedSanitizers() const override;
 
-  void printVerboseInfo(raw_ostream &OS) const override;
+  void printVerboseInfo(llvm::raw_ostream &OS) const override;
 };
 
 /// DarwinClang - The Darwin toolchain used by Clang.
@@ -631,7 +631,7 @@ public:
 private:
   void AddLinkSanitizerLibArgs(const llvm::opt::ArgList &Args,
                                llvm::opt::ArgStringList &CmdArgs,
-                               StringRef Sanitizer,
+                               llvm::StringRef Sanitizer,
                                bool shared = true) const;
 
   bool AddGnuCPlusPlusIncludePaths(const llvm::opt::ArgList &DriverArgs,

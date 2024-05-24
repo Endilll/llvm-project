@@ -341,7 +341,7 @@ public:
 
 protected:
   PathDiagnosticPieceRef constructNote(StoreInfo SI, BugReporterContext &BRC,
-                                       StringRef NodeText);
+                                       llvm::StringRef NodeText);
 };
 
 /// Visitor that tracks expressions and values.
@@ -393,7 +393,7 @@ const Expr *getDerefExpr(const Stmt *S);
 } // namespace bugreporter
 
 class TrackConstraintBRVisitor final : public BugReporterVisitor {
-  const SmallString<64> Message;
+  const llvm::SmallString<64> Message;
   const DefinedSVal Constraint;
   const bool Assumption;
   bool IsSatisfied = false;
@@ -404,7 +404,7 @@ class TrackConstraintBRVisitor final : public BugReporterVisitor {
 
 public:
   TrackConstraintBRVisitor(DefinedSVal constraint, bool assumption,
-                           StringRef Message)
+                           llvm::StringRef Message)
       : Message(Message), Constraint(constraint), Assumption(assumption) {}
 
   void Profile(llvm::FoldingSetNodeID &ID) const override;
@@ -497,7 +497,7 @@ public:
                                        bool IsAssuming);
 
   PathDiagnosticPieceRef
-  VisitConditionVariable(StringRef LhsString, const Expr *CondVarExpr,
+  VisitConditionVariable(llvm::StringRef LhsString, const Expr *CondVarExpr,
                          BugReporterContext &BRC, PathSensitiveBugReport &R,
                          const ExplodedNode *N, bool TookTrue);
 
@@ -510,10 +510,10 @@ public:
   ///
   /// \return Whether the print was successful. (The printing is successful if
   ///         we model the value and we could obtain it.)
-  bool printValue(const Expr *CondVarExpr, raw_ostream &Out,
+  bool printValue(const Expr *CondVarExpr, llvm::raw_ostream &Out,
                   const ExplodedNode *N, bool TookTrue, bool IsAssuming);
 
-  bool patternMatch(const Expr *Ex, const Expr *ParentEx, raw_ostream &Out,
+  bool patternMatch(const Expr *Ex, const Expr *ParentEx, llvm::raw_ostream &Out,
                     BugReporterContext &BRC, PathSensitiveBugReport &R,
                     const ExplodedNode *N, std::optional<bool> &prunable,
                     bool IsSameFieldName);

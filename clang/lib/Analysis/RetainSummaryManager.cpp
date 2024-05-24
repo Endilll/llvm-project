@@ -139,14 +139,14 @@ RetainSummaryManager::getPersistentSummary(const RetainSummary &OldSumm) {
 }
 
 static bool isSubclass(const Decl *D,
-                       StringRef ClassName) {
+                       llvm::StringRef ClassName) {
   using namespace ast_matchers;
   DeclarationMatcher SubclassM =
       cxxRecordDecl(isSameOrDerivedFrom(std::string(ClassName)));
   return !(match(SubclassM, *D, D->getASTContext()).empty());
 }
 
-static bool isExactClass(const Decl *D, StringRef ClassName) {
+static bool isExactClass(const Decl *D, llvm::StringRef ClassName) {
   using namespace ast_matchers;
   DeclarationMatcher sameClassM =
       cxxRecordDecl(hasName(std::string(ClassName)));
@@ -158,13 +158,13 @@ static bool isOSObjectSubclass(const Decl *D) {
          !isExactClass(D, "OSMetaClass");
 }
 
-static bool isOSObjectDynamicCast(StringRef S) { return S == "safeMetaCast"; }
+static bool isOSObjectDynamicCast(llvm::StringRef S) { return S == "safeMetaCast"; }
 
-static bool isOSObjectRequiredCast(StringRef S) {
+static bool isOSObjectRequiredCast(llvm::StringRef S) {
   return S == "requiredMetaCast";
 }
 
-static bool isOSObjectThisCast(StringRef S) {
+static bool isOSObjectThisCast(llvm::StringRef S) {
   return S == "metaCast";
 }
 
@@ -174,14 +174,14 @@ static bool isOSObjectPtr(QualType QT) {
 }
 
 static bool isISLObjectRef(QualType Ty) {
-  return StringRef(Ty.getAsString()).starts_with("isl_");
+  return llvm::StringRef(Ty.getAsString()).starts_with("isl_");
 }
 
 static bool isOSIteratorSubclass(const Decl *D) {
   return isSubclass(D, "OSIterator");
 }
 
-static bool hasRCAnnotation(const Decl *D, StringRef rcAnnotation) {
+static bool hasRCAnnotation(const Decl *D, llvm::StringRef rcAnnotation) {
   for (const auto *Ann : D->specific_attrs<AnnotateAttr>()) {
     if (Ann->getAnnotation() == rcAnnotation)
       return true;
@@ -189,22 +189,22 @@ static bool hasRCAnnotation(const Decl *D, StringRef rcAnnotation) {
   return false;
 }
 
-static bool isRetain(const FunctionDecl *FD, StringRef FName) {
+static bool isRetain(const FunctionDecl *FD, llvm::StringRef FName) {
   return FName.starts_with_insensitive("retain") ||
          FName.ends_with_insensitive("retain");
 }
 
-static bool isRelease(const FunctionDecl *FD, StringRef FName) {
+static bool isRelease(const FunctionDecl *FD, llvm::StringRef FName) {
   return FName.starts_with_insensitive("release") ||
          FName.ends_with_insensitive("release");
 }
 
-static bool isAutorelease(const FunctionDecl *FD, StringRef FName) {
+static bool isAutorelease(const FunctionDecl *FD, llvm::StringRef FName) {
   return FName.starts_with_insensitive("autorelease") ||
          FName.ends_with_insensitive("autorelease");
 }
 
-static bool isMakeCollectable(StringRef FName) {
+static bool isMakeCollectable(llvm::StringRef FName) {
   return FName.contains_insensitive("MakeCollectable");
 }
 
@@ -241,7 +241,7 @@ RetainSummaryManager::isKnownSmartPointer(QualType QT) {
 
 const RetainSummary *
 RetainSummaryManager::getSummaryForOSObject(const FunctionDecl *FD,
-                                            StringRef FName, QualType RetTy) {
+                                            llvm::StringRef FName, QualType RetTy) {
   assert(TrackOSObjects &&
          "Requesting a summary for an OSObject but OSObjects are not tracked");
 
@@ -292,7 +292,7 @@ RetainSummaryManager::getSummaryForOSObject(const FunctionDecl *FD,
 
 const RetainSummary *RetainSummaryManager::getSummaryForObjCOrCFObject(
     const FunctionDecl *FD,
-    StringRef FName,
+    llvm::StringRef FName,
     QualType RetTy,
     const FunctionType *FT,
     bool &AllowAnnotations) {
@@ -477,11 +477,11 @@ const RetainSummary *RetainSummaryManager::getSummaryForObjCOrCFObject(
       // "escape."  This means that something else holds on to the object,
       // allowing it be used even after its local retain count drops to 0.
       ArgEffectKind E =
-          (StrInStrNoCase(FName, "InsertValue") != StringRef::npos ||
-           StrInStrNoCase(FName, "AddValue") != StringRef::npos ||
-           StrInStrNoCase(FName, "SetValue") != StringRef::npos ||
-           StrInStrNoCase(FName, "AppendValue") != StringRef::npos ||
-           StrInStrNoCase(FName, "SetAttribute") != StringRef::npos)
+          (StrInStrNoCase(FName, "InsertValue") != llvm::StringRef::npos ||
+           StrInStrNoCase(FName, "AddValue") != llvm::StringRef::npos ||
+           StrInStrNoCase(FName, "SetValue") != llvm::StringRef::npos ||
+           StrInStrNoCase(FName, "AppendValue") != llvm::StringRef::npos ||
+           StrInStrNoCase(FName, "SetAttribute") != llvm::StringRef::npos)
               ? MayEscape
               : DoNothing;
 
@@ -502,7 +502,7 @@ RetainSummaryManager::generateSummary(const FunctionDecl *FD,
 
   const IdentifierInfo *II = FD->getIdentifier();
 
-  StringRef FName = II ? II->getName() : "";
+  llvm::StringRef FName = II ? II->getName() : "";
 
   // Strip away preceding '_'.  Doing this here will effect all the checks
   // down below.
@@ -723,7 +723,7 @@ RetainSummaryManager::canEval(const CallExpr *CE, const FunctionDecl *FD,
   if (!II)
     return std::nullopt;
 
-  StringRef FName = II->getName();
+  llvm::StringRef FName = II->getName();
   FName = FName.substr(FName.find_first_not_of('_'));
 
   QualType ResultTy = CE->getCallReturnType(Ctx);
@@ -888,7 +888,7 @@ RetainSummaryManager::getRetEffectFromAnnotations(QualType RetTy,
 /// \return Whether the chain of typedefs starting from @c QT
 /// has a typedef with a given name @c Name.
 static bool hasTypedefNamed(QualType QT,
-                            StringRef Name) {
+                            llvm::StringRef Name) {
   while (auto *T = QT->getAs<TypedefType>()) {
     const auto &Context = T->getDecl()->getASTContext();
     if (T->getDecl()->getIdentifier() == &Context.Idents.get(Name))
@@ -1097,7 +1097,7 @@ RetainSummaryManager::getStandardMethodSummary(const ObjCMethodDecl *MD,
   // method.
   if (S.isKeywordSelector()) {
     for (unsigned i = 0, e = S.getNumArgs(); i != e; ++i) {
-      StringRef Slot = S.getNameForSlot(i);
+      llvm::StringRef Slot = S.getNameForSlot(i);
       if (Slot.ends_with_insensitive("delegate")) {
         if (ResultEff == ObjCInitRetE)
           ResultEff = RetEffect::MakeNoRetHard();

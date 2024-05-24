@@ -20,13 +20,13 @@ namespace clang::tidy::readability {
 const char DefaultStringNames[] =
     "::std::basic_string_view;::std::basic_string";
 
-static std::vector<StringRef> removeNamespaces(ArrayRef<StringRef> Names) {
-  std::vector<StringRef> Result;
+static std::vector<llvm::StringRef> removeNamespaces(llvm::ArrayRef<llvm::StringRef> Names) {
+  std::vector<llvm::StringRef> Result;
   Result.reserve(Names.size());
-  for (StringRef Name : Names) {
-    StringRef::size_type ColonPos = Name.rfind(':');
+  for (llvm::StringRef Name : Names) {
+    llvm::StringRef::size_type ColonPos = Name.rfind(':');
     Result.push_back(
-        Name.drop_front(ColonPos == StringRef::npos ? 0 : ColonPos + 1));
+        Name.drop_front(ColonPos == llvm::StringRef::npos ? 0 : ColonPos + 1));
   }
   return Result;
 }
@@ -53,7 +53,7 @@ getConstructExprArgRange(const CXXConstructExpr &Construct) {
   return SourceRange(B, E);
 }
 
-RedundantStringInitCheck::RedundantStringInitCheck(StringRef Name,
+RedundantStringInitCheck::RedundantStringInitCheck(llvm::StringRef Name,
                                                    ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StringNames(utils::options::parseStringList(

@@ -26,7 +26,7 @@ namespace clang::tidy::misc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/misc/non-private-member-variables-in-classes.html
 class NonPrivateMemberVariablesInClassesCheck : public ClangTidyCheck {
 public:
-  NonPrivateMemberVariablesInClassesCheck(StringRef Name,
+  NonPrivateMemberVariablesInClassesCheck(llvm::StringRef Name,
                                           ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

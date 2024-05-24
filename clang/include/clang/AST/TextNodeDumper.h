@@ -32,7 +32,7 @@ namespace clang {
 class APValue;
 
 class TextTreeStructure {
-  raw_ostream &OS;
+  llvm::raw_ostream &OS;
   const bool ShowColors;
 
   /// Pending[i] is an action to dump an entity at level i.
@@ -55,7 +55,7 @@ public:
 
   /// Add a child of the current node with an optional label.
   /// Calls DoAddChild without arguments.
-  template <typename Fn> void AddChild(StringRef Label, Fn DoAddChild) {
+  template <typename Fn> void AddChild(llvm::StringRef Label, Fn DoAddChild) {
     // If we're at the top level, there's nothing interesting to do; just
     // run the dumper.
     if (TopLevel) {
@@ -121,7 +121,7 @@ public:
     FirstChild = false;
   }
 
-  TextTreeStructure(raw_ostream &OS, bool ShowColors)
+  TextTreeStructure(llvm::raw_ostream &OS, bool ShowColors)
       : OS(OS), ShowColors(ShowColors) {}
 };
 
@@ -135,7 +135,7 @@ class TextNodeDumper
       public TypeVisitor<TextNodeDumper>,
       public TypeLocVisitor<TextNodeDumper>,
       public ConstDeclVisitor<TextNodeDumper> {
-  raw_ostream &OS;
+  llvm::raw_ostream &OS;
   const bool ShowColors;
 
   /// Keep track of the last location we print out so that we can
@@ -161,19 +161,19 @@ class TextNodeDumper
   void dumpAPValueChildren(const APValue &Value, QualType Ty,
                            const APValue &(*IdxToChildFun)(const APValue &,
                                                            unsigned),
-                           unsigned NumChildren, StringRef LabelSingular,
-                           StringRef LabelPlurial);
+                           unsigned NumChildren, llvm::StringRef LabelSingular,
+                           llvm::StringRef LabelPlurial);
 
 public:
-  TextNodeDumper(raw_ostream &OS, const ASTContext &Context, bool ShowColors);
-  TextNodeDumper(raw_ostream &OS, bool ShowColors);
+  TextNodeDumper(llvm::raw_ostream &OS, const ASTContext &Context, bool ShowColors);
+  TextNodeDumper(llvm::raw_ostream &OS, bool ShowColors);
 
   void Visit(const comments::Comment *C, const comments::FullComment *FC);
 
   void Visit(const Attr *A);
 
   void Visit(const TemplateArgument &TA, SourceRange R,
-             const Decl *From = nullptr, StringRef Label = {});
+             const Decl *From = nullptr, llvm::StringRef Label = {});
 
   void Visit(const Stmt *Node);
 
@@ -214,7 +214,7 @@ public:
   void dumpNestedNameSpecifier(const NestedNameSpecifier *NNS);
   void dumpConceptReference(const ConceptReference *R);
 
-  void dumpDeclRef(const Decl *D, StringRef Label = {});
+  void dumpDeclRef(const Decl *D, llvm::StringRef Label = {});
 
   void visitTextComment(const comments::TextComment *C,
                         const comments::FullComment *);

@@ -292,7 +292,7 @@ static bool isInterestingExpr(const Expr *E, const ExplodedNode *N,
 }
 
 /// \return name of the macro inside the location \p Loc.
-static StringRef getMacroName(SourceLocation Loc,
+static llvm::StringRef getMacroName(SourceLocation Loc,
     BugReporterContext &BRC) {
   return Lexer::getImmediateMacroName(
       Loc,
@@ -541,7 +541,7 @@ class NoStoreFuncVisitor final : public NoStateChangeFuncVisitor {
   /// The limit of two indicates that we will dereference fields only once.
   static const unsigned DEREFERENCE_LIMIT = 2;
 
-  using RegionVector = SmallVector<const MemRegion *, 5>;
+  using RegionVector = llvm::SmallVector<const MemRegion *, 5>;
 
 public:
   NoStoreFuncVisitor(const SubRegion *R, bugreporter::TrackingKind TKind)
@@ -594,16 +594,16 @@ private:
   PathDiagnosticPieceRef
   maybeEmitNote(PathSensitiveBugReport &R, const CallEvent &Call,
                 const ExplodedNode *N, const RegionVector &FieldChain,
-                const MemRegion *MatchedRegion, StringRef FirstElement,
+                const MemRegion *MatchedRegion, llvm::StringRef FirstElement,
                 bool FirstIsReferenceType, unsigned IndirectionLevel);
 
   bool prettyPrintRegionName(const RegionVector &FieldChain,
                              const MemRegion *MatchedRegion,
-                             StringRef FirstElement, bool FirstIsReferenceType,
+                             llvm::StringRef FirstElement, bool FirstIsReferenceType,
                              unsigned IndirectionLevel,
                              llvm::raw_svector_ostream &os);
 
-  StringRef prettyPrintFirstElement(StringRef FirstElement,
+  llvm::StringRef prettyPrintFirstElement(llvm::StringRef FirstElement,
                                     bool MoreItemsExpected,
                                     int IndirectionLevel,
                                     llvm::raw_svector_ostream &os);
@@ -738,7 +738,7 @@ static bool isPointerToConst(QualType Ty) {
 
 PathDiagnosticPieceRef NoStoreFuncVisitor::maybeEmitNoteForParameters(
     PathSensitiveBugReport &R, const CallEvent &Call, const ExplodedNode *N) {
-  ArrayRef<ParmVarDecl *> Parameters = Call.parameters();
+  llvm::ArrayRef<ParmVarDecl *> Parameters = Call.parameters();
   for (unsigned I = 0; I < Call.getNumArgs() && I < Parameters.size(); ++I) {
     const ParmVarDecl *PVD = Parameters[I];
     SVal V = Call.getArgSVal(I);
@@ -786,7 +786,7 @@ static llvm::StringLiteral WillBeUsedForACondition =
 PathDiagnosticPieceRef NoStoreFuncVisitor::maybeEmitNote(
     PathSensitiveBugReport &R, const CallEvent &Call, const ExplodedNode *N,
     const RegionVector &FieldChain, const MemRegion *MatchedRegion,
-    StringRef FirstElement, bool FirstIsReferenceType,
+    llvm::StringRef FirstElement, bool FirstIsReferenceType,
     unsigned IndirectionLevel) {
 
   PathDiagnosticLocation L =
@@ -798,7 +798,7 @@ PathDiagnosticPieceRef NoStoreFuncVisitor::maybeEmitNote(
   if (!L.hasValidLocation())
     return nullptr;
 
-  SmallString<256> sbuf;
+  llvm::SmallString<256> sbuf;
   llvm::raw_svector_ostream os(sbuf);
   os << "Returning without writing to '";
 
@@ -815,7 +815,7 @@ PathDiagnosticPieceRef NoStoreFuncVisitor::maybeEmitNote(
 
 bool NoStoreFuncVisitor::prettyPrintRegionName(const RegionVector &FieldChain,
                                                const MemRegion *MatchedRegion,
-                                               StringRef FirstElement,
+                                               llvm::StringRef FirstElement,
                                                bool FirstIsReferenceType,
                                                unsigned IndirectionLevel,
                                                llvm::raw_svector_ostream &os) {
@@ -835,7 +835,7 @@ bool NoStoreFuncVisitor::prettyPrintRegionName(const RegionVector &FieldChain,
   std::reverse(RegionSequence.begin(), RegionSequence.end());
   RegionSequence.append(FieldChain.begin(), FieldChain.end());
 
-  StringRef Sep;
+  llvm::StringRef Sep;
   for (const MemRegion *R : RegionSequence) {
 
     // Just keep going up to the base region.
@@ -865,10 +865,10 @@ bool NoStoreFuncVisitor::prettyPrintRegionName(const RegionVector &FieldChain,
   return true;
 }
 
-StringRef NoStoreFuncVisitor::prettyPrintFirstElement(
-    StringRef FirstElement, bool MoreItemsExpected, int IndirectionLevel,
+llvm::StringRef NoStoreFuncVisitor::prettyPrintFirstElement(
+    llvm::StringRef FirstElement, bool MoreItemsExpected, int IndirectionLevel,
     llvm::raw_svector_ostream &os) {
-  StringRef Out = ".";
+  llvm::StringRef Out = ".";
 
   if (IndirectionLevel > 0 && MoreItemsExpected) {
     IndirectionLevel--;
@@ -1071,7 +1071,7 @@ public:
     getParentTracker().track(RetE, N, {TKind, EnableNullFPSuppression});
 
     // Build an appropriate message based on the return value.
-    SmallString<64> Msg;
+    llvm::SmallString<64> Msg;
     llvm::raw_svector_ostream Out(Msg);
 
     bool WouldEventBeMeaningless = false;
@@ -1767,7 +1767,7 @@ PathDiagnosticPieceRef StoreSiteFinder::VisitNode(const ExplodedNode *Succ,
     return nullptr;
 
   // Okay, we've found the binding. Emit an appropriate message.
-  SmallString<256> sbuf;
+  llvm::SmallString<256> sbuf;
   llvm::raw_svector_ostream os(sbuf);
 
   StoreInfo SI = {StoreInfo::Assignment, // default kind
@@ -2032,7 +2032,7 @@ constructDebugPieceForTrackedCondition(const Expr *Cond,
   return std::make_shared<PathDiagnosticEventPiece>(
       PathDiagnosticLocation::createBegin(
           Cond, BRC.getSourceManager(), N->getLocationContext()),
-          (Twine() + "Tracking condition '" + ConditionText + "'").str());
+          (llvm::Twine() + "Tracking condition '" + ConditionText + "'").str());
 }
 
 static bool isAssertlikeBlock(const CFGBlock *B, ASTContext &Context) {
@@ -2220,7 +2220,7 @@ static const ExplodedNode* findNodeForExpression(const ExplodedNode *N,
 
 PathDiagnosticPieceRef StoreHandler::constructNote(StoreInfo SI,
                                                    BugReporterContext &BRC,
-                                                   StringRef NodeText) {
+                                                   llvm::StringRef NodeText) {
   // Construct a new PathDiagnosticPiece.
   ProgramPoint P = SI.StoreSite->getLocation();
   PathDiagnosticLocation L;
@@ -2245,7 +2245,7 @@ public:
   PathDiagnosticPieceRef handle(StoreInfo SI, BugReporterContext &BRC,
                                 TrackingOptions Opts) override {
     // Okay, we've found the binding. Emit an appropriate message.
-    SmallString<256> Buffer;
+    llvm::SmallString<256> Buffer;
     llvm::raw_svector_ostream OS(Buffer);
 
     switch (SI.StoreKind) {
@@ -2954,7 +2954,7 @@ ConditionBRVisitor::VisitTrueTest(const Expr *Cond, BugReporterContext &BRC,
 }
 
 bool ConditionBRVisitor::patternMatch(const Expr *Ex, const Expr *ParentEx,
-                                      raw_ostream &Out, BugReporterContext &BRC,
+                                      llvm::raw_ostream &Out, BugReporterContext &BRC,
                                       PathSensitiveBugReport &report,
                                       const ExplodedNode *N,
                                       std::optional<bool> &prunable,
@@ -3055,7 +3055,7 @@ PathDiagnosticPieceRef ConditionBRVisitor::VisitTrueTest(
     IsSameFieldName =
         LhsME->getMemberDecl()->getName() == RhsME->getMemberDecl()->getName();
 
-  SmallString<128> LhsString, RhsString;
+  llvm::SmallString<128> LhsString, RhsString;
   {
     llvm::raw_svector_ostream OutLHS(LhsString), OutRHS(RhsString);
     const bool isVarLHS = patternMatch(BExpr->getLHS(), BExpr, OutLHS, BRC, R,
@@ -3082,7 +3082,7 @@ PathDiagnosticPieceRef ConditionBRVisitor::VisitTrueTest(
     return nullptr;
 
   // Should we invert the strings if the LHS is not a variable name?
-  SmallString<256> buf;
+  llvm::SmallString<256> buf;
   llvm::raw_svector_ostream Out(buf);
   Out << (IsAssuming ? "Assuming " : "")
       << (shouldInvert ? RhsString : LhsString) << " is ";
@@ -3159,12 +3159,12 @@ PathDiagnosticPieceRef ConditionBRVisitor::VisitTrueTest(
 }
 
 PathDiagnosticPieceRef ConditionBRVisitor::VisitConditionVariable(
-    StringRef LhsString, const Expr *CondVarExpr, BugReporterContext &BRC,
+    llvm::StringRef LhsString, const Expr *CondVarExpr, BugReporterContext &BRC,
     PathSensitiveBugReport &report, const ExplodedNode *N, bool TookTrue) {
   // FIXME: If there's already a constraint tracker for this variable,
   // we shouldn't emit anything here (c.f. the double note in
   // test/Analysis/inlining/path-notes.c)
-  SmallString<256> buf;
+  llvm::SmallString<256> buf;
   llvm::raw_svector_ostream Out(buf);
   Out << "Assuming " << LhsString << " is ";
 
@@ -3193,7 +3193,7 @@ PathDiagnosticPieceRef ConditionBRVisitor::VisitTrueTest(
   if (!VD)
     return nullptr;
 
-  SmallString<256> Buf;
+  llvm::SmallString<256> Buf;
   llvm::raw_svector_ostream Out(Buf);
 
   Out << (IsAssuming ? "Assuming '" : "'") << VD->getDeclName() << "' is ";
@@ -3225,7 +3225,7 @@ PathDiagnosticPieceRef ConditionBRVisitor::VisitTrueTest(
     const Expr *Cond, const MemberExpr *ME, BugReporterContext &BRC,
     PathSensitiveBugReport &report, const ExplodedNode *N, bool TookTrue,
     bool IsAssuming) {
-  SmallString<256> Buf;
+  llvm::SmallString<256> Buf;
   llvm::raw_svector_ostream Out(Buf);
 
   Out << (IsAssuming ? "Assuming field '" : "Field '")
@@ -3259,7 +3259,7 @@ PathDiagnosticPieceRef ConditionBRVisitor::VisitTrueTest(
   return event;
 }
 
-bool ConditionBRVisitor::printValue(const Expr *CondVarExpr, raw_ostream &Out,
+bool ConditionBRVisitor::printValue(const Expr *CondVarExpr, llvm::raw_ostream &Out,
                                     const ExplodedNode *N, bool TookTrue,
                                     bool IsAssuming) {
   QualType Ty = CondVarExpr->getType();
@@ -3411,7 +3411,7 @@ UndefOrNullArgVisitor::VisitNode(const ExplodedNode *N, BugReporterContext &BRC,
   CallEventManager &CEMgr = BRC.getStateManager().getCallEventManager();
   CallEventRef<> Call = CEMgr.getCaller(CEnter->getCalleeContext(), State);
   unsigned Idx = 0;
-  ArrayRef<ParmVarDecl *> parms = Call->parameters();
+  llvm::ArrayRef<ParmVarDecl *> parms = Call->parameters();
 
   for (const auto ParamDecl : parms) {
     const MemRegion *ArgReg = Call->getArgSVal(Idx).getAsRegion();

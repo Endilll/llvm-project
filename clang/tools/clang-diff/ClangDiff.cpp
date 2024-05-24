@@ -85,7 +85,7 @@ static void addExtraArgs(std::unique_ptr<CompilationDatabase> &Compilations) {
 
 static std::unique_ptr<ASTUnit>
 getAST(const std::unique_ptr<CompilationDatabase> &CommonCompilations,
-       const StringRef Filename) {
+       const llvm::StringRef Filename) {
   std::string ErrorMessage;
   std::unique_ptr<CompilationDatabase> Compilations;
   if (!CommonCompilations) {
@@ -218,7 +218,7 @@ window.onkeydown = handleKey
 <div onclick='highlight(event)'>
 )";
 
-static void printHtml(raw_ostream &OS, char C) {
+static void printHtml(llvm::raw_ostream &OS, char C) {
   switch (C) {
   case '&':
     OS << "&amp;";
@@ -240,7 +240,7 @@ static void printHtml(raw_ostream &OS, char C) {
   }
 }
 
-static void printHtml(raw_ostream &OS, const StringRef Str) {
+static void printHtml(llvm::raw_ostream &OS, const llvm::StringRef Str) {
   for (char C : Str)
     printHtml(OS, C);
 }
@@ -263,7 +263,7 @@ static std::string getChangeKindAbbr(diff::ChangeKind Kind) {
   llvm_unreachable("Invalid enumeration value.");
 }
 
-static unsigned printHtmlForNode(raw_ostream &OS, const diff::ASTDiff &Diff,
+static unsigned printHtmlForNode(llvm::raw_ostream &OS, const diff::ASTDiff &Diff,
                                  diff::SyntaxTree &Tree, bool IsLeft,
                                  diff::NodeId Id, unsigned Offset) {
   const diff::Node &Node = Tree.getNode(Id);
@@ -316,7 +316,7 @@ static unsigned printHtmlForNode(raw_ostream &OS, const diff::ASTDiff &Diff,
   return Offset;
 }
 
-static void printJsonString(raw_ostream &OS, const StringRef Str) {
+static void printJsonString(llvm::raw_ostream &OS, const llvm::StringRef Str) {
   for (signed char C : Str) {
     switch (C) {
     case '"':
@@ -341,7 +341,7 @@ static void printJsonString(raw_ostream &OS, const StringRef Str) {
   }
 }
 
-static void printNodeAttributes(raw_ostream &OS, diff::SyntaxTree &Tree,
+static void printNodeAttributes(llvm::raw_ostream &OS, diff::SyntaxTree &Tree,
                                 diff::NodeId Id) {
   const diff::Node &N = Tree.getNode(Id);
   OS << R"("id":)" << int(Id);
@@ -357,7 +357,7 @@ static void printNodeAttributes(raw_ostream &OS, diff::SyntaxTree &Tree,
   }
 }
 
-static void printNodeAsJson(raw_ostream &OS, diff::SyntaxTree &Tree,
+static void printNodeAsJson(llvm::raw_ostream &OS, diff::SyntaxTree &Tree,
                             diff::NodeId Id) {
   const diff::Node &N = Tree.getNode(Id);
   OS << "{";
@@ -385,7 +385,7 @@ static void printNodeAsJson(raw_ostream &OS, diff::SyntaxTree &Tree,
   OS << "]}";
 }
 
-static void printNode(raw_ostream &OS, diff::SyntaxTree &Tree,
+static void printNode(llvm::raw_ostream &OS, diff::SyntaxTree &Tree,
                       diff::NodeId Id) {
   if (Id.isInvalid()) {
     OS << "None";
@@ -398,7 +398,7 @@ static void printNode(raw_ostream &OS, diff::SyntaxTree &Tree,
   OS << "(" << Id << ")";
 }
 
-static void printTree(raw_ostream &OS, diff::SyntaxTree &Tree) {
+static void printTree(llvm::raw_ostream &OS, diff::SyntaxTree &Tree) {
   for (diff::NodeId Id : Tree) {
     for (int I = 0; I < Tree.getNode(Id).Depth; ++I)
       OS << " ";
@@ -407,7 +407,7 @@ static void printTree(raw_ostream &OS, diff::SyntaxTree &Tree) {
   }
 }
 
-static void printDstChange(raw_ostream &OS, diff::ASTDiff &Diff,
+static void printDstChange(llvm::raw_ostream &OS, diff::ASTDiff &Diff,
                            diff::SyntaxTree &SrcTree, diff::SyntaxTree &DstTree,
                            diff::NodeId Dst) {
   const diff::Node &DstNode = DstTree.getNode(Dst);

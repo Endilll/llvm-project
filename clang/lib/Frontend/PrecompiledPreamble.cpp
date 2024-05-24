@@ -39,7 +39,7 @@ using namespace clang;
 
 namespace {
 
-StringRef getInMemoryPreamblePath() {
+llvm::StringRef getInMemoryPreamblePath() {
 #if defined(LLVM_ON_UNIX)
   return "/__clang_tmp/___clang_inmemory_preamble___";
 #elif defined(_WIN32)
@@ -50,16 +50,16 @@ StringRef getInMemoryPreamblePath() {
 #endif
 }
 
-IntrusiveRefCntPtr<llvm::vfs::FileSystem>
-createVFSOverlayForPreamblePCH(StringRef PCHFilename,
+llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>
+createVFSOverlayForPreamblePCH(llvm::StringRef PCHFilename,
                                std::unique_ptr<llvm::MemoryBuffer> PCHBuffer,
-                               IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
+                               llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
   // We want only the PCH file from the real filesystem to be available,
   // so we create an in-memory VFS with just that and overlay it on top.
-  IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> PCHFS(
+  llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> PCHFS(
       new llvm::vfs::InMemoryFileSystem());
   PCHFS->addFile(PCHFilename, 0, std::move(PCHBuffer));
-  IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> Overlay(
+  llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> Overlay(
       new llvm::vfs::OverlayFileSystem(VFS));
   Overlay->pushOverlay(PCHFS);
   return Overlay;
@@ -95,10 +95,10 @@ public:
       : Out(Out), Search(Search), SM(SM) {}
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override {
     // File is std::nullopt if it wasn't found.
@@ -154,10 +154,10 @@ public:
   ~TemporaryFiles();
 
   /// Adds \p File to a set of tracked files.
-  void addFile(StringRef File);
+  void addFile(llvm::StringRef File);
 
   /// Remove \p File from disk and from the set of tracked files.
-  void removeFile(StringRef File);
+  void removeFile(llvm::StringRef File);
 
 private:
   std::mutex Mutex;
@@ -175,14 +175,14 @@ TemporaryFiles::~TemporaryFiles() {
     llvm::sys::fs::remove(File.getKey());
 }
 
-void TemporaryFiles::addFile(StringRef File) {
+void TemporaryFiles::addFile(llvm::StringRef File) {
   std::lock_guard<std::mutex> Guard(Mutex);
   auto IsInserted = Files.insert(File).second;
   (void)IsInserted;
   assert(IsInserted && "File has already been added");
 }
 
-void TemporaryFiles::removeFile(StringRef File) {
+void TemporaryFiles::removeFile(llvm::StringRef File) {
   std::lock_guard<std::mutex> Guard(Mutex);
   auto WasPresent = Files.erase(File);
   (void)WasPresent;
@@ -198,7 +198,7 @@ void TemporaryFiles::removeFile(StringRef File) {
 class TempPCHFile {
 public:
   // A main method used to construct TempPCHFile.
-  static std::unique_ptr<TempPCHFile> create(StringRef StoragePath) {
+  static std::unique_ptr<TempPCHFile> create(llvm::StringRef StoragePath) {
     // FIXME: This is a hack so that we can override the preamble file during
     // crash-recovery testing, which is the only case where the preamble files
     // are not necessarily cleaned up.
@@ -253,7 +253,7 @@ public:
         Callbacks(Callbacks) {}
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
   bool hasEmittedPreamblePCH() const { return HasEmittedPreamblePCH; }
 
@@ -292,10 +292,10 @@ class PrecompilePreambleConsumer : public PCHGenerator {
 public:
   PrecompilePreambleConsumer(PrecompilePreambleAction &Action, Preprocessor &PP,
                              InMemoryModuleCache &ModuleCache,
-                             StringRef isysroot,
+                             llvm::StringRef isysroot,
                              std::shared_ptr<PCHBuffer> Buffer)
       : PCHGenerator(PP, ModuleCache, "", isysroot, std::move(Buffer),
-                     ArrayRef<std::shared_ptr<ModuleFileExtension>>(),
+                     llvm::ArrayRef<std::shared_ptr<ModuleFileExtension>>(),
                      /*AllowASTWithErrors=*/true),
         Action(Action) {}
 
@@ -321,7 +321,7 @@ private:
 
 std::unique_ptr<ASTConsumer>
 PrecompilePreambleAction::CreateASTConsumer(CompilerInstance &CI,
-                                            StringRef InFile) {
+                                            llvm::StringRef InFile) {
   std::string Sysroot;
   if (!GeneratePCHAction::ComputeASTConsumerArguments(CI, Sysroot))
     return nullptr;
@@ -383,7 +383,7 @@ public:
   }
   llvm::StringRef memoryContents() const {
     assert(getKind() == Kind::InMemory);
-    return StringRef(Memory->Data.data(), Memory->Data.size());
+    return llvm::StringRef(Memory->Data.data(), Memory->Data.size());
   }
 
   // Shrink in-memory buffers to fit.
@@ -413,9 +413,9 @@ llvm::ErrorOr<PrecompiledPreamble> PrecompiledPreamble::Build(
     const CompilerInvocation &Invocation,
     const llvm::MemoryBuffer *MainFileBuffer, PreambleBounds Bounds,
     DiagnosticsEngine &Diagnostics,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps, bool StoreInMemory,
-    StringRef StoragePath, PreambleCallbacks &Callbacks) {
+    llvm::StringRef StoragePath, PreambleCallbacks &Callbacks) {
   assert(VFS && "VFS is null");
 
   auto PreambleInvocation = std::make_shared<CompilerInvocation>(Invocation);
@@ -496,7 +496,7 @@ llvm::ErrorOr<PrecompiledPreamble> PrecompiledPreamble::Build(
   Clang->getLangOpts().CompilingPCH = true;
 
   // Remap the main source file to the preamble buffer.
-  StringRef MainFilePath = FrontendOpts.Inputs[0].getFile();
+  llvm::StringRef MainFilePath = FrontendOpts.Inputs[0].getFile();
   auto PreambleInputBuffer = llvm::MemoryBuffer::getMemBufferCopy(
       MainFileBuffer->getBuffer().slice(0, Bounds.Size), MainFilePath);
   if (PreprocessorOpts.RetainRemappedFileBuffers) {
@@ -710,14 +710,14 @@ bool PrecompiledPreamble::CanReuse(const CompilerInvocation &Invocation,
 }
 
 void PrecompiledPreamble::AddImplicitPreamble(
-    CompilerInvocation &CI, IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
+    CompilerInvocation &CI, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
     llvm::MemoryBuffer *MainFileBuffer) const {
   PreambleBounds Bounds(PreambleBytes.size(), PreambleEndsAtStartOfLine);
   configurePreamble(Bounds, CI, VFS, MainFileBuffer);
 }
 
 void PrecompiledPreamble::OverridePreamble(
-    CompilerInvocation &CI, IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
+    CompilerInvocation &CI, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
     llvm::MemoryBuffer *MainFileBuffer) const {
   auto Bounds = ComputePreambleBounds(CI.getLangOpts(), *MainFileBuffer, 0);
   configurePreamble(Bounds, CI, VFS, MainFileBuffer);
@@ -761,7 +761,7 @@ PrecompiledPreamble::PreambleFileHash::createForMemoryBuffer(
 
 void PrecompiledPreamble::configurePreamble(
     PreambleBounds Bounds, CompilerInvocation &CI,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS,
     llvm::MemoryBuffer *MainFileBuffer) const {
   assert(VFS);
 
@@ -787,13 +787,13 @@ void PrecompiledPreamble::configurePreamble(
 
 void PrecompiledPreamble::setupPreambleStorage(
     const PCHStorage &Storage, PreprocessorOptions &PreprocessorOpts,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS) {
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> &VFS) {
   if (Storage.getKind() == PCHStorage::Kind::TempFile) {
     llvm::StringRef PCHPath = Storage.filePath();
     PreprocessorOpts.ImplicitPCHInclude = PCHPath.str();
 
     // Make sure we can access the PCH file even if we're using a VFS
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> RealFS =
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> RealFS =
         llvm::vfs::getRealFileSystem();
     if (VFS == RealFS || VFS->exists(PCHPath))
       return;
@@ -812,7 +812,7 @@ void PrecompiledPreamble::setupPreambleStorage(
     assert(Storage.getKind() == PCHStorage::Kind::InMemory);
     // For in-memory preamble, we have to provide a VFS overlay that makes it
     // accessible.
-    StringRef PCHPath = getInMemoryPreamblePath();
+    llvm::StringRef PCHPath = getInMemoryPreamblePath();
     PreprocessorOpts.ImplicitPCHInclude = std::string(PCHPath);
 
     auto Buf = llvm::MemoryBuffer::getMemBuffer(

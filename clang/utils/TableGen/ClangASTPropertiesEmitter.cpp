@@ -27,7 +27,7 @@ using namespace llvm;
 using namespace clang;
 using namespace clang::tblgen;
 
-static StringRef getReaderResultType(TypeNode _) { return "QualType"; }
+static llvm::StringRef getReaderResultType(TypeNode _) { return "QualType"; }
 
 namespace {
 
@@ -36,19 +36,19 @@ struct ReaderWriterInfo {
 
   /// The name of the node hierarchy.  Not actually sensitive to IsReader,
   /// but useful to cache here anyway.
-  StringRef HierarchyName;
+  llvm::StringRef HierarchyName;
 
   /// The suffix on classes: Reader/Writer
-  StringRef ClassSuffix;
+  llvm::StringRef ClassSuffix;
 
   /// The base name of methods: read/write
-  StringRef MethodPrefix;
+  llvm::StringRef MethodPrefix;
 
   /// The name of the property helper member: R/W
-  StringRef HelperVariable;
+  llvm::StringRef HelperVariable;
 
   /// The result type of methods on the class.
-  StringRef ResultType;
+  llvm::StringRef ResultType;
 
   template <class NodeClass>
   static ReaderWriterInfo forReader() {
@@ -88,14 +88,14 @@ struct CasedTypeInfo {
 };
 
 class ASTPropsEmitter {
-	raw_ostream &Out;
+	llvm::raw_ostream &Out;
 	RecordKeeper &Records;
 	std::map<HasProperties, NodeInfo> NodeInfos;
   std::vector<PropertyType> AllPropertyTypes;
   std::map<PropertyType, CasedTypeInfo> CasedTypeInfos;
 
 public:
-	ASTPropsEmitter(RecordKeeper &records, raw_ostream &out)
+	ASTPropsEmitter(RecordKeeper &records, llvm::raw_ostream &out)
 		: Out(out), Records(records) {
 
 		// Find all the properties.
@@ -181,7 +181,7 @@ public:
 
   void visitAllProperties(HasProperties derived, const NodeInfo &derivedInfo,
                           function_ref<void (Property)> visit) {
-    std::set<StringRef> ignoredProperties;
+    std::set<llvm::StringRef> ignoredProperties;
 
     auto overrideRule = derivedInfo.Override;
     if (overrideRule) {
@@ -247,14 +247,14 @@ public:
   void emitPropertiedReaderWriterBody(HasProperties node,
                                       const ReaderWriterInfo &info);
 
-  void emitReadOfProperty(StringRef readerName, Property property);
-  void emitReadOfProperty(StringRef readerName, StringRef name,
-                          PropertyType type, StringRef condition = "");
+  void emitReadOfProperty(llvm::StringRef readerName, Property property);
+  void emitReadOfProperty(llvm::StringRef readerName, llvm::StringRef name,
+                          PropertyType type, llvm::StringRef condition = "");
 
-  void emitWriteOfProperty(StringRef writerName, Property property);
-  void emitWriteOfProperty(StringRef writerName, StringRef name,
-                           PropertyType type, StringRef readCode,
-                           StringRef condition = "");
+  void emitWriteOfProperty(llvm::StringRef writerName, Property property);
+  void emitWriteOfProperty(llvm::StringRef writerName, llvm::StringRef name,
+                           PropertyType type, llvm::StringRef readCode,
+                           llvm::StringRef condition = "");
 
   void emitBasicReaderWriterFile(const ReaderWriterInfo &info);
   void emitDispatcherTemplate(const ReaderWriterInfo &info);
@@ -297,7 +297,7 @@ void ASTPropsEmitter::Validator::validateNode(HasProperties derivedNode,
   if (!ValidatedNodes.insert(derivedNode).second) return;
 
   // A map from property name to property.
-  std::map<StringRef, Property> allProperties;
+  std::map<llvm::StringRef, Property> allProperties;
 
   Emitter.visitAllNodesWithInfo(derivedNode, derivedNodeInfo,
                                 [&](HasProperties node,
@@ -356,8 +356,8 @@ void ASTPropsEmitter::Validator::validateType(PropertyType type,
 
 template <class NodeClass>
 void ASTPropsEmitter::emitNodeReaderWriterClass(const ReaderWriterInfo &info) {
-  StringRef suffix = info.ClassSuffix;
-  StringRef var = info.HelperVariable;
+  llvm::StringRef suffix = info.ClassSuffix;
+  llvm::StringRef var = info.HelperVariable;
 
   // Enter the class declaration.
   Out << "template <class Property" << suffix << ">\n"
@@ -437,7 +437,7 @@ void ASTPropsEmitter::emitPropertiedReaderWriterBody(HasProperties node,
                       + node.getName() + "\"");
   auto &nodeInfo = it->second;
 
-  StringRef creationCode;
+  llvm::StringRef creationCode;
   if (info.IsReader) {
     // We should have a creation rule.
     if (!nodeInfo.Creator)
@@ -474,7 +474,7 @@ void ASTPropsEmitter::emitPropertiedReaderWriterBody(HasProperties node,
     Out << "    " << creationCode << "\n";
 }
 
-static void emitBasicReaderWriterMethodSuffix(raw_ostream &out,
+static void emitBasicReaderWriterMethodSuffix(llvm::raw_ostream &out,
                                               PropertyType type,
                                               bool isForRead) {
   if (!type.isGenericSpecialization()) {
@@ -503,16 +503,16 @@ static void emitBasicReaderWriterMethodSuffix(raw_ostream &out,
 }
 
 /// Emit code to read the given property in a node-reader method.
-void ASTPropsEmitter::emitReadOfProperty(StringRef readerName,
+void ASTPropsEmitter::emitReadOfProperty(llvm::StringRef readerName,
                                          Property property) {
   emitReadOfProperty(readerName, property.getName(), property.getType(),
                      property.getCondition());
 }
 
-void ASTPropsEmitter::emitReadOfProperty(StringRef readerName,
-                                         StringRef name,
+void ASTPropsEmitter::emitReadOfProperty(llvm::StringRef readerName,
+                                         llvm::StringRef name,
                                          PropertyType type,
-                                         StringRef condition) {
+                                         llvm::StringRef condition) {
   // Declare all the necessary buffers.
   auto bufferTypes = type.getBufferElementTypes();
   for (size_t i = 0, e = bufferTypes.size(); i != e; ++i) {
@@ -558,17 +558,17 @@ void ASTPropsEmitter::emitReadOfProperty(StringRef readerName,
 }
 
 /// Emit code to write the given property in a node-writer method.
-void ASTPropsEmitter::emitWriteOfProperty(StringRef writerName,
+void ASTPropsEmitter::emitWriteOfProperty(llvm::StringRef writerName,
                                           Property property) {
   emitWriteOfProperty(writerName, property.getName(), property.getType(),
                       property.getReadCode(), property.getCondition());
 }
 
-void ASTPropsEmitter::emitWriteOfProperty(StringRef writerName,
-                                          StringRef name,
+void ASTPropsEmitter::emitWriteOfProperty(llvm::StringRef writerName,
+                                          llvm::StringRef name,
                                           PropertyType type,
-                                          StringRef readCode,
-                                          StringRef condition) {
+                                          llvm::StringRef readCode,
+                                          llvm::StringRef condition) {
   if (!condition.empty()) {
     Out << "    if (" << condition << ") {\n";
   }
@@ -591,28 +591,28 @@ void ASTPropsEmitter::emitWriteOfProperty(StringRef writerName,
 /// Emit an .inc file that defines the AbstractFooReader class
 /// for the given AST class hierarchy.
 template <class NodeClass>
-static void emitASTReader(RecordKeeper &records, raw_ostream &out,
-                          StringRef description) {
+static void emitASTReader(RecordKeeper &records, llvm::raw_ostream &out,
+                          llvm::StringRef description) {
   emitSourceFileHeader(description, out, records);
 
   ASTPropsEmitter(records, out).emitNodeReaderClass<NodeClass>();
 }
 
-void clang::EmitClangTypeReader(RecordKeeper &records, raw_ostream &out) {
+void clang::EmitClangTypeReader(RecordKeeper &records, llvm::raw_ostream &out) {
   emitASTReader<TypeNode>(records, out, "A CRTP reader for Clang Type nodes");
 }
 
 /// Emit an .inc file that defines the AbstractFooWriter class
 /// for the given AST class hierarchy.
 template <class NodeClass>
-static void emitASTWriter(RecordKeeper &records, raw_ostream &out,
-                          StringRef description) {
+static void emitASTWriter(RecordKeeper &records, llvm::raw_ostream &out,
+                          llvm::StringRef description) {
   emitSourceFileHeader(description, out, records);
 
   ASTPropsEmitter(records, out).emitNodeWriterClass<NodeClass>();
 }
 
-void clang::EmitClangTypeWriter(RecordKeeper &records, raw_ostream &out) {
+void clang::EmitClangTypeWriter(RecordKeeper &records, llvm::raw_ostream &out) {
   emitASTWriter<TypeNode>(records, out, "A CRTP writer for Clang Type nodes");
 }
 
@@ -623,16 +623,16 @@ void clang::EmitClangTypeWriter(RecordKeeper &records, raw_ostream &out) {
 void
 ASTPropsEmitter::emitDispatcherTemplate(const ReaderWriterInfo &info) {
   // Declare the {Read,Write}Dispatcher template.
-  StringRef dispatcherPrefix = (info.IsReader ? "Read" : "Write");
+  llvm::StringRef dispatcherPrefix = (info.IsReader ? "Read" : "Write");
   Out << "template <class ValueType>\n"
          "struct " << dispatcherPrefix << "Dispatcher;\n";
 
   // Declare a specific specialization of the dispatcher template.
   auto declareSpecialization =
-    [&](StringRef specializationParameters,
-        const Twine &cxxTypeName,
-        StringRef methodSuffix) {
-    StringRef var = info.HelperVariable;
+    [&](llvm::StringRef specializationParameters,
+        const llvm::Twine &cxxTypeName,
+        llvm::StringRef methodSuffix) {
+    llvm::StringRef var = info.HelperVariable;
     Out << "template " << specializationParameters << "\n"
            "struct " << dispatcherPrefix << "Dispatcher<"
                      << cxxTypeName << "> {\n";
@@ -660,7 +660,7 @@ ASTPropsEmitter::emitDispatcherTemplate(const ReaderWriterInfo &info) {
                             type.getAbstractTypeName());
     }
   }
-  // Declare partial specializations for ArrayRef and Optional.
+  // Declare partial specializations for llvm::ArrayRef and Optional.
   declareSpecialization("<class T>",
                         "llvm::ArrayRef<T>",
                         "Array");
@@ -670,14 +670,14 @@ ASTPropsEmitter::emitDispatcherTemplate(const ReaderWriterInfo &info) {
 
 void
 ASTPropsEmitter::emitPackUnpackOptionalTemplate(const ReaderWriterInfo &info) {
-  StringRef classPrefix = (info.IsReader ? "Unpack" : "Pack");
-  StringRef methodName = (info.IsReader ? "unpack" : "pack");
+  llvm::StringRef classPrefix = (info.IsReader ? "Unpack" : "Pack");
+  llvm::StringRef methodName = (info.IsReader ? "unpack" : "pack");
 
   // Declare the {Pack,Unpack}OptionalValue template.
   Out << "template <class ValueType>\n"
          "struct " << classPrefix << "OptionalValue;\n";
 
-  auto declareSpecialization = [&](const Twine &typeName, StringRef code) {
+  auto declareSpecialization = [&](const llvm::Twine &typeName, llvm::StringRef code) {
     Out << "template <>\n"
            "struct "
         << classPrefix << "OptionalValue<" << typeName
@@ -696,11 +696,11 @@ ASTPropsEmitter::emitPackUnpackOptionalTemplate(const ReaderWriterInfo &info) {
   };
 
   for (PropertyType type : AllPropertyTypes) {
-    StringRef code = (info.IsReader ? type.getUnpackOptionalCode()
+    llvm::StringRef code = (info.IsReader ? type.getUnpackOptionalCode()
                                     : type.getPackOptionalCode());
     if (code.empty()) continue;
 
-    StringRef typeName = type.getCXXTypeName();
+    llvm::StringRef typeName = type.getCXXTypeName();
     declareSpecialization(typeName, code);
     if (type.isConstWhenWriting() && !info.IsReader)
       declareSpecialization("const " + typeName, code);
@@ -722,11 +722,11 @@ ASTPropsEmitter::emitBasicReaderWriterTemplate(const ReaderWriterInfo &info) {
   Out << "  ASTContext &getASTContext() { return C; }\n";
   Out << "  Impl &asImpl() { return static_cast<Impl&>(*this); }\n";
 
-  auto enterReaderWriterMethod = [&](StringRef cxxTypeName,
-                                     StringRef abstractTypeName,
+  auto enterReaderWriterMethod = [&](llvm::StringRef cxxTypeName,
+                                     llvm::StringRef abstractTypeName,
                                      bool shouldPassByReference,
                                      bool constWhenWriting,
-                                     StringRef paramName) {
+                                     llvm::StringRef paramName) {
     Out << "  " << (info.IsReader ? cxxTypeName : "void")
                 << " " << info.MethodPrefix << abstractTypeName << "(";
     if (!info.IsReader)
@@ -739,7 +739,7 @@ ASTPropsEmitter::emitBasicReaderWriterTemplate(const ReaderWriterInfo &info) {
   // Emit {read,write}ValueType methods for all the enum and subclass types
   // that default to using the integer/base-class implementations.
   for (PropertyType type : AllPropertyTypes) {
-    auto enterMethod = [&](StringRef paramName) {
+    auto enterMethod = [&](llvm::StringRef paramName) {
       enterReaderWriterMethod(type.getCXXTypeName(),
                               type.getAbstractTypeName(),
                               type.shouldPassByReference(),
@@ -812,7 +812,7 @@ void ASTPropsEmitter::emitCasedReaderWriterMethodBody(PropertyType type,
 
   // Read/write the kind property;
   TypeKindRule kindRule = typeCases.KindRule;
-  StringRef kindProperty = kindRule.getKindPropertyName();
+  llvm::StringRef kindProperty = kindRule.getKindPropertyName();
   PropertyType kindType = kindRule.getKindType();
   if (info.IsReader) {
     emitReadOfProperty(subvar, kindProperty, kindType);
@@ -851,7 +851,7 @@ void ASTPropsEmitter::emitBasicReaderWriterFile(const ReaderWriterInfo &info) {
 
 /// Emit an .inc file that defines some helper classes for reading
 /// basic values.
-void clang::EmitClangBasicReader(RecordKeeper &records, raw_ostream &out) {
+void clang::EmitClangBasicReader(RecordKeeper &records, llvm::raw_ostream &out) {
   emitSourceFileHeader("Helper classes for BasicReaders", out, records);
 
   // Use any property, we won't be using those properties.
@@ -861,7 +861,7 @@ void clang::EmitClangBasicReader(RecordKeeper &records, raw_ostream &out) {
 
 /// Emit an .inc file that defines some helper classes for writing
 /// basic values.
-void clang::EmitClangBasicWriter(RecordKeeper &records, raw_ostream &out) {
+void clang::EmitClangBasicWriter(RecordKeeper &records, llvm::raw_ostream &out) {
   emitSourceFileHeader("Helper classes for BasicWriters", out, records);
 
   // Use any property, we won't be using those properties.

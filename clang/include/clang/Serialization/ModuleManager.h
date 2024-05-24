@@ -47,16 +47,16 @@ namespace serialization {
 class ModuleManager {
   /// The chain of AST files, in the order in which we started to load
   /// them (this order isn't really useful for anything).
-  SmallVector<std::unique_ptr<ModuleFile>, 2> Chain;
+  llvm::SmallVector<std::unique_ptr<ModuleFile>, 2> Chain;
 
   /// The chain of non-module PCH files. The first entry is the one named
   /// by the user, the last one is the one that doesn't depend on anything
   /// further.
-  SmallVector<ModuleFile *, 2> PCHChain;
+  llvm::SmallVector<ModuleFile *, 2> PCHChain;
 
   // The roots of the dependency DAG of AST files. This is used
   // to implement short-circuiting logic when running DFS over the dependencies.
-  SmallVector<ModuleFile *, 2> Roots;
+  llvm::SmallVector<ModuleFile *, 2> Roots;
 
   /// All loaded modules, indexed by name.
   llvm::DenseMap<const FileEntry *, ModuleFile *> Modules;
@@ -66,7 +66,7 @@ class ModuleManager {
   FileManager &FileMgr;
 
   /// Cache of PCM files.
-  IntrusiveRefCntPtr<InMemoryModuleCache> ModuleCache;
+  llvm::IntrusiveRefCntPtr<InMemoryModuleCache> ModuleCache;
 
   /// Knows how to unwrap module containers.
   const PCHContainerReader &PCHContainerRdr;
@@ -79,7 +79,7 @@ class ModuleManager {
       InMemoryBuffers;
 
   /// The visitation order.
-  SmallVector<ModuleFile *, 4> VisitOrder;
+  llvm::SmallVector<ModuleFile *, 4> VisitOrder;
 
   /// The list of module files that both we and the global module index
   /// know about.
@@ -89,7 +89,7 @@ class ModuleManager {
   /// (in which case the module manager could have modules it does not) and
   /// this particular translation unit might not have loaded all of the modules
   /// known to the global index.
-  SmallVector<ModuleFile *, 4> ModulesInCommonWithGlobalIndex;
+  llvm::SmallVector<ModuleFile *, 4> ModulesInCommonWithGlobalIndex;
 
   /// The global module index, if one is attached.
   ///
@@ -106,11 +106,11 @@ class ModuleManager {
 
     /// The stack used when marking the imports of a particular module
     /// as not-to-be-visited.
-    SmallVector<ModuleFile *, 4> Stack;
+    llvm::SmallVector<ModuleFile *, 4> Stack;
 
     /// The visit number of each module file, which indicates when
     /// this module file was last visited.
-    SmallVector<unsigned, 4> VisitNumber;
+    llvm::SmallVector<unsigned, 4> VisitNumber;
 
     /// The next visit number to use to mark visited module files.
     unsigned NextVisitNumber = 1;
@@ -127,12 +127,12 @@ class ModuleManager {
 
 public:
   using ModuleIterator = llvm::pointee_iterator<
-      SmallVectorImpl<std::unique_ptr<ModuleFile>>::iterator>;
+      llvm::SmallVectorImpl<std::unique_ptr<ModuleFile>>::iterator>;
   using ModuleConstIterator = llvm::pointee_iterator<
-      SmallVectorImpl<std::unique_ptr<ModuleFile>>::const_iterator>;
+      llvm::SmallVectorImpl<std::unique_ptr<ModuleFile>>::const_iterator>;
   using ModuleReverseIterator = llvm::pointee_iterator<
-      SmallVectorImpl<std::unique_ptr<ModuleFile>>::reverse_iterator>;
-  using ModuleOffset = std::pair<uint32_t, StringRef>;
+      llvm::SmallVectorImpl<std::unique_ptr<ModuleFile>>::reverse_iterator>;
+  using ModuleOffset = std::pair<uint32_t, llvm::StringRef>;
 
   explicit ModuleManager(FileManager &FileMgr, InMemoryModuleCache &ModuleCache,
                          const PCHContainerReader &PCHContainerRdr,
@@ -157,7 +157,7 @@ public:
   ModuleReverseIterator rend() { return Chain.rend(); }
 
   /// A range covering the PCH and preamble module files loaded.
-  llvm::iterator_range<SmallVectorImpl<ModuleFile *>::const_iterator>
+  llvm::iterator_range<llvm::SmallVectorImpl<ModuleFile *>::const_iterator>
   pch_modules() const {
     return llvm::make_range(PCHChain.begin(), PCHChain.end());
   }
@@ -174,16 +174,16 @@ public:
   ModuleFile &operator[](unsigned Index) const { return *Chain[Index]; }
 
   /// Returns the module associated with the given file name.
-  ModuleFile *lookupByFileName(StringRef FileName) const;
+  ModuleFile *lookupByFileName(llvm::StringRef FileName) const;
 
   /// Returns the module associated with the given module name.
-  ModuleFile *lookupByModuleName(StringRef ModName) const;
+  ModuleFile *lookupByModuleName(llvm::StringRef ModName) const;
 
   /// Returns the module associated with the given module file.
   ModuleFile *lookup(const FileEntry *File) const;
 
   /// Returns the in-memory (virtual file) buffer with the given name
-  std::unique_ptr<llvm::MemoryBuffer> lookupBuffer(StringRef Name);
+  std::unique_ptr<llvm::MemoryBuffer> lookupBuffer(llvm::StringRef Name);
 
   /// Number of modules loaded
   unsigned size() const { return Chain.size(); }
@@ -203,7 +203,7 @@ public:
     OutOfDate
   };
 
-  using ASTFileSignatureReader = ASTFileSignature (*)(StringRef);
+  using ASTFileSignatureReader = ASTFileSignature (*)(llvm::StringRef);
 
   /// Attempts to create a new module and add it to the list of known
   /// modules.
@@ -239,7 +239,7 @@ public:
   ///
   /// \return A pointer to the module that corresponds to this file name,
   /// and a value indicating whether the module was loaded.
-  AddModuleResult addModule(StringRef FileName, ModuleKind Type,
+  AddModuleResult addModule(llvm::StringRef FileName, ModuleKind Type,
                             SourceLocation ImportLoc,
                             ModuleFile *ImportedBy, unsigned Generation,
                             off_t ExpectedSize, time_t ExpectedModTime,
@@ -252,7 +252,7 @@ public:
   void removeModules(ModuleIterator First);
 
   /// Add an in-memory buffer the list of known buffers
-  void addInMemoryBuffer(StringRef FileName,
+  void addInMemoryBuffer(llvm::StringRef FileName,
                          std::unique_ptr<llvm::MemoryBuffer> Buffer);
 
   /// Set the global module index.
@@ -301,7 +301,7 @@ public:
   /// \returns True if a file exists but does not meet the size/
   /// modification time criteria, false if the file is either available and
   /// suitable, or is missing.
-  bool lookupModuleFile(StringRef FileName, off_t ExpectedSize,
+  bool lookupModuleFile(llvm::StringRef FileName, off_t ExpectedSize,
                         time_t ExpectedModTime, OptionalFileEntryRef &File);
 
   /// View the graphviz representation of the module graph.

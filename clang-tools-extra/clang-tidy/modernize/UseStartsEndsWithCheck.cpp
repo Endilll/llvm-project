@@ -17,7 +17,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::modernize {
 
-UseStartsEndsWithCheck::UseStartsEndsWithCheck(StringRef Name,
+UseStartsEndsWithCheck::UseStartsEndsWithCheck(llvm::StringRef Name,
                                                ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context) {}
 

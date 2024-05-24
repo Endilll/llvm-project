@@ -7,7 +7,7 @@ class D {
   struct Q {
     unsigned a, b, c, d;
   };
-  SmallVector<Q, 4> q;
+  llvm::SmallVector<Q, 4> q;
 };
 } // namespace llvm
 #endif

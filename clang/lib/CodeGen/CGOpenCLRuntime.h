@@ -50,7 +50,7 @@ protected:
   /// Maps block expression to block information.
   llvm::DenseMap<const Expr *, EnqueuedBlockInfo> EnqueuedBlockMap;
 
-  virtual llvm::Type *getPipeType(const PipeType *T, StringRef Name,
+  virtual llvm::Type *getPipeType(const PipeType *T, llvm::StringRef Name,
                                   llvm::Type *&PipeTy);
   llvm::PointerType *getPointerType(const Type *T);
 

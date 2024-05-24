@@ -39,9 +39,9 @@ outline of a ``local-rename`` action:
 
   class LocalRename final : public RefactoringAction {
   public:
-    StringRef getCommand() const override { return "local-rename"; }
+    llvm::StringRef getCommand() const override { return "local-rename"; }
 
-    StringRef getDescription() const override {
+    llvm::StringRef getDescription() const override {
       return "Finds and renames symbols in code with no indexer support";
     }
 
@@ -121,7 +121,7 @@ range:
   public:
     DeleteSelection(SourceRange Selection) : Selection(Selection) {}
 
-    Expected<AtomicChanges>
+    llvm::Expected<AtomicChanges>
     createSourceReplacements(RefactoringRuleContext &Context) override {
       AtomicChange Replacement(Context.getSources(), Selection.getBegin());
       Replacement.replace(Context.getSource,
@@ -157,7 +157,7 @@ Refactoring Action Rule Requirements
 
 A refactoring action rule requirement is a value whose type derives from the
 ``RefactoringActionRuleRequirement`` class. The type must define an
-``evaluate`` member function that returns a value of type ``Expected<...>``.
+``evaluate`` member function that returns a value of type ``llvm::Expected<...>``.
 When a requirement value is used as an argument to
 ``createRefactoringActionRule``, that value is evaluated during the initiation
 of the action rule. The evaluated result is then passed to the rule's
@@ -166,7 +166,7 @@ constructor unless the evaluation produced an error. For example, the
 will be evaluated using the following steps:
 
 #. ``SourceRangeSelectionRequirement``'s ``evaluate`` member function will be
-   called first. It will return an ``Expected<SourceRange>``.
+   called first. It will return an ``llvm::Expected<SourceRange>``.
 
 #. If the return value is an error the initiation will fail and the error
    will be reported to the client. Note that the client may not report the
@@ -233,8 +233,8 @@ the ``-new-name`` command-line option in clang-refactor:
 
   class NewNameOption : public RequiredRefactoringOption<std::string> {
   public:
-    StringRef getName() const override { return "new-name"; }
-    StringRef getDescription() const override {
+    llvm::StringRef getName() const override { return "new-name"; }
+    llvm::StringRef getDescription() const override {
       return "The new name to change the symbol to";
     }
   };

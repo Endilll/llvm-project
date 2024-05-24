@@ -21,7 +21,7 @@ namespace clang::tidy::zircon {
 /// http://clang.llvm.org/extra/clang-tidy/checks/zircon/temporary-objects.html
 class TemporaryObjectsCheck : public ClangTidyCheck {
 public:
-  TemporaryObjectsCheck(StringRef Name, ClangTidyContext *Context)
+  TemporaryObjectsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         Names(utils::options::parseStringList(Options.get("Names", ""))) {}
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
@@ -29,7 +29,7 @@ public:
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
-  std::vector<StringRef> Names;
+  std::vector<llvm::StringRef> Names;
 };
 
 } // namespace clang::tidy::zircon

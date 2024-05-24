@@ -39,7 +39,7 @@ struct TestMatch {
   MatchResult Result;
 };
 
-template <typename M> TestMatch matchCode(StringRef Code, M Matcher) {
+template <typename M> TestMatch matchCode(llvm::StringRef Code, M Matcher) {
   auto ASTUnit = tooling::buildASTFromCode(Code);
   assert(ASTUnit != nullptr && "AST construction failed");
 
@@ -56,8 +56,8 @@ template <typename M> TestMatch matchCode(StringRef Code, M Matcher) {
 }
 
 // Applies \p Selector to \p Match and, on success, returns the selected source.
-Expected<StringRef> select(RangeSelector Selector, const TestMatch &Match) {
-  Expected<CharSourceRange> Range = Selector(Match.Result);
+llvm::Expected<llvm::StringRef> select(RangeSelector Selector, const TestMatch &Match) {
+  llvm::Expected<CharSourceRange> Range = Selector(Match.Result);
   if (!Range)
     return Range.takeError();
   return tooling::getText(*Range, *Match.Result.Context);
@@ -65,7 +65,7 @@ Expected<StringRef> select(RangeSelector Selector, const TestMatch &Match) {
 
 // Applies \p Selector to a trivial match with only a single bound node with id
 // "bound_node_id".  For use in testing unbound-node errors.
-Expected<CharSourceRange> selectFromTrivial(const RangeSelector &Selector) {
+llvm::Expected<CharSourceRange> selectFromTrivial(const RangeSelector &Selector) {
   // We need to bind the result to something, or the match will fail. Use a
   // binding that is not used in the unbound node tests.
   TestMatch Match =
@@ -84,8 +84,8 @@ testing::Matcher<StringError> withUnboundNodeMessage() {
 // binds each one: a statement ("stmt"), a (non-member) ctor-initializer
 // ("init"), an expression ("expr") and a (nameless) declaration ("decl").  Used
 // to test failures caused by applying selectors to nodes of the wrong type.
-Expected<CharSourceRange> selectFromAssorted(RangeSelector Selector) {
-  StringRef Code = R"cc(
+llvm::Expected<CharSourceRange> selectFromAssorted(RangeSelector Selector) {
+  llvm::StringRef Code = R"cc(
       struct A {};
       class F : public A {
        public:
@@ -128,11 +128,11 @@ MATCHER_P(EqualsCharSourceRange, Range, "") {
 // FIXME: here and elsewhere: use llvm::Annotations library to explicitly mark
 // points and ranges of interest, enabling more readable tests.
 TEST(RangeSelectorTest, BeforeOp) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f(int x, int y, int z) { return 3; }
     int g() { return f(/* comment */ 3, 7 /* comment */, 9); }
   )cc";
-  StringRef CallID = "call";
+  llvm::StringRef CallID = "call";
   ast_matchers::internal::Matcher<Stmt> M = callExpr().bind(CallID);
   RangeSelector R = before(node(CallID.str()));
 
@@ -147,11 +147,11 @@ TEST(RangeSelectorTest, BeforeOp) {
 }
 
 TEST(RangeSelectorTest, BeforeOpParsed) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f(int x, int y, int z) { return 3; }
     int g() { return f(/* comment */ 3, 7 /* comment */, 9); }
   )cc";
-  StringRef CallID = "call";
+  llvm::StringRef CallID = "call";
   ast_matchers::internal::Matcher<Stmt> M = callExpr().bind(CallID);
   auto R = parseRangeSelector(R"rs(before(node("call")))rs");
   ASSERT_THAT_EXPECTED(R, llvm::Succeeded());
@@ -167,11 +167,11 @@ TEST(RangeSelectorTest, BeforeOpParsed) {
 }
 
 TEST(RangeSelectorTest, AfterOp) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f(int x, int y, int z) { return 3; }
     int g() { return f(/* comment */ 3, 7 /* comment */, 9); }
   )cc";
-  StringRef Call = "call";
+  llvm::StringRef Call = "call";
   TestMatch Match = matchCode(Code, callExpr().bind(Call));
   const auto* E = Match.Result.Nodes.getNodeAs<Expr>(Call);
   assert(E != nullptr);
@@ -195,7 +195,7 @@ TEST(RangeSelectorTest, AfterOp) {
 // Gets the spelling location `Length` characters after the start of AST node
 // `Id`.
 static SourceLocation getSpellingLocAfter(const MatchResult &Result,
-                                          StringRef Id, int Length) {
+                                          llvm::StringRef Id, int Length) {
   const auto *E = Result.Nodes.getNodeAs<Expr>(Id);
   assert(E != nullptr);
   return Result.SourceManager->getSpellingLoc(E->getBeginLoc())
@@ -205,7 +205,7 @@ static SourceLocation getSpellingLocAfter(const MatchResult &Result,
 // Test with a range that is the entire macro arg, but does not end the
 // expansion itself.
 TEST(RangeSelectorTest, AfterOpInMacroArg) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
 #define ISNULL(x) x == nullptr
     bool g() { int* y; return ISNULL(y); }
   )cc";
@@ -221,7 +221,7 @@ TEST(RangeSelectorTest, AfterOpInMacroArg) {
 
 // Test with a range that is the entire macro arg and ends the expansion itself.
 TEST(RangeSelectorTest, AfterOpInMacroArgEndsExpansion) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
 #define ISNULL(x) nullptr == x
     bool g() { int* y; return ISNULL(y); }
   )cc";
@@ -236,7 +236,7 @@ TEST(RangeSelectorTest, AfterOpInMacroArgEndsExpansion) {
 }
 
 TEST(RangeSelectorTest, AfterOpInPartOfMacroArg) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
 #define ISNULL(x) x == nullptr
     int* f(int*);
     bool g() { int* y; return ISNULL(f(y)); }
@@ -252,7 +252,7 @@ TEST(RangeSelectorTest, AfterOpInPartOfMacroArg) {
 }
 
 TEST(RangeSelectorTest, BetweenOp) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f(int x, int y, int z) { return 3; }
     int g() { return f(3, /* comment */ 7 /* comment */, 9); }
   )cc";
@@ -264,7 +264,7 @@ TEST(RangeSelectorTest, BetweenOp) {
 }
 
 TEST(RangeSelectorTest, BetweenOpParsed) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f(int x, int y, int z) { return 3; }
     int g() { return f(3, /* comment */ 7 /* comment */, 9); }
   )cc";
@@ -278,7 +278,7 @@ TEST(RangeSelectorTest, BetweenOpParsed) {
 
 // Node-id specific version.
 TEST(RangeSelectorTest, EncloseOpNodes) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f(int x, int y, int z) { return 3; }
     int g() { return f(/* comment */ 3, 7 /* comment */, 9); }
   )cc";
@@ -290,7 +290,7 @@ TEST(RangeSelectorTest, EncloseOpNodes) {
 }
 
 TEST(RangeSelectorTest, EncloseOpGeneral) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f(int x, int y, int z) { return 3; }
     int g() { return f(/* comment */ 3, 7 /* comment */, 9); }
   )cc";
@@ -302,7 +302,7 @@ TEST(RangeSelectorTest, EncloseOpGeneral) {
 }
 
 TEST(RangeSelectorTest, EncloseOpNodesParsed) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f(int x, int y, int z) { return 3; }
     int g() { return f(/* comment */ 3, 7 /* comment */, 9); }
   )cc";
@@ -315,7 +315,7 @@ TEST(RangeSelectorTest, EncloseOpNodesParsed) {
 }
 
 TEST(RangeSelectorTest, EncloseOpGeneralParsed) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f(int x, int y, int z) { return 3; }
     int g() { return f(/* comment */ 3, 7 /* comment */, 9); }
   )cc";
@@ -328,26 +328,26 @@ TEST(RangeSelectorTest, EncloseOpGeneralParsed) {
 }
 
 TEST(RangeSelectorTest, NodeOpStatement) {
-  StringRef Code = "int f() { return 3; }";
+  llvm::StringRef Code = "int f() { return 3; }";
   TestMatch Match = matchCode(Code, returnStmt().bind("id"));
   EXPECT_THAT_EXPECTED(select(node("id"), Match), HasValue("return 3;"));
 }
 
 TEST(RangeSelectorTest, NodeOpExpression) {
-  StringRef Code = "int f() { return 3; }";
+  llvm::StringRef Code = "int f() { return 3; }";
   TestMatch Match = matchCode(Code, expr().bind("id"));
   EXPECT_THAT_EXPECTED(select(node("id"), Match), HasValue("3"));
 }
 
 TEST(RangeSelectorTest, StatementOp) {
-  StringRef Code = "int f() { return 3; }";
+  llvm::StringRef Code = "int f() { return 3; }";
   TestMatch Match = matchCode(Code, expr().bind("id"));
   RangeSelector R = statement("id");
   EXPECT_THAT_EXPECTED(select(R, Match), HasValue("3;"));
 }
 
 TEST(RangeSelectorTest, StatementOpParsed) {
-  StringRef Code = "int f() { return 3; }";
+  llvm::StringRef Code = "int f() { return 3; }";
   TestMatch Match = matchCode(Code, expr().bind("id"));
   auto R = parseRangeSelector(R"rs(statement("id"))rs");
   ASSERT_THAT_EXPECTED(R, llvm::Succeeded());
@@ -355,7 +355,7 @@ TEST(RangeSelectorTest, StatementOpParsed) {
 }
 
 TEST(RangeSelectorTest, MemberOp) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     struct S {
       int member;
     };
@@ -371,7 +371,7 @@ TEST(RangeSelectorTest, MemberOp) {
 
 // Tests that member does not select any qualifiers on the member name.
 TEST(RangeSelectorTest, MemberOpQualified) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     struct S {
       int member;
     };
@@ -389,7 +389,7 @@ TEST(RangeSelectorTest, MemberOpQualified) {
 }
 
 TEST(RangeSelectorTest, MemberOpTemplate) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     struct S {
       template <typename T> T foo(T t);
     };
@@ -405,7 +405,7 @@ TEST(RangeSelectorTest, MemberOpTemplate) {
 }
 
 TEST(RangeSelectorTest, MemberOpOperator) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     struct S {
       int operator*();
     };
@@ -421,7 +421,7 @@ TEST(RangeSelectorTest, MemberOpOperator) {
 }
 
 TEST(RangeSelectorTest, NameOpNamedDecl) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int myfun() {
       return 3;
     }
@@ -432,7 +432,7 @@ TEST(RangeSelectorTest, NameOpNamedDecl) {
 }
 
 TEST(RangeSelectorTest, NameOpDeclRef) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int foo(int x) {
       return x;
     }
@@ -444,7 +444,7 @@ TEST(RangeSelectorTest, NameOpDeclRef) {
 }
 
 TEST(RangeSelectorTest, NameOpCtorInitializer) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     class C {
      public:
       C() : field(3) {}
@@ -457,7 +457,7 @@ TEST(RangeSelectorTest, NameOpCtorInitializer) {
 }
 
 TEST(RangeSelectorTest, NameOpTypeLoc) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     namespace ns {
     struct Foo {
       Foo();
@@ -486,7 +486,7 @@ TEST(RangeSelectorTest, NameOpTypeLoc) {
 }
 
 TEST(RangeSelectorTest, NameOpTemplateSpecializationTypeLoc) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     namespace ns {
     template <typename T>
     struct Foo {};
@@ -509,7 +509,7 @@ TEST(RangeSelectorTest, NameOpErrors) {
 }
 
 TEST(RangeSelectorTest, NameOpDeclRefError) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     struct S {
       int operator*();
     };
@@ -528,7 +528,7 @@ TEST(RangeSelectorTest, NameOpDeclRefError) {
 }
 
 TEST(RangeSelectorTest, CallArgsOp) {
-  const StringRef Code = R"cc(
+  const llvm::StringRef Code = R"cc(
     struct C {
       int bar(int, int);
     };
@@ -543,7 +543,7 @@ TEST(RangeSelectorTest, CallArgsOp) {
 }
 
 TEST(RangeSelectorTest, CallArgsOpNoArgs) {
-  const StringRef Code = R"cc(
+  const llvm::StringRef Code = R"cc(
     struct C {
       int bar();
     };
@@ -558,7 +558,7 @@ TEST(RangeSelectorTest, CallArgsOpNoArgs) {
 }
 
 TEST(RangeSelectorTest, CallArgsOpNoArgsWithComments) {
-  const StringRef Code = R"cc(
+  const llvm::StringRef Code = R"cc(
     struct C {
       int bar();
     };
@@ -575,7 +575,7 @@ TEST(RangeSelectorTest, CallArgsOpNoArgsWithComments) {
 // Tests that arguments are extracted correctly when a temporary (with parens)
 // is used.
 TEST(RangeSelectorTest, CallArgsOpWithParens) {
-  const StringRef Code = R"cc(
+  const llvm::StringRef Code = R"cc(
     struct C {
       int bar(int, int) { return 3; }
     };
@@ -591,7 +591,7 @@ TEST(RangeSelectorTest, CallArgsOpWithParens) {
 }
 
 TEST(RangeSelectorTest, CallArgsOpLeadingComments) {
-  const StringRef Code = R"cc(
+  const llvm::StringRef Code = R"cc(
     struct C {
       int bar(int, int) { return 3; }
     };
@@ -607,7 +607,7 @@ TEST(RangeSelectorTest, CallArgsOpLeadingComments) {
 }
 
 TEST(RangeSelectorTest, CallArgsOpTrailingComments) {
-  const StringRef Code = R"cc(
+  const llvm::StringRef Code = R"cc(
     struct C {
       int bar(int, int) { return 3; }
     };
@@ -623,7 +623,7 @@ TEST(RangeSelectorTest, CallArgsOpTrailingComments) {
 }
 
 TEST(RangeSelectorTest, CallArgsOpEolComments) {
-  const StringRef Code = R"cc(
+  const llvm::StringRef Code = R"cc(
     struct C {
       int bar(int, int) { return 3; }
     };
@@ -652,7 +652,7 @@ TEST(RangeSelectorTest, CallArgsErrors) {
 }
 
 TEST(RangeSelectorTest, StatementsOp) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     void g();
     void f() { /* comment */ g(); /* comment */ g(); /* comment */ }
   )cc";
@@ -664,7 +664,7 @@ TEST(RangeSelectorTest, StatementsOp) {
 }
 
 TEST(RangeSelectorTest, StatementsOpEmptyList) {
-  StringRef Code = "void f() {}";
+  llvm::StringRef Code = "void f() {}";
   const char *ID = "id";
   TestMatch Match = matchCode(Code, compoundStmt().bind(ID));
   EXPECT_THAT_EXPECTED(select(statements(ID), Match), HasValue(""));
@@ -678,7 +678,7 @@ TEST(RangeSelectorTest, StatementsOpErrors) {
 }
 
 TEST(RangeSelectorTest, ElementsOp) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     void f() {
       int v[] = {/* comment */ 3, /* comment*/ 4 /* comment */};
       (void)v;
@@ -692,7 +692,7 @@ TEST(RangeSelectorTest, ElementsOp) {
 }
 
 TEST(RangeSelectorTest, ElementsOpEmptyList) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     void f() {
       int v[] = {};
       (void)v;
@@ -711,7 +711,7 @@ TEST(RangeSelectorTest, ElementsOpErrors) {
 }
 
 TEST(RangeSelectorTest, ElseBranchOpSingleStatement) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f() {
       int x = 0;
       if (true) x = 3;
@@ -725,7 +725,7 @@ TEST(RangeSelectorTest, ElseBranchOpSingleStatement) {
 }
 
 TEST(RangeSelectorTest, ElseBranchOpCompoundStatement) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f() {
       int x = 0;
       if (true) x = 3;
@@ -741,7 +741,7 @@ TEST(RangeSelectorTest, ElseBranchOpCompoundStatement) {
 
 // Tests case where the matched node is the complete expanded text.
 TEST(RangeSelectorTest, ExpansionOp) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
 #define BADDECL(E) int bad(int x) { return E; }
     BADDECL(x * x)
   )cc";
@@ -754,7 +754,7 @@ TEST(RangeSelectorTest, ExpansionOp) {
 
 // Tests case where the matched node is (only) part of the expanded text.
 TEST(RangeSelectorTest, ExpansionOpPartial) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
 #define BADDECL(E) int bad(int x) { return E; }
     BADDECL(x * x)
   )cc";
@@ -766,7 +766,7 @@ TEST(RangeSelectorTest, ExpansionOpPartial) {
 }
 
 TEST(RangeSelectorTest, IfBoundOpBound) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f() {
       return 3 + 5;
     }
@@ -779,7 +779,7 @@ TEST(RangeSelectorTest, IfBoundOpBound) {
 }
 
 TEST(RangeSelectorTest, IfBoundOpUnbound) {
-  StringRef Code = R"cc(
+  llvm::StringRef Code = R"cc(
     int f() {
       return 3 + 5;
     }

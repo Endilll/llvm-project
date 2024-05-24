@@ -36,8 +36,8 @@ class FormatTokenLexer;
 
 // An imported symbol in a JavaScript ES6 import/export, possibly aliased.
 struct JsImportedSymbol {
-  StringRef Symbol;
-  StringRef Alias;
+  llvm::StringRef Symbol;
+  llvm::StringRef Alias;
   SourceRange Range;
 
   bool operator==(const JsImportedSymbol &RHS) const {
@@ -81,14 +81,14 @@ struct JsModuleReference {
   };
   ReferenceCategory Category = ReferenceCategory::SIDE_EFFECT;
   // The URL imported, e.g. `import .. from 'url';`. Empty for `export {a, b};`.
-  StringRef URL;
+  llvm::StringRef URL;
   // Prefix from "import * as prefix". Empty for symbol imports and `export *`.
   // Implies an empty names list.
-  StringRef Prefix;
+  llvm::StringRef Prefix;
   // Default import from "import DefaultName from '...';".
-  StringRef DefaultImport;
+  llvm::StringRef DefaultImport;
   // Symbols from `import {SymbolA, SymbolB, ...} from ...;`.
-  SmallVector<JsImportedSymbol, 1> Symbols;
+  llvm::SmallVector<JsImportedSymbol, 1> Symbols;
   // Whether some symbols were merged into this one. Controls if the module
   // reference needs re-formatting.
   bool SymbolsMerged = false;
@@ -140,13 +140,13 @@ public:
 
   std::pair<tooling::Replacements, unsigned>
   analyze(TokenAnnotator &Annotator,
-          SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+          llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
           FormatTokenLexer &Tokens) override {
     tooling::Replacements Result;
     AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
 
     const AdditionalKeywords &Keywords = Tokens.getKeywords();
-    SmallVector<JsModuleReference, 16> References;
+    llvm::SmallVector<JsModuleReference, 16> References;
     AnnotatedLine *FirstNonImportLine;
     std::tie(References, FirstNonImportLine) =
         parseModuleReferences(Keywords, AnnotatedLines);
@@ -176,7 +176,7 @@ public:
         }
       }
     }
-    StringRef PreviousText = getSourceText(InsertionPoint);
+    llvm::StringRef PreviousText = getSourceText(InsertionPoint);
     if (ReferencesText == PreviousText)
       return {Result, 0};
 
@@ -220,7 +220,7 @@ private:
 
   FormatToken invalidToken;
 
-  StringRef FileContents;
+  llvm::StringRef FileContents;
 
   void skipComments() { Current = skipComments(Current); }
 
@@ -240,11 +240,11 @@ private:
     }
   }
 
-  StringRef getSourceText(SourceRange Range) {
+  llvm::StringRef getSourceText(SourceRange Range) {
     return getSourceText(Range.getBegin(), Range.getEnd());
   }
 
-  StringRef getSourceText(SourceLocation Begin, SourceLocation End) {
+  llvm::StringRef getSourceText(SourceLocation Begin, SourceLocation End) {
     const SourceManager &SM = Env.getSourceManager();
     return FileContents.substr(SM.getFileOffset(Begin),
                                SM.getFileOffset(End) - SM.getFileOffset(Begin));
@@ -254,21 +254,21 @@ private:
   // Imports can have formatting disabled (FormattingOff), so the code below
   // skips runs of "no-formatting" module references, and sorts/merges the
   // references that have formatting enabled in individual chunks.
-  SmallVector<JsModuleReference, 16>
-  sortModuleReferences(const SmallVector<JsModuleReference, 16> &References) {
+  llvm::SmallVector<JsModuleReference, 16>
+  sortModuleReferences(const llvm::SmallVector<JsModuleReference, 16> &References) {
     // Sort module references.
     // Imports can have formatting disabled (FormattingOff), so the code below
     // skips runs of "no-formatting" module references, and sorts other
     // references per group.
     const auto *Start = References.begin();
-    SmallVector<JsModuleReference, 16> ReferencesSorted;
+    llvm::SmallVector<JsModuleReference, 16> ReferencesSorted;
     while (Start != References.end()) {
       while (Start != References.end() && Start->FormattingOff) {
         // Skip over all imports w/ disabled formatting.
         ReferencesSorted.push_back(*Start);
         ++Start;
       }
-      SmallVector<JsModuleReference, 16> SortChunk;
+      llvm::SmallVector<JsModuleReference, 16> SortChunk;
       while (Start != References.end() && !Start->FormattingOff) {
         // Skip over all imports w/ disabled formatting.
         SortChunk.push_back(*Start);
@@ -291,7 +291,7 @@ private:
   //   import {X, Y} from 'a';
   // Note: this modifies the passed in ``References`` vector (by removing no
   // longer needed references).
-  void mergeModuleReferences(SmallVector<JsModuleReference, 16> &References) {
+  void mergeModuleReferences(llvm::SmallVector<JsModuleReference, 16> &References) {
     if (References.empty())
       return;
     JsModuleReference *PreviousReference = References.begin();
@@ -331,14 +331,14 @@ private:
     }
     // Sort the individual symbols within the import.
     // E.g. `import {b, a} from 'x';` -> `import {a, b} from 'x';`
-    SmallVector<JsImportedSymbol, 1> Symbols = Reference.Symbols;
+    llvm::SmallVector<JsImportedSymbol, 1> Symbols = Reference.Symbols;
     stable_sort(Symbols,
                 [&](const JsImportedSymbol &LHS, const JsImportedSymbol &RHS) {
                   return LHS.Symbol.compare_insensitive(RHS.Symbol) < 0;
                 });
     if (!Reference.SymbolsMerged && Symbols == Reference.Symbols) {
       // Symbols didn't change, just emit the entire module reference.
-      StringRef ReferenceStmt = getSourceText(Reference.Range);
+      llvm::StringRef ReferenceStmt = getSourceText(Reference.Range);
       Buffer += ReferenceStmt;
       return;
     }
@@ -359,10 +359,10 @@ private:
   // Parses module references in the given lines. Returns the module references,
   // and a pointer to the first "main code" line if that is adjacent to the
   // affected lines of module references, nullptr otherwise.
-  std::pair<SmallVector<JsModuleReference, 16>, AnnotatedLine *>
+  std::pair<llvm::SmallVector<JsModuleReference, 16>, AnnotatedLine *>
   parseModuleReferences(const AdditionalKeywords &Keywords,
-                        SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
-    SmallVector<JsModuleReference, 16> References;
+                        llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
+    llvm::SmallVector<JsModuleReference, 16> References;
     SourceLocation Start;
     AnnotatedLine *FirstNonImportLine = nullptr;
     bool AnyImportAffected = false;
@@ -374,7 +374,7 @@ private:
       // clang-format comments toggle formatting on/off.
       // This is tracked in FormattingOff here and on JsModuleReference.
       while (Current && Current->is(tok::comment)) {
-        StringRef CommentText = Current->TokenText.trim();
+        llvm::StringRef CommentText = Current->TokenText.trim();
         if (isClangFormatOff(CommentText)) {
           FormattingOff = true;
         } else if (isClangFormatOn(CommentText)) {
@@ -587,9 +587,9 @@ private:
 };
 
 tooling::Replacements sortJavaScriptImports(const FormatStyle &Style,
-                                            StringRef Code,
-                                            ArrayRef<tooling::Range> Ranges,
-                                            StringRef FileName) {
+                                            llvm::StringRef Code,
+                                            llvm::ArrayRef<tooling::Range> Ranges,
+                                            llvm::StringRef FileName) {
   // FIXME: Cursor support.
   auto Env = Environment::make(Code, FileName, Ranges);
   if (!Env)

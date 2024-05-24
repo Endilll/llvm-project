@@ -69,10 +69,10 @@ class WalkAST: public StmtVisitor<WalkAST> {
     return false;
   }
 
-  StringRef getPrintableName(const Expr *E) {
+  llvm::StringRef getPrintableName(const Expr *E) {
     if (const auto *D = dyn_cast<DeclRefExpr>(E->IgnoreParenCasts()))
       return D->getDecl()->getName();
-    return StringRef();
+    return llvm::StringRef();
   }
 
   /// Identify erroneous patterns in the last argument to strncat - the number
@@ -222,9 +222,9 @@ void WalkAST::VisitCallExpr(CallExpr *CE) {
       PathDiagnosticLocation Loc =
         PathDiagnosticLocation::createBegin(LenArg, BR.getSourceManager(), AC);
 
-      StringRef DstName = getPrintableName(DstArg);
+      llvm::StringRef DstName = getPrintableName(DstArg);
 
-      SmallString<256> S;
+      llvm::SmallString<256> S;
       llvm::raw_svector_ostream os(S);
       os << "Potential buffer overflow. ";
       if (!DstName.empty()) {
@@ -247,9 +247,9 @@ void WalkAST::VisitCallExpr(CallExpr *CE) {
       PathDiagnosticLocation Loc =
         PathDiagnosticLocation::createBegin(LenArg, BR.getSourceManager(), AC);
 
-      StringRef DstName = getPrintableName(DstArg);
+      llvm::StringRef DstName = getPrintableName(DstArg);
 
-      SmallString<256> S;
+      llvm::SmallString<256> S;
       llvm::raw_svector_ostream os(S);
       os << "The third argument allows to potentially copy more bytes than it should. ";
       os << "Replace with the value ";

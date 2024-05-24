@@ -22,7 +22,7 @@ using testing::ElementsAre;
 
 class TreeTest : public SyntaxTreeTest {
 private:
-  Tree *createTree(ArrayRef<const Node *> Children) {
+  Tree *createTree(llvm::ArrayRef<const Node *> Children) {
     std::vector<std::pair<Node *, NodeRole>> ChildrenWithRoles;
     ChildrenWithRoles.reserve(Children.size());
     for (const auto *Child : Children) {
@@ -37,7 +37,7 @@ private:
   //
   // We do this recursively.
   std::vector<std::vector<const Tree *>>
-  generateAllForests(ArrayRef<const Node *> Children, unsigned ParentCount) {
+  generateAllForests(llvm::ArrayRef<const Node *> Children, unsigned ParentCount) {
     assert(ParentCount > 0);
     // If there is only one Parent node, then combine `Children` under
     // this Parent.
@@ -72,12 +72,12 @@ protected:
   //    `-Tree
   //      `-')'
   std::vector<const Tree *>
-  generateAllTreesWithShape(ArrayRef<const Node *> Base,
-                            ArrayRef<unsigned> NodeCountPerLayer) {
+  generateAllTreesWithShape(llvm::ArrayRef<const Node *> Base,
+                            llvm::ArrayRef<unsigned> NodeCountPerLayer) {
     // We compute the solution per layer. A layer is a collection of bases,
     // where each base has the same number of nodes, given by
     // `NodeCountPerLayer`.
-    auto GenerateNextLayer = [this](ArrayRef<std::vector<const Node *>> Layer,
+    auto GenerateNextLayer = [this](llvm::ArrayRef<std::vector<const Node *>> Layer,
                                     unsigned NextLayerNodeCount) {
       std::vector<std::vector<const Node *>> NextLayer;
       for (const auto &Base : Layer) {
@@ -179,7 +179,7 @@ class ListTest : public SyntaxTreeTest {
 private:
   std::string dumpQuotedTokensOrNull(const Node *N) {
     return N ? "'" +
-                   StringRef(N->dumpTokens(*TM))
+                   llvm::StringRef(N->dumpTokens(*TM))
                        .trim()
                        .str() +
                    "'"
@@ -188,7 +188,7 @@ private:
 
 protected:
   std::string
-  dumpElementsAndDelimiters(ArrayRef<List::ElementAndDelimiter<Node>> EDs) {
+  dumpElementsAndDelimiters(llvm::ArrayRef<List::ElementAndDelimiter<Node>> EDs) {
     std::string Storage;
     llvm::raw_string_ostream OS(Storage);
 
@@ -205,7 +205,7 @@ protected:
     return Storage;
   }
 
-  std::string dumpNodes(ArrayRef<Node *> Nodes) {
+  std::string dumpNodes(llvm::ArrayRef<Node *> Nodes) {
     std::string Storage;
     llvm::raw_string_ostream OS(Storage);
 

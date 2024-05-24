@@ -17,7 +17,7 @@ namespace doc {
 
 using Record = llvm::SmallVector<uint64_t, 1024>;
 
-// This implements decode for SmallString.
+// This implements decode for llvm::SmallString.
 llvm::Error decodeRecord(const Record &R, llvm::SmallVectorImpl<char> &Field,
                          llvm::StringRef Blob) {
   Field.assign(Blob.begin(), Blob.end());
@@ -820,7 +820,7 @@ ClangDocBitcodeReader::skipUntilRecordOrBlock(unsigned &BlockOrRecordID) {
   BlockOrRecordID = 0;
 
   while (!Stream.AtEndOfStream()) {
-    Expected<unsigned> MaybeCode = Stream.ReadCode();
+    llvm::Expected<unsigned> MaybeCode = Stream.ReadCode();
     if (!MaybeCode) {
       // FIXME this drops the error on the floor.
       consumeError(MaybeCode.takeError());
@@ -834,7 +834,7 @@ ClangDocBitcodeReader::skipUntilRecordOrBlock(unsigned &BlockOrRecordID) {
     }
     switch (static_cast<llvm::bitc::FixedAbbrevIDs>(Code)) {
     case llvm::bitc::ENTER_SUBBLOCK:
-      if (Expected<unsigned> MaybeID = Stream.ReadSubBlockID())
+      if (llvm::Expected<unsigned> MaybeID = Stream.ReadSubBlockID())
         BlockOrRecordID = MaybeID.get();
       else {
         // FIXME this drops the error on the floor.
@@ -867,7 +867,7 @@ llvm::Error ClangDocBitcodeReader::validateStream() {
 
   // Sniff for the signature.
   for (int Idx = 0; Idx != 4; ++Idx) {
-    Expected<llvm::SimpleBitstreamCursor::word_t> MaybeRead = Stream.Read(8);
+    llvm::Expected<llvm::SimpleBitstreamCursor::word_t> MaybeRead = Stream.Read(8);
     if (!MaybeRead)
       return MaybeRead.takeError();
     else if (MaybeRead.get() != BitCodeConstants::Signature[Idx])
@@ -878,7 +878,7 @@ llvm::Error ClangDocBitcodeReader::validateStream() {
 }
 
 llvm::Error ClangDocBitcodeReader::readBlockInfoBlock() {
-  Expected<std::optional<llvm::BitstreamBlockInfo>> MaybeBlockInfo =
+  llvm::Expected<std::optional<llvm::BitstreamBlockInfo>> MaybeBlockInfo =
       Stream.ReadBlockInfoBlock();
   if (!MaybeBlockInfo)
     return MaybeBlockInfo.takeError();
@@ -928,13 +928,13 @@ ClangDocBitcodeReader::readBitcode() {
 
   // Read the top level blocks.
   while (!Stream.AtEndOfStream()) {
-    Expected<unsigned> MaybeCode = Stream.ReadCode();
+    llvm::Expected<unsigned> MaybeCode = Stream.ReadCode();
     if (!MaybeCode)
       return MaybeCode.takeError();
     if (MaybeCode.get() != llvm::bitc::ENTER_SUBBLOCK)
       return llvm::createStringError(llvm::inconvertibleErrorCode(),
                                      "no blocks in input");
-    Expected<unsigned> MaybeID = Stream.ReadSubBlockID();
+    llvm::Expected<unsigned> MaybeID = Stream.ReadSubBlockID();
     if (!MaybeID)
       return MaybeID.takeError();
     unsigned ID = MaybeID.get();

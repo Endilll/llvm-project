@@ -51,13 +51,13 @@ void addDescriptiveNameChecker(AnalysisASTConsumer &AnalysisConsumer,
   });
 }
 
-bool runChecker(StringRef Code, std::string &Output) {
+bool runChecker(llvm::StringRef Code, std::string &Output) {
   return runCheckerOnCode<addDescriptiveNameChecker>(Code.str(), Output,
                                                      /*OnlyEmitWarnings=*/true);
 }
 
 TEST(MemRegionDescriptiveNameTest, ConcreteIntElementRegionIndex) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void reportDescriptiveName(int *p);
 const unsigned int index = 1;
 extern int array[3];
@@ -71,7 +71,7 @@ void top() {
 }
 
 TEST(MemRegionDescriptiveNameTest, SymbolicElementRegionIndex) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void reportDescriptiveName(int *p);
 extern unsigned int index;
 extern int array[3];
@@ -85,7 +85,7 @@ void top() {
 }
 
 TEST(MemRegionDescriptiveNameTest, SymbolicElementRegionIndexSymbolValFails) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void reportDescriptiveName(int *p);
 extern int* ptr;
 extern int array[3];
@@ -99,7 +99,7 @@ void top() {
 }
 
 TEST(MemRegionDescriptiveNameTest, SymbolicElementRegionIndexOrigRegionFails) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void reportDescriptiveName(int *p);
 extern int getInt(void);
 extern int array[3];
@@ -113,7 +113,7 @@ void top() {
 }
 
 TEST(MemRegionDescriptiveNameTest, SymbolicElementRegionIndexDescrNameFails) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void reportDescriptiveName(int *p);
 extern int *ptr;
 extern int array[3];
@@ -128,7 +128,7 @@ void top() {
 
 TEST(MemRegionDescriptiveNameTest,
      SymbolicElementRegionIndexIncorrectSymbolName) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void reportDescriptiveName(int *p);
 extern int x, y;
 extern int array[3];

@@ -48,7 +48,7 @@ public:
                 const llvm::opt::ArgList &Args);
 
   llvm::opt::DerivedArgList *
-  TranslateArgs(const llvm::opt::DerivedArgList &Args, StringRef BoundArch,
+  TranslateArgs(const llvm::opt::DerivedArgList &Args, llvm::StringRef BoundArch,
                 Action::OffloadKind DeviceOffloadKind) const override;
 
   UnwindTableLevel
@@ -106,7 +106,7 @@ public:
   bool getUniversalCRTLibraryPath(const llvm::opt::ArgList &Args,
                                   std::string &path) const;
   bool useUniversalCRT() const;
-  VersionTuple
+  llvm::VersionTuple
   computeMSVCVersion(const Driver *D,
                      const llvm::opt::ArgList &Args) const override;
 
@@ -114,7 +114,7 @@ public:
                                           types::ID InputType) const override;
   SanitizerMask getSupportedSanitizers() const override;
 
-  void printVerboseInfo(raw_ostream &OS) const override;
+  void printVerboseInfo(llvm::raw_ostream &OS) const override;
 
   bool FoundMSVCInstall() const { return !VCToolChainPath.empty(); }
 
@@ -127,9 +127,9 @@ protected:
   void AddSystemIncludeWithSubfolder(const llvm::opt::ArgList &DriverArgs,
                                      llvm::opt::ArgStringList &CC1Args,
                                      const std::string &folder,
-                                     const Twine &subfolder1,
-                                     const Twine &subfolder2 = "",
-                                     const Twine &subfolder3 = "") const;
+                                     const llvm::Twine &subfolder1,
+                                     const llvm::Twine &subfolder2 = "",
+                                     const llvm::Twine &subfolder3 = "") const;
 
   Tool *buildLinker() const override;
   Tool *buildAssembler() const override;

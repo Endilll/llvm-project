@@ -163,7 +163,7 @@ public:
   FormatToken *First;
   FormatToken *Last;
 
-  SmallVector<AnnotatedLine *, 0> Children;
+  llvm::SmallVector<AnnotatedLine *, 0> Children;
 
   LineType Type;
   unsigned Level;
@@ -219,7 +219,7 @@ public:
   /// Adapts the indent levels of comment lines to the indent of the
   /// subsequent line.
   // FIXME: Can/should this be done in the UnwrappedLineParser?
-  void setCommentLineLevels(SmallVectorImpl<AnnotatedLine *> &Lines) const;
+  void setCommentLineLevels(llvm::SmallVectorImpl<AnnotatedLine *> &Lines) const;
 
   void annotate(AnnotatedLine &Line);
   void calculateFormattingInformation(AnnotatedLine &Line) const;
@@ -267,7 +267,7 @@ private:
 
   const AdditionalKeywords &Keywords;
 
-  SmallVector<ScopeType> Scopes;
+  llvm::SmallVector<ScopeType> Scopes;
 };
 
 } // end namespace format

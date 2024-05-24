@@ -20,7 +20,7 @@ using namespace clang::driver::tools;
 using namespace clang;
 using namespace llvm::opt;
 
-StringRef loongarch::getLoongArchABI(const Driver &D, const ArgList &Args,
+llvm::StringRef loongarch::getLoongArchABI(const Driver &D, const ArgList &Args,
                                      const llvm::Triple &Triple) {
   assert((Triple.getArch() == llvm::Triple::loongarch32 ||
           Triple.getArch() == llvm::Triple::loongarch64) &&
@@ -29,7 +29,7 @@ StringRef loongarch::getLoongArchABI(const Driver &D, const ArgList &Args,
 
   // Record -mabi value for later use.
   const Arg *MABIArg = Args.getLastArg(options::OPT_mabi_EQ);
-  StringRef MABIValue;
+  llvm::StringRef MABIValue;
   if (MABIArg) {
     MABIValue = MABIArg->getValue();
   }
@@ -38,7 +38,7 @@ StringRef loongarch::getLoongArchABI(const Driver &D, const ArgList &Args,
   const Arg *MFPUArg = Args.getLastArg(options::OPT_mfpu_EQ);
   int FPU = -1;
   if (MFPUArg) {
-    StringRef V = MFPUArg->getValue();
+    llvm::StringRef V = MFPUArg->getValue();
     if (V == "64")
       FPU = 64;
     else if (V == "32")
@@ -53,7 +53,7 @@ StringRef loongarch::getLoongArchABI(const Driver &D, const ArgList &Args,
   if (const Arg *A = Args.getLastArg(options::OPT_mdouble_float,
                                      options::OPT_msingle_float,
                                      options::OPT_msoft_float)) {
-    StringRef ImpliedABI;
+    llvm::StringRef ImpliedABI;
     int ImpliedFPU = -1;
     if (A->getOption().matches(options::OPT_mdouble_float)) {
       ImpliedABI = IsLA32 ? "ilp32d" : "lp64d";
@@ -126,7 +126,7 @@ StringRef loongarch::getLoongArchABI(const Driver &D, const ArgList &Args,
 void loongarch::getLoongArchTargetFeatures(const Driver &D,
                                            const llvm::Triple &Triple,
                                            const ArgList &Args,
-                                           std::vector<StringRef> &Features) {
+                                           std::vector<llvm::StringRef> &Features) {
   std::string ArchName;
   if (const Arg *A = Args.getLastArg(options::OPT_march_EQ))
     ArchName = A->getValue();
@@ -150,7 +150,7 @@ void loongarch::getLoongArchTargetFeatures(const Driver &D,
       Features.push_back("-d");
     }
   } else if (const Arg *A = Args.getLastArg(options::OPT_mfpu_EQ)) {
-    StringRef FPU = A->getValue();
+    llvm::StringRef FPU = A->getValue();
     if (FPU == "64") {
       Features.push_back("+f");
       Features.push_back("+d");

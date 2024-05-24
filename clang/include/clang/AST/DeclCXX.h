@@ -364,11 +364,11 @@ private:
       return getVBasesSlowCase();
     }
 
-    ArrayRef<CXXBaseSpecifier> bases() const {
+    llvm::ArrayRef<CXXBaseSpecifier> bases() const {
       return llvm::ArrayRef(getBases(), NumBases);
     }
 
-    ArrayRef<CXXBaseSpecifier> vbases() const {
+    llvm::ArrayRef<CXXBaseSpecifier> vbases() const {
       return llvm::ArrayRef(getVBases(), NumVBases);
     }
 
@@ -1058,7 +1058,7 @@ public:
   TemplateParameterList *getGenericLambdaTemplateParameterList() const;
 
   /// Retrieve the lambda template parameters that were specified explicitly.
-  ArrayRef<NamedDecl *> getLambdaExplicitTemplateParameters() const;
+  llvm::ArrayRef<NamedDecl *> getLambdaExplicitTemplateParameters() const;
 
   LambdaCaptureDefault getLambdaCaptureDefault() const {
     assert(isLambda());
@@ -1072,7 +1072,7 @@ public:
   }
 
   /// Set the captures for this lambda closure type.
-  void setCaptures(ASTContext &Context, ArrayRef<LambdaCapture> Captures);
+  void setCaptures(ASTContext &Context, llvm::ArrayRef<LambdaCapture> Captures);
 
   /// For a closure type, retrieve the mapping from captured
   /// variables and \c this to the non-static data members that store the
@@ -2144,7 +2144,7 @@ public:
   /// Sema::isUsualDeallocationFunction to reconsider the answer based on the
   /// context.
   bool isUsualDeallocationFunction(
-      SmallVectorImpl<const FunctionDecl *> &PreventedBy) const;
+      llvm::SmallVectorImpl<const FunctionDecl *> &PreventedBy) const;
 
   /// Determine whether this is a copy-assignment operator, regardless
   /// of whether it was declared implicitly or explicitly.
@@ -3800,7 +3800,7 @@ class UsingPackDecl final
   unsigned NumExpansions;
 
   UsingPackDecl(DeclContext *DC, NamedDecl *InstantiatedFrom,
-                ArrayRef<NamedDecl *> UsingDecls)
+                llvm::ArrayRef<NamedDecl *> UsingDecls)
       : NamedDecl(UsingPack, DC,
                   InstantiatedFrom ? InstantiatedFrom->getLocation()
                                    : SourceLocation(),
@@ -3825,13 +3825,13 @@ public:
 
   /// Get the set of using declarations that this pack expanded into. Note that
   /// some of these may still be unresolved.
-  ArrayRef<NamedDecl *> expansions() const {
+  llvm::ArrayRef<NamedDecl *> expansions() const {
     return llvm::ArrayRef(getTrailingObjects<NamedDecl *>(), NumExpansions);
   }
 
   static UsingPackDecl *Create(ASTContext &C, DeclContext *DC,
                                NamedDecl *InstantiatedFrom,
-                               ArrayRef<NamedDecl *> UsingDecls);
+                               llvm::ArrayRef<NamedDecl *> UsingDecls);
 
   static UsingPackDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID,
                                            unsigned NumExpansions);
@@ -4170,7 +4170,7 @@ class DecompositionDecl final
   DecompositionDecl(ASTContext &C, DeclContext *DC, SourceLocation StartLoc,
                     SourceLocation LSquareLoc, QualType T,
                     TypeSourceInfo *TInfo, StorageClass SC,
-                    ArrayRef<BindingDecl *> Bindings)
+                    llvm::ArrayRef<BindingDecl *> Bindings)
       : VarDecl(Decomposition, C, DC, StartLoc, LSquareLoc, nullptr, T, TInfo,
                 SC),
         NumBindings(Bindings.size()) {
@@ -4191,15 +4191,15 @@ public:
                                    SourceLocation LSquareLoc,
                                    QualType T, TypeSourceInfo *TInfo,
                                    StorageClass S,
-                                   ArrayRef<BindingDecl *> Bindings);
+                                   llvm::ArrayRef<BindingDecl *> Bindings);
   static DecompositionDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID,
                                                unsigned NumBindings);
 
-  ArrayRef<BindingDecl *> bindings() const {
+  llvm::ArrayRef<BindingDecl *> bindings() const {
     return llvm::ArrayRef(getTrailingObjects<BindingDecl *>(), NumBindings);
   }
 
-  void printName(raw_ostream &OS, const PrintingPolicy &Policy) const override;
+  void printName(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const override;
 
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
   static bool classofKind(Kind K) { return K == Decomposition; }

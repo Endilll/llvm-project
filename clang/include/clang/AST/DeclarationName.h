@@ -538,12 +538,12 @@ public:
 
   static int compare(DeclarationName LHS, DeclarationName RHS);
 
-  void print(raw_ostream &OS, const PrintingPolicy &Policy) const;
+  void print(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const;
 
   void dump() const;
 };
 
-raw_ostream &operator<<(raw_ostream &OS, DeclarationName N);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, DeclarationName N);
 
 /// Ordering on two declaration names. If both names are identifiers,
 /// this provides a lexicographical ordering.
@@ -864,7 +864,7 @@ public:
   std::string getAsString() const;
 
   /// printName - Print the human-readable name to a stream.
-  void printName(raw_ostream &OS, PrintingPolicy Policy) const;
+  void printName(llvm::raw_ostream &OS, PrintingPolicy Policy) const;
 
   /// getBeginLoc - Retrieve the location of the first token.
   SourceLocation getBeginLoc() const { return NameLoc; }
@@ -892,7 +892,7 @@ inline const StreamingDiagnostic &operator<<(const StreamingDiagnostic &PD,
   return PD;
 }
 
-raw_ostream &operator<<(raw_ostream &OS, DeclarationNameInfo DNInfo);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, DeclarationNameInfo DNInfo);
 
 } // namespace clang
 

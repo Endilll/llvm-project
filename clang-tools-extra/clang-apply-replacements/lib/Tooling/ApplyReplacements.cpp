@@ -43,7 +43,7 @@ namespace replace {
 
 namespace detail {
 
-static constexpr std::array<StringRef, 2> AllowedExtensions = {".yaml", ".yml"};
+static constexpr std::array<llvm::StringRef, 2> AllowedExtensions = {".yaml", ".yml"};
 
 template <typename TranslationUnits>
 static std::error_code collectReplacementsFromDirectory(
@@ -140,7 +140,7 @@ groupReplacements(const TUReplacements &TUs, const TUDiagnostics &TUDs,
     // Use the file manager to deduplicate paths. FileEntries are
     // automatically canonicalized. Since relative paths can come from different
     // build directories, make them absolute immediately.
-    SmallString<128> Path = R.getFilePath();
+    llvm::SmallString<128> Path = R.getFilePath();
     if (BuildDir)
       llvm::sys::fs::make_absolute(*BuildDir, Path);
     else
@@ -243,7 +243,7 @@ bool mergeAndDeduplicate(const TUReplacements &TUs, const TUDiagnostics &TUDs,
 }
 
 llvm::Expected<std::string>
-applyChanges(StringRef File, const std::vector<tooling::AtomicChange> &Changes,
+applyChanges(llvm::StringRef File, const std::vector<tooling::AtomicChange> &Changes,
              const tooling::ApplyChangesSpec &Spec,
              DiagnosticsEngine &Diagnostics) {
   FileManager Files((FileSystemOptions()));

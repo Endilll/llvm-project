@@ -19,7 +19,7 @@ AST_MATCHER(FunctionDecl, doesDeclarationForceExternallyVisibleDefinition) {
   return Node.doesDeclarationForceExternallyVisibleDefinition();
 }
 
-RedundantDeclarationCheck::RedundantDeclarationCheck(StringRef Name,
+RedundantDeclarationCheck::RedundantDeclarationCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreMacros(Options.getLocalOrGlobal("IgnoreMacros", true)) {}

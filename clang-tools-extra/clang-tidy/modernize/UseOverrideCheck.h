@@ -16,7 +16,7 @@ namespace clang::tidy::modernize {
 /// Use C++11's `override` and remove `virtual` where applicable.
 class UseOverrideCheck : public ClangTidyCheck {
 public:
-  UseOverrideCheck(StringRef Name, ClangTidyContext *Context);
+  UseOverrideCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
@@ -29,8 +29,8 @@ private:
   const bool IgnoreDestructors;
   const bool IgnoreTemplateInstantiations;
   const bool AllowOverrideAndFinal;
-  const StringRef OverrideSpelling;
-  const StringRef FinalSpelling;
+  const llvm::StringRef OverrideSpelling;
+  const llvm::StringRef FinalSpelling;
 };
 
 } // namespace clang::tidy::modernize

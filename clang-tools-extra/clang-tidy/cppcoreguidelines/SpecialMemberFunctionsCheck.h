@@ -22,7 +22,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/special-member-functions.html
 class SpecialMemberFunctionsCheck : public ClangTidyCheck {
 public:
-  SpecialMemberFunctionsCheck(StringRef Name, ClangTidyContext *Context);
+  SpecialMemberFunctionsCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

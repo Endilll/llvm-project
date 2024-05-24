@@ -43,7 +43,7 @@ struct CNFFormulaBuilder {
   ///  `Li` must not be `NullLit`.
   ///
   ///  All literals must be distinct.
-  void addClause(ArrayRef<Literal> Literals) {
+  void addClause(llvm::ArrayRef<Literal> Literals) {
     // We generate clauses with up to 3 literals in this file.
     assert(!Literals.empty() && Literals.size() <= 3);
     // Contains literals of the simplified clause.
@@ -102,7 +102,7 @@ CNFFormula::CNFFormula(Variable LargestVar)
   ClauseStarts.push_back(0);
 }
 
-void CNFFormula::addClause(ArrayRef<Literal> lits) {
+void CNFFormula::addClause(llvm::ArrayRef<Literal> lits) {
   assert(llvm::all_of(lits, [](Literal L) { return L != NullLit; }));
 
   if (lits.empty())

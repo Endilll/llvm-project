@@ -153,7 +153,7 @@ const NoteTag *taintOriginTrackerTag(CheckerContext &C,
   return C.getNoteTag([TaintedSymbols = std::move(TaintedSymbols),
                        TaintedArgs = std::move(TaintedArgs), CallLocation](
                           PathSensitiveBugReport &BR) -> std::string {
-    SmallString<256> Msg;
+    llvm::SmallString<256> Msg;
     // We give diagnostics only for taint related reports
     if (!BR.isInteresting(CallLocation) ||
         BR.getBugType().getCategory() != categories::TaintedData) {
@@ -183,7 +183,7 @@ const NoteTag *taintPropagationExplainerTag(
   return C.getNoteTag([TaintedSymbols = std::move(TaintedSymbols),
                        TaintedArgs = std::move(TaintedArgs), CallLocation](
                           PathSensitiveBugReport &BR) -> std::string {
-    SmallString<256> Msg;
+    llvm::SmallString<256> Msg;
     llvm::raw_svector_ostream Out(Msg);
     // We give diagnostics only for taint related reports
     if (TaintedSymbols.empty() ||
@@ -257,12 +257,12 @@ class GenericTaintRule {
   ArgSet PropDstArgs;
 
   /// A message that explains why the call is sensitive to taint.
-  std::optional<StringRef> SinkMsg;
+  std::optional<llvm::StringRef> SinkMsg;
 
   GenericTaintRule() = default;
 
   GenericTaintRule(ArgSet &&Sink, ArgSet &&Filter, ArgSet &&Src, ArgSet &&Dst,
-                   std::optional<StringRef> SinkMsg = std::nullopt)
+                   std::optional<llvm::StringRef> SinkMsg = std::nullopt)
       : SinkArgs(std::move(Sink)), FilterArgs(std::move(Filter)),
         PropSrcArgs(std::move(Src)), PropDstArgs(std::move(Dst)),
         SinkMsg(SinkMsg) {}
@@ -271,7 +271,7 @@ public:
   /// Make a rule that reports a warning if taint reaches any of \p FilterArgs
   /// arguments.
   static GenericTaintRule Sink(ArgSet &&SinkArgs,
-                               std::optional<StringRef> Msg = std::nullopt) {
+                               std::optional<llvm::StringRef> Msg = std::nullopt) {
     return {std::move(SinkArgs), {}, {}, {}, Msg};
   }
 
@@ -354,7 +354,7 @@ struct GenericTaintRuleParser {
                                  TaintConfiguration &&Config) const;
 
 private:
-  using NamePartsTy = llvm::SmallVector<StringRef, 2>;
+  using NamePartsTy = llvm::SmallVector<llvm::StringRef, 2>;
 
   /// Validate part of the configuration, which contains a list of argument
   /// indexes.
@@ -384,11 +384,11 @@ public:
   void checkPreCall(const CallEvent &Call, CheckerContext &C) const;
   void checkPostCall(const CallEvent &Call, CheckerContext &C) const;
 
-  void printState(raw_ostream &Out, ProgramStateRef State, const char *NL,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State, const char *NL,
                   const char *Sep) const override;
 
   /// Generate a report if the expression is tainted or points to tainted data.
-  bool generateReportIfTainted(const Expr *E, StringRef Msg,
+  bool generateReportIfTainted(const Expr *E, llvm::StringRef Msg,
                                CheckerContext &C) const;
 
 private:
@@ -491,7 +491,7 @@ GenericTaintRuleParser::parseNameParts(const Config &C) {
   if (!C.Scope.empty()) {
     // If the Scope argument contains multiple "::" parts, those are considered
     // namespace identifiers.
-    StringRef{C.Scope}.split(NameParts, "::", /*MaxSplit*/ -1,
+    llvm::StringRef{C.Scope}.split(NameParts, "::", /*MaxSplit*/ -1,
                              /*KeepEmpty*/ false);
   }
   NameParts.emplace_back(C.Name);
@@ -810,7 +810,7 @@ void GenericTaintChecker::initTaintRules(CheckerContext &C) const {
   assert(Mgr);
   GenericTaintRuleParser ConfigParser{*Mgr};
   std::string Option{"Config"};
-  StringRef ConfigFile =
+  llvm::StringRef ConfigFile =
       Mgr->getAnalyzerOptions().getCheckerStringOption(this, Option);
   std::optional<TaintConfiguration> Config =
       getConfiguration<TaintConfiguration>(*Mgr, this, Option, ConfigFile);
@@ -909,7 +909,7 @@ void GenericTaintChecker::checkPostCall(const CallEvent &Call,
   C.addTransition(State, InjectionTag);
 }
 
-void GenericTaintChecker::printState(raw_ostream &Out, ProgramStateRef State,
+void GenericTaintChecker::printState(llvm::raw_ostream &Out, ProgramStateRef State,
                                      const char *NL, const char *Sep) const {
   printTaint(State, Out, NL, Sep);
 }
@@ -1030,7 +1030,7 @@ bool GenericTaintRule::UntrustedEnv(CheckerContext &C) {
               .ShouldAssumeControlledEnvironment;
 }
 
-bool GenericTaintChecker::generateReportIfTainted(const Expr *E, StringRef Msg,
+bool GenericTaintChecker::generateReportIfTainted(const Expr *E, llvm::StringRef Msg,
                                                   CheckerContext &C) const {
   assert(E);
   std::optional<SVal> TaintedSVal =
@@ -1107,7 +1107,7 @@ void GenericTaintChecker::taintUnsafeSocketProtocol(const CallEvent &Call,
     return;
 
   SourceLocation DomLoc = Call.getArgExpr(0)->getExprLoc();
-  StringRef DomName = C.getMacroNameOrSpelling(DomLoc);
+  llvm::StringRef DomName = C.getMacroNameOrSpelling(DomLoc);
   // Allow internal communication protocols.
   bool SafeProtocol = DomName == "AF_SYSTEM" || DomName == "AF_LOCAL" ||
                       DomName == "AF_UNIX" || DomName == "AF_RESERVED_36";

@@ -39,7 +39,7 @@ class ProgramPointTag {
 public:
   ProgramPointTag(void *tagKind = nullptr) : TagKind(tagKind) {}
   virtual ~ProgramPointTag();
-  virtual StringRef getTagDescription() const = 0;
+  virtual llvm::StringRef getTagDescription() const = 0;
 
   /// Used to implement 'isKind' in subclasses.
   const void *getTagKind() const { return TagKind; }
@@ -51,8 +51,8 @@ private:
 class SimpleProgramPointTag : public ProgramPointTag {
   std::string Desc;
 public:
-  SimpleProgramPointTag(StringRef MsgProvider, StringRef Msg);
-  StringRef getTagDescription() const override;
+  SimpleProgramPointTag(llvm::StringRef MsgProvider, llvm::StringRef Msg);
+  llvm::StringRef getTagDescription() const override;
 };
 
 class ProgramPoint {

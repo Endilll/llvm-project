@@ -75,7 +75,7 @@ public:
   }
 
   bool handleDeclOccurrence(const Decl *D, SymbolRoleSet Roles,
-                            ArrayRef<SymbolRelation>, SourceLocation Loc,
+                            llvm::ArrayRef<SymbolRelation>, SourceLocation Loc,
                             ASTNodeInfo) override {
     const auto *ND = llvm::dyn_cast<NamedDecl>(D);
     if (!ND)
@@ -116,7 +116,7 @@ public:
 
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override {
+                                                 llvm::StringRef InFile) override {
     class Consumer : public ASTConsumer {
       std::shared_ptr<Indexer> Index;
       std::shared_ptr<Preprocessor> PP;

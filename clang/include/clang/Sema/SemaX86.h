@@ -26,10 +26,10 @@ public:
   bool CheckBuiltinRoundingOrSAE(unsigned BuiltinID, CallExpr *TheCall);
   bool CheckBuiltinGatherScatterScale(unsigned BuiltinID, CallExpr *TheCall);
   bool CheckBuiltinTileArguments(unsigned BuiltinID, CallExpr *TheCall);
-  bool CheckBuiltinTileArgumentsRange(CallExpr *TheCall, ArrayRef<int> ArgNums);
-  bool CheckBuiltinTileDuplicate(CallExpr *TheCall, ArrayRef<int> ArgNums);
+  bool CheckBuiltinTileArgumentsRange(CallExpr *TheCall, llvm::ArrayRef<int> ArgNums);
+  bool CheckBuiltinTileDuplicate(CallExpr *TheCall, llvm::ArrayRef<int> ArgNums);
   bool CheckBuiltinTileRangeAndDuplicate(CallExpr *TheCall,
-                                         ArrayRef<int> ArgNums);
+                                         llvm::ArrayRef<int> ArgNums);
   bool CheckBuiltinFunctionCall(const TargetInfo &TI, unsigned BuiltinID,
                                 CallExpr *TheCall);
 };

@@ -61,7 +61,7 @@ LLVM_INSTANTIATE_REGISTRY(CompilationDatabasePluginRegistry)
 CompilationDatabase::~CompilationDatabase() = default;
 
 std::unique_ptr<CompilationDatabase>
-CompilationDatabase::loadFromDirectory(StringRef BuildDirectory,
+CompilationDatabase::loadFromDirectory(llvm::StringRef BuildDirectory,
                                        std::string &ErrorMessage) {
   llvm::raw_string_ostream ErrorStream(ErrorMessage);
   for (const CompilationDatabasePluginRegistry::entry &Database :
@@ -77,7 +77,7 @@ CompilationDatabase::loadFromDirectory(StringRef BuildDirectory,
 }
 
 static std::unique_ptr<CompilationDatabase>
-findCompilationDatabaseFromDirectory(StringRef Directory,
+findCompilationDatabaseFromDirectory(llvm::StringRef Directory,
                                      std::string &ErrorMessage) {
   std::stringstream ErrorStream;
   bool HasErrorMessage = false;
@@ -101,10 +101,10 @@ findCompilationDatabaseFromDirectory(StringRef Directory,
 }
 
 std::unique_ptr<CompilationDatabase>
-CompilationDatabase::autoDetectFromSource(StringRef SourceFile,
+CompilationDatabase::autoDetectFromSource(llvm::StringRef SourceFile,
                                           std::string &ErrorMessage) {
-  SmallString<1024> AbsolutePath(getAbsolutePath(SourceFile));
-  StringRef Directory = llvm::sys::path::parent_path(AbsolutePath);
+  llvm::SmallString<1024> AbsolutePath(getAbsolutePath(SourceFile));
+  llvm::StringRef Directory = llvm::sys::path::parent_path(AbsolutePath);
 
   std::unique_ptr<CompilationDatabase> DB =
       findCompilationDatabaseFromDirectory(Directory, ErrorMessage);
@@ -116,9 +116,9 @@ CompilationDatabase::autoDetectFromSource(StringRef SourceFile,
 }
 
 std::unique_ptr<CompilationDatabase>
-CompilationDatabase::autoDetectFromDirectory(StringRef SourceDir,
+CompilationDatabase::autoDetectFromDirectory(llvm::StringRef SourceDir,
                                              std::string &ErrorMessage) {
-  SmallString<1024> AbsolutePath(getAbsolutePath(SourceDir));
+  llvm::SmallString<1024> AbsolutePath(getAbsolutePath(SourceDir));
 
   std::unique_ptr<CompilationDatabase> DB =
       findCompilationDatabaseFromDirectory(AbsolutePath, ErrorMessage);
@@ -145,7 +145,7 @@ namespace {
 // Helper for recursively searching through a chain of actions and collecting
 // all inputs, direct and indirect, of compile jobs.
 struct CompileJobAnalyzer {
-  SmallVector<std::string, 2> Inputs;
+  llvm::SmallVector<std::string, 2> Inputs;
 
   void run(const driver::Action *A) {
     runImpl(A, false);
@@ -197,14 +197,14 @@ public:
   }
 
   DiagnosticConsumer &Other;
-  SmallVector<std::string, 2> UnusedInputs;
+  llvm::SmallVector<std::string, 2> UnusedInputs;
 };
 
 // Filter of tools unused flags such as -no-integrated-as and -Wa,*.
 // They are not used for syntax checking, and could confuse targets
 // which don't support these options.
 struct FilterUnusedFlags {
-  bool operator() (StringRef S) {
+  bool operator() (llvm::StringRef S) {
     return (S == "-no-integrated-as") || S.starts_with("-Wa,");
   }
 };
@@ -213,7 +213,7 @@ std::string GetClangToolCommand() {
   static int Dummy;
   std::string ClangExecutable =
       llvm::sys::fs::getMainExecutable("clang", (void *)&Dummy);
-  SmallString<128> ClangToolPath;
+  llvm::SmallString<128> ClangToolPath;
   ClangToolPath = llvm::sys::path::parent_path(ClangExecutable);
   llvm::sys::path::append(ClangToolPath, "clang-tool");
   return std::string(ClangToolPath);
@@ -243,12 +243,12 @@ std::string GetClangToolCommand() {
 static bool stripPositionalArgs(std::vector<const char *> Args,
                                 std::vector<std::string> &Result,
                                 std::string &ErrorMsg) {
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
   llvm::raw_string_ostream Output(ErrorMsg);
   TextDiagnosticPrinter DiagnosticPrinter(Output, &*DiagOpts);
   UnusedInputDiagConsumer DiagClient(DiagnosticPrinter);
   DiagnosticsEngine Diagnostics(
-      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()),
+      llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()),
       &*DiagOpts, &DiagClient, false);
 
   // The clang executable path isn't required since the jobs the driver builds
@@ -309,7 +309,7 @@ static bool stripPositionalArgs(std::vector<const char *> Args,
   // unused for compilation. This is necessary so that getCompileCommands() can
   // construct a command line for each file.
   std::vector<const char *>::iterator End =
-      llvm::remove_if(Args, [&](StringRef S) {
+      llvm::remove_if(Args, [&](llvm::StringRef S) {
         return llvm::is_contained(CompileAnalyzer.Inputs, S) ||
                llvm::is_contained(DiagClient.UnusedInputs, S);
       });
@@ -325,11 +325,11 @@ std::unique_ptr<FixedCompilationDatabase>
 FixedCompilationDatabase::loadFromCommandLine(int &Argc,
                                               const char *const *Argv,
                                               std::string &ErrorMsg,
-                                              const Twine &Directory) {
+                                              const llvm::Twine &Directory) {
   ErrorMsg.clear();
   if (Argc == 0)
     return nullptr;
-  const char *const *DoubleDash = std::find(Argv, Argv + Argc, StringRef("--"));
+  const char *const *DoubleDash = std::find(Argv, Argv + Argc, llvm::StringRef("--"));
   if (DoubleDash == Argv + Argc)
     return nullptr;
   std::vector<const char *> CommandLine(DoubleDash + 1, Argv + Argc);
@@ -342,7 +342,7 @@ FixedCompilationDatabase::loadFromCommandLine(int &Argc,
 }
 
 std::unique_ptr<FixedCompilationDatabase>
-FixedCompilationDatabase::loadFromFile(StringRef Path, std::string &ErrorMsg) {
+FixedCompilationDatabase::loadFromFile(llvm::StringRef Path, std::string &ErrorMsg) {
   ErrorMsg.clear();
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> File =
       llvm::MemoryBuffer::getFile(Path);
@@ -355,11 +355,11 @@ FixedCompilationDatabase::loadFromFile(StringRef Path, std::string &ErrorMsg) {
 }
 
 std::unique_ptr<FixedCompilationDatabase>
-FixedCompilationDatabase::loadFromBuffer(StringRef Directory, StringRef Data,
+FixedCompilationDatabase::loadFromBuffer(llvm::StringRef Directory, llvm::StringRef Data,
                                          std::string &ErrorMsg) {
   ErrorMsg.clear();
   std::vector<std::string> Args;
-  StringRef Line;
+  llvm::StringRef Line;
   while (!Data.empty()) {
     std::tie(Line, Data) = Data.split('\n');
     // Stray whitespace is almost certainly unintended.
@@ -371,17 +371,17 @@ FixedCompilationDatabase::loadFromBuffer(StringRef Directory, StringRef Data,
 }
 
 FixedCompilationDatabase::FixedCompilationDatabase(
-    const Twine &Directory, ArrayRef<std::string> CommandLine) {
+    const llvm::Twine &Directory, llvm::ArrayRef<std::string> CommandLine) {
   std::vector<std::string> ToolCommandLine(1, GetClangToolCommand());
   ToolCommandLine.insert(ToolCommandLine.end(),
                          CommandLine.begin(), CommandLine.end());
-  CompileCommands.emplace_back(Directory, StringRef(),
+  CompileCommands.emplace_back(Directory, llvm::StringRef(),
                                std::move(ToolCommandLine),
-                               StringRef());
+                               llvm::StringRef());
 }
 
 std::vector<CompileCommand>
-FixedCompilationDatabase::getCompileCommands(StringRef FilePath) const {
+FixedCompilationDatabase::getCompileCommands(llvm::StringRef FilePath) const {
   std::vector<CompileCommand> Result(CompileCommands);
   Result[0].CommandLine.push_back(std::string(FilePath));
   Result[0].Filename = std::string(FilePath);
@@ -392,8 +392,8 @@ namespace {
 
 class FixedCompilationDatabasePlugin : public CompilationDatabasePlugin {
   std::unique_ptr<CompilationDatabase>
-  loadFromDirectory(StringRef Directory, std::string &ErrorMessage) override {
-    SmallString<1024> DatabasePath(Directory);
+  loadFromDirectory(llvm::StringRef Directory, std::string &ErrorMessage) override {
+    llvm::SmallString<1024> DatabasePath(Directory);
     llvm::sys::path::append(DatabasePath, "compile_flags.txt");
     return FixedCompilationDatabase::loadFromFile(DatabasePath, ErrorMessage);
   }

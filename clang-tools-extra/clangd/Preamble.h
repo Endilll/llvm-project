@@ -78,13 +78,13 @@ public:
 
 private:
   std::shared_ptr<CompilerInvocation> Invocation;
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diagnostics;
-  IntrusiveRefCntPtr<TargetInfo> Target;
-  IntrusiveRefCntPtr<TargetInfo> AuxTarget;
-  IntrusiveRefCntPtr<FileManager> FileMgr;
-  IntrusiveRefCntPtr<SourceManager> SourceMgr;
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diagnostics;
+  llvm::IntrusiveRefCntPtr<TargetInfo> Target;
+  llvm::IntrusiveRefCntPtr<TargetInfo> AuxTarget;
+  llvm::IntrusiveRefCntPtr<FileManager> FileMgr;
+  llvm::IntrusiveRefCntPtr<SourceManager> SourceMgr;
   std::shared_ptr<Preprocessor> PP;
-  IntrusiveRefCntPtr<ASTContext> Context;
+  llvm::IntrusiveRefCntPtr<ASTContext> Context;
   std::shared_ptr<PreambleFileStatusCache> StatCache;
 };
 

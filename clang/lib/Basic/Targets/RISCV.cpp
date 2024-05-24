@@ -22,7 +22,7 @@
 using namespace clang;
 using namespace clang::targets;
 
-ArrayRef<const char *> RISCVTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> RISCVTargetInfo::getGCCRegNames() const {
   // clang-format off
   static const char *const GCCRegNames[] = {
       // Integer registers
@@ -50,7 +50,7 @@ ArrayRef<const char *> RISCVTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
-ArrayRef<TargetInfo::GCCRegAlias> RISCVTargetInfo::getGCCRegAliases() const {
+llvm::ArrayRef<TargetInfo::GCCRegAlias> RISCVTargetInfo::getGCCRegAliases() const {
   static const TargetInfo::GCCRegAlias GCCRegAliases[] = {
       {{"zero"}, "x0"}, {{"ra"}, "x1"},   {{"sp"}, "x2"},    {{"gp"}, "x3"},
       {{"tp"}, "x4"},   {{"t0"}, "x5"},   {{"t1"}, "x6"},    {{"t2"}, "x7"},
@@ -134,7 +134,7 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
   Builder.defineMacro("__riscv");
   bool Is64Bit = getTriple().isRISCV64();
   Builder.defineMacro("__riscv_xlen", Is64Bit ? "64" : "32");
-  StringRef CodeModel = getTargetOpts().CodeModel;
+  llvm::StringRef CodeModel = getTargetOpts().CodeModel;
   unsigned FLen = ISAInfo->getFLen();
   unsigned MinVLen = ISAInfo->getMinVLen();
   unsigned MaxELen = ISAInfo->getMaxELen();
@@ -147,7 +147,7 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
   else if (CodeModel == "medium")
     Builder.defineMacro("__riscv_cmodel_medany");
 
-  StringRef ABIName = getABI();
+  llvm::StringRef ABIName = getABI();
   if (ABIName == "ilp32f" || ABIName == "lp64f")
     Builder.defineMacro("__riscv_float_abi_single");
   else if (ABIName == "ilp32d" || ABIName == "lp64d")
@@ -164,8 +164,8 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
     auto ExtName = Extension.first;
     auto ExtInfo = Extension.second;
 
-    Builder.defineMacro(Twine("__riscv_", ExtName),
-                        Twine(getVersionValue(ExtInfo.Major, ExtInfo.Minor)));
+    Builder.defineMacro(llvm::Twine("__riscv_", ExtName),
+                        llvm::Twine(getVersionValue(ExtInfo.Major, ExtInfo.Minor)));
   }
 
   if (ISAInfo->hasExtension("m") || ISAInfo->hasExtension("zmmul"))
@@ -186,15 +186,15 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
   }
 
   if (FLen) {
-    Builder.defineMacro("__riscv_flen", Twine(FLen));
+    Builder.defineMacro("__riscv_flen", llvm::Twine(FLen));
     Builder.defineMacro("__riscv_fdiv");
     Builder.defineMacro("__riscv_fsqrt");
   }
 
   if (MinVLen) {
-    Builder.defineMacro("__riscv_v_min_vlen", Twine(MinVLen));
-    Builder.defineMacro("__riscv_v_elen", Twine(MaxELen));
-    Builder.defineMacro("__riscv_v_elen_fp", Twine(MaxELenFp));
+    Builder.defineMacro("__riscv_v_min_vlen", llvm::Twine(MinVLen));
+    Builder.defineMacro("__riscv_v_elen", llvm::Twine(MaxELen));
+    Builder.defineMacro("__riscv_v_elen_fp", llvm::Twine(MaxELenFp));
   }
 
   if (ISAInfo->hasExtension("c"))
@@ -203,13 +203,13 @@ void RISCVTargetInfo::getTargetDefines(const LangOptions &Opts,
   if (ISAInfo->hasExtension("zve32x")) {
     Builder.defineMacro("__riscv_vector");
     // Currently we support the v0.12 RISC-V V intrinsics.
-    Builder.defineMacro("__riscv_v_intrinsic", Twine(getVersionValue(0, 12)));
+    Builder.defineMacro("__riscv_v_intrinsic", llvm::Twine(getVersionValue(0, 12)));
   }
 
   auto VScale = getVScaleRange(Opts);
   if (VScale && VScale->first && VScale->first == VScale->second)
     Builder.defineMacro("__riscv_v_fixed_vlen",
-                        Twine(VScale->first * llvm::RISCV::RVVBitsPerBlock));
+                        llvm::Twine(VScale->first * llvm::RISCV::RVVBitsPerBlock));
 
   if (FastUnalignedAccess)
     Builder.defineMacro("__riscv_misaligned_fast");
@@ -237,13 +237,13 @@ static constexpr Builtin::Info BuiltinInfo[] = {
 #include "clang/Basic/BuiltinsRISCV.inc"
 };
 
-ArrayRef<Builtin::Info> RISCVTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> RISCVTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo,
                         clang::RISCV::LastTSBuiltin - Builtin::FirstTSBuiltin);
 }
 
 bool RISCVTargetInfo::initFeatureMap(
-    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, StringRef CPU,
+    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, llvm::StringRef CPU,
     const std::vector<std::string> &FeaturesVec) const {
 
   unsigned XLen = 32;
@@ -262,9 +262,9 @@ bool RISCVTargetInfo::initFeatureMap(
     std::vector<std::string> OverrideFeatures(std::next(I), FeaturesVec.end());
 
     // Add back any non ISA extension features, e.g. +relax.
-    auto IsNonISAExtFeature = [](StringRef Feature) {
+    auto IsNonISAExtFeature = [](llvm::StringRef Feature) {
       assert(Feature.size() > 1 && (Feature[0] == '+' || Feature[0] == '-'));
-      StringRef Ext = Feature.substr(1); // drop the +/-
+      llvm::StringRef Ext = Feature.substr(1); // drop the +/-
       return !llvm::RISCVISAInfo::isSupportedExtensionFeature(Ext);
     };
     llvm::copy_if(llvm::make_range(FeaturesVec.begin(), I),
@@ -314,7 +314,7 @@ RISCVTargetInfo::getVScaleRange(const LangOptions &LangOpts) const {
 }
 
 /// Return true if has this feature, need to sync with handleTargetFeatures.
-bool RISCVTargetInfo::hasFeature(StringRef Feature) const {
+bool RISCVTargetInfo::hasFeature(llvm::StringRef Feature) const {
   bool Is64Bit = getTriple().isRISCV64();
   auto Result = llvm::StringSwitch<std::optional<bool>>(Feature)
                     .Case("riscv", true)
@@ -367,29 +367,29 @@ bool RISCVTargetInfo::handleTargetFeatures(std::vector<std::string> &Features,
   return true;
 }
 
-bool RISCVTargetInfo::isValidCPUName(StringRef Name) const {
+bool RISCVTargetInfo::isValidCPUName(llvm::StringRef Name) const {
   bool Is64Bit = getTriple().isArch64Bit();
   return llvm::RISCV::parseCPU(Name, Is64Bit);
 }
 
 void RISCVTargetInfo::fillValidCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   bool Is64Bit = getTriple().isArch64Bit();
   llvm::RISCV::fillValidCPUArchList(Values, Is64Bit);
 }
 
-bool RISCVTargetInfo::isValidTuneCPUName(StringRef Name) const {
+bool RISCVTargetInfo::isValidTuneCPUName(llvm::StringRef Name) const {
   bool Is64Bit = getTriple().isArch64Bit();
   return llvm::RISCV::parseTuneCPU(Name, Is64Bit);
 }
 
 void RISCVTargetInfo::fillValidTuneCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   bool Is64Bit = getTriple().isArch64Bit();
   llvm::RISCV::fillValidTuneCPUArchList(Values, Is64Bit);
 }
 
-static void handleFullArchString(StringRef FullArchStr,
+static void handleFullArchString(llvm::StringRef FullArchStr,
                                  std::vector<std::string> &Features) {
   Features.push_back("__RISCV_TargetAttrNeedOverride");
   auto RII = llvm::RISCVISAInfo::parseArchString(
@@ -406,17 +406,17 @@ static void handleFullArchString(StringRef FullArchStr,
   }
 }
 
-ParsedTargetAttr RISCVTargetInfo::parseTargetAttr(StringRef Features) const {
+ParsedTargetAttr RISCVTargetInfo::parseTargetAttr(llvm::StringRef Features) const {
   ParsedTargetAttr Ret;
   if (Features == "default")
     return Ret;
-  SmallVector<StringRef, 1> AttrFeatures;
+  llvm::SmallVector<llvm::StringRef, 1> AttrFeatures;
   Features.split(AttrFeatures, ";");
   bool FoundArch = false;
 
   for (auto &Feature : AttrFeatures) {
     Feature = Feature.trim();
-    StringRef AttrString = Feature.split("=").second.trim();
+    llvm::StringRef AttrString = Feature.split("=").second.trim();
 
     if (Feature.starts_with("arch=")) {
       // Override last features
@@ -427,13 +427,13 @@ ParsedTargetAttr RISCVTargetInfo::parseTargetAttr(StringRef Features) const {
 
       if (AttrString.starts_with("+")) {
         // EXTENSION like arch=+v,+zbb
-        SmallVector<StringRef, 1> Exts;
+        llvm::SmallVector<llvm::StringRef, 1> Exts;
         AttrString.split(Exts, ",");
         for (auto Ext : Exts) {
           if (Ext.empty())
             continue;
 
-          StringRef ExtName = Ext.substr(1);
+          llvm::StringRef ExtName = Ext.substr(1);
           std::string TargetFeature =
               llvm::RISCVISAInfo::getTargetFeatureForExtension(ExtName);
           if (!TargetFeature.empty())
@@ -453,7 +453,7 @@ ParsedTargetAttr RISCVTargetInfo::parseTargetAttr(StringRef Features) const {
 
       if (!FoundArch) {
         // Update Features with CPU's features
-        StringRef MarchFromCPU = llvm::RISCV::getMArchFromMcpu(Ret.CPU);
+        llvm::StringRef MarchFromCPU = llvm::RISCV::getMArchFromMcpu(Ret.CPU);
         if (MarchFromCPU != "") {
           Ret.Features.clear();
           handleFullArchString(MarchFromCPU, Ret.Features);

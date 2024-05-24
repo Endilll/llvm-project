@@ -181,7 +181,7 @@ public:
 };
 
 /// A helper iterator adaptor to convert the iterators to
-/// `SmallVector<SomeDeclID>` to the iterators to `SmallVector<OtherDeclID>`.
+/// `llvm::SmallVector<SomeDeclID>` to the iterators to `llvm::SmallVector<OtherDeclID>`.
 template <class FromTy, class ToTy>
 class DeclIDIterator
     : public llvm::iterator_adaptor_base<DeclIDIterator<FromTy, ToTy>,

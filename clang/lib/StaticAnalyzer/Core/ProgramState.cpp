@@ -144,8 +144,8 @@ ProgramState::bindDefaultZero(SVal loc, const LocationContext *LCtx) const {
   return Mgr.getOwningEngine().processRegionChange(new_state, R, LCtx);
 }
 
-typedef ArrayRef<const MemRegion *> RegionList;
-typedef ArrayRef<SVal> ValueList;
+typedef llvm::ArrayRef<const MemRegion *> RegionList;
+typedef llvm::ArrayRef<SVal> ValueList;
 
 ProgramStateRef
 ProgramState::invalidateRegions(RegionList Regions,
@@ -155,7 +155,7 @@ ProgramState::invalidateRegions(RegionList Regions,
                              InvalidatedSymbols *IS,
                              const CallEvent *Call,
                              RegionAndSymbolInvalidationTraits *ITraits) const {
-  SmallVector<SVal, 8> Values;
+  llvm::SmallVector<SVal, 8> Values;
   for (const MemRegion *Reg : Regions)
     Values.push_back(loc::MemRegionVal(Reg));
 
@@ -487,7 +487,7 @@ SVal ProgramState::getLValue(const IndirectFieldDecl *D, SVal Base) const {
 //  State pretty-printing.
 //===----------------------------------------------------------------------===//
 
-void ProgramState::printJson(raw_ostream &Out, const LocationContext *LCtx,
+void ProgramState::printJson(llvm::raw_ostream &Out, const LocationContext *LCtx,
                              const char *NL, unsigned int Space,
                              bool IsDot) const {
   Indent(Out, Space, IsDot) << "\"program_state\": {" << NL;
@@ -514,7 +514,7 @@ void ProgramState::printJson(raw_ostream &Out, const LocationContext *LCtx,
   Indent(Out, Space, IsDot) << '}';
 }
 
-void ProgramState::printDOT(raw_ostream &Out, const LocationContext *LCtx,
+void ProgramState::printDOT(llvm::raw_ostream &Out, const LocationContext *LCtx,
                             unsigned int Space) const {
   printJson(Out, LCtx, /*NL=*/"\\l", Space, /*IsDot=*/true);
 }

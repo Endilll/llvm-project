@@ -19,7 +19,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/redundant-declaration.html
 class RedundantDeclarationCheck : public ClangTidyCheck {
 public:
-  RedundantDeclarationCheck(StringRef Name, ClangTidyContext *Context);
+  RedundantDeclarationCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

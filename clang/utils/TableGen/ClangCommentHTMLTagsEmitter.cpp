@@ -19,7 +19,7 @@
 
 using namespace llvm;
 
-void clang::EmitClangCommentHTMLTags(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitClangCommentHTMLTags(RecordKeeper &Records, llvm::raw_ostream &OS) {
   std::vector<Record *> Tags = Records.getAllDerivedDefinitions("Tag");
   std::vector<StringMatcher::StringPair> Matches;
   for (Record *Tag : Tags) {
@@ -29,14 +29,14 @@ void clang::EmitClangCommentHTMLTags(RecordKeeper &Records, raw_ostream &OS) {
 
   emitSourceFileHeader("HTML tag name matcher", OS, Records);
 
-  OS << "bool isHTMLTagName(StringRef Name) {\n";
+  OS << "bool isHTMLTagName(llvm::StringRef Name) {\n";
   StringMatcher("Name", Matches, OS).Emit();
   OS << "  return false;\n"
      << "}\n\n";
 }
 
 void clang::EmitClangCommentHTMLTagsProperties(RecordKeeper &Records,
-                                               raw_ostream &OS) {
+                                               llvm::raw_ostream &OS) {
   std::vector<Record *> Tags = Records.getAllDerivedDefinitions("Tag");
   std::vector<StringMatcher::StringPair> MatchesEndTagOptional;
   std::vector<StringMatcher::StringPair> MatchesEndTagForbidden;
@@ -51,12 +51,12 @@ void clang::EmitClangCommentHTMLTagsProperties(RecordKeeper &Records,
 
   emitSourceFileHeader("HTML tag properties", OS, Records);
 
-  OS << "bool isHTMLEndTagOptional(StringRef Name) {\n";
+  OS << "bool isHTMLEndTagOptional(llvm::StringRef Name) {\n";
   StringMatcher("Name", MatchesEndTagOptional, OS).Emit();
   OS << "  return false;\n"
      << "}\n\n";
 
-  OS << "bool isHTMLEndTagForbidden(StringRef Name) {\n";
+  OS << "bool isHTMLEndTagForbidden(llvm::StringRef Name) {\n";
   StringMatcher("Name", MatchesEndTagForbidden, OS).Emit();
   OS << "  return false;\n"
      << "}\n\n";

@@ -80,10 +80,10 @@ enum CallEventKind {
 class CallEvent;
 
 template <typename T = CallEvent>
-class CallEventRef : public IntrusiveRefCntPtr<const T> {
+class CallEventRef : public llvm::IntrusiveRefCntPtr<const T> {
 public:
-  CallEventRef(const T *Call) : IntrusiveRefCntPtr<const T>(Call) {}
-  CallEventRef(const CallEventRef &Orig) : IntrusiveRefCntPtr<const T>(Orig) {}
+  CallEventRef(const T *Call) : llvm::IntrusiveRefCntPtr<const T>(Call) {}
+  CallEventRef(const CallEventRef &Orig) : llvm::IntrusiveRefCntPtr<const T>(Orig) {}
 
   // The copy assignment operator is defined as deleted pending further
   // motivation.
@@ -203,7 +203,7 @@ protected:
     return getState()->getSVal(S, getLocationContext());
   }
 
-  using ValueList = SmallVectorImpl<SVal>;
+  using ValueList = llvm::SmallVectorImpl<SVal>;
 
   /// Used to specify non-argument regions that will be invalidated as a
   /// result of this call.
@@ -217,7 +217,7 @@ public:
 
   /// Returns the kind of call this is.
   virtual Kind getKind() const = 0;
-  virtual StringRef getKindAsString() const = 0;
+  virtual llvm::StringRef getKindAsString() const = 0;
 
   /// Returns the declaration of the function or method that will be
   /// called. May be null.
@@ -339,7 +339,7 @@ public:
   // FIXME: Add a helper for checking namespaces.
   // FIXME: Move this down to AnyFunctionCall once checkers have more
   // precise callbacks.
-  bool isGlobalCFunction(StringRef SpecificName = StringRef()) const;
+  bool isGlobalCFunction(llvm::StringRef SpecificName = llvm::StringRef()) const;
 
   /// Returns the name of the callee, if its name is a simple identifier.
   ///
@@ -367,9 +367,9 @@ public:
                                     ProgramStateRef Orig = nullptr) const;
 
   using FrameBindingTy = std::pair<SVal, SVal>;
-  using BindingsTy = SmallVectorImpl<FrameBindingTy>;
+  using BindingsTy = llvm::SmallVectorImpl<FrameBindingTy>;
 
-  /// Populates the given SmallVector with the bindings in the callee's stack
+  /// Populates the given llvm::SmallVector with the bindings in the callee's stack
   /// frame at the start of this call.
   virtual void getInitialStackFrameContents(const StackFrameContext *CalleeCtx,
                                             BindingsTy &Bindings) const = 0;
@@ -471,10 +471,10 @@ public:
   /// Remember that the number of formal parameters may not match the number
   /// of arguments for all calls. However, the first parameter will always
   /// correspond with the argument value returned by \c getArgSVal(0).
-  virtual ArrayRef<ParmVarDecl *> parameters() const = 0;
+  virtual llvm::ArrayRef<ParmVarDecl *> parameters() const = 0;
 
   using param_type_iterator =
-      llvm::mapped_iterator<ArrayRef<ParmVarDecl *>::iterator, GetTypeFn>;
+      llvm::mapped_iterator<llvm::ArrayRef<ParmVarDecl *>::iterator, GetTypeFn>;
 
   /// Returns an iterator over the types of the call's formal parameters.
   ///
@@ -490,7 +490,7 @@ public:
   }
 
   // For debugging purposes only
-  void dump(raw_ostream &Out) const;
+  void dump(llvm::raw_ostream &Out) const;
   void dump() const;
 };
 
@@ -522,7 +522,7 @@ public:
   void getInitialStackFrameContents(const StackFrameContext *CalleeCtx,
                                     BindingsTy &Bindings) const override;
 
-  ArrayRef<ParmVarDecl *> parameters() const override;
+  llvm::ArrayRef<ParmVarDecl *> parameters() const override;
 
   static bool classof(const CallEvent *CA) {
     return CA->getKind() >= CE_BEG_FUNCTION_CALLS &&
@@ -561,7 +561,7 @@ public:
   }
 
   Kind getKind() const override { return CE_Function; }
-  StringRef getKindAsString() const override { return "SimpleFunctionCall"; }
+  llvm::StringRef getKindAsString() const override { return "SimpleFunctionCall"; }
 
   static bool classof(const CallEvent *CA) {
     return CA->getKind() == CE_Function;
@@ -664,10 +664,10 @@ public:
   void getInitialStackFrameContents(const StackFrameContext *CalleeCtx,
                                     BindingsTy &Bindings) const override;
 
-  ArrayRef<ParmVarDecl *> parameters() const override;
+  llvm::ArrayRef<ParmVarDecl *> parameters() const override;
 
   Kind getKind() const override { return CE_Block; }
-  StringRef getKindAsString() const override { return "BlockCall"; }
+  llvm::StringRef getKindAsString() const override { return "BlockCall"; }
 
   static bool classof(const CallEvent *CA) { return CA->getKind() == CE_Block; }
 };
@@ -774,7 +774,7 @@ public:
   }
 
   Kind getKind() const override { return CE_CXXStaticOperator; }
-  StringRef getKindAsString() const override { return "CXXStaticOperatorCall"; }
+  llvm::StringRef getKindAsString() const override { return "CXXStaticOperatorCall"; }
 
   static bool classof(const CallEvent *CA) {
     return CA->getKind() == CE_CXXStaticOperator;
@@ -816,7 +816,7 @@ public:
   RuntimeDefinition getRuntimeDefinition() const override;
 
   Kind getKind() const override { return CE_CXXMember; }
-  StringRef getKindAsString() const override { return "CXXMemberCall"; }
+  llvm::StringRef getKindAsString() const override { return "CXXMemberCall"; }
 
   static bool classof(const CallEvent *CA) {
     return CA->getKind() == CE_CXXMember;
@@ -857,7 +857,7 @@ public:
   const Expr *getCXXThisExpr() const override;
 
   Kind getKind() const override { return CE_CXXMemberOperator; }
-  StringRef getKindAsString() const override { return "CXXMemberOperatorCall"; }
+  llvm::StringRef getKindAsString() const override { return "CXXMemberOperatorCall"; }
 
   static bool classof(const CallEvent *CA) {
     return CA->getKind() == CE_CXXMemberOperator;
@@ -936,7 +936,7 @@ public:
   }
 
   Kind getKind() const override { return CE_CXXDestructor; }
-  StringRef getKindAsString() const override { return "CXXDestructorCall"; }
+  llvm::StringRef getKindAsString() const override { return "CXXDestructorCall"; }
 
   static bool classof(const CallEvent *CA) {
     return CA->getKind() == CE_CXXDestructor;
@@ -1018,7 +1018,7 @@ public:
   }
 
   Kind getKind() const override { return CE_CXXConstructor; }
-  StringRef getKindAsString() const override { return "CXXConstructorCall"; }
+  llvm::StringRef getKindAsString() const override { return "CXXConstructorCall"; }
 
   static bool classof(const CallEvent *CA) {
     return CA->getKind() == CE_CXXConstructor;
@@ -1097,7 +1097,7 @@ public:
   }
 
   Kind getKind() const override { return CE_CXXInheritedConstructor; }
-  StringRef getKindAsString() const override {
+  llvm::StringRef getKindAsString() const override {
     return "CXXInheritedConstructorCall";
   }
 
@@ -1176,7 +1176,7 @@ public:
   }
 
   Kind getKind() const override { return CE_CXXAllocator; }
-  StringRef getKindAsString() const override { return "CXXAllocatorCall"; }
+  llvm::StringRef getKindAsString() const override { return "CXXAllocatorCall"; }
 
   static bool classof(const CallEvent *CE) {
     return CE->getKind() == CE_CXXAllocator;
@@ -1224,7 +1224,7 @@ public:
   }
 
   Kind getKind() const override { return CE_CXXDeallocator; }
-  StringRef getKindAsString() const override { return "CXXDeallocatorCall"; }
+  llvm::StringRef getKindAsString() const override { return "CXXDeallocatorCall"; }
 
   static bool classof(const CallEvent *CE) {
     return CE->getKind() == CE_CXXDeallocator;
@@ -1336,10 +1336,10 @@ public:
   void getInitialStackFrameContents(const StackFrameContext *CalleeCtx,
                                     BindingsTy &Bindings) const override;
 
-  ArrayRef<ParmVarDecl *> parameters() const override;
+  llvm::ArrayRef<ParmVarDecl *> parameters() const override;
 
   Kind getKind() const override { return CE_ObjCMessage; }
-  StringRef getKindAsString() const override { return "ObjCMethodCall"; }
+  llvm::StringRef getKindAsString() const override { return "ObjCMethodCall"; }
 
   static bool classof(const CallEvent *CA) {
     return CA->getKind() == CE_ObjCMessage;
@@ -1357,7 +1357,7 @@ class CallEventManager {
   friend class CallEvent;
 
   llvm::BumpPtrAllocator &Alloc;
-  SmallVector<void *, 8> Cache;
+  llvm::SmallVector<void *, 8> Cache;
 
   using CallEventTemplateTy = SimpleFunctionCall;
 

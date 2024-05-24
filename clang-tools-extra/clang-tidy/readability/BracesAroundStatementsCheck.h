@@ -40,7 +40,7 @@ namespace clang::tidy::readability {
 /// means that braces will be added to all statements (not having them already).
 class BracesAroundStatementsCheck : public ClangTidyCheck {
 public:
-  BracesAroundStatementsCheck(StringRef Name, ClangTidyContext *Context);
+  BracesAroundStatementsCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

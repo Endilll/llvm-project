@@ -22,12 +22,12 @@ namespace {
 
 class SynthesisTest : public SyntaxTreeTest {
 protected:
-  ::testing::AssertionResult treeDumpEqual(syntax::Node *Root, StringRef Dump) {
+  ::testing::AssertionResult treeDumpEqual(syntax::Node *Root, llvm::StringRef Dump) {
     if (!Root)
       return ::testing::AssertionFailure()
              << "Root was not built successfully.";
 
-    auto Actual = StringRef(Root->dump(*TM)).trim().str();
+    auto Actual = llvm::StringRef(Root->dump(*TM)).trim().str();
     auto Expected = Dump.trim().str();
     // EXPECT_EQ shows the diff between the two strings if they are different.
     EXPECT_EQ(Expected, Actual);

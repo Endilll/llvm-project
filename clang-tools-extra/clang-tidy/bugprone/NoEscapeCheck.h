@@ -21,7 +21,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/no-escape.html
 class NoEscapeCheck : public ClangTidyCheck {
 public:
-  NoEscapeCheck(StringRef Name, ClangTidyContext *Context)
+  NoEscapeCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.Blocks;

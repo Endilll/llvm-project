@@ -51,7 +51,7 @@ private:
   /// Add \p Buffer to the underlying source manager, tokenize it and store the
   /// resulting tokens. Used exclusively in `FactoryImpl` to materialize tokens
   /// that were not written in user code.
-  std::pair<FileID, ArrayRef<Token>>
+  std::pair<FileID, llvm::ArrayRef<Token>>
   lexBuffer(std::unique_ptr<llvm::MemoryBuffer> Buffer);
   friend class FactoryImpl;
 

@@ -21,7 +21,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/avoid-reference-coroutine-parameters.html
 class AvoidReferenceCoroutineParametersCheck : public ClangTidyCheck {
 public:
-  AvoidReferenceCoroutineParametersCheck(StringRef Name,
+  AvoidReferenceCoroutineParametersCheck(llvm::StringRef Name,
                                          ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

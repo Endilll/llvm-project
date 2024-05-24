@@ -23,7 +23,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::misc {
 
-StaticAssertCheck::StaticAssertCheck(StringRef Name, ClangTidyContext *Context)
+StaticAssertCheck::StaticAssertCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context) {}
 
 void StaticAssertCheck::registerMatchers(MatchFinder *Finder) {
@@ -94,7 +94,7 @@ void StaticAssertCheck::check(const MatchFinder::MatchResult &Result) {
   if (!AssertExpansionLoc.isValid() || !AssertExpansionLoc.isMacroID())
     return;
 
-  StringRef MacroName =
+  llvm::StringRef MacroName =
       Lexer::getImmediateMacroName(AssertExpansionLoc, SM, Opts);
 
   if (MacroName != "assert" || Condition->isValueDependent() ||
@@ -109,7 +109,7 @@ void StaticAssertCheck::check(const MatchFinder::MatchResult &Result) {
     if (!FalseLiteralLoc.isMacroID())
       return;
 
-    StringRef FalseMacroName =
+    llvm::StringRef FalseMacroName =
         Lexer::getImmediateMacroName(FalseLiteralLoc, SM, Opts);
     if (FalseMacroName.compare_insensitive("false") == 0 ||
         FalseMacroName.compare_insensitive("null") == 0)
@@ -118,7 +118,7 @@ void StaticAssertCheck::check(const MatchFinder::MatchResult &Result) {
 
   SourceLocation AssertLoc = SM.getImmediateMacroCallerLoc(AssertExpansionLoc);
 
-  SmallVector<FixItHint, 4> FixItHints;
+  llvm::SmallVector<FixItHint, 4> FixItHints;
   SourceLocation LastParenLoc;
   if (AssertLoc.isValid() && !AssertLoc.isMacroID() &&
       (LastParenLoc = getLastParenLoc(ASTCtx, AssertLoc)).isValid()) {
@@ -131,7 +131,7 @@ void StaticAssertCheck::check(const MatchFinder::MatchResult &Result) {
       FixItHints.push_back(FixItHint::CreateRemoval(
           SourceRange(AssertMSG->getBeginLoc(), AssertMSG->getEndLoc())));
       FixItHints.push_back(FixItHint::CreateInsertion(
-          LastParenLoc, (Twine(", \"") + AssertMSG->getString() + "\"").str()));
+          LastParenLoc, (llvm::Twine(", \"") + AssertMSG->getString() + "\"").str()));
     } else if (!Opts.CPlusPlus17) {
       FixItHints.push_back(FixItHint::CreateInsertion(LastParenLoc, ", \"\""));
     }

@@ -41,7 +41,7 @@ public:
         Point(Point), Context(Context) {}
 
   bool visitSymbolOccurrence(const NamedDecl *ND,
-                             ArrayRef<SourceRange> NameRanges) {
+                             llvm::ArrayRef<SourceRange> NameRanges) {
     if (!ND)
       return true;
     for (const auto &Range : NameRanges) {
@@ -101,7 +101,7 @@ namespace {
 class NamedDeclFindingVisitor
     : public RecursiveASTVisitor<NamedDeclFindingVisitor> {
 public:
-  explicit NamedDeclFindingVisitor(StringRef Name) : Name(Name) {}
+  explicit NamedDeclFindingVisitor(llvm::StringRef Name) : Name(Name) {}
 
   // We don't have to traverse the uses to find some declaration with a
   // specific name, so just visit the named declarations.
@@ -120,7 +120,7 @@ public:
 
 private:
   const NamedDecl *Result = nullptr;
-  StringRef Name;
+  llvm::StringRef Name;
 };
 
 } // end anonymous namespace

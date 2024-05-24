@@ -143,7 +143,7 @@ void f_functional_cast() {
 class StringRef
 {
 public:
-  StringRef(const char *);
+  llvm::StringRef(const char *);
   const char *begin() const;
   const char *end() const;
 };
@@ -164,7 +164,7 @@ template <typename T, typename U>
 const T &template_const_reference_cast(const U &u);
 
 template <typename T>
-T template_value_get(StringRef s);
+T template_value_get(llvm::StringRef s);
 
 struct S {
   template <typename T>
@@ -228,6 +228,6 @@ void f_template_cast()
   B *b11 = template_value_get<B *>("foo"), b12 = template_value_get<B>("bar");
 
   // Don't warn for implicit variables.
-  for (auto &c : template_reference_cast<StringRef>(*a)) {
+  for (auto &c : template_reference_cast<llvm::StringRef>(*a)) {
   }
 }

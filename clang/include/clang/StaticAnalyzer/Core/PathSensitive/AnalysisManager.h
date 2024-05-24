@@ -91,7 +91,7 @@ public:
     return LangOpts;
   }
 
-  ArrayRef<PathDiagnosticConsumer*> getPathDiagnosticConsumers() override {
+  llvm::ArrayRef<PathDiagnosticConsumer*> getPathDiagnosticConsumers() override {
     return PathConsumers;
   }
 

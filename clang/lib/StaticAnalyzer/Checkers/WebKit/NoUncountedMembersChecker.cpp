@@ -126,7 +126,7 @@ public:
     assert(MemberType);
     assert(MemberCXXRD);
 
-    SmallString<100> Buf;
+    llvm::SmallString<100> Buf;
     llvm::raw_svector_ostream Os(Buf);
 
     Os << "Member variable ";

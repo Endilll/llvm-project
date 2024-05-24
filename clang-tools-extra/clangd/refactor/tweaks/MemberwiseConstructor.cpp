@@ -94,7 +94,7 @@ public:
     return true;
   }
 
-  Expected<Effect> apply(const Selection &Inputs) override {
+  llvm::Expected<Effect> apply(const Selection &Inputs) override {
     std::string Code = buildCode();
     // Prefer to place the new constructor...
     std::vector<Anchor> Anchors = {

@@ -20,9 +20,9 @@ namespace clang {
 namespace format {
 
 bool AffectedRangeManager::computeAffectedLines(
-    SmallVectorImpl<AnnotatedLine *> &Lines) {
-  SmallVectorImpl<AnnotatedLine *>::iterator I = Lines.begin();
-  SmallVectorImpl<AnnotatedLine *>::iterator E = Lines.end();
+    llvm::SmallVectorImpl<AnnotatedLine *> &Lines) {
+  llvm::SmallVectorImpl<AnnotatedLine *>::iterator I = Lines.begin();
+  llvm::SmallVectorImpl<AnnotatedLine *>::iterator E = Lines.end();
   bool SomeLineAffected = false;
   const AnnotatedLine *PreviousLine = nullptr;
   while (I != E) {
@@ -34,7 +34,7 @@ bool AffectedRangeManager::computeAffectedLines(
     // if any token within the directive is affected.
     if (Line->InPPDirective) {
       FormatToken *Last = Line->Last;
-      SmallVectorImpl<AnnotatedLine *>::iterator PPEnd = I + 1;
+      llvm::SmallVectorImpl<AnnotatedLine *>::iterator PPEnd = I + 1;
       while (PPEnd != E && !(*PPEnd)->First->HasUnescapedNewline) {
         Last = (*PPEnd)->Last;
         ++PPEnd;
@@ -89,8 +89,8 @@ bool AffectedRangeManager::affectsLeadingEmptyLines(const FormatToken &Tok) {
 }
 
 void AffectedRangeManager::markAllAsAffected(
-    SmallVectorImpl<AnnotatedLine *>::iterator I,
-    SmallVectorImpl<AnnotatedLine *>::iterator E) {
+    llvm::SmallVectorImpl<AnnotatedLine *>::iterator I,
+    llvm::SmallVectorImpl<AnnotatedLine *>::iterator E) {
   while (I != E) {
     (*I)->Affected = true;
     markAllAsAffected((*I)->Children.begin(), (*I)->Children.end());
@@ -100,7 +100,7 @@ void AffectedRangeManager::markAllAsAffected(
 
 bool AffectedRangeManager::nonPPLineAffected(
     AnnotatedLine *Line, const AnnotatedLine *PreviousLine,
-    SmallVectorImpl<AnnotatedLine *> &Lines) {
+    llvm::SmallVectorImpl<AnnotatedLine *> &Lines) {
   bool SomeLineAffected = false;
   Line->ChildrenAffected = computeAffectedLines(Line->Children);
   if (Line->ChildrenAffected)

@@ -50,7 +50,7 @@ public:
   const char *id() const override;
 
   bool prepare(const Selection &Inputs) override;
-  Expected<Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Effect> apply(const Selection &Inputs) override;
   std::string title() const override;
   llvm::StringLiteral kind() const override {
     return CodeAction::REFACTOR_KIND;
@@ -234,8 +234,8 @@ bool isNamespaceForbidden(const Tweak::Selection &Inputs,
                           const NestedNameSpecifier &Namespace) {
   std::string NamespaceStr = printNamespaceScope(*Namespace.getAsNamespace());
 
-  for (StringRef Banned : Config::current().Style.FullyQualifiedNamespaces) {
-    StringRef PrefixMatch = NamespaceStr;
+  for (llvm::StringRef Banned : Config::current().Style.FullyQualifiedNamespaces) {
+    llvm::StringRef PrefixMatch = NamespaceStr;
     if (PrefixMatch.consume_front(Banned) && PrefixMatch.consume_front("::"))
       return true;
   }
@@ -358,7 +358,7 @@ bool AddUsing::prepare(const Selection &Inputs) {
   return true;
 }
 
-Expected<Tweak::Effect> AddUsing::apply(const Selection &Inputs) {
+llvm::Expected<Tweak::Effect> AddUsing::apply(const Selection &Inputs) {
   auto &SM = Inputs.AST->getSourceManager();
 
   tooling::Replacements R;

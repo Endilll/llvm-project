@@ -34,8 +34,8 @@ class DirectoryWatcherWindows : public clang::DirectoryWatcher {
 
   std::thread WatcherThread;
   std::thread HandlerThread;
-  std::function<void(ArrayRef<DirectoryWatcher::Event>, bool)> Callback;
-  SmallString<MAX_PATH> Path;
+  std::function<void(llvm::ArrayRef<DirectoryWatcher::Event>, bool)> Callback;
+  llvm::SmallString<MAX_PATH> Path;
   HANDLE Terminate;
 
   std::mutex Mutex;
@@ -48,7 +48,7 @@ class DirectoryWatcherWindows : public clang::DirectoryWatcher {
     std::condition_variable CV;
 
   public:
-    void emplace(DirectoryWatcher::Event::EventKind Kind, StringRef Path) {
+    void emplace(DirectoryWatcher::Event::EventKind Kind, llvm::StringRef Path) {
       {
         std::unique_lock<std::mutex> L(M);
         Q.emplace(Kind, Path);
@@ -216,7 +216,7 @@ void DirectoryWatcherWindows::WatcherThreadProc(HANDLE DirectoryHandle) {
         break;
       }
 
-      SmallString<MAX_PATH> filename;
+      llvm::SmallString<MAX_PATH> filename;
       sys::windows::UTF16ToUTF8(I->FileName, I->FileNameLength / sizeof(WCHAR),
                                 filename);
       Q.emplace(Kind, filename);
@@ -260,7 +260,7 @@ auto error(DWORD ErrorCode) {
 } // namespace
 
 llvm::Expected<std::unique_ptr<DirectoryWatcher>>
-clang::DirectoryWatcher::create(StringRef Path,
+clang::DirectoryWatcher::create(llvm::StringRef Path,
                                 DirectoryWatcherCallback Receiver,
                                 bool WaitForInitialSync) {
   if (Path.empty())
@@ -271,7 +271,7 @@ clang::DirectoryWatcher::create(StringRef Path,
     llvm::report_fatal_error(
         "DirectoryWatcher::create can not accept a filepath.");
 
-  SmallVector<wchar_t, MAX_PATH> WidePath;
+  llvm::SmallVector<wchar_t, MAX_PATH> WidePath;
   if (sys::windows::UTF8ToUTF16(Path, WidePath))
     return llvm::make_error<llvm::StringError>(
         "unable to convert path to UTF-16", llvm::inconvertibleErrorCode());

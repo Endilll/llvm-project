@@ -537,7 +537,7 @@ private:
   /// Emit resource leak warnings for the given symbols.
   /// Createn a non-fatal error node for these, and returns it (if any warnings
   /// were generated). Return value is non-null.
-  ExplodedNode *reportLeaks(const SmallVector<SymbolRef, 2> &LeakedSyms,
+  ExplodedNode *reportLeaks(const llvm::SmallVector<SymbolRef, 2> &LeakedSyms,
                             CheckerContext &C, ExplodedNode *Pred) const;
 
   /// Find the description data of the function called by a call event.
@@ -719,10 +719,10 @@ const ExplodedNode *StreamChecker::getAcquisitionSite(const ExplodedNode *N,
 
 static ProgramStateRef escapeArgs(ProgramStateRef State, CheckerContext &C,
                                   const CallEvent &Call,
-                                  ArrayRef<unsigned int> EscapingArgs) {
+                                  llvm::ArrayRef<unsigned int> EscapingArgs) {
   const auto *CE = Call.getOriginExpr();
 
-  SmallVector<SVal> EscapingVals;
+  llvm::SmallVector<SVal> EscapingVals;
   EscapingVals.reserve(EscapingArgs.size());
   for (auto EscArgIdx : EscapingArgs)
     EscapingVals.push_back(Call.getArgSVal(EscArgIdx));
@@ -1144,7 +1144,7 @@ void StreamChecker::evalFscanf(const FnDescription *Desc, const CallEvent &Call,
 
     if (auto const *Callee = Call.getCalleeIdentifier();
         !Callee || Callee->getName() != "vfscanf") {
-      SmallVector<unsigned int> EscArgs;
+      llvm::SmallVector<unsigned int> EscArgs;
       for (auto EscArg : llvm::seq(2u, Call.getNumArgs()))
         EscArgs.push_back(EscArg);
       StateNotFailed = escapeArgs(StateNotFailed, C, Call, EscArgs);
@@ -1724,7 +1724,7 @@ void StreamChecker::reportFEofWarning(SymbolRef StreamSym, CheckerContext &C,
 }
 
 ExplodedNode *
-StreamChecker::reportLeaks(const SmallVector<SymbolRef, 2> &LeakedSyms,
+StreamChecker::reportLeaks(const llvm::SmallVector<SymbolRef, 2> &LeakedSyms,
                            CheckerContext &C, ExplodedNode *Pred) const {
   ExplodedNode *Err = C.generateNonFatalErrorNode(C.getState(), Pred);
   if (!Err)

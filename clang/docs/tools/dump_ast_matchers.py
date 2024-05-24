@@ -307,7 +307,7 @@ def act_on_decl(declaration, comment, allowed_types):
             result_types = [r.strip() for r in results.split(",")]
             if allowed_types and allowed_types != result_types:
                 raise Exception("Inconsistent documentation for: %s" % name)
-            arg = "StringRef %s, Regex::RegexFlags Flags = NoFlags" % arg_name
+            arg = "llvm::StringRef %s, Regex::RegexFlags Flags = NoFlags" % arg_name
             comment += """
 If the matcher is used in clang-query, RegexFlags parameter
 should be passed as a quoted string. e.g: "NoFlags".
@@ -394,7 +394,7 @@ Flags can be combined with '|' example \"IgnoreCase | BasicRegex\"
                 result_types = allowed_types
             else:
                 result_types = [result]
-            arg = "StringRef %s, Regex::RegexFlags Flags = NoFlags" % arg_name
+            arg = "llvm::StringRef %s, Regex::RegexFlags Flags = NoFlags" % arg_name
             comment += """
 If the matcher is used in clang-query, RegexFlags parameter
 should be passed as a quoted string. e.g: "NoFlags".

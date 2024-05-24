@@ -108,12 +108,12 @@ void HexagonTargetInfo::getTargetDefines(const LangOptions &Opts,
 }
 
 bool HexagonTargetInfo::initFeatureMap(
-    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, StringRef CPU,
+    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, llvm::StringRef CPU,
     const std::vector<std::string> &FeaturesVec) const {
   if (isTinyCore())
     Features["audio"] = true;
 
-  StringRef CPUFeature = CPU;
+  llvm::StringRef CPUFeature = CPU;
   CPUFeature.consume_front("hexagon");
   CPUFeature.consume_back("t");
   if (!CPUFeature.empty())
@@ -184,7 +184,7 @@ const char *const HexagonTargetInfo::GCCRegNames[] = {
     "q0", "q1", "q2", "q3",
 };
 
-ArrayRef<const char *> HexagonTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> HexagonTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
@@ -194,7 +194,7 @@ const TargetInfo::GCCRegAlias HexagonTargetInfo::GCCRegAliases[] = {
     {{"lr"}, "r31"},
 };
 
-ArrayRef<TargetInfo::GCCRegAlias> HexagonTargetInfo::getGCCRegAliases() const {
+llvm::ArrayRef<TargetInfo::GCCRegAlias> HexagonTargetInfo::getGCCRegAliases() const {
   return llvm::ArrayRef(GCCRegAliases);
 }
 
@@ -208,7 +208,7 @@ static constexpr Builtin::Info BuiltinInfo[] = {
 #include "clang/Basic/BuiltinsHexagon.def"
 };
 
-bool HexagonTargetInfo::hasFeature(StringRef Feature) const {
+bool HexagonTargetInfo::hasFeature(llvm::StringRef Feature) const {
   std::string VS = "hvxv" + HVXVersion;
   if (Feature == VS)
     return true;
@@ -238,7 +238,7 @@ static constexpr CPUSuffix Suffixes[] = {
     {{"hexagonv73"}, {"73"}},
 };
 
-const char *HexagonTargetInfo::getHexagonCPUSuffix(StringRef Name) {
+const char *HexagonTargetInfo::getHexagonCPUSuffix(llvm::StringRef Name) {
   const CPUSuffix *Item = llvm::find_if(
       Suffixes, [Name](const CPUSuffix &S) { return S.Name == Name; });
   if (Item == std::end(Suffixes))
@@ -247,12 +247,12 @@ const char *HexagonTargetInfo::getHexagonCPUSuffix(StringRef Name) {
 }
 
 void HexagonTargetInfo::fillValidCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   for (const CPUSuffix &Suffix : Suffixes)
     Values.push_back(Suffix.Name);
 }
 
-ArrayRef<Builtin::Info> HexagonTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> HexagonTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo, clang::Hexagon::LastTSBuiltin -
                                          Builtin::FirstTSBuiltin);
 }

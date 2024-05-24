@@ -39,7 +39,7 @@ static cl::OptionCategory
 class MapExtDefNamesConsumer : public ASTConsumer {
 public:
   MapExtDefNamesConsumer(ASTContext &Context,
-                         StringRef astFilePath = StringRef())
+                         llvm::StringRef astFilePath = llvm::StringRef())
       : Ctx(Context), SM(Context.getSourceManager()) {
     CurrentFileName = astFilePath.str();
   }
@@ -121,22 +121,22 @@ protected:
 
 static cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 
-static IntrusiveRefCntPtr<DiagnosticsEngine> Diags;
+static llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags;
 
-IntrusiveRefCntPtr<DiagnosticsEngine> GetDiagnosticsEngine() {
+llvm::IntrusiveRefCntPtr<DiagnosticsEngine> GetDiagnosticsEngine() {
   if (Diags) {
     // Call reset to make sure we don't mix errors
     Diags->Reset(false);
     return Diags;
   }
 
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
   TextDiagnosticPrinter *DiagClient =
       new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts);
   DiagClient->setPrefix("clang-extdef-mappping");
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
 
-  IntrusiveRefCntPtr<DiagnosticsEngine> DiagEngine(
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> DiagEngine(
       new DiagnosticsEngine(DiagID, &*DiagOpts, DiagClient));
   Diags.swap(DiagEngine);
 
@@ -147,12 +147,12 @@ IntrusiveRefCntPtr<DiagnosticsEngine> GetDiagnosticsEngine() {
 
 static CompilerInstance *CI = nullptr;
 
-static bool HandleAST(StringRef AstPath) {
+static bool HandleAST(llvm::StringRef AstPath) {
 
   if (!CI)
     CI = new CompilerInstance();
 
-  IntrusiveRefCntPtr<DiagnosticsEngine> DiagEngine = GetDiagnosticsEngine();
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> DiagEngine = GetDiagnosticsEngine();
 
   std::unique_ptr<ASTUnit> Unit = ASTUnit::LoadFromASTFile(
       AstPath.str(), CI->getPCHContainerOperations()->getRawReader(),
@@ -163,7 +163,7 @@ static bool HandleAST(StringRef AstPath) {
     return false;
 
   FileManager FM(CI->getFileSystemOpts());
-  SmallString<128> AbsPath(AstPath);
+  llvm::SmallString<128> AbsPath(AstPath);
   FM.makeAbsolutePath(AbsPath);
 
   MapExtDefNamesConsumer Consumer =
@@ -173,14 +173,14 @@ static bool HandleAST(StringRef AstPath) {
   return true;
 }
 
-static int HandleFiles(ArrayRef<std::string> SourceFiles,
+static int HandleFiles(llvm::ArrayRef<std::string> SourceFiles,
                        CompilationDatabase &compilations) {
   std::vector<std::string> SourcesToBeParsed;
 
   // Loop over all input files, if they are pre-compiled AST
   // process them directly in HandleAST, otherwise put them
   // on a list for ClangTool to handle.
-  for (StringRef Src : SourceFiles) {
+  for (llvm::StringRef Src : SourceFiles) {
     if (Src.ends_with(".ast")) {
       if (!HandleAST(Src)) {
         return 1;

@@ -34,7 +34,7 @@ namespace llvm {
 
 namespace clang {
 namespace ento {
-  typedef IntrusiveRefCntPtr<const ProgramState> ProgramStateRef;
+  typedef llvm::IntrusiveRefCntPtr<const ProgramState> ProgramStateRef;
 }
 }
 

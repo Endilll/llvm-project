@@ -70,7 +70,7 @@ static clang::CharSourceRange getReplaceRange(const ExplicitCastExpr *Expr) {
   llvm_unreachable("Unsupported CastExpr");
 }
 
-static StringRef getDestTypeString(const SourceManager &SM,
+static llvm::StringRef getDestTypeString(const SourceManager &SM,
                                    const LangOptions &LangOpts,
                                    const ExplicitCastExpr *Expr) {
   SourceLocation BeginLoc;
@@ -163,7 +163,7 @@ void AvoidCStyleCastsCheck::check(const MatchFinder::MatchResult &Result) {
 
   // Leave type spelling exactly as it was (unlike
   // getTypeAsWritten().getAsString() which would spell enum types 'enum X').
-  StringRef DestTypeString = getDestTypeString(SM, getLangOpts(), CastExpr);
+  llvm::StringRef DestTypeString = getDestTypeString(SM, getLangOpts(), CastExpr);
 
   auto Diag =
       diag(CastExpr->getBeginLoc(), "C-style casts are discouraged; use %0");
@@ -179,7 +179,7 @@ void AvoidCStyleCastsCheck::check(const MatchFinder::MatchResult &Result) {
     }
     Diag << FixItHint::CreateReplacement(ReplaceRange, CastText);
   };
-  auto ReplaceWithNamedCast = [&](StringRef CastType) {
+  auto ReplaceWithNamedCast = [&](llvm::StringRef CastType) {
     Diag << CastType;
     ReplaceWithCast((CastType + "<" + DestTypeString + ">").str());
   };

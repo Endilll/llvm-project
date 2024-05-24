@@ -31,16 +31,16 @@ namespace clang::tidy::bugprone {
 ///     can increase the number of false positive warnings.
 class AssertSideEffectCheck : public ClangTidyCheck {
 public:
-  AssertSideEffectCheck(StringRef Name, ClangTidyContext *Context);
+  AssertSideEffectCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
   const bool CheckFunctionCalls;
-  const StringRef RawAssertList;
-  SmallVector<StringRef, 5> AssertMacros;
-  const std::vector<StringRef> IgnoredFunctions;
+  const llvm::StringRef RawAssertList;
+  llvm::SmallVector<llvm::StringRef, 5> AssertMacros;
+  const std::vector<llvm::StringRef> IgnoredFunctions;
 };
 
 } // namespace clang::tidy::bugprone

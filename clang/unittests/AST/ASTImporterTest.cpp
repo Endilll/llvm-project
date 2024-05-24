@@ -248,7 +248,7 @@ TEST_P(ImportPath, CycleAfterCycle) {
 
 const internal::VariadicDynCastAllOfMatcher<Stmt, SourceLocExpr> sourceLocExpr;
 
-AST_MATCHER_P(SourceLocExpr, hasBuiltinStr, StringRef, Str) {
+AST_MATCHER_P(SourceLocExpr, hasBuiltinStr, llvm::StringRef, Str) {
   return Node.getBuiltinStr() == Str;
 }
 
@@ -1161,8 +1161,8 @@ TEST_P(ASTImporterOptionSpecificTestBase, ImportUsingPackDecl) {
   auto To = cast<UsingPackDecl>(Import(From, Lang_CXX20));
   ASSERT_TRUE(To);
 
-  ArrayRef<NamedDecl *> FromExpansions = From->expansions();
-  ArrayRef<NamedDecl *> ToExpansions = To->expansions();
+  llvm::ArrayRef<NamedDecl *> FromExpansions = From->expansions();
+  llvm::ArrayRef<NamedDecl *> ToExpansions = To->expansions();
   ASSERT_EQ(FromExpansions.size(), ToExpansions.size());
   for (unsigned int I = 0; I < FromExpansions.size(); ++I) {
     auto ImportedExpansion = Import(FromExpansions[I], Lang_CXX20);
@@ -1624,7 +1624,7 @@ TEST_P(ASTImporterOptionSpecificTestBase,
       MatchVerifier<Decl>{}.match(To->getTranslationUnitDecl(), Pattern));
 }
 
-AST_MATCHER_P(RecordDecl, hasFieldOrder, std::vector<StringRef>, Order) {
+AST_MATCHER_P(RecordDecl, hasFieldOrder, std::vector<llvm::StringRef>, Order) {
   size_t Index = 0;
   for (Decl *D : Node.decls()) {
     if (isa<FieldDecl>(D) || isa<IndirectFieldDecl>(D)) {
@@ -4060,8 +4060,8 @@ TEST_P(ImportVariables, ImportDecompositionDeclArray) {
   auto *ToDecomp = Import(FromDecomp, Lang_CXX17);
   EXPECT_TRUE(ToDecomp);
 
-  ArrayRef<BindingDecl *> FromB = FromDecomp->bindings();
-  ArrayRef<BindingDecl *> ToB = ToDecomp->bindings();
+  llvm::ArrayRef<BindingDecl *> FromB = FromDecomp->bindings();
+  llvm::ArrayRef<BindingDecl *> ToB = ToDecomp->bindings();
   EXPECT_EQ(FromB.size(), ToB.size());
   for (unsigned int I = 0; I < FromB.size(); ++I) {
     auto *ToBI = Import(FromB[I], Lang_CXX17);
@@ -5513,7 +5513,7 @@ TEST_P(ASTImporterOptionSpecificTestBase, ImportSubstTemplateTypeParmPackType) {
 
     ASSERT_TRUE(FromSubstPack);
     ASSERT_EQ(FromSubstPack->getIdentifier()->getName(), "T");
-    ArrayRef<TemplateArgument> FromArgPack =
+    llvm::ArrayRef<TemplateArgument> FromArgPack =
         FromSubstPack->getArgumentPack().pack_elements();
     ASSERT_EQ(FromArgPack.size(), 3u);
     ASSERT_EQ(FromArgPack[0].getAsType(), FromCtx.FloatTy);
@@ -5531,7 +5531,7 @@ TEST_P(ASTImporterOptionSpecificTestBase, ImportSubstTemplateTypeParmPackType) {
     // Check if it meets the requirements.
     ASSERT_TRUE(ToSubstPack);
     ASSERT_EQ(ToSubstPack->getIdentifier()->getName(), "T");
-    ArrayRef<TemplateArgument> ToArgPack =
+    llvm::ArrayRef<TemplateArgument> ToArgPack =
         ToSubstPack->getArgumentPack().pack_elements();
     ASSERT_EQ(ToArgPack.size(), 3u);
     ASSERT_EQ(ToArgPack[0].getAsType(), ToCtx.FloatTy);
@@ -5580,7 +5580,7 @@ TEST_P(ASTImporterLookupTableTest,
   DeclarationName FooName = Foo->getDeclName();
 
   // Cannot find in the LookupTable of its DC (TUDecl)
-  SmallVector<NamedDecl *, 2> FoundDecls;
+  llvm::SmallVector<NamedDecl *, 2> FoundDecls;
   FooDC->getRedeclContext()->localUncachedLookup(FooName, FoundDecls);
   EXPECT_EQ(FoundDecls.size(), 0u);
 
@@ -5616,7 +5616,7 @@ TEST_P(ASTImporterLookupTableTest,
   DeclarationName FooName = Foo->getDeclName();
 
   // Cannot find in the LookupTable of its DC (TUDecl).
-  SmallVector<NamedDecl *, 2> FoundDecls;
+  llvm::SmallVector<NamedDecl *, 2> FoundDecls;
   FooDC->getRedeclContext()->localUncachedLookup(FooName, FoundDecls);
   EXPECT_EQ(FoundDecls.size(), 0u);
 
@@ -5959,7 +5959,7 @@ TEST_P(ASTImporterLookupTableTest,
   DeclarationName Name = FieldInSpec->getDeclName();
   auto TemplateDC = cast<DeclContext>(Template->getTemplatedDecl());
 
-  SmallVector<NamedDecl *, 2> FoundDecls;
+  llvm::SmallVector<NamedDecl *, 2> FoundDecls;
   TemplateDC->getRedeclContext()->localUncachedLookup(Name, FoundDecls);
   EXPECT_EQ(FoundDecls.size(), 1u);
   EXPECT_EQ(FoundDecls[0], FieldInTemplate);
@@ -6043,7 +6043,7 @@ TEST_P(ASTImporterLookupTableTest, EnumConstantDecl) {
   // Redecl context is the TU.
   ASSERT_EQ(E->getRedeclContext(), ToTU);
 
-  SmallVector<NamedDecl *, 2> FoundDecls;
+  llvm::SmallVector<NamedDecl *, 2> FoundDecls;
   // Normal lookup finds in the DC.
   E->localUncachedLookup(Name, FoundDecls);
   EXPECT_EQ(FoundDecls.size(), 1u);
@@ -6891,7 +6891,7 @@ TEST_P(SVEBuiltins, ImportTypes) {
 TEST_P(ASTImporterOptionSpecificTestBase, ImportOfDefaultImplicitFunctions) {
   // Test that import of implicit functions works and the functions
   // are merged into one chain.
-  auto GetDeclToImport = [this](StringRef File) {
+  auto GetDeclToImport = [this](llvm::StringRef File) {
     Decl *FromTU = getTuDecl(
         R"(
         struct X { };
@@ -8034,7 +8034,7 @@ TEST_P(ImportWithExternalSource, CompleteRecordBeforeImporting) {
 
   // Create and add the test ExternalASTSource.
   std::vector<clang::TagDecl *> CompletedTags;
-  IntrusiveRefCntPtr<ExternalASTSource> source =
+  llvm::IntrusiveRefCntPtr<ExternalASTSource> source =
       new SourceWithCompletedTagList(CompletedTags);
   clang::ASTContext &Context = FromTU->getASTContext();
   Context.setExternalSource(std::move(source));

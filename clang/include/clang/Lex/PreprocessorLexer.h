@@ -73,7 +73,7 @@ protected:
 
   /// Information about the set of \#if/\#ifdef/\#ifndef blocks
   /// we are currently in.
-  SmallVector<PPConditionalInfo, 4> ConditionalStack;
+  llvm::SmallVector<PPConditionalInfo, 4> ConditionalStack;
 
   PreprocessorLexer() : FID() {}
   PreprocessorLexer(Preprocessor *pp, FileID fid);
@@ -162,7 +162,7 @@ public:
   /// Iterator that traverses the current stack of preprocessor
   /// conditional directives (\#if/\#ifdef/\#ifndef).
   using conditional_iterator =
-      SmallVectorImpl<PPConditionalInfo>::const_iterator;
+      llvm::SmallVectorImpl<PPConditionalInfo>::const_iterator;
 
   conditional_iterator conditional_begin() const {
     return ConditionalStack.begin();
@@ -172,7 +172,7 @@ public:
     return ConditionalStack.end();
   }
 
-  void setConditionalLevels(ArrayRef<PPConditionalInfo> CL) {
+  void setConditionalLevels(llvm::ArrayRef<PPConditionalInfo> CL) {
     ConditionalStack.clear();
     ConditionalStack.append(CL.begin(), CL.end());
   }

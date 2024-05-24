@@ -81,11 +81,11 @@ static bool isCalleeArrow(const Expr *E) {
   return ME ? ME->isArrow() : false;
 }
 
-static StringRef ClassifyDiagnostic(const CapabilityAttr *A) {
+static llvm::StringRef ClassifyDiagnostic(const CapabilityAttr *A) {
   return A->getName();
 }
 
-static StringRef ClassifyDiagnostic(QualType VDT) {
+static llvm::StringRef ClassifyDiagnostic(QualType VDT) {
   // We need to look at the declaration of the type of the value to determine
   // which it is. The type should either be a record or a typedef, or a pointer
   // or reference thereof.
@@ -180,7 +180,7 @@ CapabilityExpr SExprBuilder::translateAttrExpr(const Expr *AttrExp,
     if (SLit->getString() == "*")
       // The "*" expr is a universal lock, which essentially turns off
       // checks until it is removed from the lockset.
-      return CapabilityExpr(new (Arena) til::Wildcard(), StringRef("wildcard"),
+      return CapabilityExpr(new (Arena) til::Wildcard(), llvm::StringRef("wildcard"),
                             false);
     else
       // Ignore other string literals for now.
@@ -208,7 +208,7 @@ CapabilityExpr SExprBuilder::translateAttrExpr(const Expr *AttrExp,
   if (!E || isa<til::Literal>(E))
     return CapabilityExpr();
 
-  StringRef Kind = ClassifyDiagnostic(AttrExp->getType());
+  llvm::StringRef Kind = ClassifyDiagnostic(AttrExp->getType());
 
   // Hack to deal with smart pointers -- strip off top-level pointer casts.
   if (const auto *CE = dyn_cast<til::Cast>(E)) {
@@ -222,7 +222,7 @@ til::LiteralPtr *SExprBuilder::createVariable(const VarDecl *VD) {
   return new (Arena) til::LiteralPtr(VD);
 }
 
-std::pair<til::LiteralPtr *, StringRef>
+std::pair<til::LiteralPtr *, llvm::StringRef>
 SExprBuilder::createThisPlaceholder(const Expr *Exp) {
   return {new (Arena) til::LiteralPtr(nullptr),
           ClassifyDiagnostic(Exp->getType())};

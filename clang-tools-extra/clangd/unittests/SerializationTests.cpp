@@ -154,7 +154,7 @@ TEST(SerializationTest, YAMLConversions) {
   EXPECT_EQ(Sym1.Signature, "");
   EXPECT_EQ(Sym1.Documentation, "Foo doc");
   EXPECT_EQ(Sym1.ReturnType, "int");
-  EXPECT_EQ(StringRef(Sym1.CanonicalDeclaration.FileURI), "file:///path/foo.h");
+  EXPECT_EQ(llvm::StringRef(Sym1.CanonicalDeclaration.FileURI), "file:///path/foo.h");
   EXPECT_EQ(Sym1.Origin, SymbolOrigin::Static);
   EXPECT_EQ(static_cast<uint8_t>(Sym1.Flags), 129);
   EXPECT_TRUE(Sym1.Flags & Symbol::IndexedForCodeCompletion);
@@ -183,7 +183,7 @@ TEST(SerializationTest, YAMLConversions) {
                                 ::testing::SizeIs(1))));
   auto Ref1 = ParsedYAML->Refs->begin()->second.front();
   EXPECT_EQ(Ref1.Kind, RefKind::Reference);
-  EXPECT_EQ(StringRef(Ref1.Location.FileURI), "file:///path/foo.cc");
+  EXPECT_EQ(llvm::StringRef(Ref1.Location.FileURI), "file:///path/foo.cc");
 
   SymbolID Base = cantFail(SymbolID::fromStr("6481EE7AF2841756"));
   SymbolID Derived = cantFail(SymbolID::fromStr("6512AEC512EA3A2D"));
@@ -383,7 +383,7 @@ TEST(SerializationTest, NoCrashOnBadArraySize) {
   // The offset isn't trivial to find, so we use the file digest.
   std::string FileDigest = llvm::fromHex("EED8F5EAF25C453C");
   unsigned Pos = Srcs->Data.find_first_of(FileDigest);
-  ASSERT_NE(Pos, StringRef::npos) << "Couldn't locate file digest";
+  ASSERT_NE(Pos, llvm::StringRef::npos) << "Couldn't locate file digest";
   Pos += FileDigest.size();
 
   // Varints are little-endian base-128 numbers, where the top-bit of each byte

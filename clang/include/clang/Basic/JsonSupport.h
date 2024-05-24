@@ -18,14 +18,14 @@
 
 namespace clang {
 
-inline raw_ostream &Indent(raw_ostream &Out, const unsigned int Space,
+inline llvm::raw_ostream &Indent(llvm::raw_ostream &Out, const unsigned int Space,
                            bool IsDot) {
   for (unsigned int I = 0; I < Space * 2; ++I)
     Out << (IsDot ? "&nbsp;" : " ");
   return Out;
 }
 
-inline std::string JsonFormat(StringRef RawSR, bool AddQuotes) {
+inline std::string JsonFormat(llvm::StringRef RawSR, bool AddQuotes) {
   if (RawSR.empty())
     return "null";
 
@@ -79,7 +79,7 @@ inline std::string JsonFormat(StringRef RawSR, bool AddQuotes) {
   return '\"' + Str + '\"';
 }
 
-inline void printSourceLocationAsJson(raw_ostream &Out, SourceLocation Loc,
+inline void printSourceLocationAsJson(llvm::raw_ostream &Out, SourceLocation Loc,
                                       const SourceManager &SM,
                                       bool AddBraces = true) {
   // Mostly copy-pasted from SourceLocation::print.

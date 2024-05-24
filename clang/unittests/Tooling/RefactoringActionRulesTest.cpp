@@ -34,7 +34,7 @@ protected:
   std::string DefaultCode = std::string(100, 'a');
 };
 
-Expected<AtomicChanges>
+llvm::Expected<AtomicChanges>
 createReplacements(const std::unique_ptr<RefactoringActionRule> &Rule,
                    RefactoringRuleContext &Context) {
   class Consumer final : public RefactoringResultConsumer {
@@ -48,7 +48,7 @@ createReplacements(const std::unique_ptr<RefactoringActionRule> &Rule,
     }
 
   public:
-    std::optional<Expected<AtomicChanges>> Result;
+    std::optional<llvm::Expected<AtomicChanges>> Result;
   };
 
   Consumer C;
@@ -64,13 +64,13 @@ TEST_F(RefactoringActionRulesTest, MyFirstRefactoringRule) {
     ReplaceAWithB(std::pair<SourceRange, int> Selection)
         : Selection(Selection) {}
 
-    static Expected<ReplaceAWithB>
+    static llvm::Expected<ReplaceAWithB>
     initiate(RefactoringRuleContext &Cotnext,
              std::pair<SourceRange, int> Selection) {
       return ReplaceAWithB(Selection);
     }
 
-    Expected<AtomicChanges>
+    llvm::Expected<AtomicChanges>
     createSourceReplacements(RefactoringRuleContext &Context) {
       const SourceManager &SM = Context.getSources();
       SourceLocation Loc =
@@ -85,9 +85,9 @@ TEST_F(RefactoringActionRulesTest, MyFirstRefactoringRule) {
 
   class SelectionRequirement : public SourceRangeSelectionRequirement {
   public:
-    Expected<std::pair<SourceRange, int>>
+    llvm::Expected<std::pair<SourceRange, int>>
     evaluate(RefactoringRuleContext &Context) const {
-      Expected<SourceRange> R =
+      llvm::Expected<SourceRange> R =
           SourceRangeSelectionRequirement::evaluate(Context);
       if (!R)
         return R.takeError();
@@ -105,7 +105,7 @@ TEST_F(RefactoringActionRulesTest, MyFirstRefactoringRule) {
             .getLocWithOffset(10);
     RefContext.setSelectionRange({Cursor, Cursor});
 
-    Expected<AtomicChanges> ErrorOrResult =
+    llvm::Expected<AtomicChanges> ErrorOrResult =
         createReplacements(Rule, RefContext);
     ASSERT_FALSE(!ErrorOrResult);
     AtomicChanges Result = std::move(*ErrorOrResult);
@@ -132,7 +132,7 @@ TEST_F(RefactoringActionRulesTest, MyFirstRefactoringRule) {
   // valid error.
   {
     RefactoringRuleContext RefContext(Context.Sources);
-    Expected<AtomicChanges> ErrorOrResult =
+    llvm::Expected<AtomicChanges> ErrorOrResult =
         createReplacements(Rule, RefContext);
 
     ASSERT_TRUE(!ErrorOrResult);
@@ -148,13 +148,13 @@ TEST_F(RefactoringActionRulesTest, MyFirstRefactoringRule) {
 TEST_F(RefactoringActionRulesTest, ReturnError) {
   class ErrorRule : public SourceChangeRefactoringRule {
   public:
-    static Expected<ErrorRule> initiate(RefactoringRuleContext &,
+    static llvm::Expected<ErrorRule> initiate(RefactoringRuleContext &,
                                         SourceRange R) {
       return ErrorRule(R);
     }
 
     ErrorRule(SourceRange R) {}
-    Expected<AtomicChanges> createSourceReplacements(RefactoringRuleContext &) {
+    llvm::Expected<AtomicChanges> createSourceReplacements(RefactoringRuleContext &) {
       return llvm::make_error<llvm::StringError>(
           "Error", llvm::make_error_code(llvm::errc::invalid_argument));
     }
@@ -166,7 +166,7 @@ TEST_F(RefactoringActionRulesTest, ReturnError) {
   SourceLocation Cursor =
       Context.Sources.getLocForStartOfFile(Context.Sources.getMainFileID());
   RefContext.setSelectionRange({Cursor, Cursor});
-  Expected<AtomicChanges> Result = createReplacements(Rule, RefContext);
+  llvm::Expected<AtomicChanges> Result = createReplacements(Rule, RefContext);
 
   ASSERT_TRUE(!Result);
   std::string Message;
@@ -203,12 +203,12 @@ TEST_F(RefactoringActionRulesTest, ReturnSymbolOccurrences) {
   public:
     FindOccurrences(SourceRange Selection) : Selection(Selection) {}
 
-    static Expected<FindOccurrences> initiate(RefactoringRuleContext &,
+    static llvm::Expected<FindOccurrences> initiate(RefactoringRuleContext &,
                                               SourceRange Selection) {
       return FindOccurrences(Selection);
     }
 
-    Expected<SymbolOccurrences>
+    llvm::Expected<SymbolOccurrences>
     findSymbolOccurrences(RefactoringRuleContext &) override {
       SymbolOccurrences Occurrences;
       Occurrences.push_back(SymbolOccurrence(SymbolName("test"),

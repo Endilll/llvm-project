@@ -46,18 +46,18 @@ void LangOptions::resetNonModularOptions() {
   IsHeaderFile = false;
 }
 
-bool LangOptions::isNoBuiltinFunc(StringRef FuncName) const {
+bool LangOptions::isNoBuiltinFunc(llvm::StringRef FuncName) const {
   for (unsigned i = 0, e = NoBuiltinFuncs.size(); i != e; ++i)
     if (FuncName == NoBuiltinFuncs[i])
       return true;
   return false;
 }
 
-VersionTuple LangOptions::getOpenCLVersionTuple() const {
+llvm::VersionTuple LangOptions::getOpenCLVersionTuple() const {
   const int Ver = OpenCLCPlusPlus ? OpenCLCPlusPlusVersion : OpenCLVersion;
   if (OpenCLCPlusPlus && Ver != 100)
-    return VersionTuple(Ver / 100);
-  return VersionTuple(Ver / 100, (Ver % 100) / 10);
+    return llvm::VersionTuple(Ver / 100);
+  return llvm::VersionTuple(Ver / 100, (Ver % 100) / 10);
 }
 
 unsigned LangOptions::getOpenCLCompatibleVersion() const {
@@ -70,7 +70,7 @@ unsigned LangOptions::getOpenCLCompatibleVersion() const {
   llvm_unreachable("Unknown OpenCL version");
 }
 
-void LangOptions::remapPathPrefix(SmallVectorImpl<char> &Path) const {
+void LangOptions::remapPathPrefix(llvm::SmallVectorImpl<char> &Path) const {
   for (const auto &Entry : MacroPrefixMap)
     if (llvm::sys::path::replace_path_prefix(Path, Entry.first, Entry.second))
       break;

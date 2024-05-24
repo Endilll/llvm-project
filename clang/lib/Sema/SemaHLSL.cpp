@@ -179,7 +179,7 @@ void SemaHLSL::ActOnTopLevelFunction(FunctionDecl *FD) {
   if (FD->getName() != TargetInfo.getTargetOpts().HLSLEntry)
     return;
 
-  StringRef Env = TargetInfo.getTriple().getEnvironmentName();
+  llvm::StringRef Env = TargetInfo.getTriple().getEnvironmentName();
   HLSLShaderAttr::ShaderType ShaderType;
   if (HLSLShaderAttr::ConvertStrToShaderType(Env, ShaderType)) {
     if (const auto *Shader = FD->getAttr<HLSLShaderAttr>()) {
@@ -280,10 +280,10 @@ void SemaHLSL::CheckSemanticAnnotation(
 void SemaHLSL::DiagnoseAttrStageMismatch(
     const Attr *A, HLSLShaderAttr::ShaderType Stage,
     std::initializer_list<HLSLShaderAttr::ShaderType> AllowedStages) {
-  SmallVector<StringRef, 8> StageStrings;
+  llvm::SmallVector<llvm::StringRef, 8> StageStrings;
   llvm::transform(AllowedStages, std::back_inserter(StageStrings),
                   [](HLSLShaderAttr::ShaderType ST) {
-                    return StringRef(
+                    return llvm::StringRef(
                         HLSLShaderAttr::ConvertShaderTypeToStr(ST));
                   });
   Diag(A->getLoc(), diag::err_hlsl_attr_unsupported_in_stage)

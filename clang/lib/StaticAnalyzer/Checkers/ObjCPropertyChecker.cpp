@@ -50,7 +50,7 @@ void ObjCPropertyChecker::checkCopyMutable(const ObjCPropertyDecl *D,
   const std::string &PropTypeName(T->getPointeeType().getCanonicalType()
                                                      .getUnqualifiedType()
                                                      .getAsString());
-  if (!StringRef(PropTypeName).starts_with("NSMutable"))
+  if (!llvm::StringRef(PropTypeName).starts_with("NSMutable"))
     return;
 
   const ObjCImplDecl *ImplD = nullptr;
@@ -64,7 +64,7 @@ void ObjCPropertyChecker::checkCopyMutable(const ObjCPropertyDecl *D,
   if (!ImplD || ImplD->HasUserDeclaredSetterMethod(D))
     return;
 
-  SmallString<128> Str;
+  llvm::SmallString<128> Str;
   llvm::raw_svector_ostream OS(Str);
   OS << "Property of mutable type '" << PropTypeName
      << "' has 'copy' attribute; an immutable object will be stored instead";

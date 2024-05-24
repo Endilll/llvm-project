@@ -46,13 +46,13 @@ FileByteRange::FileByteRange(
 }
 
 Diagnostic::Diagnostic(llvm::StringRef DiagnosticName,
-                       Diagnostic::Level DiagLevel, StringRef BuildDirectory)
+                       Diagnostic::Level DiagLevel, llvm::StringRef BuildDirectory)
     : DiagnosticName(DiagnosticName), DiagLevel(DiagLevel),
       BuildDirectory(BuildDirectory) {}
 
 Diagnostic::Diagnostic(llvm::StringRef DiagnosticName,
                        const DiagnosticMessage &Message,
-                       const SmallVector<DiagnosticMessage, 1> &Notes,
+                       const llvm::SmallVector<DiagnosticMessage, 1> &Notes,
                        Level DiagLevel, llvm::StringRef BuildDirectory)
     : DiagnosticName(DiagnosticName), Message(Message), Notes(Notes),
       DiagLevel(DiagLevel), BuildDirectory(BuildDirectory) {}

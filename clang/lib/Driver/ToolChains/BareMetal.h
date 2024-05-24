@@ -46,7 +46,7 @@ public:
   bool isPICDefaultForced() const override { return false; }
   bool SupportsProfiling() const override { return false; }
 
-  StringRef getOSLibName() const override { return "baremetal"; }
+  llvm::StringRef getOSLibName() const override { return "baremetal"; }
 
   RuntimeLibType GetDefaultRuntimeLibType() const override {
     return ToolChain::RLT_CompilerRT;

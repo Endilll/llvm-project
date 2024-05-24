@@ -22,7 +22,7 @@ namespace clang::tidy::misc {
 /// safer and more efficient.
 class StaticAssertCheck : public ClangTidyCheck {
 public:
-  StaticAssertCheck(StringRef Name, ClangTidyContext *Context);
+  StaticAssertCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11 || LangOpts.C11;
   }

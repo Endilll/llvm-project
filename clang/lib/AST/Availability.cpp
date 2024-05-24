@@ -20,7 +20,7 @@ namespace clang {
 
 AvailabilityInfo AvailabilityInfo::createFromDecl(const Decl *Decl) {
   ASTContext &Context = Decl->getASTContext();
-  StringRef PlatformName = Context.getTargetInfo().getPlatformName();
+  llvm::StringRef PlatformName = Context.getTargetInfo().getPlatformName();
   AvailabilityInfo Availability;
 
   // Collect availability attributes from all redeclarations.

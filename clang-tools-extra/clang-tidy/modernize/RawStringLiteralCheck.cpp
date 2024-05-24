@@ -17,12 +17,12 @@ namespace clang::tidy::modernize {
 
 namespace {
 
-bool containsEscapes(StringRef HayStack, StringRef Escapes) {
+bool containsEscapes(llvm::StringRef HayStack, llvm::StringRef Escapes) {
   size_t BackSlash = HayStack.find('\\');
-  if (BackSlash == StringRef::npos)
+  if (BackSlash == llvm::StringRef::npos)
     return false;
 
-  while (BackSlash != StringRef::npos) {
+  while (BackSlash != llvm::StringRef::npos) {
     if (!Escapes.contains(HayStack[BackSlash + 1]))
       return false;
     BackSlash = HayStack.find('\\', BackSlash + 2);
@@ -31,10 +31,10 @@ bool containsEscapes(StringRef HayStack, StringRef Escapes) {
   return true;
 }
 
-bool isRawStringLiteral(StringRef Text) {
+bool isRawStringLiteral(llvm::StringRef Text) {
   // Already a raw string literal if R comes before ".
   const size_t QuotePos = Text.find('"');
-  assert(QuotePos != StringRef::npos);
+  assert(QuotePos != llvm::StringRef::npos);
   return (QuotePos > 0) && (Text[QuotePos - 1] == 'R');
 }
 
@@ -52,7 +52,7 @@ bool containsEscapedCharacters(const MatchFinder::MatchResult &Result,
   CharSourceRange CharRange = Lexer::makeFileCharRange(
       CharSourceRange::getTokenRange(Literal->getSourceRange()),
       *Result.SourceManager, Result.Context->getLangOpts());
-  StringRef Text = Lexer::getSourceText(CharRange, *Result.SourceManager,
+  llvm::StringRef Text = Lexer::getSourceText(CharRange, *Result.SourceManager,
                                         Result.Context->getLangOpts());
   if (Text.empty() || isRawStringLiteral(Text))
     return false;
@@ -60,15 +60,15 @@ bool containsEscapedCharacters(const MatchFinder::MatchResult &Result,
   return containsEscapes(Text, R"('\"?x01)");
 }
 
-bool containsDelimiter(StringRef Bytes, const std::string &Delimiter) {
+bool containsDelimiter(llvm::StringRef Bytes, const std::string &Delimiter) {
   return Bytes.find(Delimiter.empty()
                         ? std::string(R"lit()")lit")
-                        : (")" + Delimiter + R"(")")) != StringRef::npos;
+                        : (")" + Delimiter + R"(")")) != llvm::StringRef::npos;
 }
 
 std::string asRawStringLiteral(const StringLiteral *Literal,
                                const std::string &DelimiterStem) {
-  const StringRef Bytes = Literal->getBytes();
+  const llvm::StringRef Bytes = Literal->getBytes();
   std::string Delimiter;
   for (int I = 0; containsDelimiter(Bytes, Delimiter); ++I) {
     Delimiter = (I == 0) ? DelimiterStem : DelimiterStem + std::to_string(I);
@@ -82,7 +82,7 @@ std::string asRawStringLiteral(const StringLiteral *Literal,
 
 } // namespace
 
-RawStringLiteralCheck::RawStringLiteralCheck(StringRef Name,
+RawStringLiteralCheck::RawStringLiteralCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       DelimiterStem(Options.get("DelimiterStem", "lit")),
@@ -96,7 +96,7 @@ RawStringLiteralCheck::RawStringLiteralCheck(StringRef Name,
   // \014 = \f form feed
   // \015 = \r carriage return
   // \177 = delete
-  for (const unsigned char C : StringRef("\000\001\002\003\004\005\006\a"
+  for (const unsigned char C : llvm::StringRef("\000\001\002\003\004\005\006\a"
                                          "\b\t\n\v\f\r\016\017"
                                          "\020\021\022\023\024\025\026\027"
                                          "\030\031\032\033\034\035\036\037"
@@ -136,7 +136,7 @@ void RawStringLiteralCheck::check(const MatchFinder::MatchResult &Result) {
 
 void RawStringLiteralCheck::replaceWithRawStringLiteral(
     const MatchFinder::MatchResult &Result, const StringLiteral *Literal,
-    StringRef Replacement) {
+    llvm::StringRef Replacement) {
   CharSourceRange CharRange = Lexer::makeFileCharRange(
       CharSourceRange::getTokenRange(Literal->getSourceRange()),
       *Result.SourceManager, getLangOpts());

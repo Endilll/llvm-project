@@ -15,6 +15,7 @@
 
 #include "clang/AST/ASTConsumer.h"
 #include "clang/Basic/LLVM.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 
 namespace llvm {
   class Constant;
@@ -103,7 +104,7 @@ public:
 /// the allocated CodeGenerator instance.
 CodeGenerator *CreateLLVMCodeGen(DiagnosticsEngine &Diags,
                                  llvm::StringRef ModuleName,
-                                 IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS,
+                                 llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS,
                                  const HeaderSearchOptions &HeaderSearchOpts,
                                  const PreprocessorOptions &PreprocessorOpts,
                                  const CodeGenOptions &CGO,

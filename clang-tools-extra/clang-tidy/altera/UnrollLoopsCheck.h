@@ -24,7 +24,7 @@ namespace clang::tidy::altera {
 /// http://clang.llvm.org/extra/clang-tidy/checks/altera/unroll-loops.html
 class UnrollLoopsCheck : public ClangTidyCheck {
 public:
-  UnrollLoopsCheck(StringRef Name, ClangTidyContext *Context);
+  UnrollLoopsCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 

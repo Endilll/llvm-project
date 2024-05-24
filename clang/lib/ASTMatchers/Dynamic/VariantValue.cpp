@@ -23,7 +23,7 @@ namespace dynamic {
 std::string ArgKind::asString() const {
   switch (getArgKind()) {
   case AK_Matcher:
-    return (Twine("Matcher<") + NodeKind.asStringRef() + ">").str();
+    return (llvm::Twine("Matcher<") + NodeKind.asStringRef() + ">").str();
   case AK_Node:
     return NodeKind.asStringRef().str();
   case AK_Boolean:
@@ -70,7 +70,7 @@ DynTypedMatcher VariantMatcher::MatcherOps::convertMatcher(
 std::optional<DynTypedMatcher>
 VariantMatcher::MatcherOps::constructVariadicOperator(
     DynTypedMatcher::VariadicOperator Op,
-    ArrayRef<VariantMatcher> InnerMatchers) const {
+    llvm::ArrayRef<VariantMatcher> InnerMatchers) const {
   std::vector<DynTypedMatcher> DynMatchers;
   for (const auto &InnerMatcher : InnerMatchers) {
     // Abort if any of the inner matchers can't be converted to
@@ -97,7 +97,7 @@ public:
   }
 
   std::string getTypeAsString() const override {
-    return (Twine("Matcher<") + Matcher.getSupportedKind().asStringRef() + ">")
+    return (llvm::Twine("Matcher<") + Matcher.getSupportedKind().asStringRef() + ">")
         .str();
   }
 
@@ -138,7 +138,7 @@ public:
         Inner += "|";
       Inner += Matchers[i].getSupportedKind().asStringRef();
     }
-    return (Twine("Matcher<") + Inner + ">").str();
+    return (llvm::Twine("Matcher<") + Inner + ">").str();
   }
 
   std::optional<DynTypedMatcher>
@@ -268,7 +268,7 @@ VariantValue::VariantValue(unsigned Unsigned) : Type(VT_Nothing) {
   setUnsigned(Unsigned);
 }
 
-VariantValue::VariantValue(StringRef String) : Type(VT_Nothing) {
+VariantValue::VariantValue(llvm::StringRef String) : Type(VT_Nothing) {
   setString(String);
 }
 
@@ -386,7 +386,7 @@ const std::string &VariantValue::getString() const {
   return *Value.String;
 }
 
-void VariantValue::setString(StringRef NewValue) {
+void VariantValue::setString(llvm::StringRef NewValue) {
   reset();
   Type = VT_String;
   Value.String = new std::string(NewValue);
@@ -459,7 +459,7 @@ bool VariantValue::isConvertibleTo(ArgKind Kind, unsigned *Specificity) const {
   llvm_unreachable("Invalid Type");
 }
 
-bool VariantValue::isConvertibleTo(ArrayRef<ArgKind> Kinds,
+bool VariantValue::isConvertibleTo(llvm::ArrayRef<ArgKind> Kinds,
                                    unsigned *Specificity) const {
   unsigned MaxSpecificity = 0;
   for (const ArgKind& Kind : Kinds) {

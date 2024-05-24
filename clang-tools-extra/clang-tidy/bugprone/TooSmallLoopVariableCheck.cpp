@@ -43,7 +43,7 @@ struct MagnitudeBits {
 
 } // namespace
 
-TooSmallLoopVariableCheck::TooSmallLoopVariableCheck(StringRef Name,
+TooSmallLoopVariableCheck::TooSmallLoopVariableCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       MagnitudeBitsUpperLimit(Options.get("MagnitudeBitsUpperLimit", 16U)) {}

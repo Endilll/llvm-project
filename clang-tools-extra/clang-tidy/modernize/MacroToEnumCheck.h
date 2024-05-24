@@ -21,7 +21,7 @@ class MacroToEnumCallbacks;
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/macro-to-enum.html
 class MacroToEnumCheck : public ClangTidyCheck {
 public:
-  MacroToEnumCheck(StringRef Name, ClangTidyContext *Context)
+  MacroToEnumCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;

@@ -333,8 +333,8 @@ class RegionChanges {
   _checkRegionChanges(void *checker,
                       ProgramStateRef state,
                       const InvalidatedSymbols *invalidated,
-                      ArrayRef<const MemRegion *> Explicits,
-                      ArrayRef<const MemRegion *> Regions,
+                      llvm::ArrayRef<const MemRegion *> Explicits,
+                      llvm::ArrayRef<const MemRegion *> Regions,
                       const LocationContext *LCtx,
                       const CallEvent *Call) {
     return ((const CHECKER *) checker)->checkRegionChanges(state, invalidated,
@@ -489,23 +489,23 @@ class CheckerBase : public ProgramPointTag {
   friend class ::clang::ento::CheckerManager;
 
 public:
-  StringRef getTagDescription() const override;
+  llvm::StringRef getTagDescription() const override;
   CheckerNameRef getCheckerName() const;
 
   /// See CheckerManager::runCheckersForPrintState.
-  virtual void printState(raw_ostream &Out, ProgramStateRef State,
+  virtual void printState(llvm::raw_ostream &Out, ProgramStateRef State,
                           const char *NL, const char *Sep) const { }
 };
 
 /// Dump checker name to stream.
-raw_ostream& operator<<(raw_ostream &Out, const CheckerBase &Checker);
+llvm::raw_ostream& operator<<(llvm::raw_ostream &Out, const CheckerBase &Checker);
 
 /// Tag that can use a checker name as a message provider
 /// (see SimpleProgramPointTag).
 class CheckerProgramPointTag : public SimpleProgramPointTag {
 public:
-  CheckerProgramPointTag(StringRef CheckerName, StringRef Msg);
-  CheckerProgramPointTag(const CheckerBase *Checker, StringRef Msg);
+  CheckerProgramPointTag(llvm::StringRef CheckerName, llvm::StringRef Msg);
+  CheckerProgramPointTag(const CheckerBase *Checker, llvm::StringRef Msg);
 };
 
 template <typename CHECK1, typename... CHECKs>

@@ -158,7 +158,7 @@ cl::opt<std::string>
           cl::init("llvm"), cl::cat(IncludeFixerCategory));
 
 std::unique_ptr<include_fixer::SymbolIndexManager>
-createSymbolIndexManager(StringRef FilePath) {
+createSymbolIndexManager(llvm::StringRef FilePath) {
   using find_all_symbols::SymbolInfo;
 
   auto SymbolIndexMgr = std::make_unique<include_fixer::SymbolIndexManager>();
@@ -168,13 +168,13 @@ createSymbolIndexManager(StringRef FilePath) {
     // <symbol>=<header><, header...>
     // Multiple symbols can be given, separated by semicolons.
     std::map<std::string, std::vector<std::string>> SymbolsMap;
-    SmallVector<StringRef, 4> SemicolonSplits;
-    StringRef(Input).split(SemicolonSplits, ";");
+    llvm::SmallVector<llvm::StringRef, 4> SemicolonSplits;
+    llvm::StringRef(Input).split(SemicolonSplits, ";");
     std::vector<find_all_symbols::SymbolAndSignals> Symbols;
-    for (StringRef Pair : SemicolonSplits) {
+    for (llvm::StringRef Pair : SemicolonSplits) {
       auto Split = Pair.split('=');
       std::vector<std::string> Headers;
-      SmallVector<StringRef, 4> CommaSplits;
+      llvm::SmallVector<llvm::StringRef, 4> CommaSplits;
       Split.second.split(CommaSplits, ",");
       for (size_t I = 0, E = CommaSplits.size(); I != E; ++I)
         Symbols.push_back(
@@ -199,8 +199,8 @@ createSymbolIndexManager(StringRef FilePath) {
         // If we don't have any input file, look in the directory of the
         // first
         // file and its parents.
-        SmallString<128> AbsolutePath(tooling::getAbsolutePath(FilePath));
-        StringRef Directory = llvm::sys::path::parent_path(AbsolutePath);
+        llvm::SmallString<128> AbsolutePath(tooling::getAbsolutePath(FilePath));
+        llvm::StringRef Directory = llvm::sys::path::parent_path(AbsolutePath);
         DB = include_fixer::YamlSymbolIndex::createFromDirectory(
             Directory, "find_all_symbols_db.yaml");
       }
@@ -275,7 +275,7 @@ int includeFixerMain(int argc, const char **argv) {
 
   llvm::StringRef SourceFilePath = options.getSourcePathList().front();
   // In STDINMode, we override the file content with the <stdin> input.
-  // Since `tool.mapVirtualFile` takes `StringRef`, we define `Code` outside of
+  // Since `tool.mapVirtualFile` takes `llvm::StringRef`, we define `Code` outside of
   // the if-block so that `Code` is not released after the if-block.
   std::unique_ptr<llvm::MemoryBuffer> Code;
   if (STDINMode) {
@@ -408,7 +408,7 @@ int includeFixerMain(int argc, const char **argv) {
 
   std::vector<tooling::Replacements> FixerReplacements;
   for (const auto &Context : Contexts) {
-    StringRef FilePath = Context.getFilePath();
+    llvm::StringRef FilePath = Context.getFilePath();
     auto InsertStyle =
         format::getStyle(format::DefaultFormatStyle, FilePath, Style);
     if (!InsertStyle) {
@@ -455,7 +455,7 @@ int includeFixerMain(int argc, const char **argv) {
   }
 
   // Set up a new source manager for applying the resulting replacements.
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(new DiagnosticOptions);
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts(new DiagnosticOptions);
   DiagnosticsEngine Diagnostics(new DiagnosticIDs, &*DiagOpts);
   TextDiagnosticPrinter DiagnosticPrinter(outs(), &*DiagOpts);
   SourceManager SM(Diagnostics, tool.getFiles());

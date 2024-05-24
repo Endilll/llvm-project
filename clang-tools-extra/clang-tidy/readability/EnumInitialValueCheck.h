@@ -20,7 +20,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/enum-initial-value.html
 class EnumInitialValueCheck : public ClangTidyCheck {
 public:
-  EnumInitialValueCheck(StringRef Name, ClangTidyContext *Context);
+  EnumInitialValueCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

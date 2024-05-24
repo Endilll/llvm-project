@@ -90,7 +90,7 @@ AST_MATCHER(InitListExpr, hasMoreThanOneElement) {
 } // namespace
 
 UseDesignatedInitializersCheck::UseDesignatedInitializersCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context), IgnoreSingleElementAggregates(Options.get(
                                          IgnoreSingleElementAggregatesName,
                                          IgnoreSingleElementAggregatesDefault)),

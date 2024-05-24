@@ -184,11 +184,11 @@ struct SanitizerSet {
 
 /// Parse a single value from a -fsanitize= or -fno-sanitize= value list.
 /// Returns a non-zero SanitizerMask, or \c 0 if \p Value is not known.
-SanitizerMask parseSanitizerValue(StringRef Value, bool AllowGroups);
+SanitizerMask parseSanitizerValue(llvm::StringRef Value, bool AllowGroups);
 
 /// Serialize a SanitizerSet into values for -fsanitize= or -fno-sanitize=.
 void serializeSanitizerSet(SanitizerSet Set,
-                           SmallVectorImpl<StringRef> &Values);
+                           llvm::SmallVectorImpl<llvm::StringRef> &Values);
 
 /// For each sanitizer group bit set in \p Kinds, set the bits for sanitizers
 /// this group enables.
@@ -201,15 +201,15 @@ inline SanitizerMask getPPTransparentSanitizers() {
          SanitizerKind::Undefined | SanitizerKind::FloatDivideByZero;
 }
 
-StringRef AsanDtorKindToString(llvm::AsanDtorKind kind);
+llvm::StringRef AsanDtorKindToString(llvm::AsanDtorKind kind);
 
-llvm::AsanDtorKind AsanDtorKindFromString(StringRef kind);
+llvm::AsanDtorKind AsanDtorKindFromString(llvm::StringRef kind);
 
-StringRef AsanDetectStackUseAfterReturnModeToString(
+llvm::StringRef AsanDetectStackUseAfterReturnModeToString(
     llvm::AsanDetectStackUseAfterReturnMode mode);
 
 llvm::AsanDetectStackUseAfterReturnMode
-AsanDetectStackUseAfterReturnModeFromString(StringRef modeStr);
+AsanDetectStackUseAfterReturnModeFromString(llvm::StringRef modeStr);
 
 } // namespace clang
 

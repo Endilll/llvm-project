@@ -188,7 +188,7 @@ std::string printQualifiedName(const NamedDecl &ND) {
   Policy.AnonymousTagLocations = false;
   ND.printQualifiedName(OS, Policy);
   OS.flush();
-  assert(!StringRef(QName).starts_with("::"));
+  assert(!llvm::StringRef(QName).starts_with("::"));
   return QName;
 }
 
@@ -361,8 +361,8 @@ const ObjCImplDecl *getCorrespondingObjCImpl(const ObjCContainerDecl *D) {
 
 Symbol::IncludeDirective
 preferredIncludeDirective(llvm::StringRef FileName, const LangOptions &LangOpts,
-                          ArrayRef<Inclusion> MainFileIncludes,
-                          ArrayRef<const Decl *> TopLevelDecls) {
+                          llvm::ArrayRef<Inclusion> MainFileIncludes,
+                          llvm::ArrayRef<const Decl *> TopLevelDecls) {
   // Always prefer #include for non-ObjC code.
   if (!LangOpts.ObjC)
     return Symbol::IncludeDirective::Include;
@@ -777,7 +777,7 @@ const TemplateTypeParmType *getUnderlyingPackType(const ParmVarDecl *Param) {
 class ForwardingCallVisitor
     : public RecursiveASTVisitor<ForwardingCallVisitor> {
 public:
-  ForwardingCallVisitor(ArrayRef<const ParmVarDecl *> Parameters)
+  ForwardingCallVisitor(llvm::ArrayRef<const ParmVarDecl *> Parameters)
       : Parameters{Parameters},
         PackType{getUnderlyingPackType(Parameters.front())} {}
 
@@ -798,7 +798,7 @@ public:
   }
 
   // The expanded parameter pack to be resolved
-  ArrayRef<const ParmVarDecl *> Parameters;
+  llvm::ArrayRef<const ParmVarDecl *> Parameters;
   // The type of the parameter pack
   const TemplateTypeParmType *PackType;
 
@@ -806,15 +806,15 @@ public:
     // If the parameters were resolved to another FunctionDecl, these are its
     // first non-variadic parameters (i.e. the first entries of the parameter
     // pack that are passed as arguments bound to a non-pack parameter.)
-    ArrayRef<const ParmVarDecl *> Head;
+    llvm::ArrayRef<const ParmVarDecl *> Head;
     // If the parameters were resolved to another FunctionDecl, these are its
     // variadic parameters (i.e. the entries of the parameter pack that are
     // passed as arguments bound to a pack parameter.)
-    ArrayRef<const ParmVarDecl *> Pack;
+    llvm::ArrayRef<const ParmVarDecl *> Pack;
     // If the parameters were resolved to another FunctionDecl, these are its
     // last non-variadic parameters (i.e. the last entries of the parameter pack
     // that are passed as arguments bound to a non-pack parameter.)
-    ArrayRef<const ParmVarDecl *> Tail;
+    llvm::ArrayRef<const ParmVarDecl *> Tail;
     // If the parameters were resolved to another forwarding FunctionDecl, this
     // is it.
     std::optional<FunctionDecl *> PackTarget;
@@ -837,7 +837,7 @@ private:
     auto PackLocation = findPack(Args);
     if (!PackLocation)
       return;
-    ArrayRef<ParmVarDecl *> MatchingParams =
+    llvm::ArrayRef<ParmVarDecl *> MatchingParams =
         Callee->parameters().slice(*PackLocation, Parameters.size());
     // Check whether the function has a parameter pack as the last template
     // parameter
@@ -942,7 +942,7 @@ private:
 
 } // namespace
 
-SmallVector<const ParmVarDecl *>
+llvm::SmallVector<const ParmVarDecl *>
 resolveForwardingParameters(const FunctionDecl *D, unsigned MaxDepth) {
   auto Parameters = D->parameters();
   // If the function has a template parameter pack
@@ -951,12 +951,12 @@ resolveForwardingParameters(const FunctionDecl *D, unsigned MaxDepth) {
     auto IsExpandedPack = [TTPT](const ParmVarDecl *P) {
       return getUnderlyingPackType(P) == TTPT;
     };
-    ArrayRef<const ParmVarDecl *> Head = Parameters.take_until(IsExpandedPack);
-    ArrayRef<const ParmVarDecl *> Pack =
+    llvm::ArrayRef<const ParmVarDecl *> Head = Parameters.take_until(IsExpandedPack);
+    llvm::ArrayRef<const ParmVarDecl *> Pack =
         Parameters.drop_front(Head.size()).take_while(IsExpandedPack);
-    ArrayRef<const ParmVarDecl *> Tail =
+    llvm::ArrayRef<const ParmVarDecl *> Tail =
         Parameters.drop_front(Head.size() + Pack.size());
-    SmallVector<const ParmVarDecl *> Result(Parameters.size());
+    llvm::SmallVector<const ParmVarDecl *> Result(Parameters.size());
     // Fill in non-pack parameters
     auto *HeadIt = std::copy(Head.begin(), Head.end(), Result.begin());
     auto TailIt = std::copy(Tail.rbegin(), Tail.rend(), Result.rbegin());

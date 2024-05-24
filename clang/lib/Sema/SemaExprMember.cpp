@@ -421,7 +421,7 @@ CheckExtVectorComponent(Sema &S, QualType baseType, ExprValueKind &VK,
           S.getLangOpts().getOpenCLCompatibleVersion() < 300) {
         const char *DiagBegin = HasRGBA ? CompName->getNameStart() : compStr;
         S.Diag(OpLoc, diag::ext_opencl_ext_vector_type_rgba_selector)
-            << StringRef(DiagBegin, 1) << SourceRange(CompLoc);
+            << llvm::StringRef(DiagBegin, 1) << SourceRange(CompLoc);
       }
     }
   } else {
@@ -437,7 +437,7 @@ CheckExtVectorComponent(Sema &S, QualType baseType, ExprValueKind &VK,
     // We didn't get to the end of the string. This means the component names
     // didn't come from the same set *or* we encountered an illegal name.
     S.Diag(OpLoc, diag::err_ext_vector_component_name_illegal)
-      << StringRef(compStr, 1) << SourceRange(CompLoc);
+      << llvm::StringRef(compStr, 1) << SourceRange(CompLoc);
     return QualType();
   }
 

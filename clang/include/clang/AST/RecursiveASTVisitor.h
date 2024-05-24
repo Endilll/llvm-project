@@ -157,7 +157,7 @@ public:
   /// recursion over Stmts and Exprs within this class, and should
   /// typically not be explicitly specified by derived classes.
   /// The bool bit indicates whether the statement has been traversed or not.
-  typedef SmallVectorImpl<llvm::PointerIntPair<Stmt *, 1, bool>>
+  typedef llvm::SmallVectorImpl<llvm::PointerIntPair<Stmt *, 1, bool>>
     DataRecursionQueue;
 
   /// Return a reference to the derived class.
@@ -277,7 +277,7 @@ public:
   ///
   /// \returns false if the visitation was terminated early, true otherwise.
   // FIXME: take a TemplateArgumentLoc* (or TemplateArgumentListInfo) instead.
-  bool TraverseTemplateArguments(ArrayRef<TemplateArgument> Args);
+  bool TraverseTemplateArguments(llvm::ArrayRef<TemplateArgument> Args);
 
   /// Recursively visit a base specifier. This can be overridden by a
   /// subclass.
@@ -509,7 +509,7 @@ private:
   bool TraverseOpenACCConstructStmt(OpenACCConstructStmt *S);
   bool
   TraverseOpenACCAssociatedStmtConstruct(OpenACCAssociatedStmtConstruct *S);
-  bool VisitOpenACCClauseList(ArrayRef<const OpenACCClause *>);
+  bool VisitOpenACCClauseList(llvm::ArrayRef<const OpenACCClause *>);
 };
 
 template <typename Derived>
@@ -661,7 +661,7 @@ bool RecursiveASTVisitor<Derived>::TraverseStmt(Stmt *S,
     return true;
   }
 
-  SmallVector<llvm::PointerIntPair<Stmt *, 1, bool>, 8> LocalQueue;
+  llvm::SmallVector<llvm::PointerIntPair<Stmt *, 1, bool>, 8> LocalQueue;
   LocalQueue.push_back({S, false});
 
   while (!LocalQueue.empty()) {
@@ -933,7 +933,7 @@ bool RecursiveASTVisitor<Derived>::TraverseTemplateArgumentLoc(
 
 template <typename Derived>
 bool RecursiveASTVisitor<Derived>::TraverseTemplateArguments(
-    ArrayRef<TemplateArgument> Args) {
+    llvm::ArrayRef<TemplateArgument> Args) {
   for (const TemplateArgument &Arg : Args)
     TRY_TO(TraverseTemplateArgument(Arg));
 
@@ -3969,7 +3969,7 @@ bool RecursiveASTVisitor<Derived>::TraverseOpenACCAssociatedStmtConstruct(
 
 template <typename Derived>
 bool RecursiveASTVisitor<Derived>::VisitOpenACCClauseList(
-    ArrayRef<const OpenACCClause *>) {
+    llvm::ArrayRef<const OpenACCClause *>) {
   // TODO OpenACC: When we have Clauses with expressions, we should visit them
   // here.
   return true;

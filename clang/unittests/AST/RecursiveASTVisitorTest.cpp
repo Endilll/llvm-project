@@ -32,7 +32,7 @@ public:
   }
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) {
+                                                 llvm::StringRef InFile) {
     class Consumer : public ASTConsumer {
     public:
       Consumer(llvm::function_ref<void(ASTContext &CTx)> Process)
@@ -134,7 +134,7 @@ private:
 };
 
 std::vector<VisitEvent> collectEvents(llvm::StringRef Code,
-                                      const Twine &FileName = "input.cc") {
+                                      const llvm::Twine &FileName = "input.cc") {
   CollectInterestingEvents Visitor;
   clang::tooling::runToolOnCode(
       std::make_unique<ProcessASTAction>(

@@ -119,7 +119,7 @@ namespace {
       }
     }
 
-    unsigned getID(StringRef CategoryString) {
+    unsigned getID(llvm::StringRef CategoryString) {
       return CategoryIDs[CategoryString];
     }
 
@@ -214,7 +214,7 @@ static void groupDiagnostics(const std::vector<Record*> &Diags,
       llvm::SMLoc Loc = Def->getLoc().front();
       if (First) {
         SrcMgr.PrintMessage(Loc, SourceMgr::DK_Error,
-                            Twine("group '") + Group.first +
+                            llvm::Twine("group '") + Group.first +
                                 "' is defined more than once");
         First = false;
       } else {
@@ -229,7 +229,7 @@ static void groupDiagnostics(const std::vector<Record*> &Diags,
       llvm::SMLoc Loc = Diag->getLoc().front();
       if (First) {
         SrcMgr.PrintMessage(Loc, SourceMgr::DK_Error,
-                            Twine("group '") + Group.first +
+                            llvm::Twine("group '") + Group.first +
                                 "' is implicitly defined more than once");
         First = false;
       } else {
@@ -448,7 +448,7 @@ enum ModifierType {
   MT_ObjCInstance,
 };
 
-static StringRef getModifierName(ModifierType MT) {
+static llvm::StringRef getModifierName(ModifierType MT) {
   switch (MT) {
   case MT_Select:
     return "select";
@@ -504,9 +504,9 @@ struct MultiPiece : Piece {
 };
 
 struct TextPiece : Piece {
-  StringRef Role;
+  llvm::StringRef Role;
   std::string Text;
-  TextPiece(StringRef Text, StringRef Role = "")
+  TextPiece(llvm::StringRef Text, llvm::StringRef Role = "")
       : Piece(TextPieceClass), Role(Role), Text(Text.str()) {}
 
   static bool classof(const Piece *P) {
@@ -594,7 +594,7 @@ struct DiagnosticTextBuilder {
     // Check that no diagnostic definitions have the same name as a
     // substitution.
     for (Record *Diag : Records.getAllDerivedDefinitions("Diagnostic")) {
-      StringRef Name = Diag->getName();
+      llvm::StringRef Name = Diag->getName();
       if (Substitutions.count(Name))
         llvm::PrintFatalError(
             Diag->getLoc(),
@@ -603,7 +603,7 @@ struct DiagnosticTextBuilder {
     }
   }
 
-  std::vector<std::string> buildForDocumentation(StringRef Role,
+  std::vector<std::string> buildForDocumentation(llvm::StringRef Role,
                                                  const Record *R);
   std::string buildForDefinition(const Record *R);
 
@@ -632,7 +632,7 @@ private:
       return Mem;
     }
 
-    DiagText(DiagnosticTextBuilder &Builder, StringRef Text)
+    DiagText(DiagnosticTextBuilder &Builder, llvm::StringRef Text)
         : Builder(Builder), Root(parseDiagText(Text, StopAt::End)) {}
 
     enum class StopAt {
@@ -644,8 +644,8 @@ private:
       Dollar,
     };
 
-    Piece *parseDiagText(StringRef &Text, StopAt Stop);
-    int parseModifier(StringRef &) const;
+    Piece *parseDiagText(llvm::StringRef &Text, StopAt Stop);
+    int parseModifier(llvm::StringRef &) const;
 
   public:
     DiagText(DiagText &&O) noexcept
@@ -766,9 +766,9 @@ protected:
   ModifierMappingsType ModifierMappings;
 };
 
-void escapeRST(StringRef Str, std::string &Out) {
+void escapeRST(llvm::StringRef Str, std::string &Out) {
   for (auto K : Str) {
-    if (StringRef("`*|_[]\\").count(K))
+    if (llvm::StringRef("`*|_[]\\").count(K))
       Out.push_back('\\');
     Out.push_back(K);
   }
@@ -872,7 +872,7 @@ struct DiagTextDocPrinter : DiagTextVisitor<DiagTextDocPrinter> {
     RST.push_back("");
     auto &S = RST.back();
 
-    StringRef T = P->Text;
+    llvm::StringRef T = P->Text;
     while (T.consume_front(" "))
       RST.back() += " |nbsp| ";
 
@@ -1003,7 +1003,7 @@ public:
   std::string &Result;
 };
 
-int DiagnosticTextBuilder::DiagText::parseModifier(StringRef &Text) const {
+int DiagnosticTextBuilder::DiagText::parseModifier(llvm::StringRef &Text) const {
   if (Text.empty() || !isdigit(Text[0]))
     Builder.PrintFatalError("expected modifier in diagnostic");
   int Val = 0;
@@ -1015,7 +1015,7 @@ int DiagnosticTextBuilder::DiagText::parseModifier(StringRef &Text) const {
   return Val;
 }
 
-Piece *DiagnosticTextBuilder::DiagText::parseDiagText(StringRef &Text,
+Piece *DiagnosticTextBuilder::DiagText::parseDiagText(llvm::StringRef &Text,
                                                       StopAt Stop) {
   std::vector<Piece *> Parsed;
 
@@ -1032,7 +1032,7 @@ Piece *DiagnosticTextBuilder::DiagText::parseDiagText(StringRef &Text,
 
     if (End) {
       Parsed.push_back(New<TextPiece>(Text.slice(0, End), "diagtext"));
-      Text = Text.slice(End, StringRef::npos);
+      Text = Text.slice(End, llvm::StringRef::npos);
       if (Text.empty())
         break;
     }
@@ -1045,8 +1045,8 @@ Piece *DiagnosticTextBuilder::DiagText::parseDiagText(StringRef &Text,
 
     // Extract the (optional) modifier.
     size_t ModLength = Text.find_first_of("0123456789{");
-    StringRef Modifier = Text.slice(0, ModLength);
-    Text = Text.slice(ModLength, StringRef::npos);
+    llvm::StringRef Modifier = Text.slice(0, ModLength);
+    Text = Text.slice(ModLength, llvm::StringRef::npos);
     ModifierType ModType = llvm::StringSwitch<ModifierType>{Modifier}
                                .Case("select", MT_Select)
                                .Case("sub", MT_Sub)
@@ -1060,7 +1060,7 @@ Piece *DiagnosticTextBuilder::DiagText::parseDiagText(StringRef &Text,
                                .Case("", MT_Placeholder)
                                .Default(MT_Unknown);
 
-    auto ExpectAndConsume = [&](StringRef Prefix) {
+    auto ExpectAndConsume = [&](llvm::StringRef Prefix) {
       if (!Text.consume_front(Prefix))
         Builder.PrintFatalError("expected '" + Prefix + "' while parsing %" +
                                 Modifier);
@@ -1087,13 +1087,13 @@ Piece *DiagnosticTextBuilder::DiagText::parseDiagText(StringRef &Text,
       do {
         Text = Text.drop_front(); // '{' or '|'
         size_t End = Text.find_first_of(':');
-        if (End == StringRef::npos)
+        if (End == llvm::StringRef::npos)
           Builder.PrintFatalError("expected ':' while parsing %plural");
         ++End;
         assert(!Text.empty());
         Plural->OptionPrefixes.push_back(
             New<TextPiece>(Text.slice(0, End), "diagtext"));
-        Text = Text.slice(End, StringRef::npos);
+        Text = Text.slice(End, llvm::StringRef::npos);
         Plural->Options.push_back(
             parseDiagText(Text, StopAt::PipeOrCloseBrace));
         assert(!Text.empty() && "malformed %plural");
@@ -1166,10 +1166,10 @@ Piece *DiagnosticTextBuilder::DiagText::parseDiagText(StringRef &Text,
 }
 
 std::vector<std::string>
-DiagnosticTextBuilder::buildForDocumentation(StringRef Severity,
+DiagnosticTextBuilder::buildForDocumentation(llvm::StringRef Severity,
                                              const Record *R) {
   EvaluatingRecordGuard Guard(&EvaluatingRecord, R);
-  StringRef Text = R->getValueAsString("Summary");
+  llvm::StringRef Text = R->getValueAsString("Summary");
 
   DiagText D(*this, Text);
   TextPiece *Prefix = D.New<TextPiece>(Severity, Severity);
@@ -1188,7 +1188,7 @@ DiagnosticTextBuilder::buildForDocumentation(StringRef Severity,
 
 std::string DiagnosticTextBuilder::buildForDefinition(const Record *R) {
   EvaluatingRecordGuard Guard(&EvaluatingRecord, R);
-  StringRef Text = R->getValueAsString("Summary");
+  llvm::StringRef Text = R->getValueAsString("Summary");
   DiagText D(*this, Text);
   std::string Result;
   DiagTextPrinter{*this, Result}.Visit(D.Root);
@@ -1216,11 +1216,11 @@ static bool isRemark(const Record &Diag) {
 
 /// ClangDiagsDefsEmitter - The top-level class emits .def files containing
 /// declarations of Clang diagnostics.
-void clang::EmitClangDiagsDefs(RecordKeeper &Records, raw_ostream &OS,
+void clang::EmitClangDiagsDefs(RecordKeeper &Records, llvm::raw_ostream &OS,
                                const std::string &Component) {
   // Write the #if guard
   if (!Component.empty()) {
-    std::string ComponentName = StringRef(Component).upper();
+    std::string ComponentName = llvm::StringRef(Component).upper();
     OS << "#ifdef " << ComponentName << "START\n";
     OS << "__" << ComponentName << "START = DIAG_START_" << ComponentName
        << ",\n";
@@ -1335,7 +1335,7 @@ void clang::EmitClangDiagsDefs(RecordKeeper &Records, raw_ostream &OS,
 static std::string getDiagCategoryEnum(llvm::StringRef name) {
   if (name.empty())
     return "DiagCat_None";
-  SmallString<256> enumName = llvm::StringRef("DiagCat_");
+  llvm::SmallString<256> enumName = llvm::StringRef("DiagCat_");
   for (llvm::StringRef::iterator I = name.begin(), E = name.end(); I != E; ++I)
     enumName += isalnum(*I) ? *I : '_';
   return std::string(enumName);
@@ -1356,7 +1356,7 @@ static std::string getDiagCategoryEnum(llvm::StringRef name) {
 /// \endcode
 ///
 static void emitDiagSubGroups(std::map<std::string, GroupInfo> &DiagsInGroup,
-                              RecordVec &GroupsInPedantic, raw_ostream &OS) {
+                              RecordVec &GroupsInPedantic, llvm::raw_ostream &OS) {
   OS << "static const int16_t DiagSubGroups[] = {\n"
      << "  /* Empty */ -1,\n";
   for (auto const &I : DiagsInGroup) {
@@ -1408,7 +1408,7 @@ static void emitDiagSubGroups(std::map<std::string, GroupInfo> &DiagsInGroup,
 /// \endcode
 ///
 static void emitDiagArrays(std::map<std::string, GroupInfo> &DiagsInGroup,
-                           RecordVec &DiagsInPedantic, raw_ostream &OS) {
+                           RecordVec &DiagsInPedantic, llvm::raw_ostream &OS) {
   OS << "static const int16_t DiagArrays[] = {\n"
      << "  /* Empty */ -1,\n";
   for (auto const &I : DiagsInGroup) {
@@ -1441,7 +1441,7 @@ static void emitDiagArrays(std::map<std::string, GroupInfo> &DiagsInGroup,
 ///   };
 /// \endcode
 static void emitDiagGroupNames(StringToOffsetTable &GroupNames,
-                               raw_ostream &OS) {
+                               llvm::raw_ostream &OS) {
   OS << "static const char DiagGroupNames[] = {\n";
   GroupNames.EmitString(OS);
   OS << "};\n\n";
@@ -1463,7 +1463,7 @@ static void emitAllDiagArrays(std::map<std::string, GroupInfo> &DiagsInGroup,
                               RecordVec &DiagsInPedantic,
                               RecordVec &GroupsInPedantic,
                               StringToOffsetTable &GroupNames,
-                              raw_ostream &OS) {
+                              llvm::raw_ostream &OS) {
   OS << "\n#ifdef GET_DIAG_ARRAYS\n";
   emitDiagArrays(DiagsInGroup, DiagsInPedantic, OS);
   emitDiagSubGroups(DiagsInGroup, GroupsInPedantic, OS);
@@ -1489,7 +1489,7 @@ static void emitAllDiagArrays(std::map<std::string, GroupInfo> &DiagsInGroup,
 static void emitDiagTable(std::map<std::string, GroupInfo> &DiagsInGroup,
                           RecordVec &DiagsInPedantic,
                           RecordVec &GroupsInPedantic,
-                          StringToOffsetTable &GroupNames, raw_ostream &OS) {
+                          StringToOffsetTable &GroupNames, llvm::raw_ostream &OS) {
   unsigned MaxLen = 0;
 
   for (auto const &I: DiagsInGroup)
@@ -1549,7 +1549,7 @@ static void emitDiagTable(std::map<std::string, GroupInfo> &DiagsInGroup,
                                     ->getValue()
                                     ->getAsUnquotedString();
 
-    OS << "R\"(" << StringRef(Documentation).trim() << ")\"";
+    OS << "R\"(" << llvm::StringRef(Documentation).trim() << ")\"";
 
     OS << ")\n";
   }
@@ -1569,7 +1569,7 @@ static void emitDiagTable(std::map<std::string, GroupInfo> &DiagsInGroup,
 ///   CATEGORY("Lambda Issue", DiagCat_Lambda_Issue)
 /// #endif
 /// \endcode
-static void emitCategoryTable(RecordKeeper &Records, raw_ostream &OS) {
+static void emitCategoryTable(RecordKeeper &Records, llvm::raw_ostream &OS) {
   DiagCategoryIDMap CategoriesByID(Records);
   OS << "\n#ifdef GET_CATEGORY_TABLE\n";
   for (auto const &C : CategoriesByID)
@@ -1577,7 +1577,7 @@ static void emitCategoryTable(RecordKeeper &Records, raw_ostream &OS) {
   OS << "#endif // GET_CATEGORY_TABLE\n\n";
 }
 
-void clang::EmitClangDiagGroups(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitClangDiagGroups(RecordKeeper &Records, llvm::raw_ostream &OS) {
   // Compute a mapping from a DiagGroup to all of its parents.
   DiagGroupParentMap DGParentMap(Records);
 
@@ -1629,7 +1629,7 @@ struct RecordIndexElement
 };
 } // end anonymous namespace.
 
-void clang::EmitClangDiagsIndexName(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitClangDiagsIndexName(RecordKeeper &Records, llvm::raw_ostream &OS) {
   const std::vector<Record*> &Diags =
     Records.getAllDerivedDefinitions("Diagnostic");
 
@@ -1663,7 +1663,7 @@ bool isRemarkGroup(const Record *DiagGroup,
                    const std::map<std::string, GroupInfo> &DiagsInGroup) {
   bool AnyRemarks = false, AnyNonRemarks = false;
 
-  std::function<void(StringRef)> Visit = [&](StringRef GroupName) {
+  std::function<void(llvm::StringRef)> Visit = [&](llvm::StringRef GroupName) {
     auto &GroupInfo = DiagsInGroup.find(std::string(GroupName))->second;
     for (const Record *Diag : GroupInfo.DiagsInGroup)
       (isRemark(*Diag) ? AnyRemarks : AnyNonRemarks) = true;
@@ -1689,7 +1689,7 @@ getDefaultSeverities(const Record *DiagGroup,
                      const std::map<std::string, GroupInfo> &DiagsInGroup) {
   std::set<std::string> States;
 
-  std::function<void(StringRef)> Visit = [&](StringRef GroupName) {
+  std::function<void(llvm::StringRef)> Visit = [&](llvm::StringRef GroupName) {
     auto &GroupInfo = DiagsInGroup.find(std::string(GroupName))->second;
     for (const Record *Diag : GroupInfo.DiagsInGroup)
       States.insert(getDefaultSeverity(Diag));
@@ -1700,13 +1700,13 @@ getDefaultSeverities(const Record *DiagGroup,
   return States;
 }
 
-void writeHeader(StringRef Str, raw_ostream &OS, char Kind = '-') {
+void writeHeader(llvm::StringRef Str, llvm::raw_ostream &OS, char Kind = '-') {
   OS << Str << "\n" << std::string(Str.size(), Kind) << "\n";
 }
 
 void writeDiagnosticText(DiagnosticTextBuilder &Builder, const Record *R,
-                         StringRef Role, raw_ostream &OS) {
-  StringRef Text = R->getValueAsString("Summary");
+                         llvm::StringRef Role, llvm::raw_ostream &OS) {
+  llvm::StringRef Text = R->getValueAsString("Summary");
   if (Text == "%0")
     OS << "The text of this diagnostic is not controlled by Clang.\n\n";
   else {
@@ -1720,7 +1720,7 @@ void writeDiagnosticText(DiagnosticTextBuilder &Builder, const Record *R,
 }  // namespace
 }  // namespace docs
 
-void clang::EmitClangDiagDocs(RecordKeeper &Records, raw_ostream &OS) {
+void clang::EmitClangDiagDocs(RecordKeeper &Records, llvm::raw_ostream &OS) {
   using namespace docs;
 
   // Get the documentation introduction paragraph.

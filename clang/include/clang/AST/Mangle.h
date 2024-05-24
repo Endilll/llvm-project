@@ -127,58 +127,58 @@ public:
 
   virtual void needsUniqueInternalLinkageNames() { }
 
-  // FIXME: consider replacing raw_ostream & with something like SmallString &.
-  void mangleName(GlobalDecl GD, raw_ostream &);
-  virtual void mangleCXXName(GlobalDecl GD, raw_ostream &) = 0;
+  // FIXME: consider replacing llvm::raw_ostream & with something like llvm::SmallString &.
+  void mangleName(GlobalDecl GD, llvm::raw_ostream &);
+  virtual void mangleCXXName(GlobalDecl GD, llvm::raw_ostream &) = 0;
   virtual void mangleThunk(const CXXMethodDecl *MD,
                           const ThunkInfo &Thunk,
-                          raw_ostream &) = 0;
+                          llvm::raw_ostream &) = 0;
   virtual void mangleCXXDtorThunk(const CXXDestructorDecl *DD, CXXDtorType Type,
                                   const ThisAdjustment &ThisAdjustment,
-                                  raw_ostream &) = 0;
+                                  llvm::raw_ostream &) = 0;
   virtual void mangleReferenceTemporary(const VarDecl *D,
                                         unsigned ManglingNumber,
-                                        raw_ostream &) = 0;
-  virtual void mangleCXXRTTI(QualType T, raw_ostream &) = 0;
-  virtual void mangleCXXRTTIName(QualType T, raw_ostream &,
+                                        llvm::raw_ostream &) = 0;
+  virtual void mangleCXXRTTI(QualType T, llvm::raw_ostream &) = 0;
+  virtual void mangleCXXRTTIName(QualType T, llvm::raw_ostream &,
                                  bool NormalizeIntegers = false) = 0;
-  virtual void mangleStringLiteral(const StringLiteral *SL, raw_ostream &) = 0;
-  virtual void mangleMSGuidDecl(const MSGuidDecl *GD, raw_ostream&);
+  virtual void mangleStringLiteral(const StringLiteral *SL, llvm::raw_ostream &) = 0;
+  virtual void mangleMSGuidDecl(const MSGuidDecl *GD, llvm::raw_ostream&);
 
   void mangleGlobalBlock(const BlockDecl *BD,
                          const NamedDecl *ID,
-                         raw_ostream &Out);
+                         llvm::raw_ostream &Out);
   void mangleCtorBlock(const CXXConstructorDecl *CD, CXXCtorType CT,
-                       const BlockDecl *BD, raw_ostream &Out);
+                       const BlockDecl *BD, llvm::raw_ostream &Out);
   void mangleDtorBlock(const CXXDestructorDecl *CD, CXXDtorType DT,
-                       const BlockDecl *BD, raw_ostream &Out);
+                       const BlockDecl *BD, llvm::raw_ostream &Out);
   void mangleBlock(const DeclContext *DC, const BlockDecl *BD,
-                   raw_ostream &Out);
+                   llvm::raw_ostream &Out);
 
-  void mangleObjCMethodName(const ObjCMethodDecl *MD, raw_ostream &OS,
+  void mangleObjCMethodName(const ObjCMethodDecl *MD, llvm::raw_ostream &OS,
                             bool includePrefixByte = true,
                             bool includeCategoryNamespace = true);
   void mangleObjCMethodNameAsSourceName(const ObjCMethodDecl *MD,
-                                        raw_ostream &);
+                                        llvm::raw_ostream &);
 
-  virtual void mangleStaticGuardVariable(const VarDecl *D, raw_ostream &) = 0;
+  virtual void mangleStaticGuardVariable(const VarDecl *D, llvm::raw_ostream &) = 0;
 
-  virtual void mangleDynamicInitializer(const VarDecl *D, raw_ostream &) = 0;
+  virtual void mangleDynamicInitializer(const VarDecl *D, llvm::raw_ostream &) = 0;
 
   virtual void mangleDynamicAtExitDestructor(const VarDecl *D,
-                                             raw_ostream &) = 0;
+                                             llvm::raw_ostream &) = 0;
 
   virtual void mangleSEHFilterExpression(GlobalDecl EnclosingDecl,
-                                         raw_ostream &Out) = 0;
+                                         llvm::raw_ostream &Out) = 0;
 
   virtual void mangleSEHFinallyBlock(GlobalDecl EnclosingDecl,
-                                     raw_ostream &Out) = 0;
+                                     llvm::raw_ostream &Out) = 0;
 
   /// Generates a unique string for an externally visible type for use with TBAA
   /// or type uniquing.
   /// TODO: Extend this to internal types by generating names that are unique
   /// across translation units so it can be used with LTO.
-  virtual void mangleCanonicalTypeName(QualType T, raw_ostream &,
+  virtual void mangleCanonicalTypeName(QualType T, llvm::raw_ostream &,
                                        bool NormalizeIntegers = false) = 0;
 
   /// @}
@@ -192,26 +192,26 @@ public:
                                 bool IsAux = false)
       : MangleContext(C, D, MK_Itanium, IsAux) {}
 
-  virtual void mangleCXXVTable(const CXXRecordDecl *RD, raw_ostream &) = 0;
-  virtual void mangleCXXVTT(const CXXRecordDecl *RD, raw_ostream &) = 0;
+  virtual void mangleCXXVTable(const CXXRecordDecl *RD, llvm::raw_ostream &) = 0;
+  virtual void mangleCXXVTT(const CXXRecordDecl *RD, llvm::raw_ostream &) = 0;
   virtual void mangleCXXCtorVTable(const CXXRecordDecl *RD, int64_t Offset,
                                    const CXXRecordDecl *Type,
-                                   raw_ostream &) = 0;
+                                   llvm::raw_ostream &) = 0;
   virtual void mangleItaniumThreadLocalInit(const VarDecl *D,
-                                            raw_ostream &) = 0;
+                                            llvm::raw_ostream &) = 0;
   virtual void mangleItaniumThreadLocalWrapper(const VarDecl *D,
-                                               raw_ostream &) = 0;
+                                               llvm::raw_ostream &) = 0;
 
   virtual void mangleCXXCtorComdat(const CXXConstructorDecl *D,
-                                   raw_ostream &) = 0;
+                                   llvm::raw_ostream &) = 0;
   virtual void mangleCXXDtorComdat(const CXXDestructorDecl *D,
-                                   raw_ostream &) = 0;
+                                   llvm::raw_ostream &) = 0;
 
-  virtual void mangleLambdaSig(const CXXRecordDecl *Lambda, raw_ostream &) = 0;
+  virtual void mangleLambdaSig(const CXXRecordDecl *Lambda, llvm::raw_ostream &) = 0;
 
-  virtual void mangleDynamicStermFinalizer(const VarDecl *D, raw_ostream &) = 0;
+  virtual void mangleDynamicStermFinalizer(const VarDecl *D, llvm::raw_ostream &) = 0;
 
-  virtual void mangleModuleInitializer(const Module *Module, raw_ostream &) = 0;
+  virtual void mangleModuleInitializer(const Module *Module, llvm::raw_ostream &) = 0;
 
   // This has to live here, otherwise the CXXNameMangler won't have access to
   // it.
@@ -238,54 +238,54 @@ public:
   /// to the vftable are included in the name.  It's up to the caller to pick
   /// them correctly.
   virtual void mangleCXXVFTable(const CXXRecordDecl *Derived,
-                                ArrayRef<const CXXRecordDecl *> BasePath,
-                                raw_ostream &Out) = 0;
+                                llvm::ArrayRef<const CXXRecordDecl *> BasePath,
+                                llvm::raw_ostream &Out) = 0;
 
   /// Mangle vbtable symbols.  Only a subset of the bases along the path
   /// to the vbtable are included in the name.  It's up to the caller to pick
   /// them correctly.
   virtual void mangleCXXVBTable(const CXXRecordDecl *Derived,
-                                ArrayRef<const CXXRecordDecl *> BasePath,
-                                raw_ostream &Out) = 0;
+                                llvm::ArrayRef<const CXXRecordDecl *> BasePath,
+                                llvm::raw_ostream &Out) = 0;
 
   virtual void mangleThreadSafeStaticGuardVariable(const VarDecl *VD,
                                                    unsigned GuardNum,
-                                                   raw_ostream &Out) = 0;
+                                                   llvm::raw_ostream &Out) = 0;
 
   virtual void mangleVirtualMemPtrThunk(const CXXMethodDecl *MD,
                                         const MethodVFTableLocation &ML,
-                                        raw_ostream &Out) = 0;
+                                        llvm::raw_ostream &Out) = 0;
 
   virtual void mangleCXXVirtualDisplacementMap(const CXXRecordDecl *SrcRD,
                                                const CXXRecordDecl *DstRD,
-                                               raw_ostream &Out) = 0;
+                                               llvm::raw_ostream &Out) = 0;
 
   virtual void mangleCXXThrowInfo(QualType T, bool IsConst, bool IsVolatile,
                                   bool IsUnaligned, uint32_t NumEntries,
-                                  raw_ostream &Out) = 0;
+                                  llvm::raw_ostream &Out) = 0;
 
   virtual void mangleCXXCatchableTypeArray(QualType T, uint32_t NumEntries,
-                                           raw_ostream &Out) = 0;
+                                           llvm::raw_ostream &Out) = 0;
 
   virtual void mangleCXXCatchableType(QualType T, const CXXConstructorDecl *CD,
                                       CXXCtorType CT, uint32_t Size,
                                       uint32_t NVOffset, int32_t VBPtrOffset,
-                                      uint32_t VBIndex, raw_ostream &Out) = 0;
+                                      uint32_t VBIndex, llvm::raw_ostream &Out) = 0;
 
   virtual void mangleCXXRTTIBaseClassDescriptor(
       const CXXRecordDecl *Derived, uint32_t NVOffset, int32_t VBPtrOffset,
-      uint32_t VBTableOffset, uint32_t Flags, raw_ostream &Out) = 0;
+      uint32_t VBTableOffset, uint32_t Flags, llvm::raw_ostream &Out) = 0;
 
   virtual void mangleCXXRTTIBaseClassArray(const CXXRecordDecl *Derived,
-                                           raw_ostream &Out) = 0;
+                                           llvm::raw_ostream &Out) = 0;
   virtual void
   mangleCXXRTTIClassHierarchyDescriptor(const CXXRecordDecl *Derived,
-                                        raw_ostream &Out) = 0;
+                                        llvm::raw_ostream &Out) = 0;
 
   virtual void
   mangleCXXRTTICompleteObjectLocator(const CXXRecordDecl *Derived,
-                                     ArrayRef<const CXXRecordDecl *> BasePath,
-                                     raw_ostream &Out) = 0;
+                                     llvm::ArrayRef<const CXXRecordDecl *> BasePath,
+                                     llvm::raw_ostream &Out) = 0;
 
   static bool classof(const MangleContext *C) {
     return C->getKind() == MK_Microsoft;
@@ -302,7 +302,7 @@ public:
 
   /// Writes name for \p D to \p OS.
   /// \returns true on failure, false on success.
-  bool writeName(const Decl *D, raw_ostream &OS);
+  bool writeName(const Decl *D, llvm::raw_ostream &OS);
 
   /// \returns name for \p D
   std::string getName(const Decl *D);

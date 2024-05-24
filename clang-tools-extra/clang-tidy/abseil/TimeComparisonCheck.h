@@ -20,7 +20,7 @@ namespace clang::tidy::abseil {
 /// http://clang.llvm.org/extra/clang-tidy/checks/abseil/time-comparison.html
 class TimeComparisonCheck : public ClangTidyCheck {
 public:
-  TimeComparisonCheck(StringRef Name, ClangTidyContext *Context)
+  TimeComparisonCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

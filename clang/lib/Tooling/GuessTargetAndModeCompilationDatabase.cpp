@@ -30,7 +30,7 @@ public:
   }
 
   std::vector<CompileCommand>
-  getCompileCommands(StringRef FilePath) const override {
+  getCompileCommands(llvm::StringRef FilePath) const override {
     return addTargetAndMode(Base->getCompileCommands(FilePath));
   }
 

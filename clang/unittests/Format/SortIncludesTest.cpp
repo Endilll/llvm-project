@@ -20,12 +20,12 @@ namespace {
 
 class SortIncludesTest : public test::FormatTestBase {
 protected:
-  std::vector<tooling::Range> GetCodeRange(StringRef Code) {
+  std::vector<tooling::Range> GetCodeRange(llvm::StringRef Code) {
     return std::vector<tooling::Range>(1, tooling::Range(0, Code.size()));
   }
 
-  std::string sort(StringRef Code, std::vector<tooling::Range> Ranges,
-                   StringRef FileName = "input.cc",
+  std::string sort(llvm::StringRef Code, std::vector<tooling::Range> Ranges,
+                   llvm::StringRef FileName = "input.cc",
                    unsigned ExpectedNumRanges = 1) {
     auto Replaces = sortIncludes(FmtStyle, Code, Ranges, FileName);
     Ranges = tooling::calculateRangesAfterReplacements(Replaces, Ranges);
@@ -38,12 +38,12 @@ protected:
     return *Result;
   }
 
-  std::string sort(StringRef Code, StringRef FileName = "input.cpp",
+  std::string sort(llvm::StringRef Code, llvm::StringRef FileName = "input.cpp",
                    unsigned ExpectedNumRanges = 1) {
     return sort(Code, GetCodeRange(Code), FileName, ExpectedNumRanges);
   }
 
-  unsigned newCursor(StringRef Code, unsigned Cursor) {
+  unsigned newCursor(llvm::StringRef Code, unsigned Cursor) {
     sortIncludes(FmtStyle, Code, GetCodeRange(Code), "input.cpp", &Cursor);
     return Cursor;
   }
@@ -157,7 +157,7 @@ TEST_F(SortIncludesTest, SortPriorityNotDefined) {
 
 TEST_F(SortIncludesTest, NoReplacementsForValidIncludes) {
   // Identical #includes have led to a failure with an unstable sort.
-  StringRef Code = "#include <a>\n"
+  llvm::StringRef Code = "#include <a>\n"
                    "#include <b>\n"
                    "#include <c>\n"
                    "#include <d>\n"
@@ -167,7 +167,7 @@ TEST_F(SortIncludesTest, NoReplacementsForValidIncludes) {
 }
 
 TEST_F(SortIncludesTest, MainFileHeader) {
-  StringRef Code = "#include <string>\n"
+  llvm::StringRef Code = "#include <string>\n"
                    "\n"
                    "#include \"a/extra_action.proto.h\"\n";
   FmtStyle = getGoogleStyle(FormatStyle::LK_Cpp);
@@ -224,7 +224,7 @@ TEST_F(SortIncludesTest, SupportClangFormatOff) {
                     "// clang-format on"));
 
   Style.IncludeBlocks = Style.IBS_Merge;
-  StringRef Code = "// clang-format off\r\n"
+  llvm::StringRef Code = "// clang-format off\r\n"
                    "#include \"d.h\"\r\n"
                    "#include \"b.h\"\r\n"
                    "// clang-format on\r\n"
@@ -233,7 +233,7 @@ TEST_F(SortIncludesTest, SupportClangFormatOff) {
                    "#include \"a.h\"\r\n"
                    "#include \"e.h\"\r\n";
 
-  StringRef Expected = "// clang-format off\r\n"
+  llvm::StringRef Expected = "// clang-format off\r\n"
                        "#include \"d.h\"\r\n"
                        "#include \"b.h\"\r\n"
                        "// clang-format on\r\n"
@@ -648,7 +648,7 @@ TEST_F(SortIncludesTest, SupportOptionalCaseSensitiveSorting) {
   Style.IncludeCategories = {
       {"^\"", 1, 0, false}, {"^<.*\\.h>$", 2, 0, false}, {"^<", 3, 0, false}};
 
-  StringRef UnsortedCode = "#include \"qt.h\"\n"
+  llvm::StringRef UnsortedCode = "#include \"qt.h\"\n"
                            "#include <algorithm>\n"
                            "#include <qtwhatever.h>\n"
                            "#include <Qtwhatever.h>\n"
@@ -701,7 +701,7 @@ TEST_F(SortIncludesTest, SupportOptionalCaseSensitiveMachting) {
                              {"^<Qt[^\\.]*>", 4, 0, false},
                              {"^<", 5, 0, false}};
 
-  StringRef UnsortedCode = "#include <QWidget>\n"
+  llvm::StringRef UnsortedCode = "#include <QWidget>\n"
                            "#include \"qt.h\"\n"
                            "#include <algorithm>\n"
                            "#include <windows.h>\n"
@@ -794,7 +794,7 @@ TEST_F(SortIncludesTest, PriorityGroupsAreSeparatedWhenRegroupping) {
 }
 
 TEST_F(SortIncludesTest, CalculatesCorrectCursorPosition) {
-  StringRef Code = "#include <ccc>\n"    // Start of line: 0
+  llvm::StringRef Code = "#include <ccc>\n"    // Start of line: 0
                    "#include <bbbbbb>\n" // Start of line: 15
                    "#include <a>\n";     // Start of line: 33
   EXPECT_EQ(31u, newCursor(Code, 0));
@@ -808,11 +808,11 @@ TEST_F(SortIncludesTest, CalculatesCorrectCursorPosition) {
 
 TEST_F(SortIncludesTest, CalculatesCorrectCursorPositionWithRegrouping) {
   Style.IncludeBlocks = Style.IBS_Regroup;
-  StringRef Code = "#include \"b\"\n"      // Start of line: 0
+  llvm::StringRef Code = "#include \"b\"\n"      // Start of line: 0
                    "\n"                    // Start of line: 13
                    "#include \"aa\"\n"     // Start of line: 14
                    "int i;";               // Start of line: 28
-  StringRef Expected = "#include \"aa\"\n" // Start of line: 0
+  llvm::StringRef Expected = "#include \"aa\"\n" // Start of line: 0
                        "#include \"b\"\n"  // Start of line: 14
                        "int i;";           // Start of line: 27
   verifyFormat(Expected, sort(Code));
@@ -827,7 +827,7 @@ TEST_F(SortIncludesTest,
   FmtStyle.LineEnding = FormatStyle::LE_CRLF;
   Style.IncludeCategories = {
       {"^\"a\"", 0, 0, false}, {"^\"b\"", 1, 1, false}, {".*", 2, 2, false}};
-  StringRef Code = "#include \"a\"\r\n" // Start of line: 0
+  llvm::StringRef Code = "#include \"a\"\r\n" // Start of line: 0
                    "\r\n"               // Start of line: 14
                    "#include \"b\"\r\n" // Start of line: 16
                    "\r\n"               // Start of line: 30
@@ -850,14 +850,14 @@ TEST_F(
   Style.IncludeBlocks = Style.IBS_Regroup;
   FmtStyle.LineEnding = FormatStyle::LE_CRLF;
   Style.IncludeCategories = {{".*", 0, 0, false}};
-  StringRef Code = "#include \"a\"\r\n"     // Start of line: 0
+  llvm::StringRef Code = "#include \"a\"\r\n"     // Start of line: 0
                    "\r\n"                   // Start of line: 14
                    "#include \"b\"\r\n"     // Start of line: 16
                    "\r\n"                   // Start of line: 30
                    "#include \"c\"\r\n"     // Start of line: 32
                    "\r\n"                   // Start of line: 46
                    "int i;";                // Start of line: 48
-  StringRef Expected = "#include \"a\"\r\n" // Start of line: 0
+  llvm::StringRef Expected = "#include \"a\"\r\n" // Start of line: 0
                        "#include \"b\"\r\n" // Start of line: 14
                        "#include \"c\"\r\n" // Start of line: 28
                        "\r\n"               // Start of line: 42
@@ -885,12 +885,12 @@ TEST_F(
   FmtStyle.LineEnding = FormatStyle::LE_CRLF;
   Style.IncludeCategories = {
       {"^\"a\"", 0, 0, false}, {"^\"b\"", 1, 1, false}, {".*", 2, 2, false}};
-  StringRef Code = "#include \"a\"\r\n"     // Start of line: 0
+  llvm::StringRef Code = "#include \"a\"\r\n"     // Start of line: 0
                    "#include \"b\"\r\n"     // Start of line: 14
                    "#include \"c\"\r\n"     // Start of line: 28
                    "\r\n"                   // Start of line: 42
                    "int i;";                // Start of line: 44
-  StringRef Expected = "#include \"a\"\r\n" // Start of line: 0
+  llvm::StringRef Expected = "#include \"a\"\r\n" // Start of line: 0
                        "\r\n"               // Start of line: 14
                        "#include \"b\"\r\n" // Start of line: 16
                        "\r\n"               // Start of line: 30
@@ -912,14 +912,14 @@ TEST_F(
   FmtStyle.LineEnding = FormatStyle::LE_CRLF;
   Style.IncludeCategories = {
       {"^\"a\"", 0, 0, false}, {"^\"b\"", 1, 1, false}, {".*", 2, 2, false}};
-  StringRef Code = "#include \"a\"\r\n"     // Start of line: 0
+  llvm::StringRef Code = "#include \"a\"\r\n"     // Start of line: 0
                    "\r\n"                   // Start of line: 14
                    "#include \"c\"\r\n"     // Start of line: 16
                    "\r\n"                   // Start of line: 30
                    "#include \"b\"\r\n"     // Start of line: 32
                    "\r\n"                   // Start of line: 46
                    "int i;";                // Start of line: 48
-  StringRef Expected = "#include \"a\"\r\n" // Start of line: 0
+  llvm::StringRef Expected = "#include \"a\"\r\n" // Start of line: 0
                        "\r\n"               // Start of line: 14
                        "#include \"b\"\r\n" // Start of line: 16
                        "\r\n"               // Start of line: 30
@@ -1010,13 +1010,13 @@ TEST_F(SortIncludesTest, SortAndDeduplicateIncludes) {
 }
 
 TEST_F(SortIncludesTest, CalculatesCorrectCursorPositionAfterDeduplicate) {
-  StringRef Code = "#include <b>\n"      // Start of line: 0
+  llvm::StringRef Code = "#include <b>\n"      // Start of line: 0
                    "#include <a>\n"      // Start of line: 13
                    "#include <b>\n"      // Start of line: 26
                    "#include <b>\n"      // Start of line: 39
                    "#include <c>\n"      // Start of line: 52
                    "#include <b>\n";     // Start of line: 65
-  StringRef Expected = "#include <a>\n"  // Start of line: 0
+  llvm::StringRef Expected = "#include <a>\n"  // Start of line: 0
                        "#include <b>\n"  // Start of line: 13
                        "#include <c>\n"; // Start of line: 26
   verifyFormat(Expected, sort(Code));
@@ -1047,7 +1047,7 @@ TEST_F(SortIncludesTest, DeduplicateLocallyInEachBlock) {
 }
 
 TEST_F(SortIncludesTest, ValidAffactedRangesAfterDeduplicatingIncludes) {
-  StringRef Code = "#include <a>\n"
+  llvm::StringRef Code = "#include <a>\n"
                    "#include <b>\n"
                    "#include <a>\n"
                    "#include <a>\n"
@@ -1075,7 +1075,7 @@ TEST_F(SortIncludesTest, DoNotSortLikelyXml) {
 
 TEST_F(SortIncludesTest, DoNotOutputReplacementsForSortedBlocksWithRegrouping) {
   Style.IncludeBlocks = Style.IBS_Regroup;
-  StringRef Code = "#include \"b.h\"\n"
+  llvm::StringRef Code = "#include \"b.h\"\n"
                    "\n"
                    "#include <a.h>";
   verifyFormat(Code, sort(Code, "input.h", 0));
@@ -1084,14 +1084,14 @@ TEST_F(SortIncludesTest, DoNotOutputReplacementsForSortedBlocksWithRegrouping) {
 TEST_F(SortIncludesTest,
        DoNotOutputReplacementsForSortedBlocksWithRegroupingWindows) {
   Style.IncludeBlocks = Style.IBS_Regroup;
-  StringRef Code = "#include \"b.h\"\r\n"
+  llvm::StringRef Code = "#include \"b.h\"\r\n"
                    "\r\n"
                    "#include <a.h>\r\n";
   verifyFormat(Code, sort(Code, "input.h", 0));
 }
 
 TEST_F(SortIncludesTest, MainIncludeChar) {
-  StringRef Code = "#include <a>\n"
+  llvm::StringRef Code = "#include <a>\n"
                    "#include \"quote/input.h\"\n"
                    "#include <angle-bracket/input.h>\n";
 
@@ -1209,7 +1209,7 @@ TEST_F(SortIncludesTest, DoNotRegroupGroupsInGoogleObjCStyle) {
 
 TEST_F(SortIncludesTest, DoNotTreatPrecompiledHeadersAsFirstBlock) {
   Style.IncludeBlocks = Style.IBS_Merge;
-  StringRef Code = "#include \"d.h\"\r\n"
+  llvm::StringRef Code = "#include \"d.h\"\r\n"
                    "#include \"b.h\"\r\n"
                    "#pragma hdrstop\r\n"
                    "\r\n"
@@ -1217,7 +1217,7 @@ TEST_F(SortIncludesTest, DoNotTreatPrecompiledHeadersAsFirstBlock) {
                    "#include \"a.h\"\r\n"
                    "#include \"e.h\"\r\n";
 
-  StringRef Expected = "#include \"b.h\"\r\n"
+  llvm::StringRef Expected = "#include \"b.h\"\r\n"
                        "#include \"d.h\"\r\n"
                        "#pragma hdrstop\r\n"
                        "\r\n"
@@ -1248,14 +1248,14 @@ TEST_F(SortIncludesTest, DoNotTreatPrecompiledHeadersAsFirstBlock) {
 
 TEST_F(SortIncludesTest, skipUTF8ByteOrderMarkMerge) {
   Style.IncludeBlocks = Style.IBS_Merge;
-  StringRef Code = "\xEF\xBB\xBF#include \"d.h\"\r\n"
+  llvm::StringRef Code = "\xEF\xBB\xBF#include \"d.h\"\r\n"
                    "#include \"b.h\"\r\n"
                    "\r\n"
                    "#include \"c.h\"\r\n"
                    "#include \"a.h\"\r\n"
                    "#include \"e.h\"\r\n";
 
-  StringRef Expected = "\xEF\xBB\xBF#include \"e.h\"\r\n"
+  llvm::StringRef Expected = "\xEF\xBB\xBF#include \"e.h\"\r\n"
                        "#include \"a.h\"\r\n"
                        "#include \"b.h\"\r\n"
                        "#include \"c.h\"\r\n"
@@ -1266,14 +1266,14 @@ TEST_F(SortIncludesTest, skipUTF8ByteOrderMarkMerge) {
 
 TEST_F(SortIncludesTest, skipUTF8ByteOrderMarkPreserve) {
   Style.IncludeBlocks = Style.IBS_Preserve;
-  StringRef Code = "\xEF\xBB\xBF#include \"d.h\"\r\n"
+  llvm::StringRef Code = "\xEF\xBB\xBF#include \"d.h\"\r\n"
                    "#include \"b.h\"\r\n"
                    "\r\n"
                    "#include \"c.h\"\r\n"
                    "#include \"a.h\"\r\n"
                    "#include \"e.h\"\r\n";
 
-  StringRef Expected = "\xEF\xBB\xBF#include \"b.h\"\r\n"
+  llvm::StringRef Expected = "\xEF\xBB\xBF#include \"b.h\"\r\n"
                        "#include \"d.h\"\r\n"
                        "\r\n"
                        "#include \"a.h\"\r\n"
@@ -1285,12 +1285,12 @@ TEST_F(SortIncludesTest, skipUTF8ByteOrderMarkPreserve) {
 
 TEST_F(SortIncludesTest, MergeLines) {
   Style.IncludeBlocks = Style.IBS_Merge;
-  StringRef Code = "#include \"c.h\"\r\n"
+  llvm::StringRef Code = "#include \"c.h\"\r\n"
                    "#include \"b\\\r\n"
                    ".h\"\r\n"
                    "#include \"a.h\"\r\n";
 
-  StringRef Expected = "#include \"a.h\"\r\n"
+  llvm::StringRef Expected = "#include \"a.h\"\r\n"
                        "#include \"b\\\r\n"
                        ".h\"\r\n"
                        "#include \"c.h\"\r\n";
@@ -1299,9 +1299,9 @@ TEST_F(SortIncludesTest, MergeLines) {
 }
 
 TEST_F(SortIncludesTest, DisableFormatDisablesIncludeSorting) {
-  StringRef Sorted = "#include <a.h>\n"
+  llvm::StringRef Sorted = "#include <a.h>\n"
                      "#include <b.h>\n";
-  StringRef Unsorted = "#include <b.h>\n"
+  llvm::StringRef Unsorted = "#include <b.h>\n"
                        "#include <a.h>\n";
   verifyFormat(Sorted, sort(Unsorted));
   FmtStyle.DisableFormat = true;

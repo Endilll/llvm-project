@@ -23,7 +23,7 @@ namespace clang::tidy::bugprone {
 /// \endcode
 class UniquePtrArrayMismatchCheck : public SmartPtrArrayMismatchCheck {
 public:
-  UniquePtrArrayMismatchCheck(StringRef Name, ClangTidyContext *Context);
+  UniquePtrArrayMismatchCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
 protected:
   SmartPtrClassMatcher getSmartPointerClassMatcher() const override;

@@ -228,7 +228,7 @@ bool isStandardSmartPointer(const ValueDecl *VD) {
   if (!ID)
     return false;
 
-  StringRef Name = ID->getName();
+  llvm::StringRef Name = ID->getName();
   if (Name != "unique_ptr" && Name != "shared_ptr" && Name != "weak_ptr")
     return false;
 
@@ -245,7 +245,7 @@ void UseAfterMoveFinder::getDeclRefs(
       continue;
 
     auto AddDeclRefs = [this, Block,
-                        DeclRefs](const ArrayRef<BoundNodes> Matches) {
+                        DeclRefs](const llvm::ArrayRef<BoundNodes> Matches) {
       for (const auto &Match : Matches) {
         const auto *DeclRef = Match.getNodeAs<DeclRefExpr>("declref");
         const auto *Operator = Match.getNodeAs<CXXOperatorCallExpr>("operator");
@@ -341,7 +341,7 @@ void UseAfterMoveFinder::getReinits(
     if (!S)
       continue;
 
-    SmallVector<BoundNodes, 1> Matches =
+    llvm::SmallVector<BoundNodes, 1> Matches =
         match(findAll(ReinitMatcher), *S->getStmt(), *Context);
 
     for (const auto &Match : Matches) {

@@ -164,7 +164,7 @@ inline Symbol::SymbolFlag &operator|=(Symbol::SymbolFlag &A,
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const Symbol &S);
 llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, Symbol::SymbolFlag);
 
-/// Invokes Callback with each StringRef& contained in the Symbol.
+/// Invokes Callback with each llvm::StringRef& contained in the Symbol.
 /// Useful for deduplicating backing strings.
 template <typename Callback> void visitStrings(Symbol &S, const Callback &CB) {
   CB(S.Name);
@@ -178,7 +178,7 @@ template <typename Callback> void visitStrings(Symbol &S, const Callback &CB) {
   auto RawCharPointerCB = [&CB](const char *&P) {
     llvm::StringRef S(P);
     CB(S);
-    assert(!S.data()[S.size()] && "Visited StringRef must be null-terminated");
+    assert(!S.data()[S.size()] && "Visited llvm::StringRef must be null-terminated");
     P = S.data();
   };
   RawCharPointerCB(S.CanonicalDeclaration.FileURI);

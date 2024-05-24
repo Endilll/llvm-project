@@ -42,7 +42,7 @@ const DiagnosticBuilder &operator<<(const DiagnosticBuilder &DB,
   Stream << "[ ";
   llvm::interleaveComma(
       Platforms, Stream,
-      [&Stream](const std::pair<PlatformType, VersionTuple> &PV) {
+      [&Stream](const std::pair<PlatformType, llvm::VersionTuple> &PV) {
         Stream << getPlatformName(PV.first);
         if (!PV.second.empty())
           Stream << PV.second.getAsString();

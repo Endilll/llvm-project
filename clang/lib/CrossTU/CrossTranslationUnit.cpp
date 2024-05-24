@@ -19,6 +19,7 @@
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
 #include "clang/Index/USRGeneration.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Support/ErrorHandling.h"
@@ -141,7 +142,7 @@ static llvm::ManagedStatic<IndexErrorCategory> Category;
 
 char IndexError::ID;
 
-void IndexError::log(raw_ostream &OS) const {
+void IndexError::log(llvm::raw_ostream &OS) const {
   OS << Category->message(static_cast<int>(Code)) << '\n';
 }
 
@@ -155,8 +156,8 @@ std::error_code IndexError::convertToErrorCode() const {
 ///                         "<USR-Length>:<USR> <File-Path>".
 /// @param[out] LookupName  The lookup name in format "<USR-Length>:<USR>".
 /// @param[out] FilePath    The file path "<File-Path>".
-static bool parseCrossTUIndexItem(StringRef LineRef, StringRef &LookupName,
-                                  StringRef &FilePath) {
+static bool parseCrossTUIndexItem(llvm::StringRef LineRef, llvm::StringRef &LookupName,
+                                  llvm::StringRef &FilePath) {
   // `LineRef` is "<USR-Length>:<USR> <File-Path>" now.
 
   size_t USRLength = 0;
@@ -179,7 +180,7 @@ static bool parseCrossTUIndexItem(StringRef LineRef, StringRef &LookupName,
 }
 
 llvm::Expected<llvm::StringMap<std::string>>
-parseCrossTUIndex(StringRef IndexPath) {
+parseCrossTUIndex(llvm::StringRef IndexPath) {
   std::ifstream ExternalMapFile{std::string(IndexPath)};
   if (!ExternalMapFile)
     return llvm::make_error<IndexError>(index_error_code::missing_index_file,
@@ -190,13 +191,13 @@ parseCrossTUIndex(StringRef IndexPath) {
   unsigned LineNo = 1;
   while (std::getline(ExternalMapFile, Line)) {
     // Split lookup name and file path
-    StringRef LookupName, FilePathInIndex;
+    llvm::StringRef LookupName, FilePathInIndex;
     if (!parseCrossTUIndexItem(Line, LookupName, FilePathInIndex))
       return llvm::make_error<IndexError>(
           index_error_code::invalid_index_format, IndexPath.str(), LineNo);
 
     // Store paths with posix-style directory separator.
-    SmallString<32> FilePath(FilePathInIndex);
+    llvm::SmallString<32> FilePath(FilePathInIndex);
     llvm::sys::path::native(FilePath, llvm::sys::path::Style::posix);
 
     bool InsertionOccured;
@@ -243,7 +244,7 @@ CrossTranslationUnitContext::~CrossTranslationUnitContext() {}
 
 std::optional<std::string>
 CrossTranslationUnitContext::getLookupName(const NamedDecl *ND) {
-  SmallString<128> DeclUSR;
+  llvm::SmallString<128> DeclUSR;
   bool Ret = index::generateUSRForDecl(ND, DeclUSR);
   if (Ret)
     return {};
@@ -255,7 +256,7 @@ CrossTranslationUnitContext::getLookupName(const NamedDecl *ND) {
 template <typename T>
 const T *
 CrossTranslationUnitContext::findDefInDeclContext(const DeclContext *DC,
-                                                  StringRef LookupName) {
+                                                  llvm::StringRef LookupName) {
   assert(DC && "Declaration Context must not be null");
   for (const Decl *D : DC->decls()) {
     const auto *SubDC = dyn_cast<DeclContext>(D);
@@ -277,7 +278,7 @@ CrossTranslationUnitContext::findDefInDeclContext(const DeclContext *DC,
 
 template <typename T>
 llvm::Expected<const T *> CrossTranslationUnitContext::getCrossTUDefinitionImpl(
-    const T *D, StringRef CrossTUDir, StringRef IndexName,
+    const T *D, llvm::StringRef CrossTUDir, llvm::StringRef IndexName,
     bool DisplayCTUProgress) {
   assert(D && "D is missing, bad call to this function!");
   assert(!hasBodyOrInit(D) &&
@@ -351,8 +352,8 @@ llvm::Expected<const T *> CrossTranslationUnitContext::getCrossTUDefinitionImpl(
 
 llvm::Expected<const FunctionDecl *>
 CrossTranslationUnitContext::getCrossTUDefinition(const FunctionDecl *FD,
-                                                  StringRef CrossTUDir,
-                                                  StringRef IndexName,
+                                                  llvm::StringRef CrossTUDir,
+                                                  llvm::StringRef IndexName,
                                                   bool DisplayCTUProgress) {
   return getCrossTUDefinitionImpl(FD, CrossTUDir, IndexName,
                                   DisplayCTUProgress);
@@ -360,8 +361,8 @@ CrossTranslationUnitContext::getCrossTUDefinition(const FunctionDecl *FD,
 
 llvm::Expected<const VarDecl *>
 CrossTranslationUnitContext::getCrossTUDefinition(const VarDecl *VD,
-                                                  StringRef CrossTUDir,
-                                                  StringRef IndexName,
+                                                  llvm::StringRef CrossTUDir,
+                                                  llvm::StringRef IndexName,
                                                   bool DisplayCTUProgress) {
   return getCrossTUDefinitionImpl(VD, CrossTUDir, IndexName,
                                   DisplayCTUProgress);
@@ -400,7 +401,7 @@ CrossTranslationUnitContext::ASTUnitStorage::ASTUnitStorage(
 
 llvm::Expected<ASTUnit *>
 CrossTranslationUnitContext::ASTUnitStorage::getASTUnitForFile(
-    StringRef FileName, bool DisplayCTUProgress) {
+    llvm::StringRef FileName, bool DisplayCTUProgress) {
   // Try the cache first.
   auto ASTCacheEntry = FileASTUnitMap.find(FileName);
   if (ASTCacheEntry == FileASTUnitMap.end()) {
@@ -440,7 +441,7 @@ CrossTranslationUnitContext::ASTUnitStorage::getASTUnitForFile(
 
 llvm::Expected<ASTUnit *>
 CrossTranslationUnitContext::ASTUnitStorage::getASTUnitForFunction(
-    StringRef FunctionName, StringRef CrossTUDir, StringRef IndexName,
+    llvm::StringRef FunctionName, llvm::StringRef CrossTUDir, llvm::StringRef IndexName,
     bool DisplayCTUProgress) {
   // Try the cache first.
   auto ASTCacheEntry = NameASTUnitMap.find(FunctionName);
@@ -478,20 +479,20 @@ CrossTranslationUnitContext::ASTUnitStorage::getASTUnitForFunction(
 
 llvm::Expected<std::string>
 CrossTranslationUnitContext::ASTUnitStorage::getFileForFunction(
-    StringRef FunctionName, StringRef CrossTUDir, StringRef IndexName) {
+    llvm::StringRef FunctionName, llvm::StringRef CrossTUDir, llvm::StringRef IndexName) {
   if (llvm::Error IndexLoadError = ensureCTUIndexLoaded(CrossTUDir, IndexName))
     return std::move(IndexLoadError);
   return NameFileMap[FunctionName];
 }
 
 llvm::Error CrossTranslationUnitContext::ASTUnitStorage::ensureCTUIndexLoaded(
-    StringRef CrossTUDir, StringRef IndexName) {
+    llvm::StringRef CrossTUDir, llvm::StringRef IndexName) {
   // Dont initialize if the map is filled.
   if (!NameFileMap.empty())
     return llvm::Error::success();
 
   // Get the absolute path to the index file.
-  SmallString<256> IndexFile = CrossTUDir;
+  llvm::SmallString<256> IndexFile = CrossTUDir;
   if (llvm::sys::path::is_absolute(IndexName))
     IndexFile = IndexName;
   else
@@ -508,7 +509,7 @@ llvm::Error CrossTranslationUnitContext::ASTUnitStorage::ensureCTUIndexLoaded(
 }
 
 llvm::Expected<ASTUnit *> CrossTranslationUnitContext::loadExternalAST(
-    StringRef LookupName, StringRef CrossTUDir, StringRef IndexName,
+    llvm::StringRef LookupName, llvm::StringRef CrossTUDir, llvm::StringRef IndexName,
     bool DisplayCTUProgress) {
   // FIXME: The current implementation only supports loading decls with
   //        a lookup name from a single translation unit. If multiple
@@ -531,11 +532,11 @@ llvm::Expected<ASTUnit *> CrossTranslationUnitContext::loadExternalAST(
 }
 
 CrossTranslationUnitContext::ASTLoader::ASTLoader(
-    CompilerInstance &CI, StringRef CTUDir, StringRef InvocationListFilePath)
+    CompilerInstance &CI, llvm::StringRef CTUDir, llvm::StringRef InvocationListFilePath)
     : CI(CI), CTUDir(CTUDir), InvocationListFilePath(InvocationListFilePath) {}
 
 CrossTranslationUnitContext::LoadResultTy
-CrossTranslationUnitContext::ASTLoader::load(StringRef Identifier) {
+CrossTranslationUnitContext::ASTLoader::load(llvm::StringRef Identifier) {
   llvm::SmallString<256> Path;
   if (llvm::sys::path::is_absolute(Identifier, PathStyle)) {
     Path = Identifier;
@@ -558,12 +559,12 @@ CrossTranslationUnitContext::ASTLoader::load(StringRef Identifier) {
 }
 
 CrossTranslationUnitContext::LoadResultTy
-CrossTranslationUnitContext::ASTLoader::loadFromDump(StringRef ASTDumpPath) {
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+CrossTranslationUnitContext::ASTLoader::loadFromDump(llvm::StringRef ASTDumpPath) {
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
   TextDiagnosticPrinter *DiagClient =
       new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts);
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
       new DiagnosticsEngine(DiagID, &*DiagOpts, DiagClient));
   return ASTUnit::LoadFromASTFile(
       std::string(ASTDumpPath.str()),
@@ -584,7 +585,7 @@ CrossTranslationUnitContext::ASTLoader::loadFromDump(StringRef ASTDumpPath) {
 /// consideration.
 CrossTranslationUnitContext::LoadResultTy
 CrossTranslationUnitContext::ASTLoader::loadFromSource(
-    StringRef SourceFilePath) {
+    llvm::StringRef SourceFilePath) {
 
   if (llvm::Error InitError = lazyInitInvocationList())
     return std::move(InitError);
@@ -597,16 +598,16 @@ CrossTranslationUnitContext::ASTLoader::loadFromSource(
 
   const InvocationListTy::mapped_type &InvocationCommand = Invocation->second;
 
-  SmallVector<const char *, 32> CommandLineArgs(InvocationCommand.size());
+  llvm::SmallVector<const char *, 32> CommandLineArgs(InvocationCommand.size());
   std::transform(InvocationCommand.begin(), InvocationCommand.end(),
                  CommandLineArgs.begin(),
                  [](auto &&CmdPart) { return CmdPart.c_str(); });
 
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts{&CI.getDiagnosticOpts()};
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts{&CI.getDiagnosticOpts()};
   auto *DiagClient = new ForwardingDiagnosticConsumer{CI.getDiagnosticClient()};
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID{
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID{
       CI.getDiagnostics().getDiagnosticIDs()};
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
       new DiagnosticsEngine{DiagID, &*DiagOpts, DiagClient});
 
   return ASTUnit::LoadFromCommandLine(CommandLineArgs.begin(),
@@ -616,7 +617,7 @@ CrossTranslationUnitContext::ASTLoader::loadFromSource(
 }
 
 llvm::Expected<InvocationListTy>
-parseInvocationList(StringRef FileContent, llvm::sys::path::Style PathStyle) {
+parseInvocationList(llvm::StringRef FileContent, llvm::sys::path::Style PathStyle) {
   InvocationListTy InvocationList;
 
   /// LLVM YAML parser is used to extract information from invocation list file.
@@ -651,14 +652,14 @@ parseInvocationList(StringRef FileContent, llvm::sys::path::Style PathStyle) {
       return llvm::make_error<IndexError>(
           index_error_code::invocation_list_wrong_format);
 
-    SmallString<32> ValueStorage;
-    StringRef SourcePath = Key->getValue(ValueStorage);
+    llvm::SmallString<32> ValueStorage;
+    llvm::StringRef SourcePath = Key->getValue(ValueStorage);
 
     // Store paths with PathStyle directory separator.
-    SmallString<32> NativeSourcePath(SourcePath);
+    llvm::SmallString<32> NativeSourcePath(SourcePath);
     llvm::sys::path::native(NativeSourcePath, PathStyle);
 
-    StringRef InvocationKey = NativeSourcePath;
+    llvm::StringRef InvocationKey = NativeSourcePath;
 
     if (InvocationList.contains(InvocationKey))
       return llvm::make_error<IndexError>(

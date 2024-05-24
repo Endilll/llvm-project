@@ -455,7 +455,7 @@ const NodeType *findFirst(ASTContext &ASTCtx, const MatcherType &M) {
 template <typename Node>
 std::pair<testing::AssertionResult, Value *>
 getProperty(const Environment &Env, ASTContext &ASTCtx, const Node *N,
-            StringRef Property) {
+            llvm::StringRef Property) {
   if (!N)
     return {testing::AssertionFailure() << "No node", nullptr};
   const StorageLocation *Loc = Env.getStorageLocation(*N);
@@ -476,7 +476,7 @@ getProperty(const Environment &Env, ASTContext &ASTCtx, const Node *N,
 template <typename Node>
 testing::AssertionResult isPropertyImplied(const Environment &Env,
                                            ASTContext &ASTCtx, const Node *N,
-                                           StringRef Property, bool Implies) {
+                                           llvm::StringRef Property, bool Implies) {
   auto [Result, Prop] = getProperty(Env, ASTCtx, N, Property);
   if (!Prop)
     return Result;

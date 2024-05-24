@@ -71,9 +71,9 @@ namespace internal {
 /// If ``Status`` is non-null, its value will be populated with the status of
 /// this formatting attempt. See \c FormattingAttemptStatus.
 std::pair<tooling::Replacements, unsigned>
-reformat(const FormatStyle &Style, StringRef Code,
-         ArrayRef<tooling::Range> Ranges, unsigned FirstStartColumn,
-         unsigned NextStartColumn, unsigned LastStartColumn, StringRef FileName,
+reformat(const FormatStyle &Style, llvm::StringRef Code,
+         llvm::ArrayRef<tooling::Range> Ranges, unsigned FirstStartColumn,
+         unsigned NextStartColumn, unsigned LastStartColumn, llvm::StringRef FileName,
          FormattingAttemptStatus *Status);
 
 } // namespace internal

@@ -94,7 +94,7 @@ findNextTokenIncludingComments(SourceLocation Start, const SourceManager &SM,
   // Break down the source location.
   std::pair<FileID, unsigned> LocInfo = SM.getDecomposedLoc(Start);
   bool InvalidTemp = false;
-  StringRef File = SM.getBufferData(LocInfo.first, &InvalidTemp);
+  llvm::StringRef File = SM.getBufferData(LocInfo.first, &InvalidTemp);
   if (InvalidTemp)
     return std::nullopt;
   // Lex from the start of the given location.
@@ -154,7 +154,7 @@ std::optional<Token> getQualifyingToken(tok::TokenKind TK,
           TK == tok::kw_restrict) &&
          "TK is not a qualifier keyword");
   std::pair<FileID, unsigned> LocInfo = SM.getDecomposedLoc(Range.getBegin());
-  StringRef File = SM.getBufferData(LocInfo.first);
+  llvm::StringRef File = SM.getBufferData(LocInfo.first);
   Lexer RawLexer(SM.getLocForStartOfFile(LocInfo.first), Context.getLangOpts(),
                  File.begin(), File.data() + LocInfo.second, File.end());
   std::optional<Token> LastMatchBeforeTemplate;
@@ -166,7 +166,7 @@ std::optional<Token> getQualifyingToken(tok::TokenKind TK,
          !SM.isBeforeInTranslationUnit(Range.getEnd(), Tok.getLocation())) {
     if (Tok.is(tok::raw_identifier)) {
       IdentifierInfo &Info = Context.Idents.get(
-          StringRef(SM.getCharacterData(Tok.getLocation()), Tok.getLength()));
+          llvm::StringRef(SM.getCharacterData(Tok.getLocation()), Tok.getLength()));
       Tok.setIdentifierInfo(&Info);
       Tok.setKind(Info.getTokenID());
     }

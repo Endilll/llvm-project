@@ -130,10 +130,10 @@ public:
   std::pair<StringRef, StringRef> split(char Separator) const;
   std::pair<StringRef, StringRef> split(StringRef Separator) const;
   std::pair<StringRef, StringRef> rsplit(StringRef Separator) const;
-  void split(SmallVectorImpl<StringRef> &A,
+  void split(llvm::SmallVectorImpl<StringRef> &A,
              StringRef Separator, int MaxSplit = -1,
              bool KeepEmpty = true) const;
-  void split(SmallVectorImpl<StringRef> &A, char Separator, int MaxSplit = -1,
+  void split(llvm::SmallVectorImpl<StringRef> &A, char Separator, int MaxSplit = -1,
              bool KeepEmpty = true) const;
   std::pair<StringRef, StringRef> rsplit(char Separator) const;
   StringRef ltrim(char Char) const;

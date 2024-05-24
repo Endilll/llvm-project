@@ -39,9 +39,9 @@ void MisplacedArrayIndexCheck::check(const MatchFinder::MatchResult &Result) {
       !isa<MemberExpr>(RHSE))
     return;
 
-  const StringRef LText = tooling::fixit::getText(
+  const llvm::StringRef LText = tooling::fixit::getText(
       ArraySubscriptE->getLHS()->getSourceRange(), *Result.Context);
-  const StringRef RText = tooling::fixit::getText(
+  const llvm::StringRef RText = tooling::fixit::getText(
       ArraySubscriptE->getRHS()->getSourceRange(), *Result.Context);
 
   Diag << FixItHint::CreateReplacement(

@@ -67,7 +67,7 @@ ThreadSafetyHandler::~ThreadSafetyHandler() = default;
 /// Issue a warning about an invalid lock expression
 static void warnInvalidLock(ThreadSafetyHandler &Handler,
                             const Expr *MutexExp, const NamedDecl *D,
-                            const Expr *DeclExp, StringRef Kind) {
+                            const Expr *DeclExp, llvm::StringRef Kind) {
   SourceLocation Loc;
   if (DeclExp)
     Loc = DeclExp->getExprLoc();
@@ -81,7 +81,7 @@ namespace {
 
 /// A set of CapabilityExpr objects, which are compiled from thread safety
 /// attributes on a function.
-class CapExprSet : public SmallVector<CapabilityExpr, 4> {
+class CapExprSet : public llvm::SmallVector<CapabilityExpr, 4> {
 public:
   /// Push M onto list, but discard duplicates.
   void push_back_nodup(const CapabilityExpr &CapE) {
@@ -178,7 +178,7 @@ public:
 /// may involve partial pattern matches, rather than exact matches.
 class FactSet {
 private:
-  using FactVec = SmallVector<FactID, 4>;
+  using FactVec = llvm::SmallVector<FactID, 4>;
 
   FactVec FactIDs;
 
@@ -276,7 +276,7 @@ namespace threadSafety {
 
 class BeforeSet {
 private:
-  using BeforeVect = SmallVector<const ValueDecl *, 4>;
+  using BeforeVect = llvm::SmallVector<const ValueDecl *, 4>;
 
   struct BeforeInfo {
     BeforeVect Vect;
@@ -302,7 +302,7 @@ public:
   void checkBeforeAfter(const ValueDecl* Vd,
                         const FactSet& FSet,
                         ThreadSafetyAnalyzer& Analyzer,
-                        SourceLocation Loc, StringRef CapKind);
+                        SourceLocation Loc, llvm::StringRef CapKind);
 
 private:
   BeforeMap BMap;
@@ -900,7 +900,7 @@ private:
     UnderlyingCapabilityKind Kind;
   };
 
-  SmallVector<UnderlyingCapability, 2> UnderlyingMutexes;
+  llvm::SmallVector<UnderlyingCapability, 2> UnderlyingMutexes;
 
 public:
   ScopedLockableFactEntry(const CapabilityExpr &CE, SourceLocation Loc)
@@ -1146,8 +1146,8 @@ BeforeSet::getBeforeInfoForDecl(const ValueDecl *Vd,
 void BeforeSet::checkBeforeAfter(const ValueDecl* StartVd,
                                  const FactSet& FSet,
                                  ThreadSafetyAnalyzer& Analyzer,
-                                 SourceLocation Loc, StringRef CapKind) {
-  SmallVector<BeforeInfo*, 8> InfoVect;
+                                 SourceLocation Loc, llvm::StringRef CapKind) {
+  llvm::SmallVector<BeforeInfo*, 8> InfoVect;
 
   // Do a depth-first traversal of Vd.
   // Return true if there are cycles.
@@ -1171,15 +1171,15 @@ void BeforeSet::checkBeforeAfter(const ValueDecl* StartVd,
     for (const auto *Vdb : Info->Vect) {
       // Exclude mutexes in our immediate before set.
       if (FSet.containsMutexDecl(Analyzer.FactMan, Vdb)) {
-        StringRef L1 = StartVd->getName();
-        StringRef L2 = Vdb->getName();
+        llvm::StringRef L1 = StartVd->getName();
+        llvm::StringRef L2 = Vdb->getName();
         Analyzer.Handler.handleLockAcquiredBefore(CapKind, L1, L2, Loc);
       }
       // Transitively search other before sets, and warn on cycles.
       if (traverse(Vdb)) {
         if (!CycMap.contains(Vd)) {
           CycMap.insert(std::make_pair(Vd, true));
-          StringRef L1 = Vd->getName();
+          llvm::StringRef L1 = Vd->getName();
           Analyzer.Handler.handleBeforeAfterCycle(L1, Vd->getLocation());
         }
       }
@@ -1631,7 +1631,7 @@ void ThreadSafetyAnalyzer::warnIfMutexNotHeld(
     if (LDat) {
       // Warn that there's no precise match.
       std::string PartMatchStr = LDat->toString();
-      StringRef   PartMatchName(PartMatchStr);
+      llvm::StringRef   PartMatchName(PartMatchStr);
       Handler.handleMutexNotHeld(Cp.getKind(), D, POK, Cp.toString(), LK, Loc,
                                  &PartMatchName);
     } else {
@@ -1805,7 +1805,7 @@ void BuildLockset::handleCall(const Expr *Exp, const NamedDecl *D,
     assert(!Self);
     const auto *TagT = Exp->getType()->getAs<TagType>();
     if (TagT && Exp->isPRValue()) {
-      std::pair<til::LiteralPtr *, StringRef> Placeholder =
+      std::pair<til::LiteralPtr *, llvm::StringRef> Placeholder =
           Analyzer->SxBuilder.createThisPlaceholder(Exp);
       [[maybe_unused]] auto inserted =
           Analyzer->ConstructedObjects.insert({Exp, Placeholder.first});
@@ -2004,7 +2004,7 @@ void BuildLockset::examineArguments(const FunctionDecl *FD,
   if (FD->hasAttr<NoThreadSafetyAnalysisAttr>())
     return;
 
-  const ArrayRef<ParmVarDecl *> Params = FD->parameters();
+  const llvm::ArrayRef<ParmVarDecl *> Params = FD->parameters();
   auto Param = Params.begin();
   if (SkipFirstParam)
     ++Param;

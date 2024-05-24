@@ -25,7 +25,7 @@ namespace clang::tidy::mpi {
 /// http://clang.llvm.org/extra/clang-tidy/checks/mpi/type-mismatch.html
 class TypeMismatchCheck : public ClangTidyCheck {
 public:
-  TypeMismatchCheck(StringRef Name, ClangTidyContext *Context)
+  TypeMismatchCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
@@ -40,9 +40,9 @@ private:
   /// \param BufferExprs buffer arguments as expressions
   /// \param MPIDatatypes MPI datatype
   /// \param LO language options
-  void checkArguments(ArrayRef<const Type *> BufferTypes,
-                      ArrayRef<const Expr *> BufferExprs,
-                      ArrayRef<StringRef> MPIDatatypes, const LangOptions &LO);
+  void checkArguments(llvm::ArrayRef<const Type *> BufferTypes,
+                      llvm::ArrayRef<const Expr *> BufferExprs,
+                      llvm::ArrayRef<llvm::StringRef> MPIDatatypes, const LangOptions &LO);
 
   std::optional<ento::mpi::MPIFunctionClassifier> FuncClassifier;
 };

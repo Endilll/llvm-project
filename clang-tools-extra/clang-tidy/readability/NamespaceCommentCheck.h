@@ -21,7 +21,7 @@ namespace clang::tidy::readability {
 /// https://google.github.io/styleguide/cppguide.html#Namespaces
 class NamespaceCommentCheck : public ClangTidyCheck {
 public:
-  NamespaceCommentCheck(StringRef Name, ClangTidyContext *Context);
+  NamespaceCommentCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

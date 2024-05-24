@@ -115,7 +115,7 @@ public:
   PrettyStackTraceAnalysis(const AdornedCFG &ACFG, const char *Message)
       : ACFG(ACFG), Message(Message) {}
 
-  void print(raw_ostream &OS) const override {
+  void print(llvm::raw_ostream &OS) const override {
     OS << Message << "\n";
     OS << "Decl:\n";
     ACFG.getDecl().dump(OS);
@@ -135,7 +135,7 @@ public:
       : Element(Element), BlockIdx(BlockIdx), ElementIdx(ElementIdx),
         Message(Message) {}
 
-  void print(raw_ostream &OS) const override {
+  void print(llvm::raw_ostream &OS) const override {
     OS << Message << ": Element [B" << BlockIdx << "." << ElementIdx << "]\n";
     if (auto Stmt = Element.getAs<CFGStmt>()) {
       OS << "Stmt:\n";

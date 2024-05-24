@@ -181,16 +181,16 @@ const auto isMoveOnly = [] {
 };
 
 template <class T> struct NodeID;
-template <> struct NodeID<Expr> { static constexpr StringRef value = "expr"; };
-template <> struct NodeID<Decl> { static constexpr StringRef value = "decl"; };
-constexpr StringRef NodeID<Expr>::value;
-constexpr StringRef NodeID<Decl>::value;
+template <> struct NodeID<Expr> { static constexpr llvm::StringRef value = "expr"; };
+template <> struct NodeID<Decl> { static constexpr llvm::StringRef value = "decl"; };
+constexpr llvm::StringRef NodeID<Expr>::value;
+constexpr llvm::StringRef NodeID<Decl>::value;
 
 template <class T,
           class F = const Stmt *(ExprMutationAnalyzer::Analyzer::*)(const T *)>
-const Stmt *tryEachMatch(ArrayRef<ast_matchers::BoundNodes> Matches,
+const Stmt *tryEachMatch(llvm::ArrayRef<ast_matchers::BoundNodes> Matches,
                          ExprMutationAnalyzer::Analyzer *Analyzer, F Finder) {
-  const StringRef ID = NodeID<T>::value;
+  const llvm::StringRef ID = NodeID<T>::value;
   for (const auto &Nodes : Matches) {
     if (const Stmt *S = (Analyzer->*Finder)(Nodes.getNodeAs<T>(ID)))
       return S;
@@ -307,25 +307,25 @@ bool ExprMutationAnalyzer::Analyzer::isUnevaluated(const Expr *Exp) {
 }
 
 const Stmt *
-ExprMutationAnalyzer::Analyzer::findExprMutation(ArrayRef<BoundNodes> Matches) {
+ExprMutationAnalyzer::Analyzer::findExprMutation(llvm::ArrayRef<BoundNodes> Matches) {
   return tryEachMatch<Expr>(Matches, this,
                             &ExprMutationAnalyzer::Analyzer::findMutation);
 }
 
 const Stmt *
-ExprMutationAnalyzer::Analyzer::findDeclMutation(ArrayRef<BoundNodes> Matches) {
+ExprMutationAnalyzer::Analyzer::findDeclMutation(llvm::ArrayRef<BoundNodes> Matches) {
   return tryEachMatch<Decl>(Matches, this,
                             &ExprMutationAnalyzer::Analyzer::findMutation);
 }
 
 const Stmt *ExprMutationAnalyzer::Analyzer::findExprPointeeMutation(
-    ArrayRef<ast_matchers::BoundNodes> Matches) {
+    llvm::ArrayRef<ast_matchers::BoundNodes> Matches) {
   return tryEachMatch<Expr>(
       Matches, this, &ExprMutationAnalyzer::Analyzer::findPointeeMutation);
 }
 
 const Stmt *ExprMutationAnalyzer::Analyzer::findDeclPointeeMutation(
-    ArrayRef<ast_matchers::BoundNodes> Matches) {
+    llvm::ArrayRef<ast_matchers::BoundNodes> Matches) {
   return tryEachMatch<Decl>(
       Matches, this, &ExprMutationAnalyzer::Analyzer::findPointeeMutation);
 }
@@ -640,7 +640,7 @@ ExprMutationAnalyzer::Analyzer::findFunctionArgMutation(const Expr *Exp) {
       return Exp;
 
     const auto *Parm = Nodes.getNodeAs<ParmVarDecl>("parm");
-    const ArrayRef<ParmVarDecl *> AllParams =
+    const llvm::ArrayRef<ParmVarDecl *> AllParams =
         Func->getPrimaryTemplate()->getTemplatedDecl()->parameters();
     QualType ParmType =
         AllParams[std::min<size_t>(Parm->getFunctionScopeIndex(),

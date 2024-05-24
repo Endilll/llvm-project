@@ -170,7 +170,7 @@ public:
     Data.setInt(false);
   }
 
-  void replaceExternalDecls(ArrayRef<NamedDecl*> Decls) {
+  void replaceExternalDecls(llvm::ArrayRef<NamedDecl*> Decls) {
     // Remove all declarations that are either external or are replaced with
     // external declarations with higher visibilities.
     DeclListNode::Decls *Tail = erase_if([Decls](NamedDecl *ND) {

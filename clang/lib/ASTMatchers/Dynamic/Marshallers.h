@@ -76,7 +76,7 @@ template <> struct ArgTypeTraits<std::string> {
 };
 
 template <>
-struct ArgTypeTraits<StringRef> : public ArgTypeTraits<std::string> {
+struct ArgTypeTraits<llvm::StringRef> : public ArgTypeTraits<std::string> {
 };
 
 template <class T> struct ArgTypeTraits<ast_matchers::internal::Matcher<T>> {
@@ -306,7 +306,7 @@ public:
   virtual ~MatcherDescriptor() = default;
 
   virtual VariantMatcher create(SourceRange NameRange,
-                                ArrayRef<ParserValue> Args,
+                                llvm::ArrayRef<ParserValue> Args,
                                 Diagnostics *Error) const = 0;
 
   virtual ASTNodeKind nodeMatcherType() const { return ASTNodeKind(); }
@@ -314,7 +314,7 @@ public:
   virtual bool isBuilderMatcher() const { return false; }
 
   virtual std::unique_ptr<MatcherDescriptor>
-  buildMatcherCtor(SourceRange NameRange, ArrayRef<ParserValue> Args,
+  buildMatcherCtor(SourceRange NameRange, llvm::ArrayRef<ParserValue> Args,
                    Diagnostics *Error) const {
     return {};
   }
@@ -349,7 +349,7 @@ public:
   virtual bool isPolymorphic() const { return false; }
 };
 
-inline bool isRetKindConvertibleTo(ArrayRef<ASTNodeKind> RetKinds,
+inline bool isRetKindConvertibleTo(llvm::ArrayRef<ASTNodeKind> RetKinds,
                                    ASTNodeKind Kind, unsigned *Specificity,
                                    ASTNodeKind *LeastDerivedKind) {
   for (const ASTNodeKind &NodeKind : RetKinds) {
@@ -372,9 +372,9 @@ inline bool isRetKindConvertibleTo(ArrayRef<ASTNodeKind> RetKinds,
 class FixedArgCountMatcherDescriptor : public MatcherDescriptor {
 public:
   using MarshallerType = VariantMatcher (*)(void (*Func)(),
-                                            StringRef MatcherName,
+                                            llvm::StringRef MatcherName,
                                             SourceRange NameRange,
-                                            ArrayRef<ParserValue> Args,
+                                            llvm::ArrayRef<ParserValue> Args,
                                             Diagnostics *Error);
 
   /// \param Marshaller Function to unpack the arguments and call \c Func
@@ -384,15 +384,15 @@ public:
   ///   convertible.
   /// \param ArgKinds The types of the arguments this matcher takes.
   FixedArgCountMatcherDescriptor(MarshallerType Marshaller, void (*Func)(),
-                                 StringRef MatcherName,
-                                 ArrayRef<ASTNodeKind> RetKinds,
-                                 ArrayRef<ArgKind> ArgKinds)
+                                 llvm::StringRef MatcherName,
+                                 llvm::ArrayRef<ASTNodeKind> RetKinds,
+                                 llvm::ArrayRef<ArgKind> ArgKinds)
       : Marshaller(Marshaller), Func(Func), MatcherName(MatcherName),
         RetKinds(RetKinds.begin(), RetKinds.end()),
         ArgKinds(ArgKinds.begin(), ArgKinds.end()) {}
 
   VariantMatcher create(SourceRange NameRange,
-                        ArrayRef<ParserValue> Args,
+                        llvm::ArrayRef<ParserValue> Args,
                         Diagnostics *Error) const override {
     return Marshaller(Func, MatcherName, NameRange, Args, Error);
   }
@@ -488,13 +488,13 @@ struct BuildReturnTypeVector<ast_matchers::internal::BindableMatcher<T>> {
 
 /// Variadic marshaller function.
 template <typename ResultT, typename ArgT,
-          ResultT (*Func)(ArrayRef<const ArgT *>)>
+          ResultT (*Func)(llvm::ArrayRef<const ArgT *>)>
 VariantMatcher
-variadicMatcherDescriptor(StringRef MatcherName, SourceRange NameRange,
-                          ArrayRef<ParserValue> Args, Diagnostics *Error) {
-  SmallVector<ArgT *, 8> InnerArgsPtr;
+variadicMatcherDescriptor(llvm::StringRef MatcherName, SourceRange NameRange,
+                          llvm::ArrayRef<ParserValue> Args, Diagnostics *Error) {
+  llvm::SmallVector<ArgT *, 8> InnerArgsPtr;
   InnerArgsPtr.resize_for_overwrite(Args.size());
-  SmallVector<ArgT, 8> InnerArgs;
+  llvm::SmallVector<ArgT, 8> InnerArgs;
   InnerArgs.reserve(Args.size());
 
   for (size_t i = 0, e = Args.size(); i != e; ++i) {
@@ -540,16 +540,16 @@ variadicMatcherDescriptor(StringRef MatcherName, SourceRange NameRange,
 /// object file.
 class VariadicFuncMatcherDescriptor : public MatcherDescriptor {
 public:
-  using RunFunc = VariantMatcher (*)(StringRef MatcherName,
+  using RunFunc = VariantMatcher (*)(llvm::StringRef MatcherName,
                                      SourceRange NameRange,
-                                     ArrayRef<ParserValue> Args,
+                                     llvm::ArrayRef<ParserValue> Args,
                                      Diagnostics *Error);
 
   template <typename ResultT, typename ArgT,
-            ResultT (*F)(ArrayRef<const ArgT *>)>
+            ResultT (*F)(llvm::ArrayRef<const ArgT *>)>
   VariadicFuncMatcherDescriptor(
       ast_matchers::internal::VariadicFunction<ResultT, ArgT, F> Func,
-      StringRef MatcherName)
+      llvm::StringRef MatcherName)
       : Func(&variadicMatcherDescriptor<ResultT, ArgT, F>),
         MatcherName(MatcherName.str()),
         ArgsKind(ArgTypeTraits<ArgT>::getKind()) {
@@ -557,7 +557,7 @@ public:
   }
 
   VariantMatcher create(SourceRange NameRange,
-                        ArrayRef<ParserValue> Args,
+                        llvm::ArrayRef<ParserValue> Args,
                         Diagnostics *Error) const override {
     return Func(MatcherName, NameRange, Args, Error);
   }
@@ -591,7 +591,7 @@ public:
   template <typename BaseT, typename DerivedT>
   DynCastAllOfMatcherDescriptor(
       ast_matchers::internal::VariadicDynCastAllOfMatcher<BaseT, DerivedT> Func,
-      StringRef MatcherName)
+      llvm::StringRef MatcherName)
       : VariadicFuncMatcherDescriptor(Func, MatcherName),
         DerivedKind(ASTNodeKind::getFromNodeKind<DerivedT>()) {}
 
@@ -649,9 +649,9 @@ private:
 
 /// 0-arg marshaller function.
 template <typename ReturnType>
-static VariantMatcher matcherMarshall0(void (*Func)(), StringRef MatcherName,
+static VariantMatcher matcherMarshall0(void (*Func)(), llvm::StringRef MatcherName,
                                        SourceRange NameRange,
-                                       ArrayRef<ParserValue> Args,
+                                       llvm::ArrayRef<ParserValue> Args,
                                        Diagnostics *Error) {
   using FuncType = ReturnType (*)();
   CHECK_ARG_COUNT(0);
@@ -660,9 +660,9 @@ static VariantMatcher matcherMarshall0(void (*Func)(), StringRef MatcherName,
 
 /// 1-arg marshaller function.
 template <typename ReturnType, typename ArgType1>
-static VariantMatcher matcherMarshall1(void (*Func)(), StringRef MatcherName,
+static VariantMatcher matcherMarshall1(void (*Func)(), llvm::StringRef MatcherName,
                                        SourceRange NameRange,
-                                       ArrayRef<ParserValue> Args,
+                                       llvm::ArrayRef<ParserValue> Args,
                                        Diagnostics *Error) {
   using FuncType = ReturnType (*)(ArgType1);
   CHECK_ARG_COUNT(1);
@@ -673,9 +673,9 @@ static VariantMatcher matcherMarshall1(void (*Func)(), StringRef MatcherName,
 
 /// 2-arg marshaller function.
 template <typename ReturnType, typename ArgType1, typename ArgType2>
-static VariantMatcher matcherMarshall2(void (*Func)(), StringRef MatcherName,
+static VariantMatcher matcherMarshall2(void (*Func)(), llvm::StringRef MatcherName,
                                        SourceRange NameRange,
-                                       ArrayRef<ParserValue> Args,
+                                       llvm::ArrayRef<ParserValue> Args,
                                        Diagnostics *Error) {
   using FuncType = ReturnType (*)(ArgType1, ArgType2);
   CHECK_ARG_COUNT(2);
@@ -696,7 +696,7 @@ template <template <typename ToArg, typename FromArg> class ArgumentAdapterT,
 class AdaptativeOverloadCollector {
 public:
   AdaptativeOverloadCollector(
-      StringRef Name, std::vector<std::unique_ptr<MatcherDescriptor>> &Out)
+      llvm::StringRef Name, std::vector<std::unique_ptr<MatcherDescriptor>> &Out)
       : Name(Name), Out(Out) {
     collect(FromTypes());
   }
@@ -713,7 +713,7 @@ private:
   template <typename FromTypeList>
   inline void collect(FromTypeList);
 
-  StringRef Name;
+  llvm::StringRef Name;
   std::vector<std::unique_ptr<MatcherDescriptor>> &Out;
 };
 
@@ -725,14 +725,14 @@ private:
 class OverloadedMatcherDescriptor : public MatcherDescriptor {
 public:
   OverloadedMatcherDescriptor(
-      MutableArrayRef<std::unique_ptr<MatcherDescriptor>> Callbacks)
+      llvm::MutableArrayRef<std::unique_ptr<MatcherDescriptor>> Callbacks)
       : Overloads(std::make_move_iterator(Callbacks.begin()),
                   std::make_move_iterator(Callbacks.end())) {}
 
   ~OverloadedMatcherDescriptor() override = default;
 
   VariantMatcher create(SourceRange NameRange,
-                        ArrayRef<ParserValue> Args,
+                        llvm::ArrayRef<ParserValue> Args,
                         Diagnostics *Error) const override {
     std::vector<VariantMatcher> Constructed;
     Diagnostics::OverloadContext Ctx(Error);
@@ -798,10 +798,10 @@ private:
 template <typename ReturnType>
 class RegexMatcherDescriptor : public MatcherDescriptor {
 public:
-  RegexMatcherDescriptor(ReturnType (*WithFlags)(StringRef,
+  RegexMatcherDescriptor(ReturnType (*WithFlags)(llvm::StringRef,
                                                  llvm::Regex::RegexFlags),
-                         ReturnType (*NoFlags)(StringRef),
-                         ArrayRef<ASTNodeKind> RetKinds)
+                         ReturnType (*NoFlags)(llvm::StringRef),
+                         llvm::ArrayRef<ASTNodeKind> RetKinds)
       : WithFlags(WithFlags), NoFlags(NoFlags),
         RetKinds(RetKinds.begin(), RetKinds.end()) {}
   bool isVariadic() const override { return true; }
@@ -819,22 +819,22 @@ public:
                                   LeastDerivedKind);
   }
 
-  VariantMatcher create(SourceRange NameRange, ArrayRef<ParserValue> Args,
+  VariantMatcher create(SourceRange NameRange, llvm::ArrayRef<ParserValue> Args,
                         Diagnostics *Error) const override {
     if (Args.size() < 1 || Args.size() > 2) {
       Error->addError(NameRange, Diagnostics::ET_RegistryWrongArgCount)
           << "1 or 2" << Args.size();
       return VariantMatcher();
     }
-    if (!ArgTypeTraits<StringRef>::hasCorrectType(Args[0].Value)) {
+    if (!ArgTypeTraits<llvm::StringRef>::hasCorrectType(Args[0].Value)) {
       Error->addError(Args[0].Range, Error->ET_RegistryWrongArgType)
-          << 1 << ArgTypeTraits<StringRef>::getKind().asString()
+          << 1 << ArgTypeTraits<llvm::StringRef>::getKind().asString()
           << Args[0].Value.getTypeAsString();
       return VariantMatcher();
     }
     if (Args.size() == 1) {
       return outvalueToVariantMatcher(
-          NoFlags(ArgTypeTraits<StringRef>::get(Args[0].Value)));
+          NoFlags(ArgTypeTraits<llvm::StringRef>::get(Args[0].Value)));
     }
     if (!ArgTypeTraits<llvm::Regex::RegexFlags>::hasCorrectType(
             Args[1].Value)) {
@@ -857,13 +857,13 @@ public:
       return VariantMatcher();
     }
     return outvalueToVariantMatcher(
-        WithFlags(ArgTypeTraits<StringRef>::get(Args[0].Value),
+        WithFlags(ArgTypeTraits<llvm::StringRef>::get(Args[0].Value),
                   ArgTypeTraits<llvm::Regex::RegexFlags>::get(Args[1].Value)));
   }
 
 private:
-  ReturnType (*const WithFlags)(StringRef, llvm::Regex::RegexFlags);
-  ReturnType (*const NoFlags)(StringRef);
+  ReturnType (*const WithFlags)(llvm::StringRef, llvm::Regex::RegexFlags);
+  ReturnType (*const NoFlags)(llvm::StringRef);
   const std::vector<ASTNodeKind> RetKinds;
 };
 
@@ -873,20 +873,20 @@ public:
   using VarOp = DynTypedMatcher::VariadicOperator;
 
   VariadicOperatorMatcherDescriptor(unsigned MinCount, unsigned MaxCount,
-                                    VarOp Op, StringRef MatcherName)
+                                    VarOp Op, llvm::StringRef MatcherName)
       : MinCount(MinCount), MaxCount(MaxCount), Op(Op),
         MatcherName(MatcherName) {}
 
   VariantMatcher create(SourceRange NameRange,
-                        ArrayRef<ParserValue> Args,
+                        llvm::ArrayRef<ParserValue> Args,
                         Diagnostics *Error) const override {
     if (Args.size() < MinCount || MaxCount < Args.size()) {
       const std::string MaxStr =
           (MaxCount == std::numeric_limits<unsigned>::max() ? ""
-                                                            : Twine(MaxCount))
+                                                            : llvm::Twine(MaxCount))
               .str();
       Error->addError(NameRange, Error->ET_RegistryWrongArgCount)
-          << ("(" + Twine(MinCount) + ", " + MaxStr + ")") << Args.size();
+          << ("(" + llvm::Twine(MinCount) + ", " + MaxStr + ")") << Args.size();
       return VariantMatcher();
     }
 
@@ -927,7 +927,7 @@ private:
   const unsigned MinCount;
   const unsigned MaxCount;
   const VarOp Op;
-  const StringRef MatcherName;
+  const llvm::StringRef MatcherName;
 };
 
 class MapAnyOfMatcherDescriptor : public MatcherDescriptor {
@@ -939,7 +939,7 @@ public:
                             std::vector<ASTNodeKind> NodeKinds)
       : CladeNodeKind(CladeNodeKind), NodeKinds(std::move(NodeKinds)) {}
 
-  VariantMatcher create(SourceRange NameRange, ArrayRef<ParserValue> Args,
+  VariantMatcher create(SourceRange NameRange, llvm::ArrayRef<ParserValue> Args,
                         Diagnostics *Error) const override {
 
     std::vector<DynTypedMatcher> NodeArgs;
@@ -996,7 +996,7 @@ public:
 
 class MapAnyOfBuilderDescriptor : public MatcherDescriptor {
 public:
-  VariantMatcher create(SourceRange, ArrayRef<ParserValue>,
+  VariantMatcher create(SourceRange, llvm::ArrayRef<ParserValue>,
                         Diagnostics *) const override {
     return {};
   }
@@ -1004,7 +1004,7 @@ public:
   bool isBuilderMatcher() const override { return true; }
 
   std::unique_ptr<MatcherDescriptor>
-  buildMatcherCtor(SourceRange, ArrayRef<ParserValue> Args,
+  buildMatcherCtor(SourceRange, llvm::ArrayRef<ParserValue> Args,
                    Diagnostics *) const override {
 
     std::vector<ASTNodeKind> NodeKinds;
@@ -1055,7 +1055,7 @@ public:
 /// 0-arg overload
 template <typename ReturnType>
 std::unique_ptr<MatcherDescriptor>
-makeMatcherAutoMarshall(ReturnType (*Func)(), StringRef MatcherName) {
+makeMatcherAutoMarshall(ReturnType (*Func)(), llvm::StringRef MatcherName) {
   std::vector<ASTNodeKind> RetTypes;
   BuildReturnTypeVector<ReturnType>::build(RetTypes);
   return std::make_unique<FixedArgCountMatcherDescriptor>(
@@ -1066,7 +1066,7 @@ makeMatcherAutoMarshall(ReturnType (*Func)(), StringRef MatcherName) {
 /// 1-arg overload
 template <typename ReturnType, typename ArgType1>
 std::unique_ptr<MatcherDescriptor>
-makeMatcherAutoMarshall(ReturnType (*Func)(ArgType1), StringRef MatcherName) {
+makeMatcherAutoMarshall(ReturnType (*Func)(ArgType1), llvm::StringRef MatcherName) {
   std::vector<ASTNodeKind> RetTypes;
   BuildReturnTypeVector<ReturnType>::build(RetTypes);
   ArgKind AK = ArgTypeTraits<ArgType1>::getKind();
@@ -1079,7 +1079,7 @@ makeMatcherAutoMarshall(ReturnType (*Func)(ArgType1), StringRef MatcherName) {
 template <typename ReturnType, typename ArgType1, typename ArgType2>
 std::unique_ptr<MatcherDescriptor>
 makeMatcherAutoMarshall(ReturnType (*Func)(ArgType1, ArgType2),
-                        StringRef MatcherName) {
+                        llvm::StringRef MatcherName) {
   std::vector<ASTNodeKind> RetTypes;
   BuildReturnTypeVector<ReturnType>::build(RetTypes);
   ArgKind AKs[] = { ArgTypeTraits<ArgType1>::getKind(),
@@ -1101,10 +1101,10 @@ std::unique_ptr<MatcherDescriptor> makeMatcherRegexMarshall(
 
 /// Variadic overload.
 template <typename ResultT, typename ArgT,
-          ResultT (*Func)(ArrayRef<const ArgT *>)>
+          ResultT (*Func)(llvm::ArrayRef<const ArgT *>)>
 std::unique_ptr<MatcherDescriptor> makeMatcherAutoMarshall(
     ast_matchers::internal::VariadicFunction<ResultT, ArgT, Func> VarFunc,
-    StringRef MatcherName) {
+    llvm::StringRef MatcherName) {
   return std::make_unique<VariadicFuncMatcherDescriptor>(VarFunc, MatcherName);
 }
 
@@ -1116,7 +1116,7 @@ template <typename BaseT, typename DerivedT>
 std::unique_ptr<MatcherDescriptor> makeMatcherAutoMarshall(
     ast_matchers::internal::VariadicDynCastAllOfMatcher<BaseT, DerivedT>
         VarFunc,
-    StringRef MatcherName) {
+    llvm::StringRef MatcherName) {
   return std::make_unique<DynCastAllOfMatcherDescriptor>(VarFunc, MatcherName);
 }
 
@@ -1126,7 +1126,7 @@ template <template <typename ToArg, typename FromArg> class ArgumentAdapterT,
 std::unique_ptr<MatcherDescriptor> makeMatcherAutoMarshall(
     ast_matchers::internal::ArgumentAdaptingMatcherFunc<ArgumentAdapterT,
                                                         FromTypes, ToTypes>,
-    StringRef MatcherName) {
+    llvm::StringRef MatcherName) {
   std::vector<std::unique_ptr<MatcherDescriptor>> Overloads;
   AdaptativeOverloadCollector<ArgumentAdapterT, FromTypes, ToTypes>(MatcherName,
                                                                     Overloads);
@@ -1148,7 +1148,7 @@ template <unsigned MinCount, unsigned MaxCount>
 std::unique_ptr<MatcherDescriptor> makeMatcherAutoMarshall(
     ast_matchers::internal::VariadicOperatorMatcherFunc<MinCount, MaxCount>
         Func,
-    StringRef MatcherName) {
+    llvm::StringRef MatcherName) {
   return std::make_unique<VariadicOperatorMatcherDescriptor>(
       MinCount, MaxCount, Func.Op, MatcherName);
 }
@@ -1156,7 +1156,7 @@ std::unique_ptr<MatcherDescriptor> makeMatcherAutoMarshall(
 template <typename CladeType, typename... MatcherT>
 std::unique_ptr<MatcherDescriptor> makeMatcherAutoMarshall(
     ast_matchers::internal::MapAnyOfMatcherImpl<CladeType, MatcherT...>,
-    StringRef MatcherName) {
+    llvm::StringRef MatcherName) {
   return std::make_unique<MapAnyOfMatcherDescriptor>(
       ASTNodeKind::getFromNodeKind<CladeType>(),
       std::vector<ASTNodeKind>{ASTNodeKind::getFromNodeKind<MatcherT>()...});

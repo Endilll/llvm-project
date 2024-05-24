@@ -61,9 +61,9 @@ public:
     Profile(profile, R);
   }
 
-  StringRef getKindStr() const override;
+  llvm::StringRef getKindStr() const override;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
   const MemRegion *getOriginRegion() const override { return getRegion(); }
 
   QualType getType() const override;
@@ -105,9 +105,9 @@ public:
 
   QualType getType() const override;
 
-  StringRef getKindStr() const override;
+  llvm::StringRef getKindStr() const override;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static void Profile(llvm::FoldingSetNodeID& profile, const Stmt *S,
                       QualType T, unsigned Count, const LocationContext *LCtx,
@@ -151,9 +151,9 @@ public:
 
   QualType getType() const override;
 
-  StringRef getKindStr() const override;
+  llvm::StringRef getKindStr() const override;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
   const MemRegion *getOriginRegion() const override { return getRegion(); }
 
   static void Profile(llvm::FoldingSetNodeID& profile, SymbolRef parent,
@@ -190,9 +190,9 @@ public:
 
   QualType getType() const override;
 
-  StringRef getKindStr() const override;
+  llvm::StringRef getKindStr() const override;
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static void Profile(llvm::FoldingSetNodeID& profile, const SubRegion *R) {
     profile.AddInteger((unsigned) SymbolExtentKind);
@@ -249,9 +249,9 @@ public:
 
     QualType getType() const override;
 
-    StringRef getKindStr() const override;
+    llvm::StringRef getKindStr() const override;
 
-    void dumpToStream(raw_ostream &os) const override;
+    void dumpToStream(llvm::raw_ostream &os) const override;
 
     static void Profile(llvm::FoldingSetNodeID &profile, const MemRegion *R,
                         const Stmt *S, QualType T, const LocationContext *LCtx,
@@ -305,7 +305,7 @@ public:
   LLVM_ATTRIBUTE_RETURNS_NONNULL
   const SymExpr *getOperand() const { return Operand; }
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static void Profile(llvm::FoldingSetNodeID& ID,
                       const SymExpr *In, QualType From, QualType To) {
@@ -354,7 +354,7 @@ public:
   UnaryOperator::Opcode getOpcode() const { return Op; }
   QualType getType() const override { return T; }
 
-  void dumpToStream(raw_ostream &os) const override;
+  void dumpToStream(llvm::raw_ostream &os) const override;
 
   static void Profile(llvm::FoldingSetNodeID &ID, const SymExpr *In,
                       UnaryOperator::Opcode Op, QualType T) {
@@ -415,9 +415,9 @@ protected:
   }
   static const SymExpr *getPointer(const SymExpr *Value) { return Value; }
 
-  static void dumpToStreamImpl(raw_ostream &os, const SymExpr *Value);
-  static void dumpToStreamImpl(raw_ostream &os, const llvm::APSInt &Value);
-  static void dumpToStreamImpl(raw_ostream &os, BinaryOperator::Opcode op);
+  static void dumpToStreamImpl(llvm::raw_ostream &os, const SymExpr *Value);
+  static void dumpToStreamImpl(llvm::raw_ostream &os, const llvm::APSInt &Value);
+  static void dumpToStreamImpl(llvm::raw_ostream &os, BinaryOperator::Opcode op);
 };
 
 /// Template implementation for all binary symbolic expressions
@@ -434,7 +434,7 @@ public:
     assert(getPointer(rhs));
   }
 
-  void dumpToStream(raw_ostream &os) const override {
+  void dumpToStream(llvm::raw_ostream &os) const override {
     dumpToStreamImpl(os, LHS);
     dumpToStreamImpl(os, getOpcode());
     dumpToStreamImpl(os, RHS);

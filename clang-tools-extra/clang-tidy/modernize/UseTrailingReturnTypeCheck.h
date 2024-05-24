@@ -27,7 +27,7 @@ struct ClassifiedToken {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-trailing-return-type.html
 class UseTrailingReturnTypeCheck : public ClangTidyCheck {
 public:
-  UseTrailingReturnTypeCheck(StringRef Name, ClangTidyContext *Context)
+  UseTrailingReturnTypeCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;
@@ -43,7 +43,7 @@ private:
   SourceLocation findTrailingReturnTypeSourceLocation(
       const FunctionDecl &F, const FunctionTypeLoc &FTL, const ASTContext &Ctx,
       const SourceManager &SM, const LangOptions &LangOpts);
-  std::optional<SmallVector<ClassifiedToken, 8>>
+  std::optional<llvm::SmallVector<ClassifiedToken, 8>>
   classifyTokensBeforeFunctionName(const FunctionDecl &F, const ASTContext &Ctx,
                                    const SourceManager &SM,
                                    const LangOptions &LangOpts);

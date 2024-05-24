@@ -254,7 +254,7 @@ class TypeSourceInfo;
     /// (which we have already complained about).
     NonEquivalentDeclSet NonEquivalentDecls;
 
-    using FoundDeclsTy = SmallVector<NamedDecl *, 2>;
+    using FoundDeclsTy = llvm::SmallVector<NamedDecl *, 2>;
     FoundDeclsTy findDeclsInToCtx(DeclContext *DC, DeclarationName Name);
 
     void AddToLookupTable(Decl *ToD);
@@ -264,7 +264,7 @@ class TypeSourceInfo;
     /// Can be overwritten by subclasses to implement their own import logic.
     /// The overwritten method should call this method if it didn't import the
     /// decl on its own.
-    virtual Expected<Decl *> ImportImpl(Decl *From);
+    virtual llvm::Expected<Decl *> ImportImpl(Decl *From);
 
     /// Used only in unittests to verify the behaviour of the error handling.
     virtual bool returnWithErrorInTest() { return false; };
@@ -512,7 +512,7 @@ class TypeSourceInfo;
     ///
     /// \returns the name that the newly-imported declaration should have. Or
     /// an error if we can't handle the name conflict.
-    virtual Expected<DeclarationName>
+    virtual llvm::Expected<DeclarationName>
     HandleNameConflict(DeclarationName Name, DeclContext *DC, unsigned IDNS,
                        NamedDecl **Decls, unsigned NumDecls);
 

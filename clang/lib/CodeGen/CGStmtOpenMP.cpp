@@ -194,7 +194,7 @@ class OMPLoopScope : public CodeGenFunction::RunCleanupsScope {
       // CompoundStmts and DeclStmts are used as lists of PreInit statements and
       // declarations. Since declarations must be visible in the the following
       // that they initialize, unpack the ComboundStmt they are nested in.
-      SmallVector<const Stmt *> PreInitStmts;
+      llvm::SmallVector<const Stmt *> PreInitStmts;
       if (auto *PreInitCompound = dyn_cast<CompoundStmt>(PreInits))
         llvm::append_range(PreInitStmts, PreInitCompound->body());
       else
@@ -345,7 +345,7 @@ llvm::Value *CodeGenFunction::getTypeSize(QualType Ty) {
 }
 
 void CodeGenFunction::GenerateOpenMPCapturedVars(
-    const CapturedStmt &S, SmallVectorImpl<llvm::Value *> &CapturedVars) {
+    const CapturedStmt &S, llvm::SmallVectorImpl<llvm::Value *> &CapturedVars) {
   const RecordDecl *RD = S.getCapturedRecordDecl();
   auto CurField = RD->field_begin();
   auto CurCap = S.captures().begin();
@@ -367,7 +367,7 @@ void CodeGenFunction::GenerateOpenMPCapturedVars(
         ASTContext &Ctx = getContext();
         Address DstAddr = CreateMemTemp(
             Ctx.getUIntPtrType(),
-            Twine(CurCap->getCapturedVar()->getName(), ".casted"));
+            llvm::Twine(CurCap->getCapturedVar()->getName(), ".casted"));
         LValue DstLV = MakeAddrLValue(DstAddr, Ctx.getUIntPtrType());
 
         llvm::Value *SrcAddrVal = EmitScalarConversion(
@@ -392,7 +392,7 @@ void CodeGenFunction::GenerateOpenMPCapturedVars(
 }
 
 static Address castValueFromUintptr(CodeGenFunction &CGF, SourceLocation Loc,
-                                    QualType DstType, StringRef Name,
+                                    QualType DstType, llvm::StringRef Name,
                                     LValue AddrLV) {
   ASTContext &Ctx = CGF.getContext();
 
@@ -433,11 +433,11 @@ struct FunctionOptions {
   /// sizes.
   const bool RegisterCastedArgsOnly = false;
   /// Name of the generated function.
-  const StringRef FunctionName;
+  const llvm::StringRef FunctionName;
   /// Location of the non-debug version of the outlined function.
   SourceLocation Loc;
   explicit FunctionOptions(const CapturedStmt *S, bool UIntPtrCastRequired,
-                           bool RegisterCastedArgsOnly, StringRef FunctionName,
+                           bool RegisterCastedArgsOnly, llvm::StringRef FunctionName,
                            SourceLocation Loc)
       : S(S), UIntPtrCastRequired(UIntPtrCastRequired),
         RegisterCastedArgsOnly(UIntPtrCastRequired && RegisterCastedArgsOnly),
@@ -642,7 +642,7 @@ CodeGenFunction::GenerateOpenMPCapturedStmtFunction(const CapturedStmt &S,
   FunctionArgList Args;
   llvm::MapVector<const Decl *, std::pair<const VarDecl *, Address>> LocalAddrs;
   llvm::DenseMap<const Decl *, std::pair<const Expr *, llvm::Value *>> VLASizes;
-  SmallString<256> Buffer;
+  llvm::SmallString<256> Buffer;
   llvm::raw_svector_ostream Out(Buffer);
   Out << CapturedStmtInfo->getHelperName();
   if (NeedWrapperFunction)
@@ -1216,14 +1216,14 @@ void CodeGenFunction::EmitOMPReductionClauseInit(
     CodeGenFunction::OMPPrivateScope &PrivateScope, bool ForInscan) {
   if (!HaveInsertPoint())
     return;
-  SmallVector<const Expr *, 4> Shareds;
-  SmallVector<const Expr *, 4> Privates;
-  SmallVector<const Expr *, 4> ReductionOps;
-  SmallVector<const Expr *, 4> LHSs;
-  SmallVector<const Expr *, 4> RHSs;
+  llvm::SmallVector<const Expr *, 4> Shareds;
+  llvm::SmallVector<const Expr *, 4> Privates;
+  llvm::SmallVector<const Expr *, 4> ReductionOps;
+  llvm::SmallVector<const Expr *, 4> LHSs;
+  llvm::SmallVector<const Expr *, 4> RHSs;
   OMPTaskDataTy Data;
-  SmallVector<const Expr *, 4> TaskLHSs;
-  SmallVector<const Expr *, 4> TaskRHSs;
+  llvm::SmallVector<const Expr *, 4> TaskLHSs;
+  llvm::SmallVector<const Expr *, 4> TaskRHSs;
   for (const auto *C : D.getClausesOfKind<OMPReductionClause>()) {
     if (ForInscan != (C->getModifier() == OMPC_REDUCTION_inscan))
       continue;
@@ -1692,7 +1692,7 @@ Address CodeGenFunction::OMPBuilderCBHelpers::getAddrOfThreadPrivate(
       CGF.Builder.CreatePointerCast(VDAddr.emitRawPointer(CGF), CGM.Int8PtrTy);
   llvm::ConstantInt *Size = CGM.getSize(CGM.GetTargetTypeStoreSize(VarTy));
   std::string Suffix = getNameWithSeparators({"cache", ""});
-  llvm::Twine CacheName = Twine(CGM.getMangledName(VD)).concat(Suffix);
+  llvm::Twine CacheName = llvm::Twine(CGM.getMangledName(VD)).concat(Suffix);
 
   llvm::CallInst *ThreadPrivateCacheCall =
       OMPBuilder.createCachedThreadPrivate(CGF.Builder, Data, Size, CacheName);
@@ -1701,11 +1701,11 @@ Address CodeGenFunction::OMPBuilderCBHelpers::getAddrOfThreadPrivate(
 }
 
 std::string CodeGenFunction::OMPBuilderCBHelpers::getNameWithSeparators(
-    ArrayRef<StringRef> Parts, StringRef FirstSeparator, StringRef Separator) {
-  SmallString<128> Buffer;
+    llvm::ArrayRef<llvm::StringRef> Parts, llvm::StringRef FirstSeparator, llvm::StringRef Separator) {
+  llvm::SmallString<128> Buffer;
   llvm::raw_svector_ostream OS(Buffer);
-  StringRef Sep = FirstSeparator;
-  for (StringRef Part : Parts) {
+  llvm::StringRef Sep = FirstSeparator;
+  for (llvm::StringRef Part : Parts) {
     OS << Sep << Part;
     Sep = Separator;
   }
@@ -1714,7 +1714,7 @@ std::string CodeGenFunction::OMPBuilderCBHelpers::getNameWithSeparators(
 
 void CodeGenFunction::OMPBuilderCBHelpers::EmitOMPInlinedRegionBody(
     CodeGenFunction &CGF, const Stmt *RegionBodyStmt, InsertPointTy AllocaIP,
-    InsertPointTy CodeGenIP, Twine RegionName) {
+    InsertPointTy CodeGenIP, llvm::Twine RegionName) {
   CGBuilderTy &Builder = CGF.Builder;
   Builder.restoreIP(CodeGenIP);
   llvm::BasicBlock *FiniBB = splitBBWithSuffix(Builder, /*CreateBranch=*/false,
@@ -1731,7 +1731,7 @@ void CodeGenFunction::OMPBuilderCBHelpers::EmitOMPInlinedRegionBody(
 
 void CodeGenFunction::OMPBuilderCBHelpers::EmitOMPOutlinedRegionBody(
     CodeGenFunction &CGF, const Stmt *RegionBodyStmt, InsertPointTy AllocaIP,
-    InsertPointTy CodeGenIP, Twine RegionName) {
+    InsertPointTy CodeGenIP, llvm::Twine RegionName) {
   CGBuilderTy &Builder = CGF.Builder;
   Builder.restoreIP(CodeGenIP);
   llvm::BasicBlock *FiniBB = splitBBWithSuffix(Builder, /*CreateBranch=*/false,
@@ -1990,7 +1990,7 @@ static llvm::CallInst *
 emitCapturedStmtCall(CodeGenFunction &ParentCGF, EmittedClosureTy Cap,
                      llvm::ArrayRef<llvm::Value *> Args) {
   // Append the closure context to the argument.
-  SmallVector<llvm::Value *> EffectiveArgs;
+  llvm::SmallVector<llvm::Value *> EffectiveArgs;
   EffectiveArgs.reserve(Args.size() + 1);
   llvm::append_range(EffectiveArgs, Args);
   EffectiveArgs.push_back(Cap.second);
@@ -3249,7 +3249,7 @@ void CodeGenFunction::EmitOMPDistributeSimdDirective(
 }
 
 void CodeGenFunction::EmitOMPTargetSimdDeviceFunction(
-    CodeGenModule &CGM, StringRef ParentName, const OMPTargetSimdDirective &S) {
+    CodeGenModule &CGM, llvm::StringRef ParentName, const OMPTargetSimdDirective &S) {
   // Emit SPMD target parallel for region as a standalone region.
   auto &&CodeGen = [&S](CodeGenFunction &CGF, PrePostActionTy &Action) {
     emitOMPSimdRegion(CGF, S, Action);
@@ -3564,10 +3564,10 @@ static void emitScanBasedDirectiveDecls(
     llvm::function_ref<llvm::Value *(CodeGenFunction &)> NumIteratorsGen) {
   llvm::Value *OMPScanNumIterations = CGF.Builder.CreateIntCast(
       NumIteratorsGen(CGF), CGF.SizeTy, /*isSigned=*/false);
-  SmallVector<const Expr *, 4> Shareds;
-  SmallVector<const Expr *, 4> Privates;
-  SmallVector<const Expr *, 4> ReductionOps;
-  SmallVector<const Expr *, 4> CopyArrayTemps;
+  llvm::SmallVector<const Expr *, 4> Shareds;
+  llvm::SmallVector<const Expr *, 4> Privates;
+  llvm::SmallVector<const Expr *, 4> ReductionOps;
+  llvm::SmallVector<const Expr *, 4> CopyArrayTemps;
   for (const auto *C : S.getClausesOfKind<OMPReductionClause>()) {
     assert(C->getModifier() == OMPC_REDUCTION_inscan &&
            "Only inscan reductions are expected.");
@@ -3616,12 +3616,12 @@ static void emitScanBasedDirectiveFinals(
     llvm::function_ref<llvm::Value *(CodeGenFunction &)> NumIteratorsGen) {
   llvm::Value *OMPScanNumIterations = CGF.Builder.CreateIntCast(
       NumIteratorsGen(CGF), CGF.SizeTy, /*isSigned=*/false);
-  SmallVector<const Expr *, 4> Shareds;
-  SmallVector<const Expr *, 4> LHSs;
-  SmallVector<const Expr *, 4> RHSs;
-  SmallVector<const Expr *, 4> Privates;
-  SmallVector<const Expr *, 4> CopyOps;
-  SmallVector<const Expr *, 4> CopyArrayElems;
+  llvm::SmallVector<const Expr *, 4> Shareds;
+  llvm::SmallVector<const Expr *, 4> LHSs;
+  llvm::SmallVector<const Expr *, 4> RHSs;
+  llvm::SmallVector<const Expr *, 4> Privates;
+  llvm::SmallVector<const Expr *, 4> CopyOps;
+  llvm::SmallVector<const Expr *, 4> CopyArrayElems;
   for (const auto *C : S.getClausesOfKind<OMPReductionClause>()) {
     assert(C->getModifier() == OMPC_REDUCTION_inscan &&
            "Only inscan reductions are expected.");
@@ -3682,11 +3682,11 @@ static void emitScanBasedDirective(
     llvm::function_ref<void(CodeGenFunction &)> SecondGen) {
   llvm::Value *OMPScanNumIterations = CGF.Builder.CreateIntCast(
       NumIteratorsGen(CGF), CGF.SizeTy, /*isSigned=*/false);
-  SmallVector<const Expr *, 4> Privates;
-  SmallVector<const Expr *, 4> ReductionOps;
-  SmallVector<const Expr *, 4> LHSs;
-  SmallVector<const Expr *, 4> RHSs;
-  SmallVector<const Expr *, 4> CopyArrayElems;
+  llvm::SmallVector<const Expr *, 4> Privates;
+  llvm::SmallVector<const Expr *, 4> ReductionOps;
+  llvm::SmallVector<const Expr *, 4> LHSs;
+  llvm::SmallVector<const Expr *, 4> RHSs;
+  llvm::SmallVector<const Expr *, 4> CopyArrayElems;
   for (const auto *C : S.getClausesOfKind<OMPReductionClause>()) {
     assert(C->getModifier() == OMPC_REDUCTION_inscan &&
            "Only inscan reductions are expected.");
@@ -3987,7 +3987,7 @@ void CodeGenFunction::EmitOMPForSimdDirective(const OMPForSimdDirective &S) {
 }
 
 static LValue createSectionLVal(CodeGenFunction &CGF, QualType Ty,
-                                const Twine &Name,
+                                const llvm::Twine &Name,
                                 llvm::Value *Init = nullptr) {
   LValue LVal = CGF.MakeAddrLValue(CGF.CreateMemTemp(Ty, Name), Ty);
   if (Init)
@@ -4589,7 +4589,7 @@ public:
   }
 
   /// Swaps list of vars with the provided one.
-  ArrayRef<const VarDecl *> getPrivateDecls() const { return PrivateDecls; }
+  llvm::ArrayRef<const VarDecl *> getPrivateDecls() const { return PrivateDecls; }
 };
 } // anonymous namespace
 
@@ -4708,8 +4708,8 @@ void CodeGenFunction::EmitOMPTaskBasedDirective(
       ++ID;
     }
   }
-  SmallVector<const Expr *, 4> LHSs;
-  SmallVector<const Expr *, 4> RHSs;
+  llvm::SmallVector<const Expr *, 4> LHSs;
+  llvm::SmallVector<const Expr *, 4> RHSs;
   for (const auto *C : S.getClausesOfKind<OMPReductionClause>()) {
     Data.ReductionVars.append(C->varlist_begin(), C->varlist_end());
     Data.ReductionOrigs.append(C->varlist_begin(), C->varlist_end());
@@ -4772,7 +4772,7 @@ void CodeGenFunction::EmitOMPTaskBasedDirective(
           // its DIExpression to add offset to base address.
           auto UpdateExpr = [](llvm::LLVMContext &Ctx, auto *Declare,
                                unsigned Offset) {
-            SmallVector<uint64_t, 8> Ops;
+            llvm::SmallVector<uint64_t, 8> Ops;
             // Add offset to the base address if non zero.
             if (Offset) {
               Ops.push_back(llvm::dwarf::DW_OP_plus_uconst);
@@ -4945,10 +4945,10 @@ void CodeGenFunction::EmitOMPTaskBasedDirective(
     }
     // Privatize all private variables except for in_reduction items.
     (void)Scope.Privatize();
-    SmallVector<const Expr *, 4> InRedVars;
-    SmallVector<const Expr *, 4> InRedPrivs;
-    SmallVector<const Expr *, 4> InRedOps;
-    SmallVector<const Expr *, 4> TaskgroupDescriptors;
+    llvm::SmallVector<const Expr *, 4> InRedVars;
+    llvm::SmallVector<const Expr *, 4> InRedPrivs;
+    llvm::SmallVector<const Expr *, 4> InRedOps;
+    llvm::SmallVector<const Expr *, 4> TaskgroupDescriptors;
     for (const auto *C : S.getClausesOfKind<OMPInReductionClause>()) {
       auto IPriv = C->privates().begin();
       auto IRed = C->reduction_ops().begin();
@@ -5069,8 +5069,8 @@ void CodeGenFunction::EmitOMPTargetTaskBasedDirective(
       ++IElemInitRef;
     }
   }
-  SmallVector<const Expr *, 4> LHSs;
-  SmallVector<const Expr *, 4> RHSs;
+  llvm::SmallVector<const Expr *, 4> LHSs;
+  llvm::SmallVector<const Expr *, 4> RHSs;
   for (const auto *C : S.getClausesOfKind<OMPInReductionClause>()) {
     Data.ReductionVars.append(C->varlist_begin(), C->varlist_end());
     Data.ReductionOrigs.append(C->varlist_begin(), C->varlist_end());
@@ -5226,10 +5226,10 @@ void CodeGenFunction::processInReduction(const OMPExecutableDirective &S,
     }
   }
   (void)Scope.Privatize();
-  SmallVector<const Expr *, 4> InRedVars;
-  SmallVector<const Expr *, 4> InRedPrivs;
-  SmallVector<const Expr *, 4> InRedOps;
-  SmallVector<const Expr *, 4> TaskgroupDescriptors;
+  llvm::SmallVector<const Expr *, 4> InRedVars;
+  llvm::SmallVector<const Expr *, 4> InRedPrivs;
+  llvm::SmallVector<const Expr *, 4> InRedOps;
+  llvm::SmallVector<const Expr *, 4> TaskgroupDescriptors;
   for (const auto *C : S.getClausesOfKind<OMPInReductionClause>()) {
     auto IPriv = C->privates().begin();
     auto IRed = C->reduction_ops().begin();
@@ -5364,8 +5364,8 @@ void CodeGenFunction::EmitOMPTaskgroupDirective(
   auto &&CodeGen = [&S](CodeGenFunction &CGF, PrePostActionTy &Action) {
     Action.Enter(CGF);
     if (const Expr *E = S.getReductionRef()) {
-      SmallVector<const Expr *, 4> LHSs;
-      SmallVector<const Expr *, 4> RHSs;
+      llvm::SmallVector<const Expr *, 4> LHSs;
+      llvm::SmallVector<const Expr *, 4> RHSs;
       OMPTaskDataTy Data;
       for (const auto *C : S.getClausesOfKind<OMPTaskReductionClause>()) {
         Data.ReductionVars.append(C->varlist_begin(), C->varlist_end());
@@ -5395,7 +5395,7 @@ void CodeGenFunction::EmitOMPFlushDirective(const OMPFlushDirective &S) {
                                 : llvm::AtomicOrdering::AcquireRelease;
   CGM.getOpenMPRuntime().emitFlush(
       *this,
-      [&S]() -> ArrayRef<const Expr *> {
+      [&S]() -> llvm::ArrayRef<const Expr *> {
         if (const auto *FlushClause = S.getSingleClause<OMPFlushClause>())
           return llvm::ArrayRef(FlushClause->varlist_begin(),
                                 FlushClause->varlist_end());
@@ -5432,14 +5432,14 @@ void CodeGenFunction::EmitOMPScanDirective(const OMPScanDirective &S) {
     return;
   const OMPExecutableDirective &ParentDir = *OMPParentLoopDirectiveForScan;
   bool IsInclusive = S.hasClausesOfKind<OMPInclusiveClause>();
-  SmallVector<const Expr *, 4> Shareds;
-  SmallVector<const Expr *, 4> Privates;
-  SmallVector<const Expr *, 4> LHSs;
-  SmallVector<const Expr *, 4> RHSs;
-  SmallVector<const Expr *, 4> ReductionOps;
-  SmallVector<const Expr *, 4> CopyOps;
-  SmallVector<const Expr *, 4> CopyArrayTemps;
-  SmallVector<const Expr *, 4> CopyArrayElems;
+  llvm::SmallVector<const Expr *, 4> Shareds;
+  llvm::SmallVector<const Expr *, 4> Privates;
+  llvm::SmallVector<const Expr *, 4> LHSs;
+  llvm::SmallVector<const Expr *, 4> RHSs;
+  llvm::SmallVector<const Expr *, 4> ReductionOps;
+  llvm::SmallVector<const Expr *, 4> CopyOps;
+  llvm::SmallVector<const Expr *, 4> CopyArrayTemps;
+  llvm::SmallVector<const Expr *, 4> CopyArrayElems;
   for (const auto *C : ParentDir.getClausesOfKind<OMPReductionClause>()) {
     if (C->getModifier() != OMPC_REDUCTION_inscan)
       continue;
@@ -6688,7 +6688,7 @@ static void emitCommonOMPTargetDirective(CodeGenFunction &CGF,
   }
 
   assert(CGF.CurFuncDecl && "No parent declaration for target region!");
-  StringRef ParentName;
+  llvm::StringRef ParentName;
   // In case we have Ctors/Dtors we use the complete type variant to produce
   // the mangling of the device outlined kernel.
   if (const auto *D = dyn_cast<CXXConstructorDecl>(CGF.CurFuncDecl))
@@ -6735,7 +6735,7 @@ static void emitTargetRegion(CodeGenFunction &CGF, const OMPTargetDirective &S,
 }
 
 void CodeGenFunction::EmitOMPTargetDeviceFunction(CodeGenModule &CGM,
-                                                  StringRef ParentName,
+                                                  llvm::StringRef ParentName,
                                                   const OMPTargetDirective &S) {
   auto &&CodeGen = [&S](CodeGenFunction &CGF, PrePostActionTy &Action) {
     emitTargetRegion(CGF, S, Action);
@@ -6822,7 +6822,7 @@ static void emitTargetTeamsRegion(CodeGenFunction &CGF, PrePostActionTy &Action,
 }
 
 void CodeGenFunction::EmitOMPTargetTeamsDeviceFunction(
-    CodeGenModule &CGM, StringRef ParentName,
+    CodeGenModule &CGM, llvm::StringRef ParentName,
     const OMPTargetTeamsDirective &S) {
   auto &&CodeGen = [&S](CodeGenFunction &CGF, PrePostActionTy &Action) {
     emitTargetTeamsRegion(CGF, Action, S);
@@ -6868,7 +6868,7 @@ emitTargetTeamsDistributeRegion(CodeGenFunction &CGF, PrePostActionTy &Action,
 }
 
 void CodeGenFunction::EmitOMPTargetTeamsDistributeDeviceFunction(
-    CodeGenModule &CGM, StringRef ParentName,
+    CodeGenModule &CGM, llvm::StringRef ParentName,
     const OMPTargetTeamsDistributeDirective &S) {
   auto &&CodeGen = [&S](CodeGenFunction &CGF, PrePostActionTy &Action) {
     emitTargetTeamsDistributeRegion(CGF, Action, S);
@@ -6914,7 +6914,7 @@ static void emitTargetTeamsDistributeSimdRegion(
 }
 
 void CodeGenFunction::EmitOMPTargetTeamsDistributeSimdDeviceFunction(
-    CodeGenModule &CGM, StringRef ParentName,
+    CodeGenModule &CGM, llvm::StringRef ParentName,
     const OMPTargetTeamsDistributeSimdDirective &S) {
   auto &&CodeGen = [&S](CodeGenFunction &CGF, PrePostActionTy &Action) {
     emitTargetTeamsDistributeSimdRegion(CGF, Action, S);
@@ -7125,7 +7125,7 @@ static void emitTargetTeamsDistributeParallelForRegion(
 }
 
 void CodeGenFunction::EmitOMPTargetTeamsDistributeParallelForDeviceFunction(
-    CodeGenModule &CGM, StringRef ParentName,
+    CodeGenModule &CGM, llvm::StringRef ParentName,
     const OMPTargetTeamsDistributeParallelForDirective &S) {
   // Emit SPMD target teams distribute parallel for region as a standalone
   // region.
@@ -7177,7 +7177,7 @@ static void emitTargetTeamsDistributeParallelForSimdRegion(
 }
 
 void CodeGenFunction::EmitOMPTargetTeamsDistributeParallelForSimdDeviceFunction(
-    CodeGenModule &CGM, StringRef ParentName,
+    CodeGenModule &CGM, llvm::StringRef ParentName,
     const OMPTargetTeamsDistributeParallelForSimdDirective &S) {
   // Emit SPMD target teams distribute parallel for simd region as a standalone
   // region.
@@ -7530,7 +7530,7 @@ static void emitTargetParallelRegion(CodeGenFunction &CGF,
 }
 
 void CodeGenFunction::EmitOMPTargetParallelDeviceFunction(
-    CodeGenModule &CGM, StringRef ParentName,
+    CodeGenModule &CGM, llvm::StringRef ParentName,
     const OMPTargetParallelDirective &S) {
   auto &&CodeGen = [&S](CodeGenFunction &CGF, PrePostActionTy &Action) {
     emitTargetParallelRegion(CGF, S, Action);
@@ -7569,7 +7569,7 @@ static void emitTargetParallelForRegion(CodeGenFunction &CGF,
 }
 
 void CodeGenFunction::EmitOMPTargetParallelForDeviceFunction(
-    CodeGenModule &CGM, StringRef ParentName,
+    CodeGenModule &CGM, llvm::StringRef ParentName,
     const OMPTargetParallelForDirective &S) {
   // Emit SPMD target parallel for region as a standalone region.
   auto &&CodeGen = [&S](CodeGenFunction &CGF, PrePostActionTy &Action) {
@@ -7608,7 +7608,7 @@ emitTargetParallelForSimdRegion(CodeGenFunction &CGF,
 }
 
 void CodeGenFunction::EmitOMPTargetParallelForSimdDeviceFunction(
-    CodeGenModule &CGM, StringRef ParentName,
+    CodeGenModule &CGM, llvm::StringRef ParentName,
     const OMPTargetParallelForSimdDirective &S) {
   // Emit SPMD target parallel for region as a standalone region.
   auto &&CodeGen = [&S](CodeGenFunction &CGF, PrePostActionTy &Action) {
@@ -8051,7 +8051,7 @@ void CodeGenFunction::EmitOMPTargetTeamsGenericLoopDirective(
 }
 
 void CodeGenFunction::EmitOMPTargetTeamsGenericLoopDeviceFunction(
-    CodeGenModule &CGM, StringRef ParentName,
+    CodeGenModule &CGM, llvm::StringRef ParentName,
     const OMPTargetTeamsGenericLoopDirective &S) {
   // Emit SPMD target parallel loop region as a standalone region.
   auto &&CodeGen = [&S](CodeGenFunction &CGF, PrePostActionTy &Action) {
@@ -8086,7 +8086,7 @@ static void emitTargetParallelGenericLoopRegion(
 }
 
 void CodeGenFunction::EmitOMPTargetParallelGenericLoopDeviceFunction(
-    CodeGenModule &CGM, StringRef ParentName,
+    CodeGenModule &CGM, llvm::StringRef ParentName,
     const OMPTargetParallelGenericLoopDirective &S) {
   // Emit target parallel loop region as a standalone region.
   auto &&CodeGen = [&S](CodeGenFunction &CGF, PrePostActionTy &Action) {

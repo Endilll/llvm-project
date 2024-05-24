@@ -20,7 +20,7 @@ namespace clang::tidy::cert {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cert/oop57-cpp.html
 class NonTrivialTypesLibcMemoryCallsCheck : public ClangTidyCheck {
 public:
-  NonTrivialTypesLibcMemoryCallsCheck(StringRef Name,
+  NonTrivialTypesLibcMemoryCallsCheck(llvm::StringRef Name,
                                       ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus && !LangOpts.ObjC;
@@ -30,9 +30,9 @@ public:
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
-  const StringRef MemSetNames;
-  const StringRef MemCpyNames;
-  const StringRef MemCmpNames;
+  const llvm::StringRef MemSetNames;
+  const llvm::StringRef MemCpyNames;
+  const llvm::StringRef MemCmpNames;
 };
 
 } // namespace clang::tidy::cert

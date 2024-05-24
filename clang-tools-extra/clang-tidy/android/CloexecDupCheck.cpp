@@ -22,7 +22,7 @@ void CloexecDupCheck::registerMatchers(MatchFinder *Finder) {
 
 void CloexecDupCheck::check(const MatchFinder::MatchResult &Result) {
   std::string ReplacementText =
-      (Twine("fcntl(") + getSpellingArg(Result, 0) + ", F_DUPFD_CLOEXEC)")
+      (llvm::Twine("fcntl(") + getSpellingArg(Result, 0) + ", F_DUPFD_CLOEXEC)")
           .str();
 
   replaceFunc(Result,

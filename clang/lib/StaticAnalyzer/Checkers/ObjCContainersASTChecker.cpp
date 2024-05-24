@@ -81,20 +81,20 @@ public:
 };
 } // end anonymous namespace
 
-static StringRef getCalleeName(CallExpr *CE) {
+static llvm::StringRef getCalleeName(CallExpr *CE) {
   const FunctionDecl *FD = CE->getDirectCallee();
   if (!FD)
-    return StringRef();
+    return llvm::StringRef();
 
   IdentifierInfo *II = FD->getIdentifier();
   if (!II)   // if no identifier, not a simple C function
-    return StringRef();
+    return llvm::StringRef();
 
   return II->getName();
 }
 
 void WalkAST::VisitCallExpr(CallExpr *CE) {
-  StringRef Name = getCalleeName(CE);
+  llvm::StringRef Name = getCalleeName(CE);
   if (Name.empty())
     return;
 
@@ -127,11 +127,11 @@ void WalkAST::VisitCallExpr(CallExpr *CE) {
   if (Arg) {
     assert(ArgNum == 1 || ArgNum == 2);
 
-    SmallString<64> BufName;
+    llvm::SmallString<64> BufName;
     llvm::raw_svector_ostream OsName(BufName);
     OsName << " Invalid use of '" << Name << "'" ;
 
-    SmallString<256> Buf;
+    llvm::SmallString<256> Buf;
     llvm::raw_svector_ostream Os(Buf);
     // Use "second" and "third" since users will expect 1-based indexing
     // for parameter names when mentioned in prose.

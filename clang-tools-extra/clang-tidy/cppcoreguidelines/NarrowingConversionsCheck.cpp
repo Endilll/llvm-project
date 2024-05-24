@@ -26,12 +26,12 @@ namespace clang::tidy::cppcoreguidelines {
 
 namespace {
 
-AST_MATCHER_P(QualType, hasAnyType, std::vector<StringRef>, Names) {
+AST_MATCHER_P(QualType, hasAnyType, std::vector<llvm::StringRef>, Names) {
   if (Names.empty())
     return false;
 
   std::string Name = Node.getLocalUnqualifiedType().getAsString();
-  return llvm::any_of(Names, [&Name](StringRef Ref) { return Ref == Name; });
+  return llvm::any_of(Names, [&Name](llvm::StringRef Ref) { return Ref == Name; });
 }
 
 AST_MATCHER(FieldDecl, hasIntBitwidth) {
@@ -44,7 +44,7 @@ AST_MATCHER(FieldDecl, hasIntBitwidth) {
 
 } // namespace
 
-NarrowingConversionsCheck::NarrowingConversionsCheck(StringRef Name,
+NarrowingConversionsCheck::NarrowingConversionsCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       WarnOnIntegerNarrowingConversion(
@@ -80,7 +80,7 @@ void NarrowingConversionsCheck::registerMatchers(MatchFinder *Finder) {
   const auto IsCeilFloorCallExpr = expr(callExpr(callee(functionDecl(
       hasAnyName("::ceil", "::std::ceil", "::floor", "::std::floor")))));
 
-  std::vector<StringRef> IgnoreConversionFromTypesVec =
+  std::vector<llvm::StringRef> IgnoreConversionFromTypesVec =
       utils::options::parseStringList(IgnoreConversionFromTypes);
 
   // We may want to exclude other types from the checks, such as `size_type`

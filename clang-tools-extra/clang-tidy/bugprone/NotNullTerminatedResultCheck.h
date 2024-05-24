@@ -23,7 +23,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/not-null-terminated-result.html
 class NotNullTerminatedResultCheck : public ClangTidyCheck {
 public:
-  NotNullTerminatedResultCheck(StringRef Name, ClangTidyContext *Context);
+  NotNullTerminatedResultCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
@@ -39,22 +39,22 @@ private:
   bool UseSafeFunctions = false;
 
   void memoryHandlerFunctionFix(
-      StringRef Name, const ast_matchers::MatchFinder::MatchResult &Result);
-  void memcpyFix(StringRef Name,
+      llvm::StringRef Name, const ast_matchers::MatchFinder::MatchResult &Result);
+  void memcpyFix(llvm::StringRef Name,
                  const ast_matchers::MatchFinder::MatchResult &Result,
                  DiagnosticBuilder &Diag);
-  void memcpy_sFix(StringRef Name,
+  void memcpy_sFix(llvm::StringRef Name,
                    const ast_matchers::MatchFinder::MatchResult &Result,
                    DiagnosticBuilder &Diag);
-  void memchrFix(StringRef Name,
+  void memchrFix(llvm::StringRef Name,
                  const ast_matchers::MatchFinder::MatchResult &Result);
-  void memmoveFix(StringRef Name,
+  void memmoveFix(llvm::StringRef Name,
                   const ast_matchers::MatchFinder::MatchResult &Result,
                   DiagnosticBuilder &Diag) const;
   void strerror_sFix(const ast_matchers::MatchFinder::MatchResult &Result);
-  void ncmpFix(StringRef Name,
+  void ncmpFix(llvm::StringRef Name,
                const ast_matchers::MatchFinder::MatchResult &Result);
-  void xfrmFix(StringRef Name,
+  void xfrmFix(llvm::StringRef Name,
                const ast_matchers::MatchFinder::MatchResult &Result);
 };
 

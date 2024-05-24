@@ -93,13 +93,13 @@ enum DirectiveKind : uint8_t {
 /// scanning. It's used to track various preprocessor directives that could
 /// potentially have an effect on the dependencies.
 struct Directive {
-  ArrayRef<Token> Tokens;
+  llvm::ArrayRef<Token> Tokens;
 
   /// The kind of token.
   DirectiveKind Kind = pp_none;
 
   Directive() = default;
-  Directive(DirectiveKind K, ArrayRef<Token> Tokens)
+  Directive(DirectiveKind K, llvm::ArrayRef<Token> Tokens)
       : Tokens(Tokens), Kind(K) {}
 };
 
@@ -115,8 +115,8 @@ struct Directive {
 /// null, an appropriate error is reported using the given input location
 /// with the offset that corresponds to the \p Input buffer offset.
 bool scanSourceForDependencyDirectives(
-    StringRef Input, SmallVectorImpl<dependency_directives_scan::Token> &Tokens,
-    SmallVectorImpl<dependency_directives_scan::Directive> &Directives,
+    llvm::StringRef Input, llvm::SmallVectorImpl<dependency_directives_scan::Token> &Tokens,
+    llvm::SmallVectorImpl<dependency_directives_scan::Directive> &Directives,
     DiagnosticsEngine *Diags = nullptr,
     SourceLocation InputSourceLoc = SourceLocation());
 
@@ -131,8 +131,8 @@ bool scanSourceForDependencyDirectives(
 /// This is used primarily for testing purposes, during dependency scanning the
 /// \p Lexer uses the tokens directly, not their printed version.
 void printDependencyDirectivesAsSource(
-    StringRef Source,
-    ArrayRef<dependency_directives_scan::Directive> Directives,
+    llvm::StringRef Source,
+    llvm::ArrayRef<dependency_directives_scan::Directive> Directives,
     llvm::raw_ostream &OS);
 
 } // end namespace clang

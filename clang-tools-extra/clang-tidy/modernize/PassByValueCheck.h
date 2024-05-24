@@ -18,7 +18,7 @@ namespace clang::tidy::modernize {
 
 class PassByValueCheck : public ClangTidyCheck {
 public:
-  PassByValueCheck(StringRef Name, ClangTidyContext *Context);
+  PassByValueCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

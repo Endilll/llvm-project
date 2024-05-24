@@ -17,7 +17,7 @@ namespace clang::tidy::bugprone {
 /// Finds dynamically initialized static variables in header files.
 class DynamicStaticInitializersCheck : public ClangTidyCheck {
 public:
-  DynamicStaticInitializersCheck(StringRef Name, ClangTidyContext *Context);
+  DynamicStaticInitializersCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus && !LangOpts.ThreadsafeStatics;
   }

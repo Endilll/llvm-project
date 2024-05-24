@@ -19,7 +19,7 @@ namespace clang::tidy::android {
 /// http://clang.llvm.org/extra/clang-tidy/checks/android/cloexec-pipe2.html
 class CloexecPipe2Check : public CloexecCheck {
 public:
-  CloexecPipe2Check(StringRef Name, ClangTidyContext *Context)
+  CloexecPipe2Check(llvm::StringRef Name, ClangTidyContext *Context)
       : CloexecCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

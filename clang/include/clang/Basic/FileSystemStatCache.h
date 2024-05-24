@@ -49,7 +49,7 @@ public:
   /// implementation can optionally fill in \p F with a valid \p File object and
   /// the client guarantees that it will close it.
   static std::error_code
-  get(StringRef Path, llvm::vfs::Status &Status, bool isFile,
+  get(llvm::StringRef Path, llvm::vfs::Status &Status, bool isFile,
       std::unique_ptr<llvm::vfs::File> *F,
       FileSystemStatCache *Cache, llvm::vfs::FileSystem &FS);
 
@@ -57,7 +57,7 @@ protected:
   // FIXME: The pointer here is a non-owning/optional reference to the
   // unique_ptr. std::optional<unique_ptr<vfs::File>&> might be nicer, but
   // Optional needs some work to support references so this isn't possible yet.
-  virtual std::error_code getStat(StringRef Path, llvm::vfs::Status &Status,
+  virtual std::error_code getStat(llvm::StringRef Path, llvm::vfs::Status &Status,
                                   bool isFile,
                                   std::unique_ptr<llvm::vfs::File> *F,
                                   llvm::vfs::FileSystem &FS) = 0;
@@ -78,7 +78,7 @@ public:
   iterator begin() const { return StatCalls.begin(); }
   iterator end() const { return StatCalls.end(); }
 
-  std::error_code getStat(StringRef Path, llvm::vfs::Status &Status,
+  std::error_code getStat(llvm::StringRef Path, llvm::vfs::Status &Status,
                           bool isFile,
                           std::unique_ptr<llvm::vfs::File> *F,
                           llvm::vfs::FileSystem &FS) override;

@@ -33,7 +33,7 @@ namespace clang::tidy::google::build {
 /// https://clang.llvm.org/extra/clang-tidy/checks/google/build-using-namespace.html
 class UsingNamespaceDirectiveCheck : public ClangTidyCheck {
 public:
-  UsingNamespaceDirectiveCheck(StringRef Name, ClangTidyContext *Context)
+  UsingNamespaceDirectiveCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

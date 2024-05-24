@@ -44,7 +44,7 @@ enum class Language : uint8_t {
   HLSL,
   ///@}
 };
-StringRef languageToString(Language L);
+llvm::StringRef languageToString(Language L);
 
 enum LangFeatures {
   LineComment = (1 << 0),
@@ -139,10 +139,10 @@ public:
   /// isOpenCL - Language is a OpenCL variant.
   bool isOpenCL() const { return Flags & OpenCL; }
 
-  static Kind getLangKind(StringRef Name);
-  static Kind getHLSLLangKind(StringRef Name);
+  static Kind getLangKind(llvm::StringRef Name);
+  static Kind getHLSLLangKind(llvm::StringRef Name);
   static const LangStandard &getLangStandardForKind(Kind K);
-  static const LangStandard *getLangStandardForName(StringRef Name);
+  static const LangStandard *getLangStandardForName(llvm::StringRef Name);
 };
 
 LangStandard::Kind getDefaultLanguageStandard(clang::Language Lang,

@@ -351,7 +351,7 @@ static bool checkFunctionOrMethodParameterIndex(
 /// and return false, otherwise set \p Str to the value of the string literal
 /// and return true.
 bool Sema::checkStringLiteralArgumentAttr(const AttributeCommonInfo &CI,
-                                          const Expr *E, StringRef &Str,
+                                          const Expr *E, llvm::StringRef &Str,
                                           SourceLocation *ArgLocation) {
   const auto *Literal = dyn_cast<StringLiteral>(E->IgnoreParenCasts());
   if (ArgLocation)
@@ -372,7 +372,7 @@ bool Sema::checkStringLiteralArgumentAttr(const AttributeCommonInfo &CI,
 /// will emit an error with a fixit hint and treat it as if it was a string
 /// literal.
 bool Sema::checkStringLiteralArgumentAttr(const ParsedAttr &AL, unsigned ArgNum,
-                                          StringRef &Str,
+                                          llvm::StringRef &Str,
                                           SourceLocation *ArgLocation) {
   // Look for identifiers. If we have one emit a hint to fix it to a literal.
   if (AL.isArgIdent(ArgNum)) {
@@ -609,7 +609,7 @@ static bool isCapabilityExpr(Sema &S, const Expr *Ex) {
 /// parameter list.
 static void checkAttrArgsAreCapabilityObjs(Sema &S, Decl *D,
                                            const ParsedAttr &AL,
-                                           SmallVectorImpl<Expr *> &Args,
+                                           llvm::SmallVectorImpl<Expr *> &Args,
                                            unsigned Sidx = 0,
                                            bool ParamIdxOk = false) {
   if (Sidx == AL.getNumArgs()) {
@@ -713,7 +713,7 @@ static void handlePtGuardedVarAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 static bool checkGuardedByAttrCommon(Sema &S, Decl *D, const ParsedAttr &AL,
                                      Expr *&Arg) {
-  SmallVector<Expr *, 1> Args;
+  llvm::SmallVector<Expr *, 1> Args;
   // check that all arguments are lockable objects
   checkAttrArgsAreCapabilityObjs(S, D, AL, Args);
   unsigned Size = Args.size();
@@ -745,7 +745,7 @@ static void handlePtGuardedByAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static bool checkAcquireOrderAttrCommon(Sema &S, Decl *D, const ParsedAttr &AL,
-                                        SmallVectorImpl<Expr *> &Args) {
+                                        llvm::SmallVectorImpl<Expr *> &Args) {
   if (!AL.checkAtLeastNumArgs(S, 1))
     return false;
 
@@ -765,7 +765,7 @@ static bool checkAcquireOrderAttrCommon(Sema &S, Decl *D, const ParsedAttr &AL,
 }
 
 static void handleAcquiredAfterAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  SmallVector<Expr *, 1> Args;
+  llvm::SmallVector<Expr *, 1> Args;
   if (!checkAcquireOrderAttrCommon(S, D, AL, Args))
     return;
 
@@ -775,7 +775,7 @@ static void handleAcquiredAfterAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static void handleAcquiredBeforeAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  SmallVector<Expr *, 1> Args;
+  llvm::SmallVector<Expr *, 1> Args;
   if (!checkAcquireOrderAttrCommon(S, D, AL, Args))
     return;
 
@@ -785,7 +785,7 @@ static void handleAcquiredBeforeAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static bool checkLockFunAttrCommon(Sema &S, Decl *D, const ParsedAttr &AL,
-                                   SmallVectorImpl<Expr *> &Args) {
+                                   llvm::SmallVectorImpl<Expr *> &Args) {
   // zero or more arguments ok
   // check that all arguments are lockable objects
   checkAttrArgsAreCapabilityObjs(S, D, AL, Args, 0, /*ParamIdxOk=*/true);
@@ -794,7 +794,7 @@ static bool checkLockFunAttrCommon(Sema &S, Decl *D, const ParsedAttr &AL,
 }
 
 static void handleAssertSharedLockAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  SmallVector<Expr *, 1> Args;
+  llvm::SmallVector<Expr *, 1> Args;
   if (!checkLockFunAttrCommon(S, D, AL, Args))
     return;
 
@@ -806,7 +806,7 @@ static void handleAssertSharedLockAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 static void handleAssertExclusiveLockAttr(Sema &S, Decl *D,
                                           const ParsedAttr &AL) {
-  SmallVector<Expr *, 1> Args;
+  llvm::SmallVector<Expr *, 1> Args;
   if (!checkLockFunAttrCommon(S, D, AL, Args))
     return;
 
@@ -879,7 +879,7 @@ static void handleAllocSizeAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static bool checkTryLockFunAttrCommon(Sema &S, Decl *D, const ParsedAttr &AL,
-                                      SmallVectorImpl<Expr *> &Args) {
+                                      llvm::SmallVectorImpl<Expr *> &Args) {
   if (!AL.checkAtLeastNumArgs(S, 1))
     return false;
 
@@ -897,7 +897,7 @@ static bool checkTryLockFunAttrCommon(Sema &S, Decl *D, const ParsedAttr &AL,
 
 static void handleSharedTrylockFunctionAttr(Sema &S, Decl *D,
                                             const ParsedAttr &AL) {
-  SmallVector<Expr*, 2> Args;
+  llvm::SmallVector<Expr*, 2> Args;
   if (!checkTryLockFunAttrCommon(S, D, AL, Args))
     return;
 
@@ -907,7 +907,7 @@ static void handleSharedTrylockFunctionAttr(Sema &S, Decl *D,
 
 static void handleExclusiveTrylockFunctionAttr(Sema &S, Decl *D,
                                                const ParsedAttr &AL) {
-  SmallVector<Expr*, 2> Args;
+  llvm::SmallVector<Expr*, 2> Args;
   if (!checkTryLockFunAttrCommon(S, D, AL, Args))
     return;
 
@@ -917,7 +917,7 @@ static void handleExclusiveTrylockFunctionAttr(Sema &S, Decl *D,
 
 static void handleLockReturnedAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   // check that the argument is lockable object
-  SmallVector<Expr*, 1> Args;
+  llvm::SmallVector<Expr*, 1> Args;
   checkAttrArgsAreCapabilityObjs(S, D, AL, Args);
   unsigned Size = Args.size();
   if (Size == 0)
@@ -931,7 +931,7 @@ static void handleLocksExcludedAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
     return;
 
   // check that all arguments are lockable objects
-  SmallVector<Expr*, 1> Args;
+  llvm::SmallVector<Expr*, 1> Args;
   checkAttrArgsAreCapabilityObjs(S, D, AL, Args);
   unsigned Size = Args.size();
   if (Size == 0)
@@ -943,7 +943,7 @@ static void handleLocksExcludedAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static bool checkFunctionConditionAttr(Sema &S, Decl *D, const ParsedAttr &AL,
-                                       Expr *&Cond, StringRef &Msg) {
+                                       Expr *&Cond, llvm::StringRef &Msg) {
   Cond = AL.getArgAsExpr(0);
   if (!Cond->isTypeDependent()) {
     ExprResult Converted = S.PerformContextuallyConvertToBool(Cond);
@@ -958,7 +958,7 @@ static bool checkFunctionConditionAttr(Sema &S, Decl *D, const ParsedAttr &AL,
   if (Msg.empty())
     Msg = "<no message provided>";
 
-  SmallVector<PartialDiagnosticAt, 8> Diags;
+  llvm::SmallVector<PartialDiagnosticAt, 8> Diags;
   if (isa<FunctionDecl>(D) && !Cond->isValueDependent() &&
       !Expr::isPotentialConstantExprUnevaluated(Cond, cast<FunctionDecl>(D),
                                                 Diags)) {
@@ -974,13 +974,13 @@ static void handleEnableIfAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   S.Diag(AL.getLoc(), diag::ext_clang_enable_if);
 
   Expr *Cond;
-  StringRef Msg;
+  llvm::StringRef Msg;
   if (checkFunctionConditionAttr(S, D, AL, Cond, Msg))
     D->addAttr(::new (S.Context) EnableIfAttr(S.Context, AL, Cond, Msg));
 }
 
 static void handleErrorAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef NewUserDiagnostic;
+  llvm::StringRef NewUserDiagnostic;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, NewUserDiagnostic))
     return;
   if (ErrorAttr *EA = S.mergeErrorAttr(D, AL, NewUserDiagnostic))
@@ -1089,7 +1089,7 @@ static void handleDiagnoseAsBuiltinAttr(Sema &S, Decl *D,
     return;
   }
 
-  SmallVector<unsigned, 8> Indices;
+  llvm::SmallVector<unsigned, 8> Indices;
 
   for (unsigned I = 1; I < AL.getNumArgs(); ++I) {
     if (!AL.isArgExpr(I)) {
@@ -1130,11 +1130,11 @@ static void handleDiagnoseIfAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   S.Diag(AL.getLoc(), diag::ext_clang_diagnose_if);
 
   Expr *Cond;
-  StringRef Msg;
+  llvm::StringRef Msg;
   if (!checkFunctionConditionAttr(S, D, AL, Cond, Msg))
     return;
 
-  StringRef DiagTypeStr;
+  llvm::StringRef DiagTypeStr;
   if (!S.checkStringLiteralArgumentAttr(AL, 2, DiagTypeStr))
     return;
 
@@ -1153,12 +1153,12 @@ static void handleDiagnoseIfAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static void handleNoBuiltinAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  static constexpr const StringRef kWildcard = "*";
+  static constexpr const llvm::StringRef kWildcard = "*";
 
-  llvm::SmallVector<StringRef, 16> Names;
+  llvm::SmallVector<llvm::StringRef, 16> Names;
   bool HasWildcard = false;
 
-  const auto AddBuiltinName = [&Names, &HasWildcard](StringRef Name) {
+  const auto AddBuiltinName = [&Names, &HasWildcard](llvm::StringRef Name) {
     if (Name == kWildcard)
       HasWildcard = true;
     Names.push_back(Name);
@@ -1166,7 +1166,7 @@ static void handleNoBuiltinAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
   // Add previously defined attributes.
   if (const auto *NBA = D->getAttr<NoBuiltinAttr>())
-    for (StringRef BuiltinName : NBA->builtinNames())
+    for (llvm::StringRef BuiltinName : NBA->builtinNames())
       AddBuiltinName(BuiltinName);
 
   // Add current attributes.
@@ -1174,7 +1174,7 @@ static void handleNoBuiltinAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
     AddBuiltinName(kWildcard);
   else
     for (unsigned I = 0, E = AL.getNumArgs(); I != E; ++I) {
-      StringRef BuiltinName;
+      llvm::StringRef BuiltinName;
       SourceLocation LiteralLoc;
       if (!S.checkStringLiteralArgumentAttr(AL, I, BuiltinName, &LiteralLoc))
         return;
@@ -1276,11 +1276,11 @@ static void handleCallableWhenAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   if (!checkForConsumableClass(S, cast<CXXMethodDecl>(D), AL))
     return;
 
-  SmallVector<CallableWhenAttr::ConsumedState, 3> States;
+  llvm::SmallVector<CallableWhenAttr::ConsumedState, 3> States;
   for (unsigned ArgIndex = 0; ArgIndex < AL.getNumArgs(); ++ArgIndex) {
     CallableWhenAttr::ConsumedState CallableState;
 
-    StringRef StateString;
+    llvm::StringRef StateString;
     SourceLocation Loc;
     if (AL.isArgIdent(ArgIndex)) {
       IdentifierLoc *Ident = AL.getArgAsIdent(ArgIndex);
@@ -1309,7 +1309,7 @@ static void handleParamTypestateAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
   if (AL.isArgIdent(0)) {
     IdentifierLoc *Ident = AL.getArgAsIdent(0);
-    StringRef StateString = Ident->Ident->getName();
+    llvm::StringRef StateString = Ident->Ident->getName();
 
     if (!ParamTypestateAttr::ConvertStrToConsumedState(StateString,
                                                        ParamState)) {
@@ -1390,7 +1390,7 @@ static void handleSetTypestateAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   SetTypestateAttr::ConsumedState NewState;
   if (AL.isArgIdent(0)) {
     IdentifierLoc *Ident = AL.getArgAsIdent(0);
-    StringRef Param = Ident->Ident->getName();
+    llvm::StringRef Param = Ident->Ident->getName();
     if (!SetTypestateAttr::ConvertStrToConsumedState(Param, NewState)) {
       S.Diag(Ident->Loc, diag::warn_attribute_type_not_supported) << AL
                                                                   << Param;
@@ -1412,7 +1412,7 @@ static void handleTestTypestateAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   TestTypestateAttr::ConsumedState TestState;
   if (AL.isArgIdent(0)) {
     IdentifierLoc *Ident = AL.getArgAsIdent(0);
-    StringRef Param = Ident->Ident->getName();
+    llvm::StringRef Param = Ident->Ident->getName();
     if (!TestTypestateAttr::ConvertStrToConsumedState(Param, TestState)) {
       S.Diag(Ident->Loc, diag::warn_attribute_type_not_supported) << AL
                                                                   << Param;
@@ -1614,7 +1614,7 @@ static bool attrNonNullArgCheck(Sema &S, QualType T, const ParsedAttr &AL,
 }
 
 static void handleNonNullAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  SmallVector<ParamIdx, 8> NonNullArgs;
+  llvm::SmallVector<ParamIdx, 8> NonNullArgs;
   for (unsigned I = 0; I < AL.getNumArgs(); ++I) {
     Expr *Ex = AL.getArgAsExpr(I);
     ParamIdx Idx;
@@ -1794,12 +1794,12 @@ void Sema::AddAllocAlignAttr(Decl *D, const AttributeCommonInfo &CI,
 
 /// Check if \p AssumptionStr is a known assumption and warn if not.
 static void checkOMPAssumeAttr(Sema &S, SourceLocation Loc,
-                               StringRef AssumptionStr) {
+                               llvm::StringRef AssumptionStr) {
   if (llvm::KnownAssumptionStrings.count(AssumptionStr))
     return;
 
   unsigned BestEditDistance = 3;
-  StringRef Suggestion;
+  llvm::StringRef Suggestion;
   for (const auto &KnownAssumptionIt : llvm::KnownAssumptionStrings) {
     unsigned EditDistance =
         AssumptionStr.edit_distance(KnownAssumptionIt.getKey());
@@ -1819,7 +1819,7 @@ static void checkOMPAssumeAttr(Sema &S, SourceLocation Loc,
 
 static void handleOMPAssumeAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   // Handle the case where the attribute has a text message.
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation AttrStrLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str, &AttrStrLoc))
     return;
@@ -1831,7 +1831,7 @@ static void handleOMPAssumeAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 /// Normalize the attribute, __foo__ becomes foo.
 /// Returns true if normalization was applied.
-static bool normalizeName(StringRef &AttrName) {
+static bool normalizeName(llvm::StringRef &AttrName) {
   if (AttrName.size() > 4 && AttrName.starts_with("__") &&
       AttrName.ends_with("__")) {
     AttrName = AttrName.drop_front(2).drop_back(2);
@@ -1878,12 +1878,12 @@ static void handleOwnershipAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
   IdentifierInfo *Module = AL.getArgAsIdent(0)->Ident;
 
-  StringRef ModuleName = Module->getName();
+  llvm::StringRef ModuleName = Module->getName();
   if (normalizeName(ModuleName)) {
     Module = &S.PP.getIdentifierTable().get(ModuleName);
   }
 
-  SmallVector<ParamIdx, 8> OwnershipArgs;
+  llvm::SmallVector<ParamIdx, 8> OwnershipArgs;
   for (unsigned i = 1; i < AL.getNumArgs(); ++i) {
     Expr *Ex = AL.getArgAsExpr(i);
     ParamIdx Idx;
@@ -1992,8 +1992,8 @@ static void handleWeakRefAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
   // FIXME: it would be good for us to keep the WeakRefAttr as-written instead
   // of transforming it into an AliasAttr.  The WeakRefAttr never uses the
-  // StringRef parameter it was given anyway.
-  StringRef Str;
+  // llvm::StringRef parameter it was given anyway.
+  llvm::StringRef Str;
   if (AL.getNumArgs() && S.checkStringLiteralArgumentAttr(AL, 0, Str))
     // GCC will accept anything as the argument of weakref. Should we
     // check for an existing decl?
@@ -2007,12 +2007,12 @@ static void handleWeakRefAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 // https://github.com/llvm/llvm-project/issues/88825). This should handle the
 // majority of use cases while leaving namespace scope names unmarked.
 static void markUsedForAliasOrIfunc(Sema &S, Decl *D, const ParsedAttr &AL,
-                                    StringRef Str) {
+                                    llvm::StringRef Str) {
   std::unique_ptr<char, llvm::FreeDeleter> Demangled;
   if (S.getASTContext().getCXXABIKind() != TargetCXXABI::Microsoft)
     Demangled.reset(llvm::itaniumDemangle(Str, /*ParseParams=*/false));
   std::unique_ptr<MangleContext> MC(S.Context.createMangleContext());
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
 
   const DeclarationNameInfo Target(
       &S.Context.Idents.get(Demangled ? Demangled.get() : Str), AL.getLoc());
@@ -2035,7 +2035,7 @@ static void markUsedForAliasOrIfunc(Sema &S, Decl *D, const ParsedAttr &AL,
 }
 
 static void handleIFuncAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Str;
+  llvm::StringRef Str;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str))
     return;
 
@@ -2051,7 +2051,7 @@ static void handleIFuncAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static void handleAliasAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Str;
+  llvm::StringRef Str;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str))
     return;
 
@@ -2086,7 +2086,7 @@ static void handleAliasAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static void handleTLSModelAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Model;
+  llvm::StringRef Model;
   SourceLocation LiteralLoc;
   // Check that it is a string.
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Model, &LiteralLoc))
@@ -2148,7 +2148,7 @@ static void handleCPUSpecificAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   if (!AL.checkAtLeastNumArgs(S, 1))
     return;
 
-  SmallVector<IdentifierInfo *, 8> CPUs;
+  llvm::SmallVector<IdentifierInfo *, 8> CPUs;
   for (unsigned ArgNo = 0; ArgNo < getNumAttributeArgs(AL); ++ArgNo) {
     if (!AL.isArgIdent(ArgNo)) {
       S.Diag(AL.getLoc(), diag::err_attribute_argument_type)
@@ -2157,7 +2157,7 @@ static void handleCPUSpecificAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
     }
 
     IdentifierLoc *CPUArg = AL.getArgAsIdent(ArgNo);
-    StringRef CPUName = CPUArg->Ident->getName().trim();
+    llvm::StringRef CPUName = CPUArg->Ident->getName().trim();
 
     if (!S.Context.getTargetInfo().validateCPUSpecificCPUDispatch(CPUName)) {
       S.Diag(CPUArg->Loc, diag::err_invalid_cpu_specific_dispatch_value)
@@ -2417,7 +2417,7 @@ static void handleDestructorAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 template <typename AttrTy>
 static void handleAttrWithMessage(Sema &S, Decl *D, const ParsedAttr &AL) {
   // Handle the case where the attribute has a text message.
-  StringRef Str;
+  llvm::StringRef Str;
   if (AL.getNumArgs() == 1 && !S.checkStringLiteralArgumentAttr(AL, 0, Str))
     return;
 
@@ -2437,10 +2437,10 @@ static void handleObjCSuppresProtocolAttr(Sema &S, Decl *D,
 
 static bool checkAvailabilityAttr(Sema &S, SourceRange Range,
                                   IdentifierInfo *Platform,
-                                  VersionTuple Introduced,
-                                  VersionTuple Deprecated,
-                                  VersionTuple Obsoleted) {
-  StringRef PlatformName
+                                  llvm::VersionTuple Introduced,
+                                  llvm::VersionTuple Deprecated,
+                                  llvm::VersionTuple Obsoleted) {
+  llvm::StringRef PlatformName
     = AvailabilityAttr::getPrettyPlatformName(Platform->getName());
   if (PlatformName.empty())
     PlatformName = Platform->getName();
@@ -2478,7 +2478,7 @@ static bool checkAvailabilityAttr(Sema &S, SourceRange Range,
 ///
 /// If either version tuple is empty, then they are assumed to match. If
 /// \p BeforeIsOkay is true, then \p X can be less than or equal to \p Y.
-static bool versionsMatch(const VersionTuple &X, const VersionTuple &Y,
+static bool versionsMatch(const llvm::VersionTuple &X, const llvm::VersionTuple &Y,
                           bool BeforeIsOkay) {
   if (X.empty() || Y.empty())
     return true;
@@ -2494,13 +2494,13 @@ static bool versionsMatch(const VersionTuple &X, const VersionTuple &Y,
 
 AvailabilityAttr *Sema::mergeAvailabilityAttr(
     NamedDecl *D, const AttributeCommonInfo &CI, IdentifierInfo *Platform,
-    bool Implicit, VersionTuple Introduced, VersionTuple Deprecated,
-    VersionTuple Obsoleted, bool IsUnavailable, StringRef Message,
-    bool IsStrict, StringRef Replacement, AvailabilityMergeKind AMK,
+    bool Implicit, llvm::VersionTuple Introduced, llvm::VersionTuple Deprecated,
+    llvm::VersionTuple Obsoleted, bool IsUnavailable, llvm::StringRef Message,
+    bool IsStrict, llvm::StringRef Replacement, AvailabilityMergeKind AMK,
     int Priority, IdentifierInfo *Environment) {
-  VersionTuple MergedIntroduced = Introduced;
-  VersionTuple MergedDeprecated = Deprecated;
-  VersionTuple MergedObsoleted = Obsoleted;
+  llvm::VersionTuple MergedIntroduced = Introduced;
+  llvm::VersionTuple MergedDeprecated = Deprecated;
+  llvm::VersionTuple MergedObsoleted = Obsoleted;
   bool FoundAny = false;
   bool OverrideOrImpl = false;
   switch (AMK) {
@@ -2553,9 +2553,9 @@ AvailabilityAttr *Sema::mergeAvailabilityAttr(
       }
 
       FoundAny = true;
-      VersionTuple OldIntroduced = OldAA->getIntroduced();
-      VersionTuple OldDeprecated = OldAA->getDeprecated();
-      VersionTuple OldObsoleted = OldAA->getObsoleted();
+      llvm::VersionTuple OldIntroduced = OldAA->getIntroduced();
+      llvm::VersionTuple OldDeprecated = OldAA->getDeprecated();
+      llvm::VersionTuple OldObsoleted = OldAA->getObsoleted();
       bool OldIsUnavailable = OldAA->getUnavailable();
 
       if (!versionsMatch(OldIntroduced, Introduced, OverrideOrImpl) ||
@@ -2565,8 +2565,8 @@ AvailabilityAttr *Sema::mergeAvailabilityAttr(
             (OverrideOrImpl && !OldIsUnavailable && IsUnavailable))) {
         if (OverrideOrImpl) {
           int Which = -1;
-          VersionTuple FirstVersion;
-          VersionTuple SecondVersion;
+          llvm::VersionTuple FirstVersion;
+          llvm::VersionTuple SecondVersion;
           if (!versionsMatch(OldIntroduced, Introduced, OverrideOrImpl)) {
             Which = 0;
             FirstVersion = OldIntroduced;
@@ -2616,9 +2616,9 @@ AvailabilityAttr *Sema::mergeAvailabilityAttr(
         continue;
       }
 
-      VersionTuple MergedIntroduced2 = MergedIntroduced;
-      VersionTuple MergedDeprecated2 = MergedDeprecated;
-      VersionTuple MergedObsoleted2 = MergedObsoleted;
+      llvm::VersionTuple MergedIntroduced2 = MergedIntroduced;
+      llvm::VersionTuple MergedDeprecated2 = MergedDeprecated;
+      llvm::VersionTuple MergedObsoleted2 = MergedObsoleted;
 
       if (MergedIntroduced2.empty())
         MergedIntroduced2 = OldIntroduced;
@@ -2688,10 +2688,10 @@ static void handleAvailabilityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   AvailabilityChange Obsoleted = AL.getAvailabilityObsoleted();
   bool IsUnavailable = AL.getUnavailableLoc().isValid();
   bool IsStrict = AL.getStrictLoc().isValid();
-  StringRef Str;
+  llvm::StringRef Str;
   if (const auto *SE = dyn_cast_if_present<StringLiteral>(AL.getMessageExpr()))
     Str = SE->getString();
-  StringRef Replacement;
+  llvm::StringRef Replacement;
   if (const auto *SE =
           dyn_cast_if_present<StringLiteral>(AL.getReplacementExpr()))
     Replacement = SE->getString();
@@ -2762,10 +2762,10 @@ static void handleAvailabilityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
                   : nullptr;
 
       auto adjustWatchOSVersion =
-          [IOSToWatchOSMapping](VersionTuple Version) -> VersionTuple {
+          [IOSToWatchOSMapping](llvm::VersionTuple Version) -> llvm::VersionTuple {
         if (Version.empty())
           return Version;
-        auto MinimumWatchOSVersion = VersionTuple(2, 0);
+        auto MinimumWatchOSVersion = llvm::VersionTuple(2, 0);
 
         if (IOSToWatchOSMapping) {
           if (auto MappedVersion = IOSToWatchOSMapping->map(
@@ -2779,12 +2779,12 @@ static void handleAvailabilityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
         if (NewMajor >= 2) {
           if (Version.getMinor()) {
             if (Version.getSubminor())
-              return VersionTuple(NewMajor, *Version.getMinor(),
+              return llvm::VersionTuple(NewMajor, *Version.getMinor(),
                                   *Version.getSubminor());
             else
-              return VersionTuple(NewMajor, *Version.getMinor());
+              return llvm::VersionTuple(NewMajor, *Version.getMinor());
           }
-          return VersionTuple(NewMajor);
+          return llvm::VersionTuple(NewMajor);
         }
 
         return MinimumWatchOSVersion;
@@ -2819,13 +2819,13 @@ static void handleAvailabilityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
                   : nullptr;
 
       auto AdjustTvOSVersion =
-          [IOSToTvOSMapping](VersionTuple Version) -> VersionTuple {
+          [IOSToTvOSMapping](llvm::VersionTuple Version) -> llvm::VersionTuple {
         if (Version.empty())
           return Version;
 
         if (IOSToTvOSMapping) {
           if (auto MappedVersion = IOSToTvOSMapping->map(
-                  Version, VersionTuple(0, 0), std::nullopt)) {
+                  Version, llvm::VersionTuple(0, 0), std::nullopt)) {
             return *MappedVersion;
           }
         }
@@ -2859,12 +2859,12 @@ static void handleAvailabilityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
     else if (II->getName() == "ios_app_extension")
       NewII = &S.Context.Idents.get("maccatalyst_app_extension");
     if (NewII) {
-      auto MinMacCatalystVersion = [](const VersionTuple &V) {
+      auto MinMacCatalystVersion = [](const llvm::VersionTuple &V) {
         if (V.empty())
           return V;
         if (V.getMajor() < 13 ||
             (V.getMajor() == 13 && V.getMinor() && *V.getMinor() < 1))
-          return VersionTuple(13, 1); // The min Mac Catalyst version is 13.1.
+          return llvm::VersionTuple(13, 1); // The min Mac Catalyst version is 13.1.
         return V;
       };
       AvailabilityAttr *NewAttr = S.mergeAvailabilityAttr(
@@ -2888,17 +2888,17 @@ static void handleAvailabilityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
         // attributes that are inferred from 'ios'.
         NewII = &S.Context.Idents.get("maccatalyst");
         auto RemapMacOSVersion =
-            [&](const VersionTuple &V) -> std::optional<VersionTuple> {
+            [&](const llvm::VersionTuple &V) -> std::optional<llvm::VersionTuple> {
           if (V.empty())
             return std::nullopt;
           // API_TO_BE_DEPRECATED is 100000.
           if (V.getMajor() == 100000)
-            return VersionTuple(100000);
+            return llvm::VersionTuple(100000);
           // The minimum iosmac version is 13.1
-          return MacOStoMacCatalystMapping->map(V, VersionTuple(13, 1),
+          return MacOStoMacCatalystMapping->map(V, llvm::VersionTuple(13, 1),
                                                 std::nullopt);
         };
-        std::optional<VersionTuple> NewIntroduced =
+        std::optional<llvm::VersionTuple> NewIntroduced =
                                         RemapMacOSVersion(Introduced.Version),
                                     NewDeprecated =
                                         RemapMacOSVersion(Deprecated.Version),
@@ -2906,8 +2906,8 @@ static void handleAvailabilityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
                                         RemapMacOSVersion(Obsoleted.Version);
         if (NewIntroduced || NewDeprecated || NewObsoleted) {
           auto VersionOrEmptyVersion =
-              [](const std::optional<VersionTuple> &V) -> VersionTuple {
-            return V ? *V : VersionTuple();
+              [](const std::optional<llvm::VersionTuple> &V) -> llvm::VersionTuple {
+            return V ? *V : llvm::VersionTuple();
           };
           AvailabilityAttr *NewAttr = S.mergeAvailabilityAttr(
               ND, AL, NewII, true /*Implicit*/,
@@ -2931,14 +2931,14 @@ static void handleExternalSourceSymbolAttr(Sema &S, Decl *D,
   if (!AL.checkAtLeastNumArgs(S, 1) || !AL.checkAtMostNumArgs(S, 4))
     return;
 
-  StringRef Language;
+  llvm::StringRef Language;
   if (const auto *SE = dyn_cast_if_present<StringLiteral>(AL.getArgAsExpr(0)))
     Language = SE->getString();
-  StringRef DefinedIn;
+  llvm::StringRef DefinedIn;
   if (const auto *SE = dyn_cast_if_present<StringLiteral>(AL.getArgAsExpr(1)))
     DefinedIn = SE->getString();
   bool IsGeneratedDeclaration = AL.getArgAsIdent(2) != nullptr;
-  StringRef USR;
+  llvm::StringRef USR;
   if (const auto *SE = dyn_cast_if_present<StringLiteral>(AL.getArgAsExpr(3)))
     USR = SE->getString();
 
@@ -2990,7 +2990,7 @@ static void handleVisibilityAttr(Sema &S, Decl *D, const ParsedAttr &AL,
   }
 
   // Check that the argument is a string literal.
-  StringRef TypeStr;
+  llvm::StringRef TypeStr;
   SourceLocation LiteralLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, TypeStr, &LiteralLoc))
     return;
@@ -3230,7 +3230,7 @@ static void handleWarnUnusedResult(Sema &S, Decl *D, const ParsedAttr &AL) {
       return;
     }
 
-  StringRef Str;
+  llvm::StringRef Str;
   if (AL.isStandardAttributeSyntax() && !AL.getScopeName()) {
     // The standard attribute cannot be applied to variable declarations such
     // as a function pointer.
@@ -3366,7 +3366,7 @@ static void handleVecTypeHint(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 SectionAttr *Sema::mergeSectionAttr(Decl *D, const AttributeCommonInfo &CI,
-                                    StringRef Name) {
+                                    llvm::StringRef Name) {
   // Explicit or partial specializations do not inherit
   // the section attribute from the primary template.
   if (const auto *FD = dyn_cast<FunctionDecl>(D)) {
@@ -3394,19 +3394,19 @@ SectionAttr *Sema::mergeSectionAttr(Decl *D, const AttributeCommonInfo &CI,
 /// This is a simple quality of implementation feature to catch errors
 /// and give good diagnostics in cases when the assembler or code generator
 /// would otherwise reject the section specifier.
-llvm::Error Sema::isValidSectionSpecifier(StringRef SecName) {
+llvm::Error Sema::isValidSectionSpecifier(llvm::StringRef SecName) {
   if (!Context.getTargetInfo().getTriple().isOSDarwin())
     return llvm::Error::success();
 
   // Let MCSectionMachO validate this.
-  StringRef Segment, Section;
+  llvm::StringRef Segment, Section;
   unsigned TAA, StubSize;
   bool HasTAA;
   return llvm::MCSectionMachO::ParseSectionSpecifier(SecName, Segment, Section,
                                                      TAA, HasTAA, StubSize);
 }
 
-bool Sema::checkSectionName(SourceLocation LiteralLoc, StringRef SecName) {
+bool Sema::checkSectionName(SourceLocation LiteralLoc, llvm::StringRef SecName) {
   if (llvm::Error E = isValidSectionSpecifier(SecName)) {
     Diag(LiteralLoc, diag::err_attribute_section_invalid_for_target)
         << toString(std::move(E)) << 1 /*'section'*/;
@@ -3418,7 +3418,7 @@ bool Sema::checkSectionName(SourceLocation LiteralLoc, StringRef SecName) {
 static void handleSectionAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   // Make sure that there is a string literal as the sections's single
   // argument.
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation LiteralLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str, &LiteralLoc))
     return;
@@ -3438,7 +3438,7 @@ static void handleSectionAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static void handleCodeModelAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation LiteralLoc;
   // Check that it is a string.
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str, &LiteralLoc))
@@ -3456,7 +3456,7 @@ static void handleCodeModelAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 // This is used for `__declspec(code_seg("segname"))` on a decl.
 // `#pragma code_seg("segname")` uses checkSectionName() instead.
 static bool checkCodeSegName(Sema &S, SourceLocation LiteralLoc,
-                             StringRef CodeSegName) {
+                             llvm::StringRef CodeSegName) {
   if (llvm::Error E = S.isValidSectionSpecifier(CodeSegName)) {
     S.Diag(LiteralLoc, diag::err_attribute_section_invalid_for_target)
         << toString(std::move(E)) << 0 /*'code-seg'*/;
@@ -3467,7 +3467,7 @@ static bool checkCodeSegName(Sema &S, SourceLocation LiteralLoc,
 }
 
 CodeSegAttr *Sema::mergeCodeSegAttr(Decl *D, const AttributeCommonInfo &CI,
-                                    StringRef Name) {
+                                    llvm::StringRef Name) {
   // Explicit or partial specializations do not inherit
   // the code_seg attribute from the primary template.
   if (const auto *FD = dyn_cast<FunctionDecl>(D)) {
@@ -3486,7 +3486,7 @@ CodeSegAttr *Sema::mergeCodeSegAttr(Decl *D, const AttributeCommonInfo &CI,
 }
 
 static void handleCodeSegAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation LiteralLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str, &LiteralLoc))
     return;
@@ -3508,7 +3508,7 @@ static void handleCodeSegAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 // Check for things we'd like to warn about. Multiversioning issues are
 // handled later in the process, once we know how many exist.
-bool Sema::checkTargetAttr(SourceLocation LiteralLoc, StringRef AttrStr) {
+bool Sema::checkTargetAttr(SourceLocation LiteralLoc, llvm::StringRef AttrStr) {
   enum FirstParam { Unsupported, Duplicate, Unknown };
   enum SecondParam { None, CPU, Tune };
   enum ThirdParam { Target, TargetClones };
@@ -3545,14 +3545,14 @@ bool Sema::checkTargetAttr(SourceLocation LiteralLoc, StringRef AttrStr) {
            << Duplicate << None << ParsedAttrs.Duplicate << Target;
 
   for (const auto &Feature : ParsedAttrs.Features) {
-    auto CurFeature = StringRef(Feature).drop_front(); // remove + or -.
+    auto CurFeature = llvm::StringRef(Feature).drop_front(); // remove + or -.
     if (!Context.getTargetInfo().isValidFeatureName(CurFeature))
       return Diag(LiteralLoc, diag::warn_unsupported_target_attribute)
              << Unsupported << None << CurFeature << Target;
   }
 
   TargetInfo::BranchProtectionInfo BPI;
-  StringRef DiagMsg;
+  llvm::StringRef DiagMsg;
   if (ParsedAttrs.BranchProtection.empty())
     return false;
   if (!Context.getTargetInfo().validateBranchProtection(
@@ -3571,13 +3571,13 @@ bool Sema::checkTargetAttr(SourceLocation LiteralLoc, StringRef AttrStr) {
 
 // Check Target Version attrs
 bool Sema::checkTargetVersionAttr(SourceLocation LiteralLoc, Decl *D,
-                                  StringRef &AttrStr, bool &isDefault) {
+                                  llvm::StringRef &AttrStr, bool &isDefault) {
   enum FirstParam { Unsupported };
   enum SecondParam { None };
   enum ThirdParam { Target, TargetClones, TargetVersion };
   if (AttrStr.trim() == "default")
     isDefault = true;
-  llvm::SmallVector<StringRef, 8> Features;
+  llvm::SmallVector<llvm::StringRef, 8> Features;
   AttrStr.split(Features, "+");
   for (auto &CurFeature : Features) {
     CurFeature = CurFeature.trim();
@@ -3594,7 +3594,7 @@ bool Sema::checkTargetVersionAttr(SourceLocation LiteralLoc, Decl *D,
 }
 
 static void handleTargetVersionAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation LiteralLoc;
   bool isDefault = false;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str, &LiteralLoc) ||
@@ -3609,7 +3609,7 @@ static void handleTargetVersionAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static void handleTargetAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation LiteralLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str, &LiteralLoc) ||
       S.checkTargetAttr(LiteralLoc, Str))
@@ -3620,9 +3620,9 @@ static void handleTargetAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 bool Sema::checkTargetClonesAttrString(
-    SourceLocation LiteralLoc, StringRef Str, const StringLiteral *Literal,
+    SourceLocation LiteralLoc, llvm::StringRef Str, const StringLiteral *Literal,
     Decl *D, bool &HasDefault, bool &HasCommas, bool &HasNotDefault,
-    SmallVectorImpl<SmallString<64>> &StringsBuffer) {
+    llvm::SmallVectorImpl<llvm::SmallString<64>> &StringsBuffer) {
   enum FirstParam { Unsupported, Duplicate, Unknown };
   enum SecondParam { None, CPU, Tune };
   enum ThirdParam { Target, TargetClones };
@@ -3633,10 +3633,10 @@ bool Sema::checkTargetClonesAttrString(
     return Diag(LiteralLoc, diag::warn_unsupported_target_attribute)
            << Unsupported << None << "" << TargetClones;
 
-  std::pair<StringRef, StringRef> Parts = {{}, Str};
+  std::pair<llvm::StringRef, llvm::StringRef> Parts = {{}, Str};
   while (!Parts.second.empty()) {
     Parts = Parts.second.split(',');
-    StringRef Cur = Parts.first.trim();
+    llvm::StringRef Cur = Parts.first.trim();
     SourceLocation CurLoc =
         Literal->getLocationOfByte(Cur.data() - Literal->getString().data(),
                                    getSourceManager(), getLangOpts(), TInfo);
@@ -3657,11 +3657,11 @@ bool Sema::checkTargetClonesAttrString(
         else
           StringsBuffer.push_back(Cur);
       } else {
-        std::pair<StringRef, StringRef> CurParts = {{}, Cur};
-        llvm::SmallVector<StringRef, 8> CurFeatures;
+        std::pair<llvm::StringRef, llvm::StringRef> CurParts = {{}, Cur};
+        llvm::SmallVector<llvm::StringRef, 8> CurFeatures;
         while (!CurParts.second.empty()) {
           CurParts = CurParts.second.split('+');
-          StringRef CurFeature = CurParts.first.trim();
+          llvm::StringRef CurFeature = CurParts.first.trim();
           if (!TInfo.validateCpuSupports(CurFeature)) {
             Diag(CurLoc, diag::warn_unsupported_target_attribute)
                 << Unsupported << None << CurFeature << TargetClones;
@@ -3673,7 +3673,7 @@ bool Sema::checkTargetClonesAttrString(
         }
         // Canonize TargetClones Attributes
         llvm::sort(CurFeatures);
-        SmallString<64> Res;
+        llvm::SmallString<64> Res;
         for (auto &CurFeat : CurFeatures) {
           if (!Res.empty())
             Res.append("+");
@@ -3735,12 +3735,12 @@ static void handleTargetClonesAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   if (checkAttrMutualExclusion<TargetClonesAttr>(S, D, AL))
     return;
 
-  SmallVector<StringRef, 2> Strings;
-  SmallVector<SmallString<64>, 2> StringsBuffer;
+  llvm::SmallVector<llvm::StringRef, 2> Strings;
+  llvm::SmallVector<llvm::SmallString<64>, 2> StringsBuffer;
   bool HasCommas = false, HasDefault = false, HasNotDefault = false;
 
   for (unsigned I = 0, E = AL.getNumArgs(); I != E; ++I) {
-    StringRef CurStr;
+    llvm::StringRef CurStr;
     SourceLocation LiteralLoc;
     if (!S.checkStringLiteralArgumentAttr(AL, I, CurStr, &LiteralLoc) ||
         S.checkTargetClonesAttrString(
@@ -3872,7 +3872,7 @@ static void handleCleanupAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
   // Create a function call expression. This is a fake/dummy call expression.
   CallExpr *FunctionCallExpression =
-      CallExpr::Create(S.Context, E, ArrayRef{AddressOfVariable},
+      CallExpr::Create(S.Context, E, llvm::ArrayRef{AddressOfVariable},
                        S.Context.VoidTy, VK_PRValue, Loc, FPOptionsOverride{});
 
   if (S.CheckFunctionCall(FD, FunctionCallExpression,
@@ -3955,7 +3955,7 @@ enum FormatAttrKind {
 
 /// getFormatAttrKind - Map from format attribute names to supported format
 /// types.
-static FormatAttrKind getFormatAttrKind(StringRef Format) {
+static FormatAttrKind getFormatAttrKind(llvm::StringRef Format) {
   return llvm::StringSwitch<FormatAttrKind>(Format)
       // Check for formats that get handled specially.
       .Case("NSString", NSStringFormat)
@@ -4022,7 +4022,7 @@ static void handleInitPriorityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 ErrorAttr *Sema::mergeErrorAttr(Decl *D, const AttributeCommonInfo &CI,
-                                StringRef NewUserDiagnostic) {
+                                llvm::StringRef NewUserDiagnostic) {
   if (const auto *EA = D->getAttr<ErrorAttr>()) {
     std::string NewAttr = CI.getNormalizedFullName();
     assert((NewAttr == "error" || NewAttr == "warning") &&
@@ -4080,7 +4080,7 @@ static void handleFormatAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   unsigned NumArgs = getFunctionOrMethodNumParams(D) + HasImplicitThisParam;
 
   IdentifierInfo *II = AL.getArgAsIdent(0)->Ident;
-  StringRef Format = II->getName();
+  llvm::StringRef Format = II->getName();
 
   if (normalizeName(Format)) {
     // If we've modified the string name, we need a new identifier for it.
@@ -4207,7 +4207,7 @@ static void handleCallbackAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
   auto UnknownName = NameIdxMapping.end();
 
-  SmallVector<int, 8> EncodingIndices;
+  llvm::SmallVector<int, 8> EncodingIndices;
   for (unsigned I = 0, E = AL.getNumArgs(); I < E; ++I) {
     SourceRange SR;
     int32_t ArgIdx;
@@ -4412,10 +4412,10 @@ static void handleTransparentUnionAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 void Sema::AddAnnotationAttr(Decl *D, const AttributeCommonInfo &CI,
-                             StringRef Str, MutableArrayRef<Expr *> Args) {
+                             llvm::StringRef Str, llvm::MutableArrayRef<Expr *> Args) {
   auto *Attr = AnnotateAttr::Create(Context, Str, Args.data(), Args.size(), CI);
   if (ConstantFoldAttrArgs(
-          CI, MutableArrayRef<Expr *>(Attr->args_begin(), Attr->args_end()))) {
+          CI, llvm::MutableArrayRef<Expr *>(Attr->args_begin(), Attr->args_end()))) {
     D->addAttr(Attr);
   }
 }
@@ -4423,7 +4423,7 @@ void Sema::AddAnnotationAttr(Decl *D, const AttributeCommonInfo &CI,
 static void handleAnnotateAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   // Make sure that there is a string literal as the annotation's first
   // argument.
-  StringRef Str;
+  llvm::StringRef Str;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str))
     return;
 
@@ -4783,7 +4783,7 @@ bool Sema::checkMSInheritanceAttrOnDefinition(
 
 /// parseModeAttrArg - Parses attribute mode string and returns parsed type
 /// attribute.
-static void parseModeAttrArg(Sema &S, StringRef Str, unsigned &DestWidth,
+static void parseModeAttrArg(Sema &S, llvm::StringRef Str, unsigned &DestWidth,
                              bool &IntegerMode, bool &ComplexMode,
                              FloatModeKind &ExplicitType) {
   IntegerMode = true;
@@ -4870,7 +4870,7 @@ static void handleModeAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 void Sema::AddModeAttr(Decl *D, const AttributeCommonInfo &CI,
                        IdentifierInfo *Name, bool InInstantiation) {
-  StringRef Str = Name->getName();
+  llvm::StringRef Str = Name->getName();
   normalizeName(Str);
   SourceLocation AttrLoc = CI.getLoc();
 
@@ -5089,7 +5089,7 @@ MinSizeAttr *Sema::mergeMinSizeAttr(Decl *D, const AttributeCommonInfo &CI) {
 }
 
 SwiftNameAttr *Sema::mergeSwiftNameAttr(Decl *D, const SwiftNameAttr &SNA,
-                                        StringRef Name) {
+                                        llvm::StringRef Name) {
   if (const auto *PrevSNA = D->getAttr<SwiftNameAttr>()) {
     if (PrevSNA->getName() != Name && !PrevSNA->isImplicit()) {
       Diag(PrevSNA->getLocation(), diag::err_attributes_are_not_compatible)
@@ -5355,9 +5355,9 @@ static void handleSuppressAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
       return;
   }
 
-  std::vector<StringRef> DiagnosticIdentifiers;
+  std::vector<llvm::StringRef> DiagnosticIdentifiers;
   for (unsigned I = 0, E = AL.getNumArgs(); I != E; ++I) {
-    StringRef RuleName;
+    llvm::StringRef RuleName;
 
     if (!S.checkStringLiteralArgumentAttr(AL, I, RuleName, nullptr))
       return;
@@ -5515,7 +5515,7 @@ bool Sema::CheckCallingConvAttr(const ParsedAttr &Attrs, CallingConv &CC,
                                                              CC_C;
     break;
   case ParsedAttr::AT_Pcs: {
-    StringRef StrRef;
+    llvm::StringRef StrRef;
     if (!checkStringLiteralArgumentAttr(Attrs, 0, StrRef)) {
       Attrs.setInvalid();
       return true;
@@ -5947,8 +5947,8 @@ struct IntrinToName {
 };
 } // unnamed namespace
 
-static bool ArmBuiltinAliasValid(unsigned BuiltinID, StringRef AliasName,
-                                 ArrayRef<IntrinToName> Map,
+static bool ArmBuiltinAliasValid(unsigned BuiltinID, llvm::StringRef AliasName,
+                                 llvm::ArrayRef<IntrinToName> Map,
                                  const char *IntrinNames) {
   AliasName.consume_front("__arm_");
   const IntrinToName *It =
@@ -5957,30 +5957,30 @@ static bool ArmBuiltinAliasValid(unsigned BuiltinID, StringRef AliasName,
       });
   if (It == Map.end() || It->Id != BuiltinID)
     return false;
-  StringRef FullName(&IntrinNames[It->FullName]);
+  llvm::StringRef FullName(&IntrinNames[It->FullName]);
   if (AliasName == FullName)
     return true;
   if (It->ShortName == -1)
     return false;
-  StringRef ShortName(&IntrinNames[It->ShortName]);
+  llvm::StringRef ShortName(&IntrinNames[It->ShortName]);
   return AliasName == ShortName;
 }
 
-static bool ArmMveAliasValid(unsigned BuiltinID, StringRef AliasName) {
+static bool ArmMveAliasValid(unsigned BuiltinID, llvm::StringRef AliasName) {
 #include "clang/Basic/arm_mve_builtin_aliases.inc"
   // The included file defines:
-  // - ArrayRef<IntrinToName> Map
+  // - llvm::ArrayRef<IntrinToName> Map
   // - const char IntrinNames[]
   return ArmBuiltinAliasValid(BuiltinID, AliasName, Map, IntrinNames);
 }
 
-static bool ArmCdeAliasValid(unsigned BuiltinID, StringRef AliasName) {
+static bool ArmCdeAliasValid(unsigned BuiltinID, llvm::StringRef AliasName) {
 #include "clang/Basic/arm_cde_builtin_aliases.inc"
   return ArmBuiltinAliasValid(BuiltinID, AliasName, Map, IntrinNames);
 }
 
 static bool ArmSveAliasValid(ASTContext &Context, unsigned BuiltinID,
-                             StringRef AliasName) {
+                             llvm::StringRef AliasName) {
   if (Context.BuiltinInfo.isAuxBuiltinID(BuiltinID))
     BuiltinID = Context.BuiltinInfo.getAuxBuiltinID(BuiltinID);
   return BuiltinID >= AArch64::FirstSVEBuiltin &&
@@ -5988,7 +5988,7 @@ static bool ArmSveAliasValid(ASTContext &Context, unsigned BuiltinID,
 }
 
 static bool ArmSmeAliasValid(ASTContext &Context, unsigned BuiltinID,
-                             StringRef AliasName) {
+                             llvm::StringRef AliasName) {
   if (Context.BuiltinInfo.isAuxBuiltinID(BuiltinID))
     BuiltinID = Context.BuiltinInfo.getAuxBuiltinID(BuiltinID);
   return BuiltinID >= AArch64::FirstSMEBuiltin &&
@@ -6004,7 +6004,7 @@ static void handleArmBuiltinAliasAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
   IdentifierInfo *Ident = AL.getArgAsIdent(0)->Ident;
   unsigned BuiltinID = Ident->getBuiltinID();
-  StringRef AliasName = cast<FunctionDecl>(D)->getIdentifier()->getName();
+  llvm::StringRef AliasName = cast<FunctionDecl>(D)->getIdentifier()->getName();
 
   bool IsAArch64 = S.Context.getTargetInfo().getTriple().isAArch64();
   if ((IsAArch64 && !ArmSveAliasValid(S.Context, BuiltinID, AliasName) &&
@@ -6018,7 +6018,7 @@ static void handleArmBuiltinAliasAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   D->addAttr(::new (S.Context) ArmBuiltinAliasAttr(S.Context, AL, Ident));
 }
 
-static bool RISCVAliasValid(unsigned BuiltinID, StringRef AliasName) {
+static bool RISCVAliasValid(unsigned BuiltinID, llvm::StringRef AliasName) {
   return BuiltinID >= RISCV::FirstRVVBuiltin &&
          BuiltinID <= RISCV::LastRVVBuiltin;
 }
@@ -6033,7 +6033,7 @@ static void handleBuiltinAliasAttr(Sema &S, Decl *D,
 
   IdentifierInfo *Ident = AL.getArgAsIdent(0)->Ident;
   unsigned BuiltinID = Ident->getBuiltinID();
-  StringRef AliasName = cast<FunctionDecl>(D)->getIdentifier()->getName();
+  llvm::StringRef AliasName = cast<FunctionDecl>(D)->getIdentifier()->getName();
 
   bool IsAArch64 = S.Context.getTargetInfo().getTriple().isAArch64();
   bool IsARM = S.Context.getTargetInfo().getTriple().isARM();
@@ -6472,7 +6472,7 @@ static void handleObjCDesignatedInitializer(Sema &S, Decl *D,
 }
 
 static void handleObjCRuntimeName(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef MetaDataName;
+  llvm::StringRef MetaDataName;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, MetaDataName))
     return;
   D->addAttr(::new (S.Context)
@@ -6556,7 +6556,7 @@ static void handleObjCPreciseLifetimeAttr(Sema &S, Decl *D,
 static void handleSwiftAttrAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   // Make sure that there is a string literal as the annotation's single
   // argument.
-  StringRef Str;
+  llvm::StringRef Str;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str))
     return;
 
@@ -6566,7 +6566,7 @@ static void handleSwiftAttrAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 static void handleSwiftBridge(Sema &S, Decl *D, const ParsedAttr &AL) {
   // Make sure that there is a string literal as the annotation's single
   // argument.
-  StringRef BT;
+  llvm::StringRef BT;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, BT))
     return;
 
@@ -6697,7 +6697,7 @@ static void checkSwiftAsyncErrorBlock(Sema &S, Decl *D,
                            ->castAs<BlockPointerType>()
                            ->getPointeeType()
                            ->getAs<FunctionProtoType>();
-  ArrayRef<QualType> BlockParams;
+  llvm::ArrayRef<QualType> BlockParams;
   if (FuncTy)
     BlockParams = FuncTy->getParamTypes();
 
@@ -6712,7 +6712,7 @@ static void checkSwiftAsyncErrorBlock(Sema &S, Decl *D,
     }
     QualType ErrorParam = BlockParams[ParamIdx - 1];
     if (!ErrorParam->isIntegralType(S.Context)) {
-      StringRef ConvStr =
+      llvm::StringRef ConvStr =
           ErrorAttr->getConvention() == SwiftAsyncErrorAttr::ZeroArgument
               ? "zero_argument"
               : "nonzero_argument";
@@ -6806,7 +6806,7 @@ static void handleSwiftAsyncError(Sema &S, Decl *D, const ParsedAttr &AL) {
 // <code>context.identifier</code> name.
 static bool
 validateSwiftFunctionName(Sema &S, const ParsedAttr &AL, SourceLocation Loc,
-                          StringRef Name, unsigned &SwiftParamCount,
+                          llvm::StringRef Name, unsigned &SwiftParamCount,
                           bool &IsSingleParamInit) {
   SwiftParamCount = 0;
   IsSingleParamInit = false;
@@ -6824,7 +6824,7 @@ validateSwiftFunctionName(Sema &S, const ParsedAttr &AL, SourceLocation Loc,
   }
 
   bool IsMember = false;
-  StringRef ContextName, BaseName, Parameters;
+  llvm::StringRef ContextName, BaseName, Parameters;
 
   std::tie(BaseName, Parameters) = Name.split('(');
 
@@ -6833,7 +6833,7 @@ validateSwiftFunctionName(Sema &S, const ParsedAttr &AL, SourceLocation Loc,
   std::tie(ContextName, BaseName) = BaseName.split('.');
   if (BaseName.empty()) {
     BaseName = ContextName;
-    ContextName = StringRef();
+    ContextName = llvm::StringRef();
   } else if (ContextName.empty() || !isValidAsciiIdentifier(ContextName)) {
     S.Diag(Loc, diag::warn_attr_swift_name_invalid_identifier)
         << AL << /*context*/ 1;
@@ -6885,7 +6885,7 @@ validateSwiftFunctionName(Sema &S, const ParsedAttr &AL, SourceLocation Loc,
     return false;
   }
 
-  StringRef CurrentParam;
+  llvm::StringRef CurrentParam;
   std::optional<unsigned> SelfLocation;
   unsigned NewValueCount = 0;
   std::optional<unsigned> NewValueLocation;
@@ -6985,10 +6985,10 @@ validateSwiftFunctionName(Sema &S, const ParsedAttr &AL, SourceLocation Loc,
   return true;
 }
 
-bool Sema::DiagnoseSwiftName(Decl *D, StringRef Name, SourceLocation Loc,
+bool Sema::DiagnoseSwiftName(Decl *D, llvm::StringRef Name, SourceLocation Loc,
                              const ParsedAttr &AL, bool IsAsync) {
   if (isa<ObjCMethodDecl>(D) || isa<FunctionDecl>(D)) {
-    ArrayRef<ParmVarDecl*> Params;
+    llvm::ArrayRef<ParmVarDecl*> Params;
     unsigned ParamCount;
 
     if (const auto *Method = dyn_cast<ObjCMethodDecl>(D)) {
@@ -7055,12 +7055,12 @@ bool Sema::DiagnoseSwiftName(Decl *D, StringRef Name, SourceLocation Loc,
               isa<VarDecl>(D) || isa<TypedefNameDecl>(D) || isa<TagDecl>(D) ||
               isa<IndirectFieldDecl>(D) || isa<FieldDecl>(D)) &&
              !IsAsync) {
-    StringRef ContextName, BaseName;
+    llvm::StringRef ContextName, BaseName;
 
     std::tie(ContextName, BaseName) = Name.split('.');
     if (BaseName.empty()) {
       BaseName = ContextName;
-      ContextName = StringRef();
+      ContextName = llvm::StringRef();
     } else if (!isValidAsciiIdentifier(ContextName)) {
       Diag(Loc, diag::warn_attr_swift_name_invalid_identifier) << AL
           << /*context*/1;
@@ -7080,7 +7080,7 @@ bool Sema::DiagnoseSwiftName(Decl *D, StringRef Name, SourceLocation Loc,
 }
 
 static void handleSwiftName(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Name;
+  llvm::StringRef Name;
   SourceLocation Loc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Name, &Loc))
     return;
@@ -7092,7 +7092,7 @@ static void handleSwiftName(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static void handleSwiftAsyncName(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Name;
+  llvm::StringRef Name;
   SourceLocation Loc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Name, &Loc))
     return;
@@ -7190,7 +7190,7 @@ static void handleSwiftAsyncAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 //===----------------------------------------------------------------------===//
 
 UuidAttr *Sema::mergeUuidAttr(Decl *D, const AttributeCommonInfo &CI,
-                              StringRef UuidAsWritten, MSGuidDecl *GuidDecl) {
+                              llvm::StringRef UuidAsWritten, MSGuidDecl *GuidDecl) {
   if (const auto *UA = D->getAttr<UuidAttr>()) {
     if (declaresSameEntity(UA->getGuidDecl(), GuidDecl))
       return nullptr;
@@ -7211,14 +7211,14 @@ static void handleUuidAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
     return;
   }
 
-  StringRef OrigStrRef;
+  llvm::StringRef OrigStrRef;
   SourceLocation LiteralLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, OrigStrRef, &LiteralLoc))
     return;
 
   // GUID format is "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" or
   // "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}", normalize to the former.
-  StringRef StrRef = OrigStrRef;
+  llvm::StringRef StrRef = OrigStrRef;
   if (StrRef.size() == 38 && StrRef.front() == '{' && StrRef.back() == '}')
     StrRef = StrRef.drop_front().drop_back();
 
@@ -7390,7 +7390,7 @@ static void handleHLSLPackOffsetAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static void handleHLSLShaderAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation ArgLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str, &ArgLoc))
     return;
@@ -7411,8 +7411,8 @@ static void handleHLSLShaderAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 static void handleHLSLResourceBindingAttr(Sema &S, Decl *D,
                                           const ParsedAttr &AL) {
-  StringRef Space = "space0";
-  StringRef Slot = "";
+  llvm::StringRef Space = "space0";
+  llvm::StringRef Slot = "";
 
   if (!AL.isArgIdent(0)) {
     S.Diag(AL.getLoc(), diag::err_attribute_argument_type)
@@ -7421,7 +7421,7 @@ static void handleHLSLResourceBindingAttr(Sema &S, Decl *D,
   }
 
   IdentifierLoc *Loc = AL.getArgAsIdent(0);
-  StringRef Str = Loc->Ident->getName();
+  llvm::StringRef Str = Loc->Ident->getName();
   SourceLocation ArgLoc = Loc->Loc;
 
   SourceLocation SpaceArgLoc;
@@ -7454,7 +7454,7 @@ static void handleHLSLResourceBindingAttr(Sema &S, Decl *D,
       return;
     }
 
-    StringRef SlotNum = Slot.substr(1);
+    llvm::StringRef SlotNum = Slot.substr(1);
     unsigned Num = 0;
     if (SlotNum.getAsInteger(10, Num)) {
       S.Diag(ArgLoc, diag::err_hlsl_unsupported_register_number);
@@ -7466,7 +7466,7 @@ static void handleHLSLResourceBindingAttr(Sema &S, Decl *D,
     S.Diag(SpaceArgLoc, diag::err_hlsl_expected_space) << Space;
     return;
   }
-  StringRef SpaceNum = Space.substr(5);
+  llvm::StringRef SpaceNum = Space.substr(5);
   unsigned Num = 0;
   if (SpaceNum.getAsInteger(10, Num)) {
     S.Diag(SpaceArgLoc, diag::err_hlsl_expected_space) << Space;
@@ -7544,9 +7544,9 @@ static void handleMSConstexprAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static void handleAbiTagAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  SmallVector<StringRef, 4> Tags;
+  llvm::SmallVector<llvm::StringRef, 4> Tags;
   for (unsigned I = 0, E = AL.getNumArgs(); I != E; ++I) {
-    StringRef Tag;
+    llvm::StringRef Tag;
     if (!S.checkStringLiteralArgumentAttr(AL, I, Tag))
       return;
     Tags.push_back(Tag);
@@ -7581,7 +7581,7 @@ static void handleARMInterruptAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
     return;
   }
 
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation ArgLoc;
 
   if (AL.getNumArgs() == 0)
@@ -7658,7 +7658,7 @@ static void handleMipsInterruptAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
     return;
   }
 
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation ArgLoc;
 
   if (AL.getNumArgs() == 0)
@@ -7851,7 +7851,7 @@ static void handleBPFPreserveAccessIndexAttr(Sema &S, Decl *D,
   Rec->addAttr(::new (S.Context) BPFPreserveAccessIndexAttr(S.Context, AL));
 }
 
-static bool hasBTFDeclTagAttr(Decl *D, StringRef Tag) {
+static bool hasBTFDeclTagAttr(Decl *D, llvm::StringRef Tag) {
   for (const auto *I : D->specific_attrs<BTFDeclTagAttr>()) {
     if (I->getBTFDeclTag() == Tag)
       return true;
@@ -7860,7 +7860,7 @@ static bool hasBTFDeclTagAttr(Decl *D, StringRef Tag) {
 }
 
 static void handleBTFDeclTagAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Str;
+  llvm::StringRef Str;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str))
     return;
   if (hasBTFDeclTagAttr(D, Str))
@@ -7889,7 +7889,7 @@ static void handleWebAssemblyExportNameAttr(Sema &S, Decl *D,
     return;
   }
 
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation ArgLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str, &ArgLoc))
     return;
@@ -7942,7 +7942,7 @@ static void
 handleWebAssemblyImportModuleAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   auto *FD = cast<FunctionDecl>(D);
 
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation ArgLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str, &ArgLoc))
     return;
@@ -7959,7 +7959,7 @@ static void
 handleWebAssemblyImportNameAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   auto *FD = cast<FunctionDecl>(D);
 
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation ArgLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Str, &ArgLoc))
     return;
@@ -7985,7 +7985,7 @@ static void handleRISCVInterruptAttr(Sema &S, Decl *D,
   if (!AL.checkAtMostNumArgs(S, 1))
     return;
 
-  StringRef Str;
+  llvm::StringRef Str;
   SourceLocation ArgLoc;
 
   // 'machine'is the default interrupt mode.
@@ -8399,7 +8399,7 @@ static void handleCapabilityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   //
   // For backward compatibility, any capability which has no specified string
   // literal will be considered a "mutex."
-  StringRef N("mutex");
+  llvm::StringRef N("mutex");
   SourceLocation LiteralLoc;
   if (AL.getKind() == ParsedAttr::AT_Capability &&
       !S.checkStringLiteralArgumentAttr(AL, 0, N, &LiteralLoc))
@@ -8409,7 +8409,7 @@ static void handleCapabilityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 }
 
 static void handleAssertCapabilityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  SmallVector<Expr*, 1> Args;
+  llvm::SmallVector<Expr*, 1> Args;
   if (!checkLockFunAttrCommon(S, D, AL, Args))
     return;
 
@@ -8419,7 +8419,7 @@ static void handleAssertCapabilityAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 static void handleAcquireCapabilityAttr(Sema &S, Decl *D,
                                         const ParsedAttr &AL) {
-  SmallVector<Expr*, 1> Args;
+  llvm::SmallVector<Expr*, 1> Args;
   if (!checkLockFunAttrCommon(S, D, AL, Args))
     return;
 
@@ -8429,7 +8429,7 @@ static void handleAcquireCapabilityAttr(Sema &S, Decl *D,
 
 static void handleTryAcquireCapabilityAttr(Sema &S, Decl *D,
                                            const ParsedAttr &AL) {
-  SmallVector<Expr*, 2> Args;
+  llvm::SmallVector<Expr*, 2> Args;
   if (!checkTryLockFunAttrCommon(S, D, AL, Args))
     return;
 
@@ -8440,7 +8440,7 @@ static void handleTryAcquireCapabilityAttr(Sema &S, Decl *D,
 static void handleReleaseCapabilityAttr(Sema &S, Decl *D,
                                         const ParsedAttr &AL) {
   // Check that all arguments are lockable objects.
-  SmallVector<Expr *, 1> Args;
+  llvm::SmallVector<Expr *, 1> Args;
   checkAttrArgsAreCapabilityObjs(S, D, AL, Args, 0, true);
 
   D->addAttr(::new (S.Context) ReleaseCapabilityAttr(S.Context, AL, Args.data(),
@@ -8453,7 +8453,7 @@ static void handleRequiresCapabilityAttr(Sema &S, Decl *D,
     return;
 
   // check that all arguments are lockable objects
-  SmallVector<Expr*, 1> Args;
+  llvm::SmallVector<Expr*, 1> Args;
   checkAttrArgsAreCapabilityObjs(S, D, AL, Args);
   if (Args.empty())
     return;
@@ -8481,7 +8481,7 @@ static void handleDeprecatedAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   }
 
   // Handle the cases where the attribute has a text message.
-  StringRef Str, Replacement;
+  llvm::StringRef Str, Replacement;
   if (AL.isArgExpr(0) && AL.getArgAsExpr(0) &&
       !S.checkStringLiteralArgumentAttr(AL, 0, Str))
     return;
@@ -8505,7 +8505,7 @@ static bool isGlobalVar(const Decl *D) {
   return false;
 }
 
-static bool isSanitizerAttributeAllowedOnGlobals(StringRef Sanitizer) {
+static bool isSanitizerAttributeAllowedOnGlobals(llvm::StringRef Sanitizer) {
   return Sanitizer == "address" || Sanitizer == "hwaddress" ||
          Sanitizer == "memtag";
 }
@@ -8514,10 +8514,10 @@ static void handleNoSanitizeAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   if (!AL.checkAtLeastNumArgs(S, 1))
     return;
 
-  std::vector<StringRef> Sanitizers;
+  std::vector<llvm::StringRef> Sanitizers;
 
   for (unsigned I = 0, E = AL.getNumArgs(); I != E; ++I) {
-    StringRef SanitizerName;
+    llvm::StringRef SanitizerName;
     SourceLocation LiteralLoc;
 
     if (!S.checkStringLiteralArgumentAttr(AL, I, SanitizerName, &LiteralLoc))
@@ -8539,9 +8539,9 @@ static void handleNoSanitizeAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 static void handleNoSanitizeSpecificAttr(Sema &S, Decl *D,
                                          const ParsedAttr &AL) {
-  StringRef AttrName = AL.getAttrName()->getName();
+  llvm::StringRef AttrName = AL.getAttrName()->getName();
   normalizeName(AttrName);
-  StringRef SanitizerName = llvm::StringSwitch<StringRef>(AttrName)
+  llvm::StringRef SanitizerName = llvm::StringSwitch<llvm::StringRef>(AttrName)
                                 .Case("no_address_safety_analysis", "address")
                                 .Case("no_sanitize_address", "address")
                                 .Case("no_sanitize_thread", "thread")
@@ -8631,7 +8631,7 @@ static void handleOpenCLAccessAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 static void handleZeroCallUsedRegsAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   // Check that the argument is a string literal.
-  StringRef KindStr;
+  llvm::StringRef KindStr;
   SourceLocation LiteralLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, KindStr, &LiteralLoc))
     return;
@@ -8759,7 +8759,7 @@ static void handleCountedByAttrField(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 static void handleFunctionReturnThunksAttr(Sema &S, Decl *D,
                                            const ParsedAttr &AL) {
-  StringRef KindStr;
+  llvm::StringRef KindStr;
   SourceLocation LiteralLoc;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, KindStr, &LiteralLoc))
     return;
@@ -8977,7 +8977,7 @@ static void handleAcquireHandleAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
       return;
     }
   }
-  StringRef Argument;
+  llvm::StringRef Argument;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Argument))
     return;
   D->addAttr(AcquireHandleAttr::Create(S.Context, Argument, AL));
@@ -8985,7 +8985,7 @@ static void handleAcquireHandleAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 template<typename Attr>
 static void handleHandleAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Argument;
+  llvm::StringRef Argument;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Argument))
     return;
   D->addAttr(Attr::Create(S.Context, Argument, AL));
@@ -9017,7 +9017,7 @@ static void handleCFGuardAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 
 
 template <typename AttrTy>
-static const AttrTy *findEnforceTCBAttrByName(Decl *D, StringRef Name) {
+static const AttrTy *findEnforceTCBAttrByName(Decl *D, llvm::StringRef Name) {
   auto Attrs = D->specific_attrs<AttrTy>();
   auto I = llvm::find_if(Attrs,
                          [Name](const AttrTy *A) {
@@ -9028,7 +9028,7 @@ static const AttrTy *findEnforceTCBAttrByName(Decl *D, StringRef Name) {
 
 template <typename AttrTy, typename ConflictingAttrTy>
 static void handleEnforceTCBAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
-  StringRef Argument;
+  llvm::StringRef Argument;
   if (!S.checkStringLiteralArgumentAttr(AL, 0, Argument))
     return;
 
@@ -9054,7 +9054,7 @@ static void handleEnforceTCBAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 template <typename AttrTy, typename ConflictingAttrTy>
 static AttrTy *mergeEnforceTCBAttrImpl(Sema &S, Decl *D, const AttrTy &AL) {
   // Check if the new redeclaration has different leaf-ness in the same TCB.
-  StringRef TCBName = AL.getTCBName();
+  llvm::StringRef TCBName = AL.getTCBName();
   if (const ConflictingAttrTy *ConflictingAttr =
       findEnforceTCBAttrByName<ConflictingAttrTy>(D, TCBName)) {
     S.Diag(ConflictingAttr->getLoc(), diag::err_tcb_conflicting_attributes)
@@ -9121,10 +9121,10 @@ static bool MustDelayAttributeArguments(const ParsedAttr &AL) {
 
 static bool checkArmNewAttrMutualExclusion(
     Sema &S, const ParsedAttr &AL, const FunctionProtoType *FPT,
-    FunctionType::ArmStateValue CurrentState, StringRef StateName) {
+    FunctionType::ArmStateValue CurrentState, llvm::StringRef StateName) {
   auto CheckForIncompatibleAttr =
       [&](FunctionType::ArmStateValue IncompatibleState,
-          StringRef IncompatibleStateName) {
+          llvm::StringRef IncompatibleStateName) {
         if (CurrentState == IncompatibleState) {
           S.Diag(AL.getLoc(), diag::err_attributes_are_not_compatible)
               << (std::string("'__arm_new(\"") + StateName.str() + "\")'")
@@ -9149,16 +9149,16 @@ static void handleArmNewAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
     return;
   }
 
-  std::vector<StringRef> NewState;
+  std::vector<llvm::StringRef> NewState;
   if (const auto *ExistingAttr = D->getAttr<ArmNewAttr>()) {
-    for (StringRef S : ExistingAttr->newArgs())
+    for (llvm::StringRef S : ExistingAttr->newArgs())
       NewState.push_back(S);
   }
 
   bool HasZA = false;
   bool HasZT0 = false;
   for (unsigned I = 0, E = AL.getNumArgs(); I != E; ++I) {
-    StringRef StateName;
+    llvm::StringRef StateName;
     SourceLocation LiteralLoc;
     if (!S.checkStringLiteralArgumentAttr(AL, I, StateName, &LiteralLoc))
       return;
@@ -10196,7 +10196,7 @@ NamedDecl *Sema::DeclClonePragmaWeak(NamedDecl *ND, const IdentifierInfo *II,
     // a typedef.
     QualType FDTy = FD->getType();
     if (const auto *FT = FDTy->getAs<FunctionProtoType>()) {
-      SmallVector<ParmVarDecl*, 16> Params;
+      llvm::SmallVector<ParmVarDecl*, 16> Params;
       for (const auto &AI : FT->param_types()) {
         ParmVarDecl *Param = BuildParmVarDeclForTypedef(NewFD, Loc, AI);
         Param->setScopeInfo(0, Params.size());

@@ -179,7 +179,7 @@ public:
   /// buffer.
   size_t capacity() const { return this->capacity_ptr() - Begin; }
 
-  /// append - Add the specified range to the end of the SmallVector.
+  /// append - Add the specified range to the end of the llvm::SmallVector.
   template<typename in_iter>
   void append(const ASTContext &C, in_iter in_start, in_iter in_end) {
     size_type NumInputs = std::distance(in_start, in_end);
@@ -198,7 +198,7 @@ public:
     this->setEnd(this->end() + NumInputs);
   }
 
-  /// append - Add the specified range to the end of the SmallVector.
+  /// append - Add the specified range to the end of the llvm::SmallVector.
   void append(const ASTContext &C, size_type NumInputs, const T &Elt) {
     // Grow allocated space if needed.
     if (NumInputs > size_type(this->capacity_ptr()-this->end()))

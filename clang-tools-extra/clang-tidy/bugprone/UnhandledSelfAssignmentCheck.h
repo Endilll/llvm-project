@@ -21,7 +21,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/unhandled-self-assignment.html
 class UnhandledSelfAssignmentCheck : public ClangTidyCheck {
 public:
-  UnhandledSelfAssignmentCheck(StringRef Name, ClangTidyContext *Context);
+  UnhandledSelfAssignmentCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

@@ -138,9 +138,9 @@ std::optional<llvm::Regex::RegexFlags>
 clang::ast_matchers::dynamic::internal::ArgTypeTraits<
     llvm::Regex::RegexFlags>::getFlags(llvm::StringRef Flags) {
   std::optional<llvm::Regex::RegexFlags> Flag;
-  SmallVector<StringRef, 4> Split;
+  llvm::SmallVector<llvm::StringRef, 4> Split;
   Flags.split(Split, '|', -1, false);
-  for (StringRef OrFlag : Split) {
+  for (llvm::StringRef OrFlag : Split) {
     if (std::optional<llvm::Regex::RegexFlags> NextFlag =
             getRegexFlag(OrFlag.trim()))
       Flag = Flag.value_or(llvm::Regex::NoFlags) | *NextFlag;
@@ -155,7 +155,7 @@ clang::ast_matchers::dynamic::internal::ArgTypeTraits<
     llvm::Regex::RegexFlags>::getBestGuess(const VariantValue &Value) {
   if (!Value.isString())
     return std::nullopt;
-  SmallVector<StringRef, 4> Split;
+  llvm::SmallVector<llvm::StringRef, 4> Split;
   llvm::StringRef(Value.getString()).split(Split, '|', -1, false);
   for (llvm::StringRef &Flag : Split) {
     if (std::optional<llvm::StringRef> BestGuess =

@@ -241,9 +241,9 @@ public:
     const void *Ty;
 
   public:
-    ArrayRef<LValuePathEntry> Path;
+    llvm::ArrayRef<LValuePathEntry> Path;
 
-    LValuePathSerializationHelper(ArrayRef<LValuePathEntry>, QualType);
+    LValuePathSerializationHelper(llvm::ArrayRef<LValuePathEntry>, QualType);
     QualType getType();
   };
   struct NoLValuePath {};
@@ -340,7 +340,7 @@ public:
       : Kind(None) {
     MakeLValue(); setLValue(B, O, N, IsNullPtr);
   }
-  APValue(LValueBase B, const CharUnits &O, ArrayRef<LValuePathEntry> Path,
+  APValue(LValueBase B, const CharUnits &O, llvm::ArrayRef<LValuePathEntry> Path,
           bool OnePastTheEnd, bool IsNullPtr = false)
       : Kind(None) {
     MakeLValue(); setLValue(B, O, Path, OnePastTheEnd, IsNullPtr);
@@ -356,7 +356,7 @@ public:
     MakeUnion(); setUnion(D, V);
   }
   APValue(const ValueDecl *Member, bool IsDerivedMember,
-          ArrayRef<const CXXRecordDecl*> Path) : Kind(None) {
+          llvm::ArrayRef<const CXXRecordDecl*> Path) : Kind(None) {
     MakeMemberPointer(Member, IsDerivedMember, Path);
   }
   APValue(const AddrLabelExpr* LHSExpr, const AddrLabelExpr* RHSExpr)
@@ -412,10 +412,10 @@ public:
   bool isAddrLabelDiff() const { return Kind == AddrLabelDiff; }
 
   void dump() const;
-  void dump(raw_ostream &OS, const ASTContext &Context) const;
+  void dump(llvm::raw_ostream &OS, const ASTContext &Context) const;
 
-  void printPretty(raw_ostream &OS, const ASTContext &Ctx, QualType Ty) const;
-  void printPretty(raw_ostream &OS, const PrintingPolicy &Policy, QualType Ty,
+  void printPretty(llvm::raw_ostream &OS, const ASTContext &Ctx, QualType Ty) const;
+  void printPretty(llvm::raw_ostream &OS, const PrintingPolicy &Policy, QualType Ty,
                    const ASTContext *Ctx = nullptr) const;
 
   std::string getAsString(const ASTContext &Ctx, QualType Ty) const;
@@ -489,7 +489,7 @@ public:
   }
   bool isLValueOnePastTheEnd() const;
   bool hasLValuePath() const;
-  ArrayRef<LValuePathEntry> getLValuePath() const;
+  llvm::ArrayRef<LValuePathEntry> getLValuePath() const;
   unsigned getLValueCallIndex() const;
   unsigned getLValueVersion() const;
   bool isNullPointer() const;
@@ -574,7 +574,7 @@ public:
 
   const ValueDecl *getMemberPointerDecl() const;
   bool isMemberPointerToDerivedMember() const;
-  ArrayRef<const CXXRecordDecl*> getMemberPointerPath() const;
+  llvm::ArrayRef<const CXXRecordDecl*> getMemberPointerPath() const;
 
   const AddrLabelExpr* getAddrLabelDiffLHS() const {
     assert(isAddrLabelDiff() && "Invalid accessor");
@@ -598,7 +598,7 @@ public:
     *(APFixedPoint *)(char *)&Data = std::move(FX);
   }
   void setVector(const APValue *E, unsigned N) {
-    MutableArrayRef<APValue> InternalElts = setVectorUninit(N);
+    llvm::MutableArrayRef<APValue> InternalElts = setVectorUninit(N);
     for (unsigned i = 0; i != N; ++i)
       InternalElts[i] = E[i];
   }
@@ -619,7 +619,7 @@ public:
   void setLValue(LValueBase B, const CharUnits &O, NoLValuePath,
                  bool IsNullPtr);
   void setLValue(LValueBase B, const CharUnits &O,
-                 ArrayRef<LValuePathEntry> Path, bool OnePastTheEnd,
+                 llvm::ArrayRef<LValuePathEntry> Path, bool OnePastTheEnd,
                  bool IsNullPtr);
   void setUnion(const FieldDecl *Field, const APValue &Value);
   void setAddrLabelDiff(const AddrLabelExpr* LHSExpr,
@@ -673,7 +673,7 @@ private:
     Kind = Union;
   }
   void MakeMemberPointer(const ValueDecl *Member, bool IsDerivedMember,
-                         ArrayRef<const CXXRecordDecl*> Path);
+                         llvm::ArrayRef<const CXXRecordDecl*> Path);
   void MakeAddrLabelDiff() {
     assert(isAbsent() && "Bad state change");
     new ((void *)(char *)&Data) AddrLabelDiffData();
@@ -684,17 +684,17 @@ private:
   /// The following functions are used as part of initialization, during
   /// deserialization and importing. Reserve the space so that it can be
   /// filled in by those steps.
-  MutableArrayRef<APValue> setVectorUninit(unsigned N) {
+  llvm::MutableArrayRef<APValue> setVectorUninit(unsigned N) {
     assert(isVector() && "Invalid accessor");
     Vec *V = ((Vec *)(char *)&Data);
     V->Elts = new APValue[N];
     V->NumElts = N;
     return {V->Elts, V->NumElts};
   }
-  MutableArrayRef<LValuePathEntry>
+  llvm::MutableArrayRef<LValuePathEntry>
   setLValueUninit(LValueBase B, const CharUnits &O, unsigned Size,
                   bool OnePastTheEnd, bool IsNullPtr);
-  MutableArrayRef<const CXXRecordDecl *>
+  llvm::MutableArrayRef<const CXXRecordDecl *>
   setMemberPointerUninit(const ValueDecl *Member, bool IsDerivedMember,
                          unsigned Size);
 };

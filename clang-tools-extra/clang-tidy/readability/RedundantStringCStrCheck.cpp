@@ -29,7 +29,7 @@ AST_MATCHER(MaterializeTemporaryExpr, isBoundToLValue) {
 
 } // end namespace
 
-RedundantStringCStrCheck::RedundantStringCStrCheck(StringRef Name,
+RedundantStringCStrCheck::RedundantStringCStrCheck(llvm::StringRef Name,
                                                    ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StringParameterFunctions(utils::options::parseStringList(
@@ -134,22 +134,22 @@ void RedundantStringCStrCheck::registerMatchers(
                         argumentCountIs(2), hasArgument(1, StringCStrCallExpr)),
       this);
 
-  // Detect redundant 'c_str()' calls through a StringRef constructor.
+  // Detect redundant 'c_str()' calls through a llvm::StringRef constructor.
   Finder->addMatcher(
       traverse(
           TK_AsIs,
           cxxConstructExpr(
               // Implicit constructors of these classes are overloaded
-              // wrt. string types and they internally make a StringRef
+              // wrt. string types and they internally make a llvm::StringRef
               // referring to the argument.  Passing a string directly to
               // them is preferred to passing a char pointer.
               hasDeclaration(cxxMethodDecl(hasAnyName(
-                  "::llvm::StringRef::StringRef", "::llvm::Twine::Twine"))),
+                  "::llvm::StringRef::llvm::StringRef", "::llvm::Twine::Twine"))),
               argumentCountIs(1),
               // The only argument must have the form x.c_str() or p->c_str()
-              // where the method is string::c_str().  StringRef also has
+              // where the method is string::c_str().  llvm::StringRef also has
               // a constructor from string which is more efficient (avoids
-              // strlen), so we can construct StringRef from the string
+              // strlen), so we can construct llvm::StringRef from the string
               // directly.
               hasArgument(0, StringCStrCallExpr))),
       this);

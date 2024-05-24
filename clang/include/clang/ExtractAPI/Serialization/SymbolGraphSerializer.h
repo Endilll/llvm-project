@@ -85,7 +85,7 @@ private:
   llvm::StringMap<ExtendedModule> ExtendedModules;
 
   /// The Symbol Graph format version used by this serializer.
-  static const VersionTuple FormatVersion;
+  static const llvm::VersionTuple FormatVersion;
 
   /// Indicates whether to take into account the extended module. This is only
   /// useful for \c serializeSingleSymbolSGF.
@@ -112,12 +112,12 @@ private:
 
 public:
   static void
-  serializeMainSymbolGraph(raw_ostream &OS, const APISet &API,
+  serializeMainSymbolGraph(llvm::raw_ostream &OS, const APISet &API,
                            const APIIgnoresList &IgnoresList,
                            SymbolGraphSerializerOption Options = {});
 
   static void serializeWithExtensionGraphs(
-      raw_ostream &MainOutput, const APISet &API,
+      llvm::raw_ostream &MainOutput, const APISet &API,
       const APIIgnoresList &IgnoresList,
       llvm::function_ref<
           std::unique_ptr<llvm::raw_pwrite_stream>(llvm::Twine BaseFileName)>
@@ -129,7 +129,7 @@ public:
   /// \returns an optional JSON Object representing the payload that libclang
   /// expects for providing symbol information for a single symbol. If this is
   /// not a known symbol returns \c std::nullopt.
-  static std::optional<Object> serializeSingleSymbolSGF(StringRef USR,
+  static std::optional<Object> serializeSingleSymbolSGF(llvm::StringRef USR,
                                                         const APISet &API);
 
 private:
@@ -156,7 +156,7 @@ private:
   void serializeSingleRecord(const APIRecord *Record);
 
   /// Get the string representation of the relationship kind.
-  static StringRef getRelationshipString(RelationshipKind Kind);
+  static llvm::StringRef getRelationshipString(RelationshipKind Kind);
 
   void serializeRelationship(RelationshipKind Kind,
                              const SymbolReference &Source,
@@ -165,19 +165,19 @@ private:
 
   enum ConstraintKind { Conformance, ConditionalConformance };
 
-  static StringRef getConstraintString(ConstraintKind Kind);
+  static llvm::StringRef getConstraintString(ConstraintKind Kind);
 
   /// Serialize the APIs in \c ExtendedModule.
   ///
   /// \returns a JSON object that contains the root of the formatted
   /// Symbol Graph.
-  Object serializeGraph(StringRef ModuleName, ExtendedModule &&EM);
+  Object serializeGraph(llvm::StringRef ModuleName, ExtendedModule &&EM);
 
   /// Serialize the APIs in \c ExtendedModule in the Symbol Graph format and
   /// write them to the provide stream.
-  void serializeGraphToStream(raw_ostream &OS,
+  void serializeGraphToStream(llvm::raw_ostream &OS,
                               SymbolGraphSerializerOption Options,
-                              StringRef ModuleName, ExtendedModule &&EM);
+                              llvm::StringRef ModuleName, ExtendedModule &&EM);
 
   /// Synthesize the metadata section of the Symbol Graph format.
   ///
@@ -191,7 +191,7 @@ private:
   /// by the given API set.
   /// Note that "module" here is not to be confused with the Clang/C++ module
   /// concept.
-  Object serializeModuleObject(StringRef ModuleName) const;
+  Object serializeModuleObject(llvm::StringRef ModuleName) const;
 
   Array serializePathComponents(const APIRecord *Record) const;
 

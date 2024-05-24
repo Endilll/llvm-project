@@ -43,17 +43,17 @@ AST_MATCHER_P(CompoundStmt, hasAnyTextFromList, std::vector<llvm::StringRef>,
 
   ASTContext &Context = Finder->getASTContext();
   SourceManager &SM = Context.getSourceManager();
-  StringRef Text = Lexer::getSourceText(
+  llvm::StringRef Text = Lexer::getSourceText(
       CharSourceRange::getTokenRange(Node.getSourceRange()), SM,
       Context.getLangOpts());
-  return llvm::any_of(List, [&](const StringRef &Str) {
+  return llvm::any_of(List, [&](const llvm::StringRef &Str) {
     return Text.contains_insensitive(Str);
   });
 }
 
 } // namespace
 
-EmptyCatchCheck::EmptyCatchCheck(StringRef Name, ClangTidyContext *Context)
+EmptyCatchCheck::EmptyCatchCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreCatchWithKeywords(utils::options::parseStringList(
           Options.get("IgnoreCatchWithKeywords", "@TODO;@FIXME"))),

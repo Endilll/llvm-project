@@ -28,7 +28,7 @@ AST_MATCHER(CXXRecordDecl, hasBases) {
 void MultipleInheritanceCheck::addNodeToInterfaceMap(const CXXRecordDecl *Node,
                                                      bool IsInterface) {
   assert(Node->getIdentifier());
-  StringRef Name = Node->getIdentifier()->getName();
+  llvm::StringRef Name = Node->getIdentifier()->getName();
   InterfaceMap.insert(std::make_pair(Name, IsInterface));
 }
 
@@ -38,7 +38,7 @@ void MultipleInheritanceCheck::addNodeToInterfaceMap(const CXXRecordDecl *Node,
 bool MultipleInheritanceCheck::getInterfaceStatus(const CXXRecordDecl *Node,
                                                   bool &IsInterface) const {
   assert(Node->getIdentifier());
-  StringRef Name = Node->getIdentifier()->getName();
+  llvm::StringRef Name = Node->getIdentifier()->getName();
   llvm::StringMapConstIterator<bool> Pair = InterfaceMap.find(Name);
   if (Pair == InterfaceMap.end())
     return false;

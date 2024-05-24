@@ -941,8 +941,8 @@ void
 StmtProfiler::VisitOMPExecutableDirective(const OMPExecutableDirective *S) {
   VisitStmt(S);
   OMPClauseProfiler P(this);
-  ArrayRef<OMPClause *> Clauses = S->clauses();
-  for (ArrayRef<OMPClause *>::iterator I = Clauses.begin(), E = Clauses.end();
+  llvm::ArrayRef<OMPClause *> Clauses = S->clauses();
+  for (llvm::ArrayRef<OMPClause *>::iterator I = Clauses.begin(), E = Clauses.end();
        I != E; ++I)
     if (*I)
       P.Visit(*I);
@@ -2468,7 +2468,7 @@ class OpenACCClauseProfiler
 public:
   OpenACCClauseProfiler(StmtProfiler &P) : Profiler(P) {}
 
-  void VisitOpenACCClauseList(ArrayRef<const OpenACCClause *> Clauses) {
+  void VisitOpenACCClauseList(llvm::ArrayRef<const OpenACCClause *> Clauses) {
     for (const OpenACCClause *Clause : Clauses) {
       // TODO OpenACC: When we have clauses with expressions, we should
       // profile them too.

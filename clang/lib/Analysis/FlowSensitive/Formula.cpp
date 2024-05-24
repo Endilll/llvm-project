@@ -18,7 +18,7 @@
 namespace clang::dataflow {
 
 const Formula &Formula::create(llvm::BumpPtrAllocator &Alloc, Kind K,
-                               ArrayRef<const Formula *> Operands,
+                               llvm::ArrayRef<const Formula *> Operands,
                                unsigned Value) {
   assert(Operands.size() == numOperands(K));
   if (Value != 0) // Currently, formulas have values or operands, not both.

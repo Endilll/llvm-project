@@ -3085,11 +3085,11 @@ def Target : InheritableAttr {
   let Subjects = SubjectList<[Function], ErrorDiag>;
   let Documentation = [TargetDocs];
   let AdditionalMembers = [{
-    StringRef getArchitecture() const {
-      StringRef Features = getFeaturesStr();
+    llvm::StringRef getArchitecture() const {
+      llvm::StringRef Features = getFeaturesStr();
       if (Features == "default") return {};
 
-      SmallVector<StringRef, 1> AttrFeatures;
+      llvm::SmallVector<llvm::StringRef, 1> AttrFeatures;
       Features.split(AttrFeatures, ",");
 
       for (auto &Feature : AttrFeatures) {
@@ -3102,11 +3102,11 @@ def Target : InheritableAttr {
 
     // Gets the list of features as simple string-refs with no +/- or 'no-'.
     // Only adds the items to 'Out' that are additions.
-    void getAddedFeatures(llvm::SmallVectorImpl<StringRef> &Out) const {
-      StringRef Features = getFeaturesStr();
+    void getAddedFeatures(llvm::SmallVectorImpl<llvm::StringRef> &Out) const {
+      llvm::StringRef Features = getFeaturesStr();
       if (Features == "default") return;
 
-      SmallVector<StringRef, 1> AttrFeatures;
+      llvm::SmallVector<llvm::StringRef, 1> AttrFeatures;
       Features.split(AttrFeatures, ",");
 
       for (auto &Feature : AttrFeatures) {
@@ -3128,15 +3128,15 @@ def TargetVersion : InheritableAttr {
   let Subjects = SubjectList<[Function], ErrorDiag>;
   let Documentation = [TargetVersionDocs];
   let AdditionalMembers = [{
-    StringRef getName() const { return getNamesStr().trim(); }
+    llvm::StringRef getName() const { return getNamesStr().trim(); }
     bool isDefaultVersion() const {
       return getName() == "default";
     }
-    void getFeatures(llvm::SmallVectorImpl<StringRef> &Out) const {
+    void getFeatures(llvm::SmallVectorImpl<llvm::StringRef> &Out) const {
       if (isDefaultVersion()) return;
-      StringRef Features = getName();
+      llvm::StringRef Features = getName();
 
-      SmallVector<StringRef, 8> AttrFeatures;
+      llvm::SmallVector<llvm::StringRef, 8> AttrFeatures;
       Features.split(AttrFeatures, "+");
 
       for (auto &Feature : AttrFeatures) {
@@ -3153,17 +3153,17 @@ def TargetClones : InheritableAttr {
   let Documentation = [TargetClonesDocs];
   let Subjects = SubjectList<[Function], ErrorDiag>;
   let AdditionalMembers = [{
-    StringRef getFeatureStr(unsigned Index) const {
+    llvm::StringRef getFeatureStr(unsigned Index) const {
       return *(featuresStrs_begin() + Index);
     }
     bool isDefaultVersion(unsigned Index) const {
       return getFeatureStr(Index) == "default";
     }
-    void getFeatures(llvm::SmallVectorImpl<StringRef> &Out,
+    void getFeatures(llvm::SmallVectorImpl<llvm::StringRef> &Out,
                      unsigned Index) const {
       if (isDefaultVersion(Index)) return;
-      StringRef Features = getFeatureStr(Index);
-      SmallVector<StringRef, 8> AttrFeatures;
+      llvm::StringRef Features = getFeatureStr(Index);
+      llvm::SmallVector<llvm::StringRef, 8> AttrFeatures;
       Features.split(AttrFeatures, "+");
       for (auto &Feature : AttrFeatures) {
         Feature = Feature.trim();
@@ -3179,10 +3179,10 @@ def TargetClones : InheritableAttr {
     unsigned getMangledIndex(unsigned Index) const {
       if (getFeatureStr(Index) == "default")
         return std::count_if(featuresStrs_begin(), featuresStrs_end(),
-                              [](StringRef S) { return S != "default"; });
+                              [](llvm::StringRef S) { return S != "default"; });
 
       return std::count_if(featuresStrs_begin(), featuresStrs_begin() + Index,
-                           [](StringRef S) { return S != "default"; });
+                           [](llvm::StringRef S) { return S != "default"; });
     }
 
     // Given an index into the 'featuresStrs' sequence, determine if the
@@ -3190,10 +3190,10 @@ def TargetClones : InheritableAttr {
     // is used to skip over duplicate variant instances when iterating over
     // 'featuresStrs'.
     bool isFirstOfVersion(unsigned Index) const {
-      StringRef FeatureStr(getFeatureStr(Index));
+      llvm::StringRef FeatureStr(getFeatureStr(Index));
       return 0 == std::count_if(
                       featuresStrs_begin(), featuresStrs_begin() + Index,
-                      [FeatureStr](StringRef S) { return S == FeatureStr; });
+                      [FeatureStr](llvm::StringRef S) { return S == FeatureStr; });
 
     }
   }];
@@ -4033,7 +4033,7 @@ def InitSeg : Attr {
   let SemaHandler = 0;
   let Documentation = [InitSegDocs];
   let AdditionalMembers = [{
-  void printPrettyPragma(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  void printPrettyPragma(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const {
     OS << " (" << getSection() << ')';
   }
   }];
@@ -4098,7 +4098,7 @@ def LoopHint : Attr {
     llvm_unreachable("Unhandled LoopHint option.");
   }
 
-  void printPrettyPragma(raw_ostream &OS, const PrintingPolicy &Policy) const;
+  void printPrettyPragma(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const;
 
   // Return a string containing the loop hint argument including the
   // enclosing parentheses.
@@ -4170,7 +4170,7 @@ def OMPDeclareSimdDecl : Attr {
     VariadicExprArgument<"Steps">
   ];
   let AdditionalMembers = [{
-    void printPrettyPragma(raw_ostream & OS, const PrintingPolicy &Policy)
+    void printPrettyPragma(llvm::raw_ostream & OS, const PrintingPolicy &Policy)
         const;
   }];
 }
@@ -4192,7 +4192,7 @@ def OMPDeclareTargetDecl : InheritableAttr {
     UnsignedArgument<"Level">
   ];
   let AdditionalMembers = [{
-    void printPrettyPragma(raw_ostream &OS, const PrintingPolicy &Policy) const;
+    void printPrettyPragma(llvm::raw_ostream &OS, const PrintingPolicy &Policy) const;
     static std::optional<MapTypeTy>
     isDeclareTargetDeclaration(const ValueDecl *VD);
     static std::optional<OMPDeclareTargetDeclAttr*> getActiveAttr(const ValueDecl *VD);
@@ -4243,9 +4243,9 @@ def OMPDeclareVariant : InheritableAttr {
   ];
   let AdditionalMembers = [{
     OMPTraitInfo &getTraitInfo() { return *traitInfos; }
-    void printPrettyPragma(raw_ostream & OS, const PrintingPolicy &Policy)
+    void printPrettyPragma(llvm::raw_ostream & OS, const PrintingPolicy &Policy)
         const;
-    static StringRef getInteropTypeString(const OMPInteropInfo *I) {
+    static llvm::StringRef getInteropTypeString(const OMPInteropInfo *I) {
       if (I->IsTarget && I->IsTargetSync)
         return "target,targetsync";
       if (I->IsTarget)

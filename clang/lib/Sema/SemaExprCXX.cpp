@@ -508,7 +508,7 @@ bool Sema::checkLiteralOperatorId(const CXXScopeSpec &SS,
     if (!PP.getSourceManager().isInSystemHeader(Loc)) {
       if (auto Hint = FixItHint::CreateReplacement(
               Name.getSourceRange(),
-              (StringRef("operator\"\"") + II->getName()).str());
+              (llvm::StringRef("operator\"\"") + II->getName()).str());
           isReservedInAllContexts(Status)) {
         Diag(Loc, diag::warn_reserved_extern_symbol)
             << II << static_cast<int>(Status) << Hint;
@@ -1124,7 +1124,7 @@ bool Sema::CheckCXXThrowOperand(SourceLocation ThrowLoc,
 }
 
 static QualType adjustCVQualifiersForCXXThisWithinLambda(
-    ArrayRef<FunctionScopeInfo *> FunctionScopes, QualType ThisTy,
+    llvm::ArrayRef<FunctionScopeInfo *> FunctionScopes, QualType ThisTy,
     DeclContext *CurSemaContext, ASTContext &ASTCtx) {
 
   QualType ClassType = ThisTy->getPointeeType();
@@ -1725,7 +1725,7 @@ bool Sema::isUsualDeallocationFunction(const CXXMethodDecl *Method) {
     }
   }
 
-  SmallVector<const FunctionDecl*, 4> PreventedBy;
+  llvm::SmallVector<const FunctionDecl*, 4> PreventedBy;
   bool Result = Method->isUsualDeallocationFunction(PreventedBy);
 
   if (Result || !getLangOpts().CUDA || PreventedBy.empty())
@@ -2042,9 +2042,9 @@ void Sema::diagnoseUnavailableAlignedAllocation(const FunctionDecl &FD,
                                                 SourceLocation Loc) {
   if (isUnavailableAlignedAllocationFunction(FD)) {
     const llvm::Triple &T = getASTContext().getTargetInfo().getTriple();
-    StringRef OSName = AvailabilityAttr::getPlatformNameSourceSpelling(
+    llvm::StringRef OSName = AvailabilityAttr::getPlatformNameSourceSpelling(
         getASTContext().getTargetInfo().getPlatformName());
-    VersionTuple OSVersion = alignedAllocMinVersion(T.getOS());
+    llvm::VersionTuple OSVersion = alignedAllocMinVersion(T.getOS());
 
     OverloadedOperatorKind Kind = FD.getDeclName().getCXXOverloadedOperator();
     bool IsDelete = Kind == OO_Delete || Kind == OO_Array_Delete;
@@ -2362,7 +2362,7 @@ ExprResult Sema::BuildCXXNew(SourceRange Range, bool UseGlobal,
     UsualArrayDeleteWantsSize =
         doesUsualArrayDeleteWantSize(*this, StartLoc, AllocType);
 
-  SmallVector<Expr *, 8> AllPlaceArgs;
+  llvm::SmallVector<Expr *, 8> AllPlaceArgs;
   if (OperatorNew) {
     auto *Proto = OperatorNew->getType()->castAs<FunctionProtoType>();
     VariadicCallType CallType = Proto->isVariadic() ? VariadicFunction
@@ -2582,7 +2582,7 @@ bool Sema::CheckAllocatedType(QualType AllocType, SourceLocation Loc,
 }
 
 static bool resolveAllocationOverload(
-    Sema &S, LookupResult &R, SourceRange Range, SmallVectorImpl<Expr *> &Args,
+    Sema &S, LookupResult &R, SourceRange Range, llvm::SmallVectorImpl<Expr *> &Args,
     bool &PassAlignment, FunctionDecl *&Operator,
     OverloadCandidateSet *AlignedCandidates, Expr *AlignArg, bool Diagnose) {
   OverloadCandidateSet Candidates(R.getNameLoc(),
@@ -2670,8 +2670,8 @@ static bool resolveAllocationOverload(
       //
       // For an aligned allocation, separately check the aligned and unaligned
       // candidates with their respective argument lists.
-      SmallVector<OverloadCandidate*, 32> Cands;
-      SmallVector<OverloadCandidate*, 32> AlignedCands;
+      llvm::SmallVector<OverloadCandidate*, 32> Cands;
+      llvm::SmallVector<OverloadCandidate*, 32> AlignedCands;
       llvm::SmallVector<Expr*, 4> AlignedArgs;
       if (AlignedCandidates) {
         auto IsAligned = [](OverloadCandidate &C) {
@@ -2741,7 +2741,7 @@ bool Sema::FindAllocationFunctions(SourceLocation StartLoc, SourceRange Range,
   // 3) The first argument is always size_t. Append the arguments from the
   //   placement form.
 
-  SmallVector<Expr*, 8> AllocArgs;
+  llvm::SmallVector<Expr*, 8> AllocArgs;
   AllocArgs.reserve((PassAlignment ? 2 : 1) + PlaceArgs.size());
 
   // We don't care about the actual value of these arguments.
@@ -2882,7 +2882,7 @@ bool Sema::FindAllocationFunctions(SourceLocation StartLoc, SourceRange Range,
 
   FoundDelete.suppressDiagnostics();
 
-  SmallVector<std::pair<DeclAccessPair,FunctionDecl*>, 2> Matches;
+  llvm::SmallVector<std::pair<DeclAccessPair,FunctionDecl*>, 2> Matches;
 
   // Whether we're looking for a placement operator delete is dictated
   // by whether we selected a placement operator new, not by whether
@@ -2915,7 +2915,7 @@ bool Sema::FindAllocationFunctions(SourceLocation StartLoc, SourceRange Range,
     {
       auto *Proto = OperatorNew->getType()->castAs<FunctionProtoType>();
 
-      SmallVector<QualType, 4> ArgTypes;
+      llvm::SmallVector<QualType, 4> ArgTypes;
       ArgTypes.push_back(Context.VoidPtrTy);
       for (unsigned I = 1, N = Proto->getNumParams(); I < N; ++I)
         ArgTypes.push_back(Proto->getParamType(I));
@@ -3192,7 +3192,7 @@ void Sema::DeclareGlobalNewDelete() {
 /// allocation function if it doesn't already exist.
 void Sema::DeclareGlobalAllocationFunction(DeclarationName Name,
                                            QualType Return,
-                                           ArrayRef<QualType> Params) {
+                                           llvm::ArrayRef<QualType> Params) {
   DeclContext *GlobalCtx = Context.getTranslationUnitDecl();
 
   // Check if this function is already declared.
@@ -3372,7 +3372,7 @@ bool Sema::FindDeallocationFunction(SourceLocation StartLoc, CXXRecordDecl *RD,
       if (Diagnose) {
         StringLiteral *Msg = Operator->getDeletedMessage();
         Diag(StartLoc, diag::err_deleted_function_use)
-            << (Msg != nullptr) << (Msg ? Msg->getString() : StringRef());
+            << (Msg != nullptr) << (Msg ? Msg->getString() : llvm::StringRef());
         NoteDeletedFunction(Operator);
       }
       return true;
@@ -3915,7 +3915,7 @@ static bool resolveBuiltinNewDeleteOverload(Sema &S, CallExpr *TheCall,
   // We do our own custom access checks below.
   R.suppressDiagnostics();
 
-  SmallVector<Expr *, 8> Args(TheCall->arguments());
+  llvm::SmallVector<Expr *, 8> Args(TheCall->arguments());
   OverloadCandidateSet Candidates(R.getNameLoc(),
                                   OverloadCandidateSet::CSK_Normal);
   for (LookupResult::iterator FnOvl = R.begin(), FnOvlEnd = R.end();
@@ -4203,7 +4203,7 @@ static ExprResult BuildCXXCastArgument(Sema &S,
   default: llvm_unreachable("Unhandled cast kind!");
   case CK_ConstructorConversion: {
     CXXConstructorDecl *Constructor = cast<CXXConstructorDecl>(Method);
-    SmallVector<Expr*, 8> ConstructorArgs;
+    llvm::SmallVector<Expr*, 8> ConstructorArgs;
 
     if (S.RequireNonAbstractType(CastLoc, Ty,
                                  diag::err_allocation_of_abstract_type))
@@ -4380,7 +4380,7 @@ Sema::PerformImplicitConversion(Expr *From, QualType ToType,
     // FIXME: When can ToType be a reference type?
     assert(!ToType->isReferenceType());
     if (SCS.Second == ICK_Derived_To_Base) {
-      SmallVector<Expr*, 8> ConstructorArgs;
+      llvm::SmallVector<Expr*, 8> ConstructorArgs;
       if (CompleteConstructorCall(
               cast<CXXConstructorDecl>(SCS.CopyConstructor), ToType, From,
               /*FIXME:ConstructLoc*/ SourceLocation(), ConstructorArgs))
@@ -5705,7 +5705,7 @@ static ExprResult CheckConvertibilityForTypeTraits(
 
 static bool EvaluateBooleanTypeTrait(Sema &S, TypeTrait Kind,
                                      SourceLocation KWLoc,
-                                     ArrayRef<TypeSourceInfo *> Args,
+                                     llvm::ArrayRef<TypeSourceInfo *> Args,
                                      SourceLocation RParenLoc,
                                      bool IsDependent) {
   if (IsDependent)
@@ -5768,7 +5768,7 @@ static bool EvaluateBooleanTypeTrait(Sema &S, TypeTrait Kind,
       return false;
 
     llvm::BumpPtrAllocator OpaqueExprAllocator;
-    SmallVector<Expr *, 2> ArgExprs;
+    llvm::SmallVector<Expr *, 2> ArgExprs;
     ArgExprs.reserve(Args.size() - 1);
     for (unsigned I = 1, N = Args.size(); I != N; ++I) {
       QualType ArgTy = Args[I]->getType();
@@ -5911,7 +5911,7 @@ static TypeTraitReturnType GetReturnType(TypeTrait Kind) {
 }
 
 ExprResult Sema::BuildTypeTrait(TypeTrait Kind, SourceLocation KWLoc,
-                                ArrayRef<TypeSourceInfo *> Args,
+                                llvm::ArrayRef<TypeSourceInfo *> Args,
                                 SourceLocation RParenLoc) {
   if (!CheckTypeTraitArity(getTypeTraitArity(Kind), KWLoc, Args.size()))
     return ExprError();
@@ -5942,9 +5942,9 @@ ExprResult Sema::BuildTypeTrait(TypeTrait Kind, SourceLocation KWLoc,
 }
 
 ExprResult Sema::ActOnTypeTrait(TypeTrait Kind, SourceLocation KWLoc,
-                                ArrayRef<ParsedType> Args,
+                                llvm::ArrayRef<ParsedType> Args,
                                 SourceLocation RParenLoc) {
-  SmallVector<TypeSourceInfo *, 4> ConvertedArgs;
+  llvm::SmallVector<TypeSourceInfo *, 4> ConvertedArgs;
   ConvertedArgs.reserve(Args.size());
 
   for (unsigned I = 0, N = Args.size(); I != N; ++I) {
@@ -7216,7 +7216,7 @@ QualType Sema::FindCompositePointerType(SourceLocation Loc,
     }
   };
 
-  SmallVector<Step, 8> Steps;
+  llvm::SmallVector<Step, 8> Steps;
 
   //  - if T1 is "pointer to cv1 C1" and T2 is "pointer to cv2 C2", where C1
   //    is reference-related to C2 or C2 is reference-related to C1 (8.6.3),
@@ -7430,7 +7430,7 @@ QualType Sema::FindCompositePointerType(SourceLocation Loc,
         EPI2.ExtInfo = EPI2.ExtInfo.withNoReturn(Noreturn);
 
         // The result is nothrow if both operands are.
-        SmallVector<QualType, 8> ExceptionTypeStorage;
+        llvm::SmallVector<QualType, 8> ExceptionTypeStorage;
         EPI1.ExceptionSpec = EPI2.ExceptionSpec = Context.mergeExceptionSpecs(
             EPI1.ExceptionSpec, EPI2.ExceptionSpec, ExceptionTypeStorage,
             getLangOpts().CPlusPlus17);
@@ -7838,7 +7838,7 @@ ExprResult Sema::ActOnDecltypeExpression(Expr *E) {
 
 /// Note a set of 'operator->' functions that were used for a member access.
 static void noteOperatorArrows(Sema &S,
-                               ArrayRef<FunctionDecl *> OperatorArrows) {
+                               llvm::ArrayRef<FunctionDecl *> OperatorArrows) {
   unsigned SkipStart = OperatorArrows.size(), SkipCount = 0;
   // FIXME: Make this configurable?
   unsigned Limit = 9;
@@ -7901,7 +7901,7 @@ ExprResult Sema::ActOnStartCXXMemberReference(Scope *S, Expr *Base,
     FunctionDecl *CurFD = dyn_cast<FunctionDecl>(CurContext);
     // The set of types we've considered so far.
     llvm::SmallPtrSet<CanQualType,8> CTypes;
-    SmallVector<FunctionDecl*, 8> OperatorArrows;
+    llvm::SmallVector<FunctionDecl*, 8> OperatorArrows;
     CTypes.insert(Context.getCanonicalType(BaseType));
 
     while (BaseType->isRecordType()) {
@@ -9305,7 +9305,7 @@ Sema::ActOnCompoundRequirement(
 
   auto *TPL = TemplateParameterList::Create(Context, SourceLocation(),
                                             SourceLocation(),
-                                            ArrayRef<NamedDecl *>(TParam),
+                                            llvm::ArrayRef<NamedDecl *>(TParam),
                                             SourceLocation(),
                                             /*RequiresClause=*/nullptr);
   return BuildExprRequirement(
@@ -9402,7 +9402,7 @@ Sema::BuildNestedRequirement(Expr *Constraint) {
 }
 
 concepts::NestedRequirement *
-Sema::BuildNestedRequirement(StringRef InvalidConstraintEntity,
+Sema::BuildNestedRequirement(llvm::StringRef InvalidConstraintEntity,
                        const ASTConstraintSatisfaction &Satisfaction) {
   return new (Context) concepts::NestedRequirement(
       InvalidConstraintEntity,
@@ -9411,7 +9411,7 @@ Sema::BuildNestedRequirement(StringRef InvalidConstraintEntity,
 
 RequiresExprBodyDecl *
 Sema::ActOnStartRequiresExpr(SourceLocation RequiresKWLoc,
-                             ArrayRef<ParmVarDecl *> LocalParameters,
+                             llvm::ArrayRef<ParmVarDecl *> LocalParameters,
                              Scope *BodyScope) {
   assert(BodyScope);
 
@@ -9447,8 +9447,8 @@ void Sema::ActOnFinishRequiresExpr() {
 
 ExprResult Sema::ActOnRequiresExpr(
     SourceLocation RequiresKWLoc, RequiresExprBodyDecl *Body,
-    SourceLocation LParenLoc, ArrayRef<ParmVarDecl *> LocalParameters,
-    SourceLocation RParenLoc, ArrayRef<concepts::Requirement *> Requirements,
+    SourceLocation LParenLoc, llvm::ArrayRef<ParmVarDecl *> LocalParameters,
+    SourceLocation RParenLoc, llvm::ArrayRef<concepts::Requirement *> Requirements,
     SourceLocation ClosingBraceLoc) {
   auto *RE = RequiresExpr::Create(Context, RequiresKWLoc, Body, LParenLoc,
                                   LocalParameters, RParenLoc, Requirements,

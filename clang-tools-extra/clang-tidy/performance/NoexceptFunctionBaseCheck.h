@@ -21,7 +21,7 @@ namespace clang::tidy::performance {
 /// `false`.
 class NoexceptFunctionBaseCheck : public ClangTidyCheck {
 public:
-  NoexceptFunctionBaseCheck(StringRef Name, ClangTidyContext *Context)
+  NoexceptFunctionBaseCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
@@ -39,7 +39,7 @@ protected:
   virtual void reportNoexceptEvaluatedToFalse(const FunctionDecl *FuncDecl,
                                               const Expr *NoexceptExpr) = 0;
 
-  static constexpr StringRef BindFuncDeclName = "FuncDecl";
+  static constexpr llvm::StringRef BindFuncDeclName = "FuncDecl";
 
 private:
   utils::ExceptionSpecAnalyzer SpecAnalyzer;

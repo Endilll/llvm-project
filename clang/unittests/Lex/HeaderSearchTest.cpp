@@ -78,15 +78,15 @@ protected:
     Search.AddSearchPath(DL, isAngled);
   }
 
-  IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> VFS;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> VFS;
   FileSystemOptions FileMgrOpts;
   FileManager FileMgr;
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
   DiagnosticsEngine Diags;
   SourceManager SourceMgr;
   LangOptions LangOpts;
   std::shared_ptr<TargetOptions> TargetOpts;
-  IntrusiveRefCntPtr<TargetInfo> Target;
+  llvm::IntrusiveRefCntPtr<TargetInfo> Target;
   HeaderSearch Search;
   std::unique_ptr<HeaderMap> HMap;
 };

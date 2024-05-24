@@ -75,7 +75,7 @@ public:
     : VarsToChange(VarsToChange) { }
 
   bool VisitBlockDecl(BlockDecl *block) {
-    SmallVector<VarDecl *, 4> BlockVars;
+    llvm::SmallVector<VarDecl *, 4> BlockVars;
 
     for (const auto &I : block->captures()) {
       VarDecl *var = I.getVariable();

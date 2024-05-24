@@ -61,6 +61,7 @@
 #include "clang/Sema/TypoCorrection.h"
 #include "clang/Sema/Weak.h"
 #include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallBitVector.h"
@@ -97,7 +98,7 @@ class CapturedDecl;
 class CXXBasePath;
 class CXXBasePaths;
 class CXXBindTemporaryExpr;
-typedef SmallVector<CXXBaseSpecifier *, 4> CXXCastPath;
+typedef llvm::SmallVector<CXXBaseSpecifier *, 4> CXXCastPath;
 class CXXConstructorDecl;
 class CXXConversionDecl;
 class CXXDeleteExpr;
@@ -137,7 +138,7 @@ class FunctionDecl;
 class FunctionProtoType;
 class FunctionTemplateDecl;
 class ImplicitConversionSequence;
-typedef MutableArrayRef<ImplicitConversionSequence> ConversionSequenceList;
+typedef llvm::MutableArrayRef<ImplicitConversionSequence> ConversionSequenceList;
 class InitListExpr;
 class InitializationKind;
 class InitializationSequence;
@@ -149,7 +150,7 @@ class LangOptions;
 class LocalInstantiationScope;
 class LookupResult;
 class MacroInfo;
-typedef ArrayRef<std::pair<IdentifierInfo *, SourceLocation>> ModuleIdPath;
+typedef llvm::ArrayRef<std::pair<IdentifierInfo *, SourceLocation>> ModuleIdPath;
 class ModuleLoader;
 class MultiLevelTemplateArgumentList;
 class NamedDecl;
@@ -528,7 +529,7 @@ public:
   ExternalSemaSource *getExternalSource() const { return ExternalSource.get(); }
 
   DarwinSDKInfo *getDarwinSDKInfoForAvailabilityChecking(SourceLocation Loc,
-                                                         StringRef Platform);
+                                                         llvm::StringRef Platform);
   DarwinSDKInfo *getDarwinSDKInfoForAvailabilityChecking();
 
   /// Registers an external source. If an external source already exists,
@@ -563,7 +564,7 @@ public:
 
   /// Obtain a sorted list of functions that are undefined but ODR-used.
   void getUndefinedButUsed(
-      SmallVectorImpl<std::pair<NamedDecl *, SourceLocation>> &Undefined);
+      llvm::SmallVectorImpl<std::pair<NamedDecl *, SourceLocation>> &Undefined);
 
   typedef std::pair<SourceLocation, bool> DeleteExprLoc;
   typedef llvm::SmallVector<DeleteExprLoc, 4> DeleteLocs;
@@ -577,13 +578,13 @@ public:
   /// should not be used elsewhere.
   void EmitCurrentDiagnostic(unsigned DiagID);
 
-  void addImplicitTypedef(StringRef Name, QualType T);
+  void addImplicitTypedef(llvm::StringRef Name, QualType T);
 
   /// Whether uncompilable error has occurred. This includes error happens
   /// in deferred diagnostics.
   bool hasUncompilableErrorOccurred() const;
 
-  bool findMacroSpelling(SourceLocation &loc, StringRef name);
+  bool findMacroSpelling(SourceLocation &loc, llvm::StringRef name);
 
   /// Calls \c Lexer::getLocForEndOfToken()
   SourceLocation getLocForEndOfToken(SourceLocation Loc, unsigned Offset = 0);
@@ -802,7 +803,7 @@ public:
 
   /// Stack containing information about each of the nested
   /// function, block, and method scopes that are currently active.
-  SmallVector<sema::FunctionScopeInfo *, 4> FunctionScopes;
+  llvm::SmallVector<sema::FunctionScopeInfo *, 4> FunctionScopes;
 
   /// The index of the first FunctionScope that corresponds to the current
   /// context.
@@ -910,7 +911,7 @@ public:
   }
 
   /// Callback to the parser to parse a type expressed as a string.
-  std::function<TypeResult(StringRef, StringRef, SourceLocation)>
+  std::function<TypeResult(llvm::StringRef, llvm::StringRef, SourceLocation)>
       ParseTypeFromStringCallback;
 
   /// VAListTagName - The declaration name corresponding to __va_list_tag.
@@ -1044,7 +1045,7 @@ public:
   }
 
   /// Source of additional semantic information.
-  IntrusiveRefCntPtr<ExternalSemaSource> ExternalSource;
+  llvm::IntrusiveRefCntPtr<ExternalSemaSource> ExternalSource;
 
 protected:
   friend class Parser;
@@ -1144,7 +1145,7 @@ public:
                                          Expr *ArgExpr,
                                          DeclAccessPair FoundDecl);
   AccessResult CheckMemberOperatorAccess(SourceLocation Loc, Expr *ObjectExpr,
-                                         ArrayRef<Expr *> ArgExprs,
+                                         llvm::ArrayRef<Expr *> ArgExprs,
                                          DeclAccessPair FoundDecl);
   AccessResult CheckAddressOfMemberAccess(Expr *OvlExpr,
                                           DeclAccessPair FoundDecl);
@@ -1229,7 +1230,7 @@ public:
 
   struct PragmaPackInfo {
     PragmaMsStackAction Action;
-    StringRef SlotLabel;
+    llvm::StringRef SlotLabel;
     Token Alignment;
   };
 
@@ -1397,7 +1398,7 @@ public:
     // syntax.
     //
     // Push / pop a named sentinel slot.
-    void SentinelAction(PragmaMsStackAction Action, StringRef Label) {
+    void SentinelAction(PragmaMsStackAction Action, llvm::StringRef Label) {
       assert((Action == PSK_Push || Action == PSK_Pop) &&
              "Can only push / pop #pragma stack sentinels!");
       Act(CurrentPragmaLocation, Action, Label, CurrentValue);
@@ -1409,7 +1410,7 @@ public:
 
     bool hasValue() const { return CurrentValue != DefaultValue; }
 
-    SmallVector<Slot, 2> Stack;
+    llvm::SmallVector<Slot, 2> Stack;
     ValueType DefaultValue; // Value used for PSK_Reset action.
     ValueType CurrentValue;
     SourceLocation CurrentPragmaLocation;
@@ -1433,7 +1434,7 @@ public:
     SourceLocation CurrentPragmaLocation;
     bool HasNonDefaultValue, ShouldWarnOnInclude;
   };
-  SmallVector<AlignPackIncludeState, 8> AlignPackIncludeStack;
+  llvm::SmallVector<AlignPackIncludeState, 8> AlignPackIncludeStack;
   // Segment #pragmas.
   PragmaStack<StringLiteral *> DataSegStack;
   PragmaStack<StringLiteral *> BSSSegStack;
@@ -1466,12 +1467,12 @@ public:
   // Actions should be performed only if we enter / exit a C++ method body.
   class PragmaStackSentinelRAII {
   public:
-    PragmaStackSentinelRAII(Sema &S, StringRef SlotLabel, bool ShouldAct);
+    PragmaStackSentinelRAII(Sema &S, llvm::StringRef SlotLabel, bool ShouldAct);
     ~PragmaStackSentinelRAII();
 
   private:
     Sema &S;
-    StringRef SlotLabel;
+    llvm::StringRef SlotLabel;
     bool ShouldAct;
   };
 
@@ -1480,7 +1481,7 @@ public:
   SourceLocation CurInitSegLoc;
 
   /// Sections used with #pragma alloc_text.
-  llvm::StringMap<std::tuple<StringRef, SourceLocation>> FunctionToSectionMap;
+  llvm::StringMap<std::tuple<llvm::StringRef, SourceLocation>> FunctionToSectionMap;
 
   /// VisContext - Manages the stack for \#pragma GCC visibility.
   void *VisContext; // Really a "PragmaVisStack*"
@@ -1489,7 +1490,7 @@ public:
   struct PragmaAttributeEntry {
     SourceLocation Loc;
     ParsedAttr *Attribute;
-    SmallVector<attr::SubjectMatchRule, 4> MatchRules;
+    llvm::SmallVector<attr::SubjectMatchRule, 4> MatchRules;
     bool IsUsed;
   };
 
@@ -1499,10 +1500,10 @@ public:
     SourceLocation Loc;
     /// The namespace of this push group.
     const IdentifierInfo *Namespace;
-    SmallVector<PragmaAttributeEntry, 2> Entries;
+    llvm::SmallVector<PragmaAttributeEntry, 2> Entries;
   };
 
-  SmallVector<PragmaAttributeGroup, 2> PragmaAttributeStack;
+  llvm::SmallVector<PragmaAttributeGroup, 2> PragmaAttributeStack;
 
   /// The declaration that is currently receiving an attribute from the
   /// #pragma attribute stack.
@@ -1527,7 +1528,7 @@ public:
   bool MSPragmaOptimizeIsOn = true;
 
   /// Set of no-builtin functions listed by \#pragma function.
-  llvm::SmallSetVector<StringRef, 4> MSFunctionNoBuiltins;
+  llvm::SmallSetVector<llvm::StringRef, 4> MSFunctionNoBuiltins;
 
   /// AddAlignmentAttributesForRecord - Adds any needed alignment attributes to
   /// a the record decl, to handle '\#pragma pack' and '\#pragma options align'.
@@ -1563,7 +1564,7 @@ public:
   void ActOnPragmaClangSection(SourceLocation PragmaLoc,
                                PragmaClangSectionAction Action,
                                PragmaClangSectionKind SecKind,
-                               StringRef SecName);
+                               llvm::StringRef SecName);
 
   /// ActOnPragmaOptionsAlign - Called on well formed \#pragma options align.
   void ActOnPragmaOptionsAlign(PragmaOptionsAlignKind Kind,
@@ -1571,14 +1572,14 @@ public:
 
   /// ActOnPragmaPack - Called on well formed \#pragma pack(...).
   void ActOnPragmaPack(SourceLocation PragmaLoc, PragmaMsStackAction Action,
-                       StringRef SlotLabel, Expr *Alignment);
+                       llvm::StringRef SlotLabel, Expr *Alignment);
 
   /// ConstantFoldAttrArgs - Folds attribute arguments into ConstantExprs
   /// (unless they are value dependent or type dependent). Returns false
   /// and emits a diagnostic if one or more of the arguments could not be
   /// folded into a constant.
   bool ConstantFoldAttrArgs(const AttributeCommonInfo &CI,
-                            MutableArrayRef<Expr *> Args);
+                            llvm::MutableArrayRef<Expr *> Args);
 
   enum class PragmaAlignPackDiagnoseKind {
     NonDefaultStateAtInclude,
@@ -1595,11 +1596,11 @@ public:
   /// ActOnPragmaMSComment - Called on well formed
   /// \#pragma comment(kind, "arg").
   void ActOnPragmaMSComment(SourceLocation CommentLoc, PragmaMSCommentKind Kind,
-                            StringRef Arg);
+                            llvm::StringRef Arg);
 
   /// ActOnPragmaDetectMismatch - Call on well-formed \#pragma detect_mismatch
-  void ActOnPragmaDetectMismatch(SourceLocation Loc, StringRef Name,
-                                 StringRef Value);
+  void ActOnPragmaDetectMismatch(SourceLocation Loc, llvm::StringRef Name,
+                                 llvm::StringRef Value);
 
   /// Are precise floating point semantics currently enabled?
   bool isPreciseFPEnabled() {
@@ -1627,9 +1628,9 @@ public:
   void ActOnPragmaMSVtorDisp(PragmaMsStackAction Action,
                              SourceLocation PragmaLoc, MSVtorDispMode Value);
 
-  bool UnifySection(StringRef SectionName, int SectionFlags,
+  bool UnifySection(llvm::StringRef SectionName, int SectionFlags,
                     NamedDecl *TheDecl);
-  bool UnifySection(StringRef SectionName, int SectionFlags,
+  bool UnifySection(llvm::StringRef SectionName, int SectionFlags,
                     SourceLocation PragmaSectionLocation);
 
   /// Called on well formed \#pragma bss_seg/data_seg/const_seg/code_seg.
@@ -1648,8 +1649,8 @@ public:
 
   /// Called on well-formed \#pragma alloc_text().
   void ActOnPragmaMSAllocText(
-      SourceLocation PragmaLocation, StringRef Section,
-      const SmallVector<std::tuple<IdentifierInfo *, SourceLocation>>
+      SourceLocation PragmaLocation, llvm::StringRef Section,
+      const llvm::SmallVector<std::tuple<IdentifierInfo *, SourceLocation>>
           &Functions);
 
   /// ActOnPragmaMSStrictGuardStackCheck - Called on well formed \#pragma
@@ -1689,7 +1690,7 @@ public:
   /// Call on well formed \#pragma function.
   void
   ActOnPragmaMSFunction(SourceLocation Loc,
-                        const llvm::SmallVectorImpl<StringRef> &NoBuiltins);
+                        const llvm::SmallVectorImpl<llvm::StringRef> &NoBuiltins);
 
   /// Only called on function definitions; if there is a pragma in scope
   /// with the effect of a range-based optnone, consider marking the function
@@ -1798,7 +1799,7 @@ public:
   /// potential availability violations.
   sema::FunctionScopeInfo *getCurFunctionAvailabilityContext();
 
-  void DiagnoseAvailabilityOfDecl(NamedDecl *D, ArrayRef<SourceLocation> Locs,
+  void DiagnoseAvailabilityOfDecl(NamedDecl *D, llvm::ArrayRef<SourceLocation> Locs,
                                   const ObjCInterfaceDecl *UnknownObjCClass,
                                   bool ObjCPropertyAccess,
                                   bool AvoidPartialAvailabilityChecks = false,
@@ -1996,7 +1997,7 @@ public:
                                     Expr::NullPointerConstantKind NullType,
                                     bool IsEqual, SourceRange Range);
 
-  bool CheckParmsForFunctionDef(ArrayRef<ParmVarDecl *> Parameters,
+  bool CheckParmsForFunctionDef(llvm::ArrayRef<ParmVarDecl *> Parameters,
                                 bool CheckParameterNames);
 
   void CheckCastAlign(Expr *Op, QualType T, SourceRange TRange);
@@ -2048,7 +2049,7 @@ public:
   bool CheckHLSLBuiltinFunctionCall(unsigned BuiltinID, CallExpr *TheCall);
 
   void checkCall(NamedDecl *FDecl, const FunctionProtoType *Proto,
-                 const Expr *ThisArg, ArrayRef<const Expr *> Args,
+                 const Expr *ThisArg, llvm::ArrayRef<const Expr *> Args,
                  bool IsMemberFunction, SourceLocation Loc, SourceRange Range,
                  VariadicCallType CallType);
 
@@ -2084,13 +2085,13 @@ private:
                         const FunctionProtoType *Proto);
   bool CheckOtherCall(CallExpr *TheCall, const FunctionProtoType *Proto);
   void CheckConstructorCall(FunctionDecl *FDecl, QualType ThisType,
-                            ArrayRef<const Expr *> Args,
+                            llvm::ArrayRef<const Expr *> Args,
                             const FunctionProtoType *Proto, SourceLocation Loc);
 
   void checkAIXMemberAlignment(SourceLocation Loc, const Expr *Arg);
 
   void CheckArgAlignment(SourceLocation Loc, NamedDecl *FDecl,
-                         StringRef ParamName, QualType ArgTy, QualType ParamTy);
+                         llvm::StringRef ParamName, QualType ArgTy, QualType ParamTy);
 
   ExprResult CheckOSLogFormatStringArg(Expr *Arg);
 
@@ -2109,7 +2110,7 @@ private:
   bool CheckMVEBuiltinFunctionCall(unsigned BuiltinID, CallExpr *TheCall);
   bool CheckSVEBuiltinFunctionCall(unsigned BuiltinID, CallExpr *TheCall);
   bool ParseSVEImmChecks(CallExpr *TheCall,
-                         SmallVector<std::tuple<int, int, int>, 3> &ImmChecks);
+                         llvm::SmallVector<std::tuple<int, int, int>, 3> &ImmChecks);
   bool CheckSMEBuiltinFunctionCall(unsigned BuiltinID, CallExpr *TheCall);
   bool CheckCDEBuiltinFunctionCall(const TargetInfo &TI, unsigned BuiltinID,
                                    CallExpr *TheCall);
@@ -2196,11 +2197,11 @@ private:
   bool BuiltinWasmTableCopy(CallExpr *TheCall);
 
   bool CheckFormatArguments(const FormatAttr *Format,
-                            ArrayRef<const Expr *> Args, bool IsCXXMember,
+                            llvm::ArrayRef<const Expr *> Args, bool IsCXXMember,
                             VariadicCallType CallType, SourceLocation Loc,
                             SourceRange Range,
                             llvm::SmallBitVector &CheckedVarArgs);
-  bool CheckFormatArguments(ArrayRef<const Expr *> Args,
+  bool CheckFormatArguments(llvm::ArrayRef<const Expr *> Args,
                             FormatArgumentPassingKind FAPK, unsigned format_idx,
                             unsigned firstDataArg, FormatStringType Type,
                             VariadicCallType CallType, SourceLocation Loc,
@@ -2248,7 +2249,7 @@ private:
   /// Peform checks on a call of a function with argument_with_type_tag
   /// or pointer_with_type_tag attributes.
   void CheckArgumentWithTypeTag(const ArgumentWithTypeTagAttr *Attr,
-                                const ArrayRef<const Expr *> ExprArgs,
+                                const llvm::ArrayRef<const Expr *> ExprArgs,
                                 SourceLocation CallSiteLoc);
 
   /// Check if we are taking the address of a packed field
@@ -2274,7 +2275,7 @@ private:
   };
   /// Small set of gathered accesses to potentially misaligned members
   /// due to the packed attribute.
-  SmallVector<MisalignedMember, 4> MisalignedMembers;
+  llvm::SmallVector<MisalignedMember, 4> MisalignedMembers;
 
   /// Adds an expression to the set of gathered misaligned members.
   void AddPotentialMisalignedMembers(Expr *E, RecordDecl *RD, ValueDecl *MD,
@@ -2297,7 +2298,7 @@ public:
   ClassTemplateDecl *StdCoroutineTraitsCache;
 
   bool ActOnCoroutineBodyStart(Scope *S, SourceLocation KwLoc,
-                               StringRef Keyword);
+                               llvm::StringRef Keyword);
   ExprResult ActOnCoawaitExpr(Scope *S, SourceLocation KwLoc, Expr *E);
   ExprResult ActOnCoyieldExpr(Scope *S, SourceLocation KwLoc, Expr *E);
   StmtResult ActOnCoreturnStmt(Scope *S, SourceLocation KwLoc, Expr *E);
@@ -2639,7 +2640,7 @@ public:
   TentativeDefinitionsType TentativeDefinitions;
 
   /// All the external declarations encoutered and used in the TU.
-  SmallVector<VarDecl *, 4> ExternalDeclarations;
+  llvm::SmallVector<VarDecl *, 4> ExternalDeclarations;
 
   /// Generally null except when we temporarily switch decl contexts,
   /// like in \see SemaObjC::ActOnObjCTemporaryExitContainerContext.
@@ -2961,7 +2962,7 @@ public:
   NamedDecl *ActOnVariableDeclarator(
       Scope *S, Declarator &D, DeclContext *DC, TypeSourceInfo *TInfo,
       LookupResult &Previous, MultiTemplateParamsArg TemplateParamLists,
-      bool &AddToScope, ArrayRef<BindingDecl *> Bindings = std::nullopt);
+      bool &AddToScope, llvm::ArrayRef<BindingDecl *> Bindings = std::nullopt);
 
   // Returns true if the variable declaration is a redeclaration
   bool CheckVariableDeclaration(VarDecl *NewVD, LookupResult &Previous);
@@ -3051,13 +3052,13 @@ public:
   void CheckThreadLocalForLargeAlignment(VarDecl *VD);
   void FinalizeDeclaration(Decl *D);
   DeclGroupPtrTy FinalizeDeclaratorGroup(Scope *S, const DeclSpec &DS,
-                                         ArrayRef<Decl *> Group);
-  DeclGroupPtrTy BuildDeclaratorGroup(MutableArrayRef<Decl *> Group);
+                                         llvm::ArrayRef<Decl *> Group);
+  DeclGroupPtrTy BuildDeclaratorGroup(llvm::MutableArrayRef<Decl *> Group);
 
   /// Should be called on all declarations that might have attached
   /// documentation comments.
   void ActOnDocumentableDecl(Decl *D);
-  void ActOnDocumentableDecls(ArrayRef<Decl *> Group);
+  void ActOnDocumentableDecls(llvm::ArrayRef<Decl *> Group);
 
   enum class FnBodyKind {
     /// C++26 [dcl.fct.def.general]p1
@@ -3120,13 +3121,13 @@ public:
 
   /// Diagnose any unused parameters in the given sequence of
   /// ParmVarDecl pointers.
-  void DiagnoseUnusedParameters(ArrayRef<ParmVarDecl *> Parameters);
+  void DiagnoseUnusedParameters(llvm::ArrayRef<ParmVarDecl *> Parameters);
 
   /// Diagnose whether the size of parameters or return value of a
   /// function or obj-c method definition is pass-by-value and larger than a
   /// specified threshold.
   void
-  DiagnoseSizeOfParametersAndReturnValue(ArrayRef<ParmVarDecl *> Parameters,
+  DiagnoseSizeOfParametersAndReturnValue(llvm::ArrayRef<ParmVarDecl *> Parameters,
                                          QualType ReturnTy, NamedDecl *D);
 
   Decl *ActOnFileScopeAsmDecl(Expr *expr, SourceLocation AsmLoc,
@@ -3220,11 +3221,11 @@ public:
   bool CheckNontrivialField(FieldDecl *FD);
 
   void ActOnLastBitfield(SourceLocation DeclStart,
-                         SmallVectorImpl<Decl *> &AllIvarDecls);
+                         llvm::SmallVectorImpl<Decl *> &AllIvarDecls);
 
   // This is used for both record definitions and ObjC interface declarations.
   void ActOnFields(Scope *S, SourceLocation RecLoc, Decl *TagDecl,
-                   ArrayRef<Decl *> Fields, SourceLocation LBrac,
+                   llvm::ArrayRef<Decl *> Fields, SourceLocation LBrac,
                    SourceLocation RBrac, const ParsedAttributesView &AttrList);
 
   /// ActOnTagStartDefinition - Invoked when we have entered the
@@ -3281,7 +3282,7 @@ public:
                           const ParsedAttributesView &Attrs,
                           SourceLocation EqualLoc, Expr *Val);
   void ActOnEnumBody(SourceLocation EnumLoc, SourceRange BraceRange,
-                     Decl *EnumDecl, ArrayRef<Decl *> Elements, Scope *S,
+                     Decl *EnumDecl, llvm::ArrayRef<Decl *> Elements, Scope *S,
                      const ParsedAttributesView &Attr);
 
   /// Set the current declaration context until it gets popped.
@@ -3553,10 +3554,10 @@ public:
   /// I couldn't figure out a clean way to generate these in-line, so
   /// we store them here and handle separately -- which is a hack.
   /// It would be best to refactor this.
-  SmallVector<Decl *, 2> WeakTopLevelDecl;
+  llvm::SmallVector<Decl *, 2> WeakTopLevelDecl;
 
   /// WeakTopLevelDeclDecls - access to \#pragma weak-generated Decls
-  SmallVectorImpl<Decl *> &WeakTopLevelDecls() { return WeakTopLevelDecl; }
+  llvm::SmallVectorImpl<Decl *> &WeakTopLevelDecls() { return WeakTopLevelDecl; }
 
   typedef LazyVector<TypedefNameDecl *, ExternalSemaSource,
                      &ExternalSemaSource::ReadExtVectorDecls, 2, 2>
@@ -3568,10 +3569,10 @@ public:
   ExtVectorDeclsType ExtVectorDecls;
 
   bool checkStringLiteralArgumentAttr(const AttributeCommonInfo &CI,
-                                      const Expr *E, StringRef &Str,
+                                      const Expr *E, llvm::StringRef &Str,
                                       SourceLocation *ArgLocation = nullptr);
   bool checkStringLiteralArgumentAttr(const ParsedAttr &Attr, unsigned ArgNum,
-                                      StringRef &Str,
+                                      llvm::StringRef &Str,
                                       SourceLocation *ArgLocation = nullptr);
 
   /// Determine if type T is a valid subject for a nonnull and similar
@@ -3595,9 +3596,9 @@ public:
 
   AvailabilityAttr *mergeAvailabilityAttr(
       NamedDecl *D, const AttributeCommonInfo &CI, IdentifierInfo *Platform,
-      bool Implicit, VersionTuple Introduced, VersionTuple Deprecated,
-      VersionTuple Obsoleted, bool IsUnavailable, StringRef Message,
-      bool IsStrict, StringRef Replacement, AvailabilityMergeKind AMK,
+      bool Implicit, llvm::VersionTuple Introduced, llvm::VersionTuple Deprecated,
+      llvm::VersionTuple Obsoleted, bool IsUnavailable, llvm::StringRef Message,
+      bool IsStrict, llvm::StringRef Replacement, AvailabilityMergeKind AMK,
       int Priority, IdentifierInfo *IIEnvironment);
 
   TypeVisibilityAttr *
@@ -3606,23 +3607,23 @@ public:
   VisibilityAttr *mergeVisibilityAttr(Decl *D, const AttributeCommonInfo &CI,
                                       VisibilityAttr::VisibilityType Vis);
   SectionAttr *mergeSectionAttr(Decl *D, const AttributeCommonInfo &CI,
-                                StringRef Name);
+                                llvm::StringRef Name);
 
-  llvm::Error isValidSectionSpecifier(StringRef Str);
-  bool checkSectionName(SourceLocation LiteralLoc, StringRef Str);
+  llvm::Error isValidSectionSpecifier(llvm::StringRef Str);
+  bool checkSectionName(SourceLocation LiteralLoc, llvm::StringRef Str);
   CodeSegAttr *mergeCodeSegAttr(Decl *D, const AttributeCommonInfo &CI,
-                                StringRef Name);
+                                llvm::StringRef Name);
 
-  bool checkTargetAttr(SourceLocation LiteralLoc, StringRef Str);
+  bool checkTargetAttr(SourceLocation LiteralLoc, llvm::StringRef Str);
   bool checkTargetVersionAttr(SourceLocation LiteralLoc, Decl *D,
-                              StringRef &Str, bool &isDefault);
+                              llvm::StringRef &Str, bool &isDefault);
   bool checkTargetClonesAttrString(
-      SourceLocation LiteralLoc, StringRef Str, const StringLiteral *Literal,
+      SourceLocation LiteralLoc, llvm::StringRef Str, const StringLiteral *Literal,
       Decl *D, bool &HasDefault, bool &HasCommas, bool &HasNotDefault,
-      SmallVectorImpl<SmallString<64>> &StringsBuffer);
+      llvm::SmallVectorImpl<llvm::SmallString<64>> &StringsBuffer);
 
   ErrorAttr *mergeErrorAttr(Decl *D, const AttributeCommonInfo &CI,
-                            StringRef NewUserDiagnostic);
+                            llvm::StringRef NewUserDiagnostic);
   FormatAttr *mergeFormatAttr(Decl *D, const AttributeCommonInfo &CI,
                               IdentifierInfo *Format, int FormatIdx,
                               int FirstArg);
@@ -3639,7 +3640,7 @@ public:
 
   /// AddAnnotationAttr - Adds an annotation Annot with Args arguments to D.
   void AddAnnotationAttr(Decl *D, const AttributeCommonInfo &CI,
-                         StringRef Annot, MutableArrayRef<Expr *> Args);
+                         llvm::StringRef Annot, llvm::MutableArrayRef<Expr *> Args);
 
   bool checkMSInheritanceAttrOnDefinition(CXXRecordDecl *RD, SourceRange Range,
                                           bool BestCase,
@@ -3655,7 +3656,7 @@ public:
                                           const IdentifierInfo *Ident);
   MinSizeAttr *mergeMinSizeAttr(Decl *D, const AttributeCommonInfo &CI);
   SwiftNameAttr *mergeSwiftNameAttr(Decl *D, const SwiftNameAttr &SNA,
-                                    StringRef Name);
+                                    llvm::StringRef Name);
   OptimizeNoneAttr *mergeOptimizeNoneAttr(Decl *D,
                                           const AttributeCommonInfo &CI);
   InternalLinkageAttr *mergeInternalLinkageAttr(Decl *D, const ParsedAttr &AL);
@@ -3697,11 +3698,11 @@ public:
   /// \p AL is used to provide caret diagnostics in case of a malformed name.
   ///
   /// \returns true if the name is a valid swift name for \p D, false otherwise.
-  bool DiagnoseSwiftName(Decl *D, StringRef Name, SourceLocation Loc,
+  bool DiagnoseSwiftName(Decl *D, llvm::StringRef Name, SourceLocation Loc,
                          const ParsedAttr &AL, bool IsAsync);
 
   UuidAttr *mergeUuidAttr(Decl *D, const AttributeCommonInfo &CI,
-                          StringRef UuidAsWritten, MSGuidDecl *GuidDecl);
+                          llvm::StringRef UuidAsWritten, MSGuidDecl *GuidDecl);
 
   BTFDeclTagAttr *mergeBTFDeclTagAttr(Decl *D, const BTFDeclTagAttr &AL);
 
@@ -3927,7 +3928,7 @@ public:
                                        SourceLocation NameLoc,
                                        TypeSourceInfo *EnumType, EnumDecl *ED);
   NamedDecl *BuildUsingPackDecl(NamedDecl *InstantiatedFrom,
-                                ArrayRef<NamedDecl *> Expansions);
+                                llvm::ArrayRef<NamedDecl *> Expansions);
 
   bool CheckInheritingConstructorUsingDecl(UsingDecl *UD);
 
@@ -4003,7 +4004,7 @@ public:
     // throw(...) is used instead if any called function uses it.
     ExceptionSpecificationType ComputedEST;
     llvm::SmallPtrSet<CanQualType, 4> ExceptionsSeen;
-    SmallVector<QualType, 4> Exceptions;
+    llvm::SmallVector<QualType, 4> Exceptions;
 
     void ClearExceptions() {
       ExceptionsSeen.clear();
@@ -4066,10 +4067,10 @@ public:
   /// exception specification information with the results.
   void checkExceptionSpecification(bool IsTopLevel,
                                    ExceptionSpecificationType EST,
-                                   ArrayRef<ParsedType> DynamicExceptions,
-                                   ArrayRef<SourceRange> DynamicExceptionRanges,
+                                   llvm::ArrayRef<ParsedType> DynamicExceptions,
+                                   llvm::ArrayRef<SourceRange> DynamicExceptionRanges,
                                    Expr *NoexceptExpr,
-                                   SmallVectorImpl<QualType> &Exceptions,
+                                   llvm::SmallVectorImpl<QualType> &Exceptions,
                                    FunctionProtoType::ExceptionSpecInfo &ESI);
 
   /// Add an exception-specification to the given member or friend function
@@ -4077,8 +4078,8 @@ public:
   /// after the function itself was declared.
   void actOnDelayedExceptionSpecification(
       Decl *D, ExceptionSpecificationType EST, SourceRange SpecificationRange,
-      ArrayRef<ParsedType> DynamicExceptions,
-      ArrayRef<SourceRange> DynamicExceptionRanges, Expr *NoexceptExpr);
+      llvm::ArrayRef<ParsedType> DynamicExceptions,
+      llvm::ArrayRef<SourceRange> DynamicExceptionRanges, Expr *NoexceptExpr);
 
   class InheritedConstructorInfo;
 
@@ -4211,7 +4212,7 @@ public:
   bool CompleteConstructorCall(CXXConstructorDecl *Constructor,
                                QualType DeclInitType, MultiExprArg ArgsPtr,
                                SourceLocation Loc,
-                               SmallVectorImpl<Expr *> &ConvertedArgs,
+                               llvm::SmallVectorImpl<Expr *> &ConvertedArgs,
                                bool AllowExplicit = false,
                                bool IsListInitialization = false);
 
@@ -4279,7 +4280,7 @@ public:
   ActOnMemInitializer(Decl *ConstructorD, Scope *S, CXXScopeSpec &SS,
                       IdentifierInfo *MemberOrBase, ParsedType TemplateTypeTy,
                       const DeclSpec &DS, SourceLocation IdLoc,
-                      SourceLocation LParenLoc, ArrayRef<Expr *> Args,
+                      SourceLocation LParenLoc, llvm::ArrayRef<Expr *> Args,
                       SourceLocation RParenLoc, SourceLocation EllipsisLoc);
 
   MemInitResult ActOnMemInitializer(Decl *ConstructorD, Scope *S,
@@ -4312,7 +4313,7 @@ public:
 
   bool SetCtorInitializers(
       CXXConstructorDecl *Constructor, bool AnyErrors,
-      ArrayRef<CXXCtorInitializer *> Initializers = std::nullopt);
+      llvm::ArrayRef<CXXCtorInitializer *> Initializers = std::nullopt);
 
   /// MarkBaseAndMemberDestructorsReferenced - Given a record decl,
   /// mark all the non-trivial destructors of its members and bases as
@@ -4343,7 +4344,7 @@ public:
 
   /// The list of vtables that are required but have not yet been
   /// materialized.
-  SmallVector<VTableUse, 16> VTableUses;
+  llvm::SmallVector<VTableUse, 16> VTableUses;
 
   /// The set of classes whose vtables have been used within
   /// this translation unit, and a bit that will be true if the vtable is
@@ -4379,7 +4380,7 @@ public:
   void AddImplicitlyDeclaredMembersToClass(CXXRecordDecl *ClassDecl);
 
   void ActOnMemInitializers(Decl *ConstructorDecl, SourceLocation ColonLoc,
-                            ArrayRef<CXXCtorInitializer *> MemInits,
+                            llvm::ArrayRef<CXXCtorInitializer *> MemInits,
                             bool AnyErrors);
 
   /// Check class-level dllimport/dllexport attribute. The caller must
@@ -4502,9 +4503,9 @@ public:
                                 SourceLocation EllipsisLoc);
 
   bool AttachBaseSpecifiers(CXXRecordDecl *Class,
-                            MutableArrayRef<CXXBaseSpecifier *> Bases);
+                            llvm::MutableArrayRef<CXXBaseSpecifier *> Bases);
   void ActOnBaseSpecifiers(Decl *ClassDecl,
-                           MutableArrayRef<CXXBaseSpecifier *> Bases);
+                           llvm::MutableArrayRef<CXXBaseSpecifier *> Bases);
 
   bool IsDerivedFrom(SourceLocation Loc, QualType Derived, QualType Base);
   bool IsDerivedFrom(SourceLocation Loc, QualType Derived, QualType Base,
@@ -4598,8 +4599,8 @@ public:
 
   // Emitting members of dllexported classes is delayed until the class
   // (including field initializers) is fully parsed.
-  SmallVector<CXXRecordDecl *, 4> DelayedDllExportClasses;
-  SmallVector<CXXMethodDecl *, 4> DelayedDllExportMemberFunctions;
+  llvm::SmallVector<CXXRecordDecl *, 4> DelayedDllExportClasses;
+  llvm::SmallVector<CXXMethodDecl *, 4> DelayedDllExportMemberFunctions;
 
   void MergeVarDeclExceptionSpecs(VarDecl *New, VarDecl *Old);
   bool MergeCXXFunctionDecl(FunctionDecl *New, FunctionDecl *Old, Scope *S);
@@ -4718,10 +4719,10 @@ public:
   void DiagnoseHiddenVirtualMethods(CXXMethodDecl *MD);
   void
   FindHiddenVirtualMethods(CXXMethodDecl *MD,
-                           SmallVectorImpl<CXXMethodDecl *> &OverloadedMethods);
+                           llvm::SmallVectorImpl<CXXMethodDecl *> &OverloadedMethods);
   void
   NoteHiddenVirtualMethods(CXXMethodDecl *MD,
-                           SmallVectorImpl<CXXMethodDecl *> &OverloadedMethods);
+                           llvm::SmallVectorImpl<CXXMethodDecl *> &OverloadedMethods);
   void ActOnParamDefaultArgument(Decl *param, SourceLocation EqualLoc,
                                  Expr *defarg);
   void ActOnParamUnparsedDefaultArgument(Decl *param, SourceLocation EqualLoc,
@@ -4759,7 +4760,7 @@ public:
   /// corresponding template parameter in the enclosing abbreviated function
   /// template. This information is also present in LambdaScopeInfo, stored in
   /// the FunctionScopes stack.
-  SmallVector<InventedTemplateParameterInfo, 4> InventedParameterInfos;
+  llvm::SmallVector<InventedTemplateParameterInfo, 4> InventedParameterInfos;
 
   /// FieldCollector - Collects CXXFieldDecls during parsing of C++ classes.
   std::unique_ptr<CXXFieldCollector> FieldCollector;
@@ -4828,7 +4829,7 @@ public:
 private:
   void setupImplicitSpecialMemberType(CXXMethodDecl *SpecialMem,
                                       QualType ResultTy,
-                                      ArrayRef<QualType> Args);
+                                      llvm::ArrayRef<QualType> Args);
 
   // A cache representing if we've fully checked the various comparison category
   // types stored in ASTContext. The bit-index corresponds to the integer value
@@ -4857,7 +4858,7 @@ public:
   /// All the overriding functions seen during a class definition
   /// that had their exception spec checks delayed, plus the overridden
   /// function.
-  SmallVector<std::pair<const CXXMethodDecl *, const CXXMethodDecl *>, 2>
+  llvm::SmallVector<std::pair<const CXXMethodDecl *, const CXXMethodDecl *>, 2>
       DelayedOverridingExceptionSpecChecks;
 
   /// All the function redeclarations seen during a class definition that had
@@ -4865,7 +4866,7 @@ public:
   /// should be checked against. Except during error recovery, the new decl
   /// should always be a friend declaration, as that's the only valid way to
   /// redeclare a special member before its class is complete.
-  SmallVector<std::pair<FunctionDecl *, FunctionDecl *>, 2>
+  llvm::SmallVector<std::pair<FunctionDecl *, FunctionDecl *>, 2>
       DelayedEquivalentExceptionSpecChecks;
 
   /// Determine if we're in a case where we need to (incorrectly) eagerly
@@ -5015,7 +5016,7 @@ public:
 
     /// The lambdas that are present within this context, if it
     /// is indeed an unevaluated context.
-    SmallVector<LambdaExpr *, 2> Lambdas;
+    llvm::SmallVector<LambdaExpr *, 2> Lambdas;
 
     /// The declaration that provides context for lambda expressions
     /// and block literals if the normal declaration context does not
@@ -5024,18 +5025,18 @@ public:
 
     /// If we are processing a decltype type, a set of call expressions
     /// for which we have deferred checking the completeness of the return type.
-    SmallVector<CallExpr *, 8> DelayedDecltypeCalls;
+    llvm::SmallVector<CallExpr *, 8> DelayedDecltypeCalls;
 
     /// If we are processing a decltype type, a set of temporary binding
     /// expressions for which we have deferred checking the destructor.
-    SmallVector<CXXBindTemporaryExpr *, 8> DelayedDecltypeBinds;
+    llvm::SmallVector<CXXBindTemporaryExpr *, 8> DelayedDecltypeBinds;
 
     llvm::SmallPtrSet<const Expr *, 8> PossibleDerefs;
 
     /// Expressions appearing as the LHS of a volatile assignment in this
     /// context. We produce a warning for these when popping the context if
     /// they are not discarded-value expressions nor unevaluated operands.
-    SmallVector<Expr *, 2> VolatileAssignmentLHSs;
+    llvm::SmallVector<Expr *, 2> VolatileAssignmentLHSs;
 
     /// Set of candidates for starting an immediate invocation.
     llvm::SmallVector<ImmediateInvocationCandidate, 4>
@@ -5049,7 +5050,7 @@ public:
     /// MaterializeTemporaryExprs in for-range-init expressions which need to
     /// extend lifetime. Add MaterializeTemporaryExpr* if the value of
     /// InLifetimeExtendingContext is true.
-    SmallVector<MaterializeTemporaryExpr *, 8> ForRangeLifetimeExtendTemps;
+    llvm::SmallVector<MaterializeTemporaryExpr *, 8> ForRangeLifetimeExtendTemps;
 
     /// \brief Describes whether we are in an expression constext which we have
     /// to handle differently.
@@ -5162,7 +5163,7 @@ public:
 
   /// ExprCleanupObjects - This is the stack of objects requiring
   /// cleanup that are created by the current full expression.
-  SmallVector<ExprWithCleanups::CleanupObject, 8> ExprCleanupObjects;
+  llvm::SmallVector<ExprWithCleanups::CleanupObject, 8> ExprCleanupObjects;
 
   // AssignmentAction - This is used by all the assignment diagnostic functions
   // to represent what is actually causing the operation
@@ -5188,7 +5189,7 @@ public:
         /*SkipTrailingRequiresClause=*/true);
   }
 
-  bool DiagnoseUseOfDecl(NamedDecl *D, ArrayRef<SourceLocation> Locs,
+  bool DiagnoseUseOfDecl(NamedDecl *D, llvm::ArrayRef<SourceLocation> Locs,
                          const ObjCInterfaceDecl *UnknownObjCClass = nullptr,
                          bool ObjCPropertyAccess = false,
                          bool AvoidPartialAvailabilityChecks = false,
@@ -5197,7 +5198,7 @@ public:
   void NoteDeletedFunction(FunctionDecl *FD);
 
   void DiagnoseSentinelCalls(const NamedDecl *D, SourceLocation Loc,
-                             ArrayRef<Expr *> Args);
+                             llvm::ArrayRef<Expr *> Args);
 
   void PushExpressionEvaluationContext(
       ExpressionEvaluationContext NewContext, Decl *LambdaContextDecl = nullptr,
@@ -5308,7 +5309,7 @@ public:
   void MarkDeclarationsReferencedInType(SourceLocation Loc, QualType T);
   void MarkDeclarationsReferencedInExpr(
       Expr *E, bool SkipLocalVariables = false,
-      ArrayRef<const Expr *> StopAt = std::nullopt);
+      llvm::ArrayRef<const Expr *> StopAt = std::nullopt);
 
   /// Try to convert an expression \p E to type \p Ty. Returns the result of the
   /// conversion.
@@ -5321,7 +5322,7 @@ public:
   /// the function body is parsed, and then do a basic reachability analysis to
   /// determine if the statement is reachable. If it is unreachable, the
   /// diagnostic will not be emitted.
-  bool DiagIfReachable(SourceLocation Loc, ArrayRef<const Stmt *> Stmts,
+  bool DiagIfReachable(SourceLocation Loc, llvm::ArrayRef<const Stmt *> Stmts,
                        const PartialDiagnostic &PD);
 
   /// Conditionally issue a diagnostic based on the current
@@ -5335,7 +5336,7 @@ public:
                            const PartialDiagnostic &PD);
   /// Similar, but diagnostic is only produced if all the specified statements
   /// are reachable.
-  bool DiagRuntimeBehavior(SourceLocation Loc, ArrayRef<const Stmt *> Stmts,
+  bool DiagRuntimeBehavior(SourceLocation Loc, llvm::ArrayRef<const Stmt *> Stmts,
                            const PartialDiagnostic &PD);
 
   // Primary Expressions.
@@ -5359,7 +5360,7 @@ public:
   DiagnoseEmptyLookup(Scope *S, CXXScopeSpec &SS, LookupResult &R,
                       CorrectionCandidateCallback &CCC,
                       TemplateArgumentListInfo *ExplicitTemplateArgs = nullptr,
-                      ArrayRef<Expr *> Args = std::nullopt,
+                      llvm::ArrayRef<Expr *> Args = std::nullopt,
                       DeclContext *LookupCtx = nullptr,
                       TypoExpr **Out = nullptr);
 
@@ -5403,7 +5404,7 @@ public:
   // ExpandFunctionLocalPredefinedMacros - Returns a new vector of Tokens,
   // where Tokens representing function local predefined macros (such as
   // __FUNCTION__) are replaced (expanded) with string-literal Tokens.
-  std::vector<Token> ExpandFunctionLocalPredefinedMacros(ArrayRef<Token> Toks);
+  std::vector<Token> ExpandFunctionLocalPredefinedMacros(llvm::ArrayRef<Token> Toks);
 
   ExprResult BuildPredefinedExpr(SourceLocation Loc, PredefinedIdentKind IK);
   ExprResult ActOnPredefinedExpr(SourceLocation Loc, tok::TokenKind Kind);
@@ -5420,10 +5421,10 @@ public:
 
   /// ActOnStringLiteral - The specified tokens were lexed as pasted string
   /// fragments (e.g. "foo" "bar" L"baz").
-  ExprResult ActOnStringLiteral(ArrayRef<Token> StringToks,
+  ExprResult ActOnStringLiteral(llvm::ArrayRef<Token> StringToks,
                                 Scope *UDLScope = nullptr);
 
-  ExprResult ActOnUnevaluatedStringLiteral(ArrayRef<Token> StringToks);
+  ExprResult ActOnUnevaluatedStringLiteral(llvm::ArrayRef<Token> StringToks);
 
   /// ControllingExprOrType is either an opaque pointer coming out of a
   /// ParsedType or an Expr *. FIXME: it'd be better to split this interface
@@ -5435,8 +5436,8 @@ public:
                                        SourceLocation RParenLoc,
                                        bool PredicateIsExpr,
                                        void *ControllingExprOrType,
-                                       ArrayRef<ParsedType> ArgTypes,
-                                       ArrayRef<Expr *> ArgExprs);
+                                       llvm::ArrayRef<ParsedType> ArgTypes,
+                                       llvm::ArrayRef<Expr *> ArgExprs);
   /// ControllingExprOrType is either a TypeSourceInfo * or an Expr *. FIXME:
   /// it'd be better to split this interface into two so we don't take a
   /// void *, but see the FIXME on ActOnGenericSelectionExpr as to why that
@@ -5446,8 +5447,8 @@ public:
                                         SourceLocation RParenLoc,
                                         bool PredicateIsExpr,
                                         void *ControllingExprOrType,
-                                        ArrayRef<TypeSourceInfo *> Types,
-                                        ArrayRef<Expr *> Exprs);
+                                        llvm::ArrayRef<TypeSourceInfo *> Types,
+                                        llvm::ArrayRef<Expr *> Exprs);
 
   // Binary/Unary Operators.  'Tok' is the token for the operator.
   ExprResult CreateBuiltinUnaryOp(SourceLocation OpLoc, UnaryOperatorKind Opc,
@@ -5464,9 +5465,9 @@ public:
 
   QualType CheckAddressOfOperand(ExprResult &Operand, SourceLocation OpLoc);
 
-  bool ActOnAlignasTypeArgument(StringRef KWName, ParsedType Ty,
+  bool ActOnAlignasTypeArgument(llvm::StringRef KWName, ParsedType Ty,
                                 SourceLocation OpLoc, SourceRange R);
-  bool CheckAlignasTypeArgument(StringRef KWName, TypeSourceInfo *TInfo,
+  bool CheckAlignasTypeArgument(llvm::StringRef KWName, TypeSourceInfo *TInfo,
                                 SourceLocation OpLoc, SourceRange R);
 
   ExprResult CreateUnaryExprOrTypeTraitExpr(TypeSourceInfo *TInfo,
@@ -5487,7 +5488,7 @@ public:
   bool CheckUnaryExprOrTypeTraitOperand(QualType ExprType, SourceLocation OpLoc,
                                         SourceRange ExprRange,
                                         UnaryExprOrTypeTrait ExprKind,
-                                        StringRef KWName);
+                                        llvm::StringRef KWName);
 
   ExprResult ActOnPostfixUnaryOp(Scope *S, SourceLocation OpLoc,
                                  tok::TokenKind Kind, Expr *Input);
@@ -5504,7 +5505,7 @@ public:
 
   bool ConvertArgumentsForCall(CallExpr *Call, Expr *Fn, FunctionDecl *FDecl,
                                const FunctionProtoType *Proto,
-                               ArrayRef<Expr *> Args, SourceLocation RParenLoc,
+                               llvm::ArrayRef<Expr *> Args, SourceLocation RParenLoc,
                                bool ExecConfig = false);
   void CheckStaticArrayArgument(SourceLocation CallLoc, ParmVarDecl *Param,
                                 const Expr *ArgExpr);
@@ -5527,7 +5528,7 @@ public:
 
   ExprResult
   BuildResolvedCallExpr(Expr *Fn, NamedDecl *NDecl, SourceLocation LParenLoc,
-                        ArrayRef<Expr *> Arg, SourceLocation RParenLoc,
+                        llvm::ArrayRef<Expr *> Arg, SourceLocation RParenLoc,
                         Expr *Config = nullptr, bool IsExecConfig = false,
                         ADLCallKind UsesADL = ADLCallKind::NotADL);
 
@@ -5601,12 +5602,12 @@ public:
   /// __builtin_offsetof(type, a.b[123][456].c)
   ExprResult BuildBuiltinOffsetOf(SourceLocation BuiltinLoc,
                                   TypeSourceInfo *TInfo,
-                                  ArrayRef<OffsetOfComponent> Components,
+                                  llvm::ArrayRef<OffsetOfComponent> Components,
                                   SourceLocation RParenLoc);
   ExprResult ActOnBuiltinOffsetOf(Scope *S, SourceLocation BuiltinLoc,
                                   SourceLocation TypeLoc,
                                   ParsedType ParsedArgTy,
-                                  ArrayRef<OffsetOfComponent> Components,
+                                  llvm::ArrayRef<OffsetOfComponent> Components,
                                   SourceLocation RParenLoc);
 
   // __builtin_choose_expr(constExpr, expr1, expr2)
@@ -5675,7 +5676,7 @@ public:
 
   /// Attempts to produce a RecoveryExpr after some AST node cannot be created.
   ExprResult CreateRecoveryExpr(SourceLocation Begin, SourceLocation End,
-                                ArrayRef<Expr *> SubExprs,
+                                llvm::ArrayRef<Expr *> SubExprs,
                                 QualType T = QualType());
 
   ExprResult PerformObjectMemberConversion(Expr *From,
@@ -6002,8 +6003,8 @@ public:
   /// form of call prototypes.
   bool GatherArgumentsForCall(SourceLocation CallLoc, FunctionDecl *FDecl,
                               const FunctionProtoType *Proto,
-                              unsigned FirstParam, ArrayRef<Expr *> Args,
-                              SmallVectorImpl<Expr *> &AllArgs,
+                              unsigned FirstParam, llvm::ArrayRef<Expr *> Args,
+                              llvm::SmallVectorImpl<Expr *> &AllArgs,
                               VariadicCallType CallType = VariadicDoesNotApply,
                               bool AllowExplicit = false,
                               bool IsListInitialization = false);
@@ -6370,7 +6371,7 @@ public:
   RecordDecl *StdSourceLocationImplDecl;
 
   /// A stack of expression evaluation contexts.
-  SmallVector<ExpressionEvaluationContextRecord, 8> ExprEvalContexts;
+  llvm::SmallVector<ExpressionEvaluationContextRecord, 8> ExprEvalContexts;
 
   // Set of failed immediate invocations to avoid double diagnosing.
   llvm::SmallPtrSet<ConstantExpr *, 4> FailedImmediateInvocations;
@@ -6605,7 +6606,7 @@ public:
                                bool Diagnose = true);
   void DeclareGlobalNewDelete();
   void DeclareGlobalAllocationFunction(DeclarationName Name, QualType Return,
-                                       ArrayRef<QualType> Params);
+                                       llvm::ArrayRef<QualType> Params);
 
   bool FindDeallocationFunction(SourceLocation StartLoc, CXXRecordDecl *RD,
                                 DeclarationName Name, FunctionDecl *&Operator,
@@ -6701,10 +6702,10 @@ public:
 
   /// Parsed one of the type trait support pseudo-functions.
   ExprResult ActOnTypeTrait(TypeTrait Kind, SourceLocation KWLoc,
-                            ArrayRef<ParsedType> Args,
+                            llvm::ArrayRef<ParsedType> Args,
                             SourceLocation RParenLoc);
   ExprResult BuildTypeTrait(TypeTrait Kind, SourceLocation KWLoc,
-                            ArrayRef<TypeSourceInfo *> Args,
+                            llvm::ArrayRef<TypeSourceInfo *> Args,
                             SourceLocation RParenLoc);
 
   /// ActOnArrayTypeTrait - Parsed one of the binary type trait support
@@ -6825,7 +6826,7 @@ public:
 
   RequiresExprBodyDecl *
   ActOnStartRequiresExpr(SourceLocation RequiresKWLoc,
-                         ArrayRef<ParmVarDecl *> LocalParameters,
+                         llvm::ArrayRef<ParmVarDecl *> LocalParameters,
                          Scope *BodyScope);
   void ActOnFinishRequiresExpr();
   concepts::Requirement *ActOnSimpleRequirement(Expr *E);
@@ -6852,14 +6853,14 @@ public:
       concepts::Requirement::SubstitutionDiagnostic *SubstDiag);
   concepts::NestedRequirement *BuildNestedRequirement(Expr *E);
   concepts::NestedRequirement *
-  BuildNestedRequirement(StringRef InvalidConstraintEntity,
+  BuildNestedRequirement(llvm::StringRef InvalidConstraintEntity,
                          const ASTConstraintSatisfaction &Satisfaction);
   ExprResult ActOnRequiresExpr(SourceLocation RequiresKWLoc,
                                RequiresExprBodyDecl *Body,
                                SourceLocation LParenLoc,
-                               ArrayRef<ParmVarDecl *> LocalParameters,
+                               llvm::ArrayRef<ParmVarDecl *> LocalParameters,
                                SourceLocation RParenLoc,
-                               ArrayRef<concepts::Requirement *> Requirements,
+                               llvm::ArrayRef<concepts::Requirement *> Requirements,
                                SourceLocation ClosingBraceLoc);
 
 private:
@@ -7065,7 +7066,7 @@ public:
       CXXMethodDecl *Method, SourceLocation LambdaLoc,
       SourceLocation CallOperatorLoc, Expr *TrailingRequiresClause,
       TypeSourceInfo *MethodTyInfo, ConstexprSpecKind ConstexprKind,
-      StorageClass SC, ArrayRef<ParmVarDecl *> Params,
+      StorageClass SC, llvm::ArrayRef<ParmVarDecl *> Params,
       bool HasExplicitResultType);
 
   /// Returns true if the explicit object parameter was invalid.
@@ -7118,7 +7119,7 @@ public:
   /// on a lambda (if it exists) in C++2a.
   void ActOnLambdaExplicitTemplateParameterList(LambdaIntroducer &Intro,
                                                 SourceLocation LAngleLoc,
-                                                ArrayRef<NamedDecl *> TParams,
+                                                llvm::ArrayRef<NamedDecl *> TParams,
                                                 SourceLocation RAngleLoc,
                                                 ExprResult RequiresClause);
 
@@ -7127,7 +7128,7 @@ public:
 
   void ActOnLambdaClosureParameters(
       Scope *LambdaScope,
-      MutableArrayRef<DeclaratorChunk::ParamInfo> ParamInfo);
+      llvm::MutableArrayRef<DeclaratorChunk::ParamInfo> ParamInfo);
 
   /// ActOnStartOfLambdaDefinition - This is called just before we start
   /// parsing the body of a lambda; it analyzes the explicit captures and
@@ -7512,20 +7513,20 @@ public:
                     bool ErrorRecovery = true);
 
   void FindAssociatedClassesAndNamespaces(
-      SourceLocation InstantiationLoc, ArrayRef<Expr *> Args,
+      SourceLocation InstantiationLoc, llvm::ArrayRef<Expr *> Args,
       AssociatedNamespaceSet &AssociatedNamespaces,
       AssociatedClassSet &AssociatedClasses);
 
   void DiagnoseAmbiguousLookup(LookupResult &Result);
 
   LiteralOperatorLookupResult
-  LookupLiteralOperator(Scope *S, LookupResult &R, ArrayRef<QualType> ArgTys,
+  LookupLiteralOperator(Scope *S, LookupResult &R, llvm::ArrayRef<QualType> ArgTys,
                         bool AllowRaw, bool AllowTemplate,
                         bool AllowStringTemplate, bool DiagnoseMissing,
                         StringLiteral *StringLit = nullptr);
 
   void ArgumentDependentLookup(DeclarationName Name, SourceLocation Loc,
-                               ArrayRef<Expr *> Args, ADLResult &Functions);
+                               llvm::ArrayRef<Expr *> Args, ADLResult &Functions);
 
   void LookupVisibleDecls(Scope *S, LookupNameKind Kind,
                           VisibleDeclConsumer &Consumer,
@@ -7573,7 +7574,7 @@ public:
   void diagnoseMissingImport(SourceLocation Loc, const NamedDecl *Decl,
                              MissingImportKind MIK, bool Recover = true);
   void diagnoseMissingImport(SourceLocation Loc, const NamedDecl *Decl,
-                             SourceLocation DeclLoc, ArrayRef<Module *> Modules,
+                             SourceLocation DeclLoc, llvm::ArrayRef<Module *> Modules,
                              MissingImportKind MIK, bool Recover);
 
   struct TypoExprState {
@@ -7910,8 +7911,8 @@ public:
   bool IsBlockPointerConversion(QualType FromType, QualType ToType,
                                 QualType &ConvertedType);
 
-  bool FunctionParamTypesAreEqual(ArrayRef<QualType> Old,
-                                  ArrayRef<QualType> New,
+  bool FunctionParamTypesAreEqual(llvm::ArrayRef<QualType> Old,
+                                  llvm::ArrayRef<QualType> New,
                                   unsigned *ArgPos = nullptr,
                                   bool Reversed = false);
 
@@ -8106,7 +8107,7 @@ public:
                                ReferenceConversions *Conv = nullptr);
 
   void AddOverloadCandidate(
-      FunctionDecl *Function, DeclAccessPair FoundDecl, ArrayRef<Expr *> Args,
+      FunctionDecl *Function, DeclAccessPair FoundDecl, llvm::ArrayRef<Expr *> Args,
       OverloadCandidateSet &CandidateSet, bool SuppressUserConversions = false,
       bool PartialOverloading = false, bool AllowExplicit = true,
       bool AllowExplicitConversion = false,
@@ -8115,14 +8116,14 @@ public:
       OverloadCandidateParamOrder PO = {},
       bool AggregateCandidateDeduction = false);
   void AddFunctionCandidates(
-      const UnresolvedSetImpl &Functions, ArrayRef<Expr *> Args,
+      const UnresolvedSetImpl &Functions, llvm::ArrayRef<Expr *> Args,
       OverloadCandidateSet &CandidateSet,
       TemplateArgumentListInfo *ExplicitTemplateArgs = nullptr,
       bool SuppressUserConversions = false, bool PartialOverloading = false,
       bool FirstArgumentIsBase = false);
   void AddMethodCandidate(DeclAccessPair FoundDecl, QualType ObjectType,
                           Expr::Classification ObjectClassification,
-                          ArrayRef<Expr *> Args,
+                          llvm::ArrayRef<Expr *> Args,
                           OverloadCandidateSet &CandidateSet,
                           bool SuppressUserConversion = false,
                           OverloadCandidateParamOrder PO = {});
@@ -8130,7 +8131,7 @@ public:
   AddMethodCandidate(CXXMethodDecl *Method, DeclAccessPair FoundDecl,
                      CXXRecordDecl *ActingContext, QualType ObjectType,
                      Expr::Classification ObjectClassification,
-                     ArrayRef<Expr *> Args, OverloadCandidateSet &CandidateSet,
+                     llvm::ArrayRef<Expr *> Args, OverloadCandidateSet &CandidateSet,
                      bool SuppressUserConversions = false,
                      bool PartialOverloading = false,
                      ConversionSequenceList EarlyConversions = std::nullopt,
@@ -8139,20 +8140,20 @@ public:
       FunctionTemplateDecl *MethodTmpl, DeclAccessPair FoundDecl,
       CXXRecordDecl *ActingContext,
       TemplateArgumentListInfo *ExplicitTemplateArgs, QualType ObjectType,
-      Expr::Classification ObjectClassification, ArrayRef<Expr *> Args,
+      Expr::Classification ObjectClassification, llvm::ArrayRef<Expr *> Args,
       OverloadCandidateSet &CandidateSet, bool SuppressUserConversions = false,
       bool PartialOverloading = false, OverloadCandidateParamOrder PO = {});
   void AddTemplateOverloadCandidate(
       FunctionTemplateDecl *FunctionTemplate, DeclAccessPair FoundDecl,
-      TemplateArgumentListInfo *ExplicitTemplateArgs, ArrayRef<Expr *> Args,
+      TemplateArgumentListInfo *ExplicitTemplateArgs, llvm::ArrayRef<Expr *> Args,
       OverloadCandidateSet &CandidateSet, bool SuppressUserConversions = false,
       bool PartialOverloading = false, bool AllowExplicit = true,
       ADLCallKind IsADLCandidate = ADLCallKind::NotADL,
       OverloadCandidateParamOrder PO = {},
       bool AggregateCandidateDeduction = false);
   bool CheckNonDependentConversions(
-      FunctionTemplateDecl *FunctionTemplate, ArrayRef<QualType> ParamTypes,
-      ArrayRef<Expr *> Args, OverloadCandidateSet &CandidateSet,
+      FunctionTemplateDecl *FunctionTemplate, llvm::ArrayRef<QualType> ParamTypes,
+      llvm::ArrayRef<Expr *> Args, OverloadCandidateSet &CandidateSet,
       ConversionSequenceList &Conversions, bool SuppressUserConversions,
       CXXRecordDecl *ActingContext = nullptr, QualType ObjectType = QualType(),
       Expr::Classification ObjectClassification = {},
@@ -8171,32 +8172,32 @@ public:
                              DeclAccessPair FoundDecl,
                              CXXRecordDecl *ActingContext,
                              const FunctionProtoType *Proto, Expr *Object,
-                             ArrayRef<Expr *> Args,
+                             llvm::ArrayRef<Expr *> Args,
                              OverloadCandidateSet &CandidateSet);
   void AddNonMemberOperatorCandidates(
-      const UnresolvedSetImpl &Functions, ArrayRef<Expr *> Args,
+      const UnresolvedSetImpl &Functions, llvm::ArrayRef<Expr *> Args,
       OverloadCandidateSet &CandidateSet,
       TemplateArgumentListInfo *ExplicitTemplateArgs = nullptr);
   void AddMemberOperatorCandidates(OverloadedOperatorKind Op,
-                                   SourceLocation OpLoc, ArrayRef<Expr *> Args,
+                                   SourceLocation OpLoc, llvm::ArrayRef<Expr *> Args,
                                    OverloadCandidateSet &CandidateSet,
                                    OverloadCandidateParamOrder PO = {});
-  void AddBuiltinCandidate(QualType *ParamTys, ArrayRef<Expr *> Args,
+  void AddBuiltinCandidate(QualType *ParamTys, llvm::ArrayRef<Expr *> Args,
                            OverloadCandidateSet &CandidateSet,
                            bool IsAssignmentOperator = false,
                            unsigned NumContextualBoolArguments = 0);
   void AddBuiltinOperatorCandidates(OverloadedOperatorKind Op,
-                                    SourceLocation OpLoc, ArrayRef<Expr *> Args,
+                                    SourceLocation OpLoc, llvm::ArrayRef<Expr *> Args,
                                     OverloadCandidateSet &CandidateSet);
   void AddArgumentDependentLookupCandidates(
-      DeclarationName Name, SourceLocation Loc, ArrayRef<Expr *> Args,
+      DeclarationName Name, SourceLocation Loc, llvm::ArrayRef<Expr *> Args,
       TemplateArgumentListInfo *ExplicitTemplateArgs,
       OverloadCandidateSet &CandidateSet, bool PartialOverloading = false);
 
   /// Check the enable_if expressions on the given function. Returns the first
   /// failing attribute, or NULL if they were all successful.
   EnableIfAttr *CheckEnableIf(FunctionDecl *Function, SourceLocation CallLoc,
-                              ArrayRef<Expr *> Args,
+                              llvm::ArrayRef<Expr *> Args,
                               bool MissingImplicitThis = false);
 
   /// Emit diagnostics for the diagnose_if attributes on Function, ignoring any
@@ -8208,7 +8209,7 @@ public:
   /// Returns true if any errors were emitted.
   bool diagnoseArgDependentDiagnoseIfAttrs(const FunctionDecl *Function,
                                            const Expr *ThisArg,
-                                           ArrayRef<const Expr *> Args,
+                                           llvm::ArrayRef<const Expr *> Args,
                                            SourceLocation Loc);
 
   /// Emit diagnostics for the diagnose_if attributes on Function, ignoring any
@@ -8228,7 +8229,7 @@ public:
                                               const NamedDecl *B);
   void diagnoseEquivalentInternalLinkageDeclarations(
       SourceLocation Loc, const NamedDecl *D,
-      ArrayRef<const NamedDecl *> Equiv);
+      llvm::ArrayRef<const NamedDecl *> Equiv);
 
   // Emit as a 'note' the specific overload candidate
   void NoteOverloadCandidate(
@@ -8279,12 +8280,12 @@ public:
       unsigned DiagIDForComplaining = 0);
 
   void AddOverloadedCallCandidates(UnresolvedLookupExpr *ULE,
-                                   ArrayRef<Expr *> Args,
+                                   llvm::ArrayRef<Expr *> Args,
                                    OverloadCandidateSet &CandidateSet,
                                    bool PartialOverloading = false);
   void AddOverloadedCallCandidates(
       LookupResult &R, TemplateArgumentListInfo *ExplicitTemplateArgs,
-      ArrayRef<Expr *> Args, OverloadCandidateSet &CandidateSet);
+      llvm::ArrayRef<Expr *> Args, OverloadCandidateSet &CandidateSet);
 
   // An enum used to represent the different possible results of building a
   // range-based for loop.
@@ -8325,7 +8326,7 @@ public:
   void LookupOverloadedBinOp(OverloadCandidateSet &CandidateSet,
                              OverloadedOperatorKind Op,
                              const UnresolvedSetImpl &Fns,
-                             ArrayRef<Expr *> Args, bool RequiresADL = true);
+                             llvm::ArrayRef<Expr *> Args, bool RequiresADL = true);
   ExprResult CreateOverloadedBinOp(SourceLocation OpLoc, BinaryOperatorKind Opc,
                                    const UnresolvedSetImpl &Fns, Expr *LHS,
                                    Expr *RHS, bool RequiresADL = true,
@@ -8358,7 +8359,7 @@ public:
                                     bool HadMultipleCandidates);
 
   ExprResult BuildLiteralOperatorCall(
-      LookupResult &R, DeclarationNameInfo &SuffixInfo, ArrayRef<Expr *> Args,
+      LookupResult &R, DeclarationNameInfo &SuffixInfo, llvm::ArrayRef<Expr *> Args,
       SourceLocation LitEndLoc,
       TemplateArgumentListInfo *ExplicitTemplateArgs = nullptr);
 
@@ -8372,7 +8373,7 @@ public:
   /// nullptr if none could be found
   ObjCMethodDecl *SelectBestMethod(Selector Sel, MultiExprArg Args,
                                    bool IsInstance,
-                                   SmallVectorImpl<ObjCMethodDecl *> &Methods);
+                                   llvm::SmallVectorImpl<ObjCMethodDecl *> &Methods);
 
   ///@}
 
@@ -8388,7 +8389,7 @@ public:
 
 public:
   /// Stack of active SEH __finally scopes.  Can be empty.
-  SmallVector<Scope *, 2> CurrentSEHFinally;
+  llvm::SmallVector<Scope *, 2> CurrentSEHFinally;
 
   StmtResult ActOnExprStmt(ExprResult Arg, bool DiscardedValue = true);
   StmtResult ActOnExprStmtError();
@@ -8408,7 +8409,7 @@ public:
   void ActOnAfterCompoundStatementLeadingPragmas();
   void ActOnFinishOfCompoundStmt();
   StmtResult ActOnCompoundStmt(SourceLocation L, SourceLocation R,
-                               ArrayRef<Stmt *> Elts, bool isStmtExpr);
+                               llvm::ArrayRef<Stmt *> Elts, bool isStmtExpr);
 
   sema::CompoundScopeInfo &getCurCompoundScope() const;
 
@@ -8425,7 +8426,7 @@ public:
                             SourceLocation ColonLoc, Stmt *SubStmt);
 
   StmtResult BuildAttributedStmt(SourceLocation AttrsLoc,
-                                 ArrayRef<const Attr *> Attrs, Stmt *SubStmt);
+                                 llvm::ArrayRef<const Attr *> Attrs, Stmt *SubStmt);
   StmtResult ActOnAttributedStmt(const ParsedAttributes &AttrList,
                                  Stmt *SubStmt);
 
@@ -8487,13 +8488,13 @@ public:
       Scope *S, SourceLocation ForLoc, SourceLocation CoawaitLoc,
       Stmt *InitStmt, Stmt *LoopVar, SourceLocation ColonLoc, Expr *Collection,
       SourceLocation RParenLoc, BuildForRangeKind Kind,
-      ArrayRef<MaterializeTemporaryExpr *> LifetimeExtendTemps = {});
+      llvm::ArrayRef<MaterializeTemporaryExpr *> LifetimeExtendTemps = {});
   StmtResult BuildCXXForRangeStmt(
       SourceLocation ForLoc, SourceLocation CoawaitLoc, Stmt *InitStmt,
       SourceLocation ColonLoc, Stmt *RangeDecl, Stmt *Begin, Stmt *End,
       Expr *Cond, Expr *Inc, Stmt *LoopVarDecl, SourceLocation RParenLoc,
       BuildForRangeKind Kind,
-      ArrayRef<MaterializeTemporaryExpr *> LifetimeExtendTemps = {});
+      llvm::ArrayRef<MaterializeTemporaryExpr *> LifetimeExtendTemps = {});
   StmtResult FinishCXXForRangeStmt(Stmt *ForRange, Stmt *Body);
 
   StmtResult ActOnGotoStmt(SourceLocation GotoLoc, SourceLocation LabelLoc,
@@ -8541,7 +8542,7 @@ public:
   StmtResult ActOnCXXCatchBlock(SourceLocation CatchLoc, Decl *ExDecl,
                                 Stmt *HandlerBlock);
   StmtResult ActOnCXXTryBlock(SourceLocation TryLoc, Stmt *TryBlock,
-                              ArrayRef<Stmt *> Handlers);
+                              llvm::ArrayRef<Stmt *> Handlers);
 
   StmtResult ActOnSEHTryBlock(bool IsCXXTry, // try (true) or __try (false) ?
                               SourceLocation TryLoc, Stmt *TryBlock,
@@ -8564,10 +8565,10 @@ public:
 
   void ActOnCapturedRegionStart(SourceLocation Loc, Scope *CurScope,
                                 CapturedRegionKind Kind, unsigned NumParams);
-  typedef std::pair<StringRef, QualType> CapturedParamNameType;
+  typedef std::pair<llvm::StringRef, QualType> CapturedParamNameType;
   void ActOnCapturedRegionStart(SourceLocation Loc, Scope *CurScope,
                                 CapturedRegionKind Kind,
-                                ArrayRef<CapturedParamNameType> Params,
+                                llvm::ArrayRef<CapturedParamNameType> Params,
                                 unsigned OpenMPCaptureLevel = 0);
   StmtResult ActOnCapturedRegionEnd(Stmt *S);
   void ActOnCapturedRegionError();
@@ -8610,17 +8611,17 @@ public:
                                        SourceLocation TemplateKWLoc,
                                        UnqualifiedId &Id,
                                        bool IsUnevaluatedContext);
-  bool LookupInlineAsmField(StringRef Base, StringRef Member, unsigned &Offset,
+  bool LookupInlineAsmField(llvm::StringRef Base, llvm::StringRef Member, unsigned &Offset,
                             SourceLocation AsmLoc);
-  ExprResult LookupInlineAsmVarDeclField(Expr *RefExpr, StringRef Member,
+  ExprResult LookupInlineAsmVarDeclField(Expr *RefExpr, llvm::StringRef Member,
                                          SourceLocation AsmLoc);
   StmtResult ActOnMSAsmStmt(SourceLocation AsmLoc, SourceLocation LBraceLoc,
-                            ArrayRef<Token> AsmToks, StringRef AsmString,
+                            llvm::ArrayRef<Token> AsmToks, llvm::StringRef AsmString,
                             unsigned NumOutputs, unsigned NumInputs,
-                            ArrayRef<StringRef> Constraints,
-                            ArrayRef<StringRef> Clobbers,
-                            ArrayRef<Expr *> Exprs, SourceLocation EndLoc);
-  LabelDecl *GetOrCreateMSAsmLabel(StringRef ExternalLabelName,
+                            llvm::ArrayRef<llvm::StringRef> Constraints,
+                            llvm::ArrayRef<llvm::StringRef> Clobbers,
+                            llvm::ArrayRef<Expr *> Exprs, SourceLocation EndLoc);
+  LabelDecl *GetOrCreateMSAsmLabel(llvm::StringRef ExternalLabelName,
                                    SourceLocation Location, bool AlwaysCreate);
 
   ///@}
@@ -8642,12 +8643,12 @@ public:
                              const AttributeCommonInfo &A);
 
   CodeAlignAttr *BuildCodeAlignAttr(const AttributeCommonInfo &CI, Expr *E);
-  bool CheckRebuiltStmtAttributes(ArrayRef<const Attr *> Attrs);
+  bool CheckRebuiltStmtAttributes(llvm::ArrayRef<const Attr *> Attrs);
 
   /// Process the attributes before creating an attributed statement. Returns
   /// the semantic attributes that have been processed.
   void ProcessStmtAttributes(Stmt *Stmt, const ParsedAttributes &InAttrs,
-                             SmallVectorImpl<const Attr *> &OutAttrs);
+                             llvm::SmallVectorImpl<const Attr *> &OutAttrs);
 
   ExprResult ActOnCXXAssumeAttr(Stmt *St, const ParsedAttr &A,
                                 SourceRange Range);
@@ -8687,7 +8688,7 @@ public:
     FpPragmaStack.CurrentValue = FPO.getChangesFrom(FPOptions(LangOpts));
   }
 
-  ArrayRef<InventedTemplateParameterInfo> getInventedParameterInfos() const {
+  llvm::ArrayRef<InventedTemplateParameterInfo> getInventedParameterInfos() const {
     return llvm::ArrayRef(InventedParameterInfos.begin() +
                               InventedParameterInfosStart,
                           InventedParameterInfos.end());
@@ -8696,7 +8697,7 @@ public:
   /// The number of SFINAE diagnostics that have been trapped.
   unsigned NumSFINAEErrors;
 
-  ArrayRef<sema::FunctionScopeInfo *> getFunctionScopes() const {
+  llvm::ArrayRef<sema::FunctionScopeInfo *> getFunctionScopes() const {
     return llvm::ArrayRef(FunctionScopes.begin() + FunctionScopesStart,
                           FunctionScopes.end());
   }
@@ -8880,7 +8881,7 @@ public:
 
   TemplateParameterList *ActOnTemplateParameterList(
       unsigned Depth, SourceLocation ExportLoc, SourceLocation TemplateLoc,
-      SourceLocation LAngleLoc, ArrayRef<NamedDecl *> Params,
+      SourceLocation LAngleLoc, llvm::ArrayRef<NamedDecl *> Params,
       SourceLocation RAngleLoc, Expr *RequiresClause);
 
   /// The context in which we are checking a template parameter list.
@@ -8902,7 +8903,7 @@ public:
   TemplateParameterList *MatchTemplateParametersToScopeSpecifier(
       SourceLocation DeclStartLoc, SourceLocation DeclLoc,
       const CXXScopeSpec &SS, TemplateIdAnnotation *TemplateId,
-      ArrayRef<TemplateParameterList *> ParamLists, bool IsFriend,
+      llvm::ArrayRef<TemplateParameterList *> ParamLists, bool IsFriend,
       bool &IsMemberSpecialization, bool &Invalid,
       bool SuppressDiagnostic = false);
 
@@ -9001,7 +9002,7 @@ public:
   bool CheckTemplatePartialSpecializationArgs(SourceLocation Loc,
                                               TemplateDecl *PrimaryTemplate,
                                               unsigned NumExplicitArgs,
-                                              ArrayRef<TemplateArgument> Args);
+                                              llvm::ArrayRef<TemplateArgument> Args);
   void CheckTemplatePartialSpecialization(
       ClassTemplatePartialSpecializationDecl *Partial);
   void CheckTemplatePartialSpecialization(
@@ -9048,8 +9049,8 @@ public:
   TemplateArgumentLoc SubstDefaultTemplateArgumentIfAvailable(
       TemplateDecl *Template, SourceLocation TemplateLoc,
       SourceLocation RAngleLoc, Decl *Param,
-      ArrayRef<TemplateArgument> SugaredConverted,
-      ArrayRef<TemplateArgument> CanonicalConverted, bool &HasDefaultArg);
+      llvm::ArrayRef<TemplateArgument> SugaredConverted,
+      llvm::ArrayRef<TemplateArgument> CanonicalConverted, bool &HasDefaultArg);
 
   SourceLocation getTopMostPointOfInstantiation(const NamedDecl *) const;
 
@@ -9073,8 +9074,8 @@ public:
   CheckTemplateArgument(NamedDecl *Param, TemplateArgumentLoc &Arg,
                         NamedDecl *Template, SourceLocation TemplateLoc,
                         SourceLocation RAngleLoc, unsigned ArgumentPackIndex,
-                        SmallVectorImpl<TemplateArgument> &SugaredConverted,
-                        SmallVectorImpl<TemplateArgument> &CanonicalConverted,
+                        llvm::SmallVectorImpl<TemplateArgument> &SugaredConverted,
+                        llvm::SmallVectorImpl<TemplateArgument> &CanonicalConverted,
                         CheckTemplateArgumentKind CTAK);
 
   /// Check that the given template arguments can be provided to
@@ -9115,15 +9116,15 @@ public:
   bool CheckTemplateArgumentList(
       TemplateDecl *Template, SourceLocation TemplateLoc,
       TemplateArgumentListInfo &TemplateArgs, bool PartialTemplateArgs,
-      SmallVectorImpl<TemplateArgument> &SugaredConverted,
-      SmallVectorImpl<TemplateArgument> &CanonicalConverted,
+      llvm::SmallVectorImpl<TemplateArgument> &SugaredConverted,
+      llvm::SmallVectorImpl<TemplateArgument> &CanonicalConverted,
       bool UpdateArgsWithConversions = true,
       bool *ConstraintsNotSatisfied = nullptr, bool PartialOrderingTTP = false);
 
   bool CheckTemplateTypeArgument(
       TemplateTypeParmDecl *Param, TemplateArgumentLoc &Arg,
-      SmallVectorImpl<TemplateArgument> &SugaredConverted,
-      SmallVectorImpl<TemplateArgument> &CanonicalConverted);
+      llvm::SmallVectorImpl<TemplateArgument> &SugaredConverted,
+      llvm::SmallVectorImpl<TemplateArgument> &CanonicalConverted);
 
   bool CheckTemplateArgument(TypeSourceInfo *Arg);
   ExprResult CheckTemplateArgument(NonTypeTemplateParmDecl *Param,
@@ -9344,7 +9345,7 @@ public:
                                       SourceLocation Loc);
 
   FunctionTemplateDecl *DeclareAggregateDeductionGuideFromInitList(
-      TemplateDecl *Template, MutableArrayRef<QualType> ParamTypes,
+      TemplateDecl *Template, llvm::MutableArrayRef<QualType> ParamTypes,
       SourceLocation Loc);
 
   /// Find the failed Boolean condition within a given Boolean
@@ -9459,7 +9460,7 @@ public:
   /// deduction.
   ///
   /// FIXME: Serialize this structure to the AST file.
-  typedef llvm::DenseMap<Decl *, SmallVector<PartialDiagnosticAt, 1>>
+  typedef llvm::DenseMap<Decl *, llvm::SmallVector<PartialDiagnosticAt, 1>>
       SuppressedDiagnosticsMap;
   SuppressedDiagnosticsMap SuppressedDiagnostics;
 
@@ -9485,12 +9486,12 @@ public:
 
   TemplateDeductionResult
   DeduceTemplateArguments(ClassTemplatePartialSpecializationDecl *Partial,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           sema::TemplateDeductionInfo &Info);
 
   TemplateDeductionResult
   DeduceTemplateArguments(VarTemplatePartialSpecializationDecl *Partial,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           sema::TemplateDeductionInfo &Info);
 
   /// Deduce the template arguments of the given template from \p FromType.
@@ -9503,16 +9504,16 @@ public:
                                   sema::TemplateDeductionInfo &Info);
 
   TemplateDeductionResult DeduceTemplateArguments(
-      TemplateParameterList *TemplateParams, ArrayRef<TemplateArgument> Ps,
-      ArrayRef<TemplateArgument> As, sema::TemplateDeductionInfo &Info,
-      SmallVectorImpl<DeducedTemplateArgument> &Deduced,
+      TemplateParameterList *TemplateParams, llvm::ArrayRef<TemplateArgument> Ps,
+      llvm::ArrayRef<TemplateArgument> As, sema::TemplateDeductionInfo &Info,
+      llvm::SmallVectorImpl<DeducedTemplateArgument> &Deduced,
       bool NumberOfArgumentsMustMatch);
 
   TemplateDeductionResult SubstituteExplicitTemplateArguments(
       FunctionTemplateDecl *FunctionTemplate,
       TemplateArgumentListInfo &ExplicitTemplateArgs,
-      SmallVectorImpl<DeducedTemplateArgument> &Deduced,
-      SmallVectorImpl<QualType> &ParamTypes, QualType *FunctionType,
+      llvm::SmallVectorImpl<DeducedTemplateArgument> &Deduced,
+      llvm::SmallVectorImpl<QualType> &ParamTypes, QualType *FunctionType,
       sema::TemplateDeductionInfo &Info);
 
   /// brief A function argument from which we performed template argument
@@ -9532,20 +9533,20 @@ public:
 
   TemplateDeductionResult FinishTemplateArgumentDeduction(
       FunctionTemplateDecl *FunctionTemplate,
-      SmallVectorImpl<DeducedTemplateArgument> &Deduced,
+      llvm::SmallVectorImpl<DeducedTemplateArgument> &Deduced,
       unsigned NumExplicitlySpecified, FunctionDecl *&Specialization,
       sema::TemplateDeductionInfo &Info,
-      SmallVectorImpl<OriginalCallArg> const *OriginalCallArgs = nullptr,
+      llvm::SmallVectorImpl<OriginalCallArg> const *OriginalCallArgs = nullptr,
       bool PartialOverloading = false,
       llvm::function_ref<bool()> CheckNonDependent = [] { return false; });
 
   TemplateDeductionResult DeduceTemplateArguments(
       FunctionTemplateDecl *FunctionTemplate,
-      TemplateArgumentListInfo *ExplicitTemplateArgs, ArrayRef<Expr *> Args,
+      TemplateArgumentListInfo *ExplicitTemplateArgs, llvm::ArrayRef<Expr *> Args,
       FunctionDecl *&Specialization, sema::TemplateDeductionInfo &Info,
       bool PartialOverloading, bool AggregateDeductionCandidate,
       QualType ObjectType, Expr::Classification ObjectClassification,
-      llvm::function_ref<bool(ArrayRef<QualType>)> CheckNonDependent);
+      llvm::function_ref<bool(llvm::ArrayRef<QualType>)> CheckNonDependent);
 
   TemplateDeductionResult DeduceTemplateArguments(
       FunctionTemplateDecl *FunctionTemplate,
@@ -9663,7 +9664,7 @@ public:
 public:
   /// A helper class for building up ExtParameterInfos.
   class ExtParameterInfoBuilder {
-    SmallVector<FunctionProtoType::ExtParameterInfo, 16> Infos;
+    llvm::SmallVector<FunctionProtoType::ExtParameterInfo, 16> Infos;
     bool HasInteresting = false;
 
   public:
@@ -9857,7 +9858,7 @@ public:
       CXXSpecialMemberKind SpecialMember;
     };
 
-    ArrayRef<TemplateArgument> template_arguments() const {
+    llvm::ArrayRef<TemplateArgument> template_arguments() const {
       assert(Kind != DeclaringSpecialMember);
       return {TemplateArgs, NumTemplateArgs};
     }
@@ -9911,21 +9912,21 @@ public:
     /// Note that we are instantiating a type alias template declaration.
     InstantiatingTemplate(Sema &SemaRef, SourceLocation PointOfInstantiation,
                           TypeAliasTemplateDecl *Entity,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           SourceRange InstantiationRange = SourceRange());
 
     /// Note that we are instantiating a default argument in a
     /// template-id.
     InstantiatingTemplate(Sema &SemaRef, SourceLocation PointOfInstantiation,
                           TemplateParameter Param, TemplateDecl *Template,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           SourceRange InstantiationRange = SourceRange());
 
     /// Note that we are substituting either explicitly-specified or
     /// deduced template arguments during function template argument deduction.
     InstantiatingTemplate(Sema &SemaRef, SourceLocation PointOfInstantiation,
                           FunctionTemplateDecl *FunctionTemplate,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           CodeSynthesisContext::SynthesisKind Kind,
                           sema::TemplateDeductionInfo &DeductionInfo,
                           SourceRange InstantiationRange = SourceRange());
@@ -9934,7 +9935,7 @@ public:
     /// argument deduction for a class template declaration.
     InstantiatingTemplate(Sema &SemaRef, SourceLocation PointOfInstantiation,
                           TemplateDecl *Template,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           sema::TemplateDeductionInfo &DeductionInfo,
                           SourceRange InstantiationRange = SourceRange());
 
@@ -9943,7 +9944,7 @@ public:
     /// specialization.
     InstantiatingTemplate(Sema &SemaRef, SourceLocation PointOfInstantiation,
                           ClassTemplatePartialSpecializationDecl *PartialSpec,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           sema::TemplateDeductionInfo &DeductionInfo,
                           SourceRange InstantiationRange = SourceRange());
 
@@ -9952,7 +9953,7 @@ public:
     /// specialization.
     InstantiatingTemplate(Sema &SemaRef, SourceLocation PointOfInstantiation,
                           VarTemplatePartialSpecializationDecl *PartialSpec,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           sema::TemplateDeductionInfo &DeductionInfo,
                           SourceRange InstantiationRange = SourceRange());
 
@@ -9960,28 +9961,28 @@ public:
     /// parameter.
     InstantiatingTemplate(Sema &SemaRef, SourceLocation PointOfInstantiation,
                           ParmVarDecl *Param,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           SourceRange InstantiationRange = SourceRange());
 
     /// Note that we are substituting prior template arguments into a
     /// non-type parameter.
     InstantiatingTemplate(Sema &SemaRef, SourceLocation PointOfInstantiation,
                           NamedDecl *Template, NonTypeTemplateParmDecl *Param,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           SourceRange InstantiationRange);
 
     /// Note that we are substituting prior template arguments into a
     /// template template parameter.
     InstantiatingTemplate(Sema &SemaRef, SourceLocation PointOfInstantiation,
                           NamedDecl *Template, TemplateTemplateParmDecl *Param,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           SourceRange InstantiationRange);
 
     /// Note that we are checking the default template argument
     /// against the template parameter for a given template-id.
     InstantiatingTemplate(Sema &SemaRef, SourceLocation PointOfInstantiation,
                           TemplateDecl *Template, NamedDecl *Param,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           SourceRange InstantiationRange);
 
     struct ConstraintsCheck {};
@@ -9990,7 +9991,7 @@ public:
     /// constraints).
     InstantiatingTemplate(Sema &SemaRef, SourceLocation PointOfInstantiation,
                           ConstraintsCheck, NamedDecl *Template,
-                          ArrayRef<TemplateArgument> TemplateArgs,
+                          llvm::ArrayRef<TemplateArgument> TemplateArgs,
                           SourceRange InstantiationRange);
 
     struct ConstraintSubstitution {};
@@ -10064,7 +10065,7 @@ public:
         Sema &SemaRef, CodeSynthesisContext::SynthesisKind Kind,
         SourceLocation PointOfInstantiation, SourceRange InstantiationRange,
         Decl *Entity, NamedDecl *Template = nullptr,
-        ArrayRef<TemplateArgument> TemplateArgs = std::nullopt,
+        llvm::ArrayRef<TemplateArgument> TemplateArgs = std::nullopt,
         sema::TemplateDeductionInfo *DeductionInfo = nullptr);
 
     InstantiatingTemplate(const InstantiatingTemplate &) = delete;
@@ -10078,13 +10079,13 @@ public:
                              SourceLocation Loc = {},
                              const DeclarationName &Entity = {});
   bool
-  SubstTemplateArguments(ArrayRef<TemplateArgumentLoc> Args,
+  SubstTemplateArguments(llvm::ArrayRef<TemplateArgumentLoc> Args,
                          const MultiLevelTemplateArgumentList &TemplateArgs,
                          TemplateArgumentListInfo &Outputs);
 
   MultiLevelTemplateArgumentList getTemplateInstantiationArgs(
       const NamedDecl *D, const DeclContext *DC = nullptr, bool Final = false,
-      std::optional<ArrayRef<TemplateArgument>> Innermost = std::nullopt,
+      std::optional<llvm::ArrayRef<TemplateArgument>> Innermost = std::nullopt,
       bool RelativeToPrimary = false, const FunctionDecl *Pattern = nullptr,
       bool ForConstraintInstantiation = false,
       bool SkipForSpecialization = false);
@@ -10147,7 +10148,7 @@ public:
   ///
   /// This vector is treated as a stack. As synthesis of one entity requires
   /// synthesis of another, additional contexts are pushed onto the stack.
-  SmallVector<CodeSynthesisContext, 16> CodeSynthesisContexts;
+  llvm::SmallVector<CodeSynthesisContext, 16> CodeSynthesisContexts;
 
   /// Specializations whose definitions are currently being instantiated.
   llvm::DenseSet<std::pair<Decl *, unsigned>> InstantiatingSpecializations;
@@ -10158,7 +10159,7 @@ public:
 
   /// Extra modules inspected when performing a lookup during a template
   /// instantiation. Computed lazily.
-  SmallVector<Module *, 16> CodeSynthesisContextLookupModules;
+  llvm::SmallVector<Module *, 16> CodeSynthesisContextLookupModules;
 
   /// Cache of additional modules that should be used for name lookup
   /// within the current template instantiation. Computed lazily; use
@@ -10275,18 +10276,18 @@ public:
                           const MultiLevelTemplateArgumentList &Args);
   bool SubstExceptionSpec(SourceLocation Loc,
                           FunctionProtoType::ExceptionSpecInfo &ESI,
-                          SmallVectorImpl<QualType> &ExceptionStorage,
+                          llvm::SmallVectorImpl<QualType> &ExceptionStorage,
                           const MultiLevelTemplateArgumentList &Args);
   ParmVarDecl *
   SubstParmVarDecl(ParmVarDecl *D,
                    const MultiLevelTemplateArgumentList &TemplateArgs,
                    int indexAdjustment, std::optional<unsigned> NumExpansions,
                    bool ExpectParameterPack, bool EvaluateConstraints = true);
-  bool SubstParmTypes(SourceLocation Loc, ArrayRef<ParmVarDecl *> Params,
+  bool SubstParmTypes(SourceLocation Loc, llvm::ArrayRef<ParmVarDecl *> Params,
                       const FunctionProtoType::ExtParameterInfo *ExtParamInfos,
                       const MultiLevelTemplateArgumentList &TemplateArgs,
-                      SmallVectorImpl<QualType> &ParamTypes,
-                      SmallVectorImpl<ParmVarDecl *> *OutParams,
+                      llvm::SmallVectorImpl<QualType> &ParamTypes,
+                      llvm::SmallVectorImpl<ParmVarDecl *> *OutParams,
                       ExtParameterInfoBuilder &ParamInfos);
   bool SubstDefaultArgument(SourceLocation Loc, ParmVarDecl *Param,
                             const MultiLevelTemplateArgumentList &TemplateArgs,
@@ -10328,9 +10329,9 @@ public:
   /// \param Outputs Will receive all of the substituted arguments.
   ///
   /// \returns true if an error occurred, false otherwise.
-  bool SubstExprs(ArrayRef<Expr *> Exprs, bool IsCall,
+  bool SubstExprs(llvm::ArrayRef<Expr *> Exprs, bool IsCall,
                   const MultiLevelTemplateArgumentList &TemplateArgs,
-                  SmallVectorImpl<Expr *> &Outputs);
+                  llvm::SmallVectorImpl<Expr *> &Outputs);
 
   StmtResult SubstStmt(Stmt *S,
                        const MultiLevelTemplateArgumentList &TemplateArgs);
@@ -10425,10 +10426,10 @@ public:
 
   /// Queue of implicit template instantiations that cannot be performed
   /// eagerly.
-  SmallVector<PendingImplicitInstantiation, 1> LateParsedInstantiations;
+  llvm::SmallVector<PendingImplicitInstantiation, 1> LateParsedInstantiations;
 
-  SmallVector<SmallVector<VTableUse, 16>, 8> SavedVTableUses;
-  SmallVector<std::deque<PendingImplicitInstantiation>, 8>
+  llvm::SmallVector<llvm::SmallVector<VTableUse, 16>, 8> SavedVTableUses;
+  llvm::SmallVector<std::deque<PendingImplicitInstantiation>, 8>
       SavedPendingInstantiations;
 
   /// The queue of implicit template instantiations that are required
@@ -10543,7 +10544,7 @@ public:
                               Decl *D)
         : TmplAttr(A), Scope(S), NewDecl(D) {}
   };
-  typedef SmallVector<LateInstantiatedAttribute, 16> LateInstantiatedAttrVec;
+  typedef llvm::SmallVector<LateInstantiatedAttribute, 16> LateInstantiatedAttrVec;
 
   void InstantiateAttrs(const MultiLevelTemplateArgumentList &TemplateArgs,
                         const Decl *Pattern, Decl *Inst,
@@ -10577,7 +10578,7 @@ public:
       VarTemplateDecl *VarTemplate, VarDecl *FromVar,
       const TemplateArgumentList *PartialSpecArgs,
       const TemplateArgumentListInfo &TemplateArgsInfo,
-      SmallVectorImpl<TemplateArgument> &Converted,
+      llvm::SmallVectorImpl<TemplateArgument> &Converted,
       SourceLocation PointOfInstantiation,
       LateInstantiatedAttrVec *LateAttrs = nullptr,
       LocalInstantiationScope *StartingScope = nullptr);
@@ -10783,7 +10784,7 @@ public:
   /// \returns true if an error occurred, false otherwise.
   bool DiagnoseUnexpandedParameterPacks(
       SourceLocation Loc, UnexpandedParameterPackContext UPPC,
-      ArrayRef<UnexpandedParameterPack> Unexpanded);
+      llvm::ArrayRef<UnexpandedParameterPack> Unexpanded);
 
   /// If the given type contains an unexpanded parameter pack,
   /// diagnose the error.
@@ -10866,7 +10867,7 @@ public:
   /// unexpanded parameter packs.
   void collectUnexpandedParameterPacks(
       TemplateArgument Arg,
-      SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
+      llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
 
   /// Collect the set of unexpanded parameter packs within the given
   /// template argument.
@@ -10875,7 +10876,7 @@ public:
   /// unexpanded parameter packs.
   void collectUnexpandedParameterPacks(
       TemplateArgumentLoc Arg,
-      SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
+      llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
 
   /// Collect the set of unexpanded parameter packs within the given
   /// type.
@@ -10883,7 +10884,7 @@ public:
   /// \param T The type that will be traversed to find
   /// unexpanded parameter packs.
   void collectUnexpandedParameterPacks(
-      QualType T, SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
+      QualType T, llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
 
   /// Collect the set of unexpanded parameter packs within the given
   /// type.
@@ -10891,7 +10892,7 @@ public:
   /// \param TL The type that will be traversed to find
   /// unexpanded parameter packs.
   void collectUnexpandedParameterPacks(
-      TypeLoc TL, SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
+      TypeLoc TL, llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
 
   /// Collect the set of unexpanded parameter packs within the given
   /// nested-name-specifier.
@@ -10900,7 +10901,7 @@ public:
   /// unexpanded parameter packs.
   void collectUnexpandedParameterPacks(
       NestedNameSpecifierLoc NNS,
-      SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
+      llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
 
   /// Collect the set of unexpanded parameter packs within the given
   /// name.
@@ -10909,7 +10910,7 @@ public:
   /// unexpanded parameter packs.
   void collectUnexpandedParameterPacks(
       const DeclarationNameInfo &NameInfo,
-      SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
+      llvm::SmallVectorImpl<UnexpandedParameterPack> &Unexpanded);
 
   /// Invoked when parsing a template argument followed by an
   /// ellipsis, which creates a pack expansion.
@@ -10997,7 +10998,7 @@ public:
   /// must be set.
   bool CheckParameterPacksForExpansion(
       SourceLocation EllipsisLoc, SourceRange PatternRange,
-      ArrayRef<UnexpandedParameterPack> Unexpanded,
+      llvm::ArrayRef<UnexpandedParameterPack> Unexpanded,
       const MultiLevelTemplateArgumentList &TemplateArgs, bool &ShouldExpand,
       bool &RetainExpansion, std::optional<unsigned> &NumExpansions);
 
@@ -11061,7 +11062,7 @@ public:
   ExprResult BuildPackIndexingExpr(Expr *PackExpression,
                                    SourceLocation EllipsisLoc, Expr *IndexExpr,
                                    SourceLocation RSquareLoc,
-                                   ArrayRef<Expr *> ExpandedExprs = {},
+                                   llvm::ArrayRef<Expr *> ExpandedExprs = {},
                                    bool EmptyPack = false);
 
   /// Handle a C++1z fold-expression: ( expr op ... op expr ).
@@ -11155,7 +11156,7 @@ public:
   /// \returns true if an error occurred and satisfaction could not be checked,
   /// false otherwise.
   bool CheckConstraintSatisfaction(
-      const NamedDecl *Template, ArrayRef<const Expr *> ConstraintExprs,
+      const NamedDecl *Template, llvm::ArrayRef<const Expr *> ConstraintExprs,
       const MultiLevelTemplateArgumentList &TemplateArgLists,
       SourceRange TemplateIDRange, ConstraintSatisfaction &Satisfaction) {
     llvm::SmallVector<Expr *, 4> Converted;
@@ -11187,7 +11188,7 @@ public:
   /// \returns true if an error occurred and satisfaction could not be checked,
   /// false otherwise.
   bool CheckConstraintSatisfaction(
-      const NamedDecl *Template, ArrayRef<const Expr *> ConstraintExprs,
+      const NamedDecl *Template, llvm::ArrayRef<const Expr *> ConstraintExprs,
       llvm::SmallVectorImpl<Expr *> &ConvertedConstraints,
       const MultiLevelTemplateArgumentList &TemplateArgList,
       SourceRange TemplateIDRange, ConstraintSatisfaction &Satisfaction);
@@ -11247,7 +11248,7 @@ public:
 
   bool CheckInstantiatedFunctionTemplateConstraints(
       SourceLocation PointOfInstantiation, FunctionDecl *Decl,
-      ArrayRef<TemplateArgument> TemplateArgs,
+      llvm::ArrayRef<TemplateArgument> TemplateArgs,
       ConstraintSatisfaction &Satisfaction);
 
   /// \brief Emit diagnostics explaining why a constraint expression was deemed
@@ -11264,7 +11265,7 @@ public:
                                 bool First = true);
 
   const NormalizedConstraint *getNormalizedAssociatedConstraints(
-      NamedDecl *ConstrainedDecl, ArrayRef<const Expr *> AssociatedConstraints);
+      NamedDecl *ConstrainedDecl, llvm::ArrayRef<const Expr *> AssociatedConstraints);
 
   /// \brief Check whether the given declaration's associated constraints are
   /// at least as constrained than another declaration's according to the
@@ -11274,8 +11275,8 @@ public:
   /// at least constrained than D2, and false otherwise.
   ///
   /// \returns true if an error occurred, false otherwise.
-  bool IsAtLeastAsConstrained(NamedDecl *D1, MutableArrayRef<const Expr *> AC1,
-                              NamedDecl *D2, MutableArrayRef<const Expr *> AC2,
+  bool IsAtLeastAsConstrained(NamedDecl *D1, llvm::MutableArrayRef<const Expr *> AC1,
+                              NamedDecl *D2, llvm::MutableArrayRef<const Expr *> AC2,
                               bool &Result);
 
   /// If D1 was not at least as constrained as D2, but would've been if a pair
@@ -11283,8 +11284,8 @@ public:
   /// repeated in two separate places in code.
   /// \returns true if such a diagnostic was emitted, false otherwise.
   bool MaybeEmitAmbiguousAtomicConstraintsDiagnostic(
-      NamedDecl *D1, ArrayRef<const Expr *> AC1, NamedDecl *D2,
-      ArrayRef<const Expr *> AC2);
+      NamedDecl *D1, llvm::ArrayRef<const Expr *> AC1, NamedDecl *D2,
+      llvm::ArrayRef<const Expr *> AC2);
 
 private:
   /// Caches pairs of template-like decls whose associated constraints were
@@ -11315,7 +11316,7 @@ private:
   /// function.
   bool
   SetupConstraintScope(FunctionDecl *FD,
-                       std::optional<ArrayRef<TemplateArgument>> TemplateArgs,
+                       std::optional<llvm::ArrayRef<TemplateArgument>> TemplateArgs,
                        const MultiLevelTemplateArgumentList &MLTAL,
                        LocalInstantiationScope &Scope);
 
@@ -11324,7 +11325,7 @@ private:
   /// LocalInstantiationScope to have the proper set of ParVarDecls configured.
   std::optional<MultiLevelTemplateArgumentList>
   SetupConstraintCheckingTemplateArgumentsAndScope(
-      FunctionDecl *FD, std::optional<ArrayRef<TemplateArgument>> TemplateArgs,
+      FunctionDecl *FD, std::optional<llvm::ArrayRef<TemplateArgument>> TemplateArgs,
       LocalInstantiationScope &Scope);
 
   ///@}
@@ -11347,7 +11348,7 @@ public:
   static unsigned getPrintable(unsigned I) { return I; }
   static bool getPrintable(bool B) { return B; }
   static const char *getPrintable(const char *S) { return S; }
-  static StringRef getPrintable(StringRef S) { return S; }
+  static llvm::StringRef getPrintable(llvm::StringRef S) { return S; }
   static const std::string &getPrintable(const std::string &S) { return S; }
   static const IdentifierInfo *getPrintable(const IdentifierInfo *II) {
     return II;
@@ -11430,7 +11431,7 @@ public:
   /// \returns A suitable function type, if there are no errors. The
   /// unqualified type will always be a FunctionProtoType.
   /// Otherwise, returns a NULL type.
-  QualType BuildFunctionType(QualType T, MutableArrayRef<QualType> ParamTypes,
+  QualType BuildFunctionType(QualType T, llvm::MutableArrayRef<QualType> ParamTypes,
                              SourceLocation Loc, DeclarationName Entity,
                              const FunctionProtoType::ExtProtoInfo &EPI);
 
@@ -11543,7 +11544,7 @@ public:
   QualType BuildPackIndexingType(QualType Pattern, Expr *IndexExpr,
                                  SourceLocation Loc, SourceLocation EllipsisLoc,
                                  bool FullySubstituted = false,
-                                 ArrayRef<QualType> Expansions = {});
+                                 llvm::ArrayRef<QualType> Expansions = {});
 
   using UTTKind = UnaryTransformType::UTTKind;
   QualType BuildUnaryTransformType(QualType BaseType, UTTKind UKind,

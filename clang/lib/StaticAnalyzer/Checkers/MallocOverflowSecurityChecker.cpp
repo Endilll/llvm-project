@@ -49,11 +49,11 @@ public:
                         BugReporter &BR) const;
 
   void CheckMallocArgument(
-      SmallVectorImpl<MallocOverflowCheck> &PossibleMallocOverflows,
+      llvm::SmallVectorImpl<MallocOverflowCheck> &PossibleMallocOverflows,
       const CallExpr *TheCall, ASTContext &Context) const;
 
   void OutputPossibleOverflows(
-    SmallVectorImpl<MallocOverflowCheck> &PossibleMallocOverflows,
+    llvm::SmallVectorImpl<MallocOverflowCheck> &PossibleMallocOverflows,
     const Decl *D, BugReporter &BR, AnalysisManager &mgr) const;
 
 };
@@ -65,7 +65,7 @@ static inline bool EvaluatesToZero(APSInt &Val, BinaryOperatorKind op) {
 }
 
 void MallocOverflowSecurityChecker::CheckMallocArgument(
-    SmallVectorImpl<MallocOverflowCheck> &PossibleMallocOverflows,
+    llvm::SmallVectorImpl<MallocOverflowCheck> &PossibleMallocOverflows,
     const CallExpr *TheCall, ASTContext &Context) const {
 
   /* Look for a linear combination with a single variable, and at least
@@ -125,7 +125,7 @@ namespace {
 class CheckOverflowOps :
   public EvaluatedExprVisitor<CheckOverflowOps> {
 public:
-  typedef SmallVectorImpl<MallocOverflowCheck> theVecType;
+  typedef llvm::SmallVectorImpl<MallocOverflowCheck> theVecType;
 
 private:
     theVecType &toScanFor;
@@ -269,7 +269,7 @@ private:
 // detect the most blatent cases of overflow and educate the
 // programmer.
 void MallocOverflowSecurityChecker::OutputPossibleOverflows(
-  SmallVectorImpl<MallocOverflowCheck> &PossibleMallocOverflows,
+  llvm::SmallVectorImpl<MallocOverflowCheck> &PossibleMallocOverflows,
   const Decl *D, BugReporter &BR, AnalysisManager &mgr) const {
   // By far the most common case: nothing to check.
   if (PossibleMallocOverflows.empty())
@@ -299,7 +299,7 @@ void MallocOverflowSecurityChecker::checkASTCodeBody(const Decl *D,
     return;
 
   // A list of variables referenced in possibly overflowing malloc operands.
-  SmallVector<MallocOverflowCheck, 2> PossibleMallocOverflows;
+  llvm::SmallVector<MallocOverflowCheck, 2> PossibleMallocOverflows;
 
   for (CFG::iterator it = cfg->begin(), ei = cfg->end(); it != ei; ++it) {
     CFGBlock *block = *it;

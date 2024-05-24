@@ -37,7 +37,7 @@ public:
   unsigned CallbackLogIndent = 0;
 
   std::string stmtToString(Stmt *S) {
-    StringRef ClassName = S->getStmtClassName();
+    llvm::StringRef ClassName = S->getStmtClassName();
     if (IntegerLiteral *IL = dyn_cast<IntegerLiteral>(S)) {
       return (ClassName + "(" + toString(IL->getValue(), 10, false) + ")").str();
     }
@@ -72,7 +72,7 @@ public:
   /// \p CallbackName was called with the argument \p S. Then, record the
   /// effects of calling the default implementation \p CallDefaultFn.
   template <typename CallDefault>
-  void recordCallback(StringRef CallbackName, Stmt *S,
+  void recordCallback(llvm::StringRef CallbackName, Stmt *S,
                       CallDefault CallDefaultFn) {
     for (unsigned i = 0; i != CallbackLogIndent; ++i) {
       CallbackLog += "  ";
@@ -86,13 +86,13 @@ public:
 
 template <typename VisitorTy>
 ::testing::AssertionResult visitorCallbackLogEqual(VisitorTy Visitor,
-                                                   StringRef Code,
-                                                   StringRef ExpectedLog) {
+                                                   llvm::StringRef Code,
+                                                   llvm::StringRef ExpectedLog) {
   Visitor.runOver(Code);
   // EXPECT_EQ shows the diff between the two strings if they are different.
   EXPECT_EQ(ExpectedLog.trim().str(),
-            StringRef(Visitor.CallbackLog).trim().str());
-  if (ExpectedLog.trim() != StringRef(Visitor.CallbackLog).trim()) {
+            llvm::StringRef(Visitor.CallbackLog).trim().str());
+  if (ExpectedLog.trim() != llvm::StringRef(Visitor.CallbackLog).trim()) {
     return ::testing::AssertionFailure();
   }
   return ::testing::AssertionSuccess();

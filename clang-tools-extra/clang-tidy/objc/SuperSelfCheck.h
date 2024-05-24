@@ -20,7 +20,7 @@ namespace clang::tidy::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/objc/super-self.html
 class SuperSelfCheck : public ClangTidyCheck {
 public:
-  SuperSelfCheck(StringRef Name, ClangTidyContext *Context)
+  SuperSelfCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC;

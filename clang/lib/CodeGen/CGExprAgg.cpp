@@ -92,7 +92,7 @@ public:
                 const AggValueSlot &src);
 
   void EmitArrayInit(Address DestPtr, llvm::ArrayType *AType, QualType ArrayQTy,
-                     Expr *ExprToVisit, ArrayRef<Expr *> Args,
+                     Expr *ExprToVisit, llvm::ArrayRef<Expr *> Args,
                      Expr *ArrayFiller);
 
   AggValueSlot::NeedsGCBarriers_t needsGC(QualType T) {
@@ -184,7 +184,7 @@ public:
   void VisitAbstractConditionalOperator(const AbstractConditionalOperator *CO);
   void VisitChooseExpr(const ChooseExpr *CE);
   void VisitInitListExpr(InitListExpr *E);
-  void VisitCXXParenListOrInitListExpr(Expr *ExprToVisit, ArrayRef<Expr *> Args,
+  void VisitCXXParenListOrInitListExpr(Expr *ExprToVisit, llvm::ArrayRef<Expr *> Args,
                                        FieldDecl *InitializedFieldInUnion,
                                        Expr *ArrayFiller);
   void VisitArrayInitLoopExpr(const ArrayInitLoopExpr *E,
@@ -230,7 +230,7 @@ public:
 
   void VisitVAArgExpr(VAArgExpr *E);
   void VisitCXXParenListInitExpr(CXXParenListInitExpr *E);
-  void VisitCXXParenListOrInitListExpr(Expr *ExprToVisit, ArrayRef<Expr *> Args,
+  void VisitCXXParenListOrInitListExpr(Expr *ExprToVisit, llvm::ArrayRef<Expr *> Args,
                                        Expr *ArrayFiller);
 
   void EmitInitializationToLValue(Expr *E, LValue Address);
@@ -508,7 +508,7 @@ static bool isTrivialFiller(Expr *E) {
 /// be either an InitListEpxr a CXXParenInitListExpr.
 void AggExprEmitter::EmitArrayInit(Address DestPtr, llvm::ArrayType *AType,
                                    QualType ArrayQTy, Expr *ExprToVisit,
-                                   ArrayRef<Expr *> Args, Expr *ArrayFiller) {
+                                   llvm::ArrayRef<Expr *> Args, Expr *ArrayFiller) {
   uint64_t NumInitElements = Args.size();
 
   uint64_t NumArrayElements = AType->getNumElements();
@@ -1640,7 +1640,7 @@ void AggExprEmitter::VisitInitListExpr(InitListExpr *E) {
 }
 
 void AggExprEmitter::VisitCXXParenListOrInitListExpr(
-    Expr *ExprToVisit, ArrayRef<Expr *> InitExprs,
+    Expr *ExprToVisit, llvm::ArrayRef<Expr *> InitExprs,
     FieldDecl *InitializedFieldInUnion, Expr *ArrayFiller) {
 #if 0
   // FIXME: Assess perf here?  Figure out what cases are worth optimizing here
@@ -1691,7 +1691,7 @@ void AggExprEmitter::VisitCXXParenListOrInitListExpr(
 
   // We'll need to enter cleanup scopes in case any of the element
   // initializers throws an exception.
-  SmallVector<EHScopeStack::stable_iterator, 16> cleanups;
+  llvm::SmallVector<EHScopeStack::stable_iterator, 16> cleanups;
   CodeGenFunction::CleanupDeactivationScope DeactivateCleanups(CGF);
 
   unsigned curInitIndex = 0;

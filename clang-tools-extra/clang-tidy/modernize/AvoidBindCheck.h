@@ -21,7 +21,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/avoid-bind.html
 class AvoidBindCheck : public ClangTidyCheck {
 public:
-  AvoidBindCheck(StringRef Name, ClangTidyContext *Context);
+  AvoidBindCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus14;
   }

@@ -36,9 +36,9 @@ class MismatchedIteratorChecker
 
   void verifyMatch(CheckerContext &C, SVal Iter, const MemRegion *Cont) const;
   void verifyMatch(CheckerContext &C, SVal Iter1, SVal Iter2) const;
-  void reportBug(StringRef Message, SVal Val1, SVal Val2, CheckerContext &C,
+  void reportBug(llvm::StringRef Message, SVal Val1, SVal Val2, CheckerContext &C,
                  ExplodedNode *ErrNode) const;
-  void reportBug(StringRef Message, SVal Val, const MemRegion *Reg,
+  void reportBug(llvm::StringRef Message, SVal Val, const MemRegion *Reg,
                  CheckerContext &C, ExplodedNode *ErrNode) const;
 
 public:
@@ -266,7 +266,7 @@ void MismatchedIteratorChecker::verifyMatch(CheckerContext &C, SVal Iter1,
   }
 }
 
-void MismatchedIteratorChecker::reportBug(StringRef Message, SVal Val1,
+void MismatchedIteratorChecker::reportBug(llvm::StringRef Message, SVal Val1,
                                           SVal Val2, CheckerContext &C,
                                           ExplodedNode *ErrNode) const {
   auto R = std::make_unique<PathSensitiveBugReport>(MismatchedBugType, Message,
@@ -276,7 +276,7 @@ void MismatchedIteratorChecker::reportBug(StringRef Message, SVal Val1,
   C.emitReport(std::move(R));
 }
 
-void MismatchedIteratorChecker::reportBug(StringRef Message, SVal Val,
+void MismatchedIteratorChecker::reportBug(llvm::StringRef Message, SVal Val,
                                           const MemRegion *Reg,
                                           CheckerContext &C,
                                           ExplodedNode *ErrNode) const {

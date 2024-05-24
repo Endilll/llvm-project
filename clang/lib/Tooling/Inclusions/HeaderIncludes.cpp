@@ -38,7 +38,7 @@ LangOptions createLangOpts() {
 // \p GetOffsetAfterSequence should be a function that matches a sequence of
 // tokens and returns an offset after the sequence.
 unsigned getOffsetAfterTokenSequence(
-    StringRef FileName, StringRef Code, const IncludeStyle &Style,
+    llvm::StringRef FileName, llvm::StringRef Code, const IncludeStyle &Style,
     llvm::function_ref<unsigned(const SourceManager &, Lexer &, Token &)>
         GetOffsetAfterSequence) {
   SourceManagerForFile VirtualSM(FileName, Code);
@@ -57,8 +57,8 @@ unsigned getOffsetAfterTokenSequence(
 // after the given \p Tok (including \p Tok). If \p RawIDName is provided, the
 // (second) raw_identifier name is checked.
 bool checkAndConsumeDirectiveWithName(
-    Lexer &Lex, StringRef Name, Token &Tok,
-    std::optional<StringRef> RawIDName = std::nullopt) {
+    Lexer &Lex, llvm::StringRef Name, Token &Tok,
+    std::optional<llvm::StringRef> RawIDName = std::nullopt) {
   bool Matched = Tok.is(tok::hash) && !Lex.LexFromRawLexer(Tok) &&
                  Tok.is(tok::raw_identifier) &&
                  Tok.getRawIdentifier() == Name && !Lex.LexFromRawLexer(Tok) &&
@@ -79,8 +79,8 @@ void skipComments(Lexer &Lex, Token &Tok) {
 // before/after header guards (e.g. #ifndef/#define pair, #pragma once). If no
 // header guard is present in the code, this will return the offset after
 // skipping all comments from the start of the code.
-unsigned getOffsetAfterHeaderGuardsAndComments(StringRef FileName,
-                                               StringRef Code,
+unsigned getOffsetAfterHeaderGuardsAndComments(llvm::StringRef FileName,
+                                               llvm::StringRef Code,
                                                const IncludeStyle &Style) {
   // \p Consume returns location after header guard or 0 if no header guard is
   // found.
@@ -112,7 +112,7 @@ unsigned getOffsetAfterHeaderGuardsAndComments(StringRef FileName,
       ConsumeHeaderGuardAndComment(
           [](const SourceManager &SM, Lexer &Lex, Token Tok) -> unsigned {
             if (checkAndConsumeDirectiveWithName(Lex, "pragma", Tok,
-                                                 StringRef("once")))
+                                                 llvm::StringRef("once")))
               return SM.getFileOffset(Tok.getLocation());
             return 0;
           }));
@@ -156,7 +156,7 @@ bool checkAndConsumeInclusiveDirective(Lexer &Lex, Token &Tok) {
 // offset after skipping all comments from the start of the code.
 // Inserting after an #include is not allowed if it comes after code that is not
 // #include (e.g. pre-processing directive that is not #include, declarations).
-unsigned getMaxHeaderInsertionOffset(StringRef FileName, StringRef Code,
+unsigned getMaxHeaderInsertionOffset(llvm::StringRef FileName, llvm::StringRef Code,
                                      const IncludeStyle &Style) {
   return getOffsetAfterTokenSequence(
       FileName, Code, Style,
@@ -169,7 +169,7 @@ unsigned getMaxHeaderInsertionOffset(StringRef FileName, StringRef Code,
       });
 }
 
-inline StringRef trimInclude(StringRef IncludeName) {
+inline llvm::StringRef trimInclude(llvm::StringRef IncludeName) {
   return IncludeName.trim("\"<>");
 }
 
@@ -181,15 +181,15 @@ const char IncludeRegexPattern[] =
 //  - in names with multiple dots (foo.cu.cc) it terminates at the *first*
 //  - an empty stem is never returned: /foo/.bar.x => .bar
 //  - we don't bother to handle . and .. specially
-StringRef matchingStem(llvm::StringRef Path) {
-  StringRef Name = llvm::sys::path::filename(Path);
+llvm::StringRef matchingStem(llvm::StringRef Path) {
+  llvm::StringRef Name = llvm::sys::path::filename(Path);
   return Name.substr(0, Name.find('.', 1));
 }
 
 } // anonymous namespace
 
 IncludeCategoryManager::IncludeCategoryManager(const IncludeStyle &Style,
-                                               StringRef FileName)
+                                               llvm::StringRef FileName)
     : Style(Style), FileName(FileName) {
   for (const auto &Category : Style.IncludeCategories) {
     CategoryRegexs.emplace_back(Category.Regex, Category.RegexIsCaseSensitive
@@ -206,7 +206,7 @@ IncludeCategoryManager::IncludeCategoryManager(const IncludeStyle &Style,
   }
 }
 
-int IncludeCategoryManager::getIncludePriority(StringRef IncludeName,
+int IncludeCategoryManager::getIncludePriority(llvm::StringRef IncludeName,
                                                bool CheckMainHeader) const {
   int Ret = INT_MAX;
   for (unsigned i = 0, e = CategoryRegexs.size(); i != e; ++i)
@@ -219,7 +219,7 @@ int IncludeCategoryManager::getIncludePriority(StringRef IncludeName,
   return Ret;
 }
 
-int IncludeCategoryManager::getSortIncludePriority(StringRef IncludeName,
+int IncludeCategoryManager::getSortIncludePriority(llvm::StringRef IncludeName,
                                                    bool CheckMainHeader) const {
   int Ret = INT_MAX;
   for (unsigned i = 0, e = CategoryRegexs.size(); i != e; ++i)
@@ -233,7 +233,7 @@ int IncludeCategoryManager::getSortIncludePriority(StringRef IncludeName,
     Ret = 0;
   return Ret;
 }
-bool IncludeCategoryManager::isMainHeader(StringRef IncludeName) const {
+bool IncludeCategoryManager::isMainHeader(llvm::StringRef IncludeName) const {
   switch (Style.MainIncludeChar) {
   case IncludeStyle::MICD_Quote:
     if (!IncludeName.starts_with("\""))
@@ -251,9 +251,9 @@ bool IncludeCategoryManager::isMainHeader(StringRef IncludeName) const {
       IncludeName.drop_front(1).drop_back(1); // remove the surrounding "" or <>
   // Not matchingStem: implementation files may have compound extensions but
   // headers may not.
-  StringRef HeaderStem = llvm::sys::path::stem(IncludeName);
-  StringRef FileStem = llvm::sys::path::stem(FileName); // foo.cu for foo.cu.cc
-  StringRef MatchingFileStem = matchingStem(FileName);  // foo for foo.cu.cc
+  llvm::StringRef HeaderStem = llvm::sys::path::stem(IncludeName);
+  llvm::StringRef FileStem = llvm::sys::path::stem(FileName); // foo.cu for foo.cu.cc
+  llvm::StringRef MatchingFileStem = matchingStem(FileName);  // foo for foo.cu.cc
   // main-header examples:
   //  1) foo.h => foo.cc
   //  2) foo.h => foo.cu.cc
@@ -262,7 +262,7 @@ bool IncludeCategoryManager::isMainHeader(StringRef IncludeName) const {
   // non-main-header examples:
   //  1) foo.h => bar.cc
   //  2) foo.proto.h => foo.cc
-  StringRef Matching;
+  llvm::StringRef Matching;
   if (MatchingFileStem.starts_with_insensitive(HeaderStem))
     Matching = MatchingFileStem; // example 1), 2)
   else if (FileStem.equals_insensitive(HeaderStem))
@@ -278,7 +278,7 @@ bool IncludeCategoryManager::isMainHeader(StringRef IncludeName) const {
 
 const llvm::Regex HeaderIncludes::IncludeRegex(IncludeRegexPattern);
 
-HeaderIncludes::HeaderIncludes(StringRef FileName, StringRef Code,
+HeaderIncludes::HeaderIncludes(llvm::StringRef FileName, llvm::StringRef Code,
                                const IncludeStyle &Style)
     : FileName(FileName), Code(Code), FirstIncludeOffset(-1),
       MinInsertOffset(
@@ -293,12 +293,12 @@ HeaderIncludes::HeaderIncludes(StringRef FileName, StringRef Code,
   Priorities = {0, INT_MAX};
   for (const auto &Category : Style.IncludeCategories)
     Priorities.insert(Category.Priority);
-  SmallVector<StringRef, 32> Lines;
+  llvm::SmallVector<llvm::StringRef, 32> Lines;
   Code.drop_front(MinInsertOffset).split(Lines, "\n");
 
   unsigned Offset = MinInsertOffset;
   unsigned NextLineOffset;
-  SmallVector<StringRef, 4> Matches;
+  llvm::SmallVector<llvm::StringRef, 4> Matches;
   for (auto Line : Lines) {
     NextLineOffset = std::min(Code.size(), Offset + Line.size() + 1);
     if (IncludeRegex.match(Line, &Matches)) {
@@ -367,13 +367,13 @@ HeaderIncludes::insert(llvm::StringRef IncludeName, bool IsAngled,
   if (It != ExistingIncludes.end()) {
     for (const auto &Inc : It->second)
       if (Inc.Directive == Directive &&
-          ((IsAngled && StringRef(Inc.Name).starts_with("<")) ||
-           (!IsAngled && StringRef(Inc.Name).starts_with("\""))))
+          ((IsAngled && llvm::StringRef(Inc.Name).starts_with("<")) ||
+           (!IsAngled && llvm::StringRef(Inc.Name).starts_with("\""))))
         return std::nullopt;
   }
   std::string Quoted =
       std::string(llvm::formatv(IsAngled ? "<{0}>" : "\"{0}\"", IncludeName));
-  StringRef QuotedName = Quoted;
+  llvm::StringRef QuotedName = Quoted;
   int Priority = Categories.getIncludePriority(
       QuotedName, /*CheckMainHeader=*/!MainIncludeFound);
   auto CatOffset = CategoryEndOffsets.find(Priority);
@@ -410,8 +410,8 @@ tooling::Replacements HeaderIncludes::remove(llvm::StringRef IncludeName,
   if (Iter == ExistingIncludes.end())
     return Result;
   for (const auto &Inc : Iter->second) {
-    if ((IsAngled && StringRef(Inc.Name).starts_with("\"")) ||
-        (!IsAngled && StringRef(Inc.Name).starts_with("<")))
+    if ((IsAngled && llvm::StringRef(Inc.Name).starts_with("\"")) ||
+        (!IsAngled && llvm::StringRef(Inc.Name).starts_with("<")))
       continue;
     llvm::Error Err = Result.add(tooling::Replacement(
         FileName, Inc.R.getOffset(), Inc.R.getLength(), ""));

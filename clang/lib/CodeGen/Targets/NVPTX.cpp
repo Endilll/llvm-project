@@ -77,7 +77,7 @@ public:
 
   // Adds a NamedMDNode with GV, Name, and Operand as operands, and adds the
   // resulting MDNode to the nvvm.annotations MDNode.
-  static void addNVVMMetadata(llvm::GlobalValue *GV, StringRef Name,
+  static void addNVVMMetadata(llvm::GlobalValue *GV, llvm::StringRef Name,
                               int Operand);
 
 private:
@@ -271,7 +271,7 @@ void NVPTXTargetCodeGenInfo::setTargetAttributes(
 }
 
 void NVPTXTargetCodeGenInfo::addNVVMMetadata(llvm::GlobalValue *GV,
-                                             StringRef Name, int Operand) {
+                                             llvm::StringRef Name, int Operand) {
   llvm::Module *M = GV->getParent();
   llvm::LLVMContext &Ctx = M->getContext();
 

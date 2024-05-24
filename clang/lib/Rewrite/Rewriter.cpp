@@ -30,7 +30,7 @@
 
 using namespace clang;
 
-raw_ostream &RewriteBuffer::write(raw_ostream &os) const {
+llvm::raw_ostream &RewriteBuffer::write(llvm::raw_ostream &os) const {
   // Walk RewriteRope chunks efficiently using MoveToNextPiece() instead of the
   // character iterator.
   for (RopePieceBTreeIterator I = begin(), E = end(); I != E;
@@ -108,7 +108,7 @@ void RewriteBuffer::RemoveText(unsigned OrigOffset, unsigned Size,
   }
 }
 
-void RewriteBuffer::InsertText(unsigned OrigOffset, StringRef Str,
+void RewriteBuffer::InsertText(unsigned OrigOffset, llvm::StringRef Str,
                                bool InsertAfter) {
   // Nothing to insert, exit early.
   if (Str.empty()) return;
@@ -124,7 +124,7 @@ void RewriteBuffer::InsertText(unsigned OrigOffset, StringRef Str,
 /// buffer with a new string.  This is effectively a combined "remove+insert"
 /// operation.
 void RewriteBuffer::ReplaceText(unsigned OrigOffset, unsigned OrigLength,
-                                StringRef NewStr) {
+                                llvm::StringRef NewStr) {
   unsigned RealOffset = getMappedOffset(OrigOffset, true);
   Buffer.erase(RealOffset, OrigLength);
   Buffer.insert(RealOffset, NewStr.begin(), NewStr.end());
@@ -241,7 +241,7 @@ RewriteBuffer &Rewriter::getEditBuffer(FileID FID) {
     return I->second;
   I = RewriteBuffers.insert(I, std::make_pair(FID, RewriteBuffer()));
 
-  StringRef MB = SourceMgr->getBufferData(FID);
+  llvm::StringRef MB = SourceMgr->getBufferData(FID);
   I->second.Initialize(MB.begin(), MB.end());
 
   return I->second;
@@ -249,15 +249,15 @@ RewriteBuffer &Rewriter::getEditBuffer(FileID FID) {
 
 /// InsertText - Insert the specified string at the specified location in the
 /// original buffer.
-bool Rewriter::InsertText(SourceLocation Loc, StringRef Str,
+bool Rewriter::InsertText(SourceLocation Loc, llvm::StringRef Str,
                           bool InsertAfter, bool indentNewLines) {
   if (!isRewritable(Loc)) return true;
   FileID FID;
   unsigned StartOffs = getLocationOffsetAndFileID(Loc, FID);
 
-  SmallString<128> indentedStr;
+  llvm::SmallString<128> indentedStr;
   if (indentNewLines && Str.contains('\n')) {
-    StringRef MB = SourceMgr->getBufferData(FID);
+    llvm::StringRef MB = SourceMgr->getBufferData(FID);
 
     unsigned lineNo = SourceMgr->getLineNumber(FID, StartOffs) - 1;
     const SrcMgr::ContentCache *Content =
@@ -265,7 +265,7 @@ bool Rewriter::InsertText(SourceLocation Loc, StringRef Str,
     unsigned lineOffs = Content->SourceLineCache[lineNo];
 
     // Find the whitespace at the start of the line.
-    StringRef indentSpace;
+    llvm::StringRef indentSpace;
     {
       unsigned i = lineOffs;
       while (isWhitespaceExceptNL(MB[i]))
@@ -273,7 +273,7 @@ bool Rewriter::InsertText(SourceLocation Loc, StringRef Str,
       indentSpace = MB.substr(lineOffs, i-lineOffs);
     }
 
-    SmallVector<StringRef, 4> lines;
+    llvm::SmallVector<llvm::StringRef, 4> lines;
     Str.split(lines, "\n");
 
     for (unsigned i = 0, e = lines.size(); i != e; ++i) {
@@ -290,7 +290,7 @@ bool Rewriter::InsertText(SourceLocation Loc, StringRef Str,
   return false;
 }
 
-bool Rewriter::InsertTextAfterToken(SourceLocation Loc, StringRef Str) {
+bool Rewriter::InsertTextAfterToken(SourceLocation Loc, llvm::StringRef Str) {
   if (!isRewritable(Loc)) return true;
   FileID FID;
   unsigned StartOffs = getLocationOffsetAndFileID(Loc, FID);
@@ -315,7 +315,7 @@ bool Rewriter::RemoveText(SourceLocation Start, unsigned Length,
 /// buffer with a new string.  This is effectively a combined "remove/insert"
 /// operation.
 bool Rewriter::ReplaceText(SourceLocation Start, unsigned OrigLength,
-                           StringRef NewStr) {
+                           llvm::StringRef NewStr) {
   if (!isRewritable(Start)) return true;
   FileID StartFileID;
   unsigned StartOffs = getLocationOffsetAndFileID(Start, StartFileID);
@@ -334,7 +334,7 @@ bool Rewriter::ReplaceText(SourceRange range, SourceRange replacementRange) {
   FileID FID;
   unsigned newOffs = getLocationOffsetAndFileID(replacementRange.getBegin(),
                                                 FID);
-  StringRef MB = SourceMgr->getBufferData(FID);
+  llvm::StringRef MB = SourceMgr->getBufferData(FID);
   return ReplaceText(start, origLength, MB.substr(newOffs, newLength));
 }
 
@@ -358,7 +358,7 @@ bool Rewriter::IncreaseIndentation(CharSourceRange range,
     return true;
 
   FileID FID = StartFileID;
-  StringRef MB = SourceMgr->getBufferData(FID);
+  llvm::StringRef MB = SourceMgr->getBufferData(FID);
 
   unsigned parentLineNo = SourceMgr->getLineNumber(FID, parentOff) - 1;
   unsigned startLineNo = SourceMgr->getLineNumber(FID, StartOff) - 1;
@@ -372,7 +372,7 @@ bool Rewriter::IncreaseIndentation(CharSourceRange range,
   unsigned startLineOffs = Content->SourceLineCache[startLineNo];
 
   // Find the whitespace at the start of each line.
-  StringRef parentSpace, startSpace;
+  llvm::StringRef parentSpace, startSpace;
   {
     unsigned i = parentLineOffs;
     while (isWhitespaceExceptNL(MB[i]))
@@ -389,7 +389,7 @@ bool Rewriter::IncreaseIndentation(CharSourceRange range,
   if (!startSpace.starts_with(parentSpace))
     return true;
 
-  StringRef indent = startSpace.substr(parentSpace.size());
+  llvm::StringRef indent = startSpace.substr(parentSpace.size());
 
   // Indent the lines between start/end offsets.
   RewriteBuffer &RB = getEditBuffer(FID);
@@ -398,7 +398,7 @@ bool Rewriter::IncreaseIndentation(CharSourceRange range,
     unsigned i = offs;
     while (isWhitespaceExceptNL(MB[i]))
       ++i;
-    StringRef origIndent = MB.substr(offs, i-offs);
+    llvm::StringRef origIndent = MB.substr(offs, i-offs);
     if (origIndent.starts_with(startSpace))
       RB.InsertText(offs, indent, /*InsertAfter=*/false);
   }

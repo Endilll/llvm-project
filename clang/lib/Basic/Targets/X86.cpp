@@ -108,7 +108,7 @@ const TargetInfo::AddlRegName AddlRegNames[] = {
 using namespace clang;
 using namespace clang::targets;
 
-bool X86TargetInfo::setFPMath(StringRef Name) {
+bool X86TargetInfo::setFPMath(llvm::StringRef Name) {
   if (Name == "387") {
     FPMath = FP_387;
     return true;
@@ -121,7 +121,7 @@ bool X86TargetInfo::setFPMath(StringRef Name) {
 }
 
 bool X86TargetInfo::initFeatureMap(
-    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, StringRef CPU,
+    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, llvm::StringRef CPU,
     const std::vector<std::string> &FeaturesVec) const {
   // FIXME: This *really* should not be here.
   // X86_64 always has SSE2.
@@ -130,7 +130,7 @@ bool X86TargetInfo::initFeatureMap(
 
   using namespace llvm::X86;
 
-  SmallVector<StringRef, 16> CPUFeatures;
+  llvm::SmallVector<llvm::StringRef, 16> CPUFeatures;
   getFeaturesForCPU(CPU, CPUFeatures);
   for (auto &F : CPUFeatures)
     setFeatureEnabled(Features, F, true);
@@ -156,7 +156,7 @@ bool X86TargetInfo::initFeatureMap(
     if (Feature.substr(1, 6) == "avx10.") {
       if (Feature[0] == '+') {
         HasAVX10 = true;
-        if (StringRef(Feature).ends_with("512"))
+        if (llvm::StringRef(Feature).ends_with("512"))
           HasAVX10_512 = true;
         LastAVX10 = Feature;
       } else if (HasAVX10 && Feature == "-avx10.1-256") {
@@ -168,7 +168,7 @@ bool X86TargetInfo::initFeatureMap(
       // Postpone AVX10 features handling after AVX512 settled.
       UpdatedAVX10FeaturesVec.push_back(Feature);
       continue;
-    } else if (!HasAVX512F && StringRef(Feature).starts_with("+avx512")) {
+    } else if (!HasAVX512F && llvm::StringRef(Feature).starts_with("+avx512")) {
       HasAVX512F = true;
       LastAVX512 = Feature;
     } else if (HasAVX512F && Feature == "-avx512f") {
@@ -234,7 +234,7 @@ bool X86TargetInfo::initFeatureMap(
 }
 
 void X86TargetInfo::setFeatureEnabled(llvm::StringMap<bool> &Features,
-                                      StringRef Name, bool Enabled) const {
+                                      llvm::StringRef Name, bool Enabled) const {
   if (Name == "sse4") {
     // We can get here via the __target__ attribute since that's not controlled
     // via the -msse4/-mno-sse4 command line alias. Handle this the same way
@@ -1024,13 +1024,13 @@ void X86TargetInfo::getTargetDefines(const LangOptions &Opts,
     case SSSE3:
     case SSE3:
     case SSE2:
-      Builder.defineMacro("_M_IX86_FP", Twine(2));
+      Builder.defineMacro("_M_IX86_FP", llvm::Twine(2));
       break;
     case SSE1:
-      Builder.defineMacro("_M_IX86_FP", Twine(1));
+      Builder.defineMacro("_M_IX86_FP", llvm::Twine(1));
       break;
     default:
-      Builder.defineMacro("_M_IX86_FP", Twine(0));
+      Builder.defineMacro("_M_IX86_FP", llvm::Twine(0));
       break;
     }
   }
@@ -1064,7 +1064,7 @@ void X86TargetInfo::getTargetDefines(const LangOptions &Opts,
     Builder.defineMacro("__SIZEOF_FLOAT128__", "16");
 }
 
-bool X86TargetInfo::isValidFeatureName(StringRef Name) const {
+bool X86TargetInfo::isValidFeatureName(llvm::StringRef Name) const {
   return llvm::StringSwitch<bool>(Name)
       .Case("3dnow", true)
       .Case("3dnowa", true)
@@ -1183,7 +1183,7 @@ bool X86TargetInfo::isValidFeatureName(StringRef Name) const {
       .Default(false);
 }
 
-bool X86TargetInfo::hasFeature(StringRef Feature) const {
+bool X86TargetInfo::hasFeature(llvm::StringRef Feature) const {
   return llvm::StringSwitch<bool>(Feature)
       .Case("adx", HasADX)
       .Case("aes", HasAES)
@@ -1311,7 +1311,7 @@ bool X86TargetInfo::hasFeature(StringRef Feature) const {
 // bitfield structure that's initialized in the runtime only supports the
 // below currently rather than the full range of subtarget features. (See
 // X86TargetInfo::hasFeature for a somewhat comprehensive list).
-bool X86TargetInfo::validateCpuSupports(StringRef FeatureStr) const {
+bool X86TargetInfo::validateCpuSupports(llvm::StringRef FeatureStr) const {
   return llvm::StringSwitch<bool>(FeatureStr)
 #define X86_FEATURE_COMPAT(ENUM, STR, PRIORITY) .Case(STR, true)
 #define X86_MICROARCH_LEVEL(ENUM, STR, PRIORITY) .Case(STR, true)
@@ -1319,7 +1319,7 @@ bool X86TargetInfo::validateCpuSupports(StringRef FeatureStr) const {
       .Default(false);
 }
 
-static llvm::X86::ProcessorFeatures getFeature(StringRef Name) {
+static llvm::X86::ProcessorFeatures getFeature(llvm::StringRef Name) {
   return llvm::StringSwitch<llvm::X86::ProcessorFeatures>(Name)
 #define X86_FEATURE_COMPAT(ENUM, STR, PRIORITY)                                \
   .Case(STR, llvm::X86::FEATURE_##ENUM)
@@ -1330,7 +1330,7 @@ static llvm::X86::ProcessorFeatures getFeature(StringRef Name) {
   // correct, so it asserts if the value is out of range.
 }
 
-unsigned X86TargetInfo::multiVersionSortPriority(StringRef Name) const {
+unsigned X86TargetInfo::multiVersionSortPriority(llvm::StringRef Name) const {
   // Valid CPUs have a 'key feature' that compares just better than its key
   // feature.
   using namespace llvm::X86;
@@ -1345,17 +1345,17 @@ unsigned X86TargetInfo::multiVersionSortPriority(StringRef Name) const {
   return getFeaturePriority(getFeature(Name)) << 1;
 }
 
-bool X86TargetInfo::validateCPUSpecificCPUDispatch(StringRef Name) const {
+bool X86TargetInfo::validateCPUSpecificCPUDispatch(llvm::StringRef Name) const {
   return llvm::X86::validateCPUSpecificCPUDispatch(Name);
 }
 
-char X86TargetInfo::CPUSpecificManglingCharacter(StringRef Name) const {
+char X86TargetInfo::CPUSpecificManglingCharacter(llvm::StringRef Name) const {
   return llvm::X86::getCPUDispatchMangling(Name);
 }
 
 void X86TargetInfo::getCPUSpecificCPUDispatchFeatures(
-    StringRef Name, llvm::SmallVectorImpl<StringRef> &Features) const {
-  SmallVector<StringRef, 32> TargetCPUFeatures;
+    llvm::StringRef Name, llvm::SmallVectorImpl<llvm::StringRef> &Features) const {
+  llvm::SmallVector<llvm::StringRef, 32> TargetCPUFeatures;
   llvm::X86::getFeaturesForCPU(Name, TargetCPUFeatures, true);
   for (auto &F : TargetCPUFeatures)
     Features.push_back(F);
@@ -1365,7 +1365,7 @@ void X86TargetInfo::getCPUSpecificCPUDispatchFeatures(
 // versus subtarget cpus accepted in the target attribute because the
 // variables intitialized by the runtime only support the below currently
 // rather than the full range of cpus.
-bool X86TargetInfo::validateCpuIs(StringRef FeatureStr) const {
+bool X86TargetInfo::validateCpuIs(llvm::StringRef FeatureStr) const {
   return llvm::StringSwitch<bool>(FeatureStr)
 #define X86_VENDOR(ENUM, STRING) .Case(STRING, true)
 #define X86_CPU_TYPE_ALIAS(ENUM, ALIAS) .Case(ALIAS, true)
@@ -1647,7 +1647,7 @@ std::optional<unsigned> X86TargetInfo::getCPUCacheLineSize() const {
 }
 
 bool X86TargetInfo::validateOutputSize(const llvm::StringMap<bool> &FeatureMap,
-                                       StringRef Constraint,
+                                       llvm::StringRef Constraint,
                                        unsigned Size) const {
   // Strip off constraint modifiers.
   Constraint = Constraint.ltrim("=+&");
@@ -1656,13 +1656,13 @@ bool X86TargetInfo::validateOutputSize(const llvm::StringMap<bool> &FeatureMap,
 }
 
 bool X86TargetInfo::validateInputSize(const llvm::StringMap<bool> &FeatureMap,
-                                      StringRef Constraint,
+                                      llvm::StringRef Constraint,
                                       unsigned Size) const {
   return validateOperandSize(FeatureMap, Constraint, Size);
 }
 
 bool X86TargetInfo::validateOperandSize(const llvm::StringMap<bool> &FeatureMap,
-                                        StringRef Constraint,
+                                        llvm::StringRef Constraint,
                                         unsigned Size) const {
   switch (Constraint[0]) {
   default:
@@ -1776,29 +1776,29 @@ std::string X86TargetInfo::convertConstraint(const char *&Constraint) const {
   }
 }
 
-void X86TargetInfo::fillValidCPUList(SmallVectorImpl<StringRef> &Values) const {
+void X86TargetInfo::fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   bool Only64Bit = getTriple().getArch() != llvm::Triple::x86;
   llvm::X86::fillValidCPUArchList(Values, Only64Bit);
 }
 
-void X86TargetInfo::fillValidTuneCPUList(SmallVectorImpl<StringRef> &Values) const {
+void X86TargetInfo::fillValidTuneCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   llvm::X86::fillValidTuneCPUList(Values);
 }
 
-ArrayRef<const char *> X86TargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> X86TargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
-ArrayRef<TargetInfo::AddlRegName> X86TargetInfo::getGCCAddlRegNames() const {
+llvm::ArrayRef<TargetInfo::AddlRegName> X86TargetInfo::getGCCAddlRegNames() const {
   return llvm::ArrayRef(AddlRegNames);
 }
 
-ArrayRef<Builtin::Info> X86_32TargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> X86_32TargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfoX86, clang::X86::LastX86CommonBuiltin -
                                             Builtin::FirstTSBuiltin + 1);
 }
 
-ArrayRef<Builtin::Info> X86_64TargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> X86_64TargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfoX86,
                         X86::LastTSBuiltin - Builtin::FirstTSBuiltin);
 }

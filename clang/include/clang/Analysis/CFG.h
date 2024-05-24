@@ -1109,14 +1109,14 @@ public:
   void dump() const;
 
   void dump(const CFG *cfg, const LangOptions &LO, bool ShowColors = false) const;
-  void print(raw_ostream &OS, const CFG* cfg, const LangOptions &LO,
+  void print(llvm::raw_ostream &OS, const CFG* cfg, const LangOptions &LO,
              bool ShowColors) const;
 
-  void printTerminator(raw_ostream &OS, const LangOptions &LO) const;
-  void printTerminatorJson(raw_ostream &Out, const LangOptions &LO,
+  void printTerminator(llvm::raw_ostream &OS, const LangOptions &LO) const;
+  void printTerminatorJson(llvm::raw_ostream &Out, const LangOptions &LO,
                            bool AddQuotes) const;
 
-  void printAsOperand(raw_ostream &OS, bool /*PrintType*/) {
+  void printAsOperand(llvm::raw_ostream &OS, bool /*PrintType*/) {
     OS << "BB#" << getBlockID();
   }
 
@@ -1417,7 +1417,7 @@ public:
   //===--------------------------------------------------------------------===//
 
   void viewCFG(const LangOptions &LO) const;
-  void print(raw_ostream &OS, const LangOptions &LO, bool ShowColors) const;
+  void print(llvm::raw_ostream &OS, const LangOptions &LO, bool ShowColors) const;
   void dump(const LangOptions &LO, bool ShowColors) const;
 
   //===--------------------------------------------------------------------===//

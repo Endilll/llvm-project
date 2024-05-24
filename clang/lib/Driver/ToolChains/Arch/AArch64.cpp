@@ -34,7 +34,7 @@ std::string aarch64::getAArch64TargetCPU(const ArgList &Args,
   std::string CPU;
   // If we have -mcpu, use that.
   if ((A = Args.getLastArg(options::OPT_mcpu_EQ))) {
-    StringRef Mcpu = A->getValue();
+    llvm::StringRef Mcpu = A->getValue();
     CPU = Mcpu.split("+").first.lower();
   }
 
@@ -71,12 +71,12 @@ std::string aarch64::getAArch64TargetCPU(const ArgList &Args,
 }
 
 // Decode AArch64 features from string like +[no]featureA+[no]featureB+...
-static bool DecodeAArch64Features(const Driver &D, StringRef text,
+static bool DecodeAArch64Features(const Driver &D, llvm::StringRef text,
                                   llvm::AArch64::ExtensionSet &Extensions) {
-  SmallVector<StringRef, 8> Split;
-  text.split(Split, StringRef("+"), -1, false);
+  llvm::SmallVector<llvm::StringRef, 8> Split;
+  text.split(Split, llvm::StringRef("+"), -1, false);
 
-  for (StringRef Feature : Split) {
+  for (llvm::StringRef Feature : Split) {
     if (Feature == "neon" || Feature == "noneon") {
       D.Diag(clang::diag::err_drv_no_neon_modifier);
       continue;
@@ -90,9 +90,9 @@ static bool DecodeAArch64Features(const Driver &D, StringRef text,
 
 // Check if the CPU name and feature modifiers in -mcpu are legal. If yes,
 // decode CPU and feature.
-static bool DecodeAArch64Mcpu(const Driver &D, StringRef Mcpu, StringRef &CPU,
+static bool DecodeAArch64Mcpu(const Driver &D, llvm::StringRef Mcpu, llvm::StringRef &CPU,
                               llvm::AArch64::ExtensionSet &Extensions) {
-  std::pair<StringRef, StringRef> Split = Mcpu.split("+");
+  std::pair<llvm::StringRef, llvm::StringRef> Split = Mcpu.split("+");
   CPU = Split.first;
 
   if (CPU == "native")
@@ -117,11 +117,11 @@ static bool DecodeAArch64Mcpu(const Driver &D, StringRef Mcpu, StringRef &CPU,
 }
 
 static bool
-getAArch64ArchFeaturesFromMarch(const Driver &D, StringRef March,
+getAArch64ArchFeaturesFromMarch(const Driver &D, llvm::StringRef March,
                                 const ArgList &Args,
                                 llvm::AArch64::ExtensionSet &Extensions) {
   std::string MarchLowerCase = March.lower();
-  std::pair<StringRef, StringRef> Split = StringRef(MarchLowerCase).split("+");
+  std::pair<llvm::StringRef, llvm::StringRef> Split = llvm::StringRef(MarchLowerCase).split("+");
 
   const llvm::AArch64::ArchInfo *ArchInfo =
       llvm::AArch64::parseArch(Split.first);
@@ -140,10 +140,10 @@ getAArch64ArchFeaturesFromMarch(const Driver &D, StringRef March,
 }
 
 static bool
-getAArch64ArchFeaturesFromMcpu(const Driver &D, StringRef Mcpu,
+getAArch64ArchFeaturesFromMcpu(const Driver &D, llvm::StringRef Mcpu,
                                const ArgList &Args,
                                llvm::AArch64::ExtensionSet &Extensions) {
-  StringRef CPU;
+  llvm::StringRef CPU;
   std::string McpuLowerCase = Mcpu.lower();
   if (!DecodeAArch64Mcpu(D, McpuLowerCase, CPU, Extensions))
     return false;
@@ -152,13 +152,13 @@ getAArch64ArchFeaturesFromMcpu(const Driver &D, StringRef Mcpu,
 }
 
 static bool
-getAArch64MicroArchFeaturesFromMtune(const Driver &D, StringRef Mtune,
+getAArch64MicroArchFeaturesFromMtune(const Driver &D, llvm::StringRef Mtune,
                                      const ArgList &Args,
-                                     std::vector<StringRef> &Features) {
+                                     std::vector<llvm::StringRef> &Features) {
   std::string MtuneLowerCase = Mtune.lower();
   // Check CPU name is valid, but ignore any extensions on it.
   llvm::AArch64::ExtensionSet Extensions;
-  StringRef Tune;
+  llvm::StringRef Tune;
   if (!DecodeAArch64Mcpu(D, MtuneLowerCase, Tune, Extensions))
     return false;
 
@@ -168,7 +168,7 @@ getAArch64MicroArchFeaturesFromMtune(const Driver &D, StringRef Mtune,
 
   // 'cyclone' and later have zero-cycle register moves and zeroing.
   if (MtuneLowerCase == "cyclone" ||
-      StringRef(MtuneLowerCase).starts_with("apple")) {
+      llvm::StringRef(MtuneLowerCase).starts_with("apple")) {
     Features.push_back("+zcm");
     Features.push_back("+zcz");
   }
@@ -177,10 +177,10 @@ getAArch64MicroArchFeaturesFromMtune(const Driver &D, StringRef Mtune,
 }
 
 static bool
-getAArch64MicroArchFeaturesFromMcpu(const Driver &D, StringRef Mcpu,
+getAArch64MicroArchFeaturesFromMcpu(const Driver &D, llvm::StringRef Mcpu,
                                     const ArgList &Args,
-                                    std::vector<StringRef> &Features) {
-  StringRef CPU;
+                                    std::vector<llvm::StringRef> &Features) {
+  llvm::StringRef CPU;
   // Check CPU name is valid, but ignore any extensions on it.
   llvm::AArch64::ExtensionSet DecodedFeature;
   std::string McpuLowerCase = Mcpu.lower();
@@ -193,7 +193,7 @@ getAArch64MicroArchFeaturesFromMcpu(const Driver &D, StringRef Mcpu,
 void aarch64::getAArch64TargetFeatures(const Driver &D,
                                        const llvm::Triple &Triple,
                                        const ArgList &Args,
-                                       std::vector<StringRef> &Features,
+                                       std::vector<llvm::StringRef> &Features,
                                        bool ForAS) {
   Arg *A;
   bool success = true;
@@ -202,7 +202,7 @@ void aarch64::getAArch64TargetFeatures(const Driver &D,
   if (ForAS)
     for (const auto *A :
          Args.filtered(options::OPT_Wa_COMMA, options::OPT_Xassembler))
-      for (StringRef Value : A->getValues())
+      for (llvm::StringRef Value : A->getValues())
         if (Value.starts_with("-march="))
           WaMArch = Value.substr(7);
   // Call getAArch64ArchFeaturesFromMarch only if "-Wa,-march=" or
@@ -261,7 +261,7 @@ void aarch64::getAArch64TargetFeatures(const Driver &D,
   Extensions.toLLVMFeatureList(Features);
 
   if (Arg *A = Args.getLastArg(options::OPT_mtp_mode_EQ)) {
-    StringRef Mtp = A->getValue();
+    llvm::StringRef Mtp = A->getValue();
     if (Mtp == "el3" || Mtp == "tpidr_el3")
       Features.push_back("+tpidr-el3");
     else if (Mtp == "el2" || Mtp == "tpidr_el2")
@@ -276,12 +276,12 @@ void aarch64::getAArch64TargetFeatures(const Driver &D,
 
   // Enable/disable straight line speculation hardening.
   if (Arg *A = Args.getLastArg(options::OPT_mharden_sls_EQ)) {
-    StringRef Scope = A->getValue();
+    llvm::StringRef Scope = A->getValue();
     bool EnableRetBr = false;
     bool EnableBlr = false;
     bool DisableComdat = false;
     if (Scope != "none") {
-      SmallVector<StringRef, 4> Opts;
+      llvm::SmallVector<llvm::StringRef, 4> Opts;
       Scope.split(Opts, ",");
       for (auto Opt : Opts) {
         Opt = Opt.trim();

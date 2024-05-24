@@ -15,7 +15,7 @@ using namespace clang::ast_matchers;
 template <int Indirections>
 class ConstReferenceDeclRefExprsTransform : public ClangTidyCheck {
 public:
-  ConstReferenceDeclRefExprsTransform(StringRef CheckName,
+  ConstReferenceDeclRefExprsTransform(llvm::StringRef CheckName,
                                       ClangTidyContext *Context)
       : ClangTidyCheck(CheckName, Context) {}
 
@@ -41,9 +41,9 @@ public:
 
 namespace test {
 
-template <int Indirections> void RunTest(StringRef Snippet) {
+template <int Indirections> void RunTest(llvm::StringRef Snippet) {
 
-  StringRef CommonCode = R"(
+  llvm::StringRef CommonCode = R"(
     struct ConstTag{};
     struct NonConstTag{};
 
@@ -95,8 +95,8 @@ template <int Indirections> void RunTest(StringRef Snippet) {
 
   std::string Code = (CommonCode + Snippet).str();
 
-  llvm::SmallVector<StringRef, 1> Parts;
-  StringRef(Code).split(Parts, "/*const*/");
+  llvm::SmallVector<llvm::StringRef, 1> Parts;
+  llvm::StringRef(Code).split(Parts, "/*const*/");
 
   EXPECT_EQ(Code,
             runCheckOnCode<ConstReferenceDeclRefExprsTransform<Indirections>>(

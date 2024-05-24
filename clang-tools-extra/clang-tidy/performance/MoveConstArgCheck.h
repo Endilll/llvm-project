@@ -24,7 +24,7 @@ namespace clang::tidy::performance {
 //      as a const reference argument.
 class MoveConstArgCheck : public ClangTidyCheck {
 public:
-  MoveConstArgCheck(StringRef Name, ClangTidyContext *Context)
+  MoveConstArgCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context), CheckTriviallyCopyableMove(Options.get(
                                            "CheckTriviallyCopyableMove", true)),
         CheckMoveToConstRef(Options.get("CheckMoveToConstRef", true)) {}

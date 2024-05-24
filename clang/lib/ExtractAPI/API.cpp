@@ -86,7 +86,7 @@ void RecordContext::addToRecordChain(APIRecord *Record) const {
   Last = Record;
 }
 
-APIRecord *APISet::findRecordForUSR(StringRef USR) const {
+APIRecord *APISet::findRecordForUSR(llvm::StringRef USR) const {
   if (USR.empty())
     return nullptr;
 
@@ -97,7 +97,7 @@ APIRecord *APISet::findRecordForUSR(StringRef USR) const {
   return nullptr;
 }
 
-StringRef APISet::copyString(StringRef String) {
+llvm::StringRef APISet::copyString(llvm::StringRef String) {
   if (String.empty())
     return {};
 
@@ -107,11 +107,11 @@ StringRef APISet::copyString(StringRef String) {
 
   void *Ptr = Allocator.Allocate(String.size(), 1);
   memcpy(Ptr, String.data(), String.size());
-  return StringRef(reinterpret_cast<const char *>(Ptr), String.size());
+  return llvm::StringRef(reinterpret_cast<const char *>(Ptr), String.size());
 }
 
-SymbolReference APISet::createSymbolReference(StringRef Name, StringRef USR,
-                                              StringRef Source) {
+SymbolReference APISet::createSymbolReference(llvm::StringRef Name, llvm::StringRef USR,
+                                              llvm::StringRef Source) {
   return SymbolReference(copyString(Name), copyString(USR), copyString(Source));
 }
 

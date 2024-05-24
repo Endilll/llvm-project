@@ -81,7 +81,7 @@ struct ExampleAttrInfo : public ParsedAttrInfo {
         S.Diag(Attr.getLoc(), ID);
         return AttributeNotApplied;
       }
-      SmallVector<Expr *, 16> ArgsBuf;
+      llvm::SmallVector<Expr *, 16> ArgsBuf;
       for (unsigned i = 0; i < Attr.getNumArgs(); i++) {
         ArgsBuf.push_back(Attr.getArgAsExpr(i));
       }

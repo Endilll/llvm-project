@@ -23,7 +23,7 @@ namespace clang::tidy::google::runtime {
 /// http://clang.llvm.org/extra/clang-tidy/checks/google/runtime-operator.html
 class OverloadedUnaryAndCheck : public ClangTidyCheck {
 public:
-  OverloadedUnaryAndCheck(StringRef Name, ClangTidyContext *Context)
+  OverloadedUnaryAndCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

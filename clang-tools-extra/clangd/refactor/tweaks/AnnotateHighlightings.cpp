@@ -26,7 +26,7 @@ public:
   const char *id() const final;
 
   bool prepare(const Selection &Inputs) override { return true; }
-  Expected<Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Effect> apply(const Selection &Inputs) override;
 
   std::string title() const override { return "Annotate highlighting tokens"; }
   llvm::StringLiteral kind() const override {
@@ -36,7 +36,7 @@ public:
 };
 REGISTER_TWEAK(AnnotateHighlightings)
 
-Expected<Tweak::Effect> AnnotateHighlightings::apply(const Selection &Inputs) {
+llvm::Expected<Tweak::Effect> AnnotateHighlightings::apply(const Selection &Inputs) {
   const Decl *CommonDecl = nullptr;
   for (auto *N = Inputs.ASTSelection.commonAncestor(); N && !CommonDecl;
        N = N->Parent)

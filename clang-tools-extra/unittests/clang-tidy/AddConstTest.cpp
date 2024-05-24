@@ -17,7 +17,7 @@ using namespace utils::fixit;
 template <QualifierTarget CT, QualifierPolicy CP>
 class ConstTransform : public ClangTidyCheck {
 public:
-  ConstTransform(StringRef CheckName, ClangTidyContext *Context)
+  ConstTransform(llvm::StringRef CheckName, ClangTidyContext *Context)
       : ClangTidyCheck(CheckName, Context) {}
 
   void registerMatchers(MatchFinder *Finder) override {
@@ -52,7 +52,7 @@ using ValueRTransform =
 // ----------------------------------------------------------------------------
 
 TEST(Values, Builtin) {
-  StringRef Snippet = "int target = 0;";
+  llvm::StringRef Snippet = "int target = 0;";
 
   EXPECT_EQ("const int target = 0;", runCheckOnCode<ValueLTransform>(Snippet));
   EXPECT_EQ("const int target = 0;",
@@ -63,9 +63,9 @@ TEST(Values, Builtin) {
             runCheckOnCode<PointeeRTransform>(Snippet));
 }
 TEST(Values, TypedefBuiltin) {
-  StringRef T = "typedef int MyInt;";
-  StringRef S = "MyInt target = 0;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "typedef int MyInt;";
+  llvm::StringRef S = "MyInt target = 0;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const MyInt target = 0;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -78,9 +78,9 @@ TEST(Values, TypedefBuiltin) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Values, TypedefBuiltinPointer) {
-  StringRef T = "typedef int* MyInt;";
-  StringRef S = "MyInt target = nullptr;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "typedef int* MyInt;";
+  llvm::StringRef S = "MyInt target = nullptr;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const MyInt target = nullptr;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -93,9 +93,9 @@ TEST(Values, TypedefBuiltinPointer) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Values, UsingBuiltin) {
-  StringRef T = "using MyInt = int;";
-  StringRef S = "MyInt target = 0;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "using MyInt = int;";
+  llvm::StringRef S = "MyInt target = 0;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const MyInt target = 0;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -108,9 +108,9 @@ TEST(Values, UsingBuiltin) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Values, UsingBuiltinPointer) {
-  StringRef T = "using MyInt = int*;";
-  StringRef S = "MyInt target = nullptr;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "using MyInt = int*;";
+  llvm::StringRef S = "MyInt target = nullptr;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const MyInt target = nullptr;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -123,9 +123,9 @@ TEST(Values, UsingBuiltinPointer) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Values, AutoValue) {
-  StringRef T = "int f() { return 42; }\n";
-  StringRef S = "auto target = f();";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "int f() { return 42; }\n";
+  llvm::StringRef S = "auto target = f();";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const auto target = f();"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -138,9 +138,9 @@ TEST(Values, AutoValue) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Values, AutoPointer) {
-  StringRef T = "int* f() { return nullptr; }\n";
-  StringRef S = "auto target = f();";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "int* f() { return nullptr; }\n";
+  llvm::StringRef S = "auto target = f();";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const auto target = f();"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -153,9 +153,9 @@ TEST(Values, AutoPointer) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Values, AutoReference) {
-  StringRef T = "static int global = 42; int& f() { return global; }\n";
-  StringRef S = "auto target = f();";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "static int global = 42; int& f() { return global; }\n";
+  llvm::StringRef S = "auto target = f();";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const auto target = f();"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -168,9 +168,9 @@ TEST(Values, AutoReference) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Values, DeclTypeValue) {
-  StringRef T = "int f() { return 42; }\n";
-  StringRef S = "decltype(f()) target = f();";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "int f() { return 42; }\n";
+  llvm::StringRef S = "decltype(f()) target = f();";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const decltype(f()) target = f();"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -185,9 +185,9 @@ TEST(Values, DeclTypeValue) {
 TEST(Values, DeclTypePointer) {
   // The pointer itself will be changed to 'const'. There is no
   // way to make the pointee 'const' with this syntax.
-  StringRef T = "int* f() { return nullptr; }\n";
-  StringRef S = "decltype(f()) target = f();";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "int* f() { return nullptr; }\n";
+  llvm::StringRef S = "decltype(f()) target = f();";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const decltype(f()) target = f();"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -203,9 +203,9 @@ TEST(Values, DeclTypeReference) {
   // Same as pointer, but the reference itself will be marked 'const'.
   // This has no effect and will result in a warning afterwards. The
   // transformation itself is still correct.
-  StringRef T = "static int global = 42; int& f() { return global; }\n";
-  StringRef S = "decltype(f()) target = f();";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "static int global = 42; int& f() { return global; }\n";
+  llvm::StringRef S = "decltype(f()) target = f();";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const decltype(f()) target = f();"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -218,7 +218,7 @@ TEST(Values, DeclTypeReference) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Values, Parens) {
-  StringRef Snippet = "int ((target)) = 0;";
+  llvm::StringRef Snippet = "int ((target)) = 0;";
 
   EXPECT_EQ("const int ((target)) = 0;",
             runCheckOnCode<ValueLTransform>(Snippet));
@@ -236,7 +236,7 @@ TEST(Values, Parens) {
 // ----------------------------------------------------------------------------
 
 TEST(Arrays, Builtin) {
-  StringRef Snippet = "int target[][1] = {{1}, {2}, {3}};";
+  llvm::StringRef Snippet = "int target[][1] = {{1}, {2}, {3}};";
 
   EXPECT_EQ("const int target[][1] = {{1}, {2}, {3}};",
             runCheckOnCode<PointeeLTransform>(Snippet));
@@ -249,7 +249,7 @@ TEST(Arrays, Builtin) {
             runCheckOnCode<ValueRTransform>(Snippet));
 }
 TEST(Arrays, BuiltinParens) {
-  StringRef Snippet = "int ((target))[][1] = {{1}, {2}, {3}};";
+  llvm::StringRef Snippet = "int ((target))[][1] = {{1}, {2}, {3}};";
 
   EXPECT_EQ("const int ((target))[][1] = {{1}, {2}, {3}};",
             runCheckOnCode<PointeeLTransform>(Snippet));
@@ -262,7 +262,7 @@ TEST(Arrays, BuiltinParens) {
             runCheckOnCode<ValueRTransform>(Snippet));
 }
 TEST(Arrays, Pointers) {
-  StringRef Snippet = "int x; int* target[] = {&x, &x, &x};";
+  llvm::StringRef Snippet = "int x; int* target[] = {&x, &x, &x};";
 
   EXPECT_EQ("int x; const int* target[] = {&x, &x, &x};",
             runCheckOnCode<PointeeLTransform>(Snippet));
@@ -275,7 +275,7 @@ TEST(Arrays, Pointers) {
             runCheckOnCode<ValueRTransform>(Snippet));
 }
 TEST(Arrays, PointerPointers) {
-  StringRef Snippet = "int* x = nullptr; int** target[] = {&x, &x, &x};";
+  llvm::StringRef Snippet = "int* x = nullptr; int** target[] = {&x, &x, &x};";
 
   EXPECT_EQ("int* x = nullptr; int* const* target[] = {&x, &x, &x};",
             runCheckOnCode<PointeeLTransform>(Snippet));
@@ -288,7 +288,7 @@ TEST(Arrays, PointerPointers) {
             runCheckOnCode<ValueRTransform>(Snippet));
 }
 TEST(Arrays, PointersParens) {
-  StringRef Snippet = "int x; int* (target)[] = {&x, &x, &x};";
+  llvm::StringRef Snippet = "int x; int* (target)[] = {&x, &x, &x};";
 
   EXPECT_EQ("int x; const int* (target)[] = {&x, &x, &x};",
             runCheckOnCode<PointeeLTransform>(Snippet));
@@ -306,7 +306,7 @@ TEST(Arrays, PointersParens) {
 // ----------------------------------------------------------------------------
 
 TEST(Reference, LValueBuiltin) {
-  StringRef Snippet = "int x = 42; int& target = x;";
+  llvm::StringRef Snippet = "int x = 42; int& target = x;";
 
   EXPECT_EQ("int x = 42; const int& target = x;",
             runCheckOnCode<ValueLTransform>(Snippet));
@@ -319,7 +319,7 @@ TEST(Reference, LValueBuiltin) {
             runCheckOnCode<PointeeRTransform>(Snippet));
 }
 TEST(Reference, RValueBuiltin) {
-  StringRef Snippet = "int&& target = 42;";
+  llvm::StringRef Snippet = "int&& target = 42;";
   EXPECT_EQ("const int&& target = 42;",
             runCheckOnCode<ValueLTransform>(Snippet));
   EXPECT_EQ("const int&& target = 42;",
@@ -331,7 +331,7 @@ TEST(Reference, RValueBuiltin) {
             runCheckOnCode<PointeeRTransform>(Snippet));
 }
 TEST(Reference, LValueToPointer) {
-  StringRef Snippet = "int* p; int *& target = p;";
+  llvm::StringRef Snippet = "int* p; int *& target = p;";
   EXPECT_EQ("int* p; int * const& target = p;",
             runCheckOnCode<ValueLTransform>(Snippet));
   EXPECT_EQ("int* p; int * const& target = p;",
@@ -343,7 +343,7 @@ TEST(Reference, LValueToPointer) {
             runCheckOnCode<PointeeRTransform>(Snippet));
 }
 TEST(Reference, LValueParens) {
-  StringRef Snippet = "int x = 42; int ((& target)) = x;";
+  llvm::StringRef Snippet = "int x = 42; int ((& target)) = x;";
 
   EXPECT_EQ("int x = 42; const int ((& target)) = x;",
             runCheckOnCode<ValueLTransform>(Snippet));
@@ -356,9 +356,9 @@ TEST(Reference, LValueParens) {
             runCheckOnCode<PointeeRTransform>(Snippet));
 }
 TEST(Reference, ToArray) {
-  StringRef ArraySnippet = "int a[4] = {1, 2, 3, 4};";
-  StringRef Snippet = "int (&target)[4] = a;";
-  auto Cat = [&ArraySnippet](StringRef S) { return (ArraySnippet + S).str(); };
+  llvm::StringRef ArraySnippet = "int a[4] = {1, 2, 3, 4};";
+  llvm::StringRef Snippet = "int (&target)[4] = a;";
+  auto Cat = [&ArraySnippet](llvm::StringRef S) { return (ArraySnippet + S).str(); };
 
   EXPECT_EQ(Cat("const int (&target)[4] = a;"),
             runCheckOnCode<ValueLTransform>(Cat(Snippet)));
@@ -371,9 +371,9 @@ TEST(Reference, ToArray) {
             runCheckOnCode<PointeeRTransform>(Cat(Snippet)));
 }
 TEST(Reference, Auto) {
-  StringRef T = "static int global = 42; int& f() { return global; }\n";
-  StringRef S = "auto& target = f();";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "static int global = 42; int& f() { return global; }\n";
+  llvm::StringRef S = "auto& target = f();";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const auto& target = f();"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -391,7 +391,7 @@ TEST(Reference, Auto) {
 // ----------------------------------------------------------------------------
 
 TEST(Pointers, SingleBuiltin) {
-  StringRef Snippet = "int* target = nullptr;";
+  llvm::StringRef Snippet = "int* target = nullptr;";
 
   EXPECT_EQ("int* const target = nullptr;",
             runCheckOnCode<ValueLTransform>(Snippet));
@@ -404,7 +404,7 @@ TEST(Pointers, SingleBuiltin) {
             runCheckOnCode<PointeeRTransform>(Snippet));
 }
 TEST(Pointers, MultiBuiltin) {
-  StringRef Snippet = "int** target = nullptr;";
+  llvm::StringRef Snippet = "int** target = nullptr;";
 
   EXPECT_EQ("int** const target = nullptr;",
             runCheckOnCode<ValueLTransform>(Snippet));
@@ -417,9 +417,9 @@ TEST(Pointers, MultiBuiltin) {
             runCheckOnCode<PointeeRTransform>(Snippet));
 }
 TEST(Pointers, ToArray) {
-  StringRef ArraySnippet = "int a[4] = {1, 2, 3, 4};";
-  StringRef Snippet = "int (*target)[4] = &a;";
-  auto Cat = [&ArraySnippet](StringRef S) { return (ArraySnippet + S).str(); };
+  llvm::StringRef ArraySnippet = "int a[4] = {1, 2, 3, 4};";
+  llvm::StringRef Snippet = "int (*target)[4] = &a;";
+  auto Cat = [&ArraySnippet](llvm::StringRef S) { return (ArraySnippet + S).str(); };
 
   EXPECT_EQ(Cat("int (*const target)[4] = &a;"),
             runCheckOnCode<ValueLTransform>(Cat(Snippet)));
@@ -432,7 +432,7 @@ TEST(Pointers, ToArray) {
             runCheckOnCode<PointeeRTransform>(Cat(Snippet)));
 }
 TEST(Pointers, Parens) {
-  StringRef Snippet = "int ((**target)) = nullptr;";
+  llvm::StringRef Snippet = "int ((**target)) = nullptr;";
 
   EXPECT_EQ("int ((**const target)) = nullptr;",
             runCheckOnCode<ValueLTransform>(Snippet));
@@ -445,9 +445,9 @@ TEST(Pointers, Parens) {
             runCheckOnCode<PointeeRTransform>(Snippet));
 }
 TEST(Pointers, Auto) {
-  StringRef T = "int* f() { return nullptr; }\n";
-  StringRef S = "auto* target = f();";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "int* f() { return nullptr; }\n";
+  llvm::StringRef S = "auto* target = f();";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("auto* const target = f();"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -460,9 +460,9 @@ TEST(Pointers, Auto) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Pointers, AutoParens) {
-  StringRef T = "int* f() { return nullptr; }\n";
-  StringRef S = "auto (((* target))) = f();";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "int* f() { return nullptr; }\n";
+  llvm::StringRef S = "auto (((* target))) = f();";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("auto (((* const target))) = f();"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -475,7 +475,7 @@ TEST(Pointers, AutoParens) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Pointers, FunctionPointer) {
-  StringRef S = "int (*target)(float, int, double) = nullptr;";
+  llvm::StringRef S = "int (*target)(float, int, double) = nullptr;";
 
   EXPECT_EQ("int (*const target)(float, int, double) = nullptr;",
             runCheckOnCode<ValueLTransform>(S));
@@ -492,9 +492,9 @@ TEST(Pointers, FunctionPointer) {
             runCheckOnCode<PointeeRTransform>(S));
 }
 TEST(Pointers, MemberFunctionPointer) {
-  StringRef T = "struct A { int f() { return 1; } };";
-  StringRef S = "int (A::*target)() = &A::f;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "struct A { int f() { return 1; } };";
+  llvm::StringRef S = "int (A::*target)() = &A::f;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("int (A::*const target)() = &A::f;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -511,9 +511,9 @@ TEST(Pointers, MemberFunctionPointer) {
             runCheckOnCode<ValueLTransform>(Cat(S)));
 }
 TEST(Pointers, MemberDataPointer) {
-  StringRef T = "struct A { int member = 0; };";
-  StringRef S = "int A::*target = &A::member;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "struct A { int member = 0; };";
+  llvm::StringRef S = "int A::*target = &A::member;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("int A::*const target = &A::member;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -535,9 +535,9 @@ TEST(Pointers, MemberDataPointer) {
 // ----------------------------------------------------------------------------
 
 TEST(TagTypes, Struct) {
-  StringRef T = "struct Foo { int data; int method(); };\n";
-  StringRef S = "struct Foo target{0};";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "struct Foo { int data; int method(); };\n";
+  llvm::StringRef S = "struct Foo target{0};";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const struct Foo target{0};"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -594,9 +594,9 @@ TEST(TagTypes, Struct) {
             runCheckOnCode<PointeeRTransform>(S));
 }
 TEST(TagTypes, Class) {
-  StringRef T = "class Foo { int data; int method(); };\n";
-  StringRef S = "class Foo target;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "class Foo { int data; int method(); };\n";
+  llvm::StringRef S = "class Foo target;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const class Foo target;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -629,9 +629,9 @@ TEST(TagTypes, Class) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(TagTypes, Enum) {
-  StringRef T = "enum Foo { N_ONE, N_TWO, N_THREE };\n";
-  StringRef S = "enum Foo target;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "enum Foo { N_ONE, N_TWO, N_THREE };\n";
+  llvm::StringRef S = "enum Foo target;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const enum Foo target;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -664,9 +664,9 @@ TEST(TagTypes, Enum) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(TagTypes, Union) {
-  StringRef T = "union Foo { int yay; float nej; };\n";
-  StringRef S = "union Foo target;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "union Foo { int yay; float nej; };\n";
+  llvm::StringRef S = "union Foo target;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("const union Foo target;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -704,9 +704,9 @@ TEST(TagTypes, Union) {
 // ----------------------------------------------------------------------------
 
 TEST(Macro, AllInMacro) {
-  StringRef T = "#define DEFINE_VARIABLE int target = 42\n";
-  StringRef S = "DEFINE_VARIABLE;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "#define DEFINE_VARIABLE int target = 42\n";
+  llvm::StringRef S = "DEFINE_VARIABLE;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("DEFINE_VARIABLE;"), runCheckOnCode<ValueLTransform>(Cat(S)));
   EXPECT_EQ(Cat("DEFINE_VARIABLE;"), runCheckOnCode<ValueRTransform>(Cat(S)));
@@ -715,9 +715,9 @@ TEST(Macro, AllInMacro) {
   EXPECT_EQ(Cat("DEFINE_VARIABLE;"), runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Macro, MacroParameter) {
-  StringRef T = "#define DEFINE_VARIABLE(X) int X = 42\n";
-  StringRef S = "DEFINE_VARIABLE(target);";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "#define DEFINE_VARIABLE(X) int X = 42\n";
+  llvm::StringRef S = "DEFINE_VARIABLE(target);";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("DEFINE_VARIABLE(target);"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -730,9 +730,9 @@ TEST(Macro, MacroParameter) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Macro, MacroTypeValue) {
-  StringRef T = "#define BAD_TYPEDEF int\n";
-  StringRef S = "BAD_TYPEDEF target = 42;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "#define BAD_TYPEDEF int\n";
+  llvm::StringRef S = "BAD_TYPEDEF target = 42;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("BAD_TYPEDEF target = 42;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -745,9 +745,9 @@ TEST(Macro, MacroTypeValue) {
             runCheckOnCode<ValueRTransform>(Cat(S)));
 }
 TEST(Macro, MacroTypePointer) {
-  StringRef T = "#define BAD_TYPEDEF int *\n";
-  StringRef S = "BAD_TYPEDEF target = nullptr;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "#define BAD_TYPEDEF int *\n";
+  llvm::StringRef S = "BAD_TYPEDEF target = nullptr;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("BAD_TYPEDEF const target = nullptr;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -762,9 +762,9 @@ TEST(Macro, MacroTypePointer) {
             runCheckOnCode<PointeeLTransform>(Cat(S)));
 }
 TEST(Macro, MacroTypeReference) {
-  StringRef T = "static int g = 42;\n#define BAD_TYPEDEF int&\n";
-  StringRef S = "BAD_TYPEDEF target = g;";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "static int g = 42;\n#define BAD_TYPEDEF int&\n";
+  llvm::StringRef S = "BAD_TYPEDEF target = g;";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("BAD_TYPEDEF target = g;"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -780,11 +780,11 @@ TEST(Macro, MacroTypeReference) {
 }
 // This failed in LLVM.
 TEST(Macro, Variable) {
-  StringRef M = "#define DEBUG(X) do { if (1) { X; } } while (0)\n";
-  StringRef F = "void foo() ";
-  StringRef V = "{ DEBUG(int target = 42;); }";
+  llvm::StringRef M = "#define DEBUG(X) do { if (1) { X; } } while (0)\n";
+  llvm::StringRef F = "void foo() ";
+  llvm::StringRef V = "{ DEBUG(int target = 42;); }";
 
-  auto Cat = [&](StringRef S) { return (M + F + V).str(); };
+  auto Cat = [&](llvm::StringRef S) { return (M + F + V).str(); };
 
   EXPECT_EQ(Cat("{ DEBUG(const int target = 42;); }"),
             runCheckOnCode<ValueLTransform>(Cat(V)));
@@ -792,12 +792,12 @@ TEST(Macro, Variable) {
             runCheckOnCode<ValueRTransform>(Cat(V)));
 }
 TEST(Macro, RangeLoop) {
-  StringRef M = "#define DEBUG(X) do { if (1) { X; }} while (false)\n";
-  StringRef F = "void foo() { char array[] = {'a', 'b', 'c'}; ";
-  StringRef V = "DEBUG( for(auto& target: array) 10 + target; );";
-  StringRef E = "}";
+  llvm::StringRef M = "#define DEBUG(X) do { if (1) { X; }} while (false)\n";
+  llvm::StringRef F = "void foo() { char array[] = {'a', 'b', 'c'}; ";
+  llvm::StringRef V = "DEBUG( for(auto& target: array) 10 + target; );";
+  llvm::StringRef E = "}";
 
-  auto Cat = [&](StringRef S) { return (M + F + V + E).str(); };
+  auto Cat = [&](llvm::StringRef S) { return (M + F + V + E).str(); };
 
   EXPECT_EQ(Cat("DEBUG( for(const auto& target: array); );"),
             runCheckOnCode<ValueLTransform>(Cat(V)));
@@ -810,7 +810,7 @@ TEST(Macro, RangeLoop) {
 // ----------------------------------------------------------------------------
 
 TEST(Template, TemplateVariable) {
-  StringRef T = "template <typename T> T target = 3.1415;";
+  llvm::StringRef T = "template <typename T> T target = 3.1415;";
 
   EXPECT_EQ("template <typename T> const T target = 3.1415;",
             runCheckOnCode<ValueLTransform>(T));
@@ -823,9 +823,9 @@ TEST(Template, TemplateVariable) {
             runCheckOnCode<PointeeRTransform>(T));
 }
 TEST(Template, FunctionValue) {
-  StringRef T = "template <typename T> void f(T v) \n";
-  StringRef S = "{ T target = v; }";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "template <typename T> void f(T v) \n";
+  llvm::StringRef S = "{ T target = v; }";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("{ const T target = v; }"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -838,9 +838,9 @@ TEST(Template, FunctionValue) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Template, FunctionPointer) {
-  StringRef T = "template <typename T> void f(T* v) \n";
-  StringRef S = "{ T* target = v; }";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "template <typename T> void f(T* v) \n";
+  llvm::StringRef S = "{ T* target = v; }";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("{ T* const target = v; }"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -853,9 +853,9 @@ TEST(Template, FunctionPointer) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Template, FunctionReference) {
-  StringRef T = "template <typename T> void f(T& v) \n";
-  StringRef S = "{ T& target = v; }";
-  auto Cat = [&T](StringRef S) { return (T + S).str(); };
+  llvm::StringRef T = "template <typename T> void f(T& v) \n";
+  llvm::StringRef S = "{ T& target = v; }";
+  auto Cat = [&T](llvm::StringRef S) { return (T + S).str(); };
 
   EXPECT_EQ(Cat("{ const T& target = v; }"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -868,19 +868,19 @@ TEST(Template, FunctionReference) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Template, MultiInstantiationsFunction) {
-  StringRef T = "template <typename T> void f(T v) \n";
-  StringRef S = "{ T target = v; }";
-  StringRef InstantStart = "void calls() {\n";
-  StringRef InstValue = "f<int>(42);\n";
-  StringRef InstConstValue = "f<const int>(42);\n";
-  StringRef InstPointer = "f<int*>(nullptr);\n";
-  StringRef InstPointerConst = "f<int* const>(nullptr);\n";
-  StringRef InstConstPointer = "f<const int*>(nullptr);\n";
-  StringRef InstConstPointerConst = "f<const int* const>(nullptr);\n";
-  StringRef InstRef = "int i = 42;\nf<int&>(i);\n";
-  StringRef InstConstRef = "f<const int&>(i);\n";
-  StringRef InstantEnd = "}";
-  auto Cat = [&](StringRef Target) {
+  llvm::StringRef T = "template <typename T> void f(T v) \n";
+  llvm::StringRef S = "{ T target = v; }";
+  llvm::StringRef InstantStart = "void calls() {\n";
+  llvm::StringRef InstValue = "f<int>(42);\n";
+  llvm::StringRef InstConstValue = "f<const int>(42);\n";
+  llvm::StringRef InstPointer = "f<int*>(nullptr);\n";
+  llvm::StringRef InstPointerConst = "f<int* const>(nullptr);\n";
+  llvm::StringRef InstConstPointer = "f<const int*>(nullptr);\n";
+  llvm::StringRef InstConstPointerConst = "f<const int* const>(nullptr);\n";
+  llvm::StringRef InstRef = "int i = 42;\nf<int&>(i);\n";
+  llvm::StringRef InstConstRef = "f<const int&>(i);\n";
+  llvm::StringRef InstantEnd = "}";
+  auto Cat = [&](llvm::StringRef Target) {
     return (T + Target + InstantStart + InstValue + InstConstValue +
             InstPointer + InstPointerConst + InstConstPointer +
             InstConstPointerConst + InstRef + InstConstRef + InstantEnd)
@@ -899,10 +899,10 @@ TEST(Template, MultiInstantiationsFunction) {
 }
 
 TEST(Template, StructValue) {
-  StringRef T = "template <typename T> struct S { void f(T& v) \n";
-  StringRef S = "{ T target = v; }";
-  StringRef End = "\n};";
-  auto Cat = [&T, &End](StringRef S) { return (T + S + End).str(); };
+  llvm::StringRef T = "template <typename T> struct S { void f(T& v) \n";
+  llvm::StringRef S = "{ T target = v; }";
+  llvm::StringRef End = "\n};";
+  auto Cat = [&T, &End](llvm::StringRef S) { return (T + S + End).str(); };
 
   EXPECT_EQ(Cat("{ const T target = v; }"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -915,10 +915,10 @@ TEST(Template, StructValue) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Template, StructPointer) {
-  StringRef T = "template <typename T> struct S { void f(T* v) \n";
-  StringRef S = "{ T* target = v; }";
-  StringRef End = "\n};";
-  auto Cat = [&T, &End](StringRef S) { return (T + S + End).str(); };
+  llvm::StringRef T = "template <typename T> struct S { void f(T* v) \n";
+  llvm::StringRef S = "{ T* target = v; }";
+  llvm::StringRef End = "\n};";
+  auto Cat = [&T, &End](llvm::StringRef S) { return (T + S + End).str(); };
 
   EXPECT_EQ(Cat("{ T* const target = v; }"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -931,10 +931,10 @@ TEST(Template, StructPointer) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Template, StructReference) {
-  StringRef T = "template <typename T> struct S { void f(T& v) \n";
-  StringRef S = "{ T& target = v; }";
-  StringRef End = "\n};";
-  auto Cat = [&T, &End](StringRef S) { return (T + S + End).str(); };
+  llvm::StringRef T = "template <typename T> struct S { void f(T& v) \n";
+  llvm::StringRef S = "{ T& target = v; }";
+  llvm::StringRef End = "\n};";
+  auto Cat = [&T, &End](llvm::StringRef S) { return (T + S + End).str(); };
 
   EXPECT_EQ(Cat("{ const T& target = v; }"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -947,10 +947,10 @@ TEST(Template, StructReference) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Template, DependentReturnFunction) {
-  StringRef TS = "template <typename T> struct TS { using value_type = T; };";
-  StringRef T = "template <typename T> void foo() ";
-  StringRef S = "{ typename T::value_type target; }";
-  auto Cat = [&TS, &T](StringRef S) { return (TS + T + S).str(); };
+  llvm::StringRef TS = "template <typename T> struct TS { using value_type = T; };";
+  llvm::StringRef T = "template <typename T> void foo() ";
+  llvm::StringRef S = "{ typename T::value_type target; }";
+  auto Cat = [&TS, &T](llvm::StringRef S) { return (TS + T + S).str(); };
 
   EXPECT_EQ(Cat("{ const typename T::value_type target; }"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -963,10 +963,10 @@ TEST(Template, DependentReturnFunction) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Template, DependentReturnPointerFunction) {
-  StringRef TS = "template <typename T> struct TS { using value_type = T; };";
-  StringRef T = "template <typename T> void foo() ";
-  StringRef S = "{ typename T::value_type *target; }";
-  auto Cat = [&TS, &T](StringRef S) { return (TS + T + S).str(); };
+  llvm::StringRef TS = "template <typename T> struct TS { using value_type = T; };";
+  llvm::StringRef T = "template <typename T> void foo() ";
+  llvm::StringRef S = "{ typename T::value_type *target; }";
+  auto Cat = [&TS, &T](llvm::StringRef S) { return (TS + T + S).str(); };
 
   EXPECT_EQ(Cat("{ typename T::value_type *const target; }"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -979,10 +979,10 @@ TEST(Template, DependentReturnPointerFunction) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Template, DependentReturnReferenceFunction) {
-  StringRef TS = "template <typename T> struct TS { using value_type = T; };";
-  StringRef T = "template <typename T> void foo(T& f) ";
-  StringRef S = "{ typename T::value_type &target = f; }";
-  auto Cat = [&TS, &T](StringRef S) { return (TS + T + S).str(); };
+  llvm::StringRef TS = "template <typename T> struct TS { using value_type = T; };";
+  llvm::StringRef T = "template <typename T> void foo(T& f) ";
+  llvm::StringRef S = "{ typename T::value_type &target = f; }";
+  auto Cat = [&TS, &T](llvm::StringRef S) { return (TS + T + S).str(); };
 
   EXPECT_EQ(Cat("{ const typename T::value_type &target = f; }"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -995,10 +995,10 @@ TEST(Template, DependentReturnReferenceFunction) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Template, VectorLikeType) {
-  StringRef TS = "template <typename T> struct TS { TS(const T&) {} }; ";
-  StringRef T = "void foo() ";
-  StringRef S = "{ TS<int> target(42); }";
-  auto Cat = [&TS, &T](StringRef S) { return (TS + T + S).str(); };
+  llvm::StringRef TS = "template <typename T> struct TS { TS(const T&) {} }; ";
+  llvm::StringRef T = "void foo() ";
+  llvm::StringRef S = "{ TS<int> target(42); }";
+  auto Cat = [&TS, &T](llvm::StringRef S) { return (TS + T + S).str(); };
 
   EXPECT_EQ(Cat("{ const TS<int> target(42); }"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -1011,11 +1011,11 @@ TEST(Template, VectorLikeType) {
             runCheckOnCode<PointeeRTransform>(Cat(S)));
 }
 TEST(Template, SpecializedTemplate) {
-  StringRef TS = "template <typename T = int> struct TS { TS(const T&) {} }; ";
-  StringRef TS2 = "template <> struct TS<double> { TS(const double&) {} }; ";
-  StringRef T = "void foo() ";
-  StringRef S = "{ TS<double> target(42.42); }";
-  auto Cat = [&](StringRef S) { return (TS + TS2 + T + S).str(); };
+  llvm::StringRef TS = "template <typename T = int> struct TS { TS(const T&) {} }; ";
+  llvm::StringRef TS2 = "template <> struct TS<double> { TS(const double&) {} }; ";
+  llvm::StringRef T = "void foo() ";
+  llvm::StringRef S = "{ TS<double> target(42.42); }";
+  auto Cat = [&](llvm::StringRef S) { return (TS + TS2 + T + S).str(); };
 
   EXPECT_EQ(Cat("{ const TS<double> target(42.42); }"),
             runCheckOnCode<ValueLTransform>(Cat(S)));
@@ -1033,7 +1033,7 @@ TEST(Template, SpecializedTemplate) {
 // -----------------------------------------------------------------------------
 
 TEST(ObjC, SimplePointers) {
-  StringRef S = "int * target = 0;";
+  llvm::StringRef S = "int * target = 0;";
   EXPECT_EQ(runCheckOnCode<PointeeLTransform>(S, nullptr, "input.m"),
             "const int * target = 0;");
   EXPECT_EQ(runCheckOnCode<PointeeRTransform>(S, nullptr, "input.m"),
@@ -1044,10 +1044,10 @@ TEST(ObjC, SimplePointers) {
             "int * const target = 0;");
 }
 TEST(ObjC, ClassPointer) {
-  StringRef TB = "@class Object;\nint main() {\n";
-  StringRef S = "Object *target;";
-  StringRef TE = "\n}";
-  auto Cat = [&](StringRef S) { return (TB + S + TE).str(); };
+  llvm::StringRef TB = "@class Object;\nint main() {\n";
+  llvm::StringRef S = "Object *target;";
+  llvm::StringRef TE = "\n}";
+  auto Cat = [&](llvm::StringRef S) { return (TB + S + TE).str(); };
 
   // FIXME: Not done properly for some reason.
   EXPECT_NE(runCheckOnCode<PointeeLTransform>(Cat(S), nullptr, "input.m"),
@@ -1060,10 +1060,10 @@ TEST(ObjC, ClassPointer) {
             Cat("Object *const target;"));
 }
 TEST(ObjC, InterfacePointer) {
-  StringRef TB = "@interface I\n";
-  StringRef S = "- (void) foo: (int *) target;";
-  StringRef TE = "\n@end";
-  auto Cat = [&](StringRef S) { return (TB + S + TE).str(); };
+  llvm::StringRef TB = "@interface I\n";
+  llvm::StringRef S = "- (void) foo: (int *) target;";
+  llvm::StringRef TE = "\n@end";
+  auto Cat = [&](llvm::StringRef S) { return (TB + S + TE).str(); };
 
   EXPECT_EQ(runCheckOnCode<PointeeLTransform>(Cat(S), nullptr, "input.m"),
             Cat("- (void) foo: (const int *) target;"));

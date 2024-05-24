@@ -163,7 +163,7 @@ public:
 
   /// Set the specified list of identifiers as the parameter list for
   /// this macro.
-  void setParameterList(ArrayRef<IdentifierInfo *> List,
+  void setParameterList(llvm::ArrayRef<IdentifierInfo *> List,
                        llvm::BumpPtrAllocator &PPAllocator) {
     assert(ParameterList == nullptr && NumParameters == 0 &&
            "Parameter list already set!");
@@ -182,8 +182,8 @@ public:
   param_iterator param_begin() const { return ParameterList; }
   param_iterator param_end() const { return ParameterList + NumParameters; }
   unsigned getNumParams() const { return NumParameters; }
-  ArrayRef<const IdentifierInfo *> params() const {
-    return ArrayRef<const IdentifierInfo *>(ParameterList, NumParameters);
+  llvm::ArrayRef<const IdentifierInfo *> params() const {
+    return llvm::ArrayRef<const IdentifierInfo *>(ParameterList, NumParameters);
   }
 
   /// Return the parameter number of the specified identifier,
@@ -246,7 +246,7 @@ public:
     return ReplacementTokens + NumReplacementTokens;
   }
   bool tokens_empty() const { return NumReplacementTokens == 0; }
-  ArrayRef<Token> tokens() const {
+  llvm::ArrayRef<Token> tokens() const {
     return llvm::ArrayRef(ReplacementTokens, NumReplacementTokens);
   }
 
@@ -260,7 +260,7 @@ public:
     return llvm::MutableArrayRef(NewReplacementTokens, NumTokens);
   }
 
-  void setTokens(ArrayRef<Token> Tokens, llvm::BumpPtrAllocator &PPAllocator) {
+  void setTokens(llvm::ArrayRef<Token> Tokens, llvm::BumpPtrAllocator &PPAllocator) {
     assert(
         !IsDefinitionLengthCached &&
         "Changing replacement tokens after definition length got calculated");
@@ -530,7 +530,7 @@ class ModuleMacro : public llvm::FoldingSetNode {
   unsigned NumOverrides;
 
   ModuleMacro(Module *OwningModule, const IdentifierInfo *II, MacroInfo *Macro,
-              ArrayRef<ModuleMacro *> Overrides)
+              llvm::ArrayRef<ModuleMacro *> Overrides)
       : II(II), Macro(Macro), OwningModule(OwningModule),
         NumOverrides(Overrides.size()) {
     std::copy(Overrides.begin(), Overrides.end(),
@@ -540,7 +540,7 @@ class ModuleMacro : public llvm::FoldingSetNode {
 public:
   static ModuleMacro *create(Preprocessor &PP, Module *OwningModule,
                              const IdentifierInfo *II, MacroInfo *Macro,
-                             ArrayRef<ModuleMacro *> Overrides);
+                             llvm::ArrayRef<ModuleMacro *> Overrides);
 
   void Profile(llvm::FoldingSetNodeID &ID) const {
     return Profile(ID, OwningModule, II);
@@ -574,7 +574,7 @@ public:
     return overrides_begin() + NumOverrides;
   }
 
-  ArrayRef<ModuleMacro *> overrides() const {
+  llvm::ArrayRef<ModuleMacro *> overrides() const {
     return llvm::ArrayRef(overrides_begin(), overrides_end());
   }
   /// \}
@@ -589,11 +589,11 @@ public:
 /// entities, which are either local MacroDirectives or imported ModuleMacros.
 class MacroDefinition {
   llvm::PointerIntPair<DefMacroDirective *, 1, bool> LatestLocalAndAmbiguous;
-  ArrayRef<ModuleMacro *> ModuleMacros;
+  llvm::ArrayRef<ModuleMacro *> ModuleMacros;
 
 public:
   MacroDefinition() = default;
-  MacroDefinition(DefMacroDirective *MD, ArrayRef<ModuleMacro *> MMs,
+  MacroDefinition(DefMacroDirective *MD, llvm::ArrayRef<ModuleMacro *> MMs,
                   bool IsAmbiguous)
       : LatestLocalAndAmbiguous(MD, IsAmbiguous), ModuleMacros(MMs) {}
 
@@ -621,7 +621,7 @@ public:
   }
 
   /// Get the active module macros for this macro.
-  ArrayRef<ModuleMacro *> getModuleMacros() const { return ModuleMacros; }
+  llvm::ArrayRef<ModuleMacro *> getModuleMacros() const { return ModuleMacros; }
 
   template <typename Fn> void forAllDefinitions(Fn F) const {
     if (auto *MD = getLocalDirective())

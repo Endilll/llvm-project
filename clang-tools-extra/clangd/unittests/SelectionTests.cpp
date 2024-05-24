@@ -25,7 +25,7 @@ using ::testing::UnorderedElementsAreArray;
 // Create a selection tree corresponding to a point or pair of points.
 // This uses the precisely-defined createRight semantics. The fuzzier
 // createEach is tested separately.
-SelectionTree makeSelectionTree(const StringRef MarkedCode, ParsedAST &AST) {
+SelectionTree makeSelectionTree(const llvm::StringRef MarkedCode, ParsedAST &AST) {
   Annotations Test(MarkedCode);
   switch (Test.points().size()) {
   case 1: { // Point selection.
@@ -50,7 +50,7 @@ Range nodeRange(const SelectionTree::Node *N, ParsedAST &AST) {
     return Range{};
   const SourceManager &SM = AST.getSourceManager();
   const LangOptions &LangOpts = AST.getLangOpts();
-  StringRef Buffer = SM.getBufferData(SM.getMainFileID());
+  llvm::StringRef Buffer = SM.getBufferData(SM.getMainFileID());
   if (llvm::isa_and_nonnull<TranslationUnitDecl>(N->ASTNode.get<Decl>()))
     return Range{Position{}, offsetToPosition(Buffer, Buffer.size())};
   auto FileRange =
@@ -78,7 +78,7 @@ std::vector<const SelectionTree::Node *> allNodes(const SelectionTree &T) {
 // Verifies nothing is selected above Common.
 bool verifyCommonAncestor(const SelectionTree::Node &Root,
                           const SelectionTree::Node *Common,
-                          StringRef MarkedCode) {
+                          llvm::StringRef MarkedCode) {
   if (&Root == Common)
     return true;
   if (Root.Selected)

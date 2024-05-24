@@ -82,7 +82,7 @@ public:
   }
 
   /// Helper function for tests to access bound symbolic values.
-  SVal getByName(StringRef Name) const { return CollectedSVals[Name]; }
+  SVal getByName(llvm::StringRef Name) const { return CollectedSVals[Name]; }
 
 private:
   /// Entry point for tests.

@@ -57,7 +57,7 @@ TEST(LineOffsetMappingTest, constructTwo) {
 
 TEST(LineOffsetMappingTest, get) {
   BumpPtrAllocator Alloc;
-  StringRef Source = "first line\n"
+  llvm::StringRef Source = "first line\n"
                      "second line\n";
   auto Mapping = LineOffsetMapping::get(MemoryBufferRef(Source, ""), Alloc);
   EXPECT_EQ(3u, Mapping.size());
@@ -68,7 +68,7 @@ TEST(LineOffsetMappingTest, get) {
 
 TEST(LineOffsetMappingTest, getMissingFinalNewline) {
   BumpPtrAllocator Alloc;
-  StringRef Source = "first line\n"
+  llvm::StringRef Source = "first line\n"
                      "second line";
   auto Mapping = LineOffsetMapping::get(MemoryBufferRef(Source, ""), Alloc);
   EXPECT_EQ(2u, Mapping.size());

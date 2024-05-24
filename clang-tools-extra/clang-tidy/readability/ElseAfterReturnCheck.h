@@ -19,7 +19,7 @@ namespace clang::tidy::readability {
 /// http://llvm.org/docs/CodingStandards.html#don-t-use-else-after-a-return
 class ElseAfterReturnCheck : public ClangTidyCheck {
 public:
-  ElseAfterReturnCheck(StringRef Name, ClangTidyContext *Context);
+  ElseAfterReturnCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
@@ -31,7 +31,7 @@ public:
   }
 
   using ConditionalBranchMap =
-      llvm::DenseMap<FileID, SmallVector<SourceRange, 1>>;
+      llvm::DenseMap<FileID, llvm::SmallVector<SourceRange, 1>>;
 
 private:
   const bool WarnOnUnfixable;

@@ -21,7 +21,7 @@ static cl::opt<bool> Help("h", cl::desc("Alias for -help"), cl::Hidden);
 // Mark all our options with this category.
 static cl::OptionCategory AMDGPUArchCategory("amdgpu-arch options");
 
-static void PrintVersion(raw_ostream &OS) {
+static void PrintVersion(llvm::raw_ostream &OS) {
   OS << clang::getClangToolFullVersion("amdgpu-arch") << '\n';
 }
 

@@ -47,10 +47,10 @@ namespace EmitDefaultedSpecialMembers {
     SmallVectorImpl() {}
     ~SmallVectorImpl() {} // non-trivial dtor
   };
-  template<typename T, unsigned N> struct SmallVector : SmallVectorImpl<T> {
+  template<typename T, unsigned N> struct SmallVector : llvm::SmallVectorImpl<T> {
     // trivial dtor
   };
-  template<unsigned N> struct SmallString : SmallVector<char, N> {
+  template<unsigned N> struct SmallString : llvm::SmallVector<char, N> {
     // trivial dtor
   };
 }

@@ -19,8 +19,8 @@ namespace ento {
 
 CheckerManager::CheckerManager(
     ASTContext &Context, AnalyzerOptions &AOptions, const Preprocessor &PP,
-    ArrayRef<std::string> plugins,
-    ArrayRef<std::function<void(CheckerRegistry &)>> checkerRegistrationFns)
+    llvm::ArrayRef<std::string> plugins,
+    llvm::ArrayRef<std::function<void(CheckerRegistry &)>> checkerRegistrationFns)
     : Context(&Context), LangOpts(Context.getLangOpts()), AOptions(AOptions),
       PP(&PP), Diags(Context.getDiagnostics()),
       RegistryData(std::make_unique<CheckerRegistryData>()) {
@@ -34,7 +34,7 @@ CheckerManager::CheckerManager(
 CheckerManager::CheckerManager(AnalyzerOptions &AOptions,
                                const LangOptions &LangOpts,
                                DiagnosticsEngine &Diags,
-                               ArrayRef<std::string> plugins)
+                               llvm::ArrayRef<std::string> plugins)
     : LangOpts(LangOpts), AOptions(AOptions), Diags(Diags),
       RegistryData(std::make_unique<CheckerRegistryData>()) {
   CheckerRegistry Registry(*RegistryData, plugins, Diags, AOptions, {});

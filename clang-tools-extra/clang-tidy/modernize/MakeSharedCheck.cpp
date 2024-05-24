@@ -15,7 +15,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::modernize {
 
-MakeSharedCheck::MakeSharedCheck(StringRef Name, ClangTidyContext *Context)
+MakeSharedCheck::MakeSharedCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : MakeSmartPtrCheck(Name, Context, "std::make_shared") {}
 
 MakeSharedCheck::SmartPtrTypeMatcher

@@ -19,7 +19,7 @@ namespace {
 
 class FormatTestSelective : public testing::Test {
 protected:
-  std::string format(StringRef Code, unsigned Offset, unsigned Length) {
+  std::string format(llvm::StringRef Code, unsigned Offset, unsigned Length) {
     LLVM_DEBUG(llvm::errs() << "---\n");
     LLVM_DEBUG(llvm::errs() << Code << "\n\n");
     std::vector<tooling::Range> Ranges(1, tooling::Range(Offset, Length));
@@ -656,7 +656,7 @@ TEST_F(FormatTestSelective, FormatMacroRegardlessOfPreviousIndent) {
   // need to be adapted.
   Style = getLLVMStyle();
 
-  const StringRef Code{"      class Foo {\n"
+  const llvm::StringRef Code{"      class Foo {\n"
                        "            void test() {\n"
                        "    #ifdef 1\n"
                        "                #define some\n" // format this line

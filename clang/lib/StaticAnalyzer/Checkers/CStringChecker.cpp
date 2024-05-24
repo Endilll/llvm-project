@@ -43,10 +43,10 @@ struct SourceArgExpr : AnyArgExpr {};
 struct DestinationArgExpr : AnyArgExpr {};
 struct SizeArgExpr : AnyArgExpr {};
 
-using ErrorMessage = SmallString<128>;
+using ErrorMessage = llvm::SmallString<128>;
 enum class AccessKind { write, read };
 
-static ErrorMessage createOutOfBoundErrorMsg(StringRef FunctionDescription,
+static ErrorMessage createOutOfBoundErrorMsg(llvm::StringRef FunctionDescription,
                                              AccessKind Access) {
   ErrorMessage Message;
   llvm::raw_svector_ostream Os(Message);
@@ -115,8 +115,8 @@ public:
   ProgramStateRef
     checkRegionChanges(ProgramStateRef state,
                        const InvalidatedSymbols *,
-                       ArrayRef<const MemRegion *> ExplicitRegions,
-                       ArrayRef<const MemRegion *> Regions,
+                       llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+                       llvm::ArrayRef<const MemRegion *> Regions,
                        const LocationContext *LCtx,
                        const CallEvent *Call) const;
 
@@ -294,7 +294,7 @@ public:
                               const MemRegion *)>
           InvalidationTraitOperations);
 
-  static bool SummarizeRegion(raw_ostream &os, ASTContext &Ctx,
+  static bool SummarizeRegion(llvm::raw_ostream &os, ASTContext &Ctx,
                               const MemRegion *MR);
 
   static bool memsetAux(const Expr *DstBuffer, SVal CharE,
@@ -322,11 +322,11 @@ public:
                       const Stmt *Second) const;
 
   void emitNullArgBug(CheckerContext &C, ProgramStateRef State, const Stmt *S,
-                      StringRef WarningMsg) const;
+                      llvm::StringRef WarningMsg) const;
   void emitOutOfBoundsBug(CheckerContext &C, ProgramStateRef State,
-                          const Stmt *S, StringRef WarningMsg) const;
+                          const Stmt *S, llvm::StringRef WarningMsg) const;
   void emitNotCStringBug(CheckerContext &C, ProgramStateRef State,
-                         const Stmt *S, StringRef WarningMsg) const;
+                         const Stmt *S, llvm::StringRef WarningMsg) const;
   void emitAdditionOverflowBug(CheckerContext &C, ProgramStateRef State) const;
   void emitUninitializedReadBug(CheckerContext &C, ProgramStateRef State,
                              const Expr *E) const;
@@ -376,7 +376,7 @@ ProgramStateRef CStringChecker::checkNonNull(CheckerContext &C,
 
   if (stateNull && !stateNonNull) {
     if (Filter.CheckCStringNullArg) {
-      SmallString<80> buf;
+      llvm::SmallString<80> buf;
       llvm::raw_svector_ostream OS(buf);
       assert(CurrentFunctionDescription);
       OS << "Null pointer passed as " << (Arg.ArgumentIndex + 1)
@@ -674,7 +674,7 @@ void CStringChecker::emitOverlapBug(CheckerContext &C, ProgramStateRef state,
 }
 
 void CStringChecker::emitNullArgBug(CheckerContext &C, ProgramStateRef State,
-                                    const Stmt *S, StringRef WarningMsg) const {
+                                    const Stmt *S, llvm::StringRef WarningMsg) const {
   if (ExplodedNode *N = C.generateErrorNode(State)) {
     if (!BT_Null) {
       // FIXME: This call uses the string constant 'categories::UnixAPI' as the
@@ -712,7 +712,7 @@ void CStringChecker::emitUninitializedReadBug(CheckerContext &C,
 
 void CStringChecker::emitOutOfBoundsBug(CheckerContext &C,
                                         ProgramStateRef State, const Stmt *S,
-                                        StringRef WarningMsg) const {
+                                        llvm::StringRef WarningMsg) const {
   if (ExplodedNode *N = C.generateErrorNode(State)) {
     if (!BT_Bounds)
       BT_Bounds.reset(new BugType(Filter.CheckCStringOutOfBounds
@@ -732,7 +732,7 @@ void CStringChecker::emitOutOfBoundsBug(CheckerContext &C,
 
 void CStringChecker::emitNotCStringBug(CheckerContext &C, ProgramStateRef State,
                                        const Stmt *S,
-                                       StringRef WarningMsg) const {
+                                       llvm::StringRef WarningMsg) const {
   if (ExplodedNode *N = C.generateNonFatalErrorNode(State)) {
     if (!BT_NotCString) {
       // FIXME: This call uses the string constant 'categories::UnixAPI' as the
@@ -918,7 +918,7 @@ SVal CStringChecker::getCStringLength(CheckerContext &C, ProgramStateRef &state,
     // a warning is for labels.
     if (std::optional<loc::GotoLabel> Label = Buf.getAs<loc::GotoLabel>()) {
       if (Filter.CheckCStringNotNullTerm) {
-        SmallString<120> buf;
+        llvm::SmallString<120> buf;
         llvm::raw_svector_ostream os(buf);
         assert(CurrentFunctionDescription);
         os << "Argument to " << CurrentFunctionDescription
@@ -980,7 +980,7 @@ SVal CStringChecker::getCStringLength(CheckerContext &C, ProgramStateRef &state,
     // In this case, an error is emitted and UndefinedVal is returned.
     // The caller should always be prepared to handle this case.
     if (Filter.CheckCStringNotNullTerm) {
-      SmallString<120> buf;
+      llvm::SmallString<120> buf;
       llvm::raw_svector_ostream os(buf);
 
       assert(CurrentFunctionDescription);
@@ -1178,7 +1178,7 @@ ProgramStateRef CStringChecker::invalidateBufferAux(
   return State->killBinding(*L);
 }
 
-bool CStringChecker::SummarizeRegion(raw_ostream &os, ASTContext &Ctx,
+bool CStringChecker::SummarizeRegion(llvm::raw_ostream &os, ASTContext &Ctx,
                                      const MemRegion *MR) {
   switch (MR->getKind()) {
   case MemRegion::FunctionCodeRegionKind: {
@@ -2233,8 +2233,8 @@ void CStringChecker::evalStrcmpCommon(CheckerContext &C, const CallEvent &Call,
                                                 LCtx, C.blockCount());
 
   if (LeftStrLiteral && RightStrLiteral) {
-    StringRef LeftStrRef = LeftStrLiteral->getString();
-    StringRef RightStrRef = RightStrLiteral->getString();
+    llvm::StringRef LeftStrRef = LeftStrLiteral->getString();
+    llvm::StringRef RightStrRef = RightStrLiteral->getString();
 
     if (IsBounded) {
       // Get the max number of characters to compare.
@@ -2256,14 +2256,14 @@ void CStringChecker::evalStrcmpCommon(CheckerContext &C, const CallEvent &Call,
     if (canComputeResult) {
       // Real strcmp stops at null characters.
       size_t s1Term = LeftStrRef.find('\0');
-      if (s1Term != StringRef::npos)
+      if (s1Term != llvm::StringRef::npos)
         LeftStrRef = LeftStrRef.substr(0, s1Term);
 
       size_t s2Term = RightStrRef.find('\0');
-      if (s2Term != StringRef::npos)
+      if (s2Term != llvm::StringRef::npos)
         RightStrRef = RightStrRef.substr(0, s2Term);
 
-      // Use StringRef's comparison methods to compute the actual result.
+      // Use llvm::StringRef's comparison methods to compute the actual result.
       int compareRes = IgnoreCase ? LeftStrRef.compare_insensitive(RightStrRef)
                                   : LeftStrRef.compare(RightStrRef);
 
@@ -2274,7 +2274,7 @@ void CStringChecker::evalStrcmpCommon(CheckerContext &C, const CallEvent &Call,
       }
       else {
         DefinedSVal zeroVal = svalBuilder.makeIntVal(0, Call.getResultType());
-        // Constrain strcmp's result range based on the result of StringRef's
+        // Constrain strcmp's result range based on the result of llvm::StringRef's
         // comparison methods.
         BinaryOperatorKind op = (compareRes > 0) ? BO_GT : BO_LT;
         SVal compareWithZero =
@@ -2632,8 +2632,8 @@ void CStringChecker::checkPreStmt(const DeclStmt *DS, CheckerContext &C) const {
 ProgramStateRef
 CStringChecker::checkRegionChanges(ProgramStateRef state,
     const InvalidatedSymbols *,
-    ArrayRef<const MemRegion *> ExplicitRegions,
-    ArrayRef<const MemRegion *> Regions,
+    llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+    llvm::ArrayRef<const MemRegion *> Regions,
     const LocationContext *LCtx,
     const CallEvent *Call) const {
   CStringLengthTy Entries = state->get<CStringLength>();

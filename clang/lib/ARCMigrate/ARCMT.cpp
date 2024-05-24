@@ -20,13 +20,14 @@
 #include "clang/Rewrite/Core/Rewriter.h"
 #include "clang/Sema/SemaDiagnostic.h"
 #include "clang/Serialization/ASTReader.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/TargetParser/Triple.h"
 #include <utility>
 using namespace clang;
 using namespace arcmt;
 
-bool CapturedDiagList::clearDiagnostic(ArrayRef<unsigned> IDs,
+bool CapturedDiagList::clearDiagnostic(llvm::ArrayRef<unsigned> IDs,
                                        SourceRange range) {
   if (range.isInvalid())
     return false;
@@ -56,7 +57,7 @@ bool CapturedDiagList::clearDiagnostic(ArrayRef<unsigned> IDs,
   return cleared;
 }
 
-bool CapturedDiagList::hasDiagnostic(ArrayRef<unsigned> IDs,
+bool CapturedDiagList::hasDiagnostic(llvm::ArrayRef<unsigned> IDs,
                                      SourceRange range) const {
   if (range.isInvalid())
     return false;
@@ -162,7 +163,7 @@ static bool HasARCRuntime(CompilerInvocation &origCI) {
     return triple.getOSMajorVersion() >= 11;
 
   if (triple.getOS() == llvm::Triple::MacOSX) {
-    return triple.getOSVersion() >= VersionTuple(10, 7);
+    return triple.getOSVersion() >= llvm::VersionTuple(10, 7);
   }
 
   return false;
@@ -178,8 +179,8 @@ createInvocationForMigration(CompilerInvocation &origCI,
     // We can't use a PCH because it was likely built in non-ARC mode and we
     // want to parse in ARC. Include the original header.
     FileManager FileMgr(origCI.getFileSystemOpts());
-    IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+    llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
         new DiagnosticsEngine(DiagID, &origCI.getDiagnosticOpts(),
                               new IgnoringDiagConsumer()));
     std::string OriginalFile = ASTReader::getOriginalSourceFile(
@@ -201,7 +202,7 @@ createInvocationForMigration(CompilerInvocation &origCI,
   for (std::vector<std::string>::iterator
          I = CInvok->getDiagnosticOpts().Warnings.begin(),
          E = CInvok->getDiagnosticOpts().Warnings.end(); I != E; ++I) {
-    if (!StringRef(*I).starts_with("error"))
+    if (!llvm::StringRef(*I).starts_with("error"))
       WarnOpts.push_back(*I);
   }
   WarnOpts.push_back("error=arc-unsafe-retained-assign");
@@ -217,8 +218,8 @@ static void emitPremigrationErrors(const CapturedDiagList &arcDiags,
                                    DiagnosticOptions *diagOpts,
                                    Preprocessor &PP) {
   TextDiagnosticPrinter printer(llvm::errs(), diagOpts);
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
       new DiagnosticsEngine(DiagID, diagOpts, &printer,
                             /*ShouldOwnClient=*/false));
   Diags->setSourceManager(&PP.getSourceManager());
@@ -236,7 +237,7 @@ bool arcmt::checkForManualIssues(
     CompilerInvocation &origCI, const FrontendInputFile &Input,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
     DiagnosticConsumer *DiagClient, bool emitPremigrationARCErrors,
-    StringRef plistOut) {
+    llvm::StringRef plistOut) {
   if (!origCI.getLangOpts().ObjC)
     return false;
 
@@ -257,8 +258,8 @@ bool arcmt::checkForManualIssues(
   CapturedDiagList capturedDiags;
 
   assert(DiagClient);
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
       new DiagnosticsEngine(DiagID, &origCI.getDiagnosticOpts(),
                             DiagClient, /*ShouldOwnClient=*/false));
 
@@ -291,7 +292,7 @@ bool arcmt::checkForManualIssues(
     emitPremigrationErrors(capturedDiags, &origCI.getDiagnosticOpts(),
                            Unit->getPreprocessor());
   if (!plistOut.empty()) {
-    SmallVector<StoredDiagnostic, 8> arcDiags;
+    llvm::SmallVector<StoredDiagnostic, 8> arcDiags;
     for (CapturedDiagList::iterator
            I = capturedDiags.begin(), E = capturedDiags.end(); I != E; ++I)
       arcDiags.push_back(*I);
@@ -336,8 +337,8 @@ bool arcmt::checkForManualIssues(
 static bool
 applyTransforms(CompilerInvocation &origCI, const FrontendInputFile &Input,
                 std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-                DiagnosticConsumer *DiagClient, StringRef outputDir,
-                bool emitPremigrationARCErrors, StringRef plistOut) {
+                DiagnosticConsumer *DiagClient, llvm::StringRef outputDir,
+                bool emitPremigrationARCErrors, llvm::StringRef plistOut) {
   if (!origCI.getLangOpts().ObjC)
     return false;
 
@@ -366,8 +367,8 @@ applyTransforms(CompilerInvocation &origCI, const FrontendInputFile &Input,
     if (err) return true;
   }
 
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
       new DiagnosticsEngine(DiagID, &origCI.getDiagnosticOpts(),
                             DiagClient, /*ShouldOwnClient=*/false));
 
@@ -384,14 +385,14 @@ bool arcmt::applyTransformations(
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
     DiagnosticConsumer *DiagClient) {
   return applyTransforms(origCI, Input, PCHContainerOps, DiagClient,
-                         StringRef(), false, StringRef());
+                         llvm::StringRef(), false, llvm::StringRef());
 }
 
 bool arcmt::migrateWithTemporaryFiles(
     CompilerInvocation &origCI, const FrontendInputFile &Input,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-    DiagnosticConsumer *DiagClient, StringRef outputDir,
-    bool emitPremigrationARCErrors, StringRef plistOut) {
+    DiagnosticConsumer *DiagClient, llvm::StringRef outputDir,
+    bool emitPremigrationARCErrors, llvm::StringRef plistOut) {
   assert(!outputDir.empty() && "Expected output directory path");
   return applyTransforms(origCI, Input, PCHContainerOps, DiagClient, outputDir,
                          emitPremigrationARCErrors, plistOut);
@@ -399,12 +400,12 @@ bool arcmt::migrateWithTemporaryFiles(
 
 bool arcmt::getFileRemappings(std::vector<std::pair<std::string,std::string> > &
                                   remap,
-                              StringRef outputDir,
+                              llvm::StringRef outputDir,
                               DiagnosticConsumer *DiagClient) {
   assert(!outputDir.empty());
 
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
       new DiagnosticsEngine(DiagID, new DiagnosticOptions,
                             DiagClient, /*ShouldOwnClient=*/false));
 
@@ -415,10 +416,10 @@ bool arcmt::getFileRemappings(std::vector<std::pair<std::string,std::string> > &
     return true;
 
   remapper.forEachMapping(
-      [&](StringRef From, StringRef To) {
+      [&](llvm::StringRef From, llvm::StringRef To) {
         remap.push_back(std::make_pair(From.str(), To.str()));
       },
-      [](StringRef, const llvm::MemoryBufferRef &) {});
+      [](llvm::StringRef, const llvm::MemoryBufferRef &) {});
 
   return false;
 }
@@ -452,7 +453,7 @@ public:
     : ARCMTMacroLocs(ARCMTMacroLocs) { }
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override {
+                                                 llvm::StringRef InFile) override {
     CI.getPreprocessor().addPPCallbacks(
                std::make_unique<ARCMTMacroTrackerPPCallbacks>(ARCMTMacroLocs));
     return std::make_unique<ASTConsumer>();
@@ -475,7 +476,7 @@ public:
       Listener->finish();
   }
 
-  void insert(SourceLocation loc, StringRef text) override {
+  void insert(SourceLocation loc, llvm::StringRef text) override {
     bool err = rewriter.InsertText(loc, text, /*InsertAfter=*/true,
                                    /*indentNewLines=*/true);
     if (!err && Listener)
@@ -507,12 +508,12 @@ MigrationProcess::RewriteListener::~RewriteListener() { }
 MigrationProcess::MigrationProcess(
     CompilerInvocation &CI,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps,
-    DiagnosticConsumer *diagClient, StringRef outputDir)
+    DiagnosticConsumer *diagClient, llvm::StringRef outputDir)
     : OrigCI(CI), PCHContainerOps(std::move(PCHContainerOps)),
       DiagClient(diagClient), HadARCErrors(false) {
   if (!outputDir.empty()) {
-    IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+    llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
       new DiagnosticsEngine(DiagID, &CI.getDiagnosticOpts(),
                             DiagClient, /*ShouldOwnClient=*/false));
     Remapper.initFromDisk(outputDir, *Diags, /*ignoreIfFilesChanged=*/true);
@@ -532,8 +533,8 @@ bool MigrationProcess::applyTransform(TransformFn trans,
   std::vector<SourceLocation> ARCMTMacroLocs;
 
   assert(DiagClient);
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
       new DiagnosticsEngine(DiagID, new DiagnosticOptions,
                             DiagClient, /*ShouldOwnClient=*/false));
 
@@ -602,12 +603,12 @@ bool MigrationProcess::applyTransform(TransformFn trans,
     assert(file);
     std::string newFname = std::string(file->getName());
     newFname += "-trans";
-    SmallString<512> newText;
+    llvm::SmallString<512> newText;
     llvm::raw_svector_ostream vecOS(newText);
     buf.write(vecOS);
     std::unique_ptr<llvm::MemoryBuffer> memBuf(
         llvm::MemoryBuffer::getMemBufferCopy(newText.str(), newFname));
-    SmallString<64> filePath(file->getName());
+    llvm::SmallString<64> filePath(file->getName());
     Unit->getFileManager().FixupRelativePath(filePath);
     Remapper.remap(filePath.str(), std::move(memBuf));
   }

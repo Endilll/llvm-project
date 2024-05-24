@@ -67,7 +67,7 @@ void PreferIsaOrDynCastInConditionalsCheck::check(
   if (const auto *MatchedDecl = Result.Nodes.getNodeAs<CallExpr>("assign")) {
     SourceLocation StartLoc = MatchedDecl->getCallee()->getExprLoc();
     SourceLocation EndLoc =
-        StartLoc.getLocWithOffset(StringRef("cast").size() - 1);
+        StartLoc.getLocWithOffset(llvm::StringRef("cast").size() - 1);
 
     diag(MatchedDecl->getBeginLoc(),
          "cast<> in conditional will assert rather than return a null pointer")
@@ -77,9 +77,9 @@ void PreferIsaOrDynCastInConditionalsCheck::check(
                  Result.Nodes.getNodeAs<CallExpr>("call")) {
     SourceLocation StartLoc = MatchedDecl->getCallee()->getExprLoc();
     SourceLocation EndLoc =
-        StartLoc.getLocWithOffset(StringRef("cast").size() - 1);
+        StartLoc.getLocWithOffset(llvm::StringRef("cast").size() - 1);
 
-    StringRef Message =
+    llvm::StringRef Message =
         "cast<> in conditional will assert rather than return a null pointer";
     if (Result.Nodes.getNodeAs<NamedDecl>("dyn_cast"))
       Message = "return value from dyn_cast<> not used";
@@ -98,18 +98,18 @@ void PreferIsaOrDynCastInConditionalsCheck::check(
     assert(Arg && "Arg is null");
     assert(Func && "Func is null");
 
-    StringRef LHSString(Lexer::getSourceText(
+    llvm::StringRef LHSString(Lexer::getSourceText(
         CharSourceRange::getTokenRange(LHS->getSourceRange()),
         *Result.SourceManager, getLangOpts()));
 
-    StringRef ArgString(Lexer::getSourceText(
+    llvm::StringRef ArgString(Lexer::getSourceText(
         CharSourceRange::getTokenRange(Arg->getSourceRange()),
         *Result.SourceManager, getLangOpts()));
 
     if (ArgString != LHSString)
       return;
 
-    StringRef RHSString(Lexer::getSourceText(
+    llvm::StringRef RHSString(Lexer::getSourceText(
         CharSourceRange::getTokenRange(RHS->getSourceRange()),
         *Result.SourceManager, getLangOpts()));
 

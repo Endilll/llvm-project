@@ -54,14 +54,14 @@ class XPCTransport : public Transport {
 public:
   XPCTransport() {}
 
-  void notify(StringRef Method, json::Value Params) override {
+  void notify(llvm::StringRef Method, json::Value Params) override {
     sendMessage(json::Object{
         {"jsonrpc", "2.0"},
         {"method", Method},
         {"params", std::move(Params)},
     });
   }
-  void call(StringRef Method, json::Value Params, json::Value ID) override {
+  void call(llvm::StringRef Method, json::Value Params, json::Value ID) override {
     sendMessage(json::Object{
         {"jsonrpc", "2.0"},
         {"id", std::move(ID)},
@@ -69,7 +69,7 @@ public:
         {"params", std::move(Params)},
     });
   }
-  void reply(json::Value ID, Expected<json::Value> Result) override {
+  void reply(json::Value ID, llvm::Expected<json::Value> Result) override {
     if (Result) {
       sendMessage(json::Object{
           {"jsonrpc", "2.0"},
@@ -108,7 +108,7 @@ bool XPCTransport::handleMessage(json::Value Message, MessageHandler &Handler) {
   // Message must be an object with "jsonrpc":"2.0".
   auto *Object = Message.getAsObject();
   if (!Object ||
-      Object->getString("jsonrpc") != std::optional<StringRef>("2.0")) {
+      Object->getString("jsonrpc") != std::optional<llvm::StringRef>("2.0")) {
     elog("Not a JSON-RPC 2.0 message: {0:2}", Message);
     return false;
   }

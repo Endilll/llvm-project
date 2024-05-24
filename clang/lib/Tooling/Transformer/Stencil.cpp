@@ -34,7 +34,7 @@ using llvm::Expected;
 using llvm::StringError;
 
 static llvm::Expected<DynTypedNode> getNode(const BoundNodes &Nodes,
-                                            StringRef Id) {
+                                            llvm::StringRef Id) {
   auto &NodesMap = Nodes.getMap();
   auto It = NodesMap.find(Id);
   if (It == NodesMap.end())
@@ -43,7 +43,7 @@ static llvm::Expected<DynTypedNode> getNode(const BoundNodes &Nodes,
   return It->second;
 }
 
-static Error printNode(StringRef Id, const MatchFinder::MatchResult &Match,
+static Error printNode(llvm::StringRef Id, const MatchFinder::MatchResult &Match,
                        std::string *Result) {
   std::string Output;
   llvm::raw_string_ostream Os(Output);
@@ -117,7 +117,7 @@ public:
       : Op(Op), Id(std::move(Id)) {}
 
   std::string toString() const override {
-    StringRef OpName;
+    llvm::StringRef OpName;
     switch (Op) {
     case UnaryNodeOperator::Parens:
       OpName = "expression";
@@ -263,7 +263,7 @@ class AccessStencil : public StencilInterface {
   Stencil Member;
 
 public:
-  AccessStencil(StringRef BaseId, Stencil Member)
+  AccessStencil(llvm::StringRef BaseId, Stencil Member)
       : BaseId(std::string(BaseId)), Member(std::move(Member)) {}
 
   std::string toString() const override {
@@ -294,7 +294,7 @@ class IfBoundStencil : public StencilInterface {
   Stencil FalseStencil;
 
 public:
-  IfBoundStencil(StringRef Id, Stencil TrueStencil, Stencil FalseStencil)
+  IfBoundStencil(llvm::StringRef Id, Stencil TrueStencil, Stencil FalseStencil)
       : Id(std::string(Id)), TrueStencil(std::move(TrueStencil)),
         FalseStencil(std::move(FalseStencil)) {}
 
@@ -414,7 +414,7 @@ public:
   Error eval(const MatchFinder::MatchResult &Match,
              std::string *Result) const override {
 
-    Expected<std::string> Value = Consumer(Match);
+    llvm::Expected<std::string> Value = Consumer(Match);
     if (!Value)
       return Value.takeError();
     *Result += *Value;
@@ -423,7 +423,7 @@ public:
 };
 } // namespace
 
-Stencil transformer::detail::makeStencil(StringRef Text) {
+Stencil transformer::detail::makeStencil(llvm::StringRef Text) {
   return std::make_shared<RawTextStencil>(std::string(Text));
 }
 
@@ -431,7 +431,7 @@ Stencil transformer::detail::makeStencil(RangeSelector Selector) {
   return std::make_shared<SelectorStencil>(std::move(Selector));
 }
 
-Stencil transformer::dPrint(StringRef Id) {
+Stencil transformer::dPrint(llvm::StringRef Id) {
   return std::make_shared<DebugPrintNodeStencil>(std::string(Id));
 }
 
@@ -460,16 +460,16 @@ Stencil transformer::maybeAddressOf(llvm::StringRef ExprId) {
       UnaryNodeOperator::MaybeAddressOf, std::string(ExprId));
 }
 
-Stencil transformer::describe(StringRef Id) {
+Stencil transformer::describe(llvm::StringRef Id) {
   return std::make_shared<UnaryOperationStencil>(UnaryNodeOperator::Describe,
                                                  std::string(Id));
 }
 
-Stencil transformer::access(StringRef BaseId, Stencil Member) {
+Stencil transformer::access(llvm::StringRef BaseId, Stencil Member) {
   return std::make_shared<AccessStencil>(BaseId, std::move(Member));
 }
 
-Stencil transformer::ifBound(StringRef Id, Stencil TrueStencil,
+Stencil transformer::ifBound(llvm::StringRef Id, Stencil TrueStencil,
                              Stencil FalseStencil) {
   return std::make_shared<IfBoundStencil>(Id, std::move(TrueStencil),
                                           std::move(FalseStencil));

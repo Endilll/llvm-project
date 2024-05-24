@@ -22,7 +22,7 @@ namespace clang::tidy::abseil {
 /// http://clang.llvm.org/extra/clang-tidy/checks/abseil/upgrade-duration-conversions.html
 class UpgradeDurationConversionsCheck : public ClangTidyCheck {
 public:
-  UpgradeDurationConversionsCheck(StringRef Name, ClangTidyContext *Context)
+  UpgradeDurationConversionsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

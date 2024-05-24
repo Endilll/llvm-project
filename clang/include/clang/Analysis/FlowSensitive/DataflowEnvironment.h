@@ -679,7 +679,7 @@ public:
   Arena &arena() const { return DACtx->arena(); }
 
   LLVM_DUMP_METHOD void dump() const;
-  LLVM_DUMP_METHOD void dump(raw_ostream &OS) const;
+  LLVM_DUMP_METHOD void dump(llvm::raw_ostream &OS) const;
 
 private:
   using PrValueToResultObject =
@@ -730,7 +730,7 @@ private:
   /// `pushCall`, this member is invoked on the environment of the callee, not
   /// of the caller.
   void pushCallInternal(const FunctionDecl *FuncDecl,
-                        ArrayRef<const Expr *> Args);
+                        llvm::ArrayRef<const Expr *> Args);
 
   /// Assigns storage locations and values to all global variables, fields
   /// and functions in `Referenced`.

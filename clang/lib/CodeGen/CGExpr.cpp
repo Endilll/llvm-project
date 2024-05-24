@@ -72,7 +72,7 @@ static llvm::cl::opt<bool> ClSanitizeGuardChecks(
 /// block.
 RawAddress
 CodeGenFunction::CreateTempAllocaWithoutCast(llvm::Type *Ty, CharUnits Align,
-                                             const Twine &Name,
+                                             const llvm::Twine &Name,
                                              llvm::Value *ArraySize) {
   auto Alloca = CreateTempAlloca(Ty, Name, ArraySize);
   Alloca->setAlignment(Align.getAsAlign());
@@ -82,7 +82,7 @@ CodeGenFunction::CreateTempAllocaWithoutCast(llvm::Type *Ty, CharUnits Align,
 /// CreateTempAlloca - This creates a alloca and inserts it into the entry
 /// block. The alloca is casted to default address space if necessary.
 RawAddress CodeGenFunction::CreateTempAlloca(llvm::Type *Ty, CharUnits Align,
-                                             const Twine &Name,
+                                             const llvm::Twine &Name,
                                              llvm::Value *ArraySize,
                                              RawAddress *AllocaAddr) {
   auto Alloca = CreateTempAllocaWithoutCast(Ty, Align, Name, ArraySize);
@@ -113,7 +113,7 @@ RawAddress CodeGenFunction::CreateTempAlloca(llvm::Type *Ty, CharUnits Align,
 /// block if \p ArraySize is nullptr, otherwise inserts it at the current
 /// insertion point of the builder.
 llvm::AllocaInst *CodeGenFunction::CreateTempAlloca(llvm::Type *Ty,
-                                                    const Twine &Name,
+                                                    const llvm::Twine &Name,
                                                     llvm::Value *ArraySize) {
   llvm::AllocaInst *Alloca;
   if (ArraySize)
@@ -132,25 +132,25 @@ llvm::AllocaInst *CodeGenFunction::CreateTempAlloca(llvm::Type *Ty,
 /// guaranteed to be related in any way to the expected alignment of
 /// an AST type that might have been lowered to Ty.
 RawAddress CodeGenFunction::CreateDefaultAlignTempAlloca(llvm::Type *Ty,
-                                                         const Twine &Name) {
+                                                         const llvm::Twine &Name) {
   CharUnits Align =
       CharUnits::fromQuantity(CGM.getDataLayout().getPrefTypeAlign(Ty));
   return CreateTempAlloca(Ty, Align, Name);
 }
 
-RawAddress CodeGenFunction::CreateIRTemp(QualType Ty, const Twine &Name) {
+RawAddress CodeGenFunction::CreateIRTemp(QualType Ty, const llvm::Twine &Name) {
   CharUnits Align = getContext().getTypeAlignInChars(Ty);
   return CreateTempAlloca(ConvertType(Ty), Align, Name);
 }
 
-RawAddress CodeGenFunction::CreateMemTemp(QualType Ty, const Twine &Name,
+RawAddress CodeGenFunction::CreateMemTemp(QualType Ty, const llvm::Twine &Name,
                                           RawAddress *Alloca) {
   // FIXME: Should we prefer the preferred type alignment here?
   return CreateMemTemp(Ty, getContext().getTypeAlignInChars(Ty), Name, Alloca);
 }
 
 RawAddress CodeGenFunction::CreateMemTemp(QualType Ty, CharUnits Align,
-                                          const Twine &Name,
+                                          const llvm::Twine &Name,
                                           RawAddress *Alloca) {
   RawAddress Result = CreateTempAlloca(ConvertTypeForMem(Ty), Align, Name,
                                        /*ArraySize=*/nullptr, Alloca);
@@ -168,12 +168,12 @@ RawAddress CodeGenFunction::CreateMemTemp(QualType Ty, CharUnits Align,
 
 RawAddress CodeGenFunction::CreateMemTempWithoutCast(QualType Ty,
                                                      CharUnits Align,
-                                                     const Twine &Name) {
+                                                     const llvm::Twine &Name) {
   return CreateTempAllocaWithoutCast(ConvertTypeForMem(Ty), Align, Name);
 }
 
 RawAddress CodeGenFunction::CreateMemTempWithoutCast(QualType Ty,
-                                                     const Twine &Name) {
+                                                     const llvm::Twine &Name) {
   return CreateMemTempWithoutCast(Ty, getContext().getTypeAlignInChars(Ty),
                                   Name);
 }
@@ -500,8 +500,8 @@ EmitMaterializeTemporaryExpr(const MaterializeTemporaryExpr *M) {
     return RefTempDst;
   }
 
-  SmallVector<const Expr *, 2> CommaLHSs;
-  SmallVector<SubobjectAdjustment, 2> Adjustments;
+  llvm::SmallVector<const Expr *, 2> CommaLHSs;
+  llvm::SmallVector<SubobjectAdjustment, 2> Adjustments;
   E = E->skipRValueSubobjectAdjustments(CommaLHSs, Adjustments);
 
   for (const auto &Ignored : CommaLHSs)
@@ -703,7 +703,7 @@ void CodeGenFunction::EmitTypeCheck(TypeCheckKind TCK, SourceLocation Loc,
 
   SanitizerScope SanScope(this);
 
-  SmallVector<std::pair<llvm::Value *, SanitizerMask>, 3> Checks;
+  llvm::SmallVector<std::pair<llvm::Value *, SanitizerMask>, 3> Checks;
   llvm::BasicBlock *Done = nullptr;
 
   // Quickly determine whether we have a pointer to an alloca. It's possible
@@ -826,7 +826,7 @@ void CodeGenFunction::EmitTypeCheck(TypeCheckKind TCK, SourceLocation Loc,
     // FIXME: This is not guaranteed to be deterministic! Move to a
     //        fingerprinting mechanism once LLVM provides one. For the time
     //        being the implementation happens to be deterministic.
-    SmallString<64> MangledName;
+    llvm::SmallString<64> MangledName;
     llvm::raw_svector_ostream Out(MangledName);
     CGM.getCXXABI().getMangleContext().mangleCXXRTTI(Ty.getUnqualifiedType(),
                                                      Out);
@@ -1070,7 +1070,7 @@ public:
 } // end anonymous namespace
 
 using RecIndicesTy =
-    SmallVector<std::pair<const RecordDecl *, llvm::Value *>, 8>;
+    llvm::SmallVector<std::pair<const RecordDecl *, llvm::Value *>, 8>;
 
 static bool getGEPIndicesToField(CodeGenFunction &CGF, const RecordDecl *RD,
                                  const FieldDecl *FD, RecIndicesTy &Indices) {
@@ -1977,7 +1977,7 @@ llvm::Value *CodeGenFunction::EmitLoadOfScalar(Address Addr, bool Volatile,
       llvm::Value *V = Builder.CreateLoad(Cast, Volatile, "loadVec4");
 
       // Shuffle vector to get vec3.
-      V = Builder.CreateShuffleVector(V, ArrayRef<int>{0, 1, 2}, "extractVec");
+      V = Builder.CreateShuffleVector(V, llvm::ArrayRef<int>{0, 1, 2}, "extractVec");
       return EmitFromMemory(V, Ty);
     }
   }
@@ -2108,7 +2108,7 @@ void CodeGenFunction::EmitStoreOfScalar(llvm::Value *Value, Address Addr,
       // Handle vec3 special.
       if (VecTy && cast<llvm::FixedVectorType>(VecTy)->getNumElements() == 3) {
         // Our source is a vec3, do a shuffle vector to make it a vec4.
-        Value = Builder.CreateShuffleVector(Value, ArrayRef<int>{0, 1, 2, -1},
+        Value = Builder.CreateShuffleVector(Value, llvm::ArrayRef<int>{0, 1, 2, -1},
                                             "extractVec");
         SrcTy = llvm::FixedVectorType::get(VecTy->getElementType(), 4);
       }
@@ -2289,7 +2289,7 @@ RValue CodeGenFunction::EmitLoadOfExtVectorElementLValue(LValue LV) {
   // Always use shuffle vector to try to retain the original program structure
   unsigned NumResultElts = ExprVT->getNumElements();
 
-  SmallVector<int, 4> Mask;
+  llvm::SmallVector<int, 4> Mask;
   for (unsigned i = 0; i != NumResultElts; ++i)
     Mask.push_back(getAccessedFieldNo(i, Elts));
 
@@ -2568,7 +2568,7 @@ void CodeGenFunction::EmitStoreThroughExtVectorComponentLValue(RValue Src,
       // Use shuffle vector is the src and destination are the same number of
       // elements and restore the vector mask since it is on the side it will be
       // stored.
-      SmallVector<int, 4> Mask(NumDstElts);
+      llvm::SmallVector<int, 4> Mask(NumDstElts);
       for (unsigned i = 0; i != NumSrcElts; ++i)
         Mask[getAccessedFieldNo(i, Elts)] = i;
 
@@ -2578,13 +2578,13 @@ void CodeGenFunction::EmitStoreThroughExtVectorComponentLValue(RValue Src,
       // into the destination.
       // FIXME: since we're shuffling with undef, can we just use the indices
       //        into that?  This could be simpler.
-      SmallVector<int, 4> ExtMask;
+      llvm::SmallVector<int, 4> ExtMask;
       for (unsigned i = 0; i != NumSrcElts; ++i)
         ExtMask.push_back(i);
       ExtMask.resize(NumDstElts, -1);
       llvm::Value *ExtSrcVal = Builder.CreateShuffleVector(SrcVal, ExtMask);
       // build identity
-      SmallVector<int, 4> Mask;
+      llvm::SmallVector<int, 4> Mask;
       for (unsigned i = 0; i != NumDstElts; ++i)
         Mask.push_back(i);
 
@@ -2884,7 +2884,7 @@ static LValue EmitCapturedFieldLValue(CodeGenFunction &CGF, const FieldDecl *FD,
 /// register type, allocation type or even optimization options could be
 /// passed down via the metadata node.
 static LValue EmitGlobalNamedRegister(const VarDecl *VD, CodeGenModule &CGM) {
-  SmallString<64> Name("llvm.named.register.");
+  llvm::SmallString<64> Name("llvm.named.register.");
   AsmLabelAttr *Asm = VD->getAttr<AsmLabelAttr>();
   assert(Asm->getLabel().size() < 64-Name.size() &&
       "Register name too big");
@@ -3260,10 +3260,10 @@ LValue CodeGenFunction::EmitObjCEncodeExprLValue(const ObjCEncodeExpr *E) {
 LValue CodeGenFunction::EmitPredefinedLValue(const PredefinedExpr *E) {
   auto SL = E->getFunctionName();
   assert(SL != nullptr && "No StringLiteral name in PredefinedExpr");
-  StringRef FnName = CurFn->getName();
+  llvm::StringRef FnName = CurFn->getName();
   if (FnName.starts_with("\01"))
     FnName = FnName.substr(1);
-  StringRef NameItems[] = {
+  llvm::StringRef NameItems[] = {
       PredefinedExpr::getIdentKindName(E->getIdentKind()), FnName};
   std::string GVName = llvm::join(NameItems, NameItems + 2, ".");
   if (auto *BD = dyn_cast_or_null<BlockDecl>(CurCodeDecl)) {
@@ -3272,7 +3272,7 @@ LValue CodeGenFunction::EmitPredefinedLValue(const PredefinedExpr *E) {
       unsigned Discriminator =
           CGM.getCXXABI().getMangleContext().getBlockId(BD, true);
       if (Discriminator)
-        Name += "_" + Twine(Discriminator + 1).str();
+        Name += "_" + llvm::Twine(Discriminator + 1).str();
       auto C = CGM.GetAddrOfConstantCString(Name, GVName.c_str());
       return MakeAddrLValue(C, E->getType(), AlignmentSource::Decl);
     } else {
@@ -3313,10 +3313,10 @@ llvm::Constant *CodeGenFunction::EmitCheckTypeDescriptor(QualType T) {
 
   // Format the type name as if for a diagnostic, including quotes and
   // optionally an 'aka'.
-  SmallString<32> Buffer;
+  llvm::SmallString<32> Buffer;
   CGM.getDiags().ConvertArgToString(
-      DiagnosticsEngine::ak_qualtype, (intptr_t)T.getAsOpaquePtr(), StringRef(),
-      StringRef(), std::nullopt, Buffer, std::nullopt);
+      DiagnosticsEngine::ak_qualtype, (intptr_t)T.getAsOpaquePtr(), llvm::StringRef(),
+      llvm::StringRef(), std::nullopt, Buffer, std::nullopt);
 
   llvm::Constant *Components[] = {
     Builder.getInt16(TypeKind), Builder.getInt16(TypeInfo),
@@ -3380,7 +3380,7 @@ llvm::Constant *CodeGenFunction::EmitCheckSourceLocation(SourceLocation Loc) {
 
   PresumedLoc PLoc = getContext().getSourceManager().getPresumedLoc(Loc);
   if (PLoc.isValid()) {
-    StringRef FilenameString = PLoc.getFilename();
+    llvm::StringRef FilenameString = PLoc.getFilename();
 
     int PathComponentsToStrip =
         CGM.getCodeGenOpts().EmitCheckPathComponentsToStrip;
@@ -3463,7 +3463,7 @@ const SanitizerHandlerInfo SanitizerHandlers[] = {
 
 static void emitCheckHandlerCall(CodeGenFunction &CGF,
                                  llvm::FunctionType *FnType,
-                                 ArrayRef<llvm::Value *> FnArgs,
+                                 llvm::ArrayRef<llvm::Value *> FnArgs,
                                  SanitizerHandler CheckHandler,
                                  CheckRecoverableKind RecoverKind, bool IsFatal,
                                  llvm::BasicBlock *ContBB) {
@@ -3477,7 +3477,7 @@ static void emitCheckHandlerCall(CodeGenFunction &CGF,
       IsFatal && RecoverKind != CheckRecoverableKind::Unrecoverable;
   bool MinimalRuntime = CGF.CGM.getCodeGenOpts().SanitizeMinimalRuntime;
   const SanitizerHandlerInfo &CheckInfo = SanitizerHandlers[CheckHandler];
-  const StringRef CheckName = CheckInfo.Name;
+  const llvm::StringRef CheckName = CheckInfo.Name;
   std::string FnName = "__ubsan_handle_" + CheckName.str();
   if (CheckInfo.Version && !MinimalRuntime)
     FnName += "_v" + llvm::utostr(CheckInfo.Version);
@@ -3510,14 +3510,14 @@ static void emitCheckHandlerCall(CodeGenFunction &CGF,
 }
 
 void CodeGenFunction::EmitCheck(
-    ArrayRef<std::pair<llvm::Value *, SanitizerMask>> Checked,
-    SanitizerHandler CheckHandler, ArrayRef<llvm::Constant *> StaticArgs,
-    ArrayRef<llvm::Value *> DynamicArgs) {
+    llvm::ArrayRef<std::pair<llvm::Value *, SanitizerMask>> Checked,
+    SanitizerHandler CheckHandler, llvm::ArrayRef<llvm::Constant *> StaticArgs,
+    llvm::ArrayRef<llvm::Value *> DynamicArgs) {
   assert(IsSanitizerScope);
   assert(Checked.size() > 0);
   assert(CheckHandler >= 0 &&
          size_t(CheckHandler) < std::size(SanitizerHandlers));
-  const StringRef CheckName = SanitizerHandlers[CheckHandler].Name;
+  const llvm::StringRef CheckName = SanitizerHandlers[CheckHandler].Name;
 
   llvm::Value *FatalCond = nullptr;
   llvm::Value *RecoverableCond = nullptr;
@@ -3580,8 +3580,8 @@ void CodeGenFunction::EmitCheck(
   // Handler functions take an i8* pointing to the (handler-specific) static
   // information block, followed by a sequence of intptr_t arguments
   // representing operand values.
-  SmallVector<llvm::Value *, 4> Args;
-  SmallVector<llvm::Type *, 4> ArgTypes;
+  llvm::SmallVector<llvm::Value *, 4> Args;
+  llvm::SmallVector<llvm::Type *, 4> ArgTypes;
   if (!CGM.getCodeGenOpts().SanitizeMinimalRuntime) {
     Args.reserve(DynamicArgs.size() + 1);
     ArgTypes.reserve(DynamicArgs.size() + 1);
@@ -3634,7 +3634,7 @@ void CodeGenFunction::EmitCheck(
 
 void CodeGenFunction::EmitCfiSlowPathCheck(
     SanitizerMask Kind, llvm::Value *Cond, llvm::ConstantInt *TypeId,
-    llvm::Value *Ptr, ArrayRef<llvm::Constant *> StaticArgs) {
+    llvm::Value *Ptr, llvm::ArrayRef<llvm::Constant *> StaticArgs) {
   llvm::BasicBlock *Cont = createBasicBlock("cfi.cont");
 
   llvm::BasicBlock *CheckBB = createBasicBlock("cfi.slowpath");
@@ -3706,7 +3706,7 @@ void CodeGenFunction::EmitCfiCheckStub() {
   llvm::LLVMContext &Ctx = M->getContext();
   llvm::BasicBlock *BB = llvm::BasicBlock::Create(Ctx, "entry", F);
   // CrossDSOCFI pass is not executed if there is no executable code.
-  SmallVector<llvm::Value*> Args{F->getArg(2), F->getArg(1)};
+  llvm::SmallVector<llvm::Value*> Args{F->getArg(2), F->getArg(1)};
   llvm::CallInst::Create(M->getFunction("__cfi_check_fail"), Args, "", BB);
   llvm::ReturnInst::Create(Ctx, nullptr, BB);
 }
@@ -3787,7 +3787,7 @@ void CodeGenFunction::EmitCfiCheckFail() {
       {CFITCK_UnrelatedCast, SanitizerKind::CFIUnrelatedCast},
       {CFITCK_ICall, SanitizerKind::CFIICall}};
 
-  SmallVector<std::pair<llvm::Value *, SanitizerMask>, 5> Checks;
+  llvm::SmallVector<std::pair<llvm::Value *, SanitizerMask>, 5> Checks;
   for (auto CheckKindMaskPair : CheckKinds) {
     int Kind = CheckKindMaskPair.first;
     SanitizerMask Mask = CheckKindMaskPair.second;
@@ -3928,7 +3928,7 @@ static const Expr *isSimpleArrayDecayOperand(const Expr *E) {
 static llvm::Value *emitArraySubscriptGEP(CodeGenFunction &CGF,
                                           llvm::Type *elemType,
                                           llvm::Value *ptr,
-                                          ArrayRef<llvm::Value*> indices,
+                                          llvm::ArrayRef<llvm::Value*> indices,
                                           bool inbounds,
                                           bool signedIndices,
                                           SourceLocation loc,
@@ -3943,7 +3943,7 @@ static llvm::Value *emitArraySubscriptGEP(CodeGenFunction &CGF,
 }
 
 static Address emitArraySubscriptGEP(CodeGenFunction &CGF, Address addr,
-                                     ArrayRef<llvm::Value *> indices,
+                                     llvm::ArrayRef<llvm::Value *> indices,
                                      llvm::Type *elementType, bool inbounds,
                                      bool signedIndices, SourceLocation loc,
                                      CharUnits align,
@@ -4045,7 +4045,7 @@ static bool IsPreserveAIArrayBase(CodeGenFunction &CGF, const Expr *ArrayBase) {
 }
 
 static Address emitArraySubscriptGEP(CodeGenFunction &CGF, Address addr,
-                                     ArrayRef<llvm::Value *> indices,
+                                     llvm::ArrayRef<llvm::Value *> indices,
                                      QualType eltType, bool inbounds,
                                      bool signedIndices, SourceLocation loc,
                                      QualType *arrayType = nullptr,
@@ -4601,7 +4601,7 @@ EmitExtVectorElementExpr(const ExtVectorElementExpr *E) {
     E->getType().withCVRQualifiers(Base.getQuals().getCVRQualifiers());
 
   // Encode the element access list into a vector of unsigned indices.
-  SmallVector<uint32_t, 4> Indices;
+  llvm::SmallVector<uint32_t, 4> Indices;
   E->getEncodedElementAccess(Indices);
 
   if (Base.isSimple()) {
@@ -4613,7 +4613,7 @@ EmitExtVectorElementExpr(const ExtVectorElementExpr *E) {
   assert(Base.isExtVectorElt() && "Can only subscript lvalue vec elts here!");
 
   llvm::Constant *BaseElts = Base.getExtVectorElts();
-  SmallVector<llvm::Constant *, 4> CElts;
+  llvm::SmallVector<llvm::Constant *, 4> CElts;
 
   for (unsigned i = 0, e = Indices.size(); i != e; ++i)
     CElts.push_back(BaseElts->getAggregateElement(Indices[i]));
@@ -5488,7 +5488,7 @@ static CGCallee EmitDirectCallee(CodeGenFunction &CGF, GlobalDecl GD) {
     std::string NoBuiltinFD = ("no-builtin-" + FD->getName()).str();
     std::string NoBuiltins = "no-builtins";
 
-    StringRef Ident = CGF.CGM.getMangledName(GD);
+    llvm::StringRef Ident = CGF.CGM.getMangledName(GD);
     std::string FDInlineName = (Ident + ".inline").str();
 
     bool IsPredefinedLibFunction =
@@ -6129,7 +6129,7 @@ static LValueOrRValue emitPseudoObjectExpr(CodeGenFunction &CGF,
                                            const PseudoObjectExpr *E,
                                            bool forLValue,
                                            AggValueSlot slot) {
-  SmallVector<CodeGenFunction::OpaqueValueMappingData, 4> opaques;
+  llvm::SmallVector<CodeGenFunction::OpaqueValueMappingData, 4> opaques;
 
   // Find the result expression, if any.
   const Expr *resultExpr = E->getResultExpr();

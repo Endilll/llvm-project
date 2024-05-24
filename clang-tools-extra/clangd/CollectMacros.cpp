@@ -106,7 +106,7 @@ public:
                               std::vector<clangd::PragmaMark> &Out)
       : SM(SM), Out(Out) {}
 
-  void PragmaMark(SourceLocation Loc, StringRef Trivia) override {
+  void PragmaMark(SourceLocation Loc, llvm::StringRef Trivia) override {
     if (isInsideMainFile(Loc, SM)) {
       // FIXME: This range should just cover `XX` in `#pragma mark XX` and
       // `- XX` in `#pragma mark - XX`.

@@ -47,7 +47,7 @@ static bool shouldUnindentNextOperator(const FormatToken &Tok) {
 // Returns the length of everything up to the first possible line break after
 // the ), ], } or > matching \c Tok.
 static unsigned getLengthToMatchingParen(const FormatToken &Tok,
-                                         ArrayRef<ParenState> Stack) {
+                                         llvm::ArrayRef<ParenState> Stack) {
   // Normally whether or not a break before T is possible is calculated and
   // stored in T.CanBreakBefore. Braces, array initializers and text proto
   // messages like `key: < ... >` are an exception: a break is possible
@@ -159,7 +159,7 @@ static bool opensProtoMessageField(const FormatToken &LessTok,
 // Returns the delimiter of a raw string literal, or std::nullopt if TokenText
 // is not the text of a raw string literal. The delimiter could be the empty
 // string.  For example, the delimiter of R"deli(cont)deli" is deli.
-static std::optional<StringRef> getRawStringDelimiter(StringRef TokenText) {
+static std::optional<llvm::StringRef> getRawStringDelimiter(llvm::StringRef TokenText) {
   if (TokenText.size() < 5 // The smallest raw string possible is 'R"()"'.
       || !TokenText.starts_with("R\"") || !TokenText.ends_with("\"")) {
     return std::nullopt;
@@ -169,9 +169,9 @@ static std::optional<StringRef> getRawStringDelimiter(StringRef TokenText) {
   // size at most 16 by the standard, so the first '(' must be among the first
   // 19 bytes.
   size_t LParenPos = TokenText.substr(0, 19).find_first_of('(');
-  if (LParenPos == StringRef::npos)
+  if (LParenPos == llvm::StringRef::npos)
     return std::nullopt;
-  StringRef Delimiter = TokenText.substr(2, LParenPos - 2);
+  llvm::StringRef Delimiter = TokenText.substr(2, LParenPos - 2);
 
   // Check that the string ends in ')Delimiter"'.
   size_t RParenPos = TokenText.size() - Delimiter.size() - 2;
@@ -184,12 +184,12 @@ static std::optional<StringRef> getRawStringDelimiter(StringRef TokenText) {
 
 // Returns the canonical delimiter for \p Language, or the empty string if no
 // canonical delimiter is specified.
-static StringRef
+static llvm::StringRef
 getCanonicalRawStringDelimiter(const FormatStyle &Style,
                                FormatStyle::LanguageKind Language) {
   for (const auto &Format : Style.RawStringFormats)
     if (Format.Language == Language)
-      return StringRef(Format.CanonicalDelimiter);
+      return llvm::StringRef(Format.CanonicalDelimiter);
   return "";
 }
 
@@ -208,15 +208,15 @@ RawStringFormatStyleManager::RawStringFormatStyleManager(
       LanguageStyle = PredefinedStyle;
     }
     LanguageStyle->ColumnLimit = CodeStyle.ColumnLimit;
-    for (StringRef Delimiter : RawStringFormat.Delimiters)
+    for (llvm::StringRef Delimiter : RawStringFormat.Delimiters)
       DelimiterStyle.insert({Delimiter, *LanguageStyle});
-    for (StringRef EnclosingFunction : RawStringFormat.EnclosingFunctions)
+    for (llvm::StringRef EnclosingFunction : RawStringFormat.EnclosingFunctions)
       EnclosingFunctionStyle.insert({EnclosingFunction, *LanguageStyle});
   }
 }
 
 std::optional<FormatStyle>
-RawStringFormatStyleManager::getDelimiterStyle(StringRef Delimiter) const {
+RawStringFormatStyleManager::getDelimiterStyle(llvm::StringRef Delimiter) const {
   auto It = DelimiterStyle.find(Delimiter);
   if (It == DelimiterStyle.end())
     return std::nullopt;
@@ -225,7 +225,7 @@ RawStringFormatStyleManager::getDelimiterStyle(StringRef Delimiter) const {
 
 std::optional<FormatStyle>
 RawStringFormatStyleManager::getEnclosingFunctionStyle(
-    StringRef EnclosingFunction) const {
+    llvm::StringRef EnclosingFunction) const {
   auto It = EnclosingFunctionStyle.find(EnclosingFunction);
   if (It == EnclosingFunctionStyle.end())
     return std::nullopt;
@@ -2040,11 +2040,11 @@ void ContinuationIndenter::moveStateToNewBlock(LineState &State, bool NewLine) {
   State.Stack.back().BreakBeforeParameter = true;
 }
 
-static unsigned getLastLineEndColumn(StringRef Text, unsigned StartColumn,
+static unsigned getLastLineEndColumn(llvm::StringRef Text, unsigned StartColumn,
                                      unsigned TabWidth,
                                      encoding::Encoding Encoding) {
   size_t LastNewlinePos = Text.find_last_of("\n");
-  if (LastNewlinePos == StringRef::npos) {
+  if (LastNewlinePos == llvm::StringRef::npos) {
     return StartColumn +
            encoding::columnWidthWithTabs(Text, StartColumn, TabWidth, Encoding);
   } else {
@@ -2057,8 +2057,8 @@ unsigned ContinuationIndenter::reformatRawStringLiteral(
     const FormatToken &Current, LineState &State,
     const FormatStyle &RawStringStyle, bool DryRun, bool Newline) {
   unsigned StartColumn = State.Column - Current.ColumnWidth;
-  StringRef OldDelimiter = *getRawStringDelimiter(Current.TokenText);
-  StringRef NewDelimiter =
+  llvm::StringRef OldDelimiter = *getRawStringDelimiter(Current.TokenText);
+  llvm::StringRef NewDelimiter =
       getCanonicalRawStringDelimiter(Style, RawStringStyle.Language);
   if (NewDelimiter.empty())
     NewDelimiter = OldDelimiter;
@@ -2067,14 +2067,14 @@ unsigned ContinuationIndenter::reformatRawStringLiteral(
   unsigned OldPrefixSize = 3 + OldDelimiter.size();
   unsigned OldSuffixSize = 2 + OldDelimiter.size();
   // We create a virtual text environment which expects a null-terminated
-  // string, so we cannot use StringRef.
+  // string, so we cannot use llvm::StringRef.
   std::string RawText = std::string(
       Current.TokenText.substr(OldPrefixSize).drop_back(OldSuffixSize));
   if (NewDelimiter != OldDelimiter) {
     // Don't update to the canonical delimiter 'deli' if ')deli"' occurs in the
     // raw string.
     std::string CanonicalDelimiterSuffix = (")" + NewDelimiter + "\"").str();
-    if (StringRef(RawText).contains(CanonicalDelimiterSuffix))
+    if (llvm::StringRef(RawText).contains(CanonicalDelimiterSuffix))
       NewDelimiter = OldDelimiter;
   }
 
@@ -2273,7 +2273,7 @@ unsigned ContinuationIndenter::handleEndOfLine(const FormatToken &Current,
 
 // Returns the enclosing function name of a token, or the empty string if not
 // found.
-static StringRef getEnclosingFunctionName(const FormatToken &Current) {
+static llvm::StringRef getEnclosingFunctionName(const FormatToken &Current) {
   // Look for: 'function(' or 'function<templates>(' before Current.
   auto Tok = Current.getPreviousNonComment();
   if (!Tok || Tok->isNot(tok::l_paren))
@@ -2346,7 +2346,7 @@ ContinuationIndenter::createBreakableToken(const FormatToken &Current,
         Current.Previous->isOneOf(tok::kw_export, Keywords.kw_import)) {
       return nullptr;
     }
-    StringRef Text = Current.TokenText;
+    llvm::StringRef Text = Current.TokenText;
 
     // We need this to address the case where there is an unbreakable tail only
     // if certain other formatting decisions have been taken. The
@@ -2376,8 +2376,8 @@ ContinuationIndenter::createBreakableToken(const FormatToken &Current,
           UnbreakableTailLength, State.Line->InPPDirective, Encoding, Style);
     }
 
-    StringRef Prefix;
-    StringRef Postfix;
+    llvm::StringRef Prefix;
+    llvm::StringRef Postfix;
     // FIXME: Handle whitespace between '_T', '(', '"..."', and ')'.
     // FIXME: Store Prefix and Suffix (or PrefixLength and SuffixLength to
     // reduce the overhead) for each FormatToken, which is a string, so that we
@@ -2506,7 +2506,7 @@ ContinuationIndenter::breakProtrudingToken(const FormatToken &Current,
       BreakableToken::Split Split =
           Token->getSplit(LineIndex, TailOffset, ColumnLimit,
                           ContentStartColumn, CommentPragmasRegex);
-      if (Split.first == StringRef::npos) {
+      if (Split.first == llvm::StringRef::npos) {
         // No break opportunity - update the penalty and continue with the next
         // logical line.
         if (LineIndex < EndIndex - 1) {
@@ -2550,7 +2550,7 @@ ContinuationIndenter::breakProtrudingToken(const FormatToken &Current,
         // Compute the columns necessary to fit the next non-breakable sequence
         // into the current line.
         unsigned ToNextSplitColumns = 0;
-        if (NextSplit.first == StringRef::npos) {
+        if (NextSplit.first == llvm::StringRef::npos) {
           ToNextSplitColumns = Token->getRemainingLength(LineIndex, TailOffset,
                                                          ContentStartColumn);
         } else {
@@ -2680,7 +2680,7 @@ ContinuationIndenter::breakProtrudingToken(const FormatToken &Current,
         LLVM_DEBUG(llvm::dbgs()
                    << "    Size of reflown text: " << ContentStartColumn
                    << "\n    Potential reflow split: ");
-        if (SplitBeforeNext.first != StringRef::npos) {
+        if (SplitBeforeNext.first != llvm::StringRef::npos) {
           LLVM_DEBUG(llvm::dbgs() << SplitBeforeNext.first << ", "
                                   << SplitBeforeNext.second << "\n");
           TailOffset = SplitBeforeNext.first + SplitBeforeNext.second;
@@ -2703,7 +2703,7 @@ ContinuationIndenter::breakProtrudingToken(const FormatToken &Current,
             BreakableToken::Split Split =
                 Token->getSplit(NextLineIndex, TailOffset, ColumnLimit,
                                 ContentStartColumn, CommentPragmasRegex);
-            if (Split.first == StringRef::npos) {
+            if (Split.first == llvm::StringRef::npos) {
               LLVM_DEBUG(llvm::dbgs() << "    Did not find later break\n");
               Reflow = false;
             } else {
@@ -2766,7 +2766,7 @@ ContinuationIndenter::breakProtrudingToken(const FormatToken &Current,
 
   BreakableToken::Split SplitAfterLastLine =
       Token->getSplitAfterLastLine(TailOffset);
-  if (SplitAfterLastLine.first != StringRef::npos) {
+  if (SplitAfterLastLine.first != llvm::StringRef::npos) {
     LLVM_DEBUG(llvm::dbgs() << "Replacing whitespace after last line.\n");
 
     // We add the last line's penalty here, since that line is going to be split

@@ -26,7 +26,7 @@ void CloexecCreatCheck::registerMatchers(MatchFinder *Finder) {
 
 void CloexecCreatCheck::check(const MatchFinder::MatchResult &Result) {
   const std::string &ReplacementText =
-      (Twine("open (") + getSpellingArg(Result, 0) +
+      (llvm::Twine("open (") + getSpellingArg(Result, 0) +
        ", O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, " +
        getSpellingArg(Result, 1) + ")")
           .str();

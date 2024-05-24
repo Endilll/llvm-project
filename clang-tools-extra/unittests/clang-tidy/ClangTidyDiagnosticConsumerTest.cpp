@@ -9,7 +9,7 @@ namespace test {
 namespace {
 class TestCheck : public ClangTidyCheck {
 public:
-  TestCheck(StringRef Name, ClangTidyContext *Context)
+  TestCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {
     diag("DiagWithNoLoc");
   }
@@ -26,7 +26,7 @@ public:
 
 class HighlightTestCheck : public ClangTidyCheck {
 public:
-  HighlightTestCheck(StringRef Name, ClangTidyContext *Context)
+  HighlightTestCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override {
     Finder->addMatcher(ast_matchers::varDecl().bind("var"), this);
@@ -39,7 +39,7 @@ public:
 
 class InvalidRangeTestCheck : public ClangTidyCheck {
 public:
-  InvalidRangeTestCheck(StringRef Name, ClangTidyContext *Context)
+  InvalidRangeTestCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override {
     Finder->addMatcher(ast_matchers::varDecl().bind("var"), this);

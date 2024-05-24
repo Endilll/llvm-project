@@ -22,7 +22,7 @@ namespace clang::tidy::bugprone {
 /// removed due to using an inappropriate overload.
 class InaccurateEraseCheck : public ClangTidyCheck {
 public:
-  InaccurateEraseCheck(StringRef Name, ClangTidyContext *Context)
+  InaccurateEraseCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

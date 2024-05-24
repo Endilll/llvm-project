@@ -33,7 +33,7 @@ public:
     }
   }
 
-  StringRef getName() const override { return "Test"; }
+  llvm::StringRef getName() const override { return "Test"; }
 };
 
 class PathDiagConsumer : public PathDiagnosticConsumer {
@@ -62,7 +62,7 @@ public:
     }
   }
 
-  StringRef getName() const override { return "Test"; }
+  llvm::StringRef getName() const override { return "Test"; }
 };
 
 using AddCheckerFn = void(AnalysisASTConsumer &AnalysisConsumer,
@@ -90,7 +90,7 @@ public:
       : DiagsOutput(DiagsOutput), OnlyEmitWarnings(OnlyEmitWarnings) {}
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &Compiler,
-                                                 StringRef File) override {
+                                                 llvm::StringRef File) override {
     std::unique_ptr<AnalysisASTConsumer> AnalysisConsumer =
         CreateAnalysisConsumer(Compiler);
     if (OnlyEmitWarnings)
@@ -104,19 +104,19 @@ public:
   }
 };
 
-inline SmallString<80> getCurrentTestNameAsFileName() {
+inline llvm::SmallString<80> getCurrentTestNameAsFileName() {
   const ::testing::TestInfo *Info =
       ::testing::UnitTest::GetInstance()->current_test_info();
 
-  SmallString<80> FileName;
-  (Twine{Info->name()} + ".cc").toVector(FileName);
+  llvm::SmallString<80> FileName;
+  (llvm::Twine{Info->name()} + ".cc").toVector(FileName);
   return FileName;
 }
 
 template <AddCheckerFn... Fns>
 bool runCheckerOnCode(const std::string &Code, std::string &Diags,
                       bool OnlyEmitWarnings = false) {
-  const SmallVectorImpl<char> &FileName = getCurrentTestNameAsFileName();
+  const llvm::SmallVectorImpl<char> &FileName = getCurrentTestNameAsFileName();
   llvm::raw_string_ostream OS(Diags);
   return tooling::runToolOnCode(
       std::make_unique<TestAction<Fns...>>(OS, OnlyEmitWarnings), Code,
@@ -133,7 +133,7 @@ bool runCheckerOnCodeWithArgs(const std::string &Code,
                               const std::vector<std::string> &Args,
                               std::string &Diags,
                               bool OnlyEmitWarnings = false) {
-  const SmallVectorImpl<char> &FileName = getCurrentTestNameAsFileName();
+  const llvm::SmallVectorImpl<char> &FileName = getCurrentTestNameAsFileName();
   llvm::raw_string_ostream OS(Diags);
   return tooling::runToolOnCodeWithArgs(
       std::make_unique<TestAction<Fns...>>(OS, OnlyEmitWarnings), Code, Args,

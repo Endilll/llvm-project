@@ -16,7 +16,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::bugprone {
 
-static StringRef getFunctionSpelling(const MatchFinder::MatchResult &Result,
+static llvm::StringRef getFunctionSpelling(const MatchFinder::MatchResult &Result,
                                      const char *BindingStr) {
   const CallExpr *MatchedCall = cast<CallExpr>(
       (Result.Nodes.getNodeAs<BinaryOperator>(BindingStr))->getLHS());
@@ -64,7 +64,7 @@ void PosixReturnCheck::check(const MatchFinder::MatchResult &Result) {
     diag(OperatorLoc, "the comparison always evaluates to false because %0 "
                       "always returns non-negative values")
         << getFunctionSpelling(Result, "ltzop")
-        << FixItHint::CreateReplacement(OperatorLoc, Twine(">").str());
+        << FixItHint::CreateReplacement(OperatorLoc, llvm::Twine(">").str());
     return;
   }
   if (const auto *AlwaysTrueOp =

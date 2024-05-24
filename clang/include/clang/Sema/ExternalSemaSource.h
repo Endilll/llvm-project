@@ -75,7 +75,7 @@ public:
   /// Load the set of namespaces that are known to the external source,
   /// which will be used during typo correction.
   virtual void ReadKnownNamespaces(
-                           SmallVectorImpl<NamespaceDecl *> &Namespaces);
+                           llvm::SmallVectorImpl<NamespaceDecl *> &Namespaces);
 
   /// Load the set of used but not defined functions or variables with
   /// internal linkage, or used but not defined internal functions.
@@ -103,7 +103,7 @@ public:
   /// invoked multiple times; the external source should take care not to
   /// introduce the same declarations repeatedly.
   virtual void ReadTentativeDefinitions(
-                                  SmallVectorImpl<VarDecl *> &TentativeDefs) {}
+                                  llvm::SmallVectorImpl<VarDecl *> &TentativeDefs) {}
 
   /// Read the set of unused file-scope declarations known to the
   /// external Sema source.
@@ -113,7 +113,7 @@ public:
   /// invoked multiple times; the external source should take care not to
   /// introduce the same declarations repeatedly.
   virtual void ReadUnusedFileScopedDecls(
-                 SmallVectorImpl<const DeclaratorDecl *> &Decls) {}
+                 llvm::SmallVectorImpl<const DeclaratorDecl *> &Decls) {}
 
   /// Read the set of delegating constructors known to the
   /// external Sema source.
@@ -123,7 +123,7 @@ public:
   /// invoked multiple times; the external source should take care not to
   /// introduce the same declarations repeatedly.
   virtual void ReadDelegatingConstructors(
-                 SmallVectorImpl<CXXConstructorDecl *> &Decls) {}
+                 llvm::SmallVectorImpl<CXXConstructorDecl *> &Decls) {}
 
   /// Read the set of ext_vector type declarations known to the
   /// external Sema source.
@@ -132,7 +132,7 @@ public:
   /// the given vector of declarations. Note that this routine may be
   /// invoked multiple times; the external source should take care not to
   /// introduce the same declarations repeatedly.
-  virtual void ReadExtVectorDecls(SmallVectorImpl<TypedefNameDecl *> &Decls) {}
+  virtual void ReadExtVectorDecls(llvm::SmallVectorImpl<TypedefNameDecl *> &Decls) {}
 
   /// Read the set of potentially unused typedefs known to the source.
   ///
@@ -151,7 +151,7 @@ public:
   /// may be invoked multiple times; the external source should take care not
   /// to introduce the same selectors repeatedly.
   virtual void ReadReferencedSelectors(
-                 SmallVectorImpl<std::pair<Selector, SourceLocation> > &Sels) {}
+                 llvm::SmallVectorImpl<std::pair<Selector, SourceLocation> > &Sels) {}
 
   /// Read the set of weak, undeclared identifiers known to the
   /// external Sema source.
@@ -161,14 +161,14 @@ public:
   /// the external source should take care not to introduce the same identifiers
   /// repeatedly.
   virtual void ReadWeakUndeclaredIdentifiers(
-                 SmallVectorImpl<std::pair<IdentifierInfo *, WeakInfo> > &WI) {}
+                 llvm::SmallVectorImpl<std::pair<IdentifierInfo *, WeakInfo> > &WI) {}
 
   /// Read the set of used vtables known to the external Sema source.
   ///
   /// The external source should append its own used vtables to the given
   /// vector. Note that this routine may be invoked multiple times; the external
   /// source should take care not to introduce the same vtables repeatedly.
-  virtual void ReadUsedVTables(SmallVectorImpl<ExternalVTableUse> &VTables) {}
+  virtual void ReadUsedVTables(llvm::SmallVectorImpl<ExternalVTableUse> &VTables) {}
 
   /// Read the set of pending instantiations known to the external
   /// Sema source.
@@ -178,7 +178,7 @@ public:
   /// external source should take care not to introduce the same instantiations
   /// repeatedly.
   virtual void ReadPendingInstantiations(
-                 SmallVectorImpl<std::pair<ValueDecl *,
+                 llvm::SmallVectorImpl<std::pair<ValueDecl *,
                                            SourceLocation> > &Pending) {}
 
   /// Read the set of late parsed template functions for this source.

@@ -35,7 +35,7 @@ AST_MATCHER(Type, sugaredNullptrType) {
 /// to null within.
 /// Finding sequences of explicit casts is necessary so that an entire sequence
 /// can be replaced instead of just the inner-most implicit cast.
-StatementMatcher makeCastSequenceMatcher(llvm::ArrayRef<StringRef> NameList) {
+StatementMatcher makeCastSequenceMatcher(llvm::ArrayRef<llvm::StringRef> NameList) {
   auto ImplicitCastToNull = implicitCastExpr(
       anyOf(hasCastKind(CK_NullToPointer), hasCastKind(CK_NullToMemberPointer)),
       unless(hasImplicitDestinationType(qualType(substTemplateTypeParmType()))),
@@ -96,7 +96,7 @@ void replaceWithNullptr(ClangTidyCheck &Check, SourceManager &SM,
 /// #define MY_NULL NULL
 /// \endcode
 /// If \p Loc points to NULL, this function will return the name MY_NULL.
-StringRef getOutermostMacroName(SourceLocation Loc, const SourceManager &SM,
+llvm::StringRef getOutermostMacroName(SourceLocation Loc, const SourceManager &SM,
                                 const LangOptions &LO) {
   assert(Loc.isMacroID());
   SourceLocation OutermostMacroLoc;
@@ -191,7 +191,7 @@ private:
 /// ambiguities.
 class CastSequenceVisitor : public RecursiveASTVisitor<CastSequenceVisitor> {
 public:
-  CastSequenceVisitor(ASTContext &Context, ArrayRef<StringRef> NullMacros,
+  CastSequenceVisitor(ASTContext &Context, llvm::ArrayRef<llvm::StringRef> NullMacros,
                       ClangTidyCheck &Check)
       : SM(Context.getSourceManager()), Context(Context),
         NullMacros(NullMacros), Check(Check) {}
@@ -258,7 +258,7 @@ public:
     }
 
     if (SM.isMacroBodyExpansion(StartLoc) && SM.isMacroBodyExpansion(EndLoc)) {
-      StringRef OutermostMacroName =
+      llvm::StringRef OutermostMacroName =
           getOutermostMacroName(StartLoc, SM, Context.getLangOpts());
 
       // Check to see if the user wants to replace the macro being expanded.
@@ -342,7 +342,7 @@ private:
         if (!MacroLoc.isFileID())
           return false;
 
-        StringRef Name =
+        llvm::StringRef Name =
             Lexer::getImmediateMacroName(OldArgLoc, SM, Context.getLangOpts());
         return llvm::is_contained(NullMacros, Name);
       }
@@ -471,7 +471,7 @@ private:
 
   SourceManager &SM;
   ASTContext &Context;
-  ArrayRef<StringRef> NullMacros;
+  llvm::ArrayRef<llvm::StringRef> NullMacros;
   ClangTidyCheck &Check;
   Expr *FirstSubExpr = nullptr;
   bool PruneSubtree = false;
@@ -479,13 +479,13 @@ private:
 
 } // namespace
 
-UseNullptrCheck::UseNullptrCheck(StringRef Name, ClangTidyContext *Context)
+UseNullptrCheck::UseNullptrCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       NullMacrosStr(Options.get("NullMacros", "NULL")),
       IgnoredTypes(utils::options::parseStringList(Options.get(
           "IgnoredTypes",
           "std::_CmpUnspecifiedParam::;^std::__cmp_cat::__unspec"))) {
-  StringRef(NullMacrosStr).split(NullMacros, ",");
+  llvm::StringRef(NullMacrosStr).split(NullMacros, ",");
 }
 
 void UseNullptrCheck::storeOptions(ClangTidyOptions::OptionMap &Opts) {

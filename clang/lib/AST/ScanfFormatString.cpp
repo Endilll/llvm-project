@@ -523,7 +523,7 @@ bool ScanfSpecifier::fixType(QualType QT, QualType RawQT,
   return true;
 }
 
-void ScanfSpecifier::toString(raw_ostream &os) const {
+void ScanfSpecifier::toString(llvm::raw_ostream &os) const {
   os << "%";
 
   if (usesPositionalArg())

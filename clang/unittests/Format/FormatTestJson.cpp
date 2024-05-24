@@ -18,7 +18,7 @@ namespace format {
 
 class FormatTestJson : public testing::Test {
 protected:
-  static std::string format(StringRef Code, unsigned Offset, unsigned Length,
+  static std::string format(llvm::StringRef Code, unsigned Offset, unsigned Length,
                             const FormatStyle &Style) {
     LLVM_DEBUG(llvm::errs() << "---\n");
     LLVM_DEBUG(llvm::errs() << Code << "\n\n");
@@ -36,7 +36,7 @@ protected:
     auto ChangedCode = applyAllReplacements(Code, Replaces);
     if (!ChangedCode)
       llvm::errs() << "Bad Json varibale replacement\n";
-    StringRef NewCode = *ChangedCode;
+    llvm::StringRef NewCode = *ChangedCode;
 
     std::vector<tooling::Range> Ranges(1, tooling::Range(0, NewCode.size()));
     Replaces = reformat(Style, NewCode, Ranges);
@@ -47,7 +47,7 @@ protected:
   }
 
   static std::string
-  format(StringRef Code,
+  format(llvm::StringRef Code,
          const FormatStyle &Style = getLLVMStyle(FormatStyle::LK_Json)) {
     return format(Code, 0, Code.size(), Style);
   }
@@ -58,12 +58,12 @@ protected:
     return Style;
   }
 
-  static void verifyFormatStable(StringRef Code, const FormatStyle &Style) {
+  static void verifyFormatStable(llvm::StringRef Code, const FormatStyle &Style) {
     EXPECT_EQ(Code.str(), format(Code, Style)) << "Expected code is not stable";
   }
 
   static void
-  verifyFormat(StringRef Code,
+  verifyFormat(llvm::StringRef Code,
                const FormatStyle &Style = getLLVMStyle(FormatStyle::LK_Json)) {
     verifyFormatStable(Code, Style);
     EXPECT_EQ(Code.str(), format(test::messUp(Code), Style));

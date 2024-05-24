@@ -21,7 +21,7 @@ namespace clang::tidy::openmp {
 /// http://clang.llvm.org/extra/clang-tidy/checks/openmp/exception-escape.html
 class ExceptionEscapeCheck : public ClangTidyCheck {
 public:
-  ExceptionEscapeCheck(StringRef Name, ClangTidyContext *Context);
+  ExceptionEscapeCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.OpenMP && LangOpts.CPlusPlus && LangOpts.CXXExceptions;
   }

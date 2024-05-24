@@ -21,7 +21,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/replace-random-shuffle.html
 class ReplaceRandomShuffleCheck : public ClangTidyCheck {
 public:
-  ReplaceRandomShuffleCheck(StringRef Name, ClangTidyContext *Context);
+  ReplaceRandomShuffleCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {

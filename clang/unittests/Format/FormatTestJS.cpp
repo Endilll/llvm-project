@@ -18,7 +18,7 @@ namespace format {
 
 class FormatTestJS : public testing::Test {
 protected:
-  static std::string format(StringRef Code, unsigned Offset, unsigned Length,
+  static std::string format(llvm::StringRef Code, unsigned Offset, unsigned Length,
                             const FormatStyle &Style) {
     LLVM_DEBUG(llvm::errs() << "---\n");
     LLVM_DEBUG(llvm::errs() << Code << "\n\n");
@@ -34,7 +34,7 @@ protected:
   }
 
   static std::string format(
-      StringRef Code,
+      llvm::StringRef Code,
       const FormatStyle &Style = getGoogleStyle(FormatStyle::LK_JavaScript)) {
     return format(Code, 0, Code.size(), Style);
   }
@@ -46,7 +46,7 @@ protected:
   }
 
   static void verifyFormat(
-      StringRef Code,
+      llvm::StringRef Code,
       const FormatStyle &Style = getGoogleStyle(FormatStyle::LK_JavaScript)) {
     EXPECT_EQ(Code.str(), format(Code, Style)) << "Expected code is not stable";
     std::string Result = format(test::messUp(Code), Style);
@@ -54,7 +54,7 @@ protected:
   }
 
   static void verifyFormat(
-      StringRef Expected, StringRef Code,
+      llvm::StringRef Expected, llvm::StringRef Code,
       const FormatStyle &Style = getGoogleStyle(FormatStyle::LK_JavaScript)) {
     EXPECT_EQ(Expected.str(), format(Expected, Style))
         << "Expected code is not stable";

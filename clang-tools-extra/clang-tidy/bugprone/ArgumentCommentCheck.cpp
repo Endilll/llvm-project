@@ -29,7 +29,7 @@ AST_MATCHER(Decl, isFromStdNamespaceOrSystemHeader) {
 }
 } // namespace
 
-ArgumentCommentCheck::ArgumentCommentCheck(StringRef Name,
+ArgumentCommentCheck::ArgumentCommentCheck(llvm::StringRef Name,
                                            ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StrictMode(Options.getLocalOrGlobal("StrictMode", false)),
@@ -77,9 +77,9 @@ void ArgumentCommentCheck::registerMatchers(MatchFinder *Finder) {
                      this);
 }
 
-static std::vector<std::pair<SourceLocation, StringRef>>
+static std::vector<std::pair<SourceLocation, llvm::StringRef>>
 getCommentsInRange(ASTContext *Ctx, CharSourceRange Range) {
-  std::vector<std::pair<SourceLocation, StringRef>> Comments;
+  std::vector<std::pair<SourceLocation, llvm::StringRef>> Comments;
   auto &SM = Ctx->getSourceManager();
   std::pair<FileID, unsigned> BeginLoc = SM.getDecomposedLoc(Range.getBegin()),
                               EndLoc = SM.getDecomposedLoc(Range.getEnd());
@@ -88,7 +88,7 @@ getCommentsInRange(ASTContext *Ctx, CharSourceRange Range) {
     return Comments;
 
   bool Invalid = false;
-  StringRef Buffer = SM.getBufferData(BeginLoc.first, &Invalid);
+  llvm::StringRef Buffer = SM.getBufferData(BeginLoc.first, &Invalid);
   if (Invalid)
     return Comments;
 
@@ -111,7 +111,7 @@ getCommentsInRange(ASTContext *Ctx, CharSourceRange Range) {
       assert(CommentLoc.first == BeginLoc.first);
       Comments.emplace_back(
           Tok.getLocation(),
-          StringRef(Buffer.begin() + CommentLoc.second, Tok.getLength()));
+          llvm::StringRef(Buffer.begin() + CommentLoc.second, Tok.getLength()));
     } else {
       // Clear comments found before the different token, e.g. comma.
       Comments.clear();
@@ -121,9 +121,9 @@ getCommentsInRange(ASTContext *Ctx, CharSourceRange Range) {
   return Comments;
 }
 
-static std::vector<std::pair<SourceLocation, StringRef>>
+static std::vector<std::pair<SourceLocation, llvm::StringRef>>
 getCommentsBeforeLoc(ASTContext *Ctx, SourceLocation Loc) {
-  std::vector<std::pair<SourceLocation, StringRef>> Comments;
+  std::vector<std::pair<SourceLocation, llvm::StringRef>> Comments;
   while (Loc.isValid()) {
     clang::Token Tok = utils::lexer::getPreviousToken(
         Loc, Ctx->getSourceManager(), Ctx->getLangOpts(),
@@ -141,9 +141,9 @@ getCommentsBeforeLoc(ASTContext *Ctx, SourceLocation Loc) {
 }
 
 static bool isLikelyTypo(llvm::ArrayRef<ParmVarDecl *> Params,
-                         StringRef ArgName, unsigned ArgIndex) {
+                         llvm::StringRef ArgName, unsigned ArgIndex) {
   std::string ArgNameLowerStr = ArgName.lower();
-  StringRef ArgNameLower = ArgNameLowerStr;
+  llvm::StringRef ArgNameLower = ArgNameLowerStr;
   // The threshold is arbitrary.
   unsigned UpperBound = (ArgName.size() + 2) / 3 + 1;
   unsigned ThisED = ArgNameLower.edit_distance(
@@ -173,7 +173,7 @@ static bool isLikelyTypo(llvm::ArrayRef<ParmVarDecl *> Params,
   return true;
 }
 
-static bool sameName(StringRef InComment, StringRef InDecl, bool StrictMode) {
+static bool sameName(llvm::StringRef InComment, llvm::StringRef InDecl, bool StrictMode) {
   if (StrictMode)
     return InComment == InDecl;
   InComment = InComment.trim('_');
@@ -297,7 +297,7 @@ void ArgumentCommentCheck::checkCallArgs(ASTContext *Ctx,
         MakeFileCharRange(ArgBeginLoc, Args[I]->getBeginLoc());
     ArgBeginLoc = Args[I]->getEndLoc();
 
-    std::vector<std::pair<SourceLocation, StringRef>> Comments;
+    std::vector<std::pair<SourceLocation, llvm::StringRef>> Comments;
     if (BeforeArgument.isValid()) {
       Comments = getCommentsInRange(Ctx, BeforeArgument);
     } else {
@@ -308,7 +308,7 @@ void ArgumentCommentCheck::checkCallArgs(ASTContext *Ctx,
     }
 
     for (auto Comment : Comments) {
-      llvm::SmallVector<StringRef, 2> Matches;
+      llvm::SmallVector<llvm::StringRef, 2> Matches;
       if (IdentRE.match(Comment.second, &Matches) &&
           !sameName(Matches[2], II->getName(), StrictMode)) {
         {

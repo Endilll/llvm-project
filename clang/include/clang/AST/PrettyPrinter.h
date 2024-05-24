@@ -25,7 +25,7 @@ class Stmt;
 class PrinterHelper {
 public:
   virtual ~PrinterHelper();
-  virtual bool handledStmt(Stmt* E, raw_ostream& OS) = 0;
+  virtual bool handledStmt(Stmt* E, llvm::raw_ostream& OS) = 0;
 };
 
 /// Callbacks to use to customize the behavior of the pretty-printer.
@@ -35,7 +35,7 @@ protected:
 
 public:
   /// Remap a path to a form suitable for printing.
-  virtual std::string remapPath(StringRef Path) const {
+  virtual std::string remapPath(llvm::StringRef Path) const {
     return std::string(Path);
   }
 

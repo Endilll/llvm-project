@@ -61,9 +61,9 @@ bool operator==(const std::string&, const char*);
 bool operator==(const char*, const std::string&);
 
 namespace llvm {
-struct StringRef {
-  StringRef(const char* p);
-  StringRef(const std::string&);
+struct llvm::StringRef {
+  llvm::StringRef(const char* p);
+  llvm::StringRef(const std::string&);
 };
 }  // namespace llvm
 

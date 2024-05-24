@@ -25,10 +25,10 @@ struct DeclOccurrence {
   unsigned Offset;
   llvm::PointerUnion<const Decl *, const MacroInfo *> DeclOrMacro;
   const IdentifierInfo *MacroName = nullptr;
-  SmallVector<SymbolRelation, 3> Relations;
+  llvm::SmallVector<SymbolRelation, 3> Relations;
 
   DeclOccurrence(SymbolRoleSet R, unsigned Offset, const Decl *D,
-                 ArrayRef<SymbolRelation> Relations)
+                 llvm::ArrayRef<SymbolRelation> Relations)
       : Roles(R), Offset(Offset), DeclOrMacro(D),
         Relations(Relations.begin(), Relations.end()) {}
   DeclOccurrence(SymbolRoleSet R, unsigned Offset, const IdentifierInfo *Name,

@@ -28,7 +28,7 @@ namespace tidy::google::runtime {
 /// http://clang.llvm.org/extra/clang-tidy/checks/google/runtime-int.html
 class IntegerTypesCheck : public ClangTidyCheck {
 public:
-  IntegerTypesCheck(StringRef Name, ClangTidyContext *Context);
+  IntegerTypesCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus && !LangOpts.ObjC;
   }
@@ -40,9 +40,9 @@ public:
   }
 
 private:
-  const StringRef UnsignedTypePrefix;
-  const StringRef SignedTypePrefix;
-  const StringRef TypeSuffix;
+  const llvm::StringRef UnsignedTypePrefix;
+  const llvm::StringRef SignedTypePrefix;
+  const llvm::StringRef TypeSuffix;
 
   std::unique_ptr<IdentifierTable> IdentTable;
 };

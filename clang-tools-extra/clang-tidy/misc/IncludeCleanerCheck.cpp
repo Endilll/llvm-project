@@ -54,7 +54,7 @@ struct MissingIncludeInfo {
 };
 } // namespace
 
-IncludeCleanerCheck::IncludeCleanerCheck(StringRef Name,
+IncludeCleanerCheck::IncludeCleanerCheck(llvm::StringRef Name,
                                          ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreHeaders(utils::options::parseStringList(

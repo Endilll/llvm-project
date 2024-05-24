@@ -43,7 +43,7 @@ void Sema::setDecl(const Decl *D) {
 }
 
 ParagraphComment *Sema::actOnParagraphComment(
-                              ArrayRef<InlineContentComment *> Content) {
+                              llvm::ArrayRef<InlineContentComment *> Content) {
   return new (Allocator) ParagraphComment(Content);
 }
 
@@ -60,7 +60,7 @@ BlockCommandComment *Sema::actOnBlockCommandStart(
 }
 
 void Sema::actOnBlockCommandArgs(BlockCommandComment *Command,
-                                 ArrayRef<BlockCommandComment::Argument> Args) {
+                                 llvm::ArrayRef<BlockCommandComment::Argument> Args) {
   Command->setArgs(Args);
 }
 
@@ -219,7 +219,7 @@ void Sema::checkContainerDecl(const BlockCommandComment *Comment) {
 
 /// Turn a string into the corresponding PassDirection or -1 if it's not
 /// valid.
-static ParamCommandPassDirection getParamPassDirection(StringRef Arg) {
+static ParamCommandPassDirection getParamPassDirection(llvm::StringRef Arg) {
   return llvm::StringSwitch<ParamCommandPassDirection>(Arg)
       .Case("[in]", ParamCommandPassDirection::In)
       .Case("[out]", ParamCommandPassDirection::Out)
@@ -230,7 +230,7 @@ static ParamCommandPassDirection getParamPassDirection(StringRef Arg) {
 void Sema::actOnParamCommandDirectionArg(ParamCommandComment *Command,
                                          SourceLocation ArgLocBegin,
                                          SourceLocation ArgLocEnd,
-                                         StringRef Arg) {
+                                         llvm::StringRef Arg) {
   std::string ArgLower = Arg.lower();
   ParamCommandPassDirection Direction = getParamPassDirection(ArgLower);
 
@@ -257,7 +257,7 @@ void Sema::actOnParamCommandDirectionArg(ParamCommandComment *Command,
 void Sema::actOnParamCommandParamNameArg(ParamCommandComment *Command,
                                          SourceLocation ArgLocBegin,
                                          SourceLocation ArgLocEnd,
-                                         StringRef Arg) {
+                                         llvm::StringRef Arg) {
   // Parser will not feed us more arguments than needed.
   assert(Command->getNumArgs() == 0);
 
@@ -298,7 +298,7 @@ TParamCommandComment *Sema::actOnTParamCommandStart(
 void Sema::actOnTParamCommandParamNameArg(TParamCommandComment *Command,
                                           SourceLocation ArgLocBegin,
                                           SourceLocation ArgLocEnd,
-                                          StringRef Arg) {
+                                          llvm::StringRef Arg) {
   // Parser will not feed us more arguments than needed.
   assert(Command->getNumArgs() == 0);
 
@@ -313,7 +313,7 @@ void Sema::actOnTParamCommandParamNameArg(TParamCommandComment *Command,
 
   const TemplateParameterList *TemplateParameters =
       ThisDeclInfo->TemplateParameters;
-  SmallVector<unsigned, 2> Position;
+  llvm::SmallVector<unsigned, 2> Position;
   if (resolveTParamReference(Arg, TemplateParameters, &Position)) {
     Command->setPosition(copyArray(llvm::ArrayRef(Position)));
     TParamCommandComment *&PrevCommand = TemplateParameterDocs[Arg];
@@ -335,7 +335,7 @@ void Sema::actOnTParamCommandParamNameArg(TParamCommandComment *Command,
   if (!TemplateParameters || TemplateParameters->size() == 0)
     return;
 
-  StringRef CorrectedName;
+  llvm::StringRef CorrectedName;
   if (TemplateParameters->size() == 1) {
     const NamedDecl *Param = TemplateParameters->getParam(0);
     const IdentifierInfo *II = Param->getIdentifier();
@@ -361,8 +361,8 @@ void Sema::actOnTParamCommandFinish(TParamCommandComment *Command,
 InlineCommandComment *
 Sema::actOnInlineCommand(SourceLocation CommandLocBegin,
                          SourceLocation CommandLocEnd, unsigned CommandID,
-                         ArrayRef<Comment::Argument> Args) {
-  StringRef CommandName = Traits.getCommandInfo(CommandID)->Name;
+                         llvm::ArrayRef<Comment::Argument> Args) {
+  llvm::StringRef CommandName = Traits.getCommandInfo(CommandID)->Name;
 
   return new (Allocator)
       InlineCommandComment(CommandLocBegin, CommandLocEnd, CommandID,
@@ -371,7 +371,7 @@ Sema::actOnInlineCommand(SourceLocation CommandLocBegin,
 
 InlineContentComment *Sema::actOnUnknownCommand(SourceLocation LocBegin,
                                                 SourceLocation LocEnd,
-                                                StringRef CommandName) {
+                                                llvm::StringRef CommandName) {
   unsigned CommandID = Traits.registerUnknownCommand(CommandName)->getID();
   return actOnUnknownCommand(LocBegin, LocEnd, CommandID);
 }
@@ -379,20 +379,20 @@ InlineContentComment *Sema::actOnUnknownCommand(SourceLocation LocBegin,
 InlineContentComment *Sema::actOnUnknownCommand(SourceLocation LocBegin,
                                                 SourceLocation LocEnd,
                                                 unsigned CommandID) {
-  ArrayRef<InlineCommandComment::Argument> Args;
+  llvm::ArrayRef<InlineCommandComment::Argument> Args;
   return new (Allocator) InlineCommandComment(
       LocBegin, LocEnd, CommandID, InlineCommandRenderKind::Normal, Args);
 }
 
 TextComment *Sema::actOnText(SourceLocation LocBegin,
                              SourceLocation LocEnd,
-                             StringRef Text) {
+                             llvm::StringRef Text) {
   return new (Allocator) TextComment(LocBegin, LocEnd, Text);
 }
 
 VerbatimBlockComment *Sema::actOnVerbatimBlockStart(SourceLocation Loc,
                                                     unsigned CommandID) {
-  StringRef CommandName = Traits.getCommandInfo(CommandID)->Name;
+  llvm::StringRef CommandName = Traits.getCommandInfo(CommandID)->Name;
   return new (Allocator) VerbatimBlockComment(
                                   Loc,
                                   Loc.getLocWithOffset(1 + CommandName.size()),
@@ -400,15 +400,15 @@ VerbatimBlockComment *Sema::actOnVerbatimBlockStart(SourceLocation Loc,
 }
 
 VerbatimBlockLineComment *Sema::actOnVerbatimBlockLine(SourceLocation Loc,
-                                                       StringRef Text) {
+                                                       llvm::StringRef Text) {
   return new (Allocator) VerbatimBlockLineComment(Loc, Text);
 }
 
 void Sema::actOnVerbatimBlockFinish(
                             VerbatimBlockComment *Block,
                             SourceLocation CloseNameLocBegin,
-                            StringRef CloseName,
-                            ArrayRef<VerbatimBlockLineComment *> Lines) {
+                            llvm::StringRef CloseName,
+                            llvm::ArrayRef<VerbatimBlockLineComment *> Lines) {
   Block->setCloseName(CloseName, CloseNameLocBegin);
   Block->setLines(Lines);
 }
@@ -416,7 +416,7 @@ void Sema::actOnVerbatimBlockFinish(
 VerbatimLineComment *Sema::actOnVerbatimLine(SourceLocation LocBegin,
                                              unsigned CommandID,
                                              SourceLocation TextBegin,
-                                             StringRef Text) {
+                                             llvm::StringRef Text) {
   VerbatimLineComment *VL = new (Allocator) VerbatimLineComment(
                               LocBegin,
                               TextBegin.getLocWithOffset(Text.size()),
@@ -429,13 +429,13 @@ VerbatimLineComment *Sema::actOnVerbatimLine(SourceLocation LocBegin,
 }
 
 HTMLStartTagComment *Sema::actOnHTMLStartTagStart(SourceLocation LocBegin,
-                                                  StringRef TagName) {
+                                                  llvm::StringRef TagName) {
   return new (Allocator) HTMLStartTagComment(LocBegin, TagName);
 }
 
 void Sema::actOnHTMLStartTagFinish(
                               HTMLStartTagComment *Tag,
-                              ArrayRef<HTMLStartTagComment::Attribute> Attrs,
+                              llvm::ArrayRef<HTMLStartTagComment::Attribute> Attrs,
                               SourceLocation GreaterLoc,
                               bool IsSelfClosing) {
   Tag->setAttrs(Attrs);
@@ -448,7 +448,7 @@ void Sema::actOnHTMLStartTagFinish(
 
 HTMLEndTagComment *Sema::actOnHTMLEndTag(SourceLocation LocBegin,
                                          SourceLocation LocEnd,
-                                         StringRef TagName) {
+                                         llvm::StringRef TagName) {
   HTMLEndTagComment *HET =
       new (Allocator) HTMLEndTagComment(LocBegin, LocEnd, TagName);
   if (isHTMLEndTagForbidden(TagName)) {
@@ -459,7 +459,7 @@ HTMLEndTagComment *Sema::actOnHTMLEndTag(SourceLocation LocBegin,
   }
 
   bool FoundOpen = false;
-  for (SmallVectorImpl<HTMLStartTagComment *>::const_reverse_iterator
+  for (llvm::SmallVectorImpl<HTMLStartTagComment *>::const_reverse_iterator
        I = HTMLOpenTags.rbegin(), E = HTMLOpenTags.rend();
        I != E; ++I) {
     if ((*I)->getTagName() == TagName) {
@@ -476,7 +476,7 @@ HTMLEndTagComment *Sema::actOnHTMLEndTag(SourceLocation LocBegin,
 
   while (!HTMLOpenTags.empty()) {
     HTMLStartTagComment *HST = HTMLOpenTags.pop_back_val();
-    StringRef LastNotClosedTagName = HST->getTagName();
+    llvm::StringRef LastNotClosedTagName = HST->getTagName();
     if (LastNotClosedTagName == TagName) {
       // If the start tag is malformed, end tag is malformed as well.
       if (HST->isMalformed())
@@ -515,7 +515,7 @@ HTMLEndTagComment *Sema::actOnHTMLEndTag(SourceLocation LocBegin,
 }
 
 FullComment *Sema::actOnFullComment(
-                              ArrayRef<BlockContentComment *> Blocks) {
+                              llvm::ArrayRef<BlockContentComment *> Blocks) {
   FullComment *FC = new (Allocator) FullComment(Blocks, ThisDeclInfo);
   resolveParamCommandIndexes(FC);
 
@@ -616,8 +616,8 @@ void Sema::checkBlockCommandDuplicate(const BlockCommandComment *Command) {
     // We don't want to check this command for duplicates.
     return;
   }
-  StringRef CommandName = Command->getCommandName(Traits);
-  StringRef PrevCommandName = PrevCommand->getCommandName(Traits);
+  llvm::StringRef CommandName = Command->getCommandName(Traits);
+  llvm::StringRef PrevCommandName = PrevCommand->getCommandName(Traits);
   Diag(Command->getLocation(), diag::warn_doc_block_command_duplicate)
       << Command->getCommandMarker()
       << CommandName
@@ -664,13 +664,13 @@ void Sema::checkDeprecatedCommand(const BlockCommandComment *Command) {
 
     const LangOptions &LO = FD->getLangOpts();
     const bool DoubleSquareBracket = LO.CPlusPlus14 || LO.C23;
-    StringRef AttributeSpelling =
+    llvm::StringRef AttributeSpelling =
         DoubleSquareBracket ? "[[deprecated]]" : "__attribute__((deprecated))";
     if (PP) {
       // Try to find a replacement macro:
       // - In C23/C++14 we prefer [[deprecated]].
       // - If not found or an older C/C++ look for __attribute__((deprecated)).
-      StringRef MacroName;
+      llvm::StringRef MacroName;
       if (DoubleSquareBracket) {
         TokenValue Tokens[] = {tok::l_square, tok::l_square,
                                PP->getIdentifierInfo("deprecated"),
@@ -685,14 +685,14 @@ void Sema::checkDeprecatedCommand(const BlockCommandComment *Command) {
             tok::kw___attribute, tok::l_paren,
             tok::l_paren,        PP->getIdentifierInfo("deprecated"),
             tok::r_paren,        tok::r_paren};
-        StringRef MacroName =
+        llvm::StringRef MacroName =
             PP->getLastMacroWithSpelling(FD->getLocation(), Tokens);
         if (!MacroName.empty())
           AttributeSpelling = MacroName;
       }
     }
 
-    SmallString<64> TextToInsert = AttributeSpelling;
+    llvm::SmallString<64> TextToInsert = AttributeSpelling;
     TextToInsert += " ";
     SourceLocation Loc = FD->getSourceRange().getBegin();
     Diag(Loc, diag::note_add_deprecation_attr)
@@ -707,13 +707,13 @@ void Sema::resolveParamCommandIndexes(const FullComment *FC) {
     return;
   }
 
-  SmallVector<ParamCommandComment *, 8> UnresolvedParamCommands;
+  llvm::SmallVector<ParamCommandComment *, 8> UnresolvedParamCommands;
 
   // Comment AST nodes that correspond to \c ParamVars for which we have
   // found a \\param command or NULL if no documentation was found so far.
-  SmallVector<ParamCommandComment *, 8> ParamVarDocs;
+  llvm::SmallVector<ParamCommandComment *, 8> ParamVarDocs;
 
-  ArrayRef<const ParmVarDecl *> ParamVars = getParamVars();
+  llvm::ArrayRef<const ParmVarDecl *> ParamVars = getParamVars();
   ParamVarDocs.resize(ParamVars.size(), nullptr);
 
   // First pass over all \\param commands: resolve all parameter names.
@@ -722,7 +722,7 @@ void Sema::resolveParamCommandIndexes(const FullComment *FC) {
     ParamCommandComment *PCC = dyn_cast<ParamCommandComment>(*I);
     if (!PCC || !PCC->hasParamName())
       continue;
-    StringRef ParamName = PCC->getParamNameAsWritten();
+    llvm::StringRef ParamName = PCC->getParamNameAsWritten();
 
     // Check that referenced parameter name is in the function decl.
     const unsigned ResolvedParamIndex = resolveParmVarReference(ParamName,
@@ -748,7 +748,7 @@ void Sema::resolveParamCommandIndexes(const FullComment *FC) {
   }
 
   // Find parameter declarations that have no corresponding \\param.
-  SmallVector<const ParmVarDecl *, 8> OrphanedParamDecls;
+  llvm::SmallVector<const ParmVarDecl *, 8> OrphanedParamDecls;
   for (unsigned i = 0, e = ParamVarDocs.size(); i != e; ++i) {
     if (!ParamVarDocs[i])
       OrphanedParamDecls.push_back(ParamVars[i]);
@@ -761,7 +761,7 @@ void Sema::resolveParamCommandIndexes(const FullComment *FC) {
     const ParamCommandComment *PCC = UnresolvedParamCommands[i];
 
     SourceRange ArgRange = PCC->getParamNameRange();
-    StringRef ParamName = PCC->getParamNameAsWritten();
+    llvm::StringRef ParamName = PCC->getParamNameAsWritten();
     Diag(ArgRange.getBegin(), diag::warn_doc_param_not_found)
       << ParamName << ArgRange;
 
@@ -954,7 +954,7 @@ bool Sema::isObjCProtocolDecl() {
          isa<ObjCProtocolDecl>(ThisDeclInfo->CurrentDecl);
 }
 
-ArrayRef<const ParmVarDecl *> Sema::getParamVars() {
+llvm::ArrayRef<const ParmVarDecl *> Sema::getParamVars() {
   if (!ThisDeclInfo->IsFilled)
     inspectThisDecl();
   return ThisDeclInfo->ParamVars;
@@ -964,8 +964,8 @@ void Sema::inspectThisDecl() {
   ThisDeclInfo->fill();
 }
 
-unsigned Sema::resolveParmVarReference(StringRef Name,
-                                       ArrayRef<const ParmVarDecl *> ParamVars) {
+unsigned Sema::resolveParmVarReference(llvm::StringRef Name,
+                                       llvm::ArrayRef<const ParmVarDecl *> ParamVars) {
   for (unsigned i = 0, e = ParamVars.size(); i != e; ++i) {
     const IdentifierInfo *II = ParamVars[i]->getIdentifier();
     if (II && II->getName() == Name)
@@ -980,7 +980,7 @@ namespace {
 class SimpleTypoCorrector {
   const NamedDecl *BestDecl;
 
-  StringRef Typo;
+  llvm::StringRef Typo;
   const unsigned MaxEditDistance;
 
   unsigned BestEditDistance;
@@ -988,7 +988,7 @@ class SimpleTypoCorrector {
   unsigned NextIndex;
 
 public:
-  explicit SimpleTypoCorrector(StringRef Typo)
+  explicit SimpleTypoCorrector(llvm::StringRef Typo)
       : BestDecl(nullptr), Typo(Typo), MaxEditDistance((Typo.size() + 2) / 3),
         BestEditDistance(MaxEditDistance + 1), BestIndex(0), NextIndex(0) {}
 
@@ -1014,7 +1014,7 @@ void SimpleTypoCorrector::addDecl(const NamedDecl *ND) {
   if (!II)
     return;
 
-  StringRef Name = II->getName();
+  llvm::StringRef Name = II->getName();
   unsigned MinPossibleEditDistance = abs((int)Name.size() - (int)Typo.size());
   if (MinPossibleEditDistance > 0 &&
       Typo.size() / MinPossibleEditDistance < 3)
@@ -1030,8 +1030,8 @@ void SimpleTypoCorrector::addDecl(const NamedDecl *ND) {
 } // end anonymous namespace
 
 unsigned Sema::correctTypoInParmVarReference(
-                                    StringRef Typo,
-                                    ArrayRef<const ParmVarDecl *> ParamVars) {
+                                    llvm::StringRef Typo,
+                                    llvm::ArrayRef<const ParmVarDecl *> ParamVars) {
   SimpleTypoCorrector Corrector(Typo);
   for (unsigned i = 0, e = ParamVars.size(); i != e; ++i)
     Corrector.addDecl(ParamVars[i]);
@@ -1043,9 +1043,9 @@ unsigned Sema::correctTypoInParmVarReference(
 
 namespace {
 bool ResolveTParamReferenceHelper(
-                            StringRef Name,
+                            llvm::StringRef Name,
                             const TemplateParameterList *TemplateParameters,
-                            SmallVectorImpl<unsigned> *Position) {
+                            llvm::SmallVectorImpl<unsigned> *Position) {
   for (unsigned i = 0, e = TemplateParameters->size(); i != e; ++i) {
     const NamedDecl *Param = TemplateParameters->getParam(i);
     const IdentifierInfo *II = Param->getIdentifier();
@@ -1068,9 +1068,9 @@ bool ResolveTParamReferenceHelper(
 } // end anonymous namespace
 
 bool Sema::resolveTParamReference(
-                            StringRef Name,
+                            llvm::StringRef Name,
                             const TemplateParameterList *TemplateParameters,
-                            SmallVectorImpl<unsigned> *Position) {
+                            llvm::SmallVectorImpl<unsigned> *Position) {
   Position->clear();
   if (!TemplateParameters)
     return false;
@@ -1094,8 +1094,8 @@ void CorrectTypoInTParamReferenceHelper(
 }
 } // end anonymous namespace
 
-StringRef Sema::correctTypoInTParamReference(
-                            StringRef Typo,
+llvm::StringRef Sema::correctTypoInTParamReference(
+                            llvm::StringRef Typo,
                             const TemplateParameterList *TemplateParameters) {
   SimpleTypoCorrector Corrector(Typo);
   CorrectTypoInTParamReferenceHelper(TemplateParameters, Corrector);
@@ -1104,10 +1104,10 @@ StringRef Sema::correctTypoInTParamReference(
     assert(II && "SimpleTypoCorrector should not return this decl");
     return II->getName();
   }
-  return StringRef();
+  return llvm::StringRef();
 }
 
-InlineCommandRenderKind Sema::getInlineCommandRenderKind(StringRef Name) const {
+InlineCommandRenderKind Sema::getInlineCommandRenderKind(llvm::StringRef Name) const {
   assert(Traits.getCommandInfo(Name)->IsInlineCommand);
 
   return llvm::StringSwitch<InlineCommandRenderKind>(Name)

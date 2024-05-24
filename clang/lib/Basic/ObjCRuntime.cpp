@@ -29,7 +29,7 @@ std::string ObjCRuntime::getAsString() const {
   return Result;
 }
 
-raw_ostream &clang::operator<<(raw_ostream &out, const ObjCRuntime &value) {
+llvm::raw_ostream &clang::operator<<(llvm::raw_ostream &out, const ObjCRuntime &value) {
   switch (value.getKind()) {
   case ObjCRuntime::MacOSX: out << "macosx"; break;
   case ObjCRuntime::FragileMacOSX: out << "macosx-fragile"; break;
@@ -39,28 +39,28 @@ raw_ostream &clang::operator<<(raw_ostream &out, const ObjCRuntime &value) {
   case ObjCRuntime::GCC: out << "gcc"; break;
   case ObjCRuntime::ObjFW: out << "objfw"; break;
   }
-  if (value.getVersion() > VersionTuple(0)) {
+  if (value.getVersion() > llvm::VersionTuple(0)) {
     out << '-' << value.getVersion();
   }
   return out;
 }
 
-bool ObjCRuntime::tryParse(StringRef input) {
+bool ObjCRuntime::tryParse(llvm::StringRef input) {
   // Look for the last dash.
   std::size_t dash = input.rfind('-');
 
   // We permit dashes in the runtime name, and we also permit the
   // version to be omitted, so if we see a dash not followed by a
   // digit then we need to ignore it.
-  if (dash != StringRef::npos && dash + 1 != input.size() &&
+  if (dash != llvm::StringRef::npos && dash + 1 != input.size() &&
       (input[dash+1] < '0' || input[dash+1] > '9')) {
-    dash = StringRef::npos;
+    dash = llvm::StringRef::npos;
   }
 
   // Everything prior to that must be a valid string name.
   Kind kind;
-  StringRef runtimeName = input.substr(0, dash);
-  Version = VersionTuple(0);
+  llvm::StringRef runtimeName = input.substr(0, dash);
+  Version = llvm::VersionTuple(0);
   if (runtimeName == "macosx") {
     kind = ObjCRuntime::MacOSX;
   } else if (runtimeName == "macosx-fragile") {
@@ -72,26 +72,26 @@ bool ObjCRuntime::tryParse(StringRef input) {
   } else if (runtimeName == "gnustep") {
     // If no version is specified then default to the most recent one that we
     // know about.
-    Version = VersionTuple(1, 6);
+    Version = llvm::VersionTuple(1, 6);
     kind = ObjCRuntime::GNUstep;
   } else if (runtimeName == "gcc") {
     kind = ObjCRuntime::GCC;
   } else if (runtimeName == "objfw") {
     kind = ObjCRuntime::ObjFW;
-    Version = VersionTuple(0, 8);
+    Version = llvm::VersionTuple(0, 8);
   } else {
     return true;
   }
   TheKind = kind;
 
-  if (dash != StringRef::npos) {
-    StringRef verString = input.substr(dash + 1);
+  if (dash != llvm::StringRef::npos) {
+    llvm::StringRef verString = input.substr(dash + 1);
     if (Version.tryParse(verString))
       return true;
   }
 
-  if (kind == ObjCRuntime::ObjFW && Version > VersionTuple(0, 8))
-    Version = VersionTuple(0, 8);
+  if (kind == ObjCRuntime::ObjFW && Version > llvm::VersionTuple(0, 8))
+    Version = llvm::VersionTuple(0, 8);
 
   return false;
 }

@@ -15,7 +15,7 @@ namespace clang {
 
 using namespace llvm;
 
-std::optional<sys::fs::file_status> getFileStatus(StringRef Path) {
+std::optional<sys::fs::file_status> getFileStatus(llvm::StringRef Path) {
   sys::fs::file_status Status;
   std::error_code EC = status(Path, Status);
   if (EC)
@@ -23,7 +23,7 @@ std::optional<sys::fs::file_status> getFileStatus(StringRef Path) {
   return Status;
 }
 
-std::vector<std::string> scanDirectory(StringRef Path) {
+std::vector<std::string> scanDirectory(llvm::StringRef Path) {
   using namespace llvm::sys;
   std::vector<std::string> Result;
 

@@ -26,7 +26,7 @@ using namespace clang;
 //===----------------------------------------------------------------------===//
 
 Sema::PragmaStackSentinelRAII::PragmaStackSentinelRAII(Sema &S,
-                                                       StringRef SlotLabel,
+                                                       llvm::StringRef SlotLabel,
                                                        bool ShouldAct)
     : S(S), SlotLabel(SlotLabel), ShouldAct(ShouldAct) {
   if (ShouldAct) {
@@ -279,13 +279,13 @@ void Sema::ActOnPragmaOptionsAlign(PragmaOptionsAlignKind Kind,
 
   AlignPackInfo Info(ModeVal, getLangOpts().XLPragmaPack);
 
-  AlignPackStack.Act(PragmaLoc, Action, StringRef(), Info);
+  AlignPackStack.Act(PragmaLoc, Action, llvm::StringRef(), Info);
 }
 
 void Sema::ActOnPragmaClangSection(SourceLocation PragmaLoc,
                                    PragmaClangSectionAction Action,
                                    PragmaClangSectionKind SecKind,
-                                   StringRef SecName) {
+                                   llvm::StringRef SecName) {
   PragmaClangSection *CSec;
   int SectionFlags = ASTContext::PSF_Read;
   switch (SecKind) {
@@ -332,7 +332,7 @@ void Sema::ActOnPragmaClangSection(SourceLocation PragmaLoc,
 }
 
 void Sema::ActOnPragmaPack(SourceLocation PragmaLoc, PragmaMsStackAction Action,
-                           StringRef SlotLabel, Expr *alignment) {
+                           llvm::StringRef SlotLabel, Expr *alignment) {
   bool IsXLPragma = getLangOpts().XLPragmaPack;
   // XL pragma pack does not support identifier syntax.
   if (IsXLPragma && !SlotLabel.empty()) {
@@ -398,7 +398,7 @@ void Sema::ActOnPragmaPack(SourceLocation PragmaLoc, PragmaMsStackAction Action,
 }
 
 bool Sema::ConstantFoldAttrArgs(const AttributeCommonInfo &CI,
-                                MutableArrayRef<Expr *> Args) {
+                                llvm::MutableArrayRef<Expr *> Args) {
   llvm::SmallVector<PartialDiagnosticAt, 8> Notes;
   for (unsigned Idx = 0; Idx < Args.size(); Idx++) {
     Expr *&E = Args.begin()[Idx];
@@ -516,15 +516,15 @@ void Sema::ActOnPragmaMSStruct(PragmaMSStructKind Kind) {
 }
 
 void Sema::ActOnPragmaMSComment(SourceLocation CommentLoc,
-                                PragmaMSCommentKind Kind, StringRef Arg) {
+                                PragmaMSCommentKind Kind, llvm::StringRef Arg) {
   auto *PCD = PragmaCommentDecl::Create(
       Context, Context.getTranslationUnitDecl(), CommentLoc, Kind, Arg);
   Context.getTranslationUnitDecl()->addDecl(PCD);
   Consumer.HandleTopLevelDecl(DeclGroupRef(PCD));
 }
 
-void Sema::ActOnPragmaDetectMismatch(SourceLocation Loc, StringRef Name,
-                                     StringRef Value) {
+void Sema::ActOnPragmaDetectMismatch(SourceLocation Loc, llvm::StringRef Name,
+                                     llvm::StringRef Value) {
   auto *PDMD = PragmaDetectMismatchDecl::Create(
       Context, Context.getTranslationUnitDecl(), Loc, Name, Value);
   Context.getTranslationUnitDecl()->addDecl(PDMD);
@@ -553,7 +553,7 @@ void Sema::ActOnPragmaFPEvalMethod(SourceLocation Loc,
     Diag(Loc, diag::err_setting_eval_method_used_in_unsafe_context) << 0 << 1;
   if (getLangOpts().AllowRecip)
     Diag(Loc, diag::err_setting_eval_method_used_in_unsafe_context) << 0 << 2;
-  FpPragmaStack.Act(Loc, PSK_Set, StringRef(), NewFPFeatures);
+  FpPragmaStack.Act(Loc, PSK_Set, llvm::StringRef(), NewFPFeatures);
   CurFPFeatures = NewFPFeatures.applyOverrides(getLangOpts());
   PP.setCurrentFPEvalMethod(Loc, Value);
 }
@@ -574,7 +574,7 @@ void Sema::ActOnPragmaFloatControl(SourceLocation Loc,
     llvm_unreachable("invalid pragma float_control kind");
   case PFC_Precise:
     NewFPFeatures.setFPPreciseEnabled(true);
-    FpPragmaStack.Act(Loc, Action, StringRef(), NewFPFeatures);
+    FpPragmaStack.Act(Loc, Action, llvm::StringRef(), NewFPFeatures);
     break;
   case PFC_NoPrecise:
     if (CurFPFeatures.getExceptionMode() == LangOptions::FPE_Strict)
@@ -583,21 +583,21 @@ void Sema::ActOnPragmaFloatControl(SourceLocation Loc,
       Diag(Loc, diag::err_pragma_fc_noprecise_requires_nofenv);
     else
       NewFPFeatures.setFPPreciseEnabled(false);
-    FpPragmaStack.Act(Loc, Action, StringRef(), NewFPFeatures);
+    FpPragmaStack.Act(Loc, Action, llvm::StringRef(), NewFPFeatures);
     break;
   case PFC_Except:
     if (!isPreciseFPEnabled())
       Diag(Loc, diag::err_pragma_fc_except_requires_precise);
     else
       NewFPFeatures.setSpecifiedExceptionModeOverride(LangOptions::FPE_Strict);
-    FpPragmaStack.Act(Loc, Action, StringRef(), NewFPFeatures);
+    FpPragmaStack.Act(Loc, Action, llvm::StringRef(), NewFPFeatures);
     break;
   case PFC_NoExcept:
     NewFPFeatures.setSpecifiedExceptionModeOverride(LangOptions::FPE_Ignore);
-    FpPragmaStack.Act(Loc, Action, StringRef(), NewFPFeatures);
+    FpPragmaStack.Act(Loc, Action, llvm::StringRef(), NewFPFeatures);
     break;
   case PFC_Push:
-    FpPragmaStack.Act(Loc, Sema::PSK_Push_Set, StringRef(), NewFPFeatures);
+    FpPragmaStack.Act(Loc, Sema::PSK_Push_Set, llvm::StringRef(), NewFPFeatures);
     break;
   case PFC_Pop:
     if (FpPragmaStack.Stack.empty()) {
@@ -605,7 +605,7 @@ void Sema::ActOnPragmaFloatControl(SourceLocation Loc,
                                               << "stack empty";
       return;
     }
-    FpPragmaStack.Act(Loc, Action, StringRef(), NewFPFeatures);
+    FpPragmaStack.Act(Loc, Action, llvm::StringRef(), NewFPFeatures);
     NewFPFeatures = FpPragmaStack.CurrentValue;
     break;
   }
@@ -625,7 +625,7 @@ void Sema::ActOnPragmaMSVtorDisp(PragmaMsStackAction Action,
   if (Action & PSK_Pop && VtorDispStack.Stack.empty())
     Diag(PragmaLoc, diag::warn_pragma_pop_failed) << "vtordisp"
                                                   << "stack empty";
-  VtorDispStack.Act(PragmaLoc, Action, StringRef(), Mode);
+  VtorDispStack.Act(PragmaLoc, Action, llvm::StringRef(), Mode);
 }
 
 template <>
@@ -690,7 +690,7 @@ void Sema::PragmaStack<Sema::AlignPackInfo>::Act(SourceLocation PragmaLocation,
   }
 }
 
-bool Sema::UnifySection(StringRef SectionName, int SectionFlags,
+bool Sema::UnifySection(llvm::StringRef SectionName, int SectionFlags,
                         NamedDecl *Decl) {
   SourceLocation PragmaLocation;
   if (auto A = Decl->getAttr<SectionAttr>())
@@ -719,7 +719,7 @@ bool Sema::UnifySection(StringRef SectionName, int SectionFlags,
   return true;
 }
 
-bool Sema::UnifySection(StringRef SectionName,
+bool Sema::UnifySection(llvm::StringRef SectionName,
                         int SectionFlags,
                         SourceLocation PragmaSectionLocation) {
   auto SectionIt = Context.SectionInfos.find(SectionName);
@@ -778,7 +778,7 @@ void Sema::ActOnPragmaMSStrictGuardStackCheck(SourceLocation PragmaLocation,
     Diag(PragmaLocation, diag::warn_pragma_pop_failed) << "strict_gs_check"
                                                        << "stack empty";
 
-  StrictGuardStackCheckStack.Act(PragmaLocation, Action, StringRef(), Value);
+  StrictGuardStackCheckStack.Act(PragmaLocation, Action, llvm::StringRef(), Value);
 }
 
 /// Called on well formed \#pragma bss_seg().
@@ -797,8 +797,8 @@ void Sema::ActOnPragmaMSInitSeg(SourceLocation PragmaLocation,
 }
 
 void Sema::ActOnPragmaMSAllocText(
-    SourceLocation PragmaLocation, StringRef Section,
-    const SmallVector<std::tuple<IdentifierInfo *, SourceLocation>>
+    SourceLocation PragmaLocation, llvm::StringRef Section,
+    const llvm::SmallVector<std::tuple<IdentifierInfo *, SourceLocation>>
         &Functions) {
   if (!CurContext->getRedeclContext()->isFileContext()) {
     Diag(PragmaLocation, diag::err_pragma_expected_file_scope) << "alloc_text";
@@ -902,7 +902,7 @@ CharSourceRange replacementRangeForListElement(const Sema &S,
 }
 
 std::string
-attrMatcherRuleListToString(ArrayRef<attr::SubjectMatchRule> Rules) {
+attrMatcherRuleListToString(llvm::ArrayRef<attr::SubjectMatchRule> Rules) {
   std::string Result;
   llvm::raw_string_ostream OS(Result);
   for (const auto &I : llvm::enumerate(Rules)) {
@@ -919,9 +919,9 @@ void Sema::ActOnPragmaAttributeAttribute(
     ParsedAttr &Attribute, SourceLocation PragmaLoc,
     attr::ParsedSubjectMatchRuleSet Rules) {
   Attribute.setIsPragmaClangAttribute();
-  SmallVector<attr::SubjectMatchRule, 4> SubjectMatchRules;
+  llvm::SmallVector<attr::SubjectMatchRule, 4> SubjectMatchRules;
   // Gather the subject match rules that are supported by the attribute.
-  SmallVector<std::pair<attr::SubjectMatchRule, bool>, 4>
+  llvm::SmallVector<std::pair<attr::SubjectMatchRule, bool>, 4>
       StrictSubjectMatchRuleSet;
   Attribute.getMatchRules(LangOpts, StrictSubjectMatchRuleSet);
 
@@ -1030,7 +1030,7 @@ void Sema::ActOnPragmaAttributeAttribute(
     auto Diagnostic =
         Diag(PragmaLoc, diag::err_pragma_attribute_invalid_matchers)
         << Attribute;
-    SmallVector<attr::SubjectMatchRule, 2> ExtraRules;
+    llvm::SmallVector<attr::SubjectMatchRule, 2> ExtraRules;
     for (const auto &Rule : Rules) {
       ExtraRules.push_back(attr::SubjectMatchRule(Rule.first));
       Diagnostic << FixItHint::CreateRemoval(
@@ -1149,7 +1149,7 @@ void Sema::ActOnPragmaMSOptimize(SourceLocation Loc, bool IsOn) {
 }
 
 void Sema::ActOnPragmaMSFunction(
-    SourceLocation Loc, const llvm::SmallVectorImpl<StringRef> &NoBuiltins) {
+    SourceLocation Loc, const llvm::SmallVectorImpl<llvm::StringRef> &NoBuiltins) {
   if (!CurContext->getRedeclContext()->isFileContext()) {
     Diag(Loc, diag::err_pragma_expected_file_scope) << "function";
     return;
@@ -1169,10 +1169,10 @@ void Sema::AddSectionMSAllocText(FunctionDecl *FD) {
   if (!FD->getIdentifier())
     return;
 
-  StringRef Name = FD->getName();
+  llvm::StringRef Name = FD->getName();
   auto It = FunctionToSectionMap.find(Name);
   if (It != FunctionToSectionMap.end()) {
-    StringRef Section;
+    llvm::StringRef Section;
     SourceLocation Loc;
     std::tie(Section, Loc) = It->second;
 
@@ -1203,7 +1203,7 @@ void Sema::AddOptnoneAttributeIfNoConflicts(FunctionDecl *FD,
 }
 
 void Sema::AddImplicitMSFunctionNoBuiltinAttr(FunctionDecl *FD) {
-  SmallVector<StringRef> V(MSFunctionNoBuiltins.begin(),
+  llvm::SmallVector<llvm::StringRef> V(MSFunctionNoBuiltins.begin(),
                            MSFunctionNoBuiltins.end());
   if (!MSFunctionNoBuiltins.empty())
     FD->addAttr(NoBuiltinAttr::CreateImplicit(Context, V.data(), V.size()));
@@ -1277,7 +1277,7 @@ void Sema::ActOnPragmaFPContract(SourceLocation Loc,
   case LangOptions::FPM_FastHonorPragmas:
     llvm_unreachable("Should not happen");
   }
-  FpPragmaStack.Act(Loc, Sema::PSK_Set, StringRef(), NewFPFeatures);
+  FpPragmaStack.Act(Loc, Sema::PSK_Set, llvm::StringRef(), NewFPFeatures);
   CurFPFeatures = NewFPFeatures.applyOverrides(getLangOpts());
 }
 
@@ -1313,14 +1313,14 @@ void Sema::ActOnPragmaFPValueChangingOption(SourceLocation Loc,
     llvm_unreachable("unhandled value changing pragma fp");
   }
 
-  FpPragmaStack.Act(Loc, PSK_Set, StringRef(), NewFPFeatures);
+  FpPragmaStack.Act(Loc, PSK_Set, llvm::StringRef(), NewFPFeatures);
   CurFPFeatures = NewFPFeatures.applyOverrides(getLangOpts());
 }
 
 void Sema::ActOnPragmaFEnvRound(SourceLocation Loc, llvm::RoundingMode FPR) {
   FPOptionsOverride NewFPFeatures = CurFPFeatureOverrides();
   NewFPFeatures.setConstRoundingModeOverride(FPR);
-  FpPragmaStack.Act(Loc, PSK_Set, StringRef(), NewFPFeatures);
+  FpPragmaStack.Act(Loc, PSK_Set, llvm::StringRef(), NewFPFeatures);
   CurFPFeatures = NewFPFeatures.applyOverrides(getLangOpts());
 }
 
@@ -1328,7 +1328,7 @@ void Sema::setExceptionMode(SourceLocation Loc,
                             LangOptions::FPExceptionModeKind FPE) {
   FPOptionsOverride NewFPFeatures = CurFPFeatureOverrides();
   NewFPFeatures.setSpecifiedExceptionModeOverride(FPE);
-  FpPragmaStack.Act(Loc, PSK_Set, StringRef(), NewFPFeatures);
+  FpPragmaStack.Act(Loc, PSK_Set, llvm::StringRef(), NewFPFeatures);
   CurFPFeatures = NewFPFeatures.applyOverrides(getLangOpts());
 }
 
@@ -1344,7 +1344,7 @@ void Sema::ActOnPragmaFEnvAccess(SourceLocation Loc, bool IsEnabled) {
   }
   NewFPFeatures.setAllowFEnvAccessOverride(IsEnabled);
   NewFPFeatures.setRoundingMathOverride(IsEnabled);
-  FpPragmaStack.Act(Loc, PSK_Set, StringRef(), NewFPFeatures);
+  FpPragmaStack.Act(Loc, PSK_Set, llvm::StringRef(), NewFPFeatures);
   CurFPFeatures = NewFPFeatures.applyOverrides(getLangOpts());
 }
 
@@ -1352,7 +1352,7 @@ void Sema::ActOnPragmaCXLimitedRange(SourceLocation Loc,
                                      LangOptions::ComplexRangeKind Range) {
   FPOptionsOverride NewFPFeatures = CurFPFeatureOverrides();
   NewFPFeatures.setComplexRangeOverride(Range);
-  FpPragmaStack.Act(Loc, PSK_Set, StringRef(), NewFPFeatures);
+  FpPragmaStack.Act(Loc, PSK_Set, llvm::StringRef(), NewFPFeatures);
   CurFPFeatures = NewFPFeatures.applyOverrides(getLangOpts());
 }
 

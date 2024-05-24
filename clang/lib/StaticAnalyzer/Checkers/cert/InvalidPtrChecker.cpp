@@ -100,7 +100,7 @@ public:
 private:
   const NoteTag *createEnvInvalidationNote(CheckerContext &C,
                                            ProgramStateRef State,
-                                           StringRef FunctionName) const;
+                                           llvm::StringRef FunctionName) const;
 };
 
 } // namespace
@@ -120,7 +120,7 @@ REGISTER_MAP_WITH_PROGRAMSTATE(PreviousCallResultMap, const FunctionDecl *,
                                const MemRegion *)
 
 const NoteTag *InvalidPtrChecker::createEnvInvalidationNote(
-    CheckerContext &C, ProgramStateRef State, StringRef FunctionName) const {
+    CheckerContext &C, ProgramStateRef State, llvm::StringRef FunctionName) const {
 
   const MemRegion *MainRegion = State->get<MainEnvPtrRegion>();
   const auto GetenvRegions = State->get<GetenvEnvPtrRegions>();
@@ -172,7 +172,7 @@ void InvalidPtrChecker::EnvpInvalidatingCall(const CallEvent &Call,
   for (const MemRegion *EnvPtr : State->get<GetenvEnvPtrRegions>())
     State = State->add<InvalidMemoryRegions>(EnvPtr);
 
-  StringRef FunctionName = Call.getCalleeIdentifier()->getName();
+  llvm::StringRef FunctionName = Call.getCalleeIdentifier()->getName();
   const NoteTag *InvalidationNote =
       createEnvInvalidationNote(C, State, FunctionName);
 
@@ -294,7 +294,7 @@ void InvalidPtrChecker::checkPostCall(const CallEvent &Call,
         if (!ErrorNode)
           return;
 
-        SmallString<256> Msg;
+        llvm::SmallString<256> Msg;
         llvm::raw_svector_ostream Out(Msg);
         Out << "use of invalidated pointer '";
         Call.getArgExpr(I)->printPretty(Out, /*Helper=*/nullptr,

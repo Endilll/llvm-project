@@ -20,7 +20,7 @@ namespace clang::tidy::cert {
 /// https://clang.llvm.org/extra/clang-tidy/checks/cert/dcl58-cpp.html
 class DontModifyStdNamespaceCheck : public ClangTidyCheck {
 public:
-  DontModifyStdNamespaceCheck(StringRef Name, ClangTidyContext *Context)
+  DontModifyStdNamespaceCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

@@ -61,7 +61,7 @@ protected:
   Address getThisAddress(CodeGenFunction &CGF);
 
   /// Issue a diagnostic about unsupported features in the ABI.
-  void ErrorUnsupportedABI(CodeGenFunction &CGF, StringRef S);
+  void ErrorUnsupportedABI(CodeGenFunction &CGF, llvm::StringRef S);
 
   /// Get a null value for unsupported member pointers.
   llvm::Constant *GetBogusMemberPointer(QualType T);
@@ -333,15 +333,15 @@ public:
       llvm::Value *Value;
       QualType Type;
     };
-    SmallVector<Arg, 1> Prefix;
-    SmallVector<Arg, 1> Suffix;
+    llvm::SmallVector<Arg, 1> Prefix;
+    llvm::SmallVector<Arg, 1> Suffix;
     AddedStructorArgs() = default;
-    AddedStructorArgs(SmallVector<Arg, 1> P, SmallVector<Arg, 1> S)
+    AddedStructorArgs(llvm::SmallVector<Arg, 1> P, llvm::SmallVector<Arg, 1> S)
         : Prefix(std::move(P)), Suffix(std::move(S)) {}
-    static AddedStructorArgs prefix(SmallVector<Arg, 1> Args) {
+    static AddedStructorArgs prefix(llvm::SmallVector<Arg, 1> Args) {
       return {std::move(Args), {}};
     }
-    static AddedStructorArgs suffix(SmallVector<Arg, 1> Args) {
+    static AddedStructorArgs suffix(llvm::SmallVector<Arg, 1> Args) {
       return {{}, std::move(Args)};
     }
   };
@@ -362,7 +362,7 @@ public:
   /// initialized with the type of 'this'.
   virtual AddedStructorArgCounts
   buildStructorSignature(GlobalDecl GD,
-                         SmallVectorImpl<CanQualType> &ArgTys) = 0;
+                         llvm::SmallVectorImpl<CanQualType> &ArgTys) = 0;
 
   /// Returns true if the given destructor type should be emitted as a linkonce
   /// delegating thunk, regardless of whether the dtor is defined in this TU or
@@ -523,10 +523,10 @@ public:
   virtual std::vector<CharUnits> getVBPtrOffsets(const CXXRecordDecl *RD);
 
   /// Gets the pure virtual member call function.
-  virtual StringRef GetPureVirtualCallName() = 0;
+  virtual llvm::StringRef GetPureVirtualCallName() = 0;
 
   /// Gets the deleted virtual member call name.
-  virtual StringRef GetDeletedVirtualCallName() = 0;
+  virtual llvm::StringRef GetDeletedVirtualCallName() = 0;
 
   /**************************** Array cookies ******************************/
 
@@ -632,9 +632,9 @@ public:
   ///        thread_local variables, a list of functions to perform the
   ///        initialization.
   virtual void EmitThreadLocalInitFuncs(
-      CodeGenModule &CGM, ArrayRef<const VarDecl *> CXXThreadLocals,
-      ArrayRef<llvm::Function *> CXXThreadLocalInits,
-      ArrayRef<const VarDecl *> CXXThreadLocalInitVars) = 0;
+      CodeGenModule &CGM, llvm::ArrayRef<const VarDecl *> CXXThreadLocals,
+      llvm::ArrayRef<llvm::Function *> CXXThreadLocalInits,
+      llvm::ArrayRef<const VarDecl *> CXXThreadLocalInitVars) = 0;
 
   // Determine if references to thread_local global variables can be made
   // directly or require access through a thread wrapper function.

@@ -217,7 +217,7 @@ void SwiftAggLowering::addTypedData(llvm::Type *type,
 
   // Legalize vector types.
   if (auto vecTy = dyn_cast<llvm::VectorType>(type)) {
-    SmallVector<llvm::Type*, 4> componentTys;
+    llvm::SmallVector<llvm::Type*, 4> componentTys;
     legalizeVectorType(CGM, end - begin, vecTy, componentTys);
     assert(componentTys.size() >= 1);
 
@@ -577,7 +577,7 @@ SwiftAggLowering::getCoerceAndExpandTypes() const {
     return { type, type };
   }
 
-  SmallVector<llvm::Type*, 8> elts;
+  llvm::SmallVector<llvm::Type*, 8> elts;
   CharUnits lastEnd = CharUnits::Zero();
   bool hasPadding = false;
   bool packed = false;
@@ -636,7 +636,7 @@ bool SwiftAggLowering::shouldPassIndirectly(bool asReturnValue) const {
                                                      asReturnValue);
   }
 
-  SmallVector<llvm::Type*, 8> componentTys;
+  llvm::SmallVector<llvm::Type*, 8> componentTys;
   componentTys.reserve(Entries.size());
   for (auto &entry : Entries) {
     componentTys.push_back(entry.Type);
@@ -645,7 +645,7 @@ bool SwiftAggLowering::shouldPassIndirectly(bool asReturnValue) const {
 }
 
 bool swiftcall::shouldPassIndirectly(CodeGenModule &CGM,
-                                     ArrayRef<llvm::Type*> componentTys,
+                                     llvm::ArrayRef<llvm::Type*> componentTys,
                                      bool asReturnValue) {
   return getSwiftABIInfo(CGM).shouldPassIndirectly(componentTys, asReturnValue);
 }

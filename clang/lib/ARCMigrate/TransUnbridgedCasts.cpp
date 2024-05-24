@@ -145,7 +145,7 @@ private:
             FD->getIdentifier() &&
             ento::cocoa::isRefType(E->getSubExpr()->getType(), "CF",
                                    FD->getIdentifier()->getName())) {
-          StringRef fname = FD->getIdentifier()->getName();
+          llvm::StringRef fname = FD->getIdentifier()->getName();
           if (fname.ends_with("Retain") || fname.contains("Create") ||
               fname.contains("Copy")) {
             // Do not migrate to couple of bridge transfer casts which
@@ -212,7 +212,7 @@ private:
       return;
     }
 
-    StringRef bridge;
+    llvm::StringRef bridge;
     switch(Kind) {
     case OBC_Bridge:
       bridge = "__bridge "; break;
@@ -229,7 +229,7 @@ private:
         TA.insertAfterToken(CCE->getLParenLoc(), bridge);
       } else {
         SourceLocation insertLoc = E->getSubExpr()->getBeginLoc();
-        SmallString<128> newCast;
+        llvm::SmallString<128> newCast;
         newCast += '(';
         newCast += bridge;
         newCast += E->getType().getAsString(Pass.Ctx.getPrintingPolicy());
@@ -245,7 +245,7 @@ private:
       }
     } else {
       assert(Kind == OBC_BridgeTransfer || Kind == OBC_BridgeRetained);
-      SmallString<32> BridgeCall;
+      llvm::SmallString<32> BridgeCall;
 
       Expr *WrapE = E->getSubExpr();
       SourceLocation InsertLoc = WrapE->getBeginLoc();
@@ -335,7 +335,7 @@ private:
   void transformObjCToNonObjCCast(CastExpr *E) {
     SourceLocation CastLoc = E->getExprLoc();
     if (CastLoc.isMacroID()) {
-      StringRef MacroName = Lexer::getImmediateMacroName(CastLoc,
+      llvm::StringRef MacroName = Lexer::getImmediateMacroName(CastLoc,
                                                     Pass.Ctx.getSourceManager(),
                                                     Pass.Ctx.getLangOpts());
       if (MacroName == "Block_copy") {

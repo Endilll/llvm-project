@@ -23,7 +23,7 @@ const char *const LanaiTargetInfo::GCCRegNames[] = {
     "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31"
 };
 
-ArrayRef<const char *> LanaiTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> LanaiTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
@@ -32,15 +32,15 @@ const TargetInfo::GCCRegAlias LanaiTargetInfo::GCCRegAliases[] = {
     {{"rr1"}, "r10"}, {{"rr2"}, "r11"}, {{"rca"}, "r15"},
 };
 
-ArrayRef<TargetInfo::GCCRegAlias> LanaiTargetInfo::getGCCRegAliases() const {
+llvm::ArrayRef<TargetInfo::GCCRegAlias> LanaiTargetInfo::getGCCRegAliases() const {
   return llvm::ArrayRef(GCCRegAliases);
 }
 
-bool LanaiTargetInfo::isValidCPUName(StringRef Name) const {
+bool LanaiTargetInfo::isValidCPUName(llvm::StringRef Name) const {
   return llvm::StringSwitch<bool>(Name).Case("v11", true).Default(false);
 }
 void LanaiTargetInfo::fillValidCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   Values.emplace_back("v11");
 }
 
@@ -50,7 +50,7 @@ bool LanaiTargetInfo::setCPU(const std::string &Name) {
   return CPU != CK_NONE;
 }
 
-bool LanaiTargetInfo::hasFeature(StringRef Feature) const {
+bool LanaiTargetInfo::hasFeature(llvm::StringRef Feature) const {
   return llvm::StringSwitch<bool>(Feature).Case("lanai", true).Default(false);
 }
 

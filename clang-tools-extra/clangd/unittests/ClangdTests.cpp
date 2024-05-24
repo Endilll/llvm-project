@@ -299,7 +299,7 @@ TEST(ClangdServerTest, PropagatesContexts) {
     mutable int Got;
 
   private:
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> viewImpl() const override {
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> viewImpl() const override {
       Got = Context::current().getExisting(Secret);
       return buildTestFS({});
     }
@@ -398,22 +398,22 @@ TEST(ClangdServerTest, SearchLibDir) {
   ClangdServer Server(CDB, FS, ClangdServer::optsForTest(), &DiagConsumer);
 
   // Just a random gcc version string
-  SmallString<8> Version("4.9.3");
+  llvm::SmallString<8> Version("4.9.3");
 
   // A lib dir for gcc installation
-  SmallString<64> LibDir("/randomusr/lib/gcc/x86_64-linux-gnu");
+  llvm::SmallString<64> LibDir("/randomusr/lib/gcc/x86_64-linux-gnu");
   llvm::sys::path::append(LibDir, Version);
 
   // Put crtbegin.o into LibDir/64 to trick clang into thinking there's a gcc
   // installation there.
-  SmallString<64> MockLibFile;
+  llvm::SmallString<64> MockLibFile;
   llvm::sys::path::append(MockLibFile, LibDir, "64", "crtbegin.o");
   FS.Files[MockLibFile] = "";
 
-  SmallString<64> IncludeDir("/randomusr/include/c++");
+  llvm::SmallString<64> IncludeDir("/randomusr/include/c++");
   llvm::sys::path::append(IncludeDir, Version);
 
-  SmallString<64> StringPath;
+  llvm::SmallString<64> StringPath;
   llvm::sys::path::append(StringPath, IncludeDir, "string");
   FS.Files[StringPath] = "class mock_string {};";
 
@@ -690,7 +690,7 @@ int d;
 
     void onDiagnosticsReady(PathRef File, llvm::StringRef Version,
                             llvm::ArrayRef<Diag> Diagnostics) override {
-      StringRef FileIndexStr = llvm::sys::path::stem(File);
+      llvm::StringRef FileIndexStr = llvm::sys::path::stem(File);
       ASSERT_TRUE(FileIndexStr.consume_front("Foo"));
 
       unsigned long FileIndex = std::stoul(FileIndexStr.str());
@@ -1001,19 +1001,19 @@ TEST(ClangdTests, PreambleVFSStatCache) {
         : CountStats(CountStats) {}
 
   private:
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> viewImpl() const override {
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> viewImpl() const override {
       class StatRecordingVFS : public llvm::vfs::ProxyFileSystem {
       public:
-        StatRecordingVFS(IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS,
+        StatRecordingVFS(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS,
                          llvm::StringMap<unsigned> &CountStats)
             : ProxyFileSystem(std::move(FS)), CountStats(CountStats) {}
 
         llvm::ErrorOr<std::unique_ptr<llvm::vfs::File>>
-        openFileForRead(const Twine &Path) override {
+        openFileForRead(const llvm::Twine &Path) override {
           ++CountStats[llvm::sys::path::filename(Path.str())];
           return ProxyFileSystem::openFileForRead(Path);
         }
-        llvm::ErrorOr<llvm::vfs::Status> status(const Twine &Path) override {
+        llvm::ErrorOr<llvm::vfs::Status> status(const llvm::Twine &Path) override {
           ++CountStats[llvm::sys::path::filename(Path.str())];
           return ProxyFileSystem::status(Path);
         }
@@ -1022,7 +1022,7 @@ TEST(ClangdTests, PreambleVFSStatCache) {
         llvm::StringMap<unsigned> &CountStats;
       };
 
-      return IntrusiveRefCntPtr<StatRecordingVFS>(
+      return llvm::IntrusiveRefCntPtr<StatRecordingVFS>(
           new StatRecordingVFS(buildTestFS(Files), CountStats));
     }
   };
@@ -1268,7 +1268,7 @@ TEST(ClangdServer, RespectsTweakFormatting) {
     struct ModuleTweak final : public Tweak {
       const char *id() const override { return TweakID; }
       bool prepare(const Selection &Sel) override { return true; }
-      Expected<Effect> apply(const Selection &Sel) override {
+      llvm::Expected<Effect> apply(const Selection &Sel) override {
         auto &SM = Sel.AST->getSourceManager();
         llvm::StringRef FilePath = SM.getFilename(Sel.Cursor);
         tooling::Replacements Reps;

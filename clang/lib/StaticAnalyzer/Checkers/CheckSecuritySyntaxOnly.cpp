@@ -139,7 +139,7 @@ void WalkAST::VisitCallExpr(CallExpr *CE) {
   IdentifierInfo *II = FD->getIdentifier();
   if (!II)   // if no identifier, not a simple C function
     return;
-  StringRef Name = II->getName();
+  llvm::StringRef Name = II->getName();
   Name.consume_front("__builtin_");
 
   // Set the evaluation function by switching on the callee name.
@@ -318,8 +318,8 @@ void WalkAST::checkLoopConditionForFloat(const ForStmt *FS) {
   // referenced the compared variable.
   const DeclRefExpr *drCond = vdLHS == vdInc ? drLHS : drRHS;
 
-  SmallVector<SourceRange, 2> ranges;
-  SmallString<256> sbuf;
+  llvm::SmallVector<SourceRange, 2> ranges;
+  llvm::SmallString<256> sbuf;
   llvm::raw_svector_ostream os(sbuf);
 
   os << "Variable '" << drCond->getDecl()->getName()
@@ -592,7 +592,7 @@ void WalkAST::checkCall_mkstemp(const CallExpr *CE, const FunctionDecl *FD) {
   if (!filter.check_mkstemp)
     return;
 
-  StringRef Name = FD->getIdentifier()->getName();
+  llvm::StringRef Name = FD->getIdentifier()->getName();
   std::pair<signed, signed> ArgSuffix =
     llvm::StringSwitch<std::pair<signed, signed> >(Name)
       .Case("mktemp", std::make_pair(0,-1))
@@ -619,7 +619,7 @@ void WalkAST::checkCall_mkstemp(const CallExpr *CE, const FunctionDecl *FD) {
     return;
 
   // Count the number of X's, taking into account a possible cutoff suffix.
-  StringRef str = strArg->getString();
+  llvm::StringRef str = strArg->getString();
   unsigned numX = 0;
   unsigned n = str.size();
 
@@ -647,7 +647,7 @@ void WalkAST::checkCall_mkstemp(const CallExpr *CE, const FunctionDecl *FD) {
   // Issue a warning.
   PathDiagnosticLocation CELoc =
     PathDiagnosticLocation::createBegin(CE, BR.getSourceManager(), AC);
-  SmallString<512> buf;
+  llvm::SmallString<512> buf;
   llvm::raw_svector_ostream out(buf);
   out << "Call to '" << Name << "' should have at least 6 'X's in the"
     " format string to be secure (" << numX << " 'X'";
@@ -761,7 +761,7 @@ void WalkAST::checkDeprecatedOrUnsafeBufferHandling(const CallExpr *CE,
   // restrictions).
   enum { DEPR_ONLY = -1, UNKNOWN_CALL = -2 };
 
-  StringRef Name = FD->getIdentifier()->getName();
+  llvm::StringRef Name = FD->getIdentifier()->getName();
   Name.consume_front("__builtin_");
 
   int ArgIndex =
@@ -788,8 +788,8 @@ void WalkAST::checkDeprecatedOrUnsafeBufferHandling(const CallExpr *CE,
       BoundsProvided = true;
   }
 
-  SmallString<128> Buf1;
-  SmallString<512> Buf2;
+  llvm::SmallString<128> Buf1;
+  llvm::SmallString<512> Buf2;
   llvm::raw_svector_ostream Out1(Buf1);
   llvm::raw_svector_ostream Out2(Buf2);
 
@@ -876,11 +876,11 @@ void WalkAST::checkCall_rand(const CallExpr *CE, const FunctionDecl *FD) {
     return;
 
   // Issue a warning.
-  SmallString<256> buf1;
+  llvm::SmallString<256> buf1;
   llvm::raw_svector_ostream os1(buf1);
   os1 << '\'' << *FD << "' is a poor random number generator";
 
-  SmallString<256> buf2;
+  llvm::SmallString<256> buf2;
   llvm::raw_svector_ostream os2(buf2);
   os2 << "Function '" << *FD
       << "' is obsolete because it implements a poor random number generator."
@@ -955,22 +955,22 @@ void WalkAST::checkMsg_decodeValueOfObjCType(const ObjCMessageExpr *ME) {
   // FIXME: We probably shouldn't register the check if it's not available.
   const TargetInfo &TI = AC->getASTContext().getTargetInfo();
   const llvm::Triple &T = TI.getTriple();
-  const VersionTuple &VT = TI.getPlatformMinVersion();
+  const llvm::VersionTuple &VT = TI.getPlatformMinVersion();
   switch (T.getOS()) {
   case llvm::Triple::IOS:
-    if (VT < VersionTuple(11, 0))
+    if (VT < llvm::VersionTuple(11, 0))
       return;
     break;
   case llvm::Triple::MacOSX:
-    if (VT < VersionTuple(10, 13))
+    if (VT < llvm::VersionTuple(10, 13))
       return;
     break;
   case llvm::Triple::WatchOS:
-    if (VT < VersionTuple(4, 0))
+    if (VT < llvm::VersionTuple(4, 0))
       return;
     break;
   case llvm::Triple::TvOS:
-    if (VT < VersionTuple(11, 0))
+    if (VT < llvm::VersionTuple(11, 0))
       return;
     break;
   case llvm::Triple::XROS:
@@ -1048,11 +1048,11 @@ void WalkAST::checkUncheckedReturnValue(CallExpr *CE) {
       return;
 
   // Issue a warning.
-  SmallString<256> buf1;
+  llvm::SmallString<256> buf1;
   llvm::raw_svector_ostream os1(buf1);
   os1 << "Return value is not checked in call to '" << *FD << '\'';
 
-  SmallString<256> buf2;
+  llvm::SmallString<256> buf2;
   llvm::raw_svector_ostream os2(buf2);
   os2 << "The return value from the call to '" << *FD
       << "' is not checked.  If an error occurs in '" << *FD

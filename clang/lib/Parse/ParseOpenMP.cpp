@@ -81,7 +81,7 @@ struct OpenMPDirectiveKindExWrapper {
 };
 
 class DeclDirectiveListParserHelper final {
-  SmallVector<Expr *, 4> Identifiers;
+  llvm::SmallVector<Expr *, 4> Identifiers;
   Parser *P;
   OpenMPDirectiveKind Kind;
 
@@ -100,7 +100,7 @@ public:
 
 // Map token string to extended OMP token kind that are
 // OpenMPDirectiveKind + OpenMPDirectiveKindEx.
-static unsigned getOpenMPDirectiveKindEx(StringRef S) {
+static unsigned getOpenMPDirectiveKindEx(llvm::StringRef S) {
   OpenMPDirectiveKindExWrapper DKind = getOpenMPDirectiveKind(S);
   if (DKind != OMPD_unknown)
     return DKind;
@@ -317,7 +317,7 @@ Parser::ParseOpenMPDeclareReductionDirective(AccessSpecifier AS) {
   if (!IsCorrect && Tok.is(tok::annot_pragma_openmp_end))
     return DeclGroupPtrTy();
 
-  SmallVector<std::pair<QualType, SourceLocation>, 8> ReductionTypes;
+  llvm::SmallVector<std::pair<QualType, SourceLocation>, 8> ReductionTypes;
   // Parse list of types until ':' token.
   do {
     ColonProtectionRAIIObject ColonRAII(*this);
@@ -607,7 +607,7 @@ Parser::ParseOpenMPDeclareMapperDirective(AccessSpecifier AS) {
           getCurScope(), MapperType, Range.getBegin(), VName);
 
   // Parse map clauses.
-  SmallVector<OMPClause *, 6> Clauses;
+  llvm::SmallVector<OMPClause *, 6> Clauses;
   while (Tok.isNot(tok::annot_pragma_openmp_end)) {
     OpenMPClauseKind CKind = Tok.isAnnotation()
                                  ? OMPC_unknown
@@ -720,9 +720,9 @@ public:
 ///      { 'linear '(' <argument_list> [ ':' <step> ] ')' }
 static bool parseDeclareSimdClauses(
     Parser &P, OMPDeclareSimdDeclAttr::BranchStateTy &BS, ExprResult &SimdLen,
-    SmallVectorImpl<Expr *> &Uniforms, SmallVectorImpl<Expr *> &Aligneds,
-    SmallVectorImpl<Expr *> &Alignments, SmallVectorImpl<Expr *> &Linears,
-    SmallVectorImpl<unsigned> &LinModifiers, SmallVectorImpl<Expr *> &Steps) {
+    llvm::SmallVectorImpl<Expr *> &Uniforms, llvm::SmallVectorImpl<Expr *> &Aligneds,
+    llvm::SmallVectorImpl<Expr *> &Alignments, llvm::SmallVectorImpl<Expr *> &Linears,
+    llvm::SmallVectorImpl<unsigned> &LinModifiers, llvm::SmallVectorImpl<Expr *> &Steps) {
   SourceRange BSRange;
   const Token &Tok = P.getCurToken();
   bool IsError = false;
@@ -731,7 +731,7 @@ static bool parseDeclareSimdClauses(
       break;
     OMPDeclareSimdDeclAttr::BranchStateTy Out;
     IdentifierInfo *II = Tok.getIdentifierInfo();
-    StringRef ClauseName = II->getName();
+    llvm::StringRef ClauseName = II->getName();
     // Parse 'inranch|notinbranch' clauses.
     if (OMPDeclareSimdDeclAttr::ConvertStrToBranchStateTy(ClauseName, Out)) {
       if (BS != OMPDeclareSimdDeclAttr::BS_Undefined && BS != Out) {
@@ -759,7 +759,7 @@ static bool parseDeclareSimdClauses(
       if (CKind == OMPC_uniform || CKind == OMPC_aligned ||
           CKind == OMPC_linear) {
         SemaOpenMP::OpenMPVarListDataTy Data;
-        SmallVectorImpl<Expr *> *Vars = &Uniforms;
+        llvm::SmallVectorImpl<Expr *> *Vars = &Uniforms;
         if (CKind == OMPC_aligned) {
           Vars = &Aligneds;
         } else if (CKind == OMPC_linear) {
@@ -812,12 +812,12 @@ Parser::ParseOMPDeclareSimdClauses(Parser::DeclGroupPtrTy Ptr,
   OMPDeclareSimdDeclAttr::BranchStateTy BS =
       OMPDeclareSimdDeclAttr::BS_Undefined;
   ExprResult Simdlen;
-  SmallVector<Expr *, 4> Uniforms;
-  SmallVector<Expr *, 4> Aligneds;
-  SmallVector<Expr *, 4> Alignments;
-  SmallVector<Expr *, 4> Linears;
-  SmallVector<unsigned, 4> LinModifiers;
-  SmallVector<Expr *, 4> Steps;
+  llvm::SmallVector<Expr *, 4> Uniforms;
+  llvm::SmallVector<Expr *, 4> Aligneds;
+  llvm::SmallVector<Expr *, 4> Alignments;
+  llvm::SmallVector<Expr *, 4> Linears;
+  llvm::SmallVector<unsigned, 4> LinModifiers;
+  llvm::SmallVector<Expr *, 4> Steps;
   bool IsError =
       parseDeclareSimdClauses(*this, BS, Simdlen, Uniforms, Aligneds,
                               Alignments, Linears, LinModifiers, Steps);
@@ -840,16 +840,16 @@ enum OMPContextLvl {
   CONTEXT_TRAIT_LVL = 2,
 };
 
-static StringRef stringLiteralParser(Parser &P) {
+static llvm::StringRef stringLiteralParser(Parser &P) {
   ExprResult Res = P.ParseStringLiteralExpression(true);
   return Res.isUsable() ? Res.getAs<StringLiteral>()->getString() : "";
 }
 
-static StringRef getNameFromIdOrString(Parser &P, Token &Tok,
+static llvm::StringRef getNameFromIdOrString(Parser &P, Token &Tok,
                                        OMPContextLvl Lvl) {
   if (Tok.is(tok::identifier) || Tok.is(tok::kw_for)) {
     llvm::SmallString<16> Buffer;
-    StringRef Name = P.getPreprocessor().getSpelling(Tok, Buffer);
+    llvm::StringRef Name = P.getPreprocessor().getSpelling(Tok, Buffer);
     (void)P.ConsumeToken();
     return Name;
   }
@@ -863,7 +863,7 @@ static StringRef getNameFromIdOrString(Parser &P, Token &Tok,
   return "";
 }
 
-static bool checkForDuplicates(Parser &P, StringRef Name,
+static bool checkForDuplicates(Parser &P, llvm::StringRef Name,
                                SourceLocation NameLoc,
                                llvm::StringMap<SourceLocation> &Seen,
                                OMPContextLvl Lvl) {
@@ -888,7 +888,7 @@ void Parser::parseOMPTraitPropertyKind(OMPTraitProperty &TIProperty,
   TIProperty.Kind = TraitProperty::invalid;
 
   SourceLocation NameLoc = Tok.getLocation();
-  StringRef Name = getNameFromIdOrString(*this, Tok, CONTEXT_TRAIT_LVL);
+  llvm::StringRef Name = getNameFromIdOrString(*this, Tok, CONTEXT_TRAIT_LVL);
   if (Name.empty()) {
     Diag(Tok.getLocation(), diag::note_omp_declare_variant_ctx_options)
         << CONTEXT_TRAIT_LVL << listOpenMPContextTraitProperties(Set, Selector);
@@ -988,7 +988,7 @@ static bool checkExtensionProperty(Parser &P, SourceLocation Loc,
     for (OMPTraitProperty &SeenProp : TISelector.Properties)
       if (IsMatchExtension(SeenProp)) {
         P.Diag(Loc, diag::err_omp_variant_ctx_second_match_extension);
-        StringRef SeenName = llvm::omp::getOpenMPContextTraitPropertyName(
+        llvm::StringRef SeenName = llvm::omp::getOpenMPContextTraitPropertyName(
             SeenProp.Kind, SeenProp.RawString);
         SourceLocation SeenLoc = Seen[SeenName];
         P.Diag(SeenLoc, diag::note_omp_declare_variant_ctx_used_here)
@@ -1055,7 +1055,7 @@ void Parser::parseOMPTraitSelectorKind(OMPTraitSelector &TISelector,
   TISelector.Kind = TraitSelector::invalid;
 
   SourceLocation NameLoc = Tok.getLocation();
-  StringRef Name = getNameFromIdOrString(*this, Tok, CONTEXT_SELECTOR_LVL);
+  llvm::StringRef Name = getNameFromIdOrString(*this, Tok, CONTEXT_SELECTOR_LVL);
   if (Name.empty()) {
     Diag(Tok.getLocation(), diag::note_omp_declare_variant_ctx_options)
         << CONTEXT_SELECTOR_LVL << listOpenMPContextTraitSelectors(Set);
@@ -1107,7 +1107,7 @@ void Parser::parseOMPTraitSelectorKind(OMPTraitSelector &TISelector,
 static ExprResult parseContextScore(Parser &P) {
   ExprResult ScoreExpr;
   llvm::SmallString<16> Buffer;
-  StringRef SelectorName =
+  llvm::StringRef SelectorName =
       P.getPreprocessor().getSpelling(P.getCurToken(), Buffer);
   if (SelectorName != "score")
     return ScoreExpr;
@@ -1241,7 +1241,7 @@ void Parser::parseOMPTraitSetKind(OMPTraitSet &TISet,
   TISet.Kind = TraitSet::invalid;
 
   SourceLocation NameLoc = Tok.getLocation();
-  StringRef Name = getNameFromIdOrString(*this, Tok, CONTEXT_SELECTOR_SET_LVL);
+  llvm::StringRef Name = getNameFromIdOrString(*this, Tok, CONTEXT_SELECTOR_SET_LVL);
   if (Name.empty()) {
     Diag(Tok.getLocation(), diag::note_omp_declare_variant_ctx_options)
         << CONTEXT_SELECTOR_SET_LVL << listOpenMPContextTraitSets();
@@ -1426,9 +1426,9 @@ void Parser::ParseOMPDeclareVariantClauses(Parser::DeclGroupPtrTy Ptr,
       Actions.OpenMP().getOMPTraitInfoForSurroundingScope();
   ASTContext &ASTCtx = Actions.getASTContext();
   OMPTraitInfo &TI = ASTCtx.getNewOMPTraitInfo();
-  SmallVector<Expr *, 6> AdjustNothing;
-  SmallVector<Expr *, 6> AdjustNeedDevicePtr;
-  SmallVector<OMPInteropInfo, 3> AppendArgs;
+  llvm::SmallVector<Expr *, 6> AdjustNothing;
+  llvm::SmallVector<Expr *, 6> AdjustNeedDevicePtr;
+  llvm::SmallVector<OMPInteropInfo, 3> AppendArgs;
   SourceLocation AdjustArgsLoc, AppendArgsLoc;
 
   // At least one clause is required.
@@ -1457,7 +1457,7 @@ void Parser::ParseOMPDeclareVariantClauses(Parser::DeclGroupPtrTy Ptr,
         AdjustArgsLoc = Tok.getLocation();
         ConsumeToken();
         SemaOpenMP::OpenMPVarListDataTy Data;
-        SmallVector<Expr *> Vars;
+        llvm::SmallVector<Expr *> Vars;
         IsError = ParseOpenMPVarList(OMPD_declare_variant, OMPC_adjust_args,
                                      Vars, Data);
         if (!IsError)
@@ -1512,7 +1512,7 @@ void Parser::ParseOMPDeclareVariantClauses(Parser::DeclGroupPtrTy Ptr,
 }
 
 bool Parser::parseOpenMPAppendArgs(
-    SmallVectorImpl<OMPInteropInfo> &InteropInfos) {
+    llvm::SmallVectorImpl<OMPInteropInfo> &InteropInfos) {
   bool HasError = false;
   // Parse '('.
   BalancedDelimiterTracker T(*this, tok::l_paren, tok::annot_pragma_openmp_end);
@@ -1644,9 +1644,9 @@ bool Parser::parseOMPDeclareVariantMatchClause(SourceLocation Loc,
 ///     'message' '(' msg-string ')'
 /// ....
 void Parser::ParseOpenMPClauses(OpenMPDirectiveKind DKind,
-                                SmallVectorImpl<OMPClause *> &Clauses,
+                                llvm::SmallVectorImpl<OMPClause *> &Clauses,
                                 SourceLocation Loc) {
-  SmallVector<llvm::PointerIntPair<OMPClause *, 1, bool>,
+  llvm::SmallVector<llvm::PointerIntPair<OMPClause *, 1, bool>,
               llvm::omp::Clause_enumSize + 1>
       FirstClauses(llvm::omp::Clause_enumSize + 1);
   while (Tok.isNot(tok::annot_pragma_openmp_end)) {
@@ -1686,7 +1686,7 @@ void Parser::ParseOpenMPClauses(OpenMPDirectiveKind DKind,
 ///
 void Parser::ParseOpenMPAssumesDirective(OpenMPDirectiveKind DKind,
                                          SourceLocation Loc) {
-  SmallVector<std::string, 4> Assumptions;
+  llvm::SmallVector<std::string, 4> Assumptions;
   bool SkippedClauses = false;
 
   auto SkipBraces = [&](llvm::StringRef Spelling, bool IssueNote) {
@@ -1703,7 +1703,7 @@ void Parser::ParseOpenMPAssumesDirective(OpenMPDirectiveKind DKind,
   /// Helper to determine which AssumptionClauseMapping (ACM) in the
   /// AssumptionClauseMappings table matches \p RawString. The return value is
   /// the index of the matching ACM into the table or -1 if there was no match.
-  auto MatchACMClause = [&](StringRef RawString) {
+  auto MatchACMClause = [&](llvm::StringRef RawString) {
     llvm::StringSwitch<int> SS(RawString);
     unsigned ACMIdx = 0;
     for (const AssumptionClauseMappingInfo &ACMI : AssumptionClauseMappings) {
@@ -1834,7 +1834,7 @@ void Parser::ParseOMPDeclareTargetClauses(
       // If we see any clause we need a to or link clause.
       RequiresToOrLinkOrIndirectClause = true;
       IdentifierInfo *II = Tok.getIdentifierInfo();
-      StringRef ClauseName = II->getName();
+      llvm::StringRef ClauseName = II->getName();
       bool IsDeviceTypeClause =
           getLangOpts().OpenMP >= 50 &&
           getOpenMPClauseKind(ClauseName) == OMPC_device_type;
@@ -2112,9 +2112,9 @@ Parser::DeclGroupPtrTy Parser::ParseOpenMPDeclarativeDirectiveWithExtDecl(
     DeclDirectiveListParserHelper Helper(this, DKind);
     if (!ParseOpenMPSimpleVarList(DKind, Helper,
                                   /*AllowScopeSpecifier=*/true)) {
-      SmallVector<OMPClause *, 1> Clauses;
+      llvm::SmallVector<OMPClause *, 1> Clauses;
       if (Tok.isNot(tok::annot_pragma_openmp_end)) {
-        SmallVector<llvm::PointerIntPair<OMPClause *, 1, bool>,
+        llvm::SmallVector<llvm::PointerIntPair<OMPClause *, 1, bool>,
                     llvm::omp::Clause_enumSize + 1>
             FirstClauses(llvm::omp::Clause_enumSize + 1);
         while (Tok.isNot(tok::annot_pragma_openmp_end)) {
@@ -2149,8 +2149,8 @@ Parser::DeclGroupPtrTy Parser::ParseOpenMPDeclarativeDirectiveWithExtDecl(
   }
   case OMPD_requires: {
     SourceLocation StartLoc = ConsumeToken();
-    SmallVector<OMPClause *, 5> Clauses;
-    SmallVector<llvm::PointerIntPair<OMPClause *, 1, bool>,
+    llvm::SmallVector<OMPClause *, 5> Clauses;
+    llvm::SmallVector<llvm::PointerIntPair<OMPClause *, 1, bool>,
                 llvm::omp::Clause_enumSize + 1>
         FirstClauses(llvm::omp::Clause_enumSize + 1);
     if (Tok.is(tok::annot_pragma_openmp_end)) {
@@ -2190,7 +2190,7 @@ Parser::DeclGroupPtrTy Parser::ParseOpenMPDeclarativeDirectiveWithExtDecl(
     return Actions.OpenMP().ActOnOpenMPRequiresDirective(StartLoc, Clauses);
   }
   case OMPD_error: {
-    SmallVector<OMPClause *, 1> Clauses;
+    llvm::SmallVector<OMPClause *, 1> Clauses;
     SourceLocation StartLoc = ConsumeToken();
     ParseOpenMPClauses(DKind, Clauses, StartLoc);
     Actions.OpenMP().ActOnOpenMPErrorDirective(Clauses, StartLoc,
@@ -2250,8 +2250,8 @@ Parser::DeclGroupPtrTy Parser::ParseOpenMPDeclarativeDirectiveWithExtDecl(
     VariantMatchInfo VMI;
     TI.getAsVariantMatchInfo(ASTCtx, VMI);
 
-    std::function<void(StringRef)> DiagUnknownTrait =
-        [this, Loc](StringRef ISATrait) {
+    std::function<void(llvm::StringRef)> DiagUnknownTrait =
+        [this, Loc](llvm::StringRef ISATrait) {
           // TODO Track the selector locations in a way that is accessible here
           // to improve the diagnostic location.
           Diag(Loc, diag::warn_unknown_declare_variant_isa_trait) << ISATrait;
@@ -2259,7 +2259,7 @@ Parser::DeclGroupPtrTy Parser::ParseOpenMPDeclarativeDirectiveWithExtDecl(
     TargetOMPContext OMPCtx(
         ASTCtx, std::move(DiagUnknownTrait),
         /* CurrentFunctionDecl */ nullptr,
-        /* ConstructTraits */ ArrayRef<llvm::omp::TraitProperty>());
+        /* ConstructTraits */ llvm::ArrayRef<llvm::omp::TraitProperty>());
 
     if (isVariantApplicableInContext(VMI, OMPCtx, /* DeviceSetOnly */ true)) {
       Actions.OpenMP().ActOnOpenMPBeginDeclareVariant(Loc, TI);
@@ -2509,8 +2509,8 @@ StmtResult Parser::ParseOpenMPDeclarativeOrExecutableDirective(
            "Not an OpenMP directive!");
   ParsingOpenMPDirectiveRAII DirScope(*this);
   ParenBraceBracketBalancer BalancerRAIIObj(*this);
-  SmallVector<OMPClause *, 5> Clauses;
-  SmallVector<llvm::PointerIntPair<OMPClause *, 1, bool>,
+  llvm::SmallVector<OMPClause *, 5> Clauses;
+  llvm::SmallVector<llvm::PointerIntPair<OMPClause *, 1, bool>,
               llvm::omp::Clause_enumSize + 1>
       FirstClauses(llvm::omp::Clause_enumSize + 1);
   unsigned ScopeFlags = Scope::FnScope | Scope::DeclScope |
@@ -2546,7 +2546,7 @@ StmtResult Parser::ParseOpenMPDeclarativeOrExecutableDirective(
     return StmtEmpty();
   case OMPD_metadirective: {
     ConsumeToken();
-    SmallVector<VariantMatchInfo, 4> VMIs;
+    llvm::SmallVector<VariantMatchInfo, 4> VMIs;
 
     // First iteration of parsing all clauses of metadirective.
     // This iteration only parses and collects all context selector ignoring the
@@ -2614,15 +2614,15 @@ StmtResult Parser::ParseOpenMPDeclarativeOrExecutableDirective(
     TPA.Revert();
     // End of the first iteration. Parser is reset to the start of metadirective
 
-    std::function<void(StringRef)> DiagUnknownTrait =
-        [this, Loc](StringRef ISATrait) {
+    std::function<void(llvm::StringRef)> DiagUnknownTrait =
+        [this, Loc](llvm::StringRef ISATrait) {
           // TODO Track the selector locations in a way that is accessible here
           // to improve the diagnostic location.
           Diag(Loc, diag::warn_unknown_declare_variant_isa_trait) << ISATrait;
         };
     TargetOMPContext OMPCtx(ASTContext, std::move(DiagUnknownTrait),
                             /* CurrentFunctionDecl */ nullptr,
-                            ArrayRef<llvm::omp::TraitProperty>());
+                            llvm::ArrayRef<llvm::omp::TraitProperty>());
 
     // A single match is returned for OpenMP 5.0
     int BestIdx = getBestVariantMatchForContext(VMIs, OMPCtx);
@@ -2715,9 +2715,9 @@ StmtResult Parser::ParseOpenMPDeclarativeOrExecutableDirective(
     DeclDirectiveListParserHelper Helper(this, DKind);
     if (!ParseOpenMPSimpleVarList(DKind, Helper,
                                   /*AllowScopeSpecifier=*/false)) {
-      SmallVector<OMPClause *, 1> Clauses;
+      llvm::SmallVector<OMPClause *, 1> Clauses;
       if (Tok.isNot(tok::annot_pragma_openmp_end)) {
-        SmallVector<llvm::PointerIntPair<OMPClause *, 1, bool>,
+        llvm::SmallVector<llvm::PointerIntPair<OMPClause *, 1, bool>,
                     llvm::omp::Clause_enumSize + 1>
             FirstClauses(llvm::omp::Clause_enumSize + 1);
         while (Tok.isNot(tok::annot_pragma_openmp_end)) {
@@ -3111,7 +3111,7 @@ bool Parser::ParseOpenMPSimpleVarList(
 
 OMPClause *Parser::ParseOpenMPSizesClause() {
   SourceLocation ClauseNameLoc, OpenLoc, CloseLoc;
-  SmallVector<Expr *, 4> ValExprs;
+  llvm::SmallVector<Expr *, 4> ValExprs;
   if (ParseOpenMPExprListClause(OMPC_sizes, ClauseNameLoc, OpenLoc, CloseLoc,
                                 ValExprs))
     return nullptr;
@@ -3128,7 +3128,7 @@ OMPClause *Parser::ParseOpenMPUsesAllocatorClause(OpenMPDirectiveKind DKind) {
   BalancedDelimiterTracker T(*this, tok::l_paren, tok::annot_pragma_openmp_end);
   if (T.expectAndConsume(diag::err_expected_lparen_after, "uses_allocator"))
     return nullptr;
-  SmallVector<SemaOpenMP::UsesAllocatorsData, 4> Data;
+  llvm::SmallVector<SemaOpenMP::UsesAllocatorsData, 4> Data;
   do {
     CXXScopeSpec SS;
     Token Replacement;
@@ -3461,7 +3461,7 @@ OMPClause *Parser::ParseOpenMPClause(OpenMPDirectiveKind DKind,
 /// Parses simple expression in parens for single-expression clauses of OpenMP
 /// constructs.
 /// \param RLoc Returned location of right paren.
-ExprResult Parser::ParseOpenMPParensExpr(StringRef ClauseName,
+ExprResult Parser::ParseOpenMPParensExpr(llvm::StringRef ClauseName,
                                          SourceLocation &RLoc,
                                          bool IsAddressOfOperand) {
   BalancedDelimiterTracker T(*this, tok::l_paren, tok::annot_pragma_openmp_end);
@@ -3752,7 +3752,7 @@ OMPClause *Parser::ParseOpenMPOMPXAttributesClause(bool ParseOnly) {
   if (ParseOnly)
     return nullptr;
 
-  SmallVector<Attr *> Attrs;
+  llvm::SmallVector<Attr *> Attrs;
   for (const ParsedAttr &PA : ParsedAttrs) {
     switch (PA.getKind()) {
     case ParsedAttr::AT_AMDGPUFlatWorkGroupSize:
@@ -3890,8 +3890,8 @@ OMPClause *Parser::ParseOpenMPSingleExprWithArgClause(OpenMPDirectiveKind DKind,
     return nullptr;
 
   ExprResult Val;
-  SmallVector<unsigned, 4> Arg;
-  SmallVector<SourceLocation, 4> KLoc;
+  llvm::SmallVector<unsigned, 4> Arg;
+  llvm::SmallVector<SourceLocation, 4> KLoc;
   if (Kind == OMPC_schedule) {
     enum { Modifier1, Modifier2, ScheduleKind, NumberOfElements };
     Arg.resize(NumberOfElements);
@@ -4221,7 +4221,7 @@ static OpenMPMapClauseKind isMapType(Parser &P);
 bool Parser::parseMapTypeModifiers(SemaOpenMP::OpenMPVarListDataTy &Data) {
   bool HasMapType = false;
   SourceLocation PreMapLoc = Tok.getLocation();
-  StringRef PreMapName = "";
+  llvm::StringRef PreMapName = "";
   while (getCurToken().isNot(tok::colon)) {
     OpenMPMapModifierKind TypeModifier = isMapModifier(*this);
     OpenMPMapClauseKind MapKind = isMapType(*this);
@@ -4342,7 +4342,7 @@ ExprResult Parser::ParseOpenMPIteratorsExpr() {
     return ExprError();
 
   SourceLocation LLoc = T.getOpenLocation();
-  SmallVector<SemaOpenMP::OMPIteratorData, 4> Data;
+  llvm::SmallVector<SemaOpenMP::OMPIteratorData, 4> Data;
   while (Tok.isNot(tok::r_paren) && Tok.isNot(tok::annot_pragma_openmp_end)) {
     // Check if the type parsing is required.
     ParsedType IteratorType;
@@ -4486,7 +4486,7 @@ static bool parseStepSize(Parser &P, SemaOpenMP::OpenMPVarListDataTy &Data,
 /// Parses clauses with list.
 bool Parser::ParseOpenMPVarList(OpenMPDirectiveKind DKind,
                                 OpenMPClauseKind Kind,
-                                SmallVectorImpl<Expr *> &Vars,
+                                llvm::SmallVectorImpl<Expr *> &Vars,
                                 SemaOpenMP::OpenMPVarListDataTy &Data) {
   UnqualifiedId UnqualifiedReductionId;
   bool InvalidReductionId = false;
@@ -4998,7 +4998,7 @@ OMPClause *Parser::ParseOpenMPVarListClause(OpenMPDirectiveKind DKind,
                                             bool ParseOnly) {
   SourceLocation Loc = Tok.getLocation();
   SourceLocation LOpen = ConsumeToken();
-  SmallVector<Expr *, 4> Vars;
+  llvm::SmallVector<Expr *, 4> Vars;
   SemaOpenMP::OpenMPVarListDataTy Data;
 
   if (ParseOpenMPVarList(DKind, Kind, Vars, Data))
@@ -5014,7 +5014,7 @@ bool Parser::ParseOpenMPExprListClause(OpenMPClauseKind Kind,
                                        SourceLocation &ClauseNameLoc,
                                        SourceLocation &OpenLoc,
                                        SourceLocation &CloseLoc,
-                                       SmallVectorImpl<Expr *> &Exprs,
+                                       llvm::SmallVectorImpl<Expr *> &Exprs,
                                        bool ReqIntConst) {
   assert(getOpenMPClauseName(Kind) == PP.getSpelling(Tok) &&
          "Expected parsing to start at clause name");

@@ -95,7 +95,7 @@ bool trans::isPlusOne(const Expr *E) {
           FD->isExternallyVisible() &&
           ento::cocoa::isRefType(callE->getType(), "CF",
                                  FD->getIdentifier()->getName())) {
-        StringRef fname = FD->getIdentifier()->getName();
+        llvm::StringRef fname = FD->getIdentifier()->getName();
         if (fname.ends_with("Retain") || fname.contains("Create") ||
             fname.contains("Copy"))
           return true;
@@ -141,7 +141,7 @@ SourceLocation trans::findSemiAfterLocation(SourceLocation loc,
 
   // Try to load the file buffer.
   bool invalidTemp = false;
-  StringRef file = SM.getBufferData(locInfo.first, &invalidTemp);
+  llvm::StringRef file = SM.getBufferData(locInfo.first, &invalidTemp);
   if (invalidTemp)
     return SourceLocation();
 
@@ -205,7 +205,7 @@ bool trans::isGlobalVar(Expr *E) {
   return false;
 }
 
-StringRef trans::getNilString(MigrationPass &Pass) {
+llvm::StringRef trans::getNilString(MigrationPass &Pass) {
   return Pass.SemaRef.PP.isMacroDefined("nil") ? "nil" : "0";
 }
 
@@ -376,8 +376,8 @@ bool MigrationContext::isGCOwnedNonObjC(QualType T) {
   return false;
 }
 
-bool MigrationContext::rewritePropertyAttribute(StringRef fromAttr,
-                                                StringRef toAttr,
+bool MigrationContext::rewritePropertyAttribute(llvm::StringRef fromAttr,
+                                                llvm::StringRef toAttr,
                                                 SourceLocation atLoc) {
   if (atLoc.isMacroID())
     return false;
@@ -389,7 +389,7 @@ bool MigrationContext::rewritePropertyAttribute(StringRef fromAttr,
 
   // Try to load the file buffer.
   bool invalidTemp = false;
-  StringRef file = SM.getBufferData(locInfo.first, &invalidTemp);
+  llvm::StringRef file = SM.getBufferData(locInfo.first, &invalidTemp);
   if (invalidTemp)
     return false;
 
@@ -458,7 +458,7 @@ bool MigrationContext::rewritePropertyAttribute(StringRef fromAttr,
   return false;
 }
 
-bool MigrationContext::addPropertyAttribute(StringRef attr,
+bool MigrationContext::addPropertyAttribute(llvm::StringRef attr,
                                             SourceLocation atLoc) {
   if (atLoc.isMacroID())
     return false;
@@ -470,7 +470,7 @@ bool MigrationContext::addPropertyAttribute(StringRef attr,
 
   // Try to load the file buffer.
   bool invalidTemp = false;
-  StringRef file = SM.getBufferData(locInfo.first, &invalidTemp);
+  llvm::StringRef file = SM.getBufferData(locInfo.first, &invalidTemp);
   if (invalidTemp)
     return false;
 

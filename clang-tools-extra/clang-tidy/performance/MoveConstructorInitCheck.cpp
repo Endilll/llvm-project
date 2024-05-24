@@ -15,7 +15,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::performance {
 
-MoveConstructorInitCheck::MoveConstructorInitCheck(StringRef Name,
+MoveConstructorInitCheck::MoveConstructorInitCheck(llvm::StringRef Name,
                                                    ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context) {}
 

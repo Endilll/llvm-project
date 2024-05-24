@@ -49,12 +49,12 @@ static constexpr llvm::StringLiteral ValidCPUNames[] = {
     {"mips64"}, {"mips64r2"}, {"mips64r3"}, {"mips64r5"}, {"mips64r6"},
     {"octeon"}, {"octeon+"}, {"p5600"}};
 
-bool MipsTargetInfo::isValidCPUName(StringRef Name) const {
+bool MipsTargetInfo::isValidCPUName(llvm::StringRef Name) const {
   return llvm::is_contained(ValidCPUNames, Name);
 }
 
 void MipsTargetInfo::fillValidCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   Values.append(std::begin(ValidCPUNames), std::end(ValidCPUNames));
 }
 
@@ -123,80 +123,80 @@ void MipsTargetInfo::getTargetDefines(const LangOptions &Opts,
 
   switch (FloatABI) {
   case HardFloat:
-    Builder.defineMacro("__mips_hard_float", Twine(1));
+    Builder.defineMacro("__mips_hard_float", llvm::Twine(1));
     break;
   case SoftFloat:
-    Builder.defineMacro("__mips_soft_float", Twine(1));
+    Builder.defineMacro("__mips_soft_float", llvm::Twine(1));
     break;
   }
 
   if (IsSingleFloat)
-    Builder.defineMacro("__mips_single_float", Twine(1));
+    Builder.defineMacro("__mips_single_float", llvm::Twine(1));
 
   switch (FPMode) {
   case FPXX:
-    Builder.defineMacro("__mips_fpr", Twine(0));
+    Builder.defineMacro("__mips_fpr", llvm::Twine(0));
     break;
   case FP32:
-    Builder.defineMacro("__mips_fpr", Twine(32));
+    Builder.defineMacro("__mips_fpr", llvm::Twine(32));
     break;
   case FP64:
-    Builder.defineMacro("__mips_fpr", Twine(64));
+    Builder.defineMacro("__mips_fpr", llvm::Twine(64));
     break;
 }
 
   if (FPMode == FP64 || IsSingleFloat)
-    Builder.defineMacro("_MIPS_FPSET", Twine(32));
+    Builder.defineMacro("_MIPS_FPSET", llvm::Twine(32));
   else
-    Builder.defineMacro("_MIPS_FPSET", Twine(16));
+    Builder.defineMacro("_MIPS_FPSET", llvm::Twine(16));
   if (NoOddSpreg)
-    Builder.defineMacro("_MIPS_SPFPSET", Twine(16));
+    Builder.defineMacro("_MIPS_SPFPSET", llvm::Twine(16));
   else
-    Builder.defineMacro("_MIPS_SPFPSET", Twine(32));
+    Builder.defineMacro("_MIPS_SPFPSET", llvm::Twine(32));
 
   if (IsMips16)
-    Builder.defineMacro("__mips16", Twine(1));
+    Builder.defineMacro("__mips16", llvm::Twine(1));
 
   if (IsMicromips)
-    Builder.defineMacro("__mips_micromips", Twine(1));
+    Builder.defineMacro("__mips_micromips", llvm::Twine(1));
 
   if (IsNan2008)
-    Builder.defineMacro("__mips_nan2008", Twine(1));
+    Builder.defineMacro("__mips_nan2008", llvm::Twine(1));
 
   if (IsAbs2008)
-    Builder.defineMacro("__mips_abs2008", Twine(1));
+    Builder.defineMacro("__mips_abs2008", llvm::Twine(1));
 
   switch (DspRev) {
   default:
     break;
   case DSP1:
-    Builder.defineMacro("__mips_dsp_rev", Twine(1));
-    Builder.defineMacro("__mips_dsp", Twine(1));
+    Builder.defineMacro("__mips_dsp_rev", llvm::Twine(1));
+    Builder.defineMacro("__mips_dsp", llvm::Twine(1));
     break;
   case DSP2:
-    Builder.defineMacro("__mips_dsp_rev", Twine(2));
-    Builder.defineMacro("__mips_dspr2", Twine(1));
-    Builder.defineMacro("__mips_dsp", Twine(1));
+    Builder.defineMacro("__mips_dsp_rev", llvm::Twine(2));
+    Builder.defineMacro("__mips_dspr2", llvm::Twine(1));
+    Builder.defineMacro("__mips_dsp", llvm::Twine(1));
     break;
   }
 
   if (HasMSA)
-    Builder.defineMacro("__mips_msa", Twine(1));
+    Builder.defineMacro("__mips_msa", llvm::Twine(1));
 
   if (DisableMadd4)
-    Builder.defineMacro("__mips_no_madd4", Twine(1));
+    Builder.defineMacro("__mips_no_madd4", llvm::Twine(1));
 
-  Builder.defineMacro("_MIPS_SZPTR", Twine(getPointerWidth(LangAS::Default)));
-  Builder.defineMacro("_MIPS_SZINT", Twine(getIntWidth()));
-  Builder.defineMacro("_MIPS_SZLONG", Twine(getLongWidth()));
+  Builder.defineMacro("_MIPS_SZPTR", llvm::Twine(getPointerWidth(LangAS::Default)));
+  Builder.defineMacro("_MIPS_SZINT", llvm::Twine(getIntWidth()));
+  Builder.defineMacro("_MIPS_SZLONG", llvm::Twine(getLongWidth()));
 
   Builder.defineMacro("_MIPS_ARCH", "\"" + CPU + "\"");
   if (CPU == "octeon+")
     Builder.defineMacro("_MIPS_ARCH_OCTEONP");
   else
-    Builder.defineMacro("_MIPS_ARCH_" + StringRef(CPU).upper());
+    Builder.defineMacro("_MIPS_ARCH_" + llvm::StringRef(CPU).upper());
 
-  if (StringRef(CPU).starts_with("octeon"))
+  if (llvm::StringRef(CPU).starts_with("octeon"))
     Builder.defineMacro("__OCTEON__");
 
   if (CPU != "mips1") {
@@ -213,7 +213,7 @@ void MipsTargetInfo::getTargetDefines(const LangOptions &Opts,
     Builder.defineMacro("__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8");
 }
 
-bool MipsTargetInfo::hasFeature(StringRef Feature) const {
+bool MipsTargetInfo::hasFeature(llvm::StringRef Feature) const {
   return llvm::StringSwitch<bool>(Feature)
       .Case("mips", true)
       .Case("dsp", DspRev >= DSP1)
@@ -223,7 +223,7 @@ bool MipsTargetInfo::hasFeature(StringRef Feature) const {
       .Default(false);
 }
 
-ArrayRef<Builtin::Info> MipsTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> MipsTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo,
                         clang::Mips::LastTSBuiltin - Builtin::FirstTSBuiltin);
 }

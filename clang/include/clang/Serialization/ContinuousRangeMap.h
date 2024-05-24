@@ -43,7 +43,7 @@ public:
   using const_pointer = const value_type *;
 
 private:
-  using Representation = SmallVector<value_type, InitialCapacity>;
+  using Representation = llvm::SmallVector<value_type, InitialCapacity>;
 
   Representation Rep;
 

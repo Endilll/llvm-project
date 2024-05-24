@@ -8,7 +8,7 @@
 
 #include "clang/Basic/MakeSupport.h"
 
-void clang::quoteMakeTarget(StringRef Target, SmallVectorImpl<char> &Res) {
+void clang::quoteMakeTarget(llvm::StringRef Target, llvm::SmallVectorImpl<char> &Res) {
   for (unsigned i = 0, e = Target.size(); i != e; ++i) {
     switch (Target[i]) {
     case ' ':

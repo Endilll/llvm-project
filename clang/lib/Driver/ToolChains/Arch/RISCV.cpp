@@ -26,8 +26,8 @@ using namespace clang;
 using namespace llvm::opt;
 
 // Returns false if an error is diagnosed.
-static bool getArchFeatures(const Driver &D, StringRef Arch,
-                            std::vector<StringRef> &Features,
+static bool getArchFeatures(const Driver &D, llvm::StringRef Arch,
+                            std::vector<llvm::StringRef> &Features,
                             const ArgList &Args) {
   bool EnableExperimentalExtensions =
       Args.hasArg(options::OPT_menable_experimental_extensions);
@@ -55,8 +55,8 @@ static bool getArchFeatures(const Driver &D, StringRef Arch,
 // Get features except standard extension feature
 static void getRISCFeaturesFromMcpu(const Driver &D, const Arg *A,
                                     const llvm::Triple &Triple,
-                                    StringRef Mcpu,
-                                    std::vector<StringRef> &Features) {
+                                    llvm::StringRef Mcpu,
+                                    std::vector<llvm::StringRef> &Features) {
   bool Is64Bit = Triple.isRISCV64();
   if (!llvm::RISCV::parseCPU(Mcpu, Is64Bit)) {
     // Try inverting Is64Bit in case the CPU is valid, but for the wrong target.
@@ -76,8 +76,8 @@ static void getRISCFeaturesFromMcpu(const Driver &D, const Arg *A,
 
 void riscv::getRISCVTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                                    const ArgList &Args,
-                                   std::vector<StringRef> &Features) {
-  StringRef MArch = getRISCVArch(Args, Triple);
+                                   std::vector<llvm::StringRef> &Features) {
+  llvm::StringRef MArch = getRISCVArch(Args, Triple);
 
   if (!getArchFeatures(D, MArch, Features, Args))
     return;
@@ -85,7 +85,7 @@ void riscv::getRISCVTargetFeatures(const Driver &D, const llvm::Triple &Triple,
   // If users give march and mcpu, get std extension feature from MArch
   // and other features (ex. mirco architecture feature) from mcpu
   if (Arg *A = Args.getLastArg(options::OPT_mcpu_EQ)) {
-    StringRef CPU = A->getValue();
+    llvm::StringRef CPU = A->getValue();
     if (CPU == "native")
       CPU = llvm::sys::getHostCPUName();
 
@@ -187,7 +187,7 @@ void riscv::getRISCVTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                             options::OPT_m_riscv_Features_Group);
 }
 
-StringRef riscv::getRISCVABI(const ArgList &Args, const llvm::Triple &Triple) {
+llvm::StringRef riscv::getRISCVABI(const ArgList &Args, const llvm::Triple &Triple) {
   assert(Triple.isRISCV() && "Unexpected triple");
 
   // GCC's logic around choosing a default `-mabi=` is complex. If GCC is not
@@ -222,7 +222,7 @@ StringRef riscv::getRISCVABI(const ArgList &Args, const llvm::Triple &Triple) {
   // rv64g | rv64*d -> lp64d
   // rv64e -> lp64e
   // rv64* -> lp64
-  StringRef Arch = getRISCVArch(Args, Triple);
+  llvm::StringRef Arch = getRISCVArch(Args, Triple);
 
   auto ParseResult = llvm::RISCVISAInfo::parseArchString(
       Arch, /* EnableExperimentalExtension */ true);
@@ -248,7 +248,7 @@ StringRef riscv::getRISCVABI(const ArgList &Args, const llvm::Triple &Triple) {
   }
 }
 
-StringRef riscv::getRISCVArch(const llvm::opt::ArgList &Args,
+llvm::StringRef riscv::getRISCVArch(const llvm::opt::ArgList &Args,
                               const llvm::Triple &Triple) {
   assert(Triple.isRISCV() && "Unexpected triple");
 
@@ -284,10 +284,10 @@ StringRef riscv::getRISCVArch(const llvm::opt::ArgList &Args,
 
   // 2. Get march (isa string) based on `-mcpu=`
   if (const Arg *A = Args.getLastArg(options::OPT_mcpu_EQ)) {
-    StringRef CPU = A->getValue();
+    llvm::StringRef CPU = A->getValue();
     if (CPU == "native")
       CPU = llvm::sys::getHostCPUName();
-    StringRef MArch = llvm::RISCV::getMArchFromMcpu(CPU);
+    llvm::StringRef MArch = llvm::RISCV::getMArchFromMcpu(CPU);
     // Bypass if target cpu's default march is empty.
     if (MArch != "")
       return MArch;
@@ -300,7 +300,7 @@ StringRef riscv::getRISCVArch(const llvm::opt::ArgList &Args,
   // ilp32 | ilp32f | ilp32d -> rv32imafdc
   // lp64 | lp64f | lp64d -> rv64imafdc
   if (const Arg *A = Args.getLastArg(options::OPT_mabi_EQ)) {
-    StringRef MABI = A->getValue();
+    llvm::StringRef MABI = A->getValue();
 
     if (MABI.equals_insensitive("ilp32e"))
       return "rv32e";

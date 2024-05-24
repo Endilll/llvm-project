@@ -19,7 +19,7 @@ namespace clang::tidy::performance {
 /// http://clang.llvm.org/extra/clang-tidy/checks/performance/for-range-copy.html
 class ForRangeCopyCheck : public ClangTidyCheck {
 public:
-  ForRangeCopyCheck(StringRef Name, ClangTidyContext *Context);
+  ForRangeCopyCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override{
     return LangOpts.CPlusPlus11;
   }
@@ -40,7 +40,7 @@ private:
                                        ASTContext &Context);
 
   const bool WarnOnAllAutoCopies;
-  const std::vector<StringRef> AllowedTypes;
+  const std::vector<llvm::StringRef> AllowedTypes;
 };
 
 } // namespace clang::tidy::performance

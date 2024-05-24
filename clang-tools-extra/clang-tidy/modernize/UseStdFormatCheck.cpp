@@ -22,7 +22,7 @@ namespace {
 AST_MATCHER(StringLiteral, isOrdinary) { return Node.isOrdinary(); }
 } // namespace
 
-UseStdFormatCheck::UseStdFormatCheck(StringRef Name, ClangTidyContext *Context)
+UseStdFormatCheck::UseStdFormatCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StrictMode(Options.getLocalOrGlobal("StrictMode", false)),
       StrFormatLikeFunctions(utils::options::parseStringList(

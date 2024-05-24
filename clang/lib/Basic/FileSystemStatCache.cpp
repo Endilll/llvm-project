@@ -31,7 +31,7 @@ void FileSystemStatCache::anchor() {}
 /// implementation can optionally fill in FileDescriptor with a valid
 /// descriptor and the client guarantees that it will close it.
 std::error_code
-FileSystemStatCache::get(StringRef Path, llvm::vfs::Status &Status,
+FileSystemStatCache::get(llvm::StringRef Path, llvm::vfs::Status &Status,
                          bool isFile, std::unique_ptr<llvm::vfs::File> *F,
                          FileSystemStatCache *Cache,
                          llvm::vfs::FileSystem &FS) {
@@ -99,7 +99,7 @@ FileSystemStatCache::get(StringRef Path, llvm::vfs::Status &Status,
 }
 
 std::error_code
-MemorizeStatCalls::getStat(StringRef Path, llvm::vfs::Status &Status,
+MemorizeStatCalls::getStat(llvm::StringRef Path, llvm::vfs::Status &Status,
                            bool isFile,
                            std::unique_ptr<llvm::vfs::File> *F,
                            llvm::vfs::FileSystem &FS) {

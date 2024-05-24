@@ -33,7 +33,7 @@ static constexpr Builtin::Info BuiltinInfo[] = {
 static constexpr llvm::StringLiteral ValidCPUNames[] = {
     {"mvp"}, {"bleeding-edge"}, {"generic"}};
 
-StringRef WebAssemblyTargetInfo::getABI() const { return ABI; }
+llvm::StringRef WebAssemblyTargetInfo::getABI() const { return ABI; }
 
 bool WebAssemblyTargetInfo::setABI(const std::string &Name) {
   if (Name != "mvp" && Name != "experimental-mv")
@@ -43,7 +43,7 @@ bool WebAssemblyTargetInfo::setABI(const std::string &Name) {
   return true;
 }
 
-bool WebAssemblyTargetInfo::hasFeature(StringRef Feature) const {
+bool WebAssemblyTargetInfo::hasFeature(llvm::StringRef Feature) const {
   return llvm::StringSwitch<bool>(Feature)
       .Case("atomics", HasAtomics)
       .Case("bulk-memory", HasBulkMemory)
@@ -62,12 +62,12 @@ bool WebAssemblyTargetInfo::hasFeature(StringRef Feature) const {
       .Default(false);
 }
 
-bool WebAssemblyTargetInfo::isValidCPUName(StringRef Name) const {
+bool WebAssemblyTargetInfo::isValidCPUName(llvm::StringRef Name) const {
   return llvm::is_contained(ValidCPUNames, Name);
 }
 
 void WebAssemblyTargetInfo::fillValidCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   Values.append(std::begin(ValidCPUNames), std::end(ValidCPUNames));
 }
 
@@ -137,7 +137,7 @@ void WebAssemblyTargetInfo::setSIMDLevel(llvm::StringMap<bool> &Features,
 }
 
 void WebAssemblyTargetInfo::setFeatureEnabled(llvm::StringMap<bool> &Features,
-                                              StringRef Name,
+                                              llvm::StringRef Name,
                                               bool Enabled) const {
   if (Name == "simd128")
     setSIMDLevel(Features, SIMD128, Enabled);
@@ -148,7 +148,7 @@ void WebAssemblyTargetInfo::setFeatureEnabled(llvm::StringMap<bool> &Features,
 }
 
 bool WebAssemblyTargetInfo::initFeatureMap(
-    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, StringRef CPU,
+    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, llvm::StringRef CPU,
     const std::vector<std::string> &FeaturesVec) const {
   auto addGenericFeatures = [&]() {
     Features["multivalue"] = true;
@@ -301,7 +301,7 @@ bool WebAssemblyTargetInfo::handleTargetFeatures(
   return true;
 }
 
-ArrayRef<Builtin::Info> WebAssemblyTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> WebAssemblyTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo, clang::WebAssembly::LastTSBuiltin -
                                          Builtin::FirstTSBuiltin);
 }

@@ -21,7 +21,7 @@ namespace clang::tidy::google::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/google/objc-avoid-nsobject-new.html
 class AvoidNSObjectNewCheck : public ClangTidyCheck {
 public:
-  AvoidNSObjectNewCheck(StringRef Name, ClangTidyContext *Context)
+  AvoidNSObjectNewCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC;

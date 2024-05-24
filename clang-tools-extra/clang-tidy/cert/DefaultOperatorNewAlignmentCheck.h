@@ -20,7 +20,7 @@ namespace clang::tidy::cert {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cert/mem57-cpp.html
 class DefaultOperatorNewAlignmentCheck : public ClangTidyCheck {
 public:
-  DefaultOperatorNewAlignmentCheck(StringRef Name, ClangTidyContext *Context)
+  DefaultOperatorNewAlignmentCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return !LangOpts.CPlusPlus17;

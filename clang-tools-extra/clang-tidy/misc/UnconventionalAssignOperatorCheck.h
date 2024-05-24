@@ -26,7 +26,7 @@ namespace clang::tidy::misc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/misc/unconventional-assign-operator.html
 class UnconventionalAssignOperatorCheck : public ClangTidyCheck {
 public:
-  UnconventionalAssignOperatorCheck(StringRef Name, ClangTidyContext *Context)
+  UnconventionalAssignOperatorCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

@@ -156,7 +156,7 @@ enum class BlockCaptureEntityKind {
 class CGBlockInfo {
 public:
   /// Name - The name of the block, kindof.
-  StringRef Name;
+  llvm::StringRef Name;
 
   /// The field index of 'this' within the block, if there is one.
   unsigned CXXThisIndex;
@@ -309,7 +309,7 @@ public:
     return BlockExpression;
   }
 
-  CGBlockInfo(const BlockDecl *blockDecl, StringRef Name);
+  CGBlockInfo(const BlockDecl *blockDecl, llvm::StringRef Name);
 };
 
 }  // end namespace CodeGen

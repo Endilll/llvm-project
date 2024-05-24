@@ -17,7 +17,7 @@
 namespace clang {
 
 static inline bool isWhitespace(llvm::StringRef S) {
-  for (StringRef::const_iterator I = S.begin(), E = S.end(); I != E; ++I) {
+  for (llvm::StringRef::const_iterator I = S.begin(), E = S.end(); I != E; ++I) {
     if (!isWhitespace(*I))
       return false;
   }
@@ -35,7 +35,7 @@ class TextTokenRetokenizer {
   bool NoMoreInterestingTokens;
 
   /// Token buffer: tokens we have processed and lookahead.
-  SmallVector<Token, 16> Toks;
+  llvm::SmallVector<Token, 16> Toks;
 
   /// A position in \c Toks.
   struct Position {
@@ -131,7 +131,7 @@ class TextTokenRetokenizer {
                           SourceLocation Loc,
                           const char *TokBegin,
                           unsigned TokLength,
-                          StringRef Text) {
+                          llvm::StringRef Text) {
     Result.setLocation(Loc);
     Result.setKind(tok::text);
     Result.setLength(TokLength);
@@ -157,7 +157,7 @@ public:
     Position SavedPos = Pos;
 
     consumeWhitespace();
-    SmallString<32> WordText;
+    llvm::SmallString<32> WordText;
     const char *WordBegin = Pos.BufferPtr;
     SourceLocation Loc = getSourceLocation();
     while (!isEnd()) {
@@ -177,7 +177,7 @@ public:
     char *TextPtr = Allocator.Allocate<char>(Length + 1);
 
     memcpy(TextPtr, WordText.c_str(), Length + 1);
-    StringRef Text = StringRef(TextPtr, Length);
+    llvm::StringRef Text = llvm::StringRef(TextPtr, Length);
 
     formTokenWithChars(Tok, Loc, WordBegin, Length, Text);
     return true;
@@ -190,7 +190,7 @@ public:
     Position SavedPos = Pos;
 
     consumeWhitespace();
-    SmallString<32> WordText;
+    llvm::SmallString<32> WordText;
     const char *WordBegin = Pos.BufferPtr;
     SourceLocation Loc = getSourceLocation();
     bool Error = false;
@@ -222,7 +222,7 @@ public:
     char *TextPtr = Allocator.Allocate<char>(Length + 1);
 
     memcpy(TextPtr, WordText.c_str(), Length + 1);
-    StringRef Text = StringRef(TextPtr, Length);
+    llvm::StringRef Text = llvm::StringRef(TextPtr, Length);
 
     formTokenWithChars(Tok, Loc, WordBegin,
                        Pos.BufferPtr - WordBegin, Text);
@@ -239,7 +239,7 @@ public:
     if (Pos.BufferPtr != Pos.BufferStart) {
       formTokenWithChars(PartialTok, getSourceLocation(),
                          Pos.BufferPtr, Pos.BufferEnd - Pos.BufferPtr,
-                         StringRef(Pos.BufferPtr,
+                         llvm::StringRef(Pos.BufferPtr,
                                    Pos.BufferEnd - Pos.BufferPtr));
       HavePartialTok = true;
       Pos.CurToken++;
@@ -289,7 +289,7 @@ void Parser::parseTParamCommandArgs(TParamCommandComment *TPC,
                                      Arg.getText());
 }
 
-ArrayRef<Comment::Argument>
+llvm::ArrayRef<Comment::Argument>
 Parser::parseCommandArgs(TextTokenRetokenizer &Retokenizer, unsigned NumArgs) {
   auto *Args = new (Allocator.Allocate<Comment::Argument>(NumArgs))
       Comment::Argument[NumArgs];
@@ -404,7 +404,7 @@ InlineCommandComment *Parser::parseInlineCommand() {
   consumeToken();
 
   TextTokenRetokenizer Retokenizer(Allocator, *this);
-  ArrayRef<Comment::Argument> Args =
+  llvm::ArrayRef<Comment::Argument> Args =
       parseCommandArgs(Retokenizer, Info->NumArgs);
 
   InlineCommandComment *IC = S.actOnInlineCommand(
@@ -431,7 +431,7 @@ HTMLStartTagComment *Parser::parseHTMLStartTag() {
                                Tok.getHTMLTagStartName());
   consumeToken();
 
-  SmallVector<HTMLStartTagComment::Attribute, 2> Attrs;
+  llvm::SmallVector<HTMLStartTagComment::Attribute, 2> Attrs;
   while (true) {
     switch (Tok.getKind()) {
     case tok::html_ident: {
@@ -541,7 +541,7 @@ HTMLEndTagComment *Parser::parseHTMLEndTag() {
 }
 
 BlockContentComment *Parser::parseParagraphOrBlockCommand() {
-  SmallVector<InlineContentComment *, 8> Content;
+  llvm::SmallVector<InlineContentComment *, 8> Content;
 
   while (true) {
     switch (Tok.getKind()) {
@@ -654,7 +654,7 @@ VerbatimBlockComment *Parser::parseVerbatimBlock() {
   if (Tok.is(tok::newline))
     consumeToken();
 
-  SmallVector<VerbatimBlockLineComment *, 8> Lines;
+  llvm::SmallVector<VerbatimBlockLineComment *, 8> Lines;
   while (Tok.is(tok::verbatim_block_line) ||
          Tok.is(tok::newline)) {
     VerbatimBlockLineComment *Line;
@@ -694,7 +694,7 @@ VerbatimLineComment *Parser::parseVerbatimLine() {
   consumeToken();
 
   SourceLocation TextBegin;
-  StringRef Text;
+  llvm::StringRef Text;
   // Next token might not be a tok::verbatim_line_text if verbatim line
   // starting command comes just before a newline or comment end.
   if (Tok.is(tok::verbatim_line_text)) {
@@ -749,7 +749,7 @@ FullComment *Parser::parseFullComment() {
   while (Tok.is(tok::newline))
     consumeToken();
 
-  SmallVector<BlockContentComment *, 8> Blocks;
+  llvm::SmallVector<BlockContentComment *, 8> Blocks;
   while (Tok.isNot(tok::eof)) {
     Blocks.push_back(parseBlockContent());
 

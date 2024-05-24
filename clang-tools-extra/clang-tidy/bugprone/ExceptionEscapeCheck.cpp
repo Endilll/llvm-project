@@ -34,20 +34,20 @@ AST_MATCHER(FunctionDecl, hasAtLeastOneParameter) {
 
 } // namespace
 
-ExceptionEscapeCheck::ExceptionEscapeCheck(StringRef Name,
+ExceptionEscapeCheck::ExceptionEscapeCheck(llvm::StringRef Name,
                                            ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context), RawFunctionsThatShouldNotThrow(Options.get(
                                          "FunctionsThatShouldNotThrow", "")),
       RawIgnoredExceptions(Options.get("IgnoredExceptions", "")) {
-  llvm::SmallVector<StringRef, 8> FunctionsThatShouldNotThrowVec,
+  llvm::SmallVector<llvm::StringRef, 8> FunctionsThatShouldNotThrowVec,
       IgnoredExceptionsVec;
-  StringRef(RawFunctionsThatShouldNotThrow)
+  llvm::StringRef(RawFunctionsThatShouldNotThrow)
       .split(FunctionsThatShouldNotThrowVec, ",", -1, false);
   FunctionsThatShouldNotThrow.insert(FunctionsThatShouldNotThrowVec.begin(),
                                      FunctionsThatShouldNotThrowVec.end());
 
   llvm::StringSet<> IgnoredExceptions;
-  StringRef(RawIgnoredExceptions).split(IgnoredExceptionsVec, ",", -1, false);
+  llvm::StringRef(RawIgnoredExceptions).split(IgnoredExceptionsVec, ",", -1, false);
   IgnoredExceptions.insert(IgnoredExceptionsVec.begin(),
                            IgnoredExceptionsVec.end());
   Tracer.ignoreExceptions(std::move(IgnoredExceptions));

@@ -135,12 +135,12 @@ public:
   void Destroy();
 
   static DelayedDiagnostic makeAvailability(AvailabilityResult AR,
-                                            ArrayRef<SourceLocation> Locs,
+                                            llvm::ArrayRef<SourceLocation> Locs,
                                             const NamedDecl *ReferringDecl,
                                             const NamedDecl *OffendingDecl,
                                             const ObjCInterfaceDecl *UnknownObjCClass,
                                             const ObjCPropertyDecl  *ObjCProperty,
-                                            StringRef Msg,
+                                            llvm::StringRef Msg,
                                             bool ObjCPropertyAccess);
 
   static DelayedDiagnostic makeAccess(SourceLocation Loc,
@@ -185,12 +185,12 @@ public:
     return AvailabilityData.OffendingDecl;
   }
 
-  StringRef getAvailabilityMessage() const {
+  llvm::StringRef getAvailabilityMessage() const {
     assert(Kind == Availability && "Not an availability diagnostic.");
-    return StringRef(AvailabilityData.Message, AvailabilityData.MessageLen);
+    return llvm::StringRef(AvailabilityData.Message, AvailabilityData.MessageLen);
   }
 
-  ArrayRef<SourceLocation> getAvailabilitySelectorLocs() const {
+  llvm::ArrayRef<SourceLocation> getAvailabilitySelectorLocs() const {
     assert(Kind == Availability && "Not an availability diagnostic.");
     return llvm::ArrayRef(AvailabilityData.SelectorLocs,
                           AvailabilityData.NumSelectorLocs);
@@ -264,7 +264,7 @@ private:
 /// A collection of diagnostics which were delayed.
 class DelayedDiagnosticPool {
   const DelayedDiagnosticPool *Parent;
-  SmallVector<DelayedDiagnostic, 4> Diagnostics;
+  llvm::SmallVector<DelayedDiagnostic, 4> Diagnostics;
 
 public:
   DelayedDiagnosticPool(const DelayedDiagnosticPool *parent) : Parent(parent) {}
@@ -285,7 +285,7 @@ public:
   }
 
   ~DelayedDiagnosticPool() {
-    for (SmallVectorImpl<DelayedDiagnostic>::iterator
+    for (llvm::SmallVectorImpl<DelayedDiagnostic>::iterator
            i = Diagnostics.begin(), e = Diagnostics.end(); i != e; ++i)
       i->Destroy();
   }
@@ -314,7 +314,7 @@ public:
     pool.Diagnostics.clear();
   }
 
-  using pool_iterator = SmallVectorImpl<DelayedDiagnostic>::const_iterator;
+  using pool_iterator = llvm::SmallVectorImpl<DelayedDiagnostic>::const_iterator;
 
   pool_iterator pool_begin() const { return Diagnostics.begin(); }
   pool_iterator pool_end() const { return Diagnostics.end(); }

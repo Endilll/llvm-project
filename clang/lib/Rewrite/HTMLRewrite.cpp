@@ -119,7 +119,7 @@ struct RelexRewriteCache {
     std::string StartTag, EndTag;
   };
 
-  // SmallVector isn't appropriate because these vectors are almost never small.
+  // llvm::SmallVector isn't appropriate because these vectors are almost never small.
   using HighlightList = std::vector<Highlight>;
   using RawHighlightList = std::vector<RawHighlight>;
 
@@ -168,10 +168,10 @@ void html::EscapeText(Rewriter &R, FileID FID,
       unsigned NumSpaces = 8-(ColNo&7);
       if (EscapeSpaces)
         RB.ReplaceText(FilePos, 1,
-                       StringRef("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                       llvm::StringRef("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                                        "&nbsp;&nbsp;&nbsp;", 6*NumSpaces));
       else
-        RB.ReplaceText(FilePos, 1, StringRef("        ", NumSpaces));
+        RB.ReplaceText(FilePos, 1, llvm::StringRef("        ", NumSpaces));
       ColNo += NumSpaces;
       break;
     }
@@ -193,7 +193,7 @@ void html::EscapeText(Rewriter &R, FileID FID,
   }
 }
 
-std::string html::EscapeText(StringRef s, bool EscapeSpaces, bool ReplaceTabs) {
+std::string html::EscapeText(llvm::StringRef s, bool EscapeSpaces, bool ReplaceTabs) {
 
   unsigned len = s.size();
   std::string Str;
@@ -236,7 +236,7 @@ std::string html::EscapeText(StringRef s, bool EscapeSpaces, bool ReplaceTabs) {
 
 static void AddLineNumber(RewriteBuffer &RB, unsigned LineNo,
                           unsigned B, unsigned E) {
-  SmallString<256> Str;
+  llvm::SmallString<256> Str;
   llvm::raw_svector_ostream OS(Str);
 
   OS << "<tr class=\"codeline\" data-linenumber=\"" << LineNo << "\">"
@@ -300,7 +300,7 @@ void html::AddLineNumbers(Rewriter& R, FileID FID) {
 }
 
 void html::AddHeaderFooterInternalBuiltinCSS(Rewriter &R, FileID FID,
-                                             StringRef title) {
+                                             llvm::StringRef title) {
 
   llvm::MemoryBufferRef Buf = R.getSourceMgr().getBufferOrFake(FID);
   const char* FileStart = Buf.getBufferStart();

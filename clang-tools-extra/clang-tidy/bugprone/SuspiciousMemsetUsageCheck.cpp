@@ -121,8 +121,8 @@ void SuspiciousMemsetUsageCheck::check(const MatchFinder::MatchResult &Result) {
     // and fix-its to swap the arguments.
     auto D = diag(Call->getBeginLoc(),
                   "memset of size zero, potentially swapped arguments");
-    StringRef RHSString = tooling::fixit::getText(*ByteCount, *Result.Context);
-    StringRef LHSString = tooling::fixit::getText(*FillChar, *Result.Context);
+    llvm::StringRef RHSString = tooling::fixit::getText(*ByteCount, *Result.Context);
+    llvm::StringRef LHSString = tooling::fixit::getText(*FillChar, *Result.Context);
     if (LHSString.empty() || RHSString.empty())
       return;
 

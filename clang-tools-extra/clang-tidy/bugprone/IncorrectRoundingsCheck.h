@@ -23,7 +23,7 @@ namespace clang::tidy::bugprone {
 ///     numbers where both -0.5f and -1.4f both round to 0.0.
 class IncorrectRoundingsCheck : public ClangTidyCheck {
 public:
-  IncorrectRoundingsCheck(StringRef Name, ClangTidyContext *Context)
+  IncorrectRoundingsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

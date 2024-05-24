@@ -30,7 +30,7 @@ using namespace llvm::opt;
 /// we remove the vendor field to form the multiarch triple.
 std::string WebAssembly::getMultiarchTriple(const Driver &D,
                                             const llvm::Triple &TargetTriple,
-                                            StringRef SysRoot) const {
+                                            llvm::StringRef SysRoot) const {
     return (TargetTriple.getArchName() + "-" +
             TargetTriple.getOSAndEnvironmentName()).str();
 }
@@ -38,7 +38,7 @@ std::string WebAssembly::getMultiarchTriple(const Driver &D,
 std::string wasm::Linker::getLinkerPath(const ArgList &Args) const {
   const ToolChain &ToolChain = getToolChain();
   if (const Arg* A = Args.getLastArg(options::OPT_fuse_ld_EQ)) {
-    StringRef UseLinker = A->getValue();
+    llvm::StringRef UseLinker = A->getValue();
     if (!UseLinker.empty()) {
       if (llvm::sys::path::is_absolute(UseLinker) &&
           llvm::sys::fs::can_execute(UseLinker))
@@ -104,7 +104,7 @@ void wasm::Linker::ConstructJob(Compilation &C, const JobAction &JA,
     IsCommand = false;
 
   if (const Arg *A = Args.getLastArg(options::OPT_mexec_model_EQ)) {
-    StringRef CM = A->getValue();
+    llvm::StringRef CM = A->getValue();
     if (CM == "command") {
       IsCommand = true;
     } else if (CM == "reactor") {
@@ -177,7 +177,7 @@ void wasm::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 
   if (Arg *A = Args.getLastArg(options::OPT_O_Group)) {
     if (!WasmOptPath.empty()) {
-      StringRef OOpt = "s";
+      llvm::StringRef OOpt = "s";
       if (A->getOption().matches(options::OPT_O4) ||
           A->getOption().matches(options::OPT_Ofast))
         OOpt = "4";
@@ -336,7 +336,7 @@ void WebAssembly::addClangTargetOptions(const ArgList &DriverArgs,
     // '-fwasm-exceptions' is not compatible with
     // '-mllvm -enable-emscripten-cxx-exceptions'
     for (const Arg *A : DriverArgs.filtered(options::OPT_mllvm)) {
-      if (StringRef(A->getValue(0)) == "-enable-emscripten-cxx-exceptions")
+      if (llvm::StringRef(A->getValue(0)) == "-enable-emscripten-cxx-exceptions")
         getDriver().Diag(diag::err_drv_argument_not_allowed_with)
             << "-fwasm-exceptions"
             << "-mllvm -enable-emscripten-cxx-exceptions";
@@ -367,13 +367,13 @@ void WebAssembly::addClangTargetOptions(const ArgList &DriverArgs,
   }
 
   for (const Arg *A : DriverArgs.filtered(options::OPT_mllvm)) {
-    StringRef Opt = A->getValue(0);
+    llvm::StringRef Opt = A->getValue(0);
     if (Opt.starts_with("-emscripten-cxx-exceptions-allowed")) {
       // '-mllvm -emscripten-cxx-exceptions-allowed' should be used with
       // '-mllvm -enable-emscripten-cxx-exceptions'
       bool EmEHArgExists = false;
       for (const Arg *A : DriverArgs.filtered(options::OPT_mllvm)) {
-        if (StringRef(A->getValue(0)) == "-enable-emscripten-cxx-exceptions") {
+        if (llvm::StringRef(A->getValue(0)) == "-enable-emscripten-cxx-exceptions") {
           EmEHArgExists = true;
           break;
         }
@@ -385,8 +385,8 @@ void WebAssembly::addClangTargetOptions(const ArgList &DriverArgs,
 
       // Prevent functions specified in -emscripten-cxx-exceptions-allowed list
       // from being inlined before reaching the wasm backend.
-      StringRef FuncNamesStr = Opt.split('=').second;
-      SmallVector<StringRef, 4> FuncNames;
+      llvm::StringRef FuncNamesStr = Opt.split('=').second;
+      llvm::SmallVector<llvm::StringRef, 4> FuncNames;
       FuncNamesStr.split(FuncNames, ',');
       for (auto Name : FuncNames) {
         CC1Args.push_back("-mllvm");
@@ -407,7 +407,7 @@ void WebAssembly::addClangTargetOptions(const ArgList &DriverArgs,
       // '-mllvm -enable-emscripten-cxx-exceptions'
       // because we don't allow Emscripten EH + Wasm SjLj
       for (const Arg *A : DriverArgs.filtered(options::OPT_mllvm)) {
-        if (StringRef(A->getValue(0)) == "-enable-emscripten-cxx-exceptions")
+        if (llvm::StringRef(A->getValue(0)) == "-enable-emscripten-cxx-exceptions")
           getDriver().Diag(diag::err_drv_argument_not_allowed_with)
               << "-mllvm -wasm-enable-sjlj"
               << "-mllvm -enable-emscripten-cxx-exceptions";
@@ -415,7 +415,7 @@ void WebAssembly::addClangTargetOptions(const ArgList &DriverArgs,
       // '-mllvm -wasm-enable-sjlj' is not compatible with
       // '-mllvm -enable-emscripten-sjlj'
       for (const Arg *A : DriverArgs.filtered(options::OPT_mllvm)) {
-        if (StringRef(A->getValue(0)) == "-enable-emscripten-sjlj")
+        if (llvm::StringRef(A->getValue(0)) == "-enable-emscripten-sjlj")
           getDriver().Diag(diag::err_drv_argument_not_allowed_with)
               << "-mllvm -wasm-enable-sjlj"
               << "-mllvm -enable-emscripten-sjlj";
@@ -453,7 +453,7 @@ ToolChain::RuntimeLibType WebAssembly::GetDefaultRuntimeLibType() const {
 ToolChain::CXXStdlibType
 WebAssembly::GetCXXStdlibType(const ArgList &Args) const {
   if (Arg *A = Args.getLastArg(options::OPT_stdlib_EQ)) {
-    StringRef Value = A->getValue();
+    llvm::StringRef Value = A->getValue();
     if (Value == "libc++")
       return ToolChain::CST_Libcxx;
     else if (Value == "libstdc++")
@@ -473,7 +473,7 @@ void WebAssembly::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
   const Driver &D = getDriver();
 
   if (!DriverArgs.hasArg(options::OPT_nobuiltininc)) {
-    SmallString<128> P(D.ResourceDir);
+    llvm::SmallString<128> P(D.ResourceDir);
     llvm::sys::path::append(P, "include");
     addSystemInclude(DriverArgs, CC1Args, P);
   }
@@ -482,13 +482,13 @@ void WebAssembly::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
     return;
 
   // Check for configure-time C include directories.
-  StringRef CIncludeDirs(C_INCLUDE_DIRS);
+  llvm::StringRef CIncludeDirs(C_INCLUDE_DIRS);
   if (CIncludeDirs != "") {
-    SmallVector<StringRef, 5> dirs;
+    llvm::SmallVector<llvm::StringRef, 5> dirs;
     CIncludeDirs.split(dirs, ":");
-    for (StringRef dir : dirs) {
-      StringRef Prefix =
-          llvm::sys::path::is_absolute(dir) ? "" : StringRef(D.SysRoot);
+    for (llvm::StringRef dir : dirs) {
+      llvm::StringRef Prefix =
+          llvm::sys::path::is_absolute(dir) ? "" : llvm::StringRef(D.SysRoot);
       addExternCSystemInclude(DriverArgs, CC1Args, Prefix + dir);
     }
     return;
@@ -594,11 +594,11 @@ void WebAssembly::addLibStdCXXIncludePaths(
     std::error_code EC;
     Generic_GCC::GCCVersion MaxVersion =
         Generic_GCC::GCCVersion::Parse("0.0.0");
-    SmallString<128> Path(LibPath);
+    llvm::SmallString<128> Path(LibPath);
     llvm::sys::path::append(Path, "c++");
     for (llvm::vfs::directory_iterator LI = getVFS().dir_begin(Path, EC), LE;
          !EC && LI != LE; LI = LI.increment(EC)) {
-      StringRef VersionText = llvm::sys::path::filename(LI->path());
+      llvm::StringRef VersionText = llvm::sys::path::filename(LI->path());
       if (VersionText[0] != 'v') {
         auto Version = Generic_GCC::GCCVersion::Parse(VersionText);
         if (Version > MaxVersion)

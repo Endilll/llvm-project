@@ -20,7 +20,7 @@ CodeGenOptions::CodeGenOptions() {
   memcpy(CoverageVersion, "408*", 4);
 }
 
-void CodeGenOptions::resetNonModularOptions(StringRef ModuleFormat) {
+void CodeGenOptions::resetNonModularOptions(llvm::StringRef ModuleFormat) {
   // First reset all CodeGen options only. The Debug options are handled later.
 #define DEBUGOPT(Name, Bits, Default)
 #define VALUE_DEBUGOPT(Name, Bits, Default)

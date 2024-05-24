@@ -26,7 +26,7 @@ namespace clang::tidy::mpi {
 /// http://clang.llvm.org/extra/clang-tidy/checks/mpi/buffer-deref.html
 class BufferDerefCheck : public ClangTidyCheck {
 public:
-  BufferDerefCheck(StringRef Name, ClangTidyContext *Context)
+  BufferDerefCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
@@ -38,8 +38,8 @@ private:
   ///
   /// \param BufferTypes buffer types
   /// \param BufferExprs buffer arguments as expressions
-  void checkBuffers(ArrayRef<const Type *> BufferTypes,
-                    ArrayRef<const Expr *> BufferExprs);
+  void checkBuffers(llvm::ArrayRef<const Type *> BufferTypes,
+                    llvm::ArrayRef<const Expr *> BufferExprs);
 
   enum class IndirectionType : unsigned char { Pointer, Array };
 

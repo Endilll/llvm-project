@@ -49,7 +49,7 @@ class DirectoryEntryRef {
 public:
   const DirectoryEntry &getDirEntry() const { return *ME->getValue(); }
 
-  StringRef getName() const { return ME->getKey(); }
+  llvm::StringRef getName() const { return ME->getKey(); }
 
   /// Hash code is based on the DirectoryEntry, not the specific named
   /// reference.

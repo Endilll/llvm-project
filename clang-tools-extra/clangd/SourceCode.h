@@ -40,7 +40,7 @@ namespace clangd {
 // This represents the type for those digests to prevent us hard coding details
 // of hashing function at every place that needs to store this information.
 using FileDigest = std::array<uint8_t, 8>;
-FileDigest digest(StringRef Content);
+FileDigest digest(llvm::StringRef Content);
 std::optional<FileDigest> digestFile(const SourceManager &SM, FileID FID);
 
 // This context variable controls the behavior of functions in this file
@@ -51,7 +51,7 @@ extern Key<OffsetEncoding> kCurrentOffsetEncoding;
 // Counts the number of UTF-16 code units needed to represent a string (LSP
 // specifies string lengths in UTF-16 code units).
 // Use of UTF-16 may be overridden by kCurrentOffsetEncoding.
-size_t lspLength(StringRef Code);
+size_t lspLength(llvm::StringRef Code);
 
 /// Turn a [line, column] pair into an offset in Code.
 ///
@@ -145,9 +145,9 @@ std::pair<size_t, size_t> offsetToClangLineColumn(llvm::StringRef Code,
 std::pair<llvm::StringRef, llvm::StringRef>
 splitQualifiedName(llvm::StringRef QName);
 
-TextEdit replacementToEdit(StringRef Code, const tooling::Replacement &R);
+TextEdit replacementToEdit(llvm::StringRef Code, const tooling::Replacement &R);
 
-std::vector<TextEdit> replacementsToEdits(StringRef Code,
+std::vector<TextEdit> replacementsToEdits(llvm::StringRef Code,
                                           const tooling::Replacements &Repls);
 
 TextEdit toTextEdit(const FixItHint &FixIt, const SourceManager &M,
@@ -181,7 +181,7 @@ format::FormatStyle getFormatStyleForFile(llvm::StringRef File,
 
 /// Cleanup and format the given replacements.
 llvm::Expected<tooling::Replacements>
-cleanupAndFormat(StringRef Code, const tooling::Replacements &Replaces,
+cleanupAndFormat(llvm::StringRef Code, const tooling::Replacements &Replaces,
                  const format::FormatStyle &Style);
 
 /// A set of edits generated for a single file. Can verify whether it is safe to

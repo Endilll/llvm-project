@@ -152,7 +152,7 @@ void ASTStmtReader::VisitNullStmt(NullStmt *S) {
 
 void ASTStmtReader::VisitCompoundStmt(CompoundStmt *S) {
   VisitStmt(S);
-  SmallVector<Stmt *, 16> Stmts;
+  llvm::SmallVector<Stmt *, 16> Stmts;
   unsigned NumStmts = Record.readInt();
   unsigned HasFPFeatures = Record.readInt();
   assert(S->hasStoredFPFeatures() == HasFPFeatures);
@@ -355,7 +355,7 @@ void ASTStmtReader::VisitDeclStmt(DeclStmt *S) {
     // Single declaration
     S->setDeclGroup(DeclGroupRef(readDecl()));
   } else {
-    SmallVector<Decl *, 16> Decls;
+    llvm::SmallVector<Decl *, 16> Decls;
     int N = Record.size() - Record.getIdx();
     Decls.reserve(N);
     for (int I = 0; I < N; ++I)
@@ -388,9 +388,9 @@ void ASTStmtReader::VisitGCCAsmStmt(GCCAsmStmt *S) {
   unsigned NumLabels = S->getNumLabels();
 
   // Outputs and inputs
-  SmallVector<IdentifierInfo *, 16> Names;
-  SmallVector<StringLiteral*, 16> Constraints;
-  SmallVector<Stmt*, 16> Exprs;
+  llvm::SmallVector<IdentifierInfo *, 16> Names;
+  llvm::SmallVector<StringLiteral*, 16> Constraints;
+  llvm::SmallVector<Stmt*, 16> Exprs;
   for (unsigned I = 0, N = NumOutputs + NumInputs; I != N; ++I) {
     Names.push_back(Record.readIdentifier());
     Constraints.push_back(cast_or_null<StringLiteral>(Record.readSubStmt()));
@@ -398,7 +398,7 @@ void ASTStmtReader::VisitGCCAsmStmt(GCCAsmStmt *S) {
   }
 
   // Constraints
-  SmallVector<StringLiteral*, 16> Clobbers;
+  llvm::SmallVector<StringLiteral*, 16> Clobbers;
   for (unsigned I = 0; I != NumClobbers; ++I)
     Clobbers.push_back(cast_or_null<StringLiteral>(Record.readSubStmt()));
 
@@ -423,18 +423,18 @@ void ASTStmtReader::VisitMSAsmStmt(MSAsmStmt *S) {
   std::string AsmStr = readString();
 
   // Read the tokens.
-  SmallVector<Token, 16> AsmToks;
+  llvm::SmallVector<Token, 16> AsmToks;
   AsmToks.reserve(S->NumAsmToks);
   for (unsigned i = 0, e = S->NumAsmToks; i != e; ++i) {
     AsmToks.push_back(Record.readToken());
   }
 
   // The calls to reserve() for the FooData vectors are mandatory to
-  // prevent dead StringRefs in the Foo vectors.
+  // prevent dead llvm::StringRefs in the Foo vectors.
 
   // Read the clobbers.
-  SmallVector<std::string, 16> ClobbersData;
-  SmallVector<StringRef, 16> Clobbers;
+  llvm::SmallVector<std::string, 16> ClobbersData;
+  llvm::SmallVector<llvm::StringRef, 16> Clobbers;
   ClobbersData.reserve(S->NumClobbers);
   Clobbers.reserve(S->NumClobbers);
   for (unsigned i = 0, e = S->NumClobbers; i != e; ++i) {
@@ -444,9 +444,9 @@ void ASTStmtReader::VisitMSAsmStmt(MSAsmStmt *S) {
 
   // Read the operands.
   unsigned NumOperands = S->NumOutputs + S->NumInputs;
-  SmallVector<Expr*, 16> Exprs;
-  SmallVector<std::string, 16> ConstraintsData;
-  SmallVector<StringRef, 16> Constraints;
+  llvm::SmallVector<Expr*, 16> Exprs;
+  llvm::SmallVector<std::string, 16> ConstraintsData;
+  llvm::SmallVector<llvm::StringRef, 16> Constraints;
   Exprs.reserve(NumOperands);
   ConstraintsData.reserve(NumOperands);
   Constraints.reserve(NumOperands);
@@ -917,7 +917,7 @@ void ASTStmtReader::VisitRequiresExpr(RequiresExpr *E) {
                     InvalidConstraintBuf);
           R = new (Record.getContext()) concepts::NestedRequirement(
               Record.getContext(),
-              StringRef(InvalidConstraintBuf, InvalidConstraint.size()),
+              llvm::StringRef(InvalidConstraintBuf, InvalidConstraint.size()),
               readConstraintSatisfaction(Record));
           break;
         }
@@ -979,11 +979,11 @@ void ASTStmtReader::VisitOMPArrayShapingExpr(OMPArrayShapingExpr *E) {
   VisitExpr(E);
   unsigned NumDims = Record.readInt();
   E->setBase(Record.readSubExpr());
-  SmallVector<Expr *, 4> Dims(NumDims);
+  llvm::SmallVector<Expr *, 4> Dims(NumDims);
   for (unsigned I = 0; I < NumDims; ++I)
     Dims[I] = Record.readSubExpr();
   E->setDimensions(Dims);
-  SmallVector<SourceRange, 4> SRs(NumDims);
+  llvm::SmallVector<SourceRange, 4> SRs(NumDims);
   for (unsigned I = 0; I < NumDims; ++I)
     SRs[I] = readSourceRange();
   E->setBracketsRanges(SRs);
@@ -1235,7 +1235,7 @@ void ASTStmtReader::VisitDesignatedInitExpr(DesignatedInitExpr *E) {
   E->setEqualOrColonLoc(readSourceLocation());
   E->setGNUSyntax(Record.readInt());
 
-  SmallVector<Designator, 4> Designators;
+  llvm::SmallVector<Designator, 4> Designators;
   while (Record.getIdx() < Record.size()) {
     switch ((DesignatorTypes)Record.readInt()) {
     case DESIG_FIELD_DECL: {
@@ -1355,7 +1355,7 @@ void ASTStmtReader::VisitGNUNullExpr(GNUNullExpr *E) {
 
 void ASTStmtReader::VisitShuffleVectorExpr(ShuffleVectorExpr *E) {
   VisitExpr(E);
-  SmallVector<Expr *, 16> Exprs;
+  llvm::SmallVector<Expr *, 16> Exprs;
   unsigned NumExprs = Record.readInt();
   while (NumExprs--)
     Exprs.push_back(Record.readSubExpr());
@@ -2885,7 +2885,7 @@ Stmt *ASTReader::ReadStmtFromStream(ModuleFile &F) {
     Stmt *S = nullptr;
     bool Finished = false;
     bool IsStmtReference = false;
-    Expected<unsigned> MaybeStmtCode = Record.readRecord(Cursor, Entry.ID);
+    llvm::Expected<unsigned> MaybeStmtCode = Record.readRecord(Cursor, Entry.ID);
     if (!MaybeStmtCode) {
       Error(toString(MaybeStmtCode.takeError()));
       return nullptr;

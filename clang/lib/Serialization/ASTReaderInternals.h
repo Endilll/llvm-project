@@ -49,7 +49,7 @@ public:
   static const int MaxTables = 4;
 
   /// The lookup result is a list of global declaration IDs.
-  using data_type = SmallVector<GlobalDeclID, 4>;
+  using data_type = llvm::SmallVector<GlobalDeclID, 4>;
 
   struct data_type_builder {
     data_type &Data;
@@ -129,8 +129,8 @@ struct DeclContextLookupTable {
 /// must provide the \c data_type type and the ReadData operation, only.
 class ASTIdentifierLookupTraitBase {
 public:
-  using external_key_type = StringRef;
-  using internal_key_type = StringRef;
+  using external_key_type = llvm::StringRef;
+  using internal_key_type = llvm::StringRef;
   using hash_value_type = unsigned;
   using offset_type = unsigned;
 
@@ -198,8 +198,8 @@ public:
     unsigned FactoryBits;
     bool InstanceHasMoreThanOneDecl;
     bool FactoryHasMoreThanOneDecl;
-    SmallVector<ObjCMethodDecl *, 2> Instance;
-    SmallVector<ObjCMethodDecl *, 2> Factory;
+    llvm::SmallVector<ObjCMethodDecl *, 2> Instance;
+    llvm::SmallVector<ObjCMethodDecl *, 2> Factory;
   };
 
   using external_key_type = Selector;
@@ -252,7 +252,7 @@ public:
   struct internal_key_type {
     off_t Size;
     time_t ModTime;
-    StringRef Filename;
+    llvm::StringRef Filename;
     bool Imported;
   };
 

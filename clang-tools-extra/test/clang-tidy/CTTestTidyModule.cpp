@@ -22,7 +22,7 @@ namespace {
 class MyTestCheck : public ClangTidyCheck {
 
 public:
-  MyTestCheck(StringRef Name, ClangTidyContext *Context)
+  MyTestCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
   void registerMatchers(ast_matchers::MatchFinder *Finder) override {

@@ -116,13 +116,13 @@ struct __attribute__((aligned(32))) s20 {
 };
 void f20(struct s20 x) {}
 
-struct StringRef {
+struct llvm::StringRef {
   long x;
   const char *Ptr;
 };
 
 // CHECK-LABEL: define{{.*}} ptr @f21(i64 %S.coerce0, ptr %S.coerce1)
-const char *f21(struct StringRef S) { return S.x+S.Ptr; }
+const char *f21(struct llvm::StringRef S) { return S.x+S.Ptr; }
 
 // PR7567
 typedef __attribute__ ((aligned(16))) struct f22s { unsigned long long x[2]; } L;

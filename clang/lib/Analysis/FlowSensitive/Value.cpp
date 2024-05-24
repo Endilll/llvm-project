@@ -40,7 +40,7 @@ bool areEquivalentValues(const Value &Val1, const Value &Val2) {
   return areEquivalentIndirectionValues(Val1, Val2);
 }
 
-raw_ostream &operator<<(raw_ostream &OS, const Value &Val) {
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const Value &Val) {
   switch (Val.getKind()) {
   case Value::Kind::Integer:
     return OS << "Integer(@" << &Val << ")";

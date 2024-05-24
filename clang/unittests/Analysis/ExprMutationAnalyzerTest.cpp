@@ -29,20 +29,20 @@ using ExprMatcher = internal::Matcher<Expr>;
 using StmtMatcher = internal::Matcher<Stmt>;
 
 std::unique_ptr<ASTUnit>
-buildASTFromCodeWithArgs(const Twine &Code,
+buildASTFromCodeWithArgs(const llvm::Twine &Code,
                          const std::vector<std::string> &Args) {
-  SmallString<1024> CodeStorage;
+  llvm::SmallString<1024> CodeStorage;
   auto AST =
       tooling::buildASTFromCodeWithArgs(Code.toStringRef(CodeStorage), Args);
   EXPECT_FALSE(AST->getDiagnostics().hasErrorOccurred());
   return AST;
 }
 
-std::unique_ptr<ASTUnit> buildASTFromCode(const Twine &Code) {
+std::unique_ptr<ASTUnit> buildASTFromCode(const llvm::Twine &Code) {
   return buildASTFromCodeWithArgs(Code, {});
 }
 
-ExprMatcher declRefTo(StringRef Name) {
+ExprMatcher declRefTo(llvm::StringRef Name) {
   return declRefExpr(to(namedDecl(hasName(Name)).bind("decl")));
 }
 
@@ -50,24 +50,24 @@ StmtMatcher withEnclosingCompound(ExprMatcher Matcher) {
   return expr(Matcher, hasAncestor(compoundStmt().bind("stmt"))).bind("expr");
 }
 
-bool isMutated(const SmallVectorImpl<BoundNodes> &Results, ASTUnit *AST) {
+bool isMutated(const llvm::SmallVectorImpl<BoundNodes> &Results, ASTUnit *AST) {
   const auto *const S = selectFirst<Stmt>("stmt", Results);
   const auto *const E = selectFirst<Expr>("expr", Results);
   TraversalKindScope RAII(AST->getASTContext(), TK_AsIs);
   return ExprMutationAnalyzer(*S, AST->getASTContext()).isMutated(E);
 }
 
-bool isDeclMutated(const SmallVectorImpl<BoundNodes> &Results, ASTUnit *AST) {
+bool isDeclMutated(const llvm::SmallVectorImpl<BoundNodes> &Results, ASTUnit *AST) {
   const auto *const S = selectFirst<Stmt>("stmt", Results);
   const auto *const D = selectFirst<Decl>("decl", Results);
   TraversalKindScope RAII(AST->getASTContext(), TK_AsIs);
   return ExprMutationAnalyzer(*S, AST->getASTContext()).isMutated(D);
 }
 
-SmallVector<std::string, 1>
-mutatedBy(const SmallVectorImpl<BoundNodes> &Results, ASTUnit *AST) {
+llvm::SmallVector<std::string, 1>
+mutatedBy(const llvm::SmallVectorImpl<BoundNodes> &Results, ASTUnit *AST) {
   const auto *const S = selectFirst<Stmt>("stmt", Results);
-  SmallVector<std::string, 1> Chain;
+  llvm::SmallVector<std::string, 1> Chain;
   ExprMutationAnalyzer Analyzer(*S, AST->getASTContext());
 
   for (const auto *E = selectFirst<Expr>("expr", Results); E != nullptr;) {
@@ -78,7 +78,7 @@ mutatedBy(const SmallVectorImpl<BoundNodes> &Results, ASTUnit *AST) {
     std::string Buffer;
     llvm::raw_string_ostream Stream(Buffer);
     By->printPretty(Stream, nullptr, AST->getASTContext().getPrintingPolicy());
-    Chain.emplace_back(StringRef(Stream.str()).trim().str());
+    Chain.emplace_back(llvm::StringRef(Stream.str()).trim().str());
     E = dyn_cast<DeclRefExpr>(By);
   }
   return Chain;
@@ -1561,7 +1561,7 @@ TEST(ExprMutationAnalyzerTest, UniquePtr) {
 
 TEST(ExprMutationAnalyzerTest, SelfRef) {
   std::unique_ptr<ASTUnit> AST{};
-  SmallVector<BoundNodes, 1> Results{};
+  llvm::SmallVector<BoundNodes, 1> Results{};
 
   AST = buildASTFromCodeWithArgs("void f() { int &x = x; }",
                                  {"-Wno-unused-value", "-Wno-uninitialized"});

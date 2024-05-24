@@ -182,7 +182,7 @@ private:
   StorageLocation &PointeeLoc;
 };
 
-raw_ostream &operator<<(raw_ostream &OS, const Value &Val);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const Value &Val);
 
 } // namespace dataflow
 } // namespace clang

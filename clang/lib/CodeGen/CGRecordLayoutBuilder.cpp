@@ -214,7 +214,7 @@ struct CGRecordLowering {
   // Helpful intermediate data-structures.
   std::vector<MemberInfo> Members;
   // Output fields, consumed by CodeGenTypes::ComputeRecordLayout.
-  SmallVector<llvm::Type *, 16> FieldTypes;
+  llvm::SmallVector<llvm::Type *, 16> FieldTypes;
   llvm::DenseMap<const FieldDecl *, unsigned> Fields;
   llvm::DenseMap<const FieldDecl *, CGBitFieldInfo> BitFields;
   llvm::DenseMap<const CXXRecordDecl *, unsigned> NonVirtualBases;
@@ -1214,7 +1214,7 @@ CodeGenTypes::ComputeRecordLayout(const RecordDecl *D, llvm::StructType *Ty) {
   return RL;
 }
 
-void CGRecordLayout::print(raw_ostream &OS) const {
+void CGRecordLayout::print(llvm::raw_ostream &OS) const {
   OS << "<CGRecordLayout\n";
   OS << "  LLVMType:" << *CompleteObjectType << "\n";
   if (BaseSubobjectType)
@@ -1248,7 +1248,7 @@ LLVM_DUMP_METHOD void CGRecordLayout::dump() const {
   print(llvm::errs());
 }
 
-void CGBitFieldInfo::print(raw_ostream &OS) const {
+void CGBitFieldInfo::print(llvm::raw_ostream &OS) const {
   OS << "<CGBitFieldInfo"
      << " Offset:" << Offset << " Size:" << Size << " IsSigned:" << IsSigned
      << " StorageSize:" << StorageSize

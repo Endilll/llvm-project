@@ -22,14 +22,14 @@ using ::testing::IsEmpty;
 
 class SimplifyConstraintsTest : public ::testing::Test {
 protected:
-  llvm::SetVector<const Formula *> parse(StringRef Lines) {
+  llvm::SetVector<const Formula *> parse(llvm::StringRef Lines) {
     std::vector<const Formula *> formulas = test::parseFormulas(A, Lines);
     llvm::SetVector<const Formula *> Constraints(formulas.begin(),
                                                  formulas.end());
     return Constraints;
   }
 
-  llvm::SetVector<const Formula *> simplify(StringRef Lines,
+  llvm::SetVector<const Formula *> simplify(llvm::StringRef Lines,
                                             SimplifyConstraintsInfo &Info) {
     llvm::SetVector<const Formula *> Constraints = parse(Lines);
     simplifyConstraints(Constraints, A, &Info);
@@ -40,7 +40,7 @@ protected:
 };
 
 void printConstraints(const llvm::SetVector<const Formula *> &Constraints,
-                      raw_ostream &OS) {
+                      llvm::raw_ostream &OS) {
   if (Constraints.empty()) {
     OS << "empty";
     return;

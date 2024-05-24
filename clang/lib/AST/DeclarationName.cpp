@@ -111,7 +111,7 @@ int DeclarationName::compare(DeclarationName LHS, DeclarationName RHS) {
 }
 
 static void printCXXConstructorDestructorName(QualType ClassType,
-                                              raw_ostream &OS,
+                                              llvm::raw_ostream &OS,
                                               PrintingPolicy Policy) {
   // We know we're printing C++ here. Ensure we print types properly.
   Policy.adjustForCPlusPlus();
@@ -129,16 +129,16 @@ static void printCXXConstructorDestructorName(QualType ClassType,
   ClassType.print(OS, Policy);
 }
 
-void DeclarationName::print(raw_ostream &OS,
+void DeclarationName::print(llvm::raw_ostream &OS,
                             const PrintingPolicy &Policy) const {
   switch (getNameKind()) {
   case DeclarationName::Identifier:
     if (const IdentifierInfo *II = getAsIdentifierInfo()) {
-      StringRef Name = II->getName();
+      llvm::StringRef Name = II->getName();
       // If this is a mangled OpenMP variant name we strip off the mangling for
       // printing. It should not be visible to the user at all.
       if (II->isMangledOpenMPVariantName()) {
-        std::pair<StringRef, StringRef> NameContextPair =
+        std::pair<llvm::StringRef, llvm::StringRef> NameContextPair =
             Name.split(getOpenMPVariantManglingSeparatorStr());
         OS << NameContextPair.first << "["
            << OMPTraitInfo(NameContextPair.second) << "]";
@@ -205,7 +205,7 @@ void DeclarationName::print(raw_ostream &OS,
 
 namespace clang {
 
-raw_ostream &operator<<(raw_ostream &OS, DeclarationName N) {
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, DeclarationName N) {
   LangOptions LO;
   N.print(OS, PrintingPolicy(LO));
   return OS;
@@ -457,13 +457,13 @@ std::string DeclarationNameInfo::getAsString() const {
   return Result;
 }
 
-raw_ostream &clang::operator<<(raw_ostream &OS, DeclarationNameInfo DNInfo) {
+llvm::raw_ostream &clang::operator<<(llvm::raw_ostream &OS, DeclarationNameInfo DNInfo) {
   LangOptions LO;
   DNInfo.printName(OS, PrintingPolicy(LangOptions()));
   return OS;
 }
 
-void DeclarationNameInfo::printName(raw_ostream &OS, PrintingPolicy Policy) const {
+void DeclarationNameInfo::printName(llvm::raw_ostream &OS, PrintingPolicy Policy) const {
   switch (Name.getNameKind()) {
   case DeclarationName::Identifier:
   case DeclarationName::ObjCZeroArgSelector:

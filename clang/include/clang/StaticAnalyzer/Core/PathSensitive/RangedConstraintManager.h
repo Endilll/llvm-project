@@ -47,7 +47,7 @@ public:
     ID.AddPointer(&From());
     ID.AddPointer(&To());
   }
-  void dump(raw_ostream &OS) const;
+  void dump(llvm::raw_ostream &OS) const;
   void dump() const;
 
   // In order to keep non-overlapping ranges sorted, we can compare only From
@@ -371,7 +371,7 @@ public:
   ///             where N = size(this)
   bool encodesTrueRange() const { return !containsZero(); }
 
-  void dump(raw_ostream &OS) const;
+  void dump(llvm::raw_ostream &OS) const;
   void dump() const;
 
   bool operator==(const RangeSet &Other) const { return *Impl == *Other.Impl; }

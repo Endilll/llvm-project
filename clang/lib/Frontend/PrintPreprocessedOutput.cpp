@@ -32,7 +32,7 @@ using namespace clang;
 /// PrintMacroDefinition - Print a macro definition in a form that will be
 /// properly accepted back as a definition.
 static void PrintMacroDefinition(const IdentifierInfo &II, const MacroInfo &MI,
-                                 Preprocessor &PP, raw_ostream *OS) {
+                                 Preprocessor &PP, llvm::raw_ostream *OS) {
   *OS << "#define " << II.getName();
 
   if (MI.isFunctionLike()) {
@@ -62,7 +62,7 @@ static void PrintMacroDefinition(const IdentifierInfo &II, const MacroInfo &MI,
   if (MI.tokens_empty() || !MI.tokens_begin()->hasLeadingSpace())
     *OS << ' ';
 
-  SmallString<128> SpellingBuffer;
+  llvm::SmallString<128> SpellingBuffer;
   for (const auto &T : MI.tokens()) {
     if (T.hasLeadingSpace())
       *OS << ' ';
@@ -81,14 +81,14 @@ class PrintPPOutputPPCallbacks : public PPCallbacks {
   SourceManager &SM;
   TokenConcatenation ConcatInfo;
 public:
-  raw_ostream *OS;
+  llvm::raw_ostream *OS;
 private:
   unsigned CurLine;
 
   bool EmittedTokensOnThisLine;
   bool EmittedDirectiveOnThisLine;
   SrcMgr::CharacteristicKind FileType;
-  SmallString<512> CurFilename;
+  llvm::SmallString<512> CurFilename;
   bool Initialized;
   bool DisableLineMarkers;
   bool DumpDefines;
@@ -98,14 +98,14 @@ private:
   bool MinimizeWhitespace;
   bool DirectivesOnly;
   bool KeepSystemIncludes;
-  raw_ostream *OrigOS;
+  llvm::raw_ostream *OrigOS;
   std::unique_ptr<llvm::raw_null_ostream> NullOS;
 
   Token PrevTok;
   Token PrevPrevTok;
 
 public:
-  PrintPPOutputPPCallbacks(Preprocessor &pp, raw_ostream *os, bool lineMarkers,
+  PrintPPOutputPPCallbacks(Preprocessor &pp, llvm::raw_ostream *os, bool lineMarkers,
                            bool defines, bool DumpIncludeDirectives,
                            bool UseLineDirectives, bool MinimizeWhitespace,
                            bool DirectivesOnly, bool KeepSystemIncludes)
@@ -150,25 +150,25 @@ public:
                    SrcMgr::CharacteristicKind FileType,
                    FileID PrevFID) override;
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
-  void Ident(SourceLocation Loc, StringRef str) override;
-  void PragmaMessage(SourceLocation Loc, StringRef Namespace,
-                     PragmaMessageKind Kind, StringRef Str) override;
-  void PragmaDebug(SourceLocation Loc, StringRef DebugType) override;
-  void PragmaDiagnosticPush(SourceLocation Loc, StringRef Namespace) override;
-  void PragmaDiagnosticPop(SourceLocation Loc, StringRef Namespace) override;
-  void PragmaDiagnostic(SourceLocation Loc, StringRef Namespace,
-                        diag::Severity Map, StringRef Str) override;
+  void Ident(SourceLocation Loc, llvm::StringRef str) override;
+  void PragmaMessage(SourceLocation Loc, llvm::StringRef Namespace,
+                     PragmaMessageKind Kind, llvm::StringRef Str) override;
+  void PragmaDebug(SourceLocation Loc, llvm::StringRef DebugType) override;
+  void PragmaDiagnosticPush(SourceLocation Loc, llvm::StringRef Namespace) override;
+  void PragmaDiagnosticPop(SourceLocation Loc, llvm::StringRef Namespace) override;
+  void PragmaDiagnostic(SourceLocation Loc, llvm::StringRef Namespace,
+                        diag::Severity Map, llvm::StringRef Str) override;
   void PragmaWarning(SourceLocation Loc, PragmaWarningSpecifier WarningSpec,
-                     ArrayRef<int> Ids) override;
+                     llvm::ArrayRef<int> Ids) override;
   void PragmaWarningPush(SourceLocation Loc, int Level) override;
   void PragmaWarningPop(SourceLocation Loc) override;
-  void PragmaExecCharsetPush(SourceLocation Loc, StringRef Str) override;
+  void PragmaExecCharsetPush(SourceLocation Loc, llvm::StringRef Str) override;
   void PragmaExecCharsetPop(SourceLocation Loc) override;
   void PragmaAssumeNonNullBegin(SourceLocation Loc) override;
   void PragmaAssumeNonNullEnd(SourceLocation Loc) override;
@@ -400,9 +400,9 @@ void PrintPPOutputPPCallbacks::FileChanged(SourceLocation Loc,
 }
 
 void PrintPPOutputPPCallbacks::InclusionDirective(
-    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    SourceLocation HashLoc, const Token &IncludeTok, llvm::StringRef FileName,
     bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
-    StringRef SearchPath, StringRef RelativePath, const Module *SuggestedModule,
+    llvm::StringRef SearchPath, llvm::StringRef RelativePath, const Module *SuggestedModule,
     bool ModuleImported, SrcMgr::CharacteristicKind FileType) {
   // In -dI mode, dump #include directives prior to dumping their content or
   // interpretation. Similar for -fkeep-system-includes.
@@ -465,7 +465,7 @@ void PrintPPOutputPPCallbacks::EndModule(const Module *M) {
 
 /// Ident - Handle #ident directives when read by the preprocessor.
 ///
-void PrintPPOutputPPCallbacks::Ident(SourceLocation Loc, StringRef S) {
+void PrintPPOutputPPCallbacks::Ident(SourceLocation Loc, llvm::StringRef S) {
   MoveToLine(Loc, /*RequireStartOfLine=*/true);
 
   OS->write("#ident ", strlen("#ident "));
@@ -509,7 +509,7 @@ void PrintPPOutputPPCallbacks::MacroUndefined(const Token &MacroNameTok,
   setEmittedDirectiveOnThisLine();
 }
 
-static void outputPrintable(raw_ostream *OS, StringRef Str) {
+static void outputPrintable(llvm::raw_ostream *OS, llvm::StringRef Str) {
   for (unsigned char Char : Str) {
     if (isPrintable(Char) && Char != '\\' && Char != '"')
       *OS << (char)Char;
@@ -522,9 +522,9 @@ static void outputPrintable(raw_ostream *OS, StringRef Str) {
 }
 
 void PrintPPOutputPPCallbacks::PragmaMessage(SourceLocation Loc,
-                                             StringRef Namespace,
+                                             llvm::StringRef Namespace,
                                              PragmaMessageKind Kind,
-                                             StringRef Str) {
+                                             llvm::StringRef Str) {
   MoveToLine(Loc, /*RequireStartOfLine=*/true);
   *OS << "#pragma ";
   if (!Namespace.empty())
@@ -549,7 +549,7 @@ void PrintPPOutputPPCallbacks::PragmaMessage(SourceLocation Loc,
 }
 
 void PrintPPOutputPPCallbacks::PragmaDebug(SourceLocation Loc,
-                                           StringRef DebugType) {
+                                           llvm::StringRef DebugType) {
   MoveToLine(Loc, /*RequireStartOfLine=*/true);
 
   *OS << "#pragma clang __debug ";
@@ -559,23 +559,23 @@ void PrintPPOutputPPCallbacks::PragmaDebug(SourceLocation Loc,
 }
 
 void PrintPPOutputPPCallbacks::
-PragmaDiagnosticPush(SourceLocation Loc, StringRef Namespace) {
+PragmaDiagnosticPush(SourceLocation Loc, llvm::StringRef Namespace) {
   MoveToLine(Loc, /*RequireStartOfLine=*/true);
   *OS << "#pragma " << Namespace << " diagnostic push";
   setEmittedDirectiveOnThisLine();
 }
 
 void PrintPPOutputPPCallbacks::
-PragmaDiagnosticPop(SourceLocation Loc, StringRef Namespace) {
+PragmaDiagnosticPop(SourceLocation Loc, llvm::StringRef Namespace) {
   MoveToLine(Loc, /*RequireStartOfLine=*/true);
   *OS << "#pragma " << Namespace << " diagnostic pop";
   setEmittedDirectiveOnThisLine();
 }
 
 void PrintPPOutputPPCallbacks::PragmaDiagnostic(SourceLocation Loc,
-                                                StringRef Namespace,
+                                                llvm::StringRef Namespace,
                                                 diag::Severity Map,
-                                                StringRef Str) {
+                                                llvm::StringRef Str) {
   MoveToLine(Loc, /*RequireStartOfLine=*/true);
   *OS << "#pragma " << Namespace << " diagnostic ";
   switch (Map) {
@@ -601,7 +601,7 @@ void PrintPPOutputPPCallbacks::PragmaDiagnostic(SourceLocation Loc,
 
 void PrintPPOutputPPCallbacks::PragmaWarning(SourceLocation Loc,
                                              PragmaWarningSpecifier WarningSpec,
-                                             ArrayRef<int> Ids) {
+                                             llvm::ArrayRef<int> Ids) {
   MoveToLine(Loc, /*RequireStartOfLine=*/true);
 
   *OS << "#pragma warning(";
@@ -618,7 +618,7 @@ void PrintPPOutputPPCallbacks::PragmaWarning(SourceLocation Loc,
   }
   *OS << ':';
 
-  for (ArrayRef<int>::iterator I = Ids.begin(), E = Ids.end(); I != E; ++I)
+  for (llvm::ArrayRef<int>::iterator I = Ids.begin(), E = Ids.end(); I != E; ++I)
     *OS << ' ' << *I;
   *OS << ')';
   setEmittedDirectiveOnThisLine();
@@ -641,7 +641,7 @@ void PrintPPOutputPPCallbacks::PragmaWarningPop(SourceLocation Loc) {
 }
 
 void PrintPPOutputPPCallbacks::PragmaExecCharsetPush(SourceLocation Loc,
-                                                     StringRef Str) {
+                                                     llvm::StringRef Str) {
   MoveToLine(Loc, /*RequireStartOfLine=*/true);
   *OS << "#pragma character_execution_set(push";
   if (!Str.empty())
@@ -934,7 +934,7 @@ static int MacroIDCompare(const id_macro_pair *LHS, const id_macro_pair *RHS) {
   return LHS->first->getName().compare(RHS->first->getName());
 }
 
-static void DoPrintMacros(Preprocessor &PP, raw_ostream *OS) {
+static void DoPrintMacros(Preprocessor &PP, llvm::raw_ostream *OS) {
   // Ignore unknown pragmas.
   PP.IgnorePragmas();
 
@@ -946,7 +946,7 @@ static void DoPrintMacros(Preprocessor &PP, raw_ostream *OS) {
   do PP.Lex(Tok);
   while (Tok.isNot(tok::eof));
 
-  SmallVector<id_macro_pair, 128> MacrosByID;
+  llvm::SmallVector<id_macro_pair, 128> MacrosByID;
   for (Preprocessor::macro_iterator I = PP.macro_begin(), E = PP.macro_end();
        I != E; ++I) {
     auto *MD = I->second.getLatest();
@@ -967,7 +967,7 @@ static void DoPrintMacros(Preprocessor &PP, raw_ostream *OS) {
 
 /// DoPrintPreprocessedInput - This implements -E mode.
 ///
-void clang::DoPrintPreprocessedInput(Preprocessor &PP, raw_ostream *OS,
+void clang::DoPrintPreprocessedInput(Preprocessor &PP, llvm::raw_ostream *OS,
                                      const PreprocessorOutputOptions &Opts) {
   // Show macros with no output is handled specially.
   if (!Opts.ShowCPP) {

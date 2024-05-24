@@ -41,7 +41,7 @@ class CXDiagnosticCustomNoteImpl : public CXDiagnosticImpl {
   std::string Message;
   CXSourceLocation Loc;
 public:
-  CXDiagnosticCustomNoteImpl(StringRef Msg, CXSourceLocation L)
+  CXDiagnosticCustomNoteImpl(llvm::StringRef Msg, CXSourceLocation L)
       : CXDiagnosticImpl(CustomNoteDiagnosticKind), Message(std::string(Msg)),
         Loc(L) {}
 
@@ -108,8 +108,8 @@ public:
   }
 
   void emitDiagnosticMessage(FullSourceLoc Loc, PresumedLoc PLoc,
-                             DiagnosticsEngine::Level Level, StringRef Message,
-                             ArrayRef<CharSourceRange> Ranges,
+                             DiagnosticsEngine::Level Level, llvm::StringRef Message,
+                             llvm::ArrayRef<CharSourceRange> Ranges,
                              DiagOrStoredDiag D) override {
     if (!D.isNull())
       return;
@@ -125,13 +125,13 @@ public:
 
   void emitDiagnosticLoc(FullSourceLoc Loc, PresumedLoc PLoc,
                          DiagnosticsEngine::Level Level,
-                         ArrayRef<CharSourceRange> Ranges) override {}
+                         llvm::ArrayRef<CharSourceRange> Ranges) override {}
 
   void emitCodeContext(FullSourceLoc Loc, DiagnosticsEngine::Level Level,
-                       SmallVectorImpl<CharSourceRange> &Ranges,
-                       ArrayRef<FixItHint> Hints) override {}
+                       llvm::SmallVectorImpl<CharSourceRange> &Ranges,
+                       llvm::ArrayRef<FixItHint> Hints) override {}
 
-  void emitNote(FullSourceLoc Loc, StringRef Message) override {
+  void emitNote(FullSourceLoc Loc, llvm::StringRef Message) override {
     CXSourceLocation L;
     if (Loc.hasManager())
       L = translateSourceLocation(Loc.getManager(), LangOpts, Loc);
@@ -181,7 +181,7 @@ CXDiagnosticSetImpl *cxdiag::lazyCreateDiags(CXTranslationUnit TU,
   if (!TU->Diagnostics) {
     CXDiagnosticSetImpl *Set = new CXDiagnosticSetImpl();
     TU->Diagnostics = Set;
-    IntrusiveRefCntPtr<DiagnosticOptions> DOpts = new DiagnosticOptions;
+    llvm::IntrusiveRefCntPtr<DiagnosticOptions> DOpts = new DiagnosticOptions;
     CXDiagnosticRenderer Renderer(AU->getASTContext().getLangOpts(),
                                   &*DOpts, Set);
     
@@ -244,7 +244,7 @@ CXString clang_formatDiagnostic(CXDiagnostic Diagnostic, unsigned Options) {
 
   CXDiagnosticSeverity Severity = clang_getDiagnosticSeverity(Diagnostic);
 
-  SmallString<256> Str;
+  llvm::SmallString<256> Str;
   llvm::raw_svector_ostream Out(Str);
   
   if (Options & CXDiagnostic_DisplaySourceLocation) {

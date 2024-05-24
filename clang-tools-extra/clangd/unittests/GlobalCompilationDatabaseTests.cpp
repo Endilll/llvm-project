@@ -164,7 +164,7 @@ TEST_F(OverlayCDBTest, Adjustments) {
 }
 
 TEST_F(OverlayCDBTest, ExpandedResponseFiles) {
-  SmallString<1024> Path;
+  llvm::SmallString<1024> Path;
   int FD;
   ASSERT_FALSE(llvm::sys::fs::createTemporaryFile("args", "", FD, Path));
   llvm::raw_fd_ostream OutStream(FD, true);
@@ -449,7 +449,7 @@ TEST(GlobalCompilationDatabaseTest, InferenceWithResponseFile) {
   EXPECT_THAT(Command("foo.cc"), IsEmpty());
 
   // Have to use real FS for response file.
-  SmallString<1024> Path;
+  llvm::SmallString<1024> Path;
   int FD;
   ASSERT_FALSE(llvm::sys::fs::createTemporaryFile("args", "", FD, Path));
   llvm::raw_fd_ostream OutStream(FD, true);

@@ -73,7 +73,7 @@ AST_MATCHER(Expr, hasSideEffects) {
 } // namespace
 
 InefficientVectorOperationCheck::InefficientVectorOperationCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       VectorLikeClasses(utils::options::parseStringList(
           Options.get("VectorLikeClasses", "::std::vector"))),
@@ -87,9 +87,9 @@ void InefficientVectorOperationCheck::storeOptions(
 }
 
 void InefficientVectorOperationCheck::addMatcher(
-    const DeclarationMatcher &TargetRecordDecl, StringRef VarDeclName,
-    StringRef VarDeclStmtName, const DeclarationMatcher &AppendMethodDecl,
-    StringRef AppendCallName, MatchFinder *Finder) {
+    const DeclarationMatcher &TargetRecordDecl, llvm::StringRef VarDeclName,
+    llvm::StringRef VarDeclStmtName, const DeclarationMatcher &AppendMethodDecl,
+    llvm::StringRef AppendCallName, MatchFinder *Finder) {
   const auto DefaultConstructorCall = cxxConstructExpr(
       hasType(TargetRecordDecl),
       hasDeclaration(cxxConstructorDecl(isDefaultConstructor())));
@@ -247,14 +247,14 @@ void InefficientVectorOperationCheck::check(
   if (RangeLoop) {
     // Get the range-expression in a for-range statement represented as
     // `for (range-declarator: range-expression)`.
-    StringRef RangeInitExpName =
+    llvm::StringRef RangeInitExpName =
         Lexer::getSourceText(CharSourceRange::getTokenRange(
                                  RangeLoop->getRangeInit()->getSourceRange()),
                              SM, Context->getLangOpts());
     ReserveSize = (RangeInitExpName + ".size()").str();
   } else if (ForLoop) {
     // Handle counter-based loop cases.
-    StringRef LoopEndSource = Lexer::getSourceText(
+    llvm::StringRef LoopEndSource = Lexer::getSourceText(
         CharSourceRange::getTokenRange(LoopEndExpr->getSourceRange()), SM,
         Context->getLangOpts());
     ReserveSize = std::string(LoopEndSource);

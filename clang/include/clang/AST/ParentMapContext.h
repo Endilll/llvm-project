@@ -87,12 +87,12 @@ public:
   ~TraversalKindScope() { Ctx.setTraversalKind(TK); }
 };
 
-/// Container for either a single DynTypedNode or for an ArrayRef to
+/// Container for either a single DynTypedNode or for an llvm::ArrayRef to
 /// DynTypedNode. For use with ParentMap.
 class DynTypedNodeList {
   union {
     DynTypedNode SingleNode;
-    ArrayRef<DynTypedNode> Nodes;
+    llvm::ArrayRef<DynTypedNode> Nodes;
   };
   bool IsSingleNode;
 
@@ -101,8 +101,8 @@ public:
     new (&SingleNode) DynTypedNode(N);
   }
 
-  DynTypedNodeList(ArrayRef<DynTypedNode> A) : IsSingleNode(false) {
-    new (&Nodes) ArrayRef<DynTypedNode>(A);
+  DynTypedNodeList(llvm::ArrayRef<DynTypedNode> A) : IsSingleNode(false) {
+    new (&Nodes) llvm::ArrayRef<DynTypedNode>(A);
   }
 
   const DynTypedNode *begin() const {

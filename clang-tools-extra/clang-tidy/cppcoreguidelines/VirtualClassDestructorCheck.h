@@ -21,7 +21,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/virtual-class-destructor.html
 class VirtualClassDestructorCheck : public ClangTidyCheck {
 public:
-  VirtualClassDestructorCheck(StringRef Name, ClangTidyContext *Context)
+  VirtualClassDestructorCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {

@@ -77,7 +77,7 @@ public:
     /// \param NameRange The location of the name in the matcher source.
     ///   Useful for error reporting.
     ///
-    /// \param BindID The ID to use to bind the matcher, or a null \c StringRef
+    /// \param BindID The ID to use to bind the matcher, or a null \c llvm::StringRef
     ///   if no ID is specified.
     ///
     /// \param Args The argument list for the matcher.
@@ -87,8 +87,8 @@ public:
     ///   description of the error.
     virtual VariantMatcher actOnMatcherExpression(MatcherCtor Ctor,
                                                   SourceRange NameRange,
-                                                  StringRef BindID,
-                                                  ArrayRef<ParserValue> Args,
+                                                  llvm::StringRef BindID,
+                                                  llvm::ArrayRef<ParserValue> Args,
                                                   Diagnostics *Error) = 0;
 
     /// Look up a matcher by name.
@@ -98,7 +98,7 @@ public:
     /// \return The matcher constructor, or std::optional<MatcherCtor>() if not
     /// found.
     virtual std::optional<MatcherCtor>
-    lookupMatcherCtor(StringRef MatcherName) = 0;
+    lookupMatcherCtor(llvm::StringRef MatcherName) = 0;
 
     virtual bool isBuilderMatcher(MatcherCtor) const = 0;
 
@@ -106,7 +106,7 @@ public:
 
     virtual internal::MatcherDescriptorPtr
     buildMatcherCtor(MatcherCtor, SourceRange NameRange,
-                     ArrayRef<ParserValue> Args, Diagnostics *Error) const = 0;
+                     llvm::ArrayRef<ParserValue> Args, Diagnostics *Error) const = 0;
 
     /// Compute the list of completion types for \p Context.
     ///
@@ -139,12 +139,12 @@ public:
     ~RegistrySema() override;
 
     std::optional<MatcherCtor>
-    lookupMatcherCtor(StringRef MatcherName) override;
+    lookupMatcherCtor(llvm::StringRef MatcherName) override;
 
     VariantMatcher actOnMatcherExpression(MatcherCtor Ctor,
                                           SourceRange NameRange,
-                                          StringRef BindID,
-                                          ArrayRef<ParserValue> Args,
+                                          llvm::StringRef BindID,
+                                          llvm::ArrayRef<ParserValue> Args,
                                           Diagnostics *Error) override;
 
     std::vector<ArgKind> getAcceptedCompletionTypes(
@@ -156,7 +156,7 @@ public:
 
     internal::MatcherDescriptorPtr
     buildMatcherCtor(MatcherCtor, SourceRange NameRange,
-                     ArrayRef<ParserValue> Args,
+                     llvm::ArrayRef<ParserValue> Args,
                      Diagnostics *Error) const override;
 
     std::vector<MatcherCompletion>
@@ -181,14 +181,14 @@ public:
   ///   description of the error.
   ///   The caller takes ownership of the DynTypedMatcher object returned.
   static std::optional<DynTypedMatcher>
-  parseMatcherExpression(StringRef &MatcherCode, Sema *S,
+  parseMatcherExpression(llvm::StringRef &MatcherCode, Sema *S,
                          const NamedValueMap *NamedValues, Diagnostics *Error);
   static std::optional<DynTypedMatcher>
-  parseMatcherExpression(StringRef &MatcherCode, Sema *S, Diagnostics *Error) {
+  parseMatcherExpression(llvm::StringRef &MatcherCode, Sema *S, Diagnostics *Error) {
     return parseMatcherExpression(MatcherCode, S, nullptr, Error);
   }
   static std::optional<DynTypedMatcher>
-  parseMatcherExpression(StringRef &MatcherCode, Diagnostics *Error) {
+  parseMatcherExpression(llvm::StringRef &MatcherCode, Diagnostics *Error) {
     return parseMatcherExpression(MatcherCode, nullptr, Error);
   }
 
@@ -204,14 +204,14 @@ public:
   /// \param NamedValues A map of precomputed named values.  This provides
   ///   the dictionary for the <NamedValue> rule of the grammar.
   ///   If null, it is ignored.
-  static bool parseExpression(StringRef &Code, Sema *S,
+  static bool parseExpression(llvm::StringRef &Code, Sema *S,
                               const NamedValueMap *NamedValues,
                               VariantValue *Value, Diagnostics *Error);
-  static bool parseExpression(StringRef &Code, Sema *S, VariantValue *Value,
+  static bool parseExpression(llvm::StringRef &Code, Sema *S, VariantValue *Value,
                               Diagnostics *Error) {
     return parseExpression(Code, S, nullptr, Value, Error);
   }
-  static bool parseExpression(StringRef &Code, VariantValue *Value,
+  static bool parseExpression(llvm::StringRef &Code, VariantValue *Value,
                               Diagnostics *Error) {
     return parseExpression(Code, nullptr, Value, Error);
   }
@@ -228,14 +228,14 @@ public:
   /// \return The list of completions, which may be empty if there are no
   /// available completions or if an error occurred.
   static std::vector<MatcherCompletion>
-  completeExpression(StringRef &Code, unsigned CompletionOffset, Sema *S,
+  completeExpression(llvm::StringRef &Code, unsigned CompletionOffset, Sema *S,
                      const NamedValueMap *NamedValues);
   static std::vector<MatcherCompletion>
-  completeExpression(StringRef &Code, unsigned CompletionOffset, Sema *S) {
+  completeExpression(llvm::StringRef &Code, unsigned CompletionOffset, Sema *S) {
     return completeExpression(Code, CompletionOffset, S, nullptr);
   }
   static std::vector<MatcherCompletion>
-  completeExpression(StringRef &Code, unsigned CompletionOffset) {
+  completeExpression(llvm::StringRef &Code, unsigned CompletionOffset) {
     return completeExpression(Code, CompletionOffset, nullptr);
   }
 
@@ -263,7 +263,7 @@ private:
   void addExpressionCompletions();
 
   std::vector<MatcherCompletion>
-  getNamedValueCompletions(ArrayRef<ArgKind> AcceptedTypes);
+  getNamedValueCompletions(llvm::ArrayRef<ArgKind> AcceptedTypes);
 
   CodeTokenizer *const Tokenizer;
   Sema *const S;

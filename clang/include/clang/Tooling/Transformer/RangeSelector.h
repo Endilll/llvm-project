@@ -28,7 +28,7 @@ using RangeSelector = MatchConsumer<CharSourceRange>;
 
 inline RangeSelector charRange(CharSourceRange R) {
   return [R](const ast_matchers::MatchFinder::MatchResult &)
-             -> Expected<CharSourceRange> { return R; };
+             -> llvm::Expected<CharSourceRange> { return R; };
 }
 
 /// Selects from the start of \p Begin and to the end of \p End.

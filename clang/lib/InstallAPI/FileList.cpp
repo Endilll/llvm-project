@@ -42,10 +42,10 @@ using namespace clang::installapi;
 namespace {
 class Implementation {
 private:
-  Expected<StringRef> parseString(const Object *Obj, StringRef Key,
-                                  StringRef Error);
-  Expected<StringRef> parsePath(const Object *Obj);
-  Expected<HeaderType> parseType(const Object *Obj);
+  llvm::Expected<llvm::StringRef> parseString(const Object *Obj, llvm::StringRef Key,
+                                  llvm::StringRef Error);
+  llvm::Expected<llvm::StringRef> parsePath(const Object *Obj);
+  llvm::Expected<HeaderType> parseType(const Object *Obj);
   std::optional<clang::Language> parseLanguage(const Object *Obj);
   Error parseHeaders(Array &Headers);
 
@@ -55,18 +55,18 @@ public:
   unsigned Version;
   HeaderSeq HeaderList;
 
-  Error parse(StringRef Input);
+  Error parse(llvm::StringRef Input);
 };
 
-Expected<StringRef>
-Implementation::parseString(const Object *Obj, StringRef Key, StringRef Error) {
+llvm::Expected<llvm::StringRef>
+Implementation::parseString(const Object *Obj, llvm::StringRef Key, llvm::StringRef Error) {
   auto Str = Obj->getString(Key);
   if (!Str)
     return make_error<StringError>(Error, inconvertibleErrorCode());
   return *Str;
 }
 
-Expected<HeaderType> Implementation::parseType(const Object *Obj) {
+llvm::Expected<HeaderType> Implementation::parseType(const Object *Obj) {
   auto TypeStr =
       parseString(Obj, "type", "required field 'type' not specified");
   if (!TypeStr)
@@ -83,7 +83,7 @@ Expected<HeaderType> Implementation::parseType(const Object *Obj) {
                                   "unsupported header type");
 }
 
-Expected<StringRef> Implementation::parsePath(const Object *Obj) {
+llvm::Expected<llvm::StringRef> Implementation::parsePath(const Object *Obj) {
   auto Path = parseString(Obj, "path", "required field 'path' not specified");
   if (!Path)
     return Path.takeError();
@@ -119,7 +119,7 @@ Error Implementation::parseHeaders(Array &Headers) {
       return Path.takeError();
     auto Language = parseLanguage(Obj);
 
-    StringRef PathStr = *Path;
+    llvm::StringRef PathStr = *Path;
     if (*Type == HeaderType::Project) {
       HeaderList.emplace_back(
           HeaderFile{PathStr, *Type, /*IncludeName=*/"", Language});
@@ -140,7 +140,7 @@ Error Implementation::parseHeaders(Array &Headers) {
   return Error::success();
 }
 
-Error Implementation::parse(StringRef Input) {
+Error Implementation::parse(llvm::StringRef Input) {
   auto Val = json::parse(Input);
   if (!Val)
     return Val.takeError();

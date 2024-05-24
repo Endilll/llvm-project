@@ -49,18 +49,18 @@ static bool printLoc(llvm::raw_ostream &OS, SourceLocation Loc,
   return false;
 }
 
-static StringRef GetExternalSourceContainer(const NamedDecl *D) {
+static llvm::StringRef GetExternalSourceContainer(const NamedDecl *D) {
   if (!D)
-    return StringRef();
+    return llvm::StringRef();
   if (auto *attr = D->getExternalSourceSymbolAttr()) {
     return attr->getDefinedIn();
   }
-  return StringRef();
+  return llvm::StringRef();
 }
 
 namespace {
 class USRGenerator : public ConstDeclVisitor<USRGenerator> {
-  SmallVectorImpl<char> &Buf;
+  llvm::SmallVectorImpl<char> &Buf;
   llvm::raw_svector_ostream Out;
   bool IgnoreResults;
   ASTContext *Context;
@@ -69,7 +69,7 @@ class USRGenerator : public ConstDeclVisitor<USRGenerator> {
   llvm::DenseMap<const Type *, unsigned> TypeSubstitutions;
 
 public:
-  explicit USRGenerator(ASTContext *Ctx, SmallVectorImpl<char> &Buf)
+  explicit USRGenerator(ASTContext *Ctx, llvm::SmallVectorImpl<char> &Buf)
   : Buf(Buf),
     Out(Buf),
     IgnoreResults(false),
@@ -143,25 +143,25 @@ public:
   /// itself.
 
   /// Generate a USR for an Objective-C class.
-  void GenObjCClass(StringRef cls, StringRef ExtSymDefinedIn,
-                    StringRef CategoryContextExtSymbolDefinedIn) {
+  void GenObjCClass(llvm::StringRef cls, llvm::StringRef ExtSymDefinedIn,
+                    llvm::StringRef CategoryContextExtSymbolDefinedIn) {
     generateUSRForObjCClass(cls, Out, ExtSymDefinedIn,
                             CategoryContextExtSymbolDefinedIn);
   }
 
   /// Generate a USR for an Objective-C class category.
-  void GenObjCCategory(StringRef cls, StringRef cat,
-                       StringRef clsExt, StringRef catExt) {
+  void GenObjCCategory(llvm::StringRef cls, llvm::StringRef cat,
+                       llvm::StringRef clsExt, llvm::StringRef catExt) {
     generateUSRForObjCCategory(cls, cat, Out, clsExt, catExt);
   }
 
   /// Generate a USR fragment for an Objective-C property.
-  void GenObjCProperty(StringRef prop, bool isClassProp) {
+  void GenObjCProperty(llvm::StringRef prop, bool isClassProp) {
     generateUSRForObjCProperty(prop, isClassProp, Out);
   }
 
   /// Generate a USR for an Objective-C protocol.
-  void GenObjCProtocol(StringRef prot, StringRef ext) {
+  void GenObjCProtocol(llvm::StringRef prot, llvm::StringRef ext) {
     generateUSRForObjCProtocol(prot, Out, ext);
   }
 
@@ -333,7 +333,7 @@ void USRGenerator::VisitVarDecl(const VarDecl *D) {
   }
 
   // Variables always have simple names.
-  StringRef s = D->getName();
+  llvm::StringRef s = D->getName();
 
   // The string can be empty if the declaration has no name; e.g., it is
   // the ParmDecl with no name for declaration of a function pointer type, e.g.:
@@ -623,7 +623,7 @@ void USRGenerator::VisitTemplateTypeParmDecl(const TemplateTypeParmDecl *D) {
 }
 
 void USRGenerator::GenExtSymbolContainer(const NamedDecl *D) {
-  StringRef Container = GetExternalSourceContainer(D);
+  llvm::StringRef Container = GetExternalSourceContainer(D);
   if (!Container.empty())
     Out << "@M@" << Container;
 }
@@ -1103,9 +1103,9 @@ void USRGenerator::VisitMSGuidDecl(const MSGuidDecl *D) {
 // USR generation functions.
 //===----------------------------------------------------------------------===//
 
-static void combineClassAndCategoryExtContainers(StringRef ClsSymDefinedIn,
-                                                 StringRef CatSymDefinedIn,
-                                                 raw_ostream &OS) {
+static void combineClassAndCategoryExtContainers(llvm::StringRef ClsSymDefinedIn,
+                                                 llvm::StringRef CatSymDefinedIn,
+                                                 llvm::raw_ostream &OS) {
   if (ClsSymDefinedIn.empty() && CatSymDefinedIn.empty())
     return;
   if (CatSymDefinedIn.empty()) {
@@ -1118,58 +1118,58 @@ static void combineClassAndCategoryExtContainers(StringRef ClsSymDefinedIn,
   }
 }
 
-void clang::index::generateUSRForObjCClass(StringRef Cls, raw_ostream &OS,
-                                           StringRef ExtSymDefinedIn,
-                                  StringRef CategoryContextExtSymbolDefinedIn) {
+void clang::index::generateUSRForObjCClass(llvm::StringRef Cls, llvm::raw_ostream &OS,
+                                           llvm::StringRef ExtSymDefinedIn,
+                                  llvm::StringRef CategoryContextExtSymbolDefinedIn) {
   combineClassAndCategoryExtContainers(ExtSymDefinedIn,
                                        CategoryContextExtSymbolDefinedIn, OS);
   OS << "objc(cs)" << Cls;
 }
 
-void clang::index::generateUSRForObjCCategory(StringRef Cls, StringRef Cat,
-                                              raw_ostream &OS,
-                                              StringRef ClsSymDefinedIn,
-                                              StringRef CatSymDefinedIn) {
+void clang::index::generateUSRForObjCCategory(llvm::StringRef Cls, llvm::StringRef Cat,
+                                              llvm::raw_ostream &OS,
+                                              llvm::StringRef ClsSymDefinedIn,
+                                              llvm::StringRef CatSymDefinedIn) {
   combineClassAndCategoryExtContainers(ClsSymDefinedIn, CatSymDefinedIn, OS);
   OS << "objc(cy)" << Cls << '@' << Cat;
 }
 
-void clang::index::generateUSRForObjCIvar(StringRef Ivar, raw_ostream &OS) {
+void clang::index::generateUSRForObjCIvar(llvm::StringRef Ivar, llvm::raw_ostream &OS) {
   OS << '@' << Ivar;
 }
 
-void clang::index::generateUSRForObjCMethod(StringRef Sel,
+void clang::index::generateUSRForObjCMethod(llvm::StringRef Sel,
                                             bool IsInstanceMethod,
-                                            raw_ostream &OS) {
+                                            llvm::raw_ostream &OS) {
   OS << (IsInstanceMethod ? "(im)" : "(cm)") << Sel;
 }
 
-void clang::index::generateUSRForObjCProperty(StringRef Prop, bool isClassProp,
-                                              raw_ostream &OS) {
+void clang::index::generateUSRForObjCProperty(llvm::StringRef Prop, bool isClassProp,
+                                              llvm::raw_ostream &OS) {
   OS << (isClassProp ? "(cpy)" : "(py)") << Prop;
 }
 
-void clang::index::generateUSRForObjCProtocol(StringRef Prot, raw_ostream &OS,
-                                              StringRef ExtSymDefinedIn) {
+void clang::index::generateUSRForObjCProtocol(llvm::StringRef Prot, llvm::raw_ostream &OS,
+                                              llvm::StringRef ExtSymDefinedIn) {
   if (!ExtSymDefinedIn.empty())
     OS << "@M@" << ExtSymDefinedIn << '@';
   OS << "objc(pl)" << Prot;
 }
 
-void clang::index::generateUSRForGlobalEnum(StringRef EnumName, raw_ostream &OS,
-                                            StringRef ExtSymDefinedIn) {
+void clang::index::generateUSRForGlobalEnum(llvm::StringRef EnumName, llvm::raw_ostream &OS,
+                                            llvm::StringRef ExtSymDefinedIn) {
   if (!ExtSymDefinedIn.empty())
     OS << "@M@" << ExtSymDefinedIn;
   OS << "@E@" << EnumName;
 }
 
-void clang::index::generateUSRForEnumConstant(StringRef EnumConstantName,
-                                              raw_ostream &OS) {
+void clang::index::generateUSRForEnumConstant(llvm::StringRef EnumConstantName,
+                                              llvm::raw_ostream &OS) {
   OS << '@' << EnumConstantName;
 }
 
 bool clang::index::generateUSRForDecl(const Decl *D,
-                                      SmallVectorImpl<char> &Buf) {
+                                      llvm::SmallVectorImpl<char> &Buf) {
   if (!D)
     return true;
   // We don't ignore decls with invalid source locations. Implicit decls, like
@@ -1192,7 +1192,7 @@ bool clang::index::generateUSRForDecl(const Decl *D,
 
 bool clang::index::generateUSRForMacro(const MacroDefinitionRecord *MD,
                                        const SourceManager &SM,
-                                       SmallVectorImpl<char> &Buf) {
+                                       llvm::SmallVectorImpl<char> &Buf) {
   if (!MD)
     return true;
   return generateUSRForMacro(MD->getName()->getName(), MD->getLocation(),
@@ -1200,9 +1200,9 @@ bool clang::index::generateUSRForMacro(const MacroDefinitionRecord *MD,
 
 }
 
-bool clang::index::generateUSRForMacro(StringRef MacroName, SourceLocation Loc,
+bool clang::index::generateUSRForMacro(llvm::StringRef MacroName, SourceLocation Loc,
                                        const SourceManager &SM,
-                                       SmallVectorImpl<char> &Buf) {
+                                       llvm::SmallVectorImpl<char> &Buf) {
   if (MacroName.empty())
     return true;
 
@@ -1221,7 +1221,7 @@ bool clang::index::generateUSRForMacro(StringRef MacroName, SourceLocation Loc,
 }
 
 bool clang::index::generateUSRForType(QualType T, ASTContext &Ctx,
-                                      SmallVectorImpl<char> &Buf) {
+                                      llvm::SmallVectorImpl<char> &Buf) {
   if (T.isNull())
     return true;
   T = T.getCanonicalType();
@@ -1232,7 +1232,7 @@ bool clang::index::generateUSRForType(QualType T, ASTContext &Ctx,
 }
 
 bool clang::index::generateFullUSRForModule(const Module *Mod,
-                                            raw_ostream &OS) {
+                                            llvm::raw_ostream &OS) {
   if (!Mod->Parent)
     return generateFullUSRForTopLevelModuleName(Mod->Name, OS);
   if (generateFullUSRForModule(Mod->Parent, OS))
@@ -1240,19 +1240,19 @@ bool clang::index::generateFullUSRForModule(const Module *Mod,
   return generateUSRFragmentForModule(Mod, OS);
 }
 
-bool clang::index::generateFullUSRForTopLevelModuleName(StringRef ModName,
-                                                        raw_ostream &OS) {
+bool clang::index::generateFullUSRForTopLevelModuleName(llvm::StringRef ModName,
+                                                        llvm::raw_ostream &OS) {
   OS << getUSRSpacePrefix();
   return generateUSRFragmentForModuleName(ModName, OS);
 }
 
 bool clang::index::generateUSRFragmentForModule(const Module *Mod,
-                                                raw_ostream &OS) {
+                                                llvm::raw_ostream &OS) {
   return generateUSRFragmentForModuleName(Mod->Name, OS);
 }
 
-bool clang::index::generateUSRFragmentForModuleName(StringRef ModName,
-                                                    raw_ostream &OS) {
+bool clang::index::generateUSRFragmentForModuleName(llvm::StringRef ModName,
+                                                    llvm::raw_ostream &OS) {
   OS << "@M@" << ModName;
   return false;
 }

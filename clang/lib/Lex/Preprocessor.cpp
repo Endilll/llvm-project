@@ -92,7 +92,7 @@ Preprocessor::Preprocessor(std::shared_ptr<PreprocessorOptions> PPOpts,
       // As the language options may have not been loaded yet (when
       // deserializing an ASTUnit), adding keywords to the identifier table is
       // deferred to Preprocessor::Initialize().
-      Identifiers(IILookup), PragmaHandlers(new PragmaNamespace(StringRef())),
+      Identifiers(IILookup), PragmaHandlers(new PragmaNamespace(llvm::StringRef())),
       TUKind(TUKind), SkipMainFilePreamble(0, true),
       CurSubmoduleState(&NullSubmoduleState) {
   OwnsHeaderSearch = OwnsHeaders;
@@ -221,7 +221,7 @@ void Preprocessor::InitializeForModelFile() {
 
   // Reset pragmas
   PragmaHandlersBackup = std::move(PragmaHandlers);
-  PragmaHandlers = std::make_unique<PragmaNamespace>(StringRef());
+  PragmaHandlers = std::make_unique<PragmaNamespace>(llvm::StringRef());
   RegisterBuiltinPragmas();
 
   // Reset PredefinesFileID
@@ -251,7 +251,7 @@ void Preprocessor::DumpToken(const Token &Tok, bool DumpFlags) const {
     llvm::errs() << " [ExpandDisabled]";
   if (Tok.needsCleaning()) {
     const char *Start = SourceMgr.getCharacterData(Tok.getLocation());
-    llvm::errs() << " [UnClean='" << StringRef(Start, Tok.getLength())
+    llvm::errs() << " [UnClean='" << llvm::StringRef(Start, Tok.getLength())
                  << "']";
   }
 
@@ -351,16 +351,16 @@ Preprocessor::macro_end(bool IncludeExternalMacros) const {
 
 /// Compares macro tokens with a specified token value sequence.
 static bool MacroDefinitionEquals(const MacroInfo *MI,
-                                  ArrayRef<TokenValue> Tokens) {
+                                  llvm::ArrayRef<TokenValue> Tokens) {
   return Tokens.size() == MI->getNumTokens() &&
       std::equal(Tokens.begin(), Tokens.end(), MI->tokens_begin());
 }
 
-StringRef Preprocessor::getLastMacroWithSpelling(
+llvm::StringRef Preprocessor::getLastMacroWithSpelling(
                                     SourceLocation Loc,
-                                    ArrayRef<TokenValue> Tokens) const {
+                                    llvm::ArrayRef<TokenValue> Tokens) const {
   SourceLocation BestLocation;
-  StringRef BestSpelling;
+  llvm::StringRef BestSpelling;
   for (Preprocessor::macro_iterator I = macro_begin(), E = macro_end();
        I != E; ++I) {
     const MacroDirective::DefInfo
@@ -463,10 +463,10 @@ void Preprocessor::CodeCompleteNaturalLanguage() {
 }
 
 /// getSpelling - This method is used to get the spelling of a token into a
-/// SmallVector. Note that the returned StringRef may not point to the
+/// llvm::SmallVector. Note that the returned llvm::StringRef may not point to the
 /// supplied buffer if a copy can be avoided.
-StringRef Preprocessor::getSpelling(const Token &Tok,
-                                          SmallVectorImpl<char> &Buffer,
+llvm::StringRef Preprocessor::getSpelling(const Token &Tok,
+                                          llvm::SmallVectorImpl<char> &Buffer,
                                           bool *Invalid) const {
   // NOTE: this has to be checked *before* testing for an IdentifierInfo.
   if (Tok.isNot(tok::raw_identifier) && !Tok.hasUCN()) {
@@ -481,13 +481,13 @@ StringRef Preprocessor::getSpelling(const Token &Tok,
 
   const char *Ptr = Buffer.data();
   unsigned Len = getSpelling(Tok, Ptr, Invalid);
-  return StringRef(Ptr, Len);
+  return llvm::StringRef(Ptr, Len);
 }
 
 /// CreateString - Plop the specified string into a scratch buffer and return a
 /// location for it.  If specified, the source location provides a source
 /// location for the token.
-void Preprocessor::CreateString(StringRef Str, Token &Tok,
+void Preprocessor::CreateString(llvm::StringRef Str, Token &Tok,
                                 SourceLocation ExpansionLocStart,
                                 SourceLocation ExpansionLocEnd) {
   Tok.setLength(Str.size());
@@ -512,7 +512,7 @@ SourceLocation Preprocessor::SplitToken(SourceLocation Loc, unsigned Length) {
   SourceLocation SpellingLoc = SM.getSpellingLoc(Loc);
   std::pair<FileID, unsigned> LocInfo = SM.getDecomposedLoc(SpellingLoc);
   bool Invalid = false;
-  StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
+  llvm::StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
   if (Invalid)
     return SourceLocation();
 
@@ -705,11 +705,11 @@ IdentifierInfo *Preprocessor::LookUpIdentifierInfo(Token &Identifier) const {
     II = getIdentifierInfo(Identifier.getRawIdentifier());
   } else {
     // Cleaning needed, alloca a buffer, clean into it, then use the buffer.
-    SmallString<64> IdentifierBuffer;
-    StringRef CleanedStr = getSpelling(Identifier, IdentifierBuffer);
+    llvm::SmallString<64> IdentifierBuffer;
+    llvm::StringRef CleanedStr = getSpelling(Identifier, IdentifierBuffer);
 
     if (Identifier.hasUCN()) {
-      SmallString<64> UCNIdentifierBuffer;
+      llvm::SmallString<64> UCNIdentifierBuffer;
       expandUCNs(UCNIdentifierBuffer, CleanedStr);
       II = getIdentifierInfo(UCNIdentifierBuffer);
     } else {
@@ -1007,7 +1007,7 @@ bool Preprocessor::LexHeaderName(Token &FilenameTok, bool AllowMacroExpansion) {
 
   // This could be a <foo/bar.h> file coming from a macro expansion.  In this
   // case, glue the tokens together into an angle_string_literal token.
-  SmallString<128> FilenameBuffer;
+  llvm::SmallString<128> FilenameBuffer;
   if (FilenameTok.is(tok::less) && AllowMacroExpansion) {
     bool StartOfLine = FilenameTok.isAtStartOfLine();
     bool LeadingSpace = FilenameTok.hasLeadingSpace();
@@ -1077,7 +1077,7 @@ bool Preprocessor::LexHeaderName(Token &FilenameTok, bool AllowMacroExpansion) {
     // A string-literal with a prefix or suffix is not translated into a
     // header-name. This could theoretically be observable via the C++20
     // context-sensitive header-name formation rules.
-    StringRef Str = getSpelling(FilenameTok, FilenameBuffer);
+    llvm::StringRef Str = getSpelling(FilenameTok, FilenameBuffer);
     if (Str.size() >= 2 && Str.front() == '"' && Str.back() == '"')
       FilenameTok.setKind(tok::header_name);
   }
@@ -1086,7 +1086,7 @@ bool Preprocessor::LexHeaderName(Token &FilenameTok, bool AllowMacroExpansion) {
 }
 
 /// Collect the tokens of a C++20 pp-import-suffix.
-void Preprocessor::CollectPpImportSuffix(SmallVectorImpl<Token> &Toks) {
+void Preprocessor::CollectPpImportSuffix(llvm::SmallVectorImpl<Token> &Toks) {
   // FIXME: For error recovery, consider recognizing attribute syntax here
   // and terminating / diagnosing a missing semicolon if we find anything
   // else? (Can we leave that to the parser?)
@@ -1168,7 +1168,7 @@ bool Preprocessor::LexAfterModuleImport(Token &Result) {
 
   // Allocate a holding buffer for a sequence of tokens and introduce it into
   // the token stream.
-  auto EnterTokens = [this](ArrayRef<Token> Toks) {
+  auto EnterTokens = [this](llvm::ArrayRef<Token> Toks) {
     auto ToksCopy = std::make_unique<Token[]>(Toks.size());
     std::copy(Toks.begin(), Toks.end(), ToksCopy.get());
     EnterTokenStream(std::move(ToksCopy), Toks.size(),
@@ -1177,7 +1177,7 @@ bool Preprocessor::LexAfterModuleImport(Token &Result) {
 
   bool ImportingHeader = Result.is(tok::header_name);
   // Check for a header-name.
-  SmallVector<Token, 32> Suffix;
+  llvm::SmallVector<Token, 32> Suffix;
   if (ImportingHeader) {
     // Enter the header-name token into the token stream; a Lex action cannot
     // both return a token and cache tokens (doing so would corrupt the token
@@ -1332,7 +1332,7 @@ bool Preprocessor::LexAfterModuleImport(Token &Result) {
 void Preprocessor::makeModuleVisible(Module *M, SourceLocation Loc) {
   CurSubmoduleState->VisibleModules.setVisible(
       M, Loc, [](Module *) {},
-      [&](ArrayRef<Module *> Path, Module *Conflict, StringRef Message) {
+      [&](llvm::ArrayRef<Module *> Path, Module *Conflict, llvm::StringRef Message) {
         // FIXME: Include the path in the diagnostic.
         // FIXME: Include the import location for the conflicting module.
         Diag(ModuleImportLoc, diag::warn_module_conflict)
@@ -1357,7 +1357,7 @@ bool Preprocessor::FinishLexStringLiteral(Token &Result, std::string &String,
   }
 
   // Lex string literal tokens, optionally with macro expansion.
-  SmallVector<Token, 4> StrToks;
+  llvm::SmallVector<Token, 4> StrToks;
   do {
     StrToks.push_back(Result);
 
@@ -1389,9 +1389,9 @@ bool Preprocessor::FinishLexStringLiteral(Token &Result, std::string &String,
 
 bool Preprocessor::parseSimpleIntegerLiteral(Token &Tok, uint64_t &Value) {
   assert(Tok.is(tok::numeric_constant));
-  SmallString<8> IntegerBuffer;
+  llvm::SmallString<8> IntegerBuffer;
   bool NumberInvalid = false;
-  StringRef Spelling = getSpelling(Tok, IntegerBuffer, &NumberInvalid);
+  llvm::StringRef Spelling = getSpelling(Tok, IntegerBuffer, &NumberInvalid);
   if (NumberInvalid)
     return false;
   NumericLiteralParser Literal(Spelling, Tok.getLocation(), getSourceManager(),
@@ -1569,7 +1569,7 @@ void Preprocessor::createPreprocessingRecord() {
 
 const char *Preprocessor::getCheckPoint(FileID FID, const char *Start) const {
   if (auto It = CheckPoints.find(FID); It != CheckPoints.end()) {
-    const SmallVector<const char *> &FileCheckPoints = It->second;
+    const llvm::SmallVector<const char *> &FileCheckPoints = It->second;
     const char *Last = nullptr;
     // FIXME: Do better than a linear search.
     for (const char *P : FileCheckPoints) {

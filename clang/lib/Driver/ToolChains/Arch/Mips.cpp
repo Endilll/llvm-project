@@ -22,7 +22,7 @@ using namespace llvm::opt;
 // Get CPU and ABI names. They are not independent
 // so we have to calculate them together.
 void mips::getMipsCPUAndABI(const ArgList &Args, const llvm::Triple &Triple,
-                            StringRef &CPUName, StringRef &ABIName) {
+                            llvm::StringRef &CPUName, llvm::StringRef &ABIName) {
   const char *DefMips32CPU = "mips32r2";
   const char *DefMips64CPU = "mips64r2";
 
@@ -125,7 +125,7 @@ void mips::getMipsCPUAndABI(const ArgList &Args, const llvm::Triple &Triple,
 
 std::string mips::getMipsABILibSuffix(const ArgList &Args,
                                       const llvm::Triple &Triple) {
-  StringRef CPUName, ABIName;
+  llvm::StringRef CPUName, ABIName;
   tools::mips::getMipsCPUAndABI(Args, Triple, CPUName, ABIName);
   return llvm::StringSwitch<std::string>(ABIName)
       .Case("o32", "")
@@ -134,7 +134,7 @@ std::string mips::getMipsABILibSuffix(const ArgList &Args,
 }
 
 // Convert ABI name to the GNU tools acceptable variant.
-StringRef mips::getGnuCompatibleMipsABIName(StringRef ABI) {
+llvm::StringRef mips::getGnuCompatibleMipsABIName(llvm::StringRef ABI) {
   return llvm::StringSwitch<llvm::StringRef>(ABI)
       .Case("o32", "32")
       .Case("n64", "64")
@@ -158,7 +158,7 @@ mips::FloatABI mips::getMipsFloatABI(const Driver &D, const ArgList &Args,
                 .Case("soft", mips::FloatABI::Soft)
                 .Case("hard", mips::FloatABI::Hard)
                 .Default(mips::FloatABI::Invalid);
-      if (ABI == mips::FloatABI::Invalid && !StringRef(A->getValue()).empty()) {
+      if (ABI == mips::FloatABI::Invalid && !llvm::StringRef(A->getValue()).empty()) {
         D.Diag(clang::diag::err_drv_invalid_mfloat_abi) << A->getAsString(Args);
         ABI = mips::FloatABI::Hard;
       }
@@ -184,9 +184,9 @@ mips::FloatABI mips::getMipsFloatABI(const Driver &D, const ArgList &Args,
 
 void mips::getMIPSTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                                  const ArgList &Args,
-                                 std::vector<StringRef> &Features) {
-  StringRef CPUName;
-  StringRef ABIName;
+                                 std::vector<llvm::StringRef> &Features) {
+  llvm::StringRef CPUName;
+  llvm::StringRef ABIName;
   getMipsCPUAndABI(Args, Triple, CPUName, ABIName);
   ABIName = getGnuCompatibleMipsABIName(ABIName);
 
@@ -284,7 +284,7 @@ void mips::getMIPSTargetFeatures(const Driver &D, const llvm::Triple &Triple,
   }
 
   if (Arg *A = Args.getLastArg(options::OPT_mnan_EQ)) {
-    StringRef Val = StringRef(A->getValue());
+    llvm::StringRef Val = llvm::StringRef(A->getValue());
     if (Val == "2008") {
       if (mips::getIEEE754Standard(CPUName) & mips::Std2008) {
         Features.push_back("+nan2008");
@@ -306,7 +306,7 @@ void mips::getMIPSTargetFeatures(const Driver &D, const llvm::Triple &Triple,
   }
 
   if (Arg *A = Args.getLastArg(options::OPT_mabs_EQ)) {
-    StringRef Val = StringRef(A->getValue());
+    llvm::StringRef Val = llvm::StringRef(A->getValue());
     if (Val == "2008") {
       if (mips::getIEEE754Standard(CPUName) & mips::Std2008) {
         Features.push_back("+abs2008");
@@ -387,7 +387,7 @@ void mips::getMIPSTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                    "ginv");
 
   if (Arg *A = Args.getLastArg(options::OPT_mindirect_jump_EQ)) {
-    StringRef Val = StringRef(A->getValue());
+    llvm::StringRef Val = llvm::StringRef(A->getValue());
     if (Val == "hazard") {
       Arg *B =
           Args.getLastArg(options::OPT_mmicromips, options::OPT_mno_micromips);
@@ -409,7 +409,7 @@ void mips::getMIPSTargetFeatures(const Driver &D, const llvm::Triple &Triple,
   }
 }
 
-mips::IEEE754Standard mips::getIEEE754Standard(StringRef &CPU) {
+mips::IEEE754Standard mips::getIEEE754Standard(llvm::StringRef &CPU) {
   // Strictly speaking, mips32r2 and mips64r2 do not conform to the
   // IEEE754-2008 standard. Support for this standard was first introduced
   // in Release 3. However, other compilers have traditionally allowed it
@@ -433,7 +433,7 @@ mips::IEEE754Standard mips::getIEEE754Standard(StringRef &CPU) {
       .Default(Std2008);
 }
 
-bool mips::hasCompactBranches(StringRef &CPU) {
+bool mips::hasCompactBranches(llvm::StringRef &CPU) {
   // mips32r6 and mips64r6 have compact branches.
   return llvm::StringSwitch<bool>(CPU)
       .Case("mips32r6", true)
@@ -443,7 +443,7 @@ bool mips::hasCompactBranches(StringRef &CPU) {
 
 bool mips::hasMipsAbiArg(const ArgList &Args, const char *Value) {
   Arg *A = Args.getLastArg(options::OPT_mabi_EQ);
-  return A && (A->getValue() == StringRef(Value));
+  return A && (A->getValue() == llvm::StringRef(Value));
 }
 
 bool mips::isUCLibc(const ArgList &Args) {
@@ -465,7 +465,7 @@ bool mips::isNaN2008(const Driver &D, const ArgList &Args,
       .Default(false);
 }
 
-bool mips::isFP64ADefault(const llvm::Triple &Triple, StringRef CPUName) {
+bool mips::isFP64ADefault(const llvm::Triple &Triple, llvm::StringRef CPUName) {
   if (!Triple.isAndroid())
     return false;
 
@@ -475,8 +475,8 @@ bool mips::isFP64ADefault(const llvm::Triple &Triple, StringRef CPUName) {
       .Default(false);
 }
 
-bool mips::isFPXXDefault(const llvm::Triple &Triple, StringRef CPUName,
-                         StringRef ABIName, mips::FloatABI FloatABI) {
+bool mips::isFPXXDefault(const llvm::Triple &Triple, llvm::StringRef CPUName,
+                         llvm::StringRef ABIName, mips::FloatABI FloatABI) {
   if (ABIName != "32")
     return false;
 
@@ -493,7 +493,7 @@ bool mips::isFPXXDefault(const llvm::Triple &Triple, StringRef CPUName,
 }
 
 bool mips::shouldUseFPXX(const ArgList &Args, const llvm::Triple &Triple,
-                         StringRef CPUName, StringRef ABIName,
+                         llvm::StringRef CPUName, llvm::StringRef ABIName,
                          mips::FloatABI FloatABI) {
   bool UseFPXX = isFPXXDefault(Triple, CPUName, ABIName, FloatABI);
 
@@ -513,7 +513,7 @@ bool mips::shouldUseFPXX(const ArgList &Args, const llvm::Triple &Triple,
   return UseFPXX;
 }
 
-bool mips::supportsIndirectJumpHazardBarrier(StringRef &CPU) {
+bool mips::supportsIndirectJumpHazardBarrier(llvm::StringRef &CPU) {
   // Supporting the hazard barrier method of dealing with indirect
   // jumps requires MIPSR2 support.
   return llvm::StringSwitch<bool>(CPU)

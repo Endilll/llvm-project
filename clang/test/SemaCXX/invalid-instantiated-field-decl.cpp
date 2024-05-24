@@ -11,8 +11,8 @@ public:
 };
 
 template <typename T, unsigned N>
-class SmallVector : public SmallVectorImpl<T> {
-  typedef typename SmallVectorImpl<T>::U U; // expected-error {{no type named 'U' in 'SmallVectorImpl<CallSite>'}}
+class SmallVector : public llvm::SmallVectorImpl<T> {
+  typedef typename llvm::SmallVectorImpl<T>::U U; // expected-error {{no type named 'U' in 'llvm::SmallVectorImpl<CallSite>'}}
   enum {
 
     MinUs = (static_cast<unsigned int>(sizeof(T))*N +	// expected-error {{invalid application of 'sizeof' to an incomplete type 'CallSite'}}
@@ -22,7 +22,7 @@ class SmallVector : public SmallVectorImpl<T> {
   };
   U InlineElts[NumInlineEltsElts];
 public:
-  SmallVector() : SmallVectorImpl<T>(NumInlineEltsElts) {
+  SmallVector() : llvm::SmallVectorImpl<T>(NumInlineEltsElts) {
   }
 
 };
@@ -31,5 +31,5 @@ class CallSite;	// expected-note {{forward declaration of 'CallSite'}}
 class InlineFunctionInfo {
 public:
   explicit InlineFunctionInfo() {}
-  SmallVector<CallSite, 2> DevirtualizedCalls;	// expected-note {{in instantiation of template class 'SmallVector<CallSite, 2>' requested}}
+  llvm::SmallVector<CallSite, 2> DevirtualizedCalls;	// expected-note {{in instantiation of template class 'llvm::SmallVector<CallSite, 2>' requested}}
 };

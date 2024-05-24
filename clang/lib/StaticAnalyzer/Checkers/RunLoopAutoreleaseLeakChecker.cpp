@@ -117,7 +117,7 @@ static void emitDiagnostics(BoundNodes &Match,
                      /*Name=*/"Memory leak inside autorelease pool",
                      /*BugCategory=*/"Memory",
                      /*Name=*/
-                     (Twine("Temporary objects allocated in the") +
+                     (llvm::Twine("Temporary objects allocated in the") +
                       " autorelease pool " +
                       (HasAutoreleasePool ? "" : "of last resort ") +
                       "followed by the launch of " +

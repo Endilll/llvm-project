@@ -35,7 +35,7 @@ public:
   /// \param MinimizeIncludePaths whether inserted include paths are optimized.
   IncludeFixerActionFactory(SymbolIndexManager &SymbolIndexMgr,
                             std::vector<IncludeFixerContext> &Contexts,
-                            StringRef StyleName,
+                            llvm::StringRef StyleName,
                             bool MinimizeIncludePaths = true);
 
   ~IncludeFixerActionFactory() override;
@@ -76,7 +76,7 @@ private:
 /// qualifiers on success; otherwise, an llvm::Error carrying llvm::StringError
 /// is returned.
 llvm::Expected<tooling::Replacements> createIncludeFixerReplacements(
-    StringRef Code, const IncludeFixerContext &Context,
+    llvm::StringRef Code, const IncludeFixerContext &Context,
     const format::FormatStyle &Style = format::getLLVMStyle(),
     bool AddQualifiers = true);
 
@@ -92,7 +92,7 @@ public:
         GenerateDiagnostics(GenerateDiagnostics) {}
 
   void setCompilerInstance(CompilerInstance *CI) { this->CI = CI; }
-  void setFilePath(StringRef FilePath) {
+  void setFilePath(llvm::StringRef FilePath) {
     this->FilePath = std::string(FilePath);
   }
 
@@ -111,7 +111,7 @@ public:
                                     const ObjCObjectPointerType *OPT) override;
 
   /// Get the minimal include for a given path.
-  std::string minimizeInclude(StringRef Include,
+  std::string minimizeInclude(llvm::StringRef Include,
                               const clang::SourceManager &SourceManager,
                               clang::HeaderSearch &HeaderSearch) const;
 
@@ -119,17 +119,17 @@ public:
   IncludeFixerContext getIncludeFixerContext(
       const clang::SourceManager &SourceManager,
       clang::HeaderSearch &HeaderSearch,
-      ArrayRef<find_all_symbols::SymbolInfo> MatchedSymbols) const;
+      llvm::ArrayRef<find_all_symbols::SymbolInfo> MatchedSymbols) const;
 
   /// Get the global matched symbols.
-  ArrayRef<find_all_symbols::SymbolInfo> getMatchedSymbols() const {
+  llvm::ArrayRef<find_all_symbols::SymbolInfo> getMatchedSymbols() const {
     return MatchedSymbols;
   }
 
 private:
   /// Query the database for a given identifier.
   std::vector<find_all_symbols::SymbolInfo>
-  query(StringRef Query, StringRef ScopedQualifiers, tooling::Range Range);
+  query(llvm::StringRef Query, llvm::StringRef ScopedQualifiers, tooling::Range Range);
 
   CompilerInstance *CI;
 

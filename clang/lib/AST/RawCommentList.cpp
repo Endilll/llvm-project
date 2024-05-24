@@ -23,7 +23,7 @@ using namespace clang;
 
 namespace {
 /// Get comment kind and bool describing if it is a trailing comment.
-std::pair<RawComment::CommentKind, bool> getCommentKind(StringRef Comment,
+std::pair<RawComment::CommentKind, bool> getCommentKind(llvm::StringRef Comment,
                                                         bool ParseAllComments) {
   const size_t MinCommentLength = ParseAllComments ? 2 : 3;
   if ((Comment.size() < MinCommentLength) || Comment[0] != '/')
@@ -61,7 +61,7 @@ std::pair<RawComment::CommentKind, bool> getCommentKind(StringRef Comment,
   return std::make_pair(K, TrailingComment);
 }
 
-bool mergedCommentIsTrailingComment(StringRef Comment) {
+bool mergedCommentIsTrailingComment(llvm::StringRef Comment) {
   return (Comment.size() > 3) && (Comment[3] == '<');
 }
 
@@ -150,7 +150,7 @@ RawComment::RawComment(const SourceManager &SourceMgr, SourceRange SR,
   }
 }
 
-StringRef RawComment::getRawTextSlow(const SourceManager &SourceMgr) const {
+llvm::StringRef RawComment::getRawTextSlow(const SourceManager &SourceMgr) const {
   FileID BeginFileID;
   FileID EndFileID;
   unsigned BeginOffset;
@@ -162,7 +162,7 @@ StringRef RawComment::getRawTextSlow(const SourceManager &SourceMgr) const {
 
   const unsigned Length = EndOffset - BeginOffset;
   if (Length < 2)
-    return StringRef();
+    return llvm::StringRef();
 
   // The comment can't begin in one file and end in another.
   assert(BeginFileID == EndFileID);
@@ -171,9 +171,9 @@ StringRef RawComment::getRawTextSlow(const SourceManager &SourceMgr) const {
   const char *BufferStart = SourceMgr.getBufferData(BeginFileID,
                                                     &Invalid).data();
   if (Invalid)
-    return StringRef();
+    return llvm::StringRef();
 
-  return StringRef(BufferStart + BeginOffset, Length);
+  return llvm::StringRef(BufferStart + BeginOffset, Length);
 }
 
 const char *RawComment::extractBriefText(const ASTContext &Context) const {
@@ -425,7 +425,7 @@ RawComment::getFormattedLines(const SourceManager &SourceMgr,
       }
       return true;
     }
-    SmallString<124> Line;
+    llvm::SmallString<124> Line;
     llvm::StringRef TokText = L.getSpelling(Tok, SourceMgr);
     bool LocInvalid = false;
     unsigned TokColumn =
@@ -434,7 +434,7 @@ RawComment::getFormattedLines(const SourceManager &SourceMgr,
 
     // Amount of leading whitespace in TokText.
     size_t WhitespaceLen = TokText.find_first_not_of(" \t");
-    if (WhitespaceLen == StringRef::npos)
+    if (WhitespaceLen == llvm::StringRef::npos)
       WhitespaceLen = TokText.size();
     // Remember the amount of whitespace we skipped in the first line to remove
     // indent up to that column in the following lines.

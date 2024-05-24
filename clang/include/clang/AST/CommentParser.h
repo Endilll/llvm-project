@@ -55,7 +55,7 @@ class Parser {
   Token Tok;
 
   /// A stack of additional lookahead tokens.
-  SmallVector<Token, 8> MoreLATokens;
+  llvm::SmallVector<Token, 8> MoreLATokens;
 
   void consumeToken() {
     if (MoreLATokens.empty())
@@ -69,7 +69,7 @@ class Parser {
     Tok = OldTok;
   }
 
-  void putBack(ArrayRef<Token> Toks) {
+  void putBack(llvm::ArrayRef<Token> Toks) {
     if (Toks.empty())
       return;
 
@@ -97,7 +97,7 @@ public:
   void parseTParamCommandArgs(TParamCommandComment *TPC,
                               TextTokenRetokenizer &Retokenizer);
 
-  ArrayRef<Comment::Argument>
+  llvm::ArrayRef<Comment::Argument>
   parseCommandArgs(TextTokenRetokenizer &Retokenizer, unsigned NumArgs);
 
   BlockCommandComment *parseBlockCommand();

@@ -150,7 +150,7 @@ protected:
   ASTContext &Context;
   APISet &API;
 
-  StringRef getTypedefName(const TagDecl *Decl) {
+  llvm::StringRef getTypedefName(const TagDecl *Decl) {
     if (const auto *TypedefDecl = Decl->getTypedefNameForAnonDecl())
       return TypedefDecl->getName();
 
@@ -167,9 +167,9 @@ private:
   }
 
 protected:
-  SmallVector<SymbolReference> getBases(const CXXRecordDecl *Decl) {
+  llvm::SmallVector<SymbolReference> getBases(const CXXRecordDecl *Decl) {
     // FIXME: store AccessSpecifier given by inheritance
-    SmallVector<SymbolReference> Bases;
+    llvm::SmallVector<SymbolReference> Bases;
     for (const auto &BaseSpecifier : Decl->bases()) {
       // skip classes not inherited as public
       if (BaseSpecifier.getAccessSpecifier() != AccessSpecifier::AS_public)
@@ -180,7 +180,7 @@ protected:
         if (auto *TTPTD = BaseSpecifier.getType()
                               ->getAs<TemplateTypeParmType>()
                               ->getDecl()) {
-          SmallString<128> USR;
+          llvm::SmallString<128> USR;
           index::generateUSRForDecl(TTPTD, USR);
           BaseClass.USR = API.copyString(USR);
           BaseClass.Source = API.copyString(getOwningModuleName(*TTPTD));
@@ -203,7 +203,7 @@ protected:
     return APIRecord::RK_CXXClass;
   }
 
-  StringRef getOwningModuleName(const Decl &D) {
+  llvm::StringRef getOwningModuleName(const Decl &D) {
     if (auto *OwningModule = D.getImportedOwningModule())
       return OwningModule->Name;
 
@@ -220,14 +220,14 @@ protected:
   }
 
   SymbolReference createSymbolReferenceForDecl(const Decl &D) {
-    SmallString<128> USR;
+    llvm::SmallString<128> USR;
     index::generateUSRForDecl(&D, USR);
 
     APIRecord *Record = API.findRecordForUSR(USR);
     if (Record)
       return SymbolReference(Record);
 
-    StringRef Name;
+    llvm::StringRef Name;
     if (auto *ND = dyn_cast<NamedDecl>(&D))
       Name = ND->getName();
 
@@ -244,7 +244,7 @@ protected:
     if (!NewRecordContext)
       return;
     auto *Tag = D.getType()->getAsTagDecl();
-    SmallString<128> TagUSR;
+    llvm::SmallString<128> TagUSR;
     clang::index::generateUSRForDecl(Tag, TagUSR);
     if (auto *Record = llvm::dyn_cast_if_present<TagRecord>(
             API.findRecordForUSR(TagUSR))) {
@@ -282,8 +282,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitVarDecl(const VarDecl *Decl) {
     return true;
 
   // Collect symbol information.
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -355,8 +355,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitFunctionDecl(
     return true;
 
   // Collect symbol information.
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -394,9 +394,9 @@ bool ExtractAPIVisitorBase<Derived>::VisitEnumDecl(const EnumDecl *Decl) {
   if (!getDerivedExtractAPIVisitor().shouldDeclBeIncluded(Decl))
     return true;
 
-  SmallString<128> QualifiedNameBuffer;
+  llvm::SmallString<128> QualifiedNameBuffer;
   // Collect symbol information.
-  StringRef Name = Decl->getName();
+  llvm::StringRef Name = Decl->getName();
   if (Name.empty())
     Name = getTypedefName(Decl);
   if (Name.empty()) {
@@ -405,7 +405,7 @@ bool ExtractAPIVisitorBase<Derived>::VisitEnumDecl(const EnumDecl *Decl) {
     Name = QualifiedNameBuffer;
   }
 
-  SmallString<128> USR;
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -518,8 +518,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitNamespaceDecl(
     return true;
   if (Decl->isAnonymousNamespace())
     return true;
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   LinkageInfo Linkage = Decl->getLinkageAndVisibility();
   PresumedLoc Loc =
@@ -549,11 +549,11 @@ bool ExtractAPIVisitorBase<Derived>::VisitRecordDecl(const RecordDecl *Decl) {
     return true;
 
   // Collect symbol information.
-  StringRef Name = Decl->getName();
+  llvm::StringRef Name = Decl->getName();
   if (Name.empty())
     Name = getTypedefName(Decl);
 
-  SmallString<128> USR;
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -590,11 +590,11 @@ bool ExtractAPIVisitorBase<Derived>::VisitCXXRecordDecl(
       Decl->isImplicit())
     return true;
 
-  StringRef Name = Decl->getName();
+  llvm::StringRef Name = Decl->getName();
   if (Name.empty())
     Name = getTypedefName(Decl);
 
-  SmallString<128> USR;
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -647,7 +647,7 @@ bool ExtractAPIVisitorBase<Derived>::VisitCXXMethodDecl(
   if (isa<CXXConstructorDecl>(Decl) || isa<CXXDestructorDecl>(Decl))
     return true;
 
-  SmallString<128> USR;
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -708,7 +708,7 @@ bool ExtractAPIVisitorBase<Derived>::VisitCXXConstructorDecl(
     return true;
 
   auto Name = Decl->getNameAsString();
-  SmallString<128> USR;
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -742,7 +742,7 @@ bool ExtractAPIVisitorBase<Derived>::VisitCXXDestructorDecl(
     return true;
 
   auto Name = Decl->getNameAsString();
-  SmallString<128> USR;
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -772,8 +772,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitConceptDecl(const ConceptDecl *Decl) {
   if (!getDerivedExtractAPIVisitor().shouldDeclBeIncluded(Decl))
     return true;
 
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -799,8 +799,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitClassTemplateSpecializationDecl(
   if (!getDerivedExtractAPIVisitor().shouldDeclBeIncluded(Decl))
     return true;
 
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -833,8 +833,8 @@ bool ExtractAPIVisitorBase<Derived>::
   if (!getDerivedExtractAPIVisitor().shouldDeclBeIncluded(Decl))
     return true;
 
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -866,8 +866,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitVarTemplateDecl(
     return true;
 
   // Collect symbol information.
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -910,8 +910,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitVarTemplateSpecializationDecl(
     return true;
 
   // Collect symbol information.
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -942,8 +942,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitVarTemplatePartialSpecializationDecl(
     return true;
 
   // Collect symbol information.
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -975,8 +975,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitFunctionTemplateDecl(
     return true;
 
   // Collect symbol information.
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -1008,8 +1008,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitObjCInterfaceDecl(
     return true;
 
   // Collect symbol information.
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -1057,8 +1057,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitObjCProtocolDecl(
     return true;
 
   // Collect symbol information.
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -1101,14 +1101,14 @@ bool ExtractAPIVisitorBase<Derived>::VisitTypedefNameDecl(
   if (!getDerivedExtractAPIVisitor().shouldDeclBeIncluded(Decl))
     return true;
 
-  StringRef Name = Decl->getName();
+  llvm::StringRef Name = Decl->getName();
 
   // If the underlying type was defined as part of the typedef modify it's
   // fragments directly and pretend the typedef doesn't exist.
   if (auto *TagDecl = Decl->getUnderlyingType()->getAsTagDecl()) {
     if (TagDecl->isEmbeddedInDeclarator() && TagDecl->isCompleteDefinition() &&
         Decl->getName() == TagDecl->getName()) {
-      SmallString<128> TagUSR;
+      llvm::SmallString<128> TagUSR;
       index::generateUSRForDecl(TagDecl, TagUSR);
       if (auto *Record = API.findRecordForUSR(TagUSR)) {
         DeclarationFragments LeadingFragments;
@@ -1128,7 +1128,7 @@ bool ExtractAPIVisitorBase<Derived>::VisitTypedefNameDecl(
 
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
-  SmallString<128> USR;
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   DocComment Comment;
   if (auto *RawComment =
@@ -1157,8 +1157,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitObjCCategoryDecl(
   if (!getDerivedExtractAPIVisitor().shouldDeclBeIncluded(Decl))
     return true;
 
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -1200,8 +1200,8 @@ void ExtractAPIVisitorBase<Derived>::recordEnumConstants(
     EnumRecord *EnumRecord, const EnumDecl::enumerator_range Constants) {
   for (const auto *Constant : Constants) {
     // Collect symbol information.
-    StringRef Name = Constant->getName();
-    SmallString<128> USR;
+    llvm::StringRef Name = Constant->getName();
+    llvm::SmallString<128> USR;
     index::generateUSRForDecl(Constant, USR);
     PresumedLoc Loc =
         Context.getSourceManager().getPresumedLoc(Constant->getLocation());
@@ -1234,8 +1234,8 @@ bool ExtractAPIVisitorBase<Derived>::VisitFieldDecl(const FieldDecl *Decl) {
     return true;
 
   // Collect symbol information.
-  StringRef Name = Decl->getName();
-  SmallString<128> USR;
+  llvm::StringRef Name = Decl->getName();
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -1287,7 +1287,7 @@ bool ExtractAPIVisitorBase<Derived>::VisitCXXConversionDecl(
     return true;
 
   auto Name = Decl->getNameAsString();
-  SmallString<128> USR;
+  llvm::SmallString<128> USR;
   index::generateUSRForDecl(Decl, USR);
   PresumedLoc Loc =
       Context.getSourceManager().getPresumedLoc(Decl->getLocation());
@@ -1332,7 +1332,7 @@ void ExtractAPIVisitorBase<Derived>::recordObjCMethods(
       continue;
 
     auto Name = Method->getSelector().getAsString();
-    SmallString<128> USR;
+    llvm::SmallString<128> USR;
     index::generateUSRForDecl(Method, USR);
     PresumedLoc Loc =
         Context.getSourceManager().getPresumedLoc(Method->getLocation());
@@ -1368,8 +1368,8 @@ void ExtractAPIVisitorBase<Derived>::recordObjCProperties(
     ObjCContainerRecord *Container,
     const ObjCContainerDecl::prop_range Properties) {
   for (const auto *Property : Properties) {
-    StringRef Name = Property->getName();
-    SmallString<128> USR;
+    llvm::StringRef Name = Property->getName();
+    llvm::SmallString<128> USR;
     index::generateUSRForDecl(Property, USR);
     PresumedLoc Loc =
         Context.getSourceManager().getPresumedLoc(Property->getLocation());
@@ -1420,8 +1420,8 @@ void ExtractAPIVisitorBase<Derived>::recordObjCInstanceVariables(
         DeclContext::specific_decl_iterator<ObjCIvarDecl>>
         Ivars) {
   for (const auto *Ivar : Ivars) {
-    StringRef Name = Ivar->getName();
-    SmallString<128> USR;
+    llvm::StringRef Name = Ivar->getName();
+    llvm::SmallString<128> USR;
     index::generateUSRForDecl(Ivar, USR);
 
     PresumedLoc Loc =

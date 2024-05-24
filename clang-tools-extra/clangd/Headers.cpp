@@ -294,8 +294,8 @@ IncludeInserter::calculateIncludePath(const HeaderFile &InsertedHeader,
         InsertedHeader.File, BuildDir, IncludingFile, &IsAngled);
   } else {
     // Calculate include relative to including file only.
-    StringRef IncludingDir = llvm::sys::path::parent_path(IncludingFile);
-    SmallString<256> RelFile(InsertedHeader.File);
+    llvm::StringRef IncludingDir = llvm::sys::path::parent_path(IncludingFile);
+    llvm::SmallString<256> RelFile(InsertedHeader.File);
     // Replacing with "" leaves "/RelFile" if IncludingDir doesn't end in "/".
     llvm::sys::path::replace_path_prefix(RelFile, IncludingDir, "./");
     Suggested = llvm::sys::path::convert_to_slash(

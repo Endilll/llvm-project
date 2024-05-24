@@ -16,7 +16,7 @@
 
 namespace clang {
 
-XRayInstrMask parseXRayInstrValue(StringRef Value) {
+XRayInstrMask parseXRayInstrValue(llvm::StringRef Value) {
   XRayInstrMask ParsedKind =
       llvm::StringSwitch<XRayInstrMask>(Value)
           .Case("all", XRayInstrKind::All)
@@ -32,7 +32,7 @@ XRayInstrMask parseXRayInstrValue(StringRef Value) {
 }
 
 void serializeXRayInstrValue(XRayInstrSet Set,
-                             SmallVectorImpl<StringRef> &Values) {
+                             llvm::SmallVectorImpl<llvm::StringRef> &Values) {
   if (Set.Mask == XRayInstrKind::All) {
     Values.push_back("all");
     return;

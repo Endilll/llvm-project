@@ -21,14 +21,14 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/non-zero-enum-to-bool-conversion.html
 class NonZeroEnumToBoolConversionCheck : public ClangTidyCheck {
 public:
-  NonZeroEnumToBoolConversionCheck(StringRef Name, ClangTidyContext *Context);
+  NonZeroEnumToBoolConversionCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override;
 
 private:
-  const std::vector<StringRef> EnumIgnoreList;
+  const std::vector<llvm::StringRef> EnumIgnoreList;
 };
 
 } // namespace clang::tidy::bugprone

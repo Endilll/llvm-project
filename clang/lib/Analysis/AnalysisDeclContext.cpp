@@ -231,7 +231,7 @@ CFG *AnalysisDeclContext::getCFG() {
 
 CFG *AnalysisDeclContext::getUnoptimizedCFG() {
   if (!builtCompleteCFG) {
-    SaveAndRestore NotPrune(cfgBuildOptions.PruneTriviallyFalseEdges, false);
+    llvm::SaveAndRestore NotPrune(cfgBuildOptions.PruneTriviallyFalseEdges, false);
     completeCFG =
         CFG::buildCFG(D, getBody(), &D->getASTContext(), cfgBuildOptions);
     // Even when the cfg is not successfully built, we don't
@@ -485,7 +485,7 @@ bool LocationContext::isParentOf(const LocationContext *LC) const {
   return false;
 }
 
-static void printLocation(raw_ostream &Out, const SourceManager &SM,
+static void printLocation(llvm::raw_ostream &Out, const SourceManager &SM,
                           SourceLocation Loc) {
   if (Loc.isFileID() && SM.isInMainFile(Loc))
     Out << SM.getExpansionLineNumber(Loc);
@@ -493,7 +493,7 @@ static void printLocation(raw_ostream &Out, const SourceManager &SM,
     Loc.print(Out, SM);
 }
 
-void LocationContext::dumpStack(raw_ostream &Out) const {
+void LocationContext::dumpStack(llvm::raw_ostream &Out) const {
   ASTContext &Ctx = getAnalysisDeclContext()->getASTContext();
   PrintingPolicy PP(Ctx.getLangOpts());
   PP.TerseOutput = 1;
@@ -528,7 +528,7 @@ void LocationContext::dumpStack(raw_ostream &Out) const {
   }
 }
 
-void LocationContext::printJson(raw_ostream &Out, const char *NL,
+void LocationContext::printJson(llvm::raw_ostream &Out, const char *NL,
                                 unsigned int Space, bool IsDot,
                                 std::function<void(const LocationContext *)>
                                     printMoreInfoPerContext) const {

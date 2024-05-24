@@ -52,8 +52,8 @@ std::string ODRDiagsEmitter::getOwningModuleNameForDiagnostic(const Decl *D) {
 template <typename MethodT>
 static bool diagnoseSubMismatchMethodParameters(DiagnosticsEngine &Diags,
                                                 const NamedDecl *FirstContainer,
-                                                StringRef FirstModule,
-                                                StringRef SecondModule,
+                                                llvm::StringRef FirstModule,
+                                                llvm::StringRef SecondModule,
                                                 const MethodT *FirstMethod,
                                                 const MethodT *SecondMethod) {
   enum DiagMethodType {
@@ -142,7 +142,7 @@ static bool diagnoseSubMismatchMethodParameters(DiagnosticsEngine &Diags,
 }
 
 bool ODRDiagsEmitter::diagnoseSubMismatchField(
-    const NamedDecl *FirstRecord, StringRef FirstModule, StringRef SecondModule,
+    const NamedDecl *FirstRecord, llvm::StringRef FirstModule, llvm::StringRef SecondModule,
     const FieldDecl *FirstField, const FieldDecl *SecondField) const {
   enum ODRFieldDifference {
     FieldName,
@@ -244,7 +244,7 @@ bool ODRDiagsEmitter::diagnoseSubMismatchField(
 }
 
 bool ODRDiagsEmitter::diagnoseSubMismatchTypedef(
-    const NamedDecl *FirstRecord, StringRef FirstModule, StringRef SecondModule,
+    const NamedDecl *FirstRecord, llvm::StringRef FirstModule, llvm::StringRef SecondModule,
     const TypedefNameDecl *FirstTD, const TypedefNameDecl *SecondTD,
     bool IsTypeAlias) const {
   enum ODRTypedefDifference {
@@ -284,8 +284,8 @@ bool ODRDiagsEmitter::diagnoseSubMismatchTypedef(
 }
 
 bool ODRDiagsEmitter::diagnoseSubMismatchVar(const NamedDecl *FirstRecord,
-                                             StringRef FirstModule,
-                                             StringRef SecondModule,
+                                             llvm::StringRef FirstModule,
+                                             llvm::StringRef SecondModule,
                                              const VarDecl *FirstVD,
                                              const VarDecl *SecondVD) const {
   enum ODRVarDifference {
@@ -360,9 +360,9 @@ bool ODRDiagsEmitter::diagnoseSubMismatchVar(const NamedDecl *FirstRecord,
 
 bool ODRDiagsEmitter::diagnoseSubMismatchProtocols(
     const ObjCProtocolList &FirstProtocols,
-    const ObjCContainerDecl *FirstContainer, StringRef FirstModule,
+    const ObjCContainerDecl *FirstContainer, llvm::StringRef FirstModule,
     const ObjCProtocolList &SecondProtocols,
-    const ObjCContainerDecl *SecondContainer, StringRef SecondModule) const {
+    const ObjCContainerDecl *SecondContainer, llvm::StringRef SecondModule) const {
   // Keep in sync with err_module_odr_violation_referenced_protocols.
   enum ODRReferencedProtocolDifference {
     NumProtocols,
@@ -418,8 +418,8 @@ bool ODRDiagsEmitter::diagnoseSubMismatchProtocols(
 }
 
 bool ODRDiagsEmitter::diagnoseSubMismatchObjCMethod(
-    const NamedDecl *FirstObjCContainer, StringRef FirstModule,
-    StringRef SecondModule, const ObjCMethodDecl *FirstMethod,
+    const NamedDecl *FirstObjCContainer, llvm::StringRef FirstModule,
+    llvm::StringRef SecondModule, const ObjCMethodDecl *FirstMethod,
     const ObjCMethodDecl *SecondMethod) const {
   enum ODRMethodDifference {
     ReturnType,
@@ -502,8 +502,8 @@ bool ODRDiagsEmitter::diagnoseSubMismatchObjCMethod(
 }
 
 bool ODRDiagsEmitter::diagnoseSubMismatchObjCProperty(
-    const NamedDecl *FirstObjCContainer, StringRef FirstModule,
-    StringRef SecondModule, const ObjCPropertyDecl *FirstProp,
+    const NamedDecl *FirstObjCContainer, llvm::StringRef FirstModule,
+    llvm::StringRef SecondModule, const ObjCPropertyDecl *FirstProp,
     const ObjCPropertyDecl *SecondProp) const {
   enum ODRPropertyDifference {
     Name,
@@ -648,8 +648,8 @@ ODRDiagsEmitter::FindTypeDiffs(DeclHashes &FirstHashes,
 }
 
 void ODRDiagsEmitter::diagnoseSubMismatchUnexpected(
-    DiffResult &DR, const NamedDecl *FirstRecord, StringRef FirstModule,
-    const NamedDecl *SecondRecord, StringRef SecondModule) const {
+    DiffResult &DR, const NamedDecl *FirstRecord, llvm::StringRef FirstModule,
+    const NamedDecl *SecondRecord, llvm::StringRef SecondModule) const {
   Diag(FirstRecord->getLocation(),
        diag::err_module_odr_violation_different_definitions)
       << FirstRecord << FirstModule.empty() << FirstModule;
@@ -670,8 +670,8 @@ void ODRDiagsEmitter::diagnoseSubMismatchUnexpected(
 }
 
 void ODRDiagsEmitter::diagnoseSubMismatchDifferentDeclKinds(
-    DiffResult &DR, const NamedDecl *FirstRecord, StringRef FirstModule,
-    const NamedDecl *SecondRecord, StringRef SecondModule) const {
+    DiffResult &DR, const NamedDecl *FirstRecord, llvm::StringRef FirstModule,
+    const NamedDecl *SecondRecord, llvm::StringRef SecondModule) const {
   auto GetMismatchedDeclLoc = [](const NamedDecl *Container,
                                  ODRMismatchDecl DiffType, const Decl *D) {
     SourceLocation Loc;
@@ -745,7 +745,7 @@ bool ODRDiagsEmitter::diagnoseMismatch(
       unsigned NumBases = DD->NumBases;
       if (NumBases == 0)
         return SourceRange();
-      ArrayRef<CXXBaseSpecifier> bases = DD->bases();
+      llvm::ArrayRef<CXXBaseSpecifier> bases = DD->bases();
       return SourceRange(bases[0].getBeginLoc(),
                          bases[NumBases - 1].getEndLoc());
     };
@@ -774,8 +774,8 @@ bool ODRDiagsEmitter::diagnoseMismatch(
       return true;
     }
 
-    ArrayRef<CXXBaseSpecifier> FirstBases = FirstDD->bases();
-    ArrayRef<CXXBaseSpecifier> SecondBases = SecondDD->bases();
+    llvm::ArrayRef<CXXBaseSpecifier> FirstBases = FirstDD->bases();
+    llvm::ArrayRef<CXXBaseSpecifier> SecondBases = SecondDD->bases();
     for (unsigned I = 0; I < FirstNumBases; ++I) {
       const CXXBaseSpecifier FirstBase = FirstBases[I];
       const CXXBaseSpecifier SecondBase = SecondBases[I];
@@ -824,9 +824,9 @@ bool ODRDiagsEmitter::diagnoseMismatch(
          "Both pointers should be null or non-null");
 
   if (FirstTemplate && SecondTemplate) {
-    ArrayRef<const NamedDecl *> FirstTemplateParams =
+    llvm::ArrayRef<const NamedDecl *> FirstTemplateParams =
         FirstTemplate->getTemplateParameters()->asArray();
-    ArrayRef<const NamedDecl *> SecondTemplateParams =
+    llvm::ArrayRef<const NamedDecl *> SecondTemplateParams =
         SecondTemplate->getTemplateParameters()->asArray();
     assert(FirstTemplateParams.size() == SecondTemplateParams.size() &&
            "Number of template parameters should be equal.");

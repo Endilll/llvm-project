@@ -76,7 +76,7 @@ llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const IndexFileOut &O);
 
 // Convert a single symbol to YAML, a nice debug representation.
 std::string toYAML(const Symbol &);
-std::string toYAML(const std::pair<SymbolID, ArrayRef<Ref>> &);
+std::string toYAML(const std::pair<SymbolID, llvm::ArrayRef<Ref>> &);
 std::string toYAML(const Relation &);
 std::string toYAML(const Ref &);
 

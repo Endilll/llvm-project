@@ -24,7 +24,7 @@ class InitOnlyAction : public FrontendAction {
   void ExecuteAction() override;
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
 public:
   // Don't claim to only use the preprocessor, we want to follow the AST path,
@@ -37,7 +37,7 @@ class ReadPCHAndPreprocessAction : public FrontendAction {
   void ExecuteAction() override;
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
 public:
   bool usesPreprocessorOnly() const override { return false; }
@@ -45,7 +45,7 @@ public:
 
 class DumpCompilerOptionsAction : public FrontendAction {
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override {
+                                                 llvm::StringRef InFile) override {
     return nullptr;
   }
 
@@ -62,31 +62,31 @@ public:
 class ASTPrintAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 };
 
 class ASTDumpAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 };
 
 class ASTDeclListAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 };
 
 class ASTViewAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 };
 
 class GeneratePCHAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
   TranslationUnitKind getTranslationUnitKind() override {
     return TU_Prefix;
@@ -107,22 +107,22 @@ public:
   /// Creates file to write the PCH into and returns a stream to write it
   /// into. On error, returns null.
   static std::unique_ptr<llvm::raw_pwrite_stream>
-  CreateOutputFile(CompilerInstance &CI, StringRef InFile,
+  CreateOutputFile(CompilerInstance &CI, llvm::StringRef InFile,
                    std::string &OutputFile);
 
   bool BeginSourceFileAction(CompilerInstance &CI) override;
 };
 
 class GenerateModuleAction : public ASTFrontendAction {
-  virtual std::unique_ptr<raw_pwrite_stream>
-  CreateOutputFile(CompilerInstance &CI, StringRef InFile) = 0;
+  virtual std::unique_ptr<llvm::raw_pwrite_stream>
+  CreateOutputFile(CompilerInstance &CI, llvm::StringRef InFile) = 0;
 
 protected:
   std::vector<std::unique_ptr<ASTConsumer>>
-  CreateMultiplexConsumer(CompilerInstance &CI, StringRef InFile);
+  CreateMultiplexConsumer(CompilerInstance &CI, llvm::StringRef InFile);
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
   TranslationUnitKind getTranslationUnitKind() override {
     return TU_ClangModule;
@@ -136,7 +136,7 @@ protected:
 class GenerateInterfaceStubsAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
   TranslationUnitKind getTranslationUnitKind() override {
     return TU_ClangModule;
@@ -148,8 +148,8 @@ class GenerateModuleFromModuleMapAction : public GenerateModuleAction {
 private:
   bool BeginSourceFileAction(CompilerInstance &CI) override;
 
-  std::unique_ptr<raw_pwrite_stream>
-  CreateOutputFile(CompilerInstance &CI, StringRef InFile) override;
+  std::unique_ptr<llvm::raw_pwrite_stream>
+  CreateOutputFile(CompilerInstance &CI, llvm::StringRef InFile) override;
 };
 
 /// Generates full BMI (which contains full information to generate the object
@@ -159,12 +159,12 @@ protected:
   bool BeginSourceFileAction(CompilerInstance &CI) override;
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
   TranslationUnitKind getTranslationUnitKind() override { return TU_Complete; }
 
-  std::unique_ptr<raw_pwrite_stream>
-  CreateOutputFile(CompilerInstance &CI, StringRef InFile) override;
+  std::unique_ptr<llvm::raw_pwrite_stream>
+  CreateOutputFile(CompilerInstance &CI, llvm::StringRef InFile) override;
 };
 
 /// Only generates the reduced BMI. This action is mainly used by tests.
@@ -172,7 +172,7 @@ class GenerateReducedModuleInterfaceAction
     : public GenerateModuleInterfaceAction {
 private:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 };
 
 class GenerateHeaderUnitAction : public GenerateModuleAction {
@@ -180,14 +180,14 @@ class GenerateHeaderUnitAction : public GenerateModuleAction {
 private:
   bool BeginSourceFileAction(CompilerInstance &CI) override;
 
-  std::unique_ptr<raw_pwrite_stream>
-  CreateOutputFile(CompilerInstance &CI, StringRef InFile) override;
+  std::unique_ptr<llvm::raw_pwrite_stream>
+  CreateOutputFile(CompilerInstance &CI, llvm::StringRef InFile) override;
 };
 
 class SyntaxOnlyAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
 public:
   ~SyntaxOnlyAction() override;
@@ -202,7 +202,7 @@ class DumpModuleInfoAction : public ASTFrontendAction {
 
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
   bool BeginInvocation(CompilerInstance &CI) override;
   void ExecuteAction() override;
 
@@ -219,7 +219,7 @@ public:
 class VerifyPCHAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
   void ExecuteAction() override;
 
@@ -230,7 +230,7 @@ public:
 class TemplightDumpAction : public ASTFrontendAction {
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
   void ExecuteAction() override;
 };
@@ -252,7 +252,7 @@ class ASTMergeAction : public FrontendAction {
 
 protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
   bool BeginSourceFileAction(CompilerInstance &CI) override;
 
@@ -261,7 +261,7 @@ protected:
 
 public:
   ASTMergeAction(std::unique_ptr<FrontendAction> AdaptedAction,
-                 ArrayRef<std::string> ASTFiles);
+                 llvm::ArrayRef<std::string> ASTFiles);
   ~ASTMergeAction() override;
 
   bool usesPreprocessorOnly() const override;
@@ -275,7 +275,7 @@ class PrintPreambleAction : public FrontendAction {
 protected:
   void ExecuteAction() override;
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &,
-                                                 StringRef) override {
+                                                 llvm::StringRef) override {
     return nullptr;
   }
 
@@ -286,7 +286,7 @@ class PrintDependencyDirectivesSourceMinimizerAction : public FrontendAction {
 protected:
   void ExecuteAction() override;
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &,
-                                                 StringRef) override {
+                                                 llvm::StringRef) override {
     return nullptr;
   }
 
@@ -320,11 +320,11 @@ protected:
 };
 
 class GetDependenciesByModuleNameAction : public PreprocessOnlyAction {
-  StringRef ModuleName;
+  llvm::StringRef ModuleName;
   void ExecuteAction() override;
 
 public:
-  GetDependenciesByModuleNameAction(StringRef ModuleName)
+  GetDependenciesByModuleNameAction(llvm::StringRef ModuleName)
       : ModuleName(ModuleName) {}
 };
 

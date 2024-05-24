@@ -31,13 +31,13 @@ AST_MATCHER(FunctionDecl, hasOtherDeclarations) {
 }
 
 struct DifferingParamInfo {
-  DifferingParamInfo(StringRef SourceName, StringRef OtherName,
+  DifferingParamInfo(llvm::StringRef SourceName, llvm::StringRef OtherName,
                      SourceRange OtherNameRange, bool GenerateFixItHint)
       : SourceName(SourceName), OtherName(OtherName),
         OtherNameRange(OtherNameRange), GenerateFixItHint(GenerateFixItHint) {}
 
-  StringRef SourceName;
-  StringRef OtherName;
+  llvm::StringRef SourceName;
+  llvm::StringRef OtherName;
   SourceRange OtherNameRange;
   bool GenerateFixItHint;
 };
@@ -86,7 +86,7 @@ bool checkIfFixItHintIsApplicable(
   return true;
 }
 
-bool nameMatch(StringRef L, StringRef R, bool Strict) {
+bool nameMatch(llvm::StringRef L, llvm::StringRef R, bool Strict) {
   if (Strict)
     return L.empty() || R.empty() || L == R;
   // We allow two names if one is a prefix/suffix of the other, ignoring case.
@@ -192,7 +192,7 @@ getParameterSourceDeclaration(const FunctionDecl *OriginalDeclaration) {
 
 std::string joinParameterNames(
     const DifferingParamsContainer &DifferingParams,
-    llvm::function_ref<StringRef(const DifferingParamInfo &)> ChooseParamName) {
+    llvm::function_ref<llvm::StringRef(const DifferingParamInfo &)> ChooseParamName) {
   llvm::SmallString<40> Str;
   bool First = true;
   for (const DifferingParamInfo &ParamInfo : DifferingParams) {
@@ -207,7 +207,7 @@ std::string joinParameterNames(
 
 void formatDifferingParamsDiagnostic(
     InconsistentDeclarationParameterNameCheck *Check, SourceLocation Location,
-    StringRef OtherDeclarationDescription,
+    llvm::StringRef OtherDeclarationDescription,
     const DifferingParamsContainer &DifferingParams) {
   auto ChooseOtherName = [](const DifferingParamInfo &ParamInfo) {
     return ParamInfo.OtherName;
@@ -264,7 +264,7 @@ void formatDiagnostics(
     const FunctionDecl *ParameterSourceDeclaration,
     const FunctionDecl *OriginalDeclaration,
     const InconsistentDeclarationsContainer &InconsistentDeclarations,
-    StringRef FunctionDescription, StringRef ParameterSourceDescription) {
+    llvm::StringRef FunctionDescription, llvm::StringRef ParameterSourceDescription) {
   for (const InconsistentDeclarationInfo &InconsistentDeclaration :
        InconsistentDeclarations) {
     Check->diag(InconsistentDeclaration.DeclarationLocation,

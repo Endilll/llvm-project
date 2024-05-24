@@ -13,7 +13,7 @@ using namespace clang;
 using namespace ento;
 
 std::unique_ptr<ASTConsumer>
-AnalysisAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+AnalysisAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   return CreateAnalysisConsumer(CI);
 }
 
@@ -22,6 +22,6 @@ ParseModelFileAction::ParseModelFileAction(llvm::StringMap<Stmt *> &Bodies)
 
 std::unique_ptr<ASTConsumer>
 ParseModelFileAction::CreateASTConsumer(CompilerInstance &CI,
-                                        StringRef InFile) {
+                                        llvm::StringRef InFile) {
   return std::make_unique<ModelConsumer>(Bodies);
 }

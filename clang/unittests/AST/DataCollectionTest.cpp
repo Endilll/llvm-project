@@ -71,7 +71,7 @@ struct StmtHashMatch : public MatchFinder::MatchCallback {
 
 static testing::AssertionResult hashStmt(llvm::MD5::MD5Result &Hash,
                                          const StatementMatcher &StmtMatch,
-                                         StringRef Code) {
+                                         llvm::StringRef Code) {
   StmtHashMatch Hasher(Hash);
   MatchFinder Finder;
   Finder.addMatcher(StmtMatch, &Hasher);
@@ -91,8 +91,8 @@ static testing::AssertionResult hashStmt(llvm::MD5::MD5Result &Hash,
 }
 
 static testing::AssertionResult
-isStmtHashEqual(const StatementMatcher &StmtMatch, StringRef Code1,
-                StringRef Code2) {
+isStmtHashEqual(const StatementMatcher &StmtMatch, llvm::StringRef Code1,
+                llvm::StringRef Code2) {
   llvm::MD5::MD5Result Hash1, Hash2;
   testing::AssertionResult Result = hashStmt(Hash1, StmtMatch, Code1);
   if (!Result)

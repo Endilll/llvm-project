@@ -22,9 +22,9 @@ namespace riscv {
 void getRISCVTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                             const llvm::opt::ArgList &Args,
                             std::vector<llvm::StringRef> &Features);
-StringRef getRISCVABI(const llvm::opt::ArgList &Args,
+llvm::StringRef getRISCVABI(const llvm::opt::ArgList &Args,
                       const llvm::Triple &Triple);
-StringRef getRISCVArch(const llvm::opt::ArgList &Args,
+llvm::StringRef getRISCVArch(const llvm::opt::ArgList &Args,
                        const llvm::Triple &Triple);
 std::string getRISCVTargetCPU(const llvm::opt::ArgList &Args,
                               const llvm::Triple &Triple);

@@ -19,7 +19,7 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::cppcoreguidelines {
 
 MisleadingCaptureDefaultByValueCheck::MisleadingCaptureDefaultByValueCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context) {}
 
 void MisleadingCaptureDefaultByValueCheck::registerMatchers(

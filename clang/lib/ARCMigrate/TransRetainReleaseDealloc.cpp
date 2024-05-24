@@ -328,7 +328,7 @@ private:
     if (!Loc.isMacroID())
       return;
     SourceManager &SM = Pass.Ctx.getSourceManager();
-    StringRef MacroName = Lexer::getImmediateMacroName(Loc, SM,
+    llvm::StringRef MacroName = Lexer::getImmediateMacroName(Loc, SM,
                                                      Pass.Ctx.getLangOpts());
     bool isGCDOrXPC = llvm::StringSwitch<bool>(MacroName)
         .Case("dispatch_retain", true)

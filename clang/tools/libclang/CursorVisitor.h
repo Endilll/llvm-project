@@ -64,7 +64,7 @@ public:
   const CXCursor &getParent() const { return parent; }
 };
 
-typedef SmallVector<VisitorJob, 10> VisitorWorkList;
+typedef llvm::SmallVector<VisitorJob, 10> VisitorWorkList;
 
 // Cursor visitor.
 class CursorVisitor : public DeclVisitor<CursorVisitor, bool>,
@@ -115,12 +115,12 @@ private:
   // iteration over all Decls contained lexically within an ObjC container.
   DeclContext::decl_iterator *DI_current;
   DeclContext::decl_iterator DE_current;
-  SmallVectorImpl<Decl *>::iterator *FileDI_current;
-  SmallVectorImpl<Decl *>::iterator FileDE_current;
+  llvm::SmallVectorImpl<Decl *>::iterator *FileDI_current;
+  llvm::SmallVectorImpl<Decl *>::iterator FileDE_current;
 
   // Cache of pre-allocated worklists for data-recursion walk of Stmts.
-  SmallVector<VisitorWorkList *, 5> WorkListFreeList;
-  SmallVector<VisitorWorkList *, 5> WorkListCache;
+  llvm::SmallVector<VisitorWorkList *, 5> WorkListFreeList;
+  llvm::SmallVector<VisitorWorkList *, 5> WorkListCache;
 
   using DeclVisitor<CursorVisitor, bool>::Visit;
   using TypeLocVisitor<CursorVisitor, bool>::Visit;
@@ -175,7 +175,7 @@ public:
 
   ~CursorVisitor() {
     // Free the pre-allocated worklists for data-recursion.
-    for (SmallVectorImpl<VisitorWorkList *>::iterator I = WorkListCache.begin(),
+    for (llvm::SmallVectorImpl<VisitorWorkList *>::iterator I = WorkListCache.begin(),
                                                       E = WorkListCache.end();
          I != E; ++I) {
       delete *I;

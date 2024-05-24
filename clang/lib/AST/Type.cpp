@@ -791,15 +791,15 @@ bool Type::isObjCClassOrClassKindOfType() const {
 }
 
 ObjCTypeParamType::ObjCTypeParamType(const ObjCTypeParamDecl *D, QualType can,
-                                     ArrayRef<ObjCProtocolDecl *> protocols)
+                                     llvm::ArrayRef<ObjCProtocolDecl *> protocols)
     : Type(ObjCTypeParam, can, toSemanticDependence(can->getDependence())),
       OTPDecl(const_cast<ObjCTypeParamDecl *>(D)) {
   initialize(protocols);
 }
 
 ObjCObjectType::ObjCObjectType(QualType Canonical, QualType Base,
-                               ArrayRef<QualType> typeArgs,
-                               ArrayRef<ObjCProtocolDecl *> protocols,
+                               llvm::ArrayRef<QualType> typeArgs,
+                               llvm::ArrayRef<ObjCProtocolDecl *> protocols,
                                bool isKindOf)
     : Type(ObjCObject, Canonical, Base->getDependence()), BaseType(Base) {
   ObjCObjectTypeBits.IsKindOf = isKindOf;
@@ -837,7 +837,7 @@ bool ObjCObjectType::isSpecialized() const {
   return false;
 }
 
-ArrayRef<QualType> ObjCObjectType::getTypeArgs() const {
+llvm::ArrayRef<QualType> ObjCObjectType::getTypeArgs() const {
   // We have type arguments written on this type.
   if (isSpecializedAsWritten())
     return getTypeArgsAsWritten();
@@ -1112,7 +1112,7 @@ public:
       return {};
 
     // Transform parameter types.
-    SmallVector<QualType, 4> paramTypes;
+    llvm::SmallVector<QualType, 4> paramTypes;
     bool paramChanged = false;
     for (auto paramType : T->getParamTypes()) {
       QualType newParamType = recurse(paramType);
@@ -1129,7 +1129,7 @@ public:
     FunctionProtoType::ExtProtoInfo info = T->getExtProtoInfo();
     bool exceptionChanged = false;
     if (info.ExceptionSpec.Type == EST_Dynamic) {
-      SmallVector<QualType, 4> exceptionTypes;
+      llvm::SmallVector<QualType, 4> exceptionTypes;
       for (auto exceptionType : info.ExceptionSpec.Exceptions) {
         QualType newExceptionType = recurse(exceptionType);
         if (newExceptionType.isNull())
@@ -1277,7 +1277,7 @@ public:
 
     // Transform type arguments.
     bool typeArgChanged = false;
-    SmallVector<QualType, 4> typeArgs;
+    llvm::SmallVector<QualType, 4> typeArgs;
     for (auto typeArg : T->getTypeArgsAsWritten()) {
       QualType newTypeArg = recurse(typeArg);
       if (newTypeArg.isNull())
@@ -1333,10 +1333,10 @@ struct SubstObjCTypeArgsVisitor
     : public SimpleTransformVisitor<SubstObjCTypeArgsVisitor> {
   using BaseType = SimpleTransformVisitor<SubstObjCTypeArgsVisitor>;
 
-  ArrayRef<QualType> TypeArgs;
+  llvm::ArrayRef<QualType> TypeArgs;
   ObjCSubstitutionContext SubstContext;
 
-  SubstObjCTypeArgsVisitor(ASTContext &ctx, ArrayRef<QualType> typeArgs,
+  SubstObjCTypeArgsVisitor(ASTContext &ctx, llvm::ArrayRef<QualType> typeArgs,
                            ObjCSubstitutionContext context)
       : BaseType(ctx), TypeArgs(typeArgs), SubstContext(context) {}
 
@@ -1352,9 +1352,9 @@ struct SubstObjCTypeArgsVisitor
 
       // Apply protocol lists if exists.
       bool hasError;
-      SmallVector<ObjCProtocolDecl *, 8> protocolsVec;
+      llvm::SmallVector<ObjCProtocolDecl *, 8> protocolsVec;
       protocolsVec.append(OTPTy->qual_begin(), OTPTy->qual_end());
-      ArrayRef<ObjCProtocolDecl *> protocolsToApply = protocolsVec;
+      llvm::ArrayRef<ObjCProtocolDecl *> protocolsToApply = protocolsVec;
       return Ctx.applyObjCProtocolQualifiers(
           argType, protocolsToApply, hasError, true/*allowOnPointerType*/);
     }
@@ -1415,7 +1415,7 @@ struct SubstObjCTypeArgsVisitor
     const auto *funcProtoType = cast<FunctionProtoType>(funcType);
 
     // Transform parameter types.
-    SmallVector<QualType, 4> paramTypes;
+    llvm::SmallVector<QualType, 4> paramTypes;
     bool paramChanged = false;
     for (auto paramType : funcProtoType->getParamTypes()) {
       QualType newParamType = paramType.substObjCTypeArgs(
@@ -1433,7 +1433,7 @@ struct SubstObjCTypeArgsVisitor
     FunctionProtoType::ExtProtoInfo info = funcProtoType->getExtProtoInfo();
     bool exceptionChanged = false;
     if (info.ExceptionSpec.Type == EST_Dynamic) {
-      SmallVector<QualType, 4> exceptionTypes;
+      llvm::SmallVector<QualType, 4> exceptionTypes;
       for (auto exceptionType : info.ExceptionSpec.Exceptions) {
         QualType newExceptionType = exceptionType.substObjCTypeArgs(
             Ctx, TypeArgs, ObjCSubstitutionContext::Ordinary);
@@ -1464,7 +1464,7 @@ struct SubstObjCTypeArgsVisitor
     // Substitute into the type arguments of a specialized Objective-C object
     // type.
     if (objcObjectType->isSpecializedAsWritten()) {
-      SmallVector<QualType, 4> newTypeArgs;
+      llvm::SmallVector<QualType, 4> newTypeArgs;
       bool anyChanged = false;
       for (auto typeArg : objcObjectType->getTypeArgsAsWritten()) {
         QualType newTypeArg = typeArg.substObjCTypeArgs(
@@ -1475,7 +1475,7 @@ struct SubstObjCTypeArgsVisitor
         if (newTypeArg.getAsOpaquePtr() != typeArg.getAsOpaquePtr()) {
           // If we're substituting based on an unspecialized context type,
           // produce an unspecialized type.
-          ArrayRef<ObjCProtocolDecl *> protocols(
+          llvm::ArrayRef<ObjCProtocolDecl *> protocols(
               objcObjectType->qual_begin(), objcObjectType->getNumProtocols());
           if (TypeArgs.empty() &&
               SubstContext != ObjCSubstitutionContext::Superclass) {
@@ -1491,7 +1491,7 @@ struct SubstObjCTypeArgsVisitor
       }
 
       if (anyChanged) {
-        ArrayRef<ObjCProtocolDecl *> protocols(
+        llvm::ArrayRef<ObjCProtocolDecl *> protocols(
             objcObjectType->qual_begin(), objcObjectType->getNumProtocols());
         return Ctx.getObjCObjectType(objcObjectType->getBaseType(), newTypeArgs,
                                      protocols,
@@ -1594,7 +1594,7 @@ bool QualType::UseExcessPrecision(const ASTContext &Ctx) {
 /// Substitute the given type arguments for Objective-C type
 /// parameters within the given type, recursively.
 QualType QualType::substObjCTypeArgs(ASTContext &ctx,
-                                     ArrayRef<QualType> typeArgs,
+                                     llvm::ArrayRef<QualType> typeArgs,
                                      ObjCSubstitutionContext context) const {
   SubstObjCTypeArgsVisitor visitor(ctx, typeArgs, context);
   return visitor.recurse(*this);
@@ -1622,7 +1622,7 @@ QualType QualType::getAtomicUnqualifiedType() const {
   return getUnqualifiedType();
 }
 
-std::optional<ArrayRef<QualType>>
+std::optional<llvm::ArrayRef<QualType>>
 Type::getObjCSubstitutions(const DeclContext *dc) const {
   // Look through method scopes.
   if (const auto method = dyn_cast<ObjCMethodDecl>(dc))
@@ -1776,7 +1776,7 @@ void ObjCObjectType::computeSuperClassTypeSlow() const {
   }
 
   // Substitute the provided type arguments into the superclass type.
-  ArrayRef<QualType> typeArgs = getTypeArgs();
+  llvm::ArrayRef<QualType> typeArgs = getTypeArgs();
   assert(typeArgs.size() == typeParams->size());
   CachedSuperClassType.setPointerAndInt(
     superClassType.substObjCTypeArgs(classDecl->getASTContext(), typeArgs,
@@ -3209,7 +3209,7 @@ TypeWithKeyword::KeywordIsTagTypeKind(ElaboratedTypeKeyword Keyword) {
   llvm_unreachable("Unknown elaborated type keyword.");
 }
 
-StringRef TypeWithKeyword::getKeywordName(ElaboratedTypeKeyword Keyword) {
+llvm::StringRef TypeWithKeyword::getKeywordName(ElaboratedTypeKeyword Keyword) {
   switch (Keyword) {
   case ElaboratedTypeKeyword::None:
     return {};
@@ -3232,7 +3232,7 @@ StringRef TypeWithKeyword::getKeywordName(ElaboratedTypeKeyword Keyword) {
 
 DependentTemplateSpecializationType::DependentTemplateSpecializationType(
     ElaboratedTypeKeyword Keyword, NestedNameSpecifier *NNS,
-    const IdentifierInfo *Name, ArrayRef<TemplateArgument> Args, QualType Canon)
+    const IdentifierInfo *Name, llvm::ArrayRef<TemplateArgument> Args, QualType Canon)
     : TypeWithKeyword(Keyword, DependentTemplateSpecialization, Canon,
                       TypeDependence::DependentInstantiation |
                           (NNS ? toTypeDependence(NNS->getDependence())
@@ -3256,7 +3256,7 @@ DependentTemplateSpecializationType::Profile(llvm::FoldingSetNodeID &ID,
                                              ElaboratedTypeKeyword Keyword,
                                              NestedNameSpecifier *Qualifier,
                                              const IdentifierInfo *Name,
-                                             ArrayRef<TemplateArgument> Args) {
+                                             llvm::ArrayRef<TemplateArgument> Args) {
   ID.AddInteger(llvm::to_underlying(Keyword));
   ID.AddPointer(Qualifier);
   ID.AddPointer(Name);
@@ -3289,7 +3289,7 @@ const char *Type::getTypeClassName() const {
   llvm_unreachable("Invalid type class.");
 }
 
-StringRef BuiltinType::getName(const PrintingPolicy &Policy) const {
+llvm::StringRef BuiltinType::getName(const PrintingPolicy &Policy) const {
   switch (getKind()) {
   case Void:
     return "void";
@@ -3490,7 +3490,7 @@ QualType QualType::getNonLValueExprType(const ASTContext &Context) const {
   return *this;
 }
 
-StringRef FunctionType::getNameForCallConv(CallingConv CC) {
+llvm::StringRef FunctionType::getNameForCallConv(CallingConv CC) {
   switch (CC) {
   case CC_C: return "cdecl";
   case CC_X86StdCall: return "stdcall";
@@ -3530,7 +3530,7 @@ void FunctionProtoType::ExceptionSpecInfo::instantiate() {
   Type = EST_DependentNoexcept;
 }
 
-FunctionProtoType::FunctionProtoType(QualType result, ArrayRef<QualType> params,
+FunctionProtoType::FunctionProtoType(QualType result, llvm::ArrayRef<QualType> params,
                                      QualType canonical,
                                      const ExtProtoInfo &epi)
     : FunctionType(FunctionProto, result, canonical, result->getDependence(),
@@ -3811,7 +3811,7 @@ BoundsAttributedType::BoundsAttributedType(TypeClass TC, QualType Wrapped,
 
 CountAttributedType::CountAttributedType(
     QualType Wrapped, QualType Canon, Expr *CountExpr, bool CountInBytes,
-    bool OrNull, ArrayRef<TypeCoupledDeclRefInfo> CoupledDecls)
+    bool OrNull, llvm::ArrayRef<TypeCoupledDeclRefInfo> CoupledDecls)
     : BoundsAttributedType(CountAttributed, Wrapped, Canon),
       CountExpr(CountExpr) {
   CountAttributedTypeBits.NumCoupledDecls = CoupledDecls.size();
@@ -3933,7 +3933,7 @@ void DependentDecltypeType::Profile(llvm::FoldingSetNodeID &ID,
 PackIndexingType::PackIndexingType(const ASTContext &Context,
                                    QualType Canonical, QualType Pattern,
                                    Expr *IndexExpr,
-                                   ArrayRef<QualType> Expansions)
+                                   llvm::ArrayRef<QualType> Expansions)
     : Type(PackIndexing, Canonical,
            computeDependence(Pattern, IndexExpr, Expansions)),
       Context(Context), Pattern(Pattern), IndexExpr(IndexExpr),
@@ -3957,7 +3957,7 @@ std::optional<unsigned> PackIndexingType::getSelectedIndex() const {
 
 TypeDependence
 PackIndexingType::computeDependence(QualType Pattern, Expr *IndexExpr,
-                                    ArrayRef<QualType> Expansions) {
+                                    llvm::ArrayRef<QualType> Expansions) {
   TypeDependence IndexD = toTypeDependence(IndexExpr->getDependence());
 
   TypeDependence TD = IndexD | (IndexExpr->isInstantiationDependent()
@@ -4202,12 +4202,12 @@ void SubstTemplateTypeParmPackType::Profile(llvm::FoldingSetNodeID &ID,
 }
 
 bool TemplateSpecializationType::anyDependentTemplateArguments(
-    const TemplateArgumentListInfo &Args, ArrayRef<TemplateArgument> Converted) {
+    const TemplateArgumentListInfo &Args, llvm::ArrayRef<TemplateArgument> Converted) {
   return anyDependentTemplateArguments(Args.arguments(), Converted);
 }
 
 bool TemplateSpecializationType::anyDependentTemplateArguments(
-    ArrayRef<TemplateArgumentLoc> Args, ArrayRef<TemplateArgument> Converted) {
+    llvm::ArrayRef<TemplateArgumentLoc> Args, llvm::ArrayRef<TemplateArgument> Converted) {
   for (const TemplateArgument &Arg : Converted)
     if (Arg.isDependent())
       return true;
@@ -4215,7 +4215,7 @@ bool TemplateSpecializationType::anyDependentTemplateArguments(
 }
 
 bool TemplateSpecializationType::anyInstantiationDependentTemplateArguments(
-      ArrayRef<TemplateArgumentLoc> Args) {
+      llvm::ArrayRef<TemplateArgumentLoc> Args) {
   for (const TemplateArgumentLoc &ArgLoc : Args) {
     if (ArgLoc.getArgument().isInstantiationDependent())
       return true;
@@ -4224,7 +4224,7 @@ bool TemplateSpecializationType::anyInstantiationDependentTemplateArguments(
 }
 
 TemplateSpecializationType::TemplateSpecializationType(
-    TemplateName T, ArrayRef<TemplateArgument> Args, QualType Canon,
+    TemplateName T, llvm::ArrayRef<TemplateArgument> Args, QualType Canon,
     QualType AliasedType)
     : Type(TemplateSpecialization, Canon.isNull() ? QualType(this, 0) : Canon,
            (Canon.isNull()
@@ -4284,7 +4284,7 @@ void TemplateSpecializationType::Profile(llvm::FoldingSetNodeID &ID,
 void
 TemplateSpecializationType::Profile(llvm::FoldingSetNodeID &ID,
                                     TemplateName T,
-                                    ArrayRef<TemplateArgument> Args,
+                                    llvm::ArrayRef<TemplateArgument> Args,
                                     const ASTContext &Context) {
   T.Profile(ID);
   for (const TemplateArgument &Arg : Args)
@@ -4309,8 +4309,8 @@ QualifierCollector::apply(const ASTContext &Context, const Type *T) const {
 
 void ObjCObjectTypeImpl::Profile(llvm::FoldingSetNodeID &ID,
                                  QualType BaseType,
-                                 ArrayRef<QualType> typeArgs,
-                                 ArrayRef<ObjCProtocolDecl *> protocols,
+                                 llvm::ArrayRef<QualType> typeArgs,
+                                 llvm::ArrayRef<ObjCProtocolDecl *> protocols,
                                  bool isKindOf) {
   ID.AddPointer(BaseType.getAsOpaquePtr());
   ID.AddInteger(typeArgs.size());
@@ -4331,7 +4331,7 @@ void ObjCObjectTypeImpl::Profile(llvm::FoldingSetNodeID &ID) {
 void ObjCTypeParamType::Profile(llvm::FoldingSetNodeID &ID,
                                 const ObjCTypeParamDecl *OTPDecl,
                                 QualType CanonicalType,
-                                ArrayRef<ObjCProtocolDecl *> protocols) {
+                                llvm::ArrayRef<ObjCProtocolDecl *> protocols) {
   ID.AddPointer(OTPDecl);
   ID.AddPointer(CanonicalType.getAsOpaquePtr());
   ID.AddInteger(protocols.size());
@@ -4993,7 +4993,7 @@ CXXRecordDecl *MemberPointerType::getMostRecentCXXRecordDecl() const {
   return getClass()->getAsCXXRecordDecl()->getMostRecentNonInjectedDecl();
 }
 
-void clang::FixedPointValueToString(SmallVectorImpl<char> &Str,
+void clang::FixedPointValueToString(llvm::SmallVectorImpl<char> &Str,
                                     llvm::APSInt Val, unsigned Scale) {
   llvm::FixedPointSemantics FXSema(Val.getBitWidth(), Scale, Val.isSigned(),
                                    /*IsSaturated=*/false,
@@ -5004,7 +5004,7 @@ void clang::FixedPointValueToString(SmallVectorImpl<char> &Str,
 AutoType::AutoType(QualType DeducedAsType, AutoTypeKeyword Keyword,
                    TypeDependence ExtraDependence, QualType Canon,
                    ConceptDecl *TypeConstraintConcept,
-                   ArrayRef<TemplateArgument> TypeConstraintArgs)
+                   llvm::ArrayRef<TemplateArgument> TypeConstraintArgs)
     : DeducedType(Auto, DeducedAsType, ExtraDependence, Canon) {
   AutoTypeBits.Keyword = llvm::to_underlying(Keyword);
   AutoTypeBits.NumArgs = TypeConstraintArgs.size();
@@ -5027,7 +5027,7 @@ AutoType::AutoType(QualType DeducedAsType, AutoTypeKeyword Keyword,
 void AutoType::Profile(llvm::FoldingSetNodeID &ID, const ASTContext &Context,
                       QualType Deduced, AutoTypeKeyword Keyword,
                       bool IsDependent, ConceptDecl *CD,
-                      ArrayRef<TemplateArgument> Arguments) {
+                      llvm::ArrayRef<TemplateArgument> Arguments) {
   ID.AddPointer(Deduced.getAsOpaquePtr());
   ID.AddInteger((unsigned)Keyword);
   ID.AddBoolean(IsDependent);

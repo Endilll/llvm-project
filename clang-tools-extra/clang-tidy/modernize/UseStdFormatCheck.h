@@ -23,7 +23,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-std-format.html
 class UseStdFormatCheck : public ClangTidyCheck {
 public:
-  UseStdFormatCheck(StringRef Name, ClangTidyContext *Context);
+  UseStdFormatCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     if (ReplacementFormatFunction == "std::format")
       return LangOpts.CPlusPlus20;
@@ -40,10 +40,10 @@ public:
 
 private:
   bool StrictMode;
-  std::vector<StringRef> StrFormatLikeFunctions;
-  StringRef ReplacementFormatFunction;
+  std::vector<llvm::StringRef> StrFormatLikeFunctions;
+  llvm::StringRef ReplacementFormatFunction;
   utils::IncludeInserter IncludeInserter;
-  std::optional<StringRef> MaybeHeaderToInclude;
+  std::optional<llvm::StringRef> MaybeHeaderToInclude;
 };
 
 } // namespace clang::tidy::modernize

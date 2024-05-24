@@ -87,7 +87,7 @@ TypeResult Parser::ParseTypeName(SourceRange *Range, DeclaratorContext Context,
 }
 
 /// Normalizes an attribute name by dropping prefixed and suffixed __.
-static StringRef normalizeAttrName(StringRef Name) {
+static llvm::StringRef normalizeAttrName(llvm::StringRef Name) {
   if (Name.size() >= 4 && Name.starts_with("__") && Name.ends_with("__"))
     return Name.drop_front(2).drop_back(2);
   return Name;
@@ -296,7 +296,7 @@ void Parser::ParseGNUAttributes(ParsedAttributes &Attrs,
     if (!SM.isWrittenInBuiltinFile(SM.getSpellingLoc(AttrTokLoc)) &&
         FindLocsWithCommonFileID(PP, AttrTokLoc, Loc)) {
       CharSourceRange ExpansionRange = SM.getExpansionRange(AttrTokLoc);
-      StringRef FoundName =
+      llvm::StringRef FoundName =
           Lexer::getSourceText(ExpansionRange, SM, PP.getLangOpts());
       IdentifierInfo *MacroII = PP.getIdentifierInfo(FoundName);
 
@@ -433,7 +433,7 @@ Parser::ParseUnevaluatedStringInAttribute(const IdentifierInfo &AttrName) {
 }
 
 bool Parser::ParseAttributeArgumentList(
-    const IdentifierInfo &AttrName, SmallVectorImpl<Expr *> &Exprs,
+    const IdentifierInfo &AttrName, llvm::SmallVectorImpl<Expr *> &Exprs,
     ParsedAttributeArgumentsProperties ArgsProperties) {
   bool SawError = false;
   unsigned Arg = 0;
@@ -783,7 +783,7 @@ bool Parser::ParseMicrosoftDeclSpecArgs(IdentifierInfo *AttrName,
 
       AccessorKind Kind;
       SourceLocation KindLoc = Tok.getLocation();
-      StringRef KindStr = Tok.getIdentifierInfo()->getName();
+      llvm::StringRef KindStr = Tok.getIdentifierInfo()->getName();
       if (KindStr == "get") {
         Kind = AK_Get;
       } else if (KindStr == "put") {
@@ -922,9 +922,9 @@ void Parser::ParseMicrosoftDeclSpecs(ParsedAttributes &Attrs) {
       IdentifierInfo *AttrName;
       SourceLocation AttrNameLoc;
       if (IsString) {
-        SmallString<8> StrBuffer;
+        llvm::SmallString<8> StrBuffer;
         bool Invalid = false;
-        StringRef Str = PP.getSpelling(Tok, StrBuffer, &Invalid);
+        llvm::StringRef Str = PP.getSpelling(Tok, StrBuffer, &Invalid);
         if (Invalid) {
           T.skipToEnd();
           return;
@@ -1120,21 +1120,21 @@ static bool VersionNumberSeparator(const char Separator) {
 ///   simple-integer '_' simple-integer
 ///   simple-integer '.' simple-integer '.' simple-integer
 ///   simple-integer '_' simple-integer '_' simple-integer
-VersionTuple Parser::ParseVersionTuple(SourceRange &Range) {
+llvm::VersionTuple Parser::ParseVersionTuple(SourceRange &Range) {
   Range = SourceRange(Tok.getLocation(), Tok.getEndLoc());
 
   if (!Tok.is(tok::numeric_constant)) {
     Diag(Tok, diag::err_expected_version);
     SkipUntil(tok::comma, tok::r_paren,
               StopAtSemi | StopBeforeMatch | StopAtCodeCompletion);
-    return VersionTuple();
+    return llvm::VersionTuple();
   }
 
   // Parse the major (and possibly minor and subminor) versions, which
   // are stored in the numeric constant. We utilize a quirk of the
   // lexer, which is that it handles something like 1.2.3 as a single
   // numeric constant, rather than two separate tokens.
-  SmallString<512> Buffer;
+  llvm::SmallString<512> Buffer;
   Buffer.resize(Tok.getLength()+1);
   const char *ThisTokBegin = &Buffer[0];
 
@@ -1142,7 +1142,7 @@ VersionTuple Parser::ParseVersionTuple(SourceRange &Range) {
   bool Invalid = false;
   unsigned ActualLength = PP.getSpelling(Tok, ThisTokBegin, &Invalid);
   if (Invalid)
-    return VersionTuple();
+    return llvm::VersionTuple();
 
   // Parse the major version.
   unsigned AfterMajor = 0;
@@ -1156,7 +1156,7 @@ VersionTuple Parser::ParseVersionTuple(SourceRange &Range) {
     Diag(Tok, diag::err_expected_version);
     SkipUntil(tok::comma, tok::r_paren,
               StopAtSemi | StopBeforeMatch | StopAtCodeCompletion);
-    return VersionTuple();
+    return llvm::VersionTuple();
   }
 
   if (AfterMajor == ActualLength) {
@@ -1165,10 +1165,10 @@ VersionTuple Parser::ParseVersionTuple(SourceRange &Range) {
     // We only had a single version component.
     if (Major == 0) {
       Diag(Tok, diag::err_zero_version);
-      return VersionTuple();
+      return llvm::VersionTuple();
     }
 
-    return VersionTuple(Major);
+    return llvm::VersionTuple(Major);
   }
 
   const char AfterMajorSeparator = ThisTokBegin[AfterMajor];
@@ -1177,7 +1177,7 @@ VersionTuple Parser::ParseVersionTuple(SourceRange &Range) {
     Diag(Tok, diag::err_expected_version);
     SkipUntil(tok::comma, tok::r_paren,
               StopAtSemi | StopBeforeMatch | StopAtCodeCompletion);
-    return VersionTuple();
+    return llvm::VersionTuple();
   }
 
   // Parse the minor version.
@@ -1194,10 +1194,10 @@ VersionTuple Parser::ParseVersionTuple(SourceRange &Range) {
     // We had major.minor.
     if (Major == 0 && Minor == 0) {
       Diag(Tok, diag::err_zero_version);
-      return VersionTuple();
+      return llvm::VersionTuple();
     }
 
-    return VersionTuple(Major, Minor);
+    return llvm::VersionTuple(Major, Minor);
   }
 
   const char AfterMinorSeparator = ThisTokBegin[AfterMinor];
@@ -1206,7 +1206,7 @@ VersionTuple Parser::ParseVersionTuple(SourceRange &Range) {
     Diag(Tok, diag::err_expected_version);
     SkipUntil(tok::comma, tok::r_paren,
               StopAtSemi | StopBeforeMatch | StopAtCodeCompletion);
-    return VersionTuple();
+    return llvm::VersionTuple();
   }
 
   // Warn if separators, be it '.' or '_', do not match.
@@ -1225,10 +1225,10 @@ VersionTuple Parser::ParseVersionTuple(SourceRange &Range) {
     Diag(Tok, diag::err_expected_version);
     SkipUntil(tok::comma, tok::r_paren,
               StopAtSemi | StopBeforeMatch | StopAtCodeCompletion);
-    return VersionTuple();
+    return llvm::VersionTuple();
   }
   ConsumeToken();
-  return VersionTuple(Major, Minor, Subminor);
+  return llvm::VersionTuple(Major, Minor, Subminor);
 }
 
 /// Parse the contents of the "availability" attribute.
@@ -1355,7 +1355,7 @@ void Parser::ParseAvailabilityAttribute(
 
       Changes[Deprecated].KeywordLoc = KeywordLoc;
       // Use a fake version here.
-      Changes[Deprecated].Version = VersionTuple(1);
+      Changes[Deprecated].Version = llvm::VersionTuple(1);
       continue;
     }
 
@@ -1411,7 +1411,7 @@ void Parser::ParseAvailabilityAttribute(
     }
 
     SourceRange VersionRange;
-    VersionTuple Version = ParseVersionTuple(VersionRange);
+    llvm::VersionTuple Version = ParseVersionTuple(VersionRange);
 
     if (Version.empty()) {
       SkipUntil(tok::r_paren, StopAtSemi);
@@ -2470,7 +2470,7 @@ Parser::DeclGroupPtrTy Parser::ParseDeclGroup(ParsingDeclSpec &DS,
     return Actions.FinalizeDeclaratorGroup(getCurScope(), DS, ThisDecl);
   }
 
-  SmallVector<Decl *, 8> DeclsInGroup;
+  llvm::SmallVector<Decl *, 8> DeclsInGroup;
   Decl *FirstDecl =
       ParseDeclarationAfterDeclaratorAndAttributes(D, TemplateInfo, FRI);
   if (LateParsedAttrs.size() > 0)
@@ -2771,7 +2771,7 @@ Decl *Parser::ParseDeclarationAfterDeclaratorAndAttributes(
       }
 
       if (Init.isInvalid()) {
-        SmallVector<tok::TokenKind, 2> StopTokens;
+        llvm::SmallVector<tok::TokenKind, 2> StopTokens;
         StopTokens.push_back(tok::comma);
         if (D.getContext() == DeclaratorContext::ForInit ||
             D.getContext() == DeclaratorContext::SelectionInit)
@@ -3242,7 +3242,7 @@ Parser::getDeclSpecContextFromDeclaratorContext(DeclaratorContext Context) {
 /// [C11]   constant-expression
 /// [C++0x] type-id ...[opt]
 /// [C++0x] assignment-expression ...[opt]
-ExprResult Parser::ParseAlignArgument(StringRef KWName, SourceLocation Start,
+ExprResult Parser::ParseAlignArgument(llvm::StringRef KWName, SourceLocation Start,
                                       SourceLocation &EllipsisLoc, bool &IsType,
                                       ParsedType &TypeResult) {
   ExprResult ER;
@@ -3569,10 +3569,10 @@ void Parser::ParseDeclarationSpecifiers(
     SourceLocation Loc = Tok.getLocation();
 
     // Helper for image types in OpenCL.
-    auto handleOpenCLImageKW = [&] (StringRef Ext, TypeSpecifierType ImageTypeSpec) {
+    auto handleOpenCLImageKW = [&] (llvm::StringRef Ext, TypeSpecifierType ImageTypeSpec) {
       // Check if the image type is supported and otherwise turn the keyword into an identifier
       // because image types from extensions are not reserved identifiers.
-      if (!StringRef(Ext).empty() && !getActions().getOpenCLOptions().isSupported(Ext, getLangOpts())) {
+      if (!llvm::StringRef(Ext).empty() && !getActions().getOpenCLOptions().isSupported(Ext, getLangOpts())) {
         Tok.getIdentifierInfo()->revertTokenIDToIdentifier();
         Tok.setKind(tok::identifier);
         return false;
@@ -5033,7 +5033,7 @@ void Parser::ParseStructUnionBody(SourceLocation RecordLoc,
         SkipUntil(tok::semi);
         continue;
       }
-      SmallVector<Decl *, 16> Fields;
+      llvm::SmallVector<Decl *, 16> Fields;
       Actions.ObjC().ActOnDefs(getCurScope(), TagDecl, Tok.getLocation(),
                                Tok.getIdentifierInfo(), Fields);
       ConsumeToken();
@@ -5061,7 +5061,7 @@ void Parser::ParseStructUnionBody(SourceLocation RecordLoc,
   // If attributes exist after struct contents, parse them.
   MaybeParseGNUAttributes(attrs);
 
-  SmallVector<Decl *, 32> FieldDecls(TagDecl->fields());
+  llvm::SmallVector<Decl *, 32> FieldDecls(TagDecl->fields());
 
   Actions.ActOnFields(getCurScope(), RecordLoc, TagDecl, FieldDecls,
                       T.getOpenLocation(), T.getCloseLocation(), attrs);
@@ -5505,8 +5505,8 @@ void Parser::ParseEnumBody(SourceLocation StartLoc, Decl *EnumDecl) {
   if (Tok.is(tok::r_brace) && !getLangOpts().CPlusPlus)
     Diag(Tok, diag::err_empty_enum);
 
-  SmallVector<Decl *, 32> EnumConstantDecls;
-  SmallVector<SuppressAccessChecks, 32> EnumAvailabilityDiags;
+  llvm::SmallVector<Decl *, 32> EnumConstantDecls;
+  llvm::SmallVector<SuppressAccessChecks, 32> EnumAvailabilityDiags;
 
   Decl *LastEnumConstDecl = nullptr;
 
@@ -5848,7 +5848,7 @@ Parser::DeclGroupPtrTy Parser::ParseTopLevelStmtDecl() {
     TLSD->setSemiMissing();
   }
 
-  SmallVector<Decl *, 2> DeclsInGroup;
+  llvm::SmallVector<Decl *, 2> DeclsInGroup;
   DeclsInGroup.push_back(TLSD);
 
   // Currently happens for things like -fms-extensions and use `__if_exists`.
@@ -7118,7 +7118,7 @@ void Parser::ParseDecompositionDeclarator(Declarator &D) {
     return ParseMisplacedBracketDeclarator(D);
   }
 
-  SmallVector<DecompositionDeclarator::Binding, 32> Bindings;
+  llvm::SmallVector<DecompositionDeclarator::Binding, 32> Bindings;
   while (Tok.isNot(tok::r_square)) {
     if (!Bindings.empty()) {
       if (Tok.is(tok::comma))
@@ -7369,7 +7369,7 @@ void Parser::ParseFunctionDeclarator(Declarator &D,
   // Otherwise, it is treated as a K&R-style function.
   bool HasProto = false;
   // Build up an array of information about the parsed arguments.
-  SmallVector<DeclaratorChunk::ParamInfo, 16> ParamInfo;
+  llvm::SmallVector<DeclaratorChunk::ParamInfo, 16> ParamInfo;
   // Remember where we see an ellipsis, if any.
   SourceLocation EllipsisLoc;
 
@@ -7378,8 +7378,8 @@ void Parser::ParseFunctionDeclarator(Declarator &D,
   SourceLocation RefQualifierLoc;
   ExceptionSpecificationType ESpecType = EST_None;
   SourceRange ESpecRange;
-  SmallVector<ParsedType, 2> DynamicExceptions;
-  SmallVector<SourceRange, 2> DynamicExceptionRanges;
+  llvm::SmallVector<ParsedType, 2> DynamicExceptions;
+  llvm::SmallVector<SourceRange, 2> DynamicExceptionRanges;
   ExprResult NoexceptExpr;
   CachedTokens *ExceptionSpecTokens = nullptr;
   ParsedAttributes FnAttrs(AttrFactory);
@@ -7517,7 +7517,7 @@ void Parser::ParseFunctionDeclarator(Declarator &D,
   // declaration. They will be moved into the scope of the function. Only do
   // this in C and not C++, where the decls will continue to live in the
   // surrounding context.
-  SmallVector<NamedDecl *, 0> DeclsInPrototype;
+  llvm::SmallVector<NamedDecl *, 0> DeclsInPrototype;
   if (getCurScope()->isFunctionDeclarationScope() && !getLangOpts().CPlusPlus) {
     for (Decl *D : getCurScope()->decls()) {
       NamedDecl *ND = dyn_cast<NamedDecl>(D);
@@ -7606,7 +7606,7 @@ bool Parser::isFunctionDeclaratorIdentifierList() {
 ///
 void Parser::ParseFunctionDeclaratorIdentifierList(
        Declarator &D,
-       SmallVectorImpl<DeclaratorChunk::ParamInfo> &ParamInfo) {
+       llvm::SmallVectorImpl<DeclaratorChunk::ParamInfo> &ParamInfo) {
   // We should never reach this point in C23 or C++.
   assert(!getLangOpts().requiresStrictPrototypes() &&
          "Cannot parse an identifier list in C23 or C++");
@@ -7687,7 +7687,7 @@ void Parser::ParseFunctionDeclaratorIdentifierList(
 ///
 void Parser::ParseParameterDeclarationClause(
     DeclaratorContext DeclaratorCtx, ParsedAttributes &FirstArgAttrs,
-    SmallVectorImpl<DeclaratorChunk::ParamInfo> &ParamInfo,
+    llvm::SmallVectorImpl<DeclaratorChunk::ParamInfo> &ParamInfo,
     SourceLocation &EllipsisLoc, bool IsACXXFunctionDeclaration) {
 
   // Avoid exceeding the maximum function scope depth.
@@ -8371,10 +8371,10 @@ bool Parser::TryAltiVecTokenOutOfLine(DeclSpec &DS, SourceLocation Loc,
   return false;
 }
 
-TypeResult Parser::ParseTypeFromString(StringRef TypeStr, StringRef Context,
+TypeResult Parser::ParseTypeFromString(llvm::StringRef TypeStr, llvm::StringRef Context,
                                        SourceLocation IncludeLoc) {
   // Consume (unexpanded) tokens up to the end-of-directive.
-  SmallVector<Token, 4> Tokens;
+  llvm::SmallVector<Token, 4> Tokens;
   {
     // Create a new buffer from which we will parse the type.
     auto &SourceMgr = PP.getSourceManager();

@@ -15,7 +15,7 @@
 
 namespace clang::tidy {
 
-void ClangTidyCheckFactories::registerCheckFactory(StringRef Name,
+void ClangTidyCheckFactories::registerCheckFactory(llvm::StringRef Name,
                                                    CheckFactory Factory) {
   Factories.insert_or_assign(Name, std::move(Factory));
 }

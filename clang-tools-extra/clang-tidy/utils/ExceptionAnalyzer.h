@@ -58,7 +58,7 @@ public:
     /// thrown.
     void registerException(const Type *ExceptionType);
 
-    /// Registers a `SmallVector` of exception types as recognized potential
+    /// Registers a `llvm::SmallVector` of exception types as recognized potential
     /// exceptions to be thrown.
     void registerExceptions(const Throwables &Exceptions);
 

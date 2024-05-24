@@ -56,10 +56,10 @@ class MacroBuilder;
 /// Contains information gathered from parsing the contents of TargetAttr.
 struct ParsedTargetAttr {
   std::vector<std::string> Features;
-  StringRef CPU;
-  StringRef Tune;
-  StringRef BranchProtection;
-  StringRef Duplicate;
+  llvm::StringRef CPU;
+  llvm::StringRef Tune;
+  llvm::StringRef BranchProtection;
+  llvm::StringRef Duplicate;
   bool operator ==(const ParsedTargetAttr &Other) const {
     return Duplicate == Other.Duplicate && CPU == Other.CPU &&
            Tune == Other.Tune && BranchProtection == Other.BranchProtection &&
@@ -215,7 +215,7 @@ enum OpenCLTypeKind : uint8_t {
 /// Exposes information about the current target.
 ///
 class TargetInfo : public TransferrableTargetInfo,
-                   public RefCountedBase<TargetInfo> {
+                   public llvm::RefCountedBase<TargetInfo> {
   std::shared_ptr<TargetOptions> TargetOpts;
   llvm::Triple Triple;
 protected:
@@ -247,8 +247,8 @@ protected:
   TargetCXXABI TheCXXABI;
   const LangASMap *AddrSpaceMap;
 
-  mutable StringRef PlatformName;
-  mutable VersionTuple PlatformMinVersion;
+  mutable llvm::StringRef PlatformName;
+  mutable llvm::VersionTuple PlatformMinVersion;
 
   LLVM_PREFERRED_TYPE(bool)
   unsigned HasAlignMac68kSupport : 1;
@@ -288,7 +288,7 @@ protected:
 
   // UserLabelPrefix must match DL's getGlobalPrefix() when interpreted
   // as a DataLayout object.
-  void resetDataLayout(StringRef DL, const char *UserLabelPrefix = "");
+  void resetDataLayout(llvm::StringRef DL, const char *UserLabelPrefix = "");
 
   // Target features that are read-only and should not be disabled/enabled
   // by command line options. Such features are for emitting predefined
@@ -1010,7 +1010,7 @@ public:
   /// Return information about target-specific builtins for
   /// the current primary target, and info about which builtins are non-portable
   /// across the current set of primary and secondary targets.
-  virtual ArrayRef<Builtin::Info> getTargetBuiltins() const = 0;
+  virtual llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const = 0;
 
   /// Returns target-specific min and max values VScale_Range.
   virtual std::optional<std::pair<unsigned, unsigned>>
@@ -1055,23 +1055,23 @@ public:
   /// inline asm statement.
   ///
   /// This is used by Sema.
-  bool isValidClobber(StringRef Name) const;
+  bool isValidClobber(llvm::StringRef Name) const;
 
   /// Returns whether the passed in string is a valid register name
   /// according to GCC.
   ///
   /// This is used by Sema for inline asm statements.
-  virtual bool isValidGCCRegisterName(StringRef Name) const;
+  virtual bool isValidGCCRegisterName(llvm::StringRef Name) const;
 
   /// Returns the "normalized" GCC register name.
   ///
   /// ReturnCannonical true will return the register name without any additions
   /// such as "{}" or "%" in it's canonical form, for example:
   /// ReturnCanonical = true and Name = "rax", will return "ax".
-  StringRef getNormalizedGCCRegisterName(StringRef Name,
+  llvm::StringRef getNormalizedGCCRegisterName(llvm::StringRef Name,
                                          bool ReturnCanonical = false) const;
 
-  virtual bool isSPRegName(StringRef) const { return false; }
+  virtual bool isSPRegName(llvm::StringRef) const { return false; }
 
   /// Extracts a register from the passed constraint (if it is a
   /// single-register constraint) and the asm label expression related to a
@@ -1079,8 +1079,8 @@ public:
   ///
   /// This function is used by Sema in order to diagnose conflicts between
   /// the clobber list and the input/output lists.
-  virtual StringRef getConstraintRegister(StringRef Constraint,
-                                          StringRef Expression) const {
+  virtual llvm::StringRef getConstraintRegister(llvm::StringRef Constraint,
+                                          llvm::StringRef Expression) const {
     return "";
   }
 
@@ -1106,7 +1106,7 @@ public:
     std::string ConstraintStr;  // constraint: "=rm"
     std::string Name;           // Operand name: [foo] with no []'s.
   public:
-    ConstraintInfo(StringRef ConstraintStr, StringRef Name)
+    ConstraintInfo(llvm::StringRef ConstraintStr, llvm::StringRef Name)
         : Flags(0), TiedOperand(-1), ConstraintStr(ConstraintStr.str()),
           Name(Name.str()) {
       ImmRange.Min = ImmRange.Max = 0;
@@ -1187,7 +1187,7 @@ public:
   /// for global register variables on this target. In addition, it returns
   /// true in HasSizeMismatch if the size of the register doesn't match the
   /// variable size passed in RegSize.
-  virtual bool validateGlobalRegisterVariable(StringRef RegName,
+  virtual bool validateGlobalRegisterVariable(llvm::StringRef RegName,
                                               unsigned RegSize,
                                               bool &HasSizeMismatch) const {
     HasSizeMismatch = false;
@@ -1198,22 +1198,22 @@ public:
   // a constraint is valid and provides information about it.
   // FIXME: These should return a real error instead of just true/false.
   bool validateOutputConstraint(ConstraintInfo &Info) const;
-  bool validateInputConstraint(MutableArrayRef<ConstraintInfo> OutputConstraints,
+  bool validateInputConstraint(llvm::MutableArrayRef<ConstraintInfo> OutputConstraints,
                                ConstraintInfo &info) const;
 
   virtual bool validateOutputSize(const llvm::StringMap<bool> &FeatureMap,
-                                  StringRef /*Constraint*/,
+                                  llvm::StringRef /*Constraint*/,
                                   unsigned /*Size*/) const {
     return true;
   }
 
   virtual bool validateInputSize(const llvm::StringMap<bool> &FeatureMap,
-                                 StringRef /*Constraint*/,
+                                 llvm::StringRef /*Constraint*/,
                                  unsigned /*Size*/) const {
     return true;
   }
   virtual bool
-  validateConstraintModifier(StringRef /*Constraint*/,
+  validateConstraintModifier(llvm::StringRef /*Constraint*/,
                              char /*Modifier*/,
                              unsigned /*Size*/,
                              std::string &/*SuggestedModifier*/) const {
@@ -1224,7 +1224,7 @@ public:
                         TargetInfo::ConstraintInfo &info) const = 0;
 
   bool resolveSymbolicName(const char *&Name,
-                           ArrayRef<ConstraintInfo> OutputConstraints,
+                           llvm::ArrayRef<ConstraintInfo> OutputConstraints,
                            unsigned &Index) const;
 
   // Constraint parm will be left pointing at the last character of
@@ -1317,11 +1317,11 @@ public:
   ///
   /// \return False on error (invalid features).
   virtual bool initFeatureMap(llvm::StringMap<bool> &Features,
-                              DiagnosticsEngine &Diags, StringRef CPU,
+                              DiagnosticsEngine &Diags, llvm::StringRef CPU,
                               const std::vector<std::string> &FeatureVec) const;
 
   /// Get the ABI currently in use.
-  virtual StringRef getABI() const { return StringRef(); }
+  virtual llvm::StringRef getABI() const { return llvm::StringRef(); }
 
   /// Get the C++ ABI currently in use.
   TargetCXXABI getCXXABI() const {
@@ -1335,26 +1335,26 @@ public:
     return false;
   }
 
-  /// Fill a SmallVectorImpl with the valid values to setCPU.
-  virtual void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const {}
+  /// Fill a llvm::SmallVectorImpl with the valid values to setCPU.
+  virtual void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const {}
 
-  /// Fill a SmallVectorImpl with the valid values for tuning CPU.
-  virtual void fillValidTuneCPUList(SmallVectorImpl<StringRef> &Values) const {
+  /// Fill a llvm::SmallVectorImpl with the valid values for tuning CPU.
+  virtual void fillValidTuneCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
     fillValidCPUList(Values);
   }
 
   /// Determine whether this TargetInfo supports the given CPU name.
-  virtual bool isValidCPUName(StringRef Name) const {
+  virtual bool isValidCPUName(llvm::StringRef Name) const {
     return true;
   }
 
   /// Determine whether this TargetInfo supports the given CPU name for
   /// tuning.
-  virtual bool isValidTuneCPUName(StringRef Name) const {
+  virtual bool isValidTuneCPUName(llvm::StringRef Name) const {
     return isValidCPUName(Name);
   }
 
-  virtual ParsedTargetAttr parseTargetAttr(StringRef Str) const;
+  virtual ParsedTargetAttr parseTargetAttr(llvm::StringRef Str) const;
 
   /// Determine whether this TargetInfo supports tune in target attribute.
   virtual bool supportsTargetAttributeTune() const {
@@ -1371,38 +1371,38 @@ public:
   /// Use the specified unit for FP math.
   ///
   /// \return False on error (invalid unit name).
-  virtual bool setFPMath(StringRef Name) {
+  virtual bool setFPMath(llvm::StringRef Name) {
     return false;
   }
 
   /// Check if target has a given feature enabled
   virtual bool hasFeatureEnabled(const llvm::StringMap<bool> &Features,
-                                 StringRef Name) const {
+                                 llvm::StringRef Name) const {
     return Features.lookup(Name);
   }
 
   /// Enable or disable a specific target feature;
   /// the feature name must be valid.
   virtual void setFeatureEnabled(llvm::StringMap<bool> &Features,
-                                 StringRef Name,
+                                 llvm::StringRef Name,
                                  bool Enabled) const {
     Features[Name] = Enabled;
   }
 
   /// Determine whether this TargetInfo supports the given feature.
-  virtual bool isValidFeatureName(StringRef Feature) const {
+  virtual bool isValidFeatureName(llvm::StringRef Feature) const {
     return true;
   }
 
   /// Returns true if feature has an impact on target code
   /// generation.
-  virtual bool doesFeatureAffectCodeGen(StringRef Feature) const {
+  virtual bool doesFeatureAffectCodeGen(llvm::StringRef Feature) const {
     return true;
   }
 
   /// For given feature return dependent ones.
-  virtual StringRef getFeatureDependencies(StringRef Feature) const {
-    return StringRef();
+  virtual llvm::StringRef getFeatureDependencies(llvm::StringRef Feature) const {
+    return llvm::StringRef();
   }
 
   struct BranchProtectionInfo {
@@ -1439,15 +1439,15 @@ public:
 
   /// Determine if the Architecture in this TargetInfo supports branch
   /// protection
-  virtual bool isBranchProtectionSupportedArch(StringRef Arch) const {
+  virtual bool isBranchProtectionSupportedArch(llvm::StringRef Arch) const {
     return false;
   }
 
   /// Determine if this TargetInfo supports the given branch protection
   /// specification
-  virtual bool validateBranchProtection(StringRef Spec, StringRef Arch,
+  virtual bool validateBranchProtection(llvm::StringRef Spec, llvm::StringRef Arch,
                                         BranchProtectionInfo &BPI,
-                                        StringRef &Err) const {
+                                        llvm::StringRef &Err) const {
     Err = "";
     return false;
   }
@@ -1469,12 +1469,12 @@ public:
   }
 
   /// Determine whether the given target has the given feature.
-  virtual bool hasFeature(StringRef Feature) const {
+  virtual bool hasFeature(llvm::StringRef Feature) const {
     return false;
   }
 
   /// Determine whether the given target feature is read only.
-  bool isReadOnlyFeature(StringRef Feature) const {
+  bool isReadOnlyFeature(llvm::StringRef Feature) const {
     return ReadOnlyFeatures.count(Feature);
   }
 
@@ -1501,11 +1501,11 @@ public:
 
   // Validate the contents of the __builtin_cpu_supports(const char*)
   // argument.
-  virtual bool validateCpuSupports(StringRef Name) const { return false; }
+  virtual bool validateCpuSupports(llvm::StringRef Name) const { return false; }
 
   // Return the target-specific priority for features/cpus/vendors so
   // that they can be properly sorted for checking.
-  virtual unsigned multiVersionSortPriority(StringRef Name) const {
+  virtual unsigned multiVersionSortPriority(llvm::StringRef Name) const {
     return 0;
   }
 
@@ -1515,23 +1515,23 @@ public:
 
   // Validate the contents of the __builtin_cpu_is(const char*)
   // argument.
-  virtual bool validateCpuIs(StringRef Name) const { return false; }
+  virtual bool validateCpuIs(llvm::StringRef Name) const { return false; }
 
   // Validate a cpu_dispatch/cpu_specific CPU option, which is a different list
   // from cpu_is, since it checks via features rather than CPUs directly.
-  virtual bool validateCPUSpecificCPUDispatch(StringRef Name) const {
+  virtual bool validateCPUSpecificCPUDispatch(llvm::StringRef Name) const {
     return false;
   }
 
   // Get the character to be added for mangling purposes for cpu_specific.
-  virtual char CPUSpecificManglingCharacter(StringRef Name) const {
+  virtual char CPUSpecificManglingCharacter(llvm::StringRef Name) const {
     llvm_unreachable(
         "cpu_specific Multiversioning not implemented on this target");
   }
 
   // Get the value for the 'tune-cpu' flag for a cpu_specific variant with the
   // programmer-specified 'Name'.
-  virtual StringRef getCPUSpecificTuneName(StringRef Name) const {
+  virtual llvm::StringRef getCPUSpecificTuneName(llvm::StringRef Name) const {
     llvm_unreachable(
         "cpu_specific Multiversioning not implemented on this target");
   }
@@ -1540,7 +1540,7 @@ public:
   // cpu_specific/cpu_dispatch so that it can be passed to llvm as optimization
   // options.
   virtual void getCPUSpecificCPUDispatchFeatures(
-      StringRef Name, llvm::SmallVectorImpl<StringRef> &Features) const {
+      llvm::StringRef Name, llvm::SmallVectorImpl<llvm::StringRef> &Features) const {
     llvm_unreachable(
         "cpu_specific Multiversioning not implemented on this target");
   }
@@ -1641,11 +1641,11 @@ public:
 
   /// Retrieve the name of the platform as it is used in the
   /// availability attribute.
-  StringRef getPlatformName() const { return PlatformName; }
+  llvm::StringRef getPlatformName() const { return PlatformName; }
 
   /// Retrieve the minimum desired version of the platform, to
   /// which the program should be compiled.
-  VersionTuple getPlatformMinVersion() const { return PlatformMinVersion; }
+  llvm::VersionTuple getPlatformMinVersion() const { return PlatformMinVersion; }
 
   bool isBigEndian() const { return BigEndian; }
   bool isLittleEndian() const { return !BigEndian; }
@@ -1804,10 +1804,10 @@ public:
 
   /// Returns the version of the darwin target variant SDK which was used during
   /// the compilation if one was specified, or an empty version otherwise.
-  const std::optional<VersionTuple> getDarwinTargetVariantSDKVersion() const {
+  const std::optional<llvm::VersionTuple> getDarwinTargetVariantSDKVersion() const {
     return !getTargetOpts().DarwinTargetVariantSDKVersion.empty()
                ? getTargetOpts().DarwinTargetVariantSDKVersion
-               : std::optional<VersionTuple>();
+               : std::optional<llvm::VersionTuple>();
   }
 
   /// Whether to support HIP image/texture API's.
@@ -1834,9 +1834,9 @@ protected:
   virtual enum IntType getPtrDiffTypeV(LangAS AddrSpace) const {
     return PtrDiffType;
   }
-  virtual ArrayRef<const char *> getGCCRegNames() const = 0;
-  virtual ArrayRef<GCCRegAlias> getGCCRegAliases() const = 0;
-  virtual ArrayRef<AddlRegName> getGCCAddlRegNames() const {
+  virtual llvm::ArrayRef<const char *> getGCCRegNames() const = 0;
+  virtual llvm::ArrayRef<GCCRegAlias> getGCCRegAliases() const = 0;
+  virtual llvm::ArrayRef<AddlRegName> getGCCAddlRegNames() const {
     return std::nullopt;
   }
 

@@ -44,7 +44,7 @@ struct DenseMapInfo<clang::tidy::RenamerClangTidyCheck::NamingCheckId> {
     assert(Val != getTombstoneKey() && "Cannot hash the tombstone key!");
 
     return DenseMapInfo<clang::SourceLocation>::getHashValue(Val.first) +
-           DenseMapInfo<StringRef>::getHashValue(Val.second);
+           DenseMapInfo<llvm::StringRef>::getHashValue(Val.second);
   }
 
   static bool isEqual(const NamingCheckId &LHS, const NamingCheckId &RHS) {
@@ -83,7 +83,7 @@ public:
 } // namespace
 
 static const NamedDecl *findDecl(const RecordDecl &RecDecl,
-                                 StringRef DeclName) {
+                                 llvm::StringRef DeclName) {
   for (const Decl *D : RecDecl.decls()) {
     if (const auto *ND = dyn_cast<NamedDecl>(D)) {
       if (ND->getDeclName().isIdentifier() && ND->getName() == DeclName)
@@ -140,7 +140,7 @@ static const NamedDecl *getFailureForNamedDecl(const NamedDecl *ND) {
 /// If a matching decl is found in multiple base classes then it will return a
 /// flag indicating the multiple resolutions.
 static NameLookup findDeclInBases(const CXXRecordDecl &Parent,
-                                  StringRef DeclName,
+                                  llvm::StringRef DeclName,
                                   bool AggressiveTemplateLookup) {
   if (!Parent.hasDefinition())
     return NameLookup(nullptr);
@@ -309,7 +309,7 @@ public:
     DeclarationName DeclName = DepMemberRef->getMemberNameInfo().getName();
     if (!DeclName.isIdentifier())
       return true;
-    StringRef DependentName = DeclName.getAsIdentifierInfo()->getName();
+    llvm::StringRef DependentName = DeclName.getAsIdentifierInfo()->getName();
 
     if (NameLookup Resolved = findDeclInBases(
             *Base, DependentName, AggressiveDependentMemberLookup)) {
@@ -393,7 +393,7 @@ private:
 
 } // namespace
 
-RenamerClangTidyCheck::RenamerClangTidyCheck(StringRef CheckName,
+RenamerClangTidyCheck::RenamerClangTidyCheck(llvm::StringRef CheckName,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(CheckName, Context),
       AggressiveDependentMemberLookup(
@@ -528,7 +528,7 @@ void RenamerClangTidyCheck::checkMacro(const Token &MacroNameTok,
   if (!MaybeFailure)
     return;
   FailureInfo &Info = *MaybeFailure;
-  StringRef Name = MacroNameTok.getIdentifierInfo()->getName();
+  llvm::StringRef Name = MacroNameTok.getIdentifierInfo()->getName();
   NamingCheckId ID(MI->getDefinitionLoc(), Name);
   NamingCheckFailure &Failure = NamingCheckFailures[ID];
   SourceRange Range(MacroNameTok.getLocation(), MacroNameTok.getEndLoc());
@@ -543,7 +543,7 @@ void RenamerClangTidyCheck::checkMacro(const Token &MacroNameTok,
 void RenamerClangTidyCheck::expandMacro(const Token &MacroNameTok,
                                         const MacroInfo *MI,
                                         const SourceManager &SourceMgr) {
-  StringRef Name = MacroNameTok.getIdentifierInfo()->getName();
+  llvm::StringRef Name = MacroNameTok.getIdentifierInfo()->getName();
   NamingCheckId ID(MI->getDefinitionLoc(), Name);
 
   auto Failure = NamingCheckFailures.find(ID);

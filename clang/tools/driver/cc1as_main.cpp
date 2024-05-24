@@ -207,14 +207,14 @@ public:
   }
 
   static bool CreateFromArgs(AssemblerInvocation &Res,
-                             ArrayRef<const char *> Argv,
+                             llvm::ArrayRef<const char *> Argv,
                              DiagnosticsEngine &Diags);
 };
 
 }
 
 bool AssemblerInvocation::CreateFromArgs(AssemblerInvocation &Opts,
-                                         ArrayRef<const char *> Argv,
+                                         llvm::ArrayRef<const char *> Argv,
                                          DiagnosticsEngine &Diags) {
   bool Success = true;
 
@@ -252,7 +252,7 @@ bool AssemblerInvocation::CreateFromArgs(AssemblerInvocation &Opts,
   if (Arg *A = Args.getLastArg(options::OPT_darwin_target_variant_triple))
     Opts.DarwinTargetVariantTriple = llvm::Triple(A->getValue());
   if (Arg *A = Args.getLastArg(OPT_darwin_target_variant_sdk_version_EQ)) {
-    VersionTuple Version;
+    llvm::VersionTuple Version;
     if (Version.tryParse(A->getValue()))
       Diags.Report(diag::err_drv_invalid_value)
           << A->getAsString(Args) << A->getValue();
@@ -297,7 +297,7 @@ bool AssemblerInvocation::CreateFromArgs(AssemblerInvocation &Opts,
   Opts.MainFileName = std::string(Args.getLastArgValue(OPT_main_file_name));
 
   for (const auto &Arg : Args.getAllArgValues(OPT_fdebug_prefix_map_EQ)) {
-    auto Split = StringRef(Arg).split('=');
+    auto Split = llvm::StringRef(Arg).split('=');
     Opts.DebugPrefixMap.emplace_back(Split.first, Split.second);
   }
 
@@ -319,7 +319,7 @@ bool AssemblerInvocation::CreateFromArgs(AssemblerInvocation &Opts,
   Opts.SplitDwarfOutput =
       std::string(Args.getLastArgValue(OPT_split_dwarf_output));
   if (Arg *A = Args.getLastArg(OPT_filetype)) {
-    StringRef Name = A->getValue();
+    llvm::StringRef Name = A->getValue();
     unsigned OutputType = StringSwitch<unsigned>(Name)
       .Case("asm", FT_Asm)
       .Case("null", FT_Null)
@@ -380,7 +380,7 @@ bool AssemblerInvocation::CreateFromArgs(AssemblerInvocation &Opts,
 }
 
 static std::unique_ptr<raw_fd_ostream>
-getOutputStream(StringRef Path, DiagnosticsEngine &Diags, bool Binary) {
+getOutputStream(llvm::StringRef Path, DiagnosticsEngine &Diags, bool Binary) {
   // Make sure that the Out file gets unlinked from the disk if we get a
   // SIGINT.
   if (Path != "-")
@@ -488,14 +488,14 @@ static bool ExecuteAssemblerImpl(AssemblerInvocation &Opts,
   if (Opts.GenDwarfForAssembly)
     Ctx.setGenDwarfForAssembly(true);
   if (!Opts.DwarfDebugFlags.empty())
-    Ctx.setDwarfDebugFlags(StringRef(Opts.DwarfDebugFlags));
+    Ctx.setDwarfDebugFlags(llvm::StringRef(Opts.DwarfDebugFlags));
   if (!Opts.DwarfDebugProducer.empty())
-    Ctx.setDwarfDebugProducer(StringRef(Opts.DwarfDebugProducer));
+    Ctx.setDwarfDebugProducer(llvm::StringRef(Opts.DwarfDebugProducer));
   if (!Opts.DebugCompilationDir.empty())
     Ctx.setCompilationDir(Opts.DebugCompilationDir);
   else {
     // If no compilation dir is set, try to use the current directory.
-    SmallString<128> CWD;
+    llvm::SmallString<128> CWD;
     if (!sys::fs::current_path(CWD))
       Ctx.setCompilationDir(CWD);
   }
@@ -503,7 +503,7 @@ static bool ExecuteAssemblerImpl(AssemblerInvocation &Opts,
     for (const auto &KV : Opts.DebugPrefixMap)
       Ctx.addDebugPrefixMapEntry(KV.first, KV.second);
   if (!Opts.MainFileName.empty())
-    Ctx.setMainFileName(StringRef(Opts.MainFileName));
+    Ctx.setMainFileName(llvm::StringRef(Opts.MainFileName));
   Ctx.setDwarfFormat(Opts.Dwarf64 ? dwarf::DWARF64 : dwarf::DWARF32);
   Ctx.setDwarfVersion(Opts.DwarfVersion);
   if (Opts.GenDwarfForAssembly)
@@ -515,7 +515,7 @@ static bool ExecuteAssemblerImpl(AssemblerInvocation &Opts,
   std::unique_ptr<MCInstrInfo> MCII(TheTarget->createMCInstrInfo());
   assert(MCII && "Unable to create instruction info!");
 
-  raw_pwrite_stream *Out = FDOS.get();
+  llvm::raw_pwrite_stream *Out = FDOS.get();
   std::unique_ptr<buffer_ostream> BOS;
 
   MCOptions.MCNoWarn = Opts.NoWarn;
@@ -589,7 +589,7 @@ static bool ExecuteAssemblerImpl(AssemblerInvocation &Opts,
 
   // Set values for symbols, if any.
   for (auto &S : Opts.SymbolDefs) {
-    auto Pair = StringRef(S).split('=');
+    auto Pair = llvm::StringRef(S).split('=');
     auto Sym = Pair.first;
     auto Val = Pair.second;
     int64_t Value;
@@ -631,18 +631,18 @@ static void LLVMErrorHandler(void *UserData, const char *Message,
   sys::Process::Exit(1);
 }
 
-int cc1as_main(ArrayRef<const char *> Argv, const char *Argv0, void *MainAddr) {
+int cc1as_main(llvm::ArrayRef<const char *> Argv, const char *Argv0, void *MainAddr) {
   // Initialize targets and assembly printers/parsers.
   InitializeAllTargetInfos();
   InitializeAllTargetMCs();
   InitializeAllAsmParsers();
 
   // Construct our diagnostic client.
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
   TextDiagnosticPrinter *DiagClient
     = new TextDiagnosticPrinter(errs(), &*DiagOpts);
   DiagClient->setPrefix("clang -cc1as");
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
   DiagnosticsEngine Diags(DiagID, &*DiagOpts, DiagClient);
 
   // Set an error handler, so that any LLVM backend diagnostics go through our

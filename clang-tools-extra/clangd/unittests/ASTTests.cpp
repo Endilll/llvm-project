@@ -35,7 +35,7 @@ using testing::IsEmpty;
 
 TEST(GetDeducedType, KwAutoKwDecltypeExpansion) {
   struct Test {
-    StringRef AnnotatedCode;
+    llvm::StringRef AnnotatedCode;
     const char *DeducedType;
   } Tests[] = {
       {"^auto i = 0;", "int"},

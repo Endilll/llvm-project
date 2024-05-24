@@ -24,7 +24,7 @@ namespace clang {
 namespace driver {
 namespace tools {
 
-void addPathIfExists(const Driver &D, const Twine &Path,
+void addPathIfExists(const Driver &D, const llvm::Twine &Path,
                      ToolChain::path_list &Paths);
 
 void AddLinkerInputs(const ToolChain &TC, const InputInfoList &Inputs,
@@ -59,13 +59,13 @@ void AddStaticDeviceLibsLinking(Compilation &C, const Tool &T,
                                 const InputInfoList &Inputs,
                                 const llvm::opt::ArgList &DriverArgs,
                                 llvm::opt::ArgStringList &CmdArgs,
-                                StringRef Arch, StringRef Target,
+                                llvm::StringRef Arch, llvm::StringRef Target,
                                 bool isBitCodeSDL);
 void AddStaticDeviceLibs(Compilation *C, const Tool *T, const JobAction *JA,
                          const InputInfoList *Inputs, const Driver &D,
                          const llvm::opt::ArgList &DriverArgs,
-                         llvm::opt::ArgStringList &CmdArgs, StringRef Arch,
-                         StringRef Target, bool isBitCodeSDL);
+                         llvm::opt::ArgStringList &CmdArgs, llvm::StringRef Arch,
+                         llvm::StringRef Target, bool isBitCodeSDL);
 
 const char *SplitDebugName(const JobAction &JA, const llvm::opt::ArgList &Args,
                            const InputInfo &Input, const InputInfo &Output);
@@ -93,9 +93,9 @@ llvm::codegenoptions::DebugInfoKind
 debugLevelToInfoKind(const llvm::opt::Arg &A);
 
 // Extract the integer N from a string spelled "-dwarf-N", returning 0
-// on mismatch. The StringRef input (rather than an Arg) allows
+// on mismatch. The llvm::StringRef input (rather than an Arg) allows
 // for use by the "-Xassembler" option parser.
-unsigned DwarfVersionNum(StringRef ArgValue);
+unsigned DwarfVersionNum(llvm::StringRef ArgValue);
 // Find a DWARF format version option.
 // This function is a complementary for DwarfVersionNum().
 const llvm::opt::Arg *getDwarfNArg(const llvm::opt::ArgList &Args);
@@ -158,9 +158,9 @@ void addDirectoryList(const llvm::opt::ArgList &Args,
                       const char *EnvVar);
 
 void AddTargetFeature(const llvm::opt::ArgList &Args,
-                      std::vector<StringRef> &Features,
+                      std::vector<llvm::StringRef> &Features,
                       llvm::opt::OptSpecifier OnOpt,
-                      llvm::opt::OptSpecifier OffOpt, StringRef FeatureName);
+                      llvm::opt::OptSpecifier OffOpt, llvm::StringRef FeatureName);
 
 std::string getCPUName(const Driver &D, const llvm::opt::ArgList &Args,
                        const llvm::Triple &T, bool FromAs = false);
@@ -178,25 +178,25 @@ void getTargetFeatures(const Driver &D, const llvm::Triple &Triple,
 /// entries in \p Features are not unique.
 void handleTargetFeaturesGroup(const Driver &D, const llvm::Triple &Triple,
                                const llvm::opt::ArgList &Args,
-                               std::vector<StringRef> &Features,
+                               std::vector<llvm::StringRef> &Features,
                                llvm::opt::OptSpecifier Group);
 
 /// If there are multiple +xxx or -xxx features, keep the last one.
-SmallVector<StringRef> unifyTargetFeatures(ArrayRef<StringRef> Features);
+llvm::SmallVector<llvm::StringRef> unifyTargetFeatures(llvm::ArrayRef<llvm::StringRef> Features);
 
 /// Handles the -save-stats option and returns the filename to save statistics
 /// to.
-SmallString<128> getStatsFileName(const llvm::opt::ArgList &Args,
+llvm::SmallString<128> getStatsFileName(const llvm::opt::ArgList &Args,
                                   const InputInfo &Output,
                                   const InputInfo &Input, const Driver &D);
 
 /// \p Flag must be a flag accepted by the driver.
-void addMultilibFlag(bool Enabled, const StringRef Flag,
+void addMultilibFlag(bool Enabled, const llvm::StringRef Flag,
                      Multilib::flags_list &Flags);
 
 void addX86AlignBranchArgs(const Driver &D, const llvm::opt::ArgList &Args,
                            llvm::opt::ArgStringList &CmdArgs, bool IsLTO,
-                           const StringRef PluginOptPrefix = "");
+                           const llvm::StringRef PluginOptPrefix = "");
 
 void checkAMDGPUCodeObjectVersion(const Driver &D,
                                   const llvm::opt::ArgList &Args);
@@ -210,11 +210,11 @@ bool haveAMDGPUCodeObjectVersionArgument(const Driver &D,
 void addMachineOutlinerArgs(const Driver &D, const llvm::opt::ArgList &Args,
                             llvm::opt::ArgStringList &CmdArgs,
                             const llvm::Triple &Triple, bool IsLTO,
-                            const StringRef PluginOptPrefix = "");
+                            const llvm::StringRef PluginOptPrefix = "");
 
 void addOpenMPDeviceRTL(const Driver &D, const llvm::opt::ArgList &DriverArgs,
                         llvm::opt::ArgStringList &CC1Args,
-                        StringRef BitcodeSuffix, const llvm::Triple &Triple,
+                        llvm::StringRef BitcodeSuffix, const llvm::Triple &Triple,
                         const ToolChain &HostTC);
 
 void addOutlineAtomicsArgs(const Driver &D, const ToolChain &TC,

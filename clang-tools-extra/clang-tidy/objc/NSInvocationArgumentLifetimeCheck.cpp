@@ -31,9 +31,9 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::objc {
 namespace {
 
-static constexpr StringRef WeakText = "__weak";
-static constexpr StringRef StrongText = "__strong";
-static constexpr StringRef UnsafeUnretainedText = "__unsafe_unretained";
+static constexpr llvm::StringRef WeakText = "__weak";
+static constexpr llvm::StringRef StrongText = "__strong";
+static constexpr llvm::StringRef UnsafeUnretainedText = "__unsafe_unretained";
 
 /// Matches ObjCIvarRefExpr, DeclRefExpr, or MemberExpr that reference
 /// Objective-C object (or block) variables or fields whose object lifetimes
@@ -50,10 +50,10 @@ AST_POLYMORPHIC_MATCHER(isObjCManagedLifetime,
 }
 
 static std::optional<FixItHint>
-fixItHintReplacementForOwnershipString(StringRef Text, CharSourceRange Range,
-                                       StringRef Ownership) {
+fixItHintReplacementForOwnershipString(llvm::StringRef Text, CharSourceRange Range,
+                                       llvm::StringRef Ownership) {
   size_t Index = Text.find(Ownership);
-  if (Index == StringRef::npos)
+  if (Index == llvm::StringRef::npos)
     return std::nullopt;
 
   SourceLocation Begin = Range.getBegin().getLocWithOffset(Index);
@@ -81,7 +81,7 @@ fixItHintForVarDecl(const VarDecl *VD, const SourceManager &SM,
     return std::nullopt;
   }
 
-  StringRef VarDeclText = Lexer::getSourceText(Range, SM, LangOpts);
+  llvm::StringRef VarDeclText = Lexer::getSourceText(Range, SM, LangOpts);
   if (std::optional<FixItHint> Hint =
           fixItHintReplacementForOwnershipString(VarDeclText, Range, WeakText))
     return Hint;

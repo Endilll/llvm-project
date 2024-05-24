@@ -29,16 +29,16 @@ const FunctionDecl *CheckerContext::getCalleeDecl(const CallExpr *CE) const {
   return L.getAsFunctionDecl();
 }
 
-StringRef CheckerContext::getCalleeName(const FunctionDecl *FunDecl) const {
+llvm::StringRef CheckerContext::getCalleeName(const FunctionDecl *FunDecl) const {
   if (!FunDecl)
-    return StringRef();
+    return llvm::StringRef();
   IdentifierInfo *funI = FunDecl->getIdentifier();
   if (!funI)
-    return StringRef();
+    return llvm::StringRef();
   return funI->getName();
 }
 
-StringRef CheckerContext::getDeclDescription(const Decl *D) {
+llvm::StringRef CheckerContext::getDeclDescription(const Decl *D) {
   if (isa<ObjCMethodDecl, CXXMethodDecl>(D))
     return "method";
   if (isa<BlockDecl>(D))
@@ -47,7 +47,7 @@ StringRef CheckerContext::getDeclDescription(const Decl *D) {
 }
 
 bool CheckerContext::isCLibraryFunction(const FunctionDecl *FD,
-                                        StringRef Name) {
+                                        llvm::StringRef Name) {
   // To avoid false positives (Ex: finding user defined functions with
   // similar names), only perform fuzzy name matching when it's a builtin.
   // Using a string compare is slow, we might want to switch on BuiltinID here.
@@ -55,9 +55,9 @@ bool CheckerContext::isCLibraryFunction(const FunctionDecl *FD,
   if (BId != 0) {
     if (Name.empty())
       return true;
-    StringRef BName = FD->getASTContext().BuiltinInfo.getName(BId);
+    llvm::StringRef BName = FD->getASTContext().BuiltinInfo.getName(BId);
     size_t start = BName.find(Name);
-    if (start != StringRef::npos) {
+    if (start != llvm::StringRef::npos) {
       // Accept exact match.
       if (BName.size() == Name.size())
         return true;
@@ -103,7 +103,7 @@ bool CheckerContext::isCLibraryFunction(const FunctionDecl *FD,
   if (Name.empty())
     return true;
 
-  StringRef FName = II->getName();
+  llvm::StringRef FName = II->getName();
   if (FName == Name)
     return true;
 
@@ -114,13 +114,13 @@ bool CheckerContext::isCLibraryFunction(const FunctionDecl *FD,
 }
 
 bool CheckerContext::isHardenedVariantOf(const FunctionDecl *FD,
-                                         StringRef Name) {
+                                         llvm::StringRef Name) {
   const IdentifierInfo *II = FD->getIdentifier();
   if (!II)
     return false;
 
   auto CompletelyMatchesParts = [II](auto... Parts) -> bool {
-    StringRef FName = II->getName();
+    llvm::StringRef FName = II->getName();
     return (FName.consume_front(Parts) && ...) && FName.empty();
   };
 
@@ -128,11 +128,11 @@ bool CheckerContext::isHardenedVariantOf(const FunctionDecl *FD,
          CompletelyMatchesParts("__builtin_", "__", Name, "_chk");
 }
 
-StringRef CheckerContext::getMacroNameOrSpelling(SourceLocation &Loc) {
+llvm::StringRef CheckerContext::getMacroNameOrSpelling(SourceLocation &Loc) {
   if (Loc.isMacroID())
     return Lexer::getImmediateMacroName(Loc, getSourceManager(),
                                              getLangOpts());
-  SmallString<16> buf;
+  llvm::SmallString<16> buf;
   return Lexer::getSpelling(Loc, buf, getSourceManager(), getLangOpts());
 }
 

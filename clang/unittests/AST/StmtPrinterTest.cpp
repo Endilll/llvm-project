@@ -33,12 +33,12 @@ namespace {
 
 enum class StdVer { CXX98, CXX11, CXX14, CXX17, CXX20 };
 
-DeclarationMatcher FunctionBodyMatcher(StringRef ContainingFunction) {
+DeclarationMatcher FunctionBodyMatcher(llvm::StringRef ContainingFunction) {
   return functionDecl(hasName(ContainingFunction),
                       has(compoundStmt(has(stmt().bind("id")))));
 }
 
-static void PrintStmt(raw_ostream &Out, const ASTContext *Context,
+static void PrintStmt(llvm::raw_ostream &Out, const ASTContext *Context,
                       const Stmt *S, PrintingPolicyAdjuster PolicyAdjuster) {
   assert(S != nullptr && "Expected non-null Stmt");
   PrintingPolicy Policy = Context->getPrintingPolicy();
@@ -49,8 +49,8 @@ static void PrintStmt(raw_ostream &Out, const ASTContext *Context,
 
 template <typename Matcher>
 ::testing::AssertionResult
-PrintedStmtMatches(StringRef Code, const std::vector<std::string> &Args,
-                   const Matcher &NodeMatch, StringRef ExpectedPrinted,
+PrintedStmtMatches(llvm::StringRef Code, const std::vector<std::string> &Args,
+                   const Matcher &NodeMatch, llvm::StringRef ExpectedPrinted,
                    PrintingPolicyAdjuster PolicyAdjuster = nullptr) {
   return PrintedNodeMatches<Stmt>(Code, Args, NodeMatch, ExpectedPrinted, "",
                                   PrintStmt, PolicyAdjuster);
@@ -58,8 +58,8 @@ PrintedStmtMatches(StringRef Code, const std::vector<std::string> &Args,
 
 template <typename T>
 ::testing::AssertionResult
-PrintedStmtCXXMatches(StdVer Standard, StringRef Code, const T &NodeMatch,
-                      StringRef ExpectedPrinted,
+PrintedStmtCXXMatches(StdVer Standard, llvm::StringRef Code, const T &NodeMatch,
+                      llvm::StringRef ExpectedPrinted,
                       PrintingPolicyAdjuster PolicyAdjuster = nullptr) {
   const char *StdOpt;
   switch (Standard) {
@@ -82,8 +82,8 @@ PrintedStmtCXXMatches(StdVer Standard, StringRef Code, const T &NodeMatch,
 
 template <typename T>
 ::testing::AssertionResult
-PrintedStmtMSMatches(StringRef Code, const T &NodeMatch,
-                     StringRef ExpectedPrinted,
+PrintedStmtMSMatches(llvm::StringRef Code, const T &NodeMatch,
+                     llvm::StringRef ExpectedPrinted,
                      PrintingPolicyAdjuster PolicyAdjuster = nullptr) {
   std::vector<std::string> Args = {
     "-std=c++98",
@@ -97,8 +97,8 @@ PrintedStmtMSMatches(StringRef Code, const T &NodeMatch,
 
 template <typename T>
 ::testing::AssertionResult
-PrintedStmtObjCMatches(StringRef Code, const T &NodeMatch,
-                       StringRef ExpectedPrinted,
+PrintedStmtObjCMatches(llvm::StringRef Code, const T &NodeMatch,
+                       llvm::StringRef ExpectedPrinted,
                        PrintingPolicyAdjuster PolicyAdjuster = nullptr) {
   std::vector<std::string> Args = {
     "-ObjC",

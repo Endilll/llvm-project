@@ -28,7 +28,7 @@ namespace clang::tidy::modernize {
 ///
 class RedundantVoidArgCheck : public ClangTidyCheck {
 public:
-  RedundantVoidArgCheck(StringRef Name, ClangTidyContext *Context)
+  RedundantVoidArgCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
@@ -66,9 +66,9 @@ private:
 
   void
   removeVoidArgumentTokens(const ast_matchers::MatchFinder::MatchResult &Result,
-                           SourceRange Range, StringRef GrammarLocation);
+                           SourceRange Range, llvm::StringRef GrammarLocation);
 
-  void removeVoidToken(Token VoidToken, StringRef Diagnostic);
+  void removeVoidToken(Token VoidToken, llvm::StringRef Diagnostic);
 };
 
 } // namespace clang::tidy::modernize

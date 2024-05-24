@@ -29,10 +29,10 @@ public:
       const SourceManager &SM, bool CheckHeaderFile);
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
 
@@ -75,7 +75,7 @@ public:
 };
 } // namespace
 
-DeprecatedHeadersCheck::DeprecatedHeadersCheck(StringRef Name,
+DeprecatedHeadersCheck::DeprecatedHeadersCheck(llvm::StringRef Name,
                                                ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       CheckHeaderFile(Options.get("CheckHeaderFile", false)) {}
@@ -177,9 +177,9 @@ IncludeModernizePPCallbacks::IncludeModernizePPCallbacks(
 }
 
 void IncludeModernizePPCallbacks::InclusionDirective(
-    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    SourceLocation HashLoc, const Token &IncludeTok, llvm::StringRef FileName,
     bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
-    StringRef SearchPath, StringRef RelativePath, const Module *SuggestedModule,
+    llvm::StringRef SearchPath, llvm::StringRef RelativePath, const Module *SuggestedModule,
     bool ModuleImported, SrcMgr::CharacteristicKind FileType) {
 
   // If we don't want to warn for non-main file reports and this is one, skip

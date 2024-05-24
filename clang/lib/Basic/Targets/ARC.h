@@ -40,7 +40,7 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override {
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override {
     return std::nullopt;
   }
 
@@ -50,7 +50,7 @@ public:
 
   std::string_view getClobbers() const override { return ""; }
 
-  ArrayRef<const char *> getGCCRegNames() const override {
+  llvm::ArrayRef<const char *> getGCCRegNames() const override {
     static const char *const GCCRegNames[] = {
         "r0",  "r1",  "r2",  "r3",  "r4",  "r5",     "r6",  "r7",
         "r8",  "r9",  "r10", "r11", "r12", "r13",    "r14", "r15",
@@ -59,7 +59,7 @@ public:
     return llvm::ArrayRef(GCCRegNames);
   }
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     return std::nullopt;
   }
 

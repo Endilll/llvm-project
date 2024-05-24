@@ -73,11 +73,11 @@ void SemaSYCL::deepTypeCheckForDevice(SourceLocation UsedAt,
   };
 
   // In case we have a Record used do the DFS for a bad field.
-  SmallVector<const ValueDecl *, 4> StackForRecursion;
+  llvm::SmallVector<const ValueDecl *, 4> StackForRecursion;
   StackForRecursion.push_back(DeclToCheck);
 
   // While doing DFS save how we get there to emit a nice set of notes.
-  SmallVector<const FieldDecl *, 4> History;
+  llvm::SmallVector<const FieldDecl *, 4> History;
   History.push_back(nullptr);
 
   do {

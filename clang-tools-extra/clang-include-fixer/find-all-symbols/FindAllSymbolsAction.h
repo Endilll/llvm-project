@@ -30,7 +30,7 @@ public:
 
   std::unique_ptr<clang::ASTConsumer>
   CreateASTConsumer(clang::CompilerInstance &Compiler,
-                    StringRef InFile) override;
+                    llvm::StringRef InFile) override;
 
 private:
   SymbolReporter *const Reporter;

@@ -93,7 +93,7 @@ public:
   llvm::TinyPtrVector<const Stmt*> Stmts;
 
   PossiblyUnreachableDiag(const PartialDiagnostic &PD, SourceLocation Loc,
-                          ArrayRef<const Stmt *> Stmts)
+                          llvm::ArrayRef<const Stmt *> Stmts)
       : PD(PD), Loc(Loc), Stmts(Stmts) {}
 };
 
@@ -206,12 +206,12 @@ public:
 
   /// SwitchStack - This is the current set of active switch statements in the
   /// block.
-  SmallVector<SwitchInfo, 8> SwitchStack;
+  llvm::SmallVector<SwitchInfo, 8> SwitchStack;
 
   /// The list of return statements that occur within the function or
   /// block, if there is any chance of applying the named return value
   /// optimization, or if we need to infer a return type.
-  SmallVector<ReturnStmt*, 4> Returns;
+  llvm::SmallVector<ReturnStmt*, 4> Returns;
 
   /// The promise object for this coroutine, if any.
   VarDecl *CoroutinePromise = nullptr;
@@ -225,7 +225,7 @@ public:
 
   /// The stack of currently active compound statement scopes in the
   /// function.
-  SmallVector<CompoundScopeInfo, 4> CompoundScopes;
+  llvm::SmallVector<CompoundScopeInfo, 4> CompoundScopes;
 
   /// The set of blocks that are introduced in this function.
   llvm::SmallPtrSet<const BlockDecl *, 1> Blocks;
@@ -236,7 +236,7 @@ public:
   /// A list of PartialDiagnostics created but delayed within the
   /// current function scope.  These diagnostics are vetted for reachability
   /// prior to being emitted.
-  SmallVector<PossiblyUnreachableDiag, 4> PossiblyUnreachableDiags;
+  llvm::SmallVector<PossiblyUnreachableDiag, 4> PossiblyUnreachableDiags;
 
   /// A list of parameters which have the nonnull attribute and are
   /// modified in the function.
@@ -370,7 +370,7 @@ public:
   /// Used to collect uses of a particular weak object in a function body.
   ///
   /// Part of the implementation of -Wrepeated-use-of-weak.
-  using WeakUseVector = SmallVector<WeakUseTy, 4>;
+  using WeakUseVector = llvm::SmallVector<WeakUseTy, 4>;
 
   /// Used to collect all uses of weak objects in a function body.
   ///
@@ -501,7 +501,7 @@ public:
 
   bool isCoroutine() const { return !FirstCoroutineStmtLoc.isInvalid(); }
 
-  void setFirstCoroutineStmt(SourceLocation Loc, StringRef Keyword) {
+  void setFirstCoroutineStmt(SourceLocation Loc, llvm::StringRef Keyword) {
     assert(FirstCoroutineStmtLoc.isInvalid() &&
                    "first coroutine statement location already set");
     FirstCoroutineStmtLoc = Loc;
@@ -515,7 +515,7 @@ public:
                   llvm::to_underlying(FirstCoroutineStmtKind::CoYield));
   }
 
-  StringRef getFirstCoroutineStmtKeyword() const {
+  llvm::StringRef getFirstCoroutineStmtKeyword() const {
     assert(FirstCoroutineStmtLoc.isValid()
                    && "no coroutine statement available");
     auto Value =
@@ -718,7 +718,7 @@ public:
   unsigned CXXThisCaptureIndex = 0;
 
   /// Captures - The captures.
-  SmallVector<Capture, 4> Captures;
+  llvm::SmallVector<Capture, 4> Captures;
 
   /// - Whether the target type of return statements in this context
   /// is deduced (e.g. a lambda or block with omitted return type).
@@ -841,7 +841,7 @@ public:
   ~CapturedRegionScopeInfo() override;
 
   /// A descriptive name for the kind of captured region this is.
-  StringRef getRegionName() const {
+  llvm::StringRef getRegionName() const {
     switch (CapRegionKind) {
     case CR_Default:
       return "default captured statement";
@@ -899,7 +899,7 @@ public:
   bool ContainsUnexpandedParameterPack = false;
 
   /// Packs introduced by this lambda, if any.
-  SmallVector<NamedDecl*, 4> LocalPacks;
+  llvm::SmallVector<NamedDecl*, 4> LocalPacks;
 
   /// Source range covering the explicit template parameter list (if it exists).
   SourceRange ExplicitTemplateParamsRange;

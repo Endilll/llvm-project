@@ -201,7 +201,7 @@ AArch64TargetInfo::AArch64TargetInfo(const llvm::Triple &Triple,
         Opts.EABIVersion == llvm::EABI::GNU ? "\01_mcount" : "mcount";
 }
 
-StringRef AArch64TargetInfo::getABI() const { return ABI; }
+llvm::StringRef AArch64TargetInfo::getABI() const { return ABI; }
 
 bool AArch64TargetInfo::setABI(const std::string &Name) {
   if (Name != "aapcs" && Name != "aapcs-soft" && Name != "darwinpcs")
@@ -221,9 +221,9 @@ bool AArch64TargetInfo::validateTarget(DiagnosticsEngine &Diags) const {
   return true;
 }
 
-bool AArch64TargetInfo::validateBranchProtection(StringRef Spec, StringRef,
+bool AArch64TargetInfo::validateBranchProtection(llvm::StringRef Spec, llvm::StringRef,
                                                  BranchProtectionInfo &BPI,
-                                                 StringRef &Err) const {
+                                                 llvm::StringRef &Err) const {
   llvm::ARM::ParsedBranchProtection PBP;
   if (!llvm::ARM::parseBranchProtection(Spec, PBP, Err, HasPAuthLR))
     return false;
@@ -245,7 +245,7 @@ bool AArch64TargetInfo::validateBranchProtection(StringRef Spec, StringRef,
   return true;
 }
 
-bool AArch64TargetInfo::isValidCPUName(StringRef Name) const {
+bool AArch64TargetInfo::isValidCPUName(llvm::StringRef Name) const {
   return Name == "generic" || llvm::AArch64::parseCpu(Name);
 }
 
@@ -254,7 +254,7 @@ bool AArch64TargetInfo::setCPU(const std::string &Name) {
 }
 
 void AArch64TargetInfo::fillValidCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   llvm::AArch64::fillValidCPUArchList(Values);
 }
 
@@ -419,7 +419,7 @@ void AArch64TargetInfo::getTargetDefines(const LangOptions &Opts,
     Builder.defineMacro("__ARM_FP_FAST", "1");
 
   Builder.defineMacro("__ARM_SIZEOF_WCHAR_T",
-                      Twine(Opts.WCharSize ? Opts.WCharSize : 4));
+                      llvm::Twine(Opts.WCharSize ? Opts.WCharSize : 4));
 
   Builder.defineMacro("__ARM_SIZEOF_MINIMAL_ENUM", Opts.ShortEnums ? "1" : "4");
 
@@ -635,11 +635,11 @@ void AArch64TargetInfo::getTargetDefines(const LangOptions &Opts,
     Builder.defineMacro("__ARM_FEATURE_SVE_VECTOR_OPERATORS", "2");
 
   if (Opts.VScaleMin && Opts.VScaleMin == Opts.VScaleMax) {
-    Builder.defineMacro("__ARM_FEATURE_SVE_BITS", Twine(Opts.VScaleMin * 128));
+    Builder.defineMacro("__ARM_FEATURE_SVE_BITS", llvm::Twine(Opts.VScaleMin * 128));
   }
 }
 
-ArrayRef<Builtin::Info> AArch64TargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> AArch64TargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo, clang::AArch64::LastTSBuiltin -
                                          Builtin::FirstTSBuiltin);
 }
@@ -656,7 +656,7 @@ AArch64TargetInfo::getVScaleRange(const LangOptions &LangOpts) const {
   return std::nullopt;
 }
 
-unsigned AArch64TargetInfo::multiVersionSortPriority(StringRef Name) const {
+unsigned AArch64TargetInfo::multiVersionSortPriority(llvm::StringRef Name) const {
   if (Name == "default")
     return 0;
   if (auto Ext = llvm::AArch64::parseArchExtension(Name))
@@ -669,21 +669,21 @@ unsigned AArch64TargetInfo::multiVersionFeatureCost() const {
   return llvm::AArch64::ExtensionInfo::MaxFMVPriority;
 }
 
-bool AArch64TargetInfo::doesFeatureAffectCodeGen(StringRef Name) const {
+bool AArch64TargetInfo::doesFeatureAffectCodeGen(llvm::StringRef Name) const {
   if (auto Ext = llvm::AArch64::parseArchExtension(Name))
     return !Ext->DependentFeatures.empty();
   return false;
 }
 
-StringRef AArch64TargetInfo::getFeatureDependencies(StringRef Name) const {
+llvm::StringRef AArch64TargetInfo::getFeatureDependencies(llvm::StringRef Name) const {
   if (auto Ext = llvm::AArch64::parseArchExtension(Name))
     return Ext->DependentFeatures;
-  return StringRef();
+  return llvm::StringRef();
 }
 
-bool AArch64TargetInfo::validateCpuSupports(StringRef FeatureStr) const {
+bool AArch64TargetInfo::validateCpuSupports(llvm::StringRef FeatureStr) const {
   // CPU features might be separated by '+', extract them and check
-  llvm::SmallVector<StringRef, 8> Features;
+  llvm::SmallVector<llvm::StringRef, 8> Features;
   FeatureStr.split(Features, "+");
   for (auto &Feature : Features)
     if (!llvm::AArch64::parseArchExtension(Feature.trim()).has_value())
@@ -691,7 +691,7 @@ bool AArch64TargetInfo::validateCpuSupports(StringRef FeatureStr) const {
   return true;
 }
 
-bool AArch64TargetInfo::hasFeature(StringRef Feature) const {
+bool AArch64TargetInfo::hasFeature(llvm::StringRef Feature) const {
   return llvm::StringSwitch<bool>(Feature)
       .Cases("aarch64", "arm64", "arm", true)
       .Case("fmv", HasFMV)
@@ -746,7 +746,7 @@ bool AArch64TargetInfo::hasFeature(StringRef Feature) const {
 }
 
 void AArch64TargetInfo::setFeatureEnabled(llvm::StringMap<bool> &Features,
-                                          StringRef Name, bool Enabled) const {
+                                          llvm::StringRef Name, bool Enabled) const {
   Features[Name] = Enabled;
   // If the feature is an architecture feature (like v8.2a), add all previous
   // architecture versions and any dependant target features.
@@ -765,7 +765,7 @@ void AArch64TargetInfo::setFeatureEnabled(llvm::StringMap<bool> &Features,
       Features[OtherArch->getSubArch()] = true;
 
   // Set any features implied by the architecture
-  std::vector<StringRef> CPUFeats;
+  std::vector<llvm::StringRef> CPUFeats;
   if (llvm::AArch64::getExtensionFeatures(ArchInfo->DefaultExts, CPUFeats)) {
     for (auto F : CPUFeats) {
       assert(F[0] == '+' && "Expected + in target feature!");
@@ -1051,14 +1051,14 @@ bool AArch64TargetInfo::handleTargetFeatures(std::vector<std::string> &Features,
 }
 
 bool AArch64TargetInfo::initFeatureMap(
-    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, StringRef CPU,
+    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, llvm::StringRef CPU,
     const std::vector<std::string> &FeaturesVec) const {
   std::vector<std::string> UpdatedFeaturesVec;
   // Parse the CPU and add any implied features.
   std::optional<llvm::AArch64::CpuInfo> CpuInfo = llvm::AArch64::parseCpu(CPU);
   if (CpuInfo) {
     auto Exts = CpuInfo->getImpliedExtensions();
-    std::vector<StringRef> CPUFeats;
+    std::vector<llvm::StringRef> CPUFeats;
     llvm::AArch64::getExtensionFeatures(Exts, CPUFeats);
     for (auto F : CPUFeats) {
       assert((F[0] == '+' || F[0] == '-') && "Expected +/- in target feature!");
@@ -1073,9 +1073,9 @@ bool AArch64TargetInfo::initFeatureMap(
   for (const auto &Feature : FeaturesVec)
     if (((Feature[0] == '?' || Feature[0] == '+')) &&
         AArch64TargetInfo::doesFeatureAffectCodeGen(Feature.substr(1))) {
-      StringRef DepFeatures =
+      llvm::StringRef DepFeatures =
           AArch64TargetInfo::getFeatureDependencies(Feature.substr(1));
-      SmallVector<StringRef, 1> AttrFeatures;
+      llvm::SmallVector<llvm::StringRef, 1> AttrFeatures;
       DepFeatures.split(AttrFeatures, ",");
       for (auto F : AttrFeatures)
         UpdatedFeaturesVec.push_back(F.str());
@@ -1101,20 +1101,20 @@ bool AArch64TargetInfo::initFeatureMap(
 //  "tune=<cpu>" - TuneCPU set to <cpu>
 //  "feature", "no-feature" - Add (or remove) feature.
 //  "+feature", "+nofeature" - Add (or remove) feature.
-ParsedTargetAttr AArch64TargetInfo::parseTargetAttr(StringRef Features) const {
+ParsedTargetAttr AArch64TargetInfo::parseTargetAttr(llvm::StringRef Features) const {
   ParsedTargetAttr Ret;
   if (Features == "default")
     return Ret;
-  SmallVector<StringRef, 1> AttrFeatures;
+  llvm::SmallVector<llvm::StringRef, 1> AttrFeatures;
   Features.split(AttrFeatures, ",");
   bool FoundArch = false;
 
-  auto SplitAndAddFeatures = [](StringRef FeatString,
+  auto SplitAndAddFeatures = [](llvm::StringRef FeatString,
                                 std::vector<std::string> &Features) {
-    SmallVector<StringRef, 8> SplitFeatures;
-    FeatString.split(SplitFeatures, StringRef("+"), -1, false);
-    for (StringRef Feature : SplitFeatures) {
-      StringRef FeatureName = llvm::AArch64::getArchExtFeature(Feature);
+    llvm::SmallVector<llvm::StringRef, 8> SplitFeatures;
+    FeatString.split(SplitFeatures, llvm::StringRef("+"), -1, false);
+    for (llvm::StringRef Feature : SplitFeatures) {
+      llvm::StringRef FeatureName = llvm::AArch64::getArchExtFeature(Feature);
       if (!FeatureName.empty())
         Features.push_back(FeatureName.str());
       else
@@ -1141,7 +1141,7 @@ ParsedTargetAttr AArch64TargetInfo::parseTargetAttr(StringRef Features) const {
       if (FoundArch)
         Ret.Duplicate = "arch=";
       FoundArch = true;
-      std::pair<StringRef, StringRef> Split =
+      std::pair<llvm::StringRef, llvm::StringRef> Split =
           Feature.split("=").second.trim().split("+");
       const llvm::AArch64::ArchInfo *AI = llvm::AArch64::parseArch(Split.first);
 
@@ -1158,7 +1158,7 @@ ParsedTargetAttr AArch64TargetInfo::parseTargetAttr(StringRef Features) const {
       else {
         // Split the cpu string into "cpu=", "cortex-a710" and any remaining
         // "+feat" features.
-        std::pair<StringRef, StringRef> Split =
+        std::pair<llvm::StringRef, llvm::StringRef> Split =
             Feature.split("=").second.trim().split("+");
         Ret.CPU = Split.first;
         SplitAndAddFeatures(Split.second, Ret.Features);
@@ -1171,7 +1171,7 @@ ParsedTargetAttr AArch64TargetInfo::parseTargetAttr(StringRef Features) const {
     } else if (Feature.starts_with("+")) {
       SplitAndAddFeatures(Feature, Ret.Features);
     } else if (Feature.starts_with("no-")) {
-      StringRef FeatureName =
+      llvm::StringRef FeatureName =
           llvm::AArch64::getArchExtFeature(Feature.split("-").second);
       if (!FeatureName.empty())
         Ret.Features.push_back("-" + FeatureName.drop_front(1).str());
@@ -1181,7 +1181,7 @@ ParsedTargetAttr AArch64TargetInfo::parseTargetAttr(StringRef Features) const {
       // Try parsing the string to the internal target feature name. If it is
       // invalid, add the original string (which could already be an internal
       // name). These should be checked later by isValidFeatureName.
-      StringRef FeatureName = llvm::AArch64::getArchExtFeature(Feature);
+      llvm::StringRef FeatureName = llvm::AArch64::getArchExtFeature(Feature);
       if (!FeatureName.empty())
         Ret.Features.push_back(FeatureName.str());
       else
@@ -1266,7 +1266,7 @@ const char *const AArch64TargetInfo::GCCRegNames[] = {
     // clang-format on
 };
 
-ArrayRef<const char *> AArch64TargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> AArch64TargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
@@ -1309,7 +1309,7 @@ const TargetInfo::GCCRegAlias AArch64TargetInfo::GCCRegAliases[] = {
     // don't want to substitute one of these for a different-sized one.
 };
 
-ArrayRef<TargetInfo::GCCRegAlias> AArch64TargetInfo::getGCCRegAliases() const {
+llvm::ArrayRef<TargetInfo::GCCRegAlias> AArch64TargetInfo::getGCCRegAliases() const {
   return llvm::ArrayRef(GCCRegAliases);
 }
 
@@ -1425,7 +1425,7 @@ bool AArch64TargetInfo::validateAsmConstraint(
 }
 
 bool AArch64TargetInfo::validateConstraintModifier(
-    StringRef Constraint, char Modifier, unsigned Size,
+    llvm::StringRef Constraint, char Modifier, unsigned Size,
     std::string &SuggestedModifier) const {
   // Strip off constraint modifiers.
   Constraint = Constraint.ltrim("=+&");

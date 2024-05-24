@@ -21,7 +21,7 @@ namespace clang::tidy::google::objc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/google/objc-avoid-throwing-exception.html
 class AvoidThrowingObjCExceptionCheck : public ClangTidyCheck {
  public:
-  AvoidThrowingObjCExceptionCheck(StringRef Name, ClangTidyContext *Context)
+  AvoidThrowingObjCExceptionCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.ObjC;

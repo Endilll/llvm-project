@@ -581,7 +581,7 @@ TEST_F(DefineOutlineTest, FailsMacroSpecifier) {
   ExtraFiles["Test.cpp"] = "";
   ExtraArgs.push_back("-DFINALOVER=final override");
 
-  std::pair<StringRef, StringRef> Cases[] = {
+  std::pair<llvm::StringRef, llvm::StringRef> Cases[] = {
       {
           R"cpp(
           #define VIRT virtual void

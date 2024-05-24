@@ -39,7 +39,7 @@ namespace data_collection {
 std::string getMacroStack(SourceLocation Loc, ASTContext &Context);
 
 /// Utility functions for implementing addData() for a consumer that has a
-/// method update(StringRef)
+/// method update(llvm::StringRef)
 template <class T>
 void addDataToConsumer(T &DataConsumer, llvm::StringRef Str) {
   DataConsumer.update(Str);
@@ -54,7 +54,7 @@ std::enable_if_t<std::is_integral<Type>::value || std::is_enum<Type>::value ||
                  std::is_convertible<Type, size_t>::value // for llvm::hash_code
                  >
 addDataToConsumer(T &DataConsumer, Type Data) {
-  DataConsumer.update(StringRef(reinterpret_cast<char *>(&Data), sizeof(Data)));
+  DataConsumer.update(llvm::StringRef(reinterpret_cast<char *>(&Data), sizeof(Data)));
 }
 
 } // end namespace data_collection

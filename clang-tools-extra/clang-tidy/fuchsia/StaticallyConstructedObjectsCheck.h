@@ -21,7 +21,7 @@ namespace clang::tidy::fuchsia {
 /// http://clang.llvm.org/extra/clang-tidy/checks/fuchsia/statically-constructed-objects.html
 class StaticallyConstructedObjectsCheck : public ClangTidyCheck {
 public:
-  StaticallyConstructedObjectsCheck(StringRef Name, ClangTidyContext *Context)
+  StaticallyConstructedObjectsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;

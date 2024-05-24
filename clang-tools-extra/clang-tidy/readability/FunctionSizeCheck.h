@@ -34,7 +34,7 @@ namespace clang::tidy::readability {
 ///     declarations. The default is `-1` (ignore the number of variables).
 class FunctionSizeCheck : public ClangTidyCheck {
 public:
-  FunctionSizeCheck(StringRef Name, ClangTidyContext *Context);
+  FunctionSizeCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

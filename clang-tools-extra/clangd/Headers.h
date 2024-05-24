@@ -145,7 +145,7 @@ public:
   std::optional<HeaderID> getID(const FileEntry *Entry) const;
   HeaderID getOrCreateID(FileEntryRef Entry);
 
-  StringRef getRealPath(HeaderID ID) const {
+  llvm::StringRef getRealPath(HeaderID ID) const {
     assert(static_cast<unsigned>(ID) <= RealPathNames.size());
     return RealPathNames[static_cast<unsigned>(ID)];
   }
@@ -166,7 +166,7 @@ public:
   includeDepth(HeaderID Root = MainFileID) const;
 
   // Maps HeaderID to the ids of the files included from it.
-  llvm::DenseMap<HeaderID, SmallVector<HeaderID>> IncludeChildren;
+  llvm::DenseMap<HeaderID, llvm::SmallVector<HeaderID>> IncludeChildren;
 
   llvm::DenseMap<tooling::stdlib::Header, llvm::SmallVector<HeaderID>>
       StdlibHeaders;
@@ -209,8 +209,8 @@ public:
   // If \p HeaderSearchInfo is nullptr (e.g. when compile command is
   // infeasible), this will only try to insert verbatim headers, and
   // include path of non-verbatim header will not be shortened.
-  IncludeInserter(StringRef FileName, StringRef Code,
-                  const format::FormatStyle &Style, StringRef BuildDir,
+  IncludeInserter(llvm::StringRef FileName, llvm::StringRef Code,
+                  const format::FormatStyle &Style, llvm::StringRef BuildDir,
                   HeaderSearch *HeaderSearchInfo)
       : FileName(FileName), Code(Code), BuildDir(BuildDir),
         HeaderSearchInfo(HeaderSearchInfo),
@@ -252,9 +252,9 @@ public:
                                  tooling::IncludeDirective Directive) const;
 
 private:
-  StringRef FileName;
-  StringRef Code;
-  StringRef BuildDir;
+  llvm::StringRef FileName;
+  llvm::StringRef Code;
+  llvm::StringRef BuildDir;
   HeaderSearch *HeaderSearchInfo = nullptr;
   llvm::StringSet<> IncludedHeaders; // Both written and resolved.
   tooling::HeaderIncludes Inserter;  // Computers insertion replacement.

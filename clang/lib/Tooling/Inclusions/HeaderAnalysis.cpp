@@ -37,7 +37,7 @@ bool isErrorAboutInclude(llvm::StringRef Line) {
 }
 
 // Heuristically headers that only want to be included via an umbrella.
-bool isDontIncludeMeHeader(StringRef Content) {
+bool isDontIncludeMeHeader(llvm::StringRef Content) {
   llvm::StringRef Line;
   // Only sniff up to 100 lines or 10KB.
   Content = Content.take_front(100 * 100);
@@ -92,7 +92,7 @@ bool codeContainsImports(llvm::StringRef Code) {
   return false;
 }
 
-std::optional<StringRef> parseIWYUPragma(const char *Text) {
+std::optional<llvm::StringRef> parseIWYUPragma(const char *Text) {
   // Skip the comment start, // or /*.
   if (Text[0] != '/' || (Text[1] != '/' && Text[1] != '*'))
     return std::nullopt;
@@ -107,7 +107,7 @@ std::optional<StringRef> parseIWYUPragma(const char *Text) {
   const char *End = Text;
   while (*End != 0 && *End != '\n')
     ++End;
-  StringRef Rest(Text, End - Text);
+  llvm::StringRef Rest(Text, End - Text);
   // Strip off whitespace and comment markers to avoid confusion. This isn't
   // fully-compatible with IWYU, which splits into whitespace-delimited tokens.
   if (BlockComment)

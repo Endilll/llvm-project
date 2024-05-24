@@ -49,7 +49,7 @@ TEST(ASTSignals, Derive) {
   namespace ns1::ns2 { int fooInNS2(); }}
   )cpp";
   ASTSignals Signals = ASTSignals::derive(TU.build());
-  std::vector<std::pair<StringRef, int>> NS;
+  std::vector<std::pair<llvm::StringRef, int>> NS;
   for (const auto &P : Signals.RelatedNamespaces)
     NS.emplace_back(P.getKey(), P.getValue());
   EXPECT_THAT(NS, UnorderedElementsAre(Pair("ns1::", 1), Pair("ns1::ns2::", 1),

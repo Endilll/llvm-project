@@ -37,7 +37,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/forward-declaration-namespace.html
 class ForwardDeclarationNamespaceCheck : public ClangTidyCheck {
 public:
-  ForwardDeclarationNamespaceCheck(StringRef Name, ClangTidyContext *Context)
+  ForwardDeclarationNamespaceCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

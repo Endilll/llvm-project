@@ -35,7 +35,7 @@ class PrintMatch : public ast_matchers::MatchFinder::MatchCallback {
   using PrinterT = NodePrinter<NodeType>;
   using FilterT = NodeFilter<NodeType>;
 
-  SmallString<1024> Printed;
+  llvm::SmallString<1024> Printed;
   unsigned NumFoundNodes;
   PrinterT Printer;
   FilterT Filter;
@@ -59,7 +59,7 @@ public:
     Printer(Out, Result.Context, N, PolicyAdjuster);
   }
 
-  StringRef getPrinted() const { return Printed; }
+  llvm::StringRef getPrinted() const { return Printed; }
 
   unsigned getNumFoundNodes() const { return NumFoundNodes; }
 };
@@ -70,9 +70,9 @@ template <typename NodeType> bool NoNodeFilter(const NodeType *) {
 
 template <typename NodeType, typename Matcher>
 ::testing::AssertionResult
-PrintedNodeMatches(StringRef Code, const std::vector<std::string> &Args,
-                   const Matcher &NodeMatch, StringRef ExpectedPrinted,
-                   StringRef FileName, NodePrinter<NodeType> Printer,
+PrintedNodeMatches(llvm::StringRef Code, const std::vector<std::string> &Args,
+                   const Matcher &NodeMatch, llvm::StringRef ExpectedPrinted,
+                   llvm::StringRef FileName, NodePrinter<NodeType> Printer,
                    PrintingPolicyAdjuster PolicyAdjuster = nullptr,
                    bool AllowError = false,
                    // Would like to use a lambda for the default value, but that

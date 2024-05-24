@@ -30,7 +30,7 @@ namespace clang::tidy::modernize {
 /// \endcode
 class MinMaxUseInitializerListCheck : public ClangTidyCheck {
 public:
-  MinMaxUseInitializerListCheck(StringRef Name, ClangTidyContext *Context);
+  MinMaxUseInitializerListCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

@@ -1022,7 +1022,7 @@ bool ByteCodeExprGen<Emitter>::VisitArraySubscriptExpr(
 }
 
 template <class Emitter>
-bool ByteCodeExprGen<Emitter>::visitInitList(ArrayRef<const Expr *> Inits,
+bool ByteCodeExprGen<Emitter>::visitInitList(llvm::ArrayRef<const Expr *> Inits,
                                              const Expr *ArrayFiller,
                                              const Expr *E) {
   if (E->getType()->isVoidType())

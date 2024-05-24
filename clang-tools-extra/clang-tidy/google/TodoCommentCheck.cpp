@@ -20,21 +20,21 @@ public:
         TodoMatch("^// *TODO *(\\(.*\\))?:?( )?(.*)$") {}
 
   bool HandleComment(Preprocessor &PP, SourceRange Range) override {
-    StringRef Text =
+    llvm::StringRef Text =
         Lexer::getSourceText(CharSourceRange::getCharRange(Range),
                              PP.getSourceManager(), PP.getLangOpts());
 
-    SmallVector<StringRef, 4> Matches;
+    llvm::SmallVector<llvm::StringRef, 4> Matches;
     if (!TodoMatch.match(Text, &Matches))
       return false;
 
-    StringRef Username = Matches[1];
-    StringRef Comment = Matches[3];
+    llvm::StringRef Username = Matches[1];
+    llvm::StringRef Comment = Matches[3];
 
     if (!Username.empty())
       return false;
 
-    std::string NewText = ("// TODO(" + Twine(User) + "): " + Comment).str();
+    std::string NewText = ("// TODO(" + llvm::Twine(User) + "): " + Comment).str();
 
     Check.diag(Range.getBegin(), "missing username/bug in TODO")
         << FixItHint::CreateReplacement(CharSourceRange::getCharRange(Range),
@@ -48,7 +48,7 @@ private:
   llvm::Regex TodoMatch;
 };
 
-TodoCommentCheck::TodoCommentCheck(StringRef Name, ClangTidyContext *Context)
+TodoCommentCheck::TodoCommentCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       Handler(std::make_unique<TodoCommentHandler>(
           *this, Context->getOptions().User)) {}

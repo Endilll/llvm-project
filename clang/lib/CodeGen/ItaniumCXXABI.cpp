@@ -251,7 +251,7 @@ public:
 
   AddedStructorArgCounts
   buildStructorSignature(GlobalDecl GD,
-                         SmallVectorImpl<CanQualType> &ArgTys) override;
+                         llvm::SmallVectorImpl<CanQualType> &ArgTys) override;
 
   bool useThunkForDtorVariant(const CXXDestructorDecl *Dtor,
                               CXXDtorType DT) const override {
@@ -347,8 +347,8 @@ public:
     return Args.size() - 1;
   }
 
-  StringRef GetPureVirtualCallName() override { return "__cxa_pure_virtual"; }
-  StringRef GetDeletedVirtualCallName() override
+  llvm::StringRef GetPureVirtualCallName() override { return "__cxa_pure_virtual"; }
+  llvm::StringRef GetDeletedVirtualCallName() override
     { return "__cxa_deleted_virtual"; }
 
   CharUnits getArrayCookieSizeImpl(QualType elementType) override;
@@ -372,9 +372,9 @@ public:
                                                 llvm::Value *Val);
   void EmitThreadLocalInitFuncs(
       CodeGenModule &CGM,
-      ArrayRef<const VarDecl *> CXXThreadLocals,
-      ArrayRef<llvm::Function *> CXXThreadLocalInits,
-      ArrayRef<const VarDecl *> CXXThreadLocalInitVars) override;
+      llvm::ArrayRef<const VarDecl *> CXXThreadLocals,
+      llvm::ArrayRef<llvm::Function *> CXXThreadLocalInits,
+      llvm::ArrayRef<const VarDecl *> CXXThreadLocalInitVars) override;
 
   bool usesThreadWrapperFunction(const VarDecl *VD) const override {
     return !isEmittedWithConstantInitializer(VD) ||
@@ -436,7 +436,7 @@ public:
        if (!Method->getCanonicalDecl()->isInlined())
          continue;
 
-       StringRef Name = CGM.getMangledName(VtableComponent.getGlobalDecl());
+       llvm::StringRef Name = CGM.getMangledName(VtableComponent.getGlobalDecl());
        auto *Entry = CGM.GetGlobalValue(Name);
        // This checks if virtual inline function has already been emitted.
        // Note that it is possible that this inline function would be emitted
@@ -1664,7 +1664,7 @@ void ItaniumCXXABI::EmitCXXConstructors(const CXXConstructorDecl *D) {
 
 CGCXXABI::AddedStructorArgCounts
 ItaniumCXXABI::buildStructorSignature(GlobalDecl GD,
-                                      SmallVectorImpl<CanQualType> &ArgTys) {
+                                      llvm::SmallVectorImpl<CanQualType> &ArgTys) {
   ASTContext &Context = getContext();
 
   // All parameters are already in place except VTT, which goes after 'this'.
@@ -1960,7 +1960,7 @@ llvm::GlobalVariable *ItaniumCXXABI::getAddrOfVTable(const CXXRecordDecl *RD,
   // Queue up this vtable for possible deferred emission.
   CGM.addDeferredVTable(RD);
 
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   llvm::raw_svector_ostream Out(Name);
   getMangleContext().mangleCXXVTable(RD, Out);
 
@@ -2463,7 +2463,7 @@ void ItaniumCXXABI::EmitGuardedInit(CodeGenFunction &CGF,
   llvm::GlobalVariable *guard = CGM.getStaticLocalDeclGuardAddress(&D);
   if (!guard) {
     // Mangle the name for the guard.
-    SmallString<256> guardName;
+    llvm::SmallString<256> guardName;
     {
       llvm::raw_svector_ostream out(guardName);
       getMangleContext().mangleStaticGuardVariable(&D, out);
@@ -2682,7 +2682,7 @@ static void emitGlobalDtorWithCXAAtExit(CodeGenFunction &CGF,
 }
 
 static llvm::Function *createGlobalInitOrCleanupFn(CodeGen::CodeGenModule &CGM,
-                                                   StringRef FnName) {
+                                                   llvm::StringRef FnName) {
   // Create a function that registers/unregisters destructors that have the same
   // priority.
   llvm::FunctionType *FTy = llvm::FunctionType::get(CGM.VoidTy, false);
@@ -2853,7 +2853,7 @@ llvm::Function *
 ItaniumCXXABI::getOrCreateThreadLocalWrapper(const VarDecl *VD,
                                              llvm::Value *Val) {
   // Mangle the name for the thread_local wrapper function.
-  SmallString<256> WrapperName;
+  llvm::SmallString<256> WrapperName;
   {
     llvm::raw_svector_ostream Out(WrapperName);
     getMangleContext().mangleItaniumThreadLocalWrapper(VD, Out);
@@ -2899,9 +2899,9 @@ ItaniumCXXABI::getOrCreateThreadLocalWrapper(const VarDecl *VD,
 }
 
 void ItaniumCXXABI::EmitThreadLocalInitFuncs(
-    CodeGenModule &CGM, ArrayRef<const VarDecl *> CXXThreadLocals,
-    ArrayRef<llvm::Function *> CXXThreadLocalInits,
-    ArrayRef<const VarDecl *> CXXThreadLocalInitVars) {
+    CodeGenModule &CGM, llvm::ArrayRef<const VarDecl *> CXXThreadLocals,
+    llvm::ArrayRef<llvm::Function *> CXXThreadLocalInits,
+    llvm::ArrayRef<const VarDecl *> CXXThreadLocalInitVars) {
   llvm::Function *InitFunc = nullptr;
 
   // Separate initializers into those with ordered (or partially-ordered)
@@ -2979,7 +2979,7 @@ void ItaniumCXXABI::EmitThreadLocalInitFuncs(
     CGM.SetLLVMFunctionAttributesForDefinition(nullptr, Wrapper);
 
     // Mangle the name for the thread_local initialization function.
-    SmallString<256> InitFnName;
+    llvm::SmallString<256> InitFnName;
     {
       llvm::raw_svector_ostream Out(InitFnName);
       getMangleContext().mangleItaniumThreadLocalInit(VD, Out);
@@ -3147,7 +3147,7 @@ class ItaniumRTTIBuilder {
   const ItaniumCXXABI &CXXABI;  // Per-module state.
 
   /// Fields - The fields of the RTTI descriptor currently being built.
-  SmallVector<llvm::Constant *, 16> Fields;
+  llvm::SmallVector<llvm::Constant *, 16> Fields;
 
   /// GetAddrOfTypeName - Returns the mangled type name of the given type.
   llvm::GlobalVariable *
@@ -3243,7 +3243,7 @@ public:
 
 llvm::GlobalVariable *ItaniumRTTIBuilder::GetAddrOfTypeName(
     QualType Ty, llvm::GlobalVariable::LinkageTypes Linkage) {
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   llvm::raw_svector_ostream Out(Name);
   CGM.getCXXABI().getMangleContext().mangleCXXRTTIName(Ty, Out);
 
@@ -3265,7 +3265,7 @@ llvm::GlobalVariable *ItaniumRTTIBuilder::GetAddrOfTypeName(
 llvm::Constant *
 ItaniumRTTIBuilder::GetAddrOfExternalRTTIDescriptor(QualType Ty) {
   // Mangle the RTTI name.
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   llvm::raw_svector_ostream Out(Name);
   CGM.getCXXABI().getMangleContext().mangleCXXRTTI(Ty, Out);
 
@@ -3759,7 +3759,7 @@ llvm::Constant *ItaniumRTTIBuilder::BuildTypeInfo(QualType Ty) {
   Ty = Ty.getCanonicalType();
 
   // Check if we've already emitted an RTTI descriptor for this type.
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   llvm::raw_svector_ostream Out(Name);
   CGM.getCXXABI().getMangleContext().mangleCXXRTTI(Ty, Out);
 
@@ -3927,7 +3927,7 @@ llvm::Constant *ItaniumRTTIBuilder::BuildTypeInfo(
 
   llvm::Constant *Init = llvm::ConstantStruct::getAnon(Fields);
 
-  SmallString<256> Name;
+  llvm::SmallString<256> Name;
   llvm::raw_svector_ostream Out(Name);
   CGM.getCXXABI().getMangleContext().mangleCXXRTTI(Ty, Out);
   llvm::Module &M = CGM.getModule();
@@ -4372,7 +4372,7 @@ static void emitConstructorDestructorAlias(CodeGenModule &CGM,
                                            GlobalDecl TargetDecl) {
   llvm::GlobalValue::LinkageTypes Linkage = CGM.getFunctionLinkage(AliasDecl);
 
-  StringRef MangledName = CGM.getMangledName(AliasDecl);
+  llvm::StringRef MangledName = CGM.getMangledName(AliasDecl);
   llvm::GlobalValue *Entry = CGM.GetGlobalValue(MangledName);
   if (Entry && !Entry->isDeclaration())
     return;
@@ -4421,7 +4421,7 @@ void ItaniumCXXABI::emitCXXStructor(GlobalDecl GD) {
     }
 
     if (CGType == StructorCodegen::RAUW) {
-      StringRef MangledName = CGM.getMangledName(GD);
+      llvm::StringRef MangledName = CGM.getMangledName(GD);
       auto *Aliasee = CGM.GetAddrOfGlobal(BaseDecl);
       CGM.addReplacement(MangledName, Aliasee);
       return;
@@ -4452,7 +4452,7 @@ void ItaniumCXXABI::emitCXXStructor(GlobalDecl GD) {
   llvm::Function *Fn = CGM.codegenCXXStructor(GD);
 
   if (CGType == StructorCodegen::COMDAT) {
-    SmallString<256> Buffer;
+    llvm::SmallString<256> Buffer;
     llvm::raw_svector_ostream Out(Buffer);
     if (DD)
       getMangleContext().mangleCXXDtorComdat(DD, Out);
@@ -4887,7 +4887,7 @@ void XLCXXABI::registerGlobalDtor(CodeGenFunction &CGF, const VarDecl &D,
 void XLCXXABI::emitCXXStermFinalizer(const VarDecl &D, llvm::Function *dtorStub,
                                      llvm::Constant *addr) {
   llvm::FunctionType *FTy = llvm::FunctionType::get(CGM.VoidTy, false);
-  SmallString<256> FnName;
+  llvm::SmallString<256> FnName;
   {
     llvm::raw_svector_ostream Out(FnName);
     getMangleContext().mangleDynamicStermFinalizer(&D, Out);

@@ -40,10 +40,10 @@ AST_POLYMORPHIC_MATCHER(
     return false;
   // Determine whether filepath contains "absl/[absl-library]" substring, where
   // [absl-library] is AbseilLibraries list entry.
-  StringRef Path = FileEntry->getName();
+  llvm::StringRef Path = FileEntry->getName();
   static constexpr llvm::StringLiteral AbslPrefix("absl/");
   size_t PrefixPosition = Path.find(AbslPrefix);
-  if (PrefixPosition == StringRef::npos)
+  if (PrefixPosition == llvm::StringRef::npos)
     return false;
   Path = Path.drop_front(PrefixPosition + AbslPrefix.size());
   static const char *AbseilLibraries[] = {

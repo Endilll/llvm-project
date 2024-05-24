@@ -29,12 +29,12 @@ void CreatUnsatisfiedConstraintRecord(
         UnsatisfiedConstraintRecord::second_type(Detail.second.get<Expr *>())};
   else {
     auto &SubstitutionDiagnostic =
-        *Detail.second.get<std::pair<SourceLocation, StringRef> *>();
+        *Detail.second.get<std::pair<SourceLocation, llvm::StringRef> *>();
     unsigned MessageSize = SubstitutionDiagnostic.second.size();
     char *Mem = new (C) char[MessageSize];
     memcpy(Mem, SubstitutionDiagnostic.second.data(), MessageSize);
-    auto *NewSubstDiag = new (C) std::pair<SourceLocation, StringRef>(
-        SubstitutionDiagnostic.first, StringRef(Mem, MessageSize));
+    auto *NewSubstDiag = new (C) std::pair<SourceLocation, llvm::StringRef>(
+        SubstitutionDiagnostic.first, llvm::StringRef(Mem, MessageSize));
     new (TrailingObject) UnsatisfiedConstraintRecord{
         Detail.first, UnsatisfiedConstraintRecord::second_type(NewSubstDiag)};
   }
@@ -83,7 +83,7 @@ ASTConstraintSatisfaction *ASTConstraintSatisfaction::Rebuild(
 
 void ConstraintSatisfaction::Profile(
     llvm::FoldingSetNodeID &ID, const ASTContext &C,
-    const NamedDecl *ConstraintOwner, ArrayRef<TemplateArgument> TemplateArgs) {
+    const NamedDecl *ConstraintOwner, llvm::ArrayRef<TemplateArgument> TemplateArgs) {
   ID.AddPointer(ConstraintOwner);
   ID.AddInteger(TemplateArgs.size());
   for (auto &Arg : TemplateArgs)

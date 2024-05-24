@@ -10,7 +10,7 @@ using llvm::SmallString;
 namespace {
 
 TEST(FixedPointString, DifferentTypes) {
-  SmallString<64> S;
+  llvm::SmallString<64> S;
   FixedPointValueToString(S, APSInt::get(320), 7);
   ASSERT_STREQ(S.c_str(), "2.5");
 
@@ -80,7 +80,7 @@ TEST(FixedPointString, DifferentTypes) {
 }
 
 TEST(FixedPointString, Negative) {
-  SmallString<64> S;
+  llvm::SmallString<64> S;
   FixedPointValueToString(S, APSInt::get(-320), 7);
   ASSERT_STREQ(S.c_str(), "-2.5");
 

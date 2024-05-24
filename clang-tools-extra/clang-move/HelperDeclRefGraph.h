@@ -63,7 +63,7 @@ public:
   void dump() const;
 
 private:
-  void print(raw_ostream &OS) const;
+  void print(llvm::raw_ostream &OS) const;
   // Lookup a node for the given declaration D. If not found, insert a new
   // node into the graph.
   CallGraphNode *getOrInsertNode(Decl *D);

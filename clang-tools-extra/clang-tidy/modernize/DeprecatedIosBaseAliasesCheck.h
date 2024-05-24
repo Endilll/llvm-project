@@ -20,7 +20,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/deprecated-ios-base-aliases.html
 class DeprecatedIosBaseAliasesCheck : public ClangTidyCheck {
 public:
-  DeprecatedIosBaseAliasesCheck(StringRef Name, ClangTidyContext *Context)
+  DeprecatedIosBaseAliasesCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

@@ -109,7 +109,7 @@ public:
   ProgramStateRef evalAssume(ProgramStateRef State, SVal Cond,
                              bool Assumption) const;
 
-  void printState(raw_ostream &Out, ProgramStateRef State, const char *NL,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State, const char *NL,
                   const char *Sep) const override;
 
   enum CheckKind {
@@ -163,13 +163,13 @@ private:
   ///
   /// When \p SuppressPath is set to true, no more bugs will be reported on this
   /// path by this checker.
-  void reportBugIfInvariantHolds(StringRef Msg, ErrorKind Error, CheckKind CK,
+  void reportBugIfInvariantHolds(llvm::StringRef Msg, ErrorKind Error, CheckKind CK,
                                  ExplodedNode *N, const MemRegion *Region,
                                  CheckerContext &C,
                                  const Stmt *ValueExpr = nullptr,
                                  bool SuppressPath = false) const;
 
-  void reportBug(StringRef Msg, ErrorKind Error, CheckKind CK, ExplodedNode *N,
+  void reportBug(llvm::StringRef Msg, ErrorKind Error, CheckKind CK, ExplodedNode *N,
                  const MemRegion *Region, BugReporter &BR,
                  const Stmt *ValueExpr = nullptr) const {
     const std::unique_ptr<BugType> &BT = getBugType(CK);
@@ -218,7 +218,7 @@ public:
     ID.AddPointer(Source);
   }
 
-  void print(raw_ostream &Out) const {
+  void print(llvm::raw_ostream &Out) const {
     Out << getNullabilityString(Nullab) << "\n";
   }
 
@@ -402,7 +402,7 @@ static bool checkValueAtLValForInvariantViolation(ProgramStateRef State,
 }
 
 static bool
-checkParamsForPreconditionViolation(ArrayRef<ParmVarDecl *> Params,
+checkParamsForPreconditionViolation(llvm::ArrayRef<ParmVarDecl *> Params,
                                     ProgramStateRef State,
                                     const LocationContext *LocCtxt) {
   for (const auto *ParamDecl : Params) {
@@ -459,7 +459,7 @@ static bool checkInvariantViolation(ProgramStateRef State, ExplodedNode *N,
   if (!D)
     return false;
 
-  ArrayRef<ParmVarDecl*> Params;
+  llvm::ArrayRef<ParmVarDecl*> Params;
   if (const auto *BD = dyn_cast<BlockDecl>(D))
     Params = BD->parameters();
   else if (const auto *FD = dyn_cast<FunctionDecl>(D))
@@ -479,7 +479,7 @@ static bool checkInvariantViolation(ProgramStateRef State, ExplodedNode *N,
 }
 
 void NullabilityChecker::reportBugIfInvariantHolds(
-    StringRef Msg, ErrorKind Error, CheckKind CK, ExplodedNode *N,
+    llvm::StringRef Msg, ErrorKind Error, CheckKind CK, ExplodedNode *N,
     const MemRegion *Region, CheckerContext &C, const Stmt *ValueExpr,
     bool SuppressPath) const {
   ProgramStateRef OriginalState = N->getState();
@@ -711,7 +711,7 @@ void NullabilityChecker::checkPreStmt(const ReturnStmt *S,
     if (!N)
       return;
 
-    SmallString<256> SBuf;
+    llvm::SmallString<256> SBuf;
     llvm::raw_svector_ostream OS(SBuf);
     OS << (RetExpr->getType()->isObjCObjectPointerType() ? "nil" : "Null");
     OS << " returned from a " << C.getDeclDescription(D) <<
@@ -745,7 +745,7 @@ void NullabilityChecker::checkPreStmt(const ReturnStmt *S,
       static CheckerProgramPointTag Tag(this, "NullableReturnedFromNonnull");
       ExplodedNode *N = C.addTransition(State, C.getPredecessor(), &Tag);
 
-      SmallString<256> SBuf;
+      llvm::SmallString<256> SBuf;
       llvm::raw_svector_ostream OS(SBuf);
       OS << "Nullable pointer is returned from a " << C.getDeclDescription(D) <<
             " that is expected to return a non-null value";
@@ -811,7 +811,7 @@ void NullabilityChecker::checkPreCall(const CallEvent &Call,
       if (!N)
         return;
 
-      SmallString<256> SBuf;
+      llvm::SmallString<256> SBuf;
       llvm::raw_svector_ostream OS(SBuf);
       OS << (Param->getType()->isObjCObjectPointerType() ? "nil" : "Null");
       OS << " passed to a callee that requires a non-null " << ParamIdx
@@ -838,7 +838,7 @@ void NullabilityChecker::checkPreCall(const CallEvent &Call,
           RequiredNullability == Nullability::Nonnull &&
           isDiagnosableCall(Call)) {
         ExplodedNode *N = C.addTransition(State);
-        SmallString<256> SBuf;
+        llvm::SmallString<256> SBuf;
         llvm::raw_svector_ostream OS(SBuf);
         OS << "Nullable pointer is passed to a callee that requires a non-null "
            << ParamIdx << llvm::getOrdinalSuffix(ParamIdx) << " parameter";
@@ -889,7 +889,7 @@ void NullabilityChecker::checkPostCall(const CallEvent &Call,
   // CG headers are misannotated. Do not warn for symbols that are the results
   // of CG calls.
   const SourceManager &SM = C.getSourceManager();
-  StringRef FilePath = SM.getFilename(SM.getSpellingLoc(Decl->getBeginLoc()));
+  llvm::StringRef FilePath = SM.getFilename(SM.getSpellingLoc(Decl->getBeginLoc()));
   if (llvm::sys::path::filename(FilePath).starts_with("CG")) {
     State = State->set<NullabilityMap>(Region, Nullability::Contradicted);
     C.addTransition(State);
@@ -1008,7 +1008,7 @@ void NullabilityChecker::checkPostObjCMessage(const ObjCMethodCall &M,
       return;
     }
     // For similar reasons ignore some methods of Cocoa arrays.
-    StringRef FirstSelectorSlot = M.getSelector().getNameForSlot(0);
+    llvm::StringRef FirstSelectorSlot = M.getSelector().getNameForSlot(0);
     if (Name.contains("Array") &&
         (FirstSelectorSlot == "firstObject" ||
          FirstSelectorSlot == "lastObject")) {
@@ -1301,7 +1301,7 @@ void NullabilityChecker::checkBind(SVal L, SVal V, const Stmt *S,
     if (ValueExpr)
       ValueStmt = ValueExpr;
 
-    SmallString<256> SBuf;
+    llvm::SmallString<256> SBuf;
     llvm::raw_svector_ostream OS(SBuf);
     OS << (LocType->isObjCObjectPointerType() ? "nil" : "Null");
     OS << " assigned to a pointer which is expected to have non-null value";
@@ -1364,7 +1364,7 @@ void NullabilityChecker::checkBind(SVal L, SVal V, const Stmt *S,
   }
 }
 
-void NullabilityChecker::printState(raw_ostream &Out, ProgramStateRef State,
+void NullabilityChecker::printState(llvm::raw_ostream &Out, ProgramStateRef State,
                                     const char *NL, const char *Sep) const {
 
   NullabilityMapTy B = State->get<NullabilityMap>();

@@ -22,7 +22,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/unsafe-functions.html
 class UnsafeFunctionsCheck : public ClangTidyCheck {
 public:
-  UnsafeFunctionsCheck(StringRef Name, ClangTidyContext *Context);
+  UnsafeFunctionsCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
 
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

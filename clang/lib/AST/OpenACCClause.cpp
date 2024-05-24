@@ -177,7 +177,7 @@ OpenACCAsyncClause *OpenACCAsyncClause::Create(const ASTContext &C,
 
 OpenACCWaitClause *OpenACCWaitClause::Create(
     const ASTContext &C, SourceLocation BeginLoc, SourceLocation LParenLoc,
-    Expr *DevNumExpr, SourceLocation QueuesLoc, ArrayRef<Expr *> QueueIdExprs,
+    Expr *DevNumExpr, SourceLocation QueuesLoc, llvm::ArrayRef<Expr *> QueueIdExprs,
     SourceLocation EndLoc) {
   // Allocates enough room in trailing storage for all the int-exprs, plus a
   // placeholder for the devnum.
@@ -190,7 +190,7 @@ OpenACCWaitClause *OpenACCWaitClause::Create(
 OpenACCNumGangsClause *OpenACCNumGangsClause::Create(const ASTContext &C,
                                                      SourceLocation BeginLoc,
                                                      SourceLocation LParenLoc,
-                                                     ArrayRef<Expr *> IntExprs,
+                                                     llvm::ArrayRef<Expr *> IntExprs,
                                                      SourceLocation EndLoc) {
   void *Mem = C.Allocate(
       OpenACCNumGangsClause::totalSizeToAlloc<Expr *>(IntExprs.size()));
@@ -200,7 +200,7 @@ OpenACCNumGangsClause *OpenACCNumGangsClause::Create(const ASTContext &C,
 OpenACCPrivateClause *OpenACCPrivateClause::Create(const ASTContext &C,
                                                    SourceLocation BeginLoc,
                                                    SourceLocation LParenLoc,
-                                                   ArrayRef<Expr *> VarList,
+                                                   llvm::ArrayRef<Expr *> VarList,
                                                    SourceLocation EndLoc) {
   void *Mem = C.Allocate(
       OpenACCPrivateClause::totalSizeToAlloc<Expr *>(VarList.size()));
@@ -209,7 +209,7 @@ OpenACCPrivateClause *OpenACCPrivateClause::Create(const ASTContext &C,
 
 OpenACCFirstPrivateClause *OpenACCFirstPrivateClause::Create(
     const ASTContext &C, SourceLocation BeginLoc, SourceLocation LParenLoc,
-    ArrayRef<Expr *> VarList, SourceLocation EndLoc) {
+    llvm::ArrayRef<Expr *> VarList, SourceLocation EndLoc) {
   void *Mem = C.Allocate(
       OpenACCFirstPrivateClause::totalSizeToAlloc<Expr *>(VarList.size()));
   return new (Mem)
@@ -219,7 +219,7 @@ OpenACCFirstPrivateClause *OpenACCFirstPrivateClause::Create(
 OpenACCAttachClause *OpenACCAttachClause::Create(const ASTContext &C,
                                                  SourceLocation BeginLoc,
                                                  SourceLocation LParenLoc,
-                                                 ArrayRef<Expr *> VarList,
+                                                 llvm::ArrayRef<Expr *> VarList,
                                                  SourceLocation EndLoc) {
   void *Mem =
       C.Allocate(OpenACCAttachClause::totalSizeToAlloc<Expr *>(VarList.size()));
@@ -229,7 +229,7 @@ OpenACCAttachClause *OpenACCAttachClause::Create(const ASTContext &C,
 OpenACCDevicePtrClause *OpenACCDevicePtrClause::Create(const ASTContext &C,
                                                        SourceLocation BeginLoc,
                                                        SourceLocation LParenLoc,
-                                                       ArrayRef<Expr *> VarList,
+                                                       llvm::ArrayRef<Expr *> VarList,
                                                        SourceLocation EndLoc) {
   void *Mem = C.Allocate(
       OpenACCDevicePtrClause::totalSizeToAlloc<Expr *>(VarList.size()));
@@ -239,7 +239,7 @@ OpenACCDevicePtrClause *OpenACCDevicePtrClause::Create(const ASTContext &C,
 OpenACCNoCreateClause *OpenACCNoCreateClause::Create(const ASTContext &C,
                                                      SourceLocation BeginLoc,
                                                      SourceLocation LParenLoc,
-                                                     ArrayRef<Expr *> VarList,
+                                                     llvm::ArrayRef<Expr *> VarList,
                                                      SourceLocation EndLoc) {
   void *Mem = C.Allocate(
       OpenACCNoCreateClause::totalSizeToAlloc<Expr *>(VarList.size()));
@@ -249,7 +249,7 @@ OpenACCNoCreateClause *OpenACCNoCreateClause::Create(const ASTContext &C,
 OpenACCPresentClause *OpenACCPresentClause::Create(const ASTContext &C,
                                                    SourceLocation BeginLoc,
                                                    SourceLocation LParenLoc,
-                                                   ArrayRef<Expr *> VarList,
+                                                   llvm::ArrayRef<Expr *> VarList,
                                                    SourceLocation EndLoc) {
   void *Mem = C.Allocate(
       OpenACCPresentClause::totalSizeToAlloc<Expr *>(VarList.size()));
@@ -259,7 +259,7 @@ OpenACCPresentClause *OpenACCPresentClause::Create(const ASTContext &C,
 OpenACCCopyClause *
 OpenACCCopyClause::Create(const ASTContext &C, OpenACCClauseKind Spelling,
                           SourceLocation BeginLoc, SourceLocation LParenLoc,
-                          ArrayRef<Expr *> VarList, SourceLocation EndLoc) {
+                          llvm::ArrayRef<Expr *> VarList, SourceLocation EndLoc) {
   void *Mem =
       C.Allocate(OpenACCCopyClause::totalSizeToAlloc<Expr *>(VarList.size()));
   return new (Mem)
@@ -269,7 +269,7 @@ OpenACCCopyClause::Create(const ASTContext &C, OpenACCClauseKind Spelling,
 OpenACCCopyInClause *
 OpenACCCopyInClause::Create(const ASTContext &C, OpenACCClauseKind Spelling,
                             SourceLocation BeginLoc, SourceLocation LParenLoc,
-                            bool IsReadOnly, ArrayRef<Expr *> VarList,
+                            bool IsReadOnly, llvm::ArrayRef<Expr *> VarList,
                             SourceLocation EndLoc) {
   void *Mem =
       C.Allocate(OpenACCCopyInClause::totalSizeToAlloc<Expr *>(VarList.size()));
@@ -280,7 +280,7 @@ OpenACCCopyInClause::Create(const ASTContext &C, OpenACCClauseKind Spelling,
 OpenACCCopyOutClause *
 OpenACCCopyOutClause::Create(const ASTContext &C, OpenACCClauseKind Spelling,
                              SourceLocation BeginLoc, SourceLocation LParenLoc,
-                             bool IsZero, ArrayRef<Expr *> VarList,
+                             bool IsZero, llvm::ArrayRef<Expr *> VarList,
                              SourceLocation EndLoc) {
   void *Mem = C.Allocate(
       OpenACCCopyOutClause::totalSizeToAlloc<Expr *>(VarList.size()));
@@ -291,7 +291,7 @@ OpenACCCopyOutClause::Create(const ASTContext &C, OpenACCClauseKind Spelling,
 OpenACCCreateClause *
 OpenACCCreateClause::Create(const ASTContext &C, OpenACCClauseKind Spelling,
                             SourceLocation BeginLoc, SourceLocation LParenLoc,
-                            bool IsZero, ArrayRef<Expr *> VarList,
+                            bool IsZero, llvm::ArrayRef<Expr *> VarList,
                             SourceLocation EndLoc) {
   void *Mem =
       C.Allocate(OpenACCCreateClause::totalSizeToAlloc<Expr *>(VarList.size()));
@@ -301,7 +301,7 @@ OpenACCCreateClause::Create(const ASTContext &C, OpenACCClauseKind Spelling,
 
 OpenACCDeviceTypeClause *OpenACCDeviceTypeClause::Create(
     const ASTContext &C, OpenACCClauseKind K, SourceLocation BeginLoc,
-    SourceLocation LParenLoc, ArrayRef<DeviceTypeArgument> Archs,
+    SourceLocation LParenLoc, llvm::ArrayRef<DeviceTypeArgument> Archs,
     SourceLocation EndLoc) {
   void *Mem =
       C.Allocate(OpenACCDeviceTypeClause::totalSizeToAlloc<DeviceTypeArgument>(
@@ -312,7 +312,7 @@ OpenACCDeviceTypeClause *OpenACCDeviceTypeClause::Create(
 
 OpenACCReductionClause *OpenACCReductionClause::Create(
     const ASTContext &C, SourceLocation BeginLoc, SourceLocation LParenLoc,
-    OpenACCReductionOperator Operator, ArrayRef<Expr *> VarList,
+    OpenACCReductionOperator Operator, llvm::ArrayRef<Expr *> VarList,
     SourceLocation EndLoc) {
   void *Mem = C.Allocate(
       OpenACCReductionClause::totalSizeToAlloc<Expr *>(VarList.size()));

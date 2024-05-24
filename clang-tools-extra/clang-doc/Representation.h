@@ -60,25 +60,25 @@ struct CommentInfo {
   // the vector.
   bool operator<(const CommentInfo &Other) const;
 
-  SmallString<16>
+  llvm::SmallString<16>
       Kind; // Kind of comment (FullComment, ParagraphComment, TextComment,
             // InlineCommandComment, HTMLStartTagComment, HTMLEndTagComment,
             // BlockCommandComment, ParamCommandComment,
             // TParamCommandComment, VerbatimBlockComment,
             // VerbatimBlockLineComment, VerbatimLineComment).
-  SmallString<64> Text;      // Text of the comment.
-  SmallString<16> Name;      // Name of the comment (for Verbatim and HTML).
-  SmallString<8> Direction;  // Parameter direction (for (T)ParamCommand).
-  SmallString<16> ParamName; // Parameter name (for (T)ParamCommand).
-  SmallString<16> CloseName; // Closing tag name (for VerbatimBlock).
+  llvm::SmallString<64> Text;      // Text of the comment.
+  llvm::SmallString<16> Name;      // Name of the comment (for Verbatim and HTML).
+  llvm::SmallString<8> Direction;  // Parameter direction (for (T)ParamCommand).
+  llvm::SmallString<16> ParamName; // Parameter name (for (T)ParamCommand).
+  llvm::SmallString<16> CloseName; // Closing tag name (for VerbatimBlock).
   bool SelfClosing = false;  // Indicates if tag is self-closing (for HTML).
   bool Explicit = false; // Indicates if the direction of a param is explicit
                          // (for (T)ParamCommand).
-  llvm::SmallVector<SmallString<16>, 4>
+  llvm::SmallVector<llvm::SmallString<16>, 4>
       AttrKeys; // List of attribute keys (for HTML).
-  llvm::SmallVector<SmallString<16>, 4>
+  llvm::SmallVector<llvm::SmallString<16>, 4>
       AttrValues; // List of attribute values for each key (for HTML).
-  llvm::SmallVector<SmallString<16>, 4>
+  llvm::SmallVector<llvm::SmallString<16>, 4>
       Args; // List of arguments to commands (for InlineCommand).
   std::vector<std::unique_ptr<CommentInfo>>
       Children; // List of child comments for this CommentInfo.
@@ -90,11 +90,11 @@ struct Reference {
   // empty string to indicate the default because we need to accept the empty
   // string as a valid input for the global namespace (it will have
   // "GlobalNamespace" as the name, but an empty QualName).
-  Reference(SymbolID USR = SymbolID(), StringRef Name = StringRef(),
+  Reference(SymbolID USR = SymbolID(), llvm::StringRef Name = llvm::StringRef(),
             InfoType IT = InfoType::IT_default)
       : USR(USR), Name(Name), QualName(Name), RefType(IT) {}
-  Reference(SymbolID USR, StringRef Name, InfoType IT, StringRef QualName,
-            StringRef Path = StringRef())
+  Reference(SymbolID USR, llvm::StringRef Name, InfoType IT, llvm::StringRef QualName,
+            llvm::StringRef Path = llvm::StringRef())
       : USR(USR), Name(Name), QualName(QualName), RefType(IT), Path(Path) {}
 
   bool operator==(const Reference &Other) const {
@@ -106,7 +106,7 @@ struct Reference {
   void merge(Reference &&I);
 
   /// Returns the path for this Reference relative to CurrentPath.
-  llvm::SmallString<64> getRelativeFilePath(const StringRef &CurrentPath) const;
+  llvm::SmallString<64> getRelativeFilePath(const llvm::StringRef &CurrentPath) const;
 
   /// Returns the basename that should be used for this Reference.
   llvm::SmallString<16> getFileBaseName() const;
@@ -116,12 +116,12 @@ struct Reference {
   // Name of type (possibly unresolved). Not including namespaces or template
   // parameters (so for a std::vector<int> this would be "vector"). See also
   // QualName.
-  SmallString<16> Name;
+  llvm::SmallString<16> Name;
 
   // Full qualified name of this type, including namespaces and template
   // parameter (for example this could be "std::vector<int>"). Contrast to
   // Name.
-  SmallString<16> QualName;
+  llvm::SmallString<16> QualName;
 
   InfoType RefType = InfoType::IT_default; // Indicates the type of this
                                            // Reference (namespace, record,
@@ -154,7 +154,7 @@ struct TypeInfo {
 
   // Convenience constructor for when there is no symbol ID or info type
   // (normally used for built-in types in tests).
-  TypeInfo(StringRef Name, StringRef Path = StringRef())
+  TypeInfo(llvm::StringRef Name, llvm::StringRef Path = llvm::StringRef())
       : Type(SymbolID(), Name, InfoType::IT_default, Name, Path) {}
 
   bool operator==(const TypeInfo &Other) const { return Type == Other.Type; }
@@ -169,12 +169,12 @@ struct TypeInfo {
 // name and default values in the future if needed.
 struct TemplateParamInfo {
   TemplateParamInfo() = default;
-  explicit TemplateParamInfo(StringRef Contents) : Contents(Contents) {}
+  explicit TemplateParamInfo(llvm::StringRef Contents) : Contents(Contents) {}
 
   // The literal contents of the code for that specifies this template parameter
   // for this declaration. Typical values will be "class T" and
   // "typename T = int".
-  SmallString<16> Contents;
+  llvm::SmallString<16> Contents;
 };
 
 struct TemplateSpecializationInfo {
@@ -198,8 +198,8 @@ struct TemplateInfo {
 // Info for field types.
 struct FieldTypeInfo : public TypeInfo {
   FieldTypeInfo() = default;
-  FieldTypeInfo(const TypeInfo &TI, StringRef Name = StringRef(),
-                StringRef DefaultValue = StringRef())
+  FieldTypeInfo(const TypeInfo &TI, llvm::StringRef Name = llvm::StringRef(),
+                llvm::StringRef DefaultValue = llvm::StringRef())
       : TypeInfo(TI), Name(Name), DefaultValue(DefaultValue) {}
 
   bool operator==(const FieldTypeInfo &Other) const {
@@ -207,17 +207,17 @@ struct FieldTypeInfo : public TypeInfo {
            std::tie(Other.Type, Other.Name, Other.DefaultValue);
   }
 
-  SmallString<16> Name; // Name associated with this info.
+  llvm::SmallString<16> Name; // Name associated with this info.
 
   // When used for function parameters, contains the string representing the
   // expression of the default value, if any.
-  SmallString<16> DefaultValue;
+  llvm::SmallString<16> DefaultValue;
 };
 
 // Info for member types.
 struct MemberTypeInfo : public FieldTypeInfo {
   MemberTypeInfo() = default;
-  MemberTypeInfo(const TypeInfo &TI, StringRef Name, AccessSpecifier Access)
+  MemberTypeInfo(const TypeInfo &TI, llvm::StringRef Name, AccessSpecifier Access)
       : FieldTypeInfo(TI, Name), Access(Access) {}
 
   bool operator==(const MemberTypeInfo &Other) const {
@@ -235,7 +235,7 @@ struct MemberTypeInfo : public FieldTypeInfo {
 };
 
 struct Location {
-  Location(int LineNumber = 0, StringRef Filename = StringRef(),
+  Location(int LineNumber = 0, llvm::StringRef Filename = llvm::StringRef(),
            bool IsFileInRootDir = false)
       : LineNumber(LineNumber), Filename(Filename),
         IsFileInRootDir(IsFileInRootDir) {}
@@ -255,14 +255,14 @@ struct Location {
   }
 
   int LineNumber = 0;           // Line number of this Location.
-  SmallString<32> Filename;     // File for this Location.
+  llvm::SmallString<32> Filename;     // File for this Location.
   bool IsFileInRootDir = false; // Indicates if file is inside root directory
 };
 
 /// A base struct for Infos.
 struct Info {
   Info(InfoType IT = InfoType::IT_default, SymbolID USR = SymbolID(),
-       StringRef Name = StringRef(), StringRef Path = StringRef())
+       llvm::StringRef Name = llvm::StringRef(), llvm::StringRef Path = llvm::StringRef())
       : USR(USR), IT(IT), Name(Name), Path(Path) {}
 
   Info(const Info &Other) = delete;
@@ -273,7 +273,7 @@ struct Info {
   SymbolID USR =
       SymbolID(); // Unique identifier for the decl described by this Info.
   const InfoType IT = InfoType::IT_default; // InfoType of this particular Info.
-  SmallString<16> Name;                     // Unqualified name of the decl.
+  llvm::SmallString<16> Name;                     // Unqualified name of the decl.
   llvm::SmallVector<Reference, 4>
       Namespace; // List of parent namespaces for this decl.
   std::vector<CommentInfo> Description; // Comment description of this decl.
@@ -286,7 +286,7 @@ struct Info {
   llvm::SmallString<16> extractName() const;
 
   /// Returns the file path for this Info relative to CurrentPath.
-  llvm::SmallString<64> getRelativeFilePath(const StringRef &CurrentPath) const;
+  llvm::SmallString<64> getRelativeFilePath(const llvm::StringRef &CurrentPath) const;
 
   /// Returns the basename that should be used for this Info.
   llvm::SmallString<16> getFileBaseName() const;
@@ -294,8 +294,8 @@ struct Info {
 
 // Info for namespaces.
 struct NamespaceInfo : public Info {
-  NamespaceInfo(SymbolID USR = SymbolID(), StringRef Name = StringRef(),
-                StringRef Path = StringRef());
+  NamespaceInfo(SymbolID USR = SymbolID(), llvm::StringRef Name = llvm::StringRef(),
+                llvm::StringRef Path = llvm::StringRef());
 
   void merge(NamespaceInfo &&I);
 
@@ -305,7 +305,7 @@ struct NamespaceInfo : public Info {
 // Info for symbols.
 struct SymbolInfo : public Info {
   SymbolInfo(InfoType IT, SymbolID USR = SymbolID(),
-             StringRef Name = StringRef(), StringRef Path = StringRef())
+             llvm::StringRef Name = llvm::StringRef(), llvm::StringRef Path = llvm::StringRef())
       : Info(IT, USR, Name, Path) {}
 
   void merge(SymbolInfo &&I);
@@ -334,7 +334,7 @@ struct FunctionInfo : public SymbolInfo {
 
   // Full qualified name of this function, including namespaces and template
   // specializations.
-  SmallString<16> FullName;
+  llvm::SmallString<16> FullName;
 
   // When present, this function is a template or specialization.
   std::optional<TemplateInfo> Template;
@@ -344,8 +344,8 @@ struct FunctionInfo : public SymbolInfo {
 // friend classes
 // Info for types.
 struct RecordInfo : public SymbolInfo {
-  RecordInfo(SymbolID USR = SymbolID(), StringRef Name = StringRef(),
-             StringRef Path = StringRef());
+  RecordInfo(SymbolID USR = SymbolID(), llvm::StringRef Name = llvm::StringRef(),
+             llvm::StringRef Path = llvm::StringRef());
 
   void merge(RecordInfo &&I);
 
@@ -354,7 +354,7 @@ struct RecordInfo : public SymbolInfo {
 
   // Full qualified name of this record, including namespaces and template
   // specializations.
-  SmallString<16> FullName;
+  llvm::SmallString<16> FullName;
 
   // When present, this record is a template or specialization.
   std::optional<TemplateInfo> Template;
@@ -398,7 +398,7 @@ struct TypedefInfo : public SymbolInfo {
 
 struct BaseRecordInfo : public RecordInfo {
   BaseRecordInfo();
-  BaseRecordInfo(SymbolID USR, StringRef Name, StringRef Path, bool IsVirtual,
+  BaseRecordInfo(SymbolID USR, llvm::StringRef Name, llvm::StringRef Path, bool IsVirtual,
                  AccessSpecifier Access, bool IsParent);
 
   // Indicates if base corresponds to a virtual inheritance
@@ -411,9 +411,9 @@ struct BaseRecordInfo : public RecordInfo {
 
 // Information for a single possible value of an enumeration.
 struct EnumValueInfo {
-  explicit EnumValueInfo(StringRef Name = StringRef(),
-                         StringRef Value = StringRef("0"),
-                         StringRef ValueExpr = StringRef())
+  explicit EnumValueInfo(llvm::StringRef Name = llvm::StringRef(),
+                         llvm::StringRef Value = llvm::StringRef("0"),
+                         llvm::StringRef ValueExpr = llvm::StringRef())
       : Name(Name), Value(Value), ValueExpr(ValueExpr) {}
 
   bool operator==(const EnumValueInfo &Other) const {
@@ -421,16 +421,16 @@ struct EnumValueInfo {
            std::tie(Other.Name, Other.Value, Other.ValueExpr);
   }
 
-  SmallString<16> Name;
+  llvm::SmallString<16> Name;
 
   // The computed value of the enumeration constant. This could be the result of
   // evaluating the ValueExpr, or it could be automatically generated according
   // to C rules.
-  SmallString<16> Value;
+  llvm::SmallString<16> Value;
 
   // Stores the user-supplied initialization expression for this enumeration
   // constant. This will be empty for implicit enumeration values.
-  SmallString<16> ValueExpr;
+  llvm::SmallString<16> ValueExpr;
 };
 
 // TODO: Expand to allow for documenting templating.
@@ -454,16 +454,16 @@ struct EnumInfo : public SymbolInfo {
 
 struct Index : public Reference {
   Index() = default;
-  Index(StringRef Name) : Reference(SymbolID(), Name) {}
-  Index(StringRef Name, StringRef JumpToSection)
+  Index(llvm::StringRef Name) : Reference(SymbolID(), Name) {}
+  Index(llvm::StringRef Name, llvm::StringRef JumpToSection)
       : Reference(SymbolID(), Name), JumpToSection(JumpToSection) {}
-  Index(SymbolID USR, StringRef Name, InfoType IT, StringRef Path)
+  Index(SymbolID USR, llvm::StringRef Name, InfoType IT, llvm::StringRef Path)
       : Reference(USR, Name, IT, Name, Path) {}
   // This is used to look for a USR in a vector of Indexes using std::find
   bool operator==(const SymbolID &Other) const { return USR == Other; }
   bool operator<(const Index &Other) const;
 
-  std::optional<SmallString<16>> JumpToSection;
+  std::optional<llvm::SmallString<16>> JumpToSection;
   std::vector<Index> Children;
 
   void sort();
@@ -479,9 +479,9 @@ mergeInfos(std::vector<std::unique_ptr<Info>> &Values);
 
 struct ClangDocContext {
   ClangDocContext() = default;
-  ClangDocContext(tooling::ExecutionContext *ECtx, StringRef ProjectName,
-                  bool PublicOnly, StringRef OutDirectory, StringRef SourceRoot,
-                  StringRef RepositoryUrl,
+  ClangDocContext(tooling::ExecutionContext *ECtx, llvm::StringRef ProjectName,
+                  bool PublicOnly, llvm::StringRef OutDirectory, llvm::StringRef SourceRoot,
+                  llvm::StringRef RepositoryUrl,
                   std::vector<std::string> UserStylesheets,
                   std::vector<std::string> JsScripts);
   tooling::ExecutionContext *ECtx;

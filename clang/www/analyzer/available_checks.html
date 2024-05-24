@@ -1124,7 +1124,7 @@ void test() {
 }
 </pre></div>
 <div class="example"><pre>
-CFStringRef test(char *bytes) {
+CFllvm::StringRef test(char *bytes) {
   return CFStringCreateWithCStringNoCopy(
            0, bytes, NSNEXTSTEPStringEncoding, 0); // warn
 }

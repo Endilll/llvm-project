@@ -31,7 +31,7 @@ namespace clang::tidy::bugprone {
 /// The check tries to detect typos and suggest automated fixes for them.
 class ArgumentCommentCheck : public ClangTidyCheck {
 public:
-  ArgumentCommentCheck(StringRef Name, ClangTidyContext *Context);
+  ArgumentCommentCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

@@ -20,7 +20,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/avoid-const-or-ref-data-members.html
 class AvoidConstOrRefDataMembersCheck : public ClangTidyCheck {
 public:
-  AvoidConstOrRefDataMembersCheck(StringRef Name, ClangTidyContext *Context)
+  AvoidConstOrRefDataMembersCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

@@ -28,7 +28,7 @@ void OMPThreadPrivateDecl::anchor() {}
 OMPThreadPrivateDecl *OMPThreadPrivateDecl::Create(ASTContext &C,
                                                    DeclContext *DC,
                                                    SourceLocation L,
-                                                   ArrayRef<Expr *> VL) {
+                                                   llvm::ArrayRef<Expr *> VL) {
   auto *D = OMPDeclarativeDirective::createDirective<OMPThreadPrivateDecl>(
       C, DC, std::nullopt, VL.size(), L);
   D->setVars(VL);
@@ -42,7 +42,7 @@ OMPThreadPrivateDecl *OMPThreadPrivateDecl::CreateDeserialized(ASTContext &C,
       C, ID, 0, N);
 }
 
-void OMPThreadPrivateDecl::setVars(ArrayRef<Expr *> VL) {
+void OMPThreadPrivateDecl::setVars(llvm::ArrayRef<Expr *> VL) {
   assert(VL.size() == Data->getNumChildren() &&
          "Number of variables is not the same as the preallocated buffer");
   llvm::copy(VL, getVars().begin());
@@ -55,8 +55,8 @@ void OMPThreadPrivateDecl::setVars(ArrayRef<Expr *> VL) {
 void OMPAllocateDecl::anchor() { }
 
 OMPAllocateDecl *OMPAllocateDecl::Create(ASTContext &C, DeclContext *DC,
-                                         SourceLocation L, ArrayRef<Expr *> VL,
-                                         ArrayRef<OMPClause *> CL) {
+                                         SourceLocation L, llvm::ArrayRef<Expr *> VL,
+                                         llvm::ArrayRef<OMPClause *> CL) {
   auto *D = OMPDeclarativeDirective::createDirective<OMPAllocateDecl>(
       C, DC, CL, VL.size(), L);
   D->setVars(VL);
@@ -71,7 +71,7 @@ OMPAllocateDecl *OMPAllocateDecl::CreateDeserialized(ASTContext &C,
       C, ID, NClauses, NVars, SourceLocation());
 }
 
-void OMPAllocateDecl::setVars(ArrayRef<Expr *> VL) {
+void OMPAllocateDecl::setVars(llvm::ArrayRef<Expr *> VL) {
   assert(VL.size() == Data->getNumChildren() &&
          "Number of variables is not the same as the preallocated buffer");
   llvm::copy(VL, getVars().begin());
@@ -85,7 +85,7 @@ void OMPRequiresDecl::anchor() {}
 
 OMPRequiresDecl *OMPRequiresDecl::Create(ASTContext &C, DeclContext *DC,
                                          SourceLocation L,
-                                         ArrayRef<OMPClause *> CL) {
+                                         llvm::ArrayRef<OMPClause *> CL) {
   return OMPDeclarativeDirective::createDirective<OMPRequiresDecl>(C, DC, CL, 0,
                                                                    L);
 }
@@ -143,7 +143,7 @@ void OMPDeclareMapperDecl::anchor() {}
 
 OMPDeclareMapperDecl *OMPDeclareMapperDecl::Create(
     ASTContext &C, DeclContext *DC, SourceLocation L, DeclarationName Name,
-    QualType T, DeclarationName VarName, ArrayRef<OMPClause *> Clauses,
+    QualType T, DeclarationName VarName, llvm::ArrayRef<OMPClause *> Clauses,
     OMPDeclareMapperDecl *PrevDeclInScope) {
   return OMPDeclarativeDirective::createDirective<OMPDeclareMapperDecl>(
       C, DC, Clauses, 1, L, Name, T, VarName, PrevDeclInScope);

@@ -545,7 +545,7 @@ void ClangdServer::formatFile(PathRef File, std::optional<Range> Rng,
 }
 
 void ClangdServer::formatOnType(PathRef File, Position Pos,
-                                StringRef TriggerText,
+                                llvm::StringRef TriggerText,
                                 Callback<std::vector<TextEdit>> CB) {
   auto Code = getDraft(File);
   if (!Code)
@@ -675,7 +675,7 @@ void ClangdServer::codeAction(const CodeActionInputs &Params,
                               Callback<CodeActionResult> CB) {
   auto Action = [Params, CB = std::move(CB),
                  FeatureModules(this->FeatureModules)](
-                    Expected<InputsAndAST> InpAST) mutable {
+                    llvm::Expected<InputsAndAST> InpAST) mutable {
     if (!InpAST)
       return CB(InpAST.takeError());
     auto KindAllowed =
@@ -733,7 +733,7 @@ void ClangdServer::codeAction(const CodeActionInputs &Params,
                             Transient);
 }
 
-void ClangdServer::applyTweak(PathRef File, Range Sel, StringRef TweakID,
+void ClangdServer::applyTweak(PathRef File, Range Sel, llvm::StringRef TweakID,
                               Callback<Tweak::Effect> CB) {
   // Tracks number of times a tweak has been attempted.
   static constexpr trace::Metric TweakAttempt(
@@ -744,7 +744,7 @@ void ClangdServer::applyTweak(PathRef File, Range Sel, StringRef TweakID,
   TweakAttempt.record(1, TweakID);
   auto Action = [File = File.str(), Sel, TweakID = TweakID.str(),
                  CB = std::move(CB),
-                 this](Expected<InputsAndAST> InpAST) mutable {
+                 this](llvm::Expected<InputsAndAST> InpAST) mutable {
     if (!InpAST)
       return CB(InpAST.takeError());
     auto FS = DirtyFS->view(std::nullopt);
@@ -842,7 +842,7 @@ void ClangdServer::typeHierarchy(PathRef File, Position Pos, int Resolve,
                                  TypeHierarchyDirection Direction,
                                  Callback<std::vector<TypeHierarchyItem>> CB) {
   auto Action = [File = File.str(), Pos, Resolve, Direction, CB = std::move(CB),
-                 this](Expected<InputsAndAST> InpAST) mutable {
+                 this](llvm::Expected<InputsAndAST> InpAST) mutable {
     if (!InpAST)
       return CB(InpAST.takeError());
     CB(clangd::getTypeHierarchy(InpAST->AST, Pos, Resolve, Direction, Index,
@@ -881,7 +881,7 @@ void ClangdServer::resolveTypeHierarchy(
 void ClangdServer::prepareCallHierarchy(
     PathRef File, Position Pos, Callback<std::vector<CallHierarchyItem>> CB) {
   auto Action = [File = File.str(), Pos,
-                 CB = std::move(CB)](Expected<InputsAndAST> InpAST) mutable {
+                 CB = std::move(CB)](llvm::Expected<InputsAndAST> InpAST) mutable {
     if (!InpAST)
       return CB(InpAST.takeError());
     CB(clangd::prepareCallHierarchy(InpAST->AST, Pos, File));
@@ -901,7 +901,7 @@ void ClangdServer::incomingCalls(
 void ClangdServer::inlayHints(PathRef File, std::optional<Range> RestrictRange,
                               Callback<std::vector<InlayHint>> CB) {
   auto Action = [RestrictRange(std::move(RestrictRange)),
-                 CB = std::move(CB)](Expected<InputsAndAST> InpAST) mutable {
+                 CB = std::move(CB)](llvm::Expected<InputsAndAST> InpAST) mutable {
     if (!InpAST)
       return CB(InpAST.takeError());
     CB(clangd::inlayHints(InpAST->AST, std::move(RestrictRange)));

@@ -38,17 +38,17 @@ public:
   llvm::DenseSet<const VarDecl *> &S;
 
   bool TraverseObjCAtFinallyStmt(ObjCAtFinallyStmt *S) {
-    SaveAndRestore inFinally(inEH, true);
+    llvm::SaveAndRestore inFinally(inEH, true);
     return ::RecursiveASTVisitor<EHCodeVisitor>::TraverseObjCAtFinallyStmt(S);
   }
 
   bool TraverseObjCAtCatchStmt(ObjCAtCatchStmt *S) {
-    SaveAndRestore inCatch(inEH, true);
+    llvm::SaveAndRestore inCatch(inEH, true);
     return ::RecursiveASTVisitor<EHCodeVisitor>::TraverseObjCAtCatchStmt(S);
   }
 
   bool TraverseCXXCatchStmt(CXXCatchStmt *S) {
-    SaveAndRestore inCatch(inEH, true);
+    llvm::SaveAndRestore inCatch(inEH, true);
     return TraverseStmt(S->getHandlerBlock());
   }
 
@@ -84,7 +84,7 @@ void ReachableCode::computeReachableBlocks() {
   if (!cfg.getNumBlockIDs())
     return;
 
-  SmallVector<const CFGBlock*, 10> worklist;
+  llvm::SmallVector<const CFGBlock*, 10> worklist;
   worklist.push_back(&cfg.getEntry());
 
   while (!worklist.empty()) {
@@ -177,7 +177,7 @@ public:
 
     FileID FID = SMgr.getFileID(Loc);
     bool Invalid = false;
-    StringRef Data = SMgr.getBufferData(FID, &Invalid);
+    llvm::StringRef Data = SMgr.getBufferData(FID, &Invalid);
     if (Invalid)
       return false;
 
@@ -207,11 +207,11 @@ public:
     if (isSuppressed(R))
       return;
 
-    SmallString<64> buf;
+    llvm::SmallString<64> buf;
     llvm::raw_svector_ostream os(buf);
     const char *BugType = nullptr;
 
-    SmallVector<FixItHint, 1> Fixits;
+    llvm::SmallVector<FixItHint, 1> Fixits;
 
     switch (dsk) {
       case DeadInit: {

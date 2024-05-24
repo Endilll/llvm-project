@@ -68,12 +68,12 @@ public:
                                      PointerEscapeKind Kind) const;
   ProgramStateRef evalAssume(ProgramStateRef state, SVal Cond,
                              bool Assumption) const;
-  void printState(raw_ostream &Out, ProgramStateRef State,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State,
                   const char *NL, const char *Sep) const override;
 
 private:
   typedef std::pair<SymbolRef, const AllocationState*> AllocationPair;
-  typedef SmallVector<AllocationPair, 2> AllocationPairVec;
+  typedef llvm::SmallVector<AllocationPair, 2> AllocationPairVec;
 
   enum APIKind {
     /// Denotes functions tracked by this checker.
@@ -100,7 +100,7 @@ private:
 
   /// Given the function name, returns the index of the allocator/deallocator
   /// function.
-  static unsigned getTrackedFunctionIndex(StringRef Name, bool IsAllocator);
+  static unsigned getTrackedFunctionIndex(llvm::StringRef Name, bool IsAllocator);
 
   void generateDeallocatorMismatchReport(const AllocationPair &AP,
                                          const Expr *ArgExpr,
@@ -175,7 +175,7 @@ const MacOSKeychainAPIChecker::ADFunctionInfo
     {"CFStringCreateWithBytesNoCopy", 1, InvalidIdx, PossibleAPI},        // 7
 };
 
-unsigned MacOSKeychainAPIChecker::getTrackedFunctionIndex(StringRef Name,
+unsigned MacOSKeychainAPIChecker::getTrackedFunctionIndex(llvm::StringRef Name,
                                                           bool IsAllocator) {
   for (unsigned I = 0; I < FunctionsToTrackSize; ++I) {
     ADFunctionInfo FI = FunctionsToTrack[I];
@@ -227,7 +227,7 @@ void MacOSKeychainAPIChecker::
 
   if (!N)
     return;
-  SmallString<80> sbuf;
+  llvm::SmallString<80> sbuf;
   llvm::raw_svector_ostream os(sbuf);
   unsigned int PDeallocIdx =
                FunctionsToTrack[AP.second->AllocatorIdx].DeallocatorIdx;
@@ -250,7 +250,7 @@ void MacOSKeychainAPIChecker::checkPreStmt(const CallExpr *CE,
   if (!FD || FD->getKind() != Decl::Function)
     return;
 
-  StringRef funName = C.getCalleeName(FD);
+  llvm::StringRef funName = C.getCalleeName(FD);
   if (funName.empty())
     return;
 
@@ -270,7 +270,7 @@ void MacOSKeychainAPIChecker::checkPreStmt(const CallExpr *CE,
         ExplodedNode *N = C.generateNonFatalErrorNode(State);
         if (!N)
           return;
-        SmallString<128> sbuf;
+        llvm::SmallString<128> sbuf;
         llvm::raw_svector_ostream os(sbuf);
         unsigned int DIdx = FunctionsToTrack[AS->AllocatorIdx].DeallocatorIdx;
         os << "Allocated data should be released before another call to "
@@ -353,7 +353,7 @@ void MacOSKeychainAPIChecker::checkPreStmt(const CallExpr *CE,
       }
       // One of the default allocators, so warn.
       if (const DeclRefExpr *DE = dyn_cast<DeclRefExpr>(DeallocatorExpr)) {
-        StringRef DeallocatorName = DE->getFoundDecl()->getName();
+        llvm::StringRef DeallocatorName = DE->getFoundDecl()->getName();
         if (DeallocatorName == "kCFAllocatorDefault" ||
             DeallocatorName == "kCFAllocatorSystemDefault" ||
             DeallocatorName == "kCFAllocatorMalloc") {
@@ -398,7 +398,7 @@ void MacOSKeychainAPIChecker::checkPostStmt(const CallExpr *CE,
   if (!FD || FD->getKind() != Decl::Function)
     return;
 
-  StringRef funName = C.getCalleeName(FD);
+  llvm::StringRef funName = C.getCalleeName(FD);
 
   // If a value has been allocated, add it to the set for tracking.
   unsigned idx = getTrackedFunctionIndex(funName, true);
@@ -465,7 +465,7 @@ std::unique_ptr<PathSensitiveBugReport>
 MacOSKeychainAPIChecker::generateAllocatedDataNotReleasedReport(
     const AllocationPair &AP, ExplodedNode *N, CheckerContext &C) const {
   const ADFunctionInfo &FI = FunctionsToTrack[AP.second->AllocatorIdx];
-  SmallString<70> sbuf;
+  llvm::SmallString<70> sbuf;
   llvm::raw_svector_ostream os(sbuf);
   os << "Allocated data is not released: missing a call to '"
       << FunctionsToTrack[FI.DeallocatorIdx].Name << "'.";
@@ -626,7 +626,7 @@ MacOSKeychainAPIChecker::SecKeychainBugVisitor::VisitNode(
       cast<CallExpr>(N->getLocation().castAs<StmtPoint>().getStmt());
   const FunctionDecl *funDecl = CE->getDirectCallee();
   assert(funDecl && "We do not support indirect function calls as of now.");
-  StringRef funName = funDecl->getName();
+  llvm::StringRef funName = funDecl->getName();
 
   // Get the expression of the corresponding argument.
   unsigned Idx = getTrackedFunctionIndex(funName, true);
@@ -638,7 +638,7 @@ MacOSKeychainAPIChecker::SecKeychainBugVisitor::VisitNode(
                                                     "Data is allocated here.");
 }
 
-void MacOSKeychainAPIChecker::printState(raw_ostream &Out,
+void MacOSKeychainAPIChecker::printState(llvm::raw_ostream &Out,
                                          ProgramStateRef State,
                                          const char *NL,
                                          const char *Sep) const {

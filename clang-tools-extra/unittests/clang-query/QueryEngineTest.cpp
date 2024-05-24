@@ -25,11 +25,11 @@ using namespace clang::query;
 using namespace clang::tooling;
 
 class QueryEngineTest : public ::testing::Test {
-  ArrayRef<std::unique_ptr<ASTUnit>> mkASTUnit2(std::unique_ptr<ASTUnit> a,
+  llvm::ArrayRef<std::unique_ptr<ASTUnit>> mkASTUnit2(std::unique_ptr<ASTUnit> a,
                                                 std::unique_ptr<ASTUnit> b) {
     ASTs[0] = std::move(a);
     ASTs[1] = std::move(b);
-    return ArrayRef<std::unique_ptr<ASTUnit>>(ASTs);
+    return llvm::ArrayRef<std::unique_ptr<ASTUnit>>(ASTs);
   }
 
 protected:

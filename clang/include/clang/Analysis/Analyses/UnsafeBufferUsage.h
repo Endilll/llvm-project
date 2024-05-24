@@ -22,7 +22,7 @@
 namespace clang {
 
 using VarGrpTy = std::vector<const VarDecl *>;
-using VarGrpRef = ArrayRef<const VarDecl *>;
+using VarGrpRef = llvm::ArrayRef<const VarDecl *>;
 
 class VariableGroupsManager {
 public:
@@ -153,7 +153,7 @@ public:
 
   virtual std::string
   getUnsafeBufferUsageAttributeTextAt(SourceLocation Loc,
-                                      StringRef WSSuffix = "") const = 0;
+                                      llvm::StringRef WSSuffix = "") const = 0;
 };
 
 // This function invokes the analysis and allows the caller to react to it

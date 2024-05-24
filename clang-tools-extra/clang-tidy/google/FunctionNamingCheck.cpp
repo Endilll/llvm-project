@@ -51,7 +51,7 @@ FixItHint generateFixItHint(const FunctionDecl *Decl) {
   if (Decl->getStorageClass() != SC_Static)
     return {};
 
-  StringRef Name = Decl->getName();
+  llvm::StringRef Name = Decl->getName();
   std::string NewName = Decl->getName().str();
 
   size_t Index = 0;

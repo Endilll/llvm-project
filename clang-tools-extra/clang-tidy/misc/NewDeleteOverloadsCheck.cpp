@@ -161,7 +161,7 @@ void NewDeleteOverloadsCheck::onEndOfTranslationUnit() {
   // corresponding overload at the same declaration context or within a base
   // class. If there is not, add the element to the list of declarations to
   // diagnose.
-  SmallVector<const FunctionDecl *, 4> Diagnose;
+  llvm::SmallVector<const FunctionDecl *, 4> Diagnose;
   for (const auto &RP : Overloads) {
     // We don't care about the CXXRecordDecl key in the map; we use it as a way
     // to shard the overloads by declaration context to reduce the algorithmic

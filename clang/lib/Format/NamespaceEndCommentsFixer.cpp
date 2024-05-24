@@ -139,7 +139,7 @@ std::string computeName(const FormatToken *NamespaceTok) {
   return name.empty() ? FirstNSName : FirstNSName + " " + name;
 }
 
-std::string computeEndCommentText(StringRef NamespaceName, bool AddNewline,
+std::string computeEndCommentText(llvm::StringRef NamespaceName, bool AddNewline,
                                   const FormatToken *NamespaceTok,
                                   unsigned SpacesToAdd) {
   std::string text = "//";
@@ -161,7 +161,7 @@ bool hasEndComment(const FormatToken *RBraceTok) {
   return RBraceTok->Next && RBraceTok->Next->is(tok::comment);
 }
 
-bool validEndComment(const FormatToken *RBraceTok, StringRef NamespaceName,
+bool validEndComment(const FormatToken *RBraceTok, llvm::StringRef NamespaceName,
                      const FormatToken *NamespaceTok) {
   assert(hasEndComment(RBraceTok));
   const FormatToken *Comment = RBraceTok->Next;
@@ -177,10 +177,10 @@ bool validEndComment(const FormatToken *RBraceTok, StringRef NamespaceName,
                   "([a-zA-Z0-9_]+)\\(([a-zA-Z0-9:_]*|\".+\")\\)\\.? *(\\*/)?$",
                   llvm::Regex::IgnoreCase);
 
-  SmallVector<StringRef, 8> Groups;
+  llvm::SmallVector<llvm::StringRef, 8> Groups;
   if (NamespaceTok->is(TT_NamespaceMacro) &&
       NamespaceMacroCommentPattern.match(Comment->TokenText, &Groups)) {
-    StringRef NamespaceTokenText = Groups.size() > 4 ? Groups[4] : "";
+    llvm::StringRef NamespaceTokenText = Groups.size() > 4 ? Groups[4] : "";
     // The name of the macro must be used.
     if (NamespaceTokenText != NamespaceTok->TokenText)
       return false;
@@ -189,11 +189,11 @@ bool validEndComment(const FormatToken *RBraceTok, StringRef NamespaceName,
     // Comment does not match regex.
     return false;
   }
-  StringRef NamespaceNameInComment = Groups.size() > 5 ? Groups[5].rtrim() : "";
+  llvm::StringRef NamespaceNameInComment = Groups.size() > 5 ? Groups[5].rtrim() : "";
   // Anonymous namespace comments must not mention a namespace name.
   if (NamespaceName.empty() && !NamespaceNameInComment.empty())
     return false;
-  StringRef AnonymousInComment = Groups.size() > 3 ? Groups[3] : "";
+  llvm::StringRef AnonymousInComment = Groups.size() > 3 ? Groups[3] : "";
   // Named namespace comments must not mention anonymous namespace.
   if (!NamespaceName.empty() && !AnonymousInComment.empty())
     return false;
@@ -217,7 +217,7 @@ bool validEndComment(const FormatToken *RBraceTok, StringRef NamespaceName,
   return NamespaceNameInComment == NamespaceName;
 }
 
-void addEndComment(const FormatToken *RBraceTok, StringRef EndCommentText,
+void addEndComment(const FormatToken *RBraceTok, llvm::StringRef EndCommentText,
                    const SourceManager &SourceMgr,
                    tooling::Replacements *Fixes) {
   auto EndLoc = RBraceTok->Tok.getEndLoc();
@@ -229,7 +229,7 @@ void addEndComment(const FormatToken *RBraceTok, StringRef EndCommentText,
   }
 }
 
-void updateEndComment(const FormatToken *RBraceTok, StringRef EndCommentText,
+void updateEndComment(const FormatToken *RBraceTok, llvm::StringRef EndCommentText,
                       const SourceManager &SourceMgr,
                       tooling::Replacements *Fixes) {
   assert(hasEndComment(RBraceTok));
@@ -246,7 +246,7 @@ void updateEndComment(const FormatToken *RBraceTok, StringRef EndCommentText,
 
 const FormatToken *
 getNamespaceToken(const AnnotatedLine *Line,
-                  const SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
+                  const llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
   if (!Line->Affected || Line->InPPDirective || !Line->startsWith(tok::r_brace))
     return nullptr;
   size_t StartLineIndex = Line->MatchingOpeningBlockLineIndex;
@@ -267,11 +267,11 @@ getNamespaceToken(const AnnotatedLine *Line,
   return NamespaceTok->getNamespaceToken();
 }
 
-StringRef
+llvm::StringRef
 getNamespaceTokenText(const AnnotatedLine *Line,
-                      const SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
+                      const llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines) {
   const FormatToken *NamespaceTok = getNamespaceToken(Line, AnnotatedLines);
-  return NamespaceTok ? NamespaceTok->TokenText : StringRef();
+  return NamespaceTok ? NamespaceTok->TokenText : llvm::StringRef();
 }
 
 NamespaceEndCommentsFixer::NamespaceEndCommentsFixer(const Environment &Env,
@@ -279,7 +279,7 @@ NamespaceEndCommentsFixer::NamespaceEndCommentsFixer(const Environment &Env,
     : TokenAnalyzer(Env, Style) {}
 
 std::pair<tooling::Replacements, unsigned> NamespaceEndCommentsFixer::analyze(
-    TokenAnnotator &Annotator, SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+    TokenAnnotator &Annotator, llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
     FormatTokenLexer &Tokens) {
   const SourceManager &SourceMgr = Env.getSourceManager();
   AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
@@ -302,7 +302,7 @@ std::pair<tooling::Replacements, unsigned> NamespaceEndCommentsFixer::analyze(
 
   std::string AllNamespaceNames;
   size_t StartLineIndex = SIZE_MAX;
-  StringRef NamespaceTokenText;
+  llvm::StringRef NamespaceTokenText;
   unsigned int CompactedNamespacesCount = 0;
   for (size_t I = 0, E = AnnotatedLines.size(); I != E; ++I) {
     const AnnotatedLine *EndLine = AnnotatedLines[I];

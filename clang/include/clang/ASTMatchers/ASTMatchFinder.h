@@ -110,7 +110,7 @@ public:
     ///
     /// This id is used, for example, for the profiling output.
     /// It defaults to "<unknown>".
-    virtual StringRef getID() const;
+    virtual llvm::StringRef getID() const;
 
     /// TraversalKind to use while matching and processing
     /// the result nodes. This API is temporary to facilitate
@@ -250,18 +250,18 @@ private:
 /// \see selectFirst
 /// @{
 template <typename MatcherT, typename NodeT>
-SmallVector<BoundNodes, 1>
+llvm::SmallVector<BoundNodes, 1>
 match(MatcherT Matcher, const NodeT &Node, ASTContext &Context);
 
 template <typename MatcherT>
-SmallVector<BoundNodes, 1> match(MatcherT Matcher, const DynTypedNode &Node,
+llvm::SmallVector<BoundNodes, 1> match(MatcherT Matcher, const DynTypedNode &Node,
                                  ASTContext &Context);
 /// @}
 
 /// Returns the results of matching \p Matcher on the translation unit of
 /// \p Context and collects the \c BoundNodes of all callback invocations.
 template <typename MatcherT>
-SmallVector<BoundNodes, 1> match(MatcherT Matcher, ASTContext &Context);
+llvm::SmallVector<BoundNodes, 1> match(MatcherT Matcher, ASTContext &Context);
 
 /// Returns the first result of type \c NodeT bound to \p BoundTo.
 ///
@@ -275,7 +275,7 @@ SmallVector<BoundNodes, 1> match(MatcherT Matcher, ASTContext &Context);
 /// \endcode
 template <typename NodeT>
 const NodeT *
-selectFirst(StringRef BoundTo, const SmallVectorImpl<BoundNodes> &Results) {
+selectFirst(llvm::StringRef BoundTo, const llvm::SmallVectorImpl<BoundNodes> &Results) {
   for (const BoundNodes &N : Results) {
     if (const NodeT *Node = N.getNodeAs<NodeT>(BoundTo))
       return Node;
@@ -294,12 +294,12 @@ public:
     return std::nullopt;
   }
 
-  SmallVector<BoundNodes, 1> Nodes;
+  llvm::SmallVector<BoundNodes, 1> Nodes;
 };
 }
 
 template <typename MatcherT>
-SmallVector<BoundNodes, 1> match(MatcherT Matcher, const DynTypedNode &Node,
+llvm::SmallVector<BoundNodes, 1> match(MatcherT Matcher, const DynTypedNode &Node,
                                  ASTContext &Context) {
   internal::CollectMatchesCallback Callback;
   MatchFinder Finder;
@@ -309,13 +309,13 @@ SmallVector<BoundNodes, 1> match(MatcherT Matcher, const DynTypedNode &Node,
 }
 
 template <typename MatcherT, typename NodeT>
-SmallVector<BoundNodes, 1>
+llvm::SmallVector<BoundNodes, 1>
 match(MatcherT Matcher, const NodeT &Node, ASTContext &Context) {
   return match(Matcher, DynTypedNode::create(Node), Context);
 }
 
 template <typename MatcherT>
-SmallVector<BoundNodes, 1>
+llvm::SmallVector<BoundNodes, 1>
 match(MatcherT Matcher, ASTContext &Context) {
   internal::CollectMatchesCallback Callback;
   MatchFinder Finder;
@@ -324,7 +324,7 @@ match(MatcherT Matcher, ASTContext &Context) {
   return std::move(Callback.Nodes);
 }
 
-inline SmallVector<BoundNodes, 1>
+inline llvm::SmallVector<BoundNodes, 1>
 matchDynamic(internal::DynTypedMatcher Matcher, const DynTypedNode &Node,
              ASTContext &Context) {
   internal::CollectMatchesCallback Callback;
@@ -335,13 +335,13 @@ matchDynamic(internal::DynTypedMatcher Matcher, const DynTypedNode &Node,
 }
 
 template <typename NodeT>
-SmallVector<BoundNodes, 1> matchDynamic(internal::DynTypedMatcher Matcher,
+llvm::SmallVector<BoundNodes, 1> matchDynamic(internal::DynTypedMatcher Matcher,
                                         const NodeT &Node,
                                         ASTContext &Context) {
   return matchDynamic(Matcher, DynTypedNode::create(Node), Context);
 }
 
-inline SmallVector<BoundNodes, 1>
+inline llvm::SmallVector<BoundNodes, 1>
 matchDynamic(internal::DynTypedMatcher Matcher, ASTContext &Context) {
   internal::CollectMatchesCallback Callback;
   MatchFinder Finder;

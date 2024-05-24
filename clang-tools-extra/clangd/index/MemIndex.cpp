@@ -26,7 +26,7 @@ std::unique_ptr<SymbolIndex> MemIndex::build(SymbolSlab Slab, RefSlab Refs,
 bool MemIndex::fuzzyFind(
     const FuzzyFindRequest &Req,
     llvm::function_ref<void(const Symbol &)> Callback) const {
-  assert(!StringRef(Req.Query).contains("::") &&
+  assert(!llvm::StringRef(Req.Query).contains("::") &&
          "There must be no :: in query.");
   trace::Span Tracer("MemIndex fuzzyFind");
 

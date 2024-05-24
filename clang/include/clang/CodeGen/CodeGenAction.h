@@ -47,7 +47,7 @@ private:
   std::unique_ptr<llvm::Module> TheModule;
 
   /// Bitcode modules to link in to our module.
-  SmallVector<LinkModule, 4> LinkModules;
+  llvm::SmallVector<LinkModule, 4> LinkModules;
   llvm::LLVMContext *VMContext;
   bool OwnsVMContext;
 
@@ -67,7 +67,7 @@ protected:
   bool hasIRSupport() const override;
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override;
+                                                 llvm::StringRef InFile) override;
 
   void ExecuteAction() override;
 

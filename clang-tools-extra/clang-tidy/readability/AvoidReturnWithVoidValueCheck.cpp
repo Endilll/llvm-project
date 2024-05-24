@@ -21,7 +21,7 @@ static constexpr char StrictModeName[] = "StrictMode";
 static const bool StrictModeDefault = true;
 
 AvoidReturnWithVoidValueCheck::AvoidReturnWithVoidValueCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreMacros(
           Options.getLocalOrGlobal(IgnoreMacrosName, IgnoreMacrosDefault)),

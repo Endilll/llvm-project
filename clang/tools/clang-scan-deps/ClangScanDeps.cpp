@@ -102,7 +102,7 @@ static void ParseArgs(int argc, char **argv) {
   llvm::BumpPtrAllocator Alloc;
   llvm::StringSaver Saver{Alloc};
   llvm::opt::InputArgList Args =
-      Tbl.parseArgs(argc, argv, OPT_UNKNOWN, Saver, [&](StringRef Msg) {
+      Tbl.parseArgs(argc, argv, OPT_UNKNOWN, Saver, [&](llvm::StringRef Msg) {
         llvm::errs() << Msg << '\n';
         std::exit(1);
       });
@@ -182,7 +182,7 @@ static void ParseArgs(int argc, char **argv) {
   EagerLoadModules = Args.hasArg(OPT_eager_load_pcm);
 
   if (const llvm::opt::Arg *A = Args.getLastArg(OPT_j)) {
-    StringRef S{A->getValue()};
+    llvm::StringRef S{A->getValue()};
     if (!llvm::to_integer(S, NumThreads, 0)) {
       llvm::errs() << ToolName << ": for the -j option: '" << S
                    << "' value invalid for uint argument!\n";
@@ -229,8 +229,8 @@ static void ParseArgs(int argc, char **argv) {
 
 class SharedStream {
 public:
-  SharedStream(raw_ostream &OS) : OS(OS) {}
-  void applyLocked(llvm::function_ref<void(raw_ostream &OS)> Fn) {
+  SharedStream(llvm::raw_ostream &OS) : OS(OS) {}
+  void applyLocked(llvm::function_ref<void(llvm::raw_ostream &OS)> Fn) {
     std::unique_lock<std::mutex> LockGuard(Lock);
     Fn(OS);
     OS.flush();
@@ -238,7 +238,7 @@ public:
 
 private:
   std::mutex Lock;
-  raw_ostream &OS;
+  llvm::raw_ostream &OS;
 };
 
 class ResourceDirectoryCache {
@@ -248,7 +248,7 @@ public:
   /// option and cache the results for reuse. \returns resource directory path
   /// associated with the given invocation command or empty string if the
   /// compiler path is NOT an absolute path.
-  StringRef findResourceDir(const tooling::CommandLineArguments &Args,
+  llvm::StringRef findResourceDir(const tooling::CommandLineArguments &Args,
                             bool ClangCLMode) {
     if (Args.size() < 1)
       return "";
@@ -265,7 +265,7 @@ public:
     if (CachedResourceDir != Cache.end())
       return CachedResourceDir->second;
 
-    std::vector<StringRef> PrintResourceDirArgs{ClangBinaryName};
+    std::vector<llvm::StringRef> PrintResourceDirArgs{ClangBinaryName};
     if (ClangCLMode)
       PrintResourceDirArgs.push_back("/clang:-print-resource-dir");
     else
@@ -278,7 +278,7 @@ public:
                                        "" /*no-suffix*/, ErrorFile);
     llvm::FileRemover OutputRemover(OutputFile.c_str());
     llvm::FileRemover ErrorRemover(ErrorFile.c_str());
-    std::optional<StringRef> Redirects[] = {
+    std::optional<llvm::StringRef> Redirects[] = {
         {""}, // Stdin
         OutputFile.str(),
         ErrorFile.str(),
@@ -293,7 +293,7 @@ public:
     auto OutputBuf = llvm::MemoryBuffer::getFile(OutputFile.c_str());
     if (!OutputBuf)
       return "";
-    StringRef Output = OutputBuf.get()->getBuffer().rtrim('\n');
+    llvm::StringRef Output = OutputBuf.get()->getBuffer().rtrim('\n');
 
     Cache[ClangBinaryPath] = Output.str();
     return Cache[ClangBinaryPath];
@@ -317,14 +317,14 @@ handleMakeDependencyToolResult(const std::string &Input,
   if (!MaybeFile) {
     llvm::handleAllErrors(
         MaybeFile.takeError(), [&Input, &Errs](llvm::StringError &Err) {
-          Errs.applyLocked([&](raw_ostream &OS) {
+          Errs.applyLocked([&](llvm::raw_ostream &OS) {
             OS << "Error while scanning dependencies for " << Input << ":\n";
             OS << Err.getMessage();
           });
         });
     return true;
   }
-  OS.applyLocked([&](raw_ostream &OS) { OS << *MaybeFile; });
+  OS.applyLocked([&](llvm::raw_ostream &OS) { OS << *MaybeFile; });
   return false;
 }
 
@@ -353,7 +353,7 @@ class FullDeps {
 public:
   FullDeps(size_t NumInputs) : Inputs(NumInputs) {}
 
-  void mergeDeps(StringRef Input, TranslationUnitDeps TUDeps,
+  void mergeDeps(llvm::StringRef Input, TranslationUnitDeps TUDeps,
                  size_t InputIndex) {
     mergeDeps(std::move(TUDeps.ModuleGraph), InputIndex);
 
@@ -391,11 +391,11 @@ public:
     }
   }
 
-  bool roundTripCommand(ArrayRef<std::string> ArgStrs,
+  bool roundTripCommand(llvm::ArrayRef<std::string> ArgStrs,
                         DiagnosticsEngine &Diags) {
     if (ArgStrs.empty() || ArgStrs[0] != "-cc1")
       return false;
-    SmallVector<const char *> Args;
+    llvm::SmallVector<const char *> Args;
     for (const std::string &Arg : ArgStrs)
       Args.push_back(Arg.c_str());
     return !CompilerInvocation::checkCC1RoundTrip(Args, Diags);
@@ -403,10 +403,10 @@ public:
 
   // Returns \c true if any command lines fail to round-trip. We expect
   // commands already be canonical when output by the scanner.
-  bool roundTripCommands(raw_ostream &ErrOS) {
-    IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions{};
+  bool roundTripCommands(llvm::raw_ostream &ErrOS) {
+    llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions{};
     TextDiagnosticPrinter DiagConsumer(ErrOS, &*DiagOpts);
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
         CompilerInstance::createDiagnostics(&*DiagOpts, &DiagConsumer,
                                             /*ShouldOwnClient=*/false);
 
@@ -422,7 +422,7 @@ public:
     return false;
   }
 
-  void printFullOutput(raw_ostream &OS) {
+  void printFullOutput(llvm::raw_ostream &OS) {
     // Skip sorting modules and constructing the JSON object if the output
     // cannot be observed anyway. This makes timings less noisy.
     if (&OS == &llvm::nulls())
@@ -540,12 +540,12 @@ private:
 };
 
 static bool handleTranslationUnitResult(
-    StringRef Input, llvm::Expected<TranslationUnitDeps> &MaybeTUDeps,
+    llvm::StringRef Input, llvm::Expected<TranslationUnitDeps> &MaybeTUDeps,
     FullDeps &FD, size_t InputIndex, SharedStream &OS, SharedStream &Errs) {
   if (!MaybeTUDeps) {
     llvm::handleAllErrors(
         MaybeTUDeps.takeError(), [&Input, &Errs](llvm::StringError &Err) {
-          Errs.applyLocked([&](raw_ostream &OS) {
+          Errs.applyLocked([&](llvm::raw_ostream &OS) {
             OS << "Error while scanning dependencies for " << Input << ":\n";
             OS << Err.getMessage();
           });
@@ -557,12 +557,12 @@ static bool handleTranslationUnitResult(
 }
 
 static bool handleModuleResult(
-    StringRef ModuleName, llvm::Expected<ModuleDepsGraph> &MaybeModuleGraph,
+    llvm::StringRef ModuleName, llvm::Expected<ModuleDepsGraph> &MaybeModuleGraph,
     FullDeps &FD, size_t InputIndex, SharedStream &OS, SharedStream &Errs) {
   if (!MaybeModuleGraph) {
     llvm::handleAllErrors(MaybeModuleGraph.takeError(),
                           [&ModuleName, &Errs](llvm::StringError &Err) {
-                            Errs.applyLocked([&](raw_ostream &OS) {
+                            Errs.applyLocked([&](llvm::raw_ostream &OS) {
                               OS << "Error while scanning dependencies for "
                                  << ModuleName << ":\n";
                               OS << Err.getMessage();
@@ -576,7 +576,7 @@ static bool handleModuleResult(
 
 class P1689Deps {
 public:
-  void printDependencies(raw_ostream &OS) {
+  void printDependencies(llvm::raw_ostream &OS) {
     addSourcePathsToRequires();
     // Sort the modules by name to get a deterministic order.
     llvm::sort(Rules, [](const P1689Rule &A, const P1689Rule &B) {
@@ -624,7 +624,7 @@ public:
 
 private:
   void addSourcePathsToRequires() {
-    llvm::DenseMap<StringRef, StringRef> ModuleSourceMapper;
+    llvm::DenseMap<llvm::StringRef, llvm::StringRef> ModuleSourceMapper;
     for (const P1689Rule &R : Rules)
       if (R.Provides && !R.Provides->SourcePath.empty())
         ModuleSourceMapper[R.Provides->ModuleName] = R.Provides->SourcePath;
@@ -649,7 +649,7 @@ handleP1689DependencyToolResult(const std::string &Input,
   if (!MaybeRule) {
     llvm::handleAllErrors(
         MaybeRule.takeError(), [&Input, &Errs](llvm::StringError &Err) {
-          Errs.applyLocked([&](raw_ostream &OS) {
+          Errs.applyLocked([&](llvm::raw_ostream &OS) {
             OS << "Error while scanning dependencies for " << Input << ":\n";
             OS << Err.getMessage();
           });
@@ -661,15 +661,15 @@ handleP1689DependencyToolResult(const std::string &Input,
 }
 
 /// Construct a path for the explicitly built PCM.
-static std::string constructPCMPath(ModuleID MID, StringRef OutputDir) {
-  SmallString<256> ExplicitPCMPath(OutputDir);
+static std::string constructPCMPath(ModuleID MID, llvm::StringRef OutputDir) {
+  llvm::SmallString<256> ExplicitPCMPath(OutputDir);
   llvm::sys::path::append(ExplicitPCMPath, MID.ContextHash,
                           MID.ModuleName + "-" + MID.ContextHash + ".pcm");
   return std::string(ExplicitPCMPath);
 }
 
 static std::string lookupModuleOutput(const ModuleID &MID, ModuleOutputKind MOK,
-                                      StringRef OutputDir) {
+                                      llvm::StringRef OutputDir) {
   std::string PCMPath = constructPCMPath(MID, OutputDir);
   switch (MOK) {
   case ModuleOutputKind::ModuleFile:
@@ -678,20 +678,20 @@ static std::string lookupModuleOutput(const ModuleID &MID, ModuleOutputKind MOK,
     return PCMPath + ".d";
   case ModuleOutputKind::DependencyTargets:
     // Null-separate the list of targets.
-    return join(ModuleDepTargets, StringRef("\0", 1));
+    return join(ModuleDepTargets, llvm::StringRef("\0", 1));
   case ModuleOutputKind::DiagnosticSerializationFile:
     return PCMPath + ".diag";
   }
   llvm_unreachable("Fully covered switch above!");
 }
 
-static std::string getModuleCachePath(ArrayRef<std::string> Args) {
-  for (StringRef Arg : llvm::reverse(Args)) {
+static std::string getModuleCachePath(llvm::ArrayRef<std::string> Args) {
+  for (llvm::StringRef Arg : llvm::reverse(Args)) {
     Arg.consume_front("/clang:");
     if (Arg.consume_front("-fmodules-cache-path="))
       return std::string(Arg);
   }
-  SmallString<128> Path;
+  llvm::SmallString<128> Path;
   driver::Driver::getDefaultModuleCachePath(Path);
   return std::string(Path);
 }
@@ -746,19 +746,19 @@ getCompilationDatabase(int argc, char **argv, std::string &ErrorMessage) {
         << "Exactly one output file is required in the per-file mode ('--').\n";
     return nullptr;
   }
-  StringRef OutputFile = LastCmd->getOutputFilenames().front();
+  llvm::StringRef OutputFile = LastCmd->getOutputFilenames().front();
 
   class InplaceCompilationDatabase : public tooling::CompilationDatabase {
   public:
-    InplaceCompilationDatabase(StringRef InputFile, StringRef OutputFile,
-                               ArrayRef<const char *> CommandLine)
+    InplaceCompilationDatabase(llvm::StringRef InputFile, llvm::StringRef OutputFile,
+                               llvm::ArrayRef<const char *> CommandLine)
         : Command(".", InputFile, {}, OutputFile) {
       for (auto *C : CommandLine)
         Command.CommandLine.push_back(C);
     }
 
     std::vector<tooling::CompileCommand>
-    getCompileCommands(StringRef FilePath) const override {
+    getCompileCommands(llvm::StringRef FilePath) const override {
       if (FilePath != Command.Filename)
         return {};
       return {Command};
@@ -800,7 +800,7 @@ int clang_scan_deps_main(int argc, char **argv, const llvm::ToolContext &) {
 
   AdjustingCompilations->appendArgumentsAdjuster(
       [&ResourceDirCache](const tooling::CommandLineArguments &Args,
-                          StringRef FileName) {
+                          llvm::StringRef FileName) {
         std::string LastO;
         bool HasResourceDir = false;
         bool ClangCLMode = false;
@@ -813,7 +813,7 @@ int clang_scan_deps_main(int argc, char **argv, const llvm::ToolContext &) {
           // Reverse scan, starting at the end or at the element before "--".
           auto R = std::make_reverse_iterator(FlagsEnd);
           for (auto I = R, E = Args.rend(); I != E; ++I) {
-            StringRef Arg = *I;
+            llvm::StringRef Arg = *I;
             if (ClangCLMode) {
               // Ignore arguments that are preceded by "-Xclang".
               if ((I + 1) != E && I[1] == "-Xclang")
@@ -846,7 +846,7 @@ int clang_scan_deps_main(int argc, char **argv, const llvm::ToolContext &) {
         }
 
         if (!HasResourceDir && ResourceDirRecipe == RDRK_InvokeCompiler) {
-          StringRef ResourceDir =
+          llvm::StringRef ResourceDir =
               ResourceDirCache.findResourceDir(Args, ClangCLMode);
           if (!ResourceDir.empty()) {
             AdjustedArgs.push_back("-resource-dir");
@@ -907,7 +907,7 @@ int clang_scan_deps_main(int argc, char **argv, const llvm::ToolContext &) {
       std::string Filename = std::move(Input->Filename);
       std::string CWD = std::move(Input->Directory);
 
-      std::optional<StringRef> MaybeModuleName;
+      std::optional<llvm::StringRef> MaybeModuleName;
       if (!ModuleName.empty())
         MaybeModuleName = ModuleName;
 

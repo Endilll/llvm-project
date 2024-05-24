@@ -40,7 +40,7 @@ void BadSignalToKillThreadCheck::check(const MatchFinder::MatchResult &Result) {
     const Token &T = MI->tokens().back();
     if (!T.isLiteral() || !T.getLiteralData())
       return std::nullopt;
-    StringRef ValueStr = StringRef(T.getLiteralData(), T.getLength());
+    llvm::StringRef ValueStr = llvm::StringRef(T.getLiteralData(), T.getLength());
 
     llvm::APInt IntValue;
     constexpr unsigned AutoSenseRadix = 0;

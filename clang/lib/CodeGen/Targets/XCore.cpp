@@ -91,9 +91,9 @@ public:
   TypeStringCache() : IncompleteCount(0), IncompleteUsedCount(0) {}
   void addIncomplete(const IdentifierInfo *ID, std::string StubEnc);
   bool removeIncomplete(const IdentifierInfo *ID);
-  void addIfComplete(const IdentifierInfo *ID, StringRef Str,
+  void addIfComplete(const IdentifierInfo *ID, llvm::StringRef Str,
                      bool IsRecursive);
-  StringRef lookupStr(const IdentifierInfo *ID);
+  llvm::StringRef lookupStr(const IdentifierInfo *ID);
 };
 
 /// TypeString encodings for enum & union fields must be order.
@@ -103,7 +103,7 @@ class FieldEncoding {
   std::string Enc;
 public:
   FieldEncoding(bool b, SmallStringEnc &e) : HasName(b), Enc(e.c_str()) {}
-  StringRef str() { return Enc; }
+  llvm::StringRef str() { return Enc; }
   bool operator<(const FieldEncoding &rhs) const {
     if (HasName != rhs.HasName) return HasName;
     return Enc < rhs.Enc;
@@ -126,7 +126,7 @@ public:
   XCoreTargetCodeGenInfo(CodeGenTypes &CGT)
       : TargetCodeGenInfo(std::make_unique<XCoreABIInfo>(CGT)) {}
   void emitTargetMetadata(CodeGen::CodeGenModule &CGM,
-                          const llvm::MapVector<GlobalDecl, StringRef>
+                          const llvm::MapVector<GlobalDecl, llvm::StringRef>
                               &MangledDeclNames) const override;
 };
 
@@ -238,7 +238,7 @@ bool TypeStringCache::removeIncomplete(const IdentifierInfo *ID) {
 
 /// Add the encoded TypeString to the cache only if it is NonRecursive or
 /// Recursive (viz: all sub-members were expanded as fully as possible).
-void TypeStringCache::addIfComplete(const IdentifierInfo *ID, StringRef Str,
+void TypeStringCache::addIfComplete(const IdentifierInfo *ID, llvm::StringRef Str,
                                     bool IsRecursive) {
   if (!ID || IncompleteUsedCount)
     return; // No key or it is an incomplete sub-type so don't add.
@@ -258,16 +258,16 @@ void TypeStringCache::addIfComplete(const IdentifierInfo *ID, StringRef Str,
 
 /// Return a cached TypeString encoding for the ID. If there isn't one, or we
 /// are recursively expanding a type (IncompleteCount != 0) and the cached
-/// encoding is Recursive, return an empty StringRef.
-StringRef TypeStringCache::lookupStr(const IdentifierInfo *ID) {
+/// encoding is Recursive, return an empty llvm::StringRef.
+llvm::StringRef TypeStringCache::lookupStr(const IdentifierInfo *ID) {
   if (!ID)
-    return StringRef();   // We have no key.
+    return llvm::StringRef();   // We have no key.
   auto I = Map.find(ID);
   if (I == Map.end())
-    return StringRef();   // We have no encoding.
+    return llvm::StringRef();   // We have no encoding.
   Entry &E = I->second;
   if (E.State == Recursive && IncompleteCount)
-    return StringRef();   // We don't use Recursive encodings for member types.
+    return llvm::StringRef();   // We don't use Recursive encodings for member types.
 
   if (E.State == Incomplete) {
     // The incomplete type is being used to break out of recursion.
@@ -310,7 +310,7 @@ void XCoreTargetCodeGenInfo::emitTargetMD(
 
 void XCoreTargetCodeGenInfo::emitTargetMetadata(
     CodeGen::CodeGenModule &CGM,
-    const llvm::MapVector<GlobalDecl, StringRef> &MangledDeclNames) const {
+    const llvm::MapVector<GlobalDecl, llvm::StringRef> &MangledDeclNames) const {
   // Warning, new MangledDeclNames may be appended within this loop.
   // We rely on MapVector insertions adding new elements to the end
   // of the container.
@@ -329,9 +329,9 @@ static bool appendType(SmallStringEnc &Enc, QualType QType,
                        TypeStringCache &TSC);
 
 /// Helper function for appendRecordType().
-/// Builds a SmallVector containing the encoded field types in declaration
+/// Builds a llvm::SmallVector containing the encoded field types in declaration
 /// order.
-static bool extractFieldType(SmallVectorImpl<FieldEncoding> &FE,
+static bool extractFieldType(llvm::SmallVectorImpl<FieldEncoding> &FE,
                              const RecordDecl *RD,
                              const CodeGen::CodeGenModule &CGM,
                              TypeStringCache &TSC) {
@@ -363,7 +363,7 @@ static bool appendRecordType(SmallStringEnc &Enc, const RecordType *RT,
                              const CodeGen::CodeGenModule &CGM,
                              TypeStringCache &TSC, const IdentifierInfo *ID) {
   // Append the cached TypeString if we have one.
-  StringRef TypeString = TSC.lookupStr(ID);
+  llvm::StringRef TypeString = TSC.lookupStr(ID);
   if (!TypeString.empty()) {
     Enc += TypeString;
     return true;
@@ -384,7 +384,7 @@ static bool appendRecordType(SmallStringEnc &Enc, const RecordType *RT,
     // An incomplete TypeString stub is placed in the cache for this RecordType
     // so that recursive calls to this RecordType will use it whilst building a
     // complete TypeString for this RecordType.
-    SmallVector<FieldEncoding, 16> FE;
+    llvm::SmallVector<FieldEncoding, 16> FE;
     std::string StubEnc(Enc.substr(Start).str());
     StubEnc += '}';  // StubEnc now holds a valid incomplete TypeString.
     TSC.addIncomplete(ID, std::move(StubEnc));
@@ -415,7 +415,7 @@ static bool appendEnumType(SmallStringEnc &Enc, const EnumType *ET,
                            TypeStringCache &TSC,
                            const IdentifierInfo *ID) {
   // Append the cached TypeString if we have one.
-  StringRef TypeString = TSC.lookupStr(ID);
+  llvm::StringRef TypeString = TSC.lookupStr(ID);
   if (!TypeString.empty()) {
     Enc += TypeString;
     return true;
@@ -429,7 +429,7 @@ static bool appendEnumType(SmallStringEnc &Enc, const EnumType *ET,
 
   // We collect all encoded enumerations and order them alphanumerically.
   if (const EnumDecl *ED = ET->getDecl()->getDefinition()) {
-    SmallVector<FieldEncoding, 16> FE;
+    llvm::SmallVector<FieldEncoding, 16> FE;
     for (auto I = ED->enumerator_begin(), E = ED->enumerator_end(); I != E;
          ++I) {
       SmallStringEnc EnumEnc;
@@ -542,7 +542,7 @@ static bool appendPointerType(SmallStringEnc &Enc, const PointerType *PT,
 static bool appendArrayType(SmallStringEnc &Enc, QualType QT,
                             const ArrayType *AT,
                             const CodeGen::CodeGenModule &CGM,
-                            TypeStringCache &TSC, StringRef NoSizeEnc) {
+                            TypeStringCache &TSC, llvm::StringRef NoSizeEnc) {
   if (AT->getSizeModifier() != ArraySizeModifier::Normal)
     return false;
   Enc += "a(";

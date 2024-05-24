@@ -47,7 +47,7 @@ public:
   /// \return The non-owning pointer to added record in slice with it's frontend
   /// attributes.
   std::pair<GlobalRecord *, FrontendAttrs *>
-  addGlobal(StringRef Name, RecordLinkage Linkage, GlobalRecord::Kind GV,
+  addGlobal(llvm::StringRef Name, RecordLinkage Linkage, GlobalRecord::Kind GV,
             const clang::AvailabilityInfo Avail, const Decl *D,
             const HeaderType Access, SymbolFlags Flags = SymbolFlags::None,
             bool Inlined = false);
@@ -64,7 +64,7 @@ public:
   /// \return The non-owning pointer to added record in slice with it's frontend
   /// attributes.
   std::pair<ObjCInterfaceRecord *, FrontendAttrs *>
-  addObjCInterface(StringRef Name, RecordLinkage Linkage,
+  addObjCInterface(llvm::StringRef Name, RecordLinkage Linkage,
                    const clang::AvailabilityInfo Avail, const Decl *D,
                    HeaderType Access, bool IsEHType);
 
@@ -80,7 +80,7 @@ public:
   /// \return The non-owning pointer to added record in slice with it's frontend
   /// attributes.
   std::pair<ObjCCategoryRecord *, FrontendAttrs *>
-  addObjCCategory(StringRef ClassToExtend, StringRef CategoryName,
+  addObjCCategory(llvm::StringRef ClassToExtend, llvm::StringRef CategoryName,
                   const clang::AvailabilityInfo Avail, const Decl *D,
                   HeaderType Access);
 
@@ -97,7 +97,7 @@ public:
   /// \return The non-owning pointer to added record in slice with it's frontend
   /// attributes.
   std::pair<ObjCIVarRecord *, FrontendAttrs *>
-  addObjCIVar(ObjCContainerRecord *Container, StringRef IvarName,
+  addObjCIVar(ObjCContainerRecord *Container, llvm::StringRef IvarName,
               RecordLinkage Linkage, const clang::AvailabilityInfo Avail,
               const Decl *D, HeaderType Access,
               const clang::ObjCIvarDecl::AccessControl AC);

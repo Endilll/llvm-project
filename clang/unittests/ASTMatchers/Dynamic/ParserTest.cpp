@@ -23,7 +23,7 @@ class MockSema : public Parser::Sema {
 public:
   ~MockSema() override {}
 
-  uint64_t expectMatcher(StringRef MatcherName) {
+  uint64_t expectMatcher(llvm::StringRef MatcherName) {
     // Optimizations on the matcher framework make simple matchers like
     // 'stmt()' to be all the same matcher.
     // Use a more complex expression to prevent that.
@@ -38,12 +38,12 @@ public:
 
   internal::MatcherDescriptorPtr
   buildMatcherCtor(MatcherCtor, SourceRange NameRange,
-                   ArrayRef<ParserValue> Args,
+                   llvm::ArrayRef<ParserValue> Args,
                    Diagnostics *Error) const override {
     return internal::MatcherDescriptorPtr{nullptr};
   }
 
-  void parse(StringRef Code) {
+  void parse(llvm::StringRef Code) {
     Diagnostics Error;
     VariantValue Value;
     Parser::parseExpression(Code, this, &Value, &Error);
@@ -51,7 +51,7 @@ public:
     Errors.push_back(Error.toStringFull());
   }
 
-  std::optional<MatcherCtor> lookupMatcherCtor(StringRef MatcherName) override {
+  std::optional<MatcherCtor> lookupMatcherCtor(llvm::StringRef MatcherName) override {
     const ExpectedMatchersTy::value_type *Matcher =
         &*ExpectedMatchers.find(std::string(MatcherName));
     return reinterpret_cast<MatcherCtor>(Matcher);
@@ -59,8 +59,8 @@ public:
 
   VariantMatcher actOnMatcherExpression(MatcherCtor Ctor,
                                         SourceRange NameRange,
-                                        StringRef BindID,
-                                        ArrayRef<ParserValue> Args,
+                                        llvm::StringRef BindID,
+                                        llvm::ArrayRef<ParserValue> Args,
                                         Diagnostics *Error) override {
     const ExpectedMatchersTy::value_type *Matcher =
         reinterpret_cast<const ExpectedMatchersTy::value_type *>(Ctor);
@@ -71,7 +71,7 @@ public:
   }
 
   struct MatcherInfo {
-    StringRef MatcherName;
+    llvm::StringRef MatcherName;
     SourceRange NameRange;
     std::vector<ParserValue> Args;
     std::string BoundID;
@@ -218,7 +218,7 @@ Parser::NamedValueMap getTestNamedValues() {
 TEST(ParserTest, FullParserTest) {
   Diagnostics Error;
 
-  StringRef Code =
+  llvm::StringRef Code =
       "varDecl(hasInitializer(binaryOperator(hasLHS(integerLiteral()),"
       "                                      hasOperatorName(\"+\"))))";
   std::optional<DynTypedMatcher> VarDecl(
@@ -290,7 +290,7 @@ TEST(ParserTest, FullParserTest) {
 TEST(ParserTest, VariadicMatchTest) {
   Diagnostics Error;
 
-  StringRef Code =
+  llvm::StringRef Code =
       "stmt(objcMessageExpr(hasAnySelector(\"methodA\", \"methodB:\")))";
   std::optional<DynTypedMatcher> OM(
       Parser::parseMatcherExpression(Code, &Error));
@@ -300,14 +300,14 @@ TEST(ParserTest, VariadicMatchTest) {
                           "void foo(I* i) { [i methodA]; }", M));
 }
 
-std::string ParseWithError(StringRef Code) {
+std::string ParseWithError(llvm::StringRef Code) {
   Diagnostics Error;
   VariantValue Value;
   Parser::parseExpression(Code, &Value, &Error);
   return Error.toStringFull();
 }
 
-std::string ParseMatcherWithError(StringRef Code) {
+std::string ParseMatcherWithError(llvm::StringRef Code) {
   Diagnostics Error;
   Parser::parseMatcherExpression(Code, &Error);
   return Error.toStringFull();
@@ -411,7 +411,7 @@ TEST(ParserTest, OverloadErrors) {
 }
 
 TEST(ParserTest, ParseMultiline) {
-  StringRef Code;
+  llvm::StringRef Code;
 
   std::optional<DynTypedMatcher> M;
   {
@@ -521,14 +521,14 @@ decl()))matcher";
 )matcher";
     M = Parser::parseMatcherExpression(Code, nullptr, nullptr, &Error);
     EXPECT_FALSE(M);
-    StringRef Expected = R"error(1:1: Error parsing argument 1 for matcher varDecl.
+    llvm::StringRef Expected = R"error(1:1: Error parsing argument 1 for matcher varDecl.
 2:3: Matcher not found: doesNotExist)error";
     EXPECT_EQ(Expected, Error.toStringFull());
   }
 }
 
 TEST(ParserTest, CompletionRegistry) {
-  StringRef Code = "while";
+  llvm::StringRef Code = "while";
   std::vector<MatcherCompletion> Comps = Parser::completeExpression(Code, 5);
   ASSERT_EQ(1u, Comps.size());
   EXPECT_EQ("Stmt(", Comps[0].TypedText);
@@ -568,7 +568,7 @@ TEST(ParserTest, CompletionRegistry) {
 TEST(ParserTest, CompletionNamedValues) {
   // Can complete non-matcher types.
   auto NamedValues = getTestNamedValues();
-  StringRef Code = "functionDecl(hasName(";
+  llvm::StringRef Code = "functionDecl(hasName(";
   std::vector<MatcherCompletion> Comps =
       Parser::completeExpression(Code, Code.size(), nullptr, &NamedValues);
   ASSERT_EQ(1u, Comps.size());
@@ -607,7 +607,7 @@ TEST(ParserTest, ParseBindOnLet) {
   Diagnostics Error;
 
   {
-    StringRef Code = "hasParamA.bind(\"parmABinding\")";
+    llvm::StringRef Code = "hasParamA.bind(\"parmABinding\")";
     std::optional<DynTypedMatcher> TopLevelLetBinding(
         Parser::parseMatcherExpression(Code, nullptr, &NamedValues, &Error));
     EXPECT_EQ("", Error.toStringFull());
@@ -622,7 +622,7 @@ TEST(ParserTest, ParseBindOnLet) {
   }
 
   {
-    StringRef Code = "functionDecl(hasParamA.bind(\"parmABinding\"))";
+    llvm::StringRef Code = "functionDecl(hasParamA.bind(\"parmABinding\"))";
     std::optional<DynTypedMatcher> NestedLetBinding(
         Parser::parseMatcherExpression(Code, nullptr, &NamedValues, &Error));
     EXPECT_EQ("", Error.toStringFull());

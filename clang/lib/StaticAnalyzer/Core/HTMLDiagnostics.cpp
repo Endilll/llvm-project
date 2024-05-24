@@ -84,13 +84,13 @@ public:
   void FlushDiagnosticsImpl(std::vector<const PathDiagnostic *> &Diags,
                             FilesMade *filesMade) override;
 
-  StringRef getName() const override { return "HTMLDiagnostics"; }
+  llvm::StringRef getName() const override { return "HTMLDiagnostics"; }
 
   bool supportsCrossFileDiagnostics() const override {
     return SupportsCrossFileDiagnostics;
   }
 
-  unsigned ProcessMacroPiece(raw_ostream &os, const PathDiagnosticMacroPiece &P,
+  unsigned ProcessMacroPiece(llvm::raw_ostream &os, const PathDiagnosticMacroPiece &P,
                              unsigned num);
 
   unsigned ProcessControlFlowPiece(Rewriter &R, FileID BugFileID,
@@ -129,13 +129,13 @@ private:
                     const ArrowMap &ArrowIndices);
 
   /// \return Javascript for displaying shortcuts help;
-  StringRef showHelpJavascript();
+  llvm::StringRef showHelpJavascript();
 
   /// \return Javascript for navigating the HTML report using j/k keys.
-  StringRef generateKeyboardNavigationJavascript();
+  llvm::StringRef generateKeyboardNavigationJavascript();
 
   /// \return Javascript for drawing control-flow arrows.
-  StringRef generateArrowDrawingJavascript();
+  llvm::StringRef generateArrowDrawingJavascript();
 
   /// \return JavaScript for an option to only show relevant lines.
   std::string showRelevantLinesJavascript(const PathDiagnostic &D,
@@ -287,7 +287,7 @@ void HTMLDiagnostics::ReportDiag(const PathDiagnostic& D,
   Rewriter R(const_cast<SourceManager&>(SMgr), PP.getLangOpts());
 
   // Get the function/method name
-  SmallString<128> declName("unknown");
+  llvm::SmallString<128> declName("unknown");
   int offsetDecl = 0;
   if (const Decl *DeclWithIssue = D.getDeclWithIssue()) {
       if (const auto *ND = dyn_cast<NamedDecl>(DeclWithIssue))
@@ -304,7 +304,7 @@ void HTMLDiagnostics::ReportDiag(const PathDiagnostic& D,
       }
   }
 
-  SmallString<32> IssueHash = getIssueHash(D, PP);
+  llvm::SmallString<32> IssueHash = getIssueHash(D, PP);
   auto [It, IsNew] = EmittedHashes.insert(IssueHash);
   if (!IsNew) {
     // We've already emitted a duplicate issue. It'll get overwritten anyway.
@@ -320,7 +320,7 @@ void HTMLDiagnostics::ReportDiag(const PathDiagnostic& D,
   // Create a path for the target HTML file.
   int FD;
 
-  SmallString<128> FileNameStr;
+  llvm::SmallString<128> FileNameStr;
   llvm::raw_svector_ostream FileName(FileNameStr);
   FileName << "report-";
 
@@ -342,9 +342,9 @@ void HTMLDiagnostics::ReportDiag(const PathDiagnostic& D,
              << declName.c_str() << "-" << offsetDecl << "-";
   }
 
-  FileName << StringRef(IssueHash).substr(0, 6).str() << ".html";
+  FileName << llvm::StringRef(IssueHash).substr(0, 6).str() << ".html";
 
-  SmallString<128> ResultPath;
+  llvm::SmallString<128> ResultPath;
   llvm::sys::path::append(ResultPath, Directory, FileName.str());
   if (std::error_code EC = llvm::sys::fs::make_absolute(ResultPath)) {
     llvm::errs() << "warning: could not make '" << ResultPath
@@ -649,11 +649,11 @@ void HTMLDiagnostics::FinalizeHTML(const PathDiagnostic &D, Rewriter &R,
     std::string s;
     llvm::raw_string_ostream os(s);
 
-    StringRef BugDesc = D.getVerboseDescription();
+    llvm::StringRef BugDesc = D.getVerboseDescription();
     if (!BugDesc.empty())
       os << "\n<!-- BUGDESC " << BugDesc << " -->\n";
 
-    StringRef BugType = D.getBugType();
+    llvm::StringRef BugType = D.getBugType();
     if (!BugType.empty())
       os << "\n<!-- BUGTYPE " << BugType << " -->\n";
 
@@ -663,7 +663,7 @@ void HTMLDiagnostics::FinalizeHTML(const PathDiagnostic &D, Rewriter &R,
                                              : D.getLocation().asLocation()),
                     SMgr);
 
-    StringRef BugCategory = D.getCategory();
+    llvm::StringRef BugCategory = D.getCategory();
     if (!BugCategory.empty())
       os << "\n<!-- BUGCATEGORY " << BugCategory << " -->\n";
 
@@ -696,7 +696,7 @@ void HTMLDiagnostics::FinalizeHTML(const PathDiagnostic &D, Rewriter &R,
   html::AddHeaderFooterInternalBuiltinCSS(R, FID, Entry.getName());
 }
 
-StringRef HTMLDiagnostics::showHelpJavascript() {
+llvm::StringRef HTMLDiagnostics::showHelpJavascript() {
   return R"<<<(
 <script type='text/javascript'>
 
@@ -746,7 +746,7 @@ static void HandlePopUpPieceEndTag(Rewriter &R,
                                    std::vector<SourceRange> &PopUpRanges,
                                    unsigned int LastReportedPieceIndex,
                                    unsigned int PopUpPieceIndex) {
-  SmallString<256> Buf;
+  llvm::SmallString<256> Buf;
   llvm::raw_svector_ostream Out(Buf);
 
   SourceRange Range(Piece.getLocation().asRange());
@@ -1035,7 +1035,7 @@ void HTMLDiagnostics::HandlePiece(Rewriter &R, FileID BugFileID,
     {
       FullSourceLoc L = MP->getLocation().asLocation().getExpansionLoc();
       assert(L.isFileID());
-      StringRef BufferInfo = L.getBufferData();
+      llvm::StringRef BufferInfo = L.getBufferData();
       std::pair<FileID, unsigned> LocInfo = L.getDecomposedLoc();
       const char* MacroName = LocInfo.second + BufferInfo.data();
       Lexer rawLexer(SM.getLocForStartOfFile(LocInfo.first), PP.getLangOpts(),
@@ -1098,7 +1098,7 @@ void HTMLDiagnostics::HandlePiece(Rewriter &R, FileID BugFileID,
   R.InsertTextBefore(Loc, os.str());
 
   // Now highlight the ranges.
-  ArrayRef<SourceRange> Ranges = P.getRanges();
+  llvm::ArrayRef<SourceRange> Ranges = P.getRanges();
   for (const auto &Range : Ranges) {
     // If we have already highlighted the range as a pop-up there is no work.
     if (llvm::is_contained(PopUpRanges, Range))
@@ -1108,7 +1108,7 @@ void HTMLDiagnostics::HandlePiece(Rewriter &R, FileID BugFileID,
   }
 }
 
-static void EmitAlphaCounter(raw_ostream &os, unsigned n) {
+static void EmitAlphaCounter(llvm::raw_ostream &os, unsigned n) {
   unsigned x = n % ('z' - 'a');
   n /= 'z' - 'a';
 
@@ -1118,7 +1118,7 @@ static void EmitAlphaCounter(raw_ostream &os, unsigned n) {
   os << char('a' + x);
 }
 
-unsigned HTMLDiagnostics::ProcessMacroPiece(raw_ostream &os,
+unsigned HTMLDiagnostics::ProcessMacroPiece(llvm::raw_ostream &os,
                                             const PathDiagnosticMacroPiece& P,
                                             unsigned num) {
   for (const auto &subPiece : P.subPieces) {
@@ -1278,7 +1278,7 @@ void HTMLDiagnostics::HighlightRange(Rewriter& R, FileID BugFileID,
   html::HighlightRange(R, InstantiationStart, E, HighlightStart, HighlightEnd);
 }
 
-StringRef HTMLDiagnostics::generateKeyboardNavigationJavascript() {
+llvm::StringRef HTMLDiagnostics::generateKeyboardNavigationJavascript() {
   return R"<<<(
 <script type='text/javascript'>
 var digitMatcher = new RegExp("[0-9]+");
@@ -1383,7 +1383,7 @@ window.addEventListener("keydown", function (event) {
   )<<<";
 }
 
-StringRef HTMLDiagnostics::generateArrowDrawingJavascript() {
+llvm::StringRef HTMLDiagnostics::generateArrowDrawingJavascript() {
   return R"<<<(
 <script type='text/javascript'>
 // Return range of numbers from a range [lower, upper).

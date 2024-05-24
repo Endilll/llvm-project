@@ -39,11 +39,11 @@ using namespace llvm::opt;
 // returns an empty string.
 llvm::SmallString<0>
 RocmInstallationDetector::findSPACKPackage(const Candidate &Cand,
-                                           StringRef PackageName) {
+                                           llvm::StringRef PackageName) {
   if (!Cand.isSPACK())
     return {};
   std::error_code EC;
-  std::string Prefix = Twine(PackageName + "-" + Cand.SPACKReleaseStr).str();
+  std::string Prefix = llvm::Twine(PackageName + "-" + Cand.SPACKReleaseStr).str();
   llvm::SmallVector<llvm::SmallString<0>> SubDirs;
   for (llvm::vfs::directory_iterator File = D.getVFS().dir_begin(Cand.Path, EC),
                                      FileEnd;
@@ -76,24 +76,24 @@ RocmInstallationDetector::findSPACKPackage(const Candidate &Cand,
 void RocmInstallationDetector::scanLibDevicePath(llvm::StringRef Path) {
   assert(!Path.empty());
 
-  const StringRef Suffix(".bc");
-  const StringRef Suffix2(".amdgcn.bc");
+  const llvm::StringRef Suffix(".bc");
+  const llvm::StringRef Suffix2(".amdgcn.bc");
 
   std::error_code EC;
   for (llvm::vfs::directory_iterator LI = D.getVFS().dir_begin(Path, EC), LE;
        !EC && LI != LE; LI = LI.increment(EC)) {
-    StringRef FilePath = LI->path();
-    StringRef FileName = llvm::sys::path::filename(FilePath);
+    llvm::StringRef FilePath = LI->path();
+    llvm::StringRef FileName = llvm::sys::path::filename(FilePath);
     if (!FileName.ends_with(Suffix))
       continue;
 
-    StringRef BaseName;
+    llvm::StringRef BaseName;
     if (FileName.ends_with(Suffix2))
       BaseName = FileName.drop_back(Suffix2.size());
     else if (FileName.ends_with(Suffix))
       BaseName = FileName.drop_back(Suffix.size());
 
-    const StringRef ABIVersionPrefix = "oclc_abi_version_";
+    const llvm::StringRef ABIVersionPrefix = "oclc_abi_version_";
     if (BaseName == "ocml") {
       OCML = FilePath;
     } else if (BaseName == "ockl") {
@@ -133,15 +133,15 @@ void RocmInstallationDetector::scanLibDevicePath(llvm::StringRef Path) {
     } else {
       // Process all bitcode filenames that look like
       // ocl_isa_version_XXX.amdgcn.bc
-      const StringRef DeviceLibPrefix = "oclc_isa_version_";
+      const llvm::StringRef DeviceLibPrefix = "oclc_isa_version_";
       if (!BaseName.starts_with(DeviceLibPrefix))
         continue;
 
-      StringRef IsaVersionNumber =
+      llvm::StringRef IsaVersionNumber =
         BaseName.drop_front(DeviceLibPrefix.size());
 
-      llvm::Twine GfxName = Twine("gfx") + IsaVersionNumber;
-      SmallString<8> Tmp;
+      llvm::Twine GfxName = llvm::Twine("gfx") + IsaVersionNumber;
+      llvm::SmallString<8> Tmp;
       LibDeviceMap.insert(
         std::make_pair(GfxName.toStringRef(Tmp), FilePath.str()));
     }
@@ -151,7 +151,7 @@ void RocmInstallationDetector::scanLibDevicePath(llvm::StringRef Path) {
 // Parse and extract version numbers from `.hipVersion`. Return `true` if
 // the parsing fails.
 bool RocmInstallationDetector::parseHIPVersionFile(llvm::StringRef V) {
-  SmallVector<StringRef, 4> VersionParts;
+  llvm::SmallVector<llvm::StringRef, 4> VersionParts;
   V.split(VersionParts, '\n');
   unsigned Major = ~0U;
   unsigned Minor = ~0U;
@@ -170,13 +170,13 @@ bool RocmInstallationDetector::parseHIPVersionFile(llvm::StringRef V) {
     return true;
   VersionMajorMinor = llvm::VersionTuple(Major, Minor);
   DetectedVersion =
-      (Twine(Major) + "." + Twine(Minor) + "." + VersionPatch).str();
+      (llvm::Twine(Major) + "." + llvm::Twine(Minor) + "." + VersionPatch).str();
   return false;
 }
 
 /// \returns a list of candidate directories for ROCm installation, which is
 /// cached and populated only once.
-const SmallVectorImpl<RocmInstallationDetector::Candidate> &
+const llvm::SmallVectorImpl<RocmInstallationDetector::Candidate> &
 RocmInstallationDetector::getInstallationPathCandidates() {
 
   // Return the cached candidate list if it has already been populated.
@@ -209,15 +209,15 @@ RocmInstallationDetector::getInstallationPathCandidates() {
   }
 
   // Try to find relative to the compiler binary.
-  StringRef InstallDir = D.Dir;
+  llvm::StringRef InstallDir = D.Dir;
 
   // Check both a normal Unix prefix position of the clang binary, as well as
   // the Windows-esque layout the ROCm packages use with the host architecture
   // subdirectory of bin.
-  auto DeduceROCmPath = [](StringRef ClangPath) {
+  auto DeduceROCmPath = [](llvm::StringRef ClangPath) {
     // Strip off directory (usually bin)
-    StringRef ParentDir = llvm::sys::path::parent_path(ClangPath);
-    StringRef ParentName = llvm::sys::path::filename(ParentDir);
+    llvm::StringRef ParentDir = llvm::sys::path::parent_path(ClangPath);
+    llvm::StringRef ParentName = llvm::sys::path::filename(ParentDir);
 
     // Some builds use bin/{host arch}, so go up again.
     if (ParentName == "bin") {
@@ -278,7 +278,7 @@ RocmInstallationDetector::getInstallationPathCandidates() {
   std::string LatestROCm;
   llvm::VersionTuple LatestVer;
   // Get ROCm version from ROCm directory name.
-  auto GetROCmVersion = [](StringRef DirName) {
+  auto GetROCmVersion = [](llvm::StringRef DirName) {
     llvm::VersionTuple V;
     std::string VerStr = DirName.drop_front(strlen("rocm-")).str();
     // The ROCm directory name follows the format of
@@ -347,7 +347,7 @@ RocmInstallationDetector::RocmInstallationDetector(
     HIPVersionArg = A->getValue();
     unsigned Major = ~0U;
     unsigned Minor = ~0U;
-    SmallVector<StringRef, 3> Parts;
+    llvm::SmallVector<llvm::StringRef, 3> Parts;
     HIPVersionArg.split(Parts, '.');
     if (Parts.size())
       Parts[0].getAsInteger(0, Major);
@@ -365,13 +365,13 @@ RocmInstallationDetector::RocmInstallationDetector(
 
     VersionMajorMinor = llvm::VersionTuple(Major, Minor);
     DetectedVersion =
-        (Twine(Major) + "." + Twine(Minor) + "." + VersionPatch).str();
+        (llvm::Twine(Major) + "." + llvm::Twine(Minor) + "." + VersionPatch).str();
   } else {
     VersionPatch = DefaultVersionPatch;
     VersionMajorMinor =
         llvm::VersionTuple(DefaultVersionMajor, DefaultVersionMinor);
-    DetectedVersion = (Twine(DefaultVersionMajor) + "." +
-                       Twine(DefaultVersionMinor) + "." + VersionPatch)
+    DetectedVersion = (llvm::Twine(DefaultVersionMajor) + "." +
+                       llvm::Twine(DefaultVersionMinor) + "." + VersionPatch)
                           .str();
   }
 
@@ -404,7 +404,7 @@ void RocmInstallationDetector::detectDeviceLibrary() {
   }
 
   // Check device library exists at the given path.
-  auto CheckDeviceLib = [&](StringRef Path, bool StrictChecking) {
+  auto CheckDeviceLib = [&](llvm::StringRef Path, bool StrictChecking) {
     bool CheckLibDevice = (!NoBuiltinLibs || StrictChecking);
     if (CheckLibDevice && !FS.exists(Path))
       return false;
@@ -445,7 +445,7 @@ void RocmInstallationDetector::detectDeviceLibrary() {
 }
 
 void RocmInstallationDetector::detectHIPRuntime() {
-  SmallVector<Candidate, 4> HIPSearchDirs;
+  llvm::SmallVector<Candidate, 4> HIPSearchDirs;
   if (!HIPPathArg.empty())
     HIPSearchDirs.emplace_back(HIPPathArg.str());
   else if (std::optional<std::string> HIPPathEnv =
@@ -476,21 +476,21 @@ void RocmInstallationDetector::detectHIPRuntime() {
     llvm::sys::path::append(SharePath, "share");
 
     // Get parent of InstallPath and append "share"
-    SmallString<0> ParentSharePath = llvm::sys::path::parent_path(InstallPath);
+    llvm::SmallString<0> ParentSharePath = llvm::sys::path::parent_path(InstallPath);
     llvm::sys::path::append(ParentSharePath, "share");
 
-    auto Append = [](SmallString<0> &path, const Twine &a, const Twine &b = "",
-                     const Twine &c = "", const Twine &d = "") {
-      SmallString<0> newpath = path;
+    auto Append = [](llvm::SmallString<0> &path, const llvm::Twine &a, const llvm::Twine &b = "",
+                     const llvm::Twine &c = "", const llvm::Twine &d = "") {
+      llvm::SmallString<0> newpath = path;
       llvm::sys::path::append(newpath, a, b, c, d);
       return newpath;
     };
     // If HIP version file can be found and parsed, use HIP version from there.
-    std::vector<SmallString<0>> VersionFilePaths = {
+    std::vector<llvm::SmallString<0>> VersionFilePaths = {
         Append(SharePath, "hip", "version"),
         InstallPath != D.SysRoot + "/usr/local"
             ? Append(ParentSharePath, "hip", "version")
-            : SmallString<0>(),
+            : llvm::SmallString<0>(),
         Append(BinPath, ".hipVersion")};
 
     for (const auto &VersionFilePath : VersionFilePaths) {
@@ -517,7 +517,7 @@ void RocmInstallationDetector::detectHIPRuntime() {
   HasHIPRuntime = false;
 }
 
-void RocmInstallationDetector::print(raw_ostream &OS) const {
+void RocmInstallationDetector::print(llvm::raw_ostream &OS) const {
   if (hasHIPRuntime())
     OS << "Found HIP installation: " << InstallPath << ", version "
        << DetectedVersion << '\n';
@@ -543,7 +543,7 @@ void RocmInstallationDetector::AddHIPIncludeArgs(const ArgList &DriverArgs,
     //
     // ROCm 3.5 does not fully support the wrapper headers. Therefore it needs
     // a workaround.
-    SmallString<128> P(D.ResourceDir);
+    llvm::SmallString<128> P(D.ResourceDir);
     if (UsesRuntimeWrapper)
       llvm::sys::path::append(P, "include", "cuda_wrappers");
     CC1Args.push_back("-internal-isystem");
@@ -551,7 +551,7 @@ void RocmInstallationDetector::AddHIPIncludeArgs(const ArgList &DriverArgs,
   }
 
   const auto HandleHipStdPar = [=, &DriverArgs, &CC1Args]() {
-    StringRef Inc = getIncludePath();
+    llvm::StringRef Inc = getIncludePath();
     auto &FS = D.getVFS();
 
     if (!hasHIPStdParLibrary())
@@ -578,7 +578,7 @@ void RocmInstallationDetector::AddHIPIncludeArgs(const ArgList &DriverArgs,
     if (hasHIPStdParLibrary())
       HIPStdParPath = DriverArgs.MakeArgString(HIPStdParPathArg);
     else
-      HIPStdParPath = DriverArgs.MakeArgString(StringRef(ThrustPath) +
+      HIPStdParPath = DriverArgs.MakeArgString(llvm::StringRef(ThrustPath) +
                                                "/system/hip/hipstdpar");
 
     const char *PrimPath;
@@ -642,15 +642,15 @@ void amdgpu::Linker::ConstructJob(Compilation &C, const JobAction &JA,
 void amdgpu::getAMDGPUTargetFeatures(const Driver &D,
                                      const llvm::Triple &Triple,
                                      const llvm::opt::ArgList &Args,
-                                     std::vector<StringRef> &Features) {
+                                     std::vector<llvm::StringRef> &Features) {
   // Add target ID features to -target-feature options. No diagnostics should
   // be emitted here since invalid target ID is diagnosed at other places.
-  StringRef TargetID = Args.getLastArgValue(options::OPT_mcpu_EQ);
+  llvm::StringRef TargetID = Args.getLastArgValue(options::OPT_mcpu_EQ);
   if (!TargetID.empty()) {
     llvm::StringMap<bool> FeatureMap;
     auto OptionalGpuArch = parseTargetID(Triple, TargetID, &FeatureMap);
     if (OptionalGpuArch) {
-      StringRef GpuArch = *OptionalGpuArch;
+      llvm::StringRef GpuArch = *OptionalGpuArch;
       // Iterate through all possible target ID features for the given GPU.
       // If it is mapped to true, add +feature.
       // If it is mapped to false, add -feature.
@@ -660,7 +660,7 @@ void amdgpu::getAMDGPUTargetFeatures(const Driver &D,
         if (Pos == FeatureMap.end())
           continue;
         Features.push_back(Args.MakeArgStringRef(
-            (Twine(Pos->second ? "+" : "-") + Feature).str()));
+            (llvm::Twine(Pos->second ? "+" : "-") + Feature).str()));
       }
     }
   }
@@ -695,7 +695,7 @@ Tool *AMDGPUToolChain::buildLinker() const {
 }
 
 DerivedArgList *
-AMDGPUToolChain::TranslateArgs(const DerivedArgList &Args, StringRef BoundArch,
+AMDGPUToolChain::TranslateArgs(const DerivedArgList &Args, llvm::StringRef BoundArch,
                                Action::OffloadKind DeviceOffloadKind) const {
 
   DerivedArgList *DAL =
@@ -711,7 +711,7 @@ AMDGPUToolChain::TranslateArgs(const DerivedArgList &Args, StringRef BoundArch,
 
   // Replace -mcpu=native with detected GPU.
   Arg *LastMCPUArg = DAL->getLastArg(options::OPT_mcpu_EQ);
-  if (LastMCPUArg && StringRef(LastMCPUArg->getValue()) == "native") {
+  if (LastMCPUArg && llvm::StringRef(LastMCPUArg->getValue()) == "native") {
     DAL->eraseArg(options::OPT_mcpu_EQ);
     auto GPUsOrErr = getSystemGPUArchs(Args);
     if (!GPUsOrErr) {
@@ -789,7 +789,7 @@ llvm::DenormalMode AMDGPUToolChain::getDefaultDenormalModeForType(
     return llvm::DenormalMode::getIEEE();
   }
 
-  const StringRef GpuArch = getGPUArch(DriverArgs);
+  const llvm::StringRef GpuArch = getGPUArch(DriverArgs);
   auto Kind = llvm::AMDGPU::parseArchAMDGCN(GpuArch);
 
   // TODO: There are way too many flags that change this. Do we need to check
@@ -839,7 +839,7 @@ void AMDGPUToolChain::addClangWarningOptions(ArgStringList &CC1Args) const {
   CC1Args.push_back("-Werror=atomic-alignment");
 }
 
-StringRef
+llvm::StringRef
 AMDGPUToolChain::getGPUArch(const llvm::opt::ArgList &DriverArgs) const {
   return getProcessorFromTargetID(
       getTriple(), DriverArgs.getLastArgValue(options::OPT_mcpu_EQ));
@@ -847,7 +847,7 @@ AMDGPUToolChain::getGPUArch(const llvm::opt::ArgList &DriverArgs) const {
 
 AMDGPUToolChain::ParsedTargetIDType
 AMDGPUToolChain::getParsedTargetID(const llvm::opt::ArgList &DriverArgs) const {
-  StringRef TargetID = DriverArgs.getLastArgValue(options::OPT_mcpu_EQ);
+  llvm::StringRef TargetID = DriverArgs.getLastArgValue(options::OPT_mcpu_EQ);
   if (TargetID.empty())
     return {std::nullopt, std::nullopt, std::nullopt};
 
@@ -868,7 +868,7 @@ void AMDGPUToolChain::checkTargetID(
   }
 }
 
-Expected<SmallVector<std::string>>
+llvm::Expected<llvm::SmallVector<std::string>>
 AMDGPUToolChain::getSystemGPUArchs(const ArgList &Args) const {
   // Detect AMD GPUs availible on the system.
   std::string Program;
@@ -881,8 +881,8 @@ AMDGPUToolChain::getSystemGPUArchs(const ArgList &Args) const {
   if (!StdoutOrErr)
     return StdoutOrErr.takeError();
 
-  SmallVector<std::string, 1> GPUArchs;
-  for (StringRef Arch : llvm::split((*StdoutOrErr)->getBuffer(), "\n"))
+  llvm::SmallVector<std::string, 1> GPUArchs;
+  for (llvm::StringRef Arch : llvm::split((*StdoutOrErr)->getBuffer(), "\n"))
     if (!Arch.empty())
       GPUArchs.push_back(Arch.str());
 
@@ -909,10 +909,10 @@ void ROCMToolChain::addClangTargetOptions(
     return;
 
   // Get the device name and canonicalize it
-  const StringRef GpuArch = getGPUArch(DriverArgs);
+  const llvm::StringRef GpuArch = getGPUArch(DriverArgs);
   auto Kind = llvm::AMDGPU::parseArchAMDGCN(GpuArch);
-  const StringRef CanonArch = llvm::AMDGPU::getArchNameAMDGCN(Kind);
-  StringRef LibDeviceFile = RocmInstallation->getLibDeviceFile(CanonArch);
+  const llvm::StringRef CanonArch = llvm::AMDGPU::getArchNameAMDGCN(Kind);
+  llvm::StringRef LibDeviceFile = RocmInstallation->getLibDeviceFile(CanonArch);
   auto ABIVer = DeviceLibABIVersion::fromCodeObjectVersion(
       getAMDGPUCodeObjectVersion(getDriver(), DriverArgs));
   if (!RocmInstallation->checkCommonBitcodeLibs(CanonArch, LibDeviceFile,
@@ -942,14 +942,14 @@ void ROCMToolChain::addClangTargetOptions(
       DriverArgs, LibDeviceFile, Wave64, DAZ, FiniteOnly, UnsafeMathOpt,
       FastRelaxedMath, CorrectSqrt, ABIVer, false));
 
-  for (StringRef BCFile : BCLibs) {
+  for (llvm::StringRef BCFile : BCLibs) {
     CC1Args.push_back("-mlink-builtin-bitcode");
     CC1Args.push_back(DriverArgs.MakeArgString(BCFile));
   }
 }
 
 bool RocmInstallationDetector::checkCommonBitcodeLibs(
-    StringRef GPUArch, StringRef LibDeviceFile,
+    llvm::StringRef GPUArch, llvm::StringRef LibDeviceFile,
     DeviceLibABIVersion ABIVer) const {
   if (!hasDeviceLibrary()) {
     D.Diag(diag::err_drv_no_rocm_device_lib) << 0;
@@ -968,12 +968,12 @@ bool RocmInstallationDetector::checkCommonBitcodeLibs(
 
 llvm::SmallVector<std::string, 12>
 RocmInstallationDetector::getCommonBitcodeLibs(
-    const llvm::opt::ArgList &DriverArgs, StringRef LibDeviceFile, bool Wave64,
+    const llvm::opt::ArgList &DriverArgs, llvm::StringRef LibDeviceFile, bool Wave64,
     bool DAZ, bool FiniteOnly, bool UnsafeMathOpt, bool FastRelaxedMath,
     bool CorrectSqrt, DeviceLibABIVersion ABIVer, bool isOpenMP = false) const {
   llvm::SmallVector<std::string, 12> BCLibs;
 
-  auto AddBCLib = [&](StringRef BCFile) { BCLibs.push_back(BCFile.str()); };
+  auto AddBCLib = [&](llvm::StringRef BCFile) { BCLibs.push_back(BCFile.str()); };
 
   AddBCLib(getOCMLPath());
   if (!isOpenMP)
@@ -996,9 +996,9 @@ ROCMToolChain::getCommonDeviceLibNames(const llvm::opt::ArgList &DriverArgs,
                                        const std::string &GPUArch,
                                        bool isOpenMP) const {
   auto Kind = llvm::AMDGPU::parseArchAMDGCN(GPUArch);
-  const StringRef CanonArch = llvm::AMDGPU::getArchNameAMDGCN(Kind);
+  const llvm::StringRef CanonArch = llvm::AMDGPU::getArchNameAMDGCN(Kind);
 
-  StringRef LibDeviceFile = RocmInstallation->getLibDeviceFile(CanonArch);
+  llvm::StringRef LibDeviceFile = RocmInstallation->getLibDeviceFile(CanonArch);
   auto ABIVer = DeviceLibABIVersion::fromCodeObjectVersion(
       getAMDGPUCodeObjectVersion(getDriver(), DriverArgs));
   if (!RocmInstallation->checkCommonBitcodeLibs(CanonArch, LibDeviceFile,

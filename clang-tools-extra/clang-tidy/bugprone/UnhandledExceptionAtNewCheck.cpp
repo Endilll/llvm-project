@@ -38,7 +38,7 @@ AST_MATCHER(CXXNewExpr, mayThrow) {
 }
 
 UnhandledExceptionAtNewCheck::UnhandledExceptionAtNewCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context) {}
 
 void UnhandledExceptionAtNewCheck::registerMatchers(MatchFinder *Finder) {

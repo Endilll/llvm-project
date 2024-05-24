@@ -58,11 +58,11 @@ public:
   /// Parse the `-selection` argument.
   ///
   /// \returns A valid argument when the parse succedeed, null otherwise.
-  static std::unique_ptr<SourceSelectionArgument> fromString(StringRef Value);
+  static std::unique_ptr<SourceSelectionArgument> fromString(llvm::StringRef Value);
 
   /// Prints any additional state associated with the selection argument to
   /// the given output stream.
-  virtual void print(raw_ostream &OS) {}
+  virtual void print(llvm::raw_ostream &OS) {}
 
   /// Returns a replacement refactoring result consumer (if any) that should
   /// consume the results of a refactoring operation.
@@ -91,7 +91,7 @@ public:
   TestSourceSelectionArgument(TestSelectionRangesInFile TestSelections)
       : TestSelections(std::move(TestSelections)) {}
 
-  void print(raw_ostream &OS) override { TestSelections.dump(OS); }
+  void print(llvm::raw_ostream &OS) override { TestSelections.dump(OS); }
 
   std::unique_ptr<ClangRefactorToolConsumerInterface>
   createCustomConsumer() override {
@@ -145,9 +145,9 @@ private:
 };
 
 std::unique_ptr<SourceSelectionArgument>
-SourceSelectionArgument::fromString(StringRef Value) {
+SourceSelectionArgument::fromString(llvm::StringRef Value) {
   if (Value.starts_with("test:")) {
-    StringRef Filename = Value.drop_front(strlen("test:"));
+    llvm::StringRef Filename = Value.drop_front(strlen("test:"));
     std::optional<TestSelectionRangesInFile> ParsedTestSelection =
         findTestSelectionRanges(Filename);
     if (!ParsedTestSelection)
@@ -206,7 +206,7 @@ public:
       MissingRequiredOptions.push_back(&Opt);
   }
 
-  ArrayRef<const RefactoringOption *> getMissingRequiredOptions() const {
+  llvm::ArrayRef<const RefactoringOption *> getMissingRequiredOptions() const {
     return MissingRequiredOptions;
   }
 
@@ -448,7 +448,7 @@ public:
     protected:
       std::unique_ptr<clang::ASTConsumer>
       CreateASTConsumer(clang::CompilerInstance &compiler,
-                        StringRef /* dummy */) override {
+                        llvm::StringRef /* dummy */) override {
         std::unique_ptr<clang::ASTConsumer> Consumer{
             new ToolASTConsumer(Callback)};
         return Consumer;
@@ -532,7 +532,7 @@ private:
 
   llvm::Expected<RefactoringActionRule *>
   getMatchingRule(RefactoringActionSubcommand &Subcommand) {
-    SmallVector<RefactoringActionRule *, 4> MatchingRules;
+    llvm::SmallVector<RefactoringActionRule *, 4> MatchingRules;
     llvm::StringSet<> MissingOptions;
 
     for (const auto &Rule : Subcommand.getActionRules()) {

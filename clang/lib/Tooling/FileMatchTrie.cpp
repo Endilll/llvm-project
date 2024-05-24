@@ -26,7 +26,7 @@ namespace {
 
 /// Default \c PathComparator using \c llvm::sys::fs::equivalent().
 struct DefaultPathComparator : public PathComparator {
-  bool equivalent(StringRef FileA, StringRef FileB) const override {
+  bool equivalent(llvm::StringRef FileA, llvm::StringRef FileB) const override {
     return FileA == FileB || llvm::sys::fs::equivalent(FileA, FileB);
   }
 };
@@ -56,7 +56,7 @@ public:
   ///   'p' there.
   ///
   /// An insert operation is linear in the number of a path's segments.
-  void insert(StringRef NewPath, unsigned ConsumedLength = 0) {
+  void insert(llvm::StringRef NewPath, unsigned ConsumedLength = 0) {
     // We cannot put relative paths into the FileMatchTrie as then a path can be
     // a postfix of another path, violating a core assumption of the trie.
     if (llvm::sys::path::is_relative(NewPath))
@@ -71,12 +71,12 @@ public:
       if (NewPath == Path)
           return;
       // Make this a node and create a child-leaf with 'Path'.
-      StringRef Element(llvm::sys::path::filename(
-          StringRef(Path).drop_back(ConsumedLength)));
+      llvm::StringRef Element(llvm::sys::path::filename(
+          llvm::StringRef(Path).drop_back(ConsumedLength)));
       Children[Element].Path = Path;
     }
-    StringRef Element(llvm::sys::path::filename(
-          StringRef(NewPath).drop_back(ConsumedLength)));
+    llvm::StringRef Element(llvm::sys::path::filename(
+          llvm::StringRef(NewPath).drop_back(ConsumedLength)));
     Children[Element].insert(NewPath, ConsumedLength + Element.size() + 1);
   }
 
@@ -101,8 +101,8 @@ public:
   ///   equivalent, continue with the parent node as if 'n' didn't exist. If one
   ///   is equivalent, the best match is found. Otherwise, report and ambigiuity
   ///   error.
-  StringRef findEquivalent(const PathComparator& Comparator,
-                           StringRef FileName,
+  llvm::StringRef findEquivalent(const PathComparator& Comparator,
+                           llvm::StringRef FileName,
                            bool &IsAmbiguous,
                            unsigned ConsumedLength = 0) const {
     // Note: we support only directory symlinks for performance reasons.
@@ -111,16 +111,16 @@ public:
       // basenames here to avoid request to file system.
       if (llvm::sys::path::filename(Path) ==
               llvm::sys::path::filename(FileName) &&
-          Comparator.equivalent(StringRef(Path), FileName))
-        return StringRef(Path);
+          Comparator.equivalent(llvm::StringRef(Path), FileName))
+        return llvm::StringRef(Path);
       return {};
     }
-    StringRef Element(llvm::sys::path::filename(FileName.drop_back(
+    llvm::StringRef Element(llvm::sys::path::filename(FileName.drop_back(
         ConsumedLength)));
     llvm::StringMap<FileMatchTrieNode>::const_iterator MatchingChild =
         Children.find(Element);
     if (MatchingChild != Children.end()) {
-      StringRef Result = MatchingChild->getValue().findEquivalent(
+      llvm::StringRef Result = MatchingChild->getValue().findEquivalent(
           Comparator, FileName, IsAmbiguous,
           ConsumedLength + Element.size() + 1);
       if (!Result.empty() || IsAmbiguous)
@@ -133,9 +133,9 @@ public:
     if (ConsumedLength == 0)
       return {};
 
-    std::vector<StringRef> AllChildren;
+    std::vector<llvm::StringRef> AllChildren;
     getAll(AllChildren, MatchingChild);
-    StringRef Result;
+    llvm::StringRef Result;
     for (const auto &Child : AllChildren) {
       if (Comparator.equivalent(Child, FileName)) {
         if (Result.empty()) {
@@ -151,12 +151,12 @@ public:
 
 private:
   /// Gets all paths under this FileMatchTrieNode.
-  void getAll(std::vector<StringRef> &Results,
+  void getAll(std::vector<llvm::StringRef> &Results,
               llvm::StringMap<FileMatchTrieNode>::const_iterator Except) const {
     if (Path.empty())
       return;
     if (Children.empty()) {
-      Results.push_back(StringRef(Path));
+      Results.push_back(llvm::StringRef(Path));
       return;
     }
     for (llvm::StringMap<FileMatchTrieNode>::const_iterator
@@ -189,18 +189,18 @@ FileMatchTrie::~FileMatchTrie() {
   delete Root;
 }
 
-void FileMatchTrie::insert(StringRef NewPath) {
+void FileMatchTrie::insert(llvm::StringRef NewPath) {
   Root->insert(NewPath);
 }
 
-StringRef FileMatchTrie::findEquivalent(StringRef FileName,
-                                        raw_ostream &Error) const {
+llvm::StringRef FileMatchTrie::findEquivalent(llvm::StringRef FileName,
+                                        llvm::raw_ostream &Error) const {
   if (llvm::sys::path::is_relative(FileName)) {
     Error << "Cannot resolve relative paths";
     return {};
   }
   bool IsAmbiguous = false;
-  StringRef Result = Root->findEquivalent(*Comparator, FileName, IsAmbiguous);
+  llvm::StringRef Result = Root->findEquivalent(*Comparator, FileName, IsAmbiguous);
   if (IsAmbiguous)
     Error << "Path is ambiguous";
   return Result;

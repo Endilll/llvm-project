@@ -123,7 +123,7 @@ bool VforkChecker::isCallExplicitelyAllowed(const IdentifierInfo *II,
 void VforkChecker::reportBug(const char *What, CheckerContext &C,
                              const char *Details) const {
   if (ExplodedNode *N = C.generateErrorNode(C.getState())) {
-    SmallString<256> buf;
+    llvm::SmallString<256> buf;
     llvm::raw_svector_ostream os(buf);
 
     os << What << " is prohibited after a successful vfork";

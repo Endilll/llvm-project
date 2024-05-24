@@ -20,7 +20,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/copy-constructor-init.html
 class CopyConstructorInitCheck : public ClangTidyCheck {
 public:
-  CopyConstructorInitCheck(StringRef Name, ClangTidyContext *Context)
+  CopyConstructorInitCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

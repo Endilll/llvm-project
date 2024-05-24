@@ -12,6 +12,7 @@
 #include "clang/CodeGen/BackendUtil.h"
 #include "clang/CodeGen/CodeGenAction.h"
 
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/IR/DiagnosticInfo.h"
 #include "llvm/Support/Timer.h"
 
@@ -34,9 +35,9 @@ class BackendConsumer : public ASTConsumer {
   const CodeGenOptions &CodeGenOpts;
   const TargetOptions &TargetOpts;
   const LangOptions &LangOpts;
-  std::unique_ptr<raw_pwrite_stream> AsmOutStream;
+  std::unique_ptr<llvm::raw_pwrite_stream> AsmOutStream;
   ASTContext *Context;
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS;
 
   llvm::Timer LLVMIRGeneration;
   unsigned LLVMIRGenerationRefCount;
@@ -50,7 +51,7 @@ class BackendConsumer : public ASTConsumer {
 
   std::unique_ptr<CodeGenerator> Gen;
 
-  SmallVector<LinkModule, 4> LinkModules;
+  llvm::SmallVector<LinkModule, 4> LinkModules;
 
   // A map from mangled names to their function's source location, used for
   // backend diagnostics as the Clang AST may be unavailable. We actually use
@@ -70,26 +71,26 @@ class BackendConsumer : public ASTConsumer {
 
 public:
   BackendConsumer(BackendAction Action, DiagnosticsEngine &Diags,
-                  IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
+                  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
                   const HeaderSearchOptions &HeaderSearchOpts,
                   const PreprocessorOptions &PPOpts,
                   const CodeGenOptions &CodeGenOpts,
                   const TargetOptions &TargetOpts, const LangOptions &LangOpts,
                   const std::string &InFile,
-                  SmallVector<LinkModule, 4> LinkModules,
-                  std::unique_ptr<raw_pwrite_stream> OS, llvm::LLVMContext &C,
+                  llvm::SmallVector<LinkModule, 4> LinkModules,
+                  std::unique_ptr<llvm::raw_pwrite_stream> OS, llvm::LLVMContext &C,
                   CoverageSourceInfo *CoverageInfo = nullptr);
 
   // This constructor is used in installing an empty BackendConsumer
   // to use the clang diagnostic handler for IR input files. It avoids
   // initializing the OS field.
   BackendConsumer(BackendAction Action, DiagnosticsEngine &Diags,
-                  IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
+                  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
                   const HeaderSearchOptions &HeaderSearchOpts,
                   const PreprocessorOptions &PPOpts,
                   const CodeGenOptions &CodeGenOpts,
                   const TargetOptions &TargetOpts, const LangOptions &LangOpts,
-                  llvm::Module *Module, SmallVector<LinkModule, 4> LinkModules,
+                  llvm::Module *Module, llvm::SmallVector<LinkModule, 4> LinkModules,
                   llvm::LLVMContext &C,
                   CoverageSourceInfo *CoverageInfo = nullptr);
 
@@ -118,7 +119,7 @@ public:
   /// may have associated debug info.
   const FullSourceLoc getBestLocationFromDebugLoc(
     const llvm::DiagnosticInfoWithLocationBase &D,
-    bool &BadDebugInfo, StringRef &Filename,
+    bool &BadDebugInfo, llvm::StringRef &Filename,
     unsigned &Line, unsigned &Column) const;
 
   std::optional<FullSourceLoc> getFunctionSourceLocation(

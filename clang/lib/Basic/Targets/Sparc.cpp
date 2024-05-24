@@ -32,7 +32,7 @@ const char *const SparcTargetInfo::GCCRegNames[] = {
     "f56", "f58", "f60", "f62",
 };
 
-ArrayRef<const char *> SparcTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> SparcTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
@@ -47,11 +47,11 @@ const TargetInfo::GCCRegAlias SparcTargetInfo::GCCRegAliases[] = {
     {{"i4"}, "r28"}, {{"i5"}, "r29"}, {{"i6", "fp"}, "r30"}, {{"i7"}, "r31"},
 };
 
-ArrayRef<TargetInfo::GCCRegAlias> SparcTargetInfo::getGCCRegAliases() const {
+llvm::ArrayRef<TargetInfo::GCCRegAlias> SparcTargetInfo::getGCCRegAliases() const {
   return llvm::ArrayRef(GCCRegAliases);
 }
 
-bool SparcTargetInfo::hasFeature(StringRef Feature) const {
+bool SparcTargetInfo::hasFeature(llvm::StringRef Feature) const {
   return llvm::StringSwitch<bool>(Feature)
       .Case("softfloat", SoftFloat)
       .Case("sparc", true)
@@ -114,7 +114,7 @@ SparcTargetInfo::getCPUGeneration(CPUKind Kind) const {
   return Item->Generation;
 }
 
-SparcTargetInfo::CPUKind SparcTargetInfo::getCPUKind(StringRef Name) const {
+SparcTargetInfo::CPUKind SparcTargetInfo::getCPUKind(llvm::StringRef Name) const {
   const SparcCPUInfo *Item = llvm::find_if(
       CPUInfo, [Name](const SparcCPUInfo &Info) { return Info.Name == Name; });
 
@@ -124,7 +124,7 @@ SparcTargetInfo::CPUKind SparcTargetInfo::getCPUKind(StringRef Name) const {
 }
 
 void SparcTargetInfo::fillValidCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   for (const SparcCPUInfo &Info : CPUInfo)
     Values.push_back(Info.Name);
 }
@@ -181,7 +181,7 @@ void SparcV9TargetInfo::getTargetDefines(const LangOptions &Opts,
 }
 
 void SparcV9TargetInfo::fillValidCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   for (const SparcCPUInfo &Info : CPUInfo)
     if (Info.Generation == CG_V9)
       Values.push_back(Info.Name);

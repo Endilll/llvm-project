@@ -58,14 +58,14 @@ class FileEntryRef {
 public:
   /// The name of this FileEntry. If a VFS uses 'use-external-name', this is
   /// the redirected name. See getRequestedName().
-  StringRef getName() const { return getBaseMapEntry().first(); }
+  llvm::StringRef getName() const { return getBaseMapEntry().first(); }
 
   /// The name of this FileEntry, as originally requested without applying any
   /// remappings for VFS 'use-external-name'.
   ///
   /// FIXME: this should be the semantics of getName(). See comment in
   /// FileManager::getFileRef().
-  StringRef getNameAsRequested() const { return ME->first(); }
+  llvm::StringRef getNameAsRequested() const { return ME->first(); }
 
   const FileEntry &getFileEntry() const {
     return *getBaseMapEntry().second->V.get<FileEntry *>();
@@ -321,7 +321,7 @@ class FileEntry {
 public:
   ~FileEntry();
 
-  StringRef tryGetRealPathName() const { return RealPathName; }
+  llvm::StringRef tryGetRealPathName() const { return RealPathName; }
   off_t getSize() const { return Size; }
   unsigned getUID() const { return UID; }
   const llvm::sys::fs::UniqueID &getUniqueID() const { return UniqueID; }

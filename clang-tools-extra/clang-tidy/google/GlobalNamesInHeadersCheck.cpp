@@ -16,7 +16,7 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::google::readability {
 
-GlobalNamesInHeadersCheck::GlobalNamesInHeadersCheck(StringRef Name,
+GlobalNamesInHeadersCheck::GlobalNamesInHeadersCheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       HeaderFileExtensions(Context->getHeaderFileExtensions()) {}

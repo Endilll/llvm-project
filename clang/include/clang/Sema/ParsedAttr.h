@@ -50,7 +50,7 @@ struct AvailabilityChange {
   SourceLocation KeywordLoc;
 
   /// The version number at which the change occurred.
-  VersionTuple Version;
+  llvm::VersionTuple Version;
 
   /// The source range covering the version number.
   SourceRange VersionRange;
@@ -544,7 +544,7 @@ public:
   }
   bool appliesToDecl(const Decl *D, attr::SubjectMatchRule MatchRule) const;
   void getMatchRules(const LangOptions &LangOpts,
-                     SmallVectorImpl<std::pair<attr::SubjectMatchRule, bool>>
+                     llvm::SmallVectorImpl<std::pair<attr::SubjectMatchRule, bool>>
                          &MatchRules) const;
   bool diagnoseLangOpts(class Sema &S) const;
   bool existsInTarget(const TargetInfo &Target) const;
@@ -668,7 +668,7 @@ private:
 
   /// Free lists.  The index is determined by the following formula:
   ///   (size - sizeof(ParsedAttr)) / sizeof(void*)
-  SmallVector<SmallVector<ParsedAttr *, 8>, InlineFreeListsCapacity> FreeLists;
+  llvm::SmallVector<llvm::SmallVector<ParsedAttr *, 8>, InlineFreeListsCapacity> FreeLists;
 
   // The following are the private interface used by AttributePool.
   friend class AttributePool;

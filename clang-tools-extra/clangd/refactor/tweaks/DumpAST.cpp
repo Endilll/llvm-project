@@ -41,7 +41,7 @@ public:
         Node = N->ASTNode;
     return Node.has_value();
   }
-  Expected<Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Effect> apply(const Selection &Inputs) override;
   std::string title() const override {
     return std::string(
         llvm::formatv("Dump {0} AST", Node->getNodeKind().asStringRef()));
@@ -88,7 +88,7 @@ public:
   const char *id() const final;
 
   bool prepare(const Selection &Inputs) override { return true; }
-  Expected<Effect> apply(const Selection &Inputs) override {
+  llvm::Expected<Effect> apply(const Selection &Inputs) override {
     return Effect::showMessage(llvm::to_string(Inputs.ASTSelection));
   }
   std::string title() const override { return "Show selection tree"; }
@@ -107,7 +107,7 @@ REGISTER_TWEAK(ShowSelectionTree)
 class DumpSymbol : public Tweak {
   const char *id() const final;
   bool prepare(const Selection &Inputs) override { return true; }
-  Expected<Effect> apply(const Selection &Inputs) override {
+  llvm::Expected<Effect> apply(const Selection &Inputs) override {
     std::string Storage;
     llvm::raw_string_ostream Out(Storage);
 
@@ -143,7 +143,7 @@ public:
     return Record && Record->isThisDeclarationADefinition() &&
            !Record->isDependentType();
   }
-  Expected<Effect> apply(const Selection &Inputs) override {
+  llvm::Expected<Effect> apply(const Selection &Inputs) override {
     std::string Str;
     llvm::raw_string_ostream OS(Str);
     Inputs.AST->getASTContext().DumpRecordLayout(Record, OS);

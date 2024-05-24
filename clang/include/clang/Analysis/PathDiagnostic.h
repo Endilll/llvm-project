@@ -95,7 +95,7 @@ public:
   public:
     PDFileEntry(llvm::FoldingSetNodeID &NodeID) : NodeID(NodeID) {}
 
-    using ConsumerFiles = std::vector<std::pair<StringRef, StringRef>>;
+    using ConsumerFiles = std::vector<std::pair<llvm::StringRef, llvm::StringRef>>;
 
     /// A vector of <consumer,file> pairs.
     ConsumerFiles files;
@@ -117,8 +117,8 @@ public:
     bool empty() const { return Set.empty(); }
 
     void addDiagnostic(const PathDiagnostic &PD,
-                       StringRef ConsumerName,
-                       StringRef fileName);
+                       llvm::StringRef ConsumerName,
+                       llvm::StringRef fileName);
 
     PDFileEntry::ConsumerFiles *getFiles(const PathDiagnostic &PD);
   };
@@ -135,7 +135,7 @@ public:
   virtual void FlushDiagnosticsImpl(std::vector<const PathDiagnostic *> &Diags,
                                     FilesMade *filesMade) = 0;
 
-  virtual StringRef getName() const = 0;
+  virtual llvm::StringRef getName() const = 0;
 
   void HandlePathDiagnostic(std::unique_ptr<PathDiagnostic> D);
 
@@ -418,13 +418,13 @@ private:
   /// typically with the identification of the creator.  The actual pointer
   /// value is meant to be an identifier; the string itself is useful for
   /// debugging.
-  StringRef Tag;
+  llvm::StringRef Tag;
 
   std::vector<SourceRange> ranges;
   std::vector<FixItHint> fixits;
 
 protected:
-  PathDiagnosticPiece(StringRef s, Kind k, DisplayHint hint = Below);
+  PathDiagnosticPiece(llvm::StringRef s, Kind k, DisplayHint hint = Below);
   PathDiagnosticPiece(Kind k, DisplayHint hint = Below);
 
 public:
@@ -433,7 +433,7 @@ public:
   PathDiagnosticPiece &operator=(const PathDiagnosticPiece &) = delete;
   virtual ~PathDiagnosticPiece();
 
-  StringRef getString() const { return str; }
+  llvm::StringRef getString() const { return str; }
 
   /// Tag this PathDiagnosticPiece with the given C-string.
   void setTag(const char *tag) { Tag = tag; }
@@ -443,7 +443,7 @@ public:
 
   /// Return the string representation of the tag.  This is useful
   /// for debugging.
-  StringRef getTagStr() const { return Tag; }
+  llvm::StringRef getTagStr() const { return Tag; }
 
   /// getDisplayHint - Return a hint indicating where the diagnostic should
   ///  be displayed by the PathDiagnosticConsumer.
@@ -471,10 +471,10 @@ public:
   }
 
   /// Return the SourceRanges associated with this PathDiagnosticPiece.
-  ArrayRef<SourceRange> getRanges() const { return ranges; }
+  llvm::ArrayRef<SourceRange> getRanges() const { return ranges; }
 
   /// Return the fix-it hints associated with this PathDiagnosticPiece.
-  ArrayRef<FixItHint> getFixits() const { return fixits; }
+  llvm::ArrayRef<FixItHint> getFixits() const { return fixits; }
 
   virtual void Profile(llvm::FoldingSetNodeID &ID) const;
 
@@ -511,7 +511,7 @@ private:
 
 public:
   PathDiagnosticSpotPiece(const PathDiagnosticLocation &pos,
-                          StringRef s,
+                          llvm::StringRef s,
                           PathDiagnosticPiece::Kind k,
                           bool addPosRange = true)
       : PathDiagnosticPiece(s, k), Pos(pos) {
@@ -536,7 +536,7 @@ class PathDiagnosticEventPiece : public PathDiagnosticSpotPiece {
 
 public:
   PathDiagnosticEventPiece(const PathDiagnosticLocation &pos,
-                           StringRef s, bool addPosRange = true)
+                           llvm::StringRef s, bool addPosRange = true)
       : PathDiagnosticSpotPiece(pos, s, Event, addPosRange) {}
   ~PathDiagnosticEventPiece() override;
 
@@ -597,7 +597,7 @@ public:
   void setCallee(const CallEnter &CE, const SourceManager &SM);
 
   bool hasCallStackMessage() { return !CallStackMessage.empty(); }
-  void setCallStackMessage(StringRef st) { CallStackMessage = std::string(st); }
+  void setCallStackMessage(llvm::StringRef st) { CallStackMessage = std::string(st); }
 
   PathDiagnosticLocation getLocation() const override { return callEnter; }
 
@@ -635,7 +635,7 @@ class PathDiagnosticControlFlowPiece : public PathDiagnosticPiece {
 public:
   PathDiagnosticControlFlowPiece(const PathDiagnosticLocation &startPos,
                                  const PathDiagnosticLocation &endPos,
-                                 StringRef s)
+                                 llvm::StringRef s)
       : PathDiagnosticPiece(s, ControlFlow) {
     LPairs.push_back(PathDiagnosticLocationPair(startPos, endPos));
   }
@@ -724,7 +724,7 @@ public:
 
 class PathDiagnosticNotePiece: public PathDiagnosticSpotPiece {
 public:
-  PathDiagnosticNotePiece(const PathDiagnosticLocation &Pos, StringRef S,
+  PathDiagnosticNotePiece(const PathDiagnosticLocation &Pos, llvm::StringRef S,
                           bool AddPosRange = true)
       : PathDiagnosticSpotPiece(Pos, S, Note, AddPosRange) {}
   ~PathDiagnosticNotePiece() override;
@@ -740,7 +740,7 @@ public:
 
 class PathDiagnosticPopUpPiece: public PathDiagnosticSpotPiece {
 public:
-  PathDiagnosticPopUpPiece(const PathDiagnosticLocation &Pos, StringRef S,
+  PathDiagnosticPopUpPiece(const PathDiagnosticLocation &Pos, llvm::StringRef S,
                            bool AddPosRange = true)
       : PathDiagnosticSpotPiece(Pos, S, PopUp, AddPosRange) {}
   ~PathDiagnosticPopUpPiece() override;
@@ -773,7 +773,7 @@ class PathDiagnostic : public llvm::FoldingSetNode {
   PathDiagnosticLocation Loc;
 
   PathPieces pathImpl;
-  SmallVector<PathPieces *, 3> pathStack;
+  llvm::SmallVector<PathPieces *, 3> pathStack;
 
   /// Important bug uniqueing location.
   /// The location info is useful to differentiate between bugs.
@@ -788,9 +788,9 @@ class PathDiagnostic : public llvm::FoldingSetNode {
 
 public:
   PathDiagnostic() = delete;
-  PathDiagnostic(StringRef CheckerName, const Decl *DeclWithIssue,
-                 StringRef bugtype, StringRef verboseDesc, StringRef shortDesc,
-                 StringRef category, PathDiagnosticLocation LocationToUnique,
+  PathDiagnostic(llvm::StringRef CheckerName, const Decl *DeclWithIssue,
+                 llvm::StringRef bugtype, llvm::StringRef verboseDesc, llvm::StringRef shortDesc,
+                 llvm::StringRef category, PathDiagnosticLocation LocationToUnique,
                  const Decl *DeclToUnique, const Decl *AnalysisEntryPoint,
                  std::unique_ptr<FilesToLineNumsMap> ExecutedLines);
   ~PathDiagnostic();
@@ -825,27 +825,27 @@ public:
     getActivePath().push_back(std::move(EndPiece));
   }
 
-  void appendToDesc(StringRef S) {
+  void appendToDesc(llvm::StringRef S) {
     if (!ShortDesc.empty())
       ShortDesc += S;
     VerboseDesc += S;
   }
 
-  StringRef getVerboseDescription() const { return VerboseDesc; }
+  llvm::StringRef getVerboseDescription() const { return VerboseDesc; }
 
-  StringRef getShortDescription() const {
+  llvm::StringRef getShortDescription() const {
     return ShortDesc.empty() ? VerboseDesc : ShortDesc;
   }
 
-  StringRef getCheckerName() const { return CheckerName; }
-  StringRef getBugType() const { return BugType; }
-  StringRef getCategory() const { return Category; }
+  llvm::StringRef getCheckerName() const { return CheckerName; }
+  llvm::StringRef getBugType() const { return BugType; }
+  llvm::StringRef getCategory() const { return Category; }
 
   using meta_iterator = std::deque<std::string>::const_iterator;
 
   meta_iterator meta_begin() const { return OtherDesc.begin(); }
   meta_iterator meta_end() const { return OtherDesc.end(); }
-  void addMeta(StringRef s) { OtherDesc.push_back(std::string(s)); }
+  void addMeta(llvm::StringRef s) { OtherDesc.push_back(std::string(s)); }
 
   const FilesToLineNumsMap &getExecutedLines() const {
     return *ExecutedLines;

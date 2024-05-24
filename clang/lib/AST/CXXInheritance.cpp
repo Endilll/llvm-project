@@ -125,7 +125,7 @@ CXXRecordDecl::isCurrentInstantiation(const DeclContext *CurContext) const {
 }
 
 bool CXXRecordDecl::forallBases(ForallBasesCallback BaseMatches) const {
-  SmallVector<const CXXRecordDecl*, 8> Queue;
+  llvm::SmallVector<const CXXRecordDecl*, 8> Queue;
 
   const CXXRecordDecl *Record = this;
   while (true) {
@@ -463,7 +463,7 @@ std::vector<const NamedDecl *> CXXRecordDecl::lookupDependentName(
 
 void OverridingMethods::add(unsigned OverriddenSubobject,
                             UniqueVirtualMethod Overriding) {
-  SmallVectorImpl<UniqueVirtualMethod> &SubobjectOverrides
+  llvm::SmallVectorImpl<UniqueVirtualMethod> &SubobjectOverrides
     = Overrides[OverriddenSubobject];
   if (!llvm::is_contained(SubobjectOverrides, Overriding))
     SubobjectOverrides.push_back(Overriding);
@@ -594,7 +594,7 @@ void FinalOverriderCollector::Collect(const CXXRecordDecl *RD,
     // overrider. To do so, we dig down to the original virtual
     // functions using data recursion and update all of the methods it
     // overrides.
-    SmallVector<OverriddenMethodsRange, 4> Stack(1, OverriddenMethods);
+    llvm::SmallVector<OverriddenMethodsRange, 4> Stack(1, OverriddenMethods);
     while (!Stack.empty()) {
       for (const CXXMethodDecl *OM : Stack.pop_back_val()) {
         const CXXMethodDecl *CanonOM = OM->getCanonicalDecl();
@@ -648,7 +648,7 @@ CXXRecordDecl::getFinalOverriders(CXXFinalOverriderMap &FinalOverriders) const {
   // This is the final-overrider variant of C++ [class.member.lookup]p10.
   for (auto &OM : FinalOverriders) {
     for (auto &SO : OM.second) {
-      SmallVectorImpl<UniqueVirtualMethod> &Overriding = SO.second;
+      llvm::SmallVectorImpl<UniqueVirtualMethod> &Overriding = SO.second;
       if (Overriding.size() < 2)
         continue;
 

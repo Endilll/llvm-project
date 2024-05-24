@@ -1060,7 +1060,7 @@ static llvm::Constant *constStructWithPadding(CodeGenModule &CGM,
   const llvm::StructLayout *Layout = DL.getStructLayout(STy);
   llvm::Type *Int8Ty = llvm::IntegerType::getInt8Ty(CGM.getLLVMContext());
   unsigned SizeSoFar = 0;
-  SmallVector<llvm::Constant *, 8> Values;
+  llvm::SmallVector<llvm::Constant *, 8> Values;
   bool NestedIntact = true;
   for (unsigned i = 0, e = STy->getNumElements(); i != e; i++) {
     unsigned CurOff = Layout->getElementOffset(i);
@@ -1382,8 +1382,8 @@ void CodeGenFunction::EmitAndRegisterVariableArrayDimensions(
     CGDebugInfo *DI, const VarDecl &D, bool EmitDebugInfo) {
   // For each dimension stores its QualType and corresponding
   // size-expression Value.
-  SmallVector<CodeGenFunction::VlaSizePair, 4> Dimensions;
-  SmallVector<const IdentifierInfo *, 4> VLAExprNames;
+  llvm::SmallVector<CodeGenFunction::VlaSizePair, 4> Dimensions;
+  llvm::SmallVector<const IdentifierInfo *, 4> VLAExprNames;
 
   // Break down the array into individual dimensions.
   QualType Type1D = D.getType();
@@ -1393,9 +1393,9 @@ void CodeGenFunction::EmitAndRegisterVariableArrayDimensions(
       Dimensions.emplace_back(C, Type1D.getUnqualifiedType());
     else {
       // Generate a locally unique name for the size expression.
-      Twine Name = Twine("__vla_expr") + Twine(VLAExprCounter++);
-      SmallString<12> Buffer;
-      StringRef NameRef = Name.toStringRef(Buffer);
+      llvm::Twine Name = llvm::Twine("__vla_expr") + llvm::Twine(VLAExprCounter++);
+      llvm::SmallString<12> Buffer;
+      llvm::StringRef NameRef = Name.toStringRef(Buffer);
       auto &Ident = getContext().Idents.getOwn(NameRef);
       VLAExprNames.push_back(&Ident);
       auto SizeExprAddr =
@@ -2407,7 +2407,7 @@ static void emitPartialArrayDestroy(CodeGenFunction &CGF,
   if (arrayDepth) {
     llvm::Value *zero = llvm::ConstantInt::get(CGF.SizeTy, 0);
 
-    SmallVector<llvm::Value*,4> gepIndices(arrayDepth+1, zero);
+    llvm::SmallVector<llvm::Value*,4> gepIndices(arrayDepth+1, zero);
     begin = CGF.Builder.CreateInBoundsGEP(
         elemTy, begin, gepIndices, "pad.arraybegin");
     end = CGF.Builder.CreateInBoundsGEP(
@@ -2779,7 +2779,7 @@ void CodeGenModule::EmitOMPAllocateDecl(const OMPAllocateDecl *D) {
     // (potentially). While not pretty, common practise is to remove the old IR
     // global and generate a new one, so we do that here too. Uses are replaced
     // properly.
-    StringRef MangledName = getMangledName(VD);
+    llvm::StringRef MangledName = getMangledName(VD);
     llvm::GlobalValue *Entry = GetGlobalValue(MangledName);
     if (!Entry)
       continue;

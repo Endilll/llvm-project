@@ -60,7 +60,7 @@ public:
                                  BinaryOperator::Opcode Op);
 
   /// Create a new compound stmt using the provided statements.
-  CompoundStmt *makeCompound(ArrayRef<Stmt*>);
+  CompoundStmt *makeCompound(llvm::ArrayRef<Stmt*>);
 
   /// Create a new DeclRefExpr for the referenced variable.
   DeclRefExpr *makeDeclRefExpr(const VarDecl *D,
@@ -110,7 +110,7 @@ public:
 
   /// Returns a *first* member field of a record declaration with a given name.
   /// \return an nullptr if no member with such a name exists.
-  ValueDecl *findMemberField(const RecordDecl *RD, StringRef Name);
+  ValueDecl *findMemberField(const RecordDecl *RD, llvm::StringRef Name);
 
 private:
   ASTContext &C;
@@ -134,7 +134,7 @@ BinaryOperator *ASTMaker::makeComparison(const Expr *LHS, const Expr *RHS,
       FPOptionsOverride());
 }
 
-CompoundStmt *ASTMaker::makeCompound(ArrayRef<Stmt *> Stmts) {
+CompoundStmt *ASTMaker::makeCompound(llvm::ArrayRef<Stmt *> Stmts) {
   return CompoundStmt::Create(C, Stmts, FPOptionsOverride(), SourceLocation(),
                               SourceLocation());
 }
@@ -235,7 +235,7 @@ MemberExpr *ASTMaker::makeMemberExpression(Expr *base, ValueDecl *MemberDecl,
       OK_Ordinary, NOUR_None);
 }
 
-ValueDecl *ASTMaker::findMemberField(const RecordDecl *RD, StringRef Name) {
+ValueDecl *ASTMaker::findMemberField(const RecordDecl *RD, llvm::StringRef Name) {
 
   CXXBasePaths Paths(
       /* FindAmbiguities=*/false,
@@ -260,7 +260,7 @@ typedef Stmt *(*FunctionFarmer)(ASTContext &C, const FunctionDecl *D);
 
 static CallExpr *create_call_once_funcptr_call(ASTContext &C, ASTMaker M,
                                                const ParmVarDecl *Callback,
-                                               ArrayRef<Expr *> CallArgs) {
+                                               llvm::ArrayRef<Expr *> CallArgs) {
 
   QualType Ty = Callback->getType();
   DeclRefExpr *Call = M.makeDeclRefExpr(Callback);
@@ -287,7 +287,7 @@ static CallExpr *create_call_once_funcptr_call(ASTContext &C, ASTMaker M,
 static CallExpr *create_call_once_lambda_call(ASTContext &C, ASTMaker M,
                                               const ParmVarDecl *Callback,
                                               CXXRecordDecl *CallbackDecl,
-                                              ArrayRef<Expr *> CallArgs) {
+                                              llvm::ArrayRef<Expr *> CallArgs) {
   assert(CallbackDecl != nullptr);
   assert(CallbackDecl->isLambda());
   FunctionDecl *callOperatorDecl = CallbackDecl->getLambdaCallOperator();
@@ -403,7 +403,7 @@ static Stmt *create_call_once(ASTContext &C, const FunctionDecl *D) {
     return nullptr;
   }
 
-  SmallVector<Expr *, 5> CallArgs;
+  llvm::SmallVector<Expr *, 5> CallArgs;
   const FunctionProtoType *CallbackFunctionType;
   if (isLambdaCall) {
 
@@ -707,7 +707,7 @@ Stmt *BodyFarm::getBody(const FunctionDecl *D) {
   if (D->getIdentifier() == nullptr)
     return nullptr;
 
-  StringRef Name = D->getName();
+  llvm::StringRef Name = D->getName();
   if (Name.empty())
     return nullptr;
 

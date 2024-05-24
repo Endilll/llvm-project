@@ -438,7 +438,7 @@ static bool rewriteToArrayLiteral(const ObjCMessageExpr *Msg,
 /// objects that were used to create it.
 /// \returns true if it is an NSArray and we got objects, or false otherwise.
 static bool getNSArrayObjects(const Expr *E, const NSAPI &NS,
-                              SmallVectorImpl<const Expr *> &Objs) {
+                              llvm::SmallVectorImpl<const Expr *> &Objs) {
   if (!E)
     return false;
 
@@ -563,11 +563,11 @@ static bool rewriteToDictionaryLiteral(const ObjCMessageExpr *Msg,
     if (Msg->getNumArgs() != 2)
       return false;
 
-    SmallVector<const Expr *, 8> Vals;
+    llvm::SmallVector<const Expr *, 8> Vals;
     if (!getNSArrayObjects(Msg->getArg(0), NS, Vals))
       return false;
 
-    SmallVector<const Expr *, 8> Keys;
+    llvm::SmallVector<const Expr *, 8> Keys;
     if (!getNSArrayObjects(Msg->getArg(1), NS, Keys))
       return false;
 
@@ -619,11 +619,11 @@ static bool shouldNotRewriteImmediateMessageArgs(const ObjCMessageExpr *Msg,
     if (Msg->getNumArgs() != 2)
       return false;
 
-    SmallVector<const Expr *, 8> Vals;
+    llvm::SmallVector<const Expr *, 8> Vals;
     if (!getNSArrayObjects(Msg->getArg(0), NS, Vals))
       return false;
 
-    SmallVector<const Expr *, 8> Keys;
+    llvm::SmallVector<const Expr *, 8> Keys;
     if (!getNSArrayObjects(Msg->getArg(1), NS, Keys))
       return false;
 
@@ -674,7 +674,7 @@ namespace {
 
 struct LiteralInfo {
   bool Hex, Octal;
-  StringRef U, F, L, LL;
+  llvm::StringRef U, F, L, LL;
   CharSourceRange WithoutSuffRange;
 };
 
@@ -686,7 +686,7 @@ static bool getLiteralInfo(SourceRange literalRange,
   if (literalRange.getBegin().isMacroID() ||
       literalRange.getEnd().isMacroID())
     return false;
-  StringRef text = Lexer::getSourceText(
+  llvm::StringRef text = Lexer::getSourceText(
                                   CharSourceRange::getTokenRange(literalRange),
                                   Ctx.getSourceManager(), Ctx.getLangOpts());
   if (text.empty())
@@ -696,7 +696,7 @@ static bool getLiteralInfo(SourceRange literalRange,
   bool UpperF = false;
 
   struct Suff {
-    static bool has(StringRef suff, StringRef &text) {
+    static bool has(llvm::StringRef suff, llvm::StringRef &text) {
       return text.consume_back(suff);
     }
   };

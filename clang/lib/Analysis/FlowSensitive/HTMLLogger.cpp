@@ -375,7 +375,7 @@ private:
       unsigned Elt = Missing;
       unsigned EltPriority = 0;
       // All stmts this is part of.
-      SmallVector<unsigned> Elts;
+      llvm::SmallVector<unsigned> Elts;
 
       // Mark this token as being part of BB.Elt.
       // RangeLen is the character length of the element's range, used to

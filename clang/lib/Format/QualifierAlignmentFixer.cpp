@@ -26,7 +26,7 @@ namespace clang {
 namespace format {
 
 void addQualifierAlignmentFixerPasses(const FormatStyle &Style,
-                                      SmallVectorImpl<AnalyzerPass> &Passes) {
+                                      llvm::SmallVectorImpl<AnalyzerPass> &Passes) {
   std::vector<std::string> LeftOrder;
   std::vector<std::string> RightOrder;
   std::vector<tok::TokenKind> ConfiguredQualifierTokens;
@@ -534,7 +534,7 @@ LeftRightQualifierAlignmentFixer::LeftRightQualifierAlignmentFixer(
 std::pair<tooling::Replacements, unsigned>
 LeftRightQualifierAlignmentFixer::analyze(
     TokenAnnotator & /*Annotator*/,
-    SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
+    llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines,
     FormatTokenLexer &Tokens) {
   tooling::Replacements Fixes;
   AffectedRangeMgr.computeAffectedLines(AnnotatedLines);
@@ -543,7 +543,7 @@ LeftRightQualifierAlignmentFixer::analyze(
 }
 
 void LeftRightQualifierAlignmentFixer::fixQualifierAlignment(
-    SmallVectorImpl<AnnotatedLine *> &AnnotatedLines, FormatTokenLexer &Tokens,
+    llvm::SmallVectorImpl<AnnotatedLine *> &AnnotatedLines, FormatTokenLexer &Tokens,
     tooling::Replacements &Fixes) {
   const AdditionalKeywords &Keywords = Tokens.getKeywords();
   const SourceManager &SourceMgr = Env.getSourceManager();

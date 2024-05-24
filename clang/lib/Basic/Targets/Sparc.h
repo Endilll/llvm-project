@@ -46,17 +46,17 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  bool hasFeature(StringRef Feature) const override;
+  bool hasFeature(llvm::StringRef Feature) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override {
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override {
     // FIXME: Implement!
     return std::nullopt;
   }
   BuiltinVaListKind getBuiltinVaListKind() const override {
     return TargetInfo::VoidPtrBuiltinVaList;
   }
-  ArrayRef<const char *> getGCCRegNames() const override;
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
   bool validateAsmConstraint(const char *&Name,
                              TargetInfo::ConstraintInfo &info) const override {
     // FIXME: Implement!
@@ -128,13 +128,13 @@ public:
 
   CPUGeneration getCPUGeneration(CPUKind Kind) const;
 
-  CPUKind getCPUKind(StringRef Name) const;
+  CPUKind getCPUKind(llvm::StringRef Name) const;
 
-  bool isValidCPUName(StringRef Name) const override {
+  bool isValidCPUName(llvm::StringRef Name) const override {
     return getCPUKind(Name) != CK_GENERIC;
   }
 
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
 
   bool setCPU(const std::string &Name) override {
     CPU = getCPUKind(Name);
@@ -221,11 +221,11 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  bool isValidCPUName(StringRef Name) const override {
+  bool isValidCPUName(llvm::StringRef Name) const override {
     return getCPUGeneration(SparcTargetInfo::getCPUKind(Name)) == CG_V9;
   }
 
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
 
   bool setCPU(const std::string &Name) override {
     if (!SparcTargetInfo::setCPU(Name))

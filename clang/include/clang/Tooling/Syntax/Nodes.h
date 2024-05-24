@@ -34,7 +34,7 @@ enum class NodeKind : uint16_t {
 #include "clang/Tooling/Syntax/Nodes.inc"
 };
 /// For debugging purposes.
-raw_ostream &operator<<(raw_ostream &OS, NodeKind K);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, NodeKind K);
 
 /// A relation between a parent and child node, e.g. 'left-hand-side of
 /// a binary expression'. Used for implementing accessors.
@@ -107,7 +107,7 @@ enum class NodeRole : uint8_t {
   Declarators
 };
 /// For debugging purposes.
-raw_ostream &operator<<(raw_ostream &OS, NodeRole R);
+llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, NodeRole R);
 
 #include "clang/Tooling/Syntax/NodeClasses.inc"
 

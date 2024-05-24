@@ -19,7 +19,7 @@ namespace clang::tidy::android {
 /// http://clang.llvm.org/extra/clang-tidy/checks/android/cloexec-epoll-create.html
 class CloexecEpollCreateCheck : public CloexecCheck {
 public:
-  CloexecEpollCreateCheck(StringRef Name, ClangTidyContext *Context)
+  CloexecEpollCreateCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : CloexecCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

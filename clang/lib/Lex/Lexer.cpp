@@ -140,7 +140,7 @@ void Lexer::InitLexer(const char *BufStart, const char *BufPtr,
   // skip the UTF-8 BOM if it's present.
   if (BufferStart == BufferPtr) {
     // Determine the size of the BOM.
-    StringRef Buf(BufferStart, BufferEnd - BufferStart);
+    llvm::StringRef Buf(BufferStart, BufferEnd - BufferStart);
     size_t BOMLength = llvm::StringSwitch<size_t>(Buf)
       .StartsWith("\xEF\xBB\xBF", 3) // UTF-8 BOM
       .Default(0);
@@ -307,14 +307,14 @@ template <typename T> static void StringifyImpl(T &Str, char Quote) {
   }
 }
 
-std::string Lexer::Stringify(StringRef Str, bool Charify) {
+std::string Lexer::Stringify(llvm::StringRef Str, bool Charify) {
   std::string Result = std::string(Str);
   char Quote = Charify ? '\'' : '"';
   StringifyImpl(Result, Quote);
   return Result;
 }
 
-void Lexer::Stringify(SmallVectorImpl<char> &Str) { StringifyImpl(Str, '"'); }
+void Lexer::Stringify(llvm::SmallVectorImpl<char> &Str) { StringifyImpl(Str, '"'); }
 
 //===----------------------------------------------------------------------===//
 // Token Spelling
@@ -376,8 +376,8 @@ static size_t getSpellingSlow(const Token &Tok, const char *BufPtr,
 /// after trigraph expansion and escaped-newline folding.  In particular, this
 /// wants to get the true, uncanonicalized, spelling of things like digraphs
 /// UCNs, etc.
-StringRef Lexer::getSpelling(SourceLocation loc,
-                             SmallVectorImpl<char> &buffer,
+llvm::StringRef Lexer::getSpelling(SourceLocation loc,
+                             llvm::SmallVectorImpl<char> &buffer,
                              const SourceManager &SM,
                              const LangOptions &options,
                              bool *invalid) {
@@ -386,7 +386,7 @@ StringRef Lexer::getSpelling(SourceLocation loc,
 
   // Try to the load the file buffer.
   bool invalidTemp = false;
-  StringRef file = SM.getBufferData(locInfo.first, &invalidTemp);
+  llvm::StringRef file = SM.getBufferData(locInfo.first, &invalidTemp);
   if (invalidTemp) {
     if (invalid) *invalid = true;
     return {};
@@ -404,12 +404,12 @@ StringRef Lexer::getSpelling(SourceLocation loc,
 
   // Common case:  no need for cleaning.
   if (!token.needsCleaning())
-    return StringRef(tokenBegin, length);
+    return llvm::StringRef(tokenBegin, length);
 
   // Hard case, we need to relex the characters into the string.
   buffer.resize(length);
   buffer.resize(getSpellingSlow(token, tokenBegin, options, buffer.data()));
-  return StringRef(buffer.data(), buffer.size());
+  return llvm::StringRef(buffer.data(), buffer.size());
 }
 
 /// getSpelling() - Return the 'spelling' of this token.  The spelling of a
@@ -522,7 +522,7 @@ bool Lexer::getRawToken(SourceLocation Loc, Token &Result,
   Loc = SM.getExpansionLoc(Loc);
   std::pair<FileID, unsigned> LocInfo = SM.getDecomposedLoc(Loc);
   bool Invalid = false;
-  StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
+  llvm::StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
   if (Invalid)
     return true;
 
@@ -541,7 +541,7 @@ bool Lexer::getRawToken(SourceLocation Loc, Token &Result,
 
 /// Returns the pointer that points to the beginning of line that contains
 /// the given offset, or null if the offset if invalid.
-static const char *findBeginningOfLine(StringRef Buffer, unsigned Offset) {
+static const char *findBeginningOfLine(llvm::StringRef Buffer, unsigned Offset) {
   const char *BufStart = Buffer.data();
   if (Offset >= Buffer.size())
     return nullptr;
@@ -567,7 +567,7 @@ static SourceLocation getBeginningOfFileToken(SourceLocation Loc,
     return Loc;
 
   bool Invalid = false;
-  StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
+  llvm::StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
   if (Invalid)
     return Loc;
 
@@ -634,7 +634,7 @@ enum PreambleDirectiveKind {
 
 } // namespace
 
-PreambleBounds Lexer::ComputePreamble(StringRef Buffer,
+PreambleBounds Lexer::ComputePreamble(llvm::StringRef Buffer,
                                       const LangOptions &LangOpts,
                                       unsigned MaxLines) {
   // Create a lexer starting at the beginning of the file. Note that we use a
@@ -713,7 +713,7 @@ PreambleBounds Lexer::ComputePreamble(StringRef Buffer,
       // the raw identifier to recognize and categorize preprocessor directives.
       TheLexer.LexFromRawLexer(TheTok);
       if (TheTok.getKind() == tok::raw_identifier && !TheTok.needsCleaning()) {
-        StringRef Keyword = TheTok.getRawIdentifier();
+        llvm::StringRef Keyword = TheTok.getRawIdentifier();
         PreambleDirectiveKind PDK
           = llvm::StringSwitch<PreambleDirectiveKind>(Keyword)
               .Case("include", PDK_Skipped)
@@ -1021,7 +1021,7 @@ CharSourceRange Lexer::makeFileCharRange(CharSourceRange Range,
   return {};
 }
 
-StringRef Lexer::getSourceText(CharSourceRange Range,
+llvm::StringRef Lexer::getSourceText(CharSourceRange Range,
                                const SourceManager &SM,
                                const LangOptions &LangOpts,
                                bool *Invalid) {
@@ -1047,7 +1047,7 @@ StringRef Lexer::getSourceText(CharSourceRange Range,
 
   // Try to the load the file buffer.
   bool invalidTemp = false;
-  StringRef file = SM.getBufferData(beginInfo.first, &invalidTemp);
+  llvm::StringRef file = SM.getBufferData(beginInfo.first, &invalidTemp);
   if (invalidTemp) {
     if (Invalid) *Invalid = true;
     return {};
@@ -1057,7 +1057,7 @@ StringRef Lexer::getSourceText(CharSourceRange Range,
   return file.substr(beginInfo.second, EndOffs - beginInfo.second);
 }
 
-StringRef Lexer::getImmediateMacroName(SourceLocation Loc,
+llvm::StringRef Lexer::getImmediateMacroName(SourceLocation Loc,
                                        const SourceManager &SM,
                                        const LangOptions &LangOpts) {
   assert(Loc.isMacroID() && "Only reasonable to call this on macros");
@@ -1100,11 +1100,11 @@ StringRef Lexer::getImmediateMacroName(SourceLocation Loc,
   // name so that we can render it into the expansion note.
   std::pair<FileID, unsigned> ExpansionInfo = SM.getDecomposedLoc(Loc);
   unsigned MacroTokenLength = Lexer::MeasureTokenLength(Loc, SM, LangOpts);
-  StringRef ExpansionBuffer = SM.getBufferData(ExpansionInfo.first);
+  llvm::StringRef ExpansionBuffer = SM.getBufferData(ExpansionInfo.first);
   return ExpansionBuffer.substr(ExpansionInfo.second, MacroTokenLength);
 }
 
-StringRef Lexer::getImmediateMacroNameForDiagnostics(
+llvm::StringRef Lexer::getImmediateMacroNameForDiagnostics(
     SourceLocation Loc, const SourceManager &SM, const LangOptions &LangOpts) {
   assert(Loc.isMacroID() && "Only reasonable to call this on macros");
   // Walk past macro argument expansions.
@@ -1127,7 +1127,7 @@ StringRef Lexer::getImmediateMacroNameForDiagnostics(
   // name so that we can render it into the expansion note.
   std::pair<FileID, unsigned> ExpansionInfo = SM.getDecomposedLoc(Loc);
   unsigned MacroTokenLength = Lexer::MeasureTokenLength(Loc, SM, LangOpts);
-  StringRef ExpansionBuffer = SM.getBufferData(ExpansionInfo.first);
+  llvm::StringRef ExpansionBuffer = SM.getBufferData(ExpansionInfo.first);
   return ExpansionBuffer.substr(ExpansionInfo.second, MacroTokenLength);
 }
 
@@ -1155,7 +1155,7 @@ bool Lexer::isNewLineEscaped(const char *BufferStart, const char *Str) {
   return *Str == '\\';
 }
 
-StringRef Lexer::getIndentationForLine(SourceLocation Loc,
+llvm::StringRef Lexer::getIndentationForLine(SourceLocation Loc,
                                        const SourceManager &SM) {
   if (Loc.isInvalid() || Loc.isMacroID())
     return {};
@@ -1163,15 +1163,15 @@ StringRef Lexer::getIndentationForLine(SourceLocation Loc,
   if (LocInfo.first.isInvalid())
     return {};
   bool Invalid = false;
-  StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
+  llvm::StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
   if (Invalid)
     return {};
   const char *Line = findBeginningOfLine(Buffer, LocInfo.second);
   if (!Line)
     return {};
-  StringRef Rest = Buffer.substr(Line - Buffer.data());
+  llvm::StringRef Rest = Buffer.substr(Line - Buffer.data());
   size_t NumWhitespaceChars = Rest.find_first_not_of(" \t");
-  return NumWhitespaceChars == StringRef::npos
+  return NumWhitespaceChars == llvm::StringRef::npos
              ? ""
              : Rest.take_front(NumWhitespaceChars);
 }
@@ -1270,7 +1270,7 @@ static char DecodeTrigraphChar(const char *CP, Lexer *L, bool Trigraphs) {
   }
 
   if (L && !L->isLexingRawMode())
-    L->Diag(CP-2, diag::trigraph_converted) << StringRef(&Res, 1);
+    L->Diag(CP-2, diag::trigraph_converted) << llvm::StringRef(&Res, 1);
   return Res;
 }
 
@@ -1336,7 +1336,7 @@ std::optional<Token> Lexer::findNextToken(SourceLocation Loc,
 
   // Try to load the file buffer.
   bool InvalidTemp = false;
-  StringRef File = SM.getBufferData(LocInfo.first, &InvalidTemp);
+  llvm::StringRef File = SM.getBufferData(LocInfo.first, &InvalidTemp);
   if (InvalidTemp)
     return std::nullopt;
 
@@ -2145,7 +2145,7 @@ const char *Lexer::LexUDSuffix(Token &Result, const char *CurPtr,
             getCharAndSizeNoWarn(CurPtr + Consumed, LangOpts);
         if (!isAsciiIdentifierContinue(Next)) {
           // End of suffix. Check whether this is on the allowed list.
-          const StringRef CompleteSuffix(Buffer, Chars);
+          const llvm::StringRef CompleteSuffix(Buffer, Chars);
           IsUDSuffix =
               StringLiteralParser::isValidUDSuffix(LangOpts, CompleteSuffix);
           break;
@@ -2274,7 +2274,7 @@ bool Lexer::LexRawStringLiteral(Token &Result, const char *CurPtr,
         Diag(PrefixEnd, diag::err_invalid_newline_raw_delim);
       } else {
         Diag(PrefixEnd, diag::err_invalid_char_raw_delim)
-          << StringRef(PrefixEnd, 1);
+          << llvm::StringRef(PrefixEnd, 1);
       }
     }
 
@@ -2312,7 +2312,7 @@ bool Lexer::LexRawStringLiteral(Token &Result, const char *CurPtr,
     } else if (C == 0 && CurPtr-1 == BufferEnd) { // End of file.
       if (!isLexingRawMode())
         Diag(BufferPtr, diag::err_unterminated_raw_string)
-          << StringRef(Prefix, PrefixLen);
+          << llvm::StringRef(Prefix, PrefixLen);
       FormTokenWithChars(Result, CurPtr-1, tok::unknown);
       return true;
     }
@@ -2377,16 +2377,16 @@ void Lexer::codeCompleteIncludedFile(const char *PathStart,
                                      const char *CompletionPoint,
                                      bool IsAngled) {
   // Completion only applies to the filename, after the last slash.
-  StringRef PartialPath(PathStart, CompletionPoint - PathStart);
+  llvm::StringRef PartialPath(PathStart, CompletionPoint - PathStart);
   llvm::StringRef SlashChars = LangOpts.MSVCCompat ? "/\\" : "/";
   auto Slash = PartialPath.find_last_of(SlashChars);
-  StringRef Dir =
-      (Slash == StringRef::npos) ? "" : PartialPath.take_front(Slash);
+  llvm::StringRef Dir =
+      (Slash == llvm::StringRef::npos) ? "" : PartialPath.take_front(Slash);
   const char *StartOfFilename =
-      (Slash == StringRef::npos) ? PathStart : PathStart + Slash + 1;
+      (Slash == llvm::StringRef::npos) ? PathStart : PathStart + Slash + 1;
   // Code completion filter range is the filename only, up to completion point.
   PP->setCodeCompletionIdentifierInfo(&PP->getIdentifierTable().get(
-      StringRef(StartOfFilename, CompletionPoint - StartOfFilename)));
+      llvm::StringRef(StartOfFilename, CompletionPoint - StartOfFilename)));
   // We should replace the characters up to the closing quote or closest slash,
   // if any.
   while (CompletionPoint < BufferEnd) {
@@ -3053,7 +3053,7 @@ bool Lexer::SkipBlockComment(Token &Result, const char *CurPtr,
 
 /// ReadToEndOfLine - Read the rest of the current preprocessor line as an
 /// uninterpreted string.  This switches the lexer out of directive mode.
-void Lexer::ReadToEndOfLine(SmallVectorImpl<char> *Result) {
+void Lexer::ReadToEndOfLine(llvm::SmallVectorImpl<char> *Result) {
   assert(ParsingPreprocessorDirective && ParsingFilename == false &&
          "Must be in a preprocessing directive!");
   Token Tmp;
@@ -3233,9 +3233,9 @@ static const char *FindConflictEnd(const char *CurPtr, const char *BufferEnd,
                                    ConflictMarkerKind CMK) {
   const char *Terminator = CMK == CMK_Perforce ? "<<<<\n" : ">>>>>>>";
   size_t TermLen = CMK == CMK_Perforce ? 5 : 7;
-  auto RestOfBuffer = StringRef(CurPtr, BufferEnd - CurPtr).substr(TermLen);
+  auto RestOfBuffer = llvm::StringRef(CurPtr, BufferEnd - CurPtr).substr(TermLen);
   size_t Pos = RestOfBuffer.find(Terminator);
-  while (Pos != StringRef::npos) {
+  while (Pos != llvm::StringRef::npos) {
     // Must occur at start of line.
     if (Pos == 0 ||
         (RestOfBuffer[Pos - 1] != '\r' && RestOfBuffer[Pos - 1] != '\n')) {
@@ -3259,8 +3259,8 @@ bool Lexer::IsStartOfConflictMarker(const char *CurPtr) {
     return false;
 
   // Check to see if we have <<<<<<< or >>>>.
-  if (!StringRef(CurPtr, BufferEnd - CurPtr).starts_with("<<<<<<<") &&
-      !StringRef(CurPtr, BufferEnd - CurPtr).starts_with(">>>> "))
+  if (!llvm::StringRef(CurPtr, BufferEnd - CurPtr).starts_with("<<<<<<<") &&
+      !llvm::StringRef(CurPtr, BufferEnd - CurPtr).starts_with(">>>> "))
     return false;
 
   // If we have a situation where we don't care about conflict markers, ignore
@@ -3421,7 +3421,7 @@ std::optional<uint32_t> Lexer::tryReadNumericUCN(const char *&StartPtr,
         break;
       if (Diagnose)
         Diag(SlashLoc, diag::warn_delimited_ucn_incomplete)
-            << StringRef(KindLoc, 1);
+            << llvm::StringRef(KindLoc, 1);
       return std::nullopt;
     }
 
@@ -3441,13 +3441,13 @@ std::optional<uint32_t> Lexer::tryReadNumericUCN(const char *&StartPtr,
     if (Diagnose)
       Diag(SlashLoc, FoundEndDelimiter ? diag::warn_delimited_ucn_empty
                                        : diag::warn_ucn_escape_no_digits)
-          << StringRef(KindLoc, 1);
+          << llvm::StringRef(KindLoc, 1);
     return std::nullopt;
   }
 
   if (Delimited && Kind == 'U') {
     if (Diagnose)
-      Diag(SlashLoc, diag::err_hex_escape_no_digits) << StringRef(KindLoc, 1);
+      Diag(SlashLoc, diag::err_hex_escape_no_digits) << llvm::StringRef(KindLoc, 1);
     return std::nullopt;
   }
 
@@ -3526,11 +3526,11 @@ std::optional<uint32_t> Lexer::tryReadNamedUCN(const char *&StartPtr,
     if (Diagnose)
       Diag(SlashLoc, FoundEndDelimiter ? diag::warn_delimited_ucn_empty
                                        : diag::warn_delimited_ucn_incomplete)
-          << StringRef(KindLoc, 1);
+          << llvm::StringRef(KindLoc, 1);
     return std::nullopt;
   }
 
-  StringRef Name(Buffer.data(), Buffer.size());
+  llvm::StringRef Name(Buffer.data(), Buffer.size());
   std::optional<char32_t> Match =
       llvm::sys::unicode::nameToCodepointStrict(Name);
   std::optional<llvm::sys::unicode::LooseMatchingResult> LooseMatch;
@@ -3538,7 +3538,7 @@ std::optional<uint32_t> Lexer::tryReadNamedUCN(const char *&StartPtr,
     LooseMatch = llvm::sys::unicode::nameToCodepointLooseMatching(Name);
     if (Diagnose) {
       Diag(StartName, diag::err_invalid_ucn_name)
-          << StringRef(Buffer.data(), Buffer.size())
+          << llvm::StringRef(Buffer.data(), Buffer.size())
           << makeCharRange(*this, StartName, CurPtr - CharSize);
       if (LooseMatch) {
         Diag(StartName, diag::note_invalid_ucn_name_loose_matching)
@@ -3625,7 +3625,7 @@ uint32_t Lexer::tryReadUCN(const char *&StartPtr, const char *SlashLoc,
         Diag(BufferPtr, diag::err_ucn_control_character);
       else {
         char C = static_cast<char>(CodePoint);
-        Diag(BufferPtr, diag::err_ucn_escape_basic_scs) << StringRef(&C, 1);
+        Diag(BufferPtr, diag::err_ucn_escape_basic_scs) << llvm::StringRef(&C, 1);
       }
     }
 

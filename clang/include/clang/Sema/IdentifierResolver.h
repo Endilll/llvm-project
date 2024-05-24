@@ -42,7 +42,7 @@ class IdentifierResolver {
   /// decl with that declaration name is shadowed in some scope.
   class IdDeclInfo {
   public:
-    using DeclsTy = SmallVector<NamedDecl *, 2>;
+    using DeclsTy = llvm::SmallVector<NamedDecl *, 2>;
 
     DeclsTy::iterator decls_begin() { return Decls.begin(); }
     DeclsTy::iterator decls_end() { return Decls.end(); }

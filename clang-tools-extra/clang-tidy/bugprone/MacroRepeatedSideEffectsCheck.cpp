@@ -85,7 +85,7 @@ unsigned MacroRepeatedPPCallbacks::countArgumentExpansions(
   bool PrevTokenIsHash = false;
   // Count when "?" is reached. The "Current" will get this value when the ":"
   // is reached.
-  std::stack<unsigned, SmallVector<unsigned, 8>> CountAtQuestion;
+  std::stack<unsigned, llvm::SmallVector<unsigned, 8>> CountAtQuestion;
   for (const auto &T : MI->tokens()) {
     // The result of __builtin_constant_p(x) is 0 if x is a macro argument
     // with side effects. If we see a __builtin_constant_p(x) followed by a

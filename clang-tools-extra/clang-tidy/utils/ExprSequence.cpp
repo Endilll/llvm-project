@@ -25,14 +25,14 @@ namespace clang::tidy::utils {
 // nodes in their subtree because RecursiveASTVisitor visits both the syntactic
 // and semantic forms of InitListExpr, and the parent-child relationships are
 // different between the two forms.
-static SmallVector<const Stmt *, 1> getParentStmts(const Stmt *S,
+static llvm::SmallVector<const Stmt *, 1> getParentStmts(const Stmt *S,
                                                    ASTContext *Context) {
-  SmallVector<const Stmt *, 1> Result;
+  llvm::SmallVector<const Stmt *, 1> Result;
 
   TraversalKindScope RAII(*Context, TK_AsIs);
   DynTypedNodeList Parents = Context->getParents(*S);
 
-  SmallVector<DynTypedNode, 1> NodesToProcess(Parents.begin(), Parents.end());
+  llvm::SmallVector<DynTypedNode, 1> NodesToProcess(Parents.begin(), Parents.end());
 
   while (!NodesToProcess.empty()) {
     DynTypedNode Node = NodesToProcess.back();
@@ -221,7 +221,7 @@ StmtToBlockMap::StmtToBlockMap(const CFG *TheCFG, ASTContext *TheContext)
 
 const CFGBlock *StmtToBlockMap::blockContainingStmt(const Stmt *S) const {
   while (!Map.count(S)) {
-    SmallVector<const Stmt *, 1> Parents = getParentStmts(S, Context);
+    llvm::SmallVector<const Stmt *, 1> Parents = getParentStmts(S, Context);
     if (Parents.empty())
       return nullptr;
     S = Parents[0];

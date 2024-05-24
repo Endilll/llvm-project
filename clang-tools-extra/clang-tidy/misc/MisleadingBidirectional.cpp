@@ -16,7 +16,7 @@
 using namespace clang;
 using namespace clang::tidy::misc;
 
-static bool containsMisleadingBidi(StringRef Buffer,
+static bool containsMisleadingBidi(llvm::StringRef Buffer,
                                    bool HonorLineBreaks = true) {
   const char *CurPtr = Buffer.begin();
 
@@ -33,7 +33,7 @@ static bool containsMisleadingBidi(StringRef Buffer,
     PDI = 0x2069
   };
 
-  SmallVector<BidiChar> BidiContexts;
+  llvm::SmallVector<BidiChar> BidiContexts;
 
   // Scan each character while maintaining a stack of opened bidi context.
   // RLO/RLE/LRO/LRE all are closed by PDF while RLI LRI and FSI are closed by
@@ -95,7 +95,7 @@ public:
 
   bool HandleComment(Preprocessor &PP, SourceRange Range) override {
     // FIXME: check that we are in a /* */ comment
-    StringRef Text =
+    llvm::StringRef Text =
         Lexer::getSourceText(CharSourceRange::getCharRange(Range),
                              PP.getSourceManager(), PP.getLangOpts());
 
@@ -111,7 +111,7 @@ private:
 };
 
 MisleadingBidirectionalCheck::MisleadingBidirectionalCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       Handler(std::make_unique<MisleadingBidirectionalHandler>(*this)) {}
 
@@ -125,7 +125,7 @@ void MisleadingBidirectionalCheck::registerPPCallbacks(
 void MisleadingBidirectionalCheck::check(
     const ast_matchers::MatchFinder::MatchResult &Result) {
   if (const auto *SL = Result.Nodes.getNodeAs<StringLiteral>("strlit")) {
-    StringRef Literal = SL->getBytes();
+    llvm::StringRef Literal = SL->getBytes();
     if (containsMisleadingBidi(Literal, false))
       diag(SL->getBeginLoc(), "string literal contains misleading "
                               "bidirectional Unicode characters");

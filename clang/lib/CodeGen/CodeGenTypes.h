@@ -208,7 +208,7 @@ public:
                                     const FunctionArgList &args);
   const CGFunctionInfo &
   arrangeBuiltinFunctionDeclaration(CanQualType resultType,
-                                    ArrayRef<CanQualType> argTypes);
+                                    llvm::ArrayRef<CanQualType> argTypes);
   const CGFunctionInfo &arrangeBuiltinFunctionCall(QualType resultType,
                                                    const CallArgList &args);
 
@@ -256,9 +256,9 @@ public:
   ///
   /// \param argTypes - must all actually be canonical as params
   const CGFunctionInfo &arrangeLLVMFunctionInfo(
-      CanQualType returnType, FnInfoOpts opts, ArrayRef<CanQualType> argTypes,
+      CanQualType returnType, FnInfoOpts opts, llvm::ArrayRef<CanQualType> argTypes,
       FunctionType::ExtInfo info,
-      ArrayRef<FunctionProtoType::ExtParameterInfo> paramInfos,
+      llvm::ArrayRef<FunctionProtoType::ExtParameterInfo> paramInfos,
       RequiredArgs args);
 
   /// Compute a new LLVM record layout object for the given record.
@@ -268,7 +268,7 @@ public:
   /// addRecordTypeName - Compute a name from the given record decl with an
   /// optional suffix and name the given LLVM type using it.
   void addRecordTypeName(const RecordDecl *RD, llvm::StructType *Ty,
-                         StringRef suffix);
+                         llvm::StringRef suffix);
 
 
 public:  // These are internal details of CGT that shouldn't be used externally.
@@ -278,7 +278,7 @@ public:  // These are internal details of CGT that shouldn't be used externally.
   /// getExpandedTypes - Expand the type \arg Ty into the LLVM
   /// argument types it would be passed as. See ABIArgInfo::Expand.
   void getExpandedTypes(QualType Ty,
-                        SmallVectorImpl<llvm::Type *>::iterator &TI);
+                        llvm::SmallVectorImpl<llvm::Type *>::iterator &TI);
 
   /// IsZeroInitializable - Return whether a type can be
   /// zero-initialized (in the C++ sense) with an LLVM zeroinitializer.

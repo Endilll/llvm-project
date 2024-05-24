@@ -54,7 +54,7 @@ private:
   // Map a kernel mangled name to a symbol for identifying kernel in host code
   // For CUDA, the symbol for identifying the kernel is the same as the device
   // stub function. For HIP, they are different.
-  llvm::DenseMap<StringRef, llvm::GlobalValue *> KernelHandles;
+  llvm::DenseMap<llvm::StringRef, llvm::GlobalValue *> KernelHandles;
   // Map a kernel handle to the kernel stub.
   llvm::DenseMap<llvm::GlobalValue *, llvm::Function *> KernelStubs;
   struct VarInfo {
@@ -80,8 +80,8 @@ private:
   llvm::FunctionType *getRegisterGlobalsFnTy() const;
   llvm::FunctionType *getCallbackFnTy() const;
   llvm::FunctionType *getRegisterLinkedBinaryFnTy() const;
-  std::string addPrefixToName(StringRef FuncName) const;
-  std::string addUnderscoredPrefixToName(StringRef FuncName) const;
+  std::string addPrefixToName(llvm::StringRef FuncName) const;
+  std::string addUnderscoredPrefixToName(llvm::StringRef FuncName) const;
 
   /// Creates a function to register all kernel stubs generated in this module.
   llvm::Function *makeRegisterGlobalsFn();
@@ -99,9 +99,9 @@ private:
   /// Helper function which generates an initialized constant array from Str,
   /// and optionally sets section name and alignment. AddNull specifies whether
   /// the array should nave NUL termination.
-  llvm::Constant *makeConstantArray(StringRef Str,
-                                    StringRef Name = "",
-                                    StringRef SectionName = "",
+  llvm::Constant *makeConstantArray(llvm::StringRef Str,
+                                    llvm::StringRef Name = "",
+                                    llvm::StringRef SectionName = "",
                                     unsigned Alignment = 0,
                                     bool AddNull = false) {
     llvm::Constant *Value =
@@ -194,16 +194,16 @@ public:
 
 } // end anonymous namespace
 
-std::string CGNVCUDARuntime::addPrefixToName(StringRef FuncName) const {
+std::string CGNVCUDARuntime::addPrefixToName(llvm::StringRef FuncName) const {
   if (CGM.getLangOpts().HIP)
-    return ((Twine("hip") + Twine(FuncName)).str());
-  return ((Twine("cuda") + Twine(FuncName)).str());
+    return ((llvm::Twine("hip") + llvm::Twine(FuncName)).str());
+  return ((llvm::Twine("cuda") + llvm::Twine(FuncName)).str());
 }
 std::string
-CGNVCUDARuntime::addUnderscoredPrefixToName(StringRef FuncName) const {
+CGNVCUDARuntime::addUnderscoredPrefixToName(llvm::StringRef FuncName) const {
   if (CGM.getLangOpts().HIP)
-    return ((Twine("__hip") + Twine(FuncName)).str());
-  return ((Twine("__cuda") + Twine(FuncName)).str());
+    return ((llvm::Twine("__hip") + llvm::Twine(FuncName)).str());
+  return ((llvm::Twine("__cuda") + llvm::Twine(FuncName)).str());
 }
 
 static std::unique_ptr<MangleContext> InitDeviceMC(CodeGenModule &CGM) {
@@ -282,7 +282,7 @@ std::string CGNVCUDARuntime::getDeviceSideName(const NamedDecl *ND) {
   else
     MC = DeviceMC.get();
   if (MC->shouldMangleDeclName(ND)) {
-    SmallString<256> Buffer;
+    llvm::SmallString<256> Buffer;
     llvm::raw_svector_ostream Out(Buffer);
     MC->mangleName(GD, Out);
     DeviceSideName = std::string(Out.str());
@@ -292,7 +292,7 @@ std::string CGNVCUDARuntime::getDeviceSideName(const NamedDecl *ND) {
   // Make unique name for device side static file-scope variable for HIP.
   if (CGM.getContext().shouldExternalize(ND) &&
       CGM.getLangOpts().GPURelocatableDeviceCode) {
-    SmallString<256> Buffer;
+    llvm::SmallString<256> Buffer;
     llvm::raw_svector_ostream Out(Buffer);
     Out << DeviceSideName;
     CGM.printPostfixForExternalizedDecl(Out, ND);
@@ -494,7 +494,7 @@ void CGNVCUDARuntime::emitDeviceStubBodyLegacy(CodeGenFunction &CGF,
 // ManagedVar populated by HIP runtime.
 static void replaceManagedVar(llvm::GlobalVariable *Var,
                               llvm::GlobalVariable *ManagedVar) {
-  SmallVector<SmallVector<llvm::User *, 8>, 8> WorkList;
+  llvm::SmallVector<llvm::SmallVector<llvm::User *, 8>, 8> WorkList;
   for (auto &&VarUse : Var->uses()) {
     WorkList.push_back({VarUse.getUser()});
   }
@@ -636,7 +636,7 @@ llvm::Function *CGNVCUDARuntime::makeRegisterGlobalsFn() {
         assert(Var->getName().ends_with(".managed") &&
                "HIP managed variables not transformed");
         auto *ManagedVar = CGM.getModule().getNamedGlobal(
-            Var->getName().drop_back(StringRef(".managed").size()));
+            Var->getName().drop_back(llvm::StringRef(".managed").size()));
         llvm::Value *Args[] = {
             &GpuBinaryHandlePtr,
             ManagedVar,
@@ -705,7 +705,7 @@ llvm::Function *CGNVCUDARuntime::makeModuleCtorFunction() {
   bool IsHIP = CGM.getLangOpts().HIP;
   bool IsCUDA = CGM.getLangOpts().CUDA;
   // No need to generate ctors/dtors if there is no GPU binary.
-  StringRef CudaGpuBinaryFileName = CGM.getCodeGenOpts().CudaGpuBinaryFileName;
+  llvm::StringRef CudaGpuBinaryFileName = CGM.getCodeGenOpts().CudaGpuBinaryFileName;
   if (CudaGpuBinaryFileName.empty() && !IsHIP)
     return nullptr;
   if ((IsHIP || (IsCUDA && !RelocatableDeviceCode)) && EmittedKernels.empty() &&
@@ -757,7 +757,7 @@ llvm::Function *CGNVCUDARuntime::makeModuleCtorFunction() {
   const char *FatbinConstantName;
   const char *FatbinSectionName;
   const char *ModuleIDSectionName;
-  StringRef ModuleIDPrefix;
+  llvm::StringRef ModuleIDPrefix;
   llvm::Constant *FatBinStr;
   unsigned FatMagic;
   if (IsHIP) {
@@ -908,7 +908,7 @@ llvm::Function *CGNVCUDARuntime::makeModuleCtorFunction() {
     }
   } else {
     // Generate a unique module ID.
-    SmallString<64> ModuleID;
+    llvm::SmallString<64> ModuleID;
     llvm::raw_svector_ostream OS(ModuleID);
     OS << ModuleIDPrefix << llvm::format("%" PRIx64, FatbinWrapper->getGUID());
     llvm::Constant *ModuleIDConstant = makeConstantArray(
@@ -916,11 +916,11 @@ llvm::Function *CGNVCUDARuntime::makeModuleCtorFunction() {
 
     // Create an alias for the FatbinWrapper that nvcc will look for.
     llvm::GlobalAlias::create(llvm::GlobalValue::ExternalLinkage,
-                              Twine("__fatbinwrap") + ModuleID, FatbinWrapper);
+                              llvm::Twine("__fatbinwrap") + ModuleID, FatbinWrapper);
 
     // void __cudaRegisterLinkedBinary%ModuleID%(void (*)(void *), void *,
     // void *, void (*)(void **))
-    SmallString<128> RegisterLinkedBinaryName("__cudaRegisterLinkedBinary");
+    llvm::SmallString<128> RegisterLinkedBinaryName("__cudaRegisterLinkedBinary");
     RegisterLinkedBinaryName += ModuleID;
     llvm::FunctionCallee RegisterLinkedBinaryFunc = CGM.CreateRuntimeFunction(
         getRegisterLinkedBinaryFnTy(), RegisterLinkedBinaryName);
@@ -1119,7 +1119,7 @@ void CGNVCUDARuntime::transformManagedVars() {
       ManagedVar->setExternallyInitialized(true);
       replaceManagedVar(Var, ManagedVar);
       ManagedVar->takeName(Var);
-      Var->setName(Twine(ManagedVar->getName()) + ".managed");
+      Var->setName(llvm::Twine(ManagedVar->getName()) + ".managed");
       // Keep managed variables even if they are not used in device code since
       // they need to be allocated by the runtime.
       if (CGM.getLangOpts().CUDAIsDevice && !Var->isDeclaration()) {
@@ -1135,7 +1135,7 @@ void CGNVCUDARuntime::transformManagedVars() {
 // registered. The linker will provide a pointer to this section so we can
 // register the symbols with the linked device image.
 void CGNVCUDARuntime::createOffloadingEntries() {
-  StringRef Section = CGM.getLangOpts().HIP ? "hip_offloading_entries"
+  llvm::StringRef Section = CGM.getLangOpts().HIP ? "hip_offloading_entries"
                                             : "cuda_offloading_entries";
   llvm::Module &M = CGM.getModule();
   for (KernelInfo &I : EmittedKernels)

@@ -19,7 +19,7 @@ using namespace clang::driver::tools;
 using namespace clang;
 using namespace llvm::opt;
 
-const char *sparc::getSparcAsmModeForCPU(StringRef Name,
+const char *sparc::getSparcAsmModeForCPU(llvm::StringRef Name,
                                          const llvm::Triple &Triple) {
   if (Triple.getArch() == llvm::Triple::sparcv9) {
     const char *DefV9CPU;
@@ -93,7 +93,7 @@ sparc::FloatABI sparc::getSparcFloatABI(const Driver &D,
                 .Case("hard", sparc::FloatABI::Hard)
                 .Default(sparc::FloatABI::Invalid);
       if (ABI == sparc::FloatABI::Invalid &&
-          !StringRef(A->getValue()).empty()) {
+          !llvm::StringRef(A->getValue()).empty()) {
         D.Diag(clang::diag::err_drv_invalid_mfloat_abi) << A->getAsString(Args);
         ABI = sparc::FloatABI::Hard;
       }
@@ -115,7 +115,7 @@ sparc::FloatABI sparc::getSparcFloatABI(const Driver &D,
 std::string sparc::getSparcTargetCPU(const Driver &D, const ArgList &Args,
                                      const llvm::Triple &Triple) {
   if (const Arg *A = Args.getLastArg(clang::driver::options::OPT_mcpu_EQ)) {
-    StringRef CPUName = A->getValue();
+    llvm::StringRef CPUName = A->getValue();
     if (CPUName == "native") {
       std::string CPU = std::string(llvm::sys::getHostCPUName());
       if (!CPU.empty() && CPU != "generic")
@@ -131,7 +131,7 @@ std::string sparc::getSparcTargetCPU(const Driver &D, const ArgList &Args,
 }
 
 void sparc::getSparcTargetFeatures(const Driver &D, const ArgList &Args,
-                                   std::vector<StringRef> &Features) {
+                                   std::vector<llvm::StringRef> &Features) {
   sparc::FloatABI FloatABI = sparc::getSparcFloatABI(D, Args);
   if (FloatABI == sparc::FloatABI::Soft)
     Features.push_back("+soft-float");

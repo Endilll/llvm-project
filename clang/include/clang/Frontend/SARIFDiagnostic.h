@@ -22,7 +22,7 @@ namespace clang {
 
 class SARIFDiagnostic : public DiagnosticRenderer {
 public:
-  SARIFDiagnostic(raw_ostream &OS, const LangOptions &LangOpts,
+  SARIFDiagnostic(llvm::raw_ostream &OS, const LangOptions &LangOpts,
                   DiagnosticOptions *DiagOpts, SarifDocumentWriter *Writer);
 
   ~SARIFDiagnostic() = default;
@@ -34,25 +34,25 @@ public:
 
 protected:
   void emitDiagnosticMessage(FullSourceLoc Loc, PresumedLoc PLoc,
-                             DiagnosticsEngine::Level Level, StringRef Message,
-                             ArrayRef<CharSourceRange> Ranges,
+                             DiagnosticsEngine::Level Level, llvm::StringRef Message,
+                             llvm::ArrayRef<CharSourceRange> Ranges,
                              DiagOrStoredDiag D) override;
 
   void emitDiagnosticLoc(FullSourceLoc Loc, PresumedLoc PLoc,
                          DiagnosticsEngine::Level Level,
-                         ArrayRef<CharSourceRange> Ranges) override;
+                         llvm::ArrayRef<CharSourceRange> Ranges) override;
 
   void emitCodeContext(FullSourceLoc Loc, DiagnosticsEngine::Level Level,
-                       SmallVectorImpl<CharSourceRange> &Ranges,
-                       ArrayRef<FixItHint> Hints) override {}
+                       llvm::SmallVectorImpl<CharSourceRange> &Ranges,
+                       llvm::ArrayRef<FixItHint> Hints) override {}
 
   void emitIncludeLocation(FullSourceLoc Loc, PresumedLoc PLoc) override;
 
   void emitImportLocation(FullSourceLoc Loc, PresumedLoc PLoc,
-                          StringRef ModuleName) override;
+                          llvm::StringRef ModuleName) override;
 
   void emitBuildingModuleLocation(FullSourceLoc Loc, PresumedLoc PLoc,
-                                  StringRef ModuleName) override;
+                                  llvm::StringRef ModuleName) override;
 
 private:
   // Shared between SARIFDiagnosticPrinter and this renderer.
@@ -60,13 +60,13 @@ private:
 
   SarifResult addLocationToResult(SarifResult Result, FullSourceLoc Loc,
                                   PresumedLoc PLoc,
-                                  ArrayRef<CharSourceRange> Ranges,
+                                  llvm::ArrayRef<CharSourceRange> Ranges,
                                   const Diagnostic &Diag);
 
   SarifRule addDiagnosticLevelToRule(SarifRule Rule,
                                      DiagnosticsEngine::Level Level);
 
-  llvm::StringRef emitFilename(StringRef Filename, const SourceManager &SM);
+  llvm::StringRef emitFilename(llvm::StringRef Filename, const SourceManager &SM);
 };
 
 } // end namespace clang

@@ -28,7 +28,7 @@ namespace clang::tidy::bugprone {
 /// properly.
 class MacroParenthesesCheck : public ClangTidyCheck {
 public:
-  MacroParenthesesCheck(StringRef Name, ClangTidyContext *Context)
+  MacroParenthesesCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;

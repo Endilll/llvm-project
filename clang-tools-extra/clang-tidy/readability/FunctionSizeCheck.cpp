@@ -124,7 +124,7 @@ public:
 
 } // namespace
 
-FunctionSizeCheck::FunctionSizeCheck(StringRef Name, ClangTidyContext *Context)
+FunctionSizeCheck::FunctionSizeCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       LineThreshold(Options.get("LineThreshold", DefaultLineThreshold)),
       StatementThreshold(

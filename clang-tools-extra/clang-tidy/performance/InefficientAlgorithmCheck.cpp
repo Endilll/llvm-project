@@ -128,10 +128,10 @@ void InefficientAlgorithmCheck::check(const MatchFinder::MatchResult &Result) {
   }
 
   if (!CallRange.getBegin().isMacroID() && !Maplike && CompatibleTypes) {
-    StringRef ContainerText = Lexer::getSourceText(
+    llvm::StringRef ContainerText = Lexer::getSourceText(
         CharSourceRange::getTokenRange(IneffContExpr->getSourceRange()), SM,
         LangOpts);
-    StringRef ParamText = Lexer::getSourceText(
+    llvm::StringRef ParamText = Lexer::getSourceText(
         CharSourceRange::getTokenRange(AlgParam->getSourceRange()), SM,
         LangOpts);
     std::string ReplacementText =

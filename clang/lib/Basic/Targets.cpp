@@ -57,7 +57,7 @@ namespace targets {
 /// DefineStd - Define a macro name and standard variants.  For example if
 /// MacroName is "unix", then this will define "__unix", "__unix__", and "unix"
 /// when in GNU mode.
-void DefineStd(MacroBuilder &Builder, StringRef MacroName,
+void DefineStd(MacroBuilder &Builder, llvm::StringRef MacroName,
                const LangOptions &Opts) {
   assert(MacroName[0] != '_' && "Identifier should be in the user's namespace");
 
@@ -73,7 +73,7 @@ void DefineStd(MacroBuilder &Builder, StringRef MacroName,
   Builder.defineMacro("__" + MacroName + "__");
 }
 
-void defineCPUMacros(MacroBuilder &Builder, StringRef CPUName, bool Tuning) {
+void defineCPUMacros(MacroBuilder &Builder, llvm::StringRef CPUName, bool Tuning) {
   Builder.defineMacro("__" + CPUName);
   Builder.defineMacro("__" + CPUName + "__");
   if (Tuning)
@@ -99,8 +99,8 @@ void addCygMingDefines(const LangOptions &Opts, MacroBuilder &Builder) {
       std::string GCCSpelling = "__attribute__((__";
       GCCSpelling += CC;
       GCCSpelling += "__))";
-      Builder.defineMacro(Twine("_") + CC, GCCSpelling);
-      Builder.defineMacro(Twine("__") + CC, GCCSpelling);
+      Builder.defineMacro(llvm::Twine("_") + CC, GCCSpelling);
+      Builder.defineMacro(llvm::Twine("__") + CC, GCCSpelling);
     }
   }
 }
@@ -773,7 +773,7 @@ TargetInfo::CreateTargetInfo(DiagnosticsEngine &Diags,
   // Set the target CPU if specified.
   if (!Opts->CPU.empty() && !Target->setCPU(Opts->CPU)) {
     Diags.Report(diag::err_target_unknown_cpu) << Opts->CPU;
-    SmallVector<StringRef, 32> ValidList;
+    llvm::SmallVector<llvm::StringRef, 32> ValidList;
     Target->fillValidCPUList(ValidList);
     if (!ValidList.empty())
       Diags.Report(diag::note_valid_options) << llvm::join(ValidList, ", ");
@@ -784,7 +784,7 @@ TargetInfo::CreateTargetInfo(DiagnosticsEngine &Diags,
   if (!Opts->TuneCPU.empty() &&
       !Target->isValidTuneCPUName(Opts->TuneCPU)) {
     Diags.Report(diag::err_target_unknown_cpu) << Opts->TuneCPU;
-    SmallVector<StringRef, 32> ValidList;
+    llvm::SmallVector<llvm::StringRef, 32> ValidList;
     Target->fillValidTuneCPUList(ValidList);
     if (!ValidList.empty())
       Diags.Report(diag::note_valid_options) << llvm::join(ValidList, ", ");
@@ -805,7 +805,7 @@ TargetInfo::CreateTargetInfo(DiagnosticsEngine &Diags,
 
   // Compute the default target features, we need the target to handle this
   // because features may have dependencies on one another.
-  llvm::erase_if(Opts->FeaturesAsWritten, [&](StringRef Name) {
+  llvm::erase_if(Opts->FeaturesAsWritten, [&](llvm::StringRef Name) {
     if (Target->isReadOnlyFeature(Name.substr(1))) {
       Diags.Report(diag::warn_fe_backend_readonly_feature_flag) << Name;
       return true;

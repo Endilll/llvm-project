@@ -58,7 +58,7 @@ using namespace extractapi;
 namespace {
 
 std::optional<std::string> getRelativeIncludeName(const CompilerInstance &CI,
-                                                  StringRef File,
+                                                  llvm::StringRef File,
                                                   bool *IsQuoted = nullptr) {
   assert(CI.hasFileManager() &&
          "CompilerInstance does not have a FileNamager!");
@@ -66,7 +66,7 @@ std::optional<std::string> getRelativeIncludeName(const CompilerInstance &CI,
   using namespace llvm::sys;
   const auto &FS = CI.getVirtualFileSystem();
 
-  SmallString<128> FilePath(File.begin(), File.end());
+  llvm::SmallString<128> FilePath(File.begin(), File.end());
   FS.makeAbsolute(FilePath);
   path::remove_dots(FilePath, true);
   FilePath = path::convert_to_slash(FilePath);
@@ -106,8 +106,8 @@ std::optional<std::string> getRelativeIncludeName(const CompilerInstance &CI,
       // symlink like `iPhoneSimulator14.5.sdk` while the file is instead
       // located in `iPhoneSimulator.sdk` (the real folder).
       if (NI->ends_with(".sdk") && DI->ends_with(".sdk")) {
-        StringRef NBasename = path::stem(*NI);
-        StringRef DBasename = path::stem(*DI);
+        llvm::StringRef NBasename = path::stem(*NI);
+        llvm::StringRef DBasename = path::stem(*DI);
         if (DBasename.starts_with(NBasename))
           continue;
       }
@@ -131,7 +131,7 @@ std::optional<std::string> getRelativeIncludeName(const CompilerInstance &CI,
       if (auto HMap = HeaderMap::Create(*EntryFile, CI.getFileManager())) {
         // If this is a headermap entry, try to reverse lookup the full path
         // for a spelled name before mapping.
-        StringRef SpelledFilename = HMap->reverseLookupFilename(File);
+        llvm::StringRef SpelledFilename = HMap->reverseLookupFilename(File);
         if (!SpelledFilename.empty())
           return SpelledFilename.str();
 
@@ -146,7 +146,7 @@ std::optional<std::string> getRelativeIncludeName(const CompilerInstance &CI,
       // The header is found in a framework path, construct the framework-style
       // include name `<Framework/Header.h>`
       if (Entry.IsFramework) {
-        SmallVector<StringRef, 4> Matches;
+        llvm::SmallVector<llvm::StringRef, 4> Matches;
         clang::installapi::HeaderFile::getFrameworkIncludeRule().match(
             File, &Matches);
         // Returned matches are always in stable order.
@@ -214,7 +214,7 @@ struct LocationFileChecker {
   }
 
   LocationFileChecker(const CompilerInstance &CI,
-                      SmallVector<std::pair<SmallString<32>, bool>> &KnownFiles)
+                      llvm::SmallVector<std::pair<llvm::SmallString<32>, bool>> &KnownFiles)
       : CI(CI), KnownFiles(KnownFiles), ExternalFileEntries() {
     for (const auto &KnownFile : KnownFiles)
       if (auto FileEntry = CI.getFileManager().getFile(KnownFile.first))
@@ -223,7 +223,7 @@ struct LocationFileChecker {
 
 private:
   const CompilerInstance &CI;
-  SmallVector<std::pair<SmallString<32>, bool>> &KnownFiles;
+  llvm::SmallVector<std::pair<llvm::SmallString<32>, bool>> &KnownFiles;
   llvm::DenseSet<const FileEntry *> KnownFileEntries;
   llvm::DenseSet<const FileEntry *> ExternalFileEntries;
 };
@@ -327,9 +327,9 @@ public:
       if (!shouldMacroBeIncluded(PM))
         continue;
 
-      StringRef Name = PM.MacroNameToken.getIdentifierInfo()->getName();
+      llvm::StringRef Name = PM.MacroNameToken.getIdentifierInfo()->getName();
       PresumedLoc Loc = SM.getPresumedLoc(PM.MacroNameToken.getLocation());
-      SmallString<128> USR;
+      llvm::SmallString<128> USR;
       index::generateUSRForMacro(Name, PM.MacroNameToken.getLocation(), SM,
                                  USR);
 
@@ -376,10 +376,10 @@ private:
 };
 
 std::unique_ptr<llvm::raw_pwrite_stream>
-createAdditionalSymbolGraphFile(CompilerInstance &CI, Twine BaseName) {
+createAdditionalSymbolGraphFile(CompilerInstance &CI, llvm::Twine BaseName) {
   auto OutputDirectory = CI.getFrontendOpts().SymbolGraphOutputDir;
 
-  SmallString<256> FileName;
+  llvm::SmallString<256> FileName;
   llvm::sys::path::append(FileName, OutputDirectory,
                           BaseName + ".symbols.json");
   return CI.createOutputFile(
@@ -396,7 +396,7 @@ void ExtractAPIActionBase::ImplEndSourceFileAction(CompilerInstance &CI) {
       CI.getFrontendOpts().EmitSymbolGraphSymbolLabelsForTesting;
 
   if (CI.getFrontendOpts().EmitExtensionSymbolGraphs) {
-    auto ConstructOutputFile = [&CI](Twine BaseName) {
+    auto ConstructOutputFile = [&CI](llvm::Twine BaseName) {
       return createAdditionalSymbolGraphFile(CI, BaseName);
     };
 
@@ -412,7 +412,7 @@ void ExtractAPIActionBase::ImplEndSourceFileAction(CompilerInstance &CI) {
 }
 
 std::unique_ptr<ASTConsumer>
-ExtractAPIAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
+ExtractAPIAction::CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) {
   auto ProductName = CI.getFrontendOpts().ProductName;
 
   if (CI.getFrontendOpts().SymbolGraphOutputDir.empty())
@@ -470,7 +470,7 @@ bool ExtractAPIAction::PrepareToExecuteAction(CompilerInstance &CI) {
   auto Kind = Inputs[0].getKind();
 
   // Convert the header file inputs into a single input buffer.
-  SmallString<256> HeaderContents;
+  llvm::SmallString<256> HeaderContents;
   bool IsQuoted = false;
   for (const FrontendInputFile &FIF : Inputs) {
     if (Kind.isObjectiveC())
@@ -478,7 +478,7 @@ bool ExtractAPIAction::PrepareToExecuteAction(CompilerInstance &CI) {
     else
       HeaderContents += "#include";
 
-    StringRef FilePath = FIF.getFile();
+    llvm::StringRef FilePath = FIF.getFile();
     if (auto RelativeName = getRelativeIncludeName(CI, FilePath, &IsQuoted)) {
       if (IsQuoted)
         HeaderContents += " \"";
@@ -491,7 +491,7 @@ bool ExtractAPIAction::PrepareToExecuteAction(CompilerInstance &CI) {
         HeaderContents += "\"\n";
       else
         HeaderContents += ">\n";
-      KnownInputFiles.emplace_back(static_cast<SmallString<32>>(*RelativeName),
+      KnownInputFiles.emplace_back(static_cast<llvm::SmallString<32>>(*RelativeName),
                                    IsQuoted);
     } else {
       HeaderContents += " \"";
@@ -521,7 +521,7 @@ void ExtractAPIAction::EndSourceFileAction() {
 
 std::unique_ptr<ASTConsumer>
 WrappingExtractAPIAction::CreateASTConsumer(CompilerInstance &CI,
-                                            StringRef InFile) {
+                                            llvm::StringRef InFile) {
   auto OtherConsumer = WrapperFrontendAction::CreateASTConsumer(CI, InFile);
   if (!OtherConsumer)
     return nullptr;

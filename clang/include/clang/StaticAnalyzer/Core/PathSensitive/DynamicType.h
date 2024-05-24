@@ -79,7 +79,7 @@ ProgramStateRef removeDeadCasts(ProgramStateRef State, SymbolReaper &SR);
 ProgramStateRef removeDeadClassObjectTypes(ProgramStateRef State,
                                            SymbolReaper &SR);
 
-void printDynamicTypeInfoJson(raw_ostream &Out, ProgramStateRef State,
+void printDynamicTypeInfoJson(llvm::raw_ostream &Out, ProgramStateRef State,
                               const char *NL = "\n", unsigned int Space = 0,
                               bool IsDot = false);
 

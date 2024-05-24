@@ -36,7 +36,7 @@ using transformer::statement;
 
 // Invert the code of an if-statement, while maintaining its semantics.
 RewriteRuleWith<std::string> invertIf() {
-  StringRef C = "C", T = "T", E = "E";
+  llvm::StringRef C = "C", T = "T", E = "E";
   RewriteRuleWith<std::string> Rule = makeRule(
       ifStmt(hasCondition(expr().bind(C)), hasThen(stmt().bind(T)),
              hasElse(stmt().bind(E))),
@@ -49,7 +49,7 @@ RewriteRuleWith<std::string> invertIf() {
 
 class IfInverterCheck : public TransformerClangTidyCheck {
 public:
-  IfInverterCheck(StringRef Name, ClangTidyContext *Context)
+  IfInverterCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : TransformerClangTidyCheck(invertIf(), Name, Context) {}
 };
 
@@ -76,7 +76,7 @@ TEST(TransformerClangTidyCheckTest, Basic) {
 TEST(TransformerClangTidyCheckTest, DiagnosticsCorrectlyGenerated) {
   class DiagOnlyCheck : public TransformerClangTidyCheck {
   public:
-    DiagOnlyCheck(StringRef Name, ClangTidyContext *Context)
+    DiagOnlyCheck(llvm::StringRef Name, ClangTidyContext *Context)
         : TransformerClangTidyCheck(
               makeRule(returnStmt(), noopEdit(node(RootID)), cat("message")),
               Name, Context) {}
@@ -102,7 +102,7 @@ transformer::ASTEdit noReplacementEdit(transformer::RangeSelector Target) {
 TEST(TransformerClangTidyCheckTest, EmptyReplacement) {
   class DiagOnlyCheck : public TransformerClangTidyCheck {
   public:
-    DiagOnlyCheck(StringRef Name, ClangTidyContext *Context)
+    DiagOnlyCheck(llvm::StringRef Name, ClangTidyContext *Context)
         : TransformerClangTidyCheck(
               makeRule(returnStmt(), edit(noReplacementEdit(node(RootID))),
                        cat("message")),
@@ -122,7 +122,7 @@ TEST(TransformerClangTidyCheckTest, EmptyReplacement) {
 TEST(TransformerClangTidyCheckTest, NotesCorrectlyGenerated) {
   class DiagAndNoteCheck : public TransformerClangTidyCheck {
   public:
-    DiagAndNoteCheck(StringRef Name, ClangTidyContext *Context)
+    DiagAndNoteCheck(llvm::StringRef Name, ClangTidyContext *Context)
         : TransformerClangTidyCheck(
               makeRule(returnStmt(),
                        note(node(RootID), cat("some note")),
@@ -143,7 +143,7 @@ TEST(TransformerClangTidyCheckTest, NotesCorrectlyGenerated) {
 TEST(TransformerClangTidyCheckTest, DiagnosticMessageEscaped) {
   class GiveDiagWithPercentSymbol : public TransformerClangTidyCheck {
   public:
-    GiveDiagWithPercentSymbol(StringRef Name, ClangTidyContext *Context)
+    GiveDiagWithPercentSymbol(llvm::StringRef Name, ClangTidyContext *Context)
         : TransformerClangTidyCheck(makeRule(returnStmt(),
                                              noopEdit(node(RootID)),
                                              cat("bad code: x % y % z")),
@@ -163,7 +163,7 @@ TEST(TransformerClangTidyCheckTest, DiagnosticMessageEscaped) {
 
 class IntLitCheck : public TransformerClangTidyCheck {
 public:
-  IntLitCheck(StringRef Name, ClangTidyContext *Context)
+  IntLitCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : TransformerClangTidyCheck(
             makeRule(integerLiteral(), change(cat("LIT")), cat("no message")),
             Name, Context) {}
@@ -186,7 +186,7 @@ TEST(TransformerClangTidyCheckTest, TwoChangesInOneMacroExpansion) {
 
 class BinOpCheck : public TransformerClangTidyCheck {
 public:
-  BinOpCheck(StringRef Name, ClangTidyContext *Context)
+  BinOpCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : TransformerClangTidyCheck(
             makeRule(
                 binaryOperator(hasOperatorName("+"), hasRHS(expr().bind("r"))),
@@ -222,7 +222,7 @@ needsObjC(const LangOptions &LangOpts,
 
 class NeedsObjCCheck : public TransformerClangTidyCheck {
 public:
-  NeedsObjCCheck(StringRef Name, ClangTidyContext *Context)
+  NeedsObjCCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : TransformerClangTidyCheck(needsObjC, Name, Context) {}
 };
 
@@ -248,7 +248,7 @@ noSkip(const LangOptions &LangOpts,
 
 class ConfigurableCheck : public TransformerClangTidyCheck {
 public:
-  ConfigurableCheck(StringRef Name, ClangTidyContext *Context)
+  ConfigurableCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : TransformerClangTidyCheck(noSkip, Name, Context) {}
 };
 
@@ -279,7 +279,7 @@ RewriteRuleWith<std::string> replaceCall(IncludeFormat Format) {
 template <IncludeFormat Format>
 class IncludeCheck : public TransformerClangTidyCheck {
 public:
-  IncludeCheck(StringRef Name, ClangTidyContext *Context)
+  IncludeCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : TransformerClangTidyCheck(replaceCall(Format), Name, Context) {}
 };
 
@@ -326,7 +326,7 @@ class IncludeOrderCheck : public TransformerClangTidyCheck {
   }
 
 public:
-  IncludeOrderCheck(StringRef Name, ClangTidyContext *Context)
+  IncludeOrderCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : TransformerClangTidyCheck(rule(), Name, Context) {}
 };
 
@@ -344,7 +344,7 @@ int h(int x) { return 5; })cc";
 int h(int x) { return 5; })cc";
 
   ClangTidyOptions Options;
-  std::map<StringRef, StringRef> PathsToContent = {{"input.h", "\n"}};
+  std::map<llvm::StringRef, llvm::StringRef> PathsToContent = {{"input.h", "\n"}};
   Options.CheckOptions["test-check-0.IncludeStyle"] = "llvm";
   EXPECT_EQ(TreatsAsLibraryHeader, test::runCheckOnCode<IncludeOrderCheck>(
                                        Input, nullptr, "inputTest.cpp",
@@ -376,7 +376,7 @@ int h(int x) { return 5; })cc";
 int h(int x) { return 5; })cc";
 
   ClangTidyOptions Options;
-  std::map<StringRef, StringRef> PathsToContent = {{"input.h", "\n"}};
+  std::map<llvm::StringRef, llvm::StringRef> PathsToContent = {{"input.h", "\n"}};
   Options.CheckOptions["IncludeStyle"] = "llvm";
   EXPECT_EQ(TreatsAsLibraryHeader, test::runCheckOnCode<IncludeOrderCheck>(
                                        Input, nullptr, "inputTest.cpp",

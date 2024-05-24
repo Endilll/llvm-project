@@ -2468,7 +2468,7 @@ TEST(SignatureHelpTest, OverloadsOrdering) {
 }
 
 TEST(SignatureHelpTest, InstantiatedSignatures) {
-  StringRef Sig0 = R"cpp(
+  llvm::StringRef Sig0 = R"cpp(
     template <class T>
     void foo(T, T, T);
 
@@ -2480,7 +2480,7 @@ TEST(SignatureHelpTest, InstantiatedSignatures) {
   EXPECT_THAT(signatures(Sig0).signatures,
               ElementsAre(sig("foo([[T]], [[T]], [[T]]) -> void")));
 
-  StringRef Sig1 = R"cpp(
+  llvm::StringRef Sig1 = R"cpp(
     template <class T>
     void foo(T, T, T);
 
@@ -2491,7 +2491,7 @@ TEST(SignatureHelpTest, InstantiatedSignatures) {
   EXPECT_THAT(signatures(Sig1).signatures,
               ElementsAre(sig("foo([[T]], [[T]], [[T]]) -> void")));
 
-  StringRef Sig2 = R"cpp(
+  llvm::StringRef Sig2 = R"cpp(
     template <class ...T>
     void foo(T...);
 
@@ -2508,7 +2508,7 @@ TEST(SignatureHelpTest, InstantiatedSignatures) {
   // do substitute in code complete.
   // FIXME: make code complete and signature help consistent, figure out which
   // way is better.
-  StringRef Sig3 = R"cpp(
+  llvm::StringRef Sig3 = R"cpp(
     template <class T>
     struct X {
       template <class U>
@@ -2531,7 +2531,7 @@ TEST(SignatureHelpTest, IndexDocumentation) {
   Foo1.Documentation = "doc from the index";
   Symbol Foo2 = sym("foo", index::SymbolKind::Function, "@F@\\0#I#I#");
 
-  StringRef Sig0 = R"cpp(
+  llvm::StringRef Sig0 = R"cpp(
     int foo();
     int foo(double);
 
@@ -2545,7 +2545,7 @@ TEST(SignatureHelpTest, IndexDocumentation) {
       ElementsAre(AllOf(sig("foo() -> int"), sigDoc("doc from the index")),
                   AllOf(sig("foo([[double]]) -> int"), sigDoc(""))));
 
-  StringRef Sig1 = R"cpp(
+  llvm::StringRef Sig1 = R"cpp(
     int foo();
     // Overriden doc from sema
     int foo(int);
@@ -2787,7 +2787,7 @@ TEST(CompletionTest, EnableSpeculativeIndexRequest) {
   IndexRequestCollector Requests;
   Opts.Index = &Requests;
 
-  auto CompleteAtPoint = [&](StringRef P) {
+  auto CompleteAtPoint = [&](llvm::StringRef P) {
     auto CCR = cantFail(runCodeComplete(Server, File, Test.point(P), Opts));
     EXPECT_TRUE(CCR.HasMore);
   };
@@ -3478,7 +3478,7 @@ TEST(CompletionTest, ObjectiveCProtocolFromIndexSpeculation) {
   IndexRequestCollector Requests({FoodClass});
   Opts.Index = &Requests;
 
-  auto CompleteAtPoint = [&](StringRef P) {
+  auto CompleteAtPoint = [&](llvm::StringRef P) {
     return cantFail(runCodeComplete(Server, File, Test.point(P), Opts))
         .Completions;
   };

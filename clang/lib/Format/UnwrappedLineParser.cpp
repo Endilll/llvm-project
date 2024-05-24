@@ -36,7 +36,7 @@ namespace format {
 namespace {
 
 void printLine(llvm::raw_ostream &OS, const UnwrappedLine &Line,
-               StringRef Prefix = "", bool PrintText = false) {
+               llvm::StringRef Prefix = "", bool PrintText = false) {
   OS << Prefix << "Line(" << Line.Level << ", FSC=" << Line.FirstStartColumn
      << ")" << (Line.InPPDirective ? " MACRO" : "") << ": ";
   bool NewLine = false;
@@ -51,7 +51,7 @@ void printLine(llvm::raw_ostream &OS, const UnwrappedLine &Line,
        << "T=" << (unsigned)I->Tok->getType()
        << ", OC=" << I->Tok->OriginalColumn << ", \"" << I->Tok->TokenText
        << "\"] ";
-    for (SmallVectorImpl<UnwrappedLine>::const_iterator
+    for (llvm::SmallVectorImpl<UnwrappedLine>::const_iterator
              CI = I->Children.begin(),
              CE = I->Children.end();
          CI != CE; ++CI) {
@@ -128,7 +128,7 @@ private:
   UnwrappedLineParser &Parser;
 
   std::unique_ptr<UnwrappedLine> PreBlockLine;
-  SmallVectorImpl<UnwrappedLine> *OriginalLines;
+  llvm::SmallVectorImpl<UnwrappedLine> *OriginalLines;
 };
 
 class CompoundStatementIndenter {
@@ -156,7 +156,7 @@ private:
 UnwrappedLineParser::UnwrappedLineParser(
     SourceManager &SourceMgr, const FormatStyle &Style,
     const AdditionalKeywords &Keywords, unsigned FirstStartColumn,
-    ArrayRef<FormatToken *> Tokens, UnwrappedLineConsumer &Callback,
+    llvm::ArrayRef<FormatToken *> Tokens, UnwrappedLineConsumer &Callback,
     llvm::SpecificBumpPtrAllocator<FormatToken> &Allocator,
     IdentifierTable &IdentTable)
     : Line(new UnwrappedLine), MustBreakBeforeNextToken(false),
@@ -495,7 +495,7 @@ void UnwrappedLineParser::calculateBraceTypes(bool ExpectClassBody) {
     FormatToken *Tok;
     const FormatToken *PrevTok;
   };
-  SmallVector<StackEntry, 8> LBraceStack;
+  llvm::SmallVector<StackEntry, 8> LBraceStack;
   assert(Tok->is(tok::l_brace));
 
   do {
@@ -689,7 +689,7 @@ bool UnwrappedLineParser::mightFitOnOneLine(
   const auto *LastToken = Tokens.back().Tok;
   assert(LastToken);
 
-  SmallVector<UnwrappedLineNode> SavedTokens(Tokens.size());
+  llvm::SmallVector<UnwrappedLineNode> SavedTokens(Tokens.size());
 
   int Index = 0;
   for (const auto &Token : Tokens) {
@@ -2004,7 +2004,7 @@ void UnwrappedLineParser::parseStructuralElement(
       }
 
       // See if the following token should start a new unwrapped line.
-      StringRef Text = FormatTok->TokenText;
+      llvm::StringRef Text = FormatTok->TokenText;
 
       FormatToken *PreviousToken = FormatTok;
       nextToken();
@@ -4580,7 +4580,7 @@ continuesLineCommentSection(const FormatToken &FormatTok,
   if (Line.Tokens.empty())
     return false;
 
-  StringRef IndentContent = FormatTok.TokenText;
+  llvm::StringRef IndentContent = FormatTok.TokenText;
   if (FormatTok.TokenText.starts_with("//") ||
       FormatTok.TokenText.starts_with("/*")) {
     IndentContent = FormatTok.TokenText.substr(2);
@@ -4724,7 +4724,7 @@ void UnwrappedLineParser::nextToken(int LevelDifference) {
 }
 
 void UnwrappedLineParser::distributeComments(
-    const SmallVectorImpl<FormatToken *> &Comments,
+    const llvm::SmallVectorImpl<FormatToken *> &Comments,
     const FormatToken *NextTok) {
   // Whether or not a line comment token continues a line is controlled by
   // the method continuesLineCommentSection, with the following caveat:
@@ -4778,7 +4778,7 @@ void UnwrappedLineParser::distributeComments(
 }
 
 void UnwrappedLineParser::readToken(int LevelDifference) {
-  SmallVector<FormatToken *, 1> Comments;
+  llvm::SmallVector<FormatToken *, 1> Comments;
   bool PreviousWasComment = false;
   bool FirstNonCommentOnLine = false;
   do {
@@ -4903,7 +4903,7 @@ void UnwrappedLineParser::readToken(int LevelDifference) {
         // Next, we insert the expanded tokens in the token stream at the
         // current position, and continue parsing.
         Unexpanded[ID] = std::move(UnexpandedLine);
-        SmallVector<FormatToken *, 8> Expansion =
+        llvm::SmallVector<FormatToken *, 8> Expansion =
             Macros.expand(ID, std::move(Args));
         if (!Expansion.empty())
           FormatTok = Tokens->insertTokens(Expansion);

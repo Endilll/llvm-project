@@ -55,10 +55,10 @@ public:
   ProgramStateRef
   checkRegionChanges(ProgramStateRef State,
                      const InvalidatedSymbols *Invalidated,
-                     ArrayRef<const MemRegion *> RequestedRegions,
-                     ArrayRef<const MemRegion *> InvalidatedRegions,
+                     llvm::ArrayRef<const MemRegion *> RequestedRegions,
+                     llvm::ArrayRef<const MemRegion *> InvalidatedRegions,
                      const LocationContext *LCtx, const CallEvent *Call) const;
-  void printState(raw_ostream &Out, ProgramStateRef State,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State,
                   const char *NL, const char *Sep) const override;
 
 private:
@@ -187,7 +187,7 @@ private:
   AggressivenessKind Aggressiveness = AK_KnownsAndLocals;
 
 public:
-  void setAggressiveness(StringRef Str, CheckerManager &Mgr) {
+  void setAggressiveness(llvm::StringRef Str, CheckerManager &Mgr) {
     Aggressiveness =
         llvm::StringSwitch<AggressivenessKind>(Str)
             .Case("KnownsOnly", AK_KnownsOnly)
@@ -295,7 +295,7 @@ MoveChecker::MovedBugVisitor::VisitNode(const ExplodedNode *N,
     return nullptr;
   Found = true;
 
-  SmallString<128> Str;
+  llvm::SmallString<128> Str;
   llvm::raw_svector_ostream OS(Str);
 
   ObjectKind OK = Chk.classifyObject(Region, RD);
@@ -697,8 +697,8 @@ void MoveChecker::checkDeadSymbols(SymbolReaper &SymReaper,
 
 ProgramStateRef MoveChecker::checkRegionChanges(
     ProgramStateRef State, const InvalidatedSymbols *Invalidated,
-    ArrayRef<const MemRegion *> RequestedRegions,
-    ArrayRef<const MemRegion *> InvalidatedRegions,
+    llvm::ArrayRef<const MemRegion *> RequestedRegions,
+    llvm::ArrayRef<const MemRegion *> InvalidatedRegions,
     const LocationContext *LCtx, const CallEvent *Call) const {
   if (Call) {
     // Relax invalidation upon function calls: only invalidate parameters
@@ -728,7 +728,7 @@ ProgramStateRef MoveChecker::checkRegionChanges(
   return State;
 }
 
-void MoveChecker::printState(raw_ostream &Out, ProgramStateRef State,
+void MoveChecker::printState(llvm::raw_ostream &Out, ProgramStateRef State,
                              const char *NL, const char *Sep) const {
 
   TrackedRegionMapTy RS = State->get<TrackedRegionMap>();

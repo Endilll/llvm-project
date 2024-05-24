@@ -629,9 +629,9 @@ ExprResult Parser::ParseOpenACCConditionExpr() {
 // a pqr-list is a comma-separated list of pdr items. The one exception is a
 // clause-list, which is a list of one or more clauses optionally separated by
 // commas.
-SmallVector<OpenACCClause *>
+llvm::SmallVector<OpenACCClause *>
 Parser::ParseOpenACCClauseList(OpenACCDirectiveKind DirKind) {
-  SmallVector<OpenACCClause *> Clauses;
+  llvm::SmallVector<OpenACCClause *> Clauses;
   bool FirstClause = true;
   while (getCurToken().isNot(tok::annot_pragma_openacc_end)) {
     // Comma is optional in a clause-list.
@@ -840,7 +840,7 @@ bool Parser::ParseOpenACCGangArgList(SourceLocation GangLoc) {
 // However, they all are named with a single-identifier (or auto/default!)
 // token, followed in some cases by either braces or parens.
 Parser::OpenACCClauseParseResult
-Parser::ParseOpenACCClause(ArrayRef<const OpenACCClause *> ExistingClauses,
+Parser::ParseOpenACCClause(llvm::ArrayRef<const OpenACCClause *> ExistingClauses,
                            OpenACCDirectiveKind DirKind) {
   // A number of clause names are actually keywords, so accept a keyword that
   // can be converted to a name.
@@ -862,7 +862,7 @@ Parser::ParseOpenACCClause(ArrayRef<const OpenACCClause *> ExistingClauses,
 }
 
 Parser::OpenACCClauseParseResult Parser::ParseOpenACCClauseParams(
-    ArrayRef<const OpenACCClause *> ExistingClauses,
+    llvm::ArrayRef<const OpenACCClause *> ExistingClauses,
     OpenACCDirectiveKind DirKind, OpenACCClauseKind ClauseKind,
     SourceLocation ClauseLoc) {
   BalancedDelimiterTracker Parens(*this, tok::l_paren,

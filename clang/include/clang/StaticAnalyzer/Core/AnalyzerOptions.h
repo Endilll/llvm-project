@@ -146,18 +146,18 @@ enum class CTUPhase1InliningKind { None, Small, All };
 /// and should be eventually converted into -analyzer-config flags. New analyzer
 /// options should not be implemented as frontend flags. Frontend flags still
 /// make sense for things that do not affect the actual analysis.
-class AnalyzerOptions : public RefCountedBase<AnalyzerOptions> {
+class AnalyzerOptions : public llvm::RefCountedBase<AnalyzerOptions> {
 public:
   using ConfigTable = llvm::StringMap<std::string>;
 
   /// Retrieves the list of checkers generated from Checkers.td. This doesn't
   /// contain statically linked but non-generated checkers and plugin checkers!
-  static std::vector<StringRef>
+  static std::vector<llvm::StringRef>
   getRegisteredCheckers(bool IncludeExperimental = false);
 
   /// Retrieves the list of packages generated from Checkers.td. This doesn't
   /// contain statically linked but non-generated packages and plugin packages!
-  static std::vector<StringRef>
+  static std::vector<llvm::StringRef>
   getRegisteredPackages(bool IncludeExperimental = false);
 
   /// Convenience function for printing options or checkers and their
@@ -178,7 +178,7 @@ public:
   ///            ^~~~~~~~~~~~~~~~~~EntryWidth
   ///   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MinLineWidth
   static void printFormattedEntry(llvm::raw_ostream &Out,
-                                  std::pair<StringRef, StringRef> EntryDescPair,
+                                  std::pair<llvm::StringRef, llvm::StringRef> EntryDescPair,
                                   size_t InitialPad, size_t EntryWidth,
                                   size_t MinLineWidth = 0);
 
@@ -312,10 +312,10 @@ public:
   /// specified for the given checker the options for the parent packages will
   /// be searched as well. The inner packages take precedence over the outer
   /// ones.
-  bool getCheckerBooleanOption(StringRef CheckerName, StringRef OptionName,
+  bool getCheckerBooleanOption(llvm::StringRef CheckerName, llvm::StringRef OptionName,
                                bool SearchInParents = false) const;
 
-  bool getCheckerBooleanOption(const ento::CheckerBase *C, StringRef OptionName,
+  bool getCheckerBooleanOption(const ento::CheckerBase *C, llvm::StringRef OptionName,
                                bool SearchInParents = false) const;
 
   /// Interprets an option's string value as an integer value.
@@ -332,10 +332,10 @@ public:
   /// specified for the given checker the options for the parent packages will
   /// be searched as well. The inner packages take precedence over the outer
   /// ones.
-  int getCheckerIntegerOption(StringRef CheckerName, StringRef OptionName,
+  int getCheckerIntegerOption(llvm::StringRef CheckerName, llvm::StringRef OptionName,
                               bool SearchInParents = false) const;
 
-  int getCheckerIntegerOption(const ento::CheckerBase *C, StringRef OptionName,
+  int getCheckerIntegerOption(const ento::CheckerBase *C, llvm::StringRef OptionName,
                               bool SearchInParents = false) const;
 
   /// Query an option's string value.
@@ -352,11 +352,11 @@ public:
   /// specified for the given checker the options for the parent packages will
   /// be searched as well. The inner packages take precedence over the outer
   /// ones.
-  StringRef getCheckerStringOption(StringRef CheckerName, StringRef OptionName,
+  llvm::StringRef getCheckerStringOption(llvm::StringRef CheckerName, llvm::StringRef OptionName,
                                    bool SearchInParents = false) const;
 
-  StringRef getCheckerStringOption(const ento::CheckerBase *C,
-                                   StringRef OptionName,
+  llvm::StringRef getCheckerStringOption(const ento::CheckerBase *C,
+                                   llvm::StringRef OptionName,
                                    bool SearchInParents = false) const;
 
   ExplorationStrategyKind getExplorationStrategy() const;
@@ -388,7 +388,7 @@ public:
   }
 };
 
-using AnalyzerOptionsRef = IntrusiveRefCntPtr<AnalyzerOptions>;
+using AnalyzerOptionsRef = llvm::IntrusiveRefCntPtr<AnalyzerOptions>;
 
 //===----------------------------------------------------------------------===//
 // We'll use AnalyzerOptions in the frontend, but we can't link the frontend
@@ -398,7 +398,7 @@ using AnalyzerOptionsRef = IntrusiveRefCntPtr<AnalyzerOptions>;
 // For this reason, implement some methods in this header file.
 //===----------------------------------------------------------------------===//
 
-inline std::vector<StringRef>
+inline std::vector<llvm::StringRef>
 AnalyzerOptions::getRegisteredCheckers(bool IncludeExperimental) {
   static constexpr llvm::StringLiteral StaticAnalyzerCheckerNames[] = {
 #define GET_CHECKERS
@@ -408,8 +408,8 @@ AnalyzerOptions::getRegisteredCheckers(bool IncludeExperimental) {
 #undef CHECKER
 #undef GET_CHECKERS
   };
-  std::vector<StringRef> Checkers;
-  for (StringRef CheckerName : StaticAnalyzerCheckerNames) {
+  std::vector<llvm::StringRef> Checkers;
+  for (llvm::StringRef CheckerName : StaticAnalyzerCheckerNames) {
     if (!CheckerName.starts_with("debug.") &&
         (IncludeExperimental || !CheckerName.starts_with("alpha.")))
       Checkers.push_back(CheckerName);
@@ -417,7 +417,7 @@ AnalyzerOptions::getRegisteredCheckers(bool IncludeExperimental) {
   return Checkers;
 }
 
-inline std::vector<StringRef>
+inline std::vector<llvm::StringRef>
 AnalyzerOptions::getRegisteredPackages(bool IncludeExperimental) {
   static constexpr llvm::StringLiteral StaticAnalyzerPackageNames[] = {
 #define GET_PACKAGES
@@ -426,8 +426,8 @@ AnalyzerOptions::getRegisteredPackages(bool IncludeExperimental) {
 #undef PACKAGE
 #undef GET_PACKAGES
   };
-  std::vector<StringRef> Packages;
-  for (StringRef PackageName : StaticAnalyzerPackageNames) {
+  std::vector<llvm::StringRef> Packages;
+  for (llvm::StringRef PackageName : StaticAnalyzerPackageNames) {
     if (PackageName != "debug" &&
         (IncludeExperimental || PackageName != "alpha"))
       Packages.push_back(PackageName);

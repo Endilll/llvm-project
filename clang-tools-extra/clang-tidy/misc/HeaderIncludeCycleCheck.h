@@ -20,13 +20,13 @@ namespace clang::tidy::misc {
 /// http://clang.llvm.org/extra/clang-tidy/checks/misc/header-include-cycle.html
 class HeaderIncludeCycleCheck : public ClangTidyCheck {
 public:
-  HeaderIncludeCycleCheck(StringRef Name, ClangTidyContext *Context);
+  HeaderIncludeCycleCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
 
 private:
-  const std::vector<StringRef> IgnoredFilesList;
+  const std::vector<llvm::StringRef> IgnoredFilesList;
 };
 
 } // namespace clang::tidy::misc

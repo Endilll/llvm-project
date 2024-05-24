@@ -176,7 +176,7 @@ public:
   // Makes adjustments to a tooling::CompileCommand which will be used to
   // process a file (possibly different from the one in the command).
   using CommandMangler = llvm::unique_function<void(tooling::CompileCommand &,
-                                                    StringRef File) const>;
+                                                    llvm::StringRef File) const>;
 
   // Base may be null, in which case no entries are inherited.
   // FallbackFlags are added to the fallback compile command.

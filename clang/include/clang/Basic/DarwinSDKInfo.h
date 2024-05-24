@@ -86,9 +86,9 @@ public:
   class RelatedTargetVersionMapping {
   public:
     RelatedTargetVersionMapping(
-        VersionTuple MinimumKeyVersion, VersionTuple MaximumKeyVersion,
-        VersionTuple MinimumValue, VersionTuple MaximumValue,
-        llvm::DenseMap<VersionTuple, VersionTuple> Mapping)
+        llvm::VersionTuple MinimumKeyVersion, llvm::VersionTuple MaximumKeyVersion,
+        llvm::VersionTuple MinimumValue, llvm::VersionTuple MaximumValue,
+        llvm::DenseMap<llvm::VersionTuple, llvm::VersionTuple> Mapping)
         : MinimumKeyVersion(MinimumKeyVersion),
           MaximumKeyVersion(MaximumKeyVersion), MinimumValue(MinimumValue),
           MaximumValue(MaximumValue), Mapping(Mapping) {
@@ -96,23 +96,23 @@ public:
     }
 
     /// Returns the value with the lowest version in the mapping.
-    const VersionTuple &getMinimumValue() const { return MinimumValue; }
+    const llvm::VersionTuple &getMinimumValue() const { return MinimumValue; }
 
     /// Returns the mapped key, or the appropriate Minimum / MaximumValue if
     /// they key is outside of the mapping bounds. If they key isn't mapped, but
     /// within the minimum and maximum bounds, std::nullopt is returned.
-    std::optional<VersionTuple>
-    map(const VersionTuple &Key, const VersionTuple &MinimumValue,
-        std::optional<VersionTuple> MaximumValue) const;
+    std::optional<llvm::VersionTuple>
+    map(const llvm::VersionTuple &Key, const llvm::VersionTuple &MinimumValue,
+        std::optional<llvm::VersionTuple> MaximumValue) const;
 
     /// Remap the 'introduced' availability version.
     /// If None is returned, the 'unavailable' availability should be used
     /// instead.
-    std::optional<VersionTuple>
-    mapIntroducedAvailabilityVersion(const VersionTuple &Key) const {
+    std::optional<llvm::VersionTuple>
+    mapIntroducedAvailabilityVersion(const llvm::VersionTuple &Key) const {
       // API_TO_BE_DEPRECATED is 100000.
       if (Key.getMajor() == 100000)
-        return VersionTuple(100000);
+        return llvm::VersionTuple(100000);
       // Use None for maximum to force unavailable behavior for
       return map(Key, MinimumValue, std::nullopt);
     }
@@ -121,28 +121,28 @@ public:
     /// If None is returned for 'obsoleted', the 'unavailable' availability
     /// should be used instead. If None is returned for 'deprecated', the
     /// 'deprecated' version should be dropped.
-    std::optional<VersionTuple>
-    mapDeprecatedObsoletedAvailabilityVersion(const VersionTuple &Key) const {
+    std::optional<llvm::VersionTuple>
+    mapDeprecatedObsoletedAvailabilityVersion(const llvm::VersionTuple &Key) const {
       // API_TO_BE_DEPRECATED is 100000.
       if (Key.getMajor() == 100000)
-        return VersionTuple(100000);
+        return llvm::VersionTuple(100000);
       return map(Key, MinimumValue, MaximumValue);
     }
 
     static std::optional<RelatedTargetVersionMapping>
     parseJSON(const llvm::json::Object &Obj,
-              VersionTuple MaximumDeploymentTarget);
+              llvm::VersionTuple MaximumDeploymentTarget);
 
   private:
-    VersionTuple MinimumKeyVersion;
-    VersionTuple MaximumKeyVersion;
-    VersionTuple MinimumValue;
-    VersionTuple MaximumValue;
-    llvm::DenseMap<VersionTuple, VersionTuple> Mapping;
+    llvm::VersionTuple MinimumKeyVersion;
+    llvm::VersionTuple MaximumKeyVersion;
+    llvm::VersionTuple MinimumValue;
+    llvm::VersionTuple MaximumValue;
+    llvm::DenseMap<llvm::VersionTuple, llvm::VersionTuple> Mapping;
   };
 
   DarwinSDKInfo(
-      VersionTuple Version, VersionTuple MaximumDeploymentTarget,
+      llvm::VersionTuple Version, llvm::VersionTuple MaximumDeploymentTarget,
       llvm::DenseMap<OSEnvPair::StorageType,
                      std::optional<RelatedTargetVersionMapping>>
           VersionMappings =
@@ -175,8 +175,8 @@ public:
   parseDarwinSDKSettingsJSON(const llvm::json::Object *Obj);
 
 private:
-  VersionTuple Version;
-  VersionTuple MaximumDeploymentTarget;
+  llvm::VersionTuple Version;
+  llvm::VersionTuple MaximumDeploymentTarget;
   // Need to wrap the value in an optional here as the value has to be default
   // constructible, and std::unique_ptr doesn't like DarwinSDKInfo being
   // Optional as Optional is trying to copy it in emplace.
@@ -189,8 +189,8 @@ private:
 ///
 /// \returns an error if the SDKSettings.json file is invalid, std::nullopt if
 /// the SDK has no SDKSettings.json, or a valid \c DarwinSDKInfo otherwise.
-Expected<std::optional<DarwinSDKInfo>>
-parseDarwinSDKInfo(llvm::vfs::FileSystem &VFS, StringRef SDKRootPath);
+llvm::Expected<std::optional<DarwinSDKInfo>>
+parseDarwinSDKInfo(llvm::vfs::FileSystem &VFS, llvm::StringRef SDKRootPath);
 
 } // end namespace clang
 

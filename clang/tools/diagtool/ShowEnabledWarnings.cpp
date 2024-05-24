@@ -24,11 +24,11 @@ using namespace diagtool;
 
 namespace {
   struct PrettyDiag {
-    StringRef Name;
-    StringRef Flag;
+    llvm::StringRef Name;
+    llvm::StringRef Flag;
     DiagnosticsEngine::Level Level;
 
-    PrettyDiag(StringRef name, StringRef flag, DiagnosticsEngine::Level level)
+    PrettyDiag(llvm::StringRef name, llvm::StringRef flag, DiagnosticsEngine::Level level)
     : Name(name), Flag(flag), Level(level) {}
 
     bool operator<(const PrettyDiag &x) const { return Name < x.Name; }
@@ -52,16 +52,16 @@ static char getCharForLevel(DiagnosticsEngine::Level Level) {
   llvm_unreachable("Unknown diagnostic level");
 }
 
-static IntrusiveRefCntPtr<DiagnosticsEngine>
+static llvm::IntrusiveRefCntPtr<DiagnosticsEngine>
 createDiagnostics(unsigned int argc, char **argv) {
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagIDs(new DiagnosticIDs());
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagIDs(new DiagnosticIDs());
 
   // Buffer diagnostics from argument parsing so that we can output them using a
   // well formed diagnostic object.
   TextDiagnosticBuffer *DiagsBuffer = new TextDiagnosticBuffer;
 
   // Try to build a CompilerInvocation.
-  SmallVector<const char *, 4> Args;
+  llvm::SmallVector<const char *, 4> Args;
   Args.push_back("diagtool");
   Args.append(argv, argv + argc);
   CreateInvocationOptions CIOpts;
@@ -73,7 +73,7 @@ createDiagnostics(unsigned int argc, char **argv) {
     return nullptr;
 
   // Build the diagnostics parser
-  IntrusiveRefCntPtr<DiagnosticsEngine> FinalDiags =
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> FinalDiags =
     CompilerInstance::createDiagnostics(&Invocation->getDiagnosticOpts());
   if (!FinalDiags)
     return nullptr;
@@ -85,11 +85,11 @@ createDiagnostics(unsigned int argc, char **argv) {
   return FinalDiags;
 }
 
-int ShowEnabledWarnings::run(unsigned int argc, char **argv, raw_ostream &Out) {
+int ShowEnabledWarnings::run(unsigned int argc, char **argv, llvm::raw_ostream &Out) {
   // First check our one flag (--levels).
   bool ShouldShowLevels = true;
   if (argc > 0) {
-    StringRef FirstArg(*argv);
+    llvm::StringRef FirstArg(*argv);
     if (FirstArg == "--no-levels") {
       ShouldShowLevels = false;
       --argc;
@@ -102,7 +102,7 @@ int ShowEnabledWarnings::run(unsigned int argc, char **argv, raw_ostream &Out) {
   }
 
   // Create the diagnostic engine.
-  IntrusiveRefCntPtr<DiagnosticsEngine> Diags = createDiagnostics(argc, argv);
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags = createDiagnostics(argc, argv);
   if (!Diags) {
     printUsage();
     return EXIT_FAILURE;
@@ -128,7 +128,7 @@ int ShowEnabledWarnings::run(unsigned int argc, char **argv, raw_ostream &Out) {
     if (DiagLevel == DiagnosticsEngine::Ignored)
       continue;
 
-    StringRef WarningOpt = DiagnosticIDs::getWarningOptionForDiag(DiagID);
+    llvm::StringRef WarningOpt = DiagnosticIDs::getWarningOptionForDiag(DiagID);
     Active.push_back(PrettyDiag(DR.getName(), WarningOpt, DiagLevel));
   }
 

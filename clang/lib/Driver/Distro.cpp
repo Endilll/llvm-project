@@ -28,12 +28,12 @@ static Distro::DistroType DetectOsRelease(llvm::vfs::FileSystem &VFS) {
   if (!File)
     return Distro::UnknownDistro;
 
-  SmallVector<StringRef, 16> Lines;
+  llvm::SmallVector<llvm::StringRef, 16> Lines;
   File.get()->getBuffer().split(Lines, "\n");
   Distro::DistroType Version = Distro::UnknownDistro;
 
   // Obviously this can be improved a lot.
-  for (StringRef Line : Lines)
+  for (llvm::StringRef Line : Lines)
     if (Version == Distro::UnknownDistro && Line.starts_with("ID="))
       Version = llvm::StringSwitch<Distro::DistroType>(Line.substr(3))
                     .Case("alpine", Distro::AlpineLinux)
@@ -54,11 +54,11 @@ static Distro::DistroType DetectLsbRelease(llvm::vfs::FileSystem &VFS) {
   if (!File)
     return Distro::UnknownDistro;
 
-  SmallVector<StringRef, 16> Lines;
+  llvm::SmallVector<llvm::StringRef, 16> Lines;
   File.get()->getBuffer().split(Lines, "\n");
   Distro::DistroType Version = Distro::UnknownDistro;
 
-  for (StringRef Line : Lines)
+  for (llvm::StringRef Line : Lines)
     if (Version == Distro::UnknownDistro &&
         Line.starts_with("DISTRIB_CODENAME="))
       Version = llvm::StringSwitch<Distro::DistroType>(Line.substr(17))
@@ -119,7 +119,7 @@ static Distro::DistroType DetectDistro(llvm::vfs::FileSystem &VFS) {
       VFS.getBufferForFile("/etc/redhat-release");
 
   if (File) {
-    StringRef Data = File.get()->getBuffer();
+    llvm::StringRef Data = File.get()->getBuffer();
     if (Data.starts_with("Fedora release"))
       return Distro::Fedora;
     if (Data.starts_with("Red Hat Enterprise Linux") ||
@@ -137,7 +137,7 @@ static Distro::DistroType DetectDistro(llvm::vfs::FileSystem &VFS) {
   // ...for Debian
   File = VFS.getBufferForFile("/etc/debian_version");
   if (File) {
-    StringRef Data = File.get()->getBuffer();
+    llvm::StringRef Data = File.get()->getBuffer();
     // Contents: < major.minor > or < codename/sid >
     int MajorVersion;
     if (!Data.split('.').first.getAsInteger(10, MajorVersion)) {
@@ -179,16 +179,16 @@ static Distro::DistroType DetectDistro(llvm::vfs::FileSystem &VFS) {
   // ...for SUSE
   File = VFS.getBufferForFile("/etc/SuSE-release");
   if (File) {
-    StringRef Data = File.get()->getBuffer();
-    SmallVector<StringRef, 8> Lines;
+    llvm::StringRef Data = File.get()->getBuffer();
+    llvm::SmallVector<llvm::StringRef, 8> Lines;
     Data.split(Lines, "\n");
-    for (const StringRef &Line : Lines) {
+    for (const llvm::StringRef &Line : Lines) {
       if (!Line.trim().starts_with("VERSION"))
         continue;
-      std::pair<StringRef, StringRef> SplitLine = Line.split('=');
+      std::pair<llvm::StringRef, llvm::StringRef> SplitLine = Line.split('=');
       // Old versions have split VERSION and PATCHLEVEL
       // Newer versions use VERSION = x.y
-      std::pair<StringRef, StringRef> SplitVer =
+      std::pair<llvm::StringRef, llvm::StringRef> SplitVer =
           SplitLine.second.trim().split('.');
       int Version;
 

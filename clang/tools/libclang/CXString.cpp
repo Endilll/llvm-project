@@ -77,7 +77,7 @@ CXString createDup(const char *String) {
   return Str;
 }
 
-CXString createRef(StringRef String) {
+CXString createRef(llvm::StringRef String) {
   if (!String.data())
     return createNull();
 
@@ -102,7 +102,7 @@ CXString createRef(StringRef String) {
   return Result;
 }
 
-CXString createDup(StringRef String) {
+CXString createDup(llvm::StringRef String) {
   CXString Result;
   char *Spelling = static_cast<char *>(llvm::safe_malloc(String.size() + 1));
   memmove(Spelling, String.data(), String.size());

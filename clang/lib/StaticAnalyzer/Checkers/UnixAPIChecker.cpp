@@ -54,7 +54,7 @@ class UnixAPIMisuseChecker
 
   ProgramStateRef
   EnsurePtrNotNull(SVal PtrVal, const Expr *PtrExpr, CheckerContext &C,
-                   ProgramStateRef State, const StringRef PtrDescr,
+                   ProgramStateRef State, const llvm::StringRef PtrDescr,
                    std::optional<std::reference_wrapper<const BugType>> BT =
                        std::nullopt) const;
 
@@ -112,7 +112,7 @@ private:
 
 ProgramStateRef UnixAPIMisuseChecker::EnsurePtrNotNull(
     SVal PtrVal, const Expr *PtrExpr, CheckerContext &C, ProgramStateRef State,
-    const StringRef PtrDescr,
+    const llvm::StringRef PtrDescr,
     std::optional<std::reference_wrapper<const BugType>> BT) const {
   const auto Ptr = PtrVal.getAs<DefinedSVal>();
   if (!Ptr)
@@ -164,7 +164,7 @@ void UnixAPIMisuseChecker::checkPreCall(const CallEvent &Call,
   if (isa_and_nonnull<NamespaceDecl>(NamespaceCtx))
     return;
 
-  StringRef FName = C.getCalleeName(FD);
+  llvm::StringRef FName = C.getCalleeName(FD);
   if (FName.empty())
     return;
 
@@ -240,7 +240,7 @@ void UnixAPIMisuseChecker::CheckOpenVariant(CheckerContext &C,
     const Expr *Arg = Call.getArgExpr(CreateModeArgIndex);
     QualType QT = Arg->getType();
     if (!QT->isIntegerType()) {
-      SmallString<256> SBuf;
+      llvm::SmallString<256> SBuf;
       llvm::raw_svector_ostream OS(SBuf);
       OS << "The " << CreateModeArgIndex + 1
          << llvm::getOrdinalSuffix(CreateModeArgIndex + 1)
@@ -252,7 +252,7 @@ void UnixAPIMisuseChecker::CheckOpenVariant(CheckerContext &C,
       return;
     }
   } else if (Call.getNumArgs() > MaxArgCount) {
-    SmallString<256> SBuf;
+    llvm::SmallString<256> SBuf;
     llvm::raw_svector_ostream OS(SBuf);
     OS << "Call to '" << VariantName << "' with more than " << MaxArgCount
        << " arguments";
@@ -295,7 +295,7 @@ void UnixAPIMisuseChecker::CheckOpenVariant(CheckerContext &C,
     return;
 
   if (Call.getNumArgs() < MaxArgCount) {
-    SmallString<256> SBuf;
+    llvm::SmallString<256> SBuf;
     llvm::raw_svector_ostream OS(SBuf);
     OS << "Call to '" << VariantName << "' requires a "
        << CreateModeArgIndex + 1
@@ -322,7 +322,7 @@ ProgramStateRef UnixAPIMisuseChecker::EnsureGetdelimBufferAndSizeCorrect(
       "by the second parameter is undefined.";
 
   auto EmitBugReport = [this, &C, SizePtrExpr, LinePtrPtrExpr](
-                           ProgramStateRef BugState, StringRef ErrMsg) {
+                           ProgramStateRef BugState, llvm::StringRef ErrMsg) {
     if (ExplodedNode *N = C.generateErrorNode(BugState)) {
       auto R = std::make_unique<PathSensitiveBugReport>(BT_getline, ErrMsg, N);
       bugreporter::trackExpressionValue(N, SizePtrExpr, *R);
@@ -418,7 +418,7 @@ void UnixAPIMisuseChecker::CheckPthreadOnce(CheckerContext &C,
   if (!N)
     return;
 
-  SmallString<256> S;
+  llvm::SmallString<256> S;
   llvm::raw_svector_ostream os(S);
   os << "Call to 'pthread_once' uses";
   if (const VarRegion *VR = dyn_cast<VarRegion>(R))
@@ -468,7 +468,7 @@ bool UnixAPIPortabilityChecker::ReportZeroByteAllocation(
   if (!N)
     return false;
 
-  SmallString<256> S;
+  llvm::SmallString<256> S;
   llvm::raw_svector_ostream os(S);
   os << "Call to '" << fn_name << "' has an allocation size of 0 bytes";
   auto report =
@@ -591,7 +591,7 @@ void UnixAPIPortabilityChecker::checkPreStmt(const CallExpr *CE,
   if (isa_and_nonnull<NamespaceDecl>(NamespaceCtx))
     return;
 
-  StringRef FName = C.getCalleeName(FD);
+  llvm::StringRef FName = C.getCalleeName(FD);
   if (FName.empty())
     return;
 

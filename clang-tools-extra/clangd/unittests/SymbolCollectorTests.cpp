@@ -64,9 +64,9 @@ MATCHER_P(templateArgs, TemplArgs, "") {
 }
 MATCHER_P(hasKind, Kind, "") { return arg.SymInfo.Kind == Kind; }
 MATCHER_P(declURI, P, "") {
-  return StringRef(arg.CanonicalDeclaration.FileURI) == P;
+  return llvm::StringRef(arg.CanonicalDeclaration.FileURI) == P;
 }
-MATCHER_P(defURI, P, "") { return StringRef(arg.Definition.FileURI) == P; }
+MATCHER_P(defURI, P, "") { return llvm::StringRef(arg.Definition.FileURI) == P; }
 MATCHER(includeHeader, "") { return !arg.IncludeHeaders.empty(); }
 MATCHER_P(includeHeader, P, "") {
   return (arg.IncludeHeaders.size() == 1) &&

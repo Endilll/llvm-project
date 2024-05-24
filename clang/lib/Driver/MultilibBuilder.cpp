@@ -19,11 +19,11 @@ using namespace driver;
 
 /// normalize Segment to "/foo/bar" or "".
 static void normalizePathSegment(std::string &Segment) {
-  StringRef seg = Segment;
+  llvm::StringRef seg = Segment;
 
   // Prune trailing "/" or "./"
   while (true) {
-    StringRef last = llvm::sys::path::filename(seg);
+    llvm::StringRef last = llvm::sys::path::filename(seg);
     if (last != ".")
       break;
     seg = llvm::sys::path::parent_path(seg);
@@ -42,29 +42,29 @@ static void normalizePathSegment(std::string &Segment) {
   }
 }
 
-MultilibBuilder::MultilibBuilder(StringRef GCC, StringRef OS, StringRef Include)
+MultilibBuilder::MultilibBuilder(llvm::StringRef GCC, llvm::StringRef OS, llvm::StringRef Include)
     : GCCSuffix(GCC), OSSuffix(OS), IncludeSuffix(Include) {
   normalizePathSegment(GCCSuffix);
   normalizePathSegment(OSSuffix);
   normalizePathSegment(IncludeSuffix);
 }
 
-MultilibBuilder::MultilibBuilder(StringRef Suffix)
+MultilibBuilder::MultilibBuilder(llvm::StringRef Suffix)
     : MultilibBuilder(Suffix, Suffix, Suffix) {}
 
-MultilibBuilder &MultilibBuilder::gccSuffix(StringRef S) {
+MultilibBuilder &MultilibBuilder::gccSuffix(llvm::StringRef S) {
   GCCSuffix = std::string(S);
   normalizePathSegment(GCCSuffix);
   return *this;
 }
 
-MultilibBuilder &MultilibBuilder::osSuffix(StringRef S) {
+MultilibBuilder &MultilibBuilder::osSuffix(llvm::StringRef S) {
   OSSuffix = std::string(S);
   normalizePathSegment(OSSuffix);
   return *this;
 }
 
-MultilibBuilder &MultilibBuilder::includeSuffix(StringRef S) {
+MultilibBuilder &MultilibBuilder::includeSuffix(llvm::StringRef S) {
   IncludeSuffix = std::string(S);
   normalizePathSegment(IncludeSuffix);
   return *this;
@@ -73,10 +73,10 @@ MultilibBuilder &MultilibBuilder::includeSuffix(StringRef S) {
 bool MultilibBuilder::isValid() const {
   llvm::StringMap<int> FlagSet;
   for (unsigned I = 0, N = Flags.size(); I != N; ++I) {
-    StringRef Flag(Flags[I]);
+    llvm::StringRef Flag(Flags[I]);
     llvm::StringMap<int>::iterator SI = FlagSet.find(Flag.substr(1));
 
-    assert(StringRef(Flag).front() == '-' || StringRef(Flag).front() == '!');
+    assert(llvm::StringRef(Flag).front() == '-' || llvm::StringRef(Flag).front() == '!');
 
     if (SI == FlagSet.end())
       FlagSet[Flag.substr(1)] = I;
@@ -86,7 +86,7 @@ bool MultilibBuilder::isValid() const {
   return true;
 }
 
-MultilibBuilder &MultilibBuilder::flag(StringRef Flag, bool Disallow) {
+MultilibBuilder &MultilibBuilder::flag(llvm::StringRef Flag, bool Disallow) {
   tools::addMultilibFlag(!Disallow, Flag, Flags);
   return *this;
 }
@@ -98,7 +98,7 @@ Multilib MultilibBuilder::makeMultilib() const {
 MultilibSetBuilder &MultilibSetBuilder::Maybe(const MultilibBuilder &M) {
   MultilibBuilder Opposite;
   // Negate positive flags
-  for (StringRef Flag : M.flags()) {
+  for (llvm::StringRef Flag : M.flags()) {
     if (Flag.front() == '-')
       Opposite.flag(Flag, /*Disallow=*/true);
   }
@@ -133,11 +133,11 @@ MultilibSetBuilder &MultilibSetBuilder::Either(const MultilibBuilder &M1,
 
 static MultilibBuilder compose(const MultilibBuilder &Base,
                                const MultilibBuilder &New) {
-  SmallString<128> GCCSuffix;
+  llvm::SmallString<128> GCCSuffix;
   llvm::sys::path::append(GCCSuffix, "/", Base.gccSuffix(), New.gccSuffix());
-  SmallString<128> OSSuffix;
+  llvm::SmallString<128> OSSuffix;
   llvm::sys::path::append(OSSuffix, "/", Base.osSuffix(), New.osSuffix());
-  SmallString<128> IncludeSuffix;
+  llvm::SmallString<128> IncludeSuffix;
   llvm::sys::path::append(IncludeSuffix, "/", Base.includeSuffix(),
                           New.includeSuffix());
 
@@ -152,7 +152,7 @@ static MultilibBuilder compose(const MultilibBuilder &Base,
 }
 
 MultilibSetBuilder &
-MultilibSetBuilder::Either(ArrayRef<MultilibBuilder> MultilibSegments) {
+MultilibSetBuilder::Either(llvm::ArrayRef<MultilibBuilder> MultilibSegments) {
   multilib_list Composed;
 
   if (Multilibs.empty())

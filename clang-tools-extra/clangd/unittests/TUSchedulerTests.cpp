@@ -193,27 +193,27 @@ TEST_F(TUSchedulerTests, MissingFiles) {
   // Assert each operation for missing file is an error (even if it's
   // available in VFS).
   S.runWithAST("", Missing,
-               [&](Expected<InputsAndAST> AST) { EXPECT_ERROR(AST); });
+               [&](llvm::Expected<InputsAndAST> AST) { EXPECT_ERROR(AST); });
   S.runWithPreamble(
       "", Missing, TUScheduler::Stale,
-      [&](Expected<InputsAndPreamble> Preamble) { EXPECT_ERROR(Preamble); });
+      [&](llvm::Expected<InputsAndPreamble> Preamble) { EXPECT_ERROR(Preamble); });
   // remove() shouldn't crash on missing files.
   S.remove(Missing);
 
   // Assert there aren't any errors for added file.
   S.runWithAST("", Added,
-               [&](Expected<InputsAndAST> AST) { EXPECT_TRUE(bool(AST)); });
+               [&](llvm::Expected<InputsAndAST> AST) { EXPECT_TRUE(bool(AST)); });
   S.runWithPreamble("", Added, TUScheduler::Stale,
-                    [&](Expected<InputsAndPreamble> Preamble) {
+                    [&](llvm::Expected<InputsAndPreamble> Preamble) {
                       EXPECT_TRUE(bool(Preamble));
                     });
   S.remove(Added);
 
   // Assert that all operations fail after removing the file.
   S.runWithAST("", Added,
-               [&](Expected<InputsAndAST> AST) { EXPECT_ERROR(AST); });
+               [&](llvm::Expected<InputsAndAST> AST) { EXPECT_ERROR(AST); });
   S.runWithPreamble("", Added, TUScheduler::Stale,
-                    [&](Expected<InputsAndPreamble> Preamble) {
+                    [&](llvm::Expected<InputsAndPreamble> Preamble) {
                       ASSERT_FALSE(bool(Preamble));
                       llvm::consumeError(Preamble.takeError());
                     });
@@ -293,13 +293,13 @@ TEST_F(TUSchedulerTests, Cancellation) {
   //    R2B
   //   U3(WantDiags=Yes)
   //    R3               <-- cancelled
-  std::vector<StringRef> DiagsSeen, ReadsSeen, ReadsCanceled;
+  std::vector<llvm::StringRef> DiagsSeen, ReadsSeen, ReadsCanceled;
   {
     Notification Proceed; // Ensure we schedule everything.
     TUScheduler S(CDB, optsForTest(), captureDiags());
     auto Path = testPath("foo.cpp");
     // Helper to schedule a named update and return a function to cancel it.
-    auto Update = [&](StringRef ID) -> Canceler {
+    auto Update = [&](llvm::StringRef ID) -> Canceler {
       auto T = cancelableTask();
       WithContext C(std::move(T.first));
       updateWithDiags(
@@ -308,7 +308,7 @@ TEST_F(TUSchedulerTests, Cancellation) {
       return std::move(T.second);
     };
     // Helper to schedule a named read and return a function to cancel it.
-    auto Read = [&](StringRef ID) -> Canceler {
+    auto Read = [&](llvm::StringRef ID) -> Canceler {
       auto T = cancelableTask();
       WithContext C(std::move(T.first));
       S.runWithAST(ID, Path, [&, ID](llvm::Expected<InputsAndAST> E) {
@@ -489,11 +489,11 @@ TEST_F(TUSchedulerTests, ManyUpdates) {
       this->FS.Files[Files.back()] = "";
     }
 
-    StringRef Contents1 = R"cpp(int a;)cpp";
-    StringRef Contents2 = R"cpp(int main() { return 1; })cpp";
-    StringRef Contents3 = R"cpp(int a; int b; int sum() { return a + b; })cpp";
+    llvm::StringRef Contents1 = R"cpp(int a;)cpp";
+    llvm::StringRef Contents2 = R"cpp(int main() { return 1; })cpp";
+    llvm::StringRef Contents3 = R"cpp(int a; int b; int sum() { return a + b; })cpp";
 
-    StringRef AllContents[] = {Contents1, Contents2, Contents3};
+    llvm::StringRef AllContents[] = {Contents1, Contents2, Contents3};
     const int AllContentsSize = 3;
 
     // Scheduler may run tasks asynchronously, but should propagate the
@@ -534,7 +534,7 @@ TEST_F(TUSchedulerTests, ManyUpdates) {
           S.runWithAST(
               "CheckAST", File,
               [File, Inputs, Nonce, &Mut,
-               &TotalASTReads](Expected<InputsAndAST> AST) {
+               &TotalASTReads](llvm::Expected<InputsAndAST> AST) {
                 EXPECT_THAT(Context::current().get(NonceKey), Pointee(Nonce));
                 EXPECT_EQ(File, boundPath());
 
@@ -554,7 +554,7 @@ TEST_F(TUSchedulerTests, ManyUpdates) {
           S.runWithPreamble(
               "CheckPreamble", File, TUScheduler::Stale,
               [File, Inputs, Nonce, &Mut,
-               &TotalPreambleReads](Expected<InputsAndPreamble> Preamble) {
+               &TotalPreambleReads](llvm::Expected<InputsAndPreamble> Preamble) {
                 EXPECT_THAT(Context::current().get(NonceKey), Pointee(Nonce));
                 EXPECT_EQ(File, boundPath());
 
@@ -690,7 +690,7 @@ TEST_F(TUSchedulerTests, EmptyPreamble) {
   S.update(Foo, getInputs(Foo, WithPreamble), WantDiagnostics::Auto);
   S.runWithPreamble(
       "getNonEmptyPreamble", Foo, TUScheduler::Stale,
-      [&](Expected<InputsAndPreamble> Preamble) {
+      [&](llvm::Expected<InputsAndPreamble> Preamble) {
         // We expect to get a non-empty preamble.
         EXPECT_GT(
             cantFail(std::move(Preamble)).Preamble->Preamble.getBounds().Size,
@@ -705,7 +705,7 @@ TEST_F(TUSchedulerTests, EmptyPreamble) {
   ASSERT_TRUE(S.blockUntilIdle(timeoutSeconds(60)));
   S.runWithPreamble(
       "getEmptyPreamble", Foo, TUScheduler::Stale,
-      [&](Expected<InputsAndPreamble> Preamble) {
+      [&](llvm::Expected<InputsAndPreamble> Preamble) {
         // We expect to get an empty preamble.
         EXPECT_EQ(
             cantFail(std::move(Preamble)).Preamble->Preamble.getBounds().Size,
@@ -734,9 +734,9 @@ TEST_F(TUSchedulerTests, ASTSignalsSmokeTests) {
   Notification TaskRun;
   S.runWithPreamble(
       "ASTSignals", Foo, TUScheduler::Stale,
-      [&](Expected<InputsAndPreamble> IP) {
+      [&](llvm::Expected<InputsAndPreamble> IP) {
         ASSERT_FALSE(!IP);
-        std::vector<std::pair<StringRef, int>> NS;
+        std::vector<std::pair<llvm::StringRef, int>> NS;
         for (const auto &P : IP->Signals->RelatedNamespaces)
           NS.emplace_back(P.getKey(), P.getValue());
         EXPECT_THAT(NS,
@@ -772,7 +772,7 @@ TEST_F(TUSchedulerTests, RunWaitsForPreamble) {
   for (int I = 0; I < ReadsToSchedule; ++I) {
     S.runWithPreamble(
         "test", Foo, TUScheduler::Stale,
-        [I, &PreamblesMut, &Preambles](Expected<InputsAndPreamble> IP) {
+        [I, &PreamblesMut, &Preambles](llvm::Expected<InputsAndPreamble> IP) {
           std::lock_guard<std::mutex> Lock(PreamblesMut);
           Preambles[I] = cantFail(std::move(IP)).Preamble;
         });
@@ -929,7 +929,7 @@ TEST_F(TUSchedulerTests, NoChangeDiags) {
   updateWithDiags(
       S, FooCpp, Contents, WantDiagnostics::No,
       [](std::vector<Diag>) { ADD_FAILURE() << "Should not be called."; });
-  S.runWithAST("touchAST", FooCpp, [](Expected<InputsAndAST> IA) {
+  S.runWithAST("touchAST", FooCpp, [](llvm::Expected<InputsAndAST> IA) {
     // Make sure the AST was actually built.
     cantFail(std::move(IA));
   });
@@ -1025,7 +1025,7 @@ TEST_F(TUSchedulerTests, TUStatus) {
                      WantDiagnostics::Auto);
   ASSERT_TRUE(Server.blockUntilIdleForTest());
   Server.locateSymbolAt(testPath("foo.cpp"), Code.point(),
-                        [](Expected<std::vector<LocatedSymbol>> Result) {
+                        [](llvm::Expected<std::vector<LocatedSymbol>> Result) {
                           ASSERT_TRUE((bool)Result);
                         });
   ASSERT_TRUE(Server.blockUntilIdleForTest());
@@ -1166,7 +1166,7 @@ TEST_F(TUSchedulerTests, AsyncPreambleThread) {
   Notification RunASTAction;
   // Issue an AST read, which shouldn't be blocked and see latest version of the
   // file.
-  S.runWithAST("test", File, [&](Expected<InputsAndAST> AST) {
+  S.runWithAST("test", File, [&](llvm::Expected<InputsAndAST> AST) {
     ASSERT_TRUE(bool(AST));
     // Make sure preamble is built with stale inputs, but AST was built using
     // new ones.

@@ -61,13 +61,13 @@ AST_MATCHER_P(CoawaitExpr, awaitable, ast_matchers::internal::Matcher<Expr>,
   return false;
 }
 
-auto typeWithNameIn(const std::vector<StringRef> &Names) {
+auto typeWithNameIn(const std::vector<llvm::StringRef> &Names) {
   return hasType(
       hasCanonicalType(hasDeclaration(namedDecl(hasAnyName(Names)))));
 }
 } // namespace
 
-CoroutineHostileRAIICheck::CoroutineHostileRAIICheck(StringRef Name,
+CoroutineHostileRAIICheck::CoroutineHostileRAIICheck(llvm::StringRef Name,
                                                      ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       RAIITypesList(utils::options::parseStringList(

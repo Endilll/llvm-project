@@ -26,7 +26,7 @@ namespace clang::tidy::readability {
 /// future.
 class ContainerSizeEmptyCheck : public ClangTidyCheck {
 public:
-  ContainerSizeEmptyCheck(StringRef Name, ClangTidyContext *Context);
+  ContainerSizeEmptyCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }

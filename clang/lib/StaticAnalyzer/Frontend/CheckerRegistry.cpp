@@ -48,9 +48,9 @@ static constexpr char PackageSeparator = '.';
 //===----------------------------------------------------------------------===//
 
 CheckerRegistry::CheckerRegistry(
-    CheckerRegistryData &Data, ArrayRef<std::string> Plugins,
+    CheckerRegistryData &Data, llvm::ArrayRef<std::string> Plugins,
     DiagnosticsEngine &Diags, AnalyzerOptions &AnOpts,
-    ArrayRef<std::function<void(CheckerRegistry &)>> CheckerRegistrationFns)
+    llvm::ArrayRef<std::function<void(CheckerRegistry &)>> CheckerRegistrationFns)
     : Data(Data), Diags(Diags), AnOpts(AnOpts) {
 
   // Register builtin checkers.
@@ -295,7 +295,7 @@ static void collectWeakDependencies(const ConstCheckerInfoList &WeakDeps,
 }
 
 template <bool IsWeak> void CheckerRegistry::resolveDependencies() {
-  for (const std::pair<StringRef, StringRef> &Entry :
+  for (const std::pair<llvm::StringRef, llvm::StringRef> &Entry :
        (IsWeak ? Data.WeakDependencies : Data.Dependencies)) {
 
     auto CheckerIt = binaryFind(Data.Checkers, Entry.first);
@@ -323,12 +323,12 @@ template <bool IsWeak> void CheckerRegistry::resolveDependencies() {
   }
 }
 
-void CheckerRegistry::addDependency(StringRef FullName, StringRef Dependency) {
+void CheckerRegistry::addDependency(llvm::StringRef FullName, llvm::StringRef Dependency) {
   Data.Dependencies.emplace_back(FullName, Dependency);
 }
 
-void CheckerRegistry::addWeakDependency(StringRef FullName,
-                                        StringRef Dependency) {
+void CheckerRegistry::addWeakDependency(llvm::StringRef FullName,
+                                        llvm::StringRef Dependency) {
   Data.WeakDependencies.emplace_back(FullName, Dependency);
 }
 
@@ -338,7 +338,7 @@ void CheckerRegistry::addWeakDependency(StringRef FullName,
 
 /// Insert the checker/package option to AnalyzerOptions' config table, and
 /// validate it, if the user supplied it on the command line.
-static void insertAndValidate(StringRef FullName, const CmdLineOption &Option,
+static void insertAndValidate(llvm::StringRef FullName, const CmdLineOption &Option,
                               AnalyzerOptions &AnOpts,
                               DiagnosticsEngine &Diags) {
 
@@ -357,7 +357,7 @@ static void insertAndValidate(StringRef FullName, const CmdLineOption &Option,
   // to it's default value, and if we're in non-compatibility mode, we'll also
   // emit an error.
 
-  StringRef SuppliedValue = It.first->getValue();
+  llvm::StringRef SuppliedValue = It.first->getValue();
 
   if (Option.OptionType == "bool") {
     if (SuppliedValue != "true" && SuppliedValue != "false") {
@@ -387,7 +387,7 @@ static void insertAndValidate(StringRef FullName, const CmdLineOption &Option,
 }
 
 template <class T>
-static void insertOptionToCollection(StringRef FullName, T &Collection,
+static void insertOptionToCollection(llvm::StringRef FullName, T &Collection,
                                      const CmdLineOption &Option,
                                      AnalyzerOptions &AnOpts,
                                      DiagnosticsEngine &Diags) {
@@ -402,29 +402,29 @@ static void insertOptionToCollection(StringRef FullName, T &Collection,
 }
 
 void CheckerRegistry::resolveCheckerAndPackageOptions() {
-  for (const std::pair<StringRef, CmdLineOption> &CheckerOptEntry :
+  for (const std::pair<llvm::StringRef, CmdLineOption> &CheckerOptEntry :
        Data.CheckerOptions) {
     insertOptionToCollection(CheckerOptEntry.first, Data.Checkers,
                              CheckerOptEntry.second, AnOpts, Diags);
   }
 
-  for (const std::pair<StringRef, CmdLineOption> &PackageOptEntry :
+  for (const std::pair<llvm::StringRef, CmdLineOption> &PackageOptEntry :
        Data.PackageOptions) {
     insertOptionToCollection(PackageOptEntry.first, Data.Packages,
                              PackageOptEntry.second, AnOpts, Diags);
   }
 }
 
-void CheckerRegistry::addPackage(StringRef FullName) {
+void CheckerRegistry::addPackage(llvm::StringRef FullName) {
   Data.Packages.emplace_back(PackageInfo(FullName));
 }
 
-void CheckerRegistry::addPackageOption(StringRef OptionType,
-                                       StringRef PackageFullName,
-                                       StringRef OptionName,
-                                       StringRef DefaultValStr,
-                                       StringRef Description,
-                                       StringRef DevelopmentStatus,
+void CheckerRegistry::addPackageOption(llvm::StringRef OptionType,
+                                       llvm::StringRef PackageFullName,
+                                       llvm::StringRef OptionName,
+                                       llvm::StringRef DefaultValStr,
+                                       llvm::StringRef Description,
+                                       llvm::StringRef DevelopmentStatus,
                                        bool IsHidden) {
   Data.PackageOptions.emplace_back(
       PackageFullName, CmdLineOption{OptionType, OptionName, DefaultValStr,
@@ -432,13 +432,13 @@ void CheckerRegistry::addPackageOption(StringRef OptionType,
 }
 
 void CheckerRegistry::addChecker(RegisterCheckerFn Rfn,
-                                 ShouldRegisterFunction Sfn, StringRef Name,
-                                 StringRef Desc, StringRef DocsUri,
+                                 ShouldRegisterFunction Sfn, llvm::StringRef Name,
+                                 llvm::StringRef Desc, llvm::StringRef DocsUri,
                                  bool IsHidden) {
   Data.Checkers.emplace_back(Rfn, Sfn, Name, Desc, DocsUri, IsHidden);
 
   // Record the presence of the checker in its packages.
-  StringRef PackageName, LeafName;
+  llvm::StringRef PackageName, LeafName;
   std::tie(PackageName, LeafName) = Name.rsplit(PackageSeparator);
   while (!LeafName.empty()) {
     Data.PackageSizes[PackageName] += 1;
@@ -446,12 +446,12 @@ void CheckerRegistry::addChecker(RegisterCheckerFn Rfn,
   }
 }
 
-void CheckerRegistry::addCheckerOption(StringRef OptionType,
-                                       StringRef CheckerFullName,
-                                       StringRef OptionName,
-                                       StringRef DefaultValStr,
-                                       StringRef Description,
-                                       StringRef DevelopmentStatus,
+void CheckerRegistry::addCheckerOption(llvm::StringRef OptionType,
+                                       llvm::StringRef CheckerFullName,
+                                       llvm::StringRef OptionName,
+                                       llvm::StringRef DefaultValStr,
+                                       llvm::StringRef Description,
+                                       llvm::StringRef DevelopmentStatus,
                                        bool IsHidden) {
   Data.CheckerOptions.emplace_back(
       CheckerFullName, CmdLineOption{OptionType, OptionName, DefaultValStr,
@@ -467,8 +467,8 @@ void CheckerRegistry::initializeManager(CheckerManager &CheckerMgr) const {
 }
 
 static void isOptionContainedIn(const CmdLineOptionList &OptionList,
-                                StringRef SuppliedChecker,
-                                StringRef SuppliedOption,
+                                llvm::StringRef SuppliedChecker,
+                                llvm::StringRef SuppliedOption,
                                 const AnalyzerOptions &AnOpts,
                                 DiagnosticsEngine &Diags) {
 
@@ -489,8 +489,8 @@ static void isOptionContainedIn(const CmdLineOptionList &OptionList,
 void CheckerRegistry::validateCheckerOptions() const {
   for (const auto &Config : AnOpts.Config) {
 
-    StringRef SuppliedCheckerOrPackage;
-    StringRef SuppliedOption;
+    llvm::StringRef SuppliedCheckerOrPackage;
+    llvm::StringRef SuppliedOption;
     std::tie(SuppliedCheckerOrPackage, SuppliedOption) =
         Config.getKey().split(':');
 

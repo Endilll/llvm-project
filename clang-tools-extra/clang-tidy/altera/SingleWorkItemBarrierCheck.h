@@ -23,7 +23,7 @@ class SingleWorkItemBarrierCheck : public ClangTidyCheck {
   const unsigned AOCVersion;
 
 public:
-  SingleWorkItemBarrierCheck(StringRef Name, ClangTidyContext *Context)
+  SingleWorkItemBarrierCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context),
         AOCVersion(Options.get("AOCVersion", 1600U)) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;

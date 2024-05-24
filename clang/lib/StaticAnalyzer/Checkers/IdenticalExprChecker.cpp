@@ -51,7 +51,7 @@ public:
 
 private:
   void reportIdenticalExpr(const BinaryOperator *B, bool CheckBitwise,
-                           ArrayRef<SourceRange> Sr);
+                           llvm::ArrayRef<SourceRange> Sr);
   void checkBitwiseOrLogicalOp(const BinaryOperator *B, bool CheckBitwise);
   void checkComparisonOp(const BinaryOperator *B);
 };
@@ -59,8 +59,8 @@ private:
 
 void FindIdenticalExprVisitor::reportIdenticalExpr(const BinaryOperator *B,
                                                    bool CheckBitwise,
-                                                   ArrayRef<SourceRange> Sr) {
-  StringRef Message;
+                                                   llvm::ArrayRef<SourceRange> Sr) {
+  llvm::StringRef Message;
   if (CheckBitwise)
     Message = "identical expressions on both sides of bitwise operator";
   else
@@ -253,7 +253,7 @@ void FindIdenticalExprVisitor::checkComparisonOp(const BinaryOperator *B) {
   if (isIdenticalStmt(AC->getASTContext(), B->getLHS(), B->getRHS())) {
     PathDiagnosticLocation ELoc =
         PathDiagnosticLocation::createOperatorLoc(B, BR.getSourceManager());
-    StringRef Message;
+    llvm::StringRef Message;
     if (Op == BO_Cmp)
       Message = "comparison of identical expressions always evaluates to "
                 "'equal'";

@@ -772,7 +772,7 @@ SpecifiedScope getQueryScopes(CodeCompletionContext &CCContext,
     if (!HeuristicPrefix.Qualifier.empty()) {
       vlog("Sema said no scope specifier, but we saw {0} in the source code",
            HeuristicPrefix.Qualifier);
-      StringRef SpelledSpecifier = HeuristicPrefix.Qualifier;
+      llvm::StringRef SpelledSpecifier = HeuristicPrefix.Qualifier;
       if (SpelledSpecifier.consume_front("::")) {
         Scopes.AccessibleScopes = {""};
         Scopes.QueryScopes = {""};
@@ -1527,7 +1527,7 @@ findTokenAfterCompletionPoint(SourceLocation CompletionPoint,
 
   // Try to load the file buffer.
   bool InvalidTemp = false;
-  StringRef File = SM.getBufferData(LocInfo.first, &InvalidTemp);
+  llvm::StringRef File = SM.getBufferData(LocInfo.first, &InvalidTemp);
   if (InvalidTemp)
     return std::nullopt;
 
@@ -1786,7 +1786,7 @@ private:
              RangeBegin = RangeEnd;
     for (size_t I = 0; I < 3 && RangeBegin > 0; ++I) {
       auto PrevNL = Content.rfind('\n', RangeBegin);
-      if (PrevNL == StringRef::npos) {
+      if (PrevNL == llvm::StringRef::npos) {
         RangeBegin = 0;
         break;
       }
@@ -2131,7 +2131,7 @@ clang::CodeCompleteOptions CodeCompleteOptions::getClangCompleteOpts() const {
 CompletionPrefix guessCompletionPrefix(llvm::StringRef Content,
                                        unsigned Offset) {
   assert(Offset <= Content.size());
-  StringRef Rest = Content.take_front(Offset);
+  llvm::StringRef Rest = Content.take_front(Offset);
   CompletionPrefix Result;
 
   // Consume the unqualified name. We only handle ASCII characters.

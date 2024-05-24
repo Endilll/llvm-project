@@ -99,9 +99,9 @@ struct MethodParameter {
   }
 };
 
-static SmallVector<MethodParameter, 8>
+static llvm::SmallVector<MethodParameter, 8>
 getAllParams(const ObjCInterfaceDecl *ID) {
-  SmallVector<MethodParameter, 8> Params;
+  llvm::SmallVector<MethodParameter, 8> Params;
   // Currently we only generate based on the ivars and properties declared
   // in the interface. We could consider expanding this to include visible
   // categories + class extensions in the future (see
@@ -121,7 +121,7 @@ getAllParams(const ObjCInterfaceDecl *ID) {
 }
 
 static std::string
-initializerForParams(const SmallVector<MethodParameter, 8> &Params,
+initializerForParams(const llvm::SmallVector<MethodParameter, 8> &Params,
                      bool GenerateImpl) {
   std::string Code;
   llvm::raw_string_ostream Stream(Code);
@@ -177,11 +177,11 @@ public:
   }
 
   bool prepare(const Selection &Inputs) override;
-  Expected<Tweak::Effect> apply(const Selection &Inputs) override;
+  llvm::Expected<Tweak::Effect> apply(const Selection &Inputs) override;
   std::string title() const override;
 
 private:
-  SmallVector<MethodParameter, 8>
+  llvm::SmallVector<MethodParameter, 8>
   paramsForSelection(const SelectionTree::Node *N);
 
   const ObjCInterfaceDecl *Interface = nullptr;
@@ -231,9 +231,9 @@ bool ObjCMemberwiseInitializer::prepare(const Selection &Inputs) {
   return Interface != nullptr;
 }
 
-SmallVector<MethodParameter, 8>
+llvm::SmallVector<MethodParameter, 8>
 ObjCMemberwiseInitializer::paramsForSelection(const SelectionTree::Node *N) {
-  SmallVector<MethodParameter, 8> Params;
+  llvm::SmallVector<MethodParameter, 8> Params;
   // Base case: selected a single ivar or property.
   if (const auto *D = N->ASTNode.get<Decl>()) {
     if (auto Param = MethodParameter::parameterFor(*D)) {
@@ -260,14 +260,14 @@ ObjCMemberwiseInitializer::paramsForSelection(const SelectionTree::Node *N) {
   return Params;
 }
 
-Expected<Tweak::Effect>
+llvm::Expected<Tweak::Effect>
 ObjCMemberwiseInitializer::apply(const Selection &Inputs) {
   const auto &SM = Inputs.AST->getASTContext().getSourceManager();
   const SelectionTree::Node *N = Inputs.ASTSelection.commonAncestor();
   if (!N)
     return error("Invalid selection");
 
-  SmallVector<MethodParameter, 8> Params = paramsForSelection(N);
+  llvm::SmallVector<MethodParameter, 8> Params = paramsForSelection(N);
 
   // Insert before the first non-init instance method.
   std::vector<Anchor> Anchors = {

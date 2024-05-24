@@ -73,7 +73,7 @@ ModuleLoader &Sema::getModuleLoader() const { return PP.getModuleLoader(); }
 
 DarwinSDKInfo *
 Sema::getDarwinSDKInfoForAvailabilityChecking(SourceLocation Loc,
-                                              StringRef Platform) {
+                                              llvm::StringRef Platform) {
   auto *SDKInfo = getDarwinSDKInfoForAvailabilityChecking();
   if (!SDKInfo && !WarnedDarwinSDKInfoMissing) {
     Diag(Loc, diag::warn_missing_sdksettings_for_availability_checking)
@@ -164,7 +164,7 @@ public:
         if (llvm::timeTraceProfilerEnabled()) {
           OptionalFileEntryRef FE = SM.getFileEntryRefForID(SM.getFileID(Loc));
           ProfilerStack.push_back(llvm::timeTraceAsyncProfilerBegin(
-              "Source", FE ? FE->getName() : StringRef("<unknown>")));
+              "Source", FE ? FE->getName() : llvm::StringRef("<unknown>")));
         }
 
         IncludeStack.push_back(IncludeLoc);
@@ -273,7 +273,7 @@ Sema::Sema(Preprocessor &pp, ASTContext &ctxt, ASTConsumer &consumer,
 // Anchor Sema's type info to this TU.
 void Sema::anchor() {}
 
-void Sema::addImplicitTypedef(StringRef Name, QualType T) {
+void Sema::addImplicitTypedef(llvm::StringRef Name, QualType T) {
   DeclarationName DN = &Context.Idents.get(Name);
   if (IdResolver.begin(DN) == IdResolver.end())
     PushOnScopeChains(Context.buildImplicitTypedef(T, Name), TUScope);
@@ -828,7 +828,7 @@ bool Sema::isExternalWithNoLinkageType(const ValueDecl *VD) const {
 /// Obtains a sorted list of functions and variables that are undefined but
 /// ODR-used.
 void Sema::getUndefinedButUsed(
-    SmallVectorImpl<std::pair<NamedDecl *, SourceLocation> > &Undefined) {
+    llvm::SmallVectorImpl<std::pair<NamedDecl *, SourceLocation> > &Undefined) {
   for (const auto &UndefinedUse : UndefinedButUsed) {
     NamedDecl *ND = UndefinedUse.first;
 
@@ -884,7 +884,7 @@ static void checkUndefinedButUsed(Sema &S) {
   if (S.UndefinedButUsed.empty()) return;
 
   // Collect all the still-undefined entities with internal linkage.
-  SmallVector<std::pair<NamedDecl *, SourceLocation>, 16> Undefined;
+  llvm::SmallVector<std::pair<NamedDecl *, SourceLocation>, 16> Undefined;
   S.getUndefinedButUsed(Undefined);
   S.UndefinedButUsed.clear();
   if (Undefined.empty()) return;
@@ -946,7 +946,7 @@ void Sema::LoadExternalWeakUndeclaredIdentifiers() {
   if (!ExternalSource)
     return;
 
-  SmallVector<std::pair<IdentifierInfo *, WeakInfo>, 4> WeakIDs;
+  llvm::SmallVector<std::pair<IdentifierInfo *, WeakInfo>, 4> WeakIDs;
   ExternalSource->ReadWeakUndeclaredIdentifiers(WeakIDs);
   for (auto &WeakID : WeakIDs)
     (void)WeakUndeclaredIdentifiers[WeakID.first].insert(WeakID.second);
@@ -1090,7 +1090,7 @@ void Sema::ActOnEndOfTranslationUnitFragment(TUFragmentKind Kind) {
   // name that was not visible at its first point of instantiation.
   if (ExternalSource) {
     // Load pending instantiations from the external source.
-    SmallVector<PendingImplicitInstantiation, 4> Pending;
+    llvm::SmallVector<PendingImplicitInstantiation, 4> Pending;
     ExternalSource->ReadPendingInstantiations(Pending);
     for (auto PII : Pending)
       if (auto Func = dyn_cast<FunctionDecl>(PII.first))
@@ -1257,7 +1257,7 @@ void Sema::ActOnEndOfTranslationUnit() {
     if (Module *CurrentModule = PP.getCurrentModule()) {
       ModuleMap &ModMap = PP.getHeaderSearchInfo().getModuleMap();
 
-      SmallVector<Module *, 2> Stack;
+      llvm::SmallVector<Module *, 2> Stack;
       Stack.push_back(CurrentModule);
       while (!Stack.empty()) {
         Module *Mod = Stack.pop_back_val();
@@ -2088,7 +2088,7 @@ void Sema::checkTypeSupport(QualType Ty, SourceLocation Loc, ValueDecl *D) {
 /// location, looking for a macro expansion with the given name.
 /// If one is found, returns true and sets the location to that
 /// expansion loc.
-bool Sema::findMacroSpelling(SourceLocation &locref, StringRef name) {
+bool Sema::findMacroSpelling(SourceLocation &locref, llvm::StringRef name) {
   SourceLocation loc = locref;
   if (!loc.isMacroID()) return false;
 
@@ -2097,7 +2097,7 @@ bool Sema::findMacroSpelling(SourceLocation &locref, StringRef name) {
   loc = getSourceManager().getExpansionLoc(loc);
 
   // If that's written with the name, stop here.
-  SmallString<16> buffer;
+  llvm::SmallString<16> buffer;
   if (getPreprocessor().getSpelling(loc, buffer) == name) {
     locref = loc;
     return true;
@@ -2411,7 +2411,7 @@ void Sema::ActOnComment(SourceRange Comment) {
   if (RC.isAlmostTrailingComment() || RC.hasUnsupportedSplice(SourceMgr)) {
     SourceRange MagicMarkerRange(Comment.getBegin(),
                                  Comment.getBegin().getLocWithOffset(3));
-    StringRef MagicMarkerText;
+    llvm::StringRef MagicMarkerText;
     switch (RC.getKind()) {
     case RawComment::RCK_OrdinaryBCPL:
       MagicMarkerText = "///<";
@@ -2442,7 +2442,7 @@ void ExternalSemaSource::ReadMethodPool(Selector Sel) { }
 void ExternalSemaSource::updateOutOfDateSelector(Selector Sel) { }
 
 void ExternalSemaSource::ReadKnownNamespaces(
-                           SmallVectorImpl<NamespaceDecl *> &Namespaces) {
+                           llvm::SmallVectorImpl<NamespaceDecl *> &Namespaces) {
 }
 
 void ExternalSemaSource::ReadUndefinedButUsed(

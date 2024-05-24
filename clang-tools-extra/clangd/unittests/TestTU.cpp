@@ -228,7 +228,7 @@ const NamedDecl &findDecl(ParsedAST &AST, llvm::StringRef QName) {
 
   const DeclContext *Scope = Ctx.getTranslationUnitDecl();
 
-  StringRef Cur, Rest;
+  llvm::StringRef Cur, Rest;
   for (std::tie(Cur, Rest) = QName.split("::"); !Rest.empty();
        std::tie(Cur, Rest) = Rest.split("::")) {
     Scope = &cast<DeclContext>(LookupDecl(*Scope, Cur));

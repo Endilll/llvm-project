@@ -40,12 +40,12 @@ namespace {
 /// Prints two successive strings, which much be kept alive as long as the
 /// PrettyStackTrace entry.
 class PrettyStackTraceDoubleString : public llvm::PrettyStackTraceEntry {
-  StringRef First, Second;
+  llvm::StringRef First, Second;
 
 public:
-  PrettyStackTraceDoubleString(StringRef First, StringRef Second)
+  PrettyStackTraceDoubleString(llvm::StringRef First, llvm::StringRef Second)
       : First(First), Second(Second) {}
-  void print(raw_ostream &OS) const override { OS << First << Second; }
+  void print(llvm::raw_ostream &OS) const override { OS << First << Second; }
 };
 } // namespace
 
@@ -93,7 +93,7 @@ APINotesManager::loadAPINotes(FileEntryRef APINotesFile) {
 
     // Make a copy of the compiled form into the buffer.
     CompiledBuffer = llvm::MemoryBuffer::getMemBufferCopy(
-        StringRef(APINotesBuffer.data(), APINotesBuffer.size()));
+        llvm::StringRef(APINotesBuffer.data(), APINotesBuffer.size()));
   }
 
   // Load the binary form we just compiled.
@@ -103,7 +103,7 @@ APINotesManager::loadAPINotes(FileEntryRef APINotesFile) {
 }
 
 std::unique_ptr<APINotesReader>
-APINotesManager::loadAPINotes(StringRef Buffer) {
+APINotesManager::loadAPINotes(llvm::StringRef Buffer) {
   llvm::SmallVector<char, 1024> APINotesBuffer;
   std::unique_ptr<llvm::MemoryBuffer> CompiledBuffer;
   SourceMgrAdapter SMAdapter(
@@ -117,7 +117,7 @@ APINotesManager::loadAPINotes(StringRef Buffer) {
     return nullptr;
 
   CompiledBuffer = llvm::MemoryBuffer::getMemBufferCopy(
-      StringRef(APINotesBuffer.data(), APINotesBuffer.size()));
+      llvm::StringRef(APINotesBuffer.data(), APINotesBuffer.size()));
   auto Reader = APINotesReader::Create(std::move(CompiledBuffer), SwiftVersion);
   assert(Reader && "Could not load the API notes we just generated?");
   return Reader;
@@ -137,12 +137,12 @@ bool APINotesManager::loadAPINotes(const DirectoryEntry *HeaderDir,
 
 OptionalFileEntryRef
 APINotesManager::findAPINotesFile(DirectoryEntryRef Directory,
-                                  StringRef Basename, bool WantPublic) {
+                                  llvm::StringRef Basename, bool WantPublic) {
   FileManager &FM = SM.getFileManager();
 
   llvm::SmallString<128> Path(Directory.getName());
 
-  StringRef Suffix = WantPublic ? "" : "_private";
+  llvm::StringRef Suffix = WantPublic ? "" : "_private";
 
   // Look for the source API notes file.
   llvm::sys::path::append(Path, llvm::Twine(Basename) + Suffix + "." +
@@ -157,7 +157,7 @@ OptionalDirectoryEntryRef APINotesManager::loadFrameworkAPINotes(
   llvm::SmallString<128> Path(FrameworkPath);
   unsigned FrameworkNameLength = Path.size();
 
-  StringRef Suffix = Public ? "" : "_private";
+  llvm::StringRef Suffix = Public ? "" : "_private";
 
   // Form the path to the APINotes file.
   llvm::sys::path::append(Path, "APINotes");
@@ -195,9 +195,9 @@ static void checkPrivateAPINotesName(DiagnosticsEngine &Diags,
   if (File->tryGetRealPathName().empty())
     return;
 
-  StringRef RealFileName =
+  llvm::StringRef RealFileName =
       llvm::sys::path::filename(File->tryGetRealPathName());
-  StringRef RealStem = llvm::sys::path::stem(RealFileName);
+  llvm::StringRef RealStem = llvm::sys::path::stem(RealFileName);
   if (RealStem.ends_with("_private"))
     return;
 
@@ -218,7 +218,7 @@ static bool hasPrivateSubmodules(const Module *M) {
 
 llvm::SmallVector<FileEntryRef, 2>
 APINotesManager::getCurrentModuleAPINotes(Module *M, bool LookInModule,
-                                          ArrayRef<std::string> SearchPaths) {
+                                          llvm::ArrayRef<std::string> SearchPaths) {
   FileManager &FM = SM.getFileManager();
   auto ModuleName = M->getTopLevelModuleName();
   auto ExportedModuleName = M->getTopLevelModule()->ExportAsModule;
@@ -300,7 +300,7 @@ APINotesManager::getCurrentModuleAPINotes(Module *M, bool LookInModule,
 }
 
 bool APINotesManager::loadCurrentModuleAPINotes(
-    Module *M, bool LookInModule, ArrayRef<std::string> SearchPaths) {
+    Module *M, bool LookInModule, llvm::ArrayRef<std::string> SearchPaths) {
   assert(!CurrentModuleReaders[ReaderKind::Public] &&
          "Already loaded API notes for the current module?");
 
@@ -316,7 +316,7 @@ bool APINotesManager::loadCurrentModuleAPINotes(
 }
 
 bool APINotesManager::loadCurrentModuleAPINotesFromBuffer(
-    ArrayRef<StringRef> Buffers) {
+    llvm::ArrayRef<llvm::StringRef> Buffers) {
   unsigned NumReader = 0;
   for (auto Buf : Buffers) {
     auto Reader = loadAPINotes(Buf);
@@ -361,7 +361,7 @@ APINotesManager::findAPINotes(SourceLocation Loc) {
   OptionalDirectoryEntryRef Dir = File->getDir();
   FileManager &FileMgr = SM.getFileManager();
   llvm::SetVector<const DirectoryEntry *,
-                  SmallVector<const DirectoryEntry *, 4>,
+                  llvm::SmallVector<const DirectoryEntry *, 4>,
                   llvm::SmallPtrSet<const DirectoryEntry *, 4>>
       DirsVisited;
   do {
@@ -386,7 +386,7 @@ APINotesManager::findAPINotes(SourceLocation Loc) {
     }
 
     // Look for API notes corresponding to this directory.
-    StringRef Path = Dir->getName();
+    llvm::StringRef Path = Dir->getName();
     if (llvm::sys::path::extension(Path) == ".framework") {
       // If this is a framework directory, check whether there are API notes
       // in the APINotes subdirectory.
@@ -445,7 +445,7 @@ APINotesManager::findAPINotes(SourceLocation Loc) {
       break;
     }
 
-    StringRef ParentPath = llvm::sys::path::parent_path(Path);
+    llvm::StringRef ParentPath = llvm::sys::path::parent_path(Path);
     while (llvm::sys::path::stem(ParentPath) == "..")
       ParentPath = llvm::sys::path::parent_path(ParentPath);
 

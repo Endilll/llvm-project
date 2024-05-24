@@ -19,7 +19,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-transparent-functors.html
 class UseTransparentFunctorsCheck : public ClangTidyCheck {
 public:
-  UseTransparentFunctorsCheck(StringRef Name, ClangTidyContext *Context);
+  UseTransparentFunctorsCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus14;
   }

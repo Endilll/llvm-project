@@ -98,7 +98,7 @@ enum PointerEscapeKind {
   PSK_EscapeOther
 };
 
-/// This wrapper is used to ensure that only StringRefs originating from the
+/// This wrapper is used to ensure that only llvm::StringRefs originating from the
 /// CheckerRegistry are used as check names. We want to make sure all checker
 /// name strings have a lifetime that keeps them alive at least until the path
 /// diagnostics have been processed, since they are expected to be constexpr
@@ -106,15 +106,15 @@ enum PointerEscapeKind {
 class CheckerNameRef {
   friend class ::clang::ento::CheckerRegistry;
 
-  StringRef Name;
+  llvm::StringRef Name;
 
-  explicit CheckerNameRef(StringRef Name) : Name(Name) {}
+  explicit CheckerNameRef(llvm::StringRef Name) : Name(Name) {}
 
 public:
   CheckerNameRef() = default;
 
-  StringRef getName() const { return Name; }
-  operator StringRef() const { return Name; }
+  llvm::StringRef getName() const { return Name; }
+  operator llvm::StringRef() const { return Name; }
 };
 
 enum class ObjCMessageVisitKind {
@@ -141,8 +141,8 @@ public:
 
   CheckerManager(
       ASTContext &Context, AnalyzerOptions &AOptions, const Preprocessor &PP,
-      ArrayRef<std::string> plugins,
-      ArrayRef<std::function<void(CheckerRegistry &)>> checkerRegistrationFns);
+      llvm::ArrayRef<std::string> plugins,
+      llvm::ArrayRef<std::function<void(CheckerRegistry &)>> checkerRegistrationFns);
 
   /// Constructs a CheckerManager that ignores all non TblGen-generated
   /// checkers. Useful for unit testing, unless the checker infrastructure
@@ -155,7 +155,7 @@ public:
   /// registration will take place. Only useful when one needs to print the
   /// help flags through CheckerRegistryData, and the AST is unavailable.
   CheckerManager(AnalyzerOptions &AOptions, const LangOptions &LangOpts,
-                 DiagnosticsEngine &Diags, ArrayRef<std::string> plugins);
+                 DiagnosticsEngine &Diags, llvm::ArrayRef<std::string> plugins);
 
   ~CheckerManager();
 
@@ -184,8 +184,8 @@ public:
   /// Emits an error through a DiagnosticsEngine about an invalid user supplied
   /// checker option value.
   void reportInvalidCheckerOptionValue(const CheckerBase *C,
-                                       StringRef OptionName,
-                                       StringRef ExpectedValueDesc) const;
+                                       llvm::StringRef OptionName,
+                                       llvm::StringRef ExpectedValueDesc) const;
 
   using CheckerRef = CheckerBase *;
   using CheckerTag = const void *;
@@ -402,8 +402,8 @@ public:
   ProgramStateRef
   runCheckersForRegionChanges(ProgramStateRef state,
                               const InvalidatedSymbols *invalidated,
-                              ArrayRef<const MemRegion *> ExplicitRegions,
-                              ArrayRef<const MemRegion *> Regions,
+                              llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+                              llvm::ArrayRef<const MemRegion *> Regions,
                               const LocationContext *LCtx,
                               const CallEvent *Call);
 
@@ -455,7 +455,7 @@ public:
   /// \param NL    The preferred representation of a newline.
   /// \param Space The preferred space between the left side and the message.
   /// \param IsDot Whether the message will be printed in 'dot' format.
-  void runCheckersForPrintStateJson(raw_ostream &Out, ProgramStateRef State,
+  void runCheckersForPrintStateJson(llvm::raw_ostream &Out, ProgramStateRef State,
                                     const char *NL = "\n",
                                     unsigned int Space = 0,
                                     bool IsDot = false) const;
@@ -516,8 +516,8 @@ public:
   using CheckRegionChangesFunc =
       CheckerFn<ProgramStateRef (ProgramStateRef,
                                  const InvalidatedSymbols *symbols,
-                                 ArrayRef<const MemRegion *> ExplicitRegions,
-                                 ArrayRef<const MemRegion *> Regions,
+                                 llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+                                 llvm::ArrayRef<const MemRegion *> Regions,
                                  const LocationContext *LCtx,
                                  const CallEvent *Call)>;
 
@@ -632,7 +632,7 @@ private:
 
   std::vector<CheckDeclFunc> BodyCheckers;
 
-  using CachedDeclCheckers = SmallVector<CheckDeclFunc, 4>;
+  using CachedDeclCheckers = llvm::SmallVector<CheckDeclFunc, 4>;
   using CachedDeclCheckersMapTy = llvm::DenseMap<unsigned, CachedDeclCheckers>;
   CachedDeclCheckersMapTy CachedDeclCheckersMap;
 
@@ -643,7 +643,7 @@ private:
   };
   std::vector<StmtCheckerInfo> StmtCheckers;
 
-  using CachedStmtCheckers = SmallVector<CheckStmtFunc, 4>;
+  using CachedStmtCheckers = llvm::SmallVector<CheckStmtFunc, 4>;
   using CachedStmtCheckersMapTy = llvm::DenseMap<unsigned, CachedStmtCheckers>;
   CachedStmtCheckersMapTy CachedStmtCheckersMap;
 
@@ -690,7 +690,7 @@ private:
   std::vector<CheckEndOfTranslationUnit> EndOfTranslationUnitCheckers;
 
   struct EventInfo {
-    SmallVector<CheckEventFunc, 4> Checkers;
+    llvm::SmallVector<CheckEventFunc, 4> Checkers;
     bool HasDispatcher = false;
 
     EventInfo() = default;

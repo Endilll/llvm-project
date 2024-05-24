@@ -15,6 +15,7 @@
 #include "clang/AST/DeclGroup.h"
 #include "clang/AST/DeclObjC.h"
 #include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 
 namespace clang {
   class FileEntry;
@@ -38,8 +39,8 @@ public:
 
   ~ScratchAlloc();
 
-  const char *toCStr(StringRef Str);
-  const char *copyCStr(StringRef Str);
+  const char *toCStr(llvm::StringRef Str);
+  const char *copyCStr(llvm::StringRef Str);
 
   template <typename T>
   T *allocate();
@@ -48,7 +49,7 @@ public:
 struct EntityInfo : public CXIdxEntityInfo {
   const NamedDecl *Dcl;
   CXIndexDataConsumer *IndexCtx;
-  IntrusiveRefCntPtr<AttrListInfo> AttrList;
+  llvm::IntrusiveRefCntPtr<AttrListInfo> AttrList;
 
   EntityInfo() {
     name = USR = nullptr;
@@ -239,9 +240,9 @@ struct IBOutletCollectionInfo : public AttrInfo {
 class AttrListInfo {
   ScratchAlloc SA;
 
-  SmallVector<AttrInfo, 2> Attrs;
-  SmallVector<IBOutletCollectionInfo, 2> IBCollAttrs;
-  SmallVector<CXIdxAttrInfo *, 2> CXAttrs;
+  llvm::SmallVector<AttrInfo, 2> Attrs;
+  llvm::SmallVector<IBOutletCollectionInfo, 2> IBCollAttrs;
+  llvm::SmallVector<CXIdxAttrInfo *, 2> CXAttrs;
   unsigned ref_cnt;
 
   AttrListInfo(const AttrListInfo &) = delete;
@@ -249,7 +250,7 @@ class AttrListInfo {
 public:
   AttrListInfo(const Decl *D, CXIndexDataConsumer &IdxCtx);
 
-  static IntrusiveRefCntPtr<AttrListInfo> create(const Decl *D,
+  static llvm::IntrusiveRefCntPtr<AttrListInfo> create(const Decl *D,
                                                  CXIndexDataConsumer &IdxCtx);
 
   const CXIdxAttrInfo *const *getAttrs() const {
@@ -296,9 +297,9 @@ class CXIndexDataConsumer : public index::IndexDataConsumer {
   friend class ScratchAlloc;
 
   struct ObjCProtocolListInfo {
-    SmallVector<CXIdxObjCProtocolRefInfo, 4> ProtInfos;
-    SmallVector<EntityInfo, 4> ProtEntities;
-    SmallVector<CXIdxObjCProtocolRefInfo *, 4> Prots;
+    llvm::SmallVector<CXIdxObjCProtocolRefInfo, 4> ProtInfos;
+    llvm::SmallVector<EntityInfo, 4> ProtEntities;
+    llvm::SmallVector<CXIdxObjCProtocolRefInfo *, 4> Prots;
 
     CXIdxObjCProtocolRefListInfo getListInfo() const {
       CXIdxObjCProtocolRefListInfo Info = { Prots.data(),
@@ -312,9 +313,9 @@ class CXIndexDataConsumer : public index::IndexDataConsumer {
   };
 
   struct CXXBasesListInfo {
-    SmallVector<CXIdxBaseClassInfo, 4> BaseInfos;
-    SmallVector<EntityInfo, 4> BaseEntities;
-    SmallVector<CXIdxBaseClassInfo *, 4> CXBases;
+    llvm::SmallVector<CXIdxBaseClassInfo, 4> BaseInfos;
+    llvm::SmallVector<EntityInfo, 4> BaseEntities;
+    llvm::SmallVector<CXIdxBaseClassInfo *, 4> CXBases;
 
     const CXIdxBaseClassInfo *const *getBases() const {
       return CXBases.data();
@@ -362,7 +363,7 @@ public:
 
   void enteredMainFile(OptionalFileEntryRef File);
 
-  void ppIncludedFile(SourceLocation hashLoc, StringRef filename,
+  void ppIncludedFile(SourceLocation hashLoc, llvm::StringRef filename,
                       OptionalFileEntryRef File, bool isImport, bool isAngled,
                       bool isModuleImport);
 
@@ -433,7 +434,7 @@ public:
 
 private:
   bool handleDeclOccurrence(const Decl *D, index::SymbolRoleSet Roles,
-                            ArrayRef<index::SymbolRelation> Relations,
+                            llvm::ArrayRef<index::SymbolRelation> Relations,
                             SourceLocation Loc, ASTNodeInfo ASTNode) override;
 
   bool handleModuleOccurrence(const ImportDecl *ImportD, const Module *Mod,

@@ -86,7 +86,7 @@ buildCompilerInvocation(const ParseInputs &Inputs, clang::DiagnosticConsumer &D,
 std::unique_ptr<CompilerInstance> prepareCompilerInstance(
     std::unique_ptr<clang::CompilerInvocation>, const PrecompiledPreamble *,
     std::unique_ptr<llvm::MemoryBuffer> MainFile,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem>, DiagnosticConsumer &);
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>, DiagnosticConsumer &);
 
 /// Respect `#pragma clang __debug crash` etc, which are usually disabled.
 /// This may only be called before threads are spawned.

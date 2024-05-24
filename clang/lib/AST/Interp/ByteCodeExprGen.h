@@ -230,7 +230,7 @@ protected:
     return this->emitFinishInitPop(I);
   }
 
-  bool visitInitList(ArrayRef<const Expr *> Inits, const Expr *ArrayFiller,
+  bool visitInitList(llvm::ArrayRef<const Expr *> Inits, const Expr *ArrayFiller,
                      const Expr *E);
   bool visitArrayElemInit(unsigned ElemIndex, const Expr *Init);
 

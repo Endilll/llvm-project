@@ -23,7 +23,7 @@ class TypeIndexer : public RecursiveASTVisitor<TypeIndexer> {
   const NamedDecl *Parent;
   const DeclContext *ParentDC;
   bool IsBase;
-  SmallVector<SymbolRelation, 3> Relations;
+  llvm::SmallVector<SymbolRelation, 3> Relations;
 
   typedef RecursiveASTVisitor<TypeIndexer> base;
 
@@ -179,7 +179,7 @@ public:
 
     // The relations we have to `Parent` do not apply to our template arguments,
     // so clear them while visiting the args.
-    SmallVector<SymbolRelation, 3> SavedRelations = Relations;
+    llvm::SmallVector<SymbolRelation, 3> SavedRelations = Relations;
     Relations.clear();
     auto ResetSavedRelations =
         llvm::make_scope_exit([&] { this->Relations = SavedRelations; });
@@ -302,7 +302,7 @@ void IndexingContext::indexNestedNameSpecifierLoc(NestedNameSpecifierLoc NNS,
 }
 
 void IndexingContext::indexTagDecl(const TagDecl *D,
-                                   ArrayRef<SymbolRelation> Relations) {
+                                   llvm::ArrayRef<SymbolRelation> Relations) {
   if (!shouldIndex(D))
     return;
   if (!shouldIndexFunctionLocalSymbols() && isFunctionLocalSymbol(D))

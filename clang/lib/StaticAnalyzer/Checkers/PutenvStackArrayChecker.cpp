@@ -49,7 +49,7 @@ void PutenvStackArrayChecker::checkPostCall(const CallEvent &Call,
   if (!isa<StackSpaceRegion>(MSR))
     return;
 
-  StringRef ErrorMsg = "The 'putenv' function should not be called with "
+  llvm::StringRef ErrorMsg = "The 'putenv' function should not be called with "
                        "arrays that have automatic storage";
   ExplodedNode *N = C.generateErrorNode();
   auto Report = std::make_unique<PathSensitiveBugReport>(BT, ErrorMsg, N);

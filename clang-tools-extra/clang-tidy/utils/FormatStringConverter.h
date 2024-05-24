@@ -61,7 +61,7 @@ private:
   bool FormatStringNeededRewriting = false;
   bool UsePrintNewlineFunction = false;
   size_t PrintfFormatStringPos = 0U;
-  StringRef PrintfFormatString;
+  llvm::StringRef PrintfFormatString;
 
   /// Lazily-created c_str() call matcher
   std::optional<clang::ast_matchers::StatementMatcher>
@@ -108,7 +108,7 @@ private:
                              const char *StartSpecifier, unsigned SpecifierLen,
                              const TargetInfo &Target) override;
 
-  void appendFormatText(StringRef Text);
+  void appendFormatText(llvm::StringRef Text);
   void finalizeFormatText();
   bool conversionNotPossible(std::string Reason) {
     ConversionNotPossibleReason = std::move(Reason);

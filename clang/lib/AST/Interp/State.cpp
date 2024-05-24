@@ -66,7 +66,7 @@ OptionalDiagnostic State::Note(SourceLocation Loc, diag::kind DiagId) {
   return OptionalDiagnostic(&addDiag(Loc, DiagId));
 }
 
-void State::addNotes(ArrayRef<PartialDiagnosticAt> Diags) {
+void State::addNotes(llvm::ArrayRef<PartialDiagnosticAt> Diags) {
   if (hasActiveDiagnostic()) {
     getEvalStatus().Diag->insert(getEvalStatus().Diag->end(), Diags.begin(),
                                  Diags.end());
@@ -152,7 +152,7 @@ void State::addCallStack(unsigned Limit) {
       continue;
     }
 
-    SmallString<128> Buffer;
+    llvm::SmallString<128> Buffer;
     llvm::raw_svector_ostream Out(Buffer);
     F->describe(Out);
     if (!Buffer.empty())

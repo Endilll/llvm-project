@@ -67,10 +67,10 @@ class PragmaHandler {
 
 public:
   PragmaHandler() = default;
-  explicit PragmaHandler(StringRef name) : Name(name) {}
+  explicit PragmaHandler(llvm::StringRef name) : Name(name) {}
   virtual ~PragmaHandler();
 
-  StringRef getName() const { return Name; }
+  llvm::StringRef getName() const { return Name; }
   virtual void HandlePragma(Preprocessor &PP, PragmaIntroducer Introducer,
                             Token &FirstToken) = 0;
 
@@ -83,7 +83,7 @@ public:
 /// used to ignore particular pragmas.
 class EmptyPragmaHandler : public PragmaHandler {
 public:
-  explicit EmptyPragmaHandler(StringRef Name = StringRef());
+  explicit EmptyPragmaHandler(llvm::StringRef Name = llvm::StringRef());
 
   void HandlePragma(Preprocessor &PP, PragmaIntroducer Introducer,
                     Token &FirstToken) override;
@@ -99,13 +99,13 @@ class PragmaNamespace : public PragmaHandler {
   llvm::StringMap<std::unique_ptr<PragmaHandler>> Handlers;
 
 public:
-  explicit PragmaNamespace(StringRef Name) : PragmaHandler(Name) {}
+  explicit PragmaNamespace(llvm::StringRef Name) : PragmaHandler(Name) {}
 
   /// FindHandler - Check to see if there is already a handler for the
   /// specified name.  If not, return the handler for the null name if it
   /// exists, otherwise return null.  If IgnoreNull is true (the default) then
   /// the null handler isn't returned on failure to match.
-  PragmaHandler *FindHandler(StringRef Name,
+  PragmaHandler *FindHandler(llvm::StringRef Name,
                              bool IgnoreNull = true) const;
 
   /// AddPragma - Add a pragma to this namespace.
@@ -128,7 +128,7 @@ public:
 /// deleting the leading and trailing double-quotes, replacing each escape
 /// sequence \" by a double-quote, and replacing each escape sequence \\ by a
 /// single backslash."
-void prepare_PragmaString(SmallVectorImpl<char> &StrVal);
+void prepare_PragmaString(llvm::SmallVectorImpl<char> &StrVal);
 
 } // namespace clang
 

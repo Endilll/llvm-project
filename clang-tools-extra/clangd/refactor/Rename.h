@@ -119,16 +119,16 @@ adjustRenameRanges(llvm::StringRef DraftCode, llvm::StringRef Identifier,
 ///
 /// REQUIRED: Indexed and Lexed are sorted.
 std::optional<std::vector<SymbolRange>>
-getMappedRanges(ArrayRef<Range> Indexed, ArrayRef<SymbolRange> Lexed);
+getMappedRanges(llvm::ArrayRef<Range> Indexed, llvm::ArrayRef<SymbolRange> Lexed);
 /// Evaluates how good the mapped result is. 0 indicates a perfect match.
 ///
 /// Exposed for testing only.
 ///
 /// REQUIRED: Indexed and Lexed are sorted, Indexed and MappedIndex have the
 /// same size.
-size_t renameRangeAdjustmentCost(ArrayRef<Range> Indexed,
-                                 ArrayRef<SymbolRange> Lexed,
-                                 ArrayRef<size_t> MappedIndex);
+size_t renameRangeAdjustmentCost(llvm::ArrayRef<Range> Indexed,
+                                 llvm::ArrayRef<SymbolRange> Lexed,
+                                 llvm::ArrayRef<size_t> MappedIndex);
 
 } // namespace clangd
 } // namespace clang

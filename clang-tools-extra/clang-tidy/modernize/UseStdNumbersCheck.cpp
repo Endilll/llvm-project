@@ -89,7 +89,7 @@ struct MatchBuilder {
     return expr(hasType(qualType(isFloating())), ignoringParenCasts(Matcher));
   }
 
-  auto matchMathCall(const StringRef FunctionName,
+  auto matchMathCall(const llvm::StringRef FunctionName,
                      const Matcher<clang::Expr> ArgumentMatcher) const {
     return expr(ignoreParenAndFloatingCasting(
         callExpr(callee(functionDecl(hasName(FunctionName),
@@ -108,7 +108,7 @@ struct MatchBuilder {
   // floatLiterals that have the value of pi.
   //
   // If the match is for a top-level match, we only care about the literal.
-  auto matchFloatLiteralNear(const StringRef Constant, const double Val) const {
+  auto matchFloatLiteralNear(const llvm::StringRef Constant, const double Val) const {
     return expr(ignoreParenAndFloatingCasting(
         floatLiteral(near(Val, DiffThreshold)).bind(Constant)));
   }
@@ -252,7 +252,7 @@ struct MatchBuilder {
   double DiffThreshold;
 };
 
-std::string getCode(const StringRef Constant, const bool IsFloat,
+std::string getCode(const llvm::StringRef Constant, const bool IsFloat,
                     const bool IsLongDouble) {
   if (IsFloat) {
     return ("std::numbers::" + Constant + "_v<float>").str();
@@ -287,7 +287,7 @@ bool isRangeOfCompleteMacro(const clang::SourceRange &Range,
 } // namespace
 
 namespace clang::tidy::modernize {
-UseStdNumbersCheck::UseStdNumbersCheck(const StringRef Name,
+UseStdNumbersCheck::UseStdNumbersCheck(const llvm::StringRef Name,
                                        ClangTidyContext *const Context)
     : ClangTidyCheck(Name, Context),
       IncludeInserter(Options.getLocalOrGlobal("IncludeStyle",
@@ -346,20 +346,20 @@ void UseStdNumbersCheck::check(const MatchFinder::MatchResult &Result) {
   // The ordering determines what constants are looked at first.
   // E.g. look at 'inv_sqrt3' before 'sqrt3' to be able to replace the larger
   // expression
-  constexpr auto Constants = std::array<std::pair<StringRef, double>, 13>{
-      std::pair{StringRef{"log2e"}, llvm::numbers::log2e},
-      std::pair{StringRef{"log10e"}, llvm::numbers::log10e},
-      std::pair{StringRef{"e"}, llvm::numbers::e},
-      std::pair{StringRef{"egamma"}, llvm::numbers::egamma},
-      std::pair{StringRef{"inv_sqrtpi"}, llvm::numbers::inv_sqrtpi},
-      std::pair{StringRef{"inv_pi"}, llvm::numbers::inv_pi},
-      std::pair{StringRef{"pi"}, llvm::numbers::pi},
-      std::pair{StringRef{"ln2"}, llvm::numbers::ln2},
-      std::pair{StringRef{"ln10"}, llvm::numbers::ln10},
-      std::pair{StringRef{"sqrt2"}, llvm::numbers::sqrt2},
-      std::pair{StringRef{"inv_sqrt3"}, llvm::numbers::inv_sqrt3},
-      std::pair{StringRef{"sqrt3"}, llvm::numbers::sqrt3},
-      std::pair{StringRef{"phi"}, llvm::numbers::phi},
+  constexpr auto Constants = std::array<std::pair<llvm::StringRef, double>, 13>{
+      std::pair{llvm::StringRef{"log2e"}, llvm::numbers::log2e},
+      std::pair{llvm::StringRef{"log10e"}, llvm::numbers::log10e},
+      std::pair{llvm::StringRef{"e"}, llvm::numbers::e},
+      std::pair{llvm::StringRef{"egamma"}, llvm::numbers::egamma},
+      std::pair{llvm::StringRef{"inv_sqrtpi"}, llvm::numbers::inv_sqrtpi},
+      std::pair{llvm::StringRef{"inv_pi"}, llvm::numbers::inv_pi},
+      std::pair{llvm::StringRef{"pi"}, llvm::numbers::pi},
+      std::pair{llvm::StringRef{"ln2"}, llvm::numbers::ln2},
+      std::pair{llvm::StringRef{"ln10"}, llvm::numbers::ln10},
+      std::pair{llvm::StringRef{"sqrt2"}, llvm::numbers::sqrt2},
+      std::pair{llvm::StringRef{"inv_sqrt3"}, llvm::numbers::inv_sqrt3},
+      std::pair{llvm::StringRef{"sqrt3"}, llvm::numbers::sqrt3},
+      std::pair{llvm::StringRef{"phi"}, llvm::numbers::phi},
   };
 
   auto MatchedLiterals =

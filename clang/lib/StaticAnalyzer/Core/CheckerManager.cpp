@@ -59,8 +59,8 @@ void CheckerManager::finishedCheckerRegistration() {
 }
 
 void CheckerManager::reportInvalidCheckerOptionValue(
-    const CheckerBase *C, StringRef OptionName,
-    StringRef ExpectedValueDesc) const {
+    const CheckerBase *C, llvm::StringRef OptionName,
+    llvm::StringRef ExpectedValueDesc) const {
 
   getDiagnostics().Report(diag::err_analyzer_checker_option_invalid_input)
       << (llvm::Twine() + C->getTagDescription() + ":" + OptionName).str()
@@ -148,7 +148,7 @@ static void expandGraphWithCheckers(CHECK_CTX checkCtx,
 namespace {
 
   struct CheckStmtContext {
-    using CheckersTy = SmallVectorImpl<CheckerManager::CheckStmtFunc>;
+    using CheckersTy = llvm::SmallVectorImpl<CheckerManager::CheckStmtFunc>;
 
     bool IsPreVisit;
     const CheckersTy &Checkers;
@@ -596,8 +596,8 @@ void CheckerManager::runCheckersForDeadSymbols(ExplodedNodeSet &Dst,
 ProgramStateRef
 CheckerManager::runCheckersForRegionChanges(ProgramStateRef state,
                                             const InvalidatedSymbols *invalidated,
-                                            ArrayRef<const MemRegion *> ExplicitRegions,
-                                            ArrayRef<const MemRegion *> Regions,
+                                            llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+                                            llvm::ArrayRef<const MemRegion *> Regions,
                                             const LocationContext *LCtx,
                                             const CallEvent *Call) {
   for (const auto &RegionChangesChecker : RegionChangesCheckers) {
@@ -717,7 +717,7 @@ void CheckerManager::runCheckersOnEndOfTranslationUnit(
     EndOfTranslationUnitChecker(TU, mgr, BR);
 }
 
-void CheckerManager::runCheckersForPrintStateJson(raw_ostream &Out,
+void CheckerManager::runCheckersForPrintStateJson(llvm::raw_ostream &Out,
                                                   ProgramStateRef State,
                                                   const char *NL,
                                                   unsigned int Space,
@@ -725,12 +725,12 @@ void CheckerManager::runCheckersForPrintStateJson(raw_ostream &Out,
   Indent(Out, Space, IsDot) << "\"checker_messages\": ";
 
   // Create a temporary stream to see whether we have any message.
-  SmallString<1024> TempBuf;
+  llvm::SmallString<1024> TempBuf;
   llvm::raw_svector_ostream TempOut(TempBuf);
   unsigned int InnerSpace = Space + 2;
 
   // Create the new-line in JSON with enough space.
-  SmallString<128> NewLine;
+  llvm::SmallString<128> NewLine;
   llvm::raw_svector_ostream NLOut(NewLine);
   NLOut << "\", " << NL;                     // Inject the ending and a new line
   Indent(NLOut, InnerSpace, IsDot) << "\"";  // then begin the next message.

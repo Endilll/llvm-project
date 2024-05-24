@@ -225,10 +225,10 @@ template <>
 struct OptionEnumMapping<
     bugprone::SignalHandlerCheck::AsyncSafeFunctionSetKind> {
   static llvm::ArrayRef<std::pair<
-      bugprone::SignalHandlerCheck::AsyncSafeFunctionSetKind, StringRef>>
+      bugprone::SignalHandlerCheck::AsyncSafeFunctionSetKind, llvm::StringRef>>
   getEnumMapping() {
     static constexpr std::pair<
-        bugprone::SignalHandlerCheck::AsyncSafeFunctionSetKind, StringRef>
+        bugprone::SignalHandlerCheck::AsyncSafeFunctionSetKind, llvm::StringRef>
         Mapping[] = {
             {bugprone::SignalHandlerCheck::AsyncSafeFunctionSetKind::Minimal,
              "minimal"},
@@ -281,7 +281,7 @@ bool isStandardFunction(const FunctionDecl *FD) {
 /// This includes all statements that have a class name with "CXX" prefix
 /// and every other statement that is declared in file ExprCXX.h.
 bool isCXXOnlyStmt(const Stmt *S) {
-  StringRef Name = S->getStmtClassName();
+  llvm::StringRef Name = S->getStmtClassName();
   if (Name.starts_with("CXX"))
     return true;
   // Check for all other class names in ExprCXX.h that have no 'CXX' prefix.
@@ -328,16 +328,16 @@ AST_MATCHER(FunctionDecl, isStandardFunction) {
   return isStandardFunction(&Node);
 }
 
-SignalHandlerCheck::SignalHandlerCheck(StringRef Name,
+SignalHandlerCheck::SignalHandlerCheck(llvm::StringRef Name,
                                        ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       AsyncSafeFunctionSet(Options.get("AsyncSafeFunctionSet",
                                        AsyncSafeFunctionSetKind::POSIX)) {
   if (AsyncSafeFunctionSet == AsyncSafeFunctionSetKind::Minimal) {
-    for (StringRef v : MinimalConformingFunctions)
+    for (llvm::StringRef v : MinimalConformingFunctions)
       ConformingFunctions.insert(v);
   } else {
-    for (StringRef v : POSIXConformingFunctions)
+    for (llvm::StringRef v : POSIXConformingFunctions)
       ConformingFunctions.insert(v);
   }
 }

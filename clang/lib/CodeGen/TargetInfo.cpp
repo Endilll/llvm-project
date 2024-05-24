@@ -26,7 +26,7 @@ using namespace clang;
 using namespace CodeGen;
 
 LLVM_DUMP_METHOD void ABIArgInfo::dump() const {
-  raw_ostream &OS = llvm::errs();
+  llvm::raw_ostream &OS = llvm::errs();
   OS << "(ABIArgInfo Kind=";
   switch (TheKind) {
   case Direct:

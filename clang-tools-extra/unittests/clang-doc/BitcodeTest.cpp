@@ -18,7 +18,7 @@ namespace clang {
 namespace doc {
 
 template <typename T> static std::string writeInfo(T &I) {
-  SmallString<2048> Buffer;
+  llvm::SmallString<2048> Buffer;
   llvm::BitstreamWriter Stream(Buffer);
   ClangDocBitcodeWriter Writer(Stream);
   Writer.emitBlock(I);
@@ -42,7 +42,7 @@ std::string writeInfo(Info *I) {
   }
 }
 
-std::vector<std::unique_ptr<Info>> readInfo(StringRef Bitcode,
+std::vector<std::unique_ptr<Info>> readInfo(llvm::StringRef Bitcode,
                                             size_t NumInfos) {
   llvm::BitstreamCursor Stream(Bitcode);
   doc::ClangDocBitcodeReader Reader(Stream);

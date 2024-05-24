@@ -40,7 +40,7 @@ void UseToStringCheck::check(const MatchFinder::MatchResult &Result) {
   auto CharType =
       Result.Nodes.getNodeAs<TemplateArgument>("char_type")->getAsType();
 
-  StringRef StringType;
+  llvm::StringRef StringType;
   if (CharType->isSpecificBuiltinType(BuiltinType::Char_S) ||
       CharType->isSpecificBuiltinType(BuiltinType::Char_U))
     StringType = "string";

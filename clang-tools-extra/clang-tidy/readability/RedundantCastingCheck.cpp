@@ -90,7 +90,7 @@ static const Decl *getSourceExprDecl(const Expr *SourceExpr) {
   return nullptr;
 }
 
-RedundantCastingCheck::RedundantCastingCheck(StringRef Name,
+RedundantCastingCheck::RedundantCastingCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IgnoreMacros(Options.getLocalOrGlobal("IgnoreMacros", true)),

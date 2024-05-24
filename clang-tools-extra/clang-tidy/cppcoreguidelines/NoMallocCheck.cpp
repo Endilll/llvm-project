@@ -50,7 +50,7 @@ void NoMallocCheck::registerMatchers(MatchFinder *Finder) {
 
 void NoMallocCheck::check(const MatchFinder::MatchResult &Result) {
   const CallExpr *Call = nullptr;
-  StringRef Recommendation;
+  llvm::StringRef Recommendation;
 
   if ((Call = Result.Nodes.getNodeAs<CallExpr>("allocation")))
     Recommendation = "consider a container or a smart pointer";

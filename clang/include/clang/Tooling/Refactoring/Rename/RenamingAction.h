@@ -47,7 +47,7 @@ private:
 
 class RenameOccurrences final : public SourceChangeRefactoringRule {
 public:
-  static Expected<RenameOccurrences> initiate(RefactoringRuleContext &Context,
+  static llvm::Expected<RenameOccurrences> initiate(RefactoringRuleContext &Context,
                                               SourceRange SelectionRange,
                                               std::string NewName);
 
@@ -59,7 +59,7 @@ private:
   RenameOccurrences(const NamedDecl *ND, std::string NewName)
       : ND(ND), NewName(std::move(NewName)) {}
 
-  Expected<AtomicChanges>
+  llvm::Expected<AtomicChanges>
   createSourceReplacements(RefactoringRuleContext &Context) override;
 
   const NamedDecl *ND;
@@ -68,7 +68,7 @@ private:
 
 class QualifiedRenameRule final : public SourceChangeRefactoringRule {
 public:
-  static Expected<QualifiedRenameRule> initiate(RefactoringRuleContext &Context,
+  static llvm::Expected<QualifiedRenameRule> initiate(RefactoringRuleContext &Context,
                                                 std::string OldQualifiedName,
                                                 std::string NewQualifiedName);
 
@@ -79,7 +79,7 @@ private:
                       std::string NewQualifiedName)
       : ND(ND), NewQualifiedName(std::move(NewQualifiedName)) {}
 
-  Expected<AtomicChanges>
+  llvm::Expected<AtomicChanges>
   createSourceReplacements(RefactoringRuleContext &Context) override;
 
   // A NamedDecl which identifies the symbol being renamed.

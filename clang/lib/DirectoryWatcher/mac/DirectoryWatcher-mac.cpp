@@ -111,7 +111,7 @@ static void eventStreamCallback(ConstFSEventStreamRef Stream,
 
   std::vector<DirectoryWatcher::Event> Events;
   for (size_t i = 0; i < NumEvents; ++i) {
-    StringRef Path = ((const char **)EventPaths)[i];
+    llvm::StringRef Path = ((const char **)EventPaths)[i];
     const FSEventStreamEventFlags Flags = EventFlags[i];
 
     if (Flags & StreamInvalidatingFlags) {
@@ -158,7 +158,7 @@ static void eventStreamCallback(ConstFSEventStreamRef Stream,
 }
 
 FSEventStreamRef createFSEventStream(
-    StringRef Path,
+    llvm::StringRef Path,
     std::function<void(llvm::ArrayRef<DirectoryWatcher::Event>, bool)> Receiver,
     dispatch_queue_t Queue) {
   if (Path.empty())
@@ -178,8 +178,8 @@ FSEventStreamRef createFSEventStream(
   FSEventStreamContext Context = [&]() {
     std::string RealPath;
     {
-      SmallString<128> Storage;
-      StringRef P = llvm::Twine(Path).toNullTerminatedStringRef(Storage);
+      llvm::SmallString<128> Storage;
+      llvm::StringRef P = llvm::Twine(Path).toNullTerminatedStringRef(Storage);
       char Buffer[PATH_MAX];
       if (::realpath(P.begin(), Buffer) != nullptr)
         RealPath = Buffer;
@@ -214,7 +214,7 @@ void stopFSEventStream(FSEventStreamRef EventStream) {
 }
 
 llvm::Expected<std::unique_ptr<DirectoryWatcher>> clang::DirectoryWatcher::create(
-    StringRef Path,
+    llvm::StringRef Path,
     std::function<void(llvm::ArrayRef<DirectoryWatcher::Event>, bool)> Receiver,
     bool WaitForInitialSync) {
   dispatch_queue_t Queue =
@@ -257,7 +257,7 @@ llvm::Expected<std::unique_ptr<DirectoryWatcher>> clang::DirectoryWatcher::creat
 
 llvm::Expected<std::unique_ptr<DirectoryWatcher>>
 clang::DirectoryWatcher::create(
-    StringRef Path,
+    llvm::StringRef Path,
     std::function<void(llvm::ArrayRef<DirectoryWatcher::Event>, bool)> Receiver,
     bool WaitForInitialSync) {
   return llvm::make_error<llvm::StringError>(

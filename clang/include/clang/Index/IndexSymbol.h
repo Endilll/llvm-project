@@ -158,18 +158,18 @@ void applyForEachSymbolRole(SymbolRoleSet Roles,
                             llvm::function_ref<void(SymbolRole)> Fn);
 bool applyForEachSymbolRoleInterruptible(SymbolRoleSet Roles,
                             llvm::function_ref<bool(SymbolRole)> Fn);
-void printSymbolRoles(SymbolRoleSet Roles, raw_ostream &OS);
+void printSymbolRoles(SymbolRoleSet Roles, llvm::raw_ostream &OS);
 
 /// \returns true if no name was printed, false otherwise.
-bool printSymbolName(const Decl *D, const LangOptions &LO, raw_ostream &OS);
+bool printSymbolName(const Decl *D, const LangOptions &LO, llvm::raw_ostream &OS);
 
-StringRef getSymbolKindString(SymbolKind K);
-StringRef getSymbolSubKindString(SymbolSubKind K);
-StringRef getSymbolLanguageString(SymbolLanguage K);
+llvm::StringRef getSymbolKindString(SymbolKind K);
+llvm::StringRef getSymbolSubKindString(SymbolSubKind K);
+llvm::StringRef getSymbolLanguageString(SymbolLanguage K);
 
 void applyForEachSymbolProperty(SymbolPropertySet Props,
                             llvm::function_ref<void(SymbolProperty)> Fn);
-void printSymbolProperties(SymbolPropertySet Props, raw_ostream &OS);
+void printSymbolProperties(SymbolPropertySet Props, llvm::raw_ostream &OS);
 
 } // namespace index
 } // namespace clang

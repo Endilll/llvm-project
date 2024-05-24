@@ -195,7 +195,7 @@ void Scope::applyNRVO() {
 
 LLVM_DUMP_METHOD void Scope::dump() const { dumpImpl(llvm::errs()); }
 
-void Scope::dumpImpl(raw_ostream &OS) const {
+void Scope::dumpImpl(llvm::raw_ostream &OS) const {
   unsigned Flags = getFlags();
   bool HasFlags = Flags != 0;
 

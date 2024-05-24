@@ -22,7 +22,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/redundant-control-flow.html
 class RedundantControlFlowCheck : public ClangTidyCheck {
 public:
-  RedundantControlFlowCheck(StringRef Name, ClangTidyContext *Context)
+  RedundantControlFlowCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

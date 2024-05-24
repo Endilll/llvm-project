@@ -101,7 +101,7 @@ static inline bool
 isSimilarlyUsedParameter(const SimilarlyUsedParameterPairSuppressor &Suppressor,
                          const ParmVarDecl *Param1, const ParmVarDecl *Param2);
 static bool prefixSuffixCoverUnderThreshold(std::size_t Threshold,
-                                            StringRef Str1, StringRef Str2);
+                                            llvm::StringRef Str1, llvm::StringRef Str2);
 } // namespace filter
 
 namespace model {
@@ -152,7 +152,7 @@ static inline std::string formatMixFlags(MixFlags F) {
   if (F == MixFlags::Invalid)
     return "#Inv!";
 
-  SmallString<8> Str{"-------"};
+  llvm::SmallString<8> Str{"-------"};
 
   if (hasFlag(F, MixFlags::None))
     // Shows the None bit explicitly, as it can be applied in the recursion
@@ -269,8 +269,8 @@ struct ConversionSequence {
 
   /// Returns all the "steps" (non-unique and non-similar) types involved in
   /// the conversion sequence. This method does **NOT** return Begin and End.
-  SmallVector<QualType, 4> getInvolvedTypesInSequence() const {
-    SmallVector<QualType, 4> Ret;
+  llvm::SmallVector<QualType, 4> getInvolvedTypesInSequence() const {
+    llvm::SmallVector<QualType, 4> Ret;
     auto EmplaceIfDifferent = [&Ret](QualType QT) {
       if (QT.isNull())
         return;
@@ -525,7 +525,7 @@ static_assert(std::is_trivially_copyable_v<Mix> &&
 
 struct MixableParameterRange {
   /// A container for Mixes.
-  using MixVector = SmallVector<Mix, 8>;
+  using MixVector = llvm::SmallVector<Mix, 8>;
 
   /// The number of parameters iterated to build the instance.
   std::size_t NumParamsChecked = 0;
@@ -1422,7 +1422,7 @@ static MixableParameterRange modelMixingRange(
 
   for (std::size_t I = StartIndex + 1; I < NumParams; ++I) {
     const ParmVarDecl *Ith = FD->getParamDecl(I);
-    StringRef ParamName = Ith->getName();
+    llvm::StringRef ParamName = Ith->getName();
     LLVM_DEBUG(llvm::dbgs()
                << "Check param #" << I << " '" << ParamName << "'...\n");
     if (filter::isIgnoredParameter(Check, Ith)) {
@@ -1430,7 +1430,7 @@ static MixableParameterRange modelMixingRange(
       break;
     }
 
-    StringRef PrevParamName = FD->getParamDecl(I - 1)->getName();
+    llvm::StringRef PrevParamName = FD->getParamDecl(I - 1)->getName();
     if (!ParamName.empty() && !PrevParamName.empty() &&
         filter::prefixSuffixCoverUnderThreshold(
             Check.NamePrefixSuffixSilenceDissimilarityTreshold, PrevParamName,
@@ -1514,13 +1514,13 @@ static bool isIgnoredParameter(const TheCheck &Check, const ParmVarDecl *Node) {
   if (!Node->getIdentifier())
     return llvm::is_contained(Check.IgnoredParameterNames, "\"\"");
 
-  StringRef NodeName = Node->getName();
+  llvm::StringRef NodeName = Node->getName();
   if (llvm::is_contained(Check.IgnoredParameterNames, NodeName)) {
     LLVM_DEBUG(llvm::dbgs() << "\tName ignored.\n");
     return true;
   }
 
-  StringRef NodeTypeName = [Node] {
+  llvm::StringRef NodeTypeName = [Node] {
     const ASTContext &Ctx = Node->getASTContext();
     const SourceManager &SM = Ctx.getSourceManager();
     SourceLocation B = Node->getTypeSpecStartLoc();
@@ -1550,7 +1550,7 @@ static bool isIgnoredParameter(const TheCheck &Check, const ParmVarDecl *Node) {
   LLVM_DEBUG(llvm::dbgs() << "\tType name is '" << NodeTypeName << "'\n");
   if (!NodeTypeName.empty()) {
     if (llvm::any_of(Check.IgnoredParameterTypeSuffixes,
-                     [NodeTypeName](StringRef E) {
+                     [NodeTypeName](llvm::StringRef E) {
                        return !E.empty() && NodeTypeName.ends_with(E);
                      })) {
       LLVM_DEBUG(llvm::dbgs() << "\tType suffix ignored.\n");
@@ -1816,28 +1816,28 @@ isSimilarlyUsedParameter(const SimilarlyUsedParameterPairSuppressor &Suppressor,
   return Suppressor(Param1, Param2);
 }
 
-static void padStringAtEnd(SmallVectorImpl<char> &Str, std::size_t ToLen) {
+static void padStringAtEnd(llvm::SmallVectorImpl<char> &Str, std::size_t ToLen) {
   while (Str.size() < ToLen)
     Str.emplace_back('\0');
 }
 
-static void padStringAtBegin(SmallVectorImpl<char> &Str, std::size_t ToLen) {
+static void padStringAtBegin(llvm::SmallVectorImpl<char> &Str, std::size_t ToLen) {
   while (Str.size() < ToLen)
     Str.insert(Str.begin(), '\0');
 }
 
-static bool isCommonPrefixWithoutSomeCharacters(std::size_t N, StringRef S1,
-                                                StringRef S2) {
+static bool isCommonPrefixWithoutSomeCharacters(std::size_t N, llvm::StringRef S1,
+                                                llvm::StringRef S2) {
   assert(S1.size() >= N && S2.size() >= N);
-  StringRef S1Prefix = S1.take_front(S1.size() - N),
+  llvm::StringRef S1Prefix = S1.take_front(S1.size() - N),
             S2Prefix = S2.take_front(S2.size() - N);
   return S1Prefix == S2Prefix && !S1Prefix.empty();
 }
 
-static bool isCommonSuffixWithoutSomeCharacters(std::size_t N, StringRef S1,
-                                                StringRef S2) {
+static bool isCommonSuffixWithoutSomeCharacters(std::size_t N, llvm::StringRef S1,
+                                                llvm::StringRef S2) {
   assert(S1.size() >= N && S2.size() >= N);
-  StringRef S1Suffix = S1.take_back(S1.size() - N),
+  llvm::StringRef S1Suffix = S1.take_back(S1.size() - N),
             S2Suffix = S2.take_back(S2.size() - N);
   return S1Suffix == S2Suffix && !S1Suffix.empty();
 }
@@ -1845,7 +1845,7 @@ static bool isCommonSuffixWithoutSomeCharacters(std::size_t N, StringRef S1,
 /// Returns whether the two strings are prefixes or suffixes of each other with
 /// at most Threshold characters differing on the non-common end.
 static bool prefixSuffixCoverUnderThreshold(std::size_t Threshold,
-                                            StringRef Str1, StringRef Str2) {
+                                            llvm::StringRef Str1, llvm::StringRef Str2) {
   if (Threshold == 0)
     return false;
 
@@ -1859,22 +1859,22 @@ static bool prefixSuffixCoverUnderThreshold(std::size_t Threshold,
     // similar and do not warn about them, which is a too eager assumption.)
     return false;
 
-  SmallString<32> S1PadE{Str1}, S2PadE{Str2};
+  llvm::SmallString<32> S1PadE{Str1}, S2PadE{Str2};
   padStringAtEnd(S1PadE, BiggerLength);
   padStringAtEnd(S2PadE, BiggerLength);
 
   if (isCommonPrefixWithoutSomeCharacters(
-          Threshold, StringRef{S1PadE.begin(), BiggerLength},
-          StringRef{S2PadE.begin(), BiggerLength}))
+          Threshold, llvm::StringRef{S1PadE.begin(), BiggerLength},
+          llvm::StringRef{S2PadE.begin(), BiggerLength}))
     return true;
 
-  SmallString<32> S1PadB{Str1}, S2PadB{Str2};
+  llvm::SmallString<32> S1PadB{Str1}, S2PadB{Str2};
   padStringAtBegin(S1PadB, BiggerLength);
   padStringAtBegin(S2PadB, BiggerLength);
 
   if (isCommonSuffixWithoutSomeCharacters(
-          Threshold, StringRef{S1PadB.begin(), BiggerLength},
-          StringRef{S2PadB.begin(), BiggerLength}))
+          Threshold, llvm::StringRef{S1PadB.begin(), BiggerLength},
+          llvm::StringRef{S2PadB.begin(), BiggerLength}))
     return true;
 
   return false;
@@ -1913,15 +1913,15 @@ static inline unsigned clampMinimumLength(const unsigned Value) {
 // FIXME: Maybe unneeded, getNameForDiagnostic() is expected to change to return
 // a crafted location when the node itself is unnamed. (See D84658, D85033.)
 /// Returns the diagnostic-friendly name of the node, or empty string.
-static SmallString<64> getName(const NamedDecl *ND) {
-  SmallString<64> Name;
+static llvm::SmallString<64> getName(const NamedDecl *ND) {
+  llvm::SmallString<64> Name;
   llvm::raw_svector_ostream OS{Name};
   ND->getNameForDiagnostic(OS, ND->getASTContext().getPrintingPolicy(), false);
   return Name;
 }
 
 /// Returns the diagnostic-friendly name of the node, or a constant value.
-static SmallString<64> getNameOrUnnamed(const NamedDecl *ND) {
+static llvm::SmallString<64> getNameOrUnnamed(const NamedDecl *ND) {
   auto Name = getName(ND);
   if (Name.empty())
     Name = "<unnamed>";
@@ -1956,9 +1956,9 @@ struct FormattedConversionSequence {
   bool Trivial = true;
 
   FormattedConversionSequence(const PrintingPolicy &PP,
-                              StringRef StartTypeAsDiagnosed,
+                              llvm::StringRef StartTypeAsDiagnosed,
                               const model::ConversionSequence &Conv,
-                              StringRef DestinationTypeAsDiagnosed) {
+                              llvm::StringRef DestinationTypeAsDiagnosed) {
     llvm::raw_string_ostream OS{DiagnosticText};
 
     // Print the type name as it is printed in other places in the diagnostic.
@@ -1976,7 +1976,7 @@ struct FormattedConversionSequence {
       Trivial = false;
     }
 
-    auto AddType = [&](StringRef ToAdd) {
+    auto AddType = [&](llvm::StringRef ToAdd) {
       if (LastAddedType != ToAdd && ToAdd != SeqEndTypeStr) {
         OS << " -> '" << ToAdd << "'";
         LastAddedType = ToAdd.str();
@@ -2081,7 +2081,7 @@ public:
 } // namespace
 
 EasilySwappableParametersCheck::EasilySwappableParametersCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       MinimumLength(clampMinimumLength(
           Options.get("MinimumLength", DefaultMinimumLength))),
@@ -2176,7 +2176,7 @@ void EasilySwappableParametersCheck::check(
     const ParmVarDecl *First = R.getFirstParam(), *Last = R.getLastParam();
     std::string FirstParamTypeAsWritten = First->getType().getAsString(PP);
     {
-      StringRef DiagText;
+      llvm::StringRef DiagText;
 
       if (HasAnyImplicits)
         DiagText = "%0 adjacent parameters of %1 of convertible types are "
@@ -2237,7 +2237,7 @@ void EasilySwappableParametersCheck::check(
 
       if (hasFlag(M.flags(), MixFlags::TypeAlias) &&
           UniqueTypeAlias(LType, RType, CommonType)) {
-        StringRef DiagText;
+        llvm::StringRef DiagText;
         bool ExplicitlyPrintCommonType = false;
         if (LTypeStr == CommonTypeStr || RTypeStr == CommonTypeStr) {
           if (hasFlag(M.flags(), MixFlags::Qualifiers))
@@ -2262,7 +2262,7 @@ void EasilySwappableParametersCheck::check(
       if ((hasFlag(M.flags(), MixFlags::ReferenceBind) ||
            hasFlag(M.flags(), MixFlags::Qualifiers)) &&
           UniqueBindPower({LType, RType})) {
-        StringRef DiagText = "'%0' and '%1' parameters accept and bind the "
+        llvm::StringRef DiagText = "'%0' and '%1' parameters accept and bind the "
                              "same kind of values";
         diag(RVar->getOuterLocStart(), DiagText, DiagnosticIDs::Note)
             << LTypeStr << RTypeStr;
@@ -2277,7 +2277,7 @@ void EasilySwappableParametersCheck::check(
         FormattedConversionSequence LTRFmt{PP, LTypeStr, LTR, RTypeStr};
         FormattedConversionSequence RTLFmt{PP, RTypeStr, RTL, LTypeStr};
 
-        StringRef DiagText = "'%0' and '%1' may be implicitly converted";
+        llvm::StringRef DiagText = "'%0' and '%1' may be implicitly converted";
         if (!LTRFmt.Trivial || !RTLFmt.Trivial)
           DiagText = "'%0' and '%1' may be implicitly converted: %2, %3";
 
@@ -2290,7 +2290,7 @@ void EasilySwappableParametersCheck::check(
             Diag << LTRFmt.DiagnosticText << RTLFmt.DiagnosticText;
         }
 
-        StringRef ConversionFunctionDiagText =
+        llvm::StringRef ConversionFunctionDiagText =
             "the implicit conversion involves the "
             "%select{|converting constructor|conversion operator}0 "
             "declared here";

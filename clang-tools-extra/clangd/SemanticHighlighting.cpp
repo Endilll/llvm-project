@@ -44,7 +44,7 @@ llvm::Expected<Position> endOfLine(llvm::StringRef Code, int Line) {
   auto StartOfLine = positionToOffset(Code, Position{Line, 0});
   if (!StartOfLine)
     return StartOfLine.takeError();
-  StringRef LineText = Code.drop_front(*StartOfLine).take_until([](char C) {
+  llvm::StringRef LineText = Code.drop_front(*StartOfLine).take_until([](char C) {
     return C == '\n';
   });
   return Position{Line, static_cast<int>(lspLength(LineText))};
@@ -356,7 +356,7 @@ std::optional<HighlightingToken> resolveConflict(const HighlightingToken &A,
   return Result;
 }
 std::optional<HighlightingToken>
-resolveConflict(ArrayRef<HighlightingToken> Tokens) {
+resolveConflict(llvm::ArrayRef<HighlightingToken> Tokens) {
   if (Tokens.size() == 1)
     return Tokens[0];
 
@@ -498,8 +498,8 @@ public:
     // removed.
     std::vector<HighlightingToken> NonConflicting;
     NonConflicting.reserve(Tokens.size());
-    for (ArrayRef<HighlightingToken> TokRef = Tokens; !TokRef.empty();) {
-      ArrayRef<HighlightingToken> Conflicting =
+    for (llvm::ArrayRef<HighlightingToken> TokRef = Tokens; !TokRef.empty();) {
+      llvm::ArrayRef<HighlightingToken> Conflicting =
           TokRef.take_while([&](const HighlightingToken &T) {
             // TokRef is guaranteed at least one element here because otherwise
             // this predicate would never fire.
@@ -526,7 +526,7 @@ public:
       return NonConflicting;
 
     const auto &SM = AST.getSourceManager();
-    StringRef MainCode = SM.getBufferOrFake(SM.getMainFileID()).getBuffer();
+    llvm::StringRef MainCode = SM.getBufferOrFake(SM.getMainFileID()).getBuffer();
 
     // Merge token stream with "inactive line" markers.
     std::vector<HighlightingToken> WithInactiveLines;
@@ -967,7 +967,7 @@ public:
 
   // We handle objective-C selectors specially, because one reference can
   // cover several non-contiguous tokens.
-  void highlightObjCSelector(const ArrayRef<SourceLocation> &Locs, bool Decl,
+  void highlightObjCSelector(const llvm::ArrayRef<SourceLocation> &Locs, bool Decl,
                              bool Def, bool Class, bool DefaultLibrary) {
     HighlightingKind Kind =
         Class ? HighlightingKind::StaticMethod : HighlightingKind::Method;
@@ -1549,7 +1549,7 @@ diffTokens(llvm::ArrayRef<SemanticToken> Old,
 std::vector<Range> getInactiveRegions(ParsedAST &AST) {
   std::vector<Range> SkippedRanges(std::move(AST.getMacros().SkippedRanges));
   const auto &SM = AST.getSourceManager();
-  StringRef MainCode = SM.getBufferOrFake(SM.getMainFileID()).getBuffer();
+  llvm::StringRef MainCode = SM.getBufferOrFake(SM.getMainFileID()).getBuffer();
   std::vector<Range> InactiveRegions;
   for (const Range &Skipped : SkippedRanges) {
     Range Inactive = Skipped;

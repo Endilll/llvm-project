@@ -309,7 +309,7 @@ static void checkRecursiveFunction(Sema &S, const FunctionDecl *FD,
 /// can reach ExitBlock.
 static bool throwEscapes(Sema &S, const CXXThrowExpr *E, CFGBlock &ThrowBlock,
                          CFG *Body) {
-  SmallVector<CFGBlock *, 16> Stack;
+  llvm::SmallVector<CFGBlock *, 16> Stack;
   llvm::BitVector Queued(Body->getNumBlockIDs());
 
   Stack.push_back(&ThrowBlock);
@@ -875,7 +875,7 @@ static void DiagUninitUse(Sema &S, const VarDecl *VD, const UninitUse &Use,
 
     // Information used when building the diagnostic.
     unsigned DiagKind;
-    StringRef Str;
+    llvm::StringRef Str;
     SourceRange Range;
 
     // FixIts to suppress the diagnostic by removing the dead condition.
@@ -1245,7 +1245,7 @@ namespace {
   };
 } // anonymous namespace
 
-static StringRef getFallthroughAttrSpelling(Preprocessor &PP,
+static llvm::StringRef getFallthroughAttrSpelling(Preprocessor &PP,
                                             SourceLocation Loc) {
   TokenValue FallthroughTokens[] = {
     tok::l_square, tok::l_square,
@@ -1261,7 +1261,7 @@ static StringRef getFallthroughAttrSpelling(Preprocessor &PP,
 
   bool PreferClangAttr = !PP.getLangOpts().CPlusPlus17 && !PP.getLangOpts().C23;
 
-  StringRef MacroName;
+  llvm::StringRef MacroName;
   if (PreferClangAttr)
     MacroName = PP.getLastMacroWithSpelling(Loc, ClangFallthroughTokens);
   if (MacroName.empty())
@@ -1329,8 +1329,8 @@ static void DiagnoseSwitchLabelsFallthrough(Sema &S, AnalysisDeclContext &AC,
       }
       if (!(B->empty() && Term && isa<BreakStmt>(Term))) {
         Preprocessor &PP = S.getPreprocessor();
-        StringRef AnnotationSpelling = getFallthroughAttrSpelling(PP, L);
-        SmallString<64> TextToInsert(AnnotationSpelling);
+        llvm::StringRef AnnotationSpelling = getFallthroughAttrSpelling(PP, L);
+        llvm::SmallString<64> TextToInsert(AnnotationSpelling);
         TextToInsert += "; ";
         S.Diag(L, diag::note_insert_fallthrough_fixit)
             << AnnotationSpelling
@@ -1385,7 +1385,7 @@ static void diagnoseRepeatedUseOfWeak(Sema &S,
   const WeakObjectUseMap &WeakMap = CurFn->getWeakObjectUses();
 
   // Extract all weak objects that are referenced more than once.
-  SmallVector<StmtUsesPair, 8> UsesByStmt;
+  llvm::SmallVector<StmtUsesPair, 8> UsesByStmt;
   for (WeakObjectUseMap::const_iterator I = WeakMap.begin(), E = WeakMap.end();
        I != E; ++I) {
     const WeakUseVector &Uses = I->second;
@@ -1528,7 +1528,7 @@ static void diagnoseRepeatedUseOfWeak(Sema &S,
 
 namespace clang {
 namespace {
-typedef SmallVector<PartialDiagnosticAt, 1> OptionalNotes;
+typedef llvm::SmallVector<PartialDiagnosticAt, 1> OptionalNotes;
 typedef std::pair<PartialDiagnosticAt, OptionalNotes> DelayedDiag;
 typedef std::list<DelayedDiag> DiagList;
 
@@ -1548,7 +1548,7 @@ struct SortDiagBySourceLocation {
 namespace {
 class UninitValsDiagReporter : public UninitVariablesHandler {
   Sema &S;
-  typedef SmallVector<UninitUse, 2> UsesVec;
+  typedef llvm::SmallVector<UninitUse, 2> UsesVec;
   typedef llvm::PointerIntPair<UsesVec *, 1, bool> MappedType;
   // Prefer using MapVector to DenseMap, so that iteration order will be
   // the same as insertion order. This is needed to obtain a deterministic
@@ -1685,7 +1685,7 @@ public:
   }
 
 private:
-  using DelayedDiagnostics = SmallVector<PartialDiagnosticAt, 2>;
+  using DelayedDiagnostics = llvm::SmallVector<PartialDiagnosticAt, 2>;
   llvm::DenseMap<const BlockDecl *, DelayedDiagnostics> DelayedBlockWarnings;
 };
 
@@ -1836,7 +1836,7 @@ class ThreadSafetyReporter : public clang::threadSafety::ThreadSafetyHandler {
     return ONS;
   }
 
-  OptionalNotes makeLockedHereNote(SourceLocation LocLocked, StringRef Kind) {
+  OptionalNotes makeLockedHereNote(SourceLocation LocLocked, llvm::StringRef Kind) {
     return LocLocked.isValid()
                ? getNotes(PartialDiagnosticAt(
                      LocLocked, S.PDiag(diag::note_locked_here) << Kind))
@@ -1844,7 +1844,7 @@ class ThreadSafetyReporter : public clang::threadSafety::ThreadSafetyHandler {
   }
 
   OptionalNotes makeUnlockedHereNote(SourceLocation LocUnlocked,
-                                     StringRef Kind) {
+                                     llvm::StringRef Kind) {
     return LocUnlocked.isValid()
                ? getNotes(PartialDiagnosticAt(
                      LocUnlocked, S.PDiag(diag::note_unlocked_here) << Kind))
@@ -1877,7 +1877,7 @@ class ThreadSafetyReporter : public clang::threadSafety::ThreadSafetyHandler {
     Warnings.emplace_back(std::move(Warning), getNotes());
   }
 
-  void handleUnmatchedUnlock(StringRef Kind, Name LockName, SourceLocation Loc,
+  void handleUnmatchedUnlock(llvm::StringRef Kind, Name LockName, SourceLocation Loc,
                              SourceLocation LocPreviousUnlock) override {
     if (Loc.isInvalid())
       Loc = FunLocation;
@@ -1887,7 +1887,7 @@ class ThreadSafetyReporter : public clang::threadSafety::ThreadSafetyHandler {
                           makeUnlockedHereNote(LocPreviousUnlock, Kind));
   }
 
-  void handleIncorrectUnlockKind(StringRef Kind, Name LockName,
+  void handleIncorrectUnlockKind(llvm::StringRef Kind, Name LockName,
                                  LockKind Expected, LockKind Received,
                                  SourceLocation LocLocked,
                                  SourceLocation LocUnlock) override {
@@ -1900,7 +1900,7 @@ class ThreadSafetyReporter : public clang::threadSafety::ThreadSafetyHandler {
                           makeLockedHereNote(LocLocked, Kind));
   }
 
-  void handleDoubleLock(StringRef Kind, Name LockName, SourceLocation LocLocked,
+  void handleDoubleLock(llvm::StringRef Kind, Name LockName, SourceLocation LocLocked,
                         SourceLocation LocDoubleLock) override {
     if (LocDoubleLock.isInvalid())
       LocDoubleLock = FunLocation;
@@ -1910,7 +1910,7 @@ class ThreadSafetyReporter : public clang::threadSafety::ThreadSafetyHandler {
                           makeLockedHereNote(LocLocked, Kind));
   }
 
-  void handleMutexHeldEndOfScope(StringRef Kind, Name LockName,
+  void handleMutexHeldEndOfScope(llvm::StringRef Kind, Name LockName,
                                  SourceLocation LocLocked,
                                  SourceLocation LocEndOfScope,
                                  LockErrorKind LEK) override {
@@ -1938,7 +1938,7 @@ class ThreadSafetyReporter : public clang::threadSafety::ThreadSafetyHandler {
                           makeLockedHereNote(LocLocked, Kind));
   }
 
-  void handleExclusiveAndShared(StringRef Kind, Name LockName,
+  void handleExclusiveAndShared(llvm::StringRef Kind, Name LockName,
                                 SourceLocation Loc1,
                                 SourceLocation Loc2) override {
     PartialDiagnosticAt Warning(Loc1,
@@ -1961,7 +1961,7 @@ class ThreadSafetyReporter : public clang::threadSafety::ThreadSafetyHandler {
     Warnings.emplace_back(std::move(Warning), getNotes());
   }
 
-  void handleMutexNotHeld(StringRef Kind, const NamedDecl *D,
+  void handleMutexNotHeld(llvm::StringRef Kind, const NamedDecl *D,
                           ProtectedOperationKind POK, Name LockName,
                           LockKind LK, SourceLocation Loc,
                           Name *PossibleMatch) override {
@@ -2038,7 +2038,7 @@ class ThreadSafetyReporter : public clang::threadSafety::ThreadSafetyHandler {
     }
   }
 
-  void handleNegativeNotHeld(StringRef Kind, Name LockName, Name Neg,
+  void handleNegativeNotHeld(llvm::StringRef Kind, Name LockName, Name Neg,
                              SourceLocation Loc) override {
     PartialDiagnosticAt Warning(Loc,
         S.PDiag(diag::warn_acquire_requires_negative_cap)
@@ -2053,14 +2053,14 @@ class ThreadSafetyReporter : public clang::threadSafety::ThreadSafetyHandler {
     Warnings.emplace_back(std::move(Warning), getNotes());
   }
 
-  void handleFunExcludesLock(StringRef Kind, Name FunName, Name LockName,
+  void handleFunExcludesLock(llvm::StringRef Kind, Name FunName, Name LockName,
                              SourceLocation Loc) override {
     PartialDiagnosticAt Warning(Loc, S.PDiag(diag::warn_fun_excludes_mutex)
                                          << Kind << FunName << LockName);
     Warnings.emplace_back(std::move(Warning), getNotes());
   }
 
-  void handleLockAcquiredBefore(StringRef Kind, Name L1Name, Name L2Name,
+  void handleLockAcquiredBefore(llvm::StringRef Kind, Name L1Name, Name L2Name,
                                 SourceLocation Loc) override {
     PartialDiagnosticAt Warning(Loc,
       S.PDiag(diag::warn_acquired_before) << Kind << L1Name << L2Name);
@@ -2111,7 +2111,7 @@ public:
   }
 
   void warnLoopStateMismatch(SourceLocation Loc,
-                             StringRef VariableName) override {
+                             llvm::StringRef VariableName) override {
     PartialDiagnosticAt Warning(Loc, S.PDiag(diag::warn_loop_state_mismatch) <<
       VariableName);
 
@@ -2119,9 +2119,9 @@ public:
   }
 
   void warnParamReturnTypestateMismatch(SourceLocation Loc,
-                                        StringRef VariableName,
-                                        StringRef ExpectedState,
-                                        StringRef ObservedState) override {
+                                        llvm::StringRef VariableName,
+                                        llvm::StringRef ExpectedState,
+                                        llvm::StringRef ObservedState) override {
 
     PartialDiagnosticAt Warning(Loc, S.PDiag(
       diag::warn_param_return_typestate_mismatch) << VariableName <<
@@ -2130,8 +2130,8 @@ public:
     Warnings.emplace_back(std::move(Warning), OptionalNotes());
   }
 
-  void warnParamTypestateMismatch(SourceLocation Loc, StringRef ExpectedState,
-                                  StringRef ObservedState) override {
+  void warnParamTypestateMismatch(SourceLocation Loc, llvm::StringRef ExpectedState,
+                                  llvm::StringRef ObservedState) override {
 
     PartialDiagnosticAt Warning(Loc, S.PDiag(
       diag::warn_param_typestate_mismatch) << ExpectedState << ObservedState);
@@ -2140,15 +2140,15 @@ public:
   }
 
   void warnReturnTypestateForUnconsumableType(SourceLocation Loc,
-                                              StringRef TypeName) override {
+                                              llvm::StringRef TypeName) override {
     PartialDiagnosticAt Warning(Loc, S.PDiag(
       diag::warn_return_typestate_for_unconsumable_type) << TypeName);
 
     Warnings.emplace_back(std::move(Warning), OptionalNotes());
   }
 
-  void warnReturnTypestateMismatch(SourceLocation Loc, StringRef ExpectedState,
-                                   StringRef ObservedState) override {
+  void warnReturnTypestateMismatch(SourceLocation Loc, llvm::StringRef ExpectedState,
+                                   llvm::StringRef ObservedState) override {
 
     PartialDiagnosticAt Warning(Loc, S.PDiag(
       diag::warn_return_typestate_mismatch) << ExpectedState << ObservedState);
@@ -2156,7 +2156,7 @@ public:
     Warnings.emplace_back(std::move(Warning), OptionalNotes());
   }
 
-  void warnUseOfTempInInvalidState(StringRef MethodName, StringRef State,
+  void warnUseOfTempInInvalidState(llvm::StringRef MethodName, llvm::StringRef State,
                                    SourceLocation Loc) override {
 
     PartialDiagnosticAt Warning(Loc, S.PDiag(
@@ -2165,8 +2165,8 @@ public:
     Warnings.emplace_back(std::move(Warning), OptionalNotes());
   }
 
-  void warnUseInInvalidState(StringRef MethodName, StringRef VariableName,
-                             StringRef State, SourceLocation Loc) override {
+  void warnUseInInvalidState(llvm::StringRef MethodName, llvm::StringRef VariableName,
+                             llvm::StringRef State, SourceLocation Loc) override {
 
     PartialDiagnosticAt Warning(Loc, S.PDiag(diag::warn_use_in_invalid_state) <<
                                 MethodName << VariableName << State);
@@ -2190,12 +2190,12 @@ class UnsafeBufferUsageReporter : public UnsafeBufferUsageHandler {
   // Lists as a string the names of variables in `VarGroupForVD` except for `VD`
   // itself:
   std::string listVariableGroupAsString(
-      const VarDecl *VD, const ArrayRef<const VarDecl *> &VarGroupForVD) const {
+      const VarDecl *VD, const llvm::ArrayRef<const VarDecl *> &VarGroupForVD) const {
     if (VarGroupForVD.size() <= 1)
       return "";
 
-    std::vector<StringRef> VarNames;
-    auto PutInQuotes = [](StringRef S) -> std::string {
+    std::vector<llvm::StringRef> VarNames;
+    auto PutInQuotes = [](llvm::StringRef S) -> std::string {
       return "'" + S.str() + "'";
     };
 
@@ -2375,7 +2375,7 @@ public:
   // characters.
   std::string
   getUnsafeBufferUsageAttributeTextAt(SourceLocation Loc,
-                                      StringRef WSSuffix = "") const override {
+                                      llvm::StringRef WSSuffix = "") const override {
     Preprocessor &PP = S.getPreprocessor();
     TokenValue ClangUnsafeBufferUsageTokens[] = {
         tok::l_square,
@@ -2386,7 +2386,7 @@ public:
         tok::r_square,
         tok::r_square};
 
-    StringRef MacroName;
+    llvm::StringRef MacroName;
 
     // The returned macro (it returns) is guaranteed not to be function-like:
     MacroName = PP.getLastMacroWithSpelling(Loc, ClangUnsafeBufferUsageTokens);

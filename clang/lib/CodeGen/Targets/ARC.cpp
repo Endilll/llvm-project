@@ -119,7 +119,7 @@ ABIArgInfo ARCABIInfo::classifyArgumentType(QualType Ty,
     llvm::LLVMContext &LLVMContext = getVMContext();
 
     llvm::IntegerType *Int32 = llvm::Type::getInt32Ty(LLVMContext);
-    SmallVector<llvm::Type *, 3> Elements(SizeInRegs, Int32);
+    llvm::SmallVector<llvm::Type *, 3> Elements(SizeInRegs, Int32);
     llvm::Type *Result = llvm::StructType::get(LLVMContext, Elements);
 
     return FreeRegs >= SizeInRegs ?

@@ -36,7 +36,7 @@ static const Expr *getLHSOfMulBinOp(const Expr *E) {
 }
 
 ImplicitWideningOfMultiplicationResultCheck::
-    ImplicitWideningOfMultiplicationResultCheck(StringRef Name,
+    ImplicitWideningOfMultiplicationResultCheck(llvm::StringRef Name,
                                                 ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       UseCXXStaticCastsInCppSources(
@@ -188,7 +188,7 @@ void ImplicitWideningOfMultiplicationResultCheck::handlePointerOffsetting(
   QualType SizeTy = IndexExprType->isSignedIntegerType() ? SSizeTy : USizeTy;
   // FIXME: is there a way to actually get the QualType for size_t/ptrdiff_t?
   // Note that SizeTy.getAsString() will be unsigned long/..., NOT size_t!
-  StringRef TyAsString =
+  llvm::StringRef TyAsString =
       IndexExprType->isSignedIntegerType() ? "ptrdiff_t" : "size_t";
 
   // So, is size_t actually wider than the result of the multiplication?
@@ -217,11 +217,11 @@ void ImplicitWideningOfMultiplicationResultCheck::handlePointerOffsetting(
     if (ShouldUseCXXStaticCast)
       Diag << FixItHint::CreateInsertion(
                   IndexExpr->getBeginLoc(),
-                  (Twine("static_cast<") + TyAsString + ">(").str())
+                  (llvm::Twine("static_cast<") + TyAsString + ">(").str())
            << FixItHint::CreateInsertion(EndLoc, ")");
     else
       Diag << FixItHint::CreateInsertion(IndexExpr->getBeginLoc(),
-                                         (Twine("(") + TyAsString + ")(").str())
+                                         (llvm::Twine("(") + TyAsString + ")(").str())
            << FixItHint::CreateInsertion(EndLoc, ")");
     Diag << includeStddefHeader(IndexExpr->getBeginLoc());
   }
@@ -235,7 +235,7 @@ void ImplicitWideningOfMultiplicationResultCheck::handlePointerOffsetting(
     if (ShouldUseCXXStaticCast)
       Diag << FixItHint::CreateInsertion(
                   LHS->getBeginLoc(),
-                  (Twine("static_cast<") + TyAsString + ">(").str())
+                  (llvm::Twine("static_cast<") + TyAsString + ">(").str())
            << FixItHint::CreateInsertion(
                   Lexer::getLocForEndOfToken(IndexExpr->getEndLoc(), 0,
                                              *Result->SourceManager,
@@ -243,7 +243,7 @@ void ImplicitWideningOfMultiplicationResultCheck::handlePointerOffsetting(
                   ")");
     else
       Diag << FixItHint::CreateInsertion(LHS->getBeginLoc(),
-                                         (Twine("(") + TyAsString + ")").str());
+                                         (llvm::Twine("(") + TyAsString + ")").str());
     Diag << includeStddefHeader(LHS->getBeginLoc());
   }
 }

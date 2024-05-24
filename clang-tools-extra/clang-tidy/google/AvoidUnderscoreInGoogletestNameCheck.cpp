@@ -21,7 +21,7 @@ namespace clang::tidy::google::readability {
 constexpr llvm::StringLiteral KDisabledTestPrefix = "DISABLED_";
 
 // Determines whether the macro is a Googletest test macro.
-static bool isGoogletestTestMacro(StringRef MacroName) {
+static bool isGoogletestTestMacro(llvm::StringRef MacroName) {
   static const llvm::StringSet<> MacroNames = {"TEST", "TEST_F", "TEST_P",
                                                "TYPED_TEST", "TYPED_TEST_P"};
   return MacroNames.contains(MacroName);
@@ -43,7 +43,7 @@ public:
     IdentifierInfo *NameIdentifierInfo = MacroNameToken.getIdentifierInfo();
     if (!NameIdentifierInfo)
       return;
-    StringRef MacroName = NameIdentifierInfo->getName();
+    llvm::StringRef MacroName = NameIdentifierInfo->getName();
     if (!isGoogletestTestMacro(MacroName) || !Args ||
         Args->getNumMacroArguments() < 2)
       return;
@@ -53,7 +53,7 @@ public:
       return;
     std::string TestSuiteNameMaybeDisabled =
         PP->getSpelling(*TestSuiteNameToken);
-    StringRef TestSuiteName = TestSuiteNameMaybeDisabled;
+    llvm::StringRef TestSuiteName = TestSuiteNameMaybeDisabled;
     TestSuiteName.consume_front(KDisabledTestPrefix);
     if (TestSuiteName.contains('_'))
       Check->diag(TestSuiteNameToken->getLocation(),
@@ -62,7 +62,7 @@ public:
           << TestSuiteName;
 
     std::string TestNameMaybeDisabled = PP->getSpelling(*TestNameToken);
-    StringRef TestName = TestNameMaybeDisabled;
+    llvm::StringRef TestName = TestNameMaybeDisabled;
     TestName.consume_front(KDisabledTestPrefix);
     if (TestName.contains('_'))
       Check->diag(TestNameToken->getLocation(),

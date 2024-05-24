@@ -36,7 +36,7 @@ bool codeContainsImports(llvm::StringRef Code);
 /// If Text begins an Include-What-You-Use directive, returns it.
 /// Given "// IWYU pragma: keep", returns "keep".
 /// Input is a null-terminated char* as provided by SM.getCharacterData().
-/// (This should not be StringRef as we do *not* want to scan for its length).
+/// (This should not be llvm::StringRef as we do *not* want to scan for its length).
 /// For multi-line comments, we return only the first line.
 std::optional<llvm::StringRef> parseIWYUPragma(const char *Text);
 

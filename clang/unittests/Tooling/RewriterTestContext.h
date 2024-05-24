@@ -19,6 +19,7 @@
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Rewrite/Core/Rewriter.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
@@ -34,7 +35,7 @@ struct RewriterDiagnosticConsumer : public DiagnosticConsumer {
   void HandleDiagnostic(DiagnosticsEngine::Level DiagLevel,
                         const Diagnostic &Info) override {
     ++NumDiagnosticsSeen;
-    SmallString<100> OutStr;
+    llvm::SmallString<100> OutStr;
     Info.FormatDiagnostic(OutStr);
     llvm::errs() << OutStr;
   }
@@ -50,7 +51,7 @@ class RewriterTestContext {
  public:
    RewriterTestContext()
        : DiagOpts(new DiagnosticOptions()),
-         Diagnostics(IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs),
+         Diagnostics(llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs),
                      &*DiagOpts),
          InMemoryFileSystem(new llvm::vfs::InMemoryFileSystem),
          OverlayFileSystem(
@@ -65,7 +66,7 @@ class RewriterTestContext {
 
   ~RewriterTestContext() {}
 
-  FileID createInMemoryFile(StringRef Name, StringRef Content) {
+  FileID createInMemoryFile(llvm::StringRef Name, llvm::StringRef Content) {
     std::unique_ptr<llvm::MemoryBuffer> Source =
         llvm::MemoryBuffer::getMemBuffer(Content);
     InMemoryFileSystem->addFile(Name, 0, std::move(Source));
@@ -77,8 +78,8 @@ class RewriterTestContext {
 
   // FIXME: this code is mostly a duplicate of
   // unittests/Tooling/RefactoringTest.cpp. Figure out a way to share it.
-  FileID createOnDiskFile(StringRef Name, StringRef Content) {
-    SmallString<1024> Path;
+  FileID createOnDiskFile(llvm::StringRef Name, llvm::StringRef Content) {
+    llvm::SmallString<1024> Path;
     int FD;
     std::error_code EC = llvm::sys::fs::createTemporaryFile(Name, "", FD, Path);
     assert(!EC);
@@ -90,7 +91,7 @@ class RewriterTestContext {
     auto File = Files.getOptionalFileRef(Path);
     assert(File);
 
-    StringRef Found =
+    llvm::StringRef Found =
         TemporaryFiles.insert(std::make_pair(Name, std::string(Path.str())))
             .first->second;
     assert(Found == Path);
@@ -113,7 +114,7 @@ class RewriterTestContext {
     return Result;
   }
 
-  std::string getFileContentFromDisk(StringRef Name) {
+  std::string getFileContentFromDisk(llvm::StringRef Name) {
     std::string Path = TemporaryFiles.lookup(Name);
     assert(!Path.empty());
     // We need to read directly from the FileManager without relaying through
@@ -125,11 +126,11 @@ class RewriterTestContext {
     return std::string((*FileBuffer)->getBuffer());
   }
 
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
   DiagnosticsEngine Diagnostics;
   RewriterDiagnosticConsumer DiagnosticPrinter;
-  IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem;
-  IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFileSystem;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFileSystem;
   FileManager Files;
   SourceManager Sources;
   LangOptions Options;

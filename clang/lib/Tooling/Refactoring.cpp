@@ -25,7 +25,7 @@ namespace clang {
 namespace tooling {
 
 RefactoringTool::RefactoringTool(
-    const CompilationDatabase &Compilations, ArrayRef<std::string> SourcePaths,
+    const CompilationDatabase &Compilations, llvm::ArrayRef<std::string> SourcePaths,
     std::shared_ptr<PCHContainerOperations> PCHContainerOps)
     : ClangTool(Compilations, SourcePaths, std::move(PCHContainerOps)) {}
 
@@ -39,10 +39,10 @@ int RefactoringTool::runAndSave(FrontendActionFactory *ActionFactory) {
   }
 
   LangOptions DefaultLangOptions;
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
   TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), &*DiagOpts);
   DiagnosticsEngine Diagnostics(
-      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()),
+      llvm::IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()),
       &*DiagOpts, &DiagnosticPrinter, false);
   SourceManager Sources(Diagnostics, getFiles());
   Rewriter Rewrite(Sources, DefaultLangOptions);
@@ -68,7 +68,7 @@ int RefactoringTool::saveRewrittenFiles(Rewriter &Rewrite) {
 
 bool formatAndApplyAllReplacements(
     const std::map<std::string, Replacements> &FileToReplaces,
-    Rewriter &Rewrite, StringRef Style) {
+    Rewriter &Rewrite, llvm::StringRef Style) {
   SourceManager &SM = Rewrite.getSourceMgr();
   FileManager &Files = SM.getFileManager();
 
@@ -80,7 +80,7 @@ bool formatAndApplyAllReplacements(
 
     FileEntryRef Entry = llvm::cantFail(Files.getFileRef(FilePath));
     FileID ID = SM.getOrCreateFileID(Entry, SrcMgr::C_User);
-    StringRef Code = SM.getBufferData(ID);
+    llvm::StringRef Code = SM.getBufferData(ID);
 
     auto CurStyle = format::getStyle(Style, FilePath, "LLVM");
     if (!CurStyle) {

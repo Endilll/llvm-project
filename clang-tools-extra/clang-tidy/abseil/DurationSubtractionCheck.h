@@ -20,7 +20,7 @@ namespace clang::tidy::abseil {
 /// http://clang.llvm.org/extra/clang-tidy/checks/abseil/duration-subtraction.html
 class DurationSubtractionCheck : public ClangTidyCheck {
 public:
-  DurationSubtractionCheck(StringRef Name, ClangTidyContext *Context)
+  DurationSubtractionCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

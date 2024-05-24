@@ -218,7 +218,7 @@ public:
           TSI = CallRec.ExplicitCastType;
         }
 
-        SmallString<64> buf;
+        llvm::SmallString<64> buf;
         llvm::raw_svector_ostream OS(buf);
 
         OS << "Result of ";
@@ -230,7 +230,7 @@ public:
         OS << " is converted to a pointer of type '" << PointeeType
            << "', which is incompatible with "
            << "sizeof operand type '" << SizeofType << "'";
-        SmallVector<SourceRange, 4> Ranges;
+        llvm::SmallVector<SourceRange, 4> Ranges;
         Ranges.push_back(CallRec.AllocCall->getCallee()->getSourceRange());
         Ranges.push_back(SFinder.Sizeofs[0]->getSourceRange());
         if (TSI)

@@ -19,7 +19,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/pro-bounds-array-to-pointer-decay.html
 class ProBoundsArrayToPointerDecayCheck : public ClangTidyCheck {
 public:
-  ProBoundsArrayToPointerDecayCheck(StringRef Name, ClangTidyContext *Context)
+  ProBoundsArrayToPointerDecayCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;

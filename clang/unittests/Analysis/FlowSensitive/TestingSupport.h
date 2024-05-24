@@ -134,7 +134,7 @@ template <typename AnalysisT> struct AnalysisInputs {
     PostVisitCFG = std::move(Arg);
     return std::move(*this);
   }
-  AnalysisInputs<AnalysisT> &&withASTBuildArgs(ArrayRef<std::string> Arg) && {
+  AnalysisInputs<AnalysisT> &&withASTBuildArgs(llvm::ArrayRef<std::string> Arg) && {
     ASTBuildArgs = std::move(Arg);
     return std::move(*this);
   }
@@ -176,7 +176,7 @@ template <typename AnalysisT> struct AnalysisInputs {
       PostVisitCFG = nullptr;
 
   /// Optional. Options for building the AST context.
-  ArrayRef<std::string> ASTBuildArgs = {};
+  llvm::ArrayRef<std::string> ASTBuildArgs = {};
   /// Optional. Options for building the AST context.
   tooling::FileContentMappings ASTBuildVirtualMappedFiles = {};
   /// Configuration options for the built-in model.
@@ -245,7 +245,7 @@ checkDataflow(AnalysisInputs<AnalysisT> AI,
     };
   }
 
-  SmallVector<ast_matchers::BoundNodes, 1> MatchResult = ast_matchers::match(
+  llvm::SmallVector<ast_matchers::BoundNodes, 1> MatchResult = ast_matchers::match(
       ast_matchers::functionDecl(ast_matchers::hasBody(ast_matchers::stmt()),
                                  AI.TargetFuncMatcher)
           .bind("target"),
@@ -556,7 +556,7 @@ public:
 
 /// Parses a list of formulas, separated by newlines, and returns them.
 /// On parse errors, calls `ADD_FAILURE()` to fail the current test.
-std::vector<const Formula *> parseFormulas(Arena &A, StringRef Lines);
+std::vector<const Formula *> parseFormulas(Arena &A, llvm::StringRef Lines);
 
 } // namespace test
 } // namespace dataflow

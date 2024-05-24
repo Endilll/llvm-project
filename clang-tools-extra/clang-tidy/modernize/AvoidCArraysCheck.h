@@ -19,7 +19,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/avoid-c-arrays.html
 class AvoidCArraysCheck : public ClangTidyCheck {
 public:
-  AvoidCArraysCheck(StringRef Name, ClangTidyContext *Context);
+  AvoidCArraysCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;

@@ -92,7 +92,7 @@ clang::NamedDecl *NameSearchContext::AddFunDecl(const CompilerType &type,
     unsigned NumArgs = func_proto_type->getNumParams();
     unsigned ArgIndex;
 
-    SmallVector<ParmVarDecl *, 5> parm_var_decls;
+    llvm::SmallVector<ParmVarDecl *, 5> parm_var_decls;
 
     for (ArgIndex = 0; ArgIndex < NumArgs; ++ArgIndex) {
       QualType arg_qual_type(func_proto_type->getParamType(ArgIndex));
@@ -103,7 +103,7 @@ clang::NamedDecl *NameSearchContext::AddFunDecl(const CompilerType &type,
                               arg_qual_type, nullptr, SC_Static, nullptr));
     }
 
-    func_decl->setParams(ArrayRef<ParmVarDecl *>(parm_var_decls));
+    func_decl->setParams(llvm::ArrayRef<ParmVarDecl *>(parm_var_decls));
   } else {
     Log *log = GetLog(LLDBLog::Expressions);
 
@@ -134,7 +134,7 @@ clang::NamedDecl *NameSearchContext::AddGenericFunDecl() {
 
   QualType generic_function_type(
       GetASTContext().getFunctionType(GetASTContext().UnknownAnyTy, // result
-                                      ArrayRef<QualType>(), // argument types
+                                      llvm::ArrayRef<QualType>(), // argument types
                                       proto_info));
 
   return AddFunDecl(m_clang_ts.GetType(generic_function_type), true);

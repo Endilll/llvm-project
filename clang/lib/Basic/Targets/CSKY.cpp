@@ -15,7 +15,7 @@
 using namespace clang;
 using namespace clang::targets;
 
-bool CSKYTargetInfo::isValidCPUName(StringRef Name) const {
+bool CSKYTargetInfo::isValidCPUName(llvm::StringRef Name) const {
   return llvm::CSKY::parseCPUArch(Name) != llvm::CSKY::ArchKind::INVALID;
 }
 
@@ -41,8 +41,8 @@ void CSKYTargetInfo::getTargetDefines(const LangOptions &Opts,
   Builder.defineMacro("__CSKYABI__", ABI == "abiv2" ? "2" : "1");
   Builder.defineMacro("__cskyabi__", ABI == "abiv2" ? "2" : "1");
 
-  StringRef ArchName = "ck810";
-  StringRef CPUName = "ck810";
+  llvm::StringRef ArchName = "ck810";
+  llvm::StringRef CPUName = "ck810";
 
   if (Arch != llvm::CSKY::ArchKind::INVALID) {
     ArchName = llvm::CSKY::getArchName(Arch);
@@ -57,32 +57,32 @@ void CSKYTargetInfo::getTargetDefines(const LangOptions &Opts,
   }
 
   // TODO: Add support for BE if BE was supported later
-  StringRef endian = "__cskyLE__";
+  llvm::StringRef endian = "__cskyLE__";
 
   Builder.defineMacro(endian);
   Builder.defineMacro(endian.upper());
   Builder.defineMacro(endian.lower());
 
   if (DSPV2) {
-    StringRef dspv2 = "__CSKY_DSPV2__";
+    llvm::StringRef dspv2 = "__CSKY_DSPV2__";
     Builder.defineMacro(dspv2);
     Builder.defineMacro(dspv2.lower());
   }
 
   if (VDSPV2) {
-    StringRef vdspv2 = "__CSKY_VDSPV2__";
+    llvm::StringRef vdspv2 = "__CSKY_VDSPV2__";
     Builder.defineMacro(vdspv2);
     Builder.defineMacro(vdspv2.lower());
 
     if (HardFloat) {
-      StringRef vdspv2_f = "__CSKY_VDSPV2_F__";
+      llvm::StringRef vdspv2_f = "__CSKY_VDSPV2_F__";
       Builder.defineMacro(vdspv2_f);
       Builder.defineMacro(vdspv2_f.lower());
     }
   }
   if (VDSPV1) {
-    StringRef vdspv1_64 = "__CSKY_VDSP64__";
-    StringRef vdspv1_128 = "__CSKY_VDSP128__";
+    llvm::StringRef vdspv1_64 = "__CSKY_VDSP64__";
+    llvm::StringRef vdspv1_128 = "__CSKY_VDSP128__";
 
     Builder.defineMacro(vdspv1_64);
     Builder.defineMacro(vdspv1_64.lower());
@@ -90,13 +90,13 @@ void CSKYTargetInfo::getTargetDefines(const LangOptions &Opts,
     Builder.defineMacro(vdspv1_128.lower());
   }
   if (is3E3R1) {
-    StringRef is3e3r1 = "__CSKY_3E3R1__";
+    llvm::StringRef is3e3r1 = "__CSKY_3E3R1__";
     Builder.defineMacro(is3e3r1);
     Builder.defineMacro(is3e3r1.lower());
   }
 }
 
-bool CSKYTargetInfo::hasFeature(StringRef Feature) const {
+bool CSKYTargetInfo::hasFeature(llvm::StringRef Feature) const {
   return llvm::StringSwitch<bool>(Feature)
       .Case("hard-float", HardFloat)
       .Case("hard-float-abi", HardFloatABI)
@@ -139,11 +139,11 @@ bool CSKYTargetInfo::handleTargetFeatures(std::vector<std::string> &Features,
   return true;
 }
 
-ArrayRef<Builtin::Info> CSKYTargetInfo::getTargetBuiltins() const {
-  return ArrayRef<Builtin::Info>();
+llvm::ArrayRef<Builtin::Info> CSKYTargetInfo::getTargetBuiltins() const {
+  return llvm::ArrayRef<Builtin::Info>();
 }
 
-ArrayRef<const char *> CSKYTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> CSKYTargetInfo::getGCCRegNames() const {
   static const char *const GCCRegNames[] = {
       // Integer registers
       "r0",
@@ -217,7 +217,7 @@ ArrayRef<const char *> CSKYTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
-ArrayRef<TargetInfo::GCCRegAlias> CSKYTargetInfo::getGCCRegAliases() const {
+llvm::ArrayRef<TargetInfo::GCCRegAlias> CSKYTargetInfo::getGCCRegAliases() const {
   static const TargetInfo::GCCRegAlias GCCRegAliases[] = {
       {{"a0"}, "r0"},
       {{"a1"}, "r1"},

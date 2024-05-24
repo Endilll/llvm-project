@@ -2706,7 +2706,7 @@ ExprResult Parser::ParseBuiltinPrimaryExpression() {
     SourceLocation TypeLoc = Tok.getLocation();
     auto OOK = Sema::OffsetOfKind::OOK_Builtin;
     if (Tok.getLocation().isMacroID()) {
-      StringRef MacroName = Lexer::getImmediateMacroNameForDiagnostics(
+      llvm::StringRef MacroName = Lexer::getImmediateMacroNameForDiagnostics(
           Tok.getLocation(), PP.getSourceManager(), getLangOpts());
       if (MacroName == "offsetof")
         OOK = Sema::OffsetOfKind::OOK_Macro;
@@ -2734,7 +2734,7 @@ ExprResult Parser::ParseBuiltinPrimaryExpression() {
     }
 
     // Keep track of the various subcomponents we see.
-    SmallVector<Sema::OffsetOfComponent, 4> Comps;
+    llvm::SmallVector<Sema::OffsetOfComponent, 4> Comps;
 
     Comps.push_back(Sema::OffsetOfComponent());
     Comps.back().isBrackets = false;
@@ -3017,7 +3017,7 @@ Parser::ParseParenExpression(ParenParseOption &ExprType, bool stopIfCastExpr,
                                  tok::kw___bridge_retain));
   if (BridgeCast && !getLangOpts().ObjCAutoRefCount) {
     if (!TryConsumeToken(tok::kw___bridge)) {
-      StringRef BridgeCastName = Tok.getName();
+      llvm::StringRef BridgeCastName = Tok.getName();
       SourceLocation BridgeKeywordLoc = ConsumeToken();
       if (!PP.getSourceManager().isInSystemHeader(BridgeKeywordLoc))
         Diag(BridgeKeywordLoc, diag::warn_arc_bridge_cast_nonarc)
@@ -3265,8 +3265,8 @@ Parser::ParseParenExpression(ParenParseOption &ExprType, bool stopIfCastExpr,
              ExprType == CastExpr && Tok.is(tok::l_square) &&
              tryParseOpenMPArrayShapingCastPart()) {
     bool ErrorFound = false;
-    SmallVector<Expr *, 4> OMPDimensions;
-    SmallVector<SourceRange, 4> OMPBracketsRanges;
+    llvm::SmallVector<Expr *, 4> OMPDimensions;
+    llvm::SmallVector<SourceRange, 4> OMPBracketsRanges;
     do {
       BalancedDelimiterTracker TS(*this, tok::l_square);
       TS.consumeOpen();
@@ -3375,7 +3375,7 @@ ExprResult Parser::ParseStringLiteralExpression(bool AllowUserDefinedLiteral,
   // String concatenation.
   // Note: some keywords like __FUNCTION__ are not considered to be strings
   // for concatenation purposes, unless Microsoft extensions are enabled.
-  SmallVector<Token, 4> StringToks;
+  llvm::SmallVector<Token, 4> StringToks;
 
   do {
     StringToks.push_back(Tok);
@@ -3454,7 +3454,7 @@ ExprResult Parser::ParseGenericSelectionExpression() {
   }
 
   SourceLocation DefaultLoc;
-  SmallVector<ParsedType, 12> Types;
+  llvm::SmallVector<ParsedType, 12> Types;
   ExprVector Exprs;
   do {
     ParsedType Ty;
@@ -3585,7 +3585,7 @@ ExprResult Parser::ParseFoldExpression(ExprResult LHS,
 /// [C++0x]   assignment-expression
 /// [C++0x]   braced-init-list
 /// \endverbatim
-bool Parser::ParseExpressionList(SmallVectorImpl<Expr *> &Exprs,
+bool Parser::ParseExpressionList(llvm::SmallVectorImpl<Expr *> &Exprs,
                                  llvm::function_ref<void()> ExpressionStarts,
                                  bool FailImmediatelyOnInvalidExpr,
                                  bool EarlyTypoCorrection) {
@@ -3651,7 +3651,7 @@ bool Parser::ParseExpressionList(SmallVectorImpl<Expr *> &Exprs,
 ///         assignment-expression
 ///         simple-expression-list , assignment-expression
 /// \endverbatim
-bool Parser::ParseSimpleExpressionList(SmallVectorImpl<Expr *> &Exprs) {
+bool Parser::ParseSimpleExpressionList(llvm::SmallVectorImpl<Expr *> &Exprs) {
   while (true) {
     ExprResult Expr = ParseAssignmentExpression();
     if (Expr.isInvalid())
@@ -3821,8 +3821,8 @@ ExprResult Parser::ParseObjCBoolLiteral() {
 /// Validate availability spec list, emitting diagnostics if necessary. Returns
 /// true if invalid.
 static bool CheckAvailabilitySpecList(Parser &P,
-                                      ArrayRef<AvailabilitySpec> AvailSpecs) {
-  llvm::SmallSet<StringRef, 4> Platforms;
+                                      llvm::ArrayRef<AvailabilitySpec> AvailSpecs) {
+  llvm::SmallSet<llvm::StringRef, 4> Platforms;
   bool HasOtherPlatformSpec = false;
   bool Valid = true;
   for (const auto &Spec : AvailSpecs) {
@@ -3841,7 +3841,7 @@ static bool CheckAvailabilitySpecList(Parser &P,
       // Rule out multiple version specs referring to the same platform.
       // For example, we emit an error for:
       // @available(macos 10.10, macos 10.11, *)
-      StringRef Platform = Spec.getPlatform();
+      llvm::StringRef Platform = Spec.getPlatform();
       P.Diag(Spec.getBeginLoc(), diag::err_availability_query_repeated_platform)
           << Spec.getEndLoc() << Platform;
       Valid = false;
@@ -3880,13 +3880,13 @@ std::optional<AvailabilitySpec> Parser::ParseAvailabilitySpec() {
 
     IdentifierLoc *PlatformIdentifier = ParseIdentifierLoc();
     SourceRange VersionRange;
-    VersionTuple Version = ParseVersionTuple(VersionRange);
+    llvm::VersionTuple Version = ParseVersionTuple(VersionRange);
 
     if (Version.empty())
       return std::nullopt;
 
-    StringRef GivenPlatform = PlatformIdentifier->Ident->getName();
-    StringRef Platform =
+    llvm::StringRef GivenPlatform = PlatformIdentifier->Ident->getName();
+    llvm::StringRef Platform =
         AvailabilityAttr::canonicalizePlatformName(GivenPlatform);
 
     if (AvailabilityAttr::getPrettyPlatformName(Platform).empty() ||
@@ -3913,7 +3913,7 @@ ExprResult Parser::ParseAvailabilityCheckExpr(SourceLocation BeginLoc) {
   if (Parens.expectAndConsume())
     return ExprError();
 
-  SmallVector<AvailabilitySpec, 4> AvailSpecs;
+  llvm::SmallVector<AvailabilitySpec, 4> AvailSpecs;
   bool HasError = false;
   while (true) {
     std::optional<AvailabilitySpec> Spec = ParseAvailabilitySpec();

@@ -41,17 +41,17 @@ class AnalysisOrderChecker
           check::LiveSymbols, eval::Call> {
 
   bool isCallbackEnabled(const AnalyzerOptions &Opts,
-                         StringRef CallbackName) const {
+                         llvm::StringRef CallbackName) const {
     return Opts.getCheckerBooleanOption(this, "*") ||
            Opts.getCheckerBooleanOption(this, CallbackName);
   }
 
-  bool isCallbackEnabled(CheckerContext &C, StringRef CallbackName) const {
+  bool isCallbackEnabled(CheckerContext &C, llvm::StringRef CallbackName) const {
     AnalyzerOptions &Opts = C.getAnalysisManager().getAnalyzerOptions();
     return isCallbackEnabled(Opts, CallbackName);
   }
 
-  bool isCallbackEnabled(ProgramStateRef State, StringRef CallbackName) const {
+  bool isCallbackEnabled(ProgramStateRef State, llvm::StringRef CallbackName) const {
     AnalyzerOptions &Opts = State->getStateManager().getOwningEngine()
                                  .getAnalysisManager().getAnalyzerOptions();
     return isCallbackEnabled(Opts, CallbackName);
@@ -197,8 +197,8 @@ public:
   ProgramStateRef
   checkRegionChanges(ProgramStateRef State,
                      const InvalidatedSymbols *Invalidated,
-                     ArrayRef<const MemRegion *> ExplicitRegions,
-                     ArrayRef<const MemRegion *> Regions,
+                     llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+                     llvm::ArrayRef<const MemRegion *> Regions,
                      const LocationContext *LCtx, const CallEvent *Call) const {
     if (isCallbackEnabled(State, "RegionChanges"))
       llvm::errs() << "RegionChanges\n";

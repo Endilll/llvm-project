@@ -15,9 +15,9 @@ using namespace clang;
 using namespace clang::dependency_directives_scan;
 
 static bool minimizeSourceToDependencyDirectives(
-    StringRef Input, SmallVectorImpl<char> &Out,
-    SmallVectorImpl<dependency_directives_scan::Token> &Tokens,
-    SmallVectorImpl<Directive> &Directives) {
+    llvm::StringRef Input, llvm::SmallVectorImpl<char> &Out,
+    llvm::SmallVectorImpl<dependency_directives_scan::Token> &Tokens,
+    llvm::SmallVectorImpl<Directive> &Directives) {
   Out.clear();
   Tokens.clear();
   Directives.clear();
@@ -34,19 +34,19 @@ static bool minimizeSourceToDependencyDirectives(
   return false;
 }
 
-static bool minimizeSourceToDependencyDirectives(StringRef Input,
-                                                 SmallVectorImpl<char> &Out) {
-  SmallVector<dependency_directives_scan::Token, 16> Tokens;
-  SmallVector<Directive, 32> Directives;
+static bool minimizeSourceToDependencyDirectives(llvm::StringRef Input,
+                                                 llvm::SmallVectorImpl<char> &Out) {
+  llvm::SmallVector<dependency_directives_scan::Token, 16> Tokens;
+  llvm::SmallVector<Directive, 32> Directives;
   return minimizeSourceToDependencyDirectives(Input, Out, Tokens, Directives);
 }
 
 namespace {
 
 TEST(MinimizeSourceToDependencyDirectivesTest, Empty) {
-  SmallVector<char, 128> Out;
-  SmallVector<dependency_directives_scan::Token, 4> Tokens;
-  SmallVector<Directive, 4> Directives;
+  llvm::SmallVector<char, 128> Out;
+  llvm::SmallVector<dependency_directives_scan::Token, 4> Tokens;
+  llvm::SmallVector<Directive, 4> Directives;
 
   ASSERT_FALSE(
       minimizeSourceToDependencyDirectives("", Out, Tokens, Directives));
@@ -65,9 +65,9 @@ TEST(MinimizeSourceToDependencyDirectivesTest, Empty) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, AllTokens) {
-  SmallVector<char, 128> Out;
-  SmallVector<dependency_directives_scan::Token, 4> Tokens;
-  SmallVector<Directive, 4> Directives;
+  llvm::SmallVector<char, 128> Out;
+  llvm::SmallVector<dependency_directives_scan::Token, 4> Tokens;
+  llvm::SmallVector<Directive, 4> Directives;
 
   ASSERT_FALSE(
       minimizeSourceToDependencyDirectives("#define A\n"
@@ -119,7 +119,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, AllTokens) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, EmptyHash) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(
       minimizeSourceToDependencyDirectives("#\n#define MACRO a\n", Out));
@@ -127,9 +127,9 @@ TEST(MinimizeSourceToDependencyDirectivesTest, EmptyHash) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, HashHash) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
     #define S
     #if 0
       ##pragma cool
@@ -142,9 +142,9 @@ TEST(MinimizeSourceToDependencyDirectivesTest, HashHash) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, Define) {
-  SmallVector<char, 128> Out;
-  SmallVector<dependency_directives_scan::Token, 4> Tokens;
-  SmallVector<Directive, 4> Directives;
+  llvm::SmallVector<char, 128> Out;
+  llvm::SmallVector<dependency_directives_scan::Token, 4> Tokens;
+  llvm::SmallVector<Directive, 4> Directives;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#define MACRO", Out,
                                                     Tokens, Directives));
@@ -155,7 +155,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, Define) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, DefineSpacing) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(
       minimizeSourceToDependencyDirectives("#define MACRO\n\n\n", Out));
@@ -175,7 +175,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, DefineSpacing) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, DefineMacroArguments) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#define MACRO()", Out));
   EXPECT_STREQ("#define MACRO()\n", Out.data());
@@ -198,7 +198,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, DefineMacroArguments) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, DefineInvalidMacroArguments) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#define MACRO((a))", Out));
   EXPECT_STREQ("#define MACRO((a))\n", Out.data());
@@ -212,7 +212,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, DefineInvalidMacroArguments) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, DefineHorizontalWhitespace) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives(
       "#define MACRO(\t)\tcon \t tent\t", Out));
@@ -232,7 +232,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, DefineHorizontalWhitespace) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, DefineMultilineArgs) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(
       minimizeSourceToDependencyDirectives("#define MACRO(a        \\\n"
@@ -251,7 +251,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, DefineMultilineArgs) {
 
 TEST(MinimizeSourceToDependencyDirectivesTest,
      DefineMultilineArgsCarriageReturn) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(
       minimizeSourceToDependencyDirectives("#define MACRO(a,       \\\r"
@@ -263,7 +263,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest,
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, DefineMultilineArgsStringize) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#define MACRO(a,b) \\\n"
                                                     "                #a \\\n"
@@ -274,7 +274,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, DefineMultilineArgsStringize) {
 
 TEST(MinimizeSourceToDependencyDirectivesTest,
      DefineMultilineArgsCarriageReturnNewline) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(
       minimizeSourceToDependencyDirectives("#define MACRO(a,       \\\r\n"
@@ -287,7 +287,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest,
 
 TEST(MinimizeSourceToDependencyDirectivesTest,
      DefineMultilineArgsNewlineCarriageReturn) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(
       minimizeSourceToDependencyDirectives("#define MACRO(a,       \\\n\r"
@@ -299,19 +299,19 @@ TEST(MinimizeSourceToDependencyDirectivesTest,
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, DefineNumber) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#define 0\n", Out));
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, DefineNoName) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#define &\n", Out));
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, DefineNoWhitespace) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#define AND&\n", Out));
   EXPECT_STREQ("#define AND&\n", Out.data());
@@ -325,7 +325,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, DefineNoWhitespace) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, MultilineComment) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(
       minimizeSourceToDependencyDirectives("#define MACRO a/*\n"
@@ -341,7 +341,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, MultilineComment) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, MultilineCommentInStrings) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#define MACRO1 \"/*\"\n"
                                                     "#define MACRO2 \"*/\"\n",
@@ -352,7 +352,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, MultilineCommentInStrings) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, CommentSlashSlashStar) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives(
       "#define MACRO 1 //* blah */\n", Out));
@@ -360,7 +360,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, CommentSlashSlashStar) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, Ifdef) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#ifdef A\n"
                                                     "#define B\n"
@@ -394,7 +394,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, Ifdef) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, Elifdef) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#ifdef A\n"
                                                     "#define B\n"
@@ -432,7 +432,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, Elifdef) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, EmptyIfdef) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#ifdef A\n"
                                                     "void skip();\n"
@@ -449,7 +449,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, EmptyIfdef) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, EmptyElifdef) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#ifdef A\n"
                                                     "void skip();\n"
@@ -466,7 +466,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, EmptyElifdef) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, Pragma) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#pragma A\n", Out));
   EXPECT_STREQ("<TokBeforeEOF>\n", Out.data());
@@ -504,7 +504,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, Pragma) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, UnderscorePragma) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives(R"(_)", Out));
   EXPECT_STREQ("<TokBeforeEOF>\n", Out.data());
@@ -590,7 +590,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, UnderscorePragma) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, Include) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#include \"A\"\n", Out));
   EXPECT_STREQ("#include \"A\"\n", Out.data());
@@ -629,7 +629,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, Include) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, AtImport) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("@import A;\n", Out));
   EXPECT_STREQ("@import A;\n", Out.data());
@@ -649,7 +649,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, AtImport) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, AtImportFailures) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_TRUE(minimizeSourceToDependencyDirectives("@import A\n", Out));
   ASSERT_FALSE(
@@ -658,7 +658,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, AtImportFailures) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, RawStringLiteral) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#ifndef GUARD\n"
                                                     "#define GUARD\n"
@@ -698,7 +698,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, RawStringLiteral) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, SplitIdentifier) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#if\\\n"
                                                     "ndef GUARD\n"
@@ -733,7 +733,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest, SplitIdentifier) {
 
 TEST(MinimizeSourceToDependencyDirectivesTest,
      WhitespaceAfterLineContinuationSlash) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#define A 1 + \\  \n"
                                                     "2 + \\\t\n"
@@ -746,7 +746,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest,
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, PoundWarningAndError) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   for (auto Source : {
            "#warning '\n#include <t.h>\n",
@@ -784,9 +784,9 @@ TEST(MinimizeSourceToDependencyDirectivesTest, PoundWarningAndError) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, CharacterLiteral) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
 #include <bob>
 int a = 0'1;
 int b = 0xfa'af'fa;
@@ -798,9 +798,9 @@ int c = 12 ' ';
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, CharacterLiteralPrefixL) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
-  StringRef Source = R"(L'P'
+  llvm::StringRef Source = R"(L'P'
 #if DEBUG
 // '
 #endif
@@ -811,9 +811,9 @@ TEST(MinimizeSourceToDependencyDirectivesTest, CharacterLiteralPrefixL) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, CharacterLiteralPrefixU) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
-  StringRef Source = R"(int x = U'P';
+  llvm::StringRef Source = R"(int x = U'P';
 #include <test.h>
 // '
 )";
@@ -822,9 +822,9 @@ TEST(MinimizeSourceToDependencyDirectivesTest, CharacterLiteralPrefixU) {
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, CharacterLiteralPrefixu) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
-  StringRef Source = R"(int x = u'b';
+  llvm::StringRef Source = R"(int x = u'b';
 int y = u8'a';
 int z = 128'78;
 #include <test.h>
@@ -835,11 +835,11 @@ int z = 128'78;
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, PragmaOnce) {
-  SmallVector<char, 128> Out;
-  SmallVector<dependency_directives_scan::Token, 4> Tokens;
-  SmallVector<Directive, 4> Directives;
+  llvm::SmallVector<char, 128> Out;
+  llvm::SmallVector<dependency_directives_scan::Token, 4> Tokens;
+  llvm::SmallVector<Directive, 4> Directives;
 
-  StringRef Source = R"(// comment
+  llvm::StringRef Source = R"(// comment
 #pragma once
 // another comment
 #include <test.h>
@@ -867,9 +867,9 @@ _Pragma("once")
 
 TEST(MinimizeSourceToDependencyDirectivesTest,
      SkipLineStringCharLiteralsUntilNewline) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
-  StringRef Source = R"(#if NEVER_ENABLED
+  llvm::StringRef Source = R"(#if NEVER_ENABLED
     #define why(fmt, ...) #error don't try me
     #endif
 
@@ -896,7 +896,7 @@ TEST(MinimizeSourceToDependencyDirectivesTest,
 
 TEST(MinimizeSourceToDependencyDirectivesTest,
      SupportWhitespaceBeforeLineContinuation) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
   ASSERT_FALSE(minimizeSourceToDependencyDirectives("#define FOO(BAR) \\\n"
                                                     "  #BAR\\\n"
@@ -907,9 +907,9 @@ TEST(MinimizeSourceToDependencyDirectivesTest,
 
 TEST(MinimizeSourceToDependencyDirectivesTest,
      SupportWhitespaceBeforeLineContinuationInStringSkipping) {
-  SmallVector<char, 128> Out;
+  llvm::SmallVector<char, 128> Out;
 
-  StringRef Source = "#define X '\\ \t\nx'\nvoid foo() {}";
+  llvm::StringRef Source = "#define X '\\ \t\nx'\nvoid foo() {}";
   ASSERT_FALSE(minimizeSourceToDependencyDirectives(Source, Out));
   EXPECT_STREQ("#define X '\\ \t\nx'\n<TokBeforeEOF>\n", Out.data());
 
@@ -923,11 +923,11 @@ TEST(MinimizeSourceToDependencyDirectivesTest,
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, CxxModules) {
-  SmallVector<char, 128> Out;
-  SmallVector<dependency_directives_scan::Token, 4> Tokens;
-  SmallVector<Directive, 4> Directives;
+  llvm::SmallVector<char, 128> Out;
+  llvm::SmallVector<dependency_directives_scan::Token, 4> Tokens;
+  llvm::SmallVector<Directive, 4> Directives;
 
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
     module;
     #include "textual-header.h"
 
@@ -969,9 +969,9 @@ ort \
 }
 
 TEST(MinimizeSourceToDependencyDirectivesTest, TokensBeforeEOF) {
-  SmallString<128> Out;
+  llvm::SmallString<128> Out;
 
-  StringRef Source = R"(
+  llvm::StringRef Source = R"(
     #define A
     #ifdef B
     int x;

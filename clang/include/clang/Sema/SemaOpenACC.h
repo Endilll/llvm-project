@@ -48,11 +48,11 @@ public:
     };
 
     struct IntExprDetails {
-      SmallVector<Expr *> IntExprs;
+      llvm::SmallVector<Expr *> IntExprs;
     };
 
     struct VarListDetails {
-      SmallVector<Expr *> VarList;
+      llvm::SmallVector<Expr *> VarList;
       bool IsReadOnly;
       bool IsZero;
     };
@@ -60,15 +60,15 @@ public:
     struct WaitDetails {
       Expr *DevNumExpr;
       SourceLocation QueuesLoc;
-      SmallVector<Expr *> QueueIdExprs;
+      llvm::SmallVector<Expr *> QueueIdExprs;
     };
 
     struct DeviceTypeDetails {
-      SmallVector<DeviceTypeArgument> Archs;
+      llvm::SmallVector<DeviceTypeArgument> Archs;
     };
     struct ReductionDetails {
       OpenACCReductionOperator Op;
-      SmallVector<Expr *> VarList;
+      llvm::SmallVector<Expr *> VarList;
     };
 
     std::variant<std::monostate, DefaultDetails, ConditionDetails,
@@ -151,17 +151,17 @@ public:
       return std::get<WaitDetails>(Details).DevNumExpr;
     }
 
-    ArrayRef<Expr *> getQueueIdExprs() const {
+    llvm::ArrayRef<Expr *> getQueueIdExprs() const {
       assert(ClauseKind == OpenACCClauseKind::Wait &&
              "Parsed clause kind does not have a queue id expr list");
 
       if (std::holds_alternative<std::monostate>(Details))
-        return ArrayRef<Expr *>{std::nullopt};
+        return llvm::ArrayRef<Expr *>{std::nullopt};
 
       return std::get<WaitDetails>(Details).QueueIdExprs;
     }
 
-    ArrayRef<Expr *> getIntExprs() {
+    llvm::ArrayRef<Expr *> getIntExprs() {
       assert((ClauseKind == OpenACCClauseKind::NumGangs ||
               ClauseKind == OpenACCClauseKind::NumWorkers ||
               ClauseKind == OpenACCClauseKind::Async ||
@@ -171,7 +171,7 @@ public:
       return std::get<IntExprDetails>(Details).IntExprs;
     }
 
-    ArrayRef<Expr *> getIntExprs() const {
+    llvm::ArrayRef<Expr *> getIntExprs() const {
       return const_cast<OpenACCParsedClause *>(this)->getIntExprs();
     }
 
@@ -179,7 +179,7 @@ public:
       return std::get<ReductionDetails>(Details).Op;
     }
 
-    ArrayRef<Expr *> getVarList() {
+    llvm::ArrayRef<Expr *> getVarList() {
       assert((ClauseKind == OpenACCClauseKind::Private ||
               ClauseKind == OpenACCClauseKind::NoCreate ||
               ClauseKind == OpenACCClauseKind::Present ||
@@ -207,7 +207,7 @@ public:
       return std::get<VarListDetails>(Details).VarList;
     }
 
-    ArrayRef<Expr *> getVarList() const {
+    llvm::ArrayRef<Expr *> getVarList() const {
       return const_cast<OpenACCParsedClause *>(this)->getVarList();
     }
 
@@ -230,7 +230,7 @@ public:
       return std::get<VarListDetails>(Details).IsZero;
     }
 
-    ArrayRef<DeviceTypeArgument> getDeviceTypeArchitectures() const {
+    llvm::ArrayRef<DeviceTypeArgument> getDeviceTypeArchitectures() const {
       assert((ClauseKind == OpenACCClauseKind::DeviceType ||
               ClauseKind == OpenACCClauseKind::DType) &&
              "Only 'device_type'/'dtype' has a device-type-arg list");
@@ -260,7 +260,7 @@ public:
       Details = ConditionDetails{ConditionExpr};
     }
 
-    void setIntExprDetails(ArrayRef<Expr *> IntExprs) {
+    void setIntExprDetails(llvm::ArrayRef<Expr *> IntExprs) {
       assert((ClauseKind == OpenACCClauseKind::NumGangs ||
               ClauseKind == OpenACCClauseKind::NumWorkers ||
               ClauseKind == OpenACCClauseKind::Async ||
@@ -277,7 +277,7 @@ public:
       Details = IntExprDetails{std::move(IntExprs)};
     }
 
-    void setVarListDetails(ArrayRef<Expr *> VarList, bool IsReadOnly,
+    void setVarListDetails(llvm::ArrayRef<Expr *> VarList, bool IsReadOnly,
                            bool IsZero) {
       assert((ClauseKind == OpenACCClauseKind::Private ||
               ClauseKind == OpenACCClauseKind::NoCreate ||
@@ -373,7 +373,7 @@ public:
   SemaOpenACC(Sema &S);
 
   /// Called after parsing an OpenACC Clause so that it can be checked.
-  OpenACCClause *ActOnClause(ArrayRef<const OpenACCClause *> ExistingClauses,
+  OpenACCClause *ActOnClause(llvm::ArrayRef<const OpenACCClause *> ExistingClauses,
                              OpenACCParsedClause &Clause);
 
   /// Called after the construct has been parsed, but clauses haven't been
@@ -401,7 +401,7 @@ public:
   StmtResult ActOnEndStmtDirective(OpenACCDirectiveKind K,
                                    SourceLocation StartLoc,
                                    SourceLocation EndLoc,
-                                   ArrayRef<OpenACCClause *> Clauses,
+                                   llvm::ArrayRef<OpenACCClause *> Clauses,
                                    StmtResult AssocStmt);
 
   /// Called after the directive has been completely parsed, including the

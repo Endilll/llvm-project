@@ -32,7 +32,7 @@ std::string getIncludePath(const SourceManager &SM, SourceLocation Loc,
 
   if (Collector)
     FilePath = Collector->getMappedHeader(FilePath);
-  SmallString<256> CleanedFilePath = FilePath;
+  llvm::SmallString<256> CleanedFilePath = FilePath;
   llvm::sys::path::remove_dots(CleanedFilePath, /*remove_dot_dot=*/false);
 
   return std::string(CleanedFilePath);

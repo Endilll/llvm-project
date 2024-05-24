@@ -836,7 +836,7 @@ static bool isTagTypeWithMissingTag(Sema &SemaRef, LookupResult &Result,
   LookupResult R(SemaRef, Name, NameLoc, Sema::LookupTagName);
   SemaRef.LookupParsedName(R, S, &SS, /*ObjectType=*/QualType());
   if (TagDecl *Tag = R.getAsSingle<TagDecl>()) {
-    StringRef FixItTagName;
+    llvm::StringRef FixItTagName;
     switch (Tag->getTagKind()) {
     case TagTypeKind::Class:
       FixItTagName = "class ";
@@ -859,7 +859,7 @@ static bool isTagTypeWithMissingTag(Sema &SemaRef, LookupResult &Result,
       break;
     }
 
-    StringRef TagName = FixItTagName.drop_back();
+    llvm::StringRef TagName = FixItTagName.drop_back();
     SemaRef.Diag(NameLoc, diag::err_use_of_tag_name_without_tag)
       << Name << TagName << SemaRef.getLangOpts().CPlusPlus
       << FixItHint::CreateInsertion(NameLoc, FixItTagName);
@@ -2250,7 +2250,7 @@ void Sema::ActOnPopScope(SourceLocation Loc, Scope *S) {
     std::optional<SourceLocation> PreviousDeclLoc;
     PartialDiagnostic PD;
   };
-  SmallVector<LocAndDiag, 16> DeclDiags;
+  llvm::SmallVector<LocAndDiag, 16> DeclDiags;
   auto addDiag = [&DeclDiags](SourceLocation Loc, PartialDiagnostic PD) {
     DeclDiags.push_back(LocAndDiag{Loc, std::nullopt, std::move(PD)});
   };
@@ -2343,7 +2343,7 @@ Scope *Sema::getNonFieldDeclScope(Scope *S) {
   return S;
 }
 
-static StringRef getHeaderName(Builtin::Context &BuiltinInfo, unsigned ID,
+static llvm::StringRef getHeaderName(Builtin::Context &BuiltinInfo, unsigned ID,
                                ASTContext::GetBuiltinTypeError Error) {
   switch (Error) {
   case ASTContext::GE_None:
@@ -2382,7 +2382,7 @@ FunctionDecl *Sema::CreateBuiltin(IdentifierInfo *II, QualType Type,
   // Create Decl objects for each parameter, adding them to the
   // FunctionDecl.
   if (const FunctionProtoType *FT = dyn_cast<FunctionProtoType>(Type)) {
-    SmallVector<ParmVarDecl *, 16> Params;
+    llvm::SmallVector<ParmVarDecl *, 16> Params;
     for (unsigned i = 0, e = FT->getNumParams(); i != e; ++i) {
       ParmVarDecl *parm = ParmVarDecl::Create(
           Context, New, SourceLocation(), SourceLocation(), nullptr,
@@ -4203,7 +4203,7 @@ bool Sema::MergeFunctionDecl(FunctionDecl *New, NamedDecl *&OldD, Scope *S,
         New->setHasInheritedPrototype();
 
         // Synthesize parameters with the same types.
-        SmallVector<ParmVarDecl *, 16> Params;
+        llvm::SmallVector<ParmVarDecl *, 16> Params;
         for (const auto &ParamType : OldProto->param_types()) {
           ParmVarDecl *Param = ParmVarDecl::Create(
               Context, New, SourceLocation(), SourceLocation(), nullptr,
@@ -4240,8 +4240,8 @@ bool Sema::MergeFunctionDecl(FunctionDecl *New, NamedDecl *&OldD, Scope *S,
       Old->hasPrototype() && !New->hasPrototype() &&
       New->getType()->getAs<FunctionProtoType>() &&
       Old->getNumParams() == New->getNumParams()) {
-    SmallVector<QualType, 16> ArgTypes;
-    SmallVector<GNUCompatibleParamWarning, 16> Warnings;
+    llvm::SmallVector<QualType, 16> ArgTypes;
+    llvm::SmallVector<GNUCompatibleParamWarning, 16> Warnings;
     const FunctionProtoType *OldProto
       = Old->getType()->getAs<FunctionProtoType>();
     const FunctionProtoType *NewProto
@@ -4772,7 +4772,7 @@ void Sema::notePreviousDefinition(const NamedDecl *Old, SourceLocation New) {
   auto *FNew = SrcMgr.getFileEntryForID(FNewDecLoc.first);
   auto FOld = SrcMgr.getFileEntryRefForID(FOldDecLoc.first);
   auto &HSI = PP.getHeaderSearchInfo();
-  StringRef HdrFilename =
+  llvm::StringRef HdrFilename =
       SrcMgr.getFilename(SrcMgr.getSpellingLoc(Old->getLocation()));
 
   auto noteFromModuleOrInclude = [&](Module *Mod,
@@ -5413,7 +5413,7 @@ static bool
 InjectAnonymousStructOrUnionMembers(Sema &SemaRef, Scope *S, DeclContext *Owner,
                                     RecordDecl *AnonRecord, AccessSpecifier AS,
                                     StorageClass SC,
-                                    SmallVectorImpl<NamedDecl *> &Chaining) {
+                                    llvm::SmallVectorImpl<NamedDecl *> &Chaining) {
   bool Invalid = false;
 
   // Look every FieldDecl and IndirectFieldDecl with a name.
@@ -5777,7 +5777,7 @@ Decl *Sema::BuildAnonymousStructOrUnion(Scope *S, DeclSpec &DS,
   // Inject the members of the anonymous struct/union into the owning
   // context and into the identifier resolver chain for name lookup
   // purposes.
-  SmallVector<NamedDecl*, 2> Chain;
+  llvm::SmallVector<NamedDecl*, 2> Chain;
   Chain.push_back(Anon);
 
   if (InjectAnonymousStructOrUnionMembers(*this, S, Owner, Record, AS, SC,
@@ -5844,7 +5844,7 @@ Decl *Sema::BuildMicrosoftCAnonymousStruct(Scope *S, DeclSpec &DS,
   // Inject the members of the anonymous struct into the current
   // context and into the identifier resolver chain for name lookup
   // purposes.
-  SmallVector<NamedDecl*, 2> Chain;
+  llvm::SmallVector<NamedDecl*, 2> Chain;
   Chain.push_back(Anon);
 
   RecordDecl *RecordDef = Record->getDefinition();
@@ -6006,7 +6006,7 @@ static QualType getCoreType(QualType Ty) {
 static bool hasSimilarParameters(ASTContext &Context,
                                      FunctionDecl *Declaration,
                                      FunctionDecl *Definition,
-                                     SmallVectorImpl<unsigned> &Params) {
+                                     llvm::SmallVectorImpl<unsigned> &Params) {
   Params.clear();
   if (Declaration->param_size() != Definition->param_size())
     return false;
@@ -6135,7 +6135,7 @@ Decl *Sema::ActOnDeclarator(Scope *S, Declarator &D) {
 
   // Check if we are in an `omp begin/end declare variant` scope. Handle this
   // declaration only if the `bind_to_declaration` extension is set.
-  SmallVector<FunctionDecl *, 4> Bases;
+  llvm::SmallVector<FunctionDecl *, 4> Bases;
   if (LangOpts.OpenMP && OpenMP().isInOpenMPDeclareVariantScope())
     if (OpenMP().getOMPTraitInfoForSurroundingScope()->isExtensionActive(
             llvm::omp::TraitProperty::
@@ -7489,7 +7489,7 @@ void emitReadOnlyPlacementAttrWarning(Sema &S, const VarDecl *VD) {
 NamedDecl *Sema::ActOnVariableDeclarator(
     Scope *S, Declarator &D, DeclContext *DC, TypeSourceInfo *TInfo,
     LookupResult &Previous, MultiTemplateParamsArg TemplateParamLists,
-    bool &AddToScope, ArrayRef<BindingDecl *> Bindings) {
+    bool &AddToScope, llvm::ArrayRef<BindingDecl *> Bindings) {
   QualType R = TInfo->getType();
   DeclarationName Name = GetNameForDeclarator(D).getName();
 
@@ -7995,7 +7995,7 @@ NamedDecl *Sema::ActOnVariableDeclarator(
   if (Expr *E = (Expr*)D.getAsmLabel()) {
     // The parser guarantees this is a string.
     StringLiteral *SE = cast<StringLiteral>(E);
-    StringRef Label = SE->getString();
+    llvm::StringRef Label = SE->getString();
     if (S->getFnParent() != nullptr) {
       switch (SC) {
       case SC_None:
@@ -9038,7 +9038,7 @@ class DifferentNameValidatorCCC final : public CorrectionCandidateCallback {
     if (candidate.getEditDistance() == 0)
       return false;
 
-    SmallVector<unsigned, 1> MismatchedParams;
+    llvm::SmallVector<unsigned, 1> MismatchedParams;
     for (TypoCorrection::const_decl_iterator CDecl = candidate.begin(),
                                           CDeclEnd = candidate.end();
          CDecl != CDeclEnd; ++CDecl) {
@@ -9089,8 +9089,8 @@ static NamedDecl *DiagnoseInvalidRedeclaration(
     ActOnFDArgs &ExtraArgs, bool IsLocalFriend, Scope *S) {
   DeclarationName Name = NewFD->getDeclName();
   DeclContext *NewDC = NewFD->getDeclContext();
-  SmallVector<unsigned, 1> MismatchedParams;
-  SmallVector<std::pair<FunctionDecl *, unsigned>, 1> NearMatches;
+  llvm::SmallVector<unsigned, 1> MismatchedParams;
+  llvm::SmallVector<std::pair<FunctionDecl *, unsigned>, 1> NearMatches;
   TypoCorrection Correction;
   bool IsDefinition = ExtraArgs.D.isFunctionDefinition();
   unsigned DiagMsg =
@@ -9200,7 +9200,7 @@ static NamedDecl *DiagnoseInvalidRedeclaration(
   if (CXXMethodDecl *NewMD = dyn_cast<CXXMethodDecl>(NewFD))
     NewFDisConst = NewMD->isConst();
 
-  for (SmallVectorImpl<std::pair<FunctionDecl *, unsigned> >::iterator
+  for (llvm::SmallVectorImpl<std::pair<FunctionDecl *, unsigned> >::iterator
        NearMatch = NearMatches.begin(), NearMatchEnd = NearMatches.end();
        NearMatch != NearMatchEnd; ++NearMatch) {
     FunctionDecl *FD = NearMatch->first;
@@ -9461,13 +9461,13 @@ static bool isOpenCLSizeDependentType(ASTContext &C, QualType Ty) {
   // Size dependent types are just typedefs to normal integer types
   // (e.g. unsigned long), so we cannot distinguish them from other typedefs to
   // integers other than by their names.
-  StringRef SizeTypeNames[] = {"size_t", "intptr_t", "uintptr_t", "ptrdiff_t"};
+  llvm::StringRef SizeTypeNames[] = {"size_t", "intptr_t", "uintptr_t", "ptrdiff_t"};
 
   // Remove typedefs one by one until we reach a typedef
   // for a size dependent type.
   QualType DesugaredTy = Ty;
   do {
-    ArrayRef<StringRef> Names(SizeTypeNames);
+    llvm::ArrayRef<llvm::StringRef> Names(SizeTypeNames);
     auto Match = llvm::find(Names, DesugaredTy.getUnqualifiedType().getAsString());
     if (Names.end() != Match)
       return true;
@@ -9654,11 +9654,11 @@ static void checkIsValidOpenCLKernelParameter(
   }
 
   // Track nested structs we will inspect
-  SmallVector<const Decl *, 4> VisitStack;
+  llvm::SmallVector<const Decl *, 4> VisitStack;
 
   // Track where we are in the nested structs. Items will migrate from
   // VisitStack to HistoryStack as we do the DFS for bad field.
-  SmallVector<const FieldDecl *, 4> HistoryStack;
+  llvm::SmallVector<const FieldDecl *, 4> HistoryStack;
   HistoryStack.push_back(nullptr);
 
   // At this point we already handled everything except of a RecordType or
@@ -9738,7 +9738,7 @@ static void checkIsValidOpenCLKernelParameter(
 
       // We have an error, now let's go back up through history and show where
       // the offending field came from
-      for (ArrayRef<const FieldDecl *>::const_iterator
+      for (llvm::ArrayRef<const FieldDecl *>::const_iterator
                I = HistoryStack.begin() + 1,
                E = HistoryStack.end();
            I != E; ++I) {
@@ -9816,7 +9816,7 @@ Sema::ActOnFunctionDeclarator(Scope *S, Declarator &D, DeclContext *DC,
   if (R.getCanonicalType()->castAs<FunctionType>()->getCmseNSCallAttr())
     Diag(D.getIdentifierLoc(), diag::err_function_decl_cmse_ns_call);
 
-  SmallVector<TemplateParameterList *, 4> TemplateParamLists;
+  llvm::SmallVector<TemplateParameterList *, 4> TemplateParamLists;
   llvm::append_range(TemplateParamLists, TemplateParamListsRef);
   if (TemplateParameterList *Invented = D.getInventedTemplateParameterList()) {
     if (!TemplateParamLists.empty() && !TemplateParamLists.back()->empty() &&
@@ -9972,7 +9972,7 @@ Sema::ActOnFunctionDeclarator(Scope *S, Declarator &D, DeclContext *DC,
         // For source fidelity, store the other template param lists.
         if (TemplateParamLists.size() > 1) {
           NewFD->setTemplateParameterListsInfo(Context,
-              ArrayRef<TemplateParameterList *>(TemplateParamLists)
+              llvm::ArrayRef<TemplateParameterList *>(TemplateParamLists)
                   .drop_back(1));
         }
       } else {
@@ -10276,7 +10276,7 @@ Sema::ActOnFunctionDeclarator(Scope *S, Declarator &D, DeclContext *DC,
 
   // Copy the parameter declarations from the declarator D to the function
   // declaration NewFD, if they are available.  First scavenge them into Params.
-  SmallVector<ParmVarDecl*, 16> Params;
+  llvm::SmallVector<ParmVarDecl*, 16> Params;
   unsigned FTIIdx;
   if (D.isFunctionDeclarator(FTIIdx)) {
     DeclaratorChunk::FunctionTypeInfo &FTI = D.getTypeObject(FTIIdx).Fun;
@@ -11138,7 +11138,7 @@ static bool CheckMultiVersionValue(Sema &S, const FunctionDecl *FD) {
       return true;
     }
     for (const auto &Feat : ParseInfo.Features) {
-      auto BareFeat = StringRef{Feat}.substr(1);
+      auto BareFeat = llvm::StringRef{Feat}.substr(1);
       if (Feat[0] == '-') {
         S.Diag(FD->getLocation(), diag::err_bad_multiversion_option)
             << Feature << ("no-" + BareFeat).str();
@@ -11155,7 +11155,7 @@ static bool CheckMultiVersionValue(Sema &S, const FunctionDecl *FD) {
   }
 
   if (TVA) {
-    llvm::SmallVector<StringRef, 8> Feats;
+    llvm::SmallVector<llvm::StringRef, 8> Feats;
     TVA->getFeatures(Feats);
     for (const auto &Feat : Feats) {
       if (!TargetInfo.validateCpuSupports(Feat)) {
@@ -11509,10 +11509,10 @@ static bool CheckTargetCausesMultiVersioning(Sema &S, FunctionDecl *OldFD,
   }
 
   if (NewTVA) {
-    llvm::SmallVector<StringRef, 8> Feats;
+    llvm::SmallVector<llvm::StringRef, 8> Feats;
     OldTVA->getFeatures(Feats);
     llvm::sort(Feats);
-    llvm::SmallVector<StringRef, 8> NewFeats;
+    llvm::SmallVector<llvm::StringRef, 8> NewFeats;
     NewTVA->getFeatures(NewFeats);
     llvm::sort(NewFeats);
 
@@ -11608,7 +11608,7 @@ static bool CheckMultiVersionAdditionalDecl(
         NewTA->getFeaturesStr());
     llvm::sort(NewParsed.Features);
   }
-  llvm::SmallVector<StringRef, 8> NewFeats;
+  llvm::SmallVector<llvm::StringRef, 8> NewFeats;
   if (NewTVA) {
     NewTVA->getFeatures(NewFeats);
     llvm::sort(NewFeats);
@@ -11664,7 +11664,7 @@ static bool CheckMultiVersionAdditionalDecl(
           OldDecl = ND;
           return false;
         }
-        llvm::SmallVector<StringRef, 8> CurFeats;
+        llvm::SmallVector<llvm::StringRef, 8> CurFeats;
         CurTVA->getFeatures(CurFeats);
         llvm::sort(CurFeats);
 
@@ -11680,7 +11680,7 @@ static bool CheckMultiVersionAdditionalDecl(
           break;
 
         for (unsigned I = 0; I < CurClones->featuresStrs_size(); ++I) {
-          llvm::SmallVector<StringRef, 8> CurFeats;
+          llvm::SmallVector<llvm::StringRef, 8> CurFeats;
           CurClones->getFeatures(CurFeats, I);
           llvm::sort(CurFeats);
 
@@ -11707,7 +11707,7 @@ static bool CheckMultiVersionAdditionalDecl(
           return true;
         }
       } else if (const auto *CurTVA = CurFD->getAttr<TargetVersionAttr>()) {
-        llvm::SmallVector<StringRef, 8> CurFeats;
+        llvm::SmallVector<llvm::StringRef, 8> CurFeats;
         CurTVA->getFeatures(CurFeats);
         llvm::sort(CurFeats);
 
@@ -13017,7 +13017,7 @@ QualType Sema::deduceVarTypeFromInitializer(VarDecl *VDecl,
     }
   }
 
-  ArrayRef<Expr*> DeduceInits;
+  llvm::ArrayRef<Expr*> DeduceInits;
   if (Init)
     DeduceInits = Init;
 
@@ -13031,7 +13031,7 @@ QualType Sema::deduceVarTypeFromInitializer(VarDecl *VDecl,
     InitializationKind Kind = InitializationKind::CreateForInit(
         VDecl->getLocation(), DirectInit, Init);
     // FIXME: Initialization should not be taking a mutable list of inits.
-    SmallVector<Expr*, 8> InitsCopy(DeduceInits.begin(), DeduceInits.end());
+    llvm::SmallVector<Expr*, 8> InitsCopy(DeduceInits.begin(), DeduceInits.end());
     return DeduceTemplateSpecializationFromInitializer(TSI, Entity, Kind,
                                                        InitsCopy);
   }
@@ -13465,7 +13465,7 @@ void Sema::AddInitializerToDecl(Decl *RealDecl, Expr *Init, bool DirectInit) {
 
   if (VDecl->isInvalidDecl()) {
     ExprResult Res = CorrectDelayedTyposInExpr(Init, VDecl);
-    SmallVector<Expr *> SubExprs;
+    llvm::SmallVector<Expr *> SubExprs;
     if (Res.isUsable())
       SubExprs.push_back(Res.get());
     ExprResult Recovery =
@@ -14496,7 +14496,7 @@ void Sema::CheckCompleteVariableDeclaration(VarDecl *var) {
           }
 
           if (OnlyOneMissingComma) {
-            SmallVector<FixItHint, 1> Hints;
+            llvm::SmallVector<FixItHint, 1> Hints;
             for (unsigned i = 0; i < NumConcat - 1; ++i)
               Hints.push_back(FixItHint::CreateInsertion(
                   PP.getLocForEndOfToken(SL->getStrTokenLoc(i)), ","));
@@ -14538,7 +14538,7 @@ void Sema::CheckCompleteVariableDeclaration(VarDecl *var) {
     // constant expressions, check whether or not it actually is now.  We can't
     // do this lazily, because the result might depend on things that change
     // later, such as which constexpr functions happen to be defined.
-    SmallVector<PartialDiagnosticAt, 8> Notes;
+    llvm::SmallVector<PartialDiagnosticAt, 8> Notes;
     if (!getLangOpts().CPlusPlus11 && !getLangOpts().C23) {
       // Prior to C++11, in contexts where a constant initializer is required,
       // the set of valid constant initializers is described by syntactic rules
@@ -14892,8 +14892,8 @@ static bool hasDeducedAuto(DeclaratorDecl *DD) {
 }
 
 Sema::DeclGroupPtrTy Sema::FinalizeDeclaratorGroup(Scope *S, const DeclSpec &DS,
-                                                   ArrayRef<Decl *> Group) {
-  SmallVector<Decl*, 8> Decls;
+                                                   llvm::ArrayRef<Decl *> Group) {
+  llvm::SmallVector<Decl*, 8> Decls;
 
   if (DS.isTypeSpecOwned())
     Decls.push_back(DS.getRepAsDecl());
@@ -14968,7 +14968,7 @@ Sema::DeclGroupPtrTy Sema::FinalizeDeclaratorGroup(Scope *S, const DeclSpec &DS,
 /// BuildDeclaratorGroup - convert a list of declarations into a declaration
 /// group, performing any necessary semantic checking.
 Sema::DeclGroupPtrTy
-Sema::BuildDeclaratorGroup(MutableArrayRef<Decl *> Group) {
+Sema::BuildDeclaratorGroup(llvm::MutableArrayRef<Decl *> Group) {
   // C++14 [dcl.spec.auto]p7: (DR1347)
   //   If the type that replaces the placeholder type is not the same in each
   //   deduction, the program is ill-formed.
@@ -15012,7 +15012,7 @@ void Sema::ActOnDocumentableDecl(Decl *D) {
   ActOnDocumentableDecls(D);
 }
 
-void Sema::ActOnDocumentableDecls(ArrayRef<Decl *> Group) {
+void Sema::ActOnDocumentableDecls(llvm::ArrayRef<Decl *> Group) {
   // Don't parse the comment if Doxygen diagnostics are ignored.
   if (Group.empty() || !Group[0])
     return;
@@ -15229,7 +15229,7 @@ ParmVarDecl *Sema::BuildParmVarDeclForTypedef(DeclContext *DC,
   return Param;
 }
 
-void Sema::DiagnoseUnusedParameters(ArrayRef<ParmVarDecl *> Parameters) {
+void Sema::DiagnoseUnusedParameters(llvm::ArrayRef<ParmVarDecl *> Parameters) {
   // Don't diagnose unused-parameter errors in template instantiations; we
   // will already have done so in the template itself.
   if (inTemplateInstantiation())
@@ -15246,7 +15246,7 @@ void Sema::DiagnoseUnusedParameters(ArrayRef<ParmVarDecl *> Parameters) {
 }
 
 void Sema::DiagnoseSizeOfParametersAndReturnValue(
-    ArrayRef<ParmVarDecl *> Parameters, QualType ReturnTy, NamedDecl *D) {
+    llvm::ArrayRef<ParmVarDecl *> Parameters, QualType ReturnTy, NamedDecl *D) {
   if (LangOpts.NumLargeByValueCopy == 0) // No check.
     return;
 
@@ -15375,7 +15375,7 @@ void Sema::ActOnFinishKNRParamDeclarations(Scope *S, Declarator &D,
       --i;
       if (FTI.Params[i].Param == nullptr) {
         if (getLangOpts().C99) {
-          SmallString<256> Code;
+          llvm::SmallString<256> Code;
           llvm::raw_svector_ostream(Code)
               << "  int " << FTI.Params[i].Ident->getName() << ";\n";
           Diag(FTI.Params[i].IdentLoc, diag::ext_param_not_declared)
@@ -15418,7 +15418,7 @@ Sema::ActOnStartOfFunctionDef(Scope *FnBodyScope, Declarator &D,
   // variant` annotation which specifies the mangled definition as a
   // specialization function under the OpenMP context defined as part of the
   // `omp begin declare variant`.
-  SmallVector<FunctionDecl *, 4> Bases;
+  llvm::SmallVector<FunctionDecl *, 4> Bases;
   if (LangOpts.OpenMP && OpenMP().isInOpenMPDeclareVariantScope())
     OpenMP().ActOnStartOfFunctionDefinitionInOpenMPDeclareVariantScope(
         ParentScope, D, TemplateParameterLists, Bases);
@@ -15977,7 +15977,7 @@ static void diagnoseImplicitlyRetainedSelf(Sema &S) {
           << FixItHint::CreateInsertion(P.first, "self->");
 }
 
-static bool methodHasName(const FunctionDecl *FD, StringRef Name) {
+static bool methodHasName(const FunctionDecl *FD, llvm::StringRef Name) {
   return isa<CXXMethodDecl>(FD) && FD->param_empty() &&
          FD->getDeclName().isIdentifier() && FD->getName() == Name;
 }
@@ -16146,7 +16146,7 @@ Decl *Sema::ActOnFinishFunctionBody(Decl *dcl, Stmt *Body,
               return false;
 
             bool Invalid = false;
-            StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
+            llvm::StringRef Buffer = SM.getBufferData(LocInfo.first, &Invalid);
             if (Invalid)
               return false;
 
@@ -16154,7 +16154,7 @@ Decl *Sema::ActOnFinishFunctionBody(Decl *dcl, Stmt *Body,
               return false;
 
             const char *LexStart = Buffer.data() + LocInfo.second;
-            StringRef StartTok(LexStart, Buffer.size() - LocInfo.second);
+            llvm::StringRef StartTok(LexStart, Buffer.size() - LocInfo.second);
 
             return StartTok.consume_front("const") &&
                    (StartTok.empty() || isWhitespace(StartTok[0]) ||
@@ -16711,7 +16711,7 @@ void Sema::AddKnownFunctionAttributes(FunctionDecl *FD) {
     }
 
     // Handle automatically recognized callbacks.
-    SmallVector<int, 4> Encoding;
+    llvm::SmallVector<int, 4> Encoding;
     if (!FD->hasAttr<CallbackAttr>() &&
         Context.BuiltinInfo.performsCallback(BuiltinID, Encoding))
       FD->addAttr(CallbackAttr::CreateImplicit(
@@ -17168,7 +17168,7 @@ static FixItHint createFriendTagNNSFixIt(Sema &SemaRef, NamedDecl *ND, Scope *S,
   // While the decl is in a namespace, do repeated lookup of that name and see
   // if we get the same namespace back.  If we do not, continue until
   // translation unit scope, at which point we have a fully qualified NNS.
-  SmallVector<IdentifierInfo *, 4> Namespaces;
+  llvm::SmallVector<IdentifierInfo *, 4> Namespaces;
   DeclContext *DC = ND->getDeclContext()->getRedeclContext();
   for (; !DC->isTranslationUnit(); DC = DC->getParent()) {
     // This tag should be declared in a namespace, which can only be enclosed by
@@ -17186,7 +17186,7 @@ static FixItHint createFriendTagNNSFixIt(Sema &SemaRef, NamedDecl *ND, Scope *S,
 
   // Once we have all the namespaces, reverse them to go outermost first, and
   // build an NNS.
-  SmallString<64> Insertion;
+  llvm::SmallString<64> Insertion;
   llvm::raw_svector_ostream OS(Insertion);
   if (DC->isTranslationUnit())
     OS << "::";
@@ -18839,7 +18839,7 @@ bool Sema::CheckNontrivialField(FieldDecl *FD) {
 /// extension \@interface, if the last ivar is a bitfield of any type,
 /// then add an implicit `char :0` ivar to the end of that interface.
 void Sema::ActOnLastBitfield(SourceLocation DeclLoc,
-                             SmallVectorImpl<Decl *> &AllIvarDecls) {
+                             llvm::SmallVectorImpl<Decl *> &AllIvarDecls) {
   if (LangOpts.ObjCRuntime.isFragile() || AllIvarDecls.empty())
     return;
 
@@ -18974,9 +18974,9 @@ static bool AreSpecialMemberFunctionsSameKind(ASTContext &Context,
 /// - no special member function of the same kind whose associated constraints
 ///   [CWG2595], if any, are satisfied is more constrained.
 static void SetEligibleMethods(Sema &S, CXXRecordDecl *Record,
-                               ArrayRef<CXXMethodDecl *> Methods,
+                               llvm::ArrayRef<CXXMethodDecl *> Methods,
                                CXXSpecialMemberKind CSM) {
-  SmallVector<bool, 4> SatisfactionStatus;
+  llvm::SmallVector<bool, 4> SatisfactionStatus;
 
   for (CXXMethodDecl *Method : Methods) {
     const Expr *Constraints = Method->getTrailingRequiresClause();
@@ -19041,11 +19041,11 @@ static void SetEligibleMethods(Sema &S, CXXRecordDecl *Record,
 
 static void ComputeSpecialMemberFunctionsEligiblity(Sema &S,
                                                     CXXRecordDecl *Record) {
-  SmallVector<CXXMethodDecl *, 4> DefaultConstructors;
-  SmallVector<CXXMethodDecl *, 4> CopyConstructors;
-  SmallVector<CXXMethodDecl *, 4> MoveConstructors;
-  SmallVector<CXXMethodDecl *, 4> CopyAssignmentOperators;
-  SmallVector<CXXMethodDecl *, 4> MoveAssignmentOperators;
+  llvm::SmallVector<CXXMethodDecl *, 4> DefaultConstructors;
+  llvm::SmallVector<CXXMethodDecl *, 4> CopyConstructors;
+  llvm::SmallVector<CXXMethodDecl *, 4> MoveConstructors;
+  llvm::SmallVector<CXXMethodDecl *, 4> CopyAssignmentOperators;
+  llvm::SmallVector<CXXMethodDecl *, 4> MoveAssignmentOperators;
 
   for (auto *Decl : Record->decls()) {
     auto *MD = dyn_cast<CXXMethodDecl>(Decl);
@@ -19085,7 +19085,7 @@ static void ComputeSpecialMemberFunctionsEligiblity(Sema &S,
 }
 
 void Sema::ActOnFields(Scope *S, SourceLocation RecLoc, Decl *EnclosingDecl,
-                       ArrayRef<Decl *> Fields, SourceLocation LBrac,
+                       llvm::ArrayRef<Decl *> Fields, SourceLocation LBrac,
                        SourceLocation RBrac,
                        const ParsedAttributesView &Attrs) {
   assert(EnclosingDecl && "missing record or interface decl");
@@ -19122,9 +19122,9 @@ void Sema::ActOnFields(Scope *S, SourceLocation RecLoc, Decl *EnclosingDecl,
   }
 
   // Verify that all the fields are okay.
-  SmallVector<FieldDecl*, 32> RecFields;
+  llvm::SmallVector<FieldDecl*, 32> RecFields;
 
-  for (ArrayRef<Decl *>::iterator i = Fields.begin(), end = Fields.end();
+  for (llvm::ArrayRef<Decl *>::iterator i = Fields.begin(), end = Fields.end();
        i != end; ++i) {
     FieldDecl *FD = cast<FieldDecl>(*i);
 
@@ -19447,7 +19447,7 @@ void Sema::ActOnFields(Scope *S, SourceLocation RecLoc, Decl *EnclosingDecl,
           llvm::all_of(Record->decls(), IsFunctionPointerOrForwardDecl))) &&
         !Record->isUnion() && !getLangOpts().RandstructSeed.empty() &&
         !Record->isRandomized()) {
-      SmallVector<Decl *, 32> NewDeclOrdering;
+      llvm::SmallVector<Decl *, 32> NewDeclOrdering;
       if (randstruct::randomizeStructureLayout(Context, Record,
                                                NewDeclOrdering))
         Record->reorderDecls(NewDeclOrdering);
@@ -19953,7 +19953,7 @@ static bool ValidDuplicateEnum(EnumConstantDecl *ECD, EnumDecl *Enum) {
 
 // Emits a warning when an element is implicitly set a value that
 // a previous element has already been set to.
-static void CheckForDuplicateEnumValues(Sema &S, ArrayRef<Decl *> Elements,
+static void CheckForDuplicateEnumValues(Sema &S, llvm::ArrayRef<Decl *> Elements,
                                         EnumDecl *Enum, QualType EnumType) {
   // Avoid anonymous enums
   if (!Enum->getIdentifier())
@@ -19966,8 +19966,8 @@ static void CheckForDuplicateEnumValues(Sema &S, ArrayRef<Decl *> Elements,
   if (S.Diags.isIgnored(diag::warn_duplicate_enum_values, Enum->getLocation()))
     return;
 
-  typedef SmallVector<EnumConstantDecl *, 3> ECDVector;
-  typedef SmallVector<std::unique_ptr<ECDVector>, 3> DuplicatesVector;
+  typedef llvm::SmallVector<EnumConstantDecl *, 3> ECDVector;
+  typedef llvm::SmallVector<std::unique_ptr<ECDVector>, 3> DuplicatesVector;
 
   typedef llvm::PointerUnion<EnumConstantDecl*, ECDVector*> DeclOrVector;
 
@@ -20093,7 +20093,7 @@ bool Sema::IsValueInFlagEnum(const EnumDecl *ED, const llvm::APInt &Val,
 }
 
 void Sema::ActOnEnumBody(SourceLocation EnumLoc, SourceRange BraceRange,
-                         Decl *EnumDeclX, ArrayRef<Decl *> Elements, Scope *S,
+                         Decl *EnumDeclX, llvm::ArrayRef<Decl *> Elements, Scope *S,
                          const ParsedAttributesView &Attrs) {
   EnumDecl *Enum = cast<EnumDecl>(EnumDeclX);
   QualType EnumType = Context.getTypeDeclType(Enum);

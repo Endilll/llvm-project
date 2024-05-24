@@ -43,7 +43,7 @@ struct DefaultHeuristicConfiguration {
 
 static constexpr std::size_t DefaultMinimumIdentifierNameLength = 3;
 
-static constexpr StringRef HeuristicToString[] = {
+static constexpr llvm::StringRef HeuristicToString[] = {
     "Equality",  "Abbreviation", "Prefix",      "Suffix",
     "Substring", "Levenshtein",  "JaroWinkler", "Dice"};
 
@@ -130,13 +130,13 @@ static constexpr std::size_t SmallVectorSize =
 /// Returns how many % X is of Y.
 static inline double percentage(double X, double Y) { return X / Y * 100.0; }
 
-static bool applyEqualityHeuristic(StringRef Arg, StringRef Param) {
+static bool applyEqualityHeuristic(llvm::StringRef Arg, llvm::StringRef Param) {
   return Arg.equals_insensitive(Param);
 }
 
 static bool applyAbbreviationHeuristic(
-    const llvm::StringMap<std::string> &AbbreviationDictionary, StringRef Arg,
-    StringRef Param) {
+    const llvm::StringMap<std::string> &AbbreviationDictionary, llvm::StringRef Arg,
+    llvm::StringRef Param) {
   if (AbbreviationDictionary.contains(Arg) &&
       Param == AbbreviationDictionary.lookup(Arg))
     return true;
@@ -149,10 +149,10 @@ static bool applyAbbreviationHeuristic(
 }
 
 /// Check whether the shorter String is a prefix of the longer String.
-static bool applyPrefixHeuristic(StringRef Arg, StringRef Param,
+static bool applyPrefixHeuristic(llvm::StringRef Arg, llvm::StringRef Param,
                                  int8_t Threshold) {
-  StringRef Shorter = Arg.size() < Param.size() ? Arg : Param;
-  StringRef Longer = Arg.size() >= Param.size() ? Arg : Param;
+  llvm::StringRef Shorter = Arg.size() < Param.size() ? Arg : Param;
+  llvm::StringRef Longer = Arg.size() >= Param.size() ? Arg : Param;
 
   if (Longer.starts_with_insensitive(Shorter))
     return percentage(Shorter.size(), Longer.size()) > Threshold;
@@ -161,10 +161,10 @@ static bool applyPrefixHeuristic(StringRef Arg, StringRef Param,
 }
 
 /// Check whether the shorter String is a suffix of the longer String.
-static bool applySuffixHeuristic(StringRef Arg, StringRef Param,
+static bool applySuffixHeuristic(llvm::StringRef Arg, llvm::StringRef Param,
                                  int8_t Threshold) {
-  StringRef Shorter = Arg.size() < Param.size() ? Arg : Param;
-  StringRef Longer = Arg.size() >= Param.size() ? Arg : Param;
+  llvm::StringRef Shorter = Arg.size() < Param.size() ? Arg : Param;
+  llvm::StringRef Longer = Arg.size() >= Param.size() ? Arg : Param;
 
   if (Longer.ends_with_insensitive(Shorter))
     return percentage(Shorter.size(), Longer.size()) > Threshold;
@@ -172,12 +172,12 @@ static bool applySuffixHeuristic(StringRef Arg, StringRef Param,
   return false;
 }
 
-static bool applySubstringHeuristic(StringRef Arg, StringRef Param,
+static bool applySubstringHeuristic(llvm::StringRef Arg, llvm::StringRef Param,
                                     int8_t Threshold) {
 
   std::size_t MaxLength = 0;
-  SmallVector<std::size_t, SmallVectorSize> Current(Param.size());
-  SmallVector<std::size_t, SmallVectorSize> Previous(Param.size());
+  llvm::SmallVector<std::size_t, SmallVectorSize> Current(Param.size());
+  llvm::SmallVector<std::size_t, SmallVectorSize> Previous(Param.size());
   std::string ArgLower = Arg.lower();
   std::string ParamLower = Param.lower();
 
@@ -201,7 +201,7 @@ static bool applySubstringHeuristic(StringRef Arg, StringRef Param,
   return percentage(MaxLength, LongerLength) > Threshold;
 }
 
-static bool applyLevenshteinHeuristic(StringRef Arg, StringRef Param,
+static bool applyLevenshteinHeuristic(llvm::StringRef Arg, llvm::StringRef Param,
                                       int8_t Threshold) {
   std::size_t LongerLength = std::max(Arg.size(), Param.size());
   double Dist = Arg.edit_distance(Param);
@@ -210,13 +210,13 @@ static bool applyLevenshteinHeuristic(StringRef Arg, StringRef Param,
 }
 
 // Based on http://en.wikipedia.org/wiki/Jaro–Winkler_distance.
-static bool applyJaroWinklerHeuristic(StringRef Arg, StringRef Param,
+static bool applyJaroWinklerHeuristic(llvm::StringRef Arg, llvm::StringRef Param,
                                       int8_t Threshold) {
   std::size_t Match = 0, Transpos = 0;
   std::ptrdiff_t ArgLen = Arg.size();
   std::ptrdiff_t ParamLen = Param.size();
-  SmallVector<int, SmallVectorSize> ArgFlags(ArgLen);
-  SmallVector<int, SmallVectorSize> ParamFlags(ParamLen);
+  llvm::SmallVector<int, SmallVectorSize> ArgFlags(ArgLen);
+  llvm::SmallVector<int, SmallVectorSize> ParamFlags(ParamLen);
   std::ptrdiff_t Range =
       std::max(std::ptrdiff_t{0}, std::max(ArgLen, ParamLen) / 2 - 1);
 
@@ -271,7 +271,7 @@ static bool applyJaroWinklerHeuristic(StringRef Arg, StringRef Param,
 }
 
 // Based on http://en.wikipedia.org/wiki/Sørensen–Dice_coefficient
-static bool applyDiceHeuristic(StringRef Arg, StringRef Param,
+static bool applyDiceHeuristic(llvm::StringRef Arg, llvm::StringRef Param,
                                int8_t Threshold) {
   llvm::StringSet<> ArgBigrams;
   llvm::StringSet<> ParamBigrams;
@@ -495,7 +495,7 @@ static bool isOverloadedUnaryOrBinarySymbolOperator(const FunctionDecl *FD) {
 }
 
 SuspiciousCallArgumentCheck::SuspiciousCallArgumentCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       MinimumIdentifierNameLength(Options.get(
           "MinimumIdentifierNameLength", DefaultMinimumIdentifierNameLength)) {
@@ -508,7 +508,7 @@ SuspiciousCallArgumentCheck::SuspiciousCallArgumentCheck(
     auto Idx = static_cast<std::size_t>(H);
     assert(Idx < HeuristicCount);
 
-    SmallString<32> Key = HeuristicToString[Idx];
+    llvm::SmallString<32> Key = HeuristicToString[Idx];
     Key.append(BK == BoundKind::DissimilarBelow ? "DissimilarBelow"
                                                 : "SimilarAbove");
     int8_t Default = BK == BoundKind::DissimilarBelow
@@ -525,7 +525,7 @@ SuspiciousCallArgumentCheck::SuspiciousCallArgumentCheck(
                        GetBoundOpt(H, BoundKind::SimilarAbove)));
   }
 
-  for (StringRef Abbreviation : optutils::parseStringList(
+  for (llvm::StringRef Abbreviation : optutils::parseStringList(
            Options.get("Abbreviations", DefaultAbbreviations))) {
     auto KeyAndValue = Abbreviation.split("=");
     assert(!KeyAndValue.first.empty() && !KeyAndValue.second.empty());
@@ -548,7 +548,7 @@ void SuspiciousCallArgumentCheck::storeOptions(
     if (!Defaults[Idx].hasBounds())
       return;
 
-    SmallString<32> Key = HeuristicToString[Idx];
+    llvm::SmallString<32> Key = HeuristicToString[Idx];
     Key.append(BK == BoundKind::DissimilarBelow ? "DissimilarBelow"
                                                 : "SimilarAbove");
     Options.store(Opts, Key, *getBound(H, BK));
@@ -561,9 +561,9 @@ void SuspiciousCallArgumentCheck::storeOptions(
     SetBoundOpt(H, BoundKind::SimilarAbove);
   }
 
-  SmallVector<std::string, 32> Abbreviations;
+  llvm::SmallVector<std::string, 32> Abbreviations;
   for (const auto &Abbreviation : AbbreviationDictionary) {
-    SmallString<32> EqualSignJoined;
+    llvm::SmallString<32> EqualSignJoined;
     EqualSignJoined.append(Abbreviation.first());
     EqualSignJoined.append("=");
     EqualSignJoined.append(Abbreviation.second);
@@ -572,7 +572,7 @@ void SuspiciousCallArgumentCheck::storeOptions(
       Abbreviations.emplace_back(EqualSignJoined.str());
   }
   Options.store(Opts, "Abbreviations",
-                optutils::serializeStringList(std::vector<StringRef>(
+                optutils::serializeStringList(std::vector<llvm::StringRef>(
                     Abbreviations.begin(), Abbreviations.end())));
 }
 
@@ -698,7 +698,7 @@ void SuspiciousCallArgumentCheck::setParamNamesAndTypes(
     if (IdentifierInfo *II = Param->getIdentifier())
       ParamNames.push_back(II->getName());
     else
-      ParamNames.push_back(StringRef());
+      ParamNames.push_back(llvm::StringRef());
   }
 }
 
@@ -732,7 +732,7 @@ void SuspiciousCallArgumentCheck::setArgNamesAndTypes(
     }
 
     ArgTypes.push_back(QualType());
-    ArgNames.push_back(StringRef());
+    ArgNames.push_back(llvm::StringRef());
   }
 }
 
@@ -777,8 +777,8 @@ bool SuspiciousCallArgumentCheck::areArgsSwapped(std::size_t Position1,
   return false;
 }
 
-bool SuspiciousCallArgumentCheck::areNamesSimilar(StringRef Arg,
-                                                  StringRef Param, Heuristic H,
+bool SuspiciousCallArgumentCheck::areNamesSimilar(llvm::StringRef Arg,
+                                                  llvm::StringRef Param, Heuristic H,
                                                   BoundKind BK) const {
   int8_t Threshold = -1;
   if (std::optional<int8_t> GotBound = getBound(H, BK))

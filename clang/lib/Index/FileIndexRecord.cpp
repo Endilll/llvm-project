@@ -16,7 +16,7 @@
 using namespace clang;
 using namespace clang::index;
 
-ArrayRef<DeclOccurrence>
+llvm::ArrayRef<DeclOccurrence>
 FileIndexRecord::getDeclOccurrencesSortedByOffset() const {
   if (!IsSorted) {
     llvm::stable_sort(Decls,
@@ -30,7 +30,7 @@ FileIndexRecord::getDeclOccurrencesSortedByOffset() const {
 
 void FileIndexRecord::addDeclOccurence(SymbolRoleSet Roles, unsigned Offset,
                                        const Decl *D,
-                                       ArrayRef<SymbolRelation> Relations) {
+                                       llvm::ArrayRef<SymbolRelation> Relations) {
   assert(D->isCanonicalDecl() &&
          "Occurrences should be associated with their canonical decl");
   IsSorted = false;

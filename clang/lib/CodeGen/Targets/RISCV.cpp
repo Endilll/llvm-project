@@ -271,8 +271,8 @@ bool RISCVABIInfo::detectFPCCEligibleStruct(QualType Ty, llvm::Type *&Field1Ty,
 ABIArgInfo RISCVABIInfo::coerceAndExpandFPCCEligibleStruct(
     llvm::Type *Field1Ty, CharUnits Field1Off, llvm::Type *Field2Ty,
     CharUnits Field2Off) const {
-  SmallVector<llvm::Type *, 3> CoerceElts;
-  SmallVector<llvm::Type *, 2> UnpaddedCoerceElts;
+  llvm::SmallVector<llvm::Type *, 3> CoerceElts;
+  llvm::SmallVector<llvm::Type *, 2> UnpaddedCoerceElts;
   if (!Field1Off.isZero())
     CoerceElts.push_back(llvm::ArrayType::get(
         llvm::Type::getInt8Ty(getVMContext()), Field1Off.getQuantity()));

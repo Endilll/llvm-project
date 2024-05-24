@@ -39,9 +39,9 @@ namespace {
 static constexpr const char *ClangBinary = "clang";
 static constexpr const char *InputFile = "/sources/foo.c";
 
-std::string concatPaths(llvm::ArrayRef<StringRef> Components) {
+std::string concatPaths(llvm::ArrayRef<llvm::StringRef> Components) {
   llvm::SmallString<128> P;
-  for (StringRef C : Components)
+  for (llvm::StringRef C : Components)
     llvm::sys::path::append(P, C);
   return std::string(P);
 }

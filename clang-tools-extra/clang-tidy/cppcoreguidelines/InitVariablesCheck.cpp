@@ -22,7 +22,7 @@ namespace {
 AST_MATCHER(VarDecl, isLocalVarDecl) { return Node.isLocalVarDecl(); }
 } // namespace
 
-InitVariablesCheck::InitVariablesCheck(StringRef Name,
+InitVariablesCheck::InitVariablesCheck(llvm::StringRef Name,
                                        ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       IncludeInserter(Options.getLocalOrGlobal("IncludeStyle",

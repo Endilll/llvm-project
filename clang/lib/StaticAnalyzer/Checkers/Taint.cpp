@@ -27,7 +27,7 @@ REGISTER_MAP_FACTORY_WITH_PROGRAMSTATE(TaintedSubRegions, const SubRegion *,
                                        TaintTagType)
 REGISTER_MAP_WITH_PROGRAMSTATE(DerivedSymTaint, SymbolRef, TaintedSubRegions)
 
-void taint::printTaint(ProgramStateRef State, raw_ostream &Out, const char *NL,
+void taint::printTaint(ProgramStateRef State, llvm::raw_ostream &Out, const char *NL,
                        const char *Sep) {
   TaintMapTy TM = State->get<TaintMap>();
 

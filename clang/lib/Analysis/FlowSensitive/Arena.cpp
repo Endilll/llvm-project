@@ -184,7 +184,7 @@ public:
   FormulaParseError(llvm::StringRef Formula, unsigned Offset)
       : Formula(Formula), Offset(Offset) {}
 
-  void log(raw_ostream &OS) const override {
+  void log(llvm::raw_ostream &OS) const override {
     OS << "bad formula at offset " << Offset << "\n";
     OS << Formula << "\n";
     OS.indent(Offset) << "^";

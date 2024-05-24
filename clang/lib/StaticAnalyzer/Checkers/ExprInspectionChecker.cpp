@@ -515,7 +515,7 @@ public:
     if (std::optional<std::string> Str = lookup(S))
       return Str;
     if (std::optional<std::string> Str = Visit(S->getOperand()))
-      return (Twine("(") + S->getType().getAsString() + ")" + *Str).str();
+      return (llvm::Twine("(") + S->getType().getAsString() + ")" + *Str).str();
     return std::nullopt;
   }
 };

@@ -68,13 +68,13 @@ class JumpScopeChecker {
       : ParentScope(parentScope), InDiag(InDiag), OutDiag(OutDiag), Loc(L) {}
   };
 
-  SmallVector<GotoScope, 48> Scopes;
+  llvm::SmallVector<GotoScope, 48> Scopes;
   llvm::DenseMap<Stmt*, unsigned> LabelAndGotoScopes;
-  SmallVector<Stmt*, 16> Jumps;
+  llvm::SmallVector<Stmt*, 16> Jumps;
 
-  SmallVector<Stmt*, 4> IndirectJumps;
-  SmallVector<LabelDecl *, 4> IndirectJumpTargets;
-  SmallVector<AttributedStmt *, 4> MustTailStmts;
+  llvm::SmallVector<Stmt*, 4> IndirectJumps;
+  llvm::SmallVector<LabelDecl *, 4> IndirectJumpTargets;
+  llvm::SmallVector<AttributedStmt *, 4> MustTailStmts;
 
 public:
   JumpScopeChecker(Stmt *Body, Sema &S);
@@ -88,7 +88,7 @@ private:
   void VerifyJumps();
   void VerifyIndirectJumps();
   void VerifyMustTailStmts();
-  void NoteJumpIntoScopes(ArrayRef<unsigned> ToScopes);
+  void NoteJumpIntoScopes(llvm::ArrayRef<unsigned> ToScopes);
   void DiagnoseIndirectOrAsmJump(Stmt *IG, unsigned IGScope, LabelDecl *Target,
                                  unsigned TargetScope);
   void CheckJump(Stmt *From, Stmt *To, SourceLocation DiagLoc,
@@ -754,7 +754,7 @@ void JumpScopeChecker::VerifyIndirectJumps() {
   // goto.  For most code bases, this substantially cuts down on the number of
   // jump sites we'll have to consider later.
   using JumpScope = std::pair<unsigned, Stmt *>;
-  SmallVector<JumpScope, 32> JumpScopes;
+  llvm::SmallVector<JumpScope, 32> JumpScopes;
   {
     llvm::DenseMap<unsigned, Stmt*> JumpScopesMap;
     for (Stmt *IG : IndirectJumps) {
@@ -876,7 +876,7 @@ static void DiagnoseIndirectOrAsmJumpStmt(Sema &S, Stmt *Jump,
 }
 
 /// Produce note diagnostics for a jump into a protected scope.
-void JumpScopeChecker::NoteJumpIntoScopes(ArrayRef<unsigned> ToScopes) {
+void JumpScopeChecker::NoteJumpIntoScopes(llvm::ArrayRef<unsigned> ToScopes) {
   if (CHECK_PERMISSIVE(ToScopes.empty()))
     return;
   for (unsigned I = 0, E = ToScopes.size(); I != E; ++I)
@@ -901,7 +901,7 @@ void JumpScopeChecker::DiagnoseIndirectOrAsmJump(Stmt *Jump, unsigned JumpScope,
       S.Diag(Scopes[I].Loc, Scopes[I].OutDiag);
     }
 
-  SmallVector<unsigned, 10> ToScopesCXX98Compat;
+  llvm::SmallVector<unsigned, 10> ToScopesCXX98Compat;
 
   // Now walk into the scopes containing the label whose address was taken.
   for (unsigned I = TargetScope; I != Common; I = Scopes[I].ParentScope)
@@ -968,9 +968,9 @@ void JumpScopeChecker::CheckJump(Stmt *From, Stmt *To, SourceLocation DiagLoc,
   if (CommonScope == ToScope) return;
 
   // Pull out (and reverse) any scopes we might need to diagnose skipping.
-  SmallVector<unsigned, 10> ToScopesCXX98Compat;
-  SmallVector<unsigned, 10> ToScopesError;
-  SmallVector<unsigned, 10> ToScopesWarning;
+  llvm::SmallVector<unsigned, 10> ToScopesCXX98Compat;
+  llvm::SmallVector<unsigned, 10> ToScopesError;
+  llvm::SmallVector<unsigned, 10> ToScopesWarning;
   for (unsigned I = ToScope; I != CommonScope; I = Scopes[I].ParentScope) {
     if (S.getLangOpts().MSVCCompat && JumpDiagWarning != 0 &&
         IsMicrosoftJumpWarning(JumpDiagError, Scopes[I].InDiag))
@@ -1024,7 +1024,7 @@ void JumpScopeChecker::VerifyMustTailStmts() {
 }
 
 const Attr *JumpScopeChecker::GetMustTailAttr(AttributedStmt *AS) {
-  ArrayRef<const Attr *> Attrs = AS->getAttrs();
+  llvm::ArrayRef<const Attr *> Attrs = AS->getAttrs();
   const auto *Iter =
       llvm::find_if(Attrs, [](const Attr *A) { return isa<MustTailAttr>(A); });
   return Iter != Attrs.end() ? *Iter : nullptr;

@@ -2299,7 +2299,7 @@ TEST_F(FormatTest, FormatsForLoop) {
                "         I = FD->getDeclsInPrototypeScope().begin(),\n"
                "         E = FD->getDeclsInPrototypeScope().end();\n"
                "     I != E; ++I) {\n}");
-  verifyFormat("for (SmallVectorImpl<TemplateIdAnnotationn *>::iterator\n"
+  verifyFormat("for (llvm::SmallVectorImpl<TemplateIdAnnotationn *>::iterator\n"
                "         I = Container.begin(),\n"
                "         E = Container.end();\n"
                "     I != E; ++I) {\n}",
@@ -4770,11 +4770,11 @@ TEST_F(FormatTest, FormatsInlineASM) {
                "int   i;");
 
   auto Style = getLLVMStyleWithColumns(0);
-  const StringRef Code1{"asm(\"xyz\" : \"=a\"(a), \"=d\"(b) : \"a\"(data));"};
-  const StringRef Code2{"asm(\"xyz\"\n"
+  const llvm::StringRef Code1{"asm(\"xyz\" : \"=a\"(a), \"=d\"(b) : \"a\"(data));"};
+  const llvm::StringRef Code2{"asm(\"xyz\"\n"
                         "    : \"=a\"(a), \"=d\"(b)\n"
                         "    : \"a\"(data));"};
-  const StringRef Code3{"asm(\"xyz\" : \"=a\"(a), \"=d\"(b)\n"
+  const llvm::StringRef Code3{"asm(\"xyz\" : \"=a\"(a), \"=d\"(b)\n"
                         "    : \"a\"(data));"};
 
   Style.BreakBeforeInlineASMColon = FormatStyle::BBIAS_OnlyMultiline;
@@ -7947,17 +7947,17 @@ TEST_F(FormatTest, AllowAllArgumentsOnNextLineDontAlign) {
   // Check that AllowAllArgumentsOnNextLine is respected for both BAS_DontAlign
   // and BAS_Align.
   FormatStyle Style = getLLVMStyleWithColumns(35);
-  StringRef Input = "functionCall(paramA, paramB, paramC);\n"
+  llvm::StringRef Input = "functionCall(paramA, paramB, paramC);\n"
                     "void functionDecl(int A, int B, int C);";
   Style.AllowAllArgumentsOnNextLine = false;
   Style.AlignAfterOpenBracket = FormatStyle::BAS_DontAlign;
-  verifyFormat(StringRef("functionCall(paramA, paramB,\n"
+  verifyFormat(llvm::StringRef("functionCall(paramA, paramB,\n"
                          "    paramC);\n"
                          "void functionDecl(int A, int B,\n"
                          "    int C);"),
                Input, Style);
   Style.AlignAfterOpenBracket = FormatStyle::BAS_Align;
-  verifyFormat(StringRef("functionCall(paramA, paramB,\n"
+  verifyFormat(llvm::StringRef("functionCall(paramA, paramB,\n"
                          "             paramC);\n"
                          "void functionDecl(int A, int B,\n"
                          "                  int C);"),
@@ -7965,7 +7965,7 @@ TEST_F(FormatTest, AllowAllArgumentsOnNextLineDontAlign) {
   // However, BAS_AlwaysBreak and BAS_BlockIndent should take precedence over
   // AllowAllArgumentsOnNextLine.
   Style.AlignAfterOpenBracket = FormatStyle::BAS_AlwaysBreak;
-  verifyFormat(StringRef("functionCall(\n"
+  verifyFormat(llvm::StringRef("functionCall(\n"
                          "    paramA, paramB, paramC);\n"
                          "void functionDecl(\n"
                          "    int A, int B, int C);"),
@@ -7983,7 +7983,7 @@ TEST_F(FormatTest, AllowAllArgumentsOnNextLineDontAlign) {
   // first argument.
   Style.AllowAllArgumentsOnNextLine = true;
   Style.AlignAfterOpenBracket = FormatStyle::BAS_AlwaysBreak;
-  verifyFormat(StringRef("functionCall(\n"
+  verifyFormat(llvm::StringRef("functionCall(\n"
                          "    paramA, paramB, paramC);\n"
                          "void functionDecl(\n"
                          "    int A, int B, int C);"),
@@ -7991,13 +7991,13 @@ TEST_F(FormatTest, AllowAllArgumentsOnNextLineDontAlign) {
   // It wouldn't fit on one line with aligned parameters so this setting
   // doesn't change anything for BAS_Align.
   Style.AlignAfterOpenBracket = FormatStyle::BAS_Align;
-  verifyFormat(StringRef("functionCall(paramA, paramB,\n"
+  verifyFormat(llvm::StringRef("functionCall(paramA, paramB,\n"
                          "             paramC);\n"
                          "void functionDecl(int A, int B,\n"
                          "                  int C);"),
                Input, Style);
   Style.AlignAfterOpenBracket = FormatStyle::BAS_DontAlign;
-  verifyFormat(StringRef("functionCall(\n"
+  verifyFormat(llvm::StringRef("functionCall(\n"
                          "    paramA, paramB, paramC);\n"
                          "void functionDecl(\n"
                          "    int A, int B, int C);"),
@@ -8005,7 +8005,7 @@ TEST_F(FormatTest, AllowAllArgumentsOnNextLineDontAlign) {
 }
 
 TEST_F(FormatTest, BreakFunctionDefinitionParameters) {
-  StringRef Input = "void functionDecl(paramA, paramB, paramC);\n"
+  llvm::StringRef Input = "void functionDecl(paramA, paramB, paramC);\n"
                     "void emptyFunctionDefinition() {}\n"
                     "void functionDefinition(int A, int B, int C) {}\n"
                     "Class::Class(int A, int B) : m_A(A), m_B(B) {}";
@@ -11511,7 +11511,7 @@ TEST_F(FormatTest, PointerAlignmentFallback) {
   FormatStyle Style = getLLVMStyle();
   Style.DerivePointerAlignment = true;
 
-  const StringRef Code("int* p;\n"
+  const llvm::StringRef Code("int* p;\n"
                        "int *q;\n"
                        "int * r;");
 
@@ -12126,7 +12126,7 @@ TEST_F(FormatTest, UnderstandsPointerQualifiersInCast) {
   FormatStyle LongPointerRight = getLLVMStyleWithColumns(999);
   FormatStyle LongPointerLeft = getLLVMStyleWithColumns(999);
   LongPointerLeft.PointerAlignment = FormatStyle::PAS_Left;
-  StringRef AllQualifiers =
+  llvm::StringRef AllQualifiers =
       "const volatile restrict __attribute__((foo)) _Nonnull _Null_unspecified "
       "_Nonnull [[clang::attr]] __ptr32 __ptr64 __capability";
   verifyFormat(("x = (foo *" + AllQualifiers + ")*v;").str(), LongPointerRight);
@@ -12421,9 +12421,9 @@ TEST_F(FormatTest, FormatsCasts) {
   verifyFormat("funptrs[4](foo)[4];");
   verifyFormat("void f(int *);");
   verifyFormat("void f(int *) = 0;");
-  verifyFormat("void f(SmallVector<int>) {}");
-  verifyFormat("void f(SmallVector<int>);");
-  verifyFormat("void f(SmallVector<int>) = 0;");
+  verifyFormat("void f(llvm::SmallVector<int>) {}");
+  verifyFormat("void f(llvm::SmallVector<int>);");
+  verifyFormat("void f(llvm::SmallVector<int>) = 0;");
   verifyFormat("void f(int i = (kA * kB) & kMask) {}");
   verifyFormat("int a = sizeof(int) * b;");
   verifyGoogleFormat("int a = alignof(int) * b;");
@@ -14331,7 +14331,7 @@ TEST_F(FormatTest, PullTrivialFunctionDefinitionsIntoSingleLine) {
       "    aaaaaaaaaaaaaaaaaa,\n"
       "    aaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb) {}");
 
-  constexpr StringRef Code{"void foo() { /* Empty */ }"};
+  constexpr llvm::StringRef Code{"void foo() { /* Empty */ }"};
   verifyFormat(Code);
   verifyFormat(Code, "void foo() { /* Empty */\n"
                      "}");
@@ -25990,7 +25990,7 @@ TEST_F(FormatTest, RequiresExpressionIndentation) {
 
 TEST_F(FormatTest, StatementAttributeLikeMacros) {
   FormatStyle Style = getLLVMStyle();
-  StringRef Source = "void Foo::slot() {\n"
+  llvm::StringRef Source = "void Foo::slot() {\n"
                      "  unsigned char MyChar = 'x';\n"
                      "  emit signal(MyChar);\n"
                      "  Q_EMIT signal(MyChar);\n"
@@ -26080,7 +26080,7 @@ TEST_F(FormatTest, IndentAccessModifiers) {
 
 TEST_F(FormatTest, LimitlessStringsAndComments) {
   auto Style = getLLVMStyleWithColumns(0);
-  constexpr StringRef Code =
+  constexpr llvm::StringRef Code =
       "/**\n"
       " * This is a multiline comment with quite some long lines, at least for "
       "the LLVM Style.\n"
@@ -26336,17 +26336,17 @@ TEST_F(FormatTest, MultilineLambdaInConditional) {
 TEST_F(FormatTest, AlignAfterOpenBracketBlockIndent) {
   auto Style = getLLVMStyle();
 
-  StringRef Short = "functionCall(paramA, paramB, paramC);\n"
+  llvm::StringRef Short = "functionCall(paramA, paramB, paramC);\n"
                     "void functionDecl(int a, int b, int c);";
 
-  StringRef Medium = "functionCall(paramA, paramB, paramC, paramD, paramE, "
+  llvm::StringRef Medium = "functionCall(paramA, paramB, paramC, paramD, paramE, "
                      "paramF, paramG, paramH, paramI);\n"
                      "void functionDecl(int argumentA, int argumentB, int "
                      "argumentC, int argumentD, int argumentE);";
 
   verifyFormat(Short, Style);
 
-  StringRef NoBreak = "functionCall(paramA, paramB, paramC, paramD, paramE, "
+  llvm::StringRef NoBreak = "functionCall(paramA, paramB, paramC, paramD, paramE, "
                       "paramF, paramG, paramH,\n"
                       "             paramI);\n"
                       "void functionDecl(int argumentA, int argumentB, int "
@@ -26941,7 +26941,7 @@ TEST_F(FormatTest, RemoveSemicolon) {
 }
 
 TEST_F(FormatTest, BreakAfterAttributes) {
-  constexpr StringRef Code("[[maybe_unused]] const int i;\n"
+  constexpr llvm::StringRef Code("[[maybe_unused]] const int i;\n"
                            "[[foo([[]])]] [[maybe_unused]]\n"
                            "int j;\n"
                            "[[maybe_unused]]\n"
@@ -27002,7 +27002,7 @@ TEST_F(FormatTest, BreakAfterAttributes) {
                "}",
                Code, Style);
 
-  constexpr StringRef CtrlStmtCode("[[likely]] if (a)\n"
+  constexpr llvm::StringRef CtrlStmtCode("[[likely]] if (a)\n"
                                    "  f();\n"
                                    "else\n"
                                    "  g();\n"
@@ -27066,7 +27066,7 @@ TEST_F(FormatTest, BreakAfterAttributes) {
                "  --d;",
                CtrlStmtCode, Style);
 
-  constexpr StringRef CtorDtorCode("struct Foo {\n"
+  constexpr llvm::StringRef CtorDtorCode("struct Foo {\n"
                                    "  [[deprecated]] Foo();\n"
                                    "  [[deprecated]] Foo() {}\n"
                                    "  [[deprecated]] ~Foo();\n"
@@ -27160,7 +27160,7 @@ TEST_F(FormatTest, KeepEmptyLinesAtEOF) {
   FormatStyle Style = getLLVMStyle();
   Style.KeepEmptyLinesAtEOF = true;
 
-  const StringRef Code{"int i;\n\n"};
+  const llvm::StringRef Code{"int i;\n\n"};
   verifyNoChange(Code, Style);
   verifyFormat(Code, "int i;\n\n\n", Style);
 }
@@ -27379,7 +27379,7 @@ TEST_F(FormatTest, PPDirectivesAndCommentsInBracedInit) {
 }
 
 TEST_F(FormatTest, BreakAdjacentStringLiterals) {
-  constexpr StringRef Code{
+  constexpr llvm::StringRef Code{
       "return \"Code\" \"\\0\\52\\26\\55\\55\\0\" \"x013\" \"\\02\\xBA\";"};
 
   verifyFormat("return \"Code\"\n"

@@ -36,12 +36,12 @@ class ForceCheckFileInputTest : public ::testing::Test {
   void TearDown() override { sys::fs::remove_directories(TestDir); }
 
 public:
-  SmallString<256> TestDir;
+  llvm::SmallString<256> TestDir;
 
-  void addFile(StringRef Path, StringRef Contents) {
+  void addFile(llvm::StringRef Path, llvm::StringRef Contents) {
     EXPECT_FALSE(sys::path::is_absolute(Path));
 
-    SmallString<256> AbsPath(TestDir);
+    llvm::SmallString<256> AbsPath(TestDir);
     sys::path::append(AbsPath, Path);
 
     EXPECT_FALSE(
@@ -63,7 +63,7 @@ export int aa = 43;
   std::string BMIPath = llvm::Twine(TestDir + "/a.pcm").str();
 
   {
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
         CompilerInstance::createDiagnostics(new DiagnosticOptions());
     CreateInvocationOptions CIOpts;
     CIOpts.Diags = Diags;
@@ -103,7 +103,7 @@ export int aa = 43;
   }
 
   {
-    IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
+    llvm::IntrusiveRefCntPtr<DiagnosticsEngine> Diags =
         CompilerInstance::createDiagnostics(new DiagnosticOptions());
     CreateInvocationOptions CIOpts;
     CIOpts.Diags = Diags;

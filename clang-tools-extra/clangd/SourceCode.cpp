@@ -186,7 +186,7 @@ llvm::Expected<size_t> positionToOffset(llvm::StringRef Code, Position P,
                    "Line value is out of range ({0})", P.line);
     StartOfLine = NextNL + 1;
   }
-  StringRef Line =
+  llvm::StringRef Line =
       Code.substr(StartOfLine).take_until([](char C) { return C == '\n'; });
 
   // P.character may be in UTF-16, transcode if necessary.
@@ -236,7 +236,7 @@ bool isSpelledInSource(SourceLocation Loc, const SourceManager &SM) {
   const auto SLocEntry = SM.getSLocEntry(Spelling.first, &InvalidSLocEntry);
   if (InvalidSLocEntry)
     return false;
-  StringRef SpellingFile = SLocEntry.getFile().getName();
+  llvm::StringRef SpellingFile = SLocEntry.getFile().getName();
   if (SpellingFile == "<scratch space>")
     return false;
   if (SpellingFile == "<built-in>")
@@ -494,7 +494,7 @@ std::pair<size_t, size_t> offsetToClangLineColumn(llvm::StringRef Code,
   return {Lines + 1, Offset - StartOfLine + 1};
 }
 
-std::pair<StringRef, StringRef> splitQualifiedName(StringRef QName) {
+std::pair<llvm::StringRef, llvm::StringRef> splitQualifiedName(llvm::StringRef QName) {
   size_t Pos = QName.rfind("::");
   if (Pos == llvm::StringRef::npos)
     return {llvm::StringRef(), QName};
@@ -609,7 +609,7 @@ format::FormatStyle getFormatStyleForFile(llvm::StringRef File,
 }
 
 llvm::Expected<tooling::Replacements>
-cleanupAndFormat(StringRef Code, const tooling::Replacements &Replaces,
+cleanupAndFormat(llvm::StringRef Code, const tooling::Replacements &Replaces,
                  const format::FormatStyle &Style) {
   auto CleanReplaces = cleanupAroundReplacements(Code, Replaces, Style);
   if (!CleanReplaces)
@@ -937,8 +937,8 @@ static bool isLikelyIdentifier(llvm::StringRef Word, llvm::StringRef Before,
   // This handles things like lowerCamel and UpperCamel.
   // The check for also containing a lowercase letter is to rule out
   // initialisms like "HTTP".
-  bool HasLower = Word.find_if(clang::isLowercase) != StringRef::npos;
-  bool HasUpper = Word.substr(1).find_if(clang::isUppercase) != StringRef::npos;
+  bool HasLower = Word.find_if(clang::isLowercase) != llvm::StringRef::npos;
+  bool HasUpper = Word.substr(1).find_if(clang::isUppercase) != llvm::StringRef::npos;
   if (HasLower && HasUpper) {
     return true;
   }

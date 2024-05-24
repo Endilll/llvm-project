@@ -93,23 +93,23 @@ class LLVM_LIBRARY_VISIBILITY AArch64TargetInfo : public TargetInfo {
 public:
   AArch64TargetInfo(const llvm::Triple &Triple, const TargetOptions &Opts);
 
-  StringRef getABI() const override;
+  llvm::StringRef getABI() const override;
   bool setABI(const std::string &Name) override;
 
-  bool validateBranchProtection(StringRef Spec, StringRef Arch,
+  bool validateBranchProtection(llvm::StringRef Spec, llvm::StringRef Arch,
                                 BranchProtectionInfo &BPI,
-                                StringRef &Err) const override;
+                                llvm::StringRef &Err) const override;
 
-  bool isValidCPUName(StringRef Name) const override;
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  bool isValidCPUName(llvm::StringRef Name) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
   bool setCPU(const std::string &Name) override;
 
-  unsigned multiVersionSortPriority(StringRef Name) const override;
+  unsigned multiVersionSortPriority(llvm::StringRef Name) const override;
   unsigned multiVersionFeatureCost() const override;
 
   bool
   initFeatureMap(llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags,
-                 StringRef CPU,
+                 llvm::StringRef CPU,
                  const std::vector<std::string> &FeaturesVec) const override;
   bool useFP16ConversionIntrinsics() const override {
     return false;
@@ -150,19 +150,19 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
   std::optional<std::pair<unsigned, unsigned>>
   getVScaleRange(const LangOptions &LangOpts) const override;
-  bool doesFeatureAffectCodeGen(StringRef Name) const override;
-  StringRef getFeatureDependencies(StringRef Name) const override;
-  bool validateCpuSupports(StringRef FeatureStr) const override;
-  bool hasFeature(StringRef Feature) const override;
-  void setFeatureEnabled(llvm::StringMap<bool> &Features, StringRef Name,
+  bool doesFeatureAffectCodeGen(llvm::StringRef Name) const override;
+  llvm::StringRef getFeatureDependencies(llvm::StringRef Name) const override;
+  bool validateCpuSupports(llvm::StringRef FeatureStr) const override;
+  bool hasFeature(llvm::StringRef Feature) const override;
+  void setFeatureEnabled(llvm::StringMap<bool> &Features, llvm::StringRef Name,
                          bool Enabled) const override;
   bool handleTargetFeatures(std::vector<std::string> &Features,
                             DiagnosticsEngine &Diags) override;
-  ParsedTargetAttr parseTargetAttr(StringRef Str) const override;
+  ParsedTargetAttr parseTargetAttr(llvm::StringRef Str) const override;
   bool supportsTargetAttributeTune() const override { return true; }
   bool supportsCpuSupports() const override { return true; }
   bool checkArithmeticFenceSupported() const override { return true; }
@@ -175,20 +175,20 @@ public:
 
   BuiltinVaListKind getBuiltinVaListKind() const override;
 
-  ArrayRef<const char *> getGCCRegNames() const override;
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override;
 
   std::string convertConstraint(const char *&Constraint) const override;
 
   bool validateAsmConstraint(const char *&Name,
                              TargetInfo::ConstraintInfo &Info) const override;
   bool
-  validateConstraintModifier(StringRef Constraint, char Modifier, unsigned Size,
+  validateConstraintModifier(llvm::StringRef Constraint, char Modifier, unsigned Size,
                              std::string &SuggestedModifier) const override;
   std::string_view getClobbers() const override;
 
-  StringRef getConstraintRegister(StringRef Constraint,
-                                  StringRef Expression) const override {
+  llvm::StringRef getConstraintRegister(llvm::StringRef Constraint,
+                                  llvm::StringRef Expression) const override {
     return Expression;
   }
 

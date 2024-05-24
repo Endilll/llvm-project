@@ -102,7 +102,7 @@ struct CGBitFieldInfo {
       : Offset(Offset), Size(Size), IsSigned(IsSigned),
         StorageSize(StorageSize), StorageOffset(StorageOffset) {}
 
-  void print(raw_ostream &OS) const;
+  void print(llvm::raw_ostream &OS) const;
   void dump() const;
 
   /// Given a bit-field decl, build an appropriate helper object for
@@ -229,7 +229,7 @@ public:
     return it->second;
   }
 
-  void print(raw_ostream &OS) const;
+  void print(llvm::raw_ostream &OS) const;
   void dump() const;
 };
 

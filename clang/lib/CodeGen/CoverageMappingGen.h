@@ -113,7 +113,7 @@ class CoverageMappingModuleGen {
   std::vector<FunctionInfo> FunctionRecords;
 
   std::string getCurrentDirname();
-  std::string normalizeFilename(StringRef Filename);
+  std::string normalizeFilename(llvm::StringRef Filename);
 
   /// Emit a function record.
   void emitFunctionMappingRecord(const FunctionInfo &Info,
@@ -131,7 +131,7 @@ public:
   /// Add a function's coverage mapping record to the collection of the
   /// function mapping records.
   void addFunctionMappingRecord(llvm::GlobalVariable *FunctionName,
-                                StringRef FunctionNameValue,
+                                llvm::StringRef FunctionNameValue,
                                 uint64_t FunctionHash,
                                 const std::string &CoverageMapping,
                                 bool IsUsed = true);

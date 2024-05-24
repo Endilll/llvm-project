@@ -47,7 +47,7 @@ public:
   }
 
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override {
+                                                 llvm::StringRef InFile) override {
     return std::make_unique<Visitor>(CI, ActOnEndOfTranslationUnit,
                                       decl_names);
   }
@@ -227,8 +227,8 @@ struct TypoDiagnosticConsumer : public DiagnosticConsumer {
       Info.FormatDiagnostic(Note);
     }
   }
-  SmallString<32> Error;
-  SmallString<32> Note;
+  llvm::SmallString<32> Error;
+  llvm::SmallString<32> Note;
 };
 
 TEST(ASTFrontendAction, ExternalSemaSource) {

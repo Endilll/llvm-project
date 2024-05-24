@@ -20,7 +20,7 @@ namespace clang::tidy::performance {
 /// https://clang.llvm.org/extra/clang-tidy/checks/performance/avoid-endl.html
 class AvoidEndlCheck : public ClangTidyCheck {
 public:
-  AvoidEndlCheck(StringRef Name, ClangTidyContext *Context)
+  AvoidEndlCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
 
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {

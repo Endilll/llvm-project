@@ -231,7 +231,7 @@ public:
     ID.AddInteger(RawIvarAccessHistory);
   }
 
-  void print(raw_ostream &Out) const;
+  void print(llvm::raw_ostream &Out) const;
 };
 
 class RetainCountChecker
@@ -287,7 +287,7 @@ public:
     return getSummaryManager(C.getASTContext());
   }
 
-  void printState(raw_ostream &Out, ProgramStateRef State,
+  void printState(llvm::raw_ostream &Out, ProgramStateRef State,
                   const char *NL, const char *Sep) const override;
 
   void checkBind(SVal loc, SVal val, const Stmt *S, CheckerContext &C) const;
@@ -317,8 +317,8 @@ public:
   ProgramStateRef
   checkRegionChanges(ProgramStateRef state,
                      const InvalidatedSymbols *invalidated,
-                     ArrayRef<const MemRegion *> ExplicitRegions,
-                     ArrayRef<const MemRegion *> Regions,
+                     llvm::ArrayRef<const MemRegion *> ExplicitRegions,
+                     llvm::ArrayRef<const MemRegion *> Regions,
                      const LocationContext* LCtx,
                      const CallEvent *Call) const;
 
@@ -345,7 +345,7 @@ public:
 
   ProgramStateRef handleSymbolDeath(ProgramStateRef state,
                                     SymbolRef sid, RefVal V,
-                                    SmallVectorImpl<SymbolRef> &Leaked) const;
+                                    llvm::SmallVectorImpl<SymbolRef> &Leaked) const;
 
   ProgramStateRef
   handleAutoreleaseCounts(ProgramStateRef state, ExplodedNode *Pred,
@@ -355,7 +355,7 @@ public:
                           const ReturnStmt *S=nullptr) const;
 
   ExplodedNode *processLeaks(ProgramStateRef state,
-                             SmallVectorImpl<SymbolRef> &Leaked,
+                             llvm::SmallVectorImpl<SymbolRef> &Leaked,
                              CheckerContext &Ctx,
                              ExplodedNode *Pred = nullptr) const;
 

@@ -98,7 +98,7 @@ TEST(CodeGenTest, DebugInfoCWDCodeGen) {
   Invocation->getCodeGenOpts().setDebugInfo(codegenoptions::FullDebugInfo);
   CompilerInstance Compiler;
 
-  SmallString<256> IRBuffer;
+  llvm::SmallString<256> IRBuffer;
   Compiler.setOutputStream(std::make_unique<raw_svector_ostream>(IRBuffer));
   Compiler.setInvocation(std::move(Invocation));
   Compiler.createDiagnostics();
@@ -108,7 +108,7 @@ TEST(CodeGenTest, DebugInfoCWDCodeGen) {
   bool Success = Compiler.ExecuteAction(Action);
   EXPECT_TRUE(Success);
 
-  SmallString<128> RealCWD;
+  llvm::SmallString<128> RealCWD;
   llvm::sys::fs::current_path(RealCWD);
   EXPECT_TRUE(!RealCWD.empty());
   EXPECT_FALSE(IRBuffer.str().contains(RealCWD));

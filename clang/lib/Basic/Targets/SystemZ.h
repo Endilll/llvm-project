@@ -72,18 +72,18 @@ public:
   void getTargetDefines(const LangOptions &Opts,
                         MacroBuilder &Builder) const override;
 
-  ArrayRef<Builtin::Info> getTargetBuiltins() const override;
+  llvm::ArrayRef<Builtin::Info> getTargetBuiltins() const override;
 
-  ArrayRef<const char *> getGCCRegNames() const override;
+  llvm::ArrayRef<const char *> getGCCRegNames() const override;
 
-  ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
+  llvm::ArrayRef<TargetInfo::GCCRegAlias> getGCCRegAliases() const override {
     // No aliases.
     return std::nullopt;
   }
 
-  ArrayRef<TargetInfo::AddlRegName> getGCCAddlRegNames() const override;
+  llvm::ArrayRef<TargetInfo::AddlRegName> getGCCAddlRegNames() const override;
 
-  bool isSPRegName(StringRef RegName) const override {
+  bool isSPRegName(llvm::StringRef RegName) const override {
     return RegName == "r15";
   }
 
@@ -123,19 +123,19 @@ public:
     return TargetInfo::SystemZBuiltinVaList;
   }
 
-  int getISARevision(StringRef Name) const;
+  int getISARevision(llvm::StringRef Name) const;
 
-  bool isValidCPUName(StringRef Name) const override {
+  bool isValidCPUName(llvm::StringRef Name) const override {
     return getISARevision(Name) != -1;
   }
 
-  void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override;
+  void fillValidCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override;
 
-  bool isValidTuneCPUName(StringRef Name) const override {
+  bool isValidTuneCPUName(llvm::StringRef Name) const override {
     return isValidCPUName(Name);
   }
 
-  void fillValidTuneCPUList(SmallVectorImpl<StringRef> &Values) const override {
+  void fillValidTuneCPUList(llvm::SmallVectorImpl<llvm::StringRef> &Values) const override {
     fillValidCPUList(Values);
   }
 
@@ -147,7 +147,7 @@ public:
 
   bool
   initFeatureMap(llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags,
-                 StringRef CPU,
+                 llvm::StringRef CPU,
                  const std::vector<std::string> &FeaturesVec) const override {
     int ISARevision = getISARevision(CPU);
     if (ISARevision >= 10)
@@ -192,7 +192,7 @@ public:
     return true;
   }
 
-  bool hasFeature(StringRef Feature) const override;
+  bool hasFeature(llvm::StringRef Feature) const override;
 
   CallingConvCheckResult checkCallingConvention(CallingConv CC) const override {
     switch (CC) {
@@ -207,7 +207,7 @@ public:
     }
   }
 
-  StringRef getABI() const override {
+  llvm::StringRef getABI() const override {
     if (HasVector)
       return "vector";
     return "";

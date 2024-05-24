@@ -249,7 +249,7 @@ public:
 
   void reportBug(const VarDecl *V) const {
     assert(V);
-    SmallString<100> Buf;
+    llvm::SmallString<100> Buf;
     llvm::raw_svector_ostream Os(Buf);
 
     Os << "Local variable ";

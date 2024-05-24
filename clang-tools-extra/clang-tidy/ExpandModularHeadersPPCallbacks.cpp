@@ -39,7 +39,7 @@ public:
       return;
 
     // FIXME: Why is this happening? We might be losing contents here.
-    std::optional<StringRef> Data = ContentCache.getBufferDataIfLoaded();
+    std::optional<llvm::StringRef> Data = ContentCache.getBufferDataIfLoaded();
     if (!Data)
       return;
 
@@ -66,7 +66,7 @@ private:
 
 ExpandModularHeadersPPCallbacks::ExpandModularHeadersPPCallbacks(
     CompilerInstance *CI,
-    IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFS)
+    llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFS)
     : Recorder(std::make_unique<FileRecorder>()), Compiler(*CI),
       InMemoryFs(new llvm::vfs::InMemoryFileSystem),
       Sources(Compiler.getSourceManager()),
@@ -164,9 +164,9 @@ void ExpandModularHeadersPPCallbacks::FileChanged(
 
 void ExpandModularHeadersPPCallbacks::InclusionDirective(
     SourceLocation DirectiveLoc, const Token &IncludeToken,
-    StringRef IncludedFilename, bool IsAngled, CharSourceRange FilenameRange,
-    OptionalFileEntryRef IncludedFile, StringRef SearchPath,
-    StringRef RelativePath, const Module *SuggestedModule, bool ModuleImported,
+    llvm::StringRef IncludedFilename, bool IsAngled, CharSourceRange FilenameRange,
+    OptionalFileEntryRef IncludedFile, llvm::StringRef SearchPath,
+    llvm::StringRef RelativePath, const Module *SuggestedModule, bool ModuleImported,
     SrcMgr::CharacteristicKind FileType) {
   if (ModuleImported) {
     serialization::ModuleFile *MF =
@@ -185,7 +185,7 @@ void ExpandModularHeadersPPCallbacks::EndOfMainFile() {
 // Handle all other callbacks.
 // Just parse to the corresponding location to generate the same callback for
 // the PPCallbacks registered in our custom preprocessor.
-void ExpandModularHeadersPPCallbacks::Ident(SourceLocation Loc, StringRef) {
+void ExpandModularHeadersPPCallbacks::Ident(SourceLocation Loc, llvm::StringRef) {
   parseToLocation(Loc);
 }
 void ExpandModularHeadersPPCallbacks::PragmaDirective(SourceLocation Loc,
@@ -194,39 +194,39 @@ void ExpandModularHeadersPPCallbacks::PragmaDirective(SourceLocation Loc,
 }
 void ExpandModularHeadersPPCallbacks::PragmaComment(SourceLocation Loc,
                                                     const IdentifierInfo *,
-                                                    StringRef) {
+                                                    llvm::StringRef) {
   parseToLocation(Loc);
 }
 void ExpandModularHeadersPPCallbacks::PragmaDetectMismatch(SourceLocation Loc,
-                                                           StringRef,
-                                                           StringRef) {
+                                                           llvm::StringRef,
+                                                           llvm::StringRef) {
   parseToLocation(Loc);
 }
 void ExpandModularHeadersPPCallbacks::PragmaDebug(SourceLocation Loc,
-                                                  StringRef) {
+                                                  llvm::StringRef) {
   parseToLocation(Loc);
 }
 void ExpandModularHeadersPPCallbacks::PragmaMessage(SourceLocation Loc,
-                                                    StringRef,
+                                                    llvm::StringRef,
                                                     PragmaMessageKind,
-                                                    StringRef) {
+                                                    llvm::StringRef) {
   parseToLocation(Loc);
 }
 void ExpandModularHeadersPPCallbacks::PragmaDiagnosticPush(SourceLocation Loc,
-                                                           StringRef) {
+                                                           llvm::StringRef) {
   parseToLocation(Loc);
 }
 void ExpandModularHeadersPPCallbacks::PragmaDiagnosticPop(SourceLocation Loc,
-                                                          StringRef) {
+                                                          llvm::StringRef) {
   parseToLocation(Loc);
 }
 void ExpandModularHeadersPPCallbacks::PragmaDiagnostic(SourceLocation Loc,
-                                                       StringRef,
+                                                       llvm::StringRef,
                                                        diag::Severity,
-                                                       StringRef) {
+                                                       llvm::StringRef) {
   parseToLocation(Loc);
 }
-void ExpandModularHeadersPPCallbacks::HasInclude(SourceLocation Loc, StringRef,
+void ExpandModularHeadersPPCallbacks::HasInclude(SourceLocation Loc, llvm::StringRef,
                                                  bool, OptionalFileEntryRef,
                                                  SrcMgr::CharacteristicKind) {
   parseToLocation(Loc);
@@ -239,7 +239,7 @@ void ExpandModularHeadersPPCallbacks::PragmaOpenCLExtension(
 }
 void ExpandModularHeadersPPCallbacks::PragmaWarning(SourceLocation Loc,
                                                     PragmaWarningSpecifier,
-                                                    ArrayRef<int>) {
+                                                    llvm::ArrayRef<int>) {
   parseToLocation(Loc);
 }
 void ExpandModularHeadersPPCallbacks::PragmaWarningPush(SourceLocation Loc,

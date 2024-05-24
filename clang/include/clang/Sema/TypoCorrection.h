@@ -169,7 +169,7 @@ public:
   }
 
   /// Clears the list of NamedDecls and adds the given set.
-  void setCorrectionDecls(ArrayRef<NamedDecl*> Decls) {
+  void setCorrectionDecls(llvm::ArrayRef<NamedDecl*> Decls) {
     CorrectionDecls.clear();
     CorrectionDecls.insert(CorrectionDecls.begin(), Decls.begin(), Decls.end());
   }
@@ -227,7 +227,7 @@ public:
     return CorrectionRange;
   }
 
-  using decl_iterator = SmallVectorImpl<NamedDecl *>::iterator;
+  using decl_iterator = llvm::SmallVectorImpl<NamedDecl *>::iterator;
 
   decl_iterator begin() {
     return isKeyword() ? CorrectionDecls.end() : CorrectionDecls.begin();
@@ -235,7 +235,7 @@ public:
 
   decl_iterator end() { return CorrectionDecls.end(); }
 
-  using const_decl_iterator = SmallVectorImpl<NamedDecl *>::const_iterator;
+  using const_decl_iterator = llvm::SmallVectorImpl<NamedDecl *>::const_iterator;
 
   const_decl_iterator begin() const {
     return isKeyword() ? CorrectionDecls.end() : CorrectionDecls.begin();
@@ -253,7 +253,7 @@ public:
   void addExtraDiagnostic(PartialDiagnostic PD) {
     ExtraDiagnostics.push_back(std::move(PD));
   }
-  ArrayRef<PartialDiagnostic> getExtraDiagnostics() const {
+  llvm::ArrayRef<PartialDiagnostic> getExtraDiagnostics() const {
     return ExtraDiagnostics;
   }
 
@@ -265,7 +265,7 @@ private:
   // Results.
   DeclarationName CorrectionName;
   NestedNameSpecifier *CorrectionNameSpec = nullptr;
-  SmallVector<NamedDecl *, 1> CorrectionDecls;
+  llvm::SmallVector<NamedDecl *, 1> CorrectionDecls;
   unsigned CharDistance = 0;
   unsigned QualifierDistance = 0;
   unsigned CallbackDistance = 0;

@@ -69,7 +69,7 @@ protected:
       RecordedAST &Out;
       RecordAction(RecordedAST &Out) : Out(Out) {}
       std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                     StringRef) override {
+                                                     llvm::StringRef) override {
         return Out.record();
       }
     };
@@ -318,7 +318,7 @@ protected:
 
   TestAST build() { return TestAST(Inputs); }
 
-  void createEmptyFiles(llvm::ArrayRef<StringRef> FileNames) {
+  void createEmptyFiles(llvm::ArrayRef<llvm::StringRef> FileNames) {
     for (llvm::StringRef File : FileNames)
       Inputs.ExtraFiles[File] = "#pragma once";
   }

@@ -75,7 +75,7 @@ class SVEType {
 public:
   SVEType() : SVEType("", 'v') {}
 
-  SVEType(StringRef TS, char CharMod, unsigned NumVectors = 1)
+  SVEType(llvm::StringRef TS, char CharMod, unsigned NumVectors = 1)
       : Float(false), Signed(true), Immediate(false), Void(false),
         Constant(false), Pointer(false), BFloat(false), DefaultType(false),
         IsScalable(true), Predicate(false), PredicatePattern(false),
@@ -136,7 +136,7 @@ public:
 
 private:
   /// Creates the type based on the typespec string in TS.
-  void applyTypespec(StringRef TS);
+  void applyTypespec(llvm::StringRef TS);
 
   /// Applies a prototype modifier to the type.
   void applyModifier(char Mod);
@@ -178,13 +178,13 @@ class Intrinsic {
 
   uint64_t Flags;
 
-  SmallVector<ImmCheck, 2> ImmChecks;
+  llvm::SmallVector<ImmCheck, 2> ImmChecks;
 
 public:
-  Intrinsic(StringRef Name, StringRef Proto, uint64_t MergeTy,
-            StringRef MergeSuffix, uint64_t MemoryElementTy, StringRef LLVMName,
-            uint64_t Flags, ArrayRef<ImmCheck> ImmChecks, TypeSpec BT,
-            ClassKind Class, SVEEmitter &Emitter, StringRef Guard);
+  Intrinsic(llvm::StringRef Name, llvm::StringRef Proto, uint64_t MergeTy,
+            llvm::StringRef MergeSuffix, uint64_t MemoryElementTy, llvm::StringRef LLVMName,
+            uint64_t Flags, llvm::ArrayRef<ImmCheck> ImmChecks, TypeSpec BT,
+            ClassKind Class, SVEEmitter &Emitter, llvm::StringRef Guard);
 
   ~Intrinsic()=default;
 
@@ -194,11 +194,11 @@ public:
   TypeSpec getBaseTypeSpec() const { return BaseTypeSpec; }
   SVEType getBaseType() const { return BaseType; }
 
-  StringRef getGuard() const { return Guard; }
+  llvm::StringRef getGuard() const { return Guard; }
   ClassKind getClassKind() const { return Class; }
 
   SVEType getReturnType() const { return Types[0]; }
-  ArrayRef<SVEType> getTypes() const { return Types; }
+  llvm::ArrayRef<SVEType> getTypes() const { return Types; }
   SVEType getParamType(unsigned I) const { return Types[I + 1]; }
   unsigned getNumParams() const {
     return Proto.size() - (2 * llvm::count(Proto, '.')) - 1;
@@ -207,7 +207,7 @@ public:
   uint64_t getFlags() const { return Flags; }
   bool isFlagSet(uint64_t Flag) const { return Flags & Flag;}
 
-  ArrayRef<ImmCheck> getImmChecks() const { return ImmChecks; }
+  llvm::ArrayRef<ImmCheck> getImmChecks() const { return ImmChecks; }
 
   /// Return the type string for a BUILTIN() macro in Builtins.def.
   std::string getBuiltinTypeStr();
@@ -222,7 +222,7 @@ public:
   /// Returns true if the intrinsic is overloaded, in that it should also generate
   /// a short form without the type-specifiers, e.g. 'svld1(..)' instead of
   /// 'svld1_u32(..)'.
-  static bool isOverloadedIntrinsic(StringRef Name) {
+  static bool isOverloadedIntrinsic(llvm::StringRef Name) {
     auto BrOpen = Name.find('[');
     auto BrClose = Name.find(']');
     return BrOpen != std::string::npos && BrClose != std::string::npos;
@@ -252,7 +252,7 @@ public:
   }
 
   /// Emits the intrinsic declaration to the ostream.
-  void emitIntrinsic(raw_ostream &OS, SVEEmitter &Emitter, ACLEKind Kind) const;
+  void emitIntrinsic(llvm::raw_ostream &OS, SVEEmitter &Emitter, ACLEKind Kind) const;
 
 private:
   std::string getMergeSuffix() const { return MergeSuffix; }
@@ -297,7 +297,7 @@ public:
   }
 
   /// Returns the enum value for the immcheck type
-  unsigned getEnumValueForImmCheck(StringRef C) const {
+  unsigned getEnumValueForImmCheck(llvm::StringRef C) const {
     auto It = ImmCheckTypes.find(C);
     if (It != ImmCheckTypes.end())
       return It->getValue();
@@ -305,7 +305,7 @@ public:
   }
 
   /// Returns the enum value for the flag type
-  uint64_t getEnumValueForFlag(StringRef C) const {
+  uint64_t getEnumValueForFlag(llvm::StringRef C) const {
     auto Res = FlagTypes.find(C);
     if (Res != FlagTypes.end())
       return Res->getValue();
@@ -313,7 +313,7 @@ public:
   }
 
   // Returns the SVETypeFlags for a given value and mask.
-  uint64_t encodeFlag(uint64_t V, StringRef MaskName) const {
+  uint64_t encodeFlag(uint64_t V, llvm::StringRef MaskName) const {
     auto It = FlagTypes.find(MaskName);
     if (It != FlagTypes.end()) {
       uint64_t Mask = It->getValue();
@@ -325,7 +325,7 @@ public:
   }
 
   // Returns the SVETypeFlags for the given element type.
-  uint64_t encodeEltType(StringRef EltName) {
+  uint64_t encodeEltType(llvm::StringRef EltName) {
     auto It = EltTypes.find(EltName);
     if (It != EltTypes.end())
       return encodeFlag(It->getValue(), "EltTypeMask");
@@ -352,45 +352,45 @@ public:
   uint64_t encodeTypeFlags(const SVEType &T);
 
   /// Emit arm_sve.h.
-  void createHeader(raw_ostream &o);
+  void createHeader(llvm::raw_ostream &o);
 
   // Emits core intrinsics in both arm_sme.h and arm_sve.h
-  void createCoreHeaderIntrinsics(raw_ostream &o, SVEEmitter &Emitter,
+  void createCoreHeaderIntrinsics(llvm::raw_ostream &o, SVEEmitter &Emitter,
                                   ACLEKind Kind);
 
   /// Emit all the __builtin prototypes and code needed by Sema.
-  void createBuiltins(raw_ostream &o);
+  void createBuiltins(llvm::raw_ostream &o);
 
   /// Emit all the information needed to map builtin -> LLVM IR intrinsic.
-  void createCodeGenMap(raw_ostream &o);
+  void createCodeGenMap(llvm::raw_ostream &o);
 
   /// Emit all the range checks for the immediates.
-  void createRangeChecks(raw_ostream &o);
+  void createRangeChecks(llvm::raw_ostream &o);
 
   /// Create the SVETypeFlags used in CGBuiltins
-  void createTypeFlags(raw_ostream &o);
+  void createTypeFlags(llvm::raw_ostream &o);
 
   /// Emit arm_sme.h.
-  void createSMEHeader(raw_ostream &o);
+  void createSMEHeader(llvm::raw_ostream &o);
 
   /// Emit all the SME __builtin prototypes and code needed by Sema.
-  void createSMEBuiltins(raw_ostream &o);
+  void createSMEBuiltins(llvm::raw_ostream &o);
 
   /// Emit all the information needed to map builtin -> LLVM IR intrinsic.
-  void createSMECodeGenMap(raw_ostream &o);
+  void createSMECodeGenMap(llvm::raw_ostream &o);
 
   /// Create a table for a builtin's requirement for PSTATE.SM.
-  void createStreamingAttrs(raw_ostream &o, ACLEKind Kind);
+  void createStreamingAttrs(llvm::raw_ostream &o, ACLEKind Kind);
 
   /// Emit all the range checks for the immediates.
-  void createSMERangeChecks(raw_ostream &o);
+  void createSMERangeChecks(llvm::raw_ostream &o);
 
   /// Create a table for a builtin's requirement for PSTATE.ZA.
-  void createBuiltinZAState(raw_ostream &OS);
+  void createBuiltinZAState(llvm::raw_ostream &OS);
 
   /// Create intrinsic and add it to \p Out
   void createIntrinsic(Record *R,
-                       SmallVectorImpl<std::unique_ptr<Intrinsic>> &Out);
+                       llvm::SmallVectorImpl<std::unique_ptr<Intrinsic>> &Out);
 };
 
 const std::array<SVEEmitter::ReinterpretTypeInfo, 12> SVEEmitter::Reinterprets =
@@ -523,7 +523,7 @@ std::string SVEType::str() const {
   return S;
 }
 
-void SVEType::applyTypespec(StringRef TS) {
+void SVEType::applyTypespec(llvm::StringRef TS) {
   for (char I : TS) {
     switch (I) {
     case 'Q':
@@ -913,7 +913,7 @@ void SVEType::applyModifier(char Mod) {
 }
 
 /// Returns the modifier and number of vectors for the given operand \p Op.
-std::pair<char, unsigned> getProtoModifier(StringRef Proto, unsigned Op) {
+std::pair<char, unsigned> getProtoModifier(llvm::StringRef Proto, unsigned Op) {
   for (unsigned P = 0; !Proto.empty(); ++P) {
     unsigned NumVectors = 1;
     unsigned CharsToSkip = 1;
@@ -939,11 +939,11 @@ std::pair<char, unsigned> getProtoModifier(StringRef Proto, unsigned Op) {
 // Intrinsic implementation
 //===----------------------------------------------------------------------===//
 
-Intrinsic::Intrinsic(StringRef Name, StringRef Proto, uint64_t MergeTy,
-                     StringRef MergeSuffix, uint64_t MemoryElementTy,
-                     StringRef LLVMName, uint64_t Flags,
-                     ArrayRef<ImmCheck> Checks, TypeSpec BT, ClassKind Class,
-                     SVEEmitter &Emitter, StringRef Guard)
+Intrinsic::Intrinsic(llvm::StringRef Name, llvm::StringRef Proto, uint64_t MergeTy,
+                     llvm::StringRef MergeSuffix, uint64_t MemoryElementTy,
+                     llvm::StringRef LLVMName, uint64_t Flags,
+                     llvm::ArrayRef<ImmCheck> Checks, TypeSpec BT, ClassKind Class,
+                     SVEEmitter &Emitter, llvm::StringRef Guard)
     : Name(Name.str()), LLVMName(LLVMName), Proto(Proto.str()),
       BaseTypeSpec(BT), Class(Class), Guard(Guard.str()),
       MergeSuffix(MergeSuffix.str()), BaseType(BT, 'd'), Flags(Flags),
@@ -1060,7 +1060,7 @@ std::string Intrinsic::mangleName(ClassKind LocalCK) const {
          getMergeSuffix();
 }
 
-void Intrinsic::emitIntrinsic(raw_ostream &OS, SVEEmitter &Emitter,
+void Intrinsic::emitIntrinsic(llvm::raw_ostream &OS, SVEEmitter &Emitter,
                               ACLEKind Kind) const {
   bool IsOverloaded = getClassKind() == ClassG && getProto().size() > 1;
 
@@ -1143,14 +1143,14 @@ uint64_t SVEEmitter::encodeTypeFlags(const SVEType &T) {
 }
 
 void SVEEmitter::createIntrinsic(
-    Record *R, SmallVectorImpl<std::unique_ptr<Intrinsic>> &Out) {
-  StringRef Name = R->getValueAsString("Name");
-  StringRef Proto = R->getValueAsString("Prototype");
-  StringRef Types = R->getValueAsString("Types");
-  StringRef Guard = R->getValueAsString("TargetGuard");
-  StringRef LLVMName = R->getValueAsString("LLVMIntrinsic");
+    Record *R, llvm::SmallVectorImpl<std::unique_ptr<Intrinsic>> &Out) {
+  llvm::StringRef Name = R->getValueAsString("Name");
+  llvm::StringRef Proto = R->getValueAsString("Prototype");
+  llvm::StringRef Types = R->getValueAsString("Types");
+  llvm::StringRef Guard = R->getValueAsString("TargetGuard");
+  llvm::StringRef LLVMName = R->getValueAsString("LLVMIntrinsic");
   uint64_t Merge = R->getValueAsInt("Merge");
-  StringRef MergeSuffix = R->getValueAsString("MergeSuffix");
+  llvm::StringRef MergeSuffix = R->getValueAsString("MergeSuffix");
   uint64_t MemEltType = R->getValueAsInt("MemEltType");
   std::vector<Record*> FlagsList = R->getValueAsListOfDefs("Flags");
   std::vector<Record*> ImmCheckList = R->getValueAsListOfDefs("ImmChecks");
@@ -1167,7 +1167,7 @@ void SVEEmitter::createIntrinsic(
   }
 
   // Extract type specs from string
-  SmallVector<TypeSpec, 8> TypeSpecs;
+  llvm::SmallVector<TypeSpec, 8> TypeSpecs;
   TypeSpec Acc;
   for (char I : Types) {
     Acc.push_back(I);
@@ -1185,7 +1185,7 @@ void SVEEmitter::createIntrinsic(
   // Create an Intrinsic for each type spec.
   for (auto TS : TypeSpecs) {
     // Collate a list of range/option checks for the immediates.
-    SmallVector<ImmCheck, 2> ImmChecks;
+    llvm::SmallVector<ImmCheck, 2> ImmChecks;
     for (auto *R : ImmCheckList) {
       int64_t Arg = R->getValueAsInt("Arg");
       int64_t EltSizeArg = R->getValueAsInt("EltSizeArg");
@@ -1213,10 +1213,10 @@ void SVEEmitter::createIntrinsic(
   }
 }
 
-void SVEEmitter::createCoreHeaderIntrinsics(raw_ostream &OS,
+void SVEEmitter::createCoreHeaderIntrinsics(llvm::raw_ostream &OS,
                                             SVEEmitter &Emitter,
                                             ACLEKind Kind) {
-  SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
+  llvm::SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
   for (auto *R : RV)
     createIntrinsic(R, Defs);
@@ -1241,7 +1241,7 @@ void SVEEmitter::createCoreHeaderIntrinsics(raw_ostream &OS,
     I->emitIntrinsic(OS, Emitter, Kind);
 }
 
-void SVEEmitter::createHeader(raw_ostream &OS) {
+void SVEEmitter::createHeader(llvm::raw_ostream &OS) {
   OS << "/*===---- arm_sve.h - ARM SVE intrinsics "
         "-----------------------------------===\n"
         " *\n"
@@ -1418,9 +1418,9 @@ void SVEEmitter::createHeader(raw_ostream &OS) {
   OS << "#endif /* __ARM_SVE_H */\n";
 }
 
-void SVEEmitter::createBuiltins(raw_ostream &OS) {
+void SVEEmitter::createBuiltins(llvm::raw_ostream &OS) {
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
-  SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
+  llvm::SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
   for (auto *R : RV)
     createIntrinsic(R, Defs);
 
@@ -1458,9 +1458,9 @@ void SVEEmitter::createBuiltins(raw_ostream &OS) {
   OS << "#endif\n\n";
 }
 
-void SVEEmitter::createCodeGenMap(raw_ostream &OS) {
+void SVEEmitter::createCodeGenMap(llvm::raw_ostream &OS) {
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
-  SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
+  llvm::SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
   for (auto *R : RV)
     createIntrinsic(R, Defs);
 
@@ -1491,9 +1491,9 @@ void SVEEmitter::createCodeGenMap(raw_ostream &OS) {
   OS << "#endif\n\n";
 }
 
-void SVEEmitter::createRangeChecks(raw_ostream &OS) {
+void SVEEmitter::createRangeChecks(llvm::raw_ostream &OS) {
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
-  SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
+  llvm::SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
   for (auto *R : RV)
     createIntrinsic(R, Defs);
 
@@ -1527,7 +1527,7 @@ void SVEEmitter::createRangeChecks(raw_ostream &OS) {
 }
 
 /// Create the SVETypeFlags used in CGBuiltins
-void SVEEmitter::createTypeFlags(raw_ostream &OS) {
+void SVEEmitter::createTypeFlags(llvm::raw_ostream &OS) {
   OS << "#ifdef LLVM_GET_SVE_TYPEFLAGS\n";
   for (auto &KV : FlagTypes)
     OS << "const uint64_t " << KV.getKey() << " = " << KV.getValue() << ";\n";
@@ -1554,7 +1554,7 @@ void SVEEmitter::createTypeFlags(raw_ostream &OS) {
   OS << "#endif\n\n";
 }
 
-void SVEEmitter::createSMEHeader(raw_ostream &OS) {
+void SVEEmitter::createSMEHeader(llvm::raw_ostream &OS) {
   OS << "/*===---- arm_sme.h - ARM SME intrinsics "
         "------===\n"
         " *\n"
@@ -1621,9 +1621,9 @@ void SVEEmitter::createSMEHeader(raw_ostream &OS) {
   OS << "#endif /* __ARM_SME_H */\n";
 }
 
-void SVEEmitter::createSMEBuiltins(raw_ostream &OS) {
+void SVEEmitter::createSMEBuiltins(llvm::raw_ostream &OS) {
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
-  SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
+  llvm::SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
   for (auto *R : RV) {
     createIntrinsic(R, Defs);
   }
@@ -1647,9 +1647,9 @@ void SVEEmitter::createSMEBuiltins(raw_ostream &OS) {
   OS << "#endif\n\n";
 }
 
-void SVEEmitter::createSMECodeGenMap(raw_ostream &OS) {
+void SVEEmitter::createSMECodeGenMap(llvm::raw_ostream &OS) {
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
-  SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
+  llvm::SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
   for (auto *R : RV) {
     createIntrinsic(R, Defs);
   }
@@ -1681,9 +1681,9 @@ void SVEEmitter::createSMECodeGenMap(raw_ostream &OS) {
   OS << "#endif\n\n";
 }
 
-void SVEEmitter::createSMERangeChecks(raw_ostream &OS) {
+void SVEEmitter::createSMERangeChecks(llvm::raw_ostream &OS) {
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
-  SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
+  llvm::SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
   for (auto *R : RV) {
     createIntrinsic(R, Defs);
   }
@@ -1717,9 +1717,9 @@ void SVEEmitter::createSMERangeChecks(raw_ostream &OS) {
   OS << "#endif\n\n";
 }
 
-void SVEEmitter::createBuiltinZAState(raw_ostream &OS) {
+void SVEEmitter::createBuiltinZAState(llvm::raw_ostream &OS) {
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
-  SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
+  llvm::SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
   for (auto *R : RV)
     createIntrinsic(R, Defs);
 
@@ -1750,20 +1750,20 @@ void SVEEmitter::createBuiltinZAState(raw_ostream &OS) {
 
   OS << "#ifdef GET_SME_BUILTIN_GET_STATE\n";
   for (auto &KV : IntrinsicsPerState) {
-    for (StringRef Name : KV.second)
+    for (llvm::StringRef Name : KV.second)
       OS << "case SME::BI__builtin_sme_" << Name << ":\n";
     OS << "  return " << KV.first << ";\n";
   }
   OS << "#endif\n\n";
 }
 
-void SVEEmitter::createStreamingAttrs(raw_ostream &OS, ACLEKind Kind) {
+void SVEEmitter::createStreamingAttrs(llvm::raw_ostream &OS, ACLEKind Kind) {
   std::vector<Record *> RV = Records.getAllDerivedDefinitions("Inst");
-  SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
+  llvm::SmallVector<std::unique_ptr<Intrinsic>, 128> Defs;
   for (auto *R : RV)
     createIntrinsic(R, Defs);
 
-  StringRef ExtensionKind;
+  llvm::StringRef ExtensionKind;
   switch (Kind) {
   case ACLEKind::SME:
     ExtensionKind = "SME";
@@ -1806,51 +1806,51 @@ void SVEEmitter::createStreamingAttrs(raw_ostream &OS, ACLEKind Kind) {
 }
 
 namespace clang {
-void EmitSveHeader(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSveHeader(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createHeader(OS);
 }
 
-void EmitSveBuiltins(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSveBuiltins(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createBuiltins(OS);
 }
 
-void EmitSveBuiltinCG(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSveBuiltinCG(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createCodeGenMap(OS);
 }
 
-void EmitSveRangeChecks(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSveRangeChecks(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createRangeChecks(OS);
 }
 
-void EmitSveTypeFlags(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSveTypeFlags(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createTypeFlags(OS);
 }
 
-void EmitSveStreamingAttrs(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSveStreamingAttrs(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createStreamingAttrs(OS, ACLEKind::SVE);
 }
 
-void EmitSmeHeader(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSmeHeader(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createSMEHeader(OS);
 }
 
-void EmitSmeBuiltins(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSmeBuiltins(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createSMEBuiltins(OS);
 }
 
-void EmitSmeBuiltinCG(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSmeBuiltinCG(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createSMECodeGenMap(OS);
 }
 
-void EmitSmeRangeChecks(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSmeRangeChecks(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createSMERangeChecks(OS);
 }
 
-void EmitSmeStreamingAttrs(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSmeStreamingAttrs(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createStreamingAttrs(OS, ACLEKind::SME);
 }
 
-void EmitSmeBuiltinZAState(RecordKeeper &Records, raw_ostream &OS) {
+void EmitSmeBuiltinZAState(RecordKeeper &Records, llvm::raw_ostream &OS) {
   SVEEmitter(Records).createBuiltinZAState(OS);
 }
 } // End namespace clang

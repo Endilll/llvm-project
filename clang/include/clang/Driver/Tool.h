@@ -10,6 +10,7 @@
 #define LLVM_CLANG_DRIVER_TOOL_H
 
 #include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace llvm {
 namespace opt {
@@ -26,7 +27,7 @@ namespace driver {
   class JobAction;
   class ToolChain;
 
-  typedef SmallVector<InputInfo, 4> InputInfoList;
+  typedef llvm::SmallVector<InputInfo, 4> InputInfoList;
 
 /// Tool - Information on a specific compilation tool.
 class Tool {

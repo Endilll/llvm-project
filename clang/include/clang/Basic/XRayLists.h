@@ -33,9 +33,9 @@ class XRayFunctionFilter {
   SourceManager &SM;
 
 public:
-  XRayFunctionFilter(ArrayRef<std::string> AlwaysInstrumentPaths,
-                     ArrayRef<std::string> NeverInstrumentPaths,
-                     ArrayRef<std::string> AttrListPaths, SourceManager &SM);
+  XRayFunctionFilter(llvm::ArrayRef<std::string> AlwaysInstrumentPaths,
+                     llvm::ArrayRef<std::string> NeverInstrumentPaths,
+                     llvm::ArrayRef<std::string> AttrListPaths, SourceManager &SM);
   ~XRayFunctionFilter();
 
   enum class ImbueAttribute {
@@ -45,14 +45,14 @@ public:
     ALWAYS_ARG1,
   };
 
-  ImbueAttribute shouldImbueFunction(StringRef FunctionName) const;
+  ImbueAttribute shouldImbueFunction(llvm::StringRef FunctionName) const;
 
   ImbueAttribute
-  shouldImbueFunctionsInFile(StringRef Filename,
-                             StringRef Category = StringRef()) const;
+  shouldImbueFunctionsInFile(llvm::StringRef Filename,
+                             llvm::StringRef Category = llvm::StringRef()) const;
 
   ImbueAttribute shouldImbueLocation(SourceLocation Loc,
-                                     StringRef Category = StringRef()) const;
+                                     llvm::StringRef Category = llvm::StringRef()) const;
 };
 
 } // namespace clang

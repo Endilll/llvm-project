@@ -96,7 +96,7 @@ void ReturnPointerRangeChecker::checkPreStmt(const ReturnStmt *RS,
                       {DeclR->getDecl(), C.getSourceManager()});
 
     if (ConcreteElementCount) {
-      SmallString<128> SBuf;
+      llvm::SmallString<128> SBuf;
       llvm::raw_svector_ostream OS(SBuf);
       OS << "Original object ";
       if (DeclR) {

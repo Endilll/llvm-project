@@ -152,7 +152,7 @@ let ManualCodegen = [{
     // Unmasked: (passthru, vector_in, scalar_in, frm, vl)
     // Masked:   (passthru, vector_in, scalar_in, mask, frm, vl, policy)
 
-    SmallVector<llvm::Value*, 7> Operands;
+    llvm::SmallVector<llvm::Value*, 7> Operands;
     bool HasMaskedOff = !(
         (IsMasked && (PolicyAttrs & RVV_VTA) && (PolicyAttrs & RVV_VMA)) ||
         (!IsMasked && PolicyAttrs & RVV_VTA));

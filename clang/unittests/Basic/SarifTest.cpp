@@ -48,10 +48,10 @@ protected:
         Diags(DiagID, DiagOpts.get(), new IgnoringDiagConsumer()),
         SourceMgr(Diags, FileMgr) {}
 
-  IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem;
   FileManager FileMgr;
-  IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
+  llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID;
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts;
   DiagnosticsEngine Diags;
   SourceManager SourceMgr;
   LangOptions LangOpts;
@@ -83,7 +83,7 @@ TEST_F(SarifDocumentWriterTest, canCreateEmptyDocument) {
 
   // WHEN:
   const llvm::json::Object &EmptyDoc = Writer.createDocument();
-  std::vector<StringRef> Keys(EmptyDoc.size());
+  std::vector<llvm::StringRef> Keys(EmptyDoc.size());
   std::transform(EmptyDoc.begin(), EmptyDoc.end(), Keys.begin(),
                  [](auto Item) { return Item.getFirst(); });
 

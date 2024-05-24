@@ -15,7 +15,7 @@ using namespace clang::ast_matchers;
 namespace clang::tidy::bugprone {
 
 UnhandledSelfAssignmentCheck::UnhandledSelfAssignmentCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       WarnOnlyIfThisHasSuspiciousField(
           Options.get("WarnOnlyIfThisHasSuspiciousField", true)) {}

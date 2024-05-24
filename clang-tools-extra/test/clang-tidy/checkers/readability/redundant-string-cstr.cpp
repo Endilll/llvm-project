@@ -8,9 +8,9 @@ struct iterator {
 };
 
 namespace llvm {
-struct StringRef {
-  StringRef(const char *p);
-  StringRef(const std::string &);
+struct llvm::StringRef {
+  llvm::StringRef(const char *p);
+  llvm::StringRef(const std::string &);
 };
 }
 

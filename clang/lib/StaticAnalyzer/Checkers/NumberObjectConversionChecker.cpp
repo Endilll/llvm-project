@@ -78,7 +78,7 @@ void Callback::run(const MatchFinder::MatchResult &Result) {
     bool MacroIndicatesWeShouldSkipTheCheck = false;
     SourceLocation Loc = CheckIfNull->getBeginLoc();
     if (Loc.isMacroID()) {
-      StringRef MacroName = Lexer::getImmediateMacroName(
+      llvm::StringRef MacroName = Lexer::getImmediateMacroName(
           Loc, ACtx.getSourceManager(), ACtx.getLangOpts());
       if (MacroName == "NULL" || MacroName == "nil")
         return;

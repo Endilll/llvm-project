@@ -21,7 +21,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/narrowing-conversions.html
 class NarrowingConversionsCheck : public ClangTidyCheck {
 public:
-  NarrowingConversionsCheck(StringRef Name, ClangTidyContext *Context);
+  NarrowingConversionsCheck(llvm::StringRef Name, ClangTidyContext *Context);
 
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
 
@@ -100,7 +100,7 @@ private:
   const bool WarnOnFloatingPointNarrowingConversion;
   const bool WarnWithinTemplateInstantiation;
   const bool WarnOnEquivalentBitWidth;
-  const StringRef IgnoreConversionFromTypes;
+  const llvm::StringRef IgnoreConversionFromTypes;
   const bool PedanticMode;
 };
 

@@ -526,7 +526,7 @@ struct PragmaMarkSymbol {
 
 /// Merge in `PragmaMarkSymbols`, sorted ascending by range, into the given
 /// `DocumentSymbol` tree.
-void mergePragmas(DocumentSymbol &Root, ArrayRef<PragmaMarkSymbol> Pragmas) {
+void mergePragmas(DocumentSymbol &Root, llvm::ArrayRef<PragmaMarkSymbol> Pragmas) {
   while (!Pragmas.empty()) {
     // We'll figure out where the Pragmas.front() should go.
     PragmaMarkSymbol P = std::move(Pragmas.front());
@@ -603,7 +603,7 @@ void mergePragmas(DocumentSymbol &Root, ArrayRef<PragmaMarkSymbol> Pragmas) {
 }
 
 PragmaMarkSymbol markToSymbol(const PragmaMark &P) {
-  StringRef Name = StringRef(P.Trivia).trim();
+  llvm::StringRef Name = llvm::StringRef(P.Trivia).trim();
   bool IsGroup = false;
   // "-\s+<group name>" or "<name>" after an initial trim. The former is
   // considered a group, the latter just a mark. Like Xcode, we don't consider
@@ -611,7 +611,7 @@ PragmaMarkSymbol markToSymbol(const PragmaMark &P) {
   //
   // We need to include a name here, otherwise editors won't properly render the
   // symbol.
-  StringRef MaybeGroupName = Name;
+  llvm::StringRef MaybeGroupName = Name;
   if (MaybeGroupName.consume_front("-") &&
       (MaybeGroupName.ltrim() != MaybeGroupName || MaybeGroupName.empty())) {
     Name = MaybeGroupName.empty() ? "(unnamed group)" : MaybeGroupName.ltrim();

@@ -26,7 +26,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/forwarding-reference-overload.html
 class ForwardingReferenceOverloadCheck : public ClangTidyCheck {
 public:
-  ForwardingReferenceOverloadCheck(StringRef Name, ClangTidyContext *Context)
+  ForwardingReferenceOverloadCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus11;

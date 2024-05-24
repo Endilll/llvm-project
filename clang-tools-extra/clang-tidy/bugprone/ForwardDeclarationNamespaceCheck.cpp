@@ -47,7 +47,7 @@ void ForwardDeclarationNamespaceCheck::check(
     const MatchFinder::MatchResult &Result) {
   if (const auto *RecordDecl =
           Result.Nodes.getNodeAs<CXXRecordDecl>("record_decl")) {
-    StringRef DeclName = RecordDecl->getName();
+    llvm::StringRef DeclName = RecordDecl->getName();
     if (RecordDecl->isThisDeclarationADefinition()) {
       DeclNameToDefinitions[DeclName].push_back(RecordDecl);
     } else {

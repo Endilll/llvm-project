@@ -54,7 +54,7 @@ class TargetOptions;
 // This lets us create the DiagnosticsEngine with a properly-filled-out
 // DiagnosticOptions instance.
 std::unique_ptr<DiagnosticOptions>
-CreateAndPopulateDiagOpts(ArrayRef<const char *> Argv);
+CreateAndPopulateDiagOpts(llvm::ArrayRef<const char *> Argv);
 
 /// Fill out Opts based on the options given in Args.
 ///
@@ -80,7 +80,7 @@ protected:
   std::shared_ptr<TargetOptions> TargetOpts;
 
   /// Options controlling the diagnostic engine.
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagnosticOpts;
+  llvm::IntrusiveRefCntPtr<DiagnosticOptions> DiagnosticOpts;
 
   /// Options controlling the \#include directive.
   std::shared_ptr<HeaderSearchOptions> HSOpts;
@@ -149,18 +149,18 @@ public:
 
   /// Command line generation.
   /// @{
-  using StringAllocator = llvm::function_ref<const char *(const Twine &)>;
+  using StringAllocator = llvm::function_ref<const char *(const llvm::Twine &)>;
   /// Generate cc1-compatible command line arguments from this instance.
   ///
   /// \param [out] Args - The generated arguments. Note that the caller is
   /// responsible for inserting the path to the clang executable and "-cc1" if
   /// desired.
-  /// \param SA - A function that given a Twine can allocate storage for a given
+  /// \param SA - A function that given a llvm::Twine can allocate storage for a given
   /// command line argument and return a pointer to the newly allocated string.
   /// The returned pointer is what gets appended to Args.
   void generateCC1CommandLine(llvm::SmallVectorImpl<const char *> &Args,
                               StringAllocator SA) const {
-    generateCC1CommandLine([&](const Twine &Arg) {
+    generateCC1CommandLine([&](const llvm::Twine &Arg) {
       // No need to allocate static string literals.
       Args.push_back(Arg.isSingleStringLiteral()
                          ? Arg.getSingleStringRef().data()
@@ -168,7 +168,7 @@ public:
     });
   }
 
-  using ArgumentConsumer = llvm::function_ref<void(const Twine &)>;
+  using ArgumentConsumer = llvm::function_ref<void(const llvm::Twine &)>;
   /// Generate cc1-compatible command line arguments from this instance.
   ///
   /// \param Consumer - Callback that gets invoked for every single generated
@@ -291,7 +291,7 @@ public:
   /// \param [in] CommandLineArgs - Array of argument strings, this must not
   /// contain "-cc1".
   static bool CreateFromArgs(CompilerInvocation &Res,
-                             ArrayRef<const char *> CommandLineArgs,
+                             llvm::ArrayRef<const char *> CommandLineArgs,
                              DiagnosticsEngine &Diags,
                              const char *Argv0 = nullptr);
 
@@ -316,7 +316,7 @@ public:
   /// be canonical.
   ///
   /// \return false if there are any errors.
-  static bool checkCC1RoundTrip(ArrayRef<const char *> Args,
+  static bool checkCC1RoundTrip(llvm::ArrayRef<const char *> Args,
                                 DiagnosticsEngine &Diags,
                                 const char *Argv0 = nullptr);
 
@@ -330,7 +330,7 @@ public:
 
 private:
   static bool CreateFromArgsImpl(CompilerInvocation &Res,
-                                 ArrayRef<const char *> CommandLineArgs,
+                                 llvm::ArrayRef<const char *> CommandLineArgs,
                                  DiagnosticsEngine &Diags, const char *Argv0);
 
   /// Parse command line options that map to LangOptions.
@@ -390,18 +390,18 @@ public:
   /// @}
 };
 
-IntrusiveRefCntPtr<llvm::vfs::FileSystem>
+llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>
 createVFSFromCompilerInvocation(const CompilerInvocation &CI,
                                 DiagnosticsEngine &Diags);
 
-IntrusiveRefCntPtr<llvm::vfs::FileSystem> createVFSFromCompilerInvocation(
+llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> createVFSFromCompilerInvocation(
     const CompilerInvocation &CI, DiagnosticsEngine &Diags,
-    IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS);
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS);
 
-IntrusiveRefCntPtr<llvm::vfs::FileSystem>
-createVFSFromOverlayFiles(ArrayRef<std::string> VFSOverlayFiles,
+llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>
+createVFSFromOverlayFiles(llvm::ArrayRef<std::string> VFSOverlayFiles,
                           DiagnosticsEngine &Diags,
-                          IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS);
+                          llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> BaseFS);
 
 } // namespace clang
 

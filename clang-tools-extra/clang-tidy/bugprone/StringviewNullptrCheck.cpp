@@ -295,7 +295,7 @@ RewriteRuleWith<std::string> StringviewNullptrCheckImpl() {
        HandleConstructorInvocation});
 }
 
-StringviewNullptrCheck::StringviewNullptrCheck(StringRef Name,
+StringviewNullptrCheck::StringviewNullptrCheck(llvm::StringRef Name,
                                                ClangTidyContext *Context)
     : utils::TransformerClangTidyCheck(StringviewNullptrCheckImpl(), Name,
                                        Context) {}

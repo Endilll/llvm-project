@@ -38,7 +38,7 @@ AST_MATCHER(Stmt, isNULLMacroExpansion) {
   return isNULLMacroExpansion(&Node, Finder->getASTContext());
 }
 
-StringRef getZeroLiteralToCompareWithForType(CastKind CastExprKind,
+llvm::StringRef getZeroLiteralToCompareWithForType(CastKind CastExprKind,
                                              QualType Type,
                                              ASTContext &Context) {
   switch (CastExprKind) {
@@ -122,7 +122,7 @@ void fixGenericExprCastToBool(DiagnosticBuilder &Diag,
   Diag << FixItHint::CreateInsertion(EndLoc, EndLocInsertion);
 }
 
-StringRef getEquivalentBoolLiteralForExpr(const Expr *Expression,
+llvm::StringRef getEquivalentBoolLiteralForExpr(const Expr *Expression,
                                           ASTContext &Context) {
   if (isNULLMacroExpansion(Expression, Context)) {
     return "false";
@@ -152,25 +152,25 @@ StringRef getEquivalentBoolLiteralForExpr(const Expr *Expression,
 
 bool needsSpacePrefix(SourceLocation Loc, ASTContext &Context) {
   SourceRange PrefixRange(Loc.getLocWithOffset(-1), Loc);
-  StringRef SpaceBeforeStmtStr = Lexer::getSourceText(
+  llvm::StringRef SpaceBeforeStmtStr = Lexer::getSourceText(
       CharSourceRange::getCharRange(PrefixRange), Context.getSourceManager(),
       Context.getLangOpts(), nullptr);
   if (SpaceBeforeStmtStr.empty())
     return true;
 
-  const StringRef AllowedCharacters(" \t\n\v\f\r(){}[]<>;,+=-|&~!^*/");
+  const llvm::StringRef AllowedCharacters(" \t\n\v\f\r(){}[]<>;,+=-|&~!^*/");
   return !AllowedCharacters.contains(SpaceBeforeStmtStr.back());
 }
 
 void fixGenericExprCastFromBool(DiagnosticBuilder &Diag,
                                 const ImplicitCastExpr *Cast,
-                                ASTContext &Context, StringRef OtherType) {
+                                ASTContext &Context, llvm::StringRef OtherType) {
   const Expr *SubExpr = Cast->getSubExpr();
   const bool NeedParens = !isa<ParenExpr>(SubExpr->IgnoreImplicit());
   const bool NeedSpace = needsSpacePrefix(Cast->getBeginLoc(), Context);
 
   Diag << FixItHint::CreateInsertion(
-      Cast->getBeginLoc(), (Twine() + (NeedSpace ? " " : "") + "static_cast<" +
+      Cast->getBeginLoc(), (llvm::Twine() + (NeedSpace ? " " : "") + "static_cast<" +
                             OtherType + ">" + (NeedParens ? "(" : ""))
                                .str());
 
@@ -183,7 +183,7 @@ void fixGenericExprCastFromBool(DiagnosticBuilder &Diag,
   }
 }
 
-StringRef getEquivalentForBoolLiteral(const CXXBoolLiteralExpr *BoolLiteral,
+llvm::StringRef getEquivalentForBoolLiteral(const CXXBoolLiteralExpr *BoolLiteral,
                                       QualType DestType, ASTContext &Context) {
   // Prior to C++11, false literal could be implicitly converted to pointer.
   if (!Context.getLangOpts().CPlusPlus11 &&
@@ -237,7 +237,7 @@ bool isCastAllowedInCondition(const ImplicitCastExpr *Cast,
 } // anonymous namespace
 
 ImplicitBoolConversionCheck::ImplicitBoolConversionCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       AllowIntegerConditions(Options.get("AllowIntegerConditions", false)),
       AllowPointerConditions(Options.get("AllowPointerConditions", false)) {}
@@ -356,7 +356,7 @@ void ImplicitBoolConversionCheck::handleCastToBool(const ImplicitCastExpr *Cast,
   auto Diag = diag(Cast->getBeginLoc(), "implicit conversion %0 -> 'bool'")
               << Cast->getSubExpr()->getType();
 
-  StringRef EquivalentLiteral =
+  llvm::StringRef EquivalentLiteral =
       getEquivalentBoolLiteralForExpr(Cast->getSubExpr(), Context);
   if (!EquivalentLiteral.empty()) {
     Diag << tooling::fixit::createReplacement(*Cast, EquivalentLiteral);

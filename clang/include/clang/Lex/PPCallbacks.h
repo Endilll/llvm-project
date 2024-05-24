@@ -91,7 +91,7 @@ public:
   ///
   /// \returns true to indicate that the preprocessor should skip this file
   /// and not issue any diagnostic.
-  virtual bool FileNotFound(StringRef FileName) { return false; }
+  virtual bool FileNotFound(llvm::StringRef FileName) { return false; }
 
   /// Callback invoked whenever an inclusion directive of
   /// any kind (\c \#include, \c \#import, etc.) has been processed, regardless
@@ -137,10 +137,10 @@ public:
   /// implicitly 'extern "C"' in C++ mode.
   ///
   virtual void InclusionDirective(SourceLocation HashLoc,
-                                  const Token &IncludeTok, StringRef FileName,
+                                  const Token &IncludeTok, llvm::StringRef FileName,
                                   bool IsAngled, CharSourceRange FilenameRange,
                                   OptionalFileEntryRef File,
-                                  StringRef SearchPath, StringRef RelativePath,
+                                  llvm::StringRef SearchPath, llvm::StringRef RelativePath,
                                   const Module *SuggestedModule,
                                   bool ModuleImported,
                                   SrcMgr::CharacteristicKind FileType) {}
@@ -192,7 +192,7 @@ public:
   /// \param Loc The location of the directive.
   /// \param str The text of the directive.
   ///
-  virtual void Ident(SourceLocation Loc, StringRef str) {
+  virtual void Ident(SourceLocation Loc, llvm::StringRef str) {
   }
 
   /// Callback invoked when start reading any pragma directive.
@@ -202,23 +202,23 @@ public:
 
   /// Callback invoked when a \#pragma comment directive is read.
   virtual void PragmaComment(SourceLocation Loc, const IdentifierInfo *Kind,
-                             StringRef Str) {
+                             llvm::StringRef Str) {
   }
 
   /// Callback invoked when a \#pragma mark comment is read.
-  virtual void PragmaMark(SourceLocation Loc, StringRef Trivia) {
+  virtual void PragmaMark(SourceLocation Loc, llvm::StringRef Trivia) {
   }
 
   /// Callback invoked when a \#pragma detect_mismatch directive is
   /// read.
-  virtual void PragmaDetectMismatch(SourceLocation Loc, StringRef Name,
-                                    StringRef Value) {
+  virtual void PragmaDetectMismatch(SourceLocation Loc, llvm::StringRef Name,
+                                    llvm::StringRef Value) {
   }
 
   /// Callback invoked when a \#pragma clang __debug directive is read.
   /// \param Loc The location of the debug directive.
   /// \param DebugType The identifier following __debug.
-  virtual void PragmaDebug(SourceLocation Loc, StringRef DebugType) {
+  virtual void PragmaDebug(SourceLocation Loc, llvm::StringRef DebugType) {
   }
 
   /// Determines the kind of \#pragma invoking a call to PragmaMessage.
@@ -238,25 +238,25 @@ public:
   /// \param Namespace The namespace of the message directive.
   /// \param Kind The type of the message directive.
   /// \param Str The text of the message directive.
-  virtual void PragmaMessage(SourceLocation Loc, StringRef Namespace,
-                             PragmaMessageKind Kind, StringRef Str) {
+  virtual void PragmaMessage(SourceLocation Loc, llvm::StringRef Namespace,
+                             PragmaMessageKind Kind, llvm::StringRef Str) {
   }
 
   /// Callback invoked when a \#pragma gcc diagnostic push directive
   /// is read.
   virtual void PragmaDiagnosticPush(SourceLocation Loc,
-                                    StringRef Namespace) {
+                                    llvm::StringRef Namespace) {
   }
 
   /// Callback invoked when a \#pragma gcc diagnostic pop directive
   /// is read.
   virtual void PragmaDiagnosticPop(SourceLocation Loc,
-                                   StringRef Namespace) {
+                                   llvm::StringRef Namespace) {
   }
 
   /// Callback invoked when a \#pragma gcc diagnostic directive is read.
-  virtual void PragmaDiagnostic(SourceLocation Loc, StringRef Namespace,
-                                diag::Severity mapping, StringRef Str) {}
+  virtual void PragmaDiagnostic(SourceLocation Loc, llvm::StringRef Namespace,
+                                diag::Severity mapping, llvm::StringRef Str) {}
 
   /// Called when an OpenCL extension is either disabled or
   /// enabled with a pragma.
@@ -279,7 +279,7 @@ public:
   };
   virtual void PragmaWarning(SourceLocation Loc,
                              PragmaWarningSpecifier WarningSpec,
-                             ArrayRef<int> Ids) {}
+                             llvm::ArrayRef<int> Ids) {}
 
   /// Callback invoked when a \#pragma warning(push) directive is read.
   virtual void PragmaWarningPush(SourceLocation Loc, int Level) {
@@ -291,7 +291,7 @@ public:
 
   /// Callback invoked when a \#pragma execution_character_set(push) directive
   /// is read.
-  virtual void PragmaExecCharsetPush(SourceLocation Loc, StringRef Str) {}
+  virtual void PragmaExecCharsetPush(SourceLocation Loc, llvm::StringRef Str) {}
 
   /// Callback invoked when a \#pragma execution_character_set(pop) directive
   /// is read.
@@ -335,7 +335,7 @@ public:
 
   /// Hook called when a '__has_include' or '__has_include_next' directive is
   /// read.
-  virtual void HasInclude(SourceLocation Loc, StringRef FileName, bool IsAngled,
+  virtual void HasInclude(SourceLocation Loc, llvm::StringRef FileName, bool IsAngled,
                           OptionalFileEntryRef File,
                           SrcMgr::CharacteristicKind FileType);
 
@@ -464,7 +464,7 @@ public:
     Second->FileSkipped(SkippedFile, FilenameTok, FileType);
   }
 
-  bool FileNotFound(StringRef FileName) override {
+  bool FileNotFound(llvm::StringRef FileName) override {
     bool Skip = First->FileNotFound(FileName);
     // Make sure to invoke the second callback, no matter if the first already
     // returned true to skip the file.
@@ -473,10 +473,10 @@ public:
   }
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override {
     First->InclusionDirective(HashLoc, IncludeTok, FileName, IsAngled,
@@ -510,7 +510,7 @@ public:
     Second->EndOfMainFile();
   }
 
-  void Ident(SourceLocation Loc, StringRef str) override {
+  void Ident(SourceLocation Loc, llvm::StringRef str) override {
     First->Ident(Loc, str);
     Second->Ident(Loc, str);
   }
@@ -522,50 +522,50 @@ public:
   }
 
   void PragmaComment(SourceLocation Loc, const IdentifierInfo *Kind,
-                     StringRef Str) override {
+                     llvm::StringRef Str) override {
     First->PragmaComment(Loc, Kind, Str);
     Second->PragmaComment(Loc, Kind, Str);
   }
 
-  void PragmaMark(SourceLocation Loc, StringRef Trivia) override {
+  void PragmaMark(SourceLocation Loc, llvm::StringRef Trivia) override {
     First->PragmaMark(Loc, Trivia);
     Second->PragmaMark(Loc, Trivia);
   }
 
-  void PragmaDetectMismatch(SourceLocation Loc, StringRef Name,
-                            StringRef Value) override {
+  void PragmaDetectMismatch(SourceLocation Loc, llvm::StringRef Name,
+                            llvm::StringRef Value) override {
     First->PragmaDetectMismatch(Loc, Name, Value);
     Second->PragmaDetectMismatch(Loc, Name, Value);
   }
 
-  void PragmaDebug(SourceLocation Loc, StringRef DebugType) override {
+  void PragmaDebug(SourceLocation Loc, llvm::StringRef DebugType) override {
     First->PragmaDebug(Loc, DebugType);
     Second->PragmaDebug(Loc, DebugType);
   }
 
-  void PragmaMessage(SourceLocation Loc, StringRef Namespace,
-                     PragmaMessageKind Kind, StringRef Str) override {
+  void PragmaMessage(SourceLocation Loc, llvm::StringRef Namespace,
+                     PragmaMessageKind Kind, llvm::StringRef Str) override {
     First->PragmaMessage(Loc, Namespace, Kind, Str);
     Second->PragmaMessage(Loc, Namespace, Kind, Str);
   }
 
-  void PragmaDiagnosticPush(SourceLocation Loc, StringRef Namespace) override {
+  void PragmaDiagnosticPush(SourceLocation Loc, llvm::StringRef Namespace) override {
     First->PragmaDiagnosticPush(Loc, Namespace);
     Second->PragmaDiagnosticPush(Loc, Namespace);
   }
 
-  void PragmaDiagnosticPop(SourceLocation Loc, StringRef Namespace) override {
+  void PragmaDiagnosticPop(SourceLocation Loc, llvm::StringRef Namespace) override {
     First->PragmaDiagnosticPop(Loc, Namespace);
     Second->PragmaDiagnosticPop(Loc, Namespace);
   }
 
-  void PragmaDiagnostic(SourceLocation Loc, StringRef Namespace,
-                        diag::Severity mapping, StringRef Str) override {
+  void PragmaDiagnostic(SourceLocation Loc, llvm::StringRef Namespace,
+                        diag::Severity mapping, llvm::StringRef Str) override {
     First->PragmaDiagnostic(Loc, Namespace, mapping, Str);
     Second->PragmaDiagnostic(Loc, Namespace, mapping, Str);
   }
 
-  void HasInclude(SourceLocation Loc, StringRef FileName, bool IsAngled,
+  void HasInclude(SourceLocation Loc, llvm::StringRef FileName, bool IsAngled,
                   OptionalFileEntryRef File,
                   SrcMgr::CharacteristicKind FileType) override;
 
@@ -576,7 +576,7 @@ public:
   }
 
   void PragmaWarning(SourceLocation Loc, PragmaWarningSpecifier WarningSpec,
-                     ArrayRef<int> Ids) override {
+                     llvm::ArrayRef<int> Ids) override {
     First->PragmaWarning(Loc, WarningSpec, Ids);
     Second->PragmaWarning(Loc, WarningSpec, Ids);
   }
@@ -591,7 +591,7 @@ public:
     Second->PragmaWarningPop(Loc);
   }
 
-  void PragmaExecCharsetPush(SourceLocation Loc, StringRef Str) override {
+  void PragmaExecCharsetPush(SourceLocation Loc, llvm::StringRef Str) override {
     First->PragmaExecCharsetPush(Loc, Str);
     Second->PragmaExecCharsetPush(Loc, Str);
   }

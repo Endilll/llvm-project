@@ -49,8 +49,8 @@ bool MigrateAction::BeginInvocation(CompilerInstance &CI) {
 }
 
 MigrateAction::MigrateAction(std::unique_ptr<FrontendAction> WrappedAction,
-                             StringRef migrateDir,
-                             StringRef plistOut,
+                             llvm::StringRef migrateDir,
+                             llvm::StringRef plistOut,
                              bool emitPremigrationARCErrors)
   : WrapperFrontendAction(std::move(WrappedAction)), MigrateDir(migrateDir),
     PlistOut(plistOut), EmitPremigrationARCErrors(emitPremigrationARCErrors) {

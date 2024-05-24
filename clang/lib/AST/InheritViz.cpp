@@ -32,12 +32,12 @@ namespace {
 /// vs. non-virtual bases.
 class InheritanceHierarchyWriter {
   ASTContext& Context;
-  raw_ostream &Out;
+  llvm::raw_ostream &Out;
   std::map<QualType, int, QualTypeOrdering> DirectBaseCount;
   std::set<QualType, QualTypeOrdering> KnownVirtualBases;
 
 public:
-  InheritanceHierarchyWriter(ASTContext& Context, raw_ostream& Out)
+  InheritanceHierarchyWriter(ASTContext& Context, llvm::raw_ostream& Out)
     : Context(Context), Out(Out) { }
 
   void WriteGraph(QualType Type) {
@@ -55,7 +55,7 @@ protected:
   /// WriteNodeReference - Write out a reference to the given node,
   /// using a unique identifier for each direct base and for the
   /// (only) virtual base.
-  raw_ostream& WriteNodeReference(QualType Type, bool FromVirtual);
+  llvm::raw_ostream& WriteNodeReference(QualType Type, bool FromVirtual);
 };
 } // namespace
 
@@ -120,7 +120,7 @@ void InheritanceHierarchyWriter::WriteNode(QualType Type, bool FromVirtual) {
 /// WriteNodeReference - Write out a reference to the given node,
 /// using a unique identifier for each direct base and for the
 /// (only) virtual base.
-raw_ostream&
+llvm::raw_ostream&
 InheritanceHierarchyWriter::WriteNodeReference(QualType Type,
                                                bool FromVirtual) {
   QualType CanonType = Context.getCanonicalType(Type);
@@ -137,7 +137,7 @@ void CXXRecordDecl::viewInheritance(ASTContext& Context) const {
   QualType Self = Context.getTypeDeclType(this);
 
   int FD;
-  SmallString<128> Filename;
+  llvm::SmallString<128> Filename;
   if (std::error_code EC = llvm::sys::fs::createTemporaryFile(
           Self.getAsString(), "dot", FD, Filename)) {
     llvm::errs() << "Error: " << EC.message() << "\n";

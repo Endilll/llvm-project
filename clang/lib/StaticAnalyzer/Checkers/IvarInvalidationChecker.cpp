@@ -317,14 +317,14 @@ const ObjCIvarDecl *IvarInvalidationCheckerImpl::findPropertyBackingIvar(
   }
 
   // Lookup IVars named "_PropName"or "PropName" among the tracked Ivars.
-  StringRef PropName = Prop->getIdentifier()->getName();
+  llvm::StringRef PropName = Prop->getIdentifier()->getName();
   for (const ObjCIvarDecl *Iv : llvm::make_first_range(TrackedIvars)) {
-    StringRef IvarName = Iv->getName();
+    llvm::StringRef IvarName = Iv->getName();
 
     if (IvarName == PropName)
       return Iv;
 
-    SmallString<128> PropNameWithUnderscore;
+    llvm::SmallString<128> PropNameWithUnderscore;
     {
       llvm::raw_svector_ostream os(PropNameWithUnderscore);
       os << '_' << PropName;
@@ -515,7 +515,7 @@ void IvarInvalidationCheckerImpl::reportNoInvalidationMethod(
     CheckerNameRef CheckName, const ObjCIvarDecl *FirstIvarDecl,
     const IvarToPropMapTy &IvarToPopertyMap,
     const ObjCInterfaceDecl *InterfaceD, bool MissingDeclaration) const {
-  SmallString<128> sbuf;
+  llvm::SmallString<128> sbuf;
   llvm::raw_svector_ostream os(sbuf);
   assert(FirstIvarDecl);
   printIvar(os, FirstIvarDecl, IvarToPopertyMap);
@@ -538,7 +538,7 @@ void IvarInvalidationCheckerImpl::
 reportIvarNeedsInvalidation(const ObjCIvarDecl *IvarD,
                             const IvarToPropMapTy &IvarToPopertyMap,
                             const ObjCMethodDecl *MethodD) const {
-  SmallString<128> sbuf;
+  llvm::SmallString<128> sbuf;
   llvm::raw_svector_ostream os(sbuf);
   printIvar(os, IvarD, IvarToPopertyMap);
   os << "needs to be invalidated or set to nil";

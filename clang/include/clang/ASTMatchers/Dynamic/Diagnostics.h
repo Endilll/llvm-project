@@ -41,7 +41,7 @@ struct SourceRange {
 /// A VariantValue instance annotated with its parser context.
 struct ParserValue {
   ParserValue() {}
-  StringRef Text;
+  llvm::StringRef Text;
   SourceRange Range;
   VariantValue Value;
 };
@@ -89,9 +89,9 @@ public:
   public:
     ArgStream(std::vector<std::string> *Out) : Out(Out) {}
     template <class T> ArgStream &operator<<(const T &Arg) {
-      return operator<<(Twine(Arg));
+      return operator<<(llvm::Twine(Arg));
     }
-    ArgStream &operator<<(const Twine &Arg);
+    ArgStream &operator<<(const llvm::Twine &Arg);
 
   private:
     std::vector<std::string> *Out;
@@ -107,11 +107,11 @@ public:
   public:
     /// About to call the constructor for a matcher.
     enum ConstructMatcherEnum { ConstructMatcher };
-    Context(ConstructMatcherEnum, Diagnostics *Error, StringRef MatcherName,
+    Context(ConstructMatcherEnum, Diagnostics *Error, llvm::StringRef MatcherName,
             SourceRange MatcherRange);
     /// About to recurse into parsing one argument for a matcher.
     enum MatcherArgEnum { MatcherArg };
-    Context(MatcherArgEnum, Diagnostics *Error, StringRef MatcherName,
+    Context(MatcherArgEnum, Diagnostics *Error, llvm::StringRef MatcherName,
             SourceRange MatcherRange, unsigned ArgNumber);
     ~Context();
 
@@ -160,7 +160,7 @@ public:
     };
     std::vector<Message> Messages;
   };
-  ArrayRef<ErrorContent> errors() const { return Errors; }
+  llvm::ArrayRef<ErrorContent> errors() const { return Errors; }
 
   /// Returns a simple string representation of each error.
   ///

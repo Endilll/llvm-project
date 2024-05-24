@@ -113,7 +113,7 @@ bool MatchQuery::run(llvm::raw_ostream &OS, QuerySession &QS) const {
     Finder.matchAST(Ctx);
 
     if (QS.PrintMatcher) {
-      SmallVector<StringRef, 4> Lines;
+      llvm::SmallVector<llvm::StringRef, 4> Lines;
       Source.split(Lines, "\n");
       auto FirstLine = Lines[0];
       Lines.erase(Lines.begin(), Lines.begin() + 1);
@@ -187,7 +187,7 @@ const QueryKind SetQueryKind<OutputKind>::value;
 #endif
 
 bool FileQuery::run(llvm::raw_ostream &OS, QuerySession &QS) const {
-  auto Buffer = llvm::MemoryBuffer::getFile(StringRef{File}.trim());
+  auto Buffer = llvm::MemoryBuffer::getFile(llvm::StringRef{File}.trim());
   if (!Buffer) {
     if (Prefix.has_value())
       llvm::errs() << *Prefix << ": ";
@@ -196,7 +196,7 @@ bool FileQuery::run(llvm::raw_ostream &OS, QuerySession &QS) const {
     return false;
   }
 
-  StringRef FileContentRef(Buffer.get()->getBuffer());
+  llvm::StringRef FileContentRef(Buffer.get()->getBuffer());
 
   while (!FileContentRef.empty()) {
     QueryRef Q = QueryParser::parse(FileContentRef, QS);

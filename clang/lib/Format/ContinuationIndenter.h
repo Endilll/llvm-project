@@ -37,10 +37,10 @@ struct RawStringFormatStyleManager {
 
   RawStringFormatStyleManager(const FormatStyle &CodeStyle);
 
-  std::optional<FormatStyle> getDelimiterStyle(StringRef Delimiter) const;
+  std::optional<FormatStyle> getDelimiterStyle(llvm::StringRef Delimiter) const;
 
   std::optional<FormatStyle>
-  getEnclosingFunctionStyle(StringRef EnclosingFunction) const;
+  getEnclosingFunctionStyle(llvm::StringRef EnclosingFunction) const;
 };
 
 class ContinuationIndenter {
@@ -433,7 +433,7 @@ struct LineState {
 
   /// A stack keeping track of properties applying to parenthesis
   /// levels.
-  SmallVector<ParenState> Stack;
+  llvm::SmallVector<ParenState> Stack;
 
   /// Ignore the stack of \c ParenStates for state comparison.
   ///

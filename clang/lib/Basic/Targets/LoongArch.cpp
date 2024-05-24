@@ -20,7 +20,7 @@
 using namespace clang;
 using namespace clang::targets;
 
-ArrayRef<const char *> LoongArchTargetInfo::getGCCRegNames() const {
+llvm::ArrayRef<const char *> LoongArchTargetInfo::getGCCRegNames() const {
   static const char *const GCCRegNames[] = {
       // General purpose registers.
       "$r0", "$r1", "$r2", "$r3", "$r4", "$r5", "$r6", "$r7", "$r8", "$r9",
@@ -47,7 +47,7 @@ ArrayRef<const char *> LoongArchTargetInfo::getGCCRegNames() const {
   return llvm::ArrayRef(GCCRegNames);
 }
 
-ArrayRef<TargetInfo::GCCRegAlias>
+llvm::ArrayRef<TargetInfo::GCCRegAlias>
 LoongArchTargetInfo::getGCCRegAliases() const {
   static const TargetInfo::GCCRegAlias GCCRegAliases[] = {
       {{"zero", "$zero", "r0"}, "$r0"},
@@ -187,7 +187,7 @@ void LoongArchTargetInfo::getTargetDefines(const LangOptions &Opts,
                                            MacroBuilder &Builder) const {
   Builder.defineMacro("__loongarch__");
   unsigned GRLen = getRegisterWidth();
-  Builder.defineMacro("__loongarch_grlen", Twine(GRLen));
+  Builder.defineMacro("__loongarch_grlen", llvm::Twine(GRLen));
   if (GRLen == 64)
     Builder.defineMacro("__loongarch64");
 
@@ -199,21 +199,21 @@ void LoongArchTargetInfo::getTargetDefines(const LangOptions &Opts,
     Builder.defineMacro("__loongarch_frlen", "0");
 
   // Define __loongarch_arch.
-  StringRef ArchName = getCPU();
-  Builder.defineMacro("__loongarch_arch", Twine('"') + ArchName + Twine('"'));
+  llvm::StringRef ArchName = getCPU();
+  Builder.defineMacro("__loongarch_arch", llvm::Twine('"') + ArchName + llvm::Twine('"'));
 
   // Define __loongarch_tune.
-  StringRef TuneCPU = getTargetOpts().TuneCPU;
+  llvm::StringRef TuneCPU = getTargetOpts().TuneCPU;
   if (TuneCPU.empty())
     TuneCPU = ArchName;
-  Builder.defineMacro("__loongarch_tune", Twine('"') + TuneCPU + Twine('"'));
+  Builder.defineMacro("__loongarch_tune", llvm::Twine('"') + TuneCPU + llvm::Twine('"'));
 
   if (HasFeatureLSX)
-    Builder.defineMacro("__loongarch_sx", Twine(1));
+    Builder.defineMacro("__loongarch_sx", llvm::Twine(1));
   if (HasFeatureLASX)
-    Builder.defineMacro("__loongarch_asx", Twine(1));
+    Builder.defineMacro("__loongarch_asx", llvm::Twine(1));
 
-  StringRef ABI = getABI();
+  llvm::StringRef ABI = getABI();
   if (ABI == "lp64d" || ABI == "lp64f" || ABI == "lp64s")
     Builder.defineMacro("__loongarch_lp64");
 
@@ -243,7 +243,7 @@ static constexpr Builtin::Info BuiltinInfo[] = {
 };
 
 bool LoongArchTargetInfo::initFeatureMap(
-    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, StringRef CPU,
+    llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags, llvm::StringRef CPU,
     const std::vector<std::string> &FeaturesVec) const {
   if (getTriple().getArch() == llvm::Triple::loongarch64)
     Features["64bit"] = true;
@@ -254,7 +254,7 @@ bool LoongArchTargetInfo::initFeatureMap(
 }
 
 /// Return true if has this feature.
-bool LoongArchTargetInfo::hasFeature(StringRef Feature) const {
+bool LoongArchTargetInfo::hasFeature(llvm::StringRef Feature) const {
   bool Is64Bit = getTriple().getArch() == llvm::Triple::loongarch64;
   // TODO: Handle more features.
   return llvm::StringSwitch<bool>(Feature)
@@ -267,7 +267,7 @@ bool LoongArchTargetInfo::hasFeature(StringRef Feature) const {
       .Default(false);
 }
 
-ArrayRef<Builtin::Info> LoongArchTargetInfo::getTargetBuiltins() const {
+llvm::ArrayRef<Builtin::Info> LoongArchTargetInfo::getTargetBuiltins() const {
   return llvm::ArrayRef(BuiltinInfo, clang::LoongArch::LastTSBuiltin -
                                          Builtin::FirstTSBuiltin);
 }
@@ -291,11 +291,11 @@ bool LoongArchTargetInfo::handleTargetFeatures(
   return true;
 }
 
-bool LoongArchTargetInfo::isValidCPUName(StringRef Name) const {
+bool LoongArchTargetInfo::isValidCPUName(llvm::StringRef Name) const {
   return llvm::LoongArch::isValidCPUName(Name);
 }
 
 void LoongArchTargetInfo::fillValidCPUList(
-    SmallVectorImpl<StringRef> &Values) const {
+    llvm::SmallVectorImpl<llvm::StringRef> &Values) const {
   llvm::LoongArch::fillValidCPUList(Values);
 }

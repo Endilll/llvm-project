@@ -44,9 +44,9 @@ namespace clang {
   void EmitBackendOutput(DiagnosticsEngine &Diags, const HeaderSearchOptions &,
                          const CodeGenOptions &CGOpts,
                          const TargetOptions &TOpts, const LangOptions &LOpts,
-                         StringRef TDesc, llvm::Module *M, BackendAction Action,
+                         llvm::StringRef TDesc, llvm::Module *M, BackendAction Action,
                          llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS,
-                         std::unique_ptr<raw_pwrite_stream> OS,
+                         std::unique_ptr<llvm::raw_pwrite_stream> OS,
                          BackendConsumer *BC = nullptr);
 
   void EmbedBitcode(llvm::Module *M, const CodeGenOptions &CGOpts,

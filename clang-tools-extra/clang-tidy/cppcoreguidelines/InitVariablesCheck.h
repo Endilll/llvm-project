@@ -21,7 +21,7 @@ namespace clang::tidy::cppcoreguidelines {
 /// http://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/init-variables.html
 class InitVariablesCheck : public ClangTidyCheck {
 public:
-  InitVariablesCheck(StringRef Name, ClangTidyContext *Context);
+  InitVariablesCheck(llvm::StringRef Name, ClangTidyContext *Context);
   void storeOptions(ClangTidyOptions::OptionMap &Opts) override;
   void registerPPCallbacks(const SourceManager &SM, Preprocessor *PP,
                            Preprocessor *ModuleExpanderPP) override;
@@ -30,7 +30,7 @@ public:
 
 private:
   utils::IncludeInserter IncludeInserter;
-  const StringRef MathHeader;
+  const llvm::StringRef MathHeader;
 };
 
 } // namespace clang::tidy::cppcoreguidelines

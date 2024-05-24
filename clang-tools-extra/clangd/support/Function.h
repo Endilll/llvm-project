@@ -22,7 +22,7 @@
 namespace clang {
 namespace clangd {
 
-/// A Callback<T> is a void function that accepts Expected<T>.
+/// A Callback<T> is a void function that accepts llvm::Expected<T>.
 /// This is accepted by ClangdServer functions that logically return T.
 template <typename T>
 using Callback = llvm::unique_function<void(llvm::Expected<T>)>;

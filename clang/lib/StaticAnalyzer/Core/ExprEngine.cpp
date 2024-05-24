@@ -370,8 +370,8 @@ ProgramStateRef ExprEngine::createTemporaryRegionIfNeeded(
   // that the whole expression 'Ex' refers to. This trick is usual,
   // in the sense that CodeGen takes a similar route.
 
-  SmallVector<const Expr *, 2> CommaLHSs;
-  SmallVector<SubobjectAdjustment, 2> Adjustments;
+  llvm::SmallVector<const Expr *, 2> CommaLHSs;
+  llvm::SmallVector<SubobjectAdjustment, 2> Adjustments;
 
   const Expr *Init = InitWithAdjustments->skipRValueSubobjectAdjustments(
       CommaLHSs, Adjustments);
@@ -672,8 +672,8 @@ ProgramStateRef ExprEngine::processAssume(ProgramStateRef state,
 ProgramStateRef
 ExprEngine::processRegionChanges(ProgramStateRef state,
                                  const InvalidatedSymbols *invalidated,
-                                 ArrayRef<const MemRegion *> Explicits,
-                                 ArrayRef<const MemRegion *> Regions,
+                                 llvm::ArrayRef<const MemRegion *> Explicits,
+                                 llvm::ArrayRef<const MemRegion *> Regions,
                                  const LocationContext *LCtx,
                                  const CallEvent *Call) {
   return getCheckerManager().runCheckersForRegionChanges(state, invalidated,
@@ -682,7 +682,7 @@ ExprEngine::processRegionChanges(ProgramStateRef state,
 }
 
 static void
-printObjectsUnderConstructionJson(raw_ostream &Out, ProgramStateRef State,
+printObjectsUnderConstructionJson(llvm::raw_ostream &Out, ProgramStateRef State,
                                   const char *NL, const LocationContext *LCtx,
                                   unsigned int Space = 0, bool IsDot = false) {
   PrintingPolicy PP =
@@ -729,7 +729,7 @@ printObjectsUnderConstructionJson(raw_ostream &Out, ProgramStateRef State,
 }
 
 static void printIndicesOfElementsToConstructJson(
-    raw_ostream &Out, ProgramStateRef State, const char *NL,
+    llvm::raw_ostream &Out, ProgramStateRef State, const char *NL,
     const LocationContext *LCtx, unsigned int Space = 0, bool IsDot = false) {
   using KeyT = std::pair<const Expr *, const LocationContext *>;
 
@@ -790,7 +790,7 @@ static void printIndicesOfElementsToConstructJson(
   }
 }
 
-static void printPendingInitLoopJson(raw_ostream &Out, ProgramStateRef State,
+static void printPendingInitLoopJson(llvm::raw_ostream &Out, ProgramStateRef State,
                                      const char *NL,
                                      const LocationContext *LCtx,
                                      unsigned int Space = 0,
@@ -851,7 +851,7 @@ static void printPendingInitLoopJson(raw_ostream &Out, ProgramStateRef State,
 }
 
 static void
-printPendingArrayDestructionsJson(raw_ostream &Out, ProgramStateRef State,
+printPendingArrayDestructionsJson(llvm::raw_ostream &Out, ProgramStateRef State,
                                   const char *NL, const LocationContext *LCtx,
                                   unsigned int Space = 0, bool IsDot = false) {
   using KeyT = const LocationContext *;
@@ -901,19 +901,19 @@ printPendingArrayDestructionsJson(raw_ostream &Out, ProgramStateRef State,
 /// A helper function to generalize program state trait printing.
 /// The function invokes Printer as 'Printer(Out, State, NL, LC, Space, IsDot,
 /// std::forward<Args>(args)...)'. \n One possible type for Printer is
-/// 'void()(raw_ostream &, ProgramStateRef, const char *, const LocationContext
+/// 'void()(llvm::raw_ostream &, ProgramStateRef, const char *, const LocationContext
 /// *, unsigned int, bool, ...)' \n \param Trait The state trait to be printed.
 /// \param Printer A void function that prints Trait.
 /// \param Args An additional parameter pack that is passed to Print upon
 /// invocation.
 template <typename Trait, typename Printer, typename... Args>
 static void printStateTraitWithLocationContextJson(
-    raw_ostream &Out, ProgramStateRef State, const LocationContext *LCtx,
+    llvm::raw_ostream &Out, ProgramStateRef State, const LocationContext *LCtx,
     const char *NL, unsigned int Space, bool IsDot,
     const char *jsonPropertyName, Printer printer, Args &&...args) {
 
   using RequiredType =
-      void (*)(raw_ostream &, ProgramStateRef, const char *,
+      void (*)(llvm::raw_ostream &, ProgramStateRef, const char *,
                const LocationContext *, unsigned int, bool, Args &&...);
 
   // Try to do as much compile time checking as possible.
@@ -936,7 +936,7 @@ static void printStateTraitWithLocationContextJson(
   }
 }
 
-void ExprEngine::printJson(raw_ostream &Out, ProgramStateRef State,
+void ExprEngine::printJson(llvm::raw_ostream &Out, ProgramStateRef State,
                            const LocationContext *LCtx, const char *NL,
                            unsigned int Space, bool IsDot) const {
 
@@ -1683,7 +1683,7 @@ void ExprEngine::VisitCXXBindTemporaryExpr(const CXXBindTemporaryExpr *BTE,
 }
 
 ProgramStateRef ExprEngine::escapeValues(ProgramStateRef State,
-                                         ArrayRef<SVal> Vs,
+                                         llvm::ArrayRef<SVal> Vs,
                                          PointerEscapeKind K,
                                          const CallEvent *Call) const {
   class CollectReachableSymbolsCallback final : public SymbolVisitor {
@@ -2890,7 +2890,7 @@ void ExprEngine::processBeginOfFunction(NodeBuilderContext &BC,
                                         ExplodedNode *Pred,
                                         ExplodedNodeSet &Dst,
                                         const BlockEdge &L) {
-  SaveAndRestore<const NodeBuilderContext *> NodeContextRAII(currBldrCtx, &BC);
+  llvm::SaveAndRestore<const NodeBuilderContext *> NodeContextRAII(currBldrCtx, &BC);
   getCheckerManager().runCheckersForBeginFunction(Dst, L, Pred, *this);
 }
 
@@ -3445,7 +3445,7 @@ void ExprEngine::VisitAtomicExpr(const AtomicExpr *AE, ExplodedNode *Pred,
     ProgramStateRef State = I->getState();
     const LocationContext *LCtx = I->getLocationContext();
 
-    SmallVector<SVal, 8> ValuesToInvalidate;
+    llvm::SmallVector<SVal, 8> ValuesToInvalidate;
     for (unsigned SI = 0, Count = AE->getNumSubExprs(); SI != Count; SI++) {
       const Expr *SubExpr = AE->getSubExprs()[SI];
       SVal SubExprVal = State->getSVal(SubExpr, LCtx);
@@ -3475,10 +3475,10 @@ void ExprEngine::VisitAtomicExpr(const AtomicExpr *AE, ExplodedNode *Pred,
 // (4) We are binding to a MemRegion with stack storage that the store
 //     does not understand.
 ProgramStateRef ExprEngine::processPointerEscapedOnBind(
-    ProgramStateRef State, ArrayRef<std::pair<SVal, SVal>> LocAndVals,
+    ProgramStateRef State, llvm::ArrayRef<std::pair<SVal, SVal>> LocAndVals,
     const LocationContext *LCtx, PointerEscapeKind Kind,
     const CallEvent *Call) {
-  SmallVector<SVal, 8> Escaped;
+  llvm::SmallVector<SVal, 8> Escaped;
   for (const std::pair<SVal, SVal> &LocAndVal : LocAndVals) {
     // Cases (1) and (2).
     const MemRegion *MR = LocAndVal.first.getAsRegion();
@@ -3526,7 +3526,7 @@ ExprEngine::processPointerEscapedOnBind(ProgramStateRef State, SVal Loc,
 ProgramStateRef
 ExprEngine::notifyCheckersOfPointerEscape(ProgramStateRef State,
     const InvalidatedSymbols *Invalidated,
-    ArrayRef<const MemRegion *> ExplicitRegions,
+    llvm::ArrayRef<const MemRegion *> ExplicitRegions,
     const CallEvent *Call,
     RegionAndSymbolInvalidationTraits &ITraits) {
   if (!Invalidated || Invalidated->empty())
@@ -3906,12 +3906,12 @@ void ExprEngine::ViewGraph(bool trim) {
   llvm::DisplayGraph(Filename, false, llvm::GraphProgram::DOT);
 }
 
-void ExprEngine::ViewGraph(ArrayRef<const ExplodedNode *> Nodes) {
+void ExprEngine::ViewGraph(llvm::ArrayRef<const ExplodedNode *> Nodes) {
   std::string Filename = DumpGraph(Nodes);
   llvm::DisplayGraph(Filename, false, llvm::GraphProgram::DOT);
 }
 
-std::string ExprEngine::DumpGraph(bool trim, StringRef Filename) {
+std::string ExprEngine::DumpGraph(bool trim, llvm::StringRef Filename) {
   if (trim) {
     std::vector<const ExplodedNode *> Src;
 
@@ -3932,8 +3932,8 @@ std::string ExprEngine::DumpGraph(bool trim, StringRef Filename) {
                           /*Filename=*/std::string(Filename));
 }
 
-std::string ExprEngine::DumpGraph(ArrayRef<const ExplodedNode *> Nodes,
-                                  StringRef Filename) {
+std::string ExprEngine::DumpGraph(llvm::ArrayRef<const ExplodedNode *> Nodes,
+                                  llvm::StringRef Filename) {
   std::unique_ptr<ExplodedGraph> TrimmedG(G.trim(Nodes));
 
   if (!TrimmedG.get()) {

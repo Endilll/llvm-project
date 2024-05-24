@@ -36,8 +36,8 @@ WhitespaceManager::Change::Change(const FormatToken &Tok,
                                   SourceRange OriginalWhitespaceRange,
                                   int Spaces, unsigned StartOfTokenColumn,
                                   unsigned NewlinesBefore,
-                                  StringRef PreviousLinePostfix,
-                                  StringRef CurrentLinePrefix, bool IsAligned,
+                                  llvm::StringRef PreviousLinePostfix,
+                                  llvm::StringRef CurrentLinePrefix, bool IsAligned,
                                   bool ContinuesPPDirective, bool IsInsideToken)
     : Tok(&Tok), CreateReplacement(CreateReplacement),
       OriginalWhitespaceRange(OriginalWhitespaceRange),
@@ -79,7 +79,7 @@ WhitespaceManager::addReplacement(const tooling::Replacement &Replacement) {
   return Replaces.add(Replacement);
 }
 
-bool WhitespaceManager::inputUsesCRLF(StringRef Text, bool DefaultToCRLF) {
+bool WhitespaceManager::inputUsesCRLF(llvm::StringRef Text, bool DefaultToCRLF) {
   size_t LF = Text.count('\n');
   size_t CR = Text.count('\r') * 2;
   return LF == CR ? DefaultToCRLF : CR > LF;
@@ -87,7 +87,7 @@ bool WhitespaceManager::inputUsesCRLF(StringRef Text, bool DefaultToCRLF) {
 
 void WhitespaceManager::replaceWhitespaceInToken(
     const FormatToken &Tok, unsigned Offset, unsigned ReplaceChars,
-    StringRef PreviousPostfix, StringRef CurrentPrefix, bool InPPDirective,
+    llvm::StringRef PreviousPostfix, llvm::StringRef CurrentPrefix, bool InPPDirective,
     unsigned Newlines, int Spaces) {
   if (Tok.Finalized || (Tok.MacroCtx && Tok.MacroCtx->Role == MR_ExpandedArg))
     return;
@@ -145,7 +145,7 @@ void WhitespaceManager::calculateLineBreakInformation() {
            OriginalWhitespaceStartOffset);
     const char *const PreviousOriginalWhitespaceEndData =
         SourceMgr.getCharacterData(PreviousOriginalWhitespaceEnd);
-    StringRef Text(PreviousOriginalWhitespaceEndData,
+    llvm::StringRef Text(PreviousOriginalWhitespaceEndData,
                    SourceMgr.getCharacterData(OriginalWhitespaceStart) -
                        PreviousOriginalWhitespaceEndData);
     // Usually consecutive changes would occur in consecutive tokens. This is
@@ -170,7 +170,7 @@ void WhitespaceManager::calculateLineBreakInformation() {
     // newlines, the token length must be adjusted to the end of the original
     // line of the token.
     auto NewlinePos = Text.find_first_of('\n');
-    if (NewlinePos == StringRef::npos) {
+    if (NewlinePos == llvm::StringRef::npos) {
       PrevTokLength = OriginalWhitespaceStartOffset -
                       PreviousOriginalWhitespaceEndOffset +
                       C.PreviousLinePostfix.size() + P.CurrentLinePrefix.size();
@@ -256,7 +256,7 @@ void WhitespaceManager::calculateLineBreakInformation() {
   // Level is increased for each conditional, unless this conditional continues
   // a chain of conditional, i.e. starts immediately after the colon of another
   // conditional.
-  SmallVector<bool, 16> ScopeStack;
+  llvm::SmallVector<bool, 16> ScopeStack;
   int ConditionalsLevel = 0;
   for (auto &Change : Changes) {
     for (unsigned i = 0, e = Change.Tok->FakeLParens.size(); i != e; ++i) {
@@ -286,7 +286,7 @@ template <typename F>
 static void
 AlignTokenSequence(const FormatStyle &Style, unsigned Start, unsigned End,
                    unsigned Column, bool RightJustify, F &&Matches,
-                   SmallVector<WhitespaceManager::Change, 16> &Changes) {
+                   llvm::SmallVector<WhitespaceManager::Change, 16> &Changes) {
   bool FoundMatchOnLine = false;
   int Shift = 0;
 
@@ -310,7 +310,7 @@ AlignTokenSequence(const FormatStyle &Style, unsigned Start, unsigned End,
   //   auto s   = "Hello"
   //          "World";
   // Special handling is required for 'nested' ternary operators.
-  SmallVector<unsigned, 16> ScopeStack;
+  llvm::SmallVector<unsigned, 16> ScopeStack;
 
   for (unsigned i = Start; i != End; ++i) {
     auto &CurrentChange = Changes[i];
@@ -524,7 +524,7 @@ AlignTokenSequence(const FormatStyle &Style, unsigned Start, unsigned End,
 // be aligned will be padded on the left to the same length before aligning.
 template <typename F>
 static unsigned AlignTokens(const FormatStyle &Style, F &&Matches,
-                            SmallVector<WhitespaceManager::Change, 16> &Changes,
+                            llvm::SmallVector<WhitespaceManager::Change, 16> &Changes,
                             unsigned StartAt,
                             const FormatStyle::AlignConsecutiveStyle &ACS = {},
                             bool RightJustify = false) {
@@ -699,7 +699,7 @@ static unsigned AlignTokens(const FormatStyle &Style, F &&Matches,
 static void AlignMatchingTokenSequence(
     unsigned &StartOfSequence, unsigned &EndOfSequence, unsigned &MinColumn,
     std::function<bool(const WhitespaceManager::Change &C)> Matches,
-    SmallVector<WhitespaceManager::Change, 16> &Changes) {
+    llvm::SmallVector<WhitespaceManager::Change, 16> &Changes) {
   if (StartOfSequence > 0 && StartOfSequence < EndOfSequence) {
     bool FoundMatchOnLine = false;
     int Shift = 0;
@@ -1451,11 +1451,11 @@ WhitespaceManager::CellDescriptions WhitespaceManager::getCells(unsigned Start,
 
   unsigned Depth = 0;
   unsigned Cell = 0;
-  SmallVector<unsigned> CellCounts;
+  llvm::SmallVector<unsigned> CellCounts;
   unsigned InitialSpaces = 0;
   unsigned InitialTokenLength = 0;
   unsigned EndSpaces = 0;
-  SmallVector<CellDescription> Cells;
+  llvm::SmallVector<CellDescription> Cells;
   const FormatToken *MatchingParen = nullptr;
   for (unsigned i = Start; i < End; ++i) {
     auto &C = Changes[i];
@@ -1679,11 +1679,11 @@ void WhitespaceManager::generateChanges() {
   }
 }
 
-void WhitespaceManager::storeReplacement(SourceRange Range, StringRef Text) {
+void WhitespaceManager::storeReplacement(SourceRange Range, llvm::StringRef Text) {
   unsigned WhitespaceLength = SourceMgr.getFileOffset(Range.getEnd()) -
                               SourceMgr.getFileOffset(Range.getBegin());
   // Don't create a replacement, if it does not change anything.
-  if (StringRef(SourceMgr.getCharacterData(Range.getBegin()),
+  if (llvm::StringRef(SourceMgr.getCharacterData(Range.getBegin()),
                 WhitespaceLength) == Text) {
     return;
   }

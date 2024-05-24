@@ -65,7 +65,7 @@ void DynamicTypeChecker::reportTypeError(QualType DynamicType,
                                          const MemRegion *Reg,
                                          const Stmt *ReportedNode,
                                          CheckerContext &C) const {
-  SmallString<192> Buf;
+  llvm::SmallString<192> Buf;
   llvm::raw_svector_ostream OS(Buf);
   OS << "Object has a dynamic type '";
   QualType::print(DynamicType.getTypePtr(), Qualifiers(), OS, C.getLangOpts(),
@@ -103,7 +103,7 @@ PathDiagnosticPieceRef DynamicTypeChecker::DynamicTypeBugVisitor::VisitNode(
 
   const LangOptions &LangOpts = BRC.getASTContext().getLangOpts();
 
-  SmallString<256> Buf;
+  llvm::SmallString<256> Buf;
   llvm::raw_svector_ostream OS(Buf);
   OS << "Type '";
   QualType::print(TrackedType.getType().getTypePtr(), Qualifiers(), OS,

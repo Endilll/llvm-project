@@ -19,7 +19,7 @@ namespace clang::tidy::modernize {
 /// http://clang.llvm.org/extra/clang-tidy/checks/modernize/use-constraints.html
 class UseConstraintsCheck : public ClangTidyCheck {
 public:
-  UseConstraintsCheck(StringRef Name, ClangTidyContext *Context)
+  UseConstraintsCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

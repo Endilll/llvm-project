@@ -21,12 +21,12 @@ public:
     for (auto &Symbol : Symbols) {
       auto Tokens = tokenize(Symbol.Symbol.getName());
       this->Symbols.emplace_back(
-          StringRef(llvm::join(Tokens.begin(), Tokens.end(), " ")),
+          llvm::StringRef(llvm::join(Tokens.begin(), Tokens.end(), " ")),
           std::move(Symbol));
     }
   }
 
-  std::vector<SymbolAndSignals> search(StringRef Query) override {
+  std::vector<SymbolAndSignals> search(llvm::StringRef Query) override {
     auto Tokens = tokenize(Query);
     llvm::Regex Pattern("^" + queryRegexp(Tokens));
     std::vector<SymbolAndSignals> Results;
@@ -63,7 +63,7 @@ CharType classify(char c) {
 
 } // namespace
 
-std::vector<std::string> FuzzySymbolIndex::tokenize(StringRef Text) {
+std::vector<std::string> FuzzySymbolIndex::tokenize(llvm::StringRef Text) {
   std::vector<std::string> Result;
   // State describes the treatment of text from Start to I.
   // Once text is Flush()ed into Result, we're done with it and advance Start.
@@ -130,7 +130,7 @@ FuzzySymbolIndex::queryRegexp(const std::vector<std::string> &Tokens) {
 }
 
 llvm::Expected<std::unique_ptr<FuzzySymbolIndex>>
-FuzzySymbolIndex::createFromYAML(StringRef FilePath) {
+FuzzySymbolIndex::createFromYAML(llvm::StringRef FilePath) {
   auto Buffer = llvm::MemoryBuffer::getFile(FilePath);
   if (!Buffer)
     return llvm::errorCodeToError(Buffer.getError());

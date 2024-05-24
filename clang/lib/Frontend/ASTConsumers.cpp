@@ -34,8 +34,8 @@ namespace {
 
   public:
     enum Kind { DumpFull, Dump, Print, None };
-    ASTPrinter(std::unique_ptr<raw_ostream> Out, Kind K,
-               ASTDumpOutputFormat Format, StringRef FilterString,
+    ASTPrinter(std::unique_ptr<llvm::raw_ostream> Out, Kind K,
+               ASTDumpOutputFormat Format, llvm::StringRef FilterString,
                bool DumpLookups = false, bool DumpDeclTypes = false)
         : Out(Out ? *Out : llvm::outs()), OwnedOut(std::move(Out)),
           OutputKind(K), OutputFormat(Format), FilterString(FilterString),
@@ -56,7 +56,7 @@ namespace {
       if (D && filterMatches(D)) {
         bool ShowColors = Out.has_colors();
         if (ShowColors)
-          Out.changeColor(raw_ostream::BLUE);
+          Out.changeColor(llvm::raw_ostream::BLUE);
 
         if (OutputFormat == ADOF_Default)
           Out << (OutputKind != Print ? "Dumping " : "Printing ") << getName(D)
@@ -112,8 +112,8 @@ namespace {
       }
     }
 
-    raw_ostream &Out;
-    std::unique_ptr<raw_ostream> OwnedOut;
+    llvm::raw_ostream &Out;
+    std::unique_ptr<llvm::raw_ostream> OwnedOut;
 
     /// How to output individual declarations.
     Kind OutputKind;
@@ -136,7 +136,7 @@ namespace {
   class ASTDeclNodeLister : public ASTConsumer,
                      public RecursiveASTVisitor<ASTDeclNodeLister> {
   public:
-    ASTDeclNodeLister(raw_ostream *Out = nullptr)
+    ASTDeclNodeLister(llvm::raw_ostream *Out = nullptr)
         : Out(Out ? *Out : llvm::outs()) {}
 
     void HandleTranslationUnit(ASTContext &Context) override {
@@ -152,19 +152,19 @@ namespace {
     }
 
   private:
-    raw_ostream &Out;
+    llvm::raw_ostream &Out;
   };
 } // end anonymous namespace
 
 std::unique_ptr<ASTConsumer>
-clang::CreateASTPrinter(std::unique_ptr<raw_ostream> Out,
-                        StringRef FilterString) {
+clang::CreateASTPrinter(std::unique_ptr<llvm::raw_ostream> Out,
+                        llvm::StringRef FilterString) {
   return std::make_unique<ASTPrinter>(std::move(Out), ASTPrinter::Print,
                                        ADOF_Default, FilterString);
 }
 
 std::unique_ptr<ASTConsumer>
-clang::CreateASTDumper(std::unique_ptr<raw_ostream> Out, StringRef FilterString,
+clang::CreateASTDumper(std::unique_ptr<llvm::raw_ostream> Out, llvm::StringRef FilterString,
                        bool DumpDecls, bool Deserialize, bool DumpLookups,
                        bool DumpDeclTypes, ASTDumpOutputFormat Format) {
   assert((DumpDecls || Deserialize || DumpLookups) && "nothing to dump");

@@ -66,19 +66,19 @@ template <> struct ScalarEnumerationTraits<InfoType> {
 };
 
 // Scalars to YAML output.
-template <unsigned U> struct ScalarTraits<SmallString<U>> {
+template <unsigned U> struct ScalarTraits<llvm::SmallString<U>> {
 
-  static void output(const SmallString<U> &S, void *, llvm::raw_ostream &OS) {
+  static void output(const llvm::SmallString<U> &S, void *, llvm::raw_ostream &OS) {
     for (const auto &C : S)
       OS << C;
   }
 
-  static StringRef input(StringRef Scalar, void *, SmallString<U> &Value) {
+  static llvm::StringRef input(llvm::StringRef Scalar, void *, llvm::SmallString<U> &Value) {
     Value.assign(Scalar.begin(), Scalar.end());
-    return StringRef();
+    return llvm::StringRef();
   }
 
-  static QuotingType mustQuote(StringRef) { return QuotingType::Single; }
+  static QuotingType mustQuote(llvm::StringRef) { return QuotingType::Single; }
 };
 
 template <> struct ScalarTraits<std::array<unsigned char, 20>> {
@@ -88,12 +88,12 @@ template <> struct ScalarTraits<std::array<unsigned char, 20>> {
     OS << toHex(toStringRef(S));
   }
 
-  static StringRef input(StringRef Scalar, void *,
+  static llvm::StringRef input(llvm::StringRef Scalar, void *,
                          std::array<unsigned char, 20> &Value) {
     if (Scalar.size() != 40)
       return "Error: Incorrect scalar size for USR.";
     Value = StringToSymbol(Scalar);
-    return StringRef();
+    return llvm::StringRef();
   }
 
   static SymbolID StringToSymbol(llvm::StringRef Value) {
@@ -103,7 +103,7 @@ template <> struct ScalarTraits<std::array<unsigned char, 20>> {
     return SymbolID(USR);
   }
 
-  static QuotingType mustQuote(StringRef) { return QuotingType::Single; }
+  static QuotingType mustQuote(llvm::StringRef) { return QuotingType::Single; }
 };
 
 // Helper functions to map infos to YAML.
@@ -114,14 +114,14 @@ static void TypeInfoMapping(IO &IO, TypeInfo &I) {
 
 static void FieldTypeInfoMapping(IO &IO, FieldTypeInfo &I) {
   TypeInfoMapping(IO, I);
-  IO.mapOptional("Name", I.Name, SmallString<16>());
-  IO.mapOptional("DefaultValue", I.DefaultValue, SmallString<16>());
+  IO.mapOptional("Name", I.Name, llvm::SmallString<16>());
+  IO.mapOptional("DefaultValue", I.DefaultValue, llvm::SmallString<16>());
 }
 
 static void InfoMapping(IO &IO, Info &I) {
   IO.mapRequired("USR", I.USR);
-  IO.mapOptional("Name", I.Name, SmallString<16>());
-  IO.mapOptional("Path", I.Path, SmallString<128>());
+  IO.mapOptional("Name", I.Name, llvm::SmallString<16>());
+  IO.mapOptional("Path", I.Path, llvm::SmallString<128>());
   IO.mapOptional("Namespace", I.Namespace, llvm::SmallVector<Reference, 4>());
   IO.mapOptional("Description", I.Description);
 }
@@ -149,19 +149,19 @@ static void RecordInfoMapping(IO &IO, RecordInfo &I) {
 }
 
 static void CommentInfoMapping(IO &IO, CommentInfo &I) {
-  IO.mapOptional("Kind", I.Kind, SmallString<16>());
-  IO.mapOptional("Text", I.Text, SmallString<64>());
-  IO.mapOptional("Name", I.Name, SmallString<16>());
-  IO.mapOptional("Direction", I.Direction, SmallString<8>());
-  IO.mapOptional("ParamName", I.ParamName, SmallString<16>());
-  IO.mapOptional("CloseName", I.CloseName, SmallString<16>());
+  IO.mapOptional("Kind", I.Kind, llvm::SmallString<16>());
+  IO.mapOptional("Text", I.Text, llvm::SmallString<64>());
+  IO.mapOptional("Name", I.Name, llvm::SmallString<16>());
+  IO.mapOptional("Direction", I.Direction, llvm::SmallString<8>());
+  IO.mapOptional("ParamName", I.ParamName, llvm::SmallString<16>());
+  IO.mapOptional("CloseName", I.CloseName, llvm::SmallString<16>());
   IO.mapOptional("SelfClosing", I.SelfClosing, false);
   IO.mapOptional("Explicit", I.Explicit, false);
-  IO.mapOptional("Args", I.Args, llvm::SmallVector<SmallString<16>, 4>());
+  IO.mapOptional("Args", I.Args, llvm::SmallVector<llvm::SmallString<16>, 4>());
   IO.mapOptional("AttrKeys", I.AttrKeys,
-                 llvm::SmallVector<SmallString<16>, 4>());
+                 llvm::SmallVector<llvm::SmallString<16>, 4>());
   IO.mapOptional("AttrValues", I.AttrValues,
-                 llvm::SmallVector<SmallString<16>, 4>());
+                 llvm::SmallVector<llvm::SmallString<16>, 4>());
   IO.mapOptional("Children", I.Children);
 }
 
@@ -170,17 +170,17 @@ static void CommentInfoMapping(IO &IO, CommentInfo &I) {
 template <> struct MappingTraits<Location> {
   static void mapping(IO &IO, Location &Loc) {
     IO.mapOptional("LineNumber", Loc.LineNumber, 0);
-    IO.mapOptional("Filename", Loc.Filename, SmallString<32>());
+    IO.mapOptional("Filename", Loc.Filename, llvm::SmallString<32>());
   }
 };
 
 template <> struct MappingTraits<Reference> {
   static void mapping(IO &IO, Reference &Ref) {
     IO.mapOptional("Type", Ref.RefType, InfoType::IT_default);
-    IO.mapOptional("Name", Ref.Name, SmallString<16>());
-    IO.mapOptional("QualName", Ref.QualName, SmallString<16>());
+    IO.mapOptional("Name", Ref.Name, llvm::SmallString<16>());
+    IO.mapOptional("QualName", Ref.QualName, llvm::SmallString<16>());
     IO.mapOptional("USR", Ref.USR, SymbolID());
-    IO.mapOptional("Path", Ref.Path, SmallString<128>());
+    IO.mapOptional("Path", Ref.Path, llvm::SmallString<128>());
   }
 };
 
@@ -191,8 +191,8 @@ template <> struct MappingTraits<TypeInfo> {
 template <> struct MappingTraits<FieldTypeInfo> {
   static void mapping(IO &IO, FieldTypeInfo &I) {
     TypeInfoMapping(IO, I);
-    IO.mapOptional("Name", I.Name, SmallString<16>());
-    IO.mapOptional("DefaultValue", I.DefaultValue, SmallString<16>());
+    IO.mapOptional("Name", I.Name, llvm::SmallString<16>());
+    IO.mapOptional("DefaultValue", I.DefaultValue, llvm::SmallString<16>());
   }
 };
 
@@ -240,7 +240,7 @@ template <> struct MappingTraits<EnumValueInfo> {
   static void mapping(IO &IO, EnumValueInfo &I) {
     IO.mapOptional("Name", I.Name);
     IO.mapOptional("Value", I.Value);
-    IO.mapOptional("Expr", I.ValueExpr, SmallString<16>());
+    IO.mapOptional("Expr", I.ValueExpr, llvm::SmallString<16>());
   }
 };
 
@@ -319,7 +319,7 @@ class YAMLGenerator : public Generator {
 public:
   static const char *Format;
 
-  llvm::Error generateDocs(StringRef RootDir,
+  llvm::Error generateDocs(llvm::StringRef RootDir,
                            llvm::StringMap<std::unique_ptr<doc::Info>> Infos,
                            const ClangDocContext &CDCtx) override;
   llvm::Error generateDocForInfo(Info *I, llvm::raw_ostream &OS,
@@ -329,7 +329,7 @@ public:
 const char *YAMLGenerator::Format = "yaml";
 
 llvm::Error
-YAMLGenerator::generateDocs(StringRef RootDir,
+YAMLGenerator::generateDocs(llvm::StringRef RootDir,
                             llvm::StringMap<std::unique_ptr<doc::Info>> Infos,
                             const ClangDocContext &CDCtx) {
   for (const auto &Group : Infos) {

@@ -76,7 +76,7 @@ FormatTokenLexer::FormatTokenLexer(
     TypeNames.insert(&IdentTable.get(TypeName));
 }
 
-ArrayRef<FormatToken *> FormatTokenLexer::lex() {
+llvm::ArrayRef<FormatToken *> FormatTokenLexer::lex() {
   assert(Tokens.empty());
   assert(FirstInLineIndex == 0);
   do {
@@ -325,7 +325,7 @@ bool FormatTokenLexer::tryMergeNSStringLiteral() {
   if (At->isNot(tok::at) || String->isNot(tok::string_literal))
     return false;
   At->Tok.setKind(tok::string_literal);
-  At->TokenText = StringRef(At->TokenText.begin(),
+  At->TokenText = llvm::StringRef(At->TokenText.begin(),
                             String->TokenText.end() - At->TokenText.begin());
   At->ColumnWidth += String->ColumnWidth;
   At->setType(TT_ObjCStringLiteral);
@@ -344,7 +344,7 @@ bool FormatTokenLexer::tryMergeJSPrivateIdentifier() {
     return false;
   Hash->Tok.setKind(tok::identifier);
   Hash->TokenText =
-      StringRef(Hash->TokenText.begin(),
+      llvm::StringRef(Hash->TokenText.begin(),
                 Identifier->TokenText.end() - Hash->TokenText.begin());
   Hash->ColumnWidth += Identifier->ColumnWidth;
   Hash->setType(TT_JsPrivateIdentifier);
@@ -384,7 +384,7 @@ bool FormatTokenLexer::tryMergeCSharpStringLiteral() {
   // Convert back into just a string_literal.
   Prefix->Tok.setKind(tok::string_literal);
   Prefix->TokenText =
-      StringRef(Prefix->TokenText.begin(),
+      llvm::StringRef(Prefix->TokenText.begin(),
                 String->TokenText.end() - Prefix->TokenText.begin());
   Prefix->ColumnWidth += String->ColumnWidth;
   Prefix->setType(TT_CSharpStringLiteral);
@@ -410,7 +410,7 @@ bool FormatTokenLexer::tryMergeNullishCoalescingEqual() {
   }
   NullishCoalescing->Tok.setKind(tok::equal); // no '??=' in clang tokens.
   NullishCoalescing->TokenText =
-      StringRef(NullishCoalescing->TokenText.begin(),
+      llvm::StringRef(NullishCoalescing->TokenText.begin(),
                 Equal->TokenText.end() - NullishCoalescing->TokenText.begin());
   NullishCoalescing->ColumnWidth += Equal->ColumnWidth;
   NullishCoalescing->setType(TT_NullCoalescingEqual);
@@ -431,7 +431,7 @@ bool FormatTokenLexer::tryMergeCSharpKeywordVariables() {
     return false;
 
   At->Tok.setKind(tok::identifier);
-  At->TokenText = StringRef(At->TokenText.begin(),
+  At->TokenText = llvm::StringRef(At->TokenText.begin(),
                             Keyword->TokenText.end() - At->TokenText.begin());
   At->ColumnWidth += Keyword->ColumnWidth;
   At->setType(Keyword->getType());
@@ -469,7 +469,7 @@ bool FormatTokenLexer::tryMergeForEach() {
   For->setType(TT_ForEachMacro);
   For->Tok.setKind(tok::kw_for);
 
-  For->TokenText = StringRef(For->TokenText.begin(),
+  For->TokenText = llvm::StringRef(For->TokenText.begin(),
                              Each->TokenText.end() - For->TokenText.begin());
   For->ColumnWidth += Each->ColumnWidth;
   Tokens.erase(Tokens.end() - 1);
@@ -548,12 +548,12 @@ bool FormatTokenLexer::tryMergeGreaterGreater() {
   return true;
 }
 
-bool FormatTokenLexer::tryMergeTokens(ArrayRef<tok::TokenKind> Kinds,
+bool FormatTokenLexer::tryMergeTokens(llvm::ArrayRef<tok::TokenKind> Kinds,
                                       TokenType NewType) {
   if (Tokens.size() < Kinds.size())
     return false;
 
-  SmallVectorImpl<FormatToken *>::const_iterator First =
+  llvm::SmallVectorImpl<FormatToken *>::const_iterator First =
       Tokens.end() - Kinds.size();
   for (unsigned i = 0; i < Kinds.size(); ++i)
     if (First[i]->isNot(Kinds[i]))
@@ -566,7 +566,7 @@ bool FormatTokenLexer::tryMergeTokens(size_t Count, TokenType NewType) {
   if (Tokens.size() < Count)
     return false;
 
-  SmallVectorImpl<FormatToken *>::const_iterator First = Tokens.end() - Count;
+  llvm::SmallVectorImpl<FormatToken *>::const_iterator First = Tokens.end() - Count;
   unsigned AddLength = 0;
   for (size_t i = 1; i < Count; ++i) {
     // If there is whitespace separating the token and the previous one,
@@ -577,7 +577,7 @@ bool FormatTokenLexer::tryMergeTokens(size_t Count, TokenType NewType) {
   }
 
   Tokens.resize(Tokens.size() - Count + 1);
-  First[0]->TokenText = StringRef(First[0]->TokenText.data(),
+  First[0]->TokenText = llvm::StringRef(First[0]->TokenText.data(),
                                   First[0]->TokenText.size() + AddLength);
   First[0]->ColumnWidth += AddLength;
   First[0]->setType(NewType);
@@ -585,8 +585,8 @@ bool FormatTokenLexer::tryMergeTokens(size_t Count, TokenType NewType) {
 }
 
 bool FormatTokenLexer::tryMergeTokensAny(
-    ArrayRef<ArrayRef<tok::TokenKind>> Kinds, TokenType NewType) {
-  return llvm::any_of(Kinds, [this, NewType](ArrayRef<tok::TokenKind> Kinds) {
+    llvm::ArrayRef<llvm::ArrayRef<tok::TokenKind>> Kinds, TokenType NewType) {
+  return llvm::any_of(Kinds, [this, NewType](llvm::ArrayRef<tok::TokenKind> Kinds) {
     return tryMergeTokens(Kinds, NewType);
   });
 }
@@ -651,7 +651,7 @@ void FormatTokenLexer::tryParseJSRegexLiteral() {
   // 'Manually' lex ahead in the current file buffer.
   const char *Offset = Lex->getBufferLocation();
   const char *RegexBegin = Offset - RegexToken->TokenText.size();
-  StringRef Buffer = Lex->getBuffer();
+  llvm::StringRef Buffer = Lex->getBuffer();
   bool InCharacterClass = false;
   bool HaveClosingSlash = false;
   for (; !HaveClosingSlash && Offset != Buffer.end(); ++Offset) {
@@ -679,7 +679,7 @@ void FormatTokenLexer::tryParseJSRegexLiteral() {
   RegexToken->setType(TT_RegexLiteral);
   // Treat regex literals like other string_literals.
   RegexToken->Tok.setKind(tok::string_literal);
-  RegexToken->TokenText = StringRef(RegexBegin, Offset - RegexBegin);
+  RegexToken->TokenText = llvm::StringRef(RegexBegin, Offset - RegexBegin);
   RegexToken->ColumnWidth = RegexToken->TokenText.size();
 
   resetLexer(SourceMgr.getFileOffset(Lex->getSourceLocation(Offset)));
@@ -782,19 +782,19 @@ void FormatTokenLexer::handleCSharpVerbatimAndInterpolatedStrings() {
   if (Offset >= End)
     return;
 
-  StringRef LiteralText(StrBegin, Offset - StrBegin + 1);
+  llvm::StringRef LiteralText(StrBegin, Offset - StrBegin + 1);
   TokenText = LiteralText;
 
   // Adjust width for potentially multiline string literals.
   size_t FirstBreak = LiteralText.find('\n');
-  StringRef FirstLineText = FirstBreak == StringRef::npos
+  llvm::StringRef FirstLineText = FirstBreak == llvm::StringRef::npos
                                 ? LiteralText
                                 : LiteralText.substr(0, FirstBreak);
   CSharpStringLiteral->ColumnWidth = encoding::columnWidthWithTabs(
       FirstLineText, CSharpStringLiteral->OriginalColumn, Style.TabWidth,
       Encoding);
   size_t LastBreak = LiteralText.rfind('\n');
-  if (LastBreak != StringRef::npos) {
+  if (LastBreak != llvm::StringRef::npos) {
     CSharpStringLiteral->IsMultiline = true;
     unsigned StartColumn = 0;
     CSharpStringLiteral->LastLineColumnWidth =
@@ -814,7 +814,7 @@ void FormatTokenLexer::handleTableGenMultilineString() {
   auto OpenOffset = Lex->getCurrentBufferOffset() - 2 /* "[{" */;
   // "}]" is the end of multi line string.
   auto CloseOffset = Lex->getBuffer().find("}]", OpenOffset);
-  if (CloseOffset == StringRef::npos)
+  if (CloseOffset == llvm::StringRef::npos)
     return;
   auto Text = Lex->getBuffer().substr(OpenOffset, CloseOffset - OpenOffset + 2);
   MultiLineString->TokenText = Text;
@@ -823,7 +823,7 @@ void FormatTokenLexer::handleTableGenMultilineString() {
   auto FirstLineText = Text;
   auto FirstBreak = Text.find('\n');
   // Set ColumnWidth and LastLineColumnWidth when it has multiple lines.
-  if (FirstBreak != StringRef::npos) {
+  if (FirstBreak != llvm::StringRef::npos) {
     MultiLineString->IsMultiline = true;
     FirstLineText = Text.substr(0, FirstBreak + 1);
     // LastLineColumnWidth holds the width of the last line.
@@ -843,7 +843,7 @@ void FormatTokenLexer::handleTableGenNumericLikeIdentifier() {
   // numeric_constant now.
   if (Tok->isNot(tok::numeric_constant))
     return;
-  StringRef Text = Tok->TokenText;
+  llvm::StringRef Text = Tok->TokenText;
   // The following check is based on llvm::TGLexer::LexToken.
   // That lexes the token as a number if any of the following holds:
   // 1. It starts with '+', '-'.
@@ -856,7 +856,7 @@ void FormatTokenLexer::handleTableGenNumericLikeIdentifier() {
     return;
   const auto NonDigitPos = Text.find_if([](char C) { return !isdigit(C); });
   // All the characters are digits
-  if (NonDigitPos == StringRef::npos)
+  if (NonDigitPos == llvm::StringRef::npos)
     return;
   char FirstNonDigit = Text[NonDigitPos];
   if (NonDigitPos < Text.size() - 1) {
@@ -916,20 +916,20 @@ void FormatTokenLexer::handleTemplateStrings() {
     }
   }
 
-  StringRef LiteralText(TmplBegin, Offset - TmplBegin);
+  llvm::StringRef LiteralText(TmplBegin, Offset - TmplBegin);
   BacktickToken->setType(TT_TemplateString);
   BacktickToken->Tok.setKind(tok::string_literal);
   BacktickToken->TokenText = LiteralText;
 
   // Adjust width for potentially multiline string literals.
   size_t FirstBreak = LiteralText.find('\n');
-  StringRef FirstLineText = FirstBreak == StringRef::npos
+  llvm::StringRef FirstLineText = FirstBreak == llvm::StringRef::npos
                                 ? LiteralText
                                 : LiteralText.substr(0, FirstBreak);
   BacktickToken->ColumnWidth = encoding::columnWidthWithTabs(
       FirstLineText, BacktickToken->OriginalColumn, Style.TabWidth, Encoding);
   size_t LastBreak = LiteralText.rfind('\n');
-  if (LastBreak != StringRef::npos) {
+  if (LastBreak != llvm::StringRef::npos) {
     BacktickToken->IsMultiline = true;
     unsigned StartColumn = 0; // The template tail spans the entire line.
     BacktickToken->LastLineColumnWidth =
@@ -950,7 +950,7 @@ void FormatTokenLexer::tryParsePythonComment() {
       Lex->getBufferLocation() - HashToken->TokenText.size(); // at "#"
   size_t From = CommentBegin - Lex->getBuffer().begin();
   size_t To = Lex->getBuffer().find_first_of('\n', From);
-  if (To == StringRef::npos)
+  if (To == llvm::StringRef::npos)
     To = Lex->getBuffer().size();
   size_t Len = To - From;
   HashToken->setType(TT_LineComment);
@@ -982,7 +982,7 @@ bool FormatTokenLexer::tryMerge_TMacro() {
 
   const char *Start = Macro->TokenText.data();
   const char *End = Last->TokenText.data() + Last->TokenText.size();
-  String->TokenText = StringRef(Start, End - Start);
+  String->TokenText = llvm::StringRef(Start, End - Start);
   String->IsFirst = Macro->IsFirst;
   String->LastNewlineOffset = Macro->LastNewlineOffset;
   String->WhitespaceRange = Macro->WhitespaceRange;
@@ -1019,17 +1019,17 @@ bool FormatTokenLexer::tryMergeConflictMarkers() {
   unsigned FirstInLineOffset;
   std::tie(ID, FirstInLineOffset) = SourceMgr.getDecomposedLoc(
       Tokens[FirstInLineIndex]->getStartOfNonWhitespace());
-  StringRef Buffer = SourceMgr.getBufferOrFake(ID).getBuffer();
+  llvm::StringRef Buffer = SourceMgr.getBufferOrFake(ID).getBuffer();
   // Calculate the offset of the start of the current line.
   auto LineOffset = Buffer.rfind('\n', FirstInLineOffset);
-  if (LineOffset == StringRef::npos)
+  if (LineOffset == llvm::StringRef::npos)
     LineOffset = 0;
   else
     ++LineOffset;
 
   auto FirstSpace = Buffer.find_first_of(" \n", LineOffset);
-  StringRef LineStart;
-  if (FirstSpace == StringRef::npos)
+  llvm::StringRef LineStart;
+  if (FirstSpace == llvm::StringRef::npos)
     LineStart = Buffer.substr(LineOffset);
   else
     LineStart = Buffer.substr(LineOffset, FirstSpace - LineOffset);
@@ -1064,7 +1064,7 @@ bool FormatTokenLexer::tryMergeConflictMarkers() {
 FormatToken *FormatTokenLexer::getStashedToken() {
   // Create a synthesized second '>' or '<' token.
   Token Tok = FormatTok->Tok;
-  StringRef TokenText = FormatTok->TokenText;
+  llvm::StringRef TokenText = FormatTok->TokenText;
 
   unsigned OriginalColumn = FormatTok->OriginalColumn;
   FormatTok = new (Allocator.Allocate()) FormatToken;
@@ -1098,7 +1098,7 @@ void FormatTokenLexer::truncateToken(size_t NewLen) {
 }
 
 /// Count the length of leading whitespace in a token.
-static size_t countLeadingWhitespace(StringRef Text) {
+static size_t countLeadingWhitespace(llvm::StringRef Text) {
   // Basically counting the length matched by this regex.
   // "^([\n\r\f\v \t]|(\\\\|\\?\\?/)[\n\r])+"
   // Directly using the regex turned out to be slow. With the regex
@@ -1156,7 +1156,7 @@ FormatToken *FormatTokenLexer::getNextToken() {
       break;
     if (LeadingWhitespace < FormatTok->TokenText.size())
       truncateToken(LeadingWhitespace);
-    StringRef Text = FormatTok->TokenText;
+    llvm::StringRef Text = FormatTok->TokenText;
     bool InEscape = false;
     for (int i = 0, e = Text.size(); i != e; ++i) {
       switch (Text[i]) {
@@ -1224,7 +1224,7 @@ FormatToken *FormatTokenLexer::getNextToken() {
   if ((Style.isJavaScript() || Style.Language == FormatStyle::LK_Java) &&
       FormatTok->is(tok::comment) && FormatTok->TokenText.starts_with("//")) {
     size_t BackslashPos = FormatTok->TokenText.find('\\');
-    while (BackslashPos != StringRef::npos) {
+    while (BackslashPos != llvm::StringRef::npos) {
       if (BackslashPos + 1 < FormatTok->TokenText.size() &&
           FormatTok->TokenText[BackslashPos + 1] == '\n') {
         truncateToken(BackslashPos + 1);
@@ -1236,7 +1236,7 @@ FormatToken *FormatTokenLexer::getNextToken() {
 
   if (Style.isVerilog()) {
     static const llvm::Regex NumberBase("^s?[bdho]", llvm::Regex::IgnoreCase);
-    SmallVector<StringRef, 1> Matches;
+    llvm::SmallVector<llvm::StringRef, 1> Matches;
     // Verilog uses the backtick instead of the hash for preprocessor stuff.
     // And it uses the hash for delays and parameter lists. In order to continue
     // using `tok::hash` in other places, the backtick gets marked as the hash
@@ -1245,7 +1245,7 @@ FormatToken *FormatTokenLexer::getNextToken() {
     if (FormatTok->is(tok::numeric_constant)) {
       // In Verilog the quote is not part of a number.
       auto Quote = FormatTok->TokenText.find('\'');
-      if (Quote != StringRef::npos)
+      if (Quote != llvm::StringRef::npos)
         truncateToken(Quote);
     } else if (FormatTok->isOneOf(tok::hash, tok::hashhash)) {
       FormatTok->Tok.setKind(tok::raw_identifier);
@@ -1277,7 +1277,7 @@ FormatToken *FormatTokenLexer::getNextToken() {
   TrailingWhitespace = 0;
   if (FormatTok->is(tok::comment)) {
     // FIXME: Add the trimmed whitespace to Column.
-    StringRef UntrimmedText = FormatTok->TokenText;
+    llvm::StringRef UntrimmedText = FormatTok->TokenText;
     FormatTok->TokenText = FormatTok->TokenText.rtrim(" \t\v\f");
     TrailingWhitespace = UntrimmedText.size() - FormatTok->TokenText.size();
   } else if (FormatTok->is(tok::raw_identifier)) {
@@ -1319,9 +1319,9 @@ FormatToken *FormatTokenLexer::getNextToken() {
 
   // Now FormatTok is the next non-whitespace token.
 
-  StringRef Text = FormatTok->TokenText;
+  llvm::StringRef Text = FormatTok->TokenText;
   size_t FirstNewlinePos = Text.find('\n');
-  if (FirstNewlinePos == StringRef::npos) {
+  if (FirstNewlinePos == llvm::StringRef::npos) {
     // FIXME: ColumnWidth actually depends on the start column, we need to
     // take this into account when the token is moved.
     FormatTok->ColumnWidth =
@@ -1387,9 +1387,9 @@ bool FormatTokenLexer::readRawTokenVerilogSpecific(Token &Tok) {
   static const llvm::Regex VerilogToken(R"re(^('|``?|\\(\\)re"
                                         "(\r?\n|\r)|[^[:space:]])*)");
 
-  SmallVector<StringRef, 4> Matches;
+  llvm::SmallVector<llvm::StringRef, 4> Matches;
   const char *Start = Lex->getBufferLocation();
-  if (!VerilogToken.match(StringRef(Start, Lex->getBuffer().end() - Start),
+  if (!VerilogToken.match(llvm::StringRef(Start, Lex->getBuffer().end() - Start),
                           &Matches)) {
     return false;
   }
@@ -1415,7 +1415,7 @@ void FormatTokenLexer::readRawToken(FormatToken &Tok) {
   // normal lexer if there isn't one.
   if (!Style.isVerilog() || !readRawTokenVerilogSpecific(Tok.Tok))
     Lex->LexFromRawLexer(Tok.Tok);
-  Tok.TokenText = StringRef(SourceMgr.getCharacterData(Tok.Tok.getLocation()),
+  Tok.TokenText = llvm::StringRef(SourceMgr.getCharacterData(Tok.Tok.getLocation()),
                             Tok.Tok.getLength());
   // For formatting, treat unterminated string literals like normal string
   // literals.
@@ -1441,7 +1441,7 @@ void FormatTokenLexer::readRawToken(FormatToken &Tok) {
 }
 
 void FormatTokenLexer::resetLexer(unsigned Offset) {
-  StringRef Buffer = SourceMgr.getBufferData(ID);
+  llvm::StringRef Buffer = SourceMgr.getBufferData(ID);
   Lex.reset(new Lexer(SourceMgr.getLocForStartOfFile(ID), LangOpts,
                       Buffer.begin(), Buffer.begin() + Offset, Buffer.end()));
   Lex->SetKeepWhitespaceMode(true);

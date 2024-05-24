@@ -28,7 +28,7 @@ using namespace clang;
 using namespace edit;
 
 void EditsReceiver::remove(CharSourceRange range) {
-  replace(range, StringRef());
+  replace(range, llvm::StringRef());
 }
 
 void EditedSource::deconstructMacroArgLoc(SourceLocation Loc,
@@ -43,8 +43,8 @@ void EditedSource::deconstructMacroArgLoc(SourceLocation Loc,
   while (SourceMgr.isMacroBodyExpansion(ExpansionLoc))
     ExpansionLoc =
         SourceMgr.getImmediateExpansionRange(ExpansionLoc).getBegin();
-  SmallString<20> Buf;
-  StringRef ArgName = Lexer::getSpelling(SourceMgr.getSpellingLoc(DefArgLoc),
+  llvm::SmallString<20> Buf;
+  llvm::StringRef ArgName = Lexer::getSpelling(SourceMgr.getSpellingLoc(DefArgLoc),
                                          Buf, SourceMgr, LangOpts);
   ArgUse = MacroArgUse{nullptr, SourceLocation(), SourceLocation()};
   if (!ArgName.empty())
@@ -66,8 +66,8 @@ void EditedSource::finishedCommit() {
   CurrCommitMacroArgExps.clear();
 }
 
-StringRef EditedSource::copyString(const Twine &twine) {
-  SmallString<128> Data;
+llvm::StringRef EditedSource::copyString(const llvm::Twine &twine) {
+  llvm::SmallString<128> Data;
   return copyString(twine.toStringRef(Data));
 }
 
@@ -109,7 +109,7 @@ bool EditedSource::canInsertInOffset(SourceLocation OrigLoc, FileOffset Offs) {
 }
 
 bool EditedSource::commitInsert(SourceLocation OrigLoc,
-                                FileOffset Offs, StringRef text,
+                                FileOffset Offs, llvm::StringRef text,
                                 bool beforePreviousInsertions) {
   if (!canInsertInOffset(OrigLoc, Offs))
     return false;
@@ -131,9 +131,9 @@ bool EditedSource::commitInsert(SourceLocation OrigLoc,
   }
 
   if (beforePreviousInsertions)
-    FA.Text = copyString(Twine(text) + FA.Text);
+    FA.Text = copyString(llvm::Twine(text) + FA.Text);
   else
-    FA.Text = copyString(Twine(FA.Text) + text);
+    FA.Text = copyString(llvm::Twine(FA.Text) + text);
 
   return true;
 }
@@ -145,7 +145,7 @@ bool EditedSource::commitInsertFromRange(SourceLocation OrigLoc,
   if (Len == 0)
     return true;
 
-  SmallString<128> StrVec;
+  llvm::SmallString<128> StrVec;
   FileOffset BeginOffs = InsertFromRangeOffs;
   FileOffset EndOffs = BeginOffs.getWithOffset(Len);
   FileEditsTy::iterator I = FileEdits.upper_bound(BeginOffs);
@@ -176,7 +176,7 @@ bool EditedSource::commitInsertFromRange(SourceLocation OrigLoc,
 
     if (BeginOffs < B) {
       bool Invalid = false;
-      StringRef text = getSourceText(BeginOffs, B, Invalid);
+      llvm::StringRef text = getSourceText(BeginOffs, B, Invalid);
       if (Invalid)
         return false;
       StrVec += text;
@@ -187,7 +187,7 @@ bool EditedSource::commitInsertFromRange(SourceLocation OrigLoc,
 
   if (BeginOffs < EndOffs) {
     bool Invalid = false;
-    StringRef text = getSourceText(BeginOffs, EndOffs, Invalid);
+    llvm::StringRef text = getSourceText(BeginOffs, EndOffs, Invalid);
     if (Invalid)
       return false;
     StrVec += text;
@@ -245,7 +245,7 @@ void EditedSource::commitRemove(SourceLocation OrigLoc,
     TopEnd = EndOffs;
     TopFA->RemoveLen += diff;
     if (B == BeginOffs)
-      TopFA->Text = StringRef();
+      TopFA->Text = llvm::StringRef();
     ++I;
   }
 
@@ -336,14 +336,14 @@ static bool canRemoveWhitespace(char left, char beforeWSpace, char right,
 /// -Insert a space if removing the range is going to mess up the source tokens.
 static void adjustRemoval(const SourceManager &SM, const LangOptions &LangOpts,
                           SourceLocation Loc, FileOffset offs,
-                          unsigned &len, StringRef &text) {
+                          unsigned &len, llvm::StringRef &text) {
   assert(len && text.empty());
   SourceLocation BeginTokLoc = Lexer::GetBeginningOfToken(Loc, SM, LangOpts);
   if (BeginTokLoc != Loc)
     return; // the range is not at the beginning of a token, keep the range.
 
   bool Invalid = false;
-  StringRef buffer = SM.getBufferData(offs.getFID(), &Invalid);
+  llvm::StringRef buffer = SM.getBufferData(offs.getFID(), &Invalid);
   if (Invalid)
     return;
 
@@ -380,7 +380,7 @@ static void adjustRemoval(const SourceManager &SM, const LangOptions &LangOpts,
 }
 
 static void applyRewrite(EditsReceiver &receiver,
-                         StringRef text, FileOffset offs, unsigned len,
+                         llvm::StringRef text, FileOffset offs, unsigned len,
                          const SourceManager &SM, const LangOptions &LangOpts,
                          bool shouldAdjustRemovals) {
   assert(offs.getFID().isValid());
@@ -408,7 +408,7 @@ static void applyRewrite(EditsReceiver &receiver,
 
 void EditedSource::applyRewrites(EditsReceiver &receiver,
                                  bool shouldAdjustRemovals) {
-  SmallString<128> StrVec;
+  llvm::SmallString<128> StrVec;
   FileOffset CurOffs, CurEnd;
   unsigned CurLen;
 
@@ -451,7 +451,7 @@ void EditedSource::clearRewrites() {
   StrAlloc.Reset();
 }
 
-StringRef EditedSource::getSourceText(FileOffset BeginOffs, FileOffset EndOffs,
+llvm::StringRef EditedSource::getSourceText(FileOffset BeginOffs, FileOffset EndOffs,
                                       bool &Invalid) {
   assert(BeginOffs.getFID() == EndOffs.getFID());
   assert(BeginOffs <= EndOffs);

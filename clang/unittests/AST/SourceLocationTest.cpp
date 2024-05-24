@@ -1094,7 +1094,7 @@ class ConceptSpecializationExprConceptReferenceRangeVerifier
 protected:
   SourceRange getRange(const VarTemplateDecl &Node) override {
     assert(Node.hasAssociatedConstraints());
-    SmallVector<const Expr *, 3> ACs;
+    llvm::SmallVector<const Expr *, 3> ACs;
     Node.getAssociatedConstraints(ACs);
     for (const Expr *Constraint : ACs) {
       if (const ConceptSpecializationExpr *CSConstraint =

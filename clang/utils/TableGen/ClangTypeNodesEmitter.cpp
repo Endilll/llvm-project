@@ -75,12 +75,12 @@ using namespace clang::tblgen;
 namespace {
 class TypeNodeEmitter {
   RecordKeeper &Records;
-  raw_ostream &Out;
+  llvm::raw_ostream &Out;
   const std::vector<Record*> Types;
-  std::vector<StringRef> MacrosToUndef;
+  std::vector<llvm::StringRef> MacrosToUndef;
 
 public:
-  TypeNodeEmitter(RecordKeeper &records, raw_ostream &out)
+  TypeNodeEmitter(RecordKeeper &records, llvm::raw_ostream &out)
     : Records(records), Out(out),
       Types(Records.getAllDerivedDefinitions(TypeNodeClassName)) {
   }
@@ -88,14 +88,14 @@ public:
   void emit();
 
 private:
-  void emitFallbackDefine(StringRef macroName, StringRef fallbackMacroName,
-                          StringRef args);
+  void emitFallbackDefine(llvm::StringRef macroName, llvm::StringRef fallbackMacroName,
+                          llvm::StringRef args);
 
   void emitNodeInvocations();
   void emitLastNodeInvocation(TypeNode lastType);
   void emitLeafNodeInvocations();
 
-  void addMacroToUndef(StringRef macroName);
+  void addMacroToUndef(llvm::StringRef macroName);
   void emitUndefs();
 };
 }
@@ -123,9 +123,9 @@ void TypeNodeEmitter::emit() {
   emitUndefs();
 }
 
-void TypeNodeEmitter::emitFallbackDefine(StringRef macroName,
-                                         StringRef fallbackMacroName,
-                                         StringRef args) {
+void TypeNodeEmitter::emitFallbackDefine(llvm::StringRef macroName,
+                                         llvm::StringRef fallbackMacroName,
+                                         llvm::StringRef args) {
   Out << "#ifndef " << macroName << "\n";
   Out << "#  define " << macroName << args
       << " " << fallbackMacroName << args << "\n";
@@ -143,11 +143,11 @@ void TypeNodeEmitter::emitNodeInvocations() {
     if (!base) return;
 
     // Figure out which macro to use.
-    StringRef macroName;
-    auto setMacroName = [&](StringRef newName) {
+    llvm::StringRef macroName;
+    auto setMacroName = [&](llvm::StringRef newName) {
       if (!macroName.empty())
         PrintFatalError(type.getLoc(),
-                        Twine("conflict when computing macro name for "
+                        llvm::Twine("conflict when computing macro name for "
                               "Type node: trying to use both \"")
                           + macroName + "\" and \"" + newName + "\"");
       macroName = newName;
@@ -193,7 +193,7 @@ void TypeNodeEmitter::emitLeafNodeInvocations() {
          "#endif\n";
 }
 
-void TypeNodeEmitter::addMacroToUndef(StringRef macroName) {
+void TypeNodeEmitter::addMacroToUndef(llvm::StringRef macroName) {
   MacrosToUndef.push_back(macroName);
 }
 
@@ -203,6 +203,6 @@ void TypeNodeEmitter::emitUndefs() {
   }
 }
 
-void clang::EmitClangTypeNodes(RecordKeeper &records, raw_ostream &out) {
+void clang::EmitClangTypeNodes(RecordKeeper &records, llvm::raw_ostream &out) {
   TypeNodeEmitter(records, out).emit();
 }

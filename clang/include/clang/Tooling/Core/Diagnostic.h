@@ -75,10 +75,10 @@ struct Diagnostic {
   Diagnostic() = default;
 
   Diagnostic(llvm::StringRef DiagnosticName, Level DiagLevel,
-             StringRef BuildDirectory);
+             llvm::StringRef BuildDirectory);
 
   Diagnostic(llvm::StringRef DiagnosticName, const DiagnosticMessage &Message,
-             const SmallVector<DiagnosticMessage, 1> &Notes, Level DiagLevel,
+             const llvm::SmallVector<DiagnosticMessage, 1> &Notes, Level DiagLevel,
              llvm::StringRef BuildDirectory);
 
   /// Name identifying the Diagnostic.
@@ -88,7 +88,7 @@ struct Diagnostic {
   DiagnosticMessage Message;
 
   /// Potential notes about the diagnostic.
-  SmallVector<DiagnosticMessage, 1> Notes;
+  llvm::SmallVector<DiagnosticMessage, 1> Notes;
 
   /// Diagnostic level. Can indicate either an error or a warning.
   Level DiagLevel;

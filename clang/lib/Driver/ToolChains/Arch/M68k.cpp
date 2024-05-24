@@ -28,7 +28,7 @@ std::string m68k::getM68kTargetCPU(const ArgList &Args) {
   if (Arg *A = Args.getLastArg(clang::driver::options::OPT_mcpu_EQ)) {
     // The canonical CPU name is captalize. However, we allow
     // starting with lower case or numbers only
-    StringRef CPUName = A->getValue();
+    llvm::StringRef CPUName = A->getValue();
 
     if (CPUName == "native") {
       std::string CPU = std::string(llvm::sys::getHostCPUName());
@@ -92,7 +92,7 @@ static void addFloatABIFeatures(const llvm::opt::ArgList &Args,
 
 void m68k::getM68kTargetFeatures(const Driver &D, const llvm::Triple &Triple,
                                  const ArgList &Args,
-                                 std::vector<StringRef> &Features) {
+                                 std::vector<llvm::StringRef> &Features) {
   addFloatABIFeatures(Args, Features);
 
   // Handle '-ffixed-<register>' flags

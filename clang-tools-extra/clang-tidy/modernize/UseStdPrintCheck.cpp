@@ -22,7 +22,7 @@ namespace {
 AST_MATCHER(StringLiteral, isOrdinary) { return Node.isOrdinary(); }
 } // namespace
 
-UseStdPrintCheck::UseStdPrintCheck(StringRef Name, ClangTidyContext *Context)
+UseStdPrintCheck::UseStdPrintCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       StrictMode(Options.getLocalOrGlobal("StrictMode", false)),
       PrintfLikeFunctions(utils::options::parseStringList(
@@ -135,7 +135,7 @@ void UseStdPrintCheck::check(const MatchFinder::MatchResult &Result) {
   utils::FormatStringConverter Converter(
       Result.Context, Printf, FormatArgOffset, ConverterConfig, getLangOpts());
   const Expr *PrintfCall = Printf->getCallee();
-  const StringRef ReplacementFunction = Converter.usePrintNewlineFunction()
+  const llvm::StringRef ReplacementFunction = Converter.usePrintNewlineFunction()
                                             ? ReplacementPrintlnFunction
                                             : ReplacementPrintFunction;
   if (!Converter.canApply()) {

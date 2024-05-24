@@ -27,7 +27,7 @@ namespace tidy {
 /// macros for renaming based on customizable criteria.
 class RenamerClangTidyCheck : public ClangTidyCheck {
 public:
-  RenamerClangTidyCheck(StringRef CheckName, ClangTidyContext *Context);
+  RenamerClangTidyCheck(llvm::StringRef CheckName, ClangTidyContext *Context);
   ~RenamerClangTidyCheck();
 
   /// Derived classes should not implement any matching logic themselves; this
@@ -102,7 +102,7 @@ public:
     NamingCheckFailure() = default;
   };
 
-  using NamingCheckId = std::pair<SourceLocation, StringRef>;
+  using NamingCheckId = std::pair<SourceLocation, llvm::StringRef>;
 
   using NamingCheckFailureMap =
       llvm::DenseMap<NamingCheckId, NamingCheckFailure>;

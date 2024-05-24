@@ -455,7 +455,7 @@ public:
     return InnerFile->status();
   }
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
-  getBuffer(const Twine &Name, int64_t FileSize, bool RequiresNullTerminator,
+  getBuffer(const llvm::Twine &Name, int64_t FileSize, bool RequiresNullTerminator,
             bool IsVolatile) override {
     WallTimerRegion T(Timer);
     return InnerFile->getBuffer(Name, FileSize, RequiresNullTerminator,

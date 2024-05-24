@@ -143,7 +143,7 @@ class SubstTemplateTemplateParmPackStorage : public UncommonTemplateNameStorage,
   llvm::PointerIntPair<Decl *, 1, bool> AssociatedDeclAndFinal;
 
 public:
-  SubstTemplateTemplateParmPackStorage(ArrayRef<TemplateArgument> ArgPack,
+  SubstTemplateTemplateParmPackStorage(llvm::ArrayRef<TemplateArgument> ArgPack,
                                        Decl *AssociatedDecl, unsigned Index,
                                        bool Final);
 
@@ -341,11 +341,11 @@ public:
   /// \param Qual print the (Qualified::None) simple name,
   /// (Qualified::AsWritten) any written (possibly partial) qualifier, or
   /// (Qualified::Fully) the fully qualified name.
-  void print(raw_ostream &OS, const PrintingPolicy &Policy,
+  void print(llvm::raw_ostream &OS, const PrintingPolicy &Policy,
              Qualified Qual = Qualified::AsWritten) const;
 
   /// Debugging aid that dumps the template name.
-  void dump(raw_ostream &OS) const;
+  void dump(llvm::raw_ostream &OS) const;
 
   /// Debugging aid that dumps the template name to standard
   /// error.

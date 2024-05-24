@@ -32,7 +32,7 @@ AST_MATCHER(ReferenceType, isSpelledAsLValue) {
 AST_MATCHER(Type, isDependentType) { return Node.isDependentType(); }
 } // namespace
 
-ConstCorrectnessCheck::ConstCorrectnessCheck(StringRef Name,
+ConstCorrectnessCheck::ConstCorrectnessCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       AnalyzeValues(Options.get("AnalyzeValues", true)),

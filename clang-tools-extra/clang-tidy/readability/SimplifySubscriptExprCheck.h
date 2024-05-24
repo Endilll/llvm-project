@@ -19,7 +19,7 @@ namespace clang::tidy::readability {
 /// http://clang.llvm.org/extra/clang-tidy/checks/readability/simplify-subscript-expr.html
 class SimplifySubscriptExprCheck : public ClangTidyCheck {
 public:
-  SimplifySubscriptExprCheck(StringRef Name, ClangTidyContext *Context);
+  SimplifySubscriptExprCheck(llvm::StringRef Name, ClangTidyContext *Context);
   bool isLanguageVersionSupported(const LangOptions &LangOpts) const override {
     return LangOpts.CPlusPlus;
   }
@@ -31,7 +31,7 @@ public:
   }
 
 private:
-  const std::vector<StringRef> Types;
+  const std::vector<llvm::StringRef> Types;
 };
 
 } // namespace clang::tidy::readability

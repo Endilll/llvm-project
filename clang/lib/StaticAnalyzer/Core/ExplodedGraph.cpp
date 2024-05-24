@@ -437,7 +437,7 @@ ExplodedNode *ExplodedGraph::createUncachedNode(const ProgramPoint &L,
 }
 
 std::unique_ptr<ExplodedGraph>
-ExplodedGraph::trim(ArrayRef<const NodeTy *> Sinks,
+ExplodedGraph::trim(llvm::ArrayRef<const NodeTy *> Sinks,
                     InterExplodedGraphMap *ForwardMap,
                     InterExplodedGraphMap *InverseMap) const {
   if (Nodes.empty())
@@ -450,7 +450,7 @@ ExplodedGraph::trim(ArrayRef<const NodeTy *> Sinks,
   InterExplodedGraphMap Pass2Scratch;
   Pass2Ty &Pass2 = ForwardMap ? *ForwardMap : Pass2Scratch;
 
-  SmallVector<const ExplodedNode*, 10> WL1, WL2;
+  llvm::SmallVector<const ExplodedNode*, 10> WL1, WL2;
 
   // ===- Pass 1 (reverse DFS) -===
   for (const auto Sink : Sinks)

@@ -579,11 +579,11 @@ std::vector<Diag> StoreDiags::take(const clang::tidy::ClangTidyContext *Tidy) {
   for (auto &Diag : Output) {
     if (const char *ClangDiag = getDiagnosticCode(Diag.ID)) {
       // Warnings controlled by -Wfoo are better recognized by that name.
-      StringRef Warning = DiagnosticIDs::getWarningOptionForDiag(Diag.ID);
+      llvm::StringRef Warning = DiagnosticIDs::getWarningOptionForDiag(Diag.ID);
       if (!Warning.empty()) {
         Diag.Name = ("-W" + Warning).str();
       } else {
-        StringRef Name(ClangDiag);
+        llvm::StringRef Name(ClangDiag);
         // Almost always an error, with a name like err_enum_class_reference.
         // Drop the err_ prefix for brevity.
         Name.consume_front("err_");
@@ -598,7 +598,7 @@ std::vector<Diag> StoreDiags::take(const clang::tidy::ClangTidyContext *Tidy) {
         // clang-tidy bakes the name into diagnostic messages. Strip it out.
         // It would be much nicer to make clang-tidy not do this.
         auto CleanMessage = [&](std::string &Msg) {
-          StringRef Rest(Msg);
+          llvm::StringRef Rest(Msg);
           if (Rest.consume_back("]") && Rest.consume_back(Diag.Name) &&
               Rest.consume_back(" ["))
             Msg.resize(Rest.size());
@@ -909,7 +909,7 @@ bool isBuiltinDiagnosticSuppressed(unsigned ID,
     if (Suppress.contains(normalizeSuppressedCode(CodePtr)))
       return true;
   }
-  StringRef Warning = DiagnosticIDs::getWarningOptionForDiag(ID);
+  llvm::StringRef Warning = DiagnosticIDs::getWarningOptionForDiag(ID);
   if (!Warning.empty() && Suppress.contains(Warning))
     return true;
   return false;
@@ -933,7 +933,7 @@ std::optional<std::string> getDiagnosticDocURI(Diag::DiagSource Source,
     // https://clang.llvm.org/docs/DiagnosticsReference.html
     break;
   case Diag::ClangTidy: {
-    StringRef Module, Check;
+    llvm::StringRef Module, Check;
     // This won't correctly get the module for clang-analyzer checks, but as we
     // don't link in the analyzer that shouldn't be an issue.
     // This would also need updating if anyone decides to create a module with a

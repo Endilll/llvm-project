@@ -23,7 +23,7 @@ using namespace llvm;
 
 static cl::opt<bool> Help("h", cl::desc("Alias for -help"), cl::Hidden);
 
-static void PrintVersion(raw_ostream &OS) {
+static void PrintVersion(llvm::raw_ostream &OS) {
   OS << clang::getClangToolFullVersion("nvptx-arch") << '\n';
 }
 // Mark all our options with this category, everything else (except for -version

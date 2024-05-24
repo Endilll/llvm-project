@@ -27,15 +27,15 @@ using namespace clang;
 
 namespace {
   class DeclPrinter : public DeclVisitor<DeclPrinter> {
-    raw_ostream &Out;
+    llvm::raw_ostream &Out;
     PrintingPolicy Policy;
     const ASTContext &Context;
     unsigned Indentation;
     bool PrintInstantiation;
 
-    raw_ostream& Indent() { return Indent(Indentation); }
-    raw_ostream& Indent(unsigned Indentation);
-    void ProcessDeclGroup(SmallVectorImpl<Decl*>& Decls);
+    llvm::raw_ostream& Indent() { return Indent(Indentation); }
+    llvm::raw_ostream& Indent(unsigned Indentation);
+    void ProcessDeclGroup(llvm::SmallVectorImpl<Decl*>& Decls);
 
     void Print(AccessSpecifier AS);
     void PrintConstructorInitializers(CXXConstructorDecl *CDecl,
@@ -51,7 +51,7 @@ namespace {
     void PrintObjCTypeParams(ObjCTypeParamList *Params);
 
   public:
-    DeclPrinter(raw_ostream &Out, const PrintingPolicy &Policy,
+    DeclPrinter(llvm::raw_ostream &Out, const PrintingPolicy &Policy,
                 const ASTContext &Context, unsigned Indentation = 0,
                 bool PrintInstantiation = false)
         : Out(Out), Policy(Policy), Context(Context), Indentation(Indentation),
@@ -123,28 +123,28 @@ namespace {
     prettyPrintAttributes(const Decl *D,
                           AttrPosAsWritten Pos = AttrPosAsWritten::Default);
     void prettyPrintPragmas(Decl *D);
-    void printDeclType(QualType T, StringRef DeclName, bool Pack = false);
+    void printDeclType(QualType T, llvm::StringRef DeclName, bool Pack = false);
   };
 }
 
-void Decl::print(raw_ostream &Out, unsigned Indentation,
+void Decl::print(llvm::raw_ostream &Out, unsigned Indentation,
                  bool PrintInstantiation) const {
   print(Out, getASTContext().getPrintingPolicy(), Indentation, PrintInstantiation);
 }
 
-void Decl::print(raw_ostream &Out, const PrintingPolicy &Policy,
+void Decl::print(llvm::raw_ostream &Out, const PrintingPolicy &Policy,
                  unsigned Indentation, bool PrintInstantiation) const {
   DeclPrinter Printer(Out, Policy, getASTContext(), Indentation,
                       PrintInstantiation);
   Printer.Visit(const_cast<Decl*>(this));
 }
 
-void TemplateParameterList::print(raw_ostream &Out, const ASTContext &Context,
+void TemplateParameterList::print(llvm::raw_ostream &Out, const ASTContext &Context,
                                   bool OmitTemplateKW) const {
   print(Out, Context, Context.getPrintingPolicy(), OmitTemplateKW);
 }
 
-void TemplateParameterList::print(raw_ostream &Out, const ASTContext &Context,
+void TemplateParameterList::print(llvm::raw_ostream &Out, const ASTContext &Context,
                                   const PrintingPolicy &Policy,
                                   bool OmitTemplateKW) const {
   DeclPrinter Printer(Out, Policy, Context);
@@ -190,7 +190,7 @@ static QualType getDeclType(Decl* D) {
 }
 
 void Decl::printGroup(Decl** Begin, unsigned NumDecls,
-                      raw_ostream &Out, const PrintingPolicy &Policy,
+                      llvm::raw_ostream &Out, const PrintingPolicy &Policy,
                       unsigned Indentation) {
   if (NumDecls == 1) {
     (*Begin)->print(Out, Policy, Indentation);
@@ -232,7 +232,7 @@ LLVM_DUMP_METHOD void DeclContext::dumpDeclContext() const {
   Printer.VisitDeclContext(const_cast<DeclContext *>(this), /*Indent=*/false);
 }
 
-raw_ostream& DeclPrinter::Indent(unsigned Indentation) {
+llvm::raw_ostream& DeclPrinter::Indent(unsigned Indentation) {
   for (unsigned i = 0; i != Indentation; ++i)
     Out << "  ";
   return Out;
@@ -310,7 +310,7 @@ void DeclPrinter::prettyPrintPragmas(Decl *D) {
   }
 }
 
-void DeclPrinter::printDeclType(QualType T, StringRef DeclName, bool Pack) {
+void DeclPrinter::printDeclType(QualType T, llvm::StringRef DeclName, bool Pack) {
   // Normally, a PackExpansionType is written as T[3]... (for instance, as a
   // template argument), but if it is the type of a declaration, the ellipsis
   // is placed before the name being declared.
@@ -321,7 +321,7 @@ void DeclPrinter::printDeclType(QualType T, StringRef DeclName, bool Pack) {
   T.print(Out, Policy, (Pack ? "..." : "") + DeclName, Indentation);
 }
 
-void DeclPrinter::ProcessDeclGroup(SmallVectorImpl<Decl*>& Decls) {
+void DeclPrinter::ProcessDeclGroup(llvm::SmallVectorImpl<Decl*>& Decls) {
   this->Indent();
   Decl::printGroup(Decls.data(), Decls.size(), Out, Policy, Indentation);
   Out << ";\n";
@@ -424,7 +424,7 @@ void DeclPrinter::VisitDeclContext(DeclContext *DC, bool Indent) {
   if (Indent)
     Indentation += Policy.Indentation;
 
-  SmallVector<Decl*, 2> Decls;
+  llvm::SmallVector<Decl*, 2> Decls;
   for (DeclContext::decl_iterator D = DC->decls_begin(), DEnd = DC->decls_end();
        D != DEnd; ++D) {
 
@@ -636,7 +636,7 @@ static void printExplicitSpecifier(ExplicitSpecifier ES, llvm::raw_ostream &Out,
 static void MaybePrintTagKeywordIfSupressingScopes(PrintingPolicy &Policy,
                                                    QualType T,
                                                    llvm::raw_ostream &Out) {
-  StringRef prefix = T->isClassType()       ? "class "
+  llvm::StringRef prefix = T->isClassType()       ? "class "
                      : T->isStructureType() ? "struct "
                      : T->isUnionType()     ? "union "
                                             : "";
@@ -1191,7 +1191,7 @@ void DeclPrinter::printTemplateParameters(const TemplateParameterList *Params,
     Out << ' ';
 }
 
-void DeclPrinter::printTemplateArguments(ArrayRef<TemplateArgument> Args,
+void DeclPrinter::printTemplateArguments(llvm::ArrayRef<TemplateArgument> Args,
                                          const TemplateParameterList *Params) {
   Out << "<";
   for (size_t I = 0, E = Args.size(); I < E; ++I) {
@@ -1207,7 +1207,7 @@ void DeclPrinter::printTemplateArguments(ArrayRef<TemplateArgument> Args,
   Out << ">";
 }
 
-void DeclPrinter::printTemplateArguments(ArrayRef<TemplateArgumentLoc> Args,
+void DeclPrinter::printTemplateArguments(llvm::ArrayRef<TemplateArgumentLoc> Args,
                                          const TemplateParameterList *Params) {
   Out << "<";
   for (size_t I = 0, E = Args.size(); I < E; ++I) {
@@ -1683,7 +1683,7 @@ void DeclPrinter::VisitObjCPropertyDecl(ObjCPropertyDecl *PDecl) {
   std::string TypeStr = PDecl->getASTContext().getUnqualifiedObjCPointerType(T).
       getAsString(Policy);
   Out << ' ' << TypeStr;
-  if (!StringRef(TypeStr).ends_with("*"))
+  if (!llvm::StringRef(TypeStr).ends_with("*"))
     Out << ' ';
   Out << *PDecl;
   if (Policy.PolishForDeclaration)
@@ -1890,7 +1890,7 @@ void DeclPrinter::VisitTemplateTypeParmDecl(const TemplateTypeParmDecl *TTP) {
 
 void DeclPrinter::VisitNonTypeTemplateParmDecl(
     const NonTypeTemplateParmDecl *NTTP) {
-  StringRef Name;
+  llvm::StringRef Name;
   if (IdentifierInfo *II = NTTP->getIdentifier())
     Name =
         Policy.CleanUglifiedParameters ? II->deuglifiedName() : II->getName();

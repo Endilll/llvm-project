@@ -19,14 +19,14 @@ int main(int argc, char *argv[]) {
   if (!ErrorOrBuffer)
     return 1;
   std::unique_ptr<MemoryBuffer> Buffer = std::move(ErrorOrBuffer.get());
-  StringRef Content = Buffer->getBuffer();
+  llvm::StringRef Content = Buffer->getBuffer();
   Content = Content.drop_until([](char c) { return c == '#'; });
-  SmallVector<StringRef> Lines;
+  llvm::SmallVector<llvm::StringRef> Lines;
   SplitString(Content, Lines, "\r\n");
 
-  std::vector<std::pair<llvm::UTF32, SmallVector<llvm::UTF32>>> Entries;
-  SmallVector<StringRef> Values;
-  for (StringRef Line : Lines) {
+  std::vector<std::pair<llvm::UTF32, llvm::SmallVector<llvm::UTF32>>> Entries;
+  llvm::SmallVector<llvm::StringRef> Values;
+  for (llvm::StringRef Line : Lines) {
     if (Line.starts_with("#"))
       continue;
 
@@ -41,10 +41,10 @@ int main(int argc, char *argv[]) {
     llvm::UTF32 CodePoint = 0;
     From.getAsInteger(16, CodePoint);
 
-    SmallVector<llvm::UTF32> To;
-    SmallVector<StringRef> ToN;
+    llvm::SmallVector<llvm::UTF32> To;
+    llvm::SmallVector<llvm::StringRef> ToN;
     Values[1].split(ToN, ' ', -1, false);
-    for (StringRef To_ : ToN) {
+    for (llvm::StringRef To_ : ToN) {
       llvm::UTF32 ToCodePoint = 0;
       To_.trim().getAsInteger(16, ToCodePoint);
       To.push_back(ToCodePoint);

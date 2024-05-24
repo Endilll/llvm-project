@@ -162,13 +162,13 @@ static bool isExpandedFromConfigurationMacro(const Stmt *S,
       // are defined as macros.  Do not treat them
       // as configuration values.
       SourceLocation TopL = getTopMostMacro(L, SM);
-      StringRef MacroName = PP.getImmediateMacroName(TopL);
+      llvm::StringRef MacroName = PP.getImmediateMacroName(TopL);
       if (MacroName == "YES" || MacroName == "NO")
         return false;
     } else if (!PP.getLangOpts().CPlusPlus) {
       // Do not treat C 'false' and 'true' macros as configuration values.
       SourceLocation TopL = getTopMostMacro(L, SM);
-      StringRef MacroName = PP.getImmediateMacroName(TopL);
+      llvm::StringRef MacroName = PP.getImmediateMacroName(TopL);
       if (MacroName == "false" || MacroName == "true")
         return false;
     }
@@ -321,7 +321,7 @@ static unsigned scanFromBlock(const CFGBlock *Start,
   unsigned count = 0;
 
   // Prep work queue
-  SmallVector<const CFGBlock*, 32> WL;
+  llvm::SmallVector<const CFGBlock*, 32> WL;
 
   // The entry block may have already been marked reachable
   // by the caller.
@@ -394,11 +394,11 @@ namespace {
   class DeadCodeScan {
     llvm::BitVector Visited;
     llvm::BitVector &Reachable;
-    SmallVector<const CFGBlock *, 10> WorkList;
+    llvm::SmallVector<const CFGBlock *, 10> WorkList;
     Preprocessor &PP;
     ASTContext &C;
 
-    typedef SmallVector<std::pair<const CFGBlock *, const Stmt *>, 12>
+    typedef llvm::SmallVector<std::pair<const CFGBlock *, const Stmt *>, 12>
     DeferredLocsTy;
 
     DeferredLocsTy DeferredLocs;

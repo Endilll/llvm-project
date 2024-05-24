@@ -73,7 +73,7 @@ AST_MATCHER(QualType, isNonConstReferenceOrPointer) {
 }
 } // namespace
 
-UseNodiscardCheck::UseNodiscardCheck(StringRef Name, ClangTidyContext *Context)
+UseNodiscardCheck::UseNodiscardCheck(llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       NoDiscardMacro(Options.get("ReplacementString", "[[nodiscard]]")) {}
 

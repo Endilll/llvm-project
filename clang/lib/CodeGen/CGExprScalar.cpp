@@ -255,7 +255,7 @@ public:
     return CGF.EmitCheckedLValue(E, TCK);
   }
 
-  void EmitBinOpCheck(ArrayRef<std::pair<Value *, SanitizerMask>> Checks,
+  void EmitBinOpCheck(llvm::ArrayRef<std::pair<Value *, SanitizerMask>> Checks,
                       const BinOpInfo &Info);
 
   Value *EmitLoadOfLValue(LValue LV, SourceLocation Loc) {
@@ -546,7 +546,7 @@ public:
   }
 
   Value *VisitObjCAvailabilityCheckExpr(ObjCAvailabilityCheckExpr *E) {
-    VersionTuple Version = E->getVersion();
+    llvm::VersionTuple Version = E->getVersion();
 
     // If we're checking for a platform older than our minimum deployment
     // target, we can fold the check away.
@@ -795,7 +795,7 @@ public:
 
   // Used for shifting constraints for OpenCL, do mask for powers of 2, URem for
   // non powers of two.
-  Value *ConstrainShiftValue(Value *LHS, Value *RHS, const Twine &Name);
+  Value *ConstrainShiftValue(Value *LHS, Value *RHS, const llvm::Twine &Name);
 
   Value *EmitDiv(const BinOpInfo &Ops);
   Value *EmitRem(const BinOpInfo &Ops);
@@ -1726,11 +1726,11 @@ Value *ScalarExprEmitter::EmitNullValue(QualType Ty) {
 /// operation). The check passes if all values in \p Checks (which are \c i1),
 /// are \c true.
 void ScalarExprEmitter::EmitBinOpCheck(
-    ArrayRef<std::pair<Value *, SanitizerMask>> Checks, const BinOpInfo &Info) {
+    llvm::ArrayRef<std::pair<Value *, SanitizerMask>> Checks, const BinOpInfo &Info) {
   assert(CGF.IsSanitizerScope);
   SanitizerHandler Check;
-  SmallVector<llvm::Constant *, 4> StaticData;
-  SmallVector<llvm::Value *, 2> DynamicData;
+  llvm::SmallVector<llvm::Constant *, 4> StaticData;
+  llvm::SmallVector<llvm::Value *, 2> DynamicData;
 
   BinaryOperatorKind Opcode = Info.Opcode;
   if (BinaryOperator::isCompoundAssignmentOp(Opcode))
@@ -1837,7 +1837,7 @@ Value *ScalarExprEmitter::VisitShuffleVectorExpr(ShuffleVectorExpr *E) {
   Value* V1 = CGF.EmitScalarExpr(E->getExpr(0));
   Value* V2 = CGF.EmitScalarExpr(E->getExpr(1));
 
-  SmallVector<int, 32> Indices;
+  llvm::SmallVector<int, 32> Indices;
   for (unsigned i = 2; i < E->getNumSubExprs(); ++i) {
     llvm::APSInt Idx = E->getShuffleMaskIdx(CGF.getContext(), i-2);
     // Check for -1 and output it as undef in the IR.
@@ -2049,7 +2049,7 @@ Value *ScalarExprEmitter::VisitInitListExpr(InitListExpr *E) {
   for (unsigned i = 0; i != NumInitElements; ++i) {
     Expr *IE = E->getInit(i);
     Value *Init = Visit(IE);
-    SmallVector<int, 16> Args;
+    llvm::SmallVector<int, 16> Args;
 
     llvm::VectorType *VVT = dyn_cast<llvm::VectorType>(Init->getType());
 
@@ -2662,7 +2662,7 @@ Value *ScalarExprEmitter::VisitCastExpr(CastExpr *CE) {
   case CK_HLSLVectorTruncation: {
     assert(DestTy->isVectorType() && "Expected dest type to be vector type");
     Value *Vec = Visit(const_cast<Expr *>(E));
-    SmallVector<int, 16> Mask;
+    llvm::SmallVector<int, 16> Mask;
     unsigned NumElts = DestTy->castAs<VectorType>()->getNumElements();
     for (unsigned I = 0; I != NumElts; ++I)
       Mask.push_back(I);
@@ -2715,7 +2715,7 @@ llvm::Value *ScalarExprEmitter::EmitIncDecConsiderOverflowBehavior(
     const UnaryOperator *E, llvm::Value *InVal, bool IsInc) {
   llvm::Value *Amount =
       llvm::ConstantInt::get(InVal->getType(), IsInc ? 1 : -1, true);
-  StringRef Name = IsInc ? "inc" : "dec";
+  llvm::StringRef Name = IsInc ? "inc" : "dec";
   switch (CGF.getLangOpts().getSignedOverflowBehavior()) {
   case LangOptions::SOB_Defined:
     if (!CGF.SanOpts.has(SanitizerKind::SignedIntegerOverflow))
@@ -3657,7 +3657,7 @@ Value *ScalarExprEmitter::EmitCompoundAssign(const CompoundAssignOperator *E,
 
 void ScalarExprEmitter::EmitUndefinedBehaviorIntegerDivAndRemCheck(
     const BinOpInfo &Ops, llvm::Value *Zero, bool isDiv) {
-  SmallVector<std::pair<llvm::Value *, SanitizerMask>, 2> Checks;
+  llvm::SmallVector<std::pair<llvm::Value *, SanitizerMask>, 2> Checks;
 
   if (CGF.SanOpts.has(SanitizerKind::IntegerDivideByZero)) {
     Checks.push_back(std::make_pair(Builder.CreateICmpNE(Ops.RHS, Zero),
@@ -4387,7 +4387,7 @@ Value *ScalarExprEmitter::GetMaximumShiftAmount(Value *LHS, Value *RHS,
 }
 
 Value *ScalarExprEmitter::ConstrainShiftValue(Value *LHS, Value *RHS,
-                                              const Twine &Name) {
+                                              const llvm::Twine &Name) {
   llvm::IntegerType *Ty;
   if (auto *VT = dyn_cast<llvm::VectorType>(LHS->getType()))
     Ty = cast<llvm::IntegerType>(VT->getElementType());
@@ -4427,7 +4427,7 @@ Value *ScalarExprEmitter::EmitShl(const BinOpInfo &Ops) {
   else if ((SanitizeBase || SanitizeExponent) &&
            isa<llvm::IntegerType>(Ops.LHS->getType())) {
     CodeGenFunction::SanitizerScope SanScope(&CGF);
-    SmallVector<std::pair<Value *, SanitizerMask>, 2> Checks;
+    llvm::SmallVector<std::pair<Value *, SanitizerMask>, 2> Checks;
     bool RHSIsSigned = Ops.rhsHasSignedIntegerRepresentation();
     llvm::Value *WidthMinusOne =
         GetMaximumShiftAmount(Ops.LHS, Ops.RHS, RHSIsSigned);
@@ -5392,7 +5392,7 @@ static Value *ConvertVec3AndVec4(CGBuilderTy &Builder, CodeGenFunction &CGF,
 static Value *createCastsForTypeOfSameSize(CGBuilderTy &Builder,
                                            const llvm::DataLayout &DL,
                                            Value *Src, llvm::Type *DstTy,
-                                           StringRef Name = "") {
+                                           llvm::StringRef Name = "") {
   auto SrcTy = Src->getType();
 
   // Case 1.
@@ -5701,9 +5701,9 @@ static GEPOffsetAndOverflow EmitGEPOffsetInBytes(Value *BasePtr, Value *GEPVal,
 
 Value *
 CodeGenFunction::EmitCheckedInBoundsGEP(llvm::Type *ElemTy, Value *Ptr,
-                                        ArrayRef<Value *> IdxList,
+                                        llvm::ArrayRef<Value *> IdxList,
                                         bool SignedIndices, bool IsSubtraction,
-                                        SourceLocation Loc, const Twine &Name) {
+                                        SourceLocation Loc, const llvm::Twine &Name) {
   llvm::Type *PtrTy = Ptr->getType();
   Value *GEPVal = Builder.CreateInBoundsGEP(ElemTy, Ptr, IdxList, Name);
 
@@ -5817,9 +5817,9 @@ CodeGenFunction::EmitCheckedInBoundsGEP(llvm::Type *ElemTy, Value *Ptr,
 }
 
 Address CodeGenFunction::EmitCheckedInBoundsGEP(
-    Address Addr, ArrayRef<Value *> IdxList, llvm::Type *elementType,
+    Address Addr, llvm::ArrayRef<Value *> IdxList, llvm::Type *elementType,
     bool SignedIndices, bool IsSubtraction, SourceLocation Loc, CharUnits Align,
-    const Twine &Name) {
+    const llvm::Twine &Name) {
   if (!SanOpts.has(SanitizerKind::PointerOverflow))
     return Builder.CreateInBoundsGEP(Addr, IdxList, elementType, Align, Name);
 

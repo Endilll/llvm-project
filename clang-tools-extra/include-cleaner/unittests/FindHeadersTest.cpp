@@ -460,7 +460,7 @@ TEST_F(HeadersForSymbolTest, PreferPublicOverNameMatchOnPrivate) {
     struct foo {};
   )cpp");
   buildAST();
-  EXPECT_THAT(headersForFoo(), ElementsAre(Header(StringRef("\"public.h\"")),
+  EXPECT_THAT(headersForFoo(), ElementsAre(Header(llvm::StringRef("\"public.h\"")),
                                            physicalHeader("foo.h")));
 }
 
@@ -523,7 +523,7 @@ TEST_F(HeadersForSymbolTest, IWYUTransitiveExportWithPrivate) {
   buildAST();
   EXPECT_THAT(headersForFoo(),
               ElementsAre(physicalHeader("foo.h"),
-                                           Header(StringRef("\"public1.h\"")),
+                                           Header(llvm::StringRef("\"public1.h\"")),
                                            physicalHeader("export1.h"),
                                            physicalHeader("export2.h"),
                                            physicalHeader("export3.h")));

@@ -20,8 +20,8 @@ using namespace clang;
 
 void MacroPPCallbacks::writeMacroDefinition(const IdentifierInfo &II,
                                             const MacroInfo &MI,
-                                            Preprocessor &PP, raw_ostream &Name,
-                                            raw_ostream &Value) {
+                                            Preprocessor &PP, llvm::raw_ostream &Name,
+                                            llvm::raw_ostream &Value) {
   Name << II.getName();
 
   if (MI.isFunctionLike()) {
@@ -47,7 +47,7 @@ void MacroPPCallbacks::writeMacroDefinition(const IdentifierInfo &II,
     Name << ')';
   }
 
-  SmallString<128> SpellingBuffer;
+  llvm::SmallString<128> SpellingBuffer;
   bool First = true;
   for (const auto &T : MI.tokens()) {
     if (!First && T.hasLeadingSpace())
@@ -166,9 +166,9 @@ void MacroPPCallbacks::FileChanged(SourceLocation Loc, FileChangeReason Reason,
 }
 
 void MacroPPCallbacks::InclusionDirective(
-    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    SourceLocation HashLoc, const Token &IncludeTok, llvm::StringRef FileName,
     bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
-    StringRef SearchPath, StringRef RelativePath, const Module *SuggestedModule,
+    llvm::StringRef SearchPath, llvm::StringRef RelativePath, const Module *SuggestedModule,
     bool ModuleImported, SrcMgr::CharacteristicKind FileType) {
 
   // Record the line location of the current included file.

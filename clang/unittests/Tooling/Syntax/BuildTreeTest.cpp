@@ -19,14 +19,14 @@ namespace {
 
 class BuildSyntaxTreeTest : public SyntaxTreeTest {
 protected:
-  ::testing::AssertionResult treeDumpEqual(StringRef Code, StringRef Tree) {
+  ::testing::AssertionResult treeDumpEqual(llvm::StringRef Code, llvm::StringRef Tree) {
     SCOPED_TRACE(llvm::join(GetParam().getCommandLineArgs(), " "));
 
     auto *Root = buildTree(Code, GetParam());
     auto ErrorOK = errorOK(Code);
     if (!ErrorOK)
       return ErrorOK;
-    auto Actual = StringRef(Root->dump(*TM)).trim().str();
+    auto Actual = llvm::StringRef(Root->dump(*TM)).trim().str();
     // EXPECT_EQ shows the diff between the two strings if they are different.
     EXPECT_EQ(Tree.trim().str(), Actual);
     if (Actual != Tree.trim().str()) {
@@ -36,8 +36,8 @@ protected:
   }
 
   ::testing::AssertionResult
-  treeDumpEqualOnAnnotations(StringRef CodeWithAnnotations,
-                             ArrayRef<StringRef> TreeDumps) {
+  treeDumpEqualOnAnnotations(llvm::StringRef CodeWithAnnotations,
+                             llvm::ArrayRef<llvm::StringRef> TreeDumps) {
     SCOPED_TRACE(llvm::join(GetParam().getCommandLineArgs(), " "));
 
     auto AnnotatedCode = llvm::Annotations(CodeWithAnnotations);
@@ -59,7 +59,7 @@ protected:
       auto *AnnotatedNode = nodeByRange(AnnotatedRanges[i], Root);
       assert(AnnotatedNode);
       auto AnnotatedNodeDump =
-          StringRef(AnnotatedNode->dump(*TM))
+          llvm::StringRef(AnnotatedNode->dump(*TM))
               .trim()
               .str();
       // EXPECT_EQ shows the diff between the two strings if they are different.
@@ -75,7 +75,7 @@ protected:
   }
 
 private:
-  ::testing::AssertionResult errorOK(StringRef RawCode) {
+  ::testing::AssertionResult errorOK(llvm::StringRef RawCode) {
     if (!RawCode.contains("error-ok")) {
       if (Diags->getClient()->getNumErrors() != 0) {
         return ::testing::AssertionFailure()

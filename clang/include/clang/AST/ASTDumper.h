@@ -19,15 +19,15 @@ class ASTDumper : public ASTNodeTraverser<ASTDumper, TextNodeDumper> {
 
   TextNodeDumper NodeDumper;
 
-  raw_ostream &OS;
+  llvm::raw_ostream &OS;
 
   const bool ShowColors;
 
 public:
-  ASTDumper(raw_ostream &OS, const ASTContext &Context, bool ShowColors)
+  ASTDumper(llvm::raw_ostream &OS, const ASTContext &Context, bool ShowColors)
       : NodeDumper(OS, Context, ShowColors), OS(OS), ShowColors(ShowColors) {}
 
-  ASTDumper(raw_ostream &OS, bool ShowColors)
+  ASTDumper(llvm::raw_ostream &OS, bool ShowColors)
       : NodeDumper(OS, ShowColors), OS(OS), ShowColors(ShowColors) {}
 
   TextNodeDumper &doGetNodeDelegate() { return NodeDumper; }

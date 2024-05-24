@@ -63,7 +63,7 @@ public:
   virtual ~SerializedDiagnosticReader() = default;
 
   /// Read the diagnostics in \c File
-  std::error_code readDiagnostics(StringRef File);
+  std::error_code readDiagnostics(llvm::StringRef File);
 
 private:
   enum class Cursor;
@@ -86,32 +86,32 @@ protected:
   virtual std::error_code visitEndOfDiagnostic() { return {}; }
 
   /// Visit a category. This associates the category \c ID to a \c Name.
-  virtual std::error_code visitCategoryRecord(unsigned ID, StringRef Name) {
+  virtual std::error_code visitCategoryRecord(unsigned ID, llvm::StringRef Name) {
     return {};
   }
 
   /// Visit a flag. This associates the flag's \c ID to a \c Name.
-  virtual std::error_code visitDiagFlagRecord(unsigned ID, StringRef Name) {
+  virtual std::error_code visitDiagFlagRecord(unsigned ID, llvm::StringRef Name) {
     return {};
   }
 
   /// Visit a diagnostic.
   virtual std::error_code
   visitDiagnosticRecord(unsigned Severity, const Location &Location,
-                        unsigned Category, unsigned Flag, StringRef Message) {
+                        unsigned Category, unsigned Flag, llvm::StringRef Message) {
     return {};
   }
 
   /// Visit a filename. This associates the file's \c ID to a \c Name.
   virtual std::error_code visitFilenameRecord(unsigned ID, unsigned Size,
                                               unsigned Timestamp,
-                                              StringRef Name) {
+                                              llvm::StringRef Name) {
     return {};
   }
 
   /// Visit a fixit hint.
   virtual std::error_code
-  visitFixitRecord(const Location &Start, const Location &End, StringRef Text) {
+  visitFixitRecord(const Location &Start, const Location &End, llvm::StringRef Text) {
     return {};
   }
 

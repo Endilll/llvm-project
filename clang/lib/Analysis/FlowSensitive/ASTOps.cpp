@@ -127,7 +127,7 @@ RecordInitListHelper::RecordInitListHelper(
 
 RecordInitListHelper::RecordInitListHelper(
     QualType Ty, std::vector<const FieldDecl *> Fields,
-    ArrayRef<Expr *> Inits) {
+    llvm::ArrayRef<Expr *> Inits) {
   auto *RD = Ty->getAsCXXRecordDecl();
   assert(RD != nullptr);
 
@@ -135,7 +135,7 @@ RecordInitListHelper::RecordInitListHelper(
   // For structs/classes initialized with an empty initializer list, Clang
   // puts `ImplicitValueInitExpr`s in `InitListExpr::inits()`, but for unions,
   // it doesn't do this -- so we create an `ImplicitValueInitExpr` ourselves.
-  SmallVector<Expr *> InitsForUnion;
+  llvm::SmallVector<Expr *> InitsForUnion;
   if (Ty->isUnionType() && Inits.empty()) {
     assert(Fields.size() == 1);
     ImplicitValueInitForUnion.emplace(Fields.front()->getType());

@@ -246,7 +246,7 @@ class FrontendInputFile {
 
 public:
   FrontendInputFile() = default;
-  FrontendInputFile(StringRef File, InputKind Kind, bool IsSystem = false)
+  FrontendInputFile(llvm::StringRef File, InputKind Kind, bool IsSystem = false)
       : File(File.str()), Kind(Kind), IsSystem(IsSystem) {}
   FrontendInputFile(llvm::MemoryBufferRef Buffer, InputKind Kind,
                     bool IsSystem = false)
@@ -264,7 +264,7 @@ public:
     return Kind.getHeaderUnitKind();
   }
 
-  StringRef getFile() const {
+  llvm::StringRef getFile() const {
     assert(isFile());
     return File;
   }
@@ -491,7 +491,7 @@ public:
   InputKind DashX;
 
   /// The input files and their types.
-  SmallVector<FrontendInputFile, 0> Inputs;
+  llvm::SmallVector<FrontendInputFile, 0> Inputs;
 
   /// When the input is a module map, the original module map file from which
   /// that map was inferred, if any (for umbrella modules).
@@ -604,7 +604,7 @@ public:
   ///
   /// \return The input kind for the extension, or Language::Unknown if the
   /// extension is not recognized.
-  static InputKind getInputKindForExtension(StringRef Extension);
+  static InputKind getInputKindForExtension(llvm::StringRef Extension);
 };
 
 } // namespace clang

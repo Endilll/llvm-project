@@ -53,7 +53,7 @@ class SourceChangeRefactoringRule : public RefactoringActionRuleBase {
 public:
   void invoke(RefactoringResultConsumer &Consumer,
               RefactoringRuleContext &Context) final {
-    Expected<AtomicChanges> Changes = createSourceReplacements(Context);
+    llvm::Expected<AtomicChanges> Changes = createSourceReplacements(Context);
     if (!Changes)
       Consumer.handleError(Changes.takeError());
     else
@@ -61,7 +61,7 @@ public:
   }
 
 private:
-  virtual Expected<AtomicChanges>
+  virtual llvm::Expected<AtomicChanges>
   createSourceReplacements(RefactoringRuleContext &Context) = 0;
 };
 
@@ -75,7 +75,7 @@ class FindSymbolOccurrencesRefactoringRule : public RefactoringActionRuleBase {
 public:
   void invoke(RefactoringResultConsumer &Consumer,
               RefactoringRuleContext &Context) final {
-    Expected<SymbolOccurrences> Occurrences = findSymbolOccurrences(Context);
+    llvm::Expected<SymbolOccurrences> Occurrences = findSymbolOccurrences(Context);
     if (!Occurrences)
       Consumer.handleError(Occurrences.takeError());
     else
@@ -83,7 +83,7 @@ public:
   }
 
 private:
-  virtual Expected<SymbolOccurrences>
+  virtual llvm::Expected<SymbolOccurrences>
   findSymbolOccurrences(RefactoringRuleContext &Context) = 0;
 };
 

@@ -24,7 +24,7 @@ namespace clang::tidy::performance {
 
 namespace {
 
-std::string paramNameOrIndex(StringRef Name, size_t Index) {
+std::string paramNameOrIndex(llvm::StringRef Name, size_t Index) {
   return (Name.empty() ? llvm::Twine('#') + llvm::Twine(Index + 1)
                        : llvm::Twine('\'') + Name + llvm::Twine('\''))
       .str();
@@ -53,7 +53,7 @@ bool hasLoopStmtAncestor(const DeclRefExpr &DeclRef, const Decl &Decl,
 } // namespace
 
 UnnecessaryValueParamCheck::UnnecessaryValueParamCheck(
-    StringRef Name, ClangTidyContext *Context)
+    llvm::StringRef Name, ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       Inserter(Options.getLocalOrGlobal("IncludeStyle",
                                         utils::IncludeSorter::IS_LLVM),

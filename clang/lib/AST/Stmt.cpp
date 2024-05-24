@@ -133,7 +133,7 @@ void Stmt::EnableStatistics() {
 }
 
 static std::pair<Stmt::Likelihood, const Attr *>
-getLikelihood(ArrayRef<const Attr *> Attrs) {
+getLikelihood(llvm::ArrayRef<const Attr *> Attrs) {
   for (const auto *A : Attrs) {
     if (isa<LikelyAttr>(A))
       return std::make_pair(Stmt::LH_Likely, A);
@@ -152,7 +152,7 @@ static std::pair<Stmt::Likelihood, const Attr *> getLikelihood(const Stmt *S) {
   return std::make_pair(Stmt::LH_None, nullptr);
 }
 
-Stmt::Likelihood Stmt::getLikelihood(ArrayRef<const Attr *> Attrs) {
+Stmt::Likelihood Stmt::getLikelihood(llvm::ArrayRef<const Attr *> Attrs) {
   return ::getLikelihood(Attrs).first;
 }
 
@@ -363,7 +363,7 @@ int64_t Stmt::getID(const ASTContext &Context) const {
   return Context.getAllocator().identifyKnownAlignedObject<Stmt>(this);
 }
 
-CompoundStmt::CompoundStmt(ArrayRef<Stmt *> Stmts, FPOptionsOverride FPFeatures,
+CompoundStmt::CompoundStmt(llvm::ArrayRef<Stmt *> Stmts, FPOptionsOverride FPFeatures,
                            SourceLocation LB, SourceLocation RB)
     : Stmt(CompoundStmtClass), LBraceLoc(LB), RBraceLoc(RB) {
   CompoundStmtBits.NumStmts = Stmts.size();
@@ -373,14 +373,14 @@ CompoundStmt::CompoundStmt(ArrayRef<Stmt *> Stmts, FPOptionsOverride FPFeatures,
     setStoredFPFeatures(FPFeatures);
 }
 
-void CompoundStmt::setStmts(ArrayRef<Stmt *> Stmts) {
+void CompoundStmt::setStmts(llvm::ArrayRef<Stmt *> Stmts) {
   assert(CompoundStmtBits.NumStmts == Stmts.size() &&
          "NumStmts doesn't fit in bits of CompoundStmtBits.NumStmts!");
 
   std::copy(Stmts.begin(), Stmts.end(), body_begin());
 }
 
-CompoundStmt *CompoundStmt::Create(const ASTContext &C, ArrayRef<Stmt *> Stmts,
+CompoundStmt *CompoundStmt::Create(const ASTContext &C, llvm::ArrayRef<Stmt *> Stmts,
                                    FPOptionsOverride FPFeatures,
                                    SourceLocation LB, SourceLocation RB) {
   void *Mem =
@@ -423,7 +423,7 @@ const char *LabelStmt::getName() const {
 }
 
 AttributedStmt *AttributedStmt::Create(const ASTContext &C, SourceLocation Loc,
-                                       ArrayRef<const Attr*> Attrs,
+                                       llvm::ArrayRef<const Attr*> Attrs,
                                        Stmt *SubStmt) {
   assert(!Attrs.empty() && "Attrs should not be empty");
   void *Mem = C.Allocate(totalSizeToAlloc<const Attr *>(Attrs.size()),
@@ -447,7 +447,7 @@ std::string AsmStmt::generateAsmString(const ASTContext &C) const {
   llvm_unreachable("unknown asm statement kind!");
 }
 
-StringRef AsmStmt::getOutputConstraint(unsigned i) const {
+llvm::StringRef AsmStmt::getOutputConstraint(unsigned i) const {
   if (const auto *gccAsmStmt = dyn_cast<GCCAsmStmt>(this))
     return gccAsmStmt->getOutputConstraint(i);
   if (const auto *msAsmStmt = dyn_cast<MSAsmStmt>(this))
@@ -463,7 +463,7 @@ const Expr *AsmStmt::getOutputExpr(unsigned i) const {
   llvm_unreachable("unknown asm statement kind!");
 }
 
-StringRef AsmStmt::getInputConstraint(unsigned i) const {
+llvm::StringRef AsmStmt::getInputConstraint(unsigned i) const {
   if (const auto *gccAsmStmt = dyn_cast<GCCAsmStmt>(this))
     return gccAsmStmt->getInputConstraint(i);
   if (const auto *msAsmStmt = dyn_cast<MSAsmStmt>(this))
@@ -479,7 +479,7 @@ const Expr *AsmStmt::getInputExpr(unsigned i) const {
   llvm_unreachable("unknown asm statement kind!");
 }
 
-StringRef AsmStmt::getClobber(unsigned i) const {
+llvm::StringRef AsmStmt::getClobber(unsigned i) const {
   if (const auto *gccAsmStmt = dyn_cast<GCCAsmStmt>(this))
     return gccAsmStmt->getClobber(i);
   if (const auto *msAsmStmt = dyn_cast<MSAsmStmt>(this))
@@ -502,7 +502,7 @@ char GCCAsmStmt::AsmStringPiece::getModifier() const {
   return isLetter(Str[0]) ? Str[0] : '\0';
 }
 
-StringRef GCCAsmStmt::getClobber(unsigned i) const {
+llvm::StringRef GCCAsmStmt::getClobber(unsigned i) const {
   return getClobberStringLiteral(i)->getString();
 }
 
@@ -513,7 +513,7 @@ Expr *GCCAsmStmt::getOutputExpr(unsigned i) {
 /// getOutputConstraint - Return the constraint string for the specified
 /// output operand.  All output constraints are known to be non-empty (either
 /// '=' or '+').
-StringRef GCCAsmStmt::getOutputConstraint(unsigned i) const {
+llvm::StringRef GCCAsmStmt::getOutputConstraint(unsigned i) const {
   return getOutputConstraintLiteral(i)->getString();
 }
 
@@ -529,13 +529,13 @@ AddrLabelExpr *GCCAsmStmt::getLabelExpr(unsigned i) const {
   return cast<AddrLabelExpr>(Exprs[i + NumOutputs + NumInputs]);
 }
 
-StringRef GCCAsmStmt::getLabelName(unsigned i) const {
+llvm::StringRef GCCAsmStmt::getLabelName(unsigned i) const {
   return getLabelExpr(i)->getLabel()->getName();
 }
 
 /// getInputConstraint - Return the specified input constraint.  Unlike output
 /// constraints, these can be empty.
-StringRef GCCAsmStmt::getInputConstraint(unsigned i) const {
+llvm::StringRef GCCAsmStmt::getInputConstraint(unsigned i) const {
   return getInputConstraintLiteral(i)->getString();
 }
 
@@ -576,7 +576,7 @@ void GCCAsmStmt::setOutputsAndInputsAndClobbers(const ASTContext &C,
 /// getNamedOperand - Given a symbolic operand reference like %[foo],
 /// translate this into a numeric value needed to reference the same operand.
 /// This returns -1 if the operand name is invalid.
-int GCCAsmStmt::getNamedOperand(StringRef SymbolicName) const {
+int GCCAsmStmt::getNamedOperand(llvm::StringRef SymbolicName) const {
   // Check if this is an output operand.
   unsigned NumOutputs = getNumOutputs();
   for (unsigned i = 0; i != NumOutputs; ++i)
@@ -599,9 +599,9 @@ int GCCAsmStmt::getNamedOperand(StringRef SymbolicName) const {
 /// AnalyzeAsmString - Analyze the asm string of the current asm, decomposing
 /// it into pieces.  If the asm string is erroneous, emit errors and return
 /// true, otherwise return false.
-unsigned GCCAsmStmt::AnalyzeAsmString(SmallVectorImpl<AsmStringPiece>&Pieces,
+unsigned GCCAsmStmt::AnalyzeAsmString(llvm::SmallVectorImpl<AsmStringPiece>&Pieces,
                                 const ASTContext &C, unsigned &DiagOffs) const {
-  StringRef Str = getAsmString()->getString();
+  llvm::StringRef Str = getAsmString()->getString();
   const char *StrStart = Str.begin();
   const char *StrEnd = Str.end();
   const char *CurPtr = StrStart;
@@ -749,7 +749,7 @@ unsigned GCCAsmStmt::AnalyzeAsmString(SmallVectorImpl<AsmStringPiece>&Pieces,
       if (NameEnd == CurPtr)
         return diag::err_asm_empty_symbolic_operand_name;
 
-      StringRef SymbolicName(CurPtr, NameEnd - CurPtr);
+      llvm::StringRef SymbolicName(CurPtr, NameEnd - CurPtr);
 
       int N = getNamedOperand(SymbolicName);
       if (N == -1) {
@@ -785,7 +785,7 @@ unsigned GCCAsmStmt::AnalyzeAsmString(SmallVectorImpl<AsmStringPiece>&Pieces,
 std::string GCCAsmStmt::generateAsmString(const ASTContext &C) const {
   // Analyze the asm string to decompose it into its pieces.  We know that Sema
   // has already done this, so it is guaranteed to be successful.
-  SmallVector<GCCAsmStmt::AsmStringPiece, 4> Pieces;
+  llvm::SmallVector<GCCAsmStmt::AsmStringPiece, 4> Pieces;
   unsigned DiagOffs;
   AnalyzeAsmString(Pieces, C, DiagOffs);
 
@@ -805,11 +805,11 @@ std::string GCCAsmStmt::generateAsmString(const ASTContext &C) const {
 /// Assemble final IR asm string (MS-style).
 std::string MSAsmStmt::generateAsmString(const ASTContext &C) const {
   // FIXME: This needs to be translated into the IR string representation.
-  SmallVector<StringRef, 8> Pieces;
+  llvm::SmallVector<llvm::StringRef, 8> Pieces;
   AsmStr.split(Pieces, "\n\t");
   std::string MSAsmString;
   for (size_t I = 0, E = Pieces.size(); I < E; ++I) {
-    StringRef Instruction = Pieces[I];
+    llvm::StringRef Instruction = Pieces[I];
     // For vex/vex2/vex3/evex masm style prefix, convert it to att style
     // since we don't support masm style prefix in backend.
     if (Instruction.starts_with("vex "))
@@ -873,10 +873,10 @@ GCCAsmStmt::GCCAsmStmt(const ASTContext &C, SourceLocation asmloc,
 
 MSAsmStmt::MSAsmStmt(const ASTContext &C, SourceLocation asmloc,
                      SourceLocation lbraceloc, bool issimple, bool isvolatile,
-                     ArrayRef<Token> asmtoks, unsigned numoutputs,
+                     llvm::ArrayRef<Token> asmtoks, unsigned numoutputs,
                      unsigned numinputs,
-                     ArrayRef<StringRef> constraints, ArrayRef<Expr*> exprs,
-                     StringRef asmstr, ArrayRef<StringRef> clobbers,
+                     llvm::ArrayRef<llvm::StringRef> constraints, llvm::ArrayRef<Expr*> exprs,
+                     llvm::StringRef asmstr, llvm::ArrayRef<llvm::StringRef> clobbers,
                      SourceLocation endloc)
     : AsmStmt(MSAsmStmtClass, asmloc, issimple, isvolatile, numoutputs,
               numinputs, clobbers.size()), LBraceLoc(lbraceloc),
@@ -884,15 +884,15 @@ MSAsmStmt::MSAsmStmt(const ASTContext &C, SourceLocation asmloc,
   initialize(C, asmstr, asmtoks, constraints, exprs, clobbers);
 }
 
-static StringRef copyIntoContext(const ASTContext &C, StringRef str) {
+static llvm::StringRef copyIntoContext(const ASTContext &C, llvm::StringRef str) {
   return str.copy(C);
 }
 
-void MSAsmStmt::initialize(const ASTContext &C, StringRef asmstr,
-                           ArrayRef<Token> asmtoks,
-                           ArrayRef<StringRef> constraints,
-                           ArrayRef<Expr*> exprs,
-                           ArrayRef<StringRef> clobbers) {
+void MSAsmStmt::initialize(const ASTContext &C, llvm::StringRef asmstr,
+                           llvm::ArrayRef<Token> asmtoks,
+                           llvm::ArrayRef<llvm::StringRef> constraints,
+                           llvm::ArrayRef<Expr*> exprs,
+                           llvm::ArrayRef<llvm::StringRef> clobbers) {
   assert(NumAsmToks == asmtoks.size());
   assert(NumClobbers == clobbers.size());
 
@@ -907,16 +907,16 @@ void MSAsmStmt::initialize(const ASTContext &C, StringRef asmstr,
   AsmToks = new (C) Token[asmtoks.size()];
   std::copy(asmtoks.begin(), asmtoks.end(), AsmToks);
 
-  Constraints = new (C) StringRef[exprs.size()];
+  Constraints = new (C) llvm::StringRef[exprs.size()];
   std::transform(constraints.begin(), constraints.end(), Constraints,
-                 [&](StringRef Constraint) {
+                 [&](llvm::StringRef Constraint) {
                    return copyIntoContext(C, Constraint);
                  });
 
-  Clobbers = new (C) StringRef[NumClobbers];
+  Clobbers = new (C) llvm::StringRef[NumClobbers];
   // FIXME: Avoid the allocation/copy if at all possible.
   std::transform(clobbers.begin(), clobbers.end(), Clobbers,
-                 [&](StringRef Clobber) {
+                 [&](llvm::StringRef Clobber) {
                    return copyIntoContext(C, Clobber);
                  });
 }
@@ -1320,8 +1320,8 @@ CapturedStmt::Capture *CapturedStmt::getStoredCaptures() const {
 }
 
 CapturedStmt::CapturedStmt(Stmt *S, CapturedRegionKind Kind,
-                           ArrayRef<Capture> Captures,
-                           ArrayRef<Expr *> CaptureInits,
+                           llvm::ArrayRef<Capture> Captures,
+                           llvm::ArrayRef<Expr *> CaptureInits,
                            CapturedDecl *CD,
                            RecordDecl *RD)
   : Stmt(CapturedStmtClass), NumCaptures(Captures.size()),
@@ -1356,8 +1356,8 @@ CapturedStmt::CapturedStmt(EmptyShell Empty, unsigned NumCaptures)
 
 CapturedStmt *CapturedStmt::Create(const ASTContext &Context, Stmt *S,
                                    CapturedRegionKind Kind,
-                                   ArrayRef<Capture> Captures,
-                                   ArrayRef<Expr *> CaptureInits,
+                                   llvm::ArrayRef<Capture> Captures,
+                                   llvm::ArrayRef<Expr *> CaptureInits,
                                    CapturedDecl *CD,
                                    RecordDecl *RD) {
   // The layout is

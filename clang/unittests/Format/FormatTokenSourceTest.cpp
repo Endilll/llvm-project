@@ -17,7 +17,7 @@ namespace {
 
 class IndexedTokenSourceTest : public testing::Test {
 protected:
-  TokenList lex(StringRef Code, const FormatStyle &Style = getLLVMStyle()) {
+  TokenList lex(llvm::StringRef Code, const FormatStyle &Style = getLLVMStyle()) {
     return TestLexer(Allocator, Buffers, Style).lex(Code);
   }
   llvm::SpecificBumpPtrAllocator<FormatToken> Allocator;

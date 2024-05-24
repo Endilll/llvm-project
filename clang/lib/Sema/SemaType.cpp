@@ -96,7 +96,7 @@ static void diagnoseBadTypeAttribute(Sema &S, const ParsedAttr &attr,
   }
 
   SourceLocation loc = attr.getLoc();
-  StringRef name = attr.getAttrName()->getName();
+  llvm::StringRef name = attr.getAttrName()->getName();
 
   // The GC attributes are usually written with macros;  special-case them.
   IdentifierInfo *II = attr.isArgIdent(0) ? attr.getArgAsIdent(0)->Ident
@@ -190,11 +190,11 @@ namespace {
     unsigned chunkIndex;
 
     /// The original set of attributes on the DeclSpec.
-    SmallVector<ParsedAttr *, 2> savedAttrs;
+    llvm::SmallVector<ParsedAttr *, 2> savedAttrs;
 
     /// A list of attributes to diagnose the uselessness of when the
     /// processing is complete.
-    SmallVector<ParsedAttr *, 2> ignoredTypeAttrs;
+    llvm::SmallVector<ParsedAttr *, 2> ignoredTypeAttrs;
 
     /// Attributes corresponding to AttributedTypeLocs that we have not yet
     /// populated.
@@ -203,7 +203,7 @@ namespace {
     // attributes in creation order as an attempt to make them line up
     // properly.
     using TypeAttrPair = std::pair<const AttributedType*, const Attr*>;
-    SmallVector<TypeAttrPair, 8> AttrsForTypes;
+    llvm::SmallVector<TypeAttrPair, 8> AttrsForTypes;
     bool AttrsForTypesSorted = true;
 
     /// MacroQualifiedTypes mapping to macro expansion locations that will be
@@ -827,7 +827,7 @@ static bool checkOmittedBlockReturnType(Sema &S, Declarator &declarator,
     return false;
 
   // Warn if we see type attributes for omitted return type on a block literal.
-  SmallVector<ParsedAttr *, 2> ToBeRemoved;
+  llvm::SmallVector<ParsedAttr *, 2> ToBeRemoved;
   for (ParsedAttr &AL : declarator.getMutableDeclSpec().getAttributes()) {
     if (AL.isInvalid() || !AL.isTypeAttr())
       continue;
@@ -2602,7 +2602,7 @@ bool Sema::CheckFunctionReturnType(QualType T, SourceLocation Loc) {
 /// Check the extended parameter information.  Most of the necessary
 /// checking should occur when applying the parameter attribute; the
 /// only other checks required are positional restrictions.
-static void checkExtParameterInfos(Sema &S, ArrayRef<QualType> paramTypes,
+static void checkExtParameterInfos(Sema &S, llvm::ArrayRef<QualType> paramTypes,
                     const FunctionProtoType::ExtProtoInfo &EPI,
                     llvm::function_ref<SourceLocation(unsigned)> getParamLoc) {
   assert(EPI.ExtParameterInfos && "shouldn't get here without param infos");
@@ -2665,7 +2665,7 @@ static void checkExtParameterInfos(Sema &S, ArrayRef<QualType> paramTypes,
 }
 
 QualType Sema::BuildFunctionType(QualType T,
-                                 MutableArrayRef<QualType> ParamTypes,
+                                 llvm::MutableArrayRef<QualType> ParamTypes,
                                  SourceLocation Loc, DeclarationName Entity,
                                  const FunctionProtoType::ExtProtoInfo &EPI) {
   bool Invalid = false;
@@ -2944,7 +2944,7 @@ void Sema::diagnoseIgnoredQualifiers(unsigned DiagID, unsigned Quals,
     { "_Atomic", DeclSpec::TQ_atomic, AtomicQualLoc }
   };
 
-  SmallString<32> QualStr;
+  llvm::SmallString<32> QualStr;
   unsigned NumQuals = 0;
   SourceLocation Loc;
   FixItHint FixIts[5];
@@ -4080,10 +4080,10 @@ static void fixItNullability(Sema &S, DiagBuilderT &Diag,
   if (!NextChar)
     return;
 
-  SmallString<32> InsertionTextBuf{" "};
+  llvm::SmallString<32> InsertionTextBuf{" "};
   InsertionTextBuf += getNullabilitySpelling(Nullability);
   InsertionTextBuf += " ";
-  StringRef InsertionText = InsertionTextBuf.str();
+  llvm::StringRef InsertionText = InsertionTextBuf.str();
 
   if (isWhitespace(*NextChar)) {
     InsertionText = InsertionText.drop_back();
@@ -5137,10 +5137,10 @@ static TypeSourceInfo *GetFullTypeForDeclarator(TypeProcessingState &state,
 
         // Otherwise, we have a function with a parameter list that is
         // potentially variadic.
-        SmallVector<QualType, 16> ParamTys;
+        llvm::SmallVector<QualType, 16> ParamTys;
         ParamTys.reserve(FTI.NumParams);
 
-        SmallVector<FunctionProtoType::ExtParameterInfo, 16>
+        llvm::SmallVector<FunctionProtoType::ExtParameterInfo, 16>
           ExtParameterInfos(FTI.NumParams);
         bool HasAnyInterestingExtParameterInfos = false;
 
@@ -5237,9 +5237,9 @@ static TypeSourceInfo *GetFullTypeForDeclarator(TypeProcessingState &state,
               [&](unsigned i) { return FTI.Params[i].Param->getLocation(); });
         }
 
-        SmallVector<QualType, 4> Exceptions;
-        SmallVector<ParsedType, 2> DynamicExceptions;
-        SmallVector<SourceRange, 2> DynamicExceptionRanges;
+        llvm::SmallVector<QualType, 4> Exceptions;
+        llvm::SmallVector<ParsedType, 2> DynamicExceptions;
+        llvm::SmallVector<SourceRange, 2> DynamicExceptionRanges;
         Expr *NoexceptExpr = nullptr;
 
         if (FTI.getExceptionSpecType() == EST_Dynamic) {
@@ -5514,7 +5514,7 @@ static TypeSourceInfo *GetFullTypeForDeclarator(TypeProcessingState &state,
       SourceRange RemovalRange;
       unsigned I;
       if (D.isFunctionDeclarator(I)) {
-        SmallVector<SourceLocation, 4> RemovalLocs;
+        llvm::SmallVector<SourceLocation, 4> RemovalLocs;
         const DeclaratorChunk &Chunk = D.getTypeObject(I);
         assert(Chunk.Kind == DeclaratorChunk::Function);
 
@@ -5523,7 +5523,7 @@ static TypeSourceInfo *GetFullTypeForDeclarator(TypeProcessingState &state,
 
         if (Chunk.Fun.hasMethodTypeQualifiers())
           Chunk.Fun.MethodQualifiers->forEachQualifier(
-              [&](DeclSpec::TQ TypeQual, StringRef QualName,
+              [&](DeclSpec::TQ TypeQual, llvm::StringRef QualName,
                   SourceLocation SL) { RemovalLocs.push_back(SL); });
 
         if (!RemovalLocs.empty()) {
@@ -6508,7 +6508,7 @@ static void HandleBTFTypeTagAttribute(QualType &Type, const ParsedAttr &Attr,
   }
 
   ASTContext &Ctx = S.Context;
-  StringRef BTFTypeTag = StrLiteral->getString();
+  llvm::StringRef BTFTypeTag = StrLiteral->getString();
   Type = State.getBTFTagAttributedType(
       ::new (Ctx) BTFTypeTagAttr(Ctx, Attr, BTFTypeTag), Type);
 }
@@ -6692,7 +6692,7 @@ static bool handleObjCOwnershipTypeAttr(TypeProcessingState &state,
   underlyingType.Quals.addObjCLifetime(lifetime);
 
   if (NonObjCPointer) {
-    StringRef name = attr.getAttrName()->getName();
+    llvm::StringRef name = attr.getAttrName()->getName();
     switch (lifetime) {
     case Qualifiers::OCL_None:
     case Qualifiers::OCL_ExplicitNone:
@@ -6866,7 +6866,7 @@ namespace {
 
     QualType Original;
     const FunctionType *Fn;
-    SmallVector<unsigned char /*WrapKind*/, 8> Stack;
+    llvm::SmallVector<unsigned char /*WrapKind*/, 8> Stack;
 
     FunctionTypeUnwrapper(Sema &S, QualType T) : Original(T) {
       while (true) {
@@ -7488,7 +7488,7 @@ static Attr *getCCTypeAttr(ASTContext &Ctx, ParsedAttr &Attr) {
     // The attribute may have had a fixit applied where we treated an
     // identifier as a string literal.  The contents of the string are valid,
     // but the form may not be.
-    StringRef Str;
+    llvm::StringRef Str;
     if (Attr.isArgExpr(0))
       Str = cast<StringLiteral>(Attr.getArgAsExpr(0))->getString();
     else
@@ -7549,7 +7549,7 @@ static bool handleArmStateAttribute(Sema &S,
   }
 
   for (unsigned I = 0; I < Attr.getNumArgs(); ++I) {
-    StringRef StateName;
+    llvm::StringRef StateName;
     SourceLocation LiteralLoc;
     if (!S.checkStringLiteralArgumentAttr(Attr, I, StateName, &LiteralLoc))
       return true;
@@ -8328,7 +8328,7 @@ static void HandleOpenCLAccessAttr(QualType &CurType, const ParsedAttr &Attr,
     } else {
       llvm_unreachable("unexpected type");
     }
-    StringRef AttrName = Attr.getAttrName()->getName();
+    llvm::StringRef AttrName = Attr.getAttrName()->getName();
     if (PrevAccessQual == AttrName.ltrim("_")) {
       // Duplicated qualifiers
       S.Diag(Attr.getLoc(), diag::warn_duplicate_declspec)
@@ -8380,7 +8380,7 @@ static void HandleAnnotateTypeAttr(TypeProcessingState &State,
 
   // Make sure that there is a string literal as the annotation's first
   // argument.
-  StringRef Str;
+  llvm::StringRef Str;
   if (!S.checkStringLiteralArgumentAttr(PA, 0, Str))
     return;
 
@@ -8693,7 +8693,7 @@ static void processTypeAttrs(TypeProcessingState &state, QualType &type,
         return;
       }
 
-      StringRef HandleType;
+      llvm::StringRef HandleType;
       if (!state.getSema().checkStringLiteralArgumentAttr(attr, 0, HandleType))
         return;
       type = state.getAttributedType(
@@ -9469,7 +9469,7 @@ QualType Sema::BuildPackIndexingType(QualType Pattern, Expr *IndexExpr,
                                      SourceLocation Loc,
                                      SourceLocation EllipsisLoc,
                                      bool FullySubstituted,
-                                     ArrayRef<QualType> Expansions) {
+                                     llvm::ArrayRef<QualType> Expansions) {
 
   std::optional<int64_t> Index;
   if (FullySubstituted && !IndexExpr->isValueDependent() &&
@@ -9644,16 +9644,16 @@ static QualType ChangeIntegralSignedness(Sema &S, QualType BaseType,
   std::array<CanQualType *, 6> AllSignedIntegers = {
       &S.Context.SignedCharTy, &S.Context.ShortTy,    &S.Context.IntTy,
       &S.Context.LongTy,       &S.Context.LongLongTy, &S.Context.Int128Ty};
-  ArrayRef<CanQualType *> AvailableSignedIntegers(
+  llvm::ArrayRef<CanQualType *> AvailableSignedIntegers(
       AllSignedIntegers.data(), AllSignedIntegers.size() - Int128Unsupported);
   std::array<CanQualType *, 6> AllUnsignedIntegers = {
       &S.Context.UnsignedCharTy,     &S.Context.UnsignedShortTy,
       &S.Context.UnsignedIntTy,      &S.Context.UnsignedLongTy,
       &S.Context.UnsignedLongLongTy, &S.Context.UnsignedInt128Ty};
-  ArrayRef<CanQualType *> AvailableUnsignedIntegers(AllUnsignedIntegers.data(),
+  llvm::ArrayRef<CanQualType *> AvailableUnsignedIntegers(AllUnsignedIntegers.data(),
                                                     AllUnsignedIntegers.size() -
                                                         Int128Unsupported);
-  ArrayRef<CanQualType *> *Consider =
+  llvm::ArrayRef<CanQualType *> *Consider =
       IsMakeSigned ? &AvailableSignedIntegers : &AvailableUnsignedIntegers;
 
   uint64_t BaseSize = S.Context.getTypeSize(BaseType);

@@ -125,7 +125,7 @@ AST_MATCHER(EnumDecl, hasSequentialInitialValues) {
 
 } // namespace
 
-EnumInitialValueCheck::EnumInitialValueCheck(StringRef Name,
+EnumInitialValueCheck::EnumInitialValueCheck(llvm::StringRef Name,
                                              ClangTidyContext *Context)
     : ClangTidyCheck(Name, Context),
       AllowExplicitZeroFirstInitialValue(

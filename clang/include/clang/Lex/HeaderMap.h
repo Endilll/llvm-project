@@ -31,7 +31,7 @@ struct HMapHeader;
 class HeaderMapImpl {
   std::unique_ptr<const llvm::MemoryBuffer> FileBuffer;
   bool NeedsBSwap;
-  mutable llvm::StringMap<StringRef> ReverseMap;
+  mutable llvm::StringMap<llvm::StringRef> ReverseMap;
 
 public:
   HeaderMapImpl(std::unique_ptr<const llvm::MemoryBuffer> File, bool NeedsBSwap)
@@ -48,24 +48,24 @@ public:
     for (unsigned Bucket = 0; Bucket < NumBuckets; ++Bucket) {
       HMapBucket B = getBucket(Bucket);
       if (B.Key != HMAP_EmptyBucketKey)
-        if (std::optional<StringRef> Key = getString(B.Key))
+        if (std::optional<llvm::StringRef> Key = getString(B.Key))
           Callback(*Key);
     }
   }
 
   /// If the specified relative filename is located in this HeaderMap return
-  /// the filename it is mapped to, otherwise return an empty StringRef.
-  StringRef lookupFilename(StringRef Filename,
-                           SmallVectorImpl<char> &DestPath) const;
+  /// the filename it is mapped to, otherwise return an empty llvm::StringRef.
+  llvm::StringRef lookupFilename(llvm::StringRef Filename,
+                           llvm::SmallVectorImpl<char> &DestPath) const;
 
   /// Return the filename of the headermap.
-  StringRef getFileName() const;
+  llvm::StringRef getFileName() const;
 
   /// Print the contents of this headermap to stderr.
   void dump() const;
 
   /// Return key for specifed path.
-  StringRef reverseLookupFilename(StringRef DestPath) const;
+  llvm::StringRef reverseLookupFilename(llvm::StringRef DestPath) const;
 
 private:
   unsigned getEndianAdjustedWord(unsigned X) const;
@@ -74,7 +74,7 @@ private:
 
   /// Look up the specified string in the string table.  If the string index is
   /// not valid, return std::nullopt.
-  std::optional<StringRef> getString(unsigned StrTabIdx) const;
+  std::optional<llvm::StringRef> getString(unsigned StrTabIdx) const;
 };
 
 /// This class represents an Apple concept known as a 'header map'.  To the

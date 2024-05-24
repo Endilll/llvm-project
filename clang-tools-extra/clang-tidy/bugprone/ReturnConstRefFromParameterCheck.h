@@ -21,7 +21,7 @@ namespace clang::tidy::bugprone {
 /// http://clang.llvm.org/extra/clang-tidy/checks/bugprone/return-const-ref-from-parameter.html
 class ReturnConstRefFromParameterCheck : public ClangTidyCheck {
 public:
-  ReturnConstRefFromParameterCheck(StringRef Name, ClangTidyContext *Context)
+  ReturnConstRefFromParameterCheck(llvm::StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;

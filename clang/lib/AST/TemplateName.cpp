@@ -67,7 +67,7 @@ void SubstTemplateTemplateParmStorage::Profile(
 }
 
 SubstTemplateTemplateParmPackStorage::SubstTemplateTemplateParmPackStorage(
-    ArrayRef<TemplateArgument> ArgPack, Decl *AssociatedDecl, unsigned Index,
+    llvm::ArrayRef<TemplateArgument> ArgPack, Decl *AssociatedDecl, unsigned Index,
     bool Final)
     : UncommonTemplateNameStorage(SubstTemplateTemplateParmPack, Index,
                                   ArgPack.size()),
@@ -290,7 +290,7 @@ void TemplateName::Profile(llvm::FoldingSetNodeID &ID) {
     ID.AddPointer(Storage.getOpaqueValue());
 }
 
-void TemplateName::print(raw_ostream &OS, const PrintingPolicy &Policy,
+void TemplateName::print(llvm::raw_ostream &OS, const PrintingPolicy &Policy,
                          Qualified Qual) const {
   auto Kind = getKind();
   TemplateDecl *Template = nullptr;
@@ -368,7 +368,7 @@ const StreamingDiagnostic &clang::operator<<(const StreamingDiagnostic &DB,
   return DB << NameStr;
 }
 
-void TemplateName::dump(raw_ostream &OS) const {
+void TemplateName::dump(llvm::raw_ostream &OS) const {
   LangOptions LO;  // FIXME!
   LO.CPlusPlus = true;
   LO.Bool = true;

@@ -24,10 +24,10 @@ public:
       : Check(Check), SM(SM) {}
 
   void InclusionDirective(SourceLocation HashLoc, const Token &IncludeTok,
-                          StringRef FileName, bool IsAngled,
+                          llvm::StringRef FileName, bool IsAngled,
                           CharSourceRange FilenameRange,
-                          OptionalFileEntryRef File, StringRef SearchPath,
-                          StringRef RelativePath, const Module *SuggestedModule,
+                          OptionalFileEntryRef File, llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath, const Module *SuggestedModule,
                           bool ModuleImported,
                           SrcMgr::CharacteristicKind FileType) override;
   void EndOfMainFile() override;
@@ -56,7 +56,7 @@ void IncludeOrderCheck::registerPPCallbacks(const SourceManager &SM,
   PP->addPPCallbacks(::std::make_unique<IncludeOrderPPCallbacks>(*this, SM));
 }
 
-static int getPriority(StringRef Filename, bool IsAngled, bool IsMainModule) {
+static int getPriority(llvm::StringRef Filename, bool IsAngled, bool IsMainModule) {
   // We leave the main module header at the top.
   if (IsMainModule)
     return 0;
@@ -80,9 +80,9 @@ static int getPriority(StringRef Filename, bool IsAngled, bool IsMainModule) {
 }
 
 void IncludeOrderPPCallbacks::InclusionDirective(
-    SourceLocation HashLoc, const Token &IncludeTok, StringRef FileName,
+    SourceLocation HashLoc, const Token &IncludeTok, llvm::StringRef FileName,
     bool IsAngled, CharSourceRange FilenameRange, OptionalFileEntryRef File,
-    StringRef SearchPath, StringRef RelativePath, const Module *SuggestedModule,
+    llvm::StringRef SearchPath, llvm::StringRef RelativePath, const Module *SuggestedModule,
     bool ModuleImported, SrcMgr::CharacteristicKind FileType) {
   // We recognize the first include as a special main module header and want
   // to leave it in the top position.
@@ -166,7 +166,7 @@ void IncludeOrderPPCallbacks::EndOfMainFile() {
         const char *FromData = SM.getCharacterData(FromLoc);
         unsigned FromLen = std::strcspn(FromData, "\n");
 
-        StringRef FixedName(FromData, FromLen);
+        llvm::StringRef FixedName(FromData, FromLen);
 
         SourceLocation ToLoc = FileDirectives[I].Range.getBegin();
         const char *ToData = SM.getCharacterData(ToLoc);

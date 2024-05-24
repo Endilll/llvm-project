@@ -15,12 +15,12 @@ using namespace clang::ast_matchers;
 
 namespace clang::tidy::modernize {
 
-static constexpr std::array<StringRef, 5> DeprecatedTypes = {
+static constexpr std::array<llvm::StringRef, 5> DeprecatedTypes = {
     "::std::ios_base::io_state", "::std::ios_base::open_mode",
     "::std::ios_base::seek_dir", "::std::ios_base::streamoff",
     "::std::ios_base::streampos"};
 
-static std::optional<const char *> getReplacementType(StringRef Type) {
+static std::optional<const char *> getReplacementType(llvm::StringRef Type) {
   return llvm::StringSwitch<std::optional<const char *>>(Type)
       .Case("io_state", "iostate")
       .Case("open_mode", "openmode")
@@ -41,7 +41,7 @@ void DeprecatedIosBaseAliasesCheck::check(
   SourceManager &SM = *Result.SourceManager;
 
   const auto *Typedef = Result.Nodes.getNodeAs<TypedefDecl>("TypeDecl");
-  StringRef TypeName = Typedef->getName();
+  llvm::StringRef TypeName = Typedef->getName();
   auto Replacement = getReplacementType(TypeName);
 
   const auto *TL = Result.Nodes.getNodeAs<TypeLoc>("TypeLoc");

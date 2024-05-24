@@ -35,7 +35,7 @@ const char *getTokenTypeName(TokenType Type) {
 }
 
 // Sorted common C++ non-keyword types.
-static SmallVector<StringRef> CppNonKeywordTypes = {
+static llvm::SmallVector<llvm::StringRef> CppNonKeywordTypes = {
     "clock_t",  "int16_t",   "int32_t", "int64_t",   "int8_t",
     "intptr_t", "ptrdiff_t", "size_t",  "time_t",    "uint16_t",
     "uint32_t", "uint64_t",  "uint8_t", "uintptr_t",
@@ -191,11 +191,11 @@ void CommaSeparatedList::precomputeFormattingInfos(const FormatToken *Token) {
   FormatToken *ItemBegin = Token->Next;
   while (ItemBegin->isTrailingComment())
     ItemBegin = ItemBegin->Next;
-  SmallVector<bool, 8> MustBreakBeforeItem;
+  llvm::SmallVector<bool, 8> MustBreakBeforeItem;
 
   // The lengths of an item if it is put at the end of the line. This includes
   // trailing comments which are otherwise ignored for column alignment.
-  SmallVector<unsigned, 8> EndOfLineItemLength;
+  llvm::SmallVector<unsigned, 8> EndOfLineItemLength;
   MustBreakBeforeItem.reserve(Commas.size() + 1);
   EndOfLineItemLength.reserve(Commas.size() + 1);
   ItemLengths.reserve(Commas.size() + 1);
@@ -257,7 +257,7 @@ void CommaSeparatedList::precomputeFormattingInfos(const FormatToken *Token) {
   // We can never place more than ColumnLimit / 3 items in a row (because of the
   // spaces and the comma).
   unsigned MaxItems = Style.ColumnLimit / 3;
-  SmallVector<unsigned> MinSizeInColumn;
+  llvm::SmallVector<unsigned> MinSizeInColumn;
   MinSizeInColumn.reserve(MaxItems);
   for (unsigned Columns = 1; Columns <= MaxItems; ++Columns) {
     ColumnFormat Format;

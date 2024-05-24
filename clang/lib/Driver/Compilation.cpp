@@ -58,14 +58,14 @@ Compilation::~Compilation() {
 }
 
 const DerivedArgList &
-Compilation::getArgsForToolChain(const ToolChain *TC, StringRef BoundArch,
+Compilation::getArgsForToolChain(const ToolChain *TC, llvm::StringRef BoundArch,
                                  Action::OffloadKind DeviceOffloadKind) {
   if (!TC)
     TC = &DefaultToolChain;
 
   DerivedArgList *&Entry = TCArgs[{TC, BoundArch, DeviceOffloadKind}];
   if (!Entry) {
-    SmallVector<Arg *, 4> AllocatedArgs;
+    llvm::SmallVector<Arg *, 4> AllocatedArgs;
     DerivedArgList *OpenMPArgs = nullptr;
     // Translate OpenMP toolchain arguments provided via the -Xopenmp-target flags.
     if (DeviceOffloadKind == Action::OFK_OpenMP) {
@@ -165,7 +165,7 @@ int Compilation::ExecuteCommand(const Command &C,
                                 bool LogOnly) const {
   if ((getDriver().CCPrintOptions ||
        getArgs().hasArg(options::OPT_v)) && !getDriver().CCGenDiagnostics) {
-    raw_ostream *OS = &llvm::errs();
+    llvm::raw_ostream *OS = &llvm::errs();
     std::unique_ptr<llvm::raw_fd_ostream> OwnedStream;
 
     // Follow gcc implementation of CC_PRINT_OPTIONS; we could also cache the
@@ -210,7 +210,7 @@ int Compilation::ExecuteCommand(const Command &C,
   return ExecutionFailed ? 1 : Res;
 }
 
-using FailingCommandList = SmallVectorImpl<std::pair<int, const Command *>>;
+using FailingCommandList = llvm::SmallVectorImpl<std::pair<int, const Command *>>;
 
 static bool ActionFailed(const Action *A,
                          const FailingCommandList &FailingCommands) {
@@ -302,10 +302,10 @@ void Compilation::initCompilationForDiagnostics() {
   ForceKeepTempFiles = true;
 }
 
-StringRef Compilation::getSysRoot() const {
+llvm::StringRef Compilation::getSysRoot() const {
   return getDriver().SysRoot;
 }
 
-void Compilation::Redirect(ArrayRef<std::optional<StringRef>> Redirects) {
+void Compilation::Redirect(llvm::ArrayRef<std::optional<llvm::StringRef>> Redirects) {
   this->Redirects = Redirects;
 }

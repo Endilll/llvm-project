@@ -1495,7 +1495,7 @@ public:
     if (!CS)
       return;
     const Stmt *S = CS->getStmt();
-    SmallVector<BoundNodes, 1> Matches =
+    llvm::SmallVector<BoundNodes, 1> Matches =
         match(callExpr(callee(functionDecl(hasName("makeTop")))).bind("top"),
               *S, getASTContext());
     if (const auto *E = selectFirst<CallExpr>("top", Matches)) {

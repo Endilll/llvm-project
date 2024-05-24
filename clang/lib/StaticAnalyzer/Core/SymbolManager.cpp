@@ -35,21 +35,21 @@ using namespace ento;
 
 void SymExpr::anchor() {}
 
-StringRef SymbolConjured::getKindStr() const { return "conj_$"; }
-StringRef SymbolDerived::getKindStr() const { return "derived_$"; }
-StringRef SymbolExtent::getKindStr() const { return "extent_$"; }
-StringRef SymbolMetadata::getKindStr() const { return "meta_$"; }
-StringRef SymbolRegionValue::getKindStr() const { return "reg_$"; }
+llvm::StringRef SymbolConjured::getKindStr() const { return "conj_$"; }
+llvm::StringRef SymbolDerived::getKindStr() const { return "derived_$"; }
+llvm::StringRef SymbolExtent::getKindStr() const { return "extent_$"; }
+llvm::StringRef SymbolMetadata::getKindStr() const { return "meta_$"; }
+llvm::StringRef SymbolRegionValue::getKindStr() const { return "reg_$"; }
 
 LLVM_DUMP_METHOD void SymExpr::dump() const { dumpToStream(llvm::errs()); }
 
-void BinarySymExpr::dumpToStreamImpl(raw_ostream &OS, const SymExpr *Sym) {
+void BinarySymExpr::dumpToStreamImpl(llvm::raw_ostream &OS, const SymExpr *Sym) {
   OS << '(';
   Sym->dumpToStream(OS);
   OS << ')';
 }
 
-void BinarySymExpr::dumpToStreamImpl(raw_ostream &OS,
+void BinarySymExpr::dumpToStreamImpl(llvm::raw_ostream &OS,
                                      const llvm::APSInt &Value) {
   if (Value.isUnsigned())
     OS << Value.getZExtValue();
@@ -59,18 +59,18 @@ void BinarySymExpr::dumpToStreamImpl(raw_ostream &OS,
     OS << 'U';
 }
 
-void BinarySymExpr::dumpToStreamImpl(raw_ostream &OS,
+void BinarySymExpr::dumpToStreamImpl(llvm::raw_ostream &OS,
                                      BinaryOperator::Opcode Op) {
   OS << ' ' << BinaryOperator::getOpcodeStr(Op) << ' ';
 }
 
-void SymbolCast::dumpToStream(raw_ostream &os) const {
+void SymbolCast::dumpToStream(llvm::raw_ostream &os) const {
   os << '(' << ToTy << ") (";
   Operand->dumpToStream(os);
   os << ')';
 }
 
-void UnarySymExpr::dumpToStream(raw_ostream &os) const {
+void UnarySymExpr::dumpToStream(llvm::raw_ostream &os) const {
   os << UnaryOperator::getOpcodeStr(Op);
   bool Binary = isa<BinarySymExpr>(Operand);
   if (Binary)
@@ -80,7 +80,7 @@ void UnarySymExpr::dumpToStream(raw_ostream &os) const {
     os << ')';
 }
 
-void SymbolConjured::dumpToStream(raw_ostream &os) const {
+void SymbolConjured::dumpToStream(llvm::raw_ostream &os) const {
   os << getKindStr() << getSymbolID() << '{' << T << ", LC" << LCtx->getID();
   if (S)
     os << ", S" << S->getID(LCtx->getDecl()->getASTContext());
@@ -89,22 +89,22 @@ void SymbolConjured::dumpToStream(raw_ostream &os) const {
   os << ", #" << Count << '}';
 }
 
-void SymbolDerived::dumpToStream(raw_ostream &os) const {
+void SymbolDerived::dumpToStream(llvm::raw_ostream &os) const {
   os << getKindStr() << getSymbolID() << '{' << getParentSymbol() << ','
      << getRegion() << '}';
 }
 
-void SymbolExtent::dumpToStream(raw_ostream &os) const {
+void SymbolExtent::dumpToStream(llvm::raw_ostream &os) const {
   os << getKindStr() << getSymbolID() << '{' << getRegion() << '}';
 }
 
-void SymbolMetadata::dumpToStream(raw_ostream &os) const {
+void SymbolMetadata::dumpToStream(llvm::raw_ostream &os) const {
   os << getKindStr() << getSymbolID() << '{' << getRegion() << ',' << T << '}';
 }
 
 void SymbolData::anchor() {}
 
-void SymbolRegionValue::dumpToStream(raw_ostream &os) const {
+void SymbolRegionValue::dumpToStream(llvm::raw_ostream &os) const {
   os << getKindStr() << getSymbolID() << '<' << getType() << ' ' << R << '>';
 }
 

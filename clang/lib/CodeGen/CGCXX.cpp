@@ -129,7 +129,7 @@ bool CodeGenModule::TryEmitBaseDestructorAsAlias(const CXXDestructorDecl *D) {
       getFunctionLinkage(TargetDecl);
 
   // Check if we have it already.
-  StringRef MangledName = getMangledName(AliasDecl);
+  llvm::StringRef MangledName = getMangledName(AliasDecl);
   llvm::GlobalValue *Entry = GetGlobalValue(MangledName);
   if (Entry && !Entry->isDeclaration())
     return false;

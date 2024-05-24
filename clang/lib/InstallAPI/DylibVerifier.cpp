@@ -45,13 +45,13 @@ struct DylibVerifier::DWARFContext {
   DylibReader::SymbolToSourceLocMap SourceLocs{};
 };
 
-static bool isCppMangled(StringRef Name) {
+static bool isCppMangled(llvm::StringRef Name) {
   // InstallAPI currently only supports itanium manglings.
   return (Name.starts_with("_Z") || Name.starts_with("__Z") ||
           Name.starts_with("___Z"));
 }
 
-static std::string demangle(StringRef Name) {
+static std::string demangle(llvm::StringRef Name) {
   // InstallAPI currently only supports itanium manglings.
   if (!isCppMangled(Name))
     return Name.str();
@@ -69,7 +69,7 @@ std::string DylibVerifier::getAnnotatedName(const Record *R,
                                             bool ValidSourceLoc) {
   assert(!SymCtx.SymbolName.empty() && "Expected symbol name");
 
-  const StringRef SymbolName = SymCtx.SymbolName;
+  const llvm::StringRef SymbolName = SymCtx.SymbolName;
   std::string PrettyName =
       (Demangle && (SymCtx.Kind == EncodeKind::GlobalSymbol))
           ? demangle(SymbolName)
@@ -99,7 +99,7 @@ std::string DylibVerifier::getAnnotatedName(const Record *R,
   // tied to it. This can only ever happen when the location has to come from
   // debug info.
   if (ValidSourceLoc) {
-    StringRef PrettyNameRef(PrettyName);
+    llvm::StringRef PrettyNameRef(PrettyName);
     if ((SymCtx.Kind == EncodeKind::GlobalSymbol) &&
         !isCppMangled(SymbolName) && PrettyNameRef.starts_with("_"))
       return Annotation + PrettyNameRef.drop_front(1).str();
@@ -148,7 +148,7 @@ static bool shouldIgnorePrivateExternAttr(const Decl *D) {
   return false;
 }
 
-Record *findRecordFromSlice(const RecordsSlice *Slice, StringRef Name,
+Record *findRecordFromSlice(const RecordsSlice *Slice, llvm::StringRef Name,
                             EncodeKind Kind) {
   switch (Kind) {
   case EncodeKind::GlobalSymbol:
@@ -239,7 +239,7 @@ bool DylibVerifier::compareObjCInterfaceSymbols(const Record *R,
     return true;
 
   auto PrintDiagnostic = [&](auto SymLinkage, const Record *Record,
-                             StringRef SymName, bool PrintAsWarning = false) {
+                             llvm::StringRef SymName, bool PrintAsWarning = false) {
     if (SymLinkage == RecordLinkage::Unknown)
       Ctx.emitDiag([&]() {
         Ctx.Diag->Report(SymCtx.FA->Loc, PrintAsWarning
@@ -513,7 +513,7 @@ void DylibVerifier::setTarget(const Target &T) {
 }
 
 void DylibVerifier::setSourceManager(
-    IntrusiveRefCntPtr<SourceManager> SourceMgr) {
+    llvm::IntrusiveRefCntPtr<SourceManager> SourceMgr) {
   if (!Ctx.Diag)
     return;
   SourceManagers.push_back(std::move(SourceMgr));
@@ -522,7 +522,7 @@ void DylibVerifier::setSourceManager(
 
 DylibVerifier::Result DylibVerifier::verify(ObjCIVarRecord *R,
                                             const FrontendAttrs *FA,
-                                            const StringRef SuperClass) {
+                                            const llvm::StringRef SuperClass) {
   if (R->isVerified())
     return getState();
 
@@ -594,7 +594,7 @@ void DylibVerifier::VerifierContext::emitDiag(llvm::function_ref<void()> Report,
 // file.
 // InstallAPI doesn't warn about weak-defined RTTI, because this doesn't affect
 // static linking and so can be ignored for text-api files.
-static bool shouldIgnoreCpp(StringRef Name, bool IsWeakDef) {
+static bool shouldIgnoreCpp(llvm::StringRef Name, bool IsWeakDef) {
   return (IsWeakDef &&
           (Name.starts_with("__ZTI") || Name.starts_with("__ZTS")));
 }
@@ -613,7 +613,7 @@ void DylibVerifier::visitSymbolInDylib(const Record &R, SymbolContext &SymCtx) {
 
   // Allow zippered symbols with potentially mismatching availability
   // between macOS and macCatalyst in the final text-api file.
-  const StringRef SymbolName(SymCtx.SymbolName);
+  const llvm::StringRef SymbolName(SymCtx.SymbolName);
   if (const Symbol *Sym = Exports->findSymbol(SymCtx.Kind, SymCtx.SymbolName,
                                               SymCtx.ObjCIFKind)) {
     if (Sym->hasArchitecture(Ctx.Target.Arch)) {
@@ -739,7 +739,7 @@ void DylibVerifier::visitGlobal(const GlobalRecord &R) {
 }
 
 void DylibVerifier::visitObjCIVar(const ObjCIVarRecord &R,
-                                  const StringRef Super) {
+                                  const llvm::StringRef Super) {
   SymbolContext SymCtx;
   SymCtx.SymbolName = ObjCIVarRecord::createScopedName(Super, R.getName());
   SymCtx.Kind = EncodeKind::ObjectiveCInstanceVariable;
@@ -804,7 +804,7 @@ DylibVerifier::Result DylibVerifier::verifyRemainingSymbols() {
   return getState();
 }
 
-bool DylibVerifier::verifyBinaryAttrs(const ArrayRef<Target> ProvidedTargets,
+bool DylibVerifier::verifyBinaryAttrs(const llvm::ArrayRef<Target> ProvidedTargets,
                                       const BinaryAttrs &ProvidedBA,
                                       const LibAttrs &ProvidedReexports,
                                       const LibAttrs &ProvidedClients,
@@ -820,13 +820,13 @@ bool DylibVerifier::verifyBinaryAttrs(const ArrayRef<Target> ProvidedTargets,
   for (const std::shared_ptr<RecordsSlice> &RS : Dylib) {
     DylibTargets.push_back(RS->getTarget());
     const BinaryAttrs &BinInfo = RS->getBinaryAttrs();
-    for (const StringRef LibName : BinInfo.RexportedLibraries)
+    for (const llvm::StringRef LibName : BinInfo.RexportedLibraries)
       DylibReexports[LibName].set(DylibTargets.back().Arch);
-    for (const StringRef LibName : BinInfo.AllowableClients)
+    for (const llvm::StringRef LibName : BinInfo.AllowableClients)
       DylibClients[LibName].set(DylibTargets.back().Arch);
     // Compare attributes that are only representable in >= TBD_V5.
     if (FT >= FileType::TBD_V5)
-      for (const StringRef Name : BinInfo.RPaths)
+      for (const llvm::StringRef Name : BinInfo.RPaths)
         DylibRPaths[Name].set(DylibTargets.back().Arch);
   }
 

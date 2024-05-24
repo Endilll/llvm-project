@@ -113,7 +113,7 @@ TEST_P(ASTMatchersTest, TranslationUnitDecl) {
     // C++.
     return;
   }
-  StringRef Code = "int MyVar1;\n"
+  llvm::StringRef Code = "int MyVar1;\n"
                    "namespace NameSpace {\n"
                    "int MyVar2;\n"
                    "}  // namespace NameSpace\n";
@@ -278,7 +278,7 @@ TEST_P(ASTMatchersTest, UsesADL) {
 
   StatementMatcher ADLMatch = callExpr(usesADL());
   StatementMatcher ADLMatchOper = cxxOperatorCallExpr(usesADL());
-  StringRef NS_Str = R"cpp(
+  llvm::StringRef NS_Str = R"cpp(
   namespace NS {
     struct X {};
     void f(X);
@@ -289,7 +289,7 @@ TEST_P(ASTMatchersTest, UsesADL) {
   void operator+(MyX, MyX);
 )cpp";
 
-  auto MkStr = [&](StringRef Body) {
+  auto MkStr = [&](llvm::StringRef Body) {
     return (NS_Str + "void test_fn() { " + Body + " }").str();
   };
 
@@ -802,7 +802,7 @@ TEST_P(ASTMatchersTest, Matcher_BindTemporaryExpression) {
 
   StatementMatcher TempExpression = traverse(TK_AsIs, cxxBindTemporaryExpr());
 
-  StringRef ClassString = "class string { public: string(); ~string(); }; ";
+  llvm::StringRef ClassString = "class string { public: string(); ~string(); }; ";
 
   EXPECT_TRUE(matches(
       ClassString + "string GetStringByValue();"
@@ -847,7 +847,7 @@ TEST_P(ASTMatchersTest, MaterializeTemporaryExpr_MatchesTemporary) {
     return;
   }
 
-  StringRef ClassString = "class string { public: string(); int length(); }; ";
+  llvm::StringRef ClassString = "class string { public: string(); int length(); }; ";
   StatementMatcher TempExpression =
       traverse(TK_AsIs, materializeTemporaryExpr());
 
@@ -1268,7 +1268,7 @@ TEST_P(ASTMatchersTest, CXXFunctionalCastExpr_MatchesSimpleCase) {
   if (!GetParam().isCXX()) {
     return;
   }
-  StringRef foo_class = "class Foo { public: Foo(const char*); };";
+  llvm::StringRef foo_class = "class Foo { public: Foo(const char*); };";
   EXPECT_TRUE(matches(foo_class + "void r() { Foo f = Foo(\"hello world\"); }",
                       cxxFunctionalCastExpr()));
 }
@@ -1277,7 +1277,7 @@ TEST_P(ASTMatchersTest, CXXFunctionalCastExpr_DoesNotMatchOtherCasts) {
   if (!GetParam().isCXX()) {
     return;
   }
-  StringRef FooClass = "class Foo { public: Foo(const char*); };";
+  llvm::StringRef FooClass = "class Foo { public: Foo(const char*); };";
   EXPECT_TRUE(
       notMatches(FooClass + "void r() { Foo f = (Foo) \"hello world\"; }",
                  cxxFunctionalCastExpr()));
@@ -1426,7 +1426,7 @@ TEST_P(ASTMatchersTest,
   if (!GetParam().isCXX11OrLater()) {
     return;
   }
-  StringRef code = "namespace std {"
+  llvm::StringRef code = "namespace std {"
                    "template <typename> class initializer_list {"
                    "  public: initializer_list() noexcept {}"
                    "};"
@@ -1721,7 +1721,7 @@ TEST_P(ASTMatchersTest, PointerType) {
   EXPECT_TRUE(matches("int* b; int* * const a = &b;",
                       loc(qualType(isConstQualified(), pointerType()))));
 
-  StringRef Fragment = "int *ptr;";
+  llvm::StringRef Fragment = "int *ptr;";
   EXPECT_TRUE(notMatches(Fragment,
                          varDecl(hasName("ptr"), hasType(blockPointerType()))));
   EXPECT_TRUE(notMatches(
@@ -1736,7 +1736,7 @@ TEST_P(ASTMatchersTest, PointerType_CXX) {
   if (!GetParam().isCXX()) {
     return;
   }
-  StringRef Fragment = "struct A { int i; }; int A::* ptr = &A::i;";
+  llvm::StringRef Fragment = "struct A { int i; }; int A::* ptr = &A::i;";
   EXPECT_TRUE(notMatches(Fragment,
                          varDecl(hasName("ptr"), hasType(blockPointerType()))));
   EXPECT_TRUE(
@@ -1769,7 +1769,7 @@ TEST_P(ASTMatchersTest, PointerType_CXX11) {
   if (!GetParam().isCXX11OrLater()) {
     return;
   }
-  StringRef Fragment = "int &&ref = 2;";
+  llvm::StringRef Fragment = "int &&ref = 2;";
   EXPECT_TRUE(notMatches(Fragment,
                          varDecl(hasName("ref"), hasType(blockPointerType()))));
   EXPECT_TRUE(notMatches(
@@ -1789,7 +1789,7 @@ TEST_P(ASTMatchersTest, AutoRefTypes) {
     return;
   }
 
-  StringRef Fragment = "auto a = 1;"
+  llvm::StringRef Fragment = "auto a = 1;"
                        "auto b = a;"
                        "auto &c = a;"
                        "auto &&d = c;"
@@ -1920,7 +1920,7 @@ TEST_P(ASTMatchersTest, SubstTemplateTypeParmType) {
   if (!GetParam().isCXX()) {
     return;
   }
-  StringRef code = "template <typename T>"
+  llvm::StringRef code = "template <typename T>"
                    "int F() {"
                    "  return 1 + T();"
                    "}"
@@ -1953,7 +1953,7 @@ TEST_P(ASTMatchersTest, NestedNameSpecifier) {
 
 TEST_P(ASTMatchersTest, Attr) {
   // Windows adds some implicit attributes.
-  bool AutomaticAttributes = StringRef(GetParam().Target).contains("win32");
+  bool AutomaticAttributes = llvm::StringRef(GetParam().Target).contains("win32");
   if (GetParam().isCXX11OrLater()) {
     EXPECT_TRUE(matches("struct [[clang::warn_unused_result]] F{};", attr()));
 
@@ -2129,7 +2129,7 @@ TEST_P(ASTMatchersTest, TypeAliasTemplateDecl) {
   if (!GetParam().isCXX11OrLater()) {
     return;
   }
-  StringRef Code = R"(
+  llvm::StringRef Code = R"(
     template <typename T>
     class X { T t; };
 
@@ -2491,7 +2491,7 @@ TEST(ASTMatchersTestObjC, ObjCMessageExpr) {
   // Don't find ObjCMessageExpr where none are present.
   EXPECT_TRUE(notMatchesObjC("", objcMessageExpr(anything())));
 
-  StringRef Objc1String = "@interface Str "
+  llvm::StringRef Objc1String = "@interface Str "
                           " - (Str *)uppercaseString;"
                           "@end "
                           "@interface foo "
@@ -2534,7 +2534,7 @@ TEST(ASTMatchersTestObjC, ObjCMessageExpr) {
 
 TEST(ASTMatchersTestObjC, ObjCStringLiteral) {
 
-  StringRef Objc1String = "@interface NSObject "
+  llvm::StringRef Objc1String = "@interface NSObject "
                           "@end "
                           "@interface NSString "
                           "@end "
@@ -2553,7 +2553,7 @@ TEST(ASTMatchersTestObjC, ObjCStringLiteral) {
 }
 
 TEST(ASTMatchersTestObjC, ObjCDecls) {
-  StringRef ObjCString = "@protocol Proto "
+  llvm::StringRef ObjCString = "@protocol Proto "
                          "- (void)protoDidThing; "
                          "@end "
                          "@interface Thing "
@@ -2584,7 +2584,7 @@ TEST(ASTMatchersTestObjC, ObjCDecls) {
 }
 
 TEST(ASTMatchersTestObjC, ObjCExceptionStmts) {
-  StringRef ObjCString = "void f(id obj) {"
+  llvm::StringRef ObjCString = "void f(id obj) {"
                          "  @try {"
                          "    @throw obj;"
                          "  } @catch (...) {"
@@ -2598,7 +2598,7 @@ TEST(ASTMatchersTestObjC, ObjCExceptionStmts) {
 }
 
 TEST(ASTMatchersTest, DecompositionDecl) {
-  StringRef Code = R"cpp(
+  llvm::StringRef Code = R"cpp(
 void foo()
 {
     int arr[3];
@@ -2629,34 +2629,34 @@ void foo()
 }
 
 TEST(ASTMatchersTestObjC, ObjCAutoreleasePoolStmt) {
-  StringRef ObjCString = "void f() {"
+  llvm::StringRef ObjCString = "void f() {"
                          "@autoreleasepool {"
                          "  int x = 1;"
                          "}"
                          "}";
   EXPECT_TRUE(matchesObjC(ObjCString, autoreleasePoolStmt()));
-  StringRef ObjCStringNoPool = "void f() { int x = 1; }";
+  llvm::StringRef ObjCStringNoPool = "void f() { int x = 1; }";
   EXPECT_FALSE(matchesObjC(ObjCStringNoPool, autoreleasePoolStmt()));
 }
 
 TEST(ASTMatchersTestOpenMP, OMPExecutableDirective) {
   auto Matcher = stmt(ompExecutableDirective());
 
-  StringRef Source0 = R"(
+  llvm::StringRef Source0 = R"(
 void x() {
 #pragma omp parallel
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source0, Matcher));
 
-  StringRef Source1 = R"(
+  llvm::StringRef Source1 = R"(
 void x() {
 #pragma omp taskyield
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source1, Matcher));
 
-  StringRef Source2 = R"(
+  llvm::StringRef Source2 = R"(
 void x() {
 ;
 })";
@@ -2666,41 +2666,41 @@ void x() {
 TEST(ASTMatchersTestOpenMP, OMPDefaultClause) {
   auto Matcher = ompExecutableDirective(hasAnyClause(ompDefaultClause()));
 
-  StringRef Source0 = R"(
+  llvm::StringRef Source0 = R"(
 void x() {
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source0, Matcher));
 
-  StringRef Source1 = R"(
+  llvm::StringRef Source1 = R"(
 void x() {
 #pragma omp parallel
 ;
 })";
   EXPECT_TRUE(notMatchesWithOpenMP(Source1, Matcher));
 
-  StringRef Source2 = R"(
+  llvm::StringRef Source2 = R"(
 void x() {
 #pragma omp parallel default(none)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source2, Matcher));
 
-  StringRef Source3 = R"(
+  llvm::StringRef Source3 = R"(
 void x() {
 #pragma omp parallel default(shared)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP(Source3, Matcher));
 
-  StringRef Source4 = R"(
+  llvm::StringRef Source4 = R"(
 void x() {
 #pragma omp parallel default(firstprivate)
 ;
 })";
   EXPECT_TRUE(matchesWithOpenMP51(Source4, Matcher));
 
-  StringRef Source5 = R"(
+  llvm::StringRef Source5 = R"(
 void x(int x) {
 #pragma omp parallel num_threads(x)
 ;
@@ -2721,7 +2721,7 @@ TEST(ASTMatchersTest, Finder_DynamicOnlyAcceptsSomeMatchers) {
 }
 
 TEST(MatchFinderAPI, MatchesDynamic) {
-  StringRef SourceCode = "struct A { void f() {} };";
+  llvm::StringRef SourceCode = "struct A { void f() {} };";
   auto Matcher = functionDecl(isDefinition()).bind("method");
 
   auto astUnit = tooling::buildASTFromCode(SourceCode);

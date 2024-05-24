@@ -156,7 +156,7 @@ private:
   bool processLinkerOptions(llvm::opt::InputArgList &Args);
   bool processFrontendOptions(llvm::opt::InputArgList &Args);
   std::vector<const char *>
-  processAndFilterOutInstallAPIOptions(ArrayRef<const char *> Args);
+  processAndFilterOutInstallAPIOptions(llvm::ArrayRef<const char *> Args);
   bool processInstallAPIXOptions(llvm::opt::InputArgList &Args);
   bool processXarchOption(llvm::opt::InputArgList &Args, arg_iterator Curr);
   bool processXplatformOption(llvm::opt::InputArgList &Args, arg_iterator Curr);
@@ -177,7 +177,7 @@ public:
 
   /// \brief Constructor for options.
   Options(clang::DiagnosticsEngine &Diag, FileManager *FM,
-          ArrayRef<const char *> Args, const StringRef ProgName);
+          llvm::ArrayRef<const char *> Args, const llvm::StringRef ProgName);
 
   /// \brief Get CC1 arguments after extracting out the irrelevant
   /// ones.

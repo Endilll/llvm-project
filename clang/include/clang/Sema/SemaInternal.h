@@ -83,7 +83,7 @@ getDepthAndIndex(UnexpandedParameterPack UPP) {
 }
 
 class TypoCorrectionConsumer : public VisibleDeclConsumer {
-  typedef SmallVector<TypoCorrection, 1> TypoResultList;
+  typedef llvm::SmallVector<TypoCorrection, 1> TypoResultList;
   typedef llvm::StringMap<TypoResultList> TypoResultsMap;
   typedef std::map<unsigned, TypoResultsMap> TypoEditDistanceMap;
 
@@ -112,8 +112,8 @@ public:
   // Methods for adding potential corrections to the consumer.
   void FoundDecl(NamedDecl *ND, NamedDecl *Hiding, DeclContext *Ctx,
                  bool InBaseClass) override;
-  void FoundName(StringRef Name);
-  void addKeywordResult(StringRef Keyword);
+  void FoundName(llvm::StringRef Name);
+  void addKeywordResult(llvm::StringRef Keyword);
   void addCorrection(TypoCorrection Correction);
 
   bool empty() const {
@@ -122,7 +122,7 @@ public:
 
   /// Return the list of TypoCorrections for the given identifier from
   /// the set of corrections that have the closest edit distance, if any.
-  TypoResultList &operator[](StringRef Name) {
+  TypoResultList &operator[](llvm::StringRef Name) {
     return CorrectionResults.begin()->second[Name];
   }
 
@@ -216,14 +216,14 @@ private:
       unsigned EditDistance;
     };
 
-    typedef SmallVector<DeclContext*, 4> DeclContextList;
-    typedef SmallVector<SpecifierInfo, 16> SpecifierInfoList;
+    typedef llvm::SmallVector<DeclContext*, 4> DeclContextList;
+    typedef llvm::SmallVector<SpecifierInfo, 16> SpecifierInfoList;
 
     ASTContext &Context;
     DeclContextList CurContextChain;
     std::string CurNameSpecifier;
-    SmallVector<const IdentifierInfo*, 4> CurContextIdentifiers;
-    SmallVector<const IdentifierInfo*, 4> CurNameSpecifierIdentifiers;
+    llvm::SmallVector<const IdentifierInfo*, 4> CurContextIdentifiers;
+    llvm::SmallVector<const IdentifierInfo*, 4> CurNameSpecifierIdentifiers;
 
     std::map<unsigned, SpecifierInfoList> DistanceMap;
 
@@ -278,7 +278,7 @@ private:
     iterator end() { return iterator(*this, /*IsAtEnd=*/true); }
   };
 
-  void addName(StringRef Name, NamedDecl *ND,
+  void addName(llvm::StringRef Name, NamedDecl *ND,
                NestedNameSpecifier *NNS = nullptr, bool isKeyword = false);
 
   /// Find any visible decls for the given typo correction candidate.
@@ -302,7 +302,7 @@ private:
   /// whether there is a keyword with this name.
   TypoEditDistanceMap CorrectionResults;
 
-  SmallVector<TypoCorrection, 4> ValidatedCorrections;
+  llvm::SmallVector<TypoCorrection, 4> ValidatedCorrections;
   size_t CurrentTCIndex;
   size_t SavedTCIndex;
 
@@ -313,7 +313,7 @@ private:
   DeclContext *MemberContext;
   LookupResult Result;
   NamespaceSpecifierSet Namespaces;
-  SmallVector<TypoCorrection, 2> QualifiedResults;
+  llvm::SmallVector<TypoCorrection, 2> QualifiedResults;
   bool EnteringContext;
   bool SearchNamespaces;
 };
