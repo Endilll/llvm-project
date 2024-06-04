@@ -12,6 +12,7 @@
 #include "lldb/Core/IOHandler.h"
 #include "lldb/DataFormatters/DataVisualization.h"
 #include "lldb/DataFormatters/FormatClasses.h"
+#include "lldb/DataFormatters/TypeRecognizer.h"
 #include "lldb/Host/Config.h"
 #include "lldb/Host/OptionParser.h"
 #include "lldb/Interpreter/CommandInterpreter.h"
@@ -32,6 +33,7 @@
 #include "lldb/Utility/ConstString.h"
 #include "lldb/Utility/RegularExpression.h"
 #include "lldb/Utility/StringList.h"
+#include "lldb/lldb-private-enumerations.h"
 
 #include "llvm/ADT/STLExtras.h"
 
@@ -74,6 +76,20 @@ public:
         m_match_type(match_type), m_category(catg) {}
 
   typedef std::shared_ptr<SynthAddOptions> SharedPointer;
+};
+
+class TypeRecognizerAddOptions {
+public:
+  TypeRecognizerImpl::Flags m_flags;
+  FormatterMatchType m_match_type;
+  StringList m_target_types;
+  std::string m_category;
+
+  TypeRecognizerAddOptions(TypeRecognizerImpl::Flags flags,
+                           FormatterMatchType match_type, std::string catg)
+      : m_flags(flags), m_match_type(match_type), m_category(catg) {}
+
+  typedef std::shared_ptr<TypeRecognizerAddOptions> SharedPointer;
 };
 
 static bool WarnOnPotentialUnquotedUnsignedType(Args &command,
@@ -506,6 +522,60 @@ public:
   bool AddSynth(ConstString type_name, lldb::SyntheticChildrenSP entry,
                 FormatterMatchType match_type, std::string category_name,
                 Status *error);
+};
+
+// CommandObjectTypeRecognizerAdd
+
+#define LLDB_OPTIONS_type_recognizer_add
+#include "CommandOptions.inc"
+
+class CommandObjectTypeRecognizerAdd : public CommandObjectParsed,
+                                       public IOHandlerDelegateMultiline {
+private:
+  class CommandOptions : public Options {
+  public:
+    CommandOptions(CommandInterpreter &interpreter) {}
+    ~CommandOptions() override = default;
+
+    Status SetOptionValue(uint32_t option_idx, llvm::StringRef option_arg,
+                          ExecutionContext *execution_context) override;
+
+    void OptionParsingStarting(ExecutionContext *execution_context) override;
+
+    llvm::ArrayRef<OptionDefinition> GetDefinitions() override;
+
+    TypeRecognizerImpl::Flags m_flags;
+    std::string m_category;
+    FormatterMatchType m_match_type;
+    std::string m_python_function;
+    bool handwrite_python;
+    bool is_function_based;
+  };
+
+  CommandOptions m_options;
+
+  Options *GetOptions() override { return &m_options; }
+
+  bool Execute_HandwritePython(Args &command, CommandReturnObject &result);
+
+  void Execute_PythonFunction(Args &command, CommandReturnObject &result);
+
+protected:
+  void DoExecute(Args &command, CommandReturnObject &result) override;
+
+  void IOHandlerActivated(IOHandler &io_handler, bool interactive) override;
+
+  void IOHandlerInputComplete(IOHandler &io_handler,
+                              std::string &data) override;
+
+public:
+  CommandObjectTypeRecognizerAdd(CommandInterpreter &interpreter);
+
+  ~CommandObjectTypeRecognizerAdd() override = default;
+
+  void AddTypeRecognizer(ConstString type_name, TypeRecognizerImplSP entry,
+                         FormatterMatchType match_type,
+                         std::string category_name, Status *error);
 };
 
 // CommandObjectTypeFormatAdd
@@ -1658,137 +1728,6 @@ protected:
   }
 };
 
-// CommandObjectTypeRecognizerAdd
-#define LLDB_OPTIONS_type_recognizer_add
-#include "CommandOptions.inc"
-
-class CommandObjectTypeRecognizerAdd : public CommandObjectParsed {
-private:
-  class CommandOptions : public Options {
-  public:
-    CommandOptions(CommandInterpreter &interpreter) {}
-    ~CommandOptions() override = default;
-
-    Status SetOptionValue(uint32_t option_idx, llvm::StringRef option_arg,
-                          ExecutionContext *execution_context) override {
-      Status error;
-      const int short_option = m_getopt_table[option_idx].val;
-      // bool success;
-      switch (short_option) {
-      case 'F':
-        m_python_function = std::string(option_arg);
-        break;
-      case 'x':
-        m_match_type = eFormatterMatchRegex;
-        break;
-      default:
-        llvm_unreachable("Unimplemented option");
-      }
-
-      return error;
-    }
-
-    void OptionParsingStarting(ExecutionContext *execution_context) override {
-      m_match_type = eFormatterMatchRegex;
-      m_python_function = "";
-    }
-
-    llvm::ArrayRef<OptionDefinition> GetDefinitions() override {
-      return llvm::ArrayRef(g_type_recognizer_add_options);
-    }
-
-    TypeRecognizerImpl::Flags m_flags;
-    FormatterMatchType m_match_type;
-    std::string m_python_function;
-  };
-
-  CommandOptions m_options;
-
-  Options *GetOptions() override { return &m_options; }
-
-public:
-  CommandObjectTypeRecognizerAdd(CommandInterpreter &interpreter)
-  : CommandObjectParsed(interpreter, "type recognizer add", "Add new dynamic type recognizer for a type."),
-    m_options(interpreter) {
-      CommandArgumentEntry type_arg;
-      CommandArgumentData type_style_arg;
-
-      type_style_arg.arg_type = eArgTypeName;
-      type_style_arg.arg_repetition = eArgRepeatPlus;
-
-      type_arg.push_back(type_style_arg);
-
-      m_arguments.push_back(type_arg);
-    }
-
-  ~CommandObjectTypeRecognizerAdd() override = default;
-
-  void AddTypeRecognizer(ConstString type_name, TypeRecognizerImplSP entry, FormatterMatchType match_type, Status *error) {
-    lldb::TypeCategoryImplSP category;
-    DataVisualization::Categories::GetCategory(ConstString("default"), category);
-
-    if (match_type == eFormatterMatchRegex) {
-      RegularExpression typeRX(type_name.GetStringRef());
-      if (!typeRX.IsValid()) {
-        if (error)
-          error->SetErrorString("regex format error (maybe this is not really a regex?)");
-        return;
-      }
-    }
-
-    category->AddTypeRecognizer(type_name.GetStringRef(), match_type, entry);
-  } 
-
-protected:
-  void DoExecute(Args &command, CommandReturnObject &result) override {
-    WarnOnPotentialUnquotedUnsignedType(command, result);
-
-    const size_t argc = command.GetArgumentCount();
-
-    if (argc < 1) {
-      result.AppendErrorWithFormat("%s takes one or more args.\n", m_cmd_name.c_str());
-      return;
-    }
-
-    TypeRecognizerImplSP script_recognizer;
-
-    if (!m_options.m_python_function.empty()) { // we have a Python function ready to use
-      const char *funct_name = m_options.m_python_function.c_str();
-      if (!funct_name || !funct_name[0]) {
-        result.AppendError("function name empty.\n");
-        return;
-      }
-
-      std::string code =
-        ("    " + m_options.m_python_function + "(valobj,internal_dict)");
-      script_recognizer = std::make_shared<TypeRecognizerImpl>(m_options.m_flags, funct_name, code.c_str());
-
-      ScriptInterpreter *interpreter = GetDebugger().GetScriptInterpreter();
-
-      if (interpreter && !interpreter->CheckObjectExists(funct_name))
-      result.AppendWarningWithFormat(
-          "The provided function \"%s\" does not exist - "
-          "please define it before attempting to use this type recognizer.\n",
-          funct_name);
-    }
-
-    // if I am here, script_format must point to something good, so I can add
-    // that as a dynamic type recognizer to all interested parties
-
-    Status error;
-
-    for (auto &entry : command.entries()) {
-      AddTypeRecognizer(ConstString(entry.ref()), script_recognizer, m_options.m_match_type, &error);
-      if (error.Fail()) {
-        result.AppendError(error.AsCString());
-        return;
-      }
-    }
-
-    return;
-  }
-};
-
 // CommandObjectTypeCategoryDefine
 #define LLDB_OPTIONS_type_category_define
 #include "CommandOptions.inc"
@@ -2198,6 +2137,17 @@ public:
             "Show a list of current synthetic providers.") {}
 };
 
+// CommandObjectTypeRecognizerList
+
+class CommandObjectTypeRecognizerList
+    : public CommandObjectTypeFormatterList<TypeRecognizerImpl> {
+public:
+  CommandObjectTypeRecognizerList(CommandInterpreter &interpreter)
+      : CommandObjectTypeFormatterList(
+            interpreter, "type recognizer list",
+            "Show a list of current recognizer providers.") {}
+};
+
 // CommandObjectTypeFilterDelete
 
 class CommandObjectTypeFilterDelete : public CommandObjectTypeFormatterDelete {
@@ -2220,6 +2170,17 @@ public:
   ~CommandObjectTypeSynthDelete() override = default;
 };
 
+// CommandObjectTypeRecognizerDelete
+
+class CommandObjectTypeRecognizerDelete : public CommandObjectTypeFormatterDelete {
+public:
+  CommandObjectTypeRecognizerDelete(CommandInterpreter &interpreter)
+      : CommandObjectTypeFormatterDelete(
+            interpreter, eFormatCategoryItemRecognizer) {}
+
+  ~CommandObjectTypeRecognizerDelete() override = default;
+};
+
 
 // CommandObjectTypeFilterClear
 
@@ -2239,6 +2200,16 @@ public:
       : CommandObjectTypeFormatterClear(
             interpreter, eFormatCategoryItemSynth, "type synthetic clear",
             "Delete all existing synthetic providers.") {}
+};
+
+// CommandObjectTypeRecognizerClear
+
+class CommandObjectTypeRecognizerClear : public CommandObjectTypeFormatterClear {
+public:
+  CommandObjectTypeRecognizerClear(CommandInterpreter &interpreter)
+      : CommandObjectTypeFormatterClear(
+            interpreter, eFormatCategoryItemRecognizer, "type recognizer clear",
+            "Delete all existing recognizer providers.") {}
 };
 
 bool CommandObjectTypeSynthAdd::Execute_HandwritePython(
@@ -2391,6 +2362,300 @@ bool CommandObjectTypeSynthAdd::AddSynth(ConstString type_name,
 
   category->AddTypeSynthetic(type_name.GetStringRef(), match_type, entry);
   return true;
+}
+
+Status CommandObjectTypeRecognizerAdd::CommandOptions::SetOptionValue(
+    uint32_t option_idx, llvm::StringRef option_arg,
+    ExecutionContext *execution_context) {
+  Status error;
+  const int short_option = m_getopt_table[option_idx].val;
+  bool success;
+
+  switch (short_option) {
+  case 'C':
+    m_flags.SetCascades(OptionArgParser::ToBoolean(option_arg, true, &success));
+    if (!success)
+      error.SetErrorStringWithFormat("invalid value for cascade: %s",
+                                     option_arg.str().c_str());
+    break;
+  case 'P':
+    handwrite_python = true;
+    break;
+  case 'F':
+    m_python_function = std::string(option_arg);
+    is_function_based = true;
+    break;
+  case 'w':
+    m_category = std::string(option_arg);
+    break;
+  case 'p':
+    m_flags.SetSkipPointers(true);
+    break;
+  case 'r':
+    m_flags.SetSkipReferences(true);
+    break;
+  case 'x':
+    if (m_match_type == eFormatterMatchCallback)
+      error.SetErrorString(
+          "can't use --regex and --recognizer-function at the same time");
+    else
+      m_match_type = eFormatterMatchRegex;
+    break;
+  case '\x01':
+    if (m_match_type == eFormatterMatchRegex)
+      error.SetErrorString(
+          "can't use --regex and --recognizer-function at the same time");
+    else
+      m_match_type = eFormatterMatchCallback;
+    break;
+  default:
+    llvm_unreachable("Unimplemented option");
+  }
+
+  return error;
+}
+
+void CommandObjectTypeRecognizerAdd::CommandOptions::OptionParsingStarting(
+    ExecutionContext *execution_context) {
+  m_flags.Clear().SetCascades().SetSkipPointers(false).SetSkipReferences(false);
+
+  m_category = "default";
+  m_match_type = eFormatterMatchExact;
+  m_python_function = "";
+  handwrite_python = false;
+  is_function_based = false;
+}
+
+llvm::ArrayRef<OptionDefinition>
+CommandObjectTypeRecognizerAdd::CommandOptions::GetDefinitions() {
+  return llvm::ArrayRef(g_type_recognizer_add_options);
+}
+
+bool CommandObjectTypeRecognizerAdd::Execute_HandwritePython(
+    Args &command, CommandReturnObject &result) {
+  auto options = std::make_unique<TypeRecognizerAddOptions>(
+      m_options.m_flags, m_options.m_match_type, m_options.m_category);
+
+  for (auto &entry : command.entries()) {
+    if (entry.ref().empty()) {
+      result.AppendError("empty typenames not allowed");
+      return false;
+    }
+
+    options->m_target_types << std::string(entry.ref());
+  }
+
+  m_interpreter.GetPythonCommandsFromIOHandler(
+      "    ",             // Prompt
+      *this,              // IOHandlerDelegate
+      options.release()); // Baton for the "io_handler" that will be passed
+                          // back into our IOHandlerDelegate functions
+  result.SetStatus(eReturnStatusSuccessFinishNoResult);
+  return result.Succeeded();
+}
+
+void CommandObjectTypeRecognizerAdd::Execute_PythonFunction(
+    Args &command, CommandReturnObject &result) {
+  const size_t argc = command.GetArgumentCount();
+
+  if (argc < 1) {
+    result.AppendErrorWithFormat("%s takes one or more args.\n",
+                                 m_cmd_name.c_str());
+    return;
+  }
+
+  TypeRecognizerImplSP script_recognizer;
+
+  // we have a Python function ready to use
+  if (!m_options.m_python_function.empty()) {
+    const char *funct_name = m_options.m_python_function.c_str();
+    if (!funct_name || !funct_name[0]) {
+      result.AppendError("function name empty.\n");
+      return;
+    }
+
+    std::string code =
+        ("    " + m_options.m_python_function + "(valobj,internal_dict)");
+    script_recognizer = std::make_shared<TypeRecognizerImpl>(
+        m_options.m_flags, funct_name, code.c_str());
+
+    ScriptInterpreter *interpreter = GetDebugger().GetScriptInterpreter();
+
+    if (interpreter && !interpreter->CheckObjectExists(funct_name)) {
+      result.AppendWarningWithFormat(
+          "The provided function \"%s\" does not exist - "
+          "please define it before attempting to use this type recognizer.\n",
+          funct_name);
+    }
+  }
+
+  // if I am here, script_format must point to something good, so I can add
+  // that as a dynamic type recognizer to all interested parties
+
+  lldb::TypeCategoryImplSP category;
+  DataVisualization::Categories::GetCategory(
+      ConstString(m_options.m_category.c_str()), category);
+
+  Status error;
+
+  for (auto &entry : command.entries()) {
+    AddTypeRecognizer(ConstString(entry.ref()), script_recognizer,
+                      m_options.m_match_type, m_options.m_category, &error);
+    if (error.Fail()) {
+      result.AppendError(error.AsCString());
+      return;
+    }
+  }
+
+  result.SetStatus(eReturnStatusSuccessFinishNoResult);
+  return;
+}
+
+void CommandObjectTypeRecognizerAdd::DoExecute(Args &command,
+                                               CommandReturnObject &result) {
+  WarnOnPotentialUnquotedUnsignedType(command, result);
+
+  if (m_options.handwrite_python) {
+    Execute_HandwritePython(command, result);
+  } else if (m_options.is_function_based) {
+    Execute_PythonFunction(command, result);
+  } else {
+    result.AppendError("must either provide a children list, a Python class "
+                       "name, or use -P and type a Python function "
+                       "line-by-line");
+  }
+}
+
+void CommandObjectTypeRecognizerAdd::IOHandlerActivated(IOHandler &io_handler,
+                                                        bool interactive) {
+  static const char *g_type_recognizer_addreader_instructions =
+      "Enter your Python command(s). Type 'DONE' to end.\n"
+      "def function (valobj,internal_dict):\n"
+      "     \"\"\"valobj: an SBValue which you want to provide a summary "
+      "for\n"
+      "        internal_dict: an LLDB support object not to be used\"\"\"\n";
+
+  StreamFileSP output_sp(io_handler.GetOutputStreamFileSP());
+  if (output_sp && interactive) {
+    output_sp->PutCString(g_type_recognizer_addreader_instructions);
+    output_sp->Flush();
+  }
+}
+
+void CommandObjectTypeRecognizerAdd::IOHandlerInputComplete(
+    IOHandler &io_handler, std::string &data) {
+  StreamFileSP error_sp = io_handler.GetErrorStreamFileSP();
+
+#if LLDB_ENABLE_PYTHON
+  ScriptInterpreter *interpreter = GetDebugger().GetScriptInterpreter();
+  if (interpreter) {
+    StringList lines;
+    lines.SplitIntoLines(data);
+    if (lines.GetSize() > 0) {
+      TypeRecognizerAddOptions *options_ptr =
+          ((TypeRecognizerAddOptions *)io_handler.GetUserData());
+      if (options_ptr) {
+        TypeRecognizerAddOptions::SharedPointer options(
+            options_ptr); // this will ensure that we get rid of the pointer
+                          // when going out of scope
+
+        ScriptInterpreter *interpreter = GetDebugger().GetScriptInterpreter();
+        if (interpreter) {
+          std::string funct_name_str;
+          if (interpreter->GenerateTypeScriptFunction(lines, funct_name_str)) {
+            if (funct_name_str.empty()) {
+              error_sp->Printf("unable to obtain a valid function name from "
+                               "the script interpreter.\n");
+              error_sp->Flush();
+            } else {
+              // now I have a valid function name, let's add this as script
+              // for every type in the list
+
+              TypeRecognizerImplSP script_recognizer;
+              script_recognizer = std::make_shared<TypeRecognizerImpl>(
+                  options->m_flags, funct_name_str.c_str(),
+                  lines.CopyList("    ").c_str());
+
+              Status error;
+
+              for (const std::string &type_name : options->m_target_types) {
+                if (!type_name.empty()) {
+                  AddTypeRecognizer(ConstString(type_name), script_recognizer,
+                                    options->m_match_type, options->m_category,
+                                    &error);
+                  if (error.Fail()) {
+                    error_sp->Printf("error: %s\n", error.AsCString());
+                    error_sp->Flush();
+                    break;
+                  };
+                } else {
+                  error_sp->Printf("error: invalid type name.\n");
+                  error_sp->Flush();
+                  break;
+                }
+              }
+            }
+          } else {
+            error_sp->Printf("error: unable to generate a function.\n");
+            error_sp->Flush();
+          }
+        } else {
+          error_sp->Printf("error: no script interpreter.\n");
+          error_sp->Flush();
+        }
+      } else {
+        error_sp->Printf("error: internal synchronization information "
+                         "missing or invalid.\n");
+        error_sp->Flush();
+      }
+    } else {
+      error_sp->Printf("error: empty function, didn't add python command.\n");
+      error_sp->Flush();
+    }
+  } else {
+    error_sp->Printf(
+        "error: script interpreter missing, didn't add python command.\n");
+    error_sp->Flush();
+  }
+#endif
+  io_handler.SetIsDone(true);
+}
+
+CommandObjectTypeRecognizerAdd::CommandObjectTypeRecognizerAdd(
+    CommandInterpreter &interpreter)
+    : CommandObjectParsed(interpreter, "type recognizer add",
+                          "Add new dynamic type recognizer for a type."),
+      IOHandlerDelegateMultiline("DONE"), m_options(interpreter) {
+  CommandArgumentEntry type_arg;
+  CommandArgumentData type_style_arg;
+
+  type_style_arg.arg_type = eArgTypeName;
+  type_style_arg.arg_repetition = eArgRepeatPlus;
+
+  type_arg.push_back(type_style_arg);
+
+  m_arguments.push_back(type_arg);
+}
+
+void CommandObjectTypeRecognizerAdd::AddTypeRecognizer(
+    ConstString type_name, TypeRecognizerImplSP entry,
+    FormatterMatchType match_type, std::string category_name, Status *error) {
+  lldb::TypeCategoryImplSP category;
+  DataVisualization::Categories::GetCategory(ConstString(category_name.c_str()),
+                                             category);
+
+  if (match_type == eFormatterMatchRegex) {
+    RegularExpression typeRX(type_name.GetStringRef());
+    if (!typeRX.IsValid()) {
+      if (error) {
+        error->SetErrorString(
+            "regex format error (maybe this is not really a regex?)");
+      }
+      return;
+    }
+  }
+
+  category->AddTypeRecognizer(type_name.GetStringRef(), match_type, entry);
 }
 
 #define LLDB_OPTIONS_type_filter_add
@@ -3034,18 +3299,19 @@ public:
             "type summary [<sub-command-options>] ") {
     LoadSubCommand(
         "add", CommandObjectSP(new CommandObjectTypeRecognizerAdd(interpreter)));
-  //   LoadSubCommand("clear", CommandObjectSP(new CommandObjectTypeSummaryClear(
-  //                               interpreter)));
-  //   LoadSubCommand("delete", CommandObjectSP(new CommandObjectTypeSummaryDelete(
-  //                                interpreter)));
-  //   LoadSubCommand(
-  //       "list", CommandObjectSP(new CommandObjectTypeSummaryList(interpreter)));
-  //   LoadSubCommand(
-  //       "info", CommandObjectSP(new CommandObjectFormatterInfo<TypeSummaryImpl>(
-  //                   interpreter, "summary",
-  //                   [](ValueObject &valobj) -> TypeSummaryImpl::SharedPointer {
-  //                     return valobj.GetSummaryFormat();
-  //                   })));
+    LoadSubCommand(
+        "clear", CommandObjectSP(new CommandObjectTypeRecognizerClear(interpreter)));
+    LoadSubCommand("delete", CommandObjectSP(new CommandObjectTypeRecognizerDelete(
+                                 interpreter)));
+    LoadSubCommand(
+        "list", CommandObjectSP(new CommandObjectTypeRecognizerList(interpreter)));
+    LoadSubCommand(
+        "info",
+        CommandObjectSP(new CommandObjectFormatterInfo<TypeRecognizerImpl>(
+            interpreter, "recognizer",
+            [](ValueObject &valobj) -> TypeRecognizerImpl::SharedPointer {
+              return valobj.GetTypeRecognizer();
+            })));
   }
 
   ~CommandObjectTypeRecognizer() override = default;

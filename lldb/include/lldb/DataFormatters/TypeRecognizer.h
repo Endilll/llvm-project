@@ -43,10 +43,10 @@ public:
       return *this;
     }
 
-    // Flags &Clear() {
-    //   m_flags = 0;
-    //   return *this;
-    // }
+    Flags &Clear() {
+      m_flags = 0;
+      return *this;
+    }
 
     bool GetCascades() const {
       return (m_flags & lldb::eTypeOptionCascade) == lldb::eTypeOptionCascade;
@@ -123,7 +123,7 @@ public:
   TypeRecognizerImpl(const Flags &flags,
                      const char *function_name,
                      const char *python_script = nullptr)
-    : m_function_name(), m_python_script()
+    : m_flags(flags), m_function_name(), m_python_script()
   {
     if (function_name)
       m_function_name.assign(function_name);
@@ -140,6 +140,16 @@ public:
   bool SkipsReferences() const { return m_flags.GetSkipReferences(); }
 
   bool NonCacheable() const { return m_flags.GetNonCacheable(); }
+
+  std::string GetDescription() {
+    StreamString sstr;
+    sstr.Printf("%s%s%s Python function %s", Cascades() ? "" : " (not cascading)",
+                SkipsPointers() ? " (skip pointers)" : "",
+                SkipsReferences() ? " (skip references)" : "",
+                m_function_name.c_str());
+
+    return std::string(sstr.GetString());
+  }
 
   typedef std::shared_ptr<TypeRecognizerImpl> SharedPointer;
 

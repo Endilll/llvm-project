@@ -745,6 +745,11 @@ class CommandLineCompletionTestCase(TestBase):
         self.runCmd("type synthetic add -x Hoo -l test")
         self.complete_from_to("type synthetic delete ", ["Hoo"])
 
+        self.runCmd("type recognizer add Ioo -F test")
+        self.complete_from_to("type recognizer delete ", ["Ioo"])
+        self.runCmd("type recognizer add -x Joo -F test")
+        self.complete_from_to("type recognizer delete ", ["Joo"])
+
     def test_register_no_complete(self):
         # The tab completion for "register read/write"  won't work without a running process.
         self.complete_from_to("register read ", "register read ")
