@@ -131,25 +131,26 @@ class StringMapEntryProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return 2
+        # Adding 'Key' and 'Value' children
+        return self.value.GetNumChildren() + 2
 
     @trace
     def get_child_index(self, name: str) -> int:
         print(f" name: {name}", end="")
         if name == "Key":
-            return 0
-        if name == "Value":
             return 1
-        return -1
+        if name == "Value":
+            return 2
+        return self.value.GetIndexOfChildWithName(name)
 
     @trace
     def get_child_at_index(self, index: int) -> Optional[SBValue]:
         print(f" index: {index}", end="")
-        if index == 0:
-            return self.key_value
         if index == 1:
+            return self.key_value
+        if index == 2:
             return self.value_value
-        return None
+        return self.value.GetChildAtIndex(index)
 
     @trace
     def update(self) -> bool:
