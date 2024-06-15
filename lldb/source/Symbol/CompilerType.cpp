@@ -274,6 +274,13 @@ bool CompilerType::IsPossibleDynamicType(CompilerType *dynamic_pointee_type,
   return false;
 }
 
+bool CompilerType::IsRecognizeableType() const {
+  if (IsValid())
+    if (auto type_system_sp = GetTypeSystem())
+      return type_system_sp->IsRecognizeableType(m_type);
+  return false;
+}
+
 bool CompilerType::IsScalarType() const {
   if (IsValid())
     if (auto type_system_sp = GetTypeSystem())

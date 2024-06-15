@@ -174,6 +174,8 @@ public:
   bool IsPossibleDynamicType(CompilerType *target_type, bool check_cplusplus,
                              bool check_objc) const;
 
+  bool IsRecognizeableType() const;
+
   bool IsPointerToScalarType() const;
 
   bool IsRuntimeGeneratedType() const;

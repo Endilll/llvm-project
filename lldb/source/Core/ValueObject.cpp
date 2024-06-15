@@ -1985,7 +1985,7 @@ void ValueObject::CalculateDynamicValue(DynamicValueType use_dynamic) {
   // Returns boolean that indicates whether we should proceed with the default
   // vtable-based method.
   auto try_type_recognizer = [&]() -> bool {
-    if (!this->GetCompilerType().IsPossibleDynamicType(nullptr, true, false)){
+    if (!this->GetCompilerType().IsRecognizeableType()) {
       return false;
     }
     lldb::TypeRecognizerImplSP current_type_recognizer_sp(m_type_recognizer_sp);

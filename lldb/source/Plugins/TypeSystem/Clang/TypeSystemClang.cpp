@@ -3664,6 +3664,24 @@ bool TypeSystemClang::IsPossibleDynamicType(lldb::opaque_compiler_type_t type,
   return false;
 }
 
+bool TypeSystemClang::IsRecognizeableType(lldb::opaque_compiler_type_t type) {
+  clang::QualType pointee_qual_type;
+  if (type) {
+    clang::QualType qual_type = RemoveWrappingTypes(GetCanonicalQualType(type));
+    const clang::Type::TypeClass type_class = qual_type->getTypeClass();
+    switch (type_class) {
+    case clang::Type::Pointer:
+    case clang::Type::LValueReference:
+    case clang::Type::RValueReference:
+      return true;
+
+    default:
+      return false;
+    }
+  }
+  return false;
+}
+
 bool TypeSystemClang::IsScalarType(lldb::opaque_compiler_type_t type) {
   if (!type)
     return false;

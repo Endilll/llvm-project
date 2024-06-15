@@ -705,6 +705,8 @@ public:
                              CompilerType *target_type, // Can pass nullptr
                              bool check_cplusplus, bool check_objc) override;
 
+  bool IsRecognizeableType(lldb::opaque_compiler_type_t type) override;
+
   bool IsRuntimeGeneratedType(lldb::opaque_compiler_type_t type) override;
 
   bool IsPointerType(lldb::opaque_compiler_type_t type,

@@ -197,6 +197,8 @@ public:
                                      CompilerType *target_type, // Can pass NULL
                                      bool check_cplusplus, bool check_objc) = 0;
 
+  virtual bool IsRecognizeableType(lldb::opaque_compiler_type_t type) = 0;
+
   virtual bool IsPointerType(lldb::opaque_compiler_type_t type,
                              CompilerType *pointee_type) = 0;
 
