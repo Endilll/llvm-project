@@ -2528,8 +2528,7 @@ bool ScriptInterpreterPythonImpl::LoadScriptingModule(
 
   auto ExtendSysPath = [&](std::string directory) -> llvm::Error {
     if (directory.empty()) {
-      return llvm::make_error<llvm::StringError>(
-          "invalid directory name", llvm::inconvertibleErrorCode());
+      return llvm::createStringError("invalid directory name");
     }
 
     replace_all(directory, "\\", "\\\\");
@@ -2542,10 +2541,8 @@ bool ScriptInterpreterPythonImpl::LoadScriptingModule(
                           directory.c_str(), directory.c_str());
     bool syspath_retval =
         ExecuteMultipleLines(command_stream.GetData(), exc_options).Success();
-    if (!syspath_retval) {
-      return llvm::make_error<llvm::StringError>(
-          "Python sys.path handling failed", llvm::inconvertibleErrorCode());
-    }
+    if (!syspath_retval)
+      return llvm::createStringError("Python sys.path handling failed");
 
     return llvm::Error::success();
   };

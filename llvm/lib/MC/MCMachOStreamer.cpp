@@ -519,11 +519,13 @@ void MCMachOStreamer::finishImpl() {
   // Set the fragment atom associations by tracking the last seen atom defining
   // symbol.
   for (MCSection &Sec : getAssembler()) {
+    cast<MCSectionMachO>(Sec).allocAtoms();
     const MCSymbol *CurrentAtom = nullptr;
+    size_t I = 0;
     for (MCFragment &Frag : Sec) {
       if (const MCSymbol *Symbol = DefiningSymbolMap.lookup(&Frag))
         CurrentAtom = Symbol;
-      Frag.setAtom(CurrentAtom);
+      cast<MCSectionMachO>(Sec).setAtom(I++, CurrentAtom);
     }
   }
 
@@ -564,7 +566,7 @@ MCStreamer *llvm::createMachOStreamer(MCContext &Context,
                                       std::unique_ptr<MCAsmBackend> &&MAB,
                                       std::unique_ptr<MCObjectWriter> &&OW,
                                       std::unique_ptr<MCCodeEmitter> &&CE,
-                                      bool RelaxAll, bool DWARFMustBeAtTheEnd,
+                                      bool DWARFMustBeAtTheEnd,
                                       bool LabelSections) {
   MCMachOStreamer *S =
       new MCMachOStreamer(Context, std::move(MAB), std::move(OW), std::move(CE),
@@ -574,8 +576,6 @@ MCStreamer *llvm::createMachOStreamer(MCContext &Context,
       Target, Context.getObjectFileInfo()->getSDKVersion(),
       Context.getObjectFileInfo()->getDarwinTargetVariantTriple(),
       Context.getObjectFileInfo()->getDarwinTargetVariantSDKVersion());
-  if (RelaxAll)
-    S->getAssembler().setRelaxAll(true);
   return S;
 }
 

@@ -6,6 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/LLVMContext.h"
@@ -347,6 +349,9 @@ using ::llvm::memprof::IndexedMemProfRecord;
 using ::llvm::memprof::MemInfoBlock;
 using FrameIdMapTy =
     llvm::DenseMap<::llvm::memprof::FrameId, ::llvm::memprof::Frame>;
+using CallStackIdMapTy =
+    llvm::DenseMap<::llvm::memprof::CallStackId,
+                   ::llvm::SmallVector<::llvm::memprof::FrameId>>;
 
 static FrameIdMapTy getFrameMapping() {
   FrameIdMapTy Mapping;
@@ -359,18 +364,60 @@ static FrameIdMapTy getFrameMapping() {
   return Mapping;
 }
 
+static CallStackIdMapTy getCallStackMapping() {
+  CallStackIdMapTy Mapping;
+  Mapping.insert({0x111, {0, 1}});
+  Mapping.insert({0x222, {2, 3}});
+  Mapping.insert({0x333, {4, 5}});
+  return Mapping;
+}
+
+// Populate all of the fields of MIB.
+MemInfoBlock makeFullMIB() {
+  MemInfoBlock MIB;
+#define MIBEntryDef(NameTag, Name, Type) MIB.NameTag;
+#include "llvm/ProfileData/MIBEntryDef.inc"
+#undef MIBEntryDef
+  return MIB;
+}
+
+// Populate those fields returned by getHotColdSchema.
+MemInfoBlock makePartialMIB() {
+  MemInfoBlock MIB;
+  MIB.AllocCount = 1;
+  MIB.TotalSize = 5;
+  MIB.TotalLifetime = 10;
+  MIB.TotalLifetimeAccessDensity = 23;
+  return MIB;
+}
+
 IndexedMemProfRecord makeRecord(
     std::initializer_list<std::initializer_list<::llvm::memprof::FrameId>>
         AllocFrames,
     std::initializer_list<std::initializer_list<::llvm::memprof::FrameId>>
         CallSiteFrames,
-    const MemInfoBlock &Block = MemInfoBlock()) {
+    const MemInfoBlock &Block = makeFullMIB()) {
   llvm::memprof::IndexedMemProfRecord MR;
   for (const auto &Frames : AllocFrames)
     MR.AllocSites.emplace_back(Frames, llvm::memprof::hashCallStack(Frames),
                                Block);
   for (const auto &Frames : CallSiteFrames)
     MR.CallSites.push_back(Frames);
+  return MR;
+}
+
+IndexedMemProfRecord
+makeRecordV2(std::initializer_list<::llvm::memprof::CallStackId> AllocFrames,
+             std::initializer_list<::llvm::memprof::CallStackId> CallSiteFrames,
+             const MemInfoBlock &Block, const memprof::MemProfSchema &Schema) {
+  llvm::memprof::IndexedMemProfRecord MR;
+  for (const auto &CSId : AllocFrames)
+    // We don't populate IndexedAllocationInfo::CallStack because we use it only
+    // in Version0 and Version1.
+    MR.AllocSites.emplace_back(::llvm::SmallVector<memprof::FrameId>(), CSId,
+                               Block, Schema);
+  for (const auto &CSId : CallSiteFrames)
+    MR.CallSiteIds.push_back(CSId);
   return MR;
 }
 
@@ -408,7 +455,7 @@ MATCHER_P(EqualsRecord, Want, "") {
   return true;
 }
 
-TEST_F(InstrProfTest, test_memprof) {
+TEST_F(InstrProfTest, test_memprof_v0) {
   ASSERT_THAT_ERROR(Writer.mergeProfileKind(InstrProfKind::MemProf),
                     Succeeded());
 
@@ -445,8 +492,92 @@ TEST_F(InstrProfTest, test_memprof) {
   };
 
   const memprof::MemProfRecord WantRecord(IndexedMR, IdToFrameCallback);
-  ASSERT_FALSE(LastUnmappedFrameId.has_value())
+  ASSERT_EQ(LastUnmappedFrameId, std::nullopt)
       << "could not map frame id: " << *LastUnmappedFrameId;
+  EXPECT_THAT(WantRecord, EqualsRecord(Record));
+}
+
+TEST_F(InstrProfTest, test_memprof_v2_full_schema) {
+  const MemInfoBlock MIB = makeFullMIB();
+
+  Writer.setMemProfVersionRequested(memprof::Version2);
+  Writer.setMemProfFullSchema(true);
+
+  ASSERT_THAT_ERROR(Writer.mergeProfileKind(InstrProfKind::MemProf),
+                    Succeeded());
+
+  const IndexedMemProfRecord IndexedMR = makeRecordV2(
+      /*AllocFrames=*/{0x111, 0x222},
+      /*CallSiteFrames=*/{0x333}, MIB, memprof::getFullSchema());
+  const FrameIdMapTy IdToFrameMap = getFrameMapping();
+  const auto CSIdToCallStackMap = getCallStackMapping();
+  for (const auto &I : IdToFrameMap) {
+    Writer.addMemProfFrame(I.first, I.getSecond(), Err);
+  }
+  for (const auto &I : CSIdToCallStackMap) {
+    Writer.addMemProfCallStack(I.first, I.getSecond(), Err);
+  }
+  Writer.addMemProfRecord(/*Id=*/0x9999, IndexedMR);
+
+  auto Profile = Writer.writeBuffer();
+  readProfile(std::move(Profile));
+
+  auto RecordOr = Reader->getMemProfRecord(0x9999);
+  ASSERT_THAT_ERROR(RecordOr.takeError(), Succeeded());
+  const memprof::MemProfRecord &Record = RecordOr.get();
+
+  memprof::FrameIdConverter<decltype(IdToFrameMap)> FrameIdConv(IdToFrameMap);
+  memprof::CallStackIdConverter<decltype(CSIdToCallStackMap)> CSIdConv(
+      CSIdToCallStackMap, FrameIdConv);
+
+  const ::llvm::memprof::MemProfRecord WantRecord =
+      IndexedMR.toMemProfRecord(CSIdConv);
+  ASSERT_EQ(FrameIdConv.LastUnmappedId, std::nullopt)
+      << "could not map frame id: " << *FrameIdConv.LastUnmappedId;
+  ASSERT_EQ(CSIdConv.LastUnmappedId, std::nullopt)
+      << "could not map call stack id: " << *CSIdConv.LastUnmappedId;
+  EXPECT_THAT(WantRecord, EqualsRecord(Record));
+}
+
+TEST_F(InstrProfTest, test_memprof_v2_partial_schema) {
+  const MemInfoBlock MIB = makePartialMIB();
+
+  Writer.setMemProfVersionRequested(memprof::Version2);
+  Writer.setMemProfFullSchema(false);
+
+  ASSERT_THAT_ERROR(Writer.mergeProfileKind(InstrProfKind::MemProf),
+                    Succeeded());
+
+  const IndexedMemProfRecord IndexedMR = makeRecordV2(
+      /*AllocFrames=*/{0x111, 0x222},
+      /*CallSiteFrames=*/{0x333}, MIB, memprof::getHotColdSchema());
+  const FrameIdMapTy IdToFrameMap = getFrameMapping();
+  const auto CSIdToCallStackMap = getCallStackMapping();
+  for (const auto &I : IdToFrameMap) {
+    Writer.addMemProfFrame(I.first, I.getSecond(), Err);
+  }
+  for (const auto &I : CSIdToCallStackMap) {
+    Writer.addMemProfCallStack(I.first, I.getSecond(), Err);
+  }
+  Writer.addMemProfRecord(/*Id=*/0x9999, IndexedMR);
+
+  auto Profile = Writer.writeBuffer();
+  readProfile(std::move(Profile));
+
+  auto RecordOr = Reader->getMemProfRecord(0x9999);
+  ASSERT_THAT_ERROR(RecordOr.takeError(), Succeeded());
+  const memprof::MemProfRecord &Record = RecordOr.get();
+
+  memprof::FrameIdConverter<decltype(IdToFrameMap)> FrameIdConv(IdToFrameMap);
+  memprof::CallStackIdConverter<decltype(CSIdToCallStackMap)> CSIdConv(
+      CSIdToCallStackMap, FrameIdConv);
+
+  const ::llvm::memprof::MemProfRecord WantRecord =
+      IndexedMR.toMemProfRecord(CSIdConv);
+  ASSERT_EQ(FrameIdConv.LastUnmappedId, std::nullopt)
+      << "could not map frame id: " << *FrameIdConv.LastUnmappedId;
+  ASSERT_EQ(CSIdConv.LastUnmappedId, std::nullopt)
+      << "could not map call stack id: " << *CSIdConv.LastUnmappedId;
   EXPECT_THAT(WantRecord, EqualsRecord(Record));
 }
 
@@ -520,22 +651,20 @@ TEST_F(InstrProfTest, test_memprof_merge) {
   ASSERT_THAT_ERROR(RecordOr.takeError(), Succeeded());
   const memprof::MemProfRecord &Record = RecordOr.get();
 
-  memprof::FrameId LastUnmappedFrameId = 0;
-  bool HasFrameMappingError = false;
+  std::optional<memprof::FrameId> LastUnmappedFrameId;
 
   auto IdToFrameCallback = [&](const memprof::FrameId Id) {
     auto Iter = IdToFrameMap.find(Id);
     if (Iter == IdToFrameMap.end()) {
       LastUnmappedFrameId = Id;
-      HasFrameMappingError = true;
       return memprof::Frame(0, 0, 0, false);
     }
     return Iter->second;
   };
 
   const memprof::MemProfRecord WantRecord(IndexedMR, IdToFrameCallback);
-  ASSERT_FALSE(HasFrameMappingError)
-      << "could not map frame id: " << LastUnmappedFrameId;
+  ASSERT_EQ(LastUnmappedFrameId, std::nullopt)
+      << "could not map frame id: " << *LastUnmappedFrameId;
   EXPECT_THAT(WantRecord, EqualsRecord(Record));
 }
 
@@ -738,13 +867,11 @@ TEST_P(InstrProfReaderWriterTest, icall_and_vtable_data_read_write) {
 
   // First indirect site.
   {
-    uint64_t TotalC;
-    auto VD = R->getValueForSite(IPVK_IndirectCallTarget, 0, &TotalC);
+    auto VD = R->getValueArrayForSite(IPVK_IndirectCallTarget, 0);
 
     EXPECT_EQ(VD[0].Count, 3U * getProfWeight());
     EXPECT_EQ(VD[1].Count, 2U * getProfWeight());
     EXPECT_EQ(VD[2].Count, 1U * getProfWeight());
-    EXPECT_EQ(TotalC, 6U * getProfWeight());
 
     EXPECT_STREQ((const char *)VD[0].Value, "callee3");
     EXPECT_STREQ((const char *)VD[1].Value, "callee2");
@@ -753,13 +880,11 @@ TEST_P(InstrProfReaderWriterTest, icall_and_vtable_data_read_write) {
 
   // First vtable site.
   {
-    uint64_t TotalC;
-    auto VD = R->getValueForSite(IPVK_VTableTarget, 0, &TotalC);
+    auto VD = R->getValueArrayForSite(IPVK_VTableTarget, 0);
 
     EXPECT_EQ(VD[0].Count, 3U * getProfWeight());
     EXPECT_EQ(VD[1].Count, 2U * getProfWeight());
     EXPECT_EQ(VD[2].Count, 1U * getProfWeight());
-    EXPECT_EQ(TotalC, 6U * getProfWeight());
 
     EXPECT_EQ(VD[0].Value, getCalleeAddress(vtable3));
     EXPECT_EQ(VD[1].Value, getCalleeAddress(vtable2));
@@ -768,12 +893,10 @@ TEST_P(InstrProfReaderWriterTest, icall_and_vtable_data_read_write) {
 
   // Second vtable site.
   {
-    uint64_t TotalC;
-    auto VD = R->getValueForSite(IPVK_VTableTarget, 1, &TotalC);
+    auto VD = R->getValueArrayForSite(IPVK_VTableTarget, 1);
 
     EXPECT_EQ(VD[0].Count, 2U * getProfWeight());
     EXPECT_EQ(VD[1].Count, 1U * getProfWeight());
-    EXPECT_EQ(TotalC, 3U * getProfWeight());
 
     EXPECT_EQ(VD[0].Value, getCalleeAddress(vtable2));
     EXPECT_EQ(VD[1].Value, getCalleeAddress(vtable1));
@@ -1002,7 +1125,7 @@ TEST_P(MaybeSparseInstrProfTest, icall_and_vtable_data_merge) {
 
   // Test the merged values for indirect calls.
   {
-    auto VD = R->getValueForSite(IPVK_IndirectCallTarget, 0);
+    auto VD = R->getValueArrayForSite(IPVK_IndirectCallTarget, 0);
     EXPECT_STREQ((const char *)VD[0].Value, "callee2");
     EXPECT_EQ(VD[0].Count, 7U);
     EXPECT_STREQ((const char *)VD[1].Value, "callee3");
@@ -1012,7 +1135,7 @@ TEST_P(MaybeSparseInstrProfTest, icall_and_vtable_data_merge) {
     EXPECT_STREQ((const char *)VD[3].Value, "callee1");
     EXPECT_EQ(VD[3].Count, 1U);
 
-    auto VD_2(R->getValueForSite(IPVK_IndirectCallTarget, 2));
+    auto VD_2 = R->getValueArrayForSite(IPVK_IndirectCallTarget, 2);
     EXPECT_STREQ((const char *)VD_2[0].Value, "callee3");
     EXPECT_EQ(VD_2[0].Count, 6U);
     EXPECT_STREQ((const char *)VD_2[1].Value, "callee4");
@@ -1022,13 +1145,13 @@ TEST_P(MaybeSparseInstrProfTest, icall_and_vtable_data_merge) {
     EXPECT_STREQ((const char *)VD_2[3].Value, "callee1");
     EXPECT_EQ(VD_2[3].Count, 1U);
 
-    auto VD_3(R->getValueForSite(IPVK_IndirectCallTarget, 3));
+    auto VD_3 = R->getValueArrayForSite(IPVK_IndirectCallTarget, 3);
     EXPECT_STREQ((const char *)VD_3[0].Value, "callee8");
     EXPECT_EQ(VD_3[0].Count, 2U);
     EXPECT_STREQ((const char *)VD_3[1].Value, "callee7");
     EXPECT_EQ(VD_3[1].Count, 1U);
 
-    auto VD_4(R->getValueForSite(IPVK_IndirectCallTarget, 4));
+    auto VD_4 = R->getValueArrayForSite(IPVK_IndirectCallTarget, 4);
     EXPECT_STREQ((const char *)VD_4[0].Value, "callee3");
     EXPECT_EQ(VD_4[0].Count, 6U);
     EXPECT_STREQ((const char *)VD_4[1].Value, "callee2");
@@ -1039,7 +1162,7 @@ TEST_P(MaybeSparseInstrProfTest, icall_and_vtable_data_merge) {
 
   // Test the merged values for vtables
   {
-    auto VD0 = R->getValueForSite(IPVK_VTableTarget, 0);
+    auto VD0 = R->getValueArrayForSite(IPVK_VTableTarget, 0);
     EXPECT_EQ(VD0[0].Value, getCalleeAddress(vtable2));
     EXPECT_EQ(VD0[0].Count, 7U);
     EXPECT_EQ(VD0[1].Value, getCalleeAddress(vtable3));
@@ -1049,7 +1172,7 @@ TEST_P(MaybeSparseInstrProfTest, icall_and_vtable_data_merge) {
     EXPECT_EQ(VD0[3].Value, getCalleeAddress(vtable1));
     EXPECT_EQ(VD0[3].Count, 1U);
 
-    auto VD1 = R->getValueForSite(IPVK_VTableTarget, 1);
+    auto VD1 = R->getValueArrayForSite(IPVK_VTableTarget, 1);
     EXPECT_EQ(VD1[0].Value, getCalleeAddress(vtable3));
     EXPECT_EQ(VD1[0].Count, 6U);
     EXPECT_EQ(VD1[1].Value, getCalleeAddress(vtable4));
@@ -1059,7 +1182,7 @@ TEST_P(MaybeSparseInstrProfTest, icall_and_vtable_data_merge) {
     EXPECT_EQ(VD1[3].Value, getCalleeAddress(vtable1));
     EXPECT_EQ(VD1[3].Count, 1U);
 
-    auto VD2 = R->getValueForSite(IPVK_VTableTarget, 2);
+    auto VD2 = R->getValueArrayForSite(IPVK_VTableTarget, 2);
     EXPECT_EQ(VD2[0].Value, getCalleeAddress(vtable3));
     EXPECT_EQ(VD2[0].Count, 6U);
     EXPECT_EQ(VD2[1].Value, getCalleeAddress(vtable2));
@@ -1132,8 +1255,7 @@ TEST_P(ValueProfileMergeEdgeCaseTest, value_profile_data_merge_saturation) {
       Reader->getInstrProfRecord("baz", 0x5678);
   ASSERT_TRUE(bool(ReadRecord2));
   ASSERT_EQ(1U, ReadRecord2->getNumValueSites(ValueKind));
-  std::unique_ptr<InstrProfValueData[]> VD =
-      ReadRecord2->getValueForSite(ValueKind, 0);
+  auto VD = ReadRecord2->getValueArrayForSite(ValueKind, 0);
   EXPECT_EQ(ProfiledValue, VD[0].Value);
   EXPECT_EQ(MaxValCount, VD[0].Count);
 }
@@ -1603,6 +1725,34 @@ TEST(SymtabTest, instr_prof_symtab_module_test) {
   Function::Create(FTy, Function::WeakODRLinkage, "Wblah", M.get());
   Function::Create(FTy, Function::WeakODRLinkage, "Wbar", M.get());
 
+  // [ptr, ptr, ptr]
+  ArrayType *VTableArrayType = ArrayType::get(
+      PointerType::get(Ctx, M->getDataLayout().getDefaultGlobalsAddressSpace()),
+      3);
+  Constant *Int32TyNull =
+      llvm::ConstantExpr::getNullValue(PointerType::getUnqual(Ctx));
+  SmallVector<llvm::Type *, 1> tys = {VTableArrayType};
+  StructType *VTableType = llvm::StructType::get(Ctx, tys);
+
+  // Create two vtables in the module, one with external linkage and the other
+  // with local linkage.
+  for (auto [Name, Linkage] :
+       {std::pair{"ExternalGV", GlobalValue::ExternalLinkage},
+        {"LocalGV", GlobalValue::InternalLinkage}}) {
+    llvm::Twine FuncName(Name, StringRef("VFunc"));
+    Function *VFunc = Function::Create(FTy, Linkage, FuncName, M.get());
+    GlobalVariable *GV = new llvm::GlobalVariable(
+        *M, VTableType, /* isConstant= */ true, Linkage,
+        llvm::ConstantStruct::get(
+            VTableType,
+            {llvm::ConstantArray::get(VTableArrayType,
+                                      {Int32TyNull, Int32TyNull, VFunc})}),
+        Name);
+    // Add type metadata for the test data, since vtables with type metadata
+    // are added to symtab.
+    GV->addTypeMetadata(16, MDString::get(Ctx, Name));
+  }
+
   InstrProfSymtab ProfSymtab;
   EXPECT_THAT_ERROR(ProfSymtab.create(*M), Succeeded());
 
@@ -1623,6 +1773,22 @@ TEST(SymtabTest, instr_prof_symtab_module_test) {
         ProfSymtab.getFuncOrVarName(IndexedInstrProf::ComputeHash(PGOName));
     EXPECT_EQ(PGOName, PGOFuncName);
     EXPECT_THAT(PGOFuncName.str(), EndsWith(Funcs[I].str()));
+  }
+
+  for (auto [VTableName, PGOName] : {std::pair{"ExternalGV", "ExternalGV"},
+                                     {"LocalGV", "MyModule.cpp;LocalGV"}}) {
+    GlobalVariable *GV =
+        M->getGlobalVariable(VTableName, /* AllowInternal=*/true);
+
+    // Test that ProfSymtab returns the expected name given a hash.
+    std::string IRPGOName = getPGOName(*GV);
+    EXPECT_STREQ(IRPGOName.c_str(), PGOName);
+    uint64_t GUID = IndexedInstrProf::ComputeHash(IRPGOName);
+    EXPECT_EQ(IRPGOName, ProfSymtab.getFuncOrVarName(GUID));
+    EXPECT_EQ(VTableName, getParsedIRPGOName(IRPGOName).second);
+
+    // Test that ProfSymtab returns the expected global variable
+    EXPECT_EQ(GV, ProfSymtab.getGlobalVariable(GUID));
   }
 }
 
