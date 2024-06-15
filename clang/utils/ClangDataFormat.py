@@ -25,7 +25,7 @@ from lldb import SBAddress, SBData, SBError, SBSyntheticValueProvider, SBTarget,
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 
-trace_call_depth = 0
+trace_call_depth : int = 0
 
 # def __lldb_init_module(debugger, internal_dict):
 #     debugger.HandleCommand("type recognizer add -F ClangDataFormat.test clang::QualType")
@@ -103,19 +103,21 @@ def trace(func_or_cls_name: Union[Callable, str]) -> Callable:
 def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     # debugger.HandleCommand("type summary add -F ClangDataFormat.SourceLocation_summary clang::SourceLocation")
     # debugger.HandleCommand("type summary add -F ClangDataFormat.QualTypeProvider.get_summary clang::QualType")
-    debugger.HandleCommand("type summary add --python-function ClangDataFormat.StringMapEntryProvider.get_summary -x '^llvm::StringMapEntry<.+>$'")
+    # debugger.HandleCommand("type summary add --python-function ClangDataFormat.StringMapEntryProvider.get_summary -x '^llvm::StringMapEntry<.+>$'")
 
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerIntPairProvider -x '^llvm::PointerIntPair<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PunnedPointerProvider  -x '^llvm::detail::PunnedPointer<.+>$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.StringMapEntryProvider -x '^llvm::StringMapEntry<.+>$'")
+    # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.StringMapEntryProvider -x '^llvm::StringMapEntry<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerUnionProvider   -x '^llvm::PointerUnion<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.QualTypeProvider       -x '^clang::QualType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TypeProvider           -x '^clang::Type$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TagTypeProvider        -x '^clang::TagType$'")
+    # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TagTypeProvider        -x '^clang::TagType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TemplateTypeParmTypeProvider -x '^clang::TemplateTypeParmType$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclProvider           -x '^clang::Decl$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclContextProvider    -x '^clang::DeclContext$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclarationNameProvider -x '^clang::DeclarationName$'")
+    # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclProvider           -x '^clang::Decl$'")
+    # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclContextProvider    -x '^clang::DeclContext$'")
+    # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclarationNameProvider -x '^clang::DeclarationName$'")
+
+    debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognizeType 'clang::Type'")
 
 
 class StringMapEntryProvider(SBSyntheticValueProvider):
@@ -438,6 +440,7 @@ class TemplateTypeParmTypeProvider(SBSyntheticValueProvider):
     @trace
     def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
         self.value = value
+        self.info_decl_union_value: SBValue = None  # type: ignore
 
     @trace
     def has_children(self) -> bool:
@@ -445,29 +448,38 @@ class TemplateTypeParmTypeProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return 1
+        return self.value.GetNumChildren()
 
     @trace
     def get_child_index(self, name: str) -> int:
         print(f" name: {name}", end="")
-        if name == "CanTTPTInfo":
-            return 0
-        if name == "TTPDecl":
-            return 0
-        return -1
+
+        if self.info_decl_union_value is not None:
+            assert self.info_decl_union_value.type.IsValid()
+            if name == "CanTTPTInfo" and self.info_decl_union_value.type.name == "clang::TemplateTypeParmType::CanonicalTTPTInfo":
+                return 2
+            if name == "TTPDecl" and self.info_decl_union_value.type.name == "clang::TemplateTypeParmDecl *":
+                return 2
+        return self.value.GetIndexOfChildWithName(name)
 
     @trace
     def get_child_at_index(self, index: int) -> Optional[SBValue]:
         print(f" index: {index}", end="")
-        if index == 0:
+        if index == 2:
             return self.info_decl_union_value
-        return None
+        return self.value.GetChildAtIndex(index)
 
     @trace
     def update(self) -> bool:
         union_value: SBValue = self.value.GetChildAtIndex(2)
+        assert union_value.IsValid()
+        raw_union_value = union_value.GetValueAsUnsigned()
+
         canonical_type_value: SBValue = self.value.GetChildMemberWithName("CanonicalType")
-        if QualTypeProvider.is_unqualified(canonical_type_value):
+        assert canonical_type_value.IsValid()
+        raw_canonical_type_value = union_value.GetValueAsUnsigned()
+
+        if raw_union_value == raw_canonical_type_value and QualTypeProvider.is_unqualified(canonical_type_value):
             self.info_decl_union_value: SBValue = union_value.GetChildMemberWithName("CanTTPTInfo")
         else:
             self.info_decl_union_value: SBValue = union_value.GetChildMemberWithName("TTPDecl")
@@ -479,29 +491,25 @@ class TypeProvider(SBSyntheticValueProvider):
     @trace
     def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
         self.value = value
-        self.bits: SBValue = None  # type: ignore
-        self.derived_value: SBValue = None  # type: ignore
+        self.type_bits: SBValue = None  # type: ignore
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return 3
+        return self.value.GetNumChildren()
 
     @trace
     def get_child_index(self, name: str) -> int:
         print(f" name: {name}", end="")
-        if name == "Bits":
-            return 0
-        if name == "Derived":
+        if name == "TypeBits":
             return 1
-        return -1
+        return self.value.GetIndexOfChildWithName(name)
 
     @trace
     def get_child_at_index(self, index: int) -> Optional[SBValue]:
         print(f" index: {index}", end="")
-        if index == 0:
-            return self.bits
         if index == 1:
-            return self.derived_value
+            # Replacing big anonymous union with just TypeBits
+            return self.type_bits
         return None
 
     @trace
@@ -509,25 +517,41 @@ class TypeProvider(SBSyntheticValueProvider):
         anon_union_value: SBValue = self.value.children[1]
         assert anon_union_value.type.name == "clang::Type::(anonymous union)"
         self.type_bits: SBValue = anon_union_value.GetChildMemberWithName("TypeBits")
-
-        raw_type_class_name = self.type_bits.GetChildMemberWithName('TC').value
-        if raw_type_class_name == "Enum":
-            self.bits: SBValue = self.value.GetChildMemberWithName("TypeBits")
-            derived_type: SBType = self.value.target.FindFirstType("clang::TagType")
-        elif raw_type_class_name == "TemplateTypeParm":
-            self.bits: SBValue = self.value.GetChildMemberWithName("TypeBits")
-            derived_type: SBType = self.value.target.FindFirstType("clang::TemplateTypeParmType")
-        else:
-            raise NotImplementedError(raw_type_class_name)
-
-        assert derived_type.IsValid()
-        self.derived_value: SBValue = cast_value(derived_type, self.value, "Derived")
-
+        assert self.type_bits.IsValid()
         return False
 
     @trace
     def has_children(self) -> bool:
         return True
+
+
+@trace("TypeRecognizers")
+def recognizeType(value: SBValue, internal_dict) -> SBValue:
+    prefer_synthetic = value.GetPreferSyntheticValue()
+    value.SetPreferSyntheticValue(False)
+
+    anon_union_value: SBValue = value.children[1]
+    assert anon_union_value.type.name == "clang::Type::(anonymous union)"
+    type_bits: SBValue = anon_union_value.GetChildMemberWithName("TypeBits")
+    assert type_bits.IsValid()
+
+    assert type_bits.GetChildMemberWithName('TC').IsValid()
+    raw_type_class_name: str = type_bits.GetChildMemberWithName('TC').value
+    if raw_type_class_name == "Enum":
+        derived_type: SBType = value.target.FindFirstType("clang::TagType")
+    elif raw_type_class_name == "TemplateTypeParm":
+        derived_type: SBType = value.target.FindFirstType("clang::TemplateTypeParmType")
+    else:
+        raise NotImplementedError(raw_type_class_name)
+
+    assert derived_type.IsValid()
+    if value.type.IsPointerType():
+        derived_type = derived_type.GetPointerType()
+    derived_value: SBValue = value.target.CreateValueFromAddress(value.name, value.addr, derived_type)
+    assert derived_value.IsValid()
+
+    value.SetPreferSyntheticValue(prefer_synthetic)
+    return derived_value
 
 
 class PointerIntPairProvider(SBSyntheticValueProvider):
