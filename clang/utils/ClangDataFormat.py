@@ -477,8 +477,33 @@ class TypeProvider(SBSyntheticValueProvider):
         bits_name: str = ""
 
     type_class_mapping = {
-      "Enum": TypeInfo("clang::EnumType"),
-      "TemplateTypeParm": TypeInfo("clang::TemplateTypeParmType"),
+        "Array"                     : TypeInfo("clang::ArrayType", "ArrayTypeBits"),
+        "Attributed"                : TypeInfo("clang::AttributedType", "AttributedTypeBits"),
+        "Auto"                      : TypeInfo("clang::AutoType", "AutoTypeBits"),
+        "Builtin"                   : TypeInfo("clang::BuiltinType", "BuiltinTypeBits"),
+        "ConstantArray"             : TypeInfo("clang::ConstantArrayType", "ConstantArrayTypeBits"),
+        "CountAttributed"           : TypeInfo("clang::CountAttributedType", "CountAttributedTypeBits"),
+        "DependentTemplateSpecialization" : TypeInfo("clang::DependentTemplateSpecializationType", "DependentTemplateSpecializationTypeBits"),
+        "DependentVector"           : TypeInfo("clang::DependentVectorType", "VectorTypeBits"),
+        "Elaborated"                : TypeInfo("clang::ElaboratedType", "ElaboratedTypeBits"),
+        "Enum"                      : TypeInfo("clang::EnumType"),
+        "Function"                  : TypeInfo("clang::FunctionType", "FunctionTypeBits"),
+        "FunctionProto"             : TypeInfo("clang::FunctionProtoType", "FunctionTypeBits"),
+        "ObjCObject"                : TypeInfo("clang::ObjCObjectType", "ObjCObjectTypeBits"),
+        "PackExpansion"             : TypeInfo("clang::PackExpansionType", "PackExpansionTypeBits"),
+        "Reference"                 : TypeInfo("clang::ReferenceType", "ReferenceTypeBits"),
+        "SubstTemplateTypeParm"     : TypeInfo("clang::SubstTemplateTypeParmType", "SubstTemplateTypeParmTypeBits"),
+        "SubstTemplateTypeParmPack" : TypeInfo("clang::SubstTemplateTypeParmPackType", "SubstTemplateTypeParmPackTypeBits"),
+        "TemplateSpecialization"    : TypeInfo("clang::TemplateSpecializationType", "TemplateSpecializationTypeBits"),
+        "TemplateTypeParm"          : TypeInfo("clang::TemplateTypeParmType"),
+        "Type"                      : TypeInfo("clang::Type", "TypeBits"),
+        "TypeOf"                    : TypeInfo("clang::TypeOfType", "TypeOfBits"),
+        "TypeOfExpr"                : TypeInfo("clang::TypeOfExprType", "TypeOfBits"),
+        "Typedef"                   : TypeInfo("clang::TypedefType", "TypedefBits"),
+        "Using"                     : TypeInfo("clang::UsingType", "UsingBits"),
+        "Vector"                    : TypeInfo("clang::VectorType", "VectorTypeBits"),
+        # FIXME: not sure what to do about this one
+        # "" : TypeInfo("clang::TypeWithKeyword", "TypeWithKeywordBits"),
     }
 
     @trace
