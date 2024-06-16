@@ -27,19 +27,6 @@ from typing import Any, Callable, Dict, NamedTuple, Optional, Tuple, Union
 
 trace_call_depth : int = 0
 
-# def __lldb_init_module(debugger, internal_dict):
-#     debugger.HandleCommand("type recognizer add -F ClangDataFormat.test clang::QualType")
-#     # debugger.HandleCommand(
-#     #     "type summary add -F ClangDataFormat.SourceLocation_summary clang::SourceLocation"
-#     # )
-#     # debugger.HandleCommand(
-#     #     "type summary add -F ClangDataFormat.QualType_summary clang::QualType"
-#     # )
-
-# def test(qualty, internal_dict):
-#     print("Called python ClangDataFormat.test()")
-#     return qualty.GetType()
-
 
 def trace(func_or_cls_name: Union[Callable, str]) -> Callable:
     def format_big_number(number: int):
