@@ -117,7 +117,7 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclContextProvider    -x '^clang::DeclContext$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclarationNameProvider -x '^clang::DeclarationName$'")
 
-    debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognizeType 'clang::Type'")
+    debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_type 'clang::Type'")
 
 
 class StringMapEntryProvider(SBSyntheticValueProvider):
@@ -527,27 +527,25 @@ class TypeProvider(SBSyntheticValueProvider):
 
 
 @trace("TypeRecognizers")
-def recognizeType(value: SBValue, internal_dict) -> SBValue:
-    prefer_synthetic = value.GetPreferSyntheticValue()
+def recognize_type(value: SBValue, internal_dict) -> SBValue:
+    prefer_synthetic: bool = value.GetPreferSyntheticValue()
     value.SetPreferSyntheticValue(False)
 
     anon_union_value: SBValue = value.children[1]
     assert anon_union_value.type.name == "clang::Type::(anonymous union)"
     type_bits: SBValue = anon_union_value.GetChildMemberWithName("TypeBits")
     assert type_bits.IsValid()
-
-    assert type_bits.GetChildMemberWithName('TC').IsValid()
-    raw_type_class_name: str = type_bits.GetChildMemberWithName('TC').value
-    if raw_type_class_name == "Enum":
-        derived_type: SBType = value.target.FindFirstType("clang::TagType")
-    elif raw_type_class_name == "TemplateTypeParm":
-        derived_type: SBType = value.target.FindFirstType("clang::TemplateTypeParmType")
-    else:
-        raise NotImplementedError(raw_type_class_name)
-
+    type_class_value: SBValue = type_bits.GetChildMemberWithName('TC')
+    assert type_class_value.IsValid()
+    type_class_name: str = type_class_value.value
+    assert type_class_name in TypeProvider.type_class_mapping
+    qual_name: str = TypeProvider.type_class_mapping[type_class_name].qual_name
+    derived_type: SBType = value.target.FindFirstType(qual_name)
     assert derived_type.IsValid()
     if value.type.IsPointerType():
         derived_type = derived_type.GetPointerType()
+    elif value.type.IsReferenceType():
+        derived_type = derived_type.GetReferenceType()
     derived_value: SBValue = value.target.CreateValueFromAddress(value.name, value.addr, derived_type)
     assert derived_value.IsValid()
 
