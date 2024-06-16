@@ -274,7 +274,7 @@ class DeclContextProvider(SBSyntheticValueProvider):
         if name == "DeclContextBits":
             return 1
         if self.derived_bits_value is not None and name == self.derived_bits_value.name:
-            return self.num_children_underlying
+            return self.num_children_underlying + 0
         return self.value.GetIndexOfChildWithName(name)
 
     @trace
@@ -283,7 +283,8 @@ class DeclContextProvider(SBSyntheticValueProvider):
         if index == 1:
             # Replacing big anonymous union with the right Bits
             return self.decl_context_bits_value
-        if index == self.num_children_underlying:
+        if index == self.num_children_underlying + 0:
+            # Adding a child for e.g. EnumDeclBits
             return self.derived_bits_value
         
         return self.value.GetChildAtIndex(index)
