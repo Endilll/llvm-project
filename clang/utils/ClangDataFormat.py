@@ -494,23 +494,25 @@ class TemplateTypeParmTypeProvider(SBSyntheticValueProvider):
     def get_child_at_index(self, index: int) -> Optional[SBValue]:
         print(f" index: {index}", end="")
         if index == 2:
+            # Replacing anonymous union with the active member of it
             return self.info_decl_union_value
         return self.value.GetChildAtIndex(index)
 
     @trace
     def update(self) -> bool:
-        union_value: SBValue = self.value.GetChildAtIndex(2)
-        assert union_value.IsValid()
-        raw_union_value = union_value.GetValueAsUnsigned()
+        anon_union_value: SBValue = self.value.GetChildAtIndex(2)
+        assert anon_union_value.IsValid()
+        assert anon_union_value.type.name == "clang::TemplateTypeParmType::(anonymous union)"
+        raw_union_value = anon_union_value.GetValueAsUnsigned()
 
         canonical_type_value: SBValue = self.value.GetChildMemberWithName("CanonicalType")
         assert canonical_type_value.IsValid()
-        raw_canonical_type_value = union_value.GetValueAsUnsigned()
+        raw_canonical_type_value = anon_union_value.GetValueAsUnsigned()
 
         if raw_union_value == raw_canonical_type_value and QualTypeProvider.is_unqualified(canonical_type_value):
-            self.info_decl_union_value: SBValue = union_value.GetChildMemberWithName("CanTTPTInfo")
+            self.info_decl_union_value: SBValue = anon_union_value.GetChildMemberWithName("CanTTPTInfo")
         else:
-            self.info_decl_union_value: SBValue = union_value.GetChildMemberWithName("TTPDecl")
+            self.info_decl_union_value: SBValue = anon_union_value.GetChildMemberWithName("TTPDecl")
 
         return False
 
