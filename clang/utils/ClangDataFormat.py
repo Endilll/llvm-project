@@ -22,7 +22,7 @@ you'll get:
 import lldb
 from lldb import SBAddress, SBData, SBError, SBSyntheticValueProvider, SBTarget, SBType, SBValue
 
-from typing import Any, Callable, Dict, Optional, Tuple, Union
+from typing import Any, Callable, Dict, NamedTuple, Optional, Tuple, Union
 
 
 trace_call_depth : int = 0
@@ -114,7 +114,7 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TagTypeProvider        -x '^clang::TagType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TemplateTypeParmTypeProvider -x '^clang::TemplateTypeParmType$'")
     # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclProvider           -x '^clang::Decl$'")
-    # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclContextProvider    -x '^clang::DeclContext$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclContextProvider    -x '^clang::DeclContext$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclarationNameProvider -x '^clang::DeclarationName$'")
 
     debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_type 'clang::Type'")
@@ -225,9 +225,23 @@ class DeclProvider(SBSyntheticValueProvider):
 
 
 class DeclContextProvider(SBSyntheticValueProvider):
+    class DeclInfo(NamedTuple):
+        '''
+        Name of the data member that holds bit-fields, e.g. EnumDeclBits.
+        '''
+        bits_name: str = ""
+
+    decl_kind_mapping = {
+        "Enum" : DeclInfo("EnumDeclBits"),
+        "OMPThreadPrivate" : DeclInfo()
+    }
+
     @trace
     def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
-        self.value = value
+        self.value: SBValue = value
+        self.num_children_underlying: int = 0
+        self.decl_context_bits_value: SBValue = None  # type: ignore
+        self.derived_bits_value: Optional[SBValue] = None
 
     @trace
     def has_children(self) -> bool:
@@ -235,27 +249,45 @@ class DeclContextProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return self.value.GetNumChildren(max_children)
+        # Single anonymous union can be interpreted as (up to) 2 different Bits
+        return min(self.num_children_underlying + 1, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
         print(f" name: {name}", end="")
         if name == "DeclContextBits":
-            return 0
-        return -1
+            return 1
+        if self.derived_bits_value is not None and name == self.derived_bits_value.name:
+            return self.num_children_underlying
+        return self.value.GetIndexOfChildWithName(name)
 
     @trace
     def get_child_at_index(self, index: int) -> Optional[SBValue]:
         print(f" index: {index}", end="")
-        if index == 0:
+        if index == 1:
+            # Replacing big anonymous union with the right Bits
             return self.decl_context_bits_value
-        return None
+        if index == self.num_children_underlying:
+            return self.derived_bits_value
+        
+        return self.value.GetChildAtIndex(index)
 
     @trace
     def update(self) -> bool:
+        self.num_children_underlying = self.value.GetNumChildren()
+
         anon_union_value: SBValue = self.value.GetChildAtIndex(1)
         assert anon_union_value.type.name == "clang::DeclContext::(anonymous union)"
         self.decl_context_bits_value = anon_union_value.GetChildMemberWithName("DeclContextBits")
+        assert self.decl_context_bits_value.IsValid()
+        decl_kind_value: SBValue = self.decl_context_bits_value.GetChildMemberWithName('DeclKind')
+        assert decl_kind_value.IsValid()
+        decl_kind_name: str = decl_kind_value.value
+        assert decl_kind_name in self.decl_kind_mapping
+        bits_name: str = self.decl_kind_mapping[decl_kind_name].bits_name
+        if bits_name != "":
+          self.derived_bits_value = anon_union_value.GetChildMemberWithName(bits_name)
+          assert self.derived_bits_value is not None and self.derived_bits_value.IsValid()
         return False
 
 
