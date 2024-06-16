@@ -111,6 +111,8 @@ class StringMapEntryProvider(SBSyntheticValueProvider):
     def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
         self.value: SBValue = value
         self.num_children_underlying: int = 0
+        self.key_value: Optional[SBValue] = None
+        self.value_value: SBValue = None  # type: ignore
 
     @trace
     def has_children(self) -> bool:
@@ -132,13 +134,11 @@ class StringMapEntryProvider(SBSyntheticValueProvider):
 
     @trace
     def get_child_at_index(self, index: int) -> Optional[SBValue]:
-        print(f" index: {index}, self.num_children_underlying: {self.num_children_underlying}", end="")
+        print(f" index: {index}", end="")
         if index == self.num_children_underlying + 0:
-            print(" returning Key", end= "")
             # Adding a child for key
             return self.key_value
         if index == self.num_children_underlying + 1:
-            print(" returning Value", end= "")
             # Adding a child for value
             return self.value_value
         return self.value.GetChildAtIndex(index)
@@ -153,21 +153,21 @@ class StringMapEntryProvider(SBSyntheticValueProvider):
         target: SBTarget = value.target
 
         key_length_value: SBValue = value.GetChildMemberWithName("keyLength")
-        assert key_length_value.IsValid()
-        raw_key_length: int = key_length_value.unsigned
+        if key_length_value.IsValid():
+            raw_key_length: int = key_length_value.unsigned
 
-        char_type: SBType = target.GetBasicType(lldb.eBasicTypeChar)
-        assert char_type.IsValid()
-        char_array_type: SBType = char_type.GetArrayType(raw_key_length + 1)
-        assert char_array_type.IsValid()
+            char_type: SBType = target.GetBasicType(lldb.eBasicTypeChar)
+            assert char_type.IsValid()
+            char_array_type: SBType = char_type.GetArrayType(raw_key_length + 1)
+            assert char_array_type.IsValid()
 
-        addr: SBAddress = value.addr
-        assert addr.IsValid()
-        addr.OffsetAddress(value.type.size)
+            addr: SBAddress = value.addr
+            assert addr.IsValid()
+            addr.OffsetAddress(value.type.size)
 
-        self.key_value: SBValue = target.CreateValueFromAddress("Key", addr, char_array_type)
-        assert self.key_value.IsValid()
-        self.key_value.SetSyntheticChildrenGenerated(True)
+            self.key_value = target.CreateValueFromAddress("Key", addr, char_array_type)
+            assert self.key_value is not None and self.key_value.IsValid()
+            self.key_value.SetSyntheticChildrenGenerated(True)
 
         base_value = value.GetChildAtIndex(0)
         assert base_value.IsValid()
