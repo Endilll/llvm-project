@@ -132,7 +132,7 @@ class StringMapEntryProvider(SBSyntheticValueProvider):
     @trace
     def num_children(self, max_children: int) -> int:
         # Adding 'Key' and 'Value' children
-        return self.value.GetNumChildren() + 2
+        return min(self.value.GetNumChildren(max_children) + 2, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
@@ -195,7 +195,7 @@ class DeclProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return 1
+        return min(1, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
@@ -235,7 +235,7 @@ class DeclContextProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return 1
+        return self.value.GetNumChildren(max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
@@ -270,7 +270,7 @@ class DeclarationNameProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return 2
+        return min(2, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
@@ -331,7 +331,7 @@ class QualTypeProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return 4
+        return min(4, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
@@ -415,7 +415,7 @@ class TagTypeProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return 1
+        return min(1, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
@@ -449,7 +449,7 @@ class TemplateTypeParmTypeProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return self.value.GetNumChildren()
+        return self.value.GetNumChildren(max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
@@ -496,7 +496,7 @@ class TypeProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return self.value.GetNumChildren()
+        return self.value.GetNumChildren(max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
@@ -562,7 +562,7 @@ class PointerIntPairProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return 2
+        return min(2, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
@@ -643,7 +643,7 @@ class PunnedPointerProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return 1
+        return min(1, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
@@ -716,7 +716,7 @@ class PointerUnionProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return 1
+        return min(1, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
