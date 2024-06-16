@@ -198,8 +198,17 @@ class DeclContextProvider(SBSyntheticValueProvider):
         bits_name: str = ""
 
     decl_kind_mapping = {
-        "Enum" : DeclInfo("EnumDeclBits"),
-        "OMPThreadPrivate" : DeclInfo()
+        "Tag"                 : DeclInfo("TagDeclBits"),
+        "Enum"                : DeclInfo("EnumDeclBits"),
+        "Record"              : DeclInfo("RecordDeclBits"),
+        "OMPDeclareReduction" : DeclInfo("OMPDeclareReductionDeclBits"),
+        "Function"            : DeclInfo("FunctionDeclBits"),
+        "CXXDeductionGuide"   : DeclInfo("FunctionDeclBits"),
+        "CXXConstructor"      : DeclInfo("CXXConstructorDeclBits"),
+        "ObjCMethod"          : DeclInfo("ObjCMethodDeclBits"),
+        "ObjCContainer"       : DeclInfo("ObjCContainerDeclBits"),
+        "LinkageSpec"         : DeclInfo("LinkageSpecDeclBits"),
+        "Block"               : DeclInfo("BlockDeclBits"),
     }
 
     @trace
@@ -250,11 +259,12 @@ class DeclContextProvider(SBSyntheticValueProvider):
         decl_kind_value: SBValue = self.decl_context_bits_value.GetChildMemberWithName('DeclKind')
         assert decl_kind_value.IsValid()
         decl_kind_name: str = decl_kind_value.value
-        assert decl_kind_name in self.decl_kind_mapping
-        bits_name: str = self.decl_kind_mapping[decl_kind_name].bits_name
-        if bits_name != "":
-          self.derived_bits_value = anon_union_value.GetChildMemberWithName(bits_name)
-          assert self.derived_bits_value is not None and self.derived_bits_value.IsValid()
+        if decl_kind_name in self.decl_kind_mapping:
+            bits_name: str = self.decl_kind_mapping[decl_kind_name].bits_name
+            if bits_name != "":
+                self.derived_bits_value = anon_union_value.GetChildMemberWithName(bits_name)
+                assert self.derived_bits_value is not None
+                assert self.derived_bits_value.IsValid()
         return False
 
 
