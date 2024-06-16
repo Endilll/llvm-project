@@ -480,33 +480,63 @@ class TypeProvider(SBSyntheticValueProvider):
         bits_name: str = ""
 
     type_class_mapping = {
-        "Array"                     : TypeInfo("clang::ArrayType", "ArrayTypeBits"),
-        "Attributed"                : TypeInfo("clang::AttributedType", "AttributedTypeBits"),
-        "Auto"                      : TypeInfo("clang::AutoType", "AutoTypeBits"),
-        "Builtin"                   : TypeInfo("clang::BuiltinType", "BuiltinTypeBits"),
+        "Adjusted"                  : TypeInfo("clang::AdjustedType"),
+        "Decayed"                   : TypeInfo("clang::DecayedType"),
         "ConstantArray"             : TypeInfo("clang::ConstantArrayType", "ConstantArrayTypeBits"),
+        "ArrayParameter"            : TypeInfo("clang::ArrayParameterType"),
+        "DependentSizedArray"       : TypeInfo("clang::DependentSizedArrayType"),
+        "IncompleteArray"           : TypeInfo("clang::IncompleteArrayType"),
+        "VariableArray"             : TypeInfo("clang::VariableArrayType"),
+        "Atomic"                    : TypeInfo("clang::AtomicType"),
+        "Attributed"                : TypeInfo("clang::AttributedType", "AttributedTypeBits"),
+        "BTFTagAttributed"          : TypeInfo("clang::BTFTagAttributedType"),
+        "BitInt"                    : TypeInfo("clang::BitIntType"),
+        "BlockPointer"              : TypeInfo("clang::BlockPointerType"),
         "CountAttributed"           : TypeInfo("clang::CountAttributedType", "CountAttributedTypeBits"),
+        "Builtin"                   : TypeInfo("clang::BuiltinType", "BuiltinTypeBits"),
+        "Complex"                   : TypeInfo("clang::ComplexType"),
+        "Decltype"                  : TypeInfo("clang::DecltypeType"),
+        "Auto"                      : TypeInfo("clang::AutoType", "AutoTypeBits"),
+        "DeducedTemplateSpecialization" : TypeInfo("clang::DeducedTemplateSpecializationType"),
+        "DependentAddressSpace"     : TypeInfo("clang::DependentAddressSpaceType"),
+        "DependentBitInt"           : TypeInfo("clang::DependentBitIntType"),
+        "DependentName"             : TypeInfo("clang::DependentNameType"),
+        "DependentSizedExtVector"   : TypeInfo("clang::DependentSizedExtVectorType"),
         "DependentTemplateSpecialization" : TypeInfo("clang::DependentTemplateSpecializationType", "DependentTemplateSpecializationTypeBits"),
         "DependentVector"           : TypeInfo("clang::DependentVectorType", "VectorTypeBits"),
         "Elaborated"                : TypeInfo("clang::ElaboratedType", "ElaboratedTypeBits"),
-        "Enum"                      : TypeInfo("clang::EnumType"),
-        "Function"                  : TypeInfo("clang::FunctionType", "FunctionTypeBits"),
+        "FunctionNoProto"           : TypeInfo("clang::FunctionNoProtoType"),
         "FunctionProto"             : TypeInfo("clang::FunctionProtoType", "FunctionTypeBits"),
+        "InjectedClassName"         : TypeInfo("clang::InjectedClassNameType"),
+        "MacroQualified"            : TypeInfo("clang::MacroQualifiedType"),
+        "ConstantMatrix"            : TypeInfo("clang::ConstantMatrixType"),
+        "DependentSizedMatrix"      : TypeInfo("clang::DependentSizedMatrixType"),
+        "MemberPointer"             : TypeInfo("clang::MemberPointerType"),
+        "ObjCObjectPointer"         : TypeInfo("clang::ObjCObjectPointerType"),
         "ObjCObject"                : TypeInfo("clang::ObjCObjectType", "ObjCObjectTypeBits"),
+        "ObjCInterface"             : TypeInfo("clang::ObjCInterfaceType"),
+        "ObjCTypeParam"             : TypeInfo("clang::ObjCTypeParamType"),
         "PackExpansion"             : TypeInfo("clang::PackExpansionType", "PackExpansionTypeBits"),
-        "Reference"                 : TypeInfo("clang::ReferenceType", "ReferenceTypeBits"),
-        "SubstTemplateTypeParm"     : TypeInfo("clang::SubstTemplateTypeParmType", "SubstTemplateTypeParmTypeBits"),
+        "PackIndexing"              : TypeInfo("clang::PackIndexingType"),
+        "Paren"                     : TypeInfo("clang::ParenType"),
+        "Pipe"                      : TypeInfo("clang::PipeType"),
+        "Pointer"                   : TypeInfo("clang::PointerType"),
+        "LValueReference"           : TypeInfo("clang::LValueReferenceType"),
+        "RValueReference"           : TypeInfo("clang::RValueReferenceType"),
         "SubstTemplateTypeParmPack" : TypeInfo("clang::SubstTemplateTypeParmPackType", "SubstTemplateTypeParmPackTypeBits"),
+        "SubstTemplateTypeParm"     : TypeInfo("clang::SubstTemplateTypeParmType", "SubstTemplateTypeParmTypeBits"),
+        "Enum"                      : TypeInfo("clang::EnumType"),
+        "Record"                    : TypeInfo("clang::RecordType"),
         "TemplateSpecialization"    : TypeInfo("clang::TemplateSpecializationType", "TemplateSpecializationTypeBits"),
         "TemplateTypeParm"          : TypeInfo("clang::TemplateTypeParmType"),
-        "Type"                      : TypeInfo("clang::Type", "TypeBits"),
-        "TypeOf"                    : TypeInfo("clang::TypeOfType", "TypeOfBits"),
         "TypeOfExpr"                : TypeInfo("clang::TypeOfExprType", "TypeOfBits"),
+        "TypeOf"                    : TypeInfo("clang::TypeOfType", "TypeOfBits"),
         "Typedef"                   : TypeInfo("clang::TypedefType", "TypedefBits"),
+        "UnaryTransform"            : TypeInfo("clang::UnaryTransformType"),
+        "UnresolvedUsing"           : TypeInfo("clang::UnresolvedUsingType"),
         "Using"                     : TypeInfo("clang::UsingType", "UsingBits"),
         "Vector"                    : TypeInfo("clang::VectorType", "VectorTypeBits"),
-        # FIXME: not sure what to do about this one
-        # "" : TypeInfo("clang::TypeWithKeyword", "TypeWithKeywordBits"),
+        "ExtVector"                 : TypeInfo("clang::ExtVectorType"),
     }
 
     @trace
@@ -568,6 +598,7 @@ class TypeProvider(SBSyntheticValueProvider):
 @trace("TypeRecognizers")
 def recognize_type(value: SBValue, internal_dict) -> SBValue:
     prefer_synthetic: bool = value.GetPreferSyntheticValue()
+    value.SetPreferSyntheticValue(False)
 
     anon_union_value: SBValue = value.children[1]
     assert anon_union_value.type.name == "clang::Type::(anonymous union)"
