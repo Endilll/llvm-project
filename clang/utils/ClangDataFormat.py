@@ -98,11 +98,14 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerUnionProvider    -x '^llvm::PointerUnion<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PunnedPointerProvider   -x '^llvm::detail::PunnedPointer<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.QualTypeProvider        -x '^clang::QualType$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.StmtProvider            -x '^clang::Stmt$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.StringMapEntryProvider  -x '^llvm::StringMapEntry<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TemplateTypeParmTypeProvider -x '^clang::TemplateTypeParmType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TypeProvider            -x '^clang::Type$'")
 
     if debugger.GetVersionString().startswith("lldb version 19"):
+      debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_stmt 'clang::Expr'")
+      debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_stmt 'clang::Stmt'")
       debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_type 'clang::Type'")
 
 
@@ -565,7 +568,6 @@ class TypeProvider(SBSyntheticValueProvider):
 @trace("TypeRecognizers")
 def recognize_type(value: SBValue, internal_dict) -> SBValue:
     prefer_synthetic: bool = value.GetPreferSyntheticValue()
-    value.SetPreferSyntheticValue(False)
 
     anon_union_value: SBValue = value.children[1]
     assert anon_union_value.type.name == "clang::Type::(anonymous union)"
@@ -578,6 +580,204 @@ def recognize_type(value: SBValue, internal_dict) -> SBValue:
     qual_name: str = TypeProvider.type_class_mapping[type_class_name].qual_name
     derived_type: SBType = value.target.FindFirstType(qual_name)
     assert derived_type.IsValid()
+    if value.type.IsPointerType():
+        derived_type = derived_type.GetPointerType()
+    elif value.type.IsReferenceType():
+        derived_type = derived_type.GetReferenceType()
+    derived_value: SBValue = value.target.CreateValueFromAddress(value.name, value.addr, derived_type)
+    assert derived_value.IsValid()
+
+    value.SetPreferSyntheticValue(prefer_synthetic)
+    return derived_value
+
+
+class StmtProvider(SBSyntheticValueProvider):
+    class StmtInfo(NamedTuple):
+        '''
+        Qualified name of the type. Typically used to call FindFirstType.
+        '''
+        qual_name: str
+
+        '''
+        Name of the data member that holds bit-fields, e.g. IfStmtBits.
+        '''
+        bits_name: str = ""
+
+    sclass_mapping = {
+        # Statements
+        "NullStmtClass"         : StmtInfo("clang::NullStmt", "NullStmtBits"),
+        "CompoundStmtClass"     : StmtInfo("clang::CompoundStmt", "CompoundStmtBits"),
+        "LabelStmtClass"        : StmtInfo("clang::LabelStmt", "LabelStmtBits"),
+        "AttributedStmtClass"   : StmtInfo("clang::AttributedStmt", "AttributedStmtBits"),
+        "IfStmtClass"           : StmtInfo("clang::IfStmt", "IfStmtBits"),
+        "SwitchStmtClass"       : StmtInfo("clang::SwitchStmt", "SwitchStmtBits"),
+        "WhileStmtClass"        : StmtInfo("clang::WhileStmt", "WhileStmtBits"),
+        "DoStmtClass"           : StmtInfo("clang::DoStmt", "DoStmtBits"),
+        "ForStmtClass"          : StmtInfo("clang::ForStmt", "ForStmtBits"),
+        "GotoStmtClass"         : StmtInfo("clang::GotoStmt", "GotoStmtBits"),
+        "IndirectGotoStmtClass" : StmtInfo("clang::IndirectGotoStmt", "GotoStmtBits"),
+        "ContinueStmtClass"     : StmtInfo("clang::ContinueStmt", "ContinueStmtBits"),
+        "BreakStmtClass"        : StmtInfo("clang::BreakStmt", "BreakStmtBits"),
+        "ReturnStmtClass"       : StmtInfo("clang::ReturnStmt", "ReturnStmtBits"),
+        "CaseStmtClass"         : StmtInfo("clang::CaseStmt", "SwitchCaseBits"),
+
+        # Expressions
+        "AtomicExprClass" : StmtInfo("clang::AtomicExpr", "ExprBits"),
+        "Class" : StmtInfo("clang::BlockDeclRefExpr", "ExprBits"),
+        "CallExprClass" : StmtInfo("clang::CallExpr", "ExprBits"),
+        "CXXConstructExprClass" : StmtInfo("clang::CXXConstructExpr", "ExprBits"),
+        "CXXDependentScopeMemberExprClass" : StmtInfo("clang::CXXDependentScopeMemberExpr", "ExprBits"),
+        "CXXNewExprClass" : StmtInfo("clang::CXXNewExpr", "ExprBits"),
+        "DeclRefExprClass" : StmtInfo("clang::DeclRefExpr", "ExprBits"),
+        "DependentScopeDeclRefExprClass" : StmtInfo("clang::DependentScopeDeclRefExpr", "ExprBits"),
+        "DesignatedInitExprClass" : StmtInfo("clang::DesignatedInitExpr", "ExprBits"),
+        "InitListExprClass" : StmtInfo("clang::InitListExpr", "ExprBits"),
+        "ObjCArrayLiteralClass" : StmtInfo("clang::ObjCArrayLiteral", "ExprBits"),
+        "ObjCDictionaryLiteralClass" : StmtInfo("clang::ObjCDictionaryLiteral", "ExprBits"),
+        "ObjCMessageExprClass" : StmtInfo("clang::ObjCMessageExpr", "ExprBits"),
+        "OffsetOfExprClass" : StmtInfo("clang::OffsetOfExpr", "ExprBits"),
+        "ParenListExprClass" : StmtInfo("clang::ParenListExpr", "ExprBits"),
+        "PseudoObjectExprClass" : StmtInfo("clang::PseudoObjectExpr", "ExprBits"),
+        "ShuffleVectorExprClass" : StmtInfo("clang::ShuffleVectorExpr", "ExprBits"),
+        "ConstantExprClass" : StmtInfo("clang::ConstantExpr", "ConstantExprBits"),
+        "PredefinedExprClass" : StmtInfo("clang::PredefinedExpr", "PredefinedExprBits"),
+        "DeclRefExprClass" : StmtInfo("clang::DeclRefExpr", "DeclRefExprBits"),
+        "FloatingLiteralClass" : StmtInfo("clang::FloatingLiteral", "FloatingLiteralBits"),
+        "StringLiteralClass" : StmtInfo("clang::StringLiteral", "StringLiteralBits"),
+        "CharacterLiteralClass" : StmtInfo("clang::CharacterLiteral", "CharacterLiteralBits"),
+        "ParenExprClass" : StmtInfo("clang::ParenExpr"),
+        "UnaryOperatorClass" : StmtInfo("clang::UnaryOperator", "UnaryOperatorBits"),
+        "UnaryExprOrTypeTraitExprClass" : StmtInfo("clang::UnaryExprOrTypeTraitExpr", "UnaryExprOrTypeTraitExprBits"),
+        "ArraySubscriptExprClass" : StmtInfo("clang::ArraySubscriptExpr", "ArrayOrMatrixSubscriptExprBits"),
+        "MatrixSubscriptExprClass" : StmtInfo("clang::MatrixSubscriptExpr", "ArrayOrMatrixSubscriptExprBits"),
+        "CallExprClass" : StmtInfo("clang::CallExpr", "CallExprBits"),
+        "MemberExprClass" : StmtInfo("clang::MemberExpr", "MemberExprBits"),
+        "ImplicitCastExprClass" : StmtInfo("clang::ImplicitCastExpr", "CastExprBits"),
+        "BinaryOperatorClass" : StmtInfo("clang::BinaryOperator", "BinaryOperatorBits"),
+        "InitListExprClass" : StmtInfo("clang::InitListExpr", "InitListExprBits"),
+        "ParenListExprClass" : StmtInfo("clang::ParenListExpr", "ParenListExprBits"),
+        "GenericSelectionExprClass" : StmtInfo("clang::GenericSelectionExpr", "GenericSelectionExprBits"),
+        "PseudoObjectExprClass" : StmtInfo("clang::PseudoObjectExpr", "PseudoObjectExprBits"),
+        "SourceLocExprClass" : StmtInfo("clang::SourceLocExpr", "SourceLocExprBits"),
+
+        # GNU Extensions.
+        "StmtExprClass" : StmtInfo("clang::StmtExpr", "StmtExprBits"),
+
+        # C++ Expressions
+        "CXXOperatorCallExprClass" : StmtInfo("clang::CXXOperatorCallExpr", "CXXOperatorCallExprBits"),
+        "CXXRewrittenBinaryOperatorClass" : StmtInfo("clang::CXXRewrittenBinaryOperator", "CXXRewrittenBinaryOperatorBits"),
+        "CXXBoolLiteralExprClass" : StmtInfo("clang::CXXBoolLiteralExpr", "CXXBoolLiteralExprBits"),
+        "CXXNullPtrLiteralExprClass" : StmtInfo("clang::CXXNullPtrLiteralExpr", "CXXNullPtrLiteralExprBits"),
+        "CXXThisExprClass" : StmtInfo("clang::CXXThisExpr", "CXXThisExprBits"),
+        "CXXThrowExprClass" : StmtInfo("clang::CXXThrowExpr", "CXXThrowExprBits"),
+        "CXXDefaultArgExprClass" : StmtInfo("clang::CXXDefaultArgExpr", "CXXDefaultArgExprBits"),
+        "CXXDefaultInitExprClass" : StmtInfo("clang::CXXDefaultInitExpr", "CXXDefaultInitExprBits"),
+        "CXXScalarValueInitExprClass" : StmtInfo("clang::CXXScalarValueInitExpr", "CXXScalarValueInitExprBits"),
+        "CXXNewExprClass" : StmtInfo("clang::CXXNewExpr", "CXXNewExprBits"),
+        "CXXDeleteExprClass" : StmtInfo("clang::CXXDeleteExpr", "CXXDeleteExprBits"),
+        "TypeTraitExprClass" : StmtInfo("clang::TypeTraitExpr", "TypeTraitExprBits"),
+        "DependentScopeDeclRefExprClass" : StmtInfo("clang::DependentScopeDeclRefExpr", "DependentScopeDeclRefExprBits"),
+        "CXXConstructExprClass" : StmtInfo("clang::CXXConstructExpr", "CXXConstructExprBits"),
+        "ExprWithCleanupsClass" : StmtInfo("clang::ExprWithCleanups", "ExprWithCleanupsBits"),
+        "CXXUnresolvedConstructExprClass" : StmtInfo("clang::CXXUnresolvedConstructExpr", "CXXUnresolvedConstructExprBits"),
+        "CXXDependentScopeMemberExprClass" : StmtInfo("clang::CXXDependentScopeMemberExpr", "CXXDependentScopeMemberExprBits"),
+        "UnresolvedLookupExprClass" : StmtInfo("clang::UnresolvedLookupExpr", "UnresolvedLookupExprBits"),
+        "UnresolvedMemberExprClass" : StmtInfo("clang::UnresolvedMemberExpr", "UnresolvedMemberExprBits"),
+        "CXXNoexceptExprClass" : StmtInfo("clang::CXXNoexceptExpr", "CXXNoexceptExprBits"),
+        "SubstNonTypeTemplateParmExprClass" : StmtInfo("clang::SubstNonTypeTemplateParmExpr", "SubstNonTypeTemplateParmExprBits"),
+        "LambdaExprClass" : StmtInfo("clang::LambdaExpr", "LambdaExprBits"),
+        "RequiresExprClass" : StmtInfo("clang::RequiresExpr", "RequiresExprBits"),
+
+        # C++ Coroutines expressions
+        "CoawaitExprClass" : StmtInfo("clang::CoawaitExpr", "CoawaitBits"),
+
+        # Obj-C Expressions
+        "ObjCIndirectCopyRestoreExprClass" : StmtInfo("clang::ObjCIndirectCopyRestoreExpr", "ObjCIndirectCopyRestoreExprBits"),
+
+        # Clang Extensions
+        "OpaqueValueExprClass" : StmtInfo("clang::OpaqueValueExpr", "OpaqueValueExprBits"),
+    }
+
+    @trace
+    def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
+        self.value: SBValue = value
+        self.num_children_underlying: int = 0
+        self.stmt_bits_value: SBValue = None  # type: ignore
+        self.derived_bits_value: Optional[SBValue] = None
+
+    @trace
+    def num_children(self, max_children: int) -> int:
+        # Single anonymous union can be interpreted as (up to) 2 different Bits
+        return min(self.num_children_underlying + 1, max_children)
+
+    @trace
+    def get_child_index(self, name: str) -> int:
+        print(f" name: {name}", end="")
+        if name == "StmtBits":
+            return 0
+        if self.derived_bits_value is not None and name == self.derived_bits_value.name:
+            return self.num_children_underlying + 0
+        return self.value.GetIndexOfChildWithName(name)
+
+    @trace
+    def get_child_at_index(self, index: int) -> Optional[SBValue]:
+        print(f" index: {index}", end="")
+        if index == 0:
+            # Replacing big anonymous union with StmtBits, that are there for sure.
+            return self.stmt_bits_value
+        if index == self.num_children_underlying + 0:
+            # Adding Bits of the derived class
+            return self.derived_bits_value
+        return self.value.GetChildAtIndex(index)
+
+    @trace
+    def update(self) -> bool:
+        self.num_children_underlying = self.value.GetNumChildren()
+
+        anon_union_value: SBValue = self.value.GetChildAtIndex(0)
+        assert anon_union_value.IsValid()
+        assert anon_union_value.type.name == "clang::Stmt::(anonymous union)"
+
+        self.stmt_bits_value: SBValue = anon_union_value.GetChildMemberWithName("StmtBits")
+        assert self.stmt_bits_value.IsValid()
+        sclass_value: SBValue = self.stmt_bits_value.GetChildMemberWithName('sClass')
+        assert sclass_value.IsValid()
+        sclass_name: str = sclass_value.value
+        assert sclass_name in self.sclass_mapping
+        bits_name: str = self.sclass_mapping[sclass_name].bits_name
+        if bits_name != "":
+          self.derived_bits_value = anon_union_value.GetChildMemberWithName(bits_name)
+          assert self.derived_bits_value is not None and self.derived_bits_value.IsValid()
+        return False
+
+    @trace
+    def has_children(self) -> bool:
+        return True
+
+
+@trace("TypeRecognizers")
+def recognize_stmt(value: SBValue, internal_dict) -> SBValue:
+    prefer_synthetic: bool = value.GetPreferSyntheticValue()
+    value.SetPreferSyntheticValue(False)
+
+    stmt_value: SBValue = value
+    if value.type.name.startswith("clang::Expr"):
+        value_stmt_value: SBValue = value.GetChildAtIndex(0)
+        assert value_stmt_value.IsValid()
+        assert value_stmt_value.type.name == "clang::ValueStmt"
+        stmt_value = value_stmt_value.GetChildAtIndex(0)
+    assert stmt_value.IsValid()
+    assert stmt_value.type.name == "clang::Stmt"
+    stmt_bits: SBValue = stmt_value.GetChildMemberWithName("StmtBits")
+    assert stmt_bits.IsValid()
+    sclass_value: SBValue = stmt_bits.GetChildMemberWithName('sClass')
+    assert sclass_value.IsValid()
+    sclass_name: str = sclass_value.value
+    assert sclass_name in StmtProvider.sclass_mapping
+    qual_name: str = StmtProvider.sclass_mapping[sclass_name].qual_name
+    derived_type: SBType = value.target.FindFirstType(qual_name)
+    assert derived_type.IsValid()
+
     if value.type.IsPointerType():
         derived_type = derived_type.GetPointerType()
     elif value.type.IsReferenceType():
