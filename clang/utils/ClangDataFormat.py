@@ -105,15 +105,15 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     # debugger.HandleCommand("type summary add -F ClangDataFormat.QualTypeProvider.get_summary clang::QualType")
     # debugger.HandleCommand("type summary add --python-function ClangDataFormat.StringMapEntryProvider.get_summary -x '^llvm::StringMapEntry<.+>$'")
 
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerIntPairProvider -x '^llvm::PointerIntPair<.+>$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PunnedPointerProvider  -x '^llvm::detail::PunnedPointer<.+>$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.StringMapEntryProvider -x '^llvm::StringMapEntry<.+>$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerUnionProvider   -x '^llvm::PointerUnion<.+>$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.QualTypeProvider       -x '^clang::QualType$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TypeProvider           -x '^clang::Type$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TemplateTypeParmTypeProvider -x '^clang::TemplateTypeParmType$'")
-    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclContextProvider    -x '^clang::DeclContext$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclContextProvider     -x '^clang::DeclContext$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclarationNameProvider -x '^clang::DeclarationName$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerIntPairProvider  -x '^llvm::PointerIntPair<.+>$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerUnionProvider    -x '^llvm::PointerUnion<.+>$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PunnedPointerProvider   -x '^llvm::detail::PunnedPointer<.+>$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.QualTypeProvider        -x '^clang::QualType$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.StringMapEntryProvider  -x '^llvm::StringMapEntry<.+>$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TemplateTypeParmTypeProvider -x '^clang::TemplateTypeParmType$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TypeProvider            -x '^clang::Type$'")
 
     if debugger.GetVersionString().startswith("lldb version 19"):
       debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_type 'clang::Type'")
