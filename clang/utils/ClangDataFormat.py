@@ -521,36 +521,69 @@ class TemplateTypeParmTypeProvider(SBSyntheticValueProvider):
 
 
 class TypeProvider(SBSyntheticValueProvider):
+    class TypeInfo(NamedTuple):
+        '''
+        Qualified name of the type. Typically used to call FindFirstType.
+        '''
+        qual_name: str
+
+        '''
+        Name of the data member that holds bit-fields, e.g. AutoTypeBits.
+        '''
+        bits_name: str = ""
+
+    type_class_mapping = {
+      "Enum": TypeInfo("clang::EnumType"),
+      "TemplateTypeParm": TypeInfo("clang::TemplateTypeParmType"),
+    }
+
     @trace
     def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
-        self.value = value
-        self.type_bits: SBValue = None  # type: ignore
+        self.value: SBValue = value
+        self.num_children_underlying: int = 0
+        self.type_bits_value: SBValue = None  # type: ignore
+        self.derived_bits_value: Optional[SBValue] = None
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return self.value.GetNumChildren(max_children)
+        # Single anonymous union can be interpreted as (up to) 2 different Bits
+        return min(self.num_children_underlying + 1, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
         print(f" name: {name}", end="")
         if name == "TypeBits":
             return 1
+        if self.derived_bits_value is not None and name == self.derived_bits_value.name:
+            return self.num_children_underlying
         return self.value.GetIndexOfChildWithName(name)
 
     @trace
     def get_child_at_index(self, index: int) -> Optional[SBValue]:
         print(f" index: {index}", end="")
         if index == 1:
-            # Replacing big anonymous union with just TypeBits
-            return self.type_bits
-        return None
+            # Replacing big anonymous union with the right Bits
+            return self.type_bits_value
+        if index == self.num_children_underlying:
+            return self.derived_bits_value
+        return self.value.GetChildAtIndex(index)
 
     @trace
     def update(self) -> bool:
+        self.num_children_underlying = self.value.GetNumChildren()
+
         anon_union_value: SBValue = self.value.children[1]
         assert anon_union_value.type.name == "clang::Type::(anonymous union)"
-        self.type_bits: SBValue = anon_union_value.GetChildMemberWithName("TypeBits")
-        assert self.type_bits.IsValid()
+        self.type_bits_value: SBValue = anon_union_value.GetChildMemberWithName("TypeBits")
+        assert self.type_bits_value.IsValid()
+        type_class_value: SBValue = self.type_bits_value.GetChildMemberWithName('TC')
+        assert type_class_value.IsValid()
+        type_class_name: str = type_class_value.value
+        assert type_class_name in self.type_class_mapping
+        bits_name: str = self.type_class_mapping[type_class_name].bits_name
+        if bits_name != "":
+          self.derived_bits_value = anon_union_value.GetChildMemberWithName(bits_name)
+          assert self.derived_bits_value is not None and self.derived_bits_value.IsValid()
         return False
 
     @trace
