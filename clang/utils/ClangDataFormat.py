@@ -311,7 +311,9 @@ class DeclContextProvider(SBSyntheticValueProvider):
 class DeclarationNameProvider(SBSyntheticValueProvider):
     @trace
     def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
-        self.value = value
+        self.value: SBValue = value
+        self.num_children_underlying: int = 0
+        self.name_kind_value: SBValue = None  # type: ignore
 
     @trace
     def has_children(self) -> bool:
@@ -319,7 +321,8 @@ class DeclarationNameProvider(SBSyntheticValueProvider):
 
     @trace
     def num_children(self, max_children: int) -> int:
-        return min(2, max_children)
+        # Ptr member is very much like PointerIntPair, so it gives us 2 children
+        return min(self.num_children_underlying + 1, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
@@ -327,24 +330,32 @@ class DeclarationNameProvider(SBSyntheticValueProvider):
         if name == "Pointer":
             return 0
         if name == "NameKind":
-            return 1
-        return -1
+            return self.num_children_underlying + 0
+        return self.value.GetIndexOfChildWithName(name)
 
     @trace
     def get_child_at_index(self, index: int) -> Optional[SBValue]:
         print(f" index: {index}", end="")
         if index == 0:
+            # Replacing bit-packed pointer with normal pointer value
             return self.pointee_value
-        if index == 1:
+        if index == self.num_children_underlying + 0:
+            # Adding the enum value stored in pointer bits
             return self.name_kind_value
-        return None
+        return self.value.GetChildAtIndex(index)
 
     @trace
     def update(self) -> bool:
+        self.num_children_underlying = self.value.GetNumChildren()
+        
+        ptr_value: SBValue = self.value.GetChildAtIndex(0)
+        assert ptr_value.IsValid()
+        assert ptr_value.name == "Ptr"
+        assert ptr_value.type.name == "uintptr_t"
+
         name_kind_enum: SBType = self.value.type.FindDirectNestedType("StoredNameKind")
         assert name_kind_enum.IsValid()
         ptr_mask_value: SBValue = get_enumerator_by_name(name_kind_enum, "PtrMask")
-        ptr_value: SBValue = self.value.GetChildMemberWithName("Ptr")
         raw_ptr_value: int = ptr_value.GetValueAsUnsigned()
 
         raw_int_mask: int = ptr_mask_value.unsigned
