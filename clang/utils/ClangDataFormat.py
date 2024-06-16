@@ -111,7 +111,6 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerUnionProvider   -x '^llvm::PointerUnion<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.QualTypeProvider       -x '^clang::QualType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TypeProvider           -x '^clang::Type$'")
-    # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TagTypeProvider        -x '^clang::TagType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TemplateTypeParmTypeProvider -x '^clang::TemplateTypeParmType$'")
     # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclProvider           -x '^clang::Decl$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclContextProvider    -x '^clang::DeclContext$'")
@@ -434,39 +433,6 @@ class QualTypeProvider(SBSyntheticValueProvider):
         for enumerator in qualifiers_enum.enum_members:
             result = result or raw_int_value & enumerator.unsigned
         return result
-
-
-class TagTypeProvider(SBSyntheticValueProvider):
-    @trace
-    def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
-        self.value = value
-
-    @trace
-    def has_children(self) -> bool:
-        return True
-
-    @trace
-    def num_children(self, max_children: int) -> int:
-        return min(1, max_children)
-
-    @trace
-    def get_child_index(self, name: str) -> int:
-        print(f" name: {name}", end="")
-        if name == "decl":
-            return 0
-        return -1
-
-    @trace
-    def get_child_at_index(self, index: int) -> Optional[SBValue]:
-        print(f" index: {index}", end="")
-        if index == 0:
-            return self.decl_value
-        return None
-
-    @trace
-    def update(self) -> bool:
-        self.decl_value: SBValue = self.value.GetChildMemberWithName("decl")
-        return False
 
 
 class TemplateTypeParmTypeProvider(SBSyntheticValueProvider):
