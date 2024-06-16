@@ -112,7 +112,6 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.QualTypeProvider       -x '^clang::QualType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TypeProvider           -x '^clang::Type$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TemplateTypeParmTypeProvider -x '^clang::TemplateTypeParmType$'")
-    # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclProvider           -x '^clang::Decl$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclContextProvider    -x '^clang::DeclContext$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclarationNameProvider -x '^clang::DeclarationName$'")
 
@@ -198,46 +197,6 @@ class StringMapEntryProvider(SBSyntheticValueProvider):
         provider: StringMapEntryProvider = cls(value)
         provider.update()
         return f"{{{provider.key_value.summary} : {provider.value_value.summary}}}"
-
-
-class DeclProvider(SBSyntheticValueProvider):
-    @trace
-    def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
-        self.value = value
-
-    @trace
-    def has_children(self) -> bool:
-        return True
-
-    @trace
-    def num_children(self, max_children: int) -> int:
-        return min(1, max_children)
-
-    @trace
-    def get_child_index(self, name: str) -> int:
-        print(f" name: {name}", end="")
-        if name == "DeclKind":
-            return 0
-        return -1
-
-    @trace
-    def get_child_at_index(self, index: int) -> Optional[SBValue]:
-        print(f" index: {index}", end="")
-        if index == 0:
-            return self.decl_kind_value
-        return None
-
-    @trace
-    def update(self) -> bool:
-        type: SBType = self.value.type
-        if type.is_pointer:
-            type: SBType = type.GetPointeeType()
-        self.decl_kind_value: SBValue = self.value.GetChildMemberWithName("DeclKind")
-        decl_kind_type: SBType = type.FindDirectNestedType("Kind")  # type: ignore
-        if decl_kind_type.IsValid():
-            self.decl_kind_value: SBValue = cast_value(decl_kind_type, self.decl_kind_value)
-        self.decl_value: SBValue = self.value.GetChildMemberWithName("decl")
-        return False
 
 
 class DeclContextProvider(SBSyntheticValueProvider):
