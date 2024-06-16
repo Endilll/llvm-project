@@ -552,7 +552,7 @@ class TypeProvider(SBSyntheticValueProvider):
         if name == "TypeBits":
             return 1
         if self.derived_bits_value is not None and name == self.derived_bits_value.name:
-            return self.num_children_underlying
+            return self.num_children_underlying + 0
         return self.value.GetIndexOfChildWithName(name)
 
     @trace
@@ -561,7 +561,7 @@ class TypeProvider(SBSyntheticValueProvider):
         if index == 1:
             # Replacing big anonymous union with the right Bits
             return self.type_bits_value
-        if index == self.num_children_underlying:
+        if index == self.num_children_underlying + 0:
             return self.derived_bits_value
         return self.value.GetChildAtIndex(index)
 
@@ -569,8 +569,10 @@ class TypeProvider(SBSyntheticValueProvider):
     def update(self) -> bool:
         self.num_children_underlying = self.value.GetNumChildren()
 
-        anon_union_value: SBValue = self.value.children[1]
+        anon_union_value: SBValue = self.value.GetChildAtIndex(1)
+        assert anon_union_value.IsValid()
         assert anon_union_value.type.name == "clang::Type::(anonymous union)"
+
         self.type_bits_value: SBValue = anon_union_value.GetChildMemberWithName("TypeBits")
         assert self.type_bits_value.IsValid()
         type_class_value: SBValue = self.type_bits_value.GetChildMemberWithName('TC')
