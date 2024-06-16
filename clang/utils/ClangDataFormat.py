@@ -94,6 +94,7 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
 
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclContextProvider     -x '^clang::DeclContext$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclarationNameProvider -x '^clang::DeclarationName$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.ExprProvider            -x '^clang::Expr$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerIntPairProvider  -x '^llvm::PointerIntPair<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerUnionProvider    -x '^llvm::PointerUnion<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PunnedPointerProvider   -x '^llvm::detail::PunnedPointer<.+>$'")
@@ -104,6 +105,7 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TypeProvider            -x '^clang::Type$'")
 
     if debugger.GetVersionString().startswith("lldb version 19"):
+      # clang::Decl has vtable, so it's handled by built-in LLDB machinery
       debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_stmt 'clang::Expr'")
       debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_stmt 'clang::Stmt'")
       debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_type 'clang::Type'")
@@ -649,7 +651,6 @@ class StmtProvider(SBSyntheticValueProvider):
         "NullStmtClass"         : StmtInfo("clang::NullStmt", "NullStmtBits"),
         "CompoundStmtClass"     : StmtInfo("clang::CompoundStmt", "CompoundStmtBits"),
         "LabelStmtClass"        : StmtInfo("clang::LabelStmt", "LabelStmtBits"),
-        "AttributedStmtClass"   : StmtInfo("clang::AttributedStmt", "AttributedStmtBits"),
         "IfStmtClass"           : StmtInfo("clang::IfStmt", "IfStmtBits"),
         "SwitchStmtClass"       : StmtInfo("clang::SwitchStmt", "SwitchStmtBits"),
         "WhileStmtClass"        : StmtInfo("clang::WhileStmt", "WhileStmtBits"),
@@ -1016,6 +1017,52 @@ def recognize_stmt(value: SBValue, internal_dict) -> SBValue:
 
     value.SetPreferSyntheticValue(prefer_synthetic)
     return derived_value
+
+
+class ExprProvider(SBSyntheticValueProvider):
+    @trace
+    def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
+        self.value: SBValue = value
+        self.num_children_underlying: int = 0
+        self.expr_bits_value: SBValue = None  # type: ignore
+
+    @trace
+    def num_children(self, max_children: int) -> int:
+        # Adding ExprBits
+        return min(self.num_children_underlying + 1, max_children)
+
+    @trace
+    def get_child_index(self, name: str) -> int:
+        print(f" name: {name}", end="")
+        if name == "ExprBits":
+            return self.num_children_underlying + 0
+        return self.value.GetIndexOfChildWithName(name)
+
+    @trace
+    def get_child_at_index(self, index: int) -> Optional[SBValue]:
+        print(f" index: {index}", end="")
+        if index == self.num_children_underlying + 0:
+            # Adding ExprBits
+            self.expr_bits_value
+        return self.value.GetChildAtIndex(index)
+
+    @trace
+    def update(self) -> bool:
+        self.num_children_underlying = self.value.GetNumChildren()
+
+        value_stmt_value: SBValue = self.value.GetChildAtIndex(0)
+        assert value_stmt_value.IsValid()
+        assert value_stmt_value.type.name == "clang::ValueStmt"
+        stmt_value = value_stmt_value.GetChildAtIndex(0)
+        assert stmt_value.IsValid()
+        assert stmt_value.type.name == "clang::Stmt"
+        self.expr_bits_value: SBValue = stmt_value.GetChildMemberWithName("ExprBits")
+        assert self.expr_bits_value.IsValid()
+        return False
+
+    @trace
+    def has_children(self) -> bool:
+        return True
 
 
 class PointerIntPairProvider(SBSyntheticValueProvider):
