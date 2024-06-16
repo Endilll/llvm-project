@@ -107,7 +107,7 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
 
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerIntPairProvider -x '^llvm::PointerIntPair<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PunnedPointerProvider  -x '^llvm::detail::PunnedPointer<.+>$'")
-    # debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.StringMapEntryProvider -x '^llvm::StringMapEntry<.+>$'")
+    debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.StringMapEntryProvider -x '^llvm::StringMapEntry<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.PointerUnionProvider   -x '^llvm::PointerUnion<.+>$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.QualTypeProvider       -x '^clang::QualType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TypeProvider           -x '^clang::Type$'")
@@ -122,7 +122,8 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
 class StringMapEntryProvider(SBSyntheticValueProvider):
     @trace
     def __init__(self, value: SBValue, internal_dict: Dict[Any, Any] = {}):
-        self.value = value
+        self.value: SBValue = value
+        self.num_children_underlying: int = 0
 
     @trace
     def has_children(self) -> bool:
@@ -131,46 +132,62 @@ class StringMapEntryProvider(SBSyntheticValueProvider):
     @trace
     def num_children(self, max_children: int) -> int:
         # Adding 'Key' and 'Value' children
-        return min(self.value.GetNumChildren(max_children) + 2, max_children)
+        return min(self.num_children_underlying + 2, max_children)
 
     @trace
     def get_child_index(self, name: str) -> int:
         print(f" name: {name}", end="")
         if name == "Key":
-            return 1
+            return self.num_children_underlying + 0
         if name == "Value":
-            return 2
+            return self.num_children_underlying + 1
         return self.value.GetIndexOfChildWithName(name)
 
     @trace
     def get_child_at_index(self, index: int) -> Optional[SBValue]:
-        print(f" index: {index}", end="")
-        if index == 1:
+        print(f" index: {index}, self.num_children_underlying: {self.num_children_underlying}", end="")
+        if index == self.num_children_underlying + 0:
+            print(" returning Key", end= "")
+            # Adding a child for Key
             return self.key_value
-        if index == 2:
+        if index == self.num_children_underlying + 1:
+            print(" returning Value", end= "")
+            # Adding a child for Value
             return self.value_value
         return self.value.GetChildAtIndex(index)
 
     @trace
     def update(self) -> bool:
+        self.num_children_underlying = self.value.GetNumChildren()
+
         value: SBValue = self.value
         if value.type.is_pointer:
             value = value.Dereference()
         target: SBTarget = value.target
 
-        self.key_length_value: SBValue = value.GetChildMemberWithName("keyLength")
-        raw_key_length: int = self.key_length_value.unsigned
+        key_length_value: SBValue = value.GetChildMemberWithName("keyLength")
+        assert key_length_value.IsValid()
+        raw_key_length: int = key_length_value.unsigned
 
         char_type: SBType = target.GetBasicType(lldb.eBasicTypeChar)
+        assert char_type.IsValid()
         char_array_type: SBType = char_type.GetArrayType(raw_key_length + 1)
+        assert char_array_type.IsValid()
 
         addr: SBAddress = value.addr
+        assert addr.IsValid()
         addr.OffsetAddress(value.type.size)
 
         self.key_value: SBValue = target.CreateValueFromAddress("Key", addr, char_array_type)
+        assert self.key_value.IsValid()
         self.key_value.SetSyntheticChildrenGenerated(True)
 
-        self.value_value: SBValue = value.GetChildMemberWithName("second").Clone("Value")
+        base_value = value.GetChildAtIndex(0)
+        assert base_value.IsValid()
+        second_value = base_value.GetChildMemberWithName("second")
+        assert second_value.IsValid()
+        self.value_value: SBValue = second_value.Clone("Value")
+        assert self.value_value.IsValid()
         self.value_value.SetSyntheticChildrenGenerated(True)
 
         return False
