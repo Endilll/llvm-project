@@ -115,7 +115,8 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclContextProvider    -x '^clang::DeclContext$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.DeclarationNameProvider -x '^clang::DeclarationName$'")
 
-    debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_type 'clang::Type'")
+    if debugger.GetVersionString().startswith("lldb version 19"):
+      debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_type 'clang::Type'")
 
 
 class StringMapEntryProvider(SBSyntheticValueProvider):
@@ -147,11 +148,11 @@ class StringMapEntryProvider(SBSyntheticValueProvider):
         print(f" index: {index}, self.num_children_underlying: {self.num_children_underlying}", end="")
         if index == self.num_children_underlying + 0:
             print(" returning Key", end= "")
-            # Adding a child for Key
+            # Adding a child for key
             return self.key_value
         if index == self.num_children_underlying + 1:
             print(" returning Value", end= "")
-            # Adding a child for Value
+            # Adding a child for value
             return self.value_value
         return self.value.GetChildAtIndex(index)
 
