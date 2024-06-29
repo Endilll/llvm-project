@@ -538,7 +538,7 @@ public:
                            std::string &destination,
                            const TypeSummaryOptions &options);
 
-  const char *GetObjectDescription();
+  llvm::Expected<std::string> GetObjectDescription();
 
   bool HasSpecialPrintableRepresentation(
       ValueObjectRepresentationStyle val_obj_display,
@@ -695,9 +695,9 @@ public:
 
   virtual SymbolContextScope *GetSymbolContextScope();
 
-  void Dump(Stream &s);
+  llvm::Error Dump(Stream &s);
 
-  void Dump(Stream &s, const DumpValueObjectOptions &options);
+  llvm::Error Dump(Stream &s, const DumpValueObjectOptions &options);
 
   static lldb::ValueObjectSP
   CreateValueObjectFromExpression(llvm::StringRef name,
