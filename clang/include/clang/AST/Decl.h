@@ -1323,7 +1323,7 @@ public:
 
   /// Determine whether this is or was instantiated from an out-of-line
   /// definition of a static data member.
-  bool isOutOfLine() const override;
+  bool isOutOfLineImpl() const;
 
   /// Returns true for file scoped variable declaration.
   bool isFileVarDecl() const {
@@ -3026,7 +3026,7 @@ public:
 
   /// Determine whether this is or was instantiated from an out-of-line
   /// definition of a member function.
-  bool isOutOfLine() const override;
+  bool isOutOfLineImpl() const;
 
   /// Identify a memory copying or setting function.
   /// If the given function is a memory copy or setting function, returns

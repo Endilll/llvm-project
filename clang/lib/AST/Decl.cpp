@@ -20,6 +20,7 @@
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclFriend.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclOpenMP.h"
 #include "clang/AST/DeclTemplate.h"
@@ -98,6 +99,23 @@ void PrettyDeclStackTraceEntry::print(raw_ostream &OS) const {
 
 // Defined here so that it can be inlined into its direct callers.
 bool Decl::isOutOfLine() const {
+  switch (getKind()) {
+#define ABSTRACT_DECL(Type)
+#define DECL_RANGE(Base, First, Last)
+#define DECL_CONTEXT(Decl)
+#define DECL(TYPE, BASE) \
+    case Kind::TYPE: \
+      return llvm::cast<TYPE##Decl>(this)->isOutOfLineImpl();
+#include "clang/AST/DeclNodes.inc"
+#undef DECL
+#undef DECL_CONTEXT
+#undef DECL_RANGE
+#undef ABSTRACT_DECL
+  }
+  return isOutOfLineImpl();
+}
+
+bool Decl::isOutOfLineImpl() const {
   return !getLexicalDeclContext()->Equals(getDeclContext());
 }
 
@@ -2416,8 +2434,8 @@ VarDecl *VarDecl::getInitializingDeclaration() {
   return Def;
 }
 
-bool VarDecl::isOutOfLine() const {
-  if (Decl::isOutOfLine())
+bool VarDecl::isOutOfLineImpl() const {
+  if (Decl::isOutOfLineImpl())
     return true;
 
   if (!isStaticDataMember())
@@ -4350,8 +4368,8 @@ SourceLocation FunctionDecl::getPointOfInstantiation() const {
   return SourceLocation();
 }
 
-bool FunctionDecl::isOutOfLine() const {
-  if (Decl::isOutOfLine())
+bool FunctionDecl::isOutOfLineImpl() const {
+  if (Decl::isOutOfLineImpl())
     return true;
 
   // If this function was instantiated from a member function of a
