@@ -526,7 +526,7 @@ public:
   bool isGnuLocal() const { return LocStart != getLocation(); }
   void setLocStart(SourceLocation L) { LocStart = L; }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(LocStart, getLocation());
   }
 
@@ -678,7 +678,7 @@ public:
     return getOriginalNamespace();
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(LocStart, RBraceLoc);
   }
 
@@ -817,7 +817,7 @@ public:
   /// declarations.
   SourceLocation getOuterLocStart() const;
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   SourceLocation getBeginLoc() const LLVM_READONLY {
     return getOuterLocStart();
@@ -1148,7 +1148,7 @@ public:
 
   static VarDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   /// Returns the storage class as written in the source. For the
   /// computed linkage of symbol, see getLinkage.
@@ -1784,7 +1784,7 @@ public:
 
   static ParmVarDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   void setObjCMethodScopeInfo(unsigned parameterIndex) {
     ParmVarDeclBits.IsObjCMethodParam = true;
@@ -2198,7 +2198,7 @@ public:
     return SourceLocation();
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   // Function definitions.
   //
@@ -3287,7 +3287,7 @@ public:
     return dyn_cast<RecordDecl>(getDeclContext());
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   /// Retrieves the canonical declaration of this field.
   FieldDecl *getCanonicalDecl() override { return getFirstDecl(); }
@@ -3336,7 +3336,7 @@ public:
     IsUnsigned = V.isUnsigned();
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   /// Retrieves the canonical declaration of this enumerator.
   EnumConstantDecl *getCanonicalDecl() override { return getFirstDecl(); }
@@ -3428,7 +3428,7 @@ public:
 
   SourceLocation getBeginLoc() const LLVM_READONLY { return LocStart; }
   void setLocStart(SourceLocation L) { LocStart = L; }
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     if (LocStart.isValid())
       return SourceRange(LocStart, getLocation());
     else
@@ -3555,7 +3555,7 @@ public:
                              const IdentifierInfo *Id, TypeSourceInfo *TInfo);
   static TypedefDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   // Implement isa/cast/dyncast/etc.
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
@@ -3580,7 +3580,7 @@ public:
                                const IdentifierInfo *Id, TypeSourceInfo *TInfo);
   static TypeAliasDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   TypeAliasTemplateDecl *getDescribedAliasTemplate() const { return Template; }
   void setDescribedAliasTemplate(TypeAliasTemplateDecl *TAT) { Template = TAT; }
@@ -3682,7 +3682,7 @@ public:
   /// Return SourceLocation representing start of source
   /// range taking into account any outer template declarations.
   SourceLocation getOuterLocStart() const;
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   TagDecl *getCanonicalDecl() override;
   const TagDecl *getCanonicalDecl() const {
@@ -3992,7 +3992,7 @@ public:
 
   /// Overrides to provide correct range when there's an enum-base specifier
   /// with forward declarations.
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   /// When created, the EnumDecl corresponds to a
   /// forward-declared enum. This method is used to mark the
@@ -4449,7 +4449,7 @@ public:
   SourceLocation getAsmLoc() const { return getLocation(); }
   SourceLocation getRParenLoc() const { return RParenLoc; }
   void setRParenLoc(SourceLocation L) { RParenLoc = L; }
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(getAsmLoc(), getRParenLoc());
   }
 
@@ -4482,7 +4482,7 @@ public:
   static TopLevelStmtDecl *Create(ASTContext &C, Stmt *Statement);
   static TopLevelStmtDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
   Stmt *getStmt() { return Statement; }
   const Stmt *getStmt() const { return Statement; }
   void setStmt(Stmt *S);
@@ -4678,7 +4678,7 @@ public:
     ManglingContextDecl = Ctx;
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   FunctionEffectsRef getFunctionEffects() const {
     if (const TypeSourceInfo *TSI = getSignatureAsWritten())
@@ -4882,7 +4882,7 @@ public:
   /// identifiers aren't available.
   ArrayRef<SourceLocation> getIdentifierLocs() const;
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
   static bool classofKind(Kind K) { return K == Import; }
@@ -4926,7 +4926,7 @@ public:
     return decls_empty() ? getLocation() : decls_begin()->getEndLoc();
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(getLocation(), getEndLoc());
   }
 
@@ -4977,7 +4977,7 @@ public:
                                 SourceLocation LBrace);
   static HLSLBufferDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(getLocStart(), RBraceLoc);
   }
   SourceLocation getLocStart() const LLVM_READONLY { return KwLoc; }

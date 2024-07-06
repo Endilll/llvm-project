@@ -144,7 +144,7 @@ public:
   }
 
   /// Retrieves the source range for the friend declaration.
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     if (NamedDecl *ND = getFriendDecl()) {
       if (const auto *FD = dyn_cast<FunctionDecl>(ND))
         return FD->getSourceRange();

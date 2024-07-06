@@ -1494,7 +1494,7 @@ ObjCTypeParamDecl *ObjCTypeParamDecl::CreateDeserialized(ASTContext &ctx,
                                          nullptr, SourceLocation(), nullptr);
 }
 
-SourceRange ObjCTypeParamDecl::getSourceRange() const {
+SourceRange ObjCTypeParamDecl::getSourceRangeImpl() const {
   SourceLocation startLoc = VarianceLoc;
   if (startLoc.isInvalid())
     startLoc = getLocation();
@@ -2400,7 +2400,7 @@ ObjCPropertyImplDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID) {
                                           nullptr, SourceLocation());
 }
 
-SourceRange ObjCPropertyImplDecl::getSourceRange() const {
+SourceRange ObjCPropertyImplDecl::getSourceRangeImpl() const {
   SourceLocation EndLoc = getLocation();
   if (IvarLoc.isValid())
     EndLoc = IvarLoc;

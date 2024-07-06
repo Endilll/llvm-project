@@ -2062,7 +2062,7 @@ static bool typeIsPostfix(QualType QT) {
   }
 }
 
-SourceRange DeclaratorDecl::getSourceRange() const {
+SourceRange DeclaratorDecl::getSourceRangeImpl() const {
   SourceLocation RangeEnd = getLocation();
   if (TypeSourceInfo *TInfo = getTypeSourceInfo()) {
     // If the declaration has no name or the type extends past the name take the
@@ -2162,15 +2162,15 @@ VarDecl::TLSKind VarDecl::getTLSKind() const {
   llvm_unreachable("Unknown thread storage class specifier!");
 }
 
-SourceRange VarDecl::getSourceRange() const {
+SourceRange VarDecl::getSourceRangeImpl() const {
   if (const Expr *Init = getInit()) {
     SourceLocation InitEnd = Init->getEndLoc();
     // If Init is implicit, ignore its source range and fallback on
-    // DeclaratorDecl::getSourceRange() to handle postfix elements.
+    // DeclaratorDecl::getSourceRangeImpl() to handle postfix elements.
     if (InitEnd.isValid() && InitEnd != getLocation())
       return SourceRange(getOuterLocStart(), InitEnd);
   }
-  return DeclaratorDecl::getSourceRange();
+  return DeclaratorDecl::getSourceRangeImpl();
 }
 
 template<typename T>
@@ -2916,7 +2916,7 @@ ParmVarDecl *ParmVarDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID) {
                   nullptr, QualType(), nullptr, SC_None, nullptr);
 }
 
-SourceRange ParmVarDecl::getSourceRange() const {
+SourceRange ParmVarDecl::getSourceRangeImpl() const {
   if (!hasInheritedDefaultArg()) {
     SourceRange ArgRange = getDefaultArgRange();
     if (ArgRange.isValid())
@@ -2928,7 +2928,7 @@ SourceRange ParmVarDecl::getSourceRange() const {
   if (isa<ObjCMethodDecl>(getDeclContext()))
     return SourceRange(DeclaratorDecl::getBeginLoc(), getLocation());
 
-  return DeclaratorDecl::getSourceRange();
+  return DeclaratorDecl::getSourceRangeImpl();
 }
 
 bool ParmVarDecl::isDestroyedInCallee() const {
@@ -4373,7 +4373,7 @@ bool FunctionDecl::isOutOfLine() const {
   return false;
 }
 
-SourceRange FunctionDecl::getSourceRange() const {
+SourceRange FunctionDecl::getSourceRangeImpl() const {
   return SourceRange(getOuterLocStart(), EndRangeLoc);
 }
 
@@ -4644,13 +4644,13 @@ unsigned FieldDecl::getFieldIndex() const {
   return CachedFieldIndex - 1;
 }
 
-SourceRange FieldDecl::getSourceRange() const {
+SourceRange FieldDecl::getSourceRangeImpl() const {
   const Expr *FinalExpr = getInClassInitializer();
   if (!FinalExpr)
     FinalExpr = getBitWidth();
   if (FinalExpr)
     return SourceRange(getInnerLocStart(), FinalExpr->getEndLoc());
-  return DeclaratorDecl::getSourceRange();
+  return DeclaratorDecl::getSourceRangeImpl();
 }
 
 void FieldDecl::setCapturedVLAType(const VariableArrayType *VLAType) {
@@ -4698,7 +4698,7 @@ SourceLocation TagDecl::getOuterLocStart() const {
   return getTemplateOrInnerLocStart(this);
 }
 
-SourceRange TagDecl::getSourceRange() const {
+SourceRange TagDecl::getSourceRangeImpl() const {
   SourceLocation RBraceLoc = BraceRange.getEnd();
   SourceLocation E = RBraceLoc.isValid() ? RBraceLoc : getLocation();
   return SourceRange(getOuterLocStart(), E);
@@ -4940,8 +4940,8 @@ unsigned EnumDecl::getODRHash() {
   return ODRHash;
 }
 
-SourceRange EnumDecl::getSourceRange() const {
-  auto Res = TagDecl::getSourceRange();
+SourceRange EnumDecl::getSourceRangeImpl() const {
+  auto Res = TagDecl::getSourceRangeImpl();
   // Set end-point to enum-base, e.g. enum foo : ^bar
   if (auto *TSI = getIntegerTypeSourceInfo()) {
     // TagDecl doesn't know about the enum base.
@@ -5240,7 +5240,7 @@ bool BlockDecl::capturesVariable(const VarDecl *variable) const {
   return false;
 }
 
-SourceRange BlockDecl::getSourceRange() const {
+SourceRange BlockDecl::getSourceRangeImpl() const {
   return SourceRange(getLocation(), Body ? Body->getEndLoc() : getLocation());
 }
 
@@ -5472,7 +5472,7 @@ IndirectFieldDecl *IndirectFieldDecl::CreateDeserialized(ASTContext &C,
                         QualType(), std::nullopt);
 }
 
-SourceRange EnumConstantDecl::getSourceRange() const {
+SourceRange EnumConstantDecl::getSourceRangeImpl() const {
   SourceLocation End = getLocation();
   if (Init)
     End = Init->getEndLoc();
@@ -5546,7 +5546,7 @@ TypeAliasDecl *TypeAliasDecl::CreateDeserialized(ASTContext &C,
                                    SourceLocation(), nullptr, nullptr);
 }
 
-SourceRange TypedefDecl::getSourceRange() const {
+SourceRange TypedefDecl::getSourceRangeImpl() const {
   SourceLocation RangeEnd = getLocation();
   if (TypeSourceInfo *TInfo = getTypeSourceInfo()) {
     if (typeIsPostfix(TInfo->getType()))
@@ -5555,7 +5555,7 @@ SourceRange TypedefDecl::getSourceRange() const {
   return SourceRange(getBeginLoc(), RangeEnd);
 }
 
-SourceRange TypeAliasDecl::getSourceRange() const {
+SourceRange TypeAliasDecl::getSourceRangeImpl() const {
   SourceLocation RangeEnd = getBeginLoc();
   if (TypeSourceInfo *TInfo = getTypeSourceInfo())
     RangeEnd = TInfo->getTypeLoc().getSourceRange().getEnd();
@@ -5595,7 +5595,7 @@ TopLevelStmtDecl *TopLevelStmtDecl::CreateDeserialized(ASTContext &C,
       TopLevelStmtDecl(/*DC=*/nullptr, SourceLocation(), /*S=*/nullptr);
 }
 
-SourceRange TopLevelStmtDecl::getSourceRange() const {
+SourceRange TopLevelStmtDecl::getSourceRangeImpl() const {
   return SourceRange(getLocation(), Statement->getEndLoc());
 }
 
@@ -5716,7 +5716,7 @@ ArrayRef<SourceLocation> ImportDecl::getIdentifierLocs() const {
                         getNumModuleIdentifiers(getImportedModule()));
 }
 
-SourceRange ImportDecl::getSourceRange() const {
+SourceRange ImportDecl::getSourceRangeImpl() const {
   if (!isImportComplete())
     return SourceRange(getLocation(), *getTrailingObjects<SourceLocation>());
 

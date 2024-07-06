@@ -674,7 +674,7 @@ SourceLocation TemplateTypeParmDecl::getDefaultArgumentLoc() const {
                               : SourceLocation();
 }
 
-SourceRange TemplateTypeParmDecl::getSourceRange() const {
+SourceRange TemplateTypeParmDecl::getSourceRangeImpl() const {
   if (hasDefaultArgument() && !defaultArgumentWasInherited())
     return SourceRange(getBeginLoc(),
                        getDefaultArgument().getSourceRange().getEnd());
@@ -683,7 +683,7 @@ SourceRange TemplateTypeParmDecl::getSourceRange() const {
   // it will return <[[typename>]] instead of <[[typename]]>
   if (getDeclName().isEmpty())
     return SourceRange(getBeginLoc());
-  return TypeDecl::getSourceRange();
+  return TypeDecl::getSourceRangeImpl();
 }
 
 void TemplateTypeParmDecl::setDefaultArgument(
@@ -793,11 +793,11 @@ NonTypeTemplateParmDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID,
   return NTTP;
 }
 
-SourceRange NonTypeTemplateParmDecl::getSourceRange() const {
+SourceRange NonTypeTemplateParmDecl::getSourceRangeImpl() const {
   if (hasDefaultArgument() && !defaultArgumentWasInherited())
     return SourceRange(getOuterLocStart(),
                        getDefaultArgument().getSourceRange().getEnd());
-  return DeclaratorDecl::getSourceRange();
+  return DeclaratorDecl::getSourceRangeImpl();
 }
 
 SourceLocation NonTypeTemplateParmDecl::getDefaultArgumentLoc() const {
@@ -999,7 +999,7 @@ ClassTemplateSpecializationDecl::getSpecializedTemplate() const {
 }
 
 SourceRange
-ClassTemplateSpecializationDecl::getSourceRange() const {
+ClassTemplateSpecializationDecl::getSourceRangeImpl() const {
   switch (getSpecializationKind()) {
   case TSK_Undeclared:
   case TSK_ImplicitInstantiation: {
@@ -1014,7 +1014,7 @@ ClassTemplateSpecializationDecl::getSourceRange() const {
     return Pattern.get<ClassTemplateDecl *>()->getSourceRange();
   }
   case TSK_ExplicitSpecialization: {
-    SourceRange Range = CXXRecordDecl::getSourceRange();
+    SourceRange Range = CXXRecordDecl::getSourceRangeImpl();
     if (const ASTTemplateArgumentListInfo *Args = getTemplateArgsAsWritten();
         !isThisDeclarationADefinition() && Args)
       Range.setEnd(Args->getRAngleLoc());
@@ -1022,7 +1022,7 @@ ClassTemplateSpecializationDecl::getSourceRange() const {
   }
   case TSK_ExplicitInstantiationDeclaration:
   case TSK_ExplicitInstantiationDefinition: {
-    SourceRange Range = CXXRecordDecl::getSourceRange();
+    SourceRange Range = CXXRecordDecl::getSourceRangeImpl();
     if (SourceLocation ExternKW = getExternKeywordLoc(); ExternKW.isValid())
       Range.setBegin(ExternKW);
     else if (SourceLocation TemplateKW = getTemplateKeywordLoc();
@@ -1166,12 +1166,12 @@ ClassTemplatePartialSpecializationDecl::CreateDeserialized(ASTContext &C,
   return Result;
 }
 
-SourceRange ClassTemplatePartialSpecializationDecl::getSourceRange() const {
+SourceRange ClassTemplatePartialSpecializationDecl::getSourceRangeImpl() const {
   if (const ClassTemplatePartialSpecializationDecl *MT =
           getInstantiatedFromMember();
       MT && !isMemberSpecialization())
     return MT->getSourceRange();
-  SourceRange Range = ClassTemplateSpecializationDecl::getSourceRange();
+  SourceRange Range = ClassTemplateSpecializationDecl::getSourceRangeImpl();
   if (const TemplateParameterList *TPL = getTemplateParameters();
       TPL && !getNumTemplateParameterLists())
     Range.setBegin(TPL->getTemplateLoc());
@@ -1410,7 +1410,7 @@ VarTemplateDecl *VarTemplateSpecializationDecl::getSpecializedTemplate() const {
   return SpecializedTemplate.get<VarTemplateDecl *>();
 }
 
-SourceRange VarTemplateSpecializationDecl::getSourceRange() const {
+SourceRange VarTemplateSpecializationDecl::getSourceRangeImpl() const {
   switch (getSpecializationKind()) {
   case TSK_Undeclared:
   case TSK_ImplicitInstantiation: {
@@ -1430,7 +1430,7 @@ SourceRange VarTemplateSpecializationDecl::getSourceRange() const {
     return VTD->getCanonicalDecl()->getSourceRange();
   }
   case TSK_ExplicitSpecialization: {
-    SourceRange Range = VarDecl::getSourceRange();
+    SourceRange Range = VarDecl::getSourceRangeImpl();
     if (const ASTTemplateArgumentListInfo *Args = getTemplateArgsAsWritten();
         !hasInit() && Args)
       Range.setEnd(Args->getRAngleLoc());
@@ -1438,7 +1438,7 @@ SourceRange VarTemplateSpecializationDecl::getSourceRange() const {
   }
   case TSK_ExplicitInstantiationDeclaration:
   case TSK_ExplicitInstantiationDefinition: {
-    SourceRange Range = VarDecl::getSourceRange();
+    SourceRange Range = VarDecl::getSourceRangeImpl();
     if (SourceLocation ExternKW = getExternKeywordLoc(); ExternKW.isValid())
       Range.setBegin(ExternKW);
     else if (SourceLocation TemplateKW = getTemplateKeywordLoc();
@@ -1516,12 +1516,12 @@ VarTemplatePartialSpecializationDecl::CreateDeserialized(ASTContext &C,
   return new (C, ID) VarTemplatePartialSpecializationDecl(C);
 }
 
-SourceRange VarTemplatePartialSpecializationDecl::getSourceRange() const {
+SourceRange VarTemplatePartialSpecializationDecl::getSourceRangeImpl() const {
   if (const VarTemplatePartialSpecializationDecl *MT =
           getInstantiatedFromMember();
       MT && !isMemberSpecialization())
     return MT->getSourceRange();
-  SourceRange Range = VarTemplateSpecializationDecl::getSourceRange();
+  SourceRange Range = VarTemplateSpecializationDecl::getSourceRangeImpl();
   if (const TemplateParameterList *TPL = getTemplateParameters();
       TPL && !getNumTemplateParameterLists())
     Range.setBegin(TPL->getTemplateLoc());

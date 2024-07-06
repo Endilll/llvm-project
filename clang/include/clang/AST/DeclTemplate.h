@@ -435,7 +435,7 @@ public:
     return K >= firstTemplate && K <= lastTemplate;
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(getTemplateParameters()->getTemplateLoc(),
                        TemplatedDecl->getSourceRange().getEnd());
   }
@@ -1337,7 +1337,7 @@ public:
       AC.push_back(getTypeConstraint()->getImmediatelyDeclaredConstraint());
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   // Implement isa/cast/dyncast/etc.
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
@@ -1422,7 +1422,7 @@ public:
   using TemplateParmPosition::setPosition;
   using TemplateParmPosition::getIndex;
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   const DefArgStorage &getDefaultArgStorage() const { return DefaultArgument; }
 
@@ -1734,7 +1734,7 @@ public:
   /// Removes the default argument of this template parameter.
   void removeDefaultArgument() { DefaultArgument.clear(); }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     SourceLocation End = getLocation();
     if (hasDefaultArgument() && !defaultArgumentWasInherited())
       End = getDefaultArgument().getSourceRange().getEnd();
@@ -1768,7 +1768,7 @@ public:
     return new (C, DC) BuiltinTemplateDecl(C, DC, Name, BTK);
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return {};
   }
 
@@ -2048,7 +2048,7 @@ public:
   /// Sets the location of the template keyword.
   void setTemplateKeywordLoc(SourceLocation Loc);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   void Profile(llvm::FoldingSetNodeID &ID) const {
     Profile(ID, TemplateArgs->asArray(), getASTContext());
@@ -2209,7 +2209,7 @@ public:
              ->getInjectedSpecializationType();
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   void Profile(llvm::FoldingSetNodeID &ID) const {
     Profile(ID, getTemplateArgs().asArray(), getTemplateParameters(),
@@ -2813,7 +2813,7 @@ public:
   /// Sets the location of the template keyword.
   void setTemplateKeywordLoc(SourceLocation Loc);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   void Profile(llvm::FoldingSetNodeID &ID) const {
     Profile(ID, TemplateArgs->asArray(), getASTContext());
@@ -2962,7 +2962,7 @@ public:
     return First->InstantiatedFromMember.setInt(true);
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   void Profile(llvm::FoldingSetNodeID &ID) const {
     Profile(ID, getTemplateArgs().asArray(), getTemplateParameters(),
@@ -3156,7 +3156,7 @@ public:
     return ConstraintExpr;
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(getTemplateParameters()->getTemplateLoc(),
                        ConstraintExpr->getEndLoc());
   }

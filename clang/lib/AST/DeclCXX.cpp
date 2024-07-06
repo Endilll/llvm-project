@@ -3182,7 +3182,7 @@ UsingDecl *UsingDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID) {
                                false);
 }
 
-SourceRange UsingDecl::getSourceRange() const {
+SourceRange UsingDecl::getSourceRangeImpl() const {
   SourceLocation Begin = isAccessDeclaration()
     ? getQualifierLoc().getBeginLoc() : UsingLocation;
   return SourceRange(Begin, getNameInfo().getEndLoc());
@@ -3207,7 +3207,7 @@ UsingEnumDecl *UsingEnumDecl::CreateDeserialized(ASTContext &C,
                     SourceLocation(), SourceLocation(), nullptr);
 }
 
-SourceRange UsingEnumDecl::getSourceRange() const {
+SourceRange UsingEnumDecl::getSourceRangeImpl() const {
   return SourceRange(UsingLocation, EnumType->getTypeLoc().getEndLoc());
 }
 
@@ -3254,7 +3254,7 @@ UnresolvedUsingValueDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID) {
                                               SourceLocation());
 }
 
-SourceRange UnresolvedUsingValueDecl::getSourceRange() const {
+SourceRange UnresolvedUsingValueDecl::getSourceRangeImpl() const {
   SourceLocation Begin = isAccessDeclaration()
     ? getQualifierLoc().getBeginLoc() : UsingLocation;
   return SourceRange(Begin, getNameInfo().getEndLoc());

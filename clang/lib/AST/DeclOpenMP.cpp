@@ -186,7 +186,7 @@ OMPCapturedExprDecl *OMPCapturedExprDecl::CreateDeserialized(ASTContext &C,
                                          /*TInfo=*/nullptr, SourceLocation());
 }
 
-SourceRange OMPCapturedExprDecl::getSourceRange() const {
+SourceRange OMPCapturedExprDecl::getSourceRangeImpl() const {
   assert(hasInit());
   return SourceRange(getInit()->getBeginLoc(), getInit()->getEndLoc());
 }

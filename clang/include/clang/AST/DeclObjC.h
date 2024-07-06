@@ -281,7 +281,7 @@ public:
   // Location information, modeled after the Stmt API.
   SourceLocation getBeginLoc() const LLVM_READONLY { return getLocation(); }
   SourceLocation getEndLoc() const LLVM_READONLY;
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(getLocation(), getEndLoc());
   }
 
@@ -617,7 +617,7 @@ public:
   static ObjCTypeParamDecl *CreateDeserialized(ASTContext &ctx,
                                                GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   /// Determine the variance of this type parameter.
   ObjCTypeParamVariance getVariance() const {
@@ -924,7 +924,7 @@ public:
     return PropertyIvarDecl;
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(AtLoc, getLocation());
   }
 
@@ -1103,7 +1103,7 @@ public:
 
   void setAtEndRange(SourceRange atEnd) { AtEnd = atEnd; }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(getAtStartLoc(), getAtEndRange().getEnd());
   }
 
@@ -1303,9 +1303,9 @@ public:
     return TypeParamList;
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     if (isThisDeclarationADefinition())
-      return ObjCContainerDecl::getSourceRange();
+      return ObjCContainerDecl::getSourceRangeImpl();
 
     return SourceRange(getAtStartLoc(), getLocation());
   }
@@ -2273,9 +2273,9 @@ public:
   /// objc_runtime_name attribute or protocol name.
   StringRef getObjCRuntimeNameAsString() const;
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     if (isThisDeclarationADefinition())
-      return ObjCContainerDecl::getSourceRange();
+      return ObjCContainerDecl::getSourceRangeImpl();
 
     return SourceRange(getAtStartLoc(), getLocation());
   }
@@ -2859,7 +2859,7 @@ public:
   static ObjCPropertyImplDecl *CreateDeserialized(ASTContext &C,
                                                   GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   SourceLocation getBeginLoc() const LLVM_READONLY { return AtLoc; }
   void setAtLoc(SourceLocation Loc) { AtLoc = Loc; }

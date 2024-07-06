@@ -1060,6 +1060,8 @@ DeclContext *Decl::castToDeclContext(const Decl *D) {
   case Decl::NAME:                                                             \
     return static_cast<NAME##Decl *>(const_cast<Decl *>(D));
 #include "clang/AST/DeclNodes.inc"
+#undef DECL_CONTEXT
+#undef DECL
   default:
     llvm_unreachable("a decl that inherits DeclContext isn't handled");
   }
@@ -1221,6 +1223,78 @@ template <class T> static Decl *getNonClosureContext(T *D) {
 
 Decl *Decl::getNonClosureContext() {
   return ::getNonClosureContext(this);
+}
+
+// SourceRange Decl::getSourceRange() const {
+//   switch(getKind()) {
+//     case Kind::AccessSpec:
+//       return llvm::cast<AccessSpecDecl>(this)->getSourceRange();
+//     case Kind::Block:
+//       return llvm::cast<BlockDecl>(this)->getSourceRange();
+//     case Kind::Enum:
+//       return llvm::cast<EnumDecl>(this)->getSourceRange();
+//     case Kind::EnumConstant:
+//       return llvm::cast<EnumConstantDecl>(this)->getSourceRange();
+//     case Kind::Export:
+//       return llvm::cast<ExportDecl>(this)->getSourceRange();
+//     case Kind::Field:
+//       return llvm::cast<FieldDecl>(this)->getSourceRange();
+//     case Kind::FileScopeAsm:
+//       return llvm::cast<FileScopeAsmDecl>(this)->getSourceRange();
+//     case Kind::Function:
+//       return llvm::cast<FunctionDecl>(this)->getSourceRange();
+//     case Kind::HLSLBuffer:
+//       return llvm::cast<HLSLBufferDecl>(this)->getSourceRange();
+//     case Kind::Import:
+//       return llvm::cast<ImportDecl>(this)->getSourceRange();
+//     case Kind::Label:
+//       return llvm::cast<LabelDecl>(this)->getSourceRange();
+//     case Kind::LinkageSpec:
+//       return llvm::cast<LinkageSpecDecl>(this)->getSourceRange();
+//     case Kind::Namespace:
+//       return llvm::cast<NamespaceDecl>(this)->getSourceRange();
+//     case Kind::NamespaceAlias:
+//       return llvm::cast<NamespaceAliasDecl>(this)->getSourceRange();
+//     case Kind::ParmVar:
+//       return llvm::cast<ParmVarDecl>(this)->getSourceRange();
+//     case Kind::TopLevelStmt:
+//       return llvm::cast<TopLevelStmtDecl>(this)->getSourceRange();
+//     case Kind::TypeAlias:
+//       return llvm::cast<TypeAliasDecl>(this)->getSourceRange();
+//     case Kind::Typedef:
+//       return llvm::cast<TypedefDecl>(this)->getSourceRange();
+//     case Kind::Using:
+//       return llvm::cast<UsingDecl>(this)->getSourceRange();
+//     case Kind::UsingDirective:
+//       return llvm::cast<UsingDirectiveDecl>(this)->getSourceRange();
+//     case Kind::UsingEnum:
+//       return llvm::cast<UsingEnumDecl>(this)->getSourceRange();
+//     case Kind::Var:
+//       return llvm::cast<VarDecl>(this)->getSourceRange();
+//   }
+//   if (Kind::firstType <= DeclKind && DeclKind <= Kind::lastDecl)
+//     return llvm::cast<TypeDecl>(this)->getSourceRange();
+//   if (Kind::firstDeclarator <= DeclKind && DeclKind <= Kind::lastDeclarator)
+//     return llvm::cast<DeclaratorDecl>(this)->getSourceRange();
+//   if (Kind::firstTag <= DeclKind && DeclKind <= Kind::lastTag)
+//     return llvm::cast<TagDecl>(this)->getSourceRange();
+// }
+
+SourceRange Decl::getSourceRange() const {
+  switch (getKind()) {
+#define ABSTRACT_DECL(Type)
+#define DECL_RANGE(Base, First, Last)
+#define DECL_CONTEXT(Decl)
+#define DECL(TYPE, BASE) \
+    case Kind::TYPE: \
+      return llvm::cast<TYPE##Decl>(this)->getSourceRangeImpl();
+#include "clang/AST/DeclNodes.inc"
+#undef DECL
+#undef DECL_CONTEXT
+#undef DECL_RANGE
+#undef ABSTRACT_DECL
+  }
+  return getSourceRangeImpl();
 }
 
 Decl *DeclContext::getNonClosureAncestor() {

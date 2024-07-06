@@ -110,7 +110,7 @@ public:
   /// Sets the location of the colon.
   void setColonLoc(SourceLocation CLoc) { ColonLoc = CLoc; }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(getAccessSpecifierLoc(), getColonLoc());
   }
 
@@ -2986,7 +2986,7 @@ public:
     return decls_empty() ? getLocation() : decls_begin()->getEndLoc();
   }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(ExternLoc, getEndLoc());
   }
 
@@ -3101,7 +3101,7 @@ public:
                                     DeclContext *CommonAncestor);
   static UsingDirectiveDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(UsingLoc, getLocation());
   }
 
@@ -3214,7 +3214,7 @@ public:
   /// may either be a NamespaceDecl or a NamespaceAliasDecl.
   NamedDecl *getAliasedNamespace() const { return Namespace; }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(NamespaceLoc, IdentLoc);
   }
 
@@ -3571,7 +3571,7 @@ public:
 
   static UsingDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   /// Retrieves the canonical declaration of this declaration.
   UsingDecl *getCanonicalDecl() override {
@@ -3762,7 +3762,7 @@ public:
 
   static UsingEnumDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   /// Retrieves the canonical declaration of this declaration.
   UsingEnumDecl *getCanonicalDecl() override {
@@ -3836,7 +3836,7 @@ public:
   static UsingPackDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID,
                                            unsigned NumExpansions);
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return InstantiatedFrom->getSourceRange();
   }
 
@@ -3929,7 +3929,7 @@ public:
   static UnresolvedUsingValueDecl *CreateDeserialized(ASTContext &C,
                                                       GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   /// Retrieves the canonical declaration of this declaration.
   UnresolvedUsingValueDecl *getCanonicalDecl() override {
@@ -4088,7 +4088,7 @@ public:
 
   SourceLocation getRParenLoc() const { return RParenLoc; }
 
-  SourceRange getSourceRange() const override LLVM_READONLY {
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(getLocation(), getRParenLoc());
   }
 

@@ -430,7 +430,8 @@ protected:
 
 public:
   /// Source range that this declaration covers.
-  virtual SourceRange getSourceRange() const LLVM_READONLY {
+  SourceRange getSourceRange() const;
+  SourceRange getSourceRangeImpl() const {
     return SourceRange(getLocation(), getLocation());
   }
 

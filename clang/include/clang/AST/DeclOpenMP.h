@@ -400,7 +400,7 @@ public:
   static OMPCapturedExprDecl *CreateDeserialized(ASTContext &C,
                                                  GlobalDeclID ID);
 
-  SourceRange getSourceRange() const override LLVM_READONLY;
+  SourceRange getSourceRangeImpl() const;
 
   // Implement isa/cast/dyncast/etc.
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
