@@ -14,6 +14,9 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTMutationListener.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclOpenMP.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExternalASTSource.h"
@@ -295,6 +298,8 @@ bool TemplateDecl::isTypeAlias() const {
 // RedeclarableTemplateDecl Implementation
 //===----------------------------------------------------------------------===//
 
+Decl::CommonBase::CommonBase() : InstantiatedFromMember(nullptr, false) {}
+
 RedeclarableTemplateDecl::CommonBase *RedeclarableTemplateDecl::getCommonPtr() const {
   if (Common)
     return Common;
@@ -325,6 +330,23 @@ RedeclarableTemplateDecl::CommonBase *RedeclarableTemplateDecl::getCommonPtr() c
     Prev->Common = Common;
 
   return Common;
+}
+
+RedeclarableTemplateDecl::CommonBase *RedeclarableTemplateDecl::newCommon(ASTContext &C) const {
+  switch (getKind()) {
+#define ABSTRACT_DECL(Type)
+#define DECL_RANGE(Base, First, Last)
+#define DECL_CONTEXT(Decl)
+#define DECL(TYPE, BASE) \
+    case Kind::TYPE: \
+      return llvm::cast<TYPE##Decl>(this)->newCommonImpl(C);
+#include "clang/AST/DeclNodes.inc"
+#undef DECL
+#undef DECL_CONTEXT
+#undef DECL_RANGE
+#undef ABSTRACT_DECL
+  }
+  llvm_unreachable("Not all Decls are covered");
 }
 
 void RedeclarableTemplateDecl::loadLazySpecializationsImpl() const {
@@ -421,7 +443,7 @@ FunctionTemplateDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID) {
 }
 
 RedeclarableTemplateDecl::CommonBase *
-FunctionTemplateDecl::newCommon(ASTContext &C) const {
+FunctionTemplateDecl::newCommonImpl(ASTContext &C) const {
   auto *CommonPtr = new (C) Common;
   C.addDestruction(CommonPtr);
   return CommonPtr;
@@ -522,7 +544,7 @@ ClassTemplateDecl::getPartialSpecializations() const {
 }
 
 RedeclarableTemplateDecl::CommonBase *
-ClassTemplateDecl::newCommon(ASTContext &C) const {
+ClassTemplateDecl::newCommonImpl(ASTContext &C) const {
   auto *CommonPtr = new (C) Common;
   C.addDestruction(CommonPtr);
   return CommonPtr;
@@ -1216,7 +1238,7 @@ TypeAliasTemplateDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID) {
 }
 
 RedeclarableTemplateDecl::CommonBase *
-TypeAliasTemplateDecl::newCommon(ASTContext &C) const {
+TypeAliasTemplateDecl::newCommonImpl(ASTContext &C) const {
   auto *CommonPtr = new (C) Common;
   C.addDestruction(CommonPtr);
   return CommonPtr;
@@ -1270,7 +1292,7 @@ VarTemplateDecl::getPartialSpecializations() const {
 }
 
 RedeclarableTemplateDecl::CommonBase *
-VarTemplateDecl::newCommon(ASTContext &C) const {
+VarTemplateDecl::newCommonImpl(ASTContext &C) const {
   auto *CommonPtr = new (C) Common;
   C.addDestruction(CommonPtr);
   return CommonPtr;

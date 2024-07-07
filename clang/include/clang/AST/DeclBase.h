@@ -59,6 +59,7 @@ class ObjCContainerDecl;
 class ObjCMethodDecl;
 struct PrintingPolicy;
 class RecordDecl;
+class RedeclarableTemplateDecl;
 class SourceManager;
 class Stmt;
 class StoredDeclsMap;
@@ -1290,6 +1291,38 @@ public:
                                 bool Qualified) const {};
 
   void completeDefinitionImpl() {}
+
+  struct CommonBase {
+    CommonBase();
+
+    /// The template from which this was most
+    /// directly instantiated (or null).
+    ///
+    /// The boolean value indicates whether this template
+    /// was explicitly specialized.
+    llvm::PointerIntPair<RedeclarableTemplateDecl*, 1, bool>
+      InstantiatedFromMember;
+
+    /// If non-null, points to an array of specializations (including
+    /// partial specializations) known only by their external declaration IDs.
+    ///
+    /// The first value in the array is the number of specializations/partial
+    /// specializations that follow.
+    GlobalDeclID *LazySpecializations = nullptr;
+
+    /// The set of "injected" template arguments used within this
+    /// template.
+    ///
+    /// This pointer refers to the template arguments (there are as
+    /// many template arguments as template parameters) for the
+    /// template, and is allocated lazily, since most templates do not
+    /// require the use of this information.
+    TemplateArgument *InjectedArgs = nullptr;
+  };
+
+  CommonBase *newCommonImpl(ASTContext &C) const {
+    llvm_unreachable("newCommon is not implemented for this class");
+  };
 
 private:
   void setAttrsImpl(const AttrVec& Attrs, ASTContext &Ctx);

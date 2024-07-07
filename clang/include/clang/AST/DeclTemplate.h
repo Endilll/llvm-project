@@ -765,34 +765,6 @@ protected:
   void addSpecializationImpl(llvm::FoldingSetVector<EntryType> &Specs,
                              EntryType *Entry, void *InsertPos);
 
-  struct CommonBase {
-    CommonBase() : InstantiatedFromMember(nullptr, false) {}
-
-    /// The template from which this was most
-    /// directly instantiated (or null).
-    ///
-    /// The boolean value indicates whether this template
-    /// was explicitly specialized.
-    llvm::PointerIntPair<RedeclarableTemplateDecl*, 1, bool>
-      InstantiatedFromMember;
-
-    /// If non-null, points to an array of specializations (including
-    /// partial specializations) known only by their external declaration IDs.
-    ///
-    /// The first value in the array is the number of specializations/partial
-    /// specializations that follow.
-    GlobalDeclID *LazySpecializations = nullptr;
-
-    /// The set of "injected" template arguments used within this
-    /// template.
-    ///
-    /// This pointer refers to the template arguments (there are as
-    /// many template arguments as template parameters) for the
-    /// template, and is allocated lazily, since most templates do not
-    /// require the use of this information.
-    TemplateArgument *InjectedArgs = nullptr;
-  };
-
   /// Pointer to the common data shared by all declarations of this
   /// template.
   mutable CommonBase *Common = nullptr;
@@ -802,7 +774,7 @@ protected:
   /// for the common pointer.
   CommonBase *getCommonPtr() const;
 
-  virtual CommonBase *newCommon(ASTContext &C) const = 0;
+  CommonBase *newCommon(ASTContext &C) const;
 
   // Construct a template decl with name, parameters, and templated element.
   RedeclarableTemplateDecl(Kind DK, ASTContext &C, DeclContext *DC,
@@ -974,8 +946,6 @@ protected:
       : RedeclarableTemplateDecl(FunctionTemplate, C, DC, L, Name, Params,
                                  Decl) {}
 
-  CommonBase *newCommon(ASTContext &C) const override;
-
   Common *getCommonPtr() const {
     return static_cast<Common *>(RedeclarableTemplateDecl::getCommonPtr());
   }
@@ -993,6 +963,8 @@ protected:
                          void *InsertPos);
 
 public:
+  CommonBase *newCommonImpl(ASTContext &C) const;
+
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
 
@@ -2258,8 +2230,6 @@ protected:
                     NamedDecl *Decl)
       : RedeclarableTemplateDecl(ClassTemplate, C, DC, L, Name, Params, Decl) {}
 
-  CommonBase *newCommon(ASTContext &C) const override;
-
   Common *getCommonPtr() const {
     return static_cast<Common *>(RedeclarableTemplateDecl::getCommonPtr());
   }
@@ -2269,6 +2239,7 @@ protected:
   }
 
 public:
+  CommonBase *newCommonImpl(ASTContext &C) const;
 
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
@@ -2513,13 +2484,13 @@ protected:
       : RedeclarableTemplateDecl(TypeAliasTemplate, C, DC, L, Name, Params,
                                  Decl) {}
 
-  CommonBase *newCommon(ASTContext &C) const override;
-
   Common *getCommonPtr() {
     return static_cast<Common *>(RedeclarableTemplateDecl::getCommonPtr());
   }
 
 public:
+  CommonBase *newCommonImpl(ASTContext &C) const;
+
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
 
@@ -3008,13 +2979,13 @@ protected:
                   NamedDecl *Decl)
       : RedeclarableTemplateDecl(VarTemplate, C, DC, L, Name, Params, Decl) {}
 
-  CommonBase *newCommon(ASTContext &C) const override;
-
   Common *getCommonPtr() const {
     return static_cast<Common *>(RedeclarableTemplateDecl::getCommonPtr());
   }
 
 public:
+  CommonBase *newCommonImpl(ASTContext &C) const;
+
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
 
