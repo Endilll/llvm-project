@@ -414,8 +414,6 @@ protected:
     if (StatisticsEnabled) add(DK);
   }
 
-  virtual ~Decl();
-
   /// Update a potentially out-of-date declaration.
   void updateOutOfDate(IdentifierInfo &II) const;
 

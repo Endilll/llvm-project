@@ -352,9 +352,6 @@ void PrettyStackTraceDecl::print(raw_ostream &OS) const {
 // Decl Implementation
 //===----------------------------------------------------------------------===//
 
-// Out-of-line virtual method providing a home for Decl.
-Decl::~Decl() = default;
-
 void Decl::setDeclContext(DeclContext *DC) {
   DeclCtx = DC;
 }
@@ -1435,100 +1432,100 @@ void Decl::getNameForDiagnostic(raw_ostream &OS,
   llvm_unreachable("Not all Decls are covered");
 }
 
-static_assert(sizeof(Decl) == 40); // was 40
-static_assert(sizeof(TranslationUnitDecl) == 104); // was 104
-static_assert(sizeof(TopLevelStmtDecl) == 88); // was 88
-static_assert(sizeof(RequiresExprBodyDecl) == 72); // was 72
-static_assert(sizeof(LinkageSpecDecl) == 80); // was 80
-static_assert(sizeof(ExternCContextDecl) == 72); // was 72
-static_assert(sizeof(ExportDecl) == 80); // was 80
-static_assert(sizeof(CapturedDecl) == 88); // was 88
-static_assert(sizeof(BlockDecl) == 128); // was 128
-static_assert(sizeof(StaticAssertDecl) == 64); // was 64
-static_assert(sizeof(PragmaDetectMismatchDecl) == 48); // was 48
-static_assert(sizeof(PragmaCommentDecl) == 40); // was 40
-static_assert(sizeof(ObjCPropertyImplDecl) == 96); // was 96
-static_assert(sizeof(OMPThreadPrivateDecl) == 48); // was 48
-static_assert(sizeof(OMPRequiresDecl) == 48); // was 48
-static_assert(sizeof(OMPAllocateDecl) == 48); // was 48
-static_assert(sizeof(ObjCMethodDecl) == 136);
-static_assert(sizeof(ObjCProtocolDecl) == 112);
-static_assert(sizeof(ObjCInterfaceDecl) == 128);
-static_assert(sizeof(ObjCImplementationDecl) == 136);
-static_assert(sizeof(ObjCCategoryImplDecl) == 104);
-static_assert(sizeof(ObjCCategoryDecl) == 152);
-static_assert(sizeof(NamespaceDecl) == 112);
-static_assert(sizeof(HLSLBufferDecl) == 96);
-static_assert(sizeof(OMPDeclareReductionDecl) == 144);
-static_assert(sizeof(OMPDeclareMapperDecl) == 120);
-static_assert(sizeof(UnresolvedUsingValueDecl) == 88);
-static_assert(sizeof(UnnamedGlobalConstantDecl) == 136);
-static_assert(sizeof(TemplateParamObjectDecl) == 136);
-static_assert(sizeof(MSGuidDecl) == 152);
-static_assert(sizeof(IndirectFieldDecl) == 72);
-static_assert(sizeof(EnumConstantDecl) == 88);
-static_assert(sizeof(DeclaratorDecl) == 72);
-static_assert(sizeof(FunctionDecl) == 168);
-static_assert(sizeof(CXXMethodDecl) == 168);
-static_assert(sizeof(CXXDestructorDecl) == 184);
-static_assert(sizeof(CXXConversionDecl) == 176);
-static_assert(sizeof(CXXConstructorDecl) == 176);
-static_assert(sizeof(CXXDeductionGuideDecl) == 184);
-static_assert(sizeof(VarDecl) == 104);
-static_assert(sizeof(VarTemplateSpecializationDecl) == 144);
-static_assert(sizeof(VarTemplatePartialSpecializationDecl) == 160);
-static_assert(sizeof(ParmVarDecl) == 104);
-static_assert(sizeof(OMPCapturedExprDecl) == 104);
-static_assert(sizeof(ImplicitParamDecl) == 104);
-static_assert(sizeof(DecompositionDecl) == 104);
-static_assert(sizeof(NonTypeTemplateParmDecl) == 88);
-static_assert(sizeof(MSPropertyDecl) == 88);
-static_assert(sizeof(FieldDecl) == 80);
-static_assert(sizeof(ObjCIvarDecl) == 96);
-static_assert(sizeof(ObjCAtDefsFieldDecl) == 80);
-static_assert(sizeof(BindingDecl) == 72);
-static_assert(sizeof(UsingShadowDecl) == 80);
-static_assert(sizeof(ConstructorUsingShadowDecl) == 104);
-static_assert(sizeof(UsingPackDecl) == 64);
-static_assert(sizeof(UsingDirectiveDecl) == 88);
-static_assert(sizeof(UnresolvedUsingIfExistsDecl) == 48);
-static_assert(sizeof(TagDecl) == 128);
-static_assert(sizeof(NamedDecl) == 48);
-static_assert(sizeof(RecordDecl) == 128);
-static_assert(sizeof(CXXRecordDecl) == 144);
-static_assert(sizeof(ClassTemplateSpecializationDecl) == 184);
-static_assert(sizeof(ClassTemplatePartialSpecializationDecl) == 200);
-static_assert(sizeof(EnumDecl) == 160);
-static_assert(sizeof(UnresolvedUsingTypenameDecl) == 88);
-static_assert(sizeof(TypedefNameDecl) == 88);
-static_assert(sizeof(TypedefDecl) == 88);
-static_assert(sizeof(TypeAliasDecl) == 96);
-static_assert(sizeof(ObjCTypeParamDecl) == 104);
-static_assert(sizeof(TemplateTypeParmDecl) == 80);
-static_assert(sizeof(TemplateDecl) == 64);
-static_assert(sizeof(TemplateTemplateParmDecl) == 88);
-static_assert(sizeof(RedeclarableTemplateDecl) == 88);
-static_assert(sizeof(VarTemplateDecl) == 88);
-static_assert(sizeof(TypeAliasTemplateDecl) == 88);
-static_assert(sizeof(FunctionTemplateDecl) == 88);
-static_assert(sizeof(ClassTemplateDecl) == 88);
-static_assert(sizeof(ConceptDecl) == 72);
-static_assert(sizeof(BuiltinTemplateDecl) == 72);
-static_assert(sizeof(ObjCPropertyDecl) == 128);
-static_assert(sizeof(ObjCCompatibleAliasDecl) == 56);
-static_assert(sizeof(NamespaceAliasDecl) == 96);
-static_assert(sizeof(LabelDecl) == 80);
-static_assert(sizeof(BaseUsingDecl) == 56);
-static_assert(sizeof(UsingEnumDecl) == 72);
-static_assert(sizeof(UsingDecl) == 88);
-static_assert(sizeof(LifetimeExtendedTemporaryDecl) == 72); // was 72
-static_assert(sizeof(ImportDecl) == 56); // was 56
-static_assert(sizeof(ImplicitConceptSpecializationDecl) == 40); // was 40
-static_assert(sizeof(FriendTemplateDecl) == 64); // was 64
-static_assert(sizeof(FriendDecl) == 64); // was 64
-static_assert(sizeof(FileScopeAsmDecl) == 56); // was 56
-static_assert(sizeof(EmptyDecl) == 40); // was 40
-static_assert(sizeof(AccessSpecDecl) == 40); // was 40
+static_assert(sizeof(Decl) == 32); // was 40
+static_assert(sizeof(TranslationUnitDecl) == 96); // was 104
+static_assert(sizeof(TopLevelStmtDecl) == 80); // was 88
+static_assert(sizeof(RequiresExprBodyDecl) == 64); // was 72
+static_assert(sizeof(LinkageSpecDecl) == 72); // was 80
+static_assert(sizeof(ExternCContextDecl) == 64); // was 72
+static_assert(sizeof(ExportDecl) == 72); // was 80
+static_assert(sizeof(CapturedDecl) == 80); // was 88
+static_assert(sizeof(BlockDecl) == 120); // was 128
+static_assert(sizeof(StaticAssertDecl) == 56); // was 64
+static_assert(sizeof(PragmaDetectMismatchDecl) == 40); // was 48
+static_assert(sizeof(PragmaCommentDecl) == 32); // was 40
+static_assert(sizeof(ObjCPropertyImplDecl) == 88); // was 96
+static_assert(sizeof(OMPThreadPrivateDecl) == 40); // was 48
+static_assert(sizeof(OMPRequiresDecl) == 40); // was 48
+static_assert(sizeof(OMPAllocateDecl) == 40); // was 48
+static_assert(sizeof(ObjCMethodDecl) == 128); // was 136
+static_assert(sizeof(ObjCProtocolDecl) == 104); // was 112
+static_assert(sizeof(ObjCInterfaceDecl) == 120); // was 128
+static_assert(sizeof(ObjCImplementationDecl) == 128); // was 136
+static_assert(sizeof(ObjCCategoryImplDecl) == 96); // was 104
+static_assert(sizeof(ObjCCategoryDecl) == 144); // was 152
+static_assert(sizeof(NamespaceDecl) == 104); // was 112
+static_assert(sizeof(HLSLBufferDecl) == 88); // was 96
+static_assert(sizeof(OMPDeclareReductionDecl) == 136); // was 144
+static_assert(sizeof(OMPDeclareMapperDecl) == 112); // was 120
+static_assert(sizeof(UnresolvedUsingValueDecl) == 80); // was 88
+static_assert(sizeof(UnnamedGlobalConstantDecl) == 128); // was 136
+static_assert(sizeof(TemplateParamObjectDecl) == 128); // was 136
+static_assert(sizeof(MSGuidDecl) == 144); // was 152
+static_assert(sizeof(IndirectFieldDecl) == 64); // was 72
+static_assert(sizeof(EnumConstantDecl) == 80); // was 88
+static_assert(sizeof(DeclaratorDecl) == 64); // was 72
+static_assert(sizeof(FunctionDecl) == 160); // was 168
+static_assert(sizeof(CXXMethodDecl) == 160); // was 168
+static_assert(sizeof(CXXDestructorDecl) == 176); // was 184
+static_assert(sizeof(CXXConversionDecl) == 168); // was 176
+static_assert(sizeof(CXXConstructorDecl) == 168); // was 176
+static_assert(sizeof(CXXDeductionGuideDecl) == 176); // was 184
+static_assert(sizeof(VarDecl) == 96); // was 104
+static_assert(sizeof(VarTemplateSpecializationDecl) == 136); // was 144
+static_assert(sizeof(VarTemplatePartialSpecializationDecl) == 152); // was 160
+static_assert(sizeof(ParmVarDecl) == 96); // was 104
+static_assert(sizeof(OMPCapturedExprDecl) == 96); // was 104
+static_assert(sizeof(ImplicitParamDecl) == 96); // was 104
+static_assert(sizeof(DecompositionDecl) == 96); // was 104
+static_assert(sizeof(NonTypeTemplateParmDecl) == 80); // was 88
+static_assert(sizeof(MSPropertyDecl) == 80); // was 88
+static_assert(sizeof(FieldDecl) == 72); // was 80
+static_assert(sizeof(ObjCIvarDecl) == 88); // was 96
+static_assert(sizeof(ObjCAtDefsFieldDecl) == 72); // was 80
+static_assert(sizeof(BindingDecl) == 64); // was 72
+static_assert(sizeof(UsingShadowDecl) == 72); // was 80
+static_assert(sizeof(ConstructorUsingShadowDecl) == 96); // was 104
+static_assert(sizeof(UsingPackDecl) == 56); // was 64
+static_assert(sizeof(UsingDirectiveDecl) == 80); // was 88
+static_assert(sizeof(UnresolvedUsingIfExistsDecl) == 40); // was 48
+static_assert(sizeof(TagDecl) == 120); // was 128
+static_assert(sizeof(NamedDecl) == 40); // was 48
+static_assert(sizeof(RecordDecl) == 120); // was 128
+static_assert(sizeof(CXXRecordDecl) == 136); // was 144
+static_assert(sizeof(ClassTemplateSpecializationDecl) == 176); // was 184
+static_assert(sizeof(ClassTemplatePartialSpecializationDecl) == 192); // was 200
+static_assert(sizeof(EnumDecl) == 152); // was 160
+static_assert(sizeof(UnresolvedUsingTypenameDecl) == 80); // was 88
+static_assert(sizeof(TypedefNameDecl) == 80); // was 88
+static_assert(sizeof(TypedefDecl) == 80); // was 88
+static_assert(sizeof(TypeAliasDecl) == 88); // was 96
+static_assert(sizeof(ObjCTypeParamDecl) == 96); // was 104
+static_assert(sizeof(TemplateTypeParmDecl) == 72); // was 80
+static_assert(sizeof(TemplateDecl) == 56); // was 64
+static_assert(sizeof(TemplateTemplateParmDecl) == 80); // was 88
+static_assert(sizeof(RedeclarableTemplateDecl) == 80); // was 88
+static_assert(sizeof(VarTemplateDecl) == 80); // was 88
+static_assert(sizeof(TypeAliasTemplateDecl) == 80); // was 88
+static_assert(sizeof(FunctionTemplateDecl) == 80); // was 88
+static_assert(sizeof(ClassTemplateDecl) == 80); // was 88
+static_assert(sizeof(ConceptDecl) == 64); // was 72
+static_assert(sizeof(BuiltinTemplateDecl) == 64); // was 72
+static_assert(sizeof(ObjCPropertyDecl) == 120); // was 128
+static_assert(sizeof(ObjCCompatibleAliasDecl) == 48); // was 56
+static_assert(sizeof(NamespaceAliasDecl) == 88); // was 96
+static_assert(sizeof(LabelDecl) == 72); // was 80
+static_assert(sizeof(BaseUsingDecl) == 48); // was 56
+static_assert(sizeof(UsingEnumDecl) == 64); // was 72
+static_assert(sizeof(UsingDecl) == 80); // was 88
+static_assert(sizeof(LifetimeExtendedTemporaryDecl) == 64); // was 72
+static_assert(sizeof(ImportDecl) == 48); // was 56
+static_assert(sizeof(ImplicitConceptSpecializationDecl) == 32); // was 40
+static_assert(sizeof(FriendTemplateDecl) == 56); // was 64
+static_assert(sizeof(FriendDecl) == 56); // was 64
+static_assert(sizeof(FileScopeAsmDecl) == 48); // was 56
+static_assert(sizeof(EmptyDecl) == 32); // was 40
+static_assert(sizeof(AccessSpecDecl) == 32); // was 40
 
 Decl *DeclContext::getNonClosureAncestor() {
   return ::getNonClosureContext(this);
