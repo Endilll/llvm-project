@@ -5436,7 +5436,7 @@ CapturedDecl *CapturedDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID,
       CapturedDecl(nullptr, NumParams);
 }
 
-Stmt *CapturedDecl::getBody() const { return BodyAndNothrow.getPointer(); }
+Stmt *CapturedDecl::getBodyImpl() const { return BodyAndNothrow.getPointer(); }
 void CapturedDecl::setBody(Stmt *B) { BodyAndNothrow.setPointer(B); }
 
 bool CapturedDecl::isNothrow() const { return BodyAndNothrow.getInt(); }

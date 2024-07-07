@@ -2270,7 +2270,9 @@ public:
   /// unnecessary AST de-serialization of the body.
   Stmt *getBody(const FunctionDecl *&Definition) const;
 
-  Stmt *getBody() const override {
+  using Decl::getBody;
+
+  Stmt *getBodyImpl() const {
     const FunctionDecl* Definition;
     return getBody(Definition);
   }
@@ -4584,7 +4586,7 @@ public:
   void setIsVariadic(bool value) { BlockDeclBits.IsVariadic = value; }
 
   CompoundStmt *getCompoundBody() const { return (CompoundStmt*) Body; }
-  Stmt *getBody() const override { return (Stmt*) Body; }
+  Stmt *getBodyImpl() const { return (Stmt*) Body; }
   void setBody(CompoundStmt *B) { Body = (Stmt*) B; }
 
   void setSignatureAsWritten(TypeSourceInfo *Sig) { SignatureAsWritten = Sig; }
@@ -4740,7 +4742,7 @@ public:
   static CapturedDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID,
                                           unsigned NumParams);
 
-  Stmt *getBody() const override;
+  Stmt *getBodyImpl() const;
   void setBody(Stmt *B);
 
   bool isNothrow() const;

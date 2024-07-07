@@ -1314,6 +1314,23 @@ bool Decl::hasBody() const {
   return hasBodyImpl();
 }
 
+Stmt* Decl::getBody() const {
+  switch (getKind()) {
+#define ABSTRACT_DECL(Type)
+#define DECL_RANGE(Base, First, Last)
+#define DECL_CONTEXT(Decl)
+#define DECL(TYPE, BASE) \
+    case Kind::TYPE: \
+      return llvm::cast<TYPE##Decl>(this)->getBodyImpl();
+#include "clang/AST/DeclNodes.inc"
+#undef DECL
+#undef DECL_CONTEXT
+#undef DECL_RANGE
+#undef ABSTRACT_DECL
+  }
+  return getBodyImpl();
+}
+
 Decl *DeclContext::getNonClosureAncestor() {
   return ::getNonClosureContext(this);
 }

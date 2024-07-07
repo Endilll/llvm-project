@@ -906,7 +906,7 @@ bool ObjCMethodDecl::hasParamDestroyedInCallee() const {
   return false;
 }
 
-Stmt *ObjCMethodDecl::getBody() const {
+Stmt *ObjCMethodDecl::getBodyImpl() const {
   return Body.get(getASTContext().getExternalSource());
 }
 

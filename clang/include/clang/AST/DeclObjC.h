@@ -523,7 +523,7 @@ public:
   bool hasBodyImpl() const { return Body.isValid(); }
 
   /// Retrieve the body of this method, if it has one.
-  Stmt *getBody() const override;
+  Stmt *getBodyImpl() const;
 
   void setLazyBody(uint64_t Offset) { Body = Offset; }
 
