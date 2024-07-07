@@ -966,9 +966,9 @@ ClassTemplateSpecializationDecl::CreateDeserialized(ASTContext &C,
   return Result;
 }
 
-void ClassTemplateSpecializationDecl::getNameForDiagnostic(
+void ClassTemplateSpecializationDecl::getNameForDiagnosticImpl(
     raw_ostream &OS, const PrintingPolicy &Policy, bool Qualified) const {
-  NamedDecl::getNameForDiagnostic(OS, Policy, Qualified);
+  NamedDecl::getNameForDiagnosticImpl(OS, Policy, Qualified);
 
   const auto *PS = dyn_cast<ClassTemplatePartialSpecializationDecl>(this);
   if (const ASTTemplateArgumentListInfo *ArgsAsWritten =
@@ -1376,9 +1376,9 @@ VarTemplateSpecializationDecl::CreateDeserialized(ASTContext &C,
       VarTemplateSpecializationDecl(VarTemplateSpecialization, C);
 }
 
-void VarTemplateSpecializationDecl::getNameForDiagnostic(
+void VarTemplateSpecializationDecl::getNameForDiagnosticImpl(
     raw_ostream &OS, const PrintingPolicy &Policy, bool Qualified) const {
-  NamedDecl::getNameForDiagnostic(OS, Policy, Qualified);
+  NamedDecl::getNameForDiagnosticImpl(OS, Policy, Qualified);
 
   const auto *PS = dyn_cast<VarTemplatePartialSpecializationDecl>(this);
   if (const ASTTemplateArgumentListInfo *ArgsAsWritten =

@@ -335,7 +335,7 @@ public:
   /// in a diagnostic.  It does not necessarily produce the same
   /// result as printName(); for example, class template
   /// specializations are printed with their template arguments.
-  virtual void getNameForDiagnostic(raw_ostream &OS,
+  void getNameForDiagnosticImpl(raw_ostream &OS,
                                     const PrintingPolicy &Policy,
                                     bool Qualified) const;
 
@@ -2169,8 +2169,8 @@ public:
     return DeclarationNameInfo(getDeclName(), getLocation(), DNLoc);
   }
 
-  void getNameForDiagnostic(raw_ostream &OS, const PrintingPolicy &Policy,
-                            bool Qualified) const override;
+  void getNameForDiagnosticImpl(raw_ostream &OS, const PrintingPolicy &Policy,
+                            bool Qualified) const;
 
   void setRangeEnd(SourceLocation E) { EndRangeLoc = E; }
 

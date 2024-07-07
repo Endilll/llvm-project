@@ -1861,8 +1861,8 @@ public:
   static ClassTemplateSpecializationDecl *CreateDeserialized(ASTContext &C,
                                                              GlobalDeclID ID);
 
-  void getNameForDiagnostic(raw_ostream &OS, const PrintingPolicy &Policy,
-                            bool Qualified) const override;
+  void getNameForDiagnosticImpl(raw_ostream &OS, const PrintingPolicy &Policy,
+                            bool Qualified) const;
 
   // FIXME: This is broken. CXXRecordDecl::getMostRecentDecl() returns a
   // different "most recent" declaration from this function for the same
@@ -2650,8 +2650,8 @@ public:
   static VarTemplateSpecializationDecl *CreateDeserialized(ASTContext &C,
                                                            GlobalDeclID ID);
 
-  void getNameForDiagnostic(raw_ostream &OS, const PrintingPolicy &Policy,
-                            bool Qualified) const override;
+  void getNameForDiagnosticImpl(raw_ostream &OS, const PrintingPolicy &Policy,
+                            bool Qualified) const;
 
   VarTemplateSpecializationDecl *getMostRecentDecl() {
     VarDecl *Recent = static_cast<VarDecl *>(this)->getMostRecentDecl();

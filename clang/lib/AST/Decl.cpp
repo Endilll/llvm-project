@@ -1817,7 +1817,7 @@ void NamedDecl::printNestedNameSpecifier(raw_ostream &OS,
   }
 }
 
-void NamedDecl::getNameForDiagnostic(raw_ostream &OS,
+void NamedDecl::getNameForDiagnosticImpl(raw_ostream &OS,
                                      const PrintingPolicy &Policy,
                                      bool Qualified) const {
   if (Qualified)
@@ -3075,9 +3075,9 @@ FunctionDecl::FunctionDecl(Kind DK, ASTContext &C, DeclContext *DC,
     setTrailingRequiresClause(TrailingRequiresClause);
 }
 
-void FunctionDecl::getNameForDiagnostic(
+void FunctionDecl::getNameForDiagnosticImpl(
     raw_ostream &OS, const PrintingPolicy &Policy, bool Qualified) const {
-  NamedDecl::getNameForDiagnostic(OS, Policy, Qualified);
+  NamedDecl::getNameForDiagnosticImpl(OS, Policy, Qualified);
   const TemplateArgumentList *TemplateArgs = getTemplateSpecializationArgs();
   if (TemplateArgs)
     printTemplateArgumentList(OS, TemplateArgs->asArray(), Policy);

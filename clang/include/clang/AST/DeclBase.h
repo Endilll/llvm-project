@@ -1274,6 +1274,21 @@ public:
   void printName(raw_ostream &OS, const PrintingPolicy &Policy) const;
   void printNameImpl(raw_ostream &OS, const PrintingPolicy &Policy) const {};
 
+  /// Appends a human-readable name for this declaration into the given stream.
+  ///
+  /// This is the method invoked by Sema when displaying a NamedDecl
+  /// in a diagnostic.  It does not necessarily produce the same
+  /// result as printName(); for example, class template
+  /// specializations are printed with their template arguments.
+  ///
+  /// Doesn't append anything for declarations that don't inherit from NamedDecl.
+  void getNameForDiagnostic(raw_ostream &OS,
+                            const PrintingPolicy &Policy,
+                            bool Qualified) const;
+  void getNameForDiagnosticImpl(raw_ostream &OS,
+                                const PrintingPolicy &Policy,
+                                bool Qualified) const {};
+
 private:
   void setAttrsImpl(const AttrVec& Attrs, ASTContext &Ctx);
   void setDeclContextsImpl(DeclContext *SemaDC, DeclContext *LexicalDC,

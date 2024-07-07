@@ -1416,6 +1416,119 @@ void Decl::printName(raw_ostream &OS, const PrintingPolicy &Policy) const {
   llvm_unreachable("Not all Decls are covered");
 }
 
+void Decl::getNameForDiagnostic(raw_ostream &OS,
+                            const PrintingPolicy &Policy,
+                            bool Qualified) const {
+  switch (getKind()) {
+#define ABSTRACT_DECL(Type)
+#define DECL_RANGE(Base, First, Last)
+#define DECL_CONTEXT(Decl)
+#define DECL(TYPE, BASE) \
+    case Kind::TYPE: \
+      return llvm::cast<TYPE##Decl>(this)->getNameForDiagnosticImpl(OS, Policy, Qualified);
+#include "clang/AST/DeclNodes.inc"
+#undef DECL
+#undef DECL_CONTEXT
+#undef DECL_RANGE
+#undef ABSTRACT_DECL
+  }
+  llvm_unreachable("Not all Decls are covered");
+}
+
+static_assert(sizeof(Decl) == 40); // was 40
+static_assert(sizeof(TranslationUnitDecl) == 104); // was 104
+static_assert(sizeof(TopLevelStmtDecl) == 88); // was 88
+static_assert(sizeof(RequiresExprBodyDecl) == 72); // was 72
+static_assert(sizeof(LinkageSpecDecl) == 80); // was 80
+static_assert(sizeof(ExternCContextDecl) == 72); // was 72
+static_assert(sizeof(ExportDecl) == 80); // was 80
+static_assert(sizeof(CapturedDecl) == 88); // was 88
+static_assert(sizeof(BlockDecl) == 128); // was 128
+static_assert(sizeof(StaticAssertDecl) == 64); // was 64
+static_assert(sizeof(PragmaDetectMismatchDecl) == 48); // was 48
+static_assert(sizeof(PragmaCommentDecl) == 40); // was 40
+static_assert(sizeof(ObjCPropertyImplDecl) == 96); // was 96
+static_assert(sizeof(OMPThreadPrivateDecl) == 48); // was 48
+static_assert(sizeof(OMPRequiresDecl) == 48); // was 48
+static_assert(sizeof(OMPAllocateDecl) == 48); // was 48
+static_assert(sizeof(ObjCMethodDecl) == 136);
+static_assert(sizeof(ObjCProtocolDecl) == 112);
+static_assert(sizeof(ObjCInterfaceDecl) == 128);
+static_assert(sizeof(ObjCImplementationDecl) == 136);
+static_assert(sizeof(ObjCCategoryImplDecl) == 104);
+static_assert(sizeof(ObjCCategoryDecl) == 152);
+static_assert(sizeof(NamespaceDecl) == 112);
+static_assert(sizeof(HLSLBufferDecl) == 96);
+static_assert(sizeof(OMPDeclareReductionDecl) == 144);
+static_assert(sizeof(OMPDeclareMapperDecl) == 120);
+static_assert(sizeof(UnresolvedUsingValueDecl) == 88);
+static_assert(sizeof(UnnamedGlobalConstantDecl) == 136);
+static_assert(sizeof(TemplateParamObjectDecl) == 136);
+static_assert(sizeof(MSGuidDecl) == 152);
+static_assert(sizeof(IndirectFieldDecl) == 72);
+static_assert(sizeof(EnumConstantDecl) == 88);
+static_assert(sizeof(DeclaratorDecl) == 72);
+static_assert(sizeof(FunctionDecl) == 168);
+static_assert(sizeof(CXXMethodDecl) == 168);
+static_assert(sizeof(CXXDestructorDecl) == 184);
+static_assert(sizeof(CXXConversionDecl) == 176);
+static_assert(sizeof(CXXConstructorDecl) == 176);
+static_assert(sizeof(CXXDeductionGuideDecl) == 184);
+static_assert(sizeof(VarDecl) == 104);
+static_assert(sizeof(VarTemplateSpecializationDecl) == 144);
+static_assert(sizeof(VarTemplatePartialSpecializationDecl) == 160);
+static_assert(sizeof(ParmVarDecl) == 104);
+static_assert(sizeof(OMPCapturedExprDecl) == 104);
+static_assert(sizeof(ImplicitParamDecl) == 104);
+static_assert(sizeof(DecompositionDecl) == 104);
+static_assert(sizeof(NonTypeTemplateParmDecl) == 88);
+static_assert(sizeof(MSPropertyDecl) == 88);
+static_assert(sizeof(FieldDecl) == 80);
+static_assert(sizeof(ObjCIvarDecl) == 96);
+static_assert(sizeof(ObjCAtDefsFieldDecl) == 80);
+static_assert(sizeof(BindingDecl) == 72);
+static_assert(sizeof(UsingShadowDecl) == 80);
+static_assert(sizeof(ConstructorUsingShadowDecl) == 104);
+static_assert(sizeof(UsingPackDecl) == 64);
+static_assert(sizeof(UsingDirectiveDecl) == 88);
+static_assert(sizeof(UnresolvedUsingIfExistsDecl) == 48);
+static_assert(sizeof(TagDecl) == 128);
+static_assert(sizeof(NamedDecl) == 48);
+static_assert(sizeof(RecordDecl) == 128);
+static_assert(sizeof(CXXRecordDecl) == 144);
+static_assert(sizeof(ClassTemplateSpecializationDecl) == 184);
+static_assert(sizeof(ClassTemplatePartialSpecializationDecl) == 200);
+static_assert(sizeof(EnumDecl) == 160);
+static_assert(sizeof(UnresolvedUsingTypenameDecl) == 88);
+static_assert(sizeof(TypedefNameDecl) == 88);
+static_assert(sizeof(TypedefDecl) == 88);
+static_assert(sizeof(TypeAliasDecl) == 96);
+static_assert(sizeof(ObjCTypeParamDecl) == 104);
+static_assert(sizeof(TemplateTypeParmDecl) == 80);
+static_assert(sizeof(TemplateDecl) == 64);
+static_assert(sizeof(TemplateTemplateParmDecl) == 88);
+static_assert(sizeof(RedeclarableTemplateDecl) == 88);
+static_assert(sizeof(VarTemplateDecl) == 88);
+static_assert(sizeof(TypeAliasTemplateDecl) == 88);
+static_assert(sizeof(FunctionTemplateDecl) == 88);
+static_assert(sizeof(ClassTemplateDecl) == 88);
+static_assert(sizeof(ConceptDecl) == 72);
+static_assert(sizeof(BuiltinTemplateDecl) == 72);
+static_assert(sizeof(ObjCPropertyDecl) == 128);
+static_assert(sizeof(ObjCCompatibleAliasDecl) == 56);
+static_assert(sizeof(NamespaceAliasDecl) == 96);
+static_assert(sizeof(LabelDecl) == 80);
+static_assert(sizeof(BaseUsingDecl) == 56);
+static_assert(sizeof(UsingEnumDecl) == 72);
+static_assert(sizeof(UsingDecl) == 88);
+static_assert(sizeof(LifetimeExtendedTemporaryDecl) == 72); // was 72
+static_assert(sizeof(ImportDecl) == 56); // was 56
+static_assert(sizeof(ImplicitConceptSpecializationDecl) == 40); // was 40
+static_assert(sizeof(FriendTemplateDecl) == 64); // was 64
+static_assert(sizeof(FriendDecl) == 64); // was 64
+static_assert(sizeof(FileScopeAsmDecl) == 56); // was 56
+static_assert(sizeof(EmptyDecl) == 40); // was 40
+static_assert(sizeof(AccessSpecDecl) == 40); // was 40
 
 Decl *DeclContext::getNonClosureAncestor() {
   return ::getNonClosureContext(this);
