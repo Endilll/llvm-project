@@ -520,7 +520,7 @@ public:
       const ObjCMethodDecl **InitMethod = nullptr) const;
 
   /// Determine whether this method has a body.
-  bool hasBody() const override { return Body.isValid(); }
+  bool hasBodyImpl() const { return Body.isValid(); }
 
   /// Retrieve the body of this method, if it has one.
   Stmt *getBody() const override;

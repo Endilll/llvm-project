@@ -1079,7 +1079,9 @@ public:
   /// code, such as a function or method definition.
   /// Note that \c hasBody can also return true if any redeclaration of this
   /// \c Decl represents a declaration for a body of code.
-  virtual bool hasBody() const { return getBody() != nullptr; }
+  bool hasBody() const;
+
+  bool hasBodyImpl() const { return getBody() != nullptr; }
 
   /// getBodyRBrace - Gets the right brace of the body, if a body exists.
   /// This works whether the body is a CompoundStmt or a CXXTryStmt.
