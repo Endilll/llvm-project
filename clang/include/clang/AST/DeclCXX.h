@@ -1736,7 +1736,9 @@ public:
   void setTrivialForCallFlags(CXXMethodDecl *MD);
 
   /// Indicates that the definition of this class is now complete.
-  void completeDefinition() override;
+  void completeDefinitionImpl();
+
+  using RecordDecl::completeDefinition;
 
   /// Indicates that the definition of this class is now complete,
   /// and provides a final overrider map to help determine

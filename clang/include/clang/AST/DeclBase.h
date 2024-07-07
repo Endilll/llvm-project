@@ -1289,6 +1289,8 @@ public:
                                 const PrintingPolicy &Policy,
                                 bool Qualified) const {};
 
+  void completeDefinitionImpl() {}
+
 private:
   void setAttrsImpl(const AttrVec& Attrs, ASTContext &Ctx);
   void setDeclContextsImpl(DeclContext *SemaDC, DeclContext *LexicalDC,

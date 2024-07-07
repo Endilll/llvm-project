@@ -4387,7 +4387,8 @@ public:
   }
 
   /// Note that the definition of this type is now complete.
-  virtual void completeDefinition();
+  void completeDefinition();
+  void completeDefinitionImpl();
 
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
   static bool classofKind(Kind K) {

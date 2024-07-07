@@ -2050,7 +2050,7 @@ bool CXXRecordDecl::isInterfaceLike() const {
   return true;
 }
 
-void CXXRecordDecl::completeDefinition() {
+void CXXRecordDecl::completeDefinitionImpl() {
   completeDefinition(nullptr);
 }
 
@@ -2076,7 +2076,7 @@ static bool hasPureVirtualFinalOverrider(
 }
 
 void CXXRecordDecl::completeDefinition(CXXFinalOverriderMap *FinalOverriders) {
-  RecordDecl::completeDefinition();
+  RecordDecl::completeDefinitionImpl();
 
   // If the class may be abstract (but hasn't been marked as such), check for
   // any pure final overriders.

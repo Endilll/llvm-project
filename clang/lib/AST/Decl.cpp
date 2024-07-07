@@ -5071,9 +5071,26 @@ RecordDecl::field_iterator RecordDecl::field_begin() const {
   return field_iterator(decl_iterator(FirstDecl));
 }
 
+void RecordDecl::completeDefinition() {
+  switch (getKind()) {
+#define ABSTRACT_DECL(Type)
+#define DECL_RANGE(Base, First, Last)
+#define DECL_CONTEXT(Decl)
+#define DECL(TYPE, BASE) \
+    case Kind::TYPE: \
+      return llvm::cast<TYPE##Decl>(this)->completeDefinitionImpl();
+#include "clang/AST/DeclNodes.inc"
+#undef DECL
+#undef DECL_CONTEXT
+#undef DECL_RANGE
+#undef ABSTRACT_DECL
+  }
+  llvm_unreachable("Not all Decls are covered");
+}
+
 /// completeDefinition - Notes that the definition of this type is now
 /// complete.
-void RecordDecl::completeDefinition() {
+void RecordDecl::completeDefinitionImpl() {
   assert(!isCompleteDefinition() && "Cannot redefine record!");
   TagDecl::completeDefinition();
 
