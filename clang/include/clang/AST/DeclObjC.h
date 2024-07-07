@@ -1266,15 +1266,15 @@ class ObjCInterfaceDecl : public ObjCContainerDecl
     return getNextRedeclaration();
   }
 
-  ObjCInterfaceDecl *getPreviousDeclImpl() override {
-    return getPreviousDecl();
-  }
-
   ObjCInterfaceDecl *getMostRecentDeclImpl() override {
     return getMostRecentDecl();
   }
 
 public:
+  ObjCInterfaceDecl *getPreviousDeclImpl() {
+    return getPreviousDecl();
+  }
+
   static ObjCInterfaceDecl *
   Create(const ASTContext &C, DeclContext *DC, SourceLocation atLoc,
          const IdentifierInfo *Id, ObjCTypeParamList *typeParamList,
@@ -2126,10 +2126,6 @@ class ObjCProtocolDecl : public ObjCContainerDecl,
     return getNextRedeclaration();
   }
 
-  ObjCProtocolDecl *getPreviousDeclImpl() override {
-    return getPreviousDecl();
-  }
-
   ObjCProtocolDecl *getMostRecentDeclImpl() override {
     return getMostRecentDecl();
   }
@@ -2139,6 +2135,10 @@ class ObjCProtocolDecl : public ObjCContainerDecl,
   void setHasODRHash(bool HasHash);
 
 public:
+  ObjCProtocolDecl *getPreviousDeclImpl() {
+    return getPreviousDecl();
+  }
+
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
   friend class ASTReader;

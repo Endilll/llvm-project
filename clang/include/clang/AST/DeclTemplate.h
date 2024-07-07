@@ -720,10 +720,6 @@ class RedeclarableTemplateDecl : public TemplateDecl,
     return getNextRedeclaration();
   }
 
-  RedeclarableTemplateDecl *getPreviousDeclImpl() override {
-    return getPreviousDecl();
-  }
-
   RedeclarableTemplateDecl *getMostRecentDeclImpl() override {
     return getMostRecentDecl();
   }
@@ -826,6 +822,10 @@ protected:
       : TemplateDecl(DK, DC, L, Name, Params, Decl), redeclarable_base(C) {}
 
 public:
+  RedeclarableTemplateDecl *getPreviousDeclImpl() {
+    return getPreviousDecl();
+  }
+
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
   friend class ASTReader;

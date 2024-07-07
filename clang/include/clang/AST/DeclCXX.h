@@ -3164,10 +3164,11 @@ class NamespaceAliasDecl : public NamedDecl,
   using redeclarable_base = Redeclarable<NamespaceAliasDecl>;
 
   NamespaceAliasDecl *getNextRedeclarationImpl() override;
-  NamespaceAliasDecl *getPreviousDeclImpl() override;
   NamespaceAliasDecl *getMostRecentDeclImpl() override;
 
 public:
+  NamespaceAliasDecl *getPreviousDeclImpl();
+
   static NamespaceAliasDecl *Create(ASTContext &C, DeclContext *DC,
                                     SourceLocation NamespaceLoc,
                                     SourceLocation AliasLoc,
@@ -3354,10 +3355,6 @@ class UsingShadowDecl : public NamedDecl, public Redeclarable<UsingShadowDecl> {
     return getNextRedeclaration();
   }
 
-  UsingShadowDecl *getPreviousDeclImpl() override {
-    return getPreviousDecl();
-  }
-
   UsingShadowDecl *getMostRecentDeclImpl() override {
     return getMostRecentDecl();
   }
@@ -3369,6 +3366,10 @@ protected:
   UsingShadowDecl(Kind K, ASTContext &C, EmptyShell);
 
 public:
+  UsingShadowDecl *getPreviousDeclImpl() {
+    return getPreviousDecl();
+  }
+
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
 

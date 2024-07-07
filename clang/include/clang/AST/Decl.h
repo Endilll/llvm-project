@@ -88,10 +88,6 @@ class TranslationUnitDecl : public Decl,
     return getNextRedeclaration();
   }
 
-  TranslationUnitDecl *getPreviousDeclImpl() override {
-    return getPreviousDecl();
-  }
-
   TranslationUnitDecl *getMostRecentDeclImpl() override {
     return getMostRecentDecl();
   }
@@ -107,6 +103,10 @@ class TranslationUnitDecl : public Decl,
   virtual void anchor();
 
 public:
+  TranslationUnitDecl *getPreviousDeclImpl() {
+    return getPreviousDecl();
+  }
+
   using redecl_range = redeclarable_base::redecl_range;
   using redecl_iterator = redeclarable_base::redecl_iterator;
 
@@ -569,10 +569,11 @@ class NamespaceDecl : public NamedDecl, public DeclContext,
   using redeclarable_base = Redeclarable<NamespaceDecl>;
 
   NamespaceDecl *getNextRedeclarationImpl() override;
-  NamespaceDecl *getPreviousDeclImpl() override;
   NamespaceDecl *getMostRecentDeclImpl() override;
 
 public:
+  NamespaceDecl *getPreviousDeclImpl();
+
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
 
@@ -1123,15 +1124,15 @@ protected:
     return getNextRedeclaration();
   }
 
-  VarDecl *getPreviousDeclImpl() override {
-    return getPreviousDecl();
-  }
-
   VarDecl *getMostRecentDeclImpl() override {
     return getMostRecentDecl();
   }
 
 public:
+  VarDecl *getPreviousDeclImpl() {
+    return getPreviousDecl();
+  }
+
   using redecl_range = redeclarable_base::redecl_range;
   using redecl_iterator = redeclarable_base::redecl_iterator;
 
@@ -2136,15 +2137,15 @@ protected:
     return getNextRedeclaration();
   }
 
-  FunctionDecl *getPreviousDeclImpl() override {
-    return getPreviousDecl();
-  }
-
   FunctionDecl *getMostRecentDeclImpl() override {
     return getMostRecentDecl();
   }
 
 public:
+  FunctionDecl *getPreviousDeclImpl() {
+    return getPreviousDecl();
+  }
+
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
 
@@ -3478,15 +3479,15 @@ protected:
     return getNextRedeclaration();
   }
 
-  TypedefNameDecl *getPreviousDeclImpl() override {
-    return getPreviousDecl();
-  }
-
   TypedefNameDecl *getMostRecentDeclImpl() override {
     return getMostRecentDecl();
   }
 
 public:
+  TypedefNameDecl *getPreviousDeclImpl() {
+    return getPreviousDecl();
+  }
+
   using redecl_range = redeclarable_base::redecl_range;
   using redecl_iterator = redeclarable_base::redecl_iterator;
 
@@ -3645,10 +3646,6 @@ protected:
     return getNextRedeclaration();
   }
 
-  TagDecl *getPreviousDeclImpl() override {
-    return getPreviousDecl();
-  }
-
   TagDecl *getMostRecentDeclImpl() override {
     return getMostRecentDecl();
   }
@@ -3670,6 +3667,10 @@ protected:
   }
 
 public:
+  TagDecl *getPreviousDeclImpl() {
+    return getPreviousDecl();
+  }
+
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
 

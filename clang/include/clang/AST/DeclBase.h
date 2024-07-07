@@ -973,16 +973,16 @@ public:
   /// Whether this particular Decl is a canonical one.
   bool isCanonicalDecl() const { return getCanonicalDecl() == this; }
 
+  /// Implementation of getPreviousDecl(), to be overridden by any
+  /// subclass that has a redeclaration chain.
+  Decl *getPreviousDeclImpl() { return nullptr; }
+
 protected:
   /// Returns the next redeclaration or itself if this is the only decl.
   ///
   /// Decl subclasses that can be redeclared should override this method so that
   /// Decl::redecl_iterator can iterate over them.
   virtual Decl *getNextRedeclarationImpl() { return this; }
-
-  /// Implementation of getPreviousDecl(), to be overridden by any
-  /// subclass that has a redeclaration chain.
-  virtual Decl *getPreviousDeclImpl() { return nullptr; }
 
   /// Implementation of getMostRecentDecl(), to be overridden by any
   /// subclass that has a redeclaration chain.
@@ -1048,12 +1048,12 @@ public:
 
   /// Retrieve the previous declaration that declares the same entity
   /// as this declaration, or NULL if there is no previous declaration.
-  Decl *getPreviousDecl() { return getPreviousDeclImpl(); }
+  Decl *getPreviousDecl();
 
   /// Retrieve the previous declaration that declares the same entity
   /// as this declaration, or NULL if there is no previous declaration.
   const Decl *getPreviousDecl() const {
-    return const_cast<Decl *>(this)->getPreviousDeclImpl();
+    return const_cast<Decl *>(this)->getPreviousDecl();
   }
 
   /// True if this is the first declaration in its redeclaration chain.
