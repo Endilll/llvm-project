@@ -16,6 +16,10 @@
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclOpenMP.h"
+#include "clang/AST/DeclTemplate.h"
 #include "clang/AST/ODRHash.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/Type.h"
@@ -398,7 +402,7 @@ ObjCPropertyDecl *ObjCInterfaceDecl::FindPropertyVisibleInPrimaryClass(
   return nullptr;
 }
 
-void ObjCInterfaceDecl::collectPropertiesToImplement(PropertyMap &PM) const {
+void ObjCInterfaceDecl::collectPropertiesToImplementImpl(PropertyMap &PM) const {
   for (auto *Prop : properties()) {
     PM[std::make_pair(Prop->getIdentifier(), Prop->isClassProperty())] = Prop;
   }
@@ -809,6 +813,23 @@ bool ObjCInterfaceDecl::hasODRHash() const {
 void ObjCInterfaceDecl::setHasODRHash(bool HasHash) {
   assert(hasDefinition() && "Cannot set ODRHash without definition");
   data().HasODRHash = HasHash;
+}
+
+void ObjCContainerDecl::collectPropertiesToImplement(PropertyMap &PM) const {
+  switch (getKind()) {
+#define ABSTRACT_DECL(Type)
+#define DECL_RANGE(Base, First, Last)
+#define DECL_CONTEXT(Decl)
+#define DECL(TYPE, BASE) \
+    case Kind::TYPE: \
+      return llvm::cast<TYPE##Decl>(this)->collectPropertiesToImplementImpl(PM);
+#include "clang/AST/DeclNodes.inc"
+#undef DECL
+#undef DECL_CONTEXT
+#undef DECL_RANGE
+#undef ABSTRACT_DECL
+  }
+  llvm_unreachable("Not all Decls are covered");
 }
 
 //===----------------------------------------------------------------------===//
@@ -2027,7 +2048,7 @@ void ObjCProtocolDecl::mergeDuplicateDefinitionWithCommon(
   Data = Definition->Data;
 }
 
-void ObjCProtocolDecl::collectPropertiesToImplement(PropertyMap &PM) const {
+void ObjCProtocolDecl::collectPropertiesToImplementImpl(PropertyMap &PM) const {
   if (const ObjCProtocolDecl *PDecl = getDefinition()) {
     for (auto *Prop : PDecl->properties()) {
       // Insert into PM if not there already.

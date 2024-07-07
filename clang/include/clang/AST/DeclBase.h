@@ -24,6 +24,7 @@
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/ADT/iterator.h"
@@ -57,6 +58,7 @@ class Module;
 class NamedDecl;
 class ObjCContainerDecl;
 class ObjCMethodDecl;
+class ObjCPropertyDecl;
 struct PrintingPolicy;
 class RecordDecl;
 class RedeclarableTemplateDecl;
@@ -1323,6 +1325,12 @@ public:
   CommonBase *newCommonImpl(ASTContext &C) const {
     llvm_unreachable("newCommon is not implemented for this class");
   };
+
+  using PropertyMap =
+      llvm::MapVector<std::pair<IdentifierInfo *, unsigned /*isClassProperty*/>,
+                      ObjCPropertyDecl *>;
+  
+  void collectPropertiesToImplementImpl(PropertyMap &PM) const {}
 
 private:
   void setAttrsImpl(const AttrVec& Attrs, ASTContext &Ctx);

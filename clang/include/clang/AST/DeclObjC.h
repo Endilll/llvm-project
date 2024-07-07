@@ -1085,7 +1085,7 @@ public:
   /// This routine collects list of properties to be implemented in the class.
   /// This includes, class's and its conforming protocols' properties.
   /// Note, the superclass's properties are not included in the list.
-  virtual void collectPropertiesToImplement(PropertyMap &PM) const {}
+  void collectPropertiesToImplement(PropertyMap &PM) const;
 
   SourceLocation getAtStartLoc() const { return ObjCContainerDeclBits.AtStart; }
 
@@ -1794,7 +1794,7 @@ public:
   FindPropertyVisibleInPrimaryClass(const IdentifierInfo *PropertyId,
                                     ObjCPropertyQueryKind QueryKind) const;
 
-  void collectPropertiesToImplement(PropertyMap &PM) const override;
+  void collectPropertiesToImplementImpl(PropertyMap &PM) const;
 
   /// isSuperClassOf - Return true if this class is the specified class or is a
   /// super class of the specified interface class.
@@ -2287,7 +2287,7 @@ public:
   const ObjCProtocolDecl *getCanonicalDecl() const { return const_cast<ObjCProtocolDecl *>(this)->getCanonicalDecl(); }
   ObjCProtocolDecl *getCanonicalDeclImpl() { return getFirstDecl(); }
 
-  void collectPropertiesToImplement(PropertyMap &PM) const override;
+  void collectPropertiesToImplementImpl(PropertyMap &PM) const;
 
   void collectInheritedProtocolProperties(const ObjCPropertyDecl *Property,
                                           ProtocolPropertySet &PS,
