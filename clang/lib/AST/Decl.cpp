@@ -2247,7 +2247,7 @@ bool VarDecl::isInExternCXXContext() const {
   return getLexicalDeclContext()->isExternCXXContext();
 }
 
-VarDecl *VarDecl::getCanonicalDecl() { return getFirstDecl(); }
+VarDecl *VarDecl::getCanonicalDeclImpl() { return getFirstDecl(); }
 
 VarDecl::DefinitionKind
 VarDecl::isThisDeclarationADefinition(ASTContext &C) const {
@@ -3613,7 +3613,7 @@ FunctionDecl::setPreviousDeclaration(FunctionDecl *PrevDecl) {
     setImplicitlyInline(true);
 }
 
-FunctionDecl *FunctionDecl::getCanonicalDecl() { return getFirstDecl(); }
+FunctionDecl *FunctionDecl::getCanonicalDeclImpl() { return getFirstDecl(); }
 
 /// Returns a value indicating whether this function corresponds to a builtin
 /// function.
@@ -4722,7 +4722,7 @@ SourceRange TagDecl::getSourceRangeImpl() const {
   return SourceRange(getOuterLocStart(), E);
 }
 
-TagDecl *TagDecl::getCanonicalDecl() { return getFirstDecl(); }
+TagDecl *TagDecl::getCanonicalDeclImpl() { return getFirstDecl(); }
 
 void TagDecl::setTypedefNameForAnonDecl(TypedefNameDecl *TDD) {
   TypedefNameDeclOrQualifier = TDD;

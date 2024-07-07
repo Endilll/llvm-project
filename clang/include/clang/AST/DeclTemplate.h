@@ -832,10 +832,13 @@ public:
   template <class decl_type> friend class RedeclarableTemplate;
 
   /// Retrieves the canonical declaration of this template.
-  RedeclarableTemplateDecl *getCanonicalDecl() override {
-    return getFirstDecl();
+  RedeclarableTemplateDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const RedeclarableTemplateDecl *getCanonicalDecl() const {
+    return const_cast<RedeclarableTemplateDecl *>(this)->getCanonicalDecl();
+  }
+  RedeclarableTemplateDecl *getCanonicalDeclImpl() {
     return getFirstDecl();
   }
 
@@ -1015,13 +1018,15 @@ public:
   FunctionDecl *findSpecialization(ArrayRef<TemplateArgument> Args,
                                    void *&InsertPos);
 
-  FunctionTemplateDecl *getCanonicalDecl() override {
-    return cast<FunctionTemplateDecl>(
-             RedeclarableTemplateDecl::getCanonicalDecl());
+  FunctionTemplateDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const FunctionTemplateDecl *getCanonicalDecl() const {
+    return const_cast<FunctionTemplateDecl *>(this)->getCanonicalDecl();
+  }
+  FunctionTemplateDecl *getCanonicalDeclImpl() {
     return cast<FunctionTemplateDecl>(
-             RedeclarableTemplateDecl::getCanonicalDecl());
+             RedeclarableTemplateDecl::getCanonicalDeclImpl());
   }
 
   /// Retrieve the previous declaration of this function template, or
@@ -2311,13 +2316,15 @@ public:
   /// in. InsertPos must be obtained from findSpecialization.
   void AddSpecialization(ClassTemplateSpecializationDecl *D, void *InsertPos);
 
-  ClassTemplateDecl *getCanonicalDecl() override {
-    return cast<ClassTemplateDecl>(
-             RedeclarableTemplateDecl::getCanonicalDecl());
+  ClassTemplateDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const ClassTemplateDecl *getCanonicalDecl() const {
+    return const_cast<ClassTemplateDecl *>(this)->getCanonicalDecl();
+  }
+  ClassTemplateDecl *getCanonicalDeclImpl() {
     return cast<ClassTemplateDecl>(
-             RedeclarableTemplateDecl::getCanonicalDecl());
+             RedeclarableTemplateDecl::getCanonicalDeclImpl());
   }
 
   /// Retrieve the previous declaration of this class template, or
@@ -2533,13 +2540,15 @@ public:
   }
 
 
-  TypeAliasTemplateDecl *getCanonicalDecl() override {
-    return cast<TypeAliasTemplateDecl>(
-             RedeclarableTemplateDecl::getCanonicalDecl());
+  TypeAliasTemplateDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const TypeAliasTemplateDecl *getCanonicalDecl() const {
+    return const_cast<TypeAliasTemplateDecl *>(this)->getCanonicalDecl();
+  }
+  TypeAliasTemplateDecl *getCanonicalDeclImpl() {
     return cast<TypeAliasTemplateDecl>(
-             RedeclarableTemplateDecl::getCanonicalDecl());
+             RedeclarableTemplateDecl::getCanonicalDeclImpl());
   }
 
   /// Retrieve the previous declaration of this function template, or
@@ -3056,11 +3065,14 @@ public:
   /// in. InsertPos must be obtained from findSpecialization.
   void AddSpecialization(VarTemplateSpecializationDecl *D, void *InsertPos);
 
-  VarTemplateDecl *getCanonicalDecl() override {
-    return cast<VarTemplateDecl>(RedeclarableTemplateDecl::getCanonicalDecl());
+  VarTemplateDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const VarTemplateDecl *getCanonicalDecl() const {
-    return cast<VarTemplateDecl>(RedeclarableTemplateDecl::getCanonicalDecl());
+    return const_cast<VarTemplateDecl *>(this)->getCanonicalDecl();
+  }
+  VarTemplateDecl *getCanonicalDeclImpl() {
+    return cast<VarTemplateDecl>(RedeclarableTemplateDecl::getCanonicalDeclImpl());
   }
 
   /// Retrieve the previous declaration of this variable template, or
@@ -3165,11 +3177,14 @@ public:
     return isa<TemplateTypeParmDecl>(getTemplateParameters()->getParam(0));
   }
 
-  ConceptDecl *getCanonicalDecl() override {
-    return cast<ConceptDecl>(getPrimaryMergedDecl(this));
+  ConceptDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const ConceptDecl *getCanonicalDecl() const {
     return const_cast<ConceptDecl *>(this)->getCanonicalDecl();
+  }
+  ConceptDecl *getCanonicalDeclImpl() {
+    return cast<ConceptDecl>(getPrimaryMergedDecl(this));
   }
 
   // Implement isa/cast/dyncast/etc.
@@ -3275,10 +3290,13 @@ public:
     Profile(ID, getType(), getValue());
   }
 
-  TemplateParamObjectDecl *getCanonicalDecl() override {
-    return getFirstDecl();
+  TemplateParamObjectDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const TemplateParamObjectDecl *getCanonicalDecl() const {
+    return const_cast<TemplateParamObjectDecl *>(this)->getCanonicalDecl();
+  }
+  TemplateParamObjectDecl *getCanonicalDeclImpl() {
     return getFirstDecl();
   }
 

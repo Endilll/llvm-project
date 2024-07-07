@@ -520,12 +520,16 @@ public:
   /// Iterator that traverses the base classes of a class.
   using base_class_const_iterator = const CXXBaseSpecifier *;
 
-  CXXRecordDecl *getCanonicalDecl() override {
-    return cast<CXXRecordDecl>(RecordDecl::getCanonicalDecl());
+  CXXRecordDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
 
   const CXXRecordDecl *getCanonicalDecl() const {
     return const_cast<CXXRecordDecl*>(this)->getCanonicalDecl();
+  }
+
+  CXXRecordDecl *getCanonicalDeclImpl() {
+    return cast<CXXRecordDecl>(RecordDecl::getCanonicalDeclImpl());
   }
 
   CXXRecordDecl *getPreviousDecl() {
@@ -2153,11 +2157,14 @@ public:
   /// Determine whether this is a move assignment operator.
   bool isMoveAssignmentOperator() const;
 
-  CXXMethodDecl *getCanonicalDecl() override {
-    return cast<CXXMethodDecl>(FunctionDecl::getCanonicalDecl());
+  CXXMethodDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const CXXMethodDecl *getCanonicalDecl() const {
     return const_cast<CXXMethodDecl*>(this)->getCanonicalDecl();
+  }
+  CXXMethodDecl *getCanonicalDeclImpl() {
+    return cast<CXXMethodDecl>(FunctionDecl::getCanonicalDeclImpl());
   }
 
   CXXMethodDecl *getMostRecentDecl() {
@@ -2774,11 +2781,14 @@ public:
       *getTrailingObjects<InheritedConstructor>() : InheritedConstructor();
   }
 
-  CXXConstructorDecl *getCanonicalDecl() override {
-    return cast<CXXConstructorDecl>(FunctionDecl::getCanonicalDecl());
+  CXXConstructorDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const CXXConstructorDecl *getCanonicalDecl() const {
     return const_cast<CXXConstructorDecl*>(this)->getCanonicalDecl();
+  }
+  CXXConstructorDecl *getCanonicalDeclImpl() {
+    return cast<CXXConstructorDecl>(FunctionDecl::getCanonicalDeclImpl());
   }
 
   // Implement isa/cast/dyncast/etc.
@@ -2837,11 +2847,14 @@ public:
     return getCanonicalDecl()->OperatorDeleteThisArg;
   }
 
-  CXXDestructorDecl *getCanonicalDecl() override {
-    return cast<CXXDestructorDecl>(FunctionDecl::getCanonicalDecl());
+  CXXDestructorDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const CXXDestructorDecl *getCanonicalDecl() const {
     return const_cast<CXXDestructorDecl*>(this)->getCanonicalDecl();
+  }
+  CXXDestructorDecl *getCanonicalDeclImpl() {
+    return cast<CXXDestructorDecl>(FunctionDecl::getCanonicalDeclImpl());
   }
 
   // Implement isa/cast/dyncast/etc.
@@ -2907,11 +2920,14 @@ public:
   /// a lambda closure type to a block pointer.
   bool isLambdaToBlockPointerConversion() const;
 
-  CXXConversionDecl *getCanonicalDecl() override {
-    return cast<CXXConversionDecl>(FunctionDecl::getCanonicalDecl());
+  CXXConversionDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const CXXConversionDecl *getCanonicalDecl() const {
     return const_cast<CXXConversionDecl*>(this)->getCanonicalDecl();
+  }
+  CXXConversionDecl *getCanonicalDeclImpl() {
+    return cast<CXXConversionDecl>(FunctionDecl::getCanonicalDeclImpl());
   }
 
   // Implement isa/cast/dyncast/etc.
@@ -3171,10 +3187,13 @@ public:
   using redeclarable_base::getPreviousDecl;
   using redeclarable_base::getMostRecentDecl;
 
-  NamespaceAliasDecl *getCanonicalDecl() override {
-    return getFirstDecl();
+  NamespaceAliasDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const NamespaceAliasDecl *getCanonicalDecl() const {
+    return const_cast<NamespaceAliasDecl *>(this)->getCanonicalDecl();
+  }
+  NamespaceAliasDecl *getCanonicalDeclImpl() {
     return getFirstDecl();
   }
 
@@ -3372,10 +3391,13 @@ public:
   using redeclarable_base::getMostRecentDecl;
   using redeclarable_base::isFirstDecl;
 
-  UsingShadowDecl *getCanonicalDecl() override {
-    return getFirstDecl();
+  UsingShadowDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const UsingShadowDecl *getCanonicalDecl() const {
+    return const_cast<UsingShadowDecl *>(this)->getCanonicalDecl();
+  }
+  UsingShadowDecl *getCanonicalDeclImpl() {
     return getFirstDecl();
   }
 
@@ -3574,10 +3596,13 @@ public:
   SourceRange getSourceRangeImpl() const;
 
   /// Retrieves the canonical declaration of this declaration.
-  UsingDecl *getCanonicalDecl() override {
-    return cast<UsingDecl>(getFirstDecl());
+  UsingDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const UsingDecl *getCanonicalDecl() const {
+    return const_cast<UsingDecl *>(this)->getCanonicalDecl();
+  }
+  UsingDecl *getCanonicalDeclImpl() {
     return cast<UsingDecl>(getFirstDecl());
   }
 
@@ -3765,10 +3790,13 @@ public:
   SourceRange getSourceRangeImpl() const;
 
   /// Retrieves the canonical declaration of this declaration.
-  UsingEnumDecl *getCanonicalDecl() override {
-    return cast<UsingEnumDecl>(getFirstDecl());
+  UsingEnumDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const UsingEnumDecl *getCanonicalDecl() const {
+    return const_cast<UsingEnumDecl *>(this)->getCanonicalDecl();
+  }
+  UsingEnumDecl *getCanonicalDeclImpl() {
     return cast<UsingEnumDecl>(getFirstDecl());
   }
 
@@ -3840,8 +3868,9 @@ public:
     return InstantiatedFrom->getSourceRange();
   }
 
-  UsingPackDecl *getCanonicalDecl() override { return getFirstDecl(); }
-  const UsingPackDecl *getCanonicalDecl() const { return getFirstDecl(); }
+  UsingPackDecl *getCanonicalDecl() { return getCanonicalDeclImpl(); }
+  const UsingPackDecl *getCanonicalDecl() const { return const_cast<UsingPackDecl *>(this)->getCanonicalDecl(); }
+  UsingPackDecl *getCanonicalDeclImpl() { return getFirstDecl(); }
 
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
   static bool classofKind(Kind K) { return K == UsingPack; }
@@ -3932,10 +3961,13 @@ public:
   SourceRange getSourceRangeImpl() const;
 
   /// Retrieves the canonical declaration of this declaration.
-  UnresolvedUsingValueDecl *getCanonicalDecl() override {
-    return getFirstDecl();
+  UnresolvedUsingValueDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const UnresolvedUsingValueDecl *getCanonicalDecl() const {
+    return const_cast<UnresolvedUsingValueDecl *>(this)->getCanonicalDecl();
+  }
+  UnresolvedUsingValueDecl *getCanonicalDeclImpl() {
     return getFirstDecl();
   }
 
@@ -4021,10 +4053,13 @@ public:
                                                          GlobalDeclID ID);
 
   /// Retrieves the canonical declaration of this declaration.
-  UnresolvedUsingTypenameDecl *getCanonicalDecl() override {
-    return getFirstDecl();
+  UnresolvedUsingTypenameDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const UnresolvedUsingTypenameDecl *getCanonicalDecl() const {
+    return const_cast<UnresolvedUsingTypenameDecl *>(this)->getCanonicalDecl();
+  }
+  UnresolvedUsingTypenameDecl *getCanonicalDeclImpl() {
     return getFirstDecl();
   }
 

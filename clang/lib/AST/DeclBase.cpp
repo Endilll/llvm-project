@@ -1331,6 +1331,23 @@ Stmt* Decl::getBody() const {
   return getBodyImpl();
 }
 
+Decl* Decl::getCanonicalDecl() {
+  switch (getKind()) {
+#define ABSTRACT_DECL(Type)
+#define DECL_RANGE(Base, First, Last)
+#define DECL_CONTEXT(Decl)
+#define DECL(TYPE, BASE) \
+    case Kind::TYPE: \
+      return llvm::cast<TYPE##Decl>(this)->getCanonicalDeclImpl();
+#include "clang/AST/DeclNodes.inc"
+#undef DECL
+#undef DECL_CONTEXT
+#undef DECL_RANGE
+#undef ABSTRACT_DECL
+  }
+  return getCanonicalDeclImpl();
+}
+
 Decl *DeclContext::getNonClosureAncestor() {
   return ::getNonClosureContext(this);
 }

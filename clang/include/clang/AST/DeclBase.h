@@ -964,10 +964,11 @@ public:
   }
 
   /// Retrieves the "canonical" declaration of the given declaration.
-  virtual Decl *getCanonicalDecl() { return this; }
+  Decl *getCanonicalDecl();
   const Decl *getCanonicalDecl() const {
     return const_cast<Decl*>(this)->getCanonicalDecl();
   }
+  Decl *getCanonicalDeclImpl() { return this; }
 
   /// Whether this particular Decl is a canonical one.
   bool isCanonicalDecl() const { return getCanonicalDecl() == this; }

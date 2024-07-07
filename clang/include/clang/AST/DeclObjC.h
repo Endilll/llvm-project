@@ -238,10 +238,11 @@ public:
 
   static ObjCMethodDecl *CreateDeserialized(ASTContext &C, GlobalDeclID ID);
 
-  ObjCMethodDecl *getCanonicalDecl() override;
+  ObjCMethodDecl *getCanonicalDecl() { return getCanonicalDeclImpl(); };
   const ObjCMethodDecl *getCanonicalDecl() const {
     return const_cast<ObjCMethodDecl*>(this)->getCanonicalDecl();
   }
+  ObjCMethodDecl *getCanonicalDeclImpl();
 
   ObjCDeclQualifier getObjCDeclQualifier() const {
     return static_cast<ObjCDeclQualifier>(ObjCMethodDeclBits.objcDeclQualifier);
@@ -1910,8 +1911,9 @@ public:
   using redeclarable_base::isFirstDecl;
 
   /// Retrieves the canonical declaration of this Objective-C class.
-  ObjCInterfaceDecl *getCanonicalDecl() override { return getFirstDecl(); }
-  const ObjCInterfaceDecl *getCanonicalDecl() const { return getFirstDecl(); }
+  ObjCInterfaceDecl *getCanonicalDecl() { return getCanonicalDeclImpl(); }
+  const ObjCInterfaceDecl *getCanonicalDecl() const { return const_cast<ObjCInterfaceDecl *>(this)->getCanonicalDecl(); }
+  ObjCInterfaceDecl *getCanonicalDeclImpl() { return getFirstDecl(); }
 
   // Low-level accessor
   const Type *getTypeForDecl() const { return TypeForDecl; }
@@ -1986,11 +1988,14 @@ public:
   const ObjCIvarDecl *getNextIvar() const { return NextIvar; }
   void setNextIvar(ObjCIvarDecl *ivar) { NextIvar = ivar; }
 
-  ObjCIvarDecl *getCanonicalDecl() override {
-    return cast<ObjCIvarDecl>(FieldDecl::getCanonicalDecl());
+  ObjCIvarDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const ObjCIvarDecl *getCanonicalDecl() const {
     return const_cast<ObjCIvarDecl *>(this)->getCanonicalDecl();
+  }
+  ObjCIvarDecl *getCanonicalDeclImpl() {
+    return cast<ObjCIvarDecl>(FieldDecl::getCanonicalDeclImpl());
   }
 
   void setAccessControl(AccessControl ac) { DeclAccess = ac; }
@@ -2291,8 +2296,9 @@ public:
   using redeclarable_base::isFirstDecl;
 
   /// Retrieves the canonical declaration of this Objective-C protocol.
-  ObjCProtocolDecl *getCanonicalDecl() override { return getFirstDecl(); }
-  const ObjCProtocolDecl *getCanonicalDecl() const { return getFirstDecl(); }
+  ObjCProtocolDecl *getCanonicalDecl() { return getCanonicalDeclImpl(); }
+  const ObjCProtocolDecl *getCanonicalDecl() const { return const_cast<ObjCProtocolDecl *>(this)->getCanonicalDecl(); }
+  ObjCProtocolDecl *getCanonicalDeclImpl() { return getFirstDecl(); }
 
   void collectPropertiesToImplement(PropertyMap &PM) const override;
 

@@ -671,12 +671,13 @@ public:
   }
 
   /// Retrieves the canonical declaration of this namespace.
-  NamespaceDecl *getCanonicalDecl() override {
-    return getOriginalNamespace();
+  NamespaceDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const NamespaceDecl *getCanonicalDecl() const {
-    return getOriginalNamespace();
+    return const_cast<NamespaceDecl *>(this)->getCanonicalDecl();
   }
+  NamespaceDecl *getCanonicalDeclImpl() { return getOriginalNamespace(); }
 
   SourceRange getSourceRangeImpl() const {
     return SourceRange(LocStart, RBraceLoc);
@@ -1272,10 +1273,11 @@ public:
     return getKind() != Decl::ParmVar && getDeclContext()->isRecord();
   }
 
-  VarDecl *getCanonicalDecl() override;
+  VarDecl *getCanonicalDecl() { return getCanonicalDeclImpl(); };
   const VarDecl *getCanonicalDecl() const {
     return const_cast<VarDecl*>(this)->getCanonicalDecl();
   }
+  VarDecl *getCanonicalDeclImpl();
 
   enum DefinitionKind {
     /// This declaration is only a declaration.
@@ -2678,10 +2680,11 @@ public:
 
   void setPreviousDeclaration(FunctionDecl * PrevDecl);
 
-  FunctionDecl *getCanonicalDecl() override;
+  FunctionDecl *getCanonicalDecl() { return getCanonicalDeclImpl(); };
   const FunctionDecl *getCanonicalDecl() const {
     return const_cast<FunctionDecl*>(this)->getCanonicalDecl();
   }
+  FunctionDecl *getCanonicalDeclImpl();
 
   unsigned getBuiltinID(bool ConsiderWrapperFunctions = false) const;
 
@@ -3294,8 +3297,9 @@ public:
   SourceRange getSourceRangeImpl() const;
 
   /// Retrieves the canonical declaration of this field.
-  FieldDecl *getCanonicalDecl() override { return getFirstDecl(); }
-  const FieldDecl *getCanonicalDecl() const { return getFirstDecl(); }
+  FieldDecl *getCanonicalDecl() { return getCanonicalDeclImpl(); }
+  const FieldDecl *getCanonicalDecl() const { return const_cast<FieldDecl *>(this)->getCanonicalDecl(); }
+  FieldDecl *getCanonicalDeclImpl() { return getFirstDecl(); }
 
   // Implement isa/cast/dyncast/etc.
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
@@ -3343,8 +3347,9 @@ public:
   SourceRange getSourceRangeImpl() const;
 
   /// Retrieves the canonical declaration of this enumerator.
-  EnumConstantDecl *getCanonicalDecl() override { return getFirstDecl(); }
-  const EnumConstantDecl *getCanonicalDecl() const { return getFirstDecl(); }
+  EnumConstantDecl *getCanonicalDecl() { return getCanonicalDeclImpl(); }
+  const EnumConstantDecl *getCanonicalDecl() const { return const_cast<EnumConstantDecl *>(this)->getCanonicalDecl(); }
+  EnumConstantDecl *getCanonicalDeclImpl() { return getFirstDecl(); }
 
   // Implement isa/cast/dyncast/etc.
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
@@ -3394,8 +3399,9 @@ public:
     return dyn_cast<VarDecl>(chain().front());
   }
 
-  IndirectFieldDecl *getCanonicalDecl() override { return getFirstDecl(); }
-  const IndirectFieldDecl *getCanonicalDecl() const { return getFirstDecl(); }
+  IndirectFieldDecl *getCanonicalDecl() { return getCanonicalDeclImpl(); }
+  const IndirectFieldDecl *getCanonicalDecl() const { return const_cast<IndirectFieldDecl *>(this)->getCanonicalDecl(); }
+  IndirectFieldDecl *getCanonicalDeclImpl() { return getFirstDecl(); }
 
   // Implement isa/cast/dyncast/etc.
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
@@ -3517,8 +3523,9 @@ public:
   }
 
   /// Retrieves the canonical declaration of this typedef-name.
-  TypedefNameDecl *getCanonicalDecl() override { return getFirstDecl(); }
-  const TypedefNameDecl *getCanonicalDecl() const { return getFirstDecl(); }
+  TypedefNameDecl *getCanonicalDecl() { return getCanonicalDeclImpl(); }
+  const TypedefNameDecl *getCanonicalDecl() const { return const_cast<TypedefNameDecl *>(this)->getCanonicalDecl(); }
+  TypedefNameDecl *getCanonicalDeclImpl() { return getFirstDecl(); }
 
   /// Retrieves the tag declaration for which this is the typedef name for
   /// linkage purposes, if any.
@@ -3688,10 +3695,11 @@ public:
   SourceLocation getOuterLocStart() const;
   SourceRange getSourceRangeImpl() const;
 
-  TagDecl *getCanonicalDecl() override;
+  TagDecl *getCanonicalDecl() { return getCanonicalDeclImpl(); };
   const TagDecl *getCanonicalDecl() const {
     return const_cast<TagDecl*>(this)->getCanonicalDecl();
   }
+  TagDecl *getCanonicalDeclImpl();
 
   /// Return true if this declaration is a completion definition of the type.
   /// Provided for consistency.
@@ -3961,11 +3969,14 @@ private:
 public:
   friend class ASTDeclReader;
 
-  EnumDecl *getCanonicalDecl() override {
-    return cast<EnumDecl>(TagDecl::getCanonicalDecl());
+  EnumDecl *getCanonicalDecl() {
+    return getCanonicalDeclImpl();
   }
   const EnumDecl *getCanonicalDecl() const {
     return const_cast<EnumDecl*>(this)->getCanonicalDecl();
+  }
+  EnumDecl *getCanonicalDeclImpl() {
+    return cast<EnumDecl>(TagDecl::getCanonicalDeclImpl());
   }
 
   EnumDecl *getPreviousDecl() {

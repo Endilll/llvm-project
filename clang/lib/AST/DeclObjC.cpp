@@ -1009,7 +1009,7 @@ ObjCMethodDecl *ObjCMethodDecl::getNextRedeclarationImpl() {
   return Redecl ? Redecl : this;
 }
 
-ObjCMethodDecl *ObjCMethodDecl::getCanonicalDecl() {
+ObjCMethodDecl *ObjCMethodDecl::getCanonicalDeclImpl() {
   auto *CtxD = cast<Decl>(getDeclContext());
   const auto &Sel = getSelector();
 
