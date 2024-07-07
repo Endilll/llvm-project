@@ -84,10 +84,6 @@ class TranslationUnitDecl : public Decl,
                             public Redeclarable<TranslationUnitDecl> {
   using redeclarable_base = Redeclarable<TranslationUnitDecl>;
 
-  TranslationUnitDecl *getNextRedeclarationImpl() override {
-    return getNextRedeclaration();
-  }
-
   ASTContext &Ctx;
 
   /// The (most recently entered) anonymous namespace for this
@@ -99,6 +95,10 @@ class TranslationUnitDecl : public Decl,
   virtual void anchor();
 
 public:
+  TranslationUnitDecl *getNextRedeclarationImpl() {
+    return getNextRedeclaration();
+  }
+
   TranslationUnitDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
   }
@@ -568,9 +568,8 @@ class NamespaceDecl : public NamedDecl, public DeclContext,
 
   using redeclarable_base = Redeclarable<NamespaceDecl>;
 
-  NamespaceDecl *getNextRedeclarationImpl() override;
-
 public:
+  NamespaceDecl *getNextRedeclarationImpl();
   NamespaceDecl *getPreviousDeclImpl();
   NamespaceDecl *getMostRecentDeclImpl();
 
@@ -1120,11 +1119,11 @@ protected:
 
   using redeclarable_base = Redeclarable<VarDecl>;
 
-  VarDecl *getNextRedeclarationImpl() override {
+public:
+  VarDecl *getNextRedeclarationImpl() {
     return getNextRedeclaration();
   }
 
-public:
   VarDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
   }
@@ -2133,11 +2132,11 @@ protected:
 
   using redeclarable_base = Redeclarable<FunctionDecl>;
 
-  FunctionDecl *getNextRedeclarationImpl() override {
+public:
+  FunctionDecl *getNextRedeclarationImpl() {
     return getNextRedeclaration();
   }
 
-public:
   FunctionDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
   }
@@ -3475,11 +3474,11 @@ protected:
 
   using redeclarable_base = Redeclarable<TypedefNameDecl>;
 
-  TypedefNameDecl *getNextRedeclarationImpl() override {
+public:
+  TypedefNameDecl *getNextRedeclarationImpl() {
     return getNextRedeclaration();
   }
 
-public:
   TypedefNameDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
   }
@@ -3642,10 +3641,6 @@ protected:
 
   using redeclarable_base = Redeclarable<TagDecl>;
 
-  TagDecl *getNextRedeclarationImpl() override {
-    return getNextRedeclaration();
-  }
-
   /// Completes the definition of this tag declaration.
   ///
   /// This is a helper function for derived classes.
@@ -3663,6 +3658,10 @@ protected:
   }
 
 public:
+  TagDecl *getNextRedeclarationImpl() {
+    return getNextRedeclaration();
+  }
+
   TagDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
   }

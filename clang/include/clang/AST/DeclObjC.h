@@ -217,12 +217,12 @@ class ObjCMethodDecl : public NamedDecl, public DeclContext {
                            ArrayRef<ParmVarDecl*> Params,
                            ArrayRef<SourceLocation> SelLocs);
 
+public:
   /// A definition will return its interface declaration.
   /// An interface declaration will return its definition.
   /// Otherwise it will return itself.
-  ObjCMethodDecl *getNextRedeclarationImpl() override;
+  ObjCMethodDecl *getNextRedeclarationImpl();
 
-public:
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
 
@@ -1262,11 +1262,11 @@ class ObjCInterfaceDecl : public ObjCContainerDecl
 
   using redeclarable_base = Redeclarable<ObjCInterfaceDecl>;
 
-  ObjCInterfaceDecl *getNextRedeclarationImpl() override {
+public:
+  ObjCInterfaceDecl *getNextRedeclarationImpl() {
     return getNextRedeclaration();
   }
 
-public:
   ObjCInterfaceDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
   }
@@ -2122,15 +2122,15 @@ class ObjCProtocolDecl : public ObjCContainerDecl,
 
   using redeclarable_base = Redeclarable<ObjCProtocolDecl>;
 
-  ObjCProtocolDecl *getNextRedeclarationImpl() override {
-    return getNextRedeclaration();
-  }
-
   /// True if a valid hash is stored in ODRHash.
   bool hasODRHash() const;
   void setHasODRHash(bool HasHash);
 
 public:
+  ObjCProtocolDecl *getNextRedeclarationImpl() {
+    return getNextRedeclaration();
+  }
+
   ObjCProtocolDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
   }

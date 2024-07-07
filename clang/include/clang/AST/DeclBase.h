@@ -973,6 +973,14 @@ public:
   /// Whether this particular Decl is a canonical one.
   bool isCanonicalDecl() const { return getCanonicalDecl() == this; }
 
+  Decl *getNextRedeclarationInternal();
+
+  /// Returns the next redeclaration or itself if this is the only decl.
+  ///
+  /// Decl subclasses that can be redeclared should override this method so that
+  /// Decl::redecl_iterator can iterate over them.
+  Decl *getNextRedeclarationImpl() { return this; }
+
   /// Implementation of getPreviousDecl(), to be overridden by any
   /// subclass that has a redeclaration chain.
   Decl *getPreviousDeclImpl() { return nullptr; }
@@ -980,13 +988,6 @@ public:
   /// Implementation of getMostRecentDecl(), to be overridden by any
   /// subclass that has a redeclaration chain.
   Decl *getMostRecentDeclImpl() { return this; }
-
-protected:
-  /// Returns the next redeclaration or itself if this is the only decl.
-  ///
-  /// Decl subclasses that can be redeclared should override this method so that
-  /// Decl::redecl_iterator can iterate over them.
-  virtual Decl *getNextRedeclarationImpl() { return this; }
 
 public:
   /// Iterates through all the redeclarations of the same decl.
@@ -1011,7 +1012,7 @@ public:
     redecl_iterator& operator++() {
       assert(Current && "Advancing while iterator has reached end");
       // Get either previous decl or latest decl.
-      Decl *Next = Current->getNextRedeclarationImpl();
+      Decl *Next = Current->getNextRedeclarationInternal();
       assert(Next && "Should return next redeclaration or itself, never null!");
       Current = (Next != Starter) ? Next : nullptr;
       return *this;

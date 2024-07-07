@@ -716,10 +716,6 @@ class RedeclarableTemplateDecl : public TemplateDecl,
 {
   using redeclarable_base = Redeclarable<RedeclarableTemplateDecl>;
 
-  RedeclarableTemplateDecl *getNextRedeclarationImpl() override {
-    return getNextRedeclaration();
-  }
-
   void anchor() override;
 protected:
   template <typename EntryType> struct SpecEntryTraits {
@@ -818,6 +814,10 @@ protected:
       : TemplateDecl(DK, DC, L, Name, Params, Decl), redeclarable_base(C) {}
 
 public:
+  RedeclarableTemplateDecl *getNextRedeclarationImpl() {
+    return getNextRedeclaration();
+  }
+
   RedeclarableTemplateDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
   }

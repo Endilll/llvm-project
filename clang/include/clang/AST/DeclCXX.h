@@ -3163,9 +3163,8 @@ class NamespaceAliasDecl : public NamedDecl,
 
   using redeclarable_base = Redeclarable<NamespaceAliasDecl>;
 
-  NamespaceAliasDecl *getNextRedeclarationImpl() override;
-
 public:
+  NamespaceAliasDecl *getNextRedeclarationImpl();
   NamespaceAliasDecl *getPreviousDeclImpl();
   NamespaceAliasDecl *getMostRecentDeclImpl();
 
@@ -3351,10 +3350,6 @@ class UsingShadowDecl : public NamedDecl, public Redeclarable<UsingShadowDecl> {
 
   using redeclarable_base = Redeclarable<UsingShadowDecl>;
 
-  UsingShadowDecl *getNextRedeclarationImpl() override {
-    return getNextRedeclaration();
-  }
-
 protected:
   UsingShadowDecl(Kind K, ASTContext &C, DeclContext *DC, SourceLocation Loc,
                   DeclarationName Name, BaseUsingDecl *Introducer,
@@ -3362,6 +3357,10 @@ protected:
   UsingShadowDecl(Kind K, ASTContext &C, EmptyShell);
 
 public:
+  UsingShadowDecl *getNextRedeclarationImpl() {
+    return getNextRedeclaration();
+  }
+
   UsingShadowDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
   }
