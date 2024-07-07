@@ -265,8 +265,6 @@ TemplateDecl::TemplateDecl(Kind DK, DeclContext *DC, SourceLocation L,
                            NamedDecl *Decl)
     : NamedDecl(DK, DC, L, Name), TemplatedDecl(Decl), TemplateParams(Params) {}
 
-void TemplateDecl::anchor() {}
-
 void TemplateDecl::
 getAssociatedConstraints(llvm::SmallVectorImpl<const Expr *> &AC) const {
   TemplateParams->getAssociatedConstraints(AC);
@@ -296,8 +294,6 @@ bool TemplateDecl::isTypeAlias() const {
 //===----------------------------------------------------------------------===//
 // RedeclarableTemplateDecl Implementation
 //===----------------------------------------------------------------------===//
-
-void RedeclarableTemplateDecl::anchor() {}
 
 RedeclarableTemplateDecl::CommonBase *RedeclarableTemplateDecl::getCommonPtr() const {
   if (Common)
@@ -817,8 +813,6 @@ void NonTypeTemplateParmDecl::setDefaultArgument(
 // TemplateTemplateParmDecl Method Implementations
 //===----------------------------------------------------------------------===//
 
-void TemplateTemplateParmDecl::anchor() {}
-
 TemplateTemplateParmDecl::TemplateTemplateParmDecl(
     DeclContext *DC, SourceLocation L, unsigned D, unsigned P,
     IdentifierInfo *Id, bool Typename, TemplateParameterList *Params,
@@ -1126,7 +1120,6 @@ void ImplicitConceptSpecializationDecl::setTemplateArguments(
 //===----------------------------------------------------------------------===//
 // ClassTemplatePartialSpecializationDecl Implementation
 //===----------------------------------------------------------------------===//
-void ClassTemplatePartialSpecializationDecl::anchor() {}
 
 ClassTemplatePartialSpecializationDecl::ClassTemplatePartialSpecializationDecl(
     ASTContext &Context, TagKind TK, DeclContext *DC, SourceLocation StartLoc,
@@ -1181,8 +1174,6 @@ SourceRange ClassTemplatePartialSpecializationDecl::getSourceRangeImpl() const {
 //===----------------------------------------------------------------------===//
 // FriendTemplateDecl Implementation
 //===----------------------------------------------------------------------===//
-
-void FriendTemplateDecl::anchor() {}
 
 FriendTemplateDecl *
 FriendTemplateDecl::Create(ASTContext &Context, DeclContext *DC,
@@ -1482,8 +1473,6 @@ void VarTemplateSpecializationDecl::setTemplateKeywordLoc(SourceLocation Loc) {
 // VarTemplatePartialSpecializationDecl Implementation
 //===----------------------------------------------------------------------===//
 
-void VarTemplatePartialSpecializationDecl::anchor() {}
-
 VarTemplatePartialSpecializationDecl::VarTemplatePartialSpecializationDecl(
     ASTContext &Context, DeclContext *DC, SourceLocation StartLoc,
     SourceLocation IdLoc, TemplateParameterList *Params,
@@ -1610,8 +1599,6 @@ static TemplateParameterList *createBuiltinTemplateParameterList(
 
   llvm_unreachable("unhandled BuiltinTemplateKind!");
 }
-
-void BuiltinTemplateDecl::anchor() {}
 
 BuiltinTemplateDecl::BuiltinTemplateDecl(const ASTContext &C, DeclContext *DC,
                                          DeclarationName Name,

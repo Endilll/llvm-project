@@ -601,8 +601,6 @@ class ObjCTypeParamDecl : public TypedefNameDecl {
         Index(index), Variance(static_cast<unsigned>(variance)),
         VarianceLoc(varianceLoc), ColonLoc(colonLoc) {}
 
-  void anchor() override;
-
 public:
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
@@ -729,8 +727,6 @@ enum class ObjCPropertyQueryKind : uint8_t {
 /// \@property (assign, readwrite) int MyProperty;
 /// \endcode
 class ObjCPropertyDecl : public NamedDecl {
-  void anchor() override;
-
 public:
   enum SetterKind { Assign, Retain, Copy, Weak };
   enum PropertyControl { None, Required, Optional };
@@ -952,8 +948,6 @@ class ObjCContainerDecl : public NamedDecl, public DeclContext {
   // These two locations in the range mark the end of the method container.
   // The first points to the '@' token, and the second to the 'end' token.
   SourceRange AtEnd;
-
-  void anchor() override;
 
 public:
   ObjCContainerDecl(Kind DK, DeclContext *DC, const IdentifierInfo *Id,
@@ -1247,8 +1241,6 @@ class ObjCInterfaceDecl : public ObjCContainerDecl
                     const IdentifierInfo *Id, ObjCTypeParamList *typeParamList,
                     SourceLocation CLoc, ObjCInterfaceDecl *PrevDecl,
                     bool IsInternal);
-
-  void anchor() override;
 
   void LoadExternalDefinition() const;
 
@@ -1950,7 +1942,6 @@ private:
 ///   }
 ///
 class ObjCIvarDecl : public FieldDecl {
-  void anchor() override;
 
 public:
   enum AccessControl {
@@ -2038,8 +2029,6 @@ class ObjCAtDefsFieldDecl : public FieldDecl {
                   /*TInfo=*/nullptr, // FIXME: Do ObjCAtDefs have declarators ?
                   BW, /*Mutable=*/false, /*HasInit=*/ICIS_NoInit) {}
 
-  void anchor() override;
-
 public:
   static ObjCAtDefsFieldDecl *Create(ASTContext &C, DeclContext *DC,
                                      SourceLocation StartLoc,
@@ -2110,8 +2099,6 @@ class ObjCProtocolDecl : public ObjCContainerDecl,
   ObjCProtocolDecl(ASTContext &C, DeclContext *DC, IdentifierInfo *Id,
                    SourceLocation nameLoc, SourceLocation atStartLoc,
                    ObjCProtocolDecl *PrevDecl);
-
-  void anchor() override;
 
   DefinitionData &data() const {
     assert(Data.getPointer() && "Objective-C protocol has no definition!");
@@ -2357,8 +2344,6 @@ class ObjCCategoryDecl : public ObjCContainerDecl {
                    SourceLocation IvarLBraceLoc = SourceLocation(),
                    SourceLocation IvarRBraceLoc = SourceLocation());
 
-  void anchor() override;
-
 public:
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
@@ -2476,8 +2461,6 @@ class ObjCImplDecl : public ObjCContainerDecl {
   /// Class interface for this class/category implementation
   ObjCInterfaceDecl *ClassInterface;
 
-  void anchor() override;
-
 protected:
   ObjCImplDecl(Kind DK, DeclContext *DC, ObjCInterfaceDecl *classInterface,
                const IdentifierInfo *Id, SourceLocation nameLoc,
@@ -2557,8 +2540,6 @@ class ObjCCategoryImplDecl : public ObjCImplDecl {
                      atStartLoc),
         CategoryNameLoc(CategoryNameLoc) {}
 
-  void anchor() override;
-
 public:
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
@@ -2634,8 +2615,6 @@ class ObjCImplementationDecl : public ObjCImplDecl {
          SuperClass(superDecl), SuperLoc(superLoc),
          IvarLBraceLoc(IvarLBraceLoc), IvarRBraceLoc(IvarRBraceLoc),
          HasNonZeroConstructors(false), HasDestructors(false) {}
-
-  void anchor() override;
 
 public:
   friend class ASTDeclReader;
@@ -2782,8 +2761,6 @@ class ObjCCompatibleAliasDecl : public NamedDecl {
   ObjCCompatibleAliasDecl(DeclContext *DC, SourceLocation L, IdentifierInfo *Id,
                           ObjCInterfaceDecl* aliasedClass)
       : NamedDecl(ObjCCompatibleAlias, DC, L, Id), AliasedClass(aliasedClass) {}
-
-  void anchor() override;
 
 public:
   static ObjCCompatibleAliasDecl *Create(ASTContext &C, DeclContext *DC,

@@ -392,8 +392,6 @@ public:
 /// The TemplateDecl class stores the list of template parameters and a
 /// reference to the templated scoped declaration: the underlying AST node.
 class TemplateDecl : public NamedDecl {
-  void anchor() override;
-
 protected:
   // Construct a template decl with name, parameters, and templated element.
   TemplateDecl(Kind DK, DeclContext *DC, SourceLocation L, DeclarationName Name,
@@ -716,7 +714,6 @@ class RedeclarableTemplateDecl : public TemplateDecl,
 {
   using redeclarable_base = Redeclarable<RedeclarableTemplateDecl>;
 
-  void anchor() override;
 protected:
   template <typename EntryType> struct SpecEntryTraits {
     using DeclType = EntryType;
@@ -1617,8 +1614,6 @@ class TemplateTemplateParmDecl final
                            TemplateParameterList *Params,
                            ArrayRef<TemplateParameterList *> Expansions);
 
-  void anchor() override;
-
 public:
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
@@ -1759,8 +1754,6 @@ class BuiltinTemplateDecl : public TemplateDecl {
 
   BuiltinTemplateDecl(const ASTContext &C, DeclContext *DC,
                       DeclarationName Name, BuiltinTemplateKind BTK);
-
-  void anchor() override;
 
 public:
   // Implement isa/cast/dyncast support
@@ -2097,8 +2090,6 @@ class ClassTemplatePartialSpecializationDecl
   ClassTemplatePartialSpecializationDecl(ASTContext &C)
     : ClassTemplateSpecializationDecl(C, ClassTemplatePartialSpecialization),
       InstantiatedFromMember(nullptr, false) {}
-
-  void anchor() override;
 
 public:
   friend class ASTDeclReader;
@@ -2439,8 +2430,6 @@ public:
 /// \note This class is not currently in use.  All of the above
 /// will yield a FriendDecl, not a FriendTemplateDecl.
 class FriendTemplateDecl : public Decl {
-  virtual void anchor();
-
 public:
   using FriendUnion = llvm::PointerUnion<NamedDecl *,TypeSourceInfo *>;
 
@@ -2867,8 +2856,6 @@ class VarTemplatePartialSpecializationDecl
       : VarTemplateSpecializationDecl(VarTemplatePartialSpecialization,
                                       Context),
         InstantiatedFromMember(nullptr, false) {}
-
-  void anchor() override;
 
 public:
   friend class ASTDeclReader;

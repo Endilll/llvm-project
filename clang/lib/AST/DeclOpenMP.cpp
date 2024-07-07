@@ -23,8 +23,6 @@ using namespace clang;
 // OMPThreadPrivateDecl Implementation.
 //===----------------------------------------------------------------------===//
 
-void OMPThreadPrivateDecl::anchor() {}
-
 OMPThreadPrivateDecl *OMPThreadPrivateDecl::Create(ASTContext &C,
                                                    DeclContext *DC,
                                                    SourceLocation L,
@@ -51,8 +49,6 @@ void OMPThreadPrivateDecl::setVars(ArrayRef<Expr *> VL) {
 //===----------------------------------------------------------------------===//
 // OMPAllocateDecl Implementation.
 //===----------------------------------------------------------------------===//
-
-void OMPAllocateDecl::anchor() { }
 
 OMPAllocateDecl *OMPAllocateDecl::Create(ASTContext &C, DeclContext *DC,
                                          SourceLocation L, ArrayRef<Expr *> VL,
@@ -81,8 +77,6 @@ void OMPAllocateDecl::setVars(ArrayRef<Expr *> VL) {
 // OMPRequiresDecl Implementation.
 //===----------------------------------------------------------------------===//
 
-void OMPRequiresDecl::anchor() {}
-
 OMPRequiresDecl *OMPRequiresDecl::Create(ASTContext &C, DeclContext *DC,
                                          SourceLocation L,
                                          ArrayRef<OMPClause *> CL) {
@@ -108,8 +102,6 @@ OMPDeclareReductionDecl::OMPDeclareReductionDecl(
       PrevDeclInScope(PrevDeclInScope) {
   setInitializer(nullptr, OMPDeclareReductionInitKind::Call);
 }
-
-void OMPDeclareReductionDecl::anchor() {}
 
 OMPDeclareReductionDecl *OMPDeclareReductionDecl::Create(
     ASTContext &C, DeclContext *DC, SourceLocation L, DeclarationName Name,
@@ -138,8 +130,6 @@ OMPDeclareReductionDecl::getPrevDeclInScope() const {
 //===----------------------------------------------------------------------===//
 // OMPDeclareMapperDecl Implementation.
 //===----------------------------------------------------------------------===//
-
-void OMPDeclareMapperDecl::anchor() {}
 
 OMPDeclareMapperDecl *OMPDeclareMapperDecl::Create(
     ASTContext &C, DeclContext *DC, SourceLocation L, DeclarationName Name,
@@ -170,8 +160,6 @@ const OMPDeclareMapperDecl *OMPDeclareMapperDecl::getPrevDeclInScope() const {
 //===----------------------------------------------------------------------===//
 // OMPCapturedExprDecl Implementation.
 //===----------------------------------------------------------------------===//
-
-void OMPCapturedExprDecl::anchor() {}
 
 OMPCapturedExprDecl *OMPCapturedExprDecl::Create(ASTContext &C, DeclContext *DC,
                                                  IdentifierInfo *Id, QualType T,

@@ -110,8 +110,6 @@ public:
 class OMPThreadPrivateDecl final : public OMPDeclarativeDirective<Decl> {
   friend class OMPDeclarativeDirective<Decl>;
 
-  virtual void anchor();
-
   OMPThreadPrivateDecl(DeclContext *DC = nullptr,
                        SourceLocation L = SourceLocation())
       : OMPDeclarativeDirective<Decl>(OMPThreadPrivate, DC, L) {}
@@ -196,8 +194,6 @@ class OMPDeclareReductionDecl final : public ValueDecl, public DeclContext {
   /// scope with the same name. Required for proper templates instantiation if
   /// the declare reduction construct is declared inside compound statement.
   LazyDeclPtr PrevDeclInScope;
-
-  void anchor() override;
 
   OMPDeclareReductionDecl(Kind DK, DeclContext *DC, SourceLocation L,
                           DeclarationName Name, QualType Ty,
@@ -297,8 +293,6 @@ class OMPDeclareMapperDecl final : public OMPDeclarativeDirective<ValueDecl>,
 
   LazyDeclPtr PrevDeclInScope;
 
-  void anchor() override;
-
   OMPDeclareMapperDecl(DeclContext *DC, SourceLocation L, DeclarationName Name,
                        QualType Ty, DeclarationName VarName,
                        OMPDeclareMapperDecl *PrevDeclInScope)
@@ -382,7 +376,6 @@ public:
 /// capture by wrapping captured expression into a variable-like declaration.
 class OMPCapturedExprDecl final : public VarDecl {
   friend class ASTDeclReader;
-  void anchor() override;
 
   OMPCapturedExprDecl(ASTContext &C, DeclContext *DC, IdentifierInfo *Id,
                       QualType Type, TypeSourceInfo *TInfo,
@@ -417,8 +410,6 @@ public:
 class OMPRequiresDecl final : public OMPDeclarativeDirective<Decl> {
   friend class OMPDeclarativeDirective<Decl>;
   friend class ASTDeclReader;
-
-  virtual void anchor();
 
   OMPRequiresDecl(DeclContext *DC, SourceLocation L)
       : OMPDeclarativeDirective<Decl>(OMPRequires, DC, L) {}
@@ -474,8 +465,6 @@ public:
 class OMPAllocateDecl final : public OMPDeclarativeDirective<Decl> {
   friend class OMPDeclarativeDirective<Decl>;
   friend class ASTDeclReader;
-
-  virtual void anchor();
 
   OMPAllocateDecl(DeclContext *DC, SourceLocation L)
       : OMPDeclarativeDirective<Decl>(OMPAllocate, DC, L) {}

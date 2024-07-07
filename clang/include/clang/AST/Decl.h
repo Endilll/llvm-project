@@ -92,8 +92,6 @@ class TranslationUnitDecl : public Decl,
 
   explicit TranslationUnitDecl(ASTContext &ctx);
 
-  virtual void anchor();
-
 public:
   TranslationUnitDecl *getNextRedeclarationImpl() {
     return getNextRedeclaration();
@@ -150,8 +148,6 @@ class PragmaCommentDecl final
                     PragmaMSCommentKind CommentKind)
       : Decl(PragmaComment, TU, CommentLoc), CommentKind(CommentKind) {}
 
-  virtual void anchor();
-
 public:
   static PragmaCommentDecl *Create(const ASTContext &C, TranslationUnitDecl *DC,
                                    SourceLocation CommentLoc,
@@ -183,8 +179,6 @@ class PragmaDetectMismatchDecl final
   PragmaDetectMismatchDecl(TranslationUnitDecl *TU, SourceLocation Loc,
                            size_t ValueStart)
       : Decl(PragmaDetectMismatch, TU, Loc), ValueStart(ValueStart) {}
-
-  virtual void anchor();
 
 public:
   static PragmaDetectMismatchDecl *Create(const ASTContext &C,
@@ -224,8 +218,6 @@ class ExternCContextDecl : public Decl, public DeclContext {
     : Decl(ExternCContext, TU, SourceLocation()),
       DeclContext(ExternCContext) {}
 
-  virtual void anchor();
-
 public:
   static ExternCContextDecl *Create(const ASTContext &C,
                                     TranslationUnitDecl *TU);
@@ -251,8 +243,6 @@ class NamedDecl : public Decl {
   /// identifier but may also be a special kind of name (C++
   /// constructor, Objective-C selector, etc.)
   DeclarationName Name;
-
-  virtual void anchor();
 
 private:
   NamedDecl *getUnderlyingDeclImpl() LLVM_READONLY;
@@ -510,8 +500,6 @@ class LabelDecl : public NamedDecl {
             LabelStmt *S, SourceLocation StartL)
       : NamedDecl(Label, DC, IdentL, II), TheStmt(S), LocStart(StartL) {}
 
-  void anchor() override;
-
 public:
   static LabelDecl *Create(ASTContext &C, DeclContext *DC,
                            SourceLocation IdentL, IdentifierInfo *II);
@@ -706,8 +694,6 @@ class VarDecl;
 /// an enum constant.
 class ValueDecl : public NamedDecl {
   QualType DeclType;
-
-  void anchor() override;
 
 protected:
   ValueDecl(Kind DK, DeclContext *DC, SourceLocation L,
@@ -1720,8 +1706,6 @@ enum class ImplicitParamKind {
 };
 
 class ImplicitParamDecl : public VarDecl {
-  void anchor() override;
-
 public:
   /// Create implicit parameter.
   static ImplicitParamDecl *Create(ASTContext &C, DeclContext *DC,
@@ -3367,8 +3351,6 @@ class IndirectFieldDecl : public ValueDecl,
                     DeclarationName N, QualType T,
                     MutableArrayRef<NamedDecl *> CH);
 
-  void anchor() override;
-
 public:
   friend class ASTDeclReader;
 
@@ -3421,8 +3403,6 @@ class TypeDecl : public NamedDecl {
   /// The start of the source range for this declaration.
   SourceLocation LocStart;
 
-  void anchor() override;
-
 protected:
   TypeDecl(Kind DK, DeclContext *DC, SourceLocation L, const IdentifierInfo *Id,
            SourceLocation StartL = SourceLocation())
@@ -3462,8 +3442,6 @@ class TypedefNameDecl : public TypeDecl, public Redeclarable<TypedefNameDecl> {
   mutable llvm::PointerIntPair<
       llvm::PointerUnion<TypeSourceInfo *, ModedTInfo *>, 2>
       MaybeModedTInfo;
-
-  void anchor() override;
 
 protected:
   TypedefNameDecl(Kind DK, ASTContext &C, DeclContext *DC,
@@ -3927,8 +3905,6 @@ class EnumDecl : public TagDecl {
   EnumDecl(ASTContext &C, DeclContext *DC, SourceLocation StartLoc,
            SourceLocation IdLoc, IdentifierInfo *Id, EnumDecl *PrevDecl,
            bool Scoped, bool ScopedUsingClassTag, bool Fixed);
-
-  void anchor() override;
 
   void setInstantiationOfMemberEnum(ASTContext &C, EnumDecl *ED,
                                     TemplateSpecializationKind TSK);
@@ -4452,8 +4428,6 @@ class FileScopeAsmDecl : public Decl {
                    SourceLocation StartL, SourceLocation EndL)
     : Decl(FileScopeAsm, DC, StartL), AsmString(asmstring), RParenLoc(EndL) {}
 
-  virtual void anchor();
-
 public:
   static FileScopeAsmDecl *Create(ASTContext &C, DeclContext *DC,
                                   StringLiteral *Str, SourceLocation AsmLoc,
@@ -4490,8 +4464,6 @@ class TopLevelStmtDecl : public Decl, public DeclContext {
 
   TopLevelStmtDecl(DeclContext *DC, SourceLocation L, Stmt *S)
       : Decl(TopLevelStmt, DC, L), DeclContext(TopLevelStmt), Statement(S) {}
-
-  virtual void anchor();
 
 public:
   static TopLevelStmtDecl *Create(ASTContext &C, Stmt *Statement);
@@ -4910,8 +4882,6 @@ public:
 ///   export void foo();
 /// \endcode
 class ExportDecl final : public Decl, public DeclContext {
-  virtual void anchor();
-
 private:
   friend class ASTDeclReader;
 
@@ -4958,8 +4928,6 @@ public:
 /// Represents an empty-declaration.
 class EmptyDecl : public Decl {
   EmptyDecl(DeclContext *DC, SourceLocation L) : Decl(Empty, DC, L) {}
-
-  virtual void anchor();
 
 public:
   static EmptyDecl *Create(ASTContext &C, DeclContext *DC,

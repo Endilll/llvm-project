@@ -24,8 +24,6 @@
 
 using namespace clang;
 
-void FriendDecl::anchor() {}
-
 FriendDecl *FriendDecl::getNextFriendSlowCase() {
   return cast_or_null<FriendDecl>(
                            NextFriend.get(getASTContext().getExternalSource()));
