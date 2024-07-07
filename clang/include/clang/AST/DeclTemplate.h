@@ -720,10 +720,6 @@ class RedeclarableTemplateDecl : public TemplateDecl,
     return getNextRedeclaration();
   }
 
-  RedeclarableTemplateDecl *getMostRecentDeclImpl() override {
-    return getMostRecentDecl();
-  }
-
   void anchor() override;
 protected:
   template <typename EntryType> struct SpecEntryTraits {
@@ -824,6 +820,10 @@ protected:
 public:
   RedeclarableTemplateDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
+  }
+
+  RedeclarableTemplateDecl *getMostRecentDeclImpl() {
+    return getMostRecentDecl();
   }
 
   friend class ASTDeclReader;

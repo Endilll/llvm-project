@@ -977,16 +977,16 @@ public:
   /// subclass that has a redeclaration chain.
   Decl *getPreviousDeclImpl() { return nullptr; }
 
+  /// Implementation of getMostRecentDecl(), to be overridden by any
+  /// subclass that has a redeclaration chain.
+  Decl *getMostRecentDeclImpl() { return this; }
+
 protected:
   /// Returns the next redeclaration or itself if this is the only decl.
   ///
   /// Decl subclasses that can be redeclared should override this method so that
   /// Decl::redecl_iterator can iterate over them.
   virtual Decl *getNextRedeclarationImpl() { return this; }
-
-  /// Implementation of getMostRecentDecl(), to be overridden by any
-  /// subclass that has a redeclaration chain.
-  virtual Decl *getMostRecentDeclImpl() { return this; }
 
 public:
   /// Iterates through all the redeclarations of the same decl.
@@ -1063,12 +1063,12 @@ public:
 
   /// Retrieve the most recent declaration that declares the same entity
   /// as this declaration (which may be this declaration).
-  Decl *getMostRecentDecl() { return getMostRecentDeclImpl(); }
+  Decl *getMostRecentDecl();
 
   /// Retrieve the most recent declaration that declares the same entity
   /// as this declaration (which may be this declaration).
   const Decl *getMostRecentDecl() const {
-    return const_cast<Decl *>(this)->getMostRecentDeclImpl();
+    return const_cast<Decl *>(this)->getMostRecentDecl();
   }
 
   /// getBody - If this Decl represents a declaration for a body of code,

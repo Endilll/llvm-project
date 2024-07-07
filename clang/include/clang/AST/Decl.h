@@ -88,10 +88,6 @@ class TranslationUnitDecl : public Decl,
     return getNextRedeclaration();
   }
 
-  TranslationUnitDecl *getMostRecentDeclImpl() override {
-    return getMostRecentDecl();
-  }
-
   ASTContext &Ctx;
 
   /// The (most recently entered) anonymous namespace for this
@@ -105,6 +101,10 @@ class TranslationUnitDecl : public Decl,
 public:
   TranslationUnitDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
+  }
+
+  TranslationUnitDecl *getMostRecentDeclImpl() {
+    return getMostRecentDecl();
   }
 
   using redecl_range = redeclarable_base::redecl_range;
@@ -569,10 +569,10 @@ class NamespaceDecl : public NamedDecl, public DeclContext,
   using redeclarable_base = Redeclarable<NamespaceDecl>;
 
   NamespaceDecl *getNextRedeclarationImpl() override;
-  NamespaceDecl *getMostRecentDeclImpl() override;
 
 public:
   NamespaceDecl *getPreviousDeclImpl();
+  NamespaceDecl *getMostRecentDeclImpl();
 
   friend class ASTDeclReader;
   friend class ASTDeclWriter;
@@ -1124,13 +1124,13 @@ protected:
     return getNextRedeclaration();
   }
 
-  VarDecl *getMostRecentDeclImpl() override {
-    return getMostRecentDecl();
-  }
-
 public:
   VarDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
+  }
+
+  VarDecl *getMostRecentDeclImpl() {
+    return getMostRecentDecl();
   }
 
   using redecl_range = redeclarable_base::redecl_range;
@@ -2137,13 +2137,13 @@ protected:
     return getNextRedeclaration();
   }
 
-  FunctionDecl *getMostRecentDeclImpl() override {
-    return getMostRecentDecl();
-  }
-
 public:
   FunctionDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
+  }
+
+  FunctionDecl *getMostRecentDeclImpl() {
+    return getMostRecentDecl();
   }
 
   friend class ASTDeclReader;
@@ -3479,13 +3479,13 @@ protected:
     return getNextRedeclaration();
   }
 
-  TypedefNameDecl *getMostRecentDeclImpl() override {
-    return getMostRecentDecl();
-  }
-
 public:
   TypedefNameDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
+  }
+
+  TypedefNameDecl *getMostRecentDeclImpl() {
+    return getMostRecentDecl();
   }
 
   using redecl_range = redeclarable_base::redecl_range;
@@ -3646,10 +3646,6 @@ protected:
     return getNextRedeclaration();
   }
 
-  TagDecl *getMostRecentDeclImpl() override {
-    return getMostRecentDecl();
-  }
-
   /// Completes the definition of this tag declaration.
   ///
   /// This is a helper function for derived classes.
@@ -3669,6 +3665,10 @@ protected:
 public:
   TagDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
+  }
+
+  TagDecl *getMostRecentDeclImpl() {
+    return getMostRecentDecl();
   }
 
   friend class ASTDeclReader;

@@ -1266,13 +1266,13 @@ class ObjCInterfaceDecl : public ObjCContainerDecl
     return getNextRedeclaration();
   }
 
-  ObjCInterfaceDecl *getMostRecentDeclImpl() override {
-    return getMostRecentDecl();
-  }
-
 public:
   ObjCInterfaceDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
+  }
+
+  ObjCInterfaceDecl *getMostRecentDeclImpl() {
+    return getMostRecentDecl();
   }
 
   static ObjCInterfaceDecl *
@@ -2126,10 +2126,6 @@ class ObjCProtocolDecl : public ObjCContainerDecl,
     return getNextRedeclaration();
   }
 
-  ObjCProtocolDecl *getMostRecentDeclImpl() override {
-    return getMostRecentDecl();
-  }
-
   /// True if a valid hash is stored in ODRHash.
   bool hasODRHash() const;
   void setHasODRHash(bool HasHash);
@@ -2137,6 +2133,10 @@ class ObjCProtocolDecl : public ObjCContainerDecl,
 public:
   ObjCProtocolDecl *getPreviousDeclImpl() {
     return getPreviousDecl();
+  }
+
+  ObjCProtocolDecl *getMostRecentDeclImpl() {
+    return getMostRecentDecl();
   }
 
   friend class ASTDeclReader;
