@@ -3254,8 +3254,8 @@ private:
 
 public:
   /// Print this template parameter object in a human-readable format.
-  void printName(llvm::raw_ostream &OS,
-                 const PrintingPolicy &Policy) const override;
+  void printNameImpl(llvm::raw_ostream &OS,
+                 const PrintingPolicy &Policy) const;
 
   /// Print this object as an equivalent expression.
   void printAsExpr(llvm::raw_ostream &OS) const;

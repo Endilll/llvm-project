@@ -1399,6 +1399,24 @@ Decl* Decl::getMostRecentDecl() {
   llvm_unreachable("Not all Decls are covered");
 }
 
+void Decl::printName(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  switch (getKind()) {
+#define ABSTRACT_DECL(Type)
+#define DECL_RANGE(Base, First, Last)
+#define DECL_CONTEXT(Decl)
+#define DECL(TYPE, BASE) \
+    case Kind::TYPE: \
+      return llvm::cast<TYPE##Decl>(this)->printNameImpl(OS, Policy);
+#include "clang/AST/DeclNodes.inc"
+#undef DECL
+#undef DECL_CONTEXT
+#undef DECL_RANGE
+#undef ABSTRACT_DECL
+  }
+  llvm_unreachable("Not all Decls are covered");
+}
+
+
 Decl *DeclContext::getNonClosureAncestor() {
   return ::getNonClosureContext(this);
 }

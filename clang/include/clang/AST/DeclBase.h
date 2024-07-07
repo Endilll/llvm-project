@@ -1267,6 +1267,13 @@ public:
   // function pointer type.
   bool isFunctionPointerType() const;
 
+  /// Pretty-print the unqualified name of this declaration. Can be overloaded
+  /// by derived classes to provide a more user-friendly name when appropriate.
+  ///
+  /// Doesn't print anything for declarations that don't inherit from NamedDecl.
+  void printName(raw_ostream &OS, const PrintingPolicy &Policy) const;
+  void printNameImpl(raw_ostream &OS, const PrintingPolicy &Policy) const {};
+
 private:
   void setAttrsImpl(const AttrVec& Attrs, ASTContext &Ctx);
   void setDeclContextsImpl(DeclContext *SemaDC, DeclContext *LexicalDC,

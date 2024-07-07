@@ -281,9 +281,9 @@ public:
   // FIXME: Deprecated, move clients to getName().
   std::string getNameAsString() const { return Name.getAsString(); }
 
-  /// Pretty-print the unqualified name of this declaration. Can be overloaded
-  /// by derived classes to provide a more user-friendly name when appropriate.
-  virtual void printName(raw_ostream &OS, const PrintingPolicy &Policy) const;
+  using Decl::printName;
+  void printNameImpl(raw_ostream &OS, const PrintingPolicy &Policy) const;
+
   /// Calls printName() with the ASTContext printing policy from the decl.
   void printName(raw_ostream &OS) const;
 
@@ -3289,7 +3289,7 @@ public:
   static bool classof(const Decl *D) { return classofKind(D->getKind()); }
   static bool classofKind(Kind K) { return K >= firstField && K <= lastField; }
 
-  void printName(raw_ostream &OS, const PrintingPolicy &Policy) const override;
+  void printNameImpl(raw_ostream &OS, const PrintingPolicy &Policy) const;
 };
 
 /// An instance of this object exists for each enum constant
@@ -3845,7 +3845,7 @@ public:
   }
 
   using TypeDecl::printName;
-  void printName(raw_ostream &OS, const PrintingPolicy &Policy) const override;
+  void printNameImpl(raw_ostream &OS, const PrintingPolicy &Policy) const;
 
   void setTemplateParameterListsInfo(ASTContext &Context,
                                      ArrayRef<TemplateParameterList *> TPLists);

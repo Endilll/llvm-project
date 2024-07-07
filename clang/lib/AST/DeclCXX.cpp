@@ -3338,7 +3338,7 @@ DecompositionDecl *DecompositionDecl::CreateDeserialized(ASTContext &C,
   return Result;
 }
 
-void DecompositionDecl::printName(llvm::raw_ostream &OS,
+void DecompositionDecl::printNameImpl(llvm::raw_ostream &OS,
                                   const PrintingPolicy &Policy) const {
   OS << '[';
   bool Comma = false;
@@ -3380,7 +3380,7 @@ MSGuidDecl *MSGuidDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID) {
   return new (C, ID) MSGuidDecl(nullptr, QualType(), Parts());
 }
 
-void MSGuidDecl::printName(llvm::raw_ostream &OS,
+void MSGuidDecl::printNameImpl(llvm::raw_ostream &OS,
                            const PrintingPolicy &) const {
   OS << llvm::format("GUID{%08" PRIx32 "-%04" PRIx16 "-%04" PRIx16 "-",
                      PartVal.Part1, PartVal.Part2, PartVal.Part3);
@@ -3489,7 +3489,7 @@ UnnamedGlobalConstantDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID) {
       UnnamedGlobalConstantDecl(C, nullptr, QualType(), APValue());
 }
 
-void UnnamedGlobalConstantDecl::printName(llvm::raw_ostream &OS,
+void UnnamedGlobalConstantDecl::printNameImpl(llvm::raw_ostream &OS,
                                           const PrintingPolicy &) const {
   OS << "unnamed-global-constant";
 }

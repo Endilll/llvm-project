@@ -1666,7 +1666,7 @@ Module *Decl::getOwningModuleForLinkage() const {
   llvm_unreachable("unknown module kind");
 }
 
-void NamedDecl::printName(raw_ostream &OS, const PrintingPolicy &Policy) const {
+void NamedDecl::printNameImpl(raw_ostream &OS, const PrintingPolicy &Policy) const {
   Name.print(OS, Policy);
 }
 
@@ -4679,14 +4679,14 @@ void FieldDecl::setCapturedVLAType(const VariableArrayType *VLAType) {
   CapturedVLAType = VLAType;
 }
 
-void FieldDecl::printName(raw_ostream &OS, const PrintingPolicy &Policy) const {
+void FieldDecl::printNameImpl(raw_ostream &OS, const PrintingPolicy &Policy) const {
   // Print unnamed members using name of their type.
   if (isAnonymousStructOrUnion()) {
     this->getType().print(OS, Policy);
     return;
   }
   // Otherwise, do the normal printing.
-  DeclaratorDecl::printName(OS, Policy);
+  DeclaratorDecl::printNameImpl(OS, Policy);
 }
 
 //===----------------------------------------------------------------------===//
@@ -4797,7 +4797,7 @@ void TagDecl::setQualifierInfo(NestedNameSpecifierLoc QualifierLoc) {
   }
 }
 
-void TagDecl::printName(raw_ostream &OS, const PrintingPolicy &Policy) const {
+void TagDecl::printNameImpl(raw_ostream &OS, const PrintingPolicy &Policy) const {
   DeclarationName Name = getDeclName();
   // If the name is supposed to have an identifier but does not have one, then
   // the tag is anonymous and we should print it differently.

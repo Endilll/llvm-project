@@ -1623,7 +1623,7 @@ TemplateParamObjectDecl::CreateDeserialized(ASTContext &C, GlobalDeclID ID) {
   return TPOD;
 }
 
-void TemplateParamObjectDecl::printName(llvm::raw_ostream &OS,
+void TemplateParamObjectDecl::printNameImpl(llvm::raw_ostream &OS,
                                         const PrintingPolicy &Policy) const {
   OS << "<template param ";
   printAsExpr(OS, Policy);
