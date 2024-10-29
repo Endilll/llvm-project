@@ -9578,3 +9578,12 @@ ExprResult Sema::ActOnRequiresExpr(
     return ExprError();
   return RE;
 }
+
+ExprResult Sema::BuildCXXReflectOfExpr(Expr *Operand, SourceRange Range) {
+  return new (Context)
+      CXXReflectOfExpr(Context.BoolTy, Operand, Range);
+}
+
+ExprResult Sema::ActOnReflectOfExpr(Expr *Operand, SourceLocation KeyLoc, SourceRange ParensRange) {
+  return BuildCXXReflectOfExpr(Operand, SourceRange(KeyLoc, ParensRange.getEnd()));
+}

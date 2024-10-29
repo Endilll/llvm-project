@@ -2162,6 +2162,13 @@ void ASTStmtWriter::VisitCXXNoexceptExpr(CXXNoexceptExpr *E) {
   Code = serialization::EXPR_CXX_NOEXCEPT;
 }
 
+void ASTStmtWriter::VisitCXXReflectOfExpr(CXXReflectOfExpr *E) {
+  VisitExpr(E);
+  Record.AddSourceRange(E->getSourceRange());
+  Record.AddStmt(E->getOperand());
+  Code = serialization::EXPR_CXX_REFLECTOF;
+}
+
 void ASTStmtWriter::VisitPackExpansionExpr(PackExpansionExpr *E) {
   VisitExpr(E);
   Record.AddSourceLocation(E->getEllipsisLoc());

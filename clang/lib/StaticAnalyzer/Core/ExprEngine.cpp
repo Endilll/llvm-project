@@ -1744,6 +1744,7 @@ void ExprEngine::Visit(const Stmt *S, ExplodedNode *Pred,
     case Stmt::TypoExprClass:
     case Stmt::RecoveryExprClass:
     case Stmt::CXXNoexceptExprClass:
+    case Stmt::CXXReflectOfExprClass:
     case Stmt::PackExpansionExprClass:
     case Stmt::PackIndexingExprClass:
     case Stmt::SubstNonTypeTemplateParmPackExprClass:

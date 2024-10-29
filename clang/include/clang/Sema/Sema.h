@@ -8486,6 +8486,9 @@ public:
                                ArrayRef<concepts::Requirement *> Requirements,
                                SourceLocation ClosingBraceLoc);
 
+  ExprResult BuildCXXReflectOfExpr(Expr *Operand, SourceRange Range);
+  ExprResult ActOnReflectOfExpr(Expr *Operand, SourceLocation KeyLoc, SourceRange ParensRange);
+
 private:
   ExprResult BuiltinOperatorNewDeleteOverloaded(ExprResult TheCallResult,
                                                 bool IsDelete);

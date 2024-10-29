@@ -1814,6 +1814,22 @@ ExprResult Parser::ParseCastExpression(CastParseKind ParseKind,
     break;
   }
 
+  case tok::kw_reflectof: {
+    if (NotPrimaryExpression)
+      *NotPrimaryExpression = true;
+    SourceLocation KeyLoc = ConsumeToken();
+    BalancedDelimiterTracker T(*this, tok::l_paren);
+    if (T.expectAndConsume(diag::err_expected_lparen_after, "reflectof"))
+      return ExprError();
+
+    Res = ParseExpression();
+    
+    T.consumeClose();
+    if (!Res.isInvalid())
+      Res = Actions.ActOnReflectOfExpr(Res.get(), KeyLoc, SourceRange(T.getOpenLocation(), T.getCloseLocation()));
+    break;
+  }
+
 #define TYPE_TRAIT(N,Spelling,K) \
   case tok::kw_##Spelling:
 #include "clang/Basic/TokenKinds.def"

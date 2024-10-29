@@ -2495,6 +2495,12 @@ void StmtPrinter::VisitCXXNoexceptExpr(CXXNoexceptExpr *E) {
   OS << ")";
 }
 
+void StmtPrinter::VisitCXXReflectOfExpr(CXXReflectOfExpr *E) {
+  OS << "reflectof(";
+  PrintExpr(E->getOperand());
+  OS << ")";
+}
+
 void StmtPrinter::VisitPackExpansionExpr(PackExpansionExpr *E) {
   PrintExpr(E->getPattern());
   OS << "...";
