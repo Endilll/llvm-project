@@ -2163,9 +2163,7 @@ void ASTStmtWriter::VisitCXXNoexceptExpr(CXXNoexceptExpr *E) {
 }
 
 void ASTStmtWriter::VisitCXXReflectOfExpr(CXXReflectOfExpr *E) {
-  VisitExpr(E);
-  Record.AddSourceRange(E->getSourceRange());
-  Record.AddStmt(E->getOperand());
+  VisitUnaryExprOrTypeTraitExpr(E);
   Code = serialization::EXPR_CXX_REFLECTOF;
 }
 

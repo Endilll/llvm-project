@@ -282,6 +282,7 @@ public:
   void VisitGenericSelectionExpr(const GenericSelectionExpr *E);
   void VisitUnaryOperator(const UnaryOperator *Node);
   void VisitUnaryExprOrTypeTraitExpr(const UnaryExprOrTypeTraitExpr *Node);
+  void VisitCXXReflectOfExpr(const CXXReflectOfExpr *Node);
   void VisitMemberExpr(const MemberExpr *Node);
   void VisitExtVectorElementExpr(const ExtVectorElementExpr *Node);
   void VisitBinaryOperator(const BinaryOperator *Node);

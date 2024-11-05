@@ -1521,6 +1521,10 @@ void TextNodeDumper::VisitUnaryExprOrTypeTraitExpr(
     dumpType(Node->getArgumentType());
 }
 
+void TextNodeDumper::VisitCXXReflectOfExpr(const CXXReflectOfExpr *Node) {
+  VisitUnaryExprOrTypeTraitExpr(Node);
+}
+
 void TextNodeDumper::VisitMemberExpr(const MemberExpr *Node) {
   OS << " " << (Node->isArrow() ? "->" : ".") << *Node->getMemberDecl();
   dumpPointer(Node->getMemberDecl());

@@ -3654,10 +3654,6 @@ public:
     return SemaRef.BuildCXXNoexceptExpr(Range.getBegin(), Arg, Range.getEnd());
   }
 
-  ExprResult RebuildCXXReflectOfExpr(SourceRange Range, Expr *Arg) {
-    return SemaRef.BuildCXXReflectOfExpr(Arg, Range);
-  }
-
   /// Build a new expression to compute the length of a parameter pack.
   ExprResult RebuildSizeOfPackExpr(SourceLocation OperatorLoc, NamedDecl *Pack,
                                    SourceLocation PackLoc,
@@ -15375,14 +15371,7 @@ TreeTransform<Derived>::TransformCXXNoexceptExpr(CXXNoexceptExpr *E) {
 template<typename Derived>
 ExprResult
 TreeTransform<Derived>::TransformCXXReflectOfExpr(CXXReflectOfExpr *E) {
-  ExprResult SubExpr = getDerived().TransformExpr(E->getOperand());
-  if (SubExpr.isInvalid())
-    return ExprError();
-
-  if (!getDerived().AlwaysRebuild() && SubExpr.get() == E->getOperand())
-    return E;
-
-  return getDerived().RebuildCXXReflectOfExpr(E->getSourceRange(), SubExpr.get());
+  return TransformUnaryExprOrTypeTraitExpr(E);
 }
 
 template<typename Derived>

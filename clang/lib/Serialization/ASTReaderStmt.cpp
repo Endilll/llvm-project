@@ -2164,9 +2164,7 @@ void ASTStmtReader::VisitCXXNoexceptExpr(CXXNoexceptExpr *E) {
 }
 
 void ASTStmtReader::VisitCXXReflectOfExpr(CXXReflectOfExpr *E) {
-  VisitExpr(E);
-  E->Range = readSourceRange();
-  E->Operand = Record.readSubExpr();
+  VisitUnaryExprOrTypeTraitExpr(E);
 }
 
 void ASTStmtReader::VisitPackExpansionExpr(PackExpansionExpr *E) {

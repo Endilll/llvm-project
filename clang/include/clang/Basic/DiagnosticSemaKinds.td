@@ -2555,6 +2555,9 @@ def err_implied_std_initializer_list_not_found : Error<
   "not found; include <initializer_list>">;
 def err_malformed_std_initializer_list : Error<
   "std::initializer_list must be a class template with a single type parameter">;
+def err_implied_std_meta_info_not_found : Error<
+  "'reflectof' requires std::meta::info; include <experimental/meta>"
+  >;
 def err_auto_init_list_from_c : Error<
   "cannot use %select{'auto'|<ERROR>|'__auto_type'}0 with "
   "%select{initializer list|array}1 in C">;

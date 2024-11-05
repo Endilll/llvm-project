@@ -9579,11 +9579,53 @@ ExprResult Sema::ActOnRequiresExpr(
   return RE;
 }
 
-ExprResult Sema::BuildCXXReflectOfExpr(Expr *Operand, SourceRange Range) {
-  return new (Context)
-      CXXReflectOfExpr(Context.BoolTy, Operand, Range);
+static CXXRecordDecl *LookupStdMetaInfo(Sema &S, SourceLocation Loc) {
+  NamespaceDecl *Std = S.getStdNamespace();
+  if (!Std) {
+    S.Diag(Loc, diag::err_implied_std_meta_info_not_found);
+    return nullptr;
+  }
+
+  LookupResult ResultForMeta(S, &S.PP.getIdentifierTable().get("meta"),
+                      Loc, Sema::LookupOrdinaryName);
+  if (!S.LookupQualifiedName(ResultForMeta, Std)) {
+    S.Diag(Loc, diag::err_implied_std_meta_info_not_found);
+    return nullptr;
+  }
+  auto *StdMetaDecl = ResultForMeta.getAsSingle<NamespaceDecl>();
+
+  LookupResult ResultForInfo(S, &S.PP.getIdentifierTable().get("info"),
+                      Loc, Sema::LookupOrdinaryName);
+  if (!S.LookupQualifiedName(ResultForInfo, StdMetaDecl)) {
+    S.Diag(Loc, diag::err_implied_std_meta_info_not_found);
+    return nullptr;
+  }
+  return ResultForInfo.getAsSingle<CXXRecordDecl>();
 }
 
-ExprResult Sema::ActOnReflectOfExpr(Expr *Operand, SourceLocation KeyLoc, SourceRange ParensRange) {
-  return BuildCXXReflectOfExpr(Operand, SourceRange(KeyLoc, ParensRange.getEnd()));
+ExprResult Sema::BuildCXXReflectOfExpr(QualType ResultType, std::variant<TypeSourceInfo *, Expr *> Operand, SourceRange Range) {
+  if (std::holds_alternative<Expr *>(Operand))
+    return new (Context) CXXReflectOfExpr(ResultType, std::get<Expr *>(Operand), Range);
+
+  assert (std::holds_alternative<TypeSourceInfo *>(Operand));
+  return new (Context) CXXReflectOfExpr(ResultType, std::get<TypeSourceInfo *>(Operand), Range);
+}
+
+ExprResult Sema::ActOnReflectOfExpr(std::variant<ParsedType, Expr *> Operand, SourceLocation KeyLoc, SourceRange ParensRange) {
+  if (!StdMetaInfo) {
+    CXXRecordDecl *StdMetaInfoDecl = LookupStdMetaInfo(*this, KeyLoc);
+    if (!StdMetaInfoDecl)
+      return ExprError();
+    StdMetaInfo = Context.getRecordType(StdMetaInfoDecl);
+  }
+
+  assert(StdMetaInfo && "std::meta::info hasn't been found, and this wasn't diagnosed");
+
+  if (std::holds_alternative<Expr *>(Operand))
+    return BuildCXXReflectOfExpr(*StdMetaInfo, std::get<Expr *>(Operand), SourceRange(KeyLoc, ParensRange.getEnd()));
+
+  assert (std::holds_alternative<ParsedType>(Operand));
+  TypeSourceInfo *TInfo;
+  (void) GetTypeFromParser(std::get<ParsedType>(Operand), &TInfo);
+  return BuildCXXReflectOfExpr(*StdMetaInfo, TInfo, SourceRange(KeyLoc, ParensRange.getEnd()));
 }

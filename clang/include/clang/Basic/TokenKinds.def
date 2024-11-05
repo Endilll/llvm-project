@@ -64,6 +64,9 @@
 #ifndef CXX11_UNARY_EXPR_OR_TYPE_TRAIT
 #define CXX11_UNARY_EXPR_OR_TYPE_TRAIT(I,E,K) CXX11_KEYWORD(I,K)
 #endif
+#ifndef CXX26_UNARY_EXPR_OR_TYPE_TRAIT
+#define CXX26_UNARY_EXPR_OR_TYPE_TRAIT(I,E,K) CXX26_KEYWORD(I,K)
+#endif
 #ifndef EXPRESSION_TRAIT
 #define EXPRESSION_TRAIT(I,E,K) KEYWORD(I,K)
 #endif
@@ -433,7 +436,7 @@ CXX20_KEYWORD(concept               , 0)
 CXX20_KEYWORD(requires              , 0)
 
 // C++26 keywords
-CXX26_KEYWORD(reflectof             , 0)
+CXX26_UNARY_EXPR_OR_TYPE_TRAIT(reflectof, ReflectOf, 0)
 
 // Not a CXX20_KEYWORD because it is disabled by -fno-char8_t.
 KEYWORD(char8_t                     , CHAR8SUPPORT)
@@ -1039,6 +1042,7 @@ ANNOTATION(embed)
 #undef PPKEYWORD
 #undef ALIAS
 #undef EXPRESSION_TRAIT
+#undef CXX26_UNARY_EXPR_OR_TYPE_TRAIT
 #undef CXX11_UNARY_EXPR_OR_TYPE_TRAIT
 #undef UNARY_EXPR_OR_TYPE_TRAIT
 #undef ARRAY_TYPE_TRAIT
@@ -1046,6 +1050,7 @@ ANNOTATION(embed)
 #undef TYPE_TRAIT_2
 #undef TYPE_TRAIT_1
 #undef TYPE_TRAIT
+#undef CXX26_KEYWORD
 #undef CXX20_KEYWORD
 #undef CXX11_KEYWORD
 #undef KEYWORD

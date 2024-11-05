@@ -104,6 +104,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <variant>
 #include <vector>
 
 namespace llvm {
@@ -6023,6 +6024,9 @@ public:
   /// \<initializer_list>.
   ClassTemplateDecl *StdInitializerList;
 
+  /// The C++ "std::meta::info" class
+  std::optional<QualType> StdMetaInfo;
+
   // Contains the locations of the beginning of unparsed default
   // argument locations.
   llvm::DenseMap<ParmVarDecl *, SourceLocation> UnparsedDefaultArgLocs;
@@ -8486,8 +8490,8 @@ public:
                                ArrayRef<concepts::Requirement *> Requirements,
                                SourceLocation ClosingBraceLoc);
 
-  ExprResult BuildCXXReflectOfExpr(Expr *Operand, SourceRange Range);
-  ExprResult ActOnReflectOfExpr(Expr *Operand, SourceLocation KeyLoc, SourceRange ParensRange);
+  ExprResult BuildCXXReflectOfExpr(QualType ResultType, std::variant<TypeSourceInfo *, Expr *> Operand, SourceRange Range);
+  ExprResult ActOnReflectOfExpr(std::variant<ParsedType, Expr *> Operand, SourceLocation KeyLoc, SourceRange ParensRange);
 
 private:
   ExprResult BuiltinOperatorNewDeleteOverloaded(ExprResult TheCallResult,

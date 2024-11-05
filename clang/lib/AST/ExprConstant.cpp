@@ -14601,6 +14601,8 @@ bool IntExprEvaluator::VisitUnaryExprOrTypeTraitExpr(
 
     return false;
   }
+  case UETT_ReflectOf:
+    llvm_unreachable("TODO Endill");
   }
 
   llvm_unreachable("unknown expr/type trait");
@@ -16981,6 +16983,7 @@ static ICEDiag CheckICE(const Expr* E, const ASTContext &Ctx) {
   case Expr::SYCLUniqueStableNameExprClass:
   case Expr::CXXParenListInitExprClass:
   case Expr::HLSLOutArgExprClass:
+  case Expr::CXXReflectOfExprClass:
     return ICEDiag(IK_NotICE, E->getBeginLoc());
 
   case Expr::InitListExprClass: {
@@ -17027,7 +17030,6 @@ static ICEDiag CheckICE(const Expr* E, const ASTContext &Ctx) {
   case Expr::ArrayTypeTraitExprClass:
   case Expr::ExpressionTraitExprClass:
   case Expr::CXXNoexceptExprClass:
-  case Expr::CXXReflectOfExprClass:
     return NoDiag();
   case Expr::CallExprClass:
   case Expr::CXXOperatorCallExprClass: {

@@ -5304,6 +5304,8 @@ recurse:
       Diags.Report(DiagID);
       return;
     }
+    case UETT_ReflectOf:
+      llvm_unreachable("mangling for reflectof is not supported yet");
     }
     break;
   }

@@ -1817,16 +1817,21 @@ ExprResult Parser::ParseCastExpression(CastParseKind ParseKind,
   case tok::kw_reflectof: {
     if (NotPrimaryExpression)
       *NotPrimaryExpression = true;
+    Token KeyTok = Tok;
     SourceLocation KeyLoc = ConsumeToken();
-    BalancedDelimiterTracker T(*this, tok::l_paren);
-    if (T.expectAndConsume(diag::err_expected_lparen_after, "reflectof"))
-      return ExprError();
 
-    Res = ParseExpression();
-    
-    T.consumeClose();
-    if (!Res.isInvalid())
-      Res = Actions.ActOnReflectOfExpr(Res.get(), KeyLoc, SourceRange(T.getOpenLocation(), T.getCloseLocation()));
+    bool IsCastExpr = false;
+    ParsedType Ty;
+    SourceRange Range;
+    Res = ParseExprAfterUnaryExprOrTypeTrait(KeyTok, IsCastExpr, Ty, Range);
+
+    if (IsCastExpr) {
+      Res = Actions.ActOnReflectOfExpr(Ty, KeyLoc, Range);
+    }
+    else if (!Res.isInvalid())
+      Res = Actions.ActOnReflectOfExpr(Res.get(), KeyLoc, Range);
+    else 
+      llvm_unreachable("operand of reflectof is neither type nor expression");
     break;
   }
 
@@ -2450,10 +2455,10 @@ Parser::ParseExprAfterUnaryExprOrTypeTrait(const Token &OpTok,
 
   assert(OpTok.isOneOf(tok::kw_typeof, tok::kw_typeof_unqual, tok::kw_sizeof,
                        tok::kw___datasizeof, tok::kw___alignof, tok::kw_alignof,
-                       tok::kw__Alignof, tok::kw_vec_step,
+                       tok::kw__Alignof, tok::kw_reflectof, tok::kw_vec_step,
                        tok::kw___builtin_omp_required_simd_align,
                        tok::kw___builtin_vectorelements) &&
-         "Not a typeof/sizeof/alignof/vec_step expression!");
+         "Not a typeof/sizeof/alignof/reflectof/vec_step expression!");
 
   ExprResult Operand;
 

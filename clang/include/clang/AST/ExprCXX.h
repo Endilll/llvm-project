@@ -4161,35 +4161,22 @@ public:
 };
 
 /// Represents reflectof(...) expression.
-class CXXReflectOfExpr : public Expr {
+class CXXReflectOfExpr : public UnaryExprOrTypeTraitExpr {
   friend class ASTStmtReader;
-  Stmt *Operand;
-  SourceRange Range;
 
 public:
-  CXXReflectOfExpr(QualType Ty, Expr *Operand, SourceRange Range)
-      : Expr(CXXReflectOfExprClass, Ty, VK_PRValue, OK_Ordinary),
-        Operand(Operand), Range(Range) {
-    setDependence(computeDependence(this));
+  CXXReflectOfExpr(QualType Ty, TypeSourceInfo *Operand, SourceRange Range)
+      : UnaryExprOrTypeTraitExpr(UETT_ReflectOf, Operand, Ty, Range.getBegin(), Range.getEnd()) {
+    // FIXME Endill: we end up with sClass for UnatyExprOrTypeTraitExpr
   }
 
-  CXXReflectOfExpr(EmptyShell Empty) : Expr(CXXReflectOfExprClass, Empty) {}
+  CXXReflectOfExpr(QualType Ty, Expr *Operand, SourceRange Range)
+      : UnaryExprOrTypeTraitExpr(UETT_ReflectOf, Operand, Ty, Range.getBegin(), Range.getEnd()) {}
 
-  Expr *getOperand() const { return static_cast<Expr *>(Operand); }
-
-  SourceLocation getBeginLoc() const { return Range.getBegin(); }
-  SourceLocation getEndLoc() const { return Range.getEnd(); }
-  SourceRange getSourceRange() const { return Range; }
+  CXXReflectOfExpr(EmptyShell Empty) : UnaryExprOrTypeTraitExpr(Empty) {}
 
   static bool classof(const Stmt *T) {
     return T->getStmtClass() == CXXReflectOfExprClass;
-  }
-
-  // Iterators
-  child_range children() { return child_range(&Operand, &Operand + 1); }
-
-  const_child_range children() const {
-    return const_child_range(&Operand, &Operand + 1);
   }
 };
 

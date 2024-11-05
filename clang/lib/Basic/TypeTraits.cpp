@@ -47,12 +47,14 @@ static constexpr const char *ArrayTypeTraitSpellings[] = {
 static constexpr const char *UnaryExprOrTypeTraitNames[] = {
 #define UNARY_EXPR_OR_TYPE_TRAIT(Spelling, Name, Key) #Name,
 #define CXX11_UNARY_EXPR_OR_TYPE_TRAIT(Spelling, Name, Key) #Name,
+#define CXX26_UNARY_EXPR_OR_TYPE_TRAIT(Spelling, Name, Key) #Name,
 #include "clang/Basic/TokenKinds.def"
 };
 
 static constexpr const char *UnaryExprOrTypeTraitSpellings[] = {
 #define UNARY_EXPR_OR_TYPE_TRAIT(Spelling, Name, Key) #Spelling,
 #define CXX11_UNARY_EXPR_OR_TYPE_TRAIT(Spelling, Name, Key) #Spelling,
+#define CXX26_UNARY_EXPR_OR_TYPE_TRAIT(Spelling, Name, Key) #Spelling,
 #include "clang/Basic/TokenKinds.def"
 };
 
