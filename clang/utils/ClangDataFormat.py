@@ -991,6 +991,8 @@ def recognize_stmt(value: SBValue, internal_dict) -> SBValue:
     value.SetPreferSyntheticValue(False)
 
     stmt_value: SBValue = value
+    if stmt_value.type.IsPointerType():
+        stmt_value = stmt_value.Dereference()
     if value.type.name.startswith("clang::Expr"):
         value_stmt_value: SBValue = value.GetChildAtIndex(0)
         assert value_stmt_value.IsValid()
