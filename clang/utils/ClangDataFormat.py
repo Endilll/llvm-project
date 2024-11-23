@@ -104,7 +104,7 @@ def __lldb_init_module(debugger:lldb.SBDebugger, internal_dict: Dict[Any, Any]):
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TemplateTypeParmTypeProvider -x '^clang::TemplateTypeParmType$'")
     debugger.HandleCommand("type synthetic add --python-class ClangDataFormat.TypeProvider            -x '^clang::Type$'")
 
-    if debugger.GetVersionString().startswith("lldb version 19"):
+    if debugger.GetVersionString().startswith("lldb version 20"):
       # clang::Decl has vtable, so it's handled by built-in LLDB machinery
       debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_stmt 'clang::Expr'")
       debugger.HandleCommand("type recognizer add -F ClangDataFormat.recognize_stmt 'clang::Stmt'")
