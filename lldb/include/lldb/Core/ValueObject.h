@@ -190,7 +190,7 @@ public:
     eClearUserVisibleDataItemsAllStrings =
         eClearUserVisibleDataItemsValue | eClearUserVisibleDataItemsSummary |
         eClearUserVisibleDataItemsLocation |
-        eClearUserVisibleDataItemsDescription | eClearUserVisibleDataItemsType,
+        eClearUserVisibleDataItemsDescription,
     eClearUserVisibleDataItemsAll = 0xFFFF
   };
 

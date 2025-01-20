@@ -572,11 +572,10 @@ class MemLocFragmentFill {
     bool FirstMeet = true;
     // LiveIn locs for BB is the meet of the already-processed preds' LiveOut
     // locs.
-    for (auto I = pred_begin(&BB), E = pred_end(&BB); I != E; I++) {
+    for (const BasicBlock *Pred : predecessors(&BB)) {
       // Ignore preds that haven't been processed yet. This is essentially the
       // same as initialising all variables to implicit top value (⊤) which is
       // the identity value for the meet operation.
-      const BasicBlock *Pred = *I;
       if (!Visited.count(Pred))
         continue;
 
@@ -941,10 +940,10 @@ public:
             LLVM_DEBUG(dbgs() << BB->getName()
                               << " has new OutLocs, add succs to worklist: [ ");
             LiveOut[BB] = std::move(LiveSet);
-            for (auto I = succ_begin(BB), E = succ_end(BB); I != E; I++) {
-              if (OnPending.insert(*I).second) {
-                LLVM_DEBUG(dbgs() << I->getName() << " ");
-                Pending.push(BBToOrder[*I]);
+            for (BasicBlock *Succ : successors(BB)) {
+              if (OnPending.insert(Succ).second) {
+                LLVM_DEBUG(dbgs() << Succ->getName() << " ");
+                Pending.push(BBToOrder[Succ]);
               }
             }
             LLVM_DEBUG(dbgs() << "]\n");
@@ -967,7 +966,7 @@ public:
         auto &Ctx = Fn.getContext();
 
         for (auto &FragMemLoc : FragMemLocs) {
-          DIExpression *Expr = DIExpression::get(Ctx, std::nullopt);
+          DIExpression *Expr = DIExpression::get(Ctx, {});
           if (FragMemLoc.SizeInBits !=
               *Aggregates[FragMemLoc.Var].first->getSizeInBits())
             Expr = *DIExpression::createFragmentExpression(
@@ -1399,7 +1398,7 @@ ArrayRef<VariableID>
 AssignmentTrackingLowering::getContainedFragments(VariableID Var) const {
   auto R = VarContains.find(Var);
   if (R == VarContains.end())
-    return std::nullopt;
+    return {};
   return R->second;
 }
 
@@ -1639,7 +1638,7 @@ void AssignmentTrackingLowering::processUntaggedInstruction(
     //
     // DIExpression: Add fragment and offset.
     DebugVariable V = FnVarLocs->getVariable(Var);
-    DIExpression *DIE = DIExpression::get(I.getContext(), std::nullopt);
+    DIExpression *DIE = DIExpression::get(I.getContext(), {});
     if (auto Frag = V.getFragment()) {
       auto R = DIExpression::createFragmentExpression(DIE, Frag->OffsetInBits,
                                                       Frag->SizeInBits);
@@ -2360,10 +2359,10 @@ bool AssignmentTrackingLowering::run(FunctionVarLocsBuilder *FnVarLocsBuilder) {
           LLVM_DEBUG(dbgs() << BB->getName()
                             << " has new OutLocs, add succs to worklist: [ ");
           LiveOut[BB] = std::move(LiveSet);
-          for (auto I = succ_begin(BB), E = succ_end(BB); I != E; I++) {
-            if (OnPending.insert(*I).second) {
-              LLVM_DEBUG(dbgs() << I->getName() << " ");
-              Pending.push(BBToOrder[*I]);
+          for (BasicBlock *Succ : successors(BB)) {
+            if (OnPending.insert(Succ).second) {
+              LLVM_DEBUG(dbgs() << Succ->getName() << " ");
+              Pending.push(BBToOrder[Succ]);
             }
           }
           LLVM_DEBUG(dbgs() << "]\n");
@@ -2420,7 +2419,7 @@ bool AssignmentTrackingLowering::run(FunctionVarLocsBuilder *FnVarLocsBuilder) {
         // built appropriately rather than always using an empty DIExpression.
         // The assert below is a reminder.
         assert(Simple);
-        VarLoc.Expr = DIExpression::get(Fn.getContext(), std::nullopt);
+        VarLoc.Expr = DIExpression::get(Fn.getContext(), {});
         DebugVariable Var = FnVarLocs->getVariable(VarLoc.VariableID);
         FnVarLocs->addSingleLocVar(Var, VarLoc.Expr, VarLoc.DL, VarLoc.Values);
         InsertedAnyIntrinsics = true;
@@ -2827,13 +2826,12 @@ bool AssignmentTrackingAnalysis::runOnFunction(Function &F) {
 
   LLVM_DEBUG(dbgs() << "AssignmentTrackingAnalysis run on " << F.getName()
                     << "\n");
-  auto DL = std::make_unique<DataLayout>(F.getParent());
 
   // Clear previous results.
   Results->clear();
 
   FunctionVarLocsBuilder Builder;
-  analyzeFunction(F, *DL.get(), &Builder);
+  analyzeFunction(F, F.getDataLayout(), &Builder);
 
   // Save these results.
   Results->init(Builder);

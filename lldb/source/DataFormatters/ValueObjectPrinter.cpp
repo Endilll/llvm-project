@@ -109,7 +109,14 @@ void ValueObjectPrinter::SetupMostSpecializedValue() {
   m_cached_valobj = &m_orig_valobj;
   if (update_success) {
     if (m_orig_valobj.IsDynamic()) {
-      if (m_options.m_use_dynamic == eNoDynamicValues) {
+      if (m_orig_valobj.GetTypeRecognizer()) {
+        ValueObject *new_dynamic_valobj =
+            m_orig_valobj.GetStaticValue()
+                ->GetDynamicValue(m_options.m_use_dynamic)
+                .get();
+        if (new_dynamic_valobj)
+          m_cached_valobj = new_dynamic_valobj;
+      } else if (m_options.m_use_dynamic == eNoDynamicValues) {
         ValueObject *static_value = m_orig_valobj.GetStaticValue().get();
         if (static_value)
           m_cached_valobj = static_value;

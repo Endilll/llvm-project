@@ -16,7 +16,6 @@
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/IntegerSet.h"
 #include "mlir/Support/LLVM.h"
-#include "mlir/Support/LogicalResult.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
@@ -893,8 +892,8 @@ FlatLinearValueConstraints::FlatLinearValueConstraints(IntegerSet set,
                             set.getNumDims() + set.getNumSymbols() + 1,
                             set.getNumDims(), set.getNumSymbols(),
                             /*numLocals=*/0) {
-  assert(operands.empty() ||
-         set.getNumInputs() == operands.size() && "operand count mismatch");
+  assert((operands.empty() || set.getNumInputs() == operands.size()) &&
+         "operand count mismatch");
   // Set the values for the non-local variables.
   for (unsigned i = 0, e = operands.size(); i < e; ++i)
     setValue(i, operands[i]);
@@ -1248,10 +1247,10 @@ LogicalResult FlatLinearValueConstraints::unionBoundingBox(
   if (!areVarsAligned(*this, otherCst)) {
     FlatLinearValueConstraints otherCopy(otherCst);
     mergeAndAlignVars(/*offset=*/getNumDimVars(), this, &otherCopy);
-    return success(IntegerPolyhedron::unionBoundingBox(otherCopy));
+    return IntegerPolyhedron::unionBoundingBox(otherCopy);
   }
 
-  return success(IntegerPolyhedron::unionBoundingBox(otherCst));
+  return IntegerPolyhedron::unionBoundingBox(otherCst);
 }
 
 //===----------------------------------------------------------------------===//

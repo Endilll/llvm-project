@@ -330,8 +330,8 @@ private:
       case 'C':
         m_cascade = OptionArgParser::ToBoolean(option_arg, true, &success);
         if (!success)
-          error.SetErrorStringWithFormat("invalid value for cascade: %s",
-                                         option_arg.str().c_str());
+          error = Status::FromErrorStringWithFormat(
+              "invalid value for cascade: %s", option_arg.str().c_str());
         break;
       case 'P':
         handwrite_python = true;
@@ -351,14 +351,14 @@ private:
         break;
       case 'x':
         if (m_match_type == eFormatterMatchCallback)
-          error.SetErrorString(
+          error = Status::FromErrorString(
               "can't use --regex and --recognizer-function at the same time");
         else
           m_match_type = eFormatterMatchRegex;
         break;
       case '\x01':
         if (m_match_type == eFormatterMatchRegex)
-          error.SetErrorString(
+          error = Status::FromErrorString(
               "can't use --regex and --recognizer-function at the same time");
         else
           m_match_type = eFormatterMatchCallback;
@@ -615,8 +615,8 @@ private:
       case 'C':
         m_cascade = OptionArgParser::ToBoolean(option_value, true, &success);
         if (!success)
-          error.SetErrorStringWithFormat("invalid value for cascade: %s",
-                                         option_value.str().c_str());
+          error = Status::FromErrorStringWithFormat(
+              "invalid value for cascade: %s", option_value.str().c_str());
         break;
       case 'p':
         m_skip_pointers = true;
@@ -1220,8 +1220,8 @@ Status CommandObjectTypeSummaryAdd::CommandOptions::SetOptionValue(
   case 'C':
     m_flags.SetCascades(OptionArgParser::ToBoolean(option_arg, true, &success));
     if (!success)
-      error.SetErrorStringWithFormat("invalid value for cascade: %s",
-                                     option_arg.str().c_str());
+      error = Status::FromErrorStringWithFormat("invalid value for cascade: %s",
+                                                option_arg.str().c_str());
     break;
   case 'e':
     m_flags.SetDontShowChildren(false);
@@ -1246,14 +1246,14 @@ Status CommandObjectTypeSummaryAdd::CommandOptions::SetOptionValue(
     break;
   case 'x':
     if (m_match_type == eFormatterMatchCallback)
-      error.SetErrorString(
+      error = Status::FromErrorString(
           "can't use --regex and --recognizer-function at the same time");
     else
       m_match_type = eFormatterMatchRegex;
     break;
   case '\x01':
     if (m_match_type == eFormatterMatchRegex)
-      error.SetErrorString(
+      error = Status::FromErrorString(
           "can't use --regex and --recognizer-function at the same time");
     else
       m_match_type = eFormatterMatchCallback;
@@ -1649,7 +1649,7 @@ bool CommandObjectTypeSummaryAdd::AddSummary(ConstString type_name,
     RegularExpression typeRX(type_name.GetStringRef());
     if (!typeRX.IsValid()) {
       if (error)
-        error->SetErrorString(
+        *error = Status::FromErrorString(
             "regex format error (maybe this is not really a regex?)");
       return false;
     }
@@ -1659,7 +1659,7 @@ bool CommandObjectTypeSummaryAdd::AddSummary(ConstString type_name,
     const char *function_name = type_name.AsCString();
     ScriptInterpreter *interpreter = GetDebugger().GetScriptInterpreter();
     if (interpreter && !interpreter->CheckObjectExists(function_name)) {
-      error->SetErrorStringWithFormat(
+      *error = Status::FromErrorStringWithFormat(
           "The provided recognizer function \"%s\" does not exist - "
           "please define it before attempting to use this summary.\n",
           function_name);
@@ -1836,8 +1836,8 @@ class CommandObjectTypeCategoryEnable : public CommandObjectParsed {
         if (!option_arg.empty()) {
           m_language = Language::GetLanguageTypeFromString(option_arg);
           if (m_language == lldb::eLanguageTypeUnknown)
-            error.SetErrorStringWithFormat("unrecognized language '%s'",
-                                           option_arg.str().c_str());
+            error = Status::FromErrorStringWithFormat(
+                "unrecognized language '%s'", option_arg.str().c_str());
         }
         break;
       default:
@@ -1978,8 +1978,8 @@ class CommandObjectTypeCategoryDisable : public CommandObjectParsed {
         if (!option_arg.empty()) {
           m_language = Language::GetLanguageTypeFromString(option_arg);
           if (m_language == lldb::eLanguageTypeUnknown)
-            error.SetErrorStringWithFormat("unrecognized language '%s'",
-                                           option_arg.str().c_str());
+            error = Status::FromErrorStringWithFormat(
+                "unrecognized language '%s'", option_arg.str().c_str());
         }
         break;
       default:
@@ -2331,9 +2331,10 @@ bool CommandObjectTypeSynthAdd::AddSynth(ConstString type_name,
     if (category->AnyMatches(candidate_type, eFormatCategoryItemFilter,
                              false)) {
       if (error)
-        error->SetErrorStringWithFormat("cannot add synthetic for type %s when "
-                                        "filter is defined in same category!",
-                                        type_name.AsCString());
+        *error = Status::FromErrorStringWithFormat(
+            "cannot add synthetic for type %s when "
+            "filter is defined in same category!",
+            type_name.AsCString());
       return false;
     }
   }
@@ -2342,7 +2343,7 @@ bool CommandObjectTypeSynthAdd::AddSynth(ConstString type_name,
     RegularExpression typeRX(type_name.GetStringRef());
     if (!typeRX.IsValid()) {
       if (error)
-        error->SetErrorString(
+        *error = Status::FromErrorString(
             "regex format error (maybe this is not really a regex?)");
       return false;
     }
@@ -2352,7 +2353,7 @@ bool CommandObjectTypeSynthAdd::AddSynth(ConstString type_name,
     const char *function_name = type_name.AsCString();
     ScriptInterpreter *interpreter = GetDebugger().GetScriptInterpreter();
     if (interpreter && !interpreter->CheckObjectExists(function_name)) {
-      error->SetErrorStringWithFormat(
+      *error = Status::FromErrorStringWithFormat(
           "The provided recognizer function \"%s\" does not exist - "
           "please define it before attempting to use this summary.\n",
           function_name);
@@ -2375,7 +2376,7 @@ Status CommandObjectTypeRecognizerAdd::CommandOptions::SetOptionValue(
   case 'C':
     m_flags.SetCascades(OptionArgParser::ToBoolean(option_arg, true, &success));
     if (!success)
-      error.SetErrorStringWithFormat("invalid value for cascade: %s",
+      error.FromErrorStringWithFormat("invalid value for cascade: %s",
                                      option_arg.str().c_str());
     break;
   case 'P':
@@ -2396,14 +2397,14 @@ Status CommandObjectTypeRecognizerAdd::CommandOptions::SetOptionValue(
     break;
   case 'x':
     if (m_match_type == eFormatterMatchCallback)
-      error.SetErrorString(
+      error.FromErrorString(
           "can't use --regex and --recognizer-function at the same time");
     else
       m_match_type = eFormatterMatchRegex;
     break;
   case '\x01':
     if (m_match_type == eFormatterMatchRegex)
-      error.SetErrorString(
+      error.FromErrorString(
           "can't use --regex and --recognizer-function at the same time");
     else
       m_match_type = eFormatterMatchCallback;
@@ -2648,7 +2649,7 @@ void CommandObjectTypeRecognizerAdd::AddTypeRecognizer(
     RegularExpression typeRX(type_name.GetStringRef());
     if (!typeRX.IsValid()) {
       if (error) {
-        error->SetErrorString(
+        error->FromErrorString(
             "regex format error (maybe this is not really a regex?)");
       }
       return;
@@ -2681,8 +2682,8 @@ private:
       case 'C':
         m_cascade = OptionArgParser::ToBoolean(option_arg, true, &success);
         if (!success)
-          error.SetErrorStringWithFormat("invalid value for cascade: %s",
-                                         option_arg.str().c_str());
+          error = Status::FromErrorStringWithFormat(
+              "invalid value for cascade: %s", option_arg.str().c_str());
         break;
       case 'c':
         m_expr_paths.push_back(std::string(option_arg));
@@ -2766,10 +2767,11 @@ private:
       if (category->AnyMatches(candidate_type, eFormatCategoryItemSynth,
                                false)) {
         if (error)
-          error->SetErrorStringWithFormat("cannot add filter for type %s when "
-                                          "synthetic is defined in same "
-                                          "category!",
-                                          type_name.AsCString());
+          *error = Status::FromErrorStringWithFormat(
+              "cannot add filter for type %s when "
+              "synthetic is defined in same "
+              "category!",
+              type_name.AsCString());
         return false;
       }
     }
@@ -2780,7 +2782,7 @@ private:
       RegularExpression typeRX(type_name.GetStringRef());
       if (!typeRX.IsValid()) {
         if (error)
-          error->SetErrorString(
+          *error = Status::FromErrorString(
               "regex format error (maybe this is not really a regex?)");
         return false;
       }

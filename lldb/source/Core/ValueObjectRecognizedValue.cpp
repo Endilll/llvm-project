@@ -117,7 +117,7 @@ bool ValueObjectRecognizedValue::UpdateValue() {
   if (!m_parent->UpdateValueIfNeeded(false)) {
     // The dynamic value failed to get an error, pass the error along
     if (m_error.Success() && m_parent->GetError().Fail())
-      m_error = m_parent->GetError();
+      m_error = m_parent->GetError().Clone();
     return false;
   }
 
@@ -140,17 +140,18 @@ bool ValueObjectRecognizedValue::UpdateValue() {
   lldb::ValueObjectSP recognized_valobj =
       m_parent->GetTypeRecognizer()->RecognizeObject(m_parent);
 
-  if (recognized_valobj) {
+  if (recognized_valobj && recognized_valobj->GetCompilerType().IsValid()) {
     m_value = recognized_valobj->GetValue();
 
-    bool has_changed_type = m_value.GetValueType() != old_value.GetValueType();
-
-    if (has_changed_type) {
+    if (m_value.GetValueType() != old_value.GetValueType()) {
+      ClearDynamicTypeInformation();
       SetValueDidChange(true);
-      m_value.SetCompilerType(recognized_valobj->GetCompilerType());
+
+      m_type_impl = TypeImpl(m_parent->GetCompilerType(),
+                             recognized_valobj->GetCompilerType());
       m_dynamic_type_info.SetCompilerType(recognized_valobj->GetCompilerType());
-      // TODO: (NekoCdr) remove comments below after figuring out what has to be done
-      // m_type_impl = TypeImpl(m_parent->GetCompilerType(), recognized_valobj->GetCompilerType());
+      m_value.SetCompilerType(recognized_valobj->GetCompilerType());
+      m_value.SetValueType(recognized_valobj->GetValue().GetValueType());
       m_error = m_value.GetValueAsData(&exe_ctx, m_data, GetModule().get());
 
       if (!m_error.Success()) {
@@ -178,7 +179,7 @@ bool ValueObjectRecognizedValue::IsInScope() { return m_parent->IsInScope(); }
 bool ValueObjectRecognizedValue::SetValueFromCString(const char *value_str,
                                                      Status &error) {
   if (!UpdateValueIfNeeded(false)) {
-    error.SetErrorString("unable to read value");
+    error.FromErrorString("unable to read value");
     return false;
   }
 
@@ -186,7 +187,7 @@ bool ValueObjectRecognizedValue::SetValueFromCString(const char *value_str,
   uint64_t parent_value = m_parent->GetValueAsUnsigned(UINT64_MAX);
 
   if (my_value == UINT64_MAX || parent_value == UINT64_MAX) {
-    error.SetErrorString("unable to read value");
+    error.FromErrorString("unable to read value");
     return false;
   }
 
@@ -198,7 +199,7 @@ bool ValueObjectRecognizedValue::SetValueFromCString(const char *value_str,
   if (my_value != parent_value) {
     // but NULL'ing out a value should always be allowed
     if (strcmp(value_str, "0")) {
-      error.SetErrorString(
+      error.FromErrorString(
           "unable to modify dynamic value, use 'expression' command");
       return false;
     }
@@ -211,7 +212,7 @@ bool ValueObjectRecognizedValue::SetValueFromCString(const char *value_str,
 
 bool ValueObjectRecognizedValue::SetData(DataExtractor &data, Status &error) {
   if (!UpdateValueIfNeeded(false)) {
-    error.SetErrorString("unable to read value");
+    error.FromErrorString("unable to read value");
     return false;
   }
 
@@ -219,7 +220,7 @@ bool ValueObjectRecognizedValue::SetData(DataExtractor &data, Status &error) {
   uint64_t parent_value = m_parent->GetValueAsUnsigned(UINT64_MAX);
 
   if (my_value == UINT64_MAX || parent_value == UINT64_MAX) {
-    error.SetErrorString("unable to read value");
+    error.FromErrorString("unable to read value");
     return false;
   }
 
@@ -233,7 +234,7 @@ bool ValueObjectRecognizedValue::SetData(DataExtractor &data, Status &error) {
     lldb::offset_t offset = 0;
 
     if (data.GetAddress(&offset) != 0) {
-      error.SetErrorString(
+      error.FromErrorString(
           "unable to modify dynamic value, use 'expression' command");
       return false;
     }
