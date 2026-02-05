@@ -11,9 +11,12 @@
 
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/TargetParser/Triple.h"
 #include <optional>
 #include <set>
+#include <string>
+#include <utility>
 
 namespace clang {
 

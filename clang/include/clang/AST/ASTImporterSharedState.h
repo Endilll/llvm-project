@@ -17,7 +17,11 @@
 #include "clang/AST/ASTImportError.h"
 #include "clang/AST/ASTImporterLookupTable.h"
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseSet.h"
+#include <memory>
 #include <optional>
 
 namespace clang {

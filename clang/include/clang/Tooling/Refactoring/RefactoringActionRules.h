@@ -9,8 +9,13 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_REFACTORINGACTIONRULES_H
 #define LLVM_CLANG_TOOLING_REFACTORING_REFACTORINGACTIONRULES_H
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Tooling/Refactoring/AtomicChange.h"
 #include "clang/Tooling/Refactoring/RefactoringActionRule.h"
-#include "clang/Tooling/Refactoring/RefactoringActionRulesInternal.h"
+#include "clang/Tooling/Refactoring/Rename/SymbolOccurrences.h"
+#include <memory>
+#include <utility>
+#include <vector>
 
 namespace clang {
 namespace tooling {

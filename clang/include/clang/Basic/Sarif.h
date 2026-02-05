@@ -31,9 +31,11 @@
 #ifndef LLVM_CLANG_BASIC_SARIF_H
 #define LLVM_CLANG_BASIC_SARIF_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Version.h"
 #include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"

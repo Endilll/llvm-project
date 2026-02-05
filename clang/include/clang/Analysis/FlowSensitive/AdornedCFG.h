@@ -21,6 +21,7 @@
 #include "clang/Analysis/FlowSensitive/ASTOps.h"
 #include "llvm/ADT/BitVector.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseSet.h"
 #include "llvm/Support/Error.h"
 #include <memory>
 #include <utility>

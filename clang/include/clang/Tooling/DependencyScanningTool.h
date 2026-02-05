@@ -9,6 +9,7 @@
 #ifndef LLVM_CLANG_TOOLING_DEPENDENCYSCANNINGTOOL_H
 #define LLVM_CLANG_TOOLING_DEPENDENCYSCANNINGTOOL_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/DependencyScanning/DependencyScannerImpl.h"
 #include "clang/DependencyScanning/DependencyScanningService.h"
 #include "clang/DependencyScanning/DependencyScanningUtils.h"
@@ -16,6 +17,11 @@
 #include "clang/DependencyScanning/ModuleDepCollector.h"
 #include "clang/Tooling/CompilationDatabase.h"
 #include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/MemoryBufferRef.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>

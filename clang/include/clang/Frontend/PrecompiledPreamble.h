@@ -13,15 +13,25 @@
 #ifndef LLVM_CLANG_FRONTEND_PRECOMPILEDPREAMBLE_H
 #define LLVM_CLANG_FRONTEND_PRECOMPILEDPREAMBLE_H
 
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/Lexer.h"
+#include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/StringSet.h"
+#include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/MD5.h"
 #include <cstddef>
+#include <ctime>
 #include <memory>
+#include <string>
+#include <sys/types.h>
 #include <system_error>
 #include <type_traits>
+#include <vector>
 
 namespace llvm {
 class MemoryBuffer;

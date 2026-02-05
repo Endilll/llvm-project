@@ -14,10 +14,16 @@
 #ifndef LLVM_CLANG_AST_LEXICALLYORDEREDRECURSIVEASTVISITOR_H
 #define LLVM_CLANG_AST_LEXICALLYORDEREDRECURSIVEASTVISITOR_H
 
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/ExprCXX.h"
 #include "clang/AST/RecursiveASTVisitor.h"
+#include "clang/AST/Stmt.h"
 #include "clang/Basic/LLVM.h"
+#include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/SourceManager.h"
-#include "llvm/Support/SaveAndRestore.h"
+#include <cassert>
+#include <utility>
 
 namespace clang {
 

@@ -10,7 +10,8 @@
 #define LLVM_CLANG_BASIC_LANGSTANDARD_H
 
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/StringRef.h"
+#include <cstdint>
+#include <optional>
 
 namespace llvm {
 class Triple;

@@ -15,19 +15,28 @@
 #ifndef LLVM_CLANG_TOOLING_TRANSFORMER_REWRITERULE_H
 #define LLVM_CLANG_TOOLING_TRANSFORMER_REWRITERULE_H
 
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TypeLoc.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchersInternal.h"
-#include "clang/Tooling/Refactoring/AtomicChange.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Tooling/Transformer/MatchConsumer.h"
 #include "clang/Tooling/Transformer/RangeSelector.h"
 #include "llvm/ADT/Any.h"
-#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
-#include <functional>
+#include <cassert>
+#include <cstddef>
+#include <initializer_list>
+#include <memory>
 #include <string>
+#include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace clang {
 namespace transformer {

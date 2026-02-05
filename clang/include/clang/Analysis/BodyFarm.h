@@ -15,7 +15,6 @@
 #define LLVM_CLANG_ANALYSIS_BODYFARM_H
 
 #include "clang/AST/DeclBase.h"
-#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
 #include <optional>
 

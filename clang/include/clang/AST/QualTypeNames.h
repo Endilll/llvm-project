@@ -61,6 +61,10 @@
 #define LLVM_CLANG_AST_QUALTYPENAMES_H
 
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/TypeBase.h"
+#include <string>
 
 namespace clang {
 namespace TypeName {

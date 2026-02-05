@@ -14,9 +14,11 @@
 #ifndef LLVM_CLANG_BASIC_TARGETOPTIONS_H
 #define LLVM_CLANG_BASIC_TARGETOPTIONS_H
 
-#include "clang/Basic/OpenCLOptions.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/Support/CodeGen.h"
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Target/TargetOptions.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 

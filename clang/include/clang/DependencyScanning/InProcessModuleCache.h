@@ -13,6 +13,8 @@
 #include "llvm/ADT/StringMap.h"
 
 #include <atomic>
+#include <ctime>
+#include <memory>
 #include <mutex>
 #include <shared_mutex>
 

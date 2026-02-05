@@ -14,7 +14,7 @@
 #include "clang/Index/IndexingOptions.h"
 #include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
-#include "llvm/ADT/ArrayRef.h"
+#include <functional>
 #include <memory>
 
 namespace clang {

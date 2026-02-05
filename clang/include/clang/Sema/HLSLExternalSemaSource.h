@@ -12,8 +12,11 @@
 #ifndef CLANG_SEMA_HLSLEXTERNALSEMASOURCE_H
 #define CLANG_SEMA_HLSLEXTERNALSEMASOURCE_H
 
+#include "clang/AST/Decl.h"
+#include "clang/AST/ExternalASTSource.h"
 #include "clang/Sema/ExternalSemaSource.h"
 #include "llvm/ADT/DenseMap.h"
+#include <functional>
 
 namespace clang {
 class NamespaceDecl;

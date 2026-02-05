@@ -15,6 +15,8 @@
 #define LLVM_CLANG_AST_COMMENTBRIEFPARSER_H
 
 #include "clang/AST/CommentLexer.h"
+#include "clang/Basic/SourceLocation.h"
+#include <string>
 
 namespace clang {
 namespace comments {

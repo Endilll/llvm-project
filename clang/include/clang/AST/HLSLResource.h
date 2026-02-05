@@ -19,9 +19,10 @@
 #include "clang/AST/Attrs.inc"
 #include "clang/AST/DeclBase.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Support/Compiler.h"
-#include "llvm/Frontend/HLSL/HLSLResource.h"
-#include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/DXILABI.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <cstdint>
 
 namespace clang {
 

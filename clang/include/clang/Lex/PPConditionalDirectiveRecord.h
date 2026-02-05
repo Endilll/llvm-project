@@ -13,9 +13,10 @@
 #ifndef LLVM_CLANG_LEX_PPCONDITIONALDIRECTIVERECORD_H
 #define LLVM_CLANG_LEX_PPCONDITIONALDIRECTIVERECORD_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/PPCallbacks.h"
-#include "llvm/ADT/SmallVector.h"
+#include <cstddef>
 #include <vector>
 
 namespace clang {

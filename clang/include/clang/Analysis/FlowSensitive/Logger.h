@@ -10,8 +10,12 @@
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_LOGGER_H
 
 #include "clang/Analysis/CFG.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/raw_ostream.h"
+#include <functional>
 #include <memory>
+#include <string>
 
 namespace clang::dataflow {
 // Forward declarations so we can use Logger anywhere in the framework.

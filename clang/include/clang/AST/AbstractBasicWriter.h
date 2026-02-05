@@ -10,7 +10,16 @@
 #define LLVM_CLANG_AST_ABSTRACTBASICWRITER_H
 
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/ExceptionSpecificationType.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cstddef>
+#include <cstdint>
 #include <optional>
 
 namespace clang {

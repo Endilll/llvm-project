@@ -18,6 +18,7 @@
 #include "clang/Analysis/FlowSensitive/DataflowAnalysis.h"
 #include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
 #include "clang/Analysis/FlowSensitive/NoopLattice.h"
+#include "clang/Analysis/FlowSensitive/TypeErasedDataflowAnalysis.h"
 
 namespace clang {
 namespace dataflow {

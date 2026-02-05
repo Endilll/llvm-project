@@ -14,6 +14,7 @@
 #ifndef LLVM_CLANG_SERIALIZATION_MODULEFILE_H
 #define LLVM_CLANG_SERIALIZATION_MODULEFILE_H
 
+#include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Module.h"
@@ -22,7 +23,6 @@
 #include "clang/Serialization/ContinuousRangeMap.h"
 #include "clang/Serialization/ModuleFileExtension.h"
 #include "llvm/ADT/BitVector.h"
-#include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallVector.h"
@@ -31,8 +31,11 @@
 #include "llvm/Support/Endian.h"
 #include <cassert>
 #include <cstdint>
+#include <ctime>
 #include <memory>
+#include <optional>
 #include <string>
+#include <sys/types.h>
 #include <vector>
 
 namespace clang {

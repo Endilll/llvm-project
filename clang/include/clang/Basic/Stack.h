@@ -16,7 +16,8 @@
 
 #include <cstddef>
 
-#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Config/llvm-config.h"
 #include "llvm/Support/Compiler.h"
 
 namespace clang {

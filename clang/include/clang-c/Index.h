@@ -16,7 +16,6 @@
 #ifndef LLVM_CLANG_C_INDEX_H
 #define LLVM_CLANG_C_INDEX_H
 
-#include "clang-c/BuildSystem.h"
 #include "clang-c/CXDiagnostic.h"
 #include "clang-c/CXErrorCode.h"
 #include "clang-c/CXFile.h"
@@ -24,6 +23,7 @@
 #include "clang-c/CXString.h"
 #include "clang-c/ExternC.h"
 #include "clang-c/Platform.h"
+#include <cstddef>
 
 /**
  * The version constants for the libclang API.

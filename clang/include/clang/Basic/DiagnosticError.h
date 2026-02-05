@@ -9,9 +9,13 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTICERROR_H
 #define LLVM_CLANG_BASIC_DIAGNOSTICERROR_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/PartialDiagnostic.h"
+#include "clang/Basic/SourceLocation.h"
 #include "llvm/Support/Error.h"
 #include <optional>
+#include <system_error>
+#include <utility>
 
 namespace clang {
 

@@ -13,7 +13,12 @@
 #define LLVM_CLANG_INSTALLAPI_DIRECTORYSCANNER_H
 
 #include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/InstallAPI/HeaderFile.h"
 #include "clang/InstallAPI/Library.h"
+#include "llvm/Support/Error.h"
+#include <utility>
+#include <vector>
 
 namespace clang::installapi {
 

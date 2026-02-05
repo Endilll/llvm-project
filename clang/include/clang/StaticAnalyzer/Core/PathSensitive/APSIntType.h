@@ -10,6 +10,8 @@
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_APSINTTYPE_H
 
 #include "llvm/ADT/APSInt.h"
+#include "llvm/Support/Compiler.h"
+#include <cstdint>
 #include <tuple>
 
 namespace clang {

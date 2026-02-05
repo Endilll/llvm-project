@@ -11,6 +11,7 @@
 
 #include "clang/Testing/CommandLineArgs.h"
 #include "llvm/Support/raw_ostream.h"
+#include <ostream>
 #include <string>
 #include <vector>
 

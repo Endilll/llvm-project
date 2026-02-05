@@ -9,15 +9,10 @@
 #ifndef LLVM_CLANG_LEX_PREPROCESSOROPTIONS_H_
 #define LLVM_CLANG_LEX_PREPROCESSOROPTIONS_H_
 
-#include "clang/Basic/BitmaskEnum.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Lex/DependencyDirectivesScanner.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/StringSet.h"
-#include <functional>
-#include <map>
-#include <memory>
+#include "llvm/ADT/BitmaskEnum.h"
+#include <cstdint>
 #include <optional>
 #include <set>
 #include <string>

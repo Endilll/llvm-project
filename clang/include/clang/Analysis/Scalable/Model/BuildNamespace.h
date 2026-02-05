@@ -22,6 +22,7 @@
 #include "llvm/ADT/StringRef.h"
 #include <optional>
 #include <string>
+#include <tuple>
 #include <vector>
 
 namespace clang::ssaf {

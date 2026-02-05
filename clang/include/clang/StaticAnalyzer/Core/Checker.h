@@ -13,11 +13,16 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_CHECKER_H
 #define LLVM_CLANG_STATICANALYZER_CORE_CHECKER_H
 
+#include "clang/AST/Stmt.h"
 #include "clang/Analysis/ProgramPoint.h"
-#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
-#include "llvm/Support/Casting.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
+#include <cassert>
+#include <optional>
 
 namespace clang {
 namespace ento {

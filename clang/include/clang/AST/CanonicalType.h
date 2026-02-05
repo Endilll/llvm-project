@@ -14,10 +14,11 @@
 #ifndef LLVM_CLANG_AST_CANONICALTYPE_H
 #define LLVM_CLANG_AST_CANONICALTYPE_H
 
+#include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/iterator.h"
 #include "llvm/Support/Casting.h"

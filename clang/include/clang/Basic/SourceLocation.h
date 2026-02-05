@@ -16,7 +16,7 @@
 
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/DenseMapInfo.h"
 #include <cassert>
 #include <cstdint>
 #include <string>

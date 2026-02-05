@@ -12,13 +12,9 @@
 #include "clang/Analysis/FlowSensitive/Arena.h"
 #include "clang/Analysis/FlowSensitive/Formula.h"
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/DenseMapInfo.h"
-#include "llvm/Support/Allocator.h"
 #include "llvm/Support/raw_ostream.h"
 #include <cassert>
-#include <string>
 
 namespace clang::dataflow {
 

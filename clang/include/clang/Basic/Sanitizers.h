@@ -16,10 +16,14 @@
 
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/bit.h"
 #include "llvm/Support/HashBuilder.h"
 #include "llvm/Transforms/Instrumentation/AddressSanitizerOptions.h"
 #include <cassert>
 #include <cstdint>
+#include <optional>
+#include <string>
+#include <vector>
 
 namespace llvm {
 class hash_code;

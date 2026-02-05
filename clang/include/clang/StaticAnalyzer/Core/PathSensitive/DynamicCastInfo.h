@@ -10,6 +10,7 @@
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_DYNAMICCASTINFO_H
 
 #include "clang/AST/Type.h"
+#include "llvm/ADT/FoldingSet.h"
 
 namespace clang {
 namespace ento {

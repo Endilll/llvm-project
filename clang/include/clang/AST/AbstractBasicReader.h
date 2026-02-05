@@ -9,8 +9,24 @@
 #ifndef LLVM_CLANG_AST_ABSTRACTBASICREADER_H
 #define LLVM_CLANG_AST_ABSTRACTBASICREADER_H
 
-#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/ExceptionSpecificationType.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/APFixedPoint.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <cstdint>
 #include <optional>
+#include <utility>
 
 namespace clang {
 namespace serialization {

@@ -16,16 +16,11 @@
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Frontend/DependencyOutputOptions.h"
-#include "clang/Options/OptionUtils.h"
-#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
-#include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSet.h"
 #include "llvm/Support/FileCollector.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <cstdint>
-#include <memory>
 #include <string>
 #include <system_error>
 #include <utility>

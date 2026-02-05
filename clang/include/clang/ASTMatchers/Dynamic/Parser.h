@@ -35,13 +35,15 @@
 #ifndef LLVM_CLANG_ASTMATCHERS_DYNAMIC_PARSER_H
 #define LLVM_CLANG_ASTMATCHERS_DYNAMIC_PARSER_H
 
-#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/ASTMatchers/Dynamic/Diagnostics.h"
 #include "clang/ASTMatchers/Dynamic/Registry.h"
 #include "clang/ASTMatchers/Dynamic/VariantValue.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
 #include <optional>
+#include <string>
 #include <utility>
 #include <vector>
 

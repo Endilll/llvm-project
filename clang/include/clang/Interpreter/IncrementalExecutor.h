@@ -13,8 +13,14 @@
 #ifndef LLVM_CLANG_LIB_INTERPRETER_INCREMENTALEXECUTOR_H
 #define LLVM_CLANG_LIB_INTERPRETER_INCREMENTALEXECUTOR_H
 
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/CodeGen.h"
 #include "llvm/Support/Error.h"
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
 
 namespace llvm {
 namespace orc {

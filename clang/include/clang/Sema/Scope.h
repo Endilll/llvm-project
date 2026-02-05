@@ -15,7 +15,7 @@
 
 #include "clang/AST/Decl.h"
 #include "clang/Basic/Diagnostic.h"
-#include "llvm/ADT/PointerIntPair.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/iterator_range.h"

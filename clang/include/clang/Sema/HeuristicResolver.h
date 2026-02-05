@@ -9,7 +9,11 @@
 #ifndef LLVM_CLANG_SEMA_HEURISTICRESOLVER_H
 #define LLVM_CLANG_SEMA_HEURISTICRESOLVER_H
 
+#include "clang/AST/APValue.h"
 #include "clang/AST/Decl.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/TypeBase.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include <vector>
 
 namespace clang {

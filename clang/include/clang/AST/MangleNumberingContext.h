@@ -14,8 +14,6 @@
 #ifndef LLVM_CLANG_AST_MANGLENUMBERINGCONTEXT_H
 #define LLVM_CLANG_AST_MANGLENUMBERINGCONTEXT_H
 
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
 
 namespace clang {
 

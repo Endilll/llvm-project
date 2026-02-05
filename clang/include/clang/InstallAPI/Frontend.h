@@ -14,13 +14,14 @@
 #define LLVM_CLANG_INSTALLAPI_FRONTEND_H
 
 #include "clang/AST/ASTConsumer.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendActions.h"
+#include "clang/Frontend/FrontendAction.h"
 #include "clang/InstallAPI/Context.h"
 #include "clang/InstallAPI/DylibVerifier.h"
 #include "clang/InstallAPI/Visitor.h"
-#include "llvm/ADT/Twine.h"
 #include "llvm/Support/MemoryBuffer.h"
+#include <memory>
 
 namespace clang {
 namespace installapi {

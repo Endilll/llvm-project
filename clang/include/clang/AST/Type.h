@@ -20,6 +20,7 @@
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/TypeBase.h" // IWYU pragma: export
+#include "clang/Basic/LLVM.h"
 
 namespace clang {
 

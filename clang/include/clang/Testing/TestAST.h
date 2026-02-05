@@ -21,10 +21,13 @@
 #ifndef LLVM_CLANG_TESTING_TESTAST_H
 #define LLVM_CLANG_TESTING_TESTAST_H
 
+#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Testing/CommandLineArgs.h"
-#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/StringMap.h"
+#include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 

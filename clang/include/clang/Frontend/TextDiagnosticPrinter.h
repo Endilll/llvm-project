@@ -16,8 +16,10 @@
 
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/Support/Compiler.h"
 #include <memory>
+#include <string>
+#include <utility>
 
 namespace clang {
 class DiagnosticOptions;

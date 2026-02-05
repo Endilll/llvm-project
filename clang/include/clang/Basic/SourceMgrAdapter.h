@@ -14,10 +14,13 @@
 #ifndef LLVM_CLANG_SOURCEMGRADAPTER_H
 #define LLVM_CLANG_SOURCEMGRADAPTER_H
 
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/Support/SMLoc.h"
 #include "llvm/Support/SourceMgr.h"
-#include <string>
+#include <optional>
 #include <utility>
 
 namespace clang {

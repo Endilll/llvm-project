@@ -16,6 +16,7 @@
 
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/LangOptions.h"
+#include "llvm/TargetParser/Triple.h"
 #include <cstdint>
 
 namespace clang {

@@ -10,8 +10,21 @@
 #define LLVM_CLANG_INSTALLAPI_DYLIBVERIFIER_H
 
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/InstallAPI/MachO.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/TextAPI/InterfaceFile.h"
+#include "llvm/TextAPI/RecordVisitor.h"
+#include "llvm/TextAPI/RecordsSlice.h"
+#include "llvm/TextAPI/Target.h"
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace clang {
 namespace installapi {

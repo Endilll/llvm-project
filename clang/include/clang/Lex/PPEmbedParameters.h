@@ -13,9 +13,13 @@
 #ifndef LLVM_CLANG_LEX_PPEMBEDPARAMETERS_H
 #define LLVM_CLANG_LEX_PPEMBEDPARAMETERS_H
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/PPDirectiveParameter.h"
 #include "clang/Lex/Token.h"
-#include "llvm/ADT/SmallVector.h"
+#include <cstddef>
+#include <optional>
+#include <utility>
 
 namespace clang {
 

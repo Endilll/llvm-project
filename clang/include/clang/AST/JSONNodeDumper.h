@@ -14,18 +14,46 @@
 #ifndef LLVM_CLANG_AST_JSONNODEDUMPER_H
 #define LLVM_CLANG_AST_JSONNODEDUMPER_H
 
+#include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTDumperUtils.h"
 #include "clang/AST/ASTNodeTraverser.h"
 #include "clang/AST/AttrVisitor.h"
+#include "clang/AST/Attrs.inc"
+#include "clang/AST/Comment.h"
 #include "clang/AST/CommentCommandTraits.h"
 #include "clang/AST/CommentVisitor.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclOpenACC.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DeclVisitor.h"
+#include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprConcepts.h"
+#include "clang/AST/ExprObjC.h"
 #include "clang/AST/Mangle.h"
+#include "clang/AST/OpenACCClause.h"
+#include "clang/AST/OpenMPClause.h"
+#include "clang/AST/Redeclarable.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/StmtObjC.h"
 #include "clang/AST/StmtVisitor.h"
+#include "clang/AST/TemplateArgumentVisitor.h"
 #include "clang/AST/Type.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/AST/TypeVisitor.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/JSON.h"
+#include <cassert>
+#include <functional>
+#include <string>
 
 namespace clang {
 

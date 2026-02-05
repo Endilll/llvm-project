@@ -9,14 +9,16 @@
 #ifndef LLVM_CLANG_INDEXSERIALIZATION_SERIALIZABLEPATHCOLLECTION_H
 #define LLVM_CLANG_INDEXSERIALIZATION_SERIALIZABLEPATHCOLLECTION_H
 
-#include "clang/Basic/FileManager.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Allocator.h"
 
+#include <cstddef>
 #include <string>
 #include <vector>
 

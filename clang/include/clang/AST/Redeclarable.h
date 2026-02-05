@@ -13,11 +13,13 @@
 #ifndef LLVM_CLANG_AST_REDECLARABLE_H
 #define LLVM_CLANG_AST_REDECLARABLE_H
 
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/ExternalASTSource.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/ADT/iterator_range.h"
-#include "llvm/Support/Casting.h"
+#include "llvm/Support/PointerLikeTypeTraits.h"
 #include <cassert>
 #include <cstddef>
 #include <iterator>

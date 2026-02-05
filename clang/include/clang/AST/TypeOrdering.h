@@ -20,6 +20,8 @@
 
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Type.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include <cstdint>
 #include <functional>
 
 namespace clang {

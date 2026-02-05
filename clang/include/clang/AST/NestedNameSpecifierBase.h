@@ -16,12 +16,17 @@
 
 #include "clang/AST/DependenceFlags.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/PointerLikeTypeTraits.h"
+#include <cassert>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
+#include <optional>
 #include <utility>
 
 namespace clang {
@@ -95,7 +100,7 @@ class NestedNameSpecifier {
   MakeNamespaceAndPrefixStorage(const ASTContext &Ctx,
                                 const NamespaceBaseDecl *Namespace,
                                 NestedNameSpecifier Prefix);
-  static inline PtrKind MakeNamespacePtrKind(const ASTContext &Ctx,
+  static PtrKind MakeNamespacePtrKind(const ASTContext &Ctx,
                                              const NamespaceBaseDecl *Namespace,
                                              NestedNameSpecifier Prefix);
 
@@ -130,20 +135,20 @@ public:
     MicrosoftSuper,
   };
 
-  inline Kind getKind() const;
+  Kind getKind() const;
 
   NestedNameSpecifier(std::nullopt_t) : StoredOrFlag(0) {}
 
-  explicit inline NestedNameSpecifier(const Type *T);
+  explicit NestedNameSpecifier(const Type *T);
 
   /// Builds a nested name specifier that names a namespace.
-  inline NestedNameSpecifier(const ASTContext &Ctx,
+  NestedNameSpecifier(const ASTContext &Ctx,
                              const NamespaceBaseDecl *Namespace,
                              NestedNameSpecifier Prefix);
 
   /// Builds a nested name specifier that names a class through microsoft's
   /// __super specifier.
-  explicit inline NestedNameSpecifier(CXXRecordDecl *RD);
+  explicit NestedNameSpecifier(CXXRecordDecl *RD);
 
   explicit operator bool() const { return StoredOrFlag != 0; }
 
@@ -161,7 +166,7 @@ public:
     return static_cast<const Type *>(Ptr);
   }
 
-  inline NamespaceAndPrefix getAsNamespaceAndPrefix() const;
+  NamespaceAndPrefix getAsNamespaceAndPrefix() const;
 
   CXXRecordDecl *getAsMicrosoftSuper() const {
     auto [Kind, Ptr] = getStored();
@@ -204,10 +209,10 @@ public:
   /// S::X<template-param-0-0>, since 'S' and 'X' are uniquely defined
   /// by declarations in the type system and the canonical type for
   /// the template type parameter 'T' is template-param-0-0.
-  inline NestedNameSpecifier getCanonical() const;
+  NestedNameSpecifier getCanonical() const;
 
   /// Whether this nested name specifier is canonical.
-  inline bool isCanonical() const;
+  bool isCanonical() const;
 
   /// Whether this nested name specifier starts with a '::'.
   bool isFullyQualified() const;
@@ -278,22 +283,6 @@ struct alignas(8) NamespaceAndPrefixStorage : NamespaceAndPrefix,
   }
 };
 
-NamespaceAndPrefix NestedNameSpecifier::getAsNamespaceAndPrefix() const {
-  auto [Kind, Ptr] = getStored();
-  switch (Kind) {
-  case StoredKind::NamespaceOrSuper:
-  case StoredKind::NamespaceWithGlobal:
-    return {static_cast<const NamespaceBaseDecl *>(Ptr),
-            Kind == StoredKind::NamespaceWithGlobal
-                ? NestedNameSpecifier::getGlobal()
-                : std::nullopt};
-  case StoredKind::NamespaceWithNamespace:
-    return *static_cast<const NamespaceAndPrefixStorage *>(Ptr);
-  case StoredKind::Type:;
-  }
-  llvm_unreachable("unexpected stored kind");
-}
-
 struct NamespaceAndPrefixLoc;
 
 /// A C++ nested-name-specifier augmented with source location
@@ -320,11 +309,11 @@ class NestedNameSpecifierLoc {
 
   /// Determines the data length for the last component in the
   /// given nested-name-specifier.
-  static inline unsigned getLocalDataLength(NestedNameSpecifier Qualifier);
+  static unsigned getLocalDataLength(NestedNameSpecifier Qualifier);
 
   /// Determines the data length for the entire
   /// nested-name-specifier.
-  static inline unsigned getDataLength(NestedNameSpecifier Qualifier);
+  static unsigned getDataLength(NestedNameSpecifier Qualifier);
 
 public:
   /// Construct an empty nested-name-specifier.
@@ -356,7 +345,7 @@ public:
   /// For example, if this instance refers to a nested-name-specifier
   /// \c \::std::vector<int>::, the returned source range would cover
   /// from the initial '::' to the last '::'.
-  inline SourceRange getSourceRange() const LLVM_READONLY;
+  SourceRange getSourceRange() const LLVM_READONLY;
 
   /// Retrieve the source range covering just the last part of
   /// this nested-name-specifier, not including the prefix.
@@ -367,7 +356,7 @@ public:
   /// For example, if this instance refers to a nested-name-specifier
   /// \c \::std::vector<int>::, the returned source range would cover
   /// from "vector" to the last '::'.
-  inline SourceRange getLocalSourceRange() const;
+  SourceRange getLocalSourceRange() const;
 
   /// Retrieve the location of the beginning of this
   /// nested-name-specifier.
@@ -375,15 +364,15 @@ public:
 
   /// Retrieve the location of the end of this
   /// nested-name-specifier.
-  inline SourceLocation getEndLoc() const;
+  SourceLocation getEndLoc() const;
 
   /// Retrieve the location of the beginning of this
   /// component of the nested-name-specifier.
-  inline SourceLocation getLocalBeginLoc() const;
+  SourceLocation getLocalBeginLoc() const;
 
   /// Retrieve the location of the end of this component of the
   /// nested-name-specifier.
-  inline SourceLocation getLocalEndLoc() const;
+  SourceLocation getLocalEndLoc() const;
 
   /// For a nested-name-specifier that refers to a namespace,
   /// retrieve the namespace and its prefix.
@@ -392,17 +381,17 @@ public:
   /// \c \::std::chrono::, the prefix is \c \::std::. Note that the
   /// returned prefix may be empty, if this is the first component of
   /// the nested-name-specifier.
-  inline NamespaceAndPrefixLoc castAsNamespaceAndPrefix() const;
-  inline NamespaceAndPrefixLoc getAsNamespaceAndPrefix() const;
+  NamespaceAndPrefixLoc castAsNamespaceAndPrefix() const;
+  NamespaceAndPrefixLoc getAsNamespaceAndPrefix() const;
 
   /// For a nested-name-specifier that refers to a type,
   /// retrieve the type with source-location information.
-  inline TypeLoc castAsTypeLoc() const;
-  inline TypeLoc getAsTypeLoc() const;
+  TypeLoc castAsTypeLoc() const;
+  TypeLoc getAsTypeLoc() const;
 
   /// Determines the data length for the entire
   /// nested-name-specifier.
-  inline unsigned getDataLength() const;
+  unsigned getDataLength() const;
 
   friend bool operator==(NestedNameSpecifierLoc X, NestedNameSpecifierLoc Y) {
     return X.Qualifier == Y.Qualifier && X.Data == Y.Data;
@@ -525,7 +514,7 @@ public:
   void Adopt(NestedNameSpecifierLoc Other);
 
   /// Retrieve the source range covered by this nested-name-specifier.
-  inline SourceRange getSourceRange() const LLVM_READONLY;
+  SourceRange getSourceRange() const LLVM_READONLY;
 
   /// Retrieve a nested-name-specifier with location information,
   /// copied into the given AST context.

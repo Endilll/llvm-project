@@ -18,9 +18,12 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_H
 #define LLVM_CLANG_TOOLING_REFACTORING_H
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Serialization/PCHContainerOperations.h"
 #include "clang/Tooling/Core/Replacement.h"
 #include "clang/Tooling/Tooling.h"
 #include <map>
+#include <memory>
 #include <string>
 
 namespace clang {

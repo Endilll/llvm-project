@@ -20,19 +20,26 @@
 
 #include "clang/AST/Availability.h"
 #include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclTemplate.h"
 #include "clang/AST/RawCommentList.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangStandard.h"
 #include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Visibility.h"
 #include "clang/ExtractAPI/DeclarationFragments.h"
+#include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Casting.h"
-#include "llvm/Support/Compiler.h"
 #include "llvm/TargetParser/Triple.h"
 #include <cstddef>
 #include <iterator>
 #include <memory>
 #include <optional>
+#include <string>
 #include <type_traits>
+#include <utility>
+#include <vector>
 
 namespace clang {
 namespace extractapi {

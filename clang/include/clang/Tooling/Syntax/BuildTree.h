@@ -11,10 +11,12 @@
 #define LLVM_CLANG_TOOLING_SYNTAX_BUILDTREE_H
 
 #include "clang/AST/Decl.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Tooling/Syntax/Nodes.h"
 #include "clang/Tooling/Syntax/TokenBufferTokenManager.h"
 #include "clang/Tooling/Syntax/Tree.h"
+#include <utility>
 
 namespace clang {
 namespace syntax {

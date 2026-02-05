@@ -16,6 +16,11 @@
 
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTTypeTraits.h"
+#include "clang/Basic/LLVM.h"
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <optional>
 
 namespace clang {
 class DynTypedNodeList;

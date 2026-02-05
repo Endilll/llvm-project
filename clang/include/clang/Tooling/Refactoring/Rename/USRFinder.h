@@ -15,10 +15,8 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_RENAME_USRFINDER_H
 #define LLVM_CLANG_TOOLING_REFACTORING_RENAME_USRFINDER_H
 
-#include "clang/AST/AST.h"
 #include "clang/AST/ASTContext.h"
 #include <string>
-#include <vector>
 
 namespace clang {
 

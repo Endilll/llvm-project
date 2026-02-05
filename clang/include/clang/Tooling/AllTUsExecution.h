@@ -14,9 +14,21 @@
 #ifndef LLVM_CLANG_TOOLING_ALLTUSEXECUTION_H
 #define LLVM_CLANG_TOOLING_ALLTUSEXECUTION_H
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Serialization/PCHContainerOperations.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
+#include "clang/Tooling/CommonOptionsParser.h"
+#include "clang/Tooling/CompilationDatabase.h"
 #include "clang/Tooling/Execution.h"
+#include "clang/Tooling/Tooling.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/Support/CommandLine.h"
+#include "llvm/Support/Error.h"
+#include <memory>
 #include <optional>
+#include <string>
+#include <utility>
 
 namespace clang {
 namespace tooling {

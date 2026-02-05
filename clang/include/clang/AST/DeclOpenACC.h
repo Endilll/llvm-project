@@ -16,9 +16,17 @@
 
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclID.h"
 #include "clang/AST/OpenACCClause.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/OpenACCKinds.h"
+#include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/TrailingObjects.h"
+#include <cassert>
+#include <memory>
 
 namespace clang {
 

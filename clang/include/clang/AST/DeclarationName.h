@@ -13,21 +13,22 @@
 #ifndef LLVM_CLANG_AST_DECLARATIONNAME_H
 #define LLVM_CLANG_AST_DECLARATIONNAME_H
 
+#include "clang/AST/TemplateName.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
-#include "clang/Basic/PartialDiagnostic.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/Support/type_traits.h"
 #include <cassert>
 #include <cstdint>
 #include <cstring>
 #include <string>
+#include <type_traits>
 
 namespace clang {
 

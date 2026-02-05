@@ -9,9 +9,15 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_EXTRACT_EXTRACT_H
 #define LLVM_CLANG_TOOLING_REFACTORING_EXTRACT_EXTRACT_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Refactoring/ASTSelection.h"
+#include "clang/Tooling/Refactoring/AtomicChange.h"
+#include "clang/Tooling/Refactoring/RefactoringActionRule.h"
 #include "clang/Tooling/Refactoring/RefactoringActionRules.h"
+#include "clang/Tooling/Refactoring/RefactoringRuleContext.h"
 #include <optional>
+#include <string>
+#include <utility>
 
 namespace clang {
 namespace tooling {

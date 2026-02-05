@@ -15,7 +15,6 @@
 #define LLVM_CLANG_STATICANALYZER_FRONTEND_ANALYSISCONSUMER_H
 
 #include "clang/AST/ASTConsumer.h"
-#include "clang/Basic/LLVM.h"
 #include <functional>
 #include <memory>
 

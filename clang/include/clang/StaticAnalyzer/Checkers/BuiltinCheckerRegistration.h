@@ -14,7 +14,6 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CHECKERS_BUILTINCHECKERREGISTRATION_H
 #define LLVM_CLANG_STATICANALYZER_CHECKERS_BUILTINCHECKERREGISTRATION_H
 
-#include "clang/StaticAnalyzer/Core/BugReporter/CommonBugCategories.h"
 
 namespace clang {
 namespace ento {

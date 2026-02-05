@@ -22,7 +22,8 @@
 #include "clang/Analysis/CFG.h"
 #include "llvm/ADT/DenseSet.h"
 #include <deque>
-#include <memory>
+#include <optional>
+#include <utility>
 #include <vector>
 
 namespace clang {

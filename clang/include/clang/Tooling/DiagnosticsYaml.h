@@ -16,9 +16,15 @@
 #define LLVM_CLANG_TOOLING_DIAGNOSTICSYAML_H
 
 #include "clang/Tooling/Core/Diagnostic.h"
-#include "clang/Tooling/ReplacementsYaml.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Error.h"
 #include "llvm/Support/YAMLTraits.h"
+#include "llvm/Support/raw_ostream.h"
 #include <string>
+#include <utility>
+#include <vector>
 
 LLVM_YAML_IS_SEQUENCE_VECTOR(clang::tooling::Diagnostic)
 LLVM_YAML_IS_SEQUENCE_VECTOR(clang::tooling::DiagnosticMessage)

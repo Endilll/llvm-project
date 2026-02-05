@@ -25,10 +25,13 @@
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Serialization/SourceLocationEncoding.h"
 #include "llvm/ADT/DenseMapInfo.h"
-#include "llvm/Bitstream/BitCodes.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/Bitstream/BitCodeEnums.h"
+#include "llvm/Support/Endian.h"
 #include "llvm/Support/MathExtras.h"
 #include <cassert>
 #include <cstdint>
+#include <type_traits>
 
 namespace clang {
 namespace serialization {

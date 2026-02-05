@@ -18,8 +18,9 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
+#include <cstdint>
 #include <optional>
-#include <vector>
+#include <utility>
 
 namespace clang {
 namespace dataflow {

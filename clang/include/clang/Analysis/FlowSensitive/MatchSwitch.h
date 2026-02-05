@@ -23,11 +23,15 @@
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_MATCHSWITCH_H_
 
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Stmt.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
 #include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include <cstddef>
 #include <functional>
 #include <string>
 #include <type_traits>

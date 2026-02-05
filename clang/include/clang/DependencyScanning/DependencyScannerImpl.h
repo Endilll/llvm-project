@@ -9,15 +9,25 @@
 #ifndef LLVM_CLANG_DEPENDENCYSCANNING_DEPENDENCYSCANNERIMPL_H
 #define LLVM_CLANG_DEPENDENCYSCANNING_DEPENDENCYSCANNERIMPL_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/DependencyScanning/DependencyScanningFilesystem.h"
 #include "clang/DependencyScanning/ModuleDepCollector.h"
-#include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/CompilerInvocation.h"
+#include "clang/Frontend/DependencyOutputOptions.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
-#include "clang/Serialization/ObjectFilePCHContainerReader.h"
+#include "clang/Serialization/PCHContainerOperations.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace clang {
 class DiagnosticConsumer;

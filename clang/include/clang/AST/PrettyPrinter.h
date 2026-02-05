@@ -16,6 +16,9 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/Support/Compiler.h"
+#include <cstdint>
+#include <string>
 
 namespace clang {
 

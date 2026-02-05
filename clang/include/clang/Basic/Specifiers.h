@@ -16,8 +16,9 @@
 #define LLVM_CLANG_BASIC_SPECIFIERS_H
 
 #include "llvm/ADT/StringRef.h"
-#include "llvm/Support/DataTypes.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
+#include <cstdint>
 
 namespace llvm {
 class raw_ostream;

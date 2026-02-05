@@ -27,6 +27,7 @@
 #include "clang/Basic/DiagnosticSema.h"
 #include "clang/Basic/DiagnosticSerialization.h"
 #include "clang/Basic/DiagnosticTrap.h"
+#include <cstddef>
 
 namespace clang {
 template <size_t SizeOfStr, typename FieldType> class StringSizerHelper {

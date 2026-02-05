@@ -9,13 +9,15 @@
 #ifndef LLVM_CLANG_ANALYSIS_MACROEXPANSIONCONTEXT_H
 #define LLVM_CLANG_ANALYSIS_MACROEXPANSIONCONTEXT_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/Token.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/SmallString.h"
-#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Compiler.h"
 #include <optional>
+#include <string>
 
 namespace clang {
 

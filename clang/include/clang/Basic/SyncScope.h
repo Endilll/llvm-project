@@ -14,9 +14,10 @@
 #ifndef LLVM_CLANG_BASIC_SYNCSCOPE_H
 #define LLVM_CLANG_BASIC_SYNCSCOPE_H
 
-#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/Support/ErrorHandling.h"
 #include <memory>
 
 namespace clang {

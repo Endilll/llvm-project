@@ -20,7 +20,6 @@
 #include "clang/AST/UnresolvedSet.h"
 #include "clang/Basic/Specifiers.h"
 #include <cassert>
-#include <cstdint>
 
 namespace clang {
 

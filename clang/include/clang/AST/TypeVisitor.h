@@ -14,6 +14,7 @@
 #define LLVM_CLANG_AST_TYPEVISITOR_H
 
 #include "clang/AST/Type.h"
+#include "llvm/Support/ErrorHandling.h"
 
 namespace clang {
 

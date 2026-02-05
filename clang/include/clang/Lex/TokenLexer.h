@@ -13,8 +13,9 @@
 #ifndef LLVM_CLANG_LEX_TOKENLEXER_H
 #define LLVM_CLANG_LEX_TOKENLEXER_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/ArrayRef.h"
+#include <optional>
 
 namespace clang {
 

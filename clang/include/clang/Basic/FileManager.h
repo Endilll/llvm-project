@@ -20,18 +20,20 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
-#include "llvm/ADT/PointerUnion.h"
-#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
+#include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorOr.h"
-#include "llvm/Support/FileSystem.h"
+#include "llvm/Support/FileSystem/UniqueID.h"
 #include "llvm/Support/VirtualFileSystem.h"
+#include <cstdint>
 #include <ctime>
-#include <map>
 #include <memory>
-#include <string>
+#include <optional>
+#include <sys/types.h>
+#include <system_error>
+#include <utility>
 
 namespace llvm {
 

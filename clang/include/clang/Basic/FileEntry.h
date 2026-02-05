@@ -20,13 +20,17 @@
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/Hashing.h"
 #include "llvm/ADT/PointerUnion.h"
-#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringMapEntry.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/FileSystem/UniqueID.h"
 
-#include <optional>
-#include <utility>
+#include <cassert>
+#include <ctime>
+#include <memory>
+#include <string>
+#include <sys/types.h>
+#include <type_traits>
 
 namespace llvm {
 

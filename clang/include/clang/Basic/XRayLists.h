@@ -14,9 +14,8 @@
 
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/StringRef.h"
 #include <memory>
+#include <string>
 
 namespace llvm {
 class SpecialCaseList;

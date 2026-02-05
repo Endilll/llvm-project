@@ -15,7 +15,6 @@
 
 #include "clang/Basic/LLVM.h"
 #include "clang/Lex/Token.h"
-#include "llvm/ADT/ArrayRef.h"
 #include "llvm/Support/TrailingObjects.h"
 #include <vector>
 

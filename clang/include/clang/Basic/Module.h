@@ -17,23 +17,23 @@
 
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/PointerIntPair.h"
-#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Compiler.h"
 #include <array>
 #include <cassert>
 #include <cstdint>
 #include <ctime>
-#include <iterator>
 #include <optional>
 #include <string>
+#include <sys/types.h>
 #include <utility>
 #include <variant>
 #include <vector>

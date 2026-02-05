@@ -9,9 +9,7 @@
 #ifndef LLVM_CLANG_INDEX_INDEXINGOPTIONS_H
 #define LLVM_CLANG_INDEX_INDEXINGOPTIONS_H
 
-#include "clang/Frontend/FrontendOptions.h"
-#include <memory>
-#include <string>
+#include <functional>
 
 namespace clang {
 class Decl;

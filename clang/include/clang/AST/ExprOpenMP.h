@@ -14,7 +14,14 @@
 #define LLVM_CLANG_AST_EXPROPENMP_H
 
 #include "clang/AST/ComputeDependence.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/TrailingObjects.h"
 
 namespace clang {
 /// An explicit cast in C or a C-style cast in C++, which uses the syntax

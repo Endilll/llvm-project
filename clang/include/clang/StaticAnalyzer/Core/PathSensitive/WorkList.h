@@ -17,6 +17,7 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/BlockCounter.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
 #include <cassert>
+#include <memory>
 
 namespace clang {
 

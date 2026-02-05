@@ -33,7 +33,6 @@
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include <memory>
-#include <optional>
 #include <utility>
 
 namespace clang {

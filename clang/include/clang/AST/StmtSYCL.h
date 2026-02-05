@@ -12,10 +12,11 @@
 #ifndef LLVM_CLANG_AST_STMTSYCL_H
 #define LLVM_CLANG_AST_STMTSYCL_H
 
-#include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Stmt.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
+#include "llvm/Support/Compiler.h"
 
 namespace clang {
 

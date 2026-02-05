@@ -14,6 +14,9 @@
 #define LLVM_CLANG_AST_LOCINFOTYPE_H
 
 #include "clang/AST/Type.h"
+#include "clang/Basic/Diagnostic.h"
+#include <cassert>
+#include <string>
 
 namespace clang {
 

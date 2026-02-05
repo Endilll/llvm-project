@@ -10,8 +10,7 @@
 #define LLVM_CLANG_FRONTEND_SERIALIZEDDIAGNOSTICPRINTER_H
 
 #include "clang/Basic/LLVM.h"
-#include "clang/Frontend/SerializedDiagnostics.h"
-#include "llvm/Bitstream/BitstreamWriter.h"
+#include <memory>
 
 namespace llvm {
 class raw_ostream;

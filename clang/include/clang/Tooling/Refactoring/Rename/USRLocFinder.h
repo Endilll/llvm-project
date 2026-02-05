@@ -15,10 +15,11 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_RENAME_USRLOCFINDER_H
 #define LLVM_CLANG_TOOLING_REFACTORING_RENAME_USRLOCFINDER_H
 
-#include "clang/AST/AST.h"
-#include "clang/Tooling/Core/Replacement.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Refactoring/AtomicChange.h"
 #include "clang/Tooling/Refactoring/Rename/SymbolOccurrences.h"
+#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/StringRef.h"
 #include <string>
 #include <vector>

@@ -9,7 +9,10 @@
 #ifndef LLVM_CLANG_CODEGEN_CODEGENACTION_H
 #define LLVM_CLANG_CODEGEN_CODEGENACTION_H
 
+#include "clang/AST/ASTConsumer.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Frontend/FrontendAction.h"
+#include "llvm/Support/MemoryBufferRef.h"
 #include <memory>
 
 namespace llvm {

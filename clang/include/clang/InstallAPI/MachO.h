@@ -13,14 +13,17 @@
 #ifndef LLVM_CLANG_INSTALLAPI_MACHO_H
 #define LLVM_CLANG_INSTALLAPI_MACHO_H
 
+#include "llvm/BinaryFormat/MachO.h"
 #include "llvm/TextAPI/Architecture.h"
+#include "llvm/TextAPI/ArchitectureSet.h"
+#include "llvm/TextAPI/FileTypes.h"
 #include "llvm/TextAPI/InterfaceFile.h"
 #include "llvm/TextAPI/PackedVersion.h"
-#include "llvm/TextAPI/Platform.h"
-#include "llvm/TextAPI/RecordVisitor.h"
+#include "llvm/TextAPI/Record.h"
+#include "llvm/TextAPI/RecordsSlice.h"
 #include "llvm/TextAPI/Symbol.h"
+#include "llvm/TextAPI/SymbolSet.h"
 #include "llvm/TextAPI/Target.h"
-#include "llvm/TextAPI/TextAPIWriter.h"
 #include "llvm/TextAPI/Utils.h"
 
 using AliasMap = llvm::MachO::AliasMap;

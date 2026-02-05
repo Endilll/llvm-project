@@ -10,8 +10,7 @@
 #define LLVM_CLANG_AST_ABSTRACTTYPEREADER_H
 
 #include "clang/AST/AbstractBasicReader.h"
-#include "clang/AST/DeclObjC.h"
-#include "clang/AST/Type.h"
+#include "clang/Basic/CodeGenOptions.h"
 
 namespace clang {
 namespace serialization {

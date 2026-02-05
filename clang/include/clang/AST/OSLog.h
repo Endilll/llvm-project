@@ -16,6 +16,9 @@
 
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Expr.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/STLExtras.h"
+#include <cassert>
 
 namespace clang {
 namespace analyze_os_log {

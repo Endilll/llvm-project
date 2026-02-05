@@ -18,11 +18,8 @@
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringRef.h"
 #include <cassert>
 #include <cstdint>
-#include <string>
 #include <type_traits>
 #include <utility>
 

@@ -11,7 +11,9 @@
 #define LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMEANNOTATIONS_H
 
 #include "clang/AST/Attr.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/TypeBase.h"
 
 namespace clang ::lifetimes {
 

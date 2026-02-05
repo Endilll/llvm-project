@@ -9,6 +9,8 @@
 #define LLVM_CLANG_ANALYSIS_ISSUEHASH_H
 
 #include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include <string>
 
 namespace clang {
 class Decl;

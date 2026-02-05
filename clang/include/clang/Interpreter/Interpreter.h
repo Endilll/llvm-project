@@ -14,18 +14,24 @@
 #ifndef LLVM_CLANG_INTERPRETER_INTERPRETER_H
 #define LLVM_CLANG_INTERPRETER_INTERPRETER_H
 
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/GlobalDecl.h"
 #include "clang/Interpreter/IncrementalExecutor.h"
 #include "clang/Interpreter/PartialTranslationUnit.h"
 #include "clang/Interpreter/Value.h"
 
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/ExecutionEngine/JITSymbol.h"
-#include "llvm/ExecutionEngine/Orc/ExecutorProcessControl.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/ExecutionEngine/Orc/Shared/ExecutorAddress.h"
 #include "llvm/Support/Error.h"
-#include <cstdint>
+#include <array>
+#include <cstddef>
+#include <functional>
+#include <list>
 #include <memory>
+#include <optional>
+#include <string>
 #include <vector>
 
 namespace llvm {

@@ -9,7 +9,6 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_REFACTORINGRESULTCONSUMER_H
 #define LLVM_CLANG_TOOLING_REFACTORING_REFACTORINGRESULTCONSUMER_H
 
-#include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Refactoring/AtomicChange.h"
 #include "clang/Tooling/Refactoring/Rename/SymbolOccurrences.h"
 #include "llvm/Support/Error.h"

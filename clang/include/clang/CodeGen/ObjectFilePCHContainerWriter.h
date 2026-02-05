@@ -9,7 +9,10 @@
 #ifndef LLVM_CLANG_CODEGEN_OBJECTFILEPCHCONTAINEROPERATIONS_H
 #define LLVM_CLANG_CODEGEN_OBJECTFILEPCHCONTAINEROPERATIONS_H
 
-#include "clang/Frontend/PCHContainerOperations.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Serialization/PCHContainerOperations.h"
+#include <memory>
+#include <string>
 
 namespace clang {
 

@@ -14,7 +14,9 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CHECKERS_MPIFUNCTIONCLASSIFIER_H
 #define LLVM_CLANG_STATICANALYZER_CHECKERS_MPIFUNCTIONCLASSIFIER_H
 
-#include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace clang {
 namespace ento {

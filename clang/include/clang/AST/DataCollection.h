@@ -27,6 +27,13 @@
 #define LLVM_CLANG_AST_DATACOLLECTION_H
 
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/StringRef.h"
+#include <cstddef>
+#include <string>
+#include <type_traits>
 
 namespace clang {
 namespace data_collection {

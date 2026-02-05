@@ -15,6 +15,7 @@
 
 #include "clang/Analysis/PathDiagnostic.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 

@@ -9,7 +9,6 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTICPARSE_H
 #define LLVM_CLANG_BASIC_DIAGNOSTICPARSE_H
 
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticParseInterface.inc"
 
 #endif // LLVM_CLANG_BASIC_DIAGNOSTICPARSE_H

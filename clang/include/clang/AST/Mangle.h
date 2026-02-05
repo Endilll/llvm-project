@@ -14,12 +14,21 @@
 #define LLVM_CLANG_AST_MANGLE_H
 
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
 #include "clang/AST/GlobalDecl.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/ABI.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/UnsignedOrNone.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/Support/Casting.h"
+#include <cstdint>
+#include <memory>
 #include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace llvm {
 class raw_ostream;

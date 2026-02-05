@@ -12,8 +12,12 @@
 #include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Compiler.h"
+#include <cassert>
 #include <climits>
+#include <cstdint>
 #include <optional>
+#include <string>
 #include <vector>
 
 namespace llvm {

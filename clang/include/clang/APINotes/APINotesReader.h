@@ -16,9 +16,13 @@
 #define LLVM_CLANG_APINOTES_READER_H
 
 #include "clang/APINotes/Types.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/VersionTuple.h"
+#include <cassert>
 #include <memory>
+#include <optional>
+#include <utility>
 
 namespace clang {
 namespace api_notes {

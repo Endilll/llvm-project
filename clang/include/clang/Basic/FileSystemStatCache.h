@@ -16,16 +16,10 @@
 
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
-#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <cstdint>
-#include <ctime>
 #include <memory>
-#include <optional>
-#include <string>
-#include <utility>
+#include <system_error>
 
 namespace clang {
 

@@ -21,6 +21,7 @@
 #include "llvm/Support/raw_ostream.h"
 
 #include <memory>
+#include <optional>
 
 namespace clang {
 class FileEntry;

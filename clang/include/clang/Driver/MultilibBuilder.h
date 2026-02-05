@@ -10,7 +10,11 @@
 #ifndef LLVM_CLANG_DRIVER_MULTILIBBUILDER_H
 #define LLVM_CLANG_DRIVER_MULTILIBBUILDER_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Driver/Multilib.h"
+#include <cassert>
+#include <string>
+#include <vector>
 
 namespace clang {
 namespace driver {

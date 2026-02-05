@@ -12,7 +12,9 @@
 #include "clang/Driver/Types.h"
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
 #include "llvm/Transforms/Instrumentation/AddressSanitizerOptions.h"
+#include <cassert>
 #include <string>
 #include <vector>
 

@@ -10,6 +10,8 @@
 #define LLVM_CLANG_ANALYSIS_SELECTOREXTRAS_H
 
 #include "clang/AST/ASTContext.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
 
 namespace clang {
 

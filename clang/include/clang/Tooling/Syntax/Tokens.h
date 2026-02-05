@@ -34,11 +34,14 @@
 #include "clang/Lex/Token.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cstdint>
+#include <optional>
+#include <string>
 #include <tuple>
+#include <utility>
+#include <vector>
 
 namespace clang {
 class Preprocessor;

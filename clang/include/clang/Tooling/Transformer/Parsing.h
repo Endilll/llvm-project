@@ -16,11 +16,9 @@
 #ifndef LLVM_CLANG_TOOLING_TRANSFORMER_PARSING_H
 #define LLVM_CLANG_TOOLING_TRANSFORMER_PARSING_H
 
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/Basic/SourceLocation.h"
 #include "clang/Tooling/Transformer/RangeSelector.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
-#include <functional>
 
 namespace clang {
 namespace transformer {

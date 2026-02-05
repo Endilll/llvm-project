@@ -20,19 +20,19 @@
 #include "clang/AST/Type.h"
 #include "clang/Basic/AttrKinds.h"
 #include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/OpenMPKinds.h"
-#include "clang/Basic/Sanitizers.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Support/Compiler.h"
 #include "llvm/Frontend/HLSL/HLSLResource.h"
 #include "llvm/Support/CodeGen.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/VersionTuple.h"
-#include "llvm/Support/raw_ostream.h"
-#include <algorithm>
 #include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 namespace clang {
 class ASTContext;

@@ -9,7 +9,6 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTICAST_H
 #define LLVM_CLANG_BASIC_DIAGNOSTICAST_H
 
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticASTInterface.inc"
 
 #endif // LLVM_CLANG_BASIC_DIAGNOSTICAST_H

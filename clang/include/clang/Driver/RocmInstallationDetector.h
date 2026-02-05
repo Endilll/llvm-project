@@ -9,7 +9,20 @@
 #ifndef LLVM_CLANG_DRIVER_ROCMINSTALLATIONDETECTOR_H
 #define LLVM_CLANG_DRIVER_ROCMINSTALLATIONDETECTOR_H
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
 #include "clang/Driver/Driver.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/VersionTuple.h"
+#include <cassert>
+#include <map>
+#include <string>
+#include <vector>
 
 namespace clang {
 namespace driver {

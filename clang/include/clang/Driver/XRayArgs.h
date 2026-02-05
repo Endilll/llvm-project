@@ -10,8 +10,12 @@
 
 #include "clang/Basic/XRayInstr.h"
 #include "clang/Driver/Types.h"
+#include "llvm/ADT/ArrayRef.h"
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
+#include <string>
+#include <vector>
 
 namespace clang {
 namespace driver {

@@ -9,12 +9,17 @@
 #ifndef LLVM_CLANG_APINOTES_APINOTESMANAGER_H
 #define LLVM_CLANG_APINOTES_APINOTESMANAGER_H
 
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/VersionTuple.h"
+#include <cassert>
 #include <memory>
 #include <string>
 

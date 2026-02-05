@@ -10,13 +10,13 @@
 #define LLVM_CLANG_FRONTEND_FRONTENDOPTIONS_H
 
 #include "clang/AST/ASTDumperUtils.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangStandard.h"
 #include "clang/Frontend/CommandLineSourceLoc.h"
 #include "clang/Sema/CodeCompleteOptions.h"
 #include "clang/Serialization/ModuleFileExtension.h"
-#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/MemoryBufferRef.h"
 #include <cassert>
 #include <map>
 #include <memory>

@@ -11,9 +11,9 @@
 
 #include "clang/Basic/LLVM.h"
 #include "llvm/Bitstream/BitstreamReader.h"
-#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorOr.h"
 #include <system_error>
+#include <type_traits>
 
 namespace clang {
 namespace serialized_diags {

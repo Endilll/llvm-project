@@ -15,6 +15,9 @@
 #define LLVM_CLANG_AST_ASTIMPORTERROR_H
 
 #include "llvm/Support/Error.h"
+#include "llvm/Support/raw_ostream.h"
+#include <string>
+#include <system_error>
 
 namespace clang {
 

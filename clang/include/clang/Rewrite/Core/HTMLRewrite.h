@@ -14,7 +14,9 @@
 #ifndef LLVM_CLANG_REWRITE_CORE_HTMLREWRITE_H
 #define LLVM_CLANG_REWRITE_CORE_HTMLREWRITE_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
+#include <memory>
 #include <string>
 
 namespace llvm {

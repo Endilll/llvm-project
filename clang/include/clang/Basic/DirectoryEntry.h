@@ -18,12 +18,13 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/Hashing.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringMapEntry.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/PointerLikeTypeTraits.h"
 
-#include <optional>
+#include <cassert>
+#include <type_traits>
 #include <utility>
 
 namespace clang {

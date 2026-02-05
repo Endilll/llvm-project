@@ -17,8 +17,13 @@
 #ifndef LLVM_CLANG_LEX_DEPENDENCYDIRECTIVESSCANNER_H
 #define LLVM_CLANG_LEX_DEPENDENCYDIRECTIVESSCANNER_H
 
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/ArrayRef.h"
+#include <cstdint>
+#include <memory>
+#include <optional>
 
 namespace clang {
 class FileManager;

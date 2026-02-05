@@ -14,12 +14,33 @@
 #ifndef LLVM_CLANG_SERIALIZATION_ASTRECORDWRITER_H
 #define LLVM_CLANG_SERIALIZATION_ASTRECORDWRITER_H
 
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTConcept.h"
+#include "clang/AST/ASTUnresolvedSet.h"
 #include "clang/AST/AbstractBasicWriter.h"
+#include "clang/AST/Attrs.inc"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OpenACCClause.h"
 #include "clang/AST/OpenMPClause.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/UnsignedOrNone.h"
 #include "clang/Serialization/ASTReader.h"
 #include "clang/Serialization/ASTWriter.h"
-#include "clang/Serialization/SourceLocationEncoding.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 namespace clang {
 

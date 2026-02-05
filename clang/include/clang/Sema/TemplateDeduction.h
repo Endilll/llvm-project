@@ -14,6 +14,8 @@
 #ifndef LLVM_CLANG_SEMA_TEMPLATEDEDUCTION_H
 #define LLVM_CLANG_SEMA_TEMPLATEDEDUCTION_H
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/UnsignedOrNone.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/SemaConcept.h"
 #include "clang/AST/ASTConcept.h"
@@ -25,7 +27,6 @@
 #include "llvm/ADT/SmallVector.h"
 #include <cassert>
 #include <cstddef>
-#include <optional>
 #include <utility>
 
 namespace clang {

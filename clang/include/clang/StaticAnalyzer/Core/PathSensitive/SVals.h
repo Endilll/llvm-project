@@ -26,9 +26,11 @@
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Casting.h"
+#include "llvm/Support/Compiler.h"
 #include <cassert>
 #include <cstdint>
 #include <optional>
+#include <type_traits>
 #include <utility>
 
 //==------------------------------------------------------------------------==//

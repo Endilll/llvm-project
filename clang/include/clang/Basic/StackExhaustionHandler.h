@@ -16,6 +16,8 @@
 #define LLVM_CLANG_BASIC_STACK_EXHAUSTION_HANDLER_H
 
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 
 namespace clang {
 class StackExhaustionHandler {

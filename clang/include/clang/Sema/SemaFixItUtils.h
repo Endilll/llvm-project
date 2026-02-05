@@ -12,7 +12,13 @@
 #ifndef LLVM_CLANG_SEMA_SEMAFIXITUTILS_H
 #define LLVM_CLANG_SEMA_SEMAFIXITUTILS_H
 
+#include "clang/AST/DeclarationName.h"
 #include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Specifiers.h"
+#include <vector>
 
 namespace clang {
 

@@ -27,7 +27,11 @@
 #include "clang/Analysis/CFG.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/ImmutableMap.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Debug.h"
+#include <cstdint>
+#include <memory>
 
 namespace clang::lifetimes::internal {
 

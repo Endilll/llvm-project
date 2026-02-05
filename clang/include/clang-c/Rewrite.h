@@ -10,7 +10,7 @@
 #ifndef LLVM_CLANG_C_REWRITE_H
 #define LLVM_CLANG_C_REWRITE_H
 
-#include "clang-c/CXString.h"
+#include "clang-c/CXSourceLocation.h"
 #include "clang-c/ExternC.h"
 #include "clang-c/Index.h"
 #include "clang-c/Platform.h"

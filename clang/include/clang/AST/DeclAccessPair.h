@@ -18,8 +18,11 @@
 #define LLVM_CLANG_AST_DECLACCESSPAIR_H
 
 #include "clang/Basic/Specifiers.h"
-#include "llvm/Support/DataTypes.h"
+#include "llvm/ADT/bit.h"
 #include "llvm/Support/Endian.h"
+#include <cassert>
+#include <cstdint>
+#include <type_traits>
 
 namespace clang {
 

@@ -15,7 +15,6 @@
 #define LLVM_CLANG_C_BUILDSYSTEM_H
 
 #include "clang-c/CXErrorCode.h"
-#include "clang-c/CXString.h"
 #include "clang-c/ExternC.h"
 #include "clang-c/Platform.h"
 

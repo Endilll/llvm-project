@@ -14,12 +14,22 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_RENAME_RENAMINGACTION_H
 #define LLVM_CLANG_TOOLING_REFACTORING_RENAME_RENAMINGACTION_H
 
-#include "clang/Tooling/Refactoring.h"
+#include "clang/AST/Decl.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Tooling/Core/Replacement.h"
 #include "clang/Tooling/Refactoring/AtomicChange.h"
+#include "clang/Tooling/Refactoring/RefactoringActionRule.h"
 #include "clang/Tooling/Refactoring/RefactoringActionRules.h"
-#include "clang/Tooling/Refactoring/RefactoringOptions.h"
+#include "clang/Tooling/Refactoring/RefactoringRuleContext.h"
 #include "clang/Tooling/Refactoring/Rename/SymbolOccurrences.h"
 #include "llvm/Support/Error.h"
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace clang {
 class ASTConsumer;

@@ -17,8 +17,12 @@
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Type.h"
-#include "llvm/Support/TrailingObjects.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
 #include <cassert>
+#include <cstdint>
+#include <utility>
 
 namespace llvm {
   class IntegerType;

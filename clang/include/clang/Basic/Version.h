@@ -17,6 +17,7 @@
 
 #include "clang/Basic/Version.inc"
 #include "llvm/ADT/StringRef.h"
+#include <string>
 
 namespace clang {
   /// Retrieves the repository path (e.g., Subversion path) that

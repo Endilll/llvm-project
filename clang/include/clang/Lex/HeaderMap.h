@@ -13,14 +13,15 @@
 #ifndef LLVM_CLANG_LEX_HEADERMAP_H
 #define LLVM_CLANG_LEX_HEADERMAP_H
 
+#include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Lex/HeaderMapTypes.h"
 #include "llvm/ADT/StringMap.h"
-#include "llvm/Support/Compiler.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include <memory>
 #include <optional>
+#include <utility>
 
 namespace clang {
 

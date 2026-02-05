@@ -11,7 +11,8 @@
 
 #include "clang/Analysis/Scalable/Model/EntityId.h"
 #include "clang/Analysis/Scalable/Model/EntityName.h"
-#include <functional>
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include <cstddef>
 #include <map>
 
 namespace clang::ssaf {

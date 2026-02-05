@@ -12,9 +12,31 @@
 #ifndef LLVM_CLANG_SEMA_MULTIPLEXEXTERNALSEMASOURCE_H
 #define LLVM_CLANG_SEMA_MULTIPLEXEXTERNALSEMASOURCE_H
 
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclID.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/ExternalASTSource.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Sema/DeclSpec.h"
 #include "clang/Sema/ExternalSemaSource.h"
+#include "clang/Sema/TypoCorrection.h"
 #include "clang/Sema/Weak.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/SmallVector.h"
+#include <cstdint>
+#include <memory>
 #include <utility>
 
 namespace clang {

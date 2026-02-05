@@ -14,12 +14,18 @@
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_ASTOPS_H
 
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
 #include "clang/AST/DynamicRecursiveASTVisitor.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/Type.h"
+#include "clang/AST/TypeLoc.h"
 #include "clang/Analysis/FlowSensitive/StorageLocation.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/SetVector.h"
+#include <optional>
+#include <utility>
+#include <vector>
 
 namespace clang {
 namespace dataflow {

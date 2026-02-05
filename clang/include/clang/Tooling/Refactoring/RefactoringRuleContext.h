@@ -10,8 +10,14 @@
 #define LLVM_CLANG_TOOLING_REFACTORING_REFACTORINGRULECONTEXT_H
 
 #include "clang/Basic/DiagnosticError.h"
+#include "clang/Basic/PartialDiagnostic.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Tooling/Refactoring/ASTSelection.h"
+#include "llvm/Support/Error.h"
+#include <cassert>
+#include <memory>
+#include <utility>
 
 namespace clang {
 

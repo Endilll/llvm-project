@@ -10,11 +10,21 @@
 #define LLVM_CLANG_TOOLING_TRANSFORMER_TRANSFORMER_H_
 
 #include "clang/ASTMatchers/ASTMatchFinder.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Refactoring/AtomicChange.h"
 #include "clang/Tooling/Transformer/RewriteRule.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Error.h"
+#include <cassert>
+#include <cstddef>
 #include <functional>
+#include <memory>
+#include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace clang {
 namespace tooling {

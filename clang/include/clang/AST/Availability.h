@@ -13,10 +13,12 @@
 #ifndef LLVM_CLANG_AST_AVAILABILITY_H
 #define LLVM_CLANG_AST_AVAILABILITY_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/VersionTuple.h"
+#include <tuple>
 
 namespace clang {
 

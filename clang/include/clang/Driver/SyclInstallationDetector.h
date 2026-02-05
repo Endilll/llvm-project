@@ -10,6 +10,8 @@
 #define LLVM_CLANG_DRIVER_SYCLINSTALLATIONDETECTOR_H
 
 #include "clang/Driver/Driver.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
 
 namespace clang {
 namespace driver {

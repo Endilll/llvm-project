@@ -9,7 +9,6 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTICSERIALIZATION_H
 #define LLVM_CLANG_BASIC_DIAGNOSTICSERIALIZATION_H
 
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticSerializationInterface.inc"
 
 #endif // LLVM_CLANG_BASIC_DIAGNOSTICSERIALIZATION_H

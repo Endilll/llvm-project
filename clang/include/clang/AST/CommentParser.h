@@ -17,7 +17,10 @@
 #include "clang/AST/CommentLexer.h"
 #include "clang/AST/CommentSema.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "llvm/Support/Allocator.h"
+#include <iterator>
 
 namespace clang {
 class SourceManager;

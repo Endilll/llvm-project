@@ -9,7 +9,6 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTICINSTALLAPI_H
 #define LLVM_CLANG_BASIC_DIAGNOSTICINSTALLAPI_H
 
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticInstallAPIInterface.inc"
 
 #endif // LLVM_CLANG_BASIC_DIAGNOSTICINSTALLAPI_H

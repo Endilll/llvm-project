@@ -17,9 +17,11 @@
 #include "SVals.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Stmt.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
+#include <cassert>
 #include <optional>
-#include <tuple>
+#include <utility>
 
 namespace clang {
 

@@ -14,6 +14,7 @@
 #ifndef LLVM_CLANG_SERIALIZATION_ASTDESERIALIZATIONLISTENER_H
 #define LLVM_CLANG_SERIALIZATION_ASTDESERIALIZATIONLISTENER_H
 
+#include "clang/AST/DeclID.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Serialization/ASTBitCodes.h"
 

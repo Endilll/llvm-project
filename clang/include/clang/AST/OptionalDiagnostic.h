@@ -14,12 +14,11 @@
 #ifndef LLVM_CLANG_AST_OPTIONALDIAGNOSTIC_H
 #define LLVM_CLANG_AST_OPTIONALDIAGNOSTIC_H
 
-#include "clang/AST/APValue.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/PartialDiagnostic.h"
+#include "llvm/ADT/APFixedPoint.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APSInt.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

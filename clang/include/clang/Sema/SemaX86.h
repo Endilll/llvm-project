@@ -15,6 +15,7 @@
 
 #include "clang/AST/ASTFwd.h"
 #include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/SemaBase.h"
 
 namespace clang {

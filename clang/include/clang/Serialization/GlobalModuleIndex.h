@@ -21,7 +21,10 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
+#include <ctime>
 #include <memory>
+#include <string>
+#include <sys/types.h>
 #include <utility>
 
 namespace llvm {

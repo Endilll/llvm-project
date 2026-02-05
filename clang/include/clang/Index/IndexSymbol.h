@@ -11,8 +11,8 @@
 
 #include "clang/Basic/LLVM.h"
 #include "clang/Lex/MacroInfo.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/Support/DataTypes.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include <cstdint>
 
 namespace clang {
   class Decl;

@@ -16,6 +16,9 @@
 #include "clang/AST/ASTConsumer.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringRef.h"
+#include <memory>
+#include <optional>
+#include <utility>
 
 namespace llvm {
   class Constant;

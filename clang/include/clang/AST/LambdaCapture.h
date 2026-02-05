@@ -15,8 +15,12 @@
 #define LLVM_CLANG_AST_LAMBDACAPTURE_H
 
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/Lambda.h"
+#include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/PointerIntPair.h"
+#include <cassert>
 
 namespace clang {
 

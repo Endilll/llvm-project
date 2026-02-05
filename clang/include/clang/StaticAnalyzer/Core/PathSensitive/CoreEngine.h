@@ -26,9 +26,9 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/WorkList.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/iterator_range.h"
-#include "llvm/Support/Casting.h"
 #include <cassert>
 #include <memory>
+#include <optional>
 #include <utility>
 #include <vector>
 

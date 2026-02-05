@@ -9,11 +9,8 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_REFACTORINGOPTIONS_H
 #define LLVM_CLANG_TOOLING_REFACTORING_REFACTORINGOPTIONS_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Tooling/Refactoring/RefactoringActionRuleRequirements.h"
 #include "clang/Tooling/Refactoring/RefactoringOption.h"
 #include "clang/Tooling/Refactoring/RefactoringOptionVisitor.h"
-#include "llvm/Support/Error.h"
 #include <optional>
 #include <type_traits>
 

@@ -11,6 +11,7 @@
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APInt.h"
+#include <cstdint>
 
 namespace clang {
 class ASTContext;

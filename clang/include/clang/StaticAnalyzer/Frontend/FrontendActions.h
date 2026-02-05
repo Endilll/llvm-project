@@ -9,9 +9,11 @@
 #ifndef LLVM_CLANG_STATICANALYZER_FRONTEND_FRONTENDACTIONS_H
 #define LLVM_CLANG_STATICANALYZER_FRONTEND_FRONTENDACTIONS_H
 
+#include "clang/AST/ASTConsumer.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Frontend/FrontendAction.h"
 #include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
+#include <memory>
 
 namespace clang {
 

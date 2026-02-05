@@ -15,6 +15,7 @@
 #ifndef LLVM_CLANG_AST_PRETTYDECLSTACKTRACE_H
 #define LLVM_CLANG_AST_PRETTYDECLSTACKTRACE_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/Support/PrettyStackTrace.h"
 

@@ -16,8 +16,14 @@
 
 #include "clang/Basic/AttributeScopeInfo.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TokenKinds.h"
+#include "llvm/Support/Compiler.h"
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
 
 namespace clang {
 

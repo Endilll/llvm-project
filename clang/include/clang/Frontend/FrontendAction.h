@@ -23,10 +23,11 @@
 #include "clang/Frontend/ASTUnit.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendOptions.h"
-#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
+#include <cassert>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace clang {

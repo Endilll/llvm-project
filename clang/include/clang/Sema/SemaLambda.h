@@ -15,8 +15,9 @@
 #ifndef LLVM_CLANG_SEMA_SEMALAMBDA_H
 #define LLVM_CLANG_SEMA_SEMALAMBDA_H
 
-#include "clang/AST/ASTLambda.h"
-#include <optional>
+#include "clang/AST/Decl.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/UnsignedOrNone.h"
 
 namespace clang {
 namespace sema {

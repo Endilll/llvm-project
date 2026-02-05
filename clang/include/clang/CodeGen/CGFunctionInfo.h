@@ -17,12 +17,20 @@
 
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/CharUnits.h"
-#include "clang/AST/Decl.h"
 #include "clang/AST/Type.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/bit.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/ADT/FoldingSet.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
 #include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 namespace clang {
 namespace CodeGen {

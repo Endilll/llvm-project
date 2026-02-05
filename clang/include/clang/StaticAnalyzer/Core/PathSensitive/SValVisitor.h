@@ -14,9 +14,11 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SVALVISITOR_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SVALVISITOR_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
+#include "llvm/Support/ErrorHandling.h"
 
 namespace clang {
 

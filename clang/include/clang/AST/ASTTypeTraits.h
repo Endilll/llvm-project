@@ -18,12 +18,20 @@
 #include "clang/AST/ASTFwd.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/LambdaCapture.h"
-#include "clang/AST/NestedNameSpecifier.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/TemplateBase.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/Hashing.h"
 #include "llvm/Support/AlignOf.h"
+#include <cassert>
+#include <cstddef>
+#include <type_traits>
+#include <utility>
 
 namespace llvm {
 class raw_ostream;

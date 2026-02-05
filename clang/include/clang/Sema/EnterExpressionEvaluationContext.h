@@ -9,6 +9,7 @@
 #ifndef LLVM_CLANG_SEMA_ENTEREXPRESSIONEVALUATIONCONTEXT_H
 #define LLVM_CLANG_SEMA_ENTEREXPRESSIONEVALUATIONCONTEXT_H
 
+#include "clang/AST/Decl.h"
 #include "clang/Sema/Sema.h"
 
 namespace clang {

@@ -12,6 +12,7 @@
 #include "clang/AST/Comment.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
+#include <type_traits>
 
 namespace clang {
 namespace comments {

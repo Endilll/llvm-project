@@ -15,24 +15,32 @@
 #define LLVM_CLANG_EXTRACTAPI_EXTRACT_API_VISITOR_H
 
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/Availability.h"
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclObjCCommon.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/ParentMapContext.h"
+#include "clang/AST/RawCommentList.h"
 #include "clang/AST/RecursiveASTVisitor.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Module.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/Specifiers.h"
+#include "clang/Basic/Visibility.h"
 #include "clang/ExtractAPI/API.h"
 #include "clang/ExtractAPI/DeclarationFragments.h"
 #include "clang/ExtractAPI/TypedefUnderlyingTypeResolver.h"
 #include "clang/Index/USRGeneration.h"
-#include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Casting.h"
 #include <type_traits>
+#include <utility>
 
 namespace clang {
 namespace extractapi {

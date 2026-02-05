@@ -18,10 +18,13 @@
 
 #include "Replacement.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include <string>
+#include <vector>
 
 namespace clang {
 namespace tooling {

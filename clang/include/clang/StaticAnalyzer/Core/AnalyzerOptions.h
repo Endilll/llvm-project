@@ -16,10 +16,13 @@
 
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Compiler.h"
+#include <cassert>
+#include <cstddef>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>

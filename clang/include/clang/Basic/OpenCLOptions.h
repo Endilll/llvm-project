@@ -16,6 +16,8 @@
 
 #include "clang/Basic/LangOptions.h"
 #include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/ErrorHandling.h"
 
 namespace clang {
 

@@ -22,9 +22,9 @@
 #include "clang/Analysis/Analyses/ThreadSafetyUtil.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
 #include <cstdint>
-#include <ostream>
 
 namespace clang {
 namespace threadSafety {

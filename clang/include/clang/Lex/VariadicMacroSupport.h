@@ -15,8 +15,15 @@
 #ifndef LLVM_CLANG_LEX_VARIADICMACROSUPPORT_H
 #define LLVM_CLANG_LEX_VARIADICMACROSUPPORT_H
 
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/Token.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Compiler.h"
+#include <cassert>
 
 namespace clang {
   class Preprocessor;

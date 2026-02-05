@@ -15,11 +15,13 @@
 #ifndef LLVM_CLANG_TOOLING_TRANSFORMER_MATCHCONSUMER_H
 #define LLVM_CLANG_TOOLING_TRANSFORMER_MATCHCONSUMER_H
 
-#include "clang/AST/ASTTypeTraits.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Errc.h"
 #include "llvm/Support/Error.h"
+#include <functional>
+#include <string>
 
 namespace clang {
 namespace transformer {

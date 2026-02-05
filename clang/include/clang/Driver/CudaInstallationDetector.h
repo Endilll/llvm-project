@@ -10,8 +10,14 @@
 #define LLVM_CLANG_DRIVER_CUDAINSTALLATIONDETECTOR_H
 
 #include "clang/Basic/Cuda.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OffloadArch.h"
 #include "clang/Driver/Driver.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
 #include <bitset>
+#include <string>
 
 namespace clang {
 namespace driver {

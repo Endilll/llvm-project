@@ -17,10 +17,15 @@
 #ifndef LLVM_CLANG_DRIVER_OFFLOADBUNDLER_H
 #define LLVM_CLANG_DRIVER_OFFLOADBUNDLER_H
 
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Compression.h"
 #include "llvm/Support/Error.h"
 #include "llvm/TargetParser/Triple.h"
+#include <cstddef>
+#include <cstdint>
 #include <llvm/Support/MemoryBuffer.h>
+#include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 

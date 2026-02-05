@@ -14,9 +14,15 @@
 #ifndef LLVM_CLANG_FRONTEND_SARIFDIAGNOSTIC_H
 #define LLVM_CLANG_FRONTEND_SARIFDIAGNOSTIC_H
 
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/Sarif.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Frontend/DiagnosticRenderer.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
+#include <utility>
 
 namespace clang {
 

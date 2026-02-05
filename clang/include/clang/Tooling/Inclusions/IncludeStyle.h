@@ -10,6 +10,7 @@
 #define LLVM_CLANG_TOOLING_INCLUSIONS_INCLUDESTYLE_H
 
 #include "llvm/Support/YAMLTraits.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 

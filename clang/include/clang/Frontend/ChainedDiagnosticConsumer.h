@@ -11,6 +11,7 @@
 
 #include "clang/Basic/Diagnostic.h"
 #include <memory>
+#include <utility>
 
 namespace clang {
 class LangOptions;

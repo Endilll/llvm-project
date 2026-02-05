@@ -17,9 +17,9 @@
 
 #include "clang/Basic/CommentOptions.h"
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 
 namespace clang {

@@ -13,7 +13,6 @@
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Edit/FileOffset.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
 
 namespace clang {

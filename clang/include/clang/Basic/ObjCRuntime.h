@@ -15,7 +15,9 @@
 #define LLVM_CLANG_BASIC_OBJCRUNTIME_H
 
 #include "clang/Basic/LLVM.h"
+#include "llvm/ADT/Hashing.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/bit.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/HashBuilder.h"
 #include "llvm/Support/VersionTuple.h"

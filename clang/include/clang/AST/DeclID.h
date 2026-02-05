@@ -19,6 +19,8 @@
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/Hashing.h"
 #include "llvm/ADT/iterator.h"
+#include <cstdint>
+#include <iterator>
 
 namespace clang {
 

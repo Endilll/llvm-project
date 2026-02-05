@@ -25,11 +25,15 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/FoldingSet.h"
-#include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
+#include "llvm/Support/Compiler.h"
+#include <cassert>
+#include <cstdint>
 #include <functional>
 #include <memory>
+#include <optional>
+#include <string>
 
 namespace clang {
 

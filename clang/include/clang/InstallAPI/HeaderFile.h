@@ -14,13 +14,17 @@
 #define LLVM_CLANG_INSTALLAPI_HEADERFILE_H
 
 #include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangStandard.h"
 #include "clang/InstallAPI/MachO.h"
-#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Regex.h"
+#include <memory>
 #include <optional>
 #include <string>
+#include <tuple>
+#include <vector>
 
 namespace clang::installapi {
 enum class HeaderType {

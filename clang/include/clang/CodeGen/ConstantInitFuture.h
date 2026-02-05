@@ -19,6 +19,10 @@
 
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/IR/Constant.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/PointerLikeTypeTraits.h"
+#include <cassert>
 
 // Forward-declare ConstantInitBuilderBase and give it a
 // PointerLikeTypeTraits specialization so that we can safely use it

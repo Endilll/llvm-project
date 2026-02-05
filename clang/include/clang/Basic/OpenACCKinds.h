@@ -18,6 +18,7 @@
 #include "llvm/ADT/BitmaskEnum.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
+#include <cstdint>
 
 namespace clang {
 LLVM_ENABLE_BITMASK_ENUMS_IN_NAMESPACE();

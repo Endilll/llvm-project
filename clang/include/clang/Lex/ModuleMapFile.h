@@ -9,15 +9,18 @@
 #ifndef LLVM_CLANG_LEX_MODULEMAPFILE_H
 #define LLVM_CLANG_LEX_MODULEMAPFILE_H
 
+#include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/LLVM.h"
 // TODO: Consider moving ModuleId to another header, parsing a modulemap file is
 //   intended to not depend on anything about the clang::Module class.
 #include "clang/Basic/Module.h"
 #include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Compiler.h"
 
+#include <cstdint>
 #include <optional>
 #include <variant>
+#include <vector>
 
 namespace clang {
 

@@ -15,17 +15,26 @@
 #ifndef LLVM_CLANG_ANALYSIS_RETAINSUMMARYMANAGER_H
 #define LLVM_CLANG_ANALYSIS_RETAINSUMMARYMANAGER_H
 
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/ImmutableMap.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
-#include "clang/AST/ParentMap.h"
 #include "clang/Analysis/AnyCall.h"
 #include "clang/Analysis/SelectorExtras.h"
-#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/Allocator.h"
 #include <optional>
+#include <utility>
 
 using namespace clang;
 

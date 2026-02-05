@@ -14,7 +14,6 @@
 #define LLVM_CLANG_TESTING_COMMANDLINEARGS_H
 
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/StringRef.h"
 #include <string>
 #include <vector>
 

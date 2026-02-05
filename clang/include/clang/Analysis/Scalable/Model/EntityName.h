@@ -13,6 +13,7 @@
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringRef.h"
 #include <string>
+#include <tuple>
 
 namespace clang::ssaf {
 /// Uniquely identifies an entity in a program.

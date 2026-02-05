@@ -10,8 +10,8 @@
 #define LLVM_CLANG_ANALYSIS_SCALABLE_ASTENTITYMAPPING_H
 
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/Analysis/Scalable/Model/EntityName.h"
-#include "llvm/ADT/StringRef.h"
 #include <optional>
 
 namespace clang::ssaf {

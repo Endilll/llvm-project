@@ -15,8 +15,12 @@
 #ifndef LLVM_CLANG_EXTRACTAPI_FRONTEND_ACTIONS_H
 #define LLVM_CLANG_EXTRACTAPI_FRONTEND_ACTIONS_H
 
+#include "clang/AST/ASTConsumer.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/ExtractAPI/ExtractAPIActionBase.h"
 #include "clang/Frontend/FrontendAction.h"
+#include <memory>
+#include <utility>
 
 namespace clang {
 

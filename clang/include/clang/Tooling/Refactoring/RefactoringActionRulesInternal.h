@@ -15,7 +15,11 @@
 #include "clang/Tooling/Refactoring/RefactoringResultConsumer.h"
 #include "clang/Tooling/Refactoring/RefactoringRuleContext.h"
 #include "llvm/Support/Error.h"
+#include <cstddef>
+#include <memory>
+#include <tuple>
 #include <type_traits>
+#include <utility>
 
 namespace clang {
 namespace tooling {

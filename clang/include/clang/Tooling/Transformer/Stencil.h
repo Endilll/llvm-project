@@ -20,14 +20,12 @@
 #ifndef LLVM_CLANG_TOOLING_TRANSFORMER_STENCIL_H_
 #define LLVM_CLANG_TOOLING_TRANSFORMER_STENCIL_H_
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTTypeTraits.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/Tooling/Transformer/MatchConsumer.h"
 #include "clang/Tooling/Transformer/RangeSelector.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/Support/Error.h"
+#include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace clang {

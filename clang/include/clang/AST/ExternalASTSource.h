@@ -16,15 +16,16 @@
 
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclID.h"
+#include "clang/AST/TemplateName.h"
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/ArrayRef.h"
+#include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/PointerUnion.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/iterator.h"
 #include "llvm/Support/PointerLikeTypeTraits.h"
+#include "llvm/Support/SwapByteOrder.h"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -32,7 +33,6 @@
 #include <iterator>
 #include <new>
 #include <optional>
-#include <utility>
 
 namespace clang {
 

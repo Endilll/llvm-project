@@ -10,6 +10,7 @@
 #define LLVM_CLANG_BASIC_ATTRIBUTES_H
 
 #include "clang/Basic/AttributeCommonInfo.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

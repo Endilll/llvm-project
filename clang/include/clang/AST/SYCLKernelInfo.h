@@ -16,6 +16,7 @@
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Type.h"
+#include <string>
 
 namespace clang {
 

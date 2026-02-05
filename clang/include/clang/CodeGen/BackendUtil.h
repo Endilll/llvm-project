@@ -10,7 +10,6 @@
 #define LLVM_CLANG_CODEGEN_BACKENDUTIL_H
 
 #include "clang/Basic/LLVM.h"
-#include "llvm/IR/ModuleSummaryIndex.h"
 #include <memory>
 
 namespace llvm {

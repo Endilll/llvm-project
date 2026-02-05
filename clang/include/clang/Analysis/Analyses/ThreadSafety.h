@@ -18,8 +18,8 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_THREADSAFETY_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_THREADSAFETY_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

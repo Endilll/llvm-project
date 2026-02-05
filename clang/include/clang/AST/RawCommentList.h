@@ -10,11 +10,14 @@
 #define LLVM_CLANG_AST_RAWCOMMENTLIST_H
 
 #include "clang/Basic/CommentOptions.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/Allocator.h"
+#include "llvm/Support/Compiler.h"
 #include <map>
+#include <string>
+#include <vector>
 
 namespace clang {
 

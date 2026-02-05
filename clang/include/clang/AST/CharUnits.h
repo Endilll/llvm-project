@@ -15,8 +15,9 @@
 
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/Support/Alignment.h"
-#include "llvm/Support/DataTypes.h"
 #include "llvm/Support/MathExtras.h"
+#include <cassert>
+#include <cstdint>
 
 namespace clang {
 

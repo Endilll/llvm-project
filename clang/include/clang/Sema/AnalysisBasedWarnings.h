@@ -15,7 +15,11 @@
 
 #include "clang/AST/Decl.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/LifetimeStats.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/ScopeInfo.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/Support/Compiler.h"
+#include <map>
 #include <memory>
 
 namespace clang {

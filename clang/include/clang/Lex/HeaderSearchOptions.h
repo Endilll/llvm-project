@@ -12,9 +12,11 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/CachedHashString.h"
 #include "llvm/ADT/SetVector.h"
-#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/HashBuilder.h"
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <string>
 #include <vector>

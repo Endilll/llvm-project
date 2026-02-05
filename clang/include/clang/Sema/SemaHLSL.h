@@ -15,16 +15,24 @@
 
 #include "clang/AST/ASTFwd.h"
 #include "clang/AST/Attr.h"
+#include "clang/AST/OperationKinds.h"
 #include "clang/AST/Type.h"
 #include "clang/AST/TypeLoc.h"
-#include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
+#include "clang/Sema/Ownership.h"
 #include "clang/Sema/SemaBase.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringSet.h"
+#include "llvm/Frontend/HLSL/HLSLRootSignature.h"
+#include "llvm/Support/DXILABI.h"
 #include "llvm/TargetParser/Triple.h"
+#include <cassert>
+#include <cstdint>
 #include <initializer_list>
+#include <optional>
+#include <utility>
 
 namespace clang {
 class AttributeCommonInfo;

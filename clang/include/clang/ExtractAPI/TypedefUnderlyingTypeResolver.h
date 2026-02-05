@@ -18,6 +18,7 @@
 
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/ExtractAPI/API.h"
 
 #include <string>

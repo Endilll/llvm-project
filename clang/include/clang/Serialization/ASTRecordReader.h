@@ -14,14 +14,42 @@
 #ifndef LLVM_CLANG_SERIALIZATION_ASTRECORDREADER_H
 #define LLVM_CLANG_SERIALIZATION_ASTRECORDREADER_H
 
+#include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/ASTFwd.h"
+#include "clang/AST/ASTUnresolvedSet.h"
 #include "clang/AST/AbstractBasicReader.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/Attrs.inc"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclID.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/UnsignedOrNone.h"
 #include "clang/Lex/Token.h"
+#include "clang/Serialization/ASTBitCodes.h"
 #include "clang/Serialization/ASTReader.h"
-#include "clang/Serialization/SourceLocationEncoding.h"
+#include "clang/Serialization/ModuleFile.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APInt.h"
-#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Bitstream/BitstreamReader.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
 
 namespace clang {
 class OpenACCClause;

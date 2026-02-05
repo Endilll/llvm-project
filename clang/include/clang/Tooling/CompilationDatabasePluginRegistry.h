@@ -9,9 +9,12 @@
 #ifndef LLVM_CLANG_TOOLING_COMPILATIONDATABASEPLUGINREGISTRY_H
 #define LLVM_CLANG_TOOLING_COMPILATIONDATABASEPLUGINREGISTRY_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Support/Compiler.h"
 #include "clang/Tooling/CompilationDatabase.h"
 #include "llvm/Support/Registry.h"
+#include <memory>
+#include <string>
 
 namespace clang {
 namespace tooling {

@@ -9,8 +9,12 @@
 #ifndef LLVM_CLANG_INDEX_INDEXDATACONSUMER_H
 #define LLVM_CLANG_INDEX_INDEXDATACONSUMER_H
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Index/IndexSymbol.h"
 #include "clang/Lex/Preprocessor.h"
+#include <memory>
 
 namespace clang {
   class ASTContext;

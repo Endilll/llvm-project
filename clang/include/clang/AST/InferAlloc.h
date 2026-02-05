@@ -15,6 +15,7 @@
 
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
 #include "llvm/Support/AllocToken.h"
 #include <optional>
 

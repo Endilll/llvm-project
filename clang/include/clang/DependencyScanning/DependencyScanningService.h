@@ -13,6 +13,9 @@
 #include "clang/DependencyScanning/InProcessModuleCache.h"
 #include "llvm/ADT/BitmaskEnum.h"
 #include "llvm/Support/Chrono.h"
+#include "llvm/Support/MathExtras.h"
+#include <chrono>
+#include <ctime>
 
 namespace clang {
 namespace dependencies {

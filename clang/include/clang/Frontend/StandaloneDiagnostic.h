@@ -14,12 +14,12 @@
 #ifndef LLVM_CLANG_FRONTEND_STANDALONEDIAGNOSTICS_H
 #define LLVM_CLANG_FRONTEND_STANDALONEDIAGNOSTICS_H
 
+#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
-#include "clang/Basic/Specifiers.h"
-#include "llvm/ADT/StringExtras.h"
+#include "llvm/ADT/StringMap.h"
 #include <cassert>
 #include <string>
 #include <vector>

@@ -33,7 +33,10 @@
 
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/Support/MathExtras.h"
+#include <cassert>
 #include <climits>
+#include <cstdint>
+#include <utility>
 
 namespace clang {
 

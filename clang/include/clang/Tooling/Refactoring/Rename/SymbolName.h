@@ -10,9 +10,9 @@
 #define LLVM_CLANG_TOOLING_REFACTORING_RENAME_SYMBOLNAME_H
 
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringRef.h"
+#include <cassert>
+#include <string>
 
 namespace clang {
 namespace tooling {

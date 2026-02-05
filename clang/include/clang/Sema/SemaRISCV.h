@@ -15,6 +15,7 @@
 
 #include "clang/AST/ASTFwd.h"
 #include "clang/AST/Type.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/SemaBase.h"
 #include "llvm/ADT/StringMap.h"

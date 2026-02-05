@@ -15,14 +15,19 @@
 #define LLVM_CLANG_CROSSTU_CROSSTRANSLATIONUNIT_H
 
 #include "clang/AST/ASTImporterSharedState.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/Analysis/MacroExpansionContext.h"
 #include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/Path.h"
+#include <memory>
 #include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
 
 namespace clang {
 class CompilerInstance;

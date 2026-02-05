@@ -16,11 +16,11 @@
 #define LLVM_CLANG_TOOLING_TRANSFORMER_RANGESELECTOR_H
 
 #include "clang/ASTMatchers/ASTMatchFinder.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Tooling/Transformer/MatchConsumer.h"
-#include "llvm/Support/Error.h"
-#include <functional>
 #include <string>
+#include <utility>
 
 namespace clang {
 namespace transformer {

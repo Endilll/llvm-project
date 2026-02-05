@@ -14,14 +14,13 @@
 #ifndef LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_VALUE_H
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_VALUE_H
 
-#include "clang/AST/Decl.h"
 #include "clang/Analysis/FlowSensitive/Formula.h"
 #include "clang/Analysis/FlowSensitive/StorageLocation.h"
-#include "llvm/ADT/DenseMap.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 #include <cassert>
-#include <utility>
 
 namespace clang {
 namespace dataflow {

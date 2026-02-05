@@ -12,6 +12,7 @@
 #include "clang/Basic/LLVM.h"
 
 #include <ctime>
+#include <memory>
 
 namespace llvm {
 class AdvisoryLock;

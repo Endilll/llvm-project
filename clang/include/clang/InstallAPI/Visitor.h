@@ -13,12 +13,25 @@
 #ifndef LLVM_CLANG_INSTALLAPI_VISITOR_H
 #define LLVM_CLANG_INSTALLAPI_VISITOR_H
 
+#include "clang/AST/ASTConsumer.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/GlobalDecl.h"
 #include "clang/AST/Mangle.h"
 #include "clang/AST/RecursiveASTVisitor.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Frontend/FrontendActions.h"
 #include "clang/InstallAPI/Context.h"
+#include "clang/InstallAPI/HeaderFile.h"
+#include "clang/Lex/Preprocessor.h"
 #include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/TextAPI/Record.h"
+#include <memory>
+#include <optional>
+#include <string>
 
 namespace clang {
 struct AvailabilityInfo;

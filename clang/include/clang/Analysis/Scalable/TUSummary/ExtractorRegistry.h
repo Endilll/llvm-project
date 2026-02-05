@@ -17,10 +17,12 @@
 #ifndef LLVM_CLANG_ANALYSIS_SCALABLE_TUSUMMARY_EXTRACTORREGISTRY_H
 #define LLVM_CLANG_ANALYSIS_SCALABLE_TUSUMMARY_EXTRACTORREGISTRY_H
 
+#include "clang/AST/ASTConsumer.h"
 #include "clang/Analysis/Scalable/TUSummary/TUSummaryExtractor.h"
 #include "clang/Support/Compiler.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Registry.h"
+#include <memory>
 
 namespace clang::ssaf {
 

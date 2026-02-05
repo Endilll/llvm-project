@@ -15,7 +15,6 @@
 #define LLVM_CLANG_C_CXERRORCODE_H
 
 #include "clang-c/ExternC.h"
-#include "clang-c/Platform.h"
 
 LLVM_CLANG_C_EXTERN_C_BEGIN
 

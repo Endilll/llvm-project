@@ -14,8 +14,10 @@
 #ifndef LLVM_CLANG_SEMA_DESIGNATOR_H
 #define LLVM_CLANG_SEMA_DESIGNATOR_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/SmallVector.h"
+#include <cassert>
 
 namespace clang {
 

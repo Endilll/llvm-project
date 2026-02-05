@@ -16,11 +16,12 @@
 #define LLVM_CLANG_AST_ODRHASH_H
 
 #include "clang/AST/DeclarationName.h"
+#include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
 #include "clang/AST/TemplateBase.h"
+#include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/FoldingSet.h"
-#include "llvm/ADT/PointerUnion.h"
 #include "llvm/ADT/SmallVector.h"
 
 namespace clang {

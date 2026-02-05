@@ -19,6 +19,8 @@
 #include "clang/ExtractAPI/APIIgnoresList.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "llvm/Support/raw_ostream.h"
+#include <memory>
+#include <string>
 
 namespace clang {
 

@@ -20,11 +20,11 @@
 #include "clang/Basic/PartialDiagnostic.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/DeclSpec.h"
-#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/Support/Casting.h"
 #include <cstddef>
 #include <limits>
+#include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>

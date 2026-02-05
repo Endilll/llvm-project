@@ -16,8 +16,10 @@
 #define LLVM_CLANG_C_DOCUMENTATION_H
 
 #include "clang-c/CXErrorCode.h"
+#include "clang-c/CXString.h"
 #include "clang-c/ExternC.h"
 #include "clang-c/Index.h"
+#include "clang-c/Platform.h"
 
 LLVM_CLANG_C_EXTERN_C_BEGIN
 

@@ -9,7 +9,6 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTICREFACTORING_H
 #define LLVM_CLANG_BASIC_DIAGNOSTICREFACTORING_H
 
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticRefactoringInterface.inc"
 
 #endif // LLVM_CLANG_BASIC_DIAGNOSTICREFACTORING_H

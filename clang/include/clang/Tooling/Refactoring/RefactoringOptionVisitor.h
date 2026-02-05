@@ -9,9 +9,10 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_REFACTORINGOPTIONVISITOR_H
 #define LLVM_CLANG_TOOLING_REFACTORING_REFACTORINGOPTIONVISITOR_H
 
-#include "clang/Basic/LLVM.h"
 #include <optional>
+#include <string>
 #include <type_traits>
+#include <utility>
 
 namespace clang {
 namespace tooling {

@@ -13,10 +13,15 @@
 #ifndef LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_CNFFORMULA_H
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_CNFFORMULA_H
 
+#include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 
 #include "clang/Analysis/FlowSensitive/Formula.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
 
 namespace clang {
 namespace dataflow {

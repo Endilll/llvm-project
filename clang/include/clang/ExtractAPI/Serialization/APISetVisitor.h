@@ -14,7 +14,9 @@
 #ifndef LLVM_CLANG_EXTRACTAPI_SERIALIZATION_SERIALIZERBASE_H
 #define LLVM_CLANG_EXTRACTAPI_SERIALIZATION_SERIALIZERBASE_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/ExtractAPI/API.h"
+#include "llvm/Support/ErrorHandling.h"
 
 namespace clang {
 namespace extractapi {

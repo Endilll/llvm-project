@@ -14,8 +14,11 @@
 #define LLVM_CLANG_TOOLING_TRANSFORMER_SOURCECODE_H
 
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TokenKinds.h"
+#include "llvm/Support/Error.h"
 #include <optional>
 
 namespace clang {

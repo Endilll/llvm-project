@@ -24,8 +24,11 @@
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Tooling/Syntax/TokenManager.h"
 #include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
 #include <cstdint>
+#include <iterator>
+#include <string>
 #include <vector>
 
 namespace clang {

@@ -14,12 +14,16 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_ATOMICCHANGE_H
 #define LLVM_CLANG_TOOLING_REFACTORING_ATOMICCHANGE_H
 
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Format/Format.h"
 #include "clang/Tooling/Core/Replacement.h"
 #include "llvm/ADT/Any.h"
+#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
+#include <string>
+#include <vector>
 
 namespace clang {
 namespace tooling {

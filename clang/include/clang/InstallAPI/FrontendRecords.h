@@ -11,8 +11,14 @@
 
 #include "clang/AST/Availability.h"
 #include "clang/AST/DeclObjC.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/InstallAPI/HeaderFile.h"
 #include "clang/InstallAPI/MachO.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/TargetParser/Triple.h"
+#include "llvm/TextAPI/RecordsSlice.h"
+#include <utility>
 
 namespace clang {
 namespace installapi {

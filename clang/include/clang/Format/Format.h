@@ -14,14 +14,21 @@
 #ifndef LLVM_CLANG_FORMAT_FORMAT_H
 #define LLVM_CLANG_FORMAT_FORMAT_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Tooling/Core/Replacement.h"
 #include "clang/Tooling/Inclusions/IncludeStyle.h"
-#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/Regex.h"
 #include "llvm/Support/SourceMgr.h"
+#include <cstdint>
+#include <map>
+#include <memory>
 #include <optional>
+#include <string>
 #include <system_error>
+#include <type_traits>
+#include <vector>
 
 namespace llvm {
 namespace vfs {

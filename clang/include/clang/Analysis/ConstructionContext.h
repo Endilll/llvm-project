@@ -16,9 +16,20 @@
 #ifndef LLVM_CLANG_ANALYSIS_CONSTRUCTIONCONTEXT_H
 #define LLVM_CLANG_ANALYSIS_CONSTRUCTIONCONTEXT_H
 
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/Stmt.h"
 #include "clang/Analysis/Support/BumpVector.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprObjC.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <iterator>
+#include <tuple>
 
 namespace clang {
 

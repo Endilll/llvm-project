@@ -15,10 +15,11 @@
 #define LLVM_CLANG_AST_ASTSTRUCTURALEQUIVALENCE_H
 
 #include "clang/AST/DeclBase.h"
-#include "llvm/ADT/DenseMap.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/UnsignedOrNone.h"
 #include "llvm/ADT/DenseSet.h"
-#include <optional>
 #include <queue>
+#include <tuple>
 #include <utility>
 
 namespace clang {

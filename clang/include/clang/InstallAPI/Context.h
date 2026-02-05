@@ -10,11 +10,18 @@
 #define LLVM_CLANG_INSTALLAPI_CONTEXT_H
 
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangStandard.h"
 #include "clang/InstallAPI/DylibVerifier.h"
 #include "clang/InstallAPI/HeaderFile.h"
 #include "clang/InstallAPI/MachO.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/StringRef.h"
+#include <memory>
+#include <optional>
+#include <string>
 
 namespace clang {
 namespace installapi {

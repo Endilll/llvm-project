@@ -11,8 +11,11 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_UTILS_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_UTILS_H
 
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/ImmutableMap.h"
 #include "llvm/ADT/ImmutableSet.h"
+#include <cstdint>
 
 namespace clang::lifetimes::internal::utils {
 

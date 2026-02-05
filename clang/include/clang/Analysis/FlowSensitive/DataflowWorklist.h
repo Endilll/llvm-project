@@ -14,7 +14,10 @@
 
 #include "clang/Analysis/Analyses/IntervalPartition.h"
 #include "clang/Analysis/Analyses/PostOrderCFGView.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/CFG.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/BitVector.h"
 #include "llvm/ADT/PriorityQueue.h"
 
 namespace clang {

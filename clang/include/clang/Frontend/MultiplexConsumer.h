@@ -14,8 +14,15 @@
 #ifndef LLVM_CLANG_FRONTEND_MULTIPLEXCONSUMER_H
 #define LLVM_CLANG_FRONTEND_MULTIPLEXCONSUMER_H
 
-#include "clang/Basic/LLVM.h"
+#include "clang/AST/APNumericStorage.h"
+#include "clang/AST/ASTConsumer.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/DeclID.h"
+#include "clang/Basic/IdentifierTable.h"
 #include "clang/Sema/SemaConsumer.h"
+#include "clang/Serialization/ASTBitCodes.h"
 #include "clang/Serialization/ASTDeserializationListener.h"
 #include <memory>
 #include <vector>

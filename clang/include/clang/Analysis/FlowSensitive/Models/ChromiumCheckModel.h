@@ -13,6 +13,7 @@
 #define CLANG_ANALYSIS_FLOWSENSITIVE_MODELS_CHROMIUMCHECKMODEL_H
 
 #include "clang/AST/DeclCXX.h"
+#include "clang/Analysis/CFG.h"
 #include "clang/Analysis/FlowSensitive/DataflowAnalysis.h"
 #include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
 #include "llvm/ADT/DenseSet.h"

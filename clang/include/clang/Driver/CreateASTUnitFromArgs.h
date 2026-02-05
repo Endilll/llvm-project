@@ -13,7 +13,13 @@
 #ifndef LLVM_CLANG_DRIVER_CREATEASTUNITFROMARGS_H
 #define LLVM_CLANG_DRIVER_CREATEASTUNITFROMARGS_H
 
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
 #include "clang/Frontend/ASTUnit.h"
+#include <memory>
+#include <optional>
 
 namespace clang {
 

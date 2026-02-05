@@ -17,7 +17,6 @@
 #define LLVM_CLANG_TOOLING_ARGUMENTSADJUSTERS_H
 
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/StringRef.h"
 #include <functional>
 #include <string>
 #include <vector>

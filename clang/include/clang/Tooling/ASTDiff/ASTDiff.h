@@ -19,8 +19,14 @@
 #ifndef LLVM_CLANG_TOOLING_ASTDIFF_ASTDIFF_H
 #define LLVM_CLANG_TOOLING_ASTDIFF_ASTDIFF_H
 
+#include "clang/AST/APNumericStorage.h"
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Tooling/ASTDiff/ASTDiffInternal.h"
+#include <memory>
 #include <optional>
+#include <string>
+#include <utility>
 
 namespace clang {
 namespace diff {

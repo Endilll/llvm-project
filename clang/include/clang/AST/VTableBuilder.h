@@ -15,13 +15,21 @@
 
 #include "clang/AST/BaseSubobject.h"
 #include "clang/AST/CXXInheritance.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclCXX.h"
 #include "clang/AST/GlobalDecl.h"
 #include "clang/AST/RecordLayout.h"
 #include "clang/Basic/ABI.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/Thunk.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
+#include <tuple>
 #include <utility>
 
 namespace clang {

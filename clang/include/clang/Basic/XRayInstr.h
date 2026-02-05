@@ -15,8 +15,6 @@
 #define LLVM_CLANG_BASIC_XRAYINSTR_H
 
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/MathExtras.h"
 #include <cassert>
 #include <cstdint>
 

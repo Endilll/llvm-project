@@ -16,9 +16,21 @@
 #ifndef LLVM_CLANG_AST_DYNAMIC_RECURSIVE_AST_VISITOR_H
 #define LLVM_CLANG_AST_DYNAMIC_RECURSIVE_AST_VISITOR_H
 
+#include "clang/AST/ASTConcept.h"
 #include "clang/AST/Attr.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclarationName.h"
 #include "clang/AST/ExprConcepts.h"
+#include "clang/AST/LambdaCapture.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
+#include "clang/Basic/LLVM.h"
+#include <type_traits>
 
 namespace clang {
 class ASTContext;

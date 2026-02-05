@@ -9,13 +9,13 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_REFACTORINGACTIONRULEREQUIREMENTS_H
 #define LLVM_CLANG_TOOLING_REFACTORING_REFACTORINGACTIONRULEREQUIREMENTS_H
 
+#include "clang/Basic/DiagnosticRefactoring.h"
 #include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Tooling/Refactoring/ASTSelection.h"
-#include "clang/Tooling/Refactoring/RefactoringDiagnostic.h"
 #include "clang/Tooling/Refactoring/RefactoringOption.h"
 #include "clang/Tooling/Refactoring/RefactoringRuleContext.h"
-#include "llvm/Support/Error.h"
-#include <type_traits>
+#include <memory>
 
 namespace clang {
 namespace tooling {

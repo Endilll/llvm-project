@@ -14,11 +14,12 @@
 #define LLVM_CLANG_LEX_LEXHLSLROOTSIGNATURE_H
 
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/LLVM.h"
 
-#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/StringSwitch.h"
+#include <cctype>
+#include <cstdint>
+#include <optional>
 
 namespace clang {
 namespace hlsl {

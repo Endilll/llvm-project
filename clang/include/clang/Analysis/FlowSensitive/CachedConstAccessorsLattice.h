@@ -22,6 +22,7 @@
 #include "clang/Analysis/FlowSensitive/Value.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
+#include <cassert>
 
 namespace clang {
 namespace dataflow {

@@ -12,6 +12,10 @@
 #include "clang/AST/ASTContext.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/ADT/StringRef.h"
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <optional>
 
 namespace llvm {
 class raw_ostream;

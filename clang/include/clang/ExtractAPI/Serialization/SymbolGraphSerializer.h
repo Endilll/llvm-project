@@ -17,19 +17,17 @@
 #ifndef LLVM_CLANG_EXTRACTAPI_SERIALIZATION_SYMBOLGRAPHSERIALIZER_H
 #define LLVM_CLANG_EXTRACTAPI_SERIALIZATION_SYMBOLGRAPHSERIALIZER_H
 
+#include "clang/Basic/LLVM.h"
 #include "clang/ExtractAPI/API.h"
 #include "clang/ExtractAPI/APIIgnoresList.h"
 #include "clang/ExtractAPI/Serialization/APISetVisitor.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/StringSet.h"
 #include "llvm/ADT/Twine.h"
 #include "llvm/Support/JSON.h"
-#include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/raw_ostream.h"
+#include <memory>
 #include <optional>
 
 namespace clang {

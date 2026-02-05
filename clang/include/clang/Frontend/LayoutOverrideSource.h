@@ -9,10 +9,12 @@
 #ifndef LLVM_CLANG_FRONTEND_LAYOUTOVERRIDESOURCE_H
 #define LLVM_CLANG_FRONTEND_LAYOUTOVERRIDESOURCE_H
 
+#include "clang/AST/CharUnits.h"
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
+#include <cstdint>
 
 namespace clang {
   /// An external AST source that overrides the layout of

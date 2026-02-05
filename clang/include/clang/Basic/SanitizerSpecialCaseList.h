@@ -16,9 +16,9 @@
 
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Sanitizers.h"
-#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/SpecialCaseList.h"
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 

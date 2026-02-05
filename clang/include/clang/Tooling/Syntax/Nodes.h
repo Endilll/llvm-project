@@ -23,6 +23,8 @@
 
 #include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Syntax/Tree.h"
+#include <cstdint>
+#include <vector>
 namespace clang {
 namespace syntax {
 

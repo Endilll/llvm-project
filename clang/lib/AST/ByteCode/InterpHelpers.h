@@ -12,6 +12,7 @@
 #include "DynamicAllocator.h"
 #include "InterpState.h"
 #include "Pointer.h"
+#include "clang/Basic/DiagnosticAST.h"
 
 namespace clang {
 class CallExpr;

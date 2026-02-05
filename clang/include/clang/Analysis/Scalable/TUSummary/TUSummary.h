@@ -16,6 +16,7 @@
 #include "clang/Analysis/Scalable/TUSummary/EntitySummary.h"
 #include <map>
 #include <memory>
+#include <utility>
 
 namespace clang::ssaf {
 

@@ -15,16 +15,21 @@
 #define LLVM_CLANG_ANALYSIS_CFG_H
 
 #include "clang/AST/Attr.h"
+#include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprObjC.h"
+#include "clang/AST/Stmt.h"
 #include "clang/Analysis/ConstructionContext.h"
 #include "clang/Analysis/Support/BumpVector.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/GraphTraits.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
 #include <bitset>
 #include <cassert>
@@ -32,6 +37,7 @@
 #include <iterator>
 #include <memory>
 #include <optional>
+#include <type_traits>
 #include <vector>
 
 namespace clang {

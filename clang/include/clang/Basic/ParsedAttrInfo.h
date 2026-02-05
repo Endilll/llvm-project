@@ -17,11 +17,17 @@
 
 #include "clang/Basic/AttrSubjectMatchRules.h"
 #include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Support/Compiler.h"
-#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/Registry.h"
 #include <climits>
+#include <cstddef>
 #include <list>
+#include <memory>
+#include <utility>
 
 namespace clang {
 

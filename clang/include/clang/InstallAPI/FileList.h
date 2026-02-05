@@ -18,6 +18,7 @@
 #include "clang/InstallAPI/HeaderFile.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/MemoryBuffer.h"
+#include <memory>
 
 namespace clang {
 namespace installapi {

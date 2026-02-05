@@ -14,18 +14,20 @@
 #ifndef LLVM_CLANG_ANALYSIS_PROGRAMPOINT_H
 #define LLVM_CLANG_ANALYSIS_PROGRAMPOINT_H
 
+#include "clang/AST/Stmt.h"
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/CFG.h"
-#include "llvm/ADT/DenseMap.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/PointerIntPair.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/Casting.h"
-#include "llvm/Support/DataTypes.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/raw_ostream.h"
 #include <cassert>
+#include <cstdint>
 #include <optional>
 #include <string>
-#include <utility>
 
 namespace clang {
 

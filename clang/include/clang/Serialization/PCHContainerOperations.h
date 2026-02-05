@@ -12,8 +12,12 @@
 #include "clang/Basic/Module.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/MemoryBufferRef.h"
+#include <cassert>
 #include <memory>
+#include <string>
+#include <utility>
 
 namespace llvm {
 class raw_pwrite_stream;

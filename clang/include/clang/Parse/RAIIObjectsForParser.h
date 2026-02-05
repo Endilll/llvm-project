@@ -14,11 +14,21 @@
 #ifndef LLVM_CLANG_PARSE_RAIIOBJECTSFORPARSER_H
 #define LLVM_CLANG_PARSE_RAIIOBJECTSFORPARSER_H
 
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticParse.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/TokenKinds.h"
 #include "clang/Parse/Parser.h"
+#include "clang/Sema/DeclSpec.h"
 #include "clang/Sema/DelayedDiagnostic.h"
-#include "clang/Sema/ParsedTemplate.h"
+#include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Sema.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <utility>
 
 namespace clang {
   // TODO: move ParsingClassDefinition here.

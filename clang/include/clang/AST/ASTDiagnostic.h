@@ -11,7 +11,9 @@
 
 #include "clang/AST/Type.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticAST.h"
+#include "clang/Basic/LLVM.h"
+#include <cstdint>
+#include <string>
 
 namespace clang {
   /// DiagnosticsEngine argument formatting function for diagnostics that

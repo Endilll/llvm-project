@@ -10,6 +10,7 @@
 #define LLVM_CLANG_ANALYSIS_SCALABLE_TUSUMMARY_ENTITYSUMMARY_H
 
 #include "clang/Analysis/Scalable/Model/SummaryName.h"
+#include <utility>
 
 namespace clang::ssaf {
 

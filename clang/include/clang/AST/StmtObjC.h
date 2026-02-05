@@ -13,7 +13,13 @@
 #define LLVM_CLANG_AST_STMTOBJC_H
 
 #include "clang/AST/Stmt.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Compiler.h"
+#include "llvm/Support/TrailingObjects.h"
+#include <cassert>
+#include <cstddef>
 
 namespace clang {
 

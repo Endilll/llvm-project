@@ -14,14 +14,20 @@
 #ifndef LLVM_CLANG_SEMA_SEMAOPENACC_H
 #define LLVM_CLANG_SEMA_SEMAOPENACC_H
 
+#include "clang/AST/ASTFwd.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/DeclGroup.h"
+#include "clang/AST/Expr.h"
 #include "clang/AST/OpenACCClause.h"
-#include "clang/AST/StmtOpenACC.h"
+#include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OpenACCKinds.h"
 #include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/UnsignedOrNone.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Compiler.h"
 #include <cassert>

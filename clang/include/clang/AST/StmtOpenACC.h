@@ -15,9 +15,13 @@
 
 #include "clang/AST/OpenACCClause.h"
 #include "clang/AST/Stmt.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/OpenACCKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/TrailingObjects.h"
+#include <cassert>
+#include <cstddef>
 #include <memory>
 
 namespace clang {

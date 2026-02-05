@@ -9,7 +9,6 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTICCOMMENT_H
 #define LLVM_CLANG_BASIC_DIAGNOSTICCOMMENT_H
 
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticCommentInterface.inc"
 
 #endif // LLVM_CLANG_BASIC_DIAGNOSTICCOMMENT_H

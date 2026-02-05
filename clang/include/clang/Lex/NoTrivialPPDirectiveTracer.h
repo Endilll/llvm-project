@@ -13,7 +13,14 @@
 #ifndef LLVM_CLANG_LEX_NO_TRIVIAL_PPDIRECTIVE_TRACER_H
 #define LLVM_CLANG_LEX_NO_TRIVIAL_PPDIRECTIVE_TRACER_H
 
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/ModuleLoader.h"
 #include "clang/Lex/PPCallbacks.h"
+#include "clang/Lex/Pragma.h"
 
 namespace clang {
 class Preprocessor;

@@ -15,9 +15,12 @@
 #ifndef LLVM_CLANG_ANALYSES_DATAFLOW_VALUES
 #define LLVM_CLANG_ANALYSES_DATAFLOW_VALUES
 
+#include "clang/AST/Stmt.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Analysis/ProgramPoint.h"
 #include "llvm/ADT/DenseMap.h"
+#include <cassert>
+#include <cstddef>
 
 namespace clang {
 

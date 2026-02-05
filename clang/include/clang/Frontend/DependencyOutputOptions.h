@@ -10,7 +10,9 @@
 #define LLVM_CLANG_FRONTEND_DEPENDENCYOUTPUTOPTIONS_H
 
 #include "clang/Basic/HeaderInclude.h"
+#include "llvm/Support/Compiler.h"
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace clang {

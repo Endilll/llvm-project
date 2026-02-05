@@ -15,12 +15,16 @@
 #define LLVM_CLANG_LEX_PPCALLBACKS_H
 
 #include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/FileEntry.h"
 #include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Module.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Lex/ModuleLoader.h"
 #include "clang/Lex/Pragma.h"
-#include "llvm/ADT/StringRef.h"
+#include <memory>
+#include <utility>
 
 namespace clang {
 class Token;

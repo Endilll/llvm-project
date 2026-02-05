@@ -16,6 +16,7 @@
 #define LLVM_CLANG_BASIC_TARGETCXXABI_H
 
 #include <map>
+#include <string>
 
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringMap.h"

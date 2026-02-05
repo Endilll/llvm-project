@@ -16,6 +16,7 @@
 
 #include "clang/Basic/Linkage.h"
 #include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/Support/Compiler.h"
 #include <cassert>
 #include <cstdint>
 

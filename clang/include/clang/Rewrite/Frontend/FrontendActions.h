@@ -9,8 +9,11 @@
 #ifndef LLVM_CLANG_REWRITE_FRONTEND_FRONTENDACTIONS_H
 #define LLVM_CLANG_REWRITE_FRONTEND_FRONTENDACTIONS_H
 
+#include "clang/AST/ASTConsumer.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Frontend/FrontendAction.h"
-#include "llvm/Support/raw_ostream.h"
+#include <memory>
+#include <utility>
 
 namespace clang {
 class FixItRewriter;

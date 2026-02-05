@@ -16,7 +16,12 @@
 #include "clang/AST/ASTImporter.h"
 #include "clang/AST/ASTImporterSharedState.h"
 #include "clang/AST/ExternalASTSource.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/raw_ostream.h"
+#include <map>
+#include <memory>
+#include <vector>
 
 namespace clang {
 

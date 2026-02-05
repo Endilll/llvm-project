@@ -17,7 +17,6 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/DenseMap.h"
-#include <array>
 #include <cassert>
 #include <optional>
 #include <vector>

@@ -11,6 +11,7 @@
 
 #include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Refactoring/RefactoringActionRules.h"
+#include <memory>
 #include <vector>
 
 namespace clang {

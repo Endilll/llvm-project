@@ -15,10 +15,17 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CALLDESCRIPTION_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CALLDESCRIPTION_H
 
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/Support/Compiler.h"
+#include <cstddef>
+#include <initializer_list>
+#include <iterator>
 #include <optional>
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace clang {

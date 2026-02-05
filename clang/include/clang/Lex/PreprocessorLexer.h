@@ -15,6 +15,7 @@
 #define LLVM_CLANG_LEX_PREPROCESSORLEXER_H
 
 #include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/MultipleIncludeOpt.h"
 #include "clang/Lex/Token.h"

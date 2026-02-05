@@ -15,17 +15,15 @@
 #define LLVM_CLANG_AST_GLOBALDECL_H
 
 #include "clang/AST/Attr.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclOpenACC.h"
 #include "clang/AST/DeclOpenMP.h"
-#include "clang/AST/DeclTemplate.h"
 #include "clang/Basic/ABI.h"
-#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/PointerIntPair.h"
-#include "llvm/Support/Casting.h"
-#include "llvm/Support/type_traits.h"
 #include <cassert>
 
 namespace clang {

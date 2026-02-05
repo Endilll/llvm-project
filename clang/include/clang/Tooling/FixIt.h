@@ -20,6 +20,9 @@
 #define LLVM_CLANG_TOOLING_FIXIT_H
 
 #include "clang/AST/ASTContext.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 
 namespace clang {
 namespace tooling {

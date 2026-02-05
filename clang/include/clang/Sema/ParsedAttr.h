@@ -14,20 +14,29 @@
 #ifndef LLVM_CLANG_SEMA_PARSEDATTR_H
 #define LLVM_CLANG_SEMA_PARSEDATTR_H
 
+#include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/AttrSubjectMatchRules.h"
 #include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/AttributeScopeInfo.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/ParsedAttrInfo.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/Ownership.h"
 #include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator.h"
 #include "llvm/Support/Allocator.h"
-#include "llvm/Support/VersionTuple.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/TrailingObjects.h"
 #include <bitset>
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <iterator>
 #include <utility>
 
 namespace clang {

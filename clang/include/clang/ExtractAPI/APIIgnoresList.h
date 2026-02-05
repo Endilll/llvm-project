@@ -15,13 +15,17 @@
 #define LLVM_CLANG_API_IGNORES_LIST_H
 
 #include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
 
 #include <memory>
+#include <string>
 #include <system_error>
+#include <utility>
+#include <vector>
 
 namespace llvm {
 class MemoryBuffer;

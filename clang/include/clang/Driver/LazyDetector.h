@@ -11,6 +11,7 @@
 
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
+#include "llvm/TargetParser/Triple.h"
 #include <optional>
 
 namespace clang {
