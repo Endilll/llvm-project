@@ -8,6 +8,7 @@
 
 #include "InterpFrame.h"
 #include "Boolean.h"
+#include "Integral.h"
 #include "ByteCode/Descriptor.h"
 #include "ByteCode/Source.h"
 #include "Function.h"

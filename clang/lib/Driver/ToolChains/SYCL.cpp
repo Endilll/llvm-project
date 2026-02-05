@@ -9,7 +9,6 @@
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Action.h"
-#include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/SyclInstallationDetector.h"
 #include "clang/Driver/ToolChain.h"
@@ -24,7 +23,6 @@
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;
-using namespace clang::driver::tools;
 using namespace clang;
 using namespace llvm::opt;
 

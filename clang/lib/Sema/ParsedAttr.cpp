@@ -12,6 +12,7 @@
 
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclObjC.h"
 #include "clang/Basic/AttrSubjectMatchRules.h"
 #include "clang/Basic/AttributeCommonInfo.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -20,7 +21,7 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/ParsedAttrInfo.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Sema/SemaInternal.h"
+#include "clang/Sema/Sema.h"
 #include "clang/Sema/Ownership.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"

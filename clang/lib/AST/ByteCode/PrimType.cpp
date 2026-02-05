@@ -10,6 +10,7 @@
 #include "Boolean.h"
 #include "FixedPoint.h"
 #include "Floating.h"
+#include "Integral.h"
 #include "IntegralAP.h"
 #include "MemberPointer.h"
 #include "Pointer.h"

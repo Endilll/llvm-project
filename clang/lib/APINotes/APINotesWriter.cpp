@@ -9,7 +9,7 @@
 #include "clang/APINotes/APINotesWriter.h"
 #include "APINotesFormat.h"
 #include "clang/APINotes/Types.h"
-#include "clang/Basic/FileManager.h"
+#include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
