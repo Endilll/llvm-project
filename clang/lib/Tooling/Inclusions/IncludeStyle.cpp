@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Inclusions/IncludeStyle.h"
+#include "llvm/Support/YAMLTraits.h"
 
 using clang::tooling::IncludeStyle;
 

@@ -10,8 +10,17 @@
 #include "CGHLSLRuntime.h"
 #include "CodeGenModule.h"
 #include "TargetInfo.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/Type.h"
-#include <climits>
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Frontend/HLSL/HLSLResource.h"
+#include "llvm/IR/DerivedTypes.h"
+#include <cassert>
+#include <cstdint>
+#include <string>
+#include <utility>
 
 //===----------------------------------------------------------------------===//
 // Implementation of constant buffer layout common between DirectX and

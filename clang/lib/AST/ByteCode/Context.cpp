@@ -8,6 +8,8 @@
 
 #include "Context.h"
 #include "Boolean.h"
+#include "ByteCode/Record.h"
+#include "ByteCode/State.h"
 #include "ByteCodeEmitter.h"
 #include "Compiler.h"
 #include "EvalEmitter.h"
@@ -19,8 +21,25 @@
 #include "PrimType.h"
 #include "Program.h"
 #include "clang/AST/ASTLambda.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/DiagnosticAST.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string.h>
+#include <string>
+#include <utility>
 
 using namespace clang;
 using namespace clang::interp;

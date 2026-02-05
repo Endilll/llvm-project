@@ -11,13 +11,26 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Refactoring.h"
+#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Format/Format.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
 #include "clang/Lex/Lexer.h"
 #include "clang/Rewrite/Core/Rewriter.h"
+#include "clang/Serialization/PCHContainerOperations.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "clang/Tooling/Tooling.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/raw_ostream.h"
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace clang {
 namespace tooling {

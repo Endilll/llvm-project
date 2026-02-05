@@ -8,6 +8,8 @@
 
 #include "InterpFrame.h"
 #include "Boolean.h"
+#include "ByteCode/Descriptor.h"
+#include "ByteCode/Source.h"
 #include "Function.h"
 #include "InterpStack.h"
 #include "InterpState.h"
@@ -16,8 +18,22 @@
 #include "PrimType.h"
 #include "Program.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/ExprCXX.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OperatorKinds.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/StringExtras.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <utility>
 
 using namespace clang;
 using namespace clang::interp;

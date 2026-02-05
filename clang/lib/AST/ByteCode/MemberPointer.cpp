@@ -7,10 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "MemberPointer.h"
+#include "ByteCode/InterpBlock.h"
+#include "ByteCode/Pointer.h"
 #include "Context.h"
 #include "FunctionPointer.h"
 #include "Program.h"
 #include "Record.h"
+#include "clang/AST/Decl.h"
+#include "clang/Basic/LLVM.h"
+#include <cassert>
+#include <optional>
 
 namespace clang {
 namespace interp {

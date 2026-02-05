@@ -11,6 +11,9 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Tooling/FixIt.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/Lexer.h"
 
 namespace clang {

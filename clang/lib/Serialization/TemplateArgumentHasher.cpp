@@ -12,10 +12,17 @@
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/DeclarationName.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeVisitor.h"
 #include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/Support/TimeProfiler.h"
+#include <cassert>
 
 using namespace clang;
 

@@ -13,10 +13,24 @@
 #include "clang/Analysis/CloneDetection.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/DataCollection.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprCXX.h"
 #include "clang/AST/StmtVisitor.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/MD5.h"
 #include "llvm/Support/Path.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 

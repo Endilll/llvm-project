@@ -11,8 +11,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "Lanai.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/MacroBuilder.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <string>
 
 using namespace clang;
 using namespace clang::targets;

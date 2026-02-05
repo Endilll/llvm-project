@@ -6,9 +6,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Tooling/CompilationDatabase.h"
 #include "clang/Tooling/Tooling.h"
+#include <cassert>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace clang {
 namespace tooling {

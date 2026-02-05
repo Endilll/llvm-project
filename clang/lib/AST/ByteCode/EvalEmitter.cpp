@@ -7,10 +7,29 @@
 //===----------------------------------------------------------------------===//
 
 #include "EvalEmitter.h"
+#include "ByteCode/Descriptor.h"
+#include "ByteCode/EvaluationResult.h"
+#include "ByteCode/Function.h"
+#include "ByteCode/InterpBlock.h"
+#include "ByteCode/InterpHelpers.h"
+#include "ByteCode/Pointer.h"
+#include "ByteCode/PrimType.h"
+#include "ByteCode/Source.h"
 #include "Context.h"
 #include "IntegralAP.h"
 #include "Interp.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <utility>
 
 using namespace clang;
 using namespace clang::interp;

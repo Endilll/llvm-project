@@ -14,21 +14,24 @@
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/Stmt.h"
 #include "clang/Analysis/ProgramPoint.h"
+#include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/JsonSupport.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Driver/DriverDiagnostic.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CoreEngine.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ExprEngine.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/TimeProfiler.h"
+#include "llvm/Support/raw_ostream.h"
 #include <cassert>
 #include <optional>
+#include <string>
 #include <vector>
 
 using namespace clang;

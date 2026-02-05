@@ -7,7 +7,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/FlowSensitive/SimplifyConstraints.h"
+#include "clang/Analysis/FlowSensitive/Arena.h"
+#include "clang/Analysis/FlowSensitive/Formula.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/EquivalenceClasses.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <algorithm>
+#include <utility>
 
 namespace clang {
 namespace dataflow {

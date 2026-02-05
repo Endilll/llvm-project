@@ -10,11 +10,39 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Address.h"
+#include "CGBuilder.h"
+#include "CGCall.h"
+#include "CGValue.h"
 #include "CodeGenFunction.h"
+#include "CodeGenModule.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetBuiltins.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/IntrinsicsRISCV.h"
+#include "llvm/IR/MDBuilder.h"
+#include "llvm/IR/Metadata.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/Alignment.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/RISCVISAInfo.h"
 #include "llvm/TargetParser/RISCVTargetParser.h"
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <utility>
 
 using namespace clang;
 using namespace CodeGen;

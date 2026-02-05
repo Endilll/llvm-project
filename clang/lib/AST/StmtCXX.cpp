@@ -13,6 +13,15 @@
 #include "clang/AST/StmtCXX.h"
 
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/STLExtras.h"
+#include <cassert>
+#include <cstddef>
+#include <memory>
 
 using namespace clang;
 

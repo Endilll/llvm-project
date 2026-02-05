@@ -8,6 +8,7 @@
 
 #include "Descriptor.h"
 #include "Boolean.h"
+#include "ByteCode/InitMap.h"
 #include "FixedPoint.h"
 #include "Floating.h"
 #include "IntegralAP.h"
@@ -16,7 +17,16 @@
 #include "PrimType.h"
 #include "Record.h"
 #include "Source.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/ExprCXX.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 using namespace clang;
 using namespace clang::interp;

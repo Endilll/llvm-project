@@ -12,12 +12,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Interpreter/Value.h"
-#include "InterpreterUtils.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Type.h"
 #include "clang/Interpreter/Interpreter.h"
+#include "llvm/ADT/APInt.h"
 #include "llvm/ADT/StringExtras.h"
+#include "llvm/ExecutionEngine/Orc/Shared/ExecutorAddress.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/raw_ostream.h"
 #include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <string>
 #include <utility>
 
 using namespace clang;

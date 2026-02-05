@@ -6,7 +6,15 @@
 //
 //==------------------------------------------------------------------------==//
 #include "SPIRVOpenMP.h"
+#include "ToolChains/SPIRV.h"
+#include "clang/Driver/Action.h"
 #include "clang/Driver/CommonArgs.h"
+#include "clang/Driver/Driver.h"
+#include "clang/Driver/ToolChain.h"
+#include "clang/Options/Options.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

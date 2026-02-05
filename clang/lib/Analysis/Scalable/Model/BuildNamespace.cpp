@@ -8,6 +8,7 @@
 
 #include "clang/Analysis/Scalable/Model/BuildNamespace.h"
 #include "llvm/Support/ErrorHandling.h"
+#include <optional>
 #include <tuple>
 
 namespace clang::ssaf {

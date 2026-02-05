@@ -7,10 +7,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/BugReporter/BugSuppression.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/Attrs.inc"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclTemplate.h"
 #include "clang/AST/DynamicRecursiveASTVisitor.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/TimeProfiler.h"
+#include <cassert>
+#include <string>
+#include <utility>
 
 using namespace clang;
 using namespace ento;

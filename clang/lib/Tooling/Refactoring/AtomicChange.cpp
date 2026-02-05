@@ -7,9 +7,25 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Refactoring/AtomicChange.h"
-#include "clang/Tooling/ReplacementsYaml.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Format/Format.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "llvm/ADT/Any.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/YAMLTraits.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <climits>
 #include <string>
+#include <utility>
+#include <vector>
 
 LLVM_YAML_IS_SEQUENCE_VECTOR(clang::tooling::AtomicChange)
 

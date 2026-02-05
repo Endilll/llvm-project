@@ -11,23 +11,55 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Address.h"
+#include "CGBuilder.h"
 #include "CGCUDARuntime.h"
 #include "CGCXXABI.h"
+#include "CGCall.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
+#include "clang/AST/Attrs.inc"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Cuda.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/CodeGen/CodeGenABITypes.h"
 #include "clang/CodeGen/ConstantInitBuilder.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Frontend/Offloading/Utility.h"
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/Attributes.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/GlobalAlias.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/IR/ReplaceConstant.h"
+#include "llvm/IR/User.h"
+#include "llvm/Object/OffloadBinary.h"
+#include "llvm/Support/Alignment.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Format.h"
 #include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/Support/raw_ostream.h"
+#include <algorithm>
+#include <cassert>
+#include <cinttypes>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
 
 using namespace clang;
 using namespace CodeGen;

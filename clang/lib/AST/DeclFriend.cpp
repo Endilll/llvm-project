@@ -16,8 +16,10 @@
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclID.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include <cassert>
 #include <cstddef>
 

@@ -13,9 +13,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Address.h"
+#include "CGBuilder.h"
 #include "CGCXXABI.h"
+#include "CGCall.h"
 #include "CGCleanup.h"
 #include "CGObjCRuntime.h"
+#include "CGValue.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
 #include "CodeGenTypes.h"
@@ -23,20 +27,47 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclObjCCommon.h"
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/StmtObjC.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/ObjCRuntime.h"
 #include "clang/Basic/SourceManager.h"
+#include "clang/Basic/Visibility.h"
 #include "clang/CodeGen/ConstantInitBuilder.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
+#include "llvm/IR/Attributes.h"
+#include "llvm/IR/Constants.h"
 #include "llvm/IR/DataLayout.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/GlobalAlias.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/MDBuilder.h"
+#include "llvm/IR/Metadata.h"
 #include "llvm/IR/Module.h"
-#include "llvm/Support/Compiler.h"
 #include "llvm/Support/ConvertUTF.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MathExtras.h"
+#include "llvm/Support/ModRef.h"
+#include <cassert>
 #include <cctype>
+#include <cstdint>
+#include <functional>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 using namespace CodeGen;

@@ -11,7 +11,14 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Basic/SanitizerSpecialCaseList.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Sanitizers.h"
 #include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 

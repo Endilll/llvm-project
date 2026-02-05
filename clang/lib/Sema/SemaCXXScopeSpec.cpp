@@ -12,14 +12,36 @@
 
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DeclarationName.h"
 #include "clang/AST/ExprCXX.h"
-#include "clang/AST/NestedNameSpecifier.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/PartialDiagnostic.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Specifiers.h"
 #include "clang/Sema/DeclSpec.h"
 #include "clang/Sema/Lookup.h"
+#include "clang/Sema/Ownership.h"
+#include "clang/Sema/Scope.h"
+#include "clang/Sema/Sema.h"
 #include "clang/Sema/Template.h"
+#include "clang/Sema/TypoCorrection.h"
 #include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <cstring>
+#include <memory>
+#include <optional>
 using namespace clang;
 
 /// Find the current instantiation that associated with the given type.

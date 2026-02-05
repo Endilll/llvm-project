@@ -16,6 +16,7 @@
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DependenceFlags.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
@@ -26,13 +27,29 @@
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MemAlloc.h"
 #include "llvm/Support/raw_ostream.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
+#include <optional>
 
 using namespace clang;
+
+CXXRecordDecl *NestedNameSpecifier::getAsRecordDecl() const {
+  switch (getKind()) {
+  case Kind::MicrosoftSuper:
+    return getAsMicrosoftSuper();
+  case Kind::Type:
+    return getAsType()->getAsCXXRecordDecl();
+  case Kind::Global:
+  case Kind::Namespace:
+  case Kind::Null:
+    return nullptr;
+  }
+  llvm_unreachable("Invalid NNS Kind!");
+}
 
 const NamespaceAndPrefixStorage *
 NestedNameSpecifier::MakeNamespaceAndPrefixStorage(

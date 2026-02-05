@@ -12,6 +12,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "SortJavaScriptImports.h"
+#include "FormatToken.h"
 #include "TokenAnalyzer.h"
 #include "TokenAnnotator.h"
 #include "clang/Basic/Diagnostic.h"
@@ -20,10 +21,17 @@
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Format/Format.h"
+#include "clang/Tooling/Core/Replacement.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Debug.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <iterator>
 #include <string>
+#include <tuple>
+#include <utility>
 
 #define DEBUG_TYPE "format-formatter"
 

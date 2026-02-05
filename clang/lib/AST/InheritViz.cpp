@@ -15,12 +15,16 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeOrdering.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/GraphWriter.h"
 #include "llvm/Support/raw_ostream.h"
 #include <map>
 #include <set>
+#include <string>
+#include <system_error>
 using namespace clang;
 
 namespace {

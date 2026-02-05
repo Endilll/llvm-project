@@ -14,6 +14,9 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Rewrite/Core/HTMLRewrite.h"
@@ -21,6 +24,9 @@
 #include "clang/Rewrite/Frontend/ASTConsumers.h"
 #include "llvm/ADT/RewriteBuffer.h"
 #include "llvm/Support/raw_ostream.h"
+#include <algorithm>
+#include <memory>
+#include <utility>
 using namespace clang;
 using llvm::RewriteBuffer;
 

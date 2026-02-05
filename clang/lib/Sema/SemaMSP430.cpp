@@ -17,6 +17,9 @@
 #include "clang/Basic/DiagnosticSema.h"
 #include "clang/Sema/Attr.h"
 #include "clang/Sema/ParsedAttr.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/APSInt.h"
+#include <optional>
 
 namespace clang {
 

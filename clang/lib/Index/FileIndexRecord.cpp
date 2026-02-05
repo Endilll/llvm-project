@@ -7,9 +7,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "FileIndexRecord.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclTemplate.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
+#include "clang/Index/DeclOccurrence.h"
+#include "clang/Index/IndexSymbol.h"
+#include "clang/Lex/MacroInfo.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Path.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
 
 using namespace clang;
 using namespace clang::index;

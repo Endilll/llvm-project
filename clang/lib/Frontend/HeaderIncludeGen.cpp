@@ -7,13 +7,30 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/DiagnosticFrontend.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/HeaderInclude.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Frontend/DependencyOutputOptions.h"
 #include "clang/Frontend/Utils.h"
+#include "clang/Lex/Lexer.h"
+#include "clang/Lex/ModuleLoader.h"
+#include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
-#include "llvm/ADT/SmallString.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/StringSet.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/JSON.h"
 #include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <memory>
+#include <string>
+#include <system_error>
 using namespace clang;
 
 namespace {

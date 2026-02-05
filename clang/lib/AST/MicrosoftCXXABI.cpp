@@ -20,7 +20,19 @@
 #include "clang/AST/MangleNumberingContext.h"
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/Type.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Specifiers.h"
 #include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MathExtras.h"
+#include "llvm/TargetParser/Triple.h"
+#include <cassert>
+#include <memory>
+#include <tuple>
+#include <utility>
 
 using namespace clang;
 

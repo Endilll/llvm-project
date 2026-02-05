@@ -12,12 +12,16 @@
 //===----------------------------------------------------------------------===//
 
 #include <utility>
+#include <vector>
 
 #include "clang/Analysis/FlowSensitive/DebugSupport.h"
+#include "clang/Analysis/FlowSensitive/Formula.h"
 #include "clang/Analysis/FlowSensitive/Solver.h"
 #include "clang/Analysis/FlowSensitive/Value.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang {
 namespace dataflow {

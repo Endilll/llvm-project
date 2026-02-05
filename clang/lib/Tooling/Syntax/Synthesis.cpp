@@ -5,11 +5,21 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Tooling/Syntax/BuildTree.h"
+#include "clang/Tooling/Syntax/Nodes.h"
+#include "clang/Tooling/Syntax/TokenManager.h"
 #include "clang/Tooling/Syntax/Tree.h"
 #include "clang/Tooling/Syntax/Tokens.h"
 #include "clang/Tooling/Syntax/TokenBufferTokenManager.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include <cassert>
+#include <memory>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 

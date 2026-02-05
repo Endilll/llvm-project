@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/DependencyScanning/DependencyScanningService.h"
+#include <ctime>
 
 using namespace clang;
 using namespace dependencies;

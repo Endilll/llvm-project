@@ -10,12 +10,46 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Address.h"
+#include "CGBuilder.h"
+#include "CGCall.h"
 #include "CGCleanup.h"
 #include "CGDebugInfo.h"
+#include "CGValue.h"
 #include "CodeGenFunction.h"
+#include "EHScopeStack.h"
+#include "clang/AST/Attrs.inc"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/StmtVisitor.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/ExceptionSpecificationType.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/ScopeExit.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/Attributes.h"
+#include "llvm/IR/CFG.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Intrinsics.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <memory>
+#include <string>
 
 using namespace clang;
 using namespace CodeGen;

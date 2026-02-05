@@ -14,10 +14,16 @@
 #include "clang/AST/ComparisonCategories.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Type.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
 #include <optional>
+#include <vector>
 
 using namespace clang;
 

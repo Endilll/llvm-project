@@ -18,20 +18,26 @@
 #include "clang/AST/DeclObjC.h"
 #include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TargetInfo.h"
 #include "clang/ExtractAPI/API.h"
 #include "clang/ExtractAPI/APIIgnoresList.h"
+#include "clang/ExtractAPI/DeclarationFragments.h"
+#include "clang/ExtractAPI/ExtractAPIActionBase.h"
 #include "clang/ExtractAPI/ExtractAPIVisitor.h"
 #include "clang/ExtractAPI/FrontendActions.h"
 #include "clang/ExtractAPI/Serialization/SymbolGraphSerializer.h"
 #include "clang/Frontend/ASTConsumers.h"
 #include "clang/Frontend/CompilerInstance.h"
+#include "clang/Frontend/FrontendAction.h"
 #include "clang/Frontend/FrontendOptions.h"
 #include "clang/Frontend/MultiplexConsumer.h"
 #include "clang/Index/USRGeneration.h"
 #include "clang/InstallAPI/HeaderFile.h"
+#include "clang/Lex/HeaderMap.h"
+#include "clang/Lex/HeaderSearchOptions.h"
 #include "clang/Lex/MacroInfo.h"
 #include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
@@ -47,9 +53,12 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Regex.h"
 #include "llvm/Support/raw_ostream.h"
+#include <cassert>
 #include <memory>
 #include <optional>
+#include <string>
 #include <utility>
+#include <vector>
 
 using namespace clang;
 using namespace extractapi;

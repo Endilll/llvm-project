@@ -7,11 +7,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "Mips.h"
+#include "clang/Basic/DiagnosticDriver.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Options/Options.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <string>
+#include <vector>
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

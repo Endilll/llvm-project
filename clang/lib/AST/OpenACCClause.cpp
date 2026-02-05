@@ -14,6 +14,13 @@
 #include "clang/AST/OpenACCClause.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Expr.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OpenACCKinds.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/STLExtras.h"
+#include <cassert>
+#include <cstddef>
+#include <optional>
 
 using namespace clang;
 

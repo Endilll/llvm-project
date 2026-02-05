@@ -7,6 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "TCE.h"
+#include "clang/Driver/Driver.h"
+#include "clang/Driver/ToolChain.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/TargetParser/Triple.h"
+#include <string>
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

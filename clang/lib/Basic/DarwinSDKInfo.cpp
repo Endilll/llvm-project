@@ -7,12 +7,25 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/DarwinSDKInfo.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/JSON.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/Path.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/TargetParser/Triple.h"
+#include <cstddef>
+#include <limits>
+#include <memory>
 #include <optional>
+#include <string>
+#include <utility>
 
 using namespace clang;
 

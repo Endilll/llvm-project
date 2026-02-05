@@ -8,11 +8,15 @@
 
 #include "InterpStack.h"
 #include "Boolean.h"
+#include "ByteCode/PrimType.h"
 #include "FixedPoint.h"
 #include "Floating.h"
 #include "Integral.h"
 #include "MemberPointer.h"
 #include "Pointer.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/raw_ostream.h"
 #include <cassert>
 #include <cstdlib>
 

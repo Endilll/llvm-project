@@ -7,9 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/ThreadSafetyTIL.h"
+#include "clang/Analysis/Analyses/ThreadSafetyUtil.h"
 #include "clang/Basic/LLVM.h"
 #include <cassert>
-#include <cstddef>
 
 using namespace clang;
 using namespace threadSafety;

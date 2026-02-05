@@ -18,8 +18,28 @@
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/Type.h"
+#include "clang/Basic/CharInfo.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Linkage.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/Visibility.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/Hashing.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <string>
+#include <utility>
 using namespace clang;
 
 /// The identity of a type_info object depends on the canonical unqualified

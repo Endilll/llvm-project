@@ -7,11 +7,33 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ODRDiagsEmitter.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclObjCCommon.h"
 #include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DeclarationName.h"
 #include "clang/AST/ODRHash.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticAST.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/Module.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <string>
+#include <utility>
 
 using namespace clang;
 

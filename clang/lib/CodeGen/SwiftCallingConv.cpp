@@ -14,7 +14,22 @@
 #include "ABIInfo.h"
 #include "CodeGenModule.h"
 #include "TargetInfo.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/Support/MathExtras.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <utility>
 
 using namespace clang;
 using namespace CodeGen;

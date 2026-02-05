@@ -24,8 +24,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/CommonOptionsParser.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Tooling/ArgumentsAdjusters.h"
+#include "clang/Tooling/CompilationDatabase.h"
 #include "clang/Tooling/Tooling.h"
 #include "llvm/Support/CommandLine.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/raw_ostream.h"
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace clang::tooling;
 using namespace llvm;

@@ -12,9 +12,31 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGCXXABI.h"
+#include "Address.h"
+#include "CGCall.h"
 #include "CGCleanup.h"
+#include "CGValue.h"
+#include "clang/AST/APValue.h"
 #include "clang/AST/Attr.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/OperationKinds.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/ABI.h"
+#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticFrontend.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Linkage.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <vector>
 
 using namespace clang;
 using namespace CodeGen;

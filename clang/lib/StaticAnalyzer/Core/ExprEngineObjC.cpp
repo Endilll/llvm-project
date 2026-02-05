@@ -10,10 +10,22 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/AST/Decl.h"
 #include "clang/AST/StmtObjC.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Analysis/CFG.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/CoreEngine.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ExprEngine.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
+#include <cassert>
+#include <tuple>
 
 using namespace clang;
 using namespace ento;

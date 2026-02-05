@@ -8,6 +8,7 @@
 
 #include "Pointer.h"
 #include "Boolean.h"
+#include "ByteCode/Descriptor.h"
 #include "Context.h"
 #include "Floating.h"
 #include "Function.h"
@@ -17,9 +18,25 @@
 #include "MemberPointer.h"
 #include "PrimType.h"
 #include "Record.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/RecordLayout.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/raw_ostream.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <optional>
+#include <string>
+#include <utility>
 
 using namespace clang;
 using namespace clang::interp;

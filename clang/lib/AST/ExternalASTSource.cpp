@@ -14,10 +14,17 @@
 
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclID.h"
 #include "clang/AST/DeclarationName.h"
+#include "clang/AST/TemplateBase.h"
 #include "clang/Basic/ASTSourceDescriptor.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/ErrorHandling.h"
 #include <cstdint>
 #include <optional>

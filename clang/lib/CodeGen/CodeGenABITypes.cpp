@@ -17,10 +17,17 @@
 
 #include "clang/CodeGen/CodeGenABITypes.h"
 #include "CGCXXABI.h"
+#include "CGCall.h"
 #include "CGRecordLayout.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/ABI.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
+#include <cassert>
 
 using namespace clang;
 using namespace CodeGen;

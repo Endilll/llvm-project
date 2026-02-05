@@ -8,7 +8,13 @@
 
 #include "clang/Basic/OpenCLOptions.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include <cassert>
+#include <utility>
 
 namespace clang {
 

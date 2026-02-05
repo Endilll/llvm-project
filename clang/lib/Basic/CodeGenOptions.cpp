@@ -7,6 +7,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/CodeGen.h"
 
 namespace clang {
 

@@ -42,8 +42,20 @@
 #include "Targets/Xtensa.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticFrontend.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/MacroBuilder.h"
+#include "clang/Basic/OpenCLOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringExtras.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/TargetParser/Triple.h"
+#include <cassert>
+#include <memory>
+#include <string>
 
 using namespace clang;
 

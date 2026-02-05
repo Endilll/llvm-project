@@ -6,13 +6,22 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Driver/SanitizerArgs.h"
+#include "clang/Basic/DiagnosticDriver.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/Sanitizers.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/ToolChain.h"
+#include "clang/Driver/Types.h"
 #include "clang/Options/Options.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/Option/OptSpecifier.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/SpecialCaseList.h"
 #include "llvm/Support/VirtualFileSystem.h"
@@ -20,7 +29,14 @@
 #include "llvm/TargetParser/RISCVTargetParser.h"
 #include "llvm/TargetParser/TargetParser.h"
 #include "llvm/Transforms/Instrumentation/AddressSanitizerOptions.h"
+#include <algorithm>
+#include <cassert>
+#include <cstring>
+#include <iterator>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 using namespace clang::driver;

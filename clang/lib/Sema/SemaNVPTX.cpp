@@ -11,8 +11,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaNVPTX.h"
+#include "clang/AST/Expr.h"
 #include "clang/Basic/TargetBuiltins.h"
 #include "clang/Sema/Sema.h"
+#include "clang/Sema/SemaBase.h"
 
 namespace clang {
 

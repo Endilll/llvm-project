@@ -14,8 +14,17 @@
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallDescription.h"
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
+#include "llvm/ADT/STLExtras.h"
+#include <cassert>
+#include <cstddef>
+#include <initializer_list>
 #include <iterator>
 #include <optional>
 

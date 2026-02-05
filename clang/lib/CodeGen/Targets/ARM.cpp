@@ -7,7 +7,40 @@
 //===----------------------------------------------------------------------===//
 
 #include "ABIInfoImpl.h"
+#include "Address.h"
+#include "CGCXXABI.h"
+#include "CGValue.h"
+#include "CodeGenModule.h"
+#include "CodeGenTypes.h"
 #include "TargetInfo.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attrs.inc"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/RecordLayout.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/CodeGen/CGFunctionInfo.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/Attributes.h"
+#include "llvm/IR/CallingConv.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MathExtras.h"
+#include "llvm/TargetParser/Triple.h"
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <memory>
 
 using namespace clang;
 using namespace clang::CodeGen;

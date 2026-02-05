@@ -11,16 +11,29 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/AST/Attr.h"
+#include "clang/AST/Attrs.inc"
+#include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
+#include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/StmtObjC.h"
 #include "clang/AST/StmtOpenACC.h"
 #include "clang/AST/StmtOpenMP.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Sema/SemaInternal.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Sema/Sema.h"
 #include "llvm/ADT/BitVector.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <utility>
 using namespace clang;
 
 namespace {

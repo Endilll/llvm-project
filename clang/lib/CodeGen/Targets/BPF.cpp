@@ -7,7 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "ABIInfoImpl.h"
+#include "CodeGenModule.h"
+#include "CodeGenTypes.h"
 #include "TargetInfo.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/CodeGen/CGFunctionInfo.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/Support/MathExtras.h"
+#include <cstdint>
+#include <memory>
 
 using namespace clang;
 using namespace clang::CodeGen;

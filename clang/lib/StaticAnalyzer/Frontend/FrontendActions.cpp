@@ -7,8 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Frontend/FrontendActions.h"
+#include "clang/AST/ASTConsumer.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Frontend/AnalysisConsumer.h"
 #include "clang/StaticAnalyzer/Frontend/ModelConsumer.h"
+#include "llvm/ADT/StringMap.h"
+#include <memory>
 using namespace clang;
 using namespace ento;
 

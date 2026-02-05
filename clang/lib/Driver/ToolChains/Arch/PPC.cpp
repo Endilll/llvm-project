@@ -7,12 +7,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "PPC.h"
+#include "clang/Basic/DiagnosticDriver.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Options/Options.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/TargetParser/Host.h"
+#include <vector>
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

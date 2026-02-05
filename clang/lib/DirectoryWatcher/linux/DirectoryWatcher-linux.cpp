@@ -9,13 +9,23 @@
 #include "DirectoryScanner.h"
 #include "clang/DirectoryWatcher/DirectoryWatcher.h"
 
+#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/ScopeExit.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Errno.h"
 #include "llvm/Support/Error.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <array>
+#include <cassert>
 #include <condition_variable>
+#include <cstddef>
+#include <functional>
+#include <linux/limits.h>
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <string>
+#include <sys/types.h>
 #include <thread>
 
 #include <fcntl.h>
@@ -24,6 +34,7 @@
 #include <sys/epoll.h>
 #include <sys/inotify.h>
 #include <unistd.h>
+#include <utility>
 
 namespace {
 

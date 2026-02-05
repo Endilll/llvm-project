@@ -13,6 +13,8 @@
 
 #include "clang/AST/SelectorLocationsKind.h"
 #include "clang/AST/Expr.h"
+#include "clang/Basic/LLVM.h"
+#include <cassert>
 
 using namespace clang;
 

@@ -13,6 +13,9 @@
 
 #include "LinkInModulesPass.h"
 #include "BackendConsumer.h"
+#include "llvm/IR/Analysis.h"
+#include "llvm/IR/PassManager.h"
+#include "llvm/Support/ErrorHandling.h"
 
 using namespace llvm;
 

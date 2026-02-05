@@ -17,21 +17,33 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/FileManager.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/FileSystemOptions.h"
 #include "clang/Basic/FileSystemStatCache.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/Statistic.h"
-#include "llvm/Config/llvm-config.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/Support/Chrono.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/IOSandbox.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/Path.h"
+#include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
 #include <cassert>
-#include <climits>
 #include <cstdint>
-#include <cstdlib>
+#include <ctime>
+#include <memory>
 #include <optional>
 #include <string>
+#include <sys/types.h>
+#include <system_error>
 #include <utility>
 
 using namespace clang;

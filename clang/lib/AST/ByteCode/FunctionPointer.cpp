@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "FunctionPointer.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Expr.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang {
 namespace interp {

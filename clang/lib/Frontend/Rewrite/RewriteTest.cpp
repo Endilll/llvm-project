@@ -10,6 +10,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Rewrite/Core/TokenRewriter.h"
 #include "clang/Rewrite/Frontend/Rewriters.h"

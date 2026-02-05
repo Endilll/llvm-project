@@ -12,14 +12,25 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Rewrite/Core/HTMLRewrite.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Lex/Lexer.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Lex/TokenConcatenation.h"
 #include "clang/Rewrite/Core/Rewriter.h"
+#include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/RewriteBuffer.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/raw_ostream.h"
+#include <cassert>
 #include <memory>
+#include <string>
+#include <vector>
 
 using namespace clang;
 using namespace llvm;

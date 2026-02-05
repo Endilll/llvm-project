@@ -11,8 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "DirectX.h"
-#include "Targets.h"
+#include "TargetDefines.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/MacroBuilder.h"
 #include "clang/Basic/TargetBuiltins.h"
+#include "llvm/ADT/SmallVector.h"
+#include <iterator>
 
 using namespace clang;
 using namespace clang::targets;

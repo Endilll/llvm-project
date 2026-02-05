@@ -13,8 +13,13 @@
 #include "clang/AST/ParentMap.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
+#include "clang/AST/OperationKinds.h"
+#include "clang/AST/Stmt.h"
 #include "clang/AST/StmtObjC.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
+#include <cassert>
+#include <utility>
 
 using namespace clang;
 

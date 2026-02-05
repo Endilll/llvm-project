@@ -9,16 +9,20 @@
 #include "clang/Frontend/SerializedDiagnosticReader.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/FileSystemOptions.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Frontend/SerializedDiagnostics.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/Bitstream/BitCodeEnums.h"
 #include "llvm/Bitstream/BitstreamReader.h"
-#include "llvm/Support/Compiler.h"
+#include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/ManagedStatic.h"
 #include <cstdint>
 #include <optional>
+#include <string>
 #include <system_error>
+#include <utility>
 
 using namespace clang;
 using namespace serialized_diags;

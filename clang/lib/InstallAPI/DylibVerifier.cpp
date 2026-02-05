@@ -8,10 +8,29 @@
 
 #include "clang/InstallAPI/DylibVerifier.h"
 #include "DiagnosticBuilderWrappers.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/DiagnosticInstallAPI.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/Specifiers.h"
 #include "clang/InstallAPI/FrontendRecords.h"
-#include "clang/InstallAPI/InstallAPIDiagnostic.h"
+#include "clang/InstallAPI/MachO.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Demangle/Demangle.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/TextAPI/Architecture.h"
 #include "llvm/TextAPI/DylibReader.h"
+#include "llvm/TextAPI/Symbol.h"
+#include "llvm/TextAPI/Target.h"
+#include <cassert>
+#include <cstdlib>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
 
 using namespace llvm::MachO;
 

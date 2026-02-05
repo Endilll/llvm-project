@@ -10,12 +10,35 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include "clang/AST/APValue.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/OpenACCClause.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/OpenACCKinds.h"
+#include "clang/Basic/PartialDiagnostic.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Sema/Ownership.h"
 #include "clang/Sema/SemaOpenACC.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
 
 using namespace clang;
 

@@ -10,17 +10,46 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Address.h"
+#include "CGBuilder.h"
 #include "CGBuiltin.h"
 #include "CodeGenFunction.h"
-#include "clang/Basic/DiagnosticFrontend.h"
+#include "CodeGenModule.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SyncScope.h"
 #include "clang/Basic/TargetBuiltins.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/Analysis/ValueTracking.h"
 #include "llvm/CodeGen/MachineFunction.h"
+#include "llvm/IR/Attributes.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/IntrinsicsAMDGPU.h"
 #include "llvm/IR/IntrinsicsR600.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/MDBuilder.h"
 #include "llvm/IR/MemoryModelRelaxationAnnotations.h"
+#include "llvm/IR/Metadata.h"
+#include "llvm/IR/Type.h"
 #include "llvm/Support/AMDGPUAddrSpace.h"
+#include "llvm/Support/Alignment.h"
+#include "llvm/Support/AtomicOrdering.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Target/TargetOptions.h"
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
 
 using namespace clang;
 using namespace CodeGen;

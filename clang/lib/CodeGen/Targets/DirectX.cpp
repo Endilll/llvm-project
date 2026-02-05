@@ -8,12 +8,18 @@
 
 #include "ABIInfoImpl.h"
 #include "CodeGenModule.h"
+#include "CodeGenTypes.h"
 #include "HLSLBufferLayoutBuilder.h"
 #include "TargetInfo.h"
 #include "clang/AST/Type.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Type.h"
+#include "llvm/Support/DXILABI.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <memory>
 
 using namespace clang;
 using namespace clang::CodeGen;

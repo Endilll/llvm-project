@@ -8,11 +8,15 @@
 
 #include "clang/Driver/Types.h"
 #include "clang/Driver/Driver.h"
+#include "clang/Driver/Phases.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/Option/ArgList.h"
 #include <cassert>
 #include <cstring>
+#include <initializer_list>
+#include <iterator>
 
 using namespace clang::driver;
 using namespace clang::driver::types;

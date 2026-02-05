@@ -13,11 +13,15 @@
 
 #include "clang/Basic/Module.h"
 #include "clang/Basic/CharInfo.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TargetInfo.h"
 #include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
@@ -27,8 +31,10 @@
 #include "llvm/Support/raw_ostream.h"
 #include <cassert>
 #include <functional>
+#include <optional>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
 
 using namespace clang;

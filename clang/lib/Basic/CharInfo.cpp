@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/CharInfo.h"
+#include <cstdint>
 
 using namespace clang::charinfo;
 

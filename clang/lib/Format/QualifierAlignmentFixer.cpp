@@ -14,8 +14,27 @@
 
 #include "QualifierAlignmentFixer.h"
 #include "FormatToken.h"
+#include "FormatTokenLexer.h"
+#include "TokenAnalyzer.h"
+#include "TokenAnnotator.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Format/Format.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/Debug.h"
+#include "llvm/Support/Error.h"
 #include "llvm/Support/Regex.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <cctype>
+#include <string>
+#include <utility>
+#include <vector>
 
 #define DEBUG_TYPE "format-qualifier-alignment-fixer"
 

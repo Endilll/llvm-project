@@ -11,9 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/DeclTemplate.h"
+#include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTMutationListener.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclID.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
@@ -26,6 +30,9 @@
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/TemplateKinds.h"
+#include "clang/Basic/UnsignedOrNone.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/PointerUnion.h"
@@ -34,6 +41,7 @@
 #include "llvm/Support/ErrorHandling.h"
 #include <cassert>
 #include <optional>
+#include <tuple>
 #include <utility>
 
 using namespace clang;

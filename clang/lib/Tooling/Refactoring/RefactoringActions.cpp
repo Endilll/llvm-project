@@ -6,10 +6,17 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Refactoring/Extract/Extract.h"
 #include "clang/Tooling/Refactoring/RefactoringAction.h"
+#include "clang/Tooling/Refactoring/RefactoringActionRuleRequirements.h"
+#include "clang/Tooling/Refactoring/RefactoringActionRules.h"
+#include "clang/Tooling/Refactoring/RefactoringActionRulesInternal.h"
 #include "clang/Tooling/Refactoring/RefactoringOptions.h"
 #include "clang/Tooling/Refactoring/Rename/RenamingAction.h"
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace clang {
 namespace tooling {

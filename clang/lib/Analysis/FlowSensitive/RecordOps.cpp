@@ -15,8 +15,13 @@
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Type.h"
 #include "clang/Analysis/FlowSensitive/ASTOps.h"
+#include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
+#include "clang/Analysis/FlowSensitive/StorageLocation.h"
+#include "clang/Analysis/FlowSensitive/Value.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringMap.h"
+#include "llvm/Support/Debug.h"
+#include <cassert>
 
 #define DEBUG_TYPE "dataflow"
 

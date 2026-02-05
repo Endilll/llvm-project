@@ -8,6 +8,19 @@
 
 #include "clang/Analysis/Support/FixitUtil.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/Lexer.h"
+#include "llvm/ADT/StringRef.h"
+#include <cassert>
+#include <optional>
+#include <string>
 
 using namespace llvm;
 using namespace clang;

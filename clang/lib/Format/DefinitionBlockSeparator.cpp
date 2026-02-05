@@ -14,6 +14,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "DefinitionBlockSeparator.h"
+#include "FormatToken.h"
+#include "FormatTokenLexer.h"
+#include "TokenAnnotator.h"
+#include "WhitespaceManager.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Format/Format.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include <cassert>
+#include <cstddef>
+#include <utility>
 #define DEBUG_TYPE "definition-block-separator"
 
 namespace clang {

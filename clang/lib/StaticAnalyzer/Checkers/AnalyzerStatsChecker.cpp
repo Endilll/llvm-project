@@ -7,7 +7,13 @@
 //===----------------------------------------------------------------------===//
 // This file reports various statistics about analyzer visitation.
 //===----------------------------------------------------------------------===//
+#include "clang/AST/Decl.h"
 #include "clang/AST/DeclObjC.h"
+#include "clang/Analysis/CFG.h"
+#include "clang/Analysis/PathDiagnostic.h"
+#include "clang/Analysis/ProgramPoint.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
@@ -20,6 +26,7 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/raw_ostream.h"
 #include <optional>
+#include <string>
 
 using namespace clang;
 using namespace ento;

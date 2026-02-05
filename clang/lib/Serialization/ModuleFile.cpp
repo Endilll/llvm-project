@@ -13,6 +13,7 @@
 
 #include "clang/Serialization/ModuleFile.h"
 #include "ASTReaderInternals.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Serialization/ContinuousRangeMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Compiler.h"

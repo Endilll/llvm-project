@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/DependencyScanning/DependencyScanningUtils.h"
+#include <utility>
 
 using namespace clang;
 using namespace dependencies;

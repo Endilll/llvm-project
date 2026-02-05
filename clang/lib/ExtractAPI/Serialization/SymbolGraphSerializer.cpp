@@ -12,19 +12,30 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ExtractAPI/Serialization/SymbolGraphSerializer.h"
+#include "clang/AST/Availability.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangStandard.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Version.h"
 #include "clang/ExtractAPI/API.h"
+#include "clang/ExtractAPI/APIIgnoresList.h"
 #include "clang/ExtractAPI/DeclarationFragments.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/FormatVariadic.h"
+#include "llvm/Support/JSON.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/TargetParser/Triple.h"
+#include <cassert>
 #include <iterator>
+#include <memory>
 #include <optional>
+#include <string>
+#include <utility>
 
 using namespace clang;
 using namespace clang::extractapi;

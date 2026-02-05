@@ -25,6 +25,7 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SetVector.h"
 #include <cassert>
+#include <cstddef>
 #include <iterator>
 #include <vector>
 

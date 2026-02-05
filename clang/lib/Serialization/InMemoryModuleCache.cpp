@@ -7,7 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Serialization/InMemoryModuleCache.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/MemoryBuffer.h"
+#include <cassert>
+#include <memory>
+#include <utility>
 
 using namespace clang;
 

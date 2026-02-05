@@ -7,8 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Testing/CommandLineArgs.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "llvm/TargetParser/Triple.h"
+#include <string>
+#include <vector>
 
 namespace clang {
 std::vector<TestLanguage> getCOrLater(const int MinimumStd) {

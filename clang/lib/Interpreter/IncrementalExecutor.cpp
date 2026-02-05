@@ -12,6 +12,17 @@
 
 #include "clang/Interpreter/IncrementalExecutor.h"
 #include "OrcIncrementalExecutor.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringExtras.h"
+#include "llvm/Config/llvm-config.h"
+#include "llvm/ExecutionEngine/Orc/MemoryMapper.h"
+#include "llvm/ExecutionEngine/Orc/TaskDispatch.h"
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <system_error>
+#include <tuple>
 #ifdef __EMSCRIPTEN__
 #include "Wasm.h"
 #endif // __EMSCRIPTEN__
@@ -29,7 +40,6 @@
 #include "llvm/ExecutionEngine/JITLink/JITLinkMemoryManager.h"
 #include "llvm/ExecutionEngine/Orc/Debugging/DebuggerSupport.h"
 #include "llvm/ExecutionEngine/Orc/EPCDynamicLibrarySearchGenerator.h"
-#include "llvm/ExecutionEngine/Orc/ExecutionUtils.h"
 #include "llvm/ExecutionEngine/Orc/ExecutorProcessControl.h"
 #include "llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h"
 #include "llvm/ExecutionEngine/Orc/LLJIT.h"
@@ -46,7 +56,6 @@
 
 #include "llvm/TargetParser/Host.h"
 
-#include <array>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -55,7 +64,6 @@
 
 #ifdef LLVM_ON_UNIX
 #include <netdb.h>
-#include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #endif

@@ -12,8 +12,11 @@
 
 #include "clang/Basic/XRayLists.h"
 #include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "llvm/Support/SpecialCaseList.h"
+#include <string>
 
 using namespace clang;
 

@@ -11,11 +11,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/MacroArgs.h"
-#include "clang/Lex/LexDiagnostic.h"
+#include "clang/Basic/DiagnosticLex.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Lex/Lexer.h"
 #include "clang/Lex/MacroInfo.h"
 #include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/Token.h"
+#include "llvm/Support/MemAlloc.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 using namespace clang;
 

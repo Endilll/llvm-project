@@ -15,6 +15,9 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/Stmt.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TokenKinds.h"
 #include "clang/Parse/Parser.h"
 #include "clang/Sema/CodeCompleteConsumer.h"
 #include "clang/Sema/EnterExpressionEvaluationContext.h"
@@ -22,9 +25,11 @@
 #include "clang/Sema/SemaConsumer.h"
 #include "clang/Sema/TemplateInstCallback.h"
 #include "llvm/Support/CrashRecoveryContext.h"
+#include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/TimeProfiler.h"
-#include <cstdio>
+#include "llvm/Support/raw_ostream.h"
 #include <memory>
+#include <utility>
 
 using namespace clang;
 

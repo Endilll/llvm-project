@@ -8,6 +8,13 @@
 
 #include "Record.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/TypeBase.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <string>
+#include <utility>
 
 using namespace clang;
 using namespace clang::interp;

@@ -9,12 +9,22 @@
 #include "IndexingContext.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclTemplate.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
+#include "clang/Basic/Specifiers.h"
 #include "clang/Index/IndexDataConsumer.h"
+#include "clang/Index/IndexSymbol.h"
+#include "clang/Index/IndexingOptions.h"
 #include "clang/Sema/HeuristicResolver.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <memory>
 
 using namespace clang;
 using namespace index;

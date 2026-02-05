@@ -12,6 +12,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"

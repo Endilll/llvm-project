@@ -8,6 +8,9 @@
 #include "InterpBuiltinBitCast.h"
 #include "BitcastBuffer.h"
 #include "Boolean.h"
+#include "ByteCode/Descriptor.h"
+#include "ByteCode/FixedPoint.h"
+#include "ByteCode/PrimType.h"
 #include "Context.h"
 #include "Floating.h"
 #include "Integral.h"
@@ -16,9 +19,25 @@
 #include "Pointer.h"
 #include "Record.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
 #include "clang/AST/RecordLayout.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/DiagnosticAST.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/SwapByteOrder.h"
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <memory>
 #include <variant>
 
 using namespace clang;

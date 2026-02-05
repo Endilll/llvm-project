@@ -13,17 +13,35 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGObjCRuntime.h"
+#include "Address.h"
+#include "CGBuilder.h"
 #include "CGCXXABI.h"
+#include "CGCall.h"
 #include "CGCleanup.h"
 #include "CGRecordLayout.h"
+#include "CGValue.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
+#include "CodeGenTBAA.h"
+#include "EHScopeStack.h"
+#include "clang/AST/Attrs.inc"
+#include "clang/AST/Decl.h"
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/StmtObjC.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
 #include "clang/CodeGen/CodeGenABITypes.h"
+#include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MathExtras.h"
 #include "llvm/Support/SaveAndRestore.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <cstdint>
+#include <string>
 
 using namespace clang;
 using namespace CodeGen;

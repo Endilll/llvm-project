@@ -11,13 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaAMDGPU.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/Builtins.h"
 #include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetBuiltins.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/Sema.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/StringMap.h"
 #include "llvm/Support/AMDGPUAddrSpace.h"
 #include "llvm/Support/AtomicOrdering.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
 #include <cstdint>
 
 namespace clang {

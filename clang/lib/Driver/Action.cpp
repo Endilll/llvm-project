@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Driver/Action.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Types.h"
+#include "clang/Driver/Util.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
 #include <cassert>
 #include <string>

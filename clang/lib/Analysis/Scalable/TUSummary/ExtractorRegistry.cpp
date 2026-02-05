@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Scalable/TUSummary/ExtractorRegistry.h"
+#include "clang/AST/ASTConsumer.h"
+#include "clang/Analysis/Scalable/TUSummary/TUSummaryExtractor.h"
+#include "clang/Support/Compiler.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Registry.h"
+#include <cassert>
 #include <memory>
 
 using namespace clang;

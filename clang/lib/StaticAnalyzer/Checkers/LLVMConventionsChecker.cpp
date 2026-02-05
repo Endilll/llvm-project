@@ -11,12 +11,21 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Analysis/PathDiagnostic.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/StmtVisitor.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
-#include "llvm/ADT/SmallString.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "llvm/Support/raw_ostream.h"
 
 using namespace clang;

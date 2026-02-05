@@ -7,13 +7,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "CSKY.h"
+#include "clang/Basic/DiagnosticDriver.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Options/Options.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
 #include "llvm/TargetParser/CSKYTargetParser.h"
 #include "llvm/TargetParser/Host.h"
 #include "llvm/TargetParser/TargetParser.h"
+#include <cstdint>
+#include <optional>
+#include <vector>
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

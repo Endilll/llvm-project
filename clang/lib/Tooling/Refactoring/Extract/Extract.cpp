@@ -17,9 +17,22 @@
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprObjC.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/DiagnosticRefactoring.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Rewrite/Core/Rewriter.h"
+#include "clang/Tooling/Refactoring/ASTSelection.h"
+#include "clang/Tooling/Refactoring/AtomicChange.h"
 #include "clang/Tooling/Refactoring/Extract/SourceExtraction.h"
+#include "clang/Tooling/Refactoring/RefactoringActionRule.h"
+#include "clang/Tooling/Refactoring/RefactoringRuleContext.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
 #include <optional>
+#include <string>
+#include <utility>
 
 namespace clang {
 namespace tooling {

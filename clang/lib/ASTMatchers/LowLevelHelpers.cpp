@@ -11,6 +11,10 @@
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
+#include "clang/AST/TypeBase.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include <algorithm>
+#include <cassert>
 #include <type_traits>
 
 namespace clang {

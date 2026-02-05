@@ -7,6 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/DirectoryWatcher/DirectoryWatcher.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Error.h"
+#include <functional>
+#include <memory>
 
 using namespace llvm;
 using namespace clang;

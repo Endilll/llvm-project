@@ -11,8 +11,19 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "CGCall.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
+#include "clang/AST/Attrs.inc"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/SYCLKernelInfo.h"
+#include "clang/AST/StmtSYCL.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/IR/Attributes.h"
+#include <cassert>
 
 using namespace clang;
 using namespace CodeGen;

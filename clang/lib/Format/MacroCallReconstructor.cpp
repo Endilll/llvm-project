@@ -13,13 +13,22 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include "FormatToken.h"
 #include "Macros.h"
 
 #include "UnwrappedLineParser.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TokenKinds.h"
+#include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/Support/Debug.h"
 #include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <memory>
+#include <utility>
 
 #define DEBUG_TYPE "format-reconstruct"
 

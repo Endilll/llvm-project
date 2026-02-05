@@ -11,9 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/FlowSensitive/CNFFormula.h"
+#include "clang/Analysis/FlowSensitive/Formula.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
 
+#include <cassert>
+#include <cstddef>
 #include <queue>
+#include <vector>
 
 namespace clang {
 namespace dataflow {

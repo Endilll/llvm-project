@@ -8,9 +8,30 @@
 
 #include "clang/Parse/ParseHLSLRootSignature.h"
 #include "clang/AST/ASTConsumer.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/DiagnosticParse.h"
+#include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Lex/LexHLSLRootSignature.h"
 #include "clang/Lex/LiteralSupport.h"
 #include "clang/Parse/Parser.h"
 #include "clang/Sema/Sema.h"
+#include "clang/Sema/SemaHLSL.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/FloatingPointMode.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/BinaryFormat/DXContainer.h"
+#include "llvm/Frontend/HLSL/HLSLRootSignature.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <cstdint>
+#include <limits>
+#include <memory>
+#include <optional>
 
 using namespace llvm::hlsl::rootsig;
 

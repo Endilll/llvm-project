@@ -7,9 +7,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/CheckerRegistryData.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/Twine.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/raw_ostream.h"
+#include <algorithm>
+#include <cstddef>
 #include <map>
+#include <string>
+#include <utility>
 
 using namespace clang;
 using namespace ento;

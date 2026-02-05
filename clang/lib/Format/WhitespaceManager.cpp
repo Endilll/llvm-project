@@ -12,10 +12,27 @@
 //===----------------------------------------------------------------------===//
 
 #include "WhitespaceManager.h"
+#include "FormatToken.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OperatorPrecedence.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Format/Format.h"
+#include "clang/Tooling/Core/Replacement.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/raw_ostream.h"
 #include <algorithm>
+#include <cassert>
+#include <climits>
+#include <cstddef>
+#include <functional>
+#include <iterator>
 #include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
 
 namespace clang {
 namespace format {

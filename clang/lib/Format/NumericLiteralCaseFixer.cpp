@@ -13,11 +13,24 @@
 //===----------------------------------------------------------------------===//
 
 #include "NumericLiteralCaseFixer.h"
+#include "AffectedRangeManager.h"
 #include "NumericLiteralInfo.h"
+#include "TokenAnalyzer.h"
 
-#include "llvm/ADT/StringExtras.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Format/Format.h"
+#include "clang/Lex/Lexer.h"
+#include "clang/Lex/Token.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/Error.h"
 
-#include <algorithm>
+#include <array>
+#include <cassert>
+#include <string>
+#include <utility>
 
 namespace clang {
 namespace format {

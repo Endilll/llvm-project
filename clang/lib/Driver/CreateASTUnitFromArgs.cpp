@@ -11,11 +11,27 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Driver/CreateASTUnitFromArgs.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
 #include "clang/Driver/CreateInvocationFromArgs.h"
+#include "clang/Frontend/ASTUnit.h"
 #include "clang/Frontend/CompilerInvocation.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include "clang/Serialization/ModuleCache.h"
+#include "clang/Serialization/PCHContainerOperations.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/Support/CrashRecoveryContext.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
 
 using namespace clang;
 

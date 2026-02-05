@@ -12,13 +12,20 @@
 
 #include "clang/Basic/Attributes.h"
 #include "clang/Basic/AttrSubjectMatchRules.h"
+#include "clang/Basic/AttributeCommonInfo.h"
 #include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/ParsedAttrInfo.h"
 #include "clang/Basic/SimpleTypoCorrection.h"
 #include "clang/Basic/TargetInfo.h"
 
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <optional>
+#include <string>
 
 using namespace clang;
 

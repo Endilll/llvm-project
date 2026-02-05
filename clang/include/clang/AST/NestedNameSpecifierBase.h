@@ -172,7 +172,7 @@ public:
 
   /// Retrieve the record declaration stored in this nested name
   /// specifier, or null.
-  inline CXXRecordDecl *getAsRecordDecl() const;
+  CXXRecordDecl *getAsRecordDecl() const;
 
   friend bool operator==(NestedNameSpecifier LHS, NestedNameSpecifier RHS) {
     return LHS.StoredOrFlag == RHS.StoredOrFlag;

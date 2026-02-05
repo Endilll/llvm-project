@@ -7,12 +7,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "AArch64.h"
+#include "clang/Basic/DiagnosticDriver.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Options/Options.h"
+#include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/TargetParser/AArch64TargetParser.h"
 #include "llvm/TargetParser/Host.h"
+#include <cassert>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

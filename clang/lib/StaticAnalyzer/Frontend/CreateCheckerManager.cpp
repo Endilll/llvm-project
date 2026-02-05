@@ -12,10 +12,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/StaticAnalyzer/Core/Checker.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "clang/StaticAnalyzer/Frontend/CheckerRegistry.h"
+#include <functional>
 #include <memory>
+#include <string>
 
 namespace clang {
 namespace ento {

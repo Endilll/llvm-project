@@ -13,8 +13,15 @@
 
 #include "clang/AST/ASTImporterLookupTable.h"
 #include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclarationName.h"
 #include "clang/AST/RecursiveASTVisitor.h"
-#include "llvm/Support/FormatVariadic.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
 
 namespace clang {
 

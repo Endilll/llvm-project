@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/PPCallbacks.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
 
 using namespace clang;
 

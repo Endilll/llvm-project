@@ -13,6 +13,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "MatchFilePath.h"
+#include "llvm/ADT/StringRef.h"
+#include <cassert>
+#include <cstring>
 
 using namespace llvm;
 

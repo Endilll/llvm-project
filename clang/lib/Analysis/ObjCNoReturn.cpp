@@ -13,6 +13,9 @@
 
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ExprObjC.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/STLExtras.h"
 #include "clang/Analysis/DomainSpecific/ObjCNoReturn.h"
 
 using namespace clang;

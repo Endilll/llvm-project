@@ -93,20 +93,6 @@ NestedNameSpecifier::NestedNameSpecifier(CXXRecordDecl *RD)
   assert(getKind() == Kind::MicrosoftSuper);
 }
 
-CXXRecordDecl *NestedNameSpecifier::getAsRecordDecl() const {
-  switch (getKind()) {
-  case Kind::MicrosoftSuper:
-    return getAsMicrosoftSuper();
-  case Kind::Type:
-    return getAsType()->getAsCXXRecordDecl();
-  case Kind::Global:
-  case Kind::Namespace:
-  case Kind::Null:
-    return nullptr;
-  }
-  llvm_unreachable("Invalid NNS Kind!");
-}
-
 NestedNameSpecifier NestedNameSpecifier::getCanonical() const {
   switch (getKind()) {
   case NestedNameSpecifier::Kind::Null:

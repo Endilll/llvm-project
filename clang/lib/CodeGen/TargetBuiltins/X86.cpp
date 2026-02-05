@@ -10,11 +10,46 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Address.h"
 #include "CGBuiltin.h"
+#include "CodeGenFunction.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetBuiltins.h"
+#include "llvm/ADT/StringSwitch.h"
+#include "llvm/IR/Attributes.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/InlineAsm.h"
+#include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/IntrinsicsX86.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Metadata.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Alignment.h"
+#include "llvm/Support/AtomicOrdering.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/TargetParser/Triple.h"
 #include "llvm/TargetParser/X86TargetParser.h"
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <utility>
 
 using namespace clang;
 using namespace CodeGen;

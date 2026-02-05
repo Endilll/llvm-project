@@ -12,6 +12,8 @@
 
 #include "InterpBlock.h"
 #include "Pointer.h"
+#include <cassert>
+#include <cstdlib>
 
 using namespace clang;
 using namespace clang::interp;

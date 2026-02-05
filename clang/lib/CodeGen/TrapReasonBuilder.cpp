@@ -11,6 +11,10 @@
 ///
 //===----------------------------------------------------------------------===//
 #include "TrapReasonBuilder.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include <cassert>
 
 namespace clang {
 namespace CodeGen {

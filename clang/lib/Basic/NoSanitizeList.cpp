@@ -13,9 +13,15 @@
 
 #include "clang/Basic/NoSanitizeList.h"
 #include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SanitizerSpecialCaseList.h"
 #include "clang/Basic/Sanitizers.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
+#include "llvm/Support/SpecialCaseList.h"
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 

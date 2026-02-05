@@ -12,12 +12,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/BugReporter/Z3CrosscheckVisitor.h"
+#include "clang/Analysis/PathDiagnostic.h"
 #include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/EntryPointStats.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/RangedConstraintManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SMTConv.h"
+#include "llvm/ADT/FoldingSet.h"
 #include "llvm/Support/SMTAPI.h"
 #include "llvm/Support/Timer.h"
+#include <algorithm>
+#include <limits>
+#include <optional>
 
 #define DEBUG_TYPE "Z3CrosscheckOracle"
 

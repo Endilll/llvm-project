@@ -11,12 +11,36 @@
 //===----------------------------------------------------------------------===//
 
 #include "ARM.h"
+#include "TargetDefines.h"
+#include "Targets/OSTargets.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/MacroBuilder.h"
+#include "clang/Basic/Specifiers.h"
 #include "clang/Basic/TargetBuiltins.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/ADT/StringTable.h"
+#include "llvm/Support/CodeGen.h"
 #include "llvm/TargetParser/ARMTargetParser.h"
+#include "llvm/TargetParser/ARMTargetParserCommon.h"
+#include <array>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <string>
+#include <string_view>
+#include <vector>
 
 using namespace clang;
 using namespace clang::targets;

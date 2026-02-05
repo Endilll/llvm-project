@@ -13,8 +13,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ExtractAPI/API.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <cstring>
 #include <memory>
 
 using namespace clang::extractapi;

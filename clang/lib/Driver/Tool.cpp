@@ -8,6 +8,7 @@
 
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/InputInfo.h"
+#include <cassert>
 
 using namespace clang::driver;
 

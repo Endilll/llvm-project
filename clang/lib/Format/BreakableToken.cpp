@@ -14,11 +14,20 @@
 
 #include "BreakableToken.h"
 #include "ContinuationIndenter.h"
+#include "Encoding.h"
+#include "FormatToken.h"
 #include "clang/Basic/CharInfo.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Format/Format.h"
 #include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/StringSet.h"
 #include "llvm/Support/Debug.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/Regex.h"
 #include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <string>
 
 #define DEBUG_TYPE "format-token-breaker"
 

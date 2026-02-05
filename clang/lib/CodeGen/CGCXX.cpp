@@ -13,16 +13,28 @@
 // We might split this into multiple files if it gets too unwieldy
 
 #include "CGCXXABI.h"
+#include "CGPointerAuthInfo.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
+#include "clang/AST/BaseSubobject.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/Mangle.h"
 #include "clang/AST/RecordLayout.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/AST/VTableBuilder.h"
+#include "clang/Basic/ABI.h"
 #include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/IR/Attributes.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/GlobalAlias.h"
+#include "llvm/Support/Alignment.h"
+#include <cassert>
+#include <cstdint>
 using namespace clang;
 using namespace CodeGen;
 

@@ -15,10 +15,29 @@
 #include "clang/APINotes/APINotesReader.h"
 #include "APINotesFormat.h"
 #include "clang/APINotes/Types.h"
+#include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/Hashing.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/Bitstream/BitCodeEnums.h"
 #include "llvm/Bitstream/BitstreamReader.h"
 #include "llvm/Support/DJB.h"
+#include "llvm/Support/Endian.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/OnDiskHashTable.h"
+#include "llvm/Support/VersionTuple.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <ctime>
+#include <memory>
+#include <optional>
+#include <string>
+#include <sys/types.h>
+#include <tuple>
+#include <utility>
 
 namespace clang {
 namespace api_notes {

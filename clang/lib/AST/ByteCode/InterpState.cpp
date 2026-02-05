@@ -7,12 +7,23 @@
 //===----------------------------------------------------------------------===//
 
 #include "InterpState.h"
+#include "ByteCode/InterpBlock.h"
+#include "ByteCode/Source.h"
 #include "InterpFrame.h"
 #include "InterpStack.h"
 #include "Program.h"
 #include "State.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/DiagnosticAST.h"
+#include "clang/Basic/LLVM.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdlib>
+#include <cstring>
 
 using namespace clang;
 using namespace clang::interp;

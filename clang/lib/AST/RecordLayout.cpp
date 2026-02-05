@@ -12,9 +12,9 @@
 
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/Basic/TargetCXXABI.h"
-#include "clang/Basic/TargetInfo.h"
+#include "clang/Basic/LLVM.h"
 #include <cassert>
+#include <cstdint>
 
 using namespace clang;
 

@@ -12,8 +12,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ASTMatchers/Dynamic/VariantValue.h"
+#include "clang/AST/ASTTypeTraits.h"
 #include "clang/Basic/LLVM.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <memory>
 #include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace clang {
 namespace ast_matchers {

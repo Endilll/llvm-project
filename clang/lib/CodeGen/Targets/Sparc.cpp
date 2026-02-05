@@ -7,8 +7,27 @@
 //===----------------------------------------------------------------------===//
 
 #include "ABIInfoImpl.h"
+#include "Address.h"
+#include "CGBuilder.h"
+#include "CGCXXABI.h"
+#include "CGValue.h"
+#include "CodeGenModule.h"
+#include "CodeGenTypes.h"
 #include "TargetInfo.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/CodeGen/CGFunctionInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/Support/MathExtras.h"
 #include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <memory>
 
 using namespace clang;
 using namespace clang::CodeGen;

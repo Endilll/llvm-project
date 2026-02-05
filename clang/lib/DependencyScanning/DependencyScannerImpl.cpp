@@ -7,13 +7,62 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/DependencyScanning/DependencyScannerImpl.h"
+#include "clang/AST/DependenceFlags.h"
+#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticFrontend.h"
+#include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/DiagnosticSerialization.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/DependencyScanning/DependencyScanningService.h"
 #include "clang/DependencyScanning/DependencyScanningWorker.h"
+#include "clang/DependencyScanning/InProcessModuleCache.h"
+#include "clang/DependencyScanning/ModuleDepCollector.h"
 #include "clang/Driver/Driver.h"
+#include "clang/Frontend/CompilerInstance.h"
+#include "clang/Frontend/CompilerInvocation.h"
+#include "clang/Frontend/FrontendAction.h"
 #include "clang/Frontend/FrontendActions.h"
+#include "clang/Frontend/FrontendOptions.h"
+#include "clang/Frontend/Utils.h"
+#include "clang/Lex/DependencyDirectivesScanner.h"
+#include "clang/Lex/HeaderSearch.h"
+#include "clang/Lex/HeaderSearchOptions.h"
+#include "clang/Lex/PPCallbacks.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/PreprocessorOptions.h"
+#include "clang/Serialization/ASTReader.h"
+#include "clang/Serialization/ModuleCache.h"
+#include "clang/Serialization/ModuleFile.h"
+#include "clang/Serialization/PCHContainerOperations.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/ADT/ScopeExit.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringExtras.h"
+#include "llvm/ADT/StringSet.h"
+#include "llvm/ADT/StringSwitch.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Path.h"
+#include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/TargetParser/Host.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <ctime>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 using namespace dependencies;

@@ -11,7 +11,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "MSP430.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/MacroBuilder.h"
+#include "llvm/ADT/ArrayRef.h"
 
 using namespace clang;
 using namespace clang::targets;

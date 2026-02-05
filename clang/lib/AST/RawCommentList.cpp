@@ -15,7 +15,20 @@
 #include "clang/AST/CommentParser.h"
 #include "clang/AST/CommentSema.h"
 #include "clang/Basic/CharInfo.h"
+#include "clang/Basic/CommentOptions.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <map>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 

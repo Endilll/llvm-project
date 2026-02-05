@@ -12,6 +12,9 @@
 //===----------------------------------------------------------------------===//
 
 #include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <utility>
 #include <vector>
 
 #include "clang/Analysis/FlowSensitive/CNFFormula.h"

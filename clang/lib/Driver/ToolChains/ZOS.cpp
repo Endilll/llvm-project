@@ -7,12 +7,30 @@
 //===----------------------------------------------------------------------===//
 
 #include "ZOS.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
 #include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Compilation.h"
+#include "clang/Driver/Driver.h"
+#include "clang/Driver/InputInfo.h"
+#include "clang/Driver/Job.h"
+#include "clang/Driver/Tool.h"
 #include "clang/Options/Options.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/WithColor.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/TargetParser/Triple.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdlib>
+#include <memory>
+#include <string>
 
 using namespace clang;
 using namespace clang::driver;

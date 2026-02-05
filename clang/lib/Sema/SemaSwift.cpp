@@ -11,14 +11,30 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaSwift.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/Attrs.inc"
+#include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/CharInfo.h"
 #include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
 #include "clang/Sema/Attr.h"
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Sema.h"
+#include "clang/Sema/SemaBase.h"
 #include "clang/Sema/SemaObjC.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <tuple>
 
 namespace clang {
 SemaSwift::SemaSwift(Sema &S) : SemaBase(S) {}

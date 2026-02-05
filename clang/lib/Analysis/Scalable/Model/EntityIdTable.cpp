@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Scalable/Model/EntityIdTable.h"
+#include "clang/Analysis/Scalable/Model/EntityId.h"
+#include "clang/Analysis/Scalable/Model/EntityName.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include <cassert>
 
 namespace clang::ssaf {

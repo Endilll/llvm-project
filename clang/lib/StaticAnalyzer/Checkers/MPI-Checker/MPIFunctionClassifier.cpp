@@ -12,7 +12,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Checkers/MPIFunctionClassifier.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/IdentifierTable.h"
 #include "llvm/ADT/STLExtras.h"
+#include <cassert>
 
 namespace clang {
 namespace ento {

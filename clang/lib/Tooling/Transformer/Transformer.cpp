@@ -11,6 +11,8 @@
 #include "clang/ASTMatchers/ASTMatchersInternal.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Tooling/Refactoring/AtomicChange.h"
+#include "clang/Tooling/Transformer/RewriteRule.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Error.h"
 #include <map>
 #include <utility>

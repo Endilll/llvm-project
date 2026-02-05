@@ -7,12 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "M68k.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Options/Options.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Support/Regex.h"
 #include "llvm/TargetParser/Host.h"
+#include <string>
+#include <vector>
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

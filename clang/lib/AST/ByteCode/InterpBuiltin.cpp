@@ -7,21 +7,57 @@
 //===----------------------------------------------------------------------===//
 #include "../ExprConstShared.h"
 #include "Boolean.h"
+#include "ByteCode/BitcastBuffer.h"
+#include "ByteCode/Descriptor.h"
+#include "ByteCode/DynamicAllocator.h"
+#include "ByteCode/FixedPoint.h"
+#include "ByteCode/Floating.h"
+#include "ByteCode/InterpFrame.h"
+#include "ByteCode/Record.h"
+#include "ByteCode/Source.h"
+#include "ByteCode/State.h"
 #include "EvalEmitter.h"
 #include "InterpBuiltinBitCast.h"
 #include "InterpHelpers.h"
 #include "PrimType.h"
 #include "Program.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/ComparisonCategories.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
 #include "clang/AST/InferAlloc.h"
 #include "clang/AST/OSLog.h"
+#include "clang/AST/OperationKinds.h"
 #include "clang/AST/RecordLayout.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/Basic/Builtins.h"
+#include "clang/Basic/DiagnosticAST.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/TargetBuiltins.h"
 #include "clang/Basic/TargetInfo.h"
+#include "clang/Basic/TypeTraits.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/FloatingPointMode.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/AllocToken.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MathExtras.h"
 #include "llvm/Support/SipHash.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
 
 namespace clang {
 namespace interp {

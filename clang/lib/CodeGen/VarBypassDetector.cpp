@@ -12,6 +12,9 @@
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/Stmt.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
 
 using namespace clang;
 using namespace CodeGen;

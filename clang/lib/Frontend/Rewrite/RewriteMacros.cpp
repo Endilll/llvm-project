@@ -11,12 +11,22 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Lex/Lexer.h"
 #include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/Token.h"
 #include "clang/Rewrite/Core/Rewriter.h"
 #include "clang/Rewrite/Frontend/Rewriters.h"
 #include "llvm/ADT/RewriteBuffer.h"
+#include "llvm/Support/MemoryBufferRef.h"
+#include <cassert>
 #include <cstdio>
+#include <string>
+#include <vector>
 
 using namespace clang;
 using llvm::RewriteBuffer;

@@ -8,11 +8,19 @@
 
 #include "AMDGPUOpenMP.h"
 #include "AMDGPU.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Sanitizers.h"
+#include "clang/Basic/TargetID.h"
+#include "clang/Driver/Action.h"
 #include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/Tool.h"
 #include "clang/Options/Options.h"
-#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Option/Arg.h"
+#include "llvm/Option/OptTable.h"
+#include "llvm/Option/Option.h"
+#include <cassert>
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

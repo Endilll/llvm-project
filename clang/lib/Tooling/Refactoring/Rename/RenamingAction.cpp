@@ -14,16 +14,29 @@
 #include "clang/Tooling/Refactoring/Rename/RenamingAction.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/Basic/DiagnosticRefactoring.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Lex/Lexer.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "clang/Tooling/Refactoring/AtomicChange.h"
+#include "clang/Tooling/Refactoring/RefactoringActionRule.h"
+#include "clang/Tooling/Refactoring/RefactoringRuleContext.h"
 #include "clang/Tooling/Refactoring/Rename/SymbolName.h"
+#include "clang/Tooling/Refactoring/Rename/SymbolOccurrences.h"
 #include "clang/Tooling/Refactoring/Rename/USRFinder.h"
 #include "clang/Tooling/Refactoring/Rename/USRFindingAction.h"
 #include "clang/Tooling/Refactoring/Rename/USRLocFinder.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Errc.h"
 #include "llvm/Support/Error.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <map>
+#include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 using namespace llvm;

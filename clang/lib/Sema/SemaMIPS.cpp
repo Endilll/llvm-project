@@ -11,12 +11,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaMIPS.h"
+#include "clang/AST/Expr.h"
 #include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TargetBuiltins.h"
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Sema/Attr.h"
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Sema.h"
+#include "clang/Sema/SemaBase.h"
+#include <string>
 
 namespace clang {
 

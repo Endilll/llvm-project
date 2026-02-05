@@ -15,7 +15,14 @@
 #include "clang/AST/Attr.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/Type.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OpenMPKinds.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Frontend/OpenMP/OMP.h.inc"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
 #include <optional>
+#include <string>
 #include <type_traits>
 using namespace clang;
 

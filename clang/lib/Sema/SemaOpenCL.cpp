@@ -12,10 +12,20 @@
 
 #include "clang/Sema/SemaOpenCL.h"
 #include "clang/AST/Attr.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Sema.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cstdint>
 
 namespace clang {
 SemaOpenCL::SemaOpenCL(Sema &S) : SemaBase(S) {}

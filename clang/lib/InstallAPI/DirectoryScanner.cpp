@@ -7,8 +7,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/InstallAPI/DirectoryScanner.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/InstallAPI/HeaderFile.h"
+#include "clang/InstallAPI/Library.h"
+#include "clang/InstallAPI/MachO.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Support/Path.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include <linux/limits.h>
+#include <system_error>
+#include <vector>
 
 using namespace llvm;
 using namespace llvm::MachO;

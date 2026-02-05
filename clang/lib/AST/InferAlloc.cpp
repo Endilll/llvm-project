@@ -15,9 +15,15 @@
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
+#include "clang/AST/OperationKinds.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/TypeTraits.h"
 #include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/Support/AllocToken.h"
+#include "llvm/Support/raw_ostream.h"
+#include <optional>
 
 using namespace clang;
 using namespace infer_alloc;

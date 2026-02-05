@@ -7,9 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "VE.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Options/Options.h"
 #include "llvm/Option/ArgList.h"
+#include <vector>
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

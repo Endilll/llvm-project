@@ -12,6 +12,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/ASTSourceDescriptor.h"
+#include "clang/Basic/Module.h"
+#include <string>
 
 namespace clang {
 

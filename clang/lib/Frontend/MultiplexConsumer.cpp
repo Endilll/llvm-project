@@ -13,8 +13,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/MultiplexConsumer.h"
+#include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTMutationListener.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/DeclGroup.h"
+#include "clang/AST/DeclID.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Sema/SemaConsumer.h"
+#include "clang/Serialization/ASTBitCodes.h"
+#include "clang/Serialization/ASTDeserializationListener.h"
+#include <cstddef>
+#include <memory>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 

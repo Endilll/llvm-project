@@ -9,15 +9,29 @@
 #include "clang/Index/CommentToXML.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
+#include "clang/AST/AttrIterator.h"
 #include "clang/AST/Comment.h"
+#include "clang/AST/CommentCommandTraits.h"
 #include "clang/AST/CommentVisitor.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/Basic/FileEntry.h"
 #include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Format/Format.h"
 #include "clang/Index/USRGeneration.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/TinyPtrVector.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <climits>
+#include <cstddef>
+#include <string>
 
 using namespace clang;
 using namespace clang::comments;

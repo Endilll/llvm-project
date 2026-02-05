@@ -11,6 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "Boolean.h"
+#include "ByteCode/Descriptor.h"
+#include "ByteCode/InitMap.h"
+#include "ByteCode/InterpBlock.h"
+#include "ByteCode/Record.h"
+#include "ByteCode/Source.h"
 #include "Context.h"
 #include "EvaluationResult.h"
 #include "FixedPoint.h"
@@ -25,9 +30,25 @@
 #include "PrimType.h"
 #include "Program.h"
 #include "clang/AST/ASTDumperUtils.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/ExprCXX.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/raw_ostream.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <memory>
+#include <string>
+#include <sys/types.h>
+#include <utility>
 
 using namespace clang;
 using namespace clang::interp;

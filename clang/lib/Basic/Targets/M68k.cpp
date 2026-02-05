@@ -11,15 +11,25 @@
 //===----------------------------------------------------------------------===//
 
 #include "M68k.h"
+#include "TargetDefines.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/MacroBuilder.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/ADT/Twine.h"
 #include "llvm/TargetParser/TargetParser.h"
 #include <cstdint>
-#include <cstring>
 #include <limits>
 #include <optional>
+#include <string>
+#include <string_view>
 
 namespace clang {
 namespace targets {

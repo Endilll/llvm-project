@@ -11,13 +11,34 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Address.h"
+#include "CGCall.h"
 #include "CGDebugInfo.h"
+#include "CGValue.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/NonTrivialTypeVisitor.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/CodeGen/CodeGenABITypes.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MathExtras.h"
 #include "llvm/Support/ScopedPrinter.h"
 #include <array>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
 
 using namespace clang;
 using namespace CodeGen;

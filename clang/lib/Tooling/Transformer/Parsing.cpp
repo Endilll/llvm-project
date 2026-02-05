@@ -8,12 +8,17 @@
 
 #include "clang/Tooling/Transformer/Parsing.h"
 #include "clang/Basic/CharInfo.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Transformer/RangeSelector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
 #include "llvm/Support/Error.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cstddef>
 #include <optional>
 #include <string>
+#include <system_error>
 #include <utility>
 
 using namespace clang;

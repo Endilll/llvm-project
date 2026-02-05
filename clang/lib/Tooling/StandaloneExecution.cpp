@@ -7,7 +7,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/StandaloneExecution.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Serialization/PCHContainerOperations.h"
+#include "clang/Tooling/ArgumentsAdjusters.h"
+#include "clang/Tooling/CommonOptionsParser.h"
+#include "clang/Tooling/CompilationDatabase.h"
+#include "clang/Tooling/Execution.h"
 #include "clang/Tooling/ToolExecutorPluginRegistry.h"
+#include "clang/Tooling/Tooling.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace clang {
 namespace tooling {

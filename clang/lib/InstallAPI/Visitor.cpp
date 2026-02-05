@@ -7,15 +7,39 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/InstallAPI/Visitor.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Availability.h"
 #include "clang/AST/ParentMapContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/AST/VTableBuilder.h"
+#include "clang/Basic/ABI.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/Linkage.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/Thunk.h"
+#include "clang/Basic/Visibility.h"
 #include "clang/InstallAPI/DylibVerifier.h"
 #include "clang/InstallAPI/FrontendRecords.h"
+#include "clang/InstallAPI/HeaderFile.h"
+#include "clang/InstallAPI/MachO.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/Mangler.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <optional>
+#include <string>
 
 using namespace llvm;
 using namespace llvm::MachO;

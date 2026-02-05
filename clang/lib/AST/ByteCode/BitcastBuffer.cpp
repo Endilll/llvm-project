@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 #include "BitcastBuffer.h"
 #include "llvm/ADT/STLExtras.h"
+#include <cassert>
+#include <cstddef>
+#include <memory>
 
 using namespace clang;
 using namespace clang::interp;

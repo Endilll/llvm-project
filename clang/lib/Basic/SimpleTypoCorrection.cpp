@@ -15,6 +15,8 @@
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringRef.h"
+#include <cstdlib>
+#include <optional>
 
 using namespace clang;
 

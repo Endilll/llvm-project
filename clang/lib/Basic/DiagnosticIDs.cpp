@@ -13,6 +13,7 @@
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/AllDiagnostics.h"
 #include "clang/Basic/DiagnosticCategories.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/SourceManager.h"
 #include "llvm/ADT/STLExtras.h"
@@ -20,8 +21,16 @@
 #include "llvm/ADT/StringTable.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
 #include <map>
 #include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 using namespace clang;
 
 //===----------------------------------------------------------------------===//

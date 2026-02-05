@@ -8,11 +8,18 @@
 
 #include "IndexingContext.h"
 #include "clang/AST/ASTConcept.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/RecursiveASTVisitor.h"
+#include "clang/AST/TemplateName.h"
 #include "clang/AST/TypeLoc.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Index/IndexSymbol.h"
 #include "clang/Sema/HeuristicResolver.h"
 #include "llvm/ADT/ScopeExit.h"
+#include <cassert>
+#include <vector>
 
 using namespace clang;
 using namespace index;

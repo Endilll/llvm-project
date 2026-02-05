@@ -14,6 +14,17 @@
 
 #include "clang/CodeGen/ConstantInitBuilder.h"
 #include "CodeGenModule.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/CodeGen/ConstantInitFuture.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Type.h"
+#include <cassert>
+#include <cstddef>
 
 using namespace clang;
 using namespace CodeGen;

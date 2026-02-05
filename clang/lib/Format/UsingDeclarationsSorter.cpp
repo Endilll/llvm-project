@@ -13,11 +13,27 @@
 //===----------------------------------------------------------------------===//
 
 #include "UsingDeclarationsSorter.h"
+#include "FormatToken.h"
+#include "FormatTokenLexer.h"
+#include "TokenAnalyzer.h"
+#include "TokenAnnotator.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TokenKinds.h"
 #include "clang/Format/Format.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Debug.h"
+#include "llvm/Support/Error.h"
 #include "llvm/Support/Regex.h"
+#include "llvm/Support/raw_ostream.h"
 
 #include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <string>
+#include <utility>
 
 #define DEBUG_TYPE "using-declarations-sorter"
 

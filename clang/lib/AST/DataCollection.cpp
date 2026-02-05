@@ -7,8 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/DataCollection.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Lex/Lexer.h"
+#include "llvm/Support/raw_ostream.h"
+#include <string>
 
 namespace clang {
 namespace data_collection {

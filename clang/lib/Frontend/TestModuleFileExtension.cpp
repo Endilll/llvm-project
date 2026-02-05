@@ -6,11 +6,24 @@
 //
 //===----------------------------------------------------------------------===//
 #include "TestModuleFileExtension.h"
+#include "clang/AST/DeclID.h"
 #include "clang/Basic/DiagnosticFrontend.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Serialization/ASTBitCodes.h"
 #include "clang/Serialization/ASTReader.h"
+#include "clang/Serialization/ModuleFile.h"
+#include "clang/Serialization/ModuleFileExtension.h"
+#include "llvm/Bitstream/BitCodes.h"
+#include "llvm/Bitstream/BitstreamReader.h"
 #include "llvm/Bitstream/BitstreamWriter.h"
+#include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <cstdint>
 #include <cstdio>
+#include <memory>
+#include <string>
+#include <utility>
 using namespace clang;
 using namespace clang::serialization;
 

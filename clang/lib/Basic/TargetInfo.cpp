@@ -12,16 +12,23 @@
 
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/CFProtectionOptions.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticFrontend.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetCXXABI.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringExtras.h"
+#include "llvm/ADT/StringMap.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/TargetParser.h"
-#include <cstdlib>
+#include <cassert>
+#include <string>
+#include <vector>
 using namespace clang;
 
 static const LangASMap DefaultAddrSpaceMap = {0};

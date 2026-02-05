@@ -13,7 +13,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/BlockCounter.h"
+#include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/ImmutableMap.h"
+#include "llvm/Support/Allocator.h"
+#include <tuple>
 
 using namespace clang;
 using namespace ento;

@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Scalable/Model/EntityName.h"
+#include "clang/Analysis/Scalable/Model/BuildNamespace.h"
+#include "llvm/ADT/StringRef.h"
+#include <utility>
 
 namespace clang::ssaf {
 

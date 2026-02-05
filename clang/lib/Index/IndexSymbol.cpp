@@ -8,11 +8,19 @@
 
 #include "clang/Index/IndexSymbol.h"
 #include "clang/AST/Attr.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DeclarationName.h"
 #include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Linkage.h"
 #include "clang/Lex/MacroInfo.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
 
 using namespace clang;
 using namespace clang::index;

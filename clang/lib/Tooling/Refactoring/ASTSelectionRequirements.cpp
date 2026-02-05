@@ -6,8 +6,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/Basic/DiagnosticRefactoring.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Tooling/Refactoring/ASTSelection.h"
 #include "clang/Tooling/Refactoring/RefactoringActionRuleRequirements.h"
+#include "clang/Tooling/Refactoring/RefactoringRuleContext.h"
+#include <memory>
 #include <optional>
+#include <utility>
 
 using namespace clang;
 using namespace tooling;

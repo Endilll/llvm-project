@@ -8,13 +8,20 @@
 
 #include "clang/DependencyScanning/DependencyScanningWorker.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticFrontend.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/DependencyScanning/DependencyScannerImpl.h"
 #include "clang/Driver/Driver.h"
-#include "clang/Driver/Tool.h"
 #include "clang/Serialization/ObjectFilePCHContainerReader.h"
+#include "clang/Serialization/PCHContainerOperations.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/VirtualFileSystem.h"
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 using namespace dependencies;

@@ -16,6 +16,7 @@
 #include "clang/Sema/Attr.h"
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Sema.h"
+#include "clang/Sema/SemaBase.h"
 
 namespace clang {
 SemaAVR::SemaAVR(Sema &S) : SemaBase(S) {}

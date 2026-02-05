@@ -12,8 +12,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/Stack.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/CrashRecoveryContext.h"
 #include "llvm/Support/ProgramStack.h"
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 
 static LLVM_THREAD_LOCAL uintptr_t BottomOfStack = 0;
 

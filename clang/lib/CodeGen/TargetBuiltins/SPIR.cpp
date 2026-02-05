@@ -12,8 +12,14 @@
 
 #include "CGHLSLRuntime.h"
 #include "CodeGenFunction.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetBuiltins.h"
+#include "llvm/IR/Attributes.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/IR/Intrinsics.h"
+#include "llvm/IR/IntrinsicsSPIRV.h"
+#include <cassert>
 
 using namespace clang;
 using namespace CodeGen;

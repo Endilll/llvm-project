@@ -7,17 +7,35 @@
 //===----------------------------------------------------------------------===//
 
 #include "Fuchsia.h"
+#include "clang/Basic/DiagnosticDriver.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Sanitizers.h"
 #include "clang/Config/config.h"
+#include "clang/Driver/Action.h"
 #include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
+#include "clang/Driver/InputInfo.h"
+#include "clang/Driver/Job.h"
+#include "clang/Driver/Multilib.h"
 #include "clang/Driver/MultilibBuilder.h"
 #include "clang/Driver/SanitizerArgs.h"
+#include "clang/Driver/Tool.h"
+#include "clang/Driver/Types.h"
 #include "clang/Options/Options.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <vector>
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

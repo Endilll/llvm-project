@@ -7,8 +7,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Execution.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Tooling/ArgumentsAdjusters.h"
+#include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/ToolExecutorPluginRegistry.h"
 #include "clang/Tooling/Tooling.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/CommandLine.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/Registry.h"
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 LLVM_INSTANTIATE_REGISTRY(clang::tooling::ToolExecutorPluginRegistry)
 

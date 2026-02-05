@@ -10,6 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/ThreadSafetyLogical.h"
+#include "llvm/Support/Casting.h"
 
 using namespace llvm;
 using namespace clang::threadSafety::lexpr;

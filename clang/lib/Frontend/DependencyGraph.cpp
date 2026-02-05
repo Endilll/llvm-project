@@ -12,14 +12,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/DiagnosticFrontend.h"
-#include "clang/Basic/FileManager.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Frontend/Utils.h"
 #include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
+#include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SetVector.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/GraphWriter.h"
 #include "llvm/Support/raw_ostream.h"
+#include <memory>
+#include <string>
+#include <system_error>
 
 using namespace clang;
 namespace DOT = llvm::DOT;

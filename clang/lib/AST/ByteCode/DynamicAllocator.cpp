@@ -7,8 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "DynamicAllocator.h"
+#include "ByteCode/Descriptor.h"
 #include "InterpBlock.h"
 #include "InterpState.h"
+#include "llvm/ADT/STLExtras.h"
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <utility>
 
 using namespace clang;
 using namespace clang::interp;

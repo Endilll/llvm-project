@@ -13,9 +13,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGCUDARuntime.h"
+#include "Address.h"
 #include "CGCall.h"
 #include "CodeGenFunction.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
+#include "clang/AST/OperationKinds.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/IR/Constant.h"
+#include <cassert>
 
 using namespace clang;
 using namespace CodeGen;

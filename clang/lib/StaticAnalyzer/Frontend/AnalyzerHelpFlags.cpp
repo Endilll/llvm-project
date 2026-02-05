@@ -11,11 +11,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Frontend/AnalyzerHelpFlags.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "clang/StaticAnalyzer/Frontend/CheckerRegistry.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/Twine.h"
 #include <memory>
+#include <string>
+#include <utility>
 
 using namespace clang;
 using namespace ento;

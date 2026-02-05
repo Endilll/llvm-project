@@ -10,9 +10,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "OSTargets.h"
-#include "AArch64.h"
+#include "TargetDefines.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/MacroBuilder.h"
+#include "clang/Basic/Sanitizers.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/TargetParser/Triple.h"
+#include <algorithm>
+#include <cassert>
 
 using namespace clang;
 using namespace clang::targets;

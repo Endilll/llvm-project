@@ -13,9 +13,14 @@
 #include "clang/Analysis/Analyses/IntervalPartition.h"
 #include "clang/Analysis/CFG.h"
 #include "llvm/ADT/BitVector.h"
+#include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/STLExtras.h"
+#include <cassert>
+#include <cstddef>
 #include <optional>
 #include <queue>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace clang {

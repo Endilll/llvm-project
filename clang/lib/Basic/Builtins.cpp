@@ -13,9 +13,21 @@
 #include "clang/Basic/Builtins.h"
 #include "BuiltinTargetFeatures.h"
 #include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/StringTable.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/TargetParser/Triple.h"
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
 using namespace clang;
 
 const char *HeaderDesc::getName() const {

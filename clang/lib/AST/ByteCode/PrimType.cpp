@@ -13,6 +13,8 @@
 #include "IntegralAP.h"
 #include "MemberPointer.h"
 #include "Pointer.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cstddef>
 
 using namespace clang;
 using namespace clang::interp;

@@ -13,12 +13,27 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/RetainSummaryManager.h"
+#include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
+#include "clang/ASTMatchers/ASTMatchers.h"
+#include "clang/Analysis/AnyCall.h"
 #include "clang/Analysis/DomainSpecific/CocoaConventions.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OperatorKinds.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
 #include <optional>
+#include <string>
 
 using namespace clang;
 using namespace ento;

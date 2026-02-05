@@ -11,9 +11,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Core/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
+#include "clang/Tooling/Core/Replacement.h"
 #include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include <cassert>
+#include <string>
 
 namespace clang {
 namespace tooling {

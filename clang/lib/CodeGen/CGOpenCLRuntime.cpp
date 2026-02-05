@@ -15,10 +15,17 @@
 #include "CGOpenCLRuntime.h"
 #include "CodeGenFunction.h"
 #include "TargetInfo.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/CodeGen/ConstantInitBuilder.h"
+#include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Function.h"
 #include "llvm/IR/GlobalValue.h"
 #include <assert.h>
+#include <cstdint>
 
 using namespace clang;
 using namespace CodeGen;

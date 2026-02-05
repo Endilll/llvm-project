@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/MakeSupport.h"
+#include "clang/Basic/LLVM.h"
 
 void clang::quoteMakeTarget(StringRef Target, SmallVectorImpl<char> &Res) {
   for (unsigned i = 0, e = Target.size(); i != e; ++i) {

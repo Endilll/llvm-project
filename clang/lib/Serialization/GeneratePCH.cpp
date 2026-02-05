@@ -13,12 +13,22 @@
 
 #include "clang/AST/ASTContext.h"
 #include "clang/Basic/DiagnosticFrontend.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/HeaderSearchOptions.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Sema/SemaConsumer.h"
+#include "clang/Serialization/ASTDeserializationListener.h"
 #include "clang/Serialization/ASTWriter.h"
+#include "clang/Serialization/PCHContainerOperations.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Bitstream/BitstreamWriter.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <memory>
+#include <system_error>
+#include <utility>
 
 using namespace clang;
 

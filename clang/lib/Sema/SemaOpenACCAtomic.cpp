@@ -10,10 +10,23 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
+#include "clang/AST/OperationKinds.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OpenACCKinds.h"
+#include "clang/Basic/OperatorKinds.h"
+#include "clang/Basic/PartialDiagnostic.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Sema/Ownership.h"
 #include "clang/Sema/SemaOpenACC.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/Support/ErrorHandling.h"
 
+#include <cassert>
 #include <optional>
 
 using namespace clang;

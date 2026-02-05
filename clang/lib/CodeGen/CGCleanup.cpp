@@ -17,8 +17,32 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGCleanup.h"
+#include "Address.h"
+#include "CGBuilder.h"
+#include "CGValue.h"
 #include "CodeGenFunction.h"
+#include "EHScopeStack.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Use.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MathExtras.h"
 #include "llvm/Support/SaveAndRestore.h"
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <initializer_list>
+#include <iterator>
+#include <memory>
 
 using namespace clang;
 using namespace CodeGen;

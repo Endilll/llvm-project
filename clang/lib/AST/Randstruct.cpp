@@ -16,13 +16,21 @@
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h" // For StaticAssertDecl
+#include "clang/AST/TypeBase.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 
 #include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <random>
 #include <set>
 #include <string>
+#include <utility>
 
 using clang::ASTContext;
 using clang::FieldDecl;

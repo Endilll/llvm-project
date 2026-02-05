@@ -8,7 +8,9 @@
 
 #include "InterpShared.h"
 #include "clang/AST/Attr.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/BitVector.h"
+#include <cassert>
 
 namespace clang {
 namespace interp {

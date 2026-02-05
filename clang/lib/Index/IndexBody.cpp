@@ -9,11 +9,25 @@
 #include "IndexingContext.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTLambda.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprConcepts.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/LambdaCapture.h"
+#include "clang/AST/OperationKinds.h"
 #include "clang/AST/RecursiveASTVisitor.h"
+#include "clang/AST/Stmt.h"
 #include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OperatorKinds.h"
+#include "clang/Index/IndexSymbol.h"
 #include "clang/Sema/HeuristicResolver.h"
+#include "llvm/ADT/STLExtras.h"
+#include <cassert>
+#include <vector>
 
 using namespace clang;
 using namespace clang::index;

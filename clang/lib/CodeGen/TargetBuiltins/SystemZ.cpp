@@ -10,9 +10,20 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Address.h"
 #include "CodeGenFunction.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetBuiltins.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/IntrinsicsS390.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/ErrorHandling.h"
 
 using namespace clang;
 using namespace CodeGen;

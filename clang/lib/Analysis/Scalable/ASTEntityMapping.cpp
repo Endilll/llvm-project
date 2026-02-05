@@ -13,8 +13,12 @@
 #include "clang/Analysis/Scalable/ASTEntityMapping.h"
 #include "clang/AST/Decl.h"
 #include "clang/Analysis/Scalable/Model/BuildNamespace.h"
+#include "clang/Analysis/Scalable/Model/EntityName.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Index/USRGeneration.h"
 #include "llvm/ADT/SmallString.h"
+#include "llvm/Support/raw_ostream.h"
+#include <optional>
 
 namespace clang::ssaf {
 

@@ -14,10 +14,26 @@
 #include "clang/AST/ASTDumper.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/ASTDumperUtils.h"
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/AST/Comment.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclLookups.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DeclarationName.h"
 #include "clang/AST/JSONNodeDumper.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceManager.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
+#include <functional>
 
 using namespace clang;
 using namespace clang::comments;

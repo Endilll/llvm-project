@@ -9,6 +9,10 @@
 #include "clang/Analysis/FlowSensitive/Models/ChromiumCheckModel.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
+#include "clang/Analysis/CFG.h"
+#include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseSet.h"
 
 namespace clang {

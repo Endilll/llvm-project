@@ -10,31 +10,49 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/CrossTU/CrossTranslationUnit.h"
+#include "clang/AST/ASTImportError.h"
 #include "clang/AST/ASTImporter.h"
+#include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/ParentMapContext.h"
+#include "clang/Analysis/MacroExpansionContext.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticCrossTU.h"
 #include "clang/Basic/DiagnosticDriver.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/CrossTU/CrossTUDiagnostic.h"
 #include "clang/Driver/CreateASTUnitFromArgs.h"
 #include "clang/Frontend/ASTUnit.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
 #include "clang/Index/USRGeneration.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/Statistic.h"
+#include "llvm/ADT/StringMap.h"
 #include "llvm/Option/ArgList.h"
+#include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/IOSandbox.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/Path.h"
+#include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/YAMLParser.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
 #include <algorithm>
+#include <cassert>
+#include <cstddef>
 #include <fstream>
+#include <memory>
 #include <optional>
 #include <sstream>
+#include <string>
+#include <system_error>
 #include <tuple>
+#include <utility>
 
 namespace clang {
 namespace cross_tu {

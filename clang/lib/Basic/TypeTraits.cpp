@@ -12,7 +12,6 @@
 
 #include "clang/Basic/TypeTraits.h"
 #include <cassert>
-#include <cstring>
 using namespace clang;
 
 static constexpr const char *TypeTraitNames[] = {

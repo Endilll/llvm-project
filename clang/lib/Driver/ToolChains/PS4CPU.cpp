@@ -7,16 +7,29 @@
 //===----------------------------------------------------------------------===//
 
 #include "PS4CPU.h"
+#include "ToolChains/Gnu.h"
+#include "clang/Basic/DiagnosticDriver.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Sanitizers.h"
 #include "clang/Config/config.h"
+#include "clang/Driver/Action.h"
 #include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
+#include "clang/Driver/InputInfo.h"
+#include "clang/Driver/Job.h"
 #include "clang/Driver/SanitizerArgs.h"
+#include "clang/Driver/Tool.h"
 #include "clang/Options/Options.h"
+#include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
+#include <cassert>
 #include <cstdlib> // ::getenv
+#include <memory>
+#include <string>
 
 using namespace clang::driver;
 using namespace clang;

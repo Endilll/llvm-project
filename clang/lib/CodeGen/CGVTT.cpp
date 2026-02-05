@@ -10,10 +10,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "CGVTables.h"
 #include "CodeGenModule.h"
 #include "CGCXXABI.h"
+#include "clang/AST/BaseSubobject.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Mangle.h"
 #include "clang/AST/RecordLayout.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/AST/VTTBuilder.h"
+#include "clang/AST/VTableBuilder.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/IR/ConstantRange.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/Support/Alignment.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <cstdint>
+#include <utility>
 using namespace clang;
 using namespace CodeGen;
 

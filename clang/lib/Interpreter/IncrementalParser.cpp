@@ -13,16 +13,35 @@
 #include "IncrementalParser.h"
 #include "IncrementalAction.h"
 
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclContextInternals.h"
+#include "clang/AST/ExternalASTSource.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TokenKinds.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Interpreter/PartialTranslationUnit.h"
 #include "clang/Parse/Parser.h"
 #include "clang/Sema/Sema.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/IR/Module.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/CrashRecoveryContext.h"
+#include "llvm/Support/Debug.h"
 #include "llvm/Support/Error.h"
+#include "llvm/Support/MemoryBuffer.h"
 
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <list>
+#include <memory>
 #include <sstream>
+#include <system_error>
+#include <utility>
+#include <vector>
 
 #define DEBUG_TYPE "clang-repl"
 

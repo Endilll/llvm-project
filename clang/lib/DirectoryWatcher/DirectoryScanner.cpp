@@ -8,8 +8,14 @@
 
 #include "DirectoryScanner.h"
 
+#include "clang/DirectoryWatcher/DirectoryWatcher.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include <optional>
+#include <string>
+#include <system_error>
+#include <vector>
 
 namespace clang {
 

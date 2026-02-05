@@ -1,8 +1,11 @@
 #include "clang/Basic/Cuda.h"
 
+#include "clang/Basic/OffloadArch.h"
 #include "llvm/ADT/Twine.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/VersionTuple.h"
+#include <limits>
+#include <string>
 
 namespace clang {
 

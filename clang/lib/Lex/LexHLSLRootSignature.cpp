@@ -7,6 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/LexHLSLRootSignature.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringSwitch.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cctype>
+#include <optional>
 
 namespace clang {
 namespace hlsl {

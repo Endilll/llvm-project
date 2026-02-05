@@ -7,7 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/IndexSerialization/SerializablePathCollection.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Path.h"
+#include <cstddef>
+#include <string>
 
 using namespace llvm;
 using namespace clang;

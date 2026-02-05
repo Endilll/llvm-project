@@ -13,7 +13,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "MPIBugReporter.h"
+#include "MPI-Checker/MPITypes.h"
+#include "clang/Analysis/PathDiagnostic.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace clang {
 namespace ento {

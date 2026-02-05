@@ -12,7 +12,13 @@
 
 #include "clang/Serialization/PCHContainerOperations.h"
 #include "clang/AST/ASTConsumer.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/raw_ostream.h"
+#include <memory>
+#include <string>
 #include <utility>
 
 using namespace clang;

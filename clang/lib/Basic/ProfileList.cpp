@@ -13,10 +13,18 @@
 
 #include "clang/Basic/ProfileList.h"
 #include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Frontend/Driver/CodeGenOptions.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SpecialCaseList.h"
 
+#include <memory>
 #include <optional>
+#include <string>
+#include <vector>
 
 using namespace clang;
 

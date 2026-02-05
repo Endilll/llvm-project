@@ -15,6 +15,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/DelayedDiagnostic.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include <cassert>
 #include <cstring>
 
 using namespace clang;

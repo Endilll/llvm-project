@@ -10,14 +10,31 @@
 
 #include "clang/Sema/SemaSYCL.h"
 #include "TreeTransform.h"
+#include "clang/AST/Attrs.inc"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/Expr.h"
 #include "clang/AST/Mangle.h"
 #include "clang/AST/SYCLKernelInfo.h"
+#include "clang/AST/Stmt.h"
 #include "clang/AST/StmtSYCL.h"
-#include "clang/AST/TypeOrdering.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/Attr.h"
+#include "clang/Sema/Ownership.h"
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Sema.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/STLExtras.h"
+#include <cassert>
+#include <cstdint>
 
 using namespace clang;
 

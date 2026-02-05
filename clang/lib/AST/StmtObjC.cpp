@@ -14,6 +14,9 @@
 
 #include "clang/AST/Expr.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/SourceLocation.h"
+#include <cstddef>
 
 using namespace clang;
 

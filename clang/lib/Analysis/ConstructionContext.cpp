@@ -14,7 +14,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/ConstructionContext.h"
-#include "clang/AST/ExprObjC.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Analysis/Support/BumpVector.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
 
 using namespace clang;
 

@@ -17,7 +17,15 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/raw_ostream.h"
+#include <array>
+#include <cassert>
+#include <cctype>
 #include <iterator>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 using namespace ento;

@@ -11,13 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/Sanitizers.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/Hashing.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/ADT/bit.h"
 #include "llvm/Support/Format.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Transforms/Instrumentation/AddressSanitizerOptions.h"
 #include <algorithm>
 #include <cmath>
 #include <optional>
+#include <string>
+#include <vector>
 
 using namespace clang;
 

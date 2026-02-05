@@ -14,7 +14,16 @@
 
 #include "FormatToken.h"
 #include "ContinuationIndenter.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Format/Format.h"
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <algorithm>
+#include <array>
+#include <cassert>
 #include <climits>
 
 namespace clang {

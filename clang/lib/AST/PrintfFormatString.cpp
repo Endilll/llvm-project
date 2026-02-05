@@ -12,10 +12,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "FormatStringParsing.h"
+#include "clang/AST/ASTContext.h"
 #include "clang/AST/FormatString.h"
 #include "clang/AST/OSLog.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetInfo.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Regex.h"
+#include <cassert>
+#include <cstddef>
+#include <string>
 
 using clang::analyze_format_string::ArgType;
 using clang::analyze_format_string::FormatStringHandler;

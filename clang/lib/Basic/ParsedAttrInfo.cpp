@@ -13,6 +13,7 @@
 
 #include "clang/Basic/ParsedAttrInfo.h"
 #include "llvm/Support/ManagedStatic.h"
+#include "llvm/Support/Registry.h"
 #include <list>
 #include <memory>
 

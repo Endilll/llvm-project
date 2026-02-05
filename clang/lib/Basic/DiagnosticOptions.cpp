@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/Support/raw_ostream.h"
 #include <type_traits>
 

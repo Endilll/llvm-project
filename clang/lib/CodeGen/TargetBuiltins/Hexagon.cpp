@@ -10,9 +10,20 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "Address.h"
 #include "CodeGenFunction.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/OperationKinds.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetBuiltins.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/IntrinsicsHexagon.h"
+#include "llvm/IR/Type.h"
+#include <iterator>
+#include <tuple>
+#include <utility>
 
 using namespace clang;
 using namespace CodeGen;

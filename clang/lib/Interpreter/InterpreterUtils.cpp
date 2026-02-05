@@ -11,7 +11,24 @@
 //===----------------------------------------------------------------------===//
 
 #include "InterpreterUtils.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/QualTypeNames.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Sema/Lookup.h"
+#include "clang/Sema/Redeclaration.h"
+#include "clang/Sema/Sema.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/StringRef.h"
+#include <cassert>
+#include <cstdint>
+#include <string>
 
 namespace clang {
 

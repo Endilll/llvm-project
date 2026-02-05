@@ -11,8 +11,22 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/AST/Decl.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/TemplateKinds.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Lex/Token.h"
 #include "clang/Parse/Parser.h"
+#include "clang/Sema/DeclSpec.h"
+#include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/ParsedTemplate.h"
+#include "clang/Sema/Sema.h"
+#include "clang/Sema/TypoCorrection.h"
+#include "llvm/ADT/STLExtras.h"
+#include <cassert>
+#include <memory>
 using namespace clang;
 
 bool Parser::isCXXDeclarationStatement(

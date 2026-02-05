@@ -14,11 +14,16 @@
 
 #include "clang/AST/OSLog.h"
 #include "clang/AST/Attr.h"
+#include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/FormatString.h"
 #include "clang/Basic/Builtins.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
 #include <optional>
 
 using namespace clang;

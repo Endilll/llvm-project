@@ -10,7 +10,37 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Sema/MultiplexExternalSemaSource.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclID.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/ExternalASTSource.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Sema/DeclSpec.h"
+#include "clang/Sema/ExternalSemaSource.h"
 #include "clang/Sema/Lookup.h"
+#include "clang/Sema/Sema.h"
+#include "clang/Sema/TypoCorrection.h"
+#include "clang/Sema/Weak.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallVector.h"
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <utility>
 
 using namespace clang;
 

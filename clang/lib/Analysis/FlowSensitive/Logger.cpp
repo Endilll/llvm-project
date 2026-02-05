@@ -7,9 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/FlowSensitive/Logger.h"
+#include "clang/Analysis/CFG.h"
 #include "clang/Analysis/FlowSensitive/AdornedCFG.h"
 #include "clang/Analysis/FlowSensitive/TypeErasedDataflowAnalysis.h"
+#include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/WithColor.h"
+#include "llvm/Support/raw_ostream.h"
+#include <memory>
 
 namespace clang::dataflow {
 

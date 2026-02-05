@@ -6,11 +6,18 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Tooling/Syntax/Tree.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Tooling/Syntax/Nodes.h"
+#include "clang/Tooling/Syntax/TokenManager.h"
 #include "llvm/ADT/BitVector.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
 #include <cassert>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 

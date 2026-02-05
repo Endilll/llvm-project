@@ -11,6 +11,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/PreprocessorLexer.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Lex/Token.h"

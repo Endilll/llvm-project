@@ -11,16 +11,29 @@
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Expr.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
+#include "clang/ASTMatchers/ASTMatchers.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/Lexer.h"
+#include "clang/Tooling/Transformer/MatchConsumer.h"
+#include "clang/Tooling/Transformer/RangeSelector.h"
 #include "clang/Tooling/Transformer/SourceCode.h"
 #include "clang/Tooling/Transformer/SourceCodeBuilders.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringExtras.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/Twine.h"
 #include "llvm/Support/Errc.h"
 #include "llvm/Support/Error.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
 #include <memory>
+#include <optional>
 #include <string>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 using namespace transformer;

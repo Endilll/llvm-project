@@ -7,7 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/StandaloneDiagnostic.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/Lexer.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/StringMap.h"
+#include <cassert>
+#include <iterator>
+#include <utility>
 
 namespace clang {
 

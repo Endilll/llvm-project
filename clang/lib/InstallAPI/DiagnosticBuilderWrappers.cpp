@@ -7,9 +7,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "DiagnosticBuilderWrappers.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/InstallAPI/DylibVerifier.h"
 #include "llvm/ADT/STLExtras.h"
+#include "llvm/BinaryFormat/MachO.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/TextAPI/Architecture.h"
+#include "llvm/TextAPI/ArchitectureSet.h"
+#include "llvm/TextAPI/FileTypes.h"
+#include "llvm/TextAPI/PackedVersion.h"
 #include "llvm/TextAPI/Platform.h"
+#include <string>
+#include <utility>
 
 using clang::DiagnosticBuilder;
 

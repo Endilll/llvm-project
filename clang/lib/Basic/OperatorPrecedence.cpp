@@ -11,6 +11,7 @@
 ///
 //===----------------------------------------------------------------------===//
 #include "clang/Basic/OperatorPrecedence.h"
+#include "clang/Basic/TokenKinds.h"
 
 namespace clang {
 

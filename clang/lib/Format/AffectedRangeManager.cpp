@@ -15,6 +15,11 @@
 
 #include "FormatToken.h"
 #include "TokenAnnotator.h"
+#include "UnwrappedLineParser.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/TokenKinds.h"
+#include <cassert>
 
 namespace clang {
 namespace format {

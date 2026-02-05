@@ -21,6 +21,9 @@
 #include "clang/StaticAnalyzer/Frontend/ModelConsumer.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclGroup.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/Support/Casting.h"
+#include <utility>
 
 using namespace clang;
 using namespace ento;

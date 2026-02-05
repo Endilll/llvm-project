@@ -6,7 +6,11 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Tooling/Syntax/Nodes.h"
-#include "llvm/Support/raw_ostream.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <vector>
 
 using namespace clang;
 

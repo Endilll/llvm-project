@@ -7,11 +7,29 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Inclusions/HeaderIncludes.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Lexer.h"
+#include "clang/Lex/Token.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "clang/Tooling/Inclusions/IncludeStyle.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/Path.h"
+#include "llvm/Support/Regex.h"
+#include <algorithm>
+#include <cassert>
+#include <climits>
+#include <functional>
+#include <iterator>
 #include <optional>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 namespace clang {
 namespace tooling {

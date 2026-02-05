@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/APSIntType.h"
+#include "llvm/ADT/APSInt.h"
 
 using namespace clang;
 using namespace ento;

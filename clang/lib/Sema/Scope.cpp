@@ -13,7 +13,12 @@
 
 #include "clang/Sema/Scope.h"
 #include "clang/AST/Decl.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <optional>
+#include <utility>
 
 using namespace clang;
 

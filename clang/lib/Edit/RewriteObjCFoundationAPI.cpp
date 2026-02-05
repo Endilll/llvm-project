@@ -10,6 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/AST/Decl.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/OperationKinds.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Edit/Rewriters.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ExprCXX.h"
@@ -18,6 +25,9 @@
 #include "clang/AST/ParentMap.h"
 #include "clang/Edit/Commit.h"
 #include "clang/Lex/Lexer.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <cstdint>
 #include <optional>
 
 using namespace clang;

@@ -8,15 +8,36 @@
 
 #include "clang/Tooling/DependencyScanningTool.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/DiagnosticFrontend.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/DependencyScanning/DependencyScannerImpl.h"
+#include "clang/DependencyScanning/DependencyScanningUtils.h"
+#include "clang/DependencyScanning/DependencyScanningWorker.h"
+#include "clang/DependencyScanning/ModuleDepCollector.h"
+#include "clang/Driver/Driver.h"
+#include "clang/Driver/Job.h"
 #include "clang/Driver/Tool.h"
+#include "clang/Frontend/DependencyOutputOptions.h"
 #include "clang/Frontend/Utils.h"
-#include "llvm/ADT/SmallVectorExtras.h"
+#include "clang/Tooling/CompilationDatabase.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/iterator.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/Error.h"
 #include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Host.h"
+#include <cassert>
+#include <memory>
 #include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 using namespace tooling;

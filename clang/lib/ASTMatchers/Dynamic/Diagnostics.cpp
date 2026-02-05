@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ASTMatchers/Dynamic/Diagnostics.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cstddef>
+#include <string>
+#include <utility>
 
 namespace clang {
 namespace ast_matchers {

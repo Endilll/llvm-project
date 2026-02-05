@@ -13,6 +13,12 @@
 #include "CodeGenModule.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Type.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Sanitizers.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/IR/Metadata.h"
+#include "llvm/Support/raw_ostream.h"
+#include <string>
 
 using namespace clang;
 using namespace CodeGen;

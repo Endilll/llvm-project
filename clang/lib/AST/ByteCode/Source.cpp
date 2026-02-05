@@ -8,6 +8,8 @@
 
 #include "Source.h"
 #include "clang/AST/Expr.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/LLVM.h"
 
 using namespace clang;
 using namespace clang::interp;

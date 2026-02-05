@@ -30,13 +30,33 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaPseudoObject.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclObjCCommon.h"
+#include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprObjC.h"
+#include "clang/AST/OperationKinds.h"
+#include "clang/AST/TypeBase.h"
 #include "clang/Basic/CharInfo.h"
+#include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Preprocessor.h"
+#include "clang/Sema/DeclSpec.h"
 #include "clang/Sema/Initialization.h"
+#include "clang/Sema/Ownership.h"
 #include "clang/Sema/ScopeInfo.h"
+#include "clang/Sema/Sema.h"
+#include "clang/Sema/SemaBase.h"
 #include "clang/Sema/SemaObjC.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
 
 using namespace clang;
 using namespace sema;

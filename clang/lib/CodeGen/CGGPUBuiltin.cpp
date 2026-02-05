@@ -11,11 +11,30 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "CGBuilder.h"
+#include "CGCall.h"
+#include "CGValue.h"
 #include "CodeGenFunction.h"
+#include "CodeGenModule.h"
+#include "clang/AST/Expr.h"
 #include "clang/Basic/Builtins.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Constants.h"
 #include "llvm/IR/DataLayout.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Instruction.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/TypeSize.h"
 #include "llvm/Transforms/Utils/AMDGPUEmitPrintf.h"
+#include <cassert>
+#include <cstdint>
+#include <utility>
 
 using namespace clang;
 using namespace CodeGen;

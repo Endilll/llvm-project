@@ -9,13 +9,20 @@
 #include "clang/Index/IndexingAction.h"
 #include "IndexingContext.h"
 #include "clang/AST/DeclGroup.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendAction.h"
 #include "clang/Index/IndexDataConsumer.h"
+#include "clang/Index/IndexSymbol.h"
+#include "clang/Index/IndexingOptions.h"
 #include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Serialization/ASTReader.h"
+#include <cassert>
+#include <functional>
 #include <memory>
+#include <utility>
 
 using namespace clang;
 using namespace clang::index;

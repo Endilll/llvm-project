@@ -7,10 +7,29 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Refactoring/ASTSelection.h"
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/ExprObjC.h"
 #include "clang/AST/LexicallyOrderedRecursiveASTVisitor.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Lexer.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
+#include "llvm/Support/raw_ostream.h"
+#include <cassert>
+#include <functional>
 #include <optional>
+#include <utility>
+#include <vector>
 
 using namespace clang;
 using namespace tooling;

@@ -7,15 +7,34 @@
 //===----------------------------------------------------------------------===//
 
 #include "ByteCodeEmitter.h"
+#include "ByteCode/Descriptor.h"
+#include "ByteCode/FixedPoint.h"
+#include "ByteCode/Function.h"
+#include "ByteCode/InterpBlock.h"
+#include "ByteCode/PrimType.h"
+#include "ByteCode/Record.h"
+#include "ByteCode/Source.h"
 #include "Context.h"
 #include "Floating.h"
 #include "IntegralAP.h"
 #include "Opcode.h"
 #include "Program.h"
-#include "clang/AST/ASTLambda.h"
 #include "clang/AST/Attr.h"
+#include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/Support/Endian.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
 #include <type_traits>
+#include <utility>
 
 using namespace clang;
 using namespace clang::interp;

@@ -13,6 +13,16 @@
 
 #include "clang/Basic/SourceMgrAdapter.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/SMLoc.h"
+#include "llvm/Support/SourceMgr.h"
+#include <memory>
+#include <optional>
+#include <utility>
 
 using namespace clang;
 

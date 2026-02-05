@@ -44,7 +44,10 @@
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
 #include <cassert>
+#include <functional>
 #include <memory>
+#include <string>
+#include <utility>
 
 using namespace clang;
 

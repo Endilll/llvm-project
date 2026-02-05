@@ -11,7 +11,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "TCE.h"
-#include "Targets.h"
+#include "TargetDefines.h"
+#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/MacroBuilder.h"
 
 using namespace clang;

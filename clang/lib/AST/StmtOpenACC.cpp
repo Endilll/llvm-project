@@ -12,8 +12,20 @@
 
 #include "clang/AST/StmtOpenACC.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
-#include "clang/AST/StmtCXX.h"
+#include "clang/AST/OpenACCClause.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OpenACCKinds.h"
+#include "clang/Basic/OperatorKinds.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <utility>
 
 using namespace clang;
 

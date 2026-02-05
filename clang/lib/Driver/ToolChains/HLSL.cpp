@@ -7,12 +7,30 @@
 //===----------------------------------------------------------------------===//
 
 #include "HLSL.h"
-#include "clang/Driver/CommonArgs.h"
+#include "clang/Basic/DiagnosticDriver.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangStandard.h"
+#include "clang/Driver/Action.h"
 #include "clang/Driver/Compilation.h"
+#include "clang/Driver/Driver.h"
 #include "clang/Driver/Job.h"
+#include "clang/Options/Options.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/Option/Arg.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/Option/OptTable.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <optional>
 #include <regex>
+#include <string>
+#include <vector>
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

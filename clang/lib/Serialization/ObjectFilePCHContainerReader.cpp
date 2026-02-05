@@ -7,8 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Serialization/ObjectFilePCHContainerReader.h"
+#include "clang/Basic/LLVM.h"
 #include "llvm/Object/COFF.h"
+#include "llvm/Object/Error.h"
 #include "llvm/Object/ObjectFile.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/MemoryBufferRef.h"
+#include "llvm/Support/raw_ostream.h"
 
 using namespace clang;
 

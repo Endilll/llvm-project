@@ -11,10 +11,24 @@
 //===----------------------------------------------------------------------===//
 
 #include "NVPTX.h"
+#include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Builtins.h"
+#include "clang/Basic/Cuda.h"
+#include "clang/Basic/LLVM.h"
 #include "clang/Basic/MacroBuilder.h"
+#include "clang/Basic/OffloadArch.h"
 #include "clang/Basic/TargetBuiltins.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/TargetParser/Triple.h"
+#include <cassert>
+#include <iterator>
 
 using namespace clang;
 using namespace clang::targets;

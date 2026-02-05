@@ -7,10 +7,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/QualTypeNames.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/Mangle.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/ErrorHandling.h"
+#include <cassert>
+#include <optional>
+#include <string>
 
 namespace clang {
 
