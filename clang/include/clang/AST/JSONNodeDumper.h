@@ -14,36 +14,23 @@
 #ifndef LLVM_CLANG_AST_JSONNODEDUMPER_H
 #define LLVM_CLANG_AST_JSONNODEDUMPER_H
 
-#include "clang/AST/ASTConcept.h"
-#include "clang/AST/ASTContext.h"
+#include <cassert>
+#include <functional>
+#include <string>
+#include <utility>
+
 #include "clang/AST/ASTNodeTraverser.h"
 #include "clang/AST/AttrVisitor.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/Comment.h"
-#include "clang/AST/CommentCommandTraits.h"
 #include "clang/AST/CommentVisitor.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclFriend.h"
-#include "clang/AST/DeclObjC.h"
-#include "clang/AST/DeclOpenACC.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/DeclVisitor.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
-#include "clang/AST/ExprConcepts.h"
-#include "clang/AST/ExprObjC.h"
 #include "clang/AST/Mangle.h"
 #include "clang/AST/OpenACCClause.h"
-#include "clang/AST/OpenMPClause.h"
-#include "clang/AST/Redeclarable.h"
-#include "clang/AST/Stmt.h"
-#include "clang/AST/StmtObjC.h"
 #include "clang/AST/StmtVisitor.h"
 #include "clang/AST/TemplateArgumentVisitor.h"
-#include "clang/AST/Type.h"
-#include "clang/AST/TypeLoc.h"
 #include "clang/AST/TypeVisitor.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -51,13 +38,125 @@
 #include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/JSON.h"
-#include <cassert>
-#include <functional>
-#include <string>
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/StmtIterator.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 
 class APValue;
+class ASTContext;
+class AccessSpecDecl;
+class AliasAttr;
+class ArrayType;
+class Attr;
+class AutoType;
+class CXXBaseSpecifier;
+class CXXBindTemporaryExpr;
+class CXXBoolLiteralExpr;
+class CXXConstructExpr;
+class CXXCtorInitializer;
+class CXXDefaultArgExpr;
+class CXXDefaultInitExpr;
+class CXXDeleteExpr;
+class CXXDependentScopeMemberExpr;
+class CXXNewExpr;
+class CXXRecordDecl;
+class CXXThisExpr;
+class CXXTypeidExpr;
+class CXXUnresolvedConstructExpr;
+class CaseStmt;
+class CleanupAttr;
+class CompoundStmt;
+class ConceptReference;
+class ConstantArrayType;
+class Decl;
+class DependentSizedExtVectorType;
+class DeprecatedAttr;
+class ExprWithCleanups;
+class FriendDecl;
+class FunctionProtoType;
+class FunctionType;
+class GotoStmt;
+class IfStmt;
+class InjectedClassNameType;
+class LabelStmt;
+class LambdaExpr;
+class LinkageSpecDecl;
+class LoopControlStmt;
+class MacroQualifiedType;
+class MaterializeTemporaryExpr;
+class MemberPointerType;
+class NamespaceAliasDecl;
+class OMPClause;
+class ObjCAtCatchStmt;
+class ObjCBoolLiteralExpr;
+class ObjCBoxedExpr;
+class ObjCCategoryDecl;
+class ObjCCategoryImplDecl;
+class ObjCCompatibleAliasDecl;
+class ObjCEncodeExpr;
+class ObjCImplementationDecl;
+class ObjCInterfaceDecl;
+class ObjCInterfaceType;
+class ObjCIvarDecl;
+class ObjCIvarRefExpr;
+class ObjCMessageExpr;
+class ObjCMethodDecl;
+class ObjCPropertyDecl;
+class ObjCPropertyImplDecl;
+class ObjCPropertyRefExpr;
+class ObjCProtocolDecl;
+class ObjCProtocolExpr;
+class ObjCSelectorExpr;
+class ObjCSubscriptRefExpr;
+class ObjCTypeParamDecl;
+class OpenACCDeclareDecl;
+class OpenACCRoutineDecl;
+class PackExpansionType;
+class QualType;
+class ReferenceType;
+class RequiresExpr;
+class SectionAttr;
+class SizeOfPackExpr;
+class SourceManager;
+class Stmt;
+class SubstTemplateTypeParmPackType;
+class SubstTemplateTypeParmType;
+class SwitchStmt;
+class TLSModelAttr;
+class TagType;
+class TemplateArgument;
+class TemplateSpecializationType;
+class TemplateTypeParmType;
+class Type;
+class TypeLoc;
+class TypedefType;
+class UnaryTransformType;
+class UnavailableAttr;
+class UnresolvedLookupExpr;
+class UnresolvedUsingType;
+class UsingDecl;
+class UsingDirectiveDecl;
+class UsingEnumDecl;
+class UsingShadowDecl;
+class UsingType;
+class VectorType;
+class VisibilityAttr;
+class WhileStmt;
+namespace comments {
+class CommandTraits;
+}  // namespace comments
+namespace concepts {
+class Requirement;
+}  // namespace concepts
+template <typename decl_type> class Mergeable;
+template <typename decl_type> class Redeclarable;
 
 class NodeStreamer {
   bool FirstChild = true;

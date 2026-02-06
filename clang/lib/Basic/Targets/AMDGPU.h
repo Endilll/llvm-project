@@ -13,17 +13,35 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_AMDGPU_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_AMDGPU_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/TargetID.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/ADT/StringSet.h"
 #include "llvm/Support/AMDGPUAddrSpace.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/TargetParser/TargetParser.h"
 #include "llvm/TargetParser/Triple.h"
-#include <optional>
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Frontend/OpenMP/OMPGridValues.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/ErrorHandling.h"
 
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 
 class LLVM_LIBRARY_VISIBILITY AMDGPUTargetInfo final : public TargetInfo {

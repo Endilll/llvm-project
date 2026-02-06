@@ -10,9 +10,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <memory>
+#include <utility>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
@@ -24,9 +27,9 @@
 #include "clang/Rewrite/Frontend/ASTConsumers.h"
 #include "llvm/ADT/RewriteBuffer.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <memory>
-#include <utility>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/MemoryBufferRef.h"
+
 using namespace clang;
 using llvm::RewriteBuffer;
 

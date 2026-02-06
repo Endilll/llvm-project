@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/ThreadSafetyCommon.h"
+
+#include <algorithm>
+#include <cassert>
+#include <string>
+#include <utility>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -30,10 +36,9 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <string>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
 
 using namespace clang;
 using namespace threadSafety;

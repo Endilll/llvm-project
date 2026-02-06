@@ -13,7 +13,9 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_CHECKER_H
 #define LLVM_CLANG_STATICANALYZER_CORE_CHECKER_H
 
-#include "clang/AST/Stmt.h"
+#include <cassert>
+#include <optional>
+
 #include "clang/Analysis/ProgramPoint.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
@@ -21,12 +23,33 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
-#include <cassert>
-#include <optional>
+#include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
+class Decl;
+class LocationContext;
+class ReturnStmt;
+class Stmt;
+class TranslationUnitDecl;
+
 namespace ento {
   class BugReporter;
+class AnalysisManager;
+class CXXAllocatorCall;
+class CallEvent;
+class CheckerContext;
+class ExplodedGraph;
+class ExplodedNode;
+class ExprEngine;
+class ObjCMethodCall;
+class SymbolReaper;
 
 namespace check {
 

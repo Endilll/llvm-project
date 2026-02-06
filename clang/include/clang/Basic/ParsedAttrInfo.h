@@ -15,23 +15,28 @@
 #ifndef LLVM_CLANG_BASIC_PARSEDATTRINFO_H
 #define LLVM_CLANG_BASIC_PARSEDATTRINFO_H
 
-#include "clang/Basic/AttrSubjectMatchRules.h"
-#include "clang/Basic/AttributeCommonInfo.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Support/Compiler.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/Support/Compiler.h"
-#include "llvm/Support/Registry.h"
 #include <climits>
 #include <cstddef>
 #include <list>
 #include <memory>
 #include <utility>
 
+#include "clang/Basic/AttrSubjectMatchRules.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Support/Compiler.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/Registry.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
+
 namespace clang {
 
-class Attr;
 class Decl;
 class LangOptions;
 class ParsedAttr;

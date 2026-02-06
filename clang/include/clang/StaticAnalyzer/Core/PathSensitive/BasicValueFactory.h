@@ -15,33 +15,39 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_BASICVALUEFACTORY_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_BASICVALUEFACTORY_H
 
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Type.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/APSIntType.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/StoreRef.h"
-#include "llvm/ADT/APInt.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/ImmutableList.h"
-#include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <utility>
+
+namespace llvm {
+class APInt;
+template <typename IteratorT> class iterator_range;
+}  // namespace llvm
 
 namespace clang {
 
 class CXXBaseSpecifier;
+class NamedDecl;
 
 namespace ento {
+class TypedValueRegion;
 
 class CompoundValData : public llvm::FoldingSetNode {
   QualType T;

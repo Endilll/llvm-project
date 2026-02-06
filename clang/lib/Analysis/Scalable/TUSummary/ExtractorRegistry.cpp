@@ -7,13 +7,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Scalable/TUSummary/ExtractorRegistry.h"
-#include "clang/AST/ASTConsumer.h"
+
+#include <cassert>
+#include <memory>
+
 #include "clang/Analysis/Scalable/TUSummary/TUSummaryExtractor.h"
 #include "clang/Support/Compiler.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Registry.h"
-#include <cassert>
-#include <memory>
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+namespace ssaf {
+class TUSummaryBuilder;
+}  // namespace ssaf
+}  // namespace clang
 
 using namespace clang;
 using namespace ssaf;

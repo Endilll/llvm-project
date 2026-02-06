@@ -13,24 +13,37 @@
 #ifndef LLVM_CLANG_AST_INTERP_PROGRAM_H
 #define LLVM_CLANG_AST_INTERP_PROGRAM_H
 
+#include <assert.h>
+#include <vector>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <utility>
+
 #include "Function.h"
 #include "Pointer.h"
-#include "PrimType.h"
 #include "Record.h"
-#include "Source.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/Allocator.h"
-#include <vector>
+#include "Descriptor.h"
+#include "InterpBlock.h"
+#include "clang/AST/Decl.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
-class RecordDecl;
 class Expr;
-class FunctionDecl;
 class StringLiteral;
-class VarDecl;
+class QualType;
+class Type;
 
 namespace interp {
 class Context;
+enum PrimType : uint8_t;
 
 /// The program contains and links the bytecode for all functions.
 class Program final {

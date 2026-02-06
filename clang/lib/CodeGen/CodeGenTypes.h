@@ -13,11 +13,19 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CODEGENTYPES_H
 #define LLVM_CLANG_LIB_CODEGEN_CODEGENTYPES_H
 
-#include "CGCall.h"
+#include <memory>
+
 #include "clang/Basic/ABI.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/IR/Module.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace llvm {
 class FunctionType;
@@ -25,29 +33,34 @@ class DataLayout;
 class Type;
 class LLVMContext;
 class StructType;
+class StringRef;
+template <typename T> class ArrayRef;
 }
 
 namespace clang {
 class ASTContext;
-template <typename> class CanQual;
 class CXXConstructorDecl;
 class CXXMethodDecl;
 class CodeGenOptions;
-class FunctionProtoType;
-class QualType;
 class RecordDecl;
 class TagDecl;
 class TargetInfo;
-class Type;
+class CXXRecordDecl;
+class InheritedConstructor;
+class ObjCMethodDecl;
+namespace CodeGen {
+class CallArgList;
+class FunctionArgList;
+enum class FnInfoOpts;
+}  // namespace CodeGen
+
 typedef CanQual<Type> CanQualType;
 class GlobalDecl;
 
 namespace CodeGen {
-class ABIInfo;
 class CGCXXABI;
 class CGRecordLayout;
 class CodeGenModule;
-class RequiredArgs;
 
 /// This class organizes the cross-module state that is used while lowering
 /// AST types to LLVM types.

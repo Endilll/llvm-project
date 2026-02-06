@@ -15,6 +15,15 @@
 /// - \ref SarifResult
 //===----------------------------------------------------------------------===//
 #include "clang/Basic/Sarif.h"
+
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+#include <iterator>
+
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -28,13 +37,8 @@
 #include "llvm/Support/JSON.h"
 #include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/Path.h"
-
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
 
 using namespace clang;
 using namespace llvm;

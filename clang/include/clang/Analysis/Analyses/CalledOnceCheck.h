@@ -18,7 +18,6 @@ namespace clang {
 
 class AnalysisDeclContext;
 class BlockDecl;
-class CFG;
 class Decl;
 class Expr;
 class ParmVarDecl;

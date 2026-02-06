@@ -14,18 +14,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Basic/JsonSupport.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/TargetInfo.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/BasicValueFactory.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
@@ -50,17 +60,24 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/Type.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
 
 using namespace clang;
 using namespace ento;

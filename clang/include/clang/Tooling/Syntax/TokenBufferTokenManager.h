@@ -9,22 +9,29 @@
 #ifndef LLVM_CLANG_TOOLING_SYNTAX_TOKEN_BUFFER_TOKEN_MANAGER_H
 #define LLVM_CLANG_TOOLING_SYNTAX_TOKEN_BUFFER_TOKEN_MANAGER_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
+#include <cassert>
+#include <memory>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Tooling/Syntax/TokenManager.h"
 #include "clang/Tooling/Syntax/Tokens.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/Support/MemoryBuffer.h"
-#include <cassert>
-#include <memory>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+class MemoryBuffer;
+}  // namespace llvm
 
 namespace clang {
+class LangOptions;
+class SourceManager;
+
 namespace syntax {
 
 /// A TokenBuffer-powered token manager.

@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Driver/MultilibBuilder.h"
+
+#include <cassert>
+#include <string>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Multilib.h"
@@ -14,8 +18,9 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Regex.h"
-#include <cassert>
-#include <string>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 using namespace driver;

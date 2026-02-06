@@ -10,6 +10,7 @@
 #define LLVM_CLANG_DRIVER_TOOL_H
 
 #include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace llvm {
 namespace opt {
@@ -22,7 +23,6 @@ namespace driver {
 
   class Compilation;
   class InputInfo;
-  class Job;
   class JobAction;
   class ToolChain;
 

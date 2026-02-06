@@ -16,6 +16,7 @@
 #include "clang/Frontend/Utils.h"
 #include "clang/Index/IndexDataConsumer.h"
 #include "clang/Index/IndexingAction.h"
+#include "clang/Index/IndexingOptions.h"
 #include "clang/Index/USRGeneration.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Serialization/ASTReader.h"

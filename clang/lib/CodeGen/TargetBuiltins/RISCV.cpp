@@ -10,6 +10,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <utility>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGCall.h"
@@ -39,10 +44,15 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/RISCVISAInfo.h"
 #include "llvm/TargetParser/RISCVTargetParser.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
 
 using namespace clang;
 using namespace CodeGen;

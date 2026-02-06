@@ -11,8 +11,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/Checker.h"
+
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 using namespace clang;
 using namespace ento;

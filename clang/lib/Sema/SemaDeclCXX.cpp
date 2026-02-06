@@ -10,6 +10,24 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <climits>
+#include <cstdint>
+#include <cstring>
+#include <iterator>
+#include <map>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <initializer_list>
+#include <list>
+#include <type_traits>
+#include <vector>
+
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTConsumer.h"
@@ -17,7 +35,6 @@
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/ASTMutationListener.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/CharUnits.h"
@@ -34,14 +51,11 @@
 #include "clang/AST/ExprConcepts.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/RecordLayout.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/StmtVisitor.h"
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TemplateName.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/AST/TypeOrdering.h"
 #include "clang/AST/UnresolvedSet.h"
@@ -95,26 +109,44 @@
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/iterator.h"
 #include "llvm/Support/ConvertUTF.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Format.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <climits>
-#include <cstdint>
-#include <cstring>
-#include <iterator>
-#include <map>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/LambdaCapture.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/ObjCRuntime.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Lex/Token.h"
+#include "clang/Sema/IdentifierResolver.h"
+#include "clang/Sema/ParsedAttr.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/SmallBitVector.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/TinyPtrVector.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace clang {
+struct PrintingPolicy;
+}  // namespace clang
 
 using namespace clang;
 

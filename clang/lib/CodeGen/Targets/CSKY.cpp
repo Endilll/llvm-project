@@ -6,6 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <memory>
+
 #include "ABIInfoImpl.h"
 #include "Address.h"
 #include "CGCXXABI.h"
@@ -14,12 +18,14 @@
 #include "CodeGenTypes.h"
 #include "TargetInfo.h"
 #include "clang/AST/CharUnits.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
 #include "llvm/IR/DerivedTypes.h"
-#include <cassert>
-#include <cstdint>
-#include <memory>
+#include "ABIInfo.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/Type.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/IR/DataLayout.h"
 
 using namespace clang;
 using namespace clang::CodeGen;

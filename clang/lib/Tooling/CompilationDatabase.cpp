@@ -15,6 +15,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/CompilationDatabase.h"
+
+#include <algorithm>
+#include <cassert>
+#include <iterator>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <system_error>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -32,22 +44,17 @@
 #include "llvm/Option/Arg.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/FileSystem.h"
-#include "llvm/Support/LineIterator.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Registry.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Host.h"
-#include <algorithm>
-#include <cassert>
-#include <iterator>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <system_error>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace tooling;

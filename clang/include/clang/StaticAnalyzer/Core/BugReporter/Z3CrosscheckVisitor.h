@@ -14,11 +14,18 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_BUGREPORTER_Z3CROSSCHECKVISITOR_H
 #define LLVM_CLANG_STATICANALYZER_CORE_BUGREPORTER_Z3CROSSCHECKVISITOR_H
 
+#include <optional>
+
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/RangedConstraintManager.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
-#include "llvm/ADT/FoldingSet.h"
-#include <optional>
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class AnalyzerOptions;
+namespace ento {
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 namespace clang::ento {
 

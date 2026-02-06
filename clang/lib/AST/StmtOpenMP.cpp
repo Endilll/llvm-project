@@ -10,8 +10,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/DeclarationName.h"
+#include <cassert>
+#include <cstddef>
+#include <new>
+
 #include "clang/AST/OpenMPClause.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
@@ -23,9 +25,10 @@
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
-#include <cassert>
-#include <cstddef>
 #include "clang/AST/StmtOpenMP.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace llvm::omp;

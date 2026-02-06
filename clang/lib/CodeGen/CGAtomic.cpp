@@ -10,6 +10,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <string>
+#include <utility>
+#include <iterator>
+#include <memory>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGCall.h"
@@ -22,11 +30,9 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SyncScope.h"
-#include "clang/CodeGen/CGFunctionInfo.h"
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
@@ -41,11 +47,32 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/Support/AtomicOrdering.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <string>
-#include <utility>
+#include "CodeGenTypes.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+
+namespace clang {
+namespace CodeGen {
+class CGFunctionInfo;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class BasicBlock;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

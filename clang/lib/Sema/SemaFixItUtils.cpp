@@ -10,22 +10,30 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <string>
+#include <vector>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Sema/Sema.h"
-#include <cassert>
-#include <string>
 #include "clang/Sema/SemaFixItUtils.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Lex/MacroInfo.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

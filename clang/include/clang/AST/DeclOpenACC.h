@@ -14,21 +14,22 @@
 #ifndef LLVM_CLANG_AST_DECLOPENACC_H
 #define LLVM_CLANG_AST_DECLOPENACC_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
+#include <cassert>
+#include <memory>
+
 #include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclID.h"
-#include "clang/AST/OpenACCClause.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/OpenACCKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <memory>
+#include "llvm/ADT/ArrayRef.h"
 
 namespace clang {
+class ASTContext;
+class Expr;
+class GlobalDeclID;
+class OpenACCClause;
 
 // A base class for the declaration constructs, which manages the clauses and
 // basic source location information. Currently not part of the Decl inheritence

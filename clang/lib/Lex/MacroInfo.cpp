@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/MacroInfo.h"
+
+#include <cassert>
+#include <optional>
+#include <new>
+#include <string>
+
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -20,8 +26,8 @@
 #include "clang/Lex/Token.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <optional>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

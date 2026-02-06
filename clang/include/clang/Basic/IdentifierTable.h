@@ -15,12 +15,19 @@
 #ifndef LLVM_CLANG_BASIC_IDENTIFIERTABLE_H
 #define LLVM_CLANG_BASIC_IDENTIFIERTABLE_H
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <string>
+#include <utility>
+#include <new>
+
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TokenKinds.h"
-#include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/PointerUnion.h"
@@ -30,22 +37,21 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/Support/PointerLikeTypeTraits.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <string>
-#include <utility>
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+template <typename T> class ArrayRef;
+template <typename T> struct PointerLikeTypeTraits;
+}  // namespace llvm
 
 namespace clang {
 
 class DeclarationName;
 class DeclarationNameTable;
-class IdentifierInfo;
 class LangOptions;
-class MultiKeywordSelector;
-class SourceLocation;
 
 /// Constants for TokenKinds.def
 enum TokenKey : unsigned {

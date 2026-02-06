@@ -16,10 +16,15 @@
 #ifndef LLVM_CLANG_TOOLING_ARGUMENTSADJUSTERS_H
 #define LLVM_CLANG_TOOLING_ARGUMENTSADJUSTERS_H
 
-#include "clang/Basic/LLVM.h"
 #include <functional>
 #include <string>
 #include <vector>
+
+#include "clang/Basic/LLVM.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
 namespace tooling {

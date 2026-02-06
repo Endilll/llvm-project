@@ -13,19 +13,20 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_LIVEVARIABLES_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_LIVEVARIABLES_H
 
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclCXX.h"
+#include <memory>
+
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "llvm/ADT/ImmutableSet.h"
-#include <memory>
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 
-class CFG;
 class CFGBlock;
 class Stmt;
-class DeclRefExpr;
 class SourceManager;
+class BindingDecl;
+class Expr;
+class VarDecl;
 
 class LiveVariables : public ManagedAnalysis {
 public:

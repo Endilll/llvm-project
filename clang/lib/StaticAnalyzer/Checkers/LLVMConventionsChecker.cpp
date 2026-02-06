@@ -11,13 +11,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <string>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/TemplateName.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
@@ -27,6 +28,21 @@
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "llvm/Support/raw_ostream.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace ento {
+class AnalysisManager;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

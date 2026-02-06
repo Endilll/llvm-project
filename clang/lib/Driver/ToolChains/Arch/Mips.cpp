@@ -7,6 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "Mips.h"
+
+#include <cassert>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/CommonArgs.h"
@@ -18,9 +23,8 @@
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <string>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

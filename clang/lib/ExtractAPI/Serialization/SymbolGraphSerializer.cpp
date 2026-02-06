@@ -12,6 +12,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ExtractAPI/Serialization/SymbolGraphSerializer.h"
+
+#include <cassert>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <tuple>
+#include <vector>
+
 #include "clang/AST/Availability.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangStandard.h"
@@ -30,12 +40,13 @@
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FormatVariadicDetails.h"
 
 using namespace clang;
 using namespace clang::extractapi;
@@ -1032,6 +1043,7 @@ void SymbolGraphSerializer::serializeSingleRecord(const APIRecord *Record) {
     break;                                                                     \
   }
 #include "clang/ExtractAPI/APIRecords.inc"
+
   // otherwise fallback on the only behavior we can implement safely.
   case APIRecord::RK_Unknown:
     visitAPIRecord(Record);

@@ -14,30 +14,70 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGCXXABI_H
 #define LLVM_CLANG_LIB_CODEGEN_CGCXXABI_H
 
+#include <stddef.h>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <vector>
+
 #include "CodeGenFunction.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/CodeGen/CodeGenABITypes.h"
+#include "Address.h"
+#include "CGBuilder.h"
+#include "CGValue.h"
+#include "CodeGenModule.h"
+#include "EHScopeStack.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/ABI.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/Linkage.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/Support/Casting.h"
 
 namespace llvm {
 class Constant;
 class Type;
 class Value;
 class CallInst;
+class BasicBlock;
+class CallBase;
+class CatchPadInst;
+class Function;
+class GlobalVariable;
+class StringRef;
+template <typename T> class ArrayRef;
 }
 
 namespace clang {
 class CastExpr;
-class CXXConstructorDecl;
-class CXXDestructorDecl;
-class CXXMethodDecl;
-class CXXRecordDecl;
 class MangleContext;
+class APValue;
+class BaseSubobject;
+class CXXCatchStmt;
+class Expr;
+class ImplicitParamDecl;
+class SourceLocation;
+class VarDecl;
+struct ReturnAdjustment;
+struct ThunkInfo;
 
 namespace CodeGen {
 class CGCallee;
-class CodeGenFunction;
-class CodeGenModule;
 struct CatchTypeInfo;
+class CGFunctionInfo;
+class CallArgList;
+class CodeGenVTables;
+class FunctionArgList;
 
 /// Implements C++ ABI-specific code generation functions.
 class CGCXXABI {

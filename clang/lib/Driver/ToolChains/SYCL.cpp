@@ -6,6 +6,9 @@
 //
 //===----------------------------------------------------------------------===//
 #include "SYCL.h"
+
+#include <string>
+
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Action.h"
@@ -19,7 +22,10 @@
 #include "llvm/Option/OptTable.h"
 #include "llvm/Option/Option.h"
 #include "llvm/TargetParser/Triple.h"
-#include <string>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

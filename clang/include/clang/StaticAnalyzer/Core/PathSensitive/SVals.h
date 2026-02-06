@@ -14,12 +14,17 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SVALS_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SVALS_H
 
-#include "clang/AST/Expr.h"
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <type_traits>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/Type.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
-#include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/ImmutableList.h"
 #include "llvm/ADT/PointerUnion.h"
@@ -27,11 +32,14 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <type_traits>
-#include <utility>
+#include "clang/AST/Decl.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValVisitor.h"
+
+namespace llvm {
+class APSInt;
+class StringRef;
+class raw_ostream;
+}  // namespace llvm
 
 //==------------------------------------------------------------------------==//
 //  Base SVal types.
@@ -40,8 +48,7 @@
 namespace clang {
 
 class CXXBaseSpecifier;
-class FunctionDecl;
-class LabelDecl;
+class ASTContext;
 
 namespace ento {
 

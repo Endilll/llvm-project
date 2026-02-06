@@ -7,6 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/InstallAPI/FileList.h"
+
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <system_error>
+#include <utility>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/LangStandard.h"
 #include "clang/InstallAPI/HeaderFile.h"
@@ -17,11 +26,6 @@
 #include "llvm/Support/JSON.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/TextAPI/TextAPIError.h"
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <system_error>
-#include <utility>
 
 // clang-format off
 /*

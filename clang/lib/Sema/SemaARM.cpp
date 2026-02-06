@@ -11,6 +11,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaARM.h"
+
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <initializer_list>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <vector>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
@@ -34,14 +44,20 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <initializer_list>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 

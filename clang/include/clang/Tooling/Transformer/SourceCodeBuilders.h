@@ -14,13 +14,14 @@
 #ifndef LLVM_CLANG_TOOLING_TRANSFORMER_SOURCECODEBUILDERS_H
 #define LLVM_CLANG_TOOLING_TRANSFORMER_SOURCECODEBUILDERS_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/TypeBase.h"
 #include <optional>
 #include <string>
 
 namespace clang {
+class ASTContext;
+class Expr;
+class QualType;
+
 namespace tooling {
 
 /// \name Code analysis utilities.

@@ -10,6 +10,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <utility>
+
 #include "clang/AST/Expr.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Checkers/Taint.h"
@@ -19,8 +22,14 @@
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
-#include <memory>
-#include <utility>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace ento {
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

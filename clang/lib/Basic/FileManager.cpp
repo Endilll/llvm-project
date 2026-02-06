@@ -17,6 +17,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/FileManager.h"
+
+#include <sys/types.h>
+#include <cassert>
+#include <cstdint>
+#include <ctime>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <chrono>
+#include <new>
+
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileSystemOptions.h"
@@ -24,7 +37,6 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallString.h"
-#include "llvm/ADT/Statistic.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Chrono.h"
 #include "llvm/Support/Compiler.h"
@@ -36,15 +48,12 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <ctime>
-#include <memory>
-#include <optional>
-#include <string>
-#include <sys/types.h>
-#include <system_error>
-#include <utility>
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FileSystem/UniqueID.h"
 
 using namespace clang;
 

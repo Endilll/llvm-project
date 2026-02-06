@@ -11,6 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/DynamicExtent.h"
+
+#include <cassert>
+#include <optional>
+#include <utility>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/TypeBase.h"
@@ -22,7 +27,13 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
-#include <cassert>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "llvm/ADT/ImmutableMap.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 REGISTER_MAP_WITH_PROGRAMSTATE(DynamicExtentMap, const clang::ento::MemRegion *,
                                clang::ento::DefinedOrUnknownSVal)

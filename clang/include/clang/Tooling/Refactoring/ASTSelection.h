@@ -9,20 +9,24 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_ASTSELECTION_H
 #define LLVM_CLANG_TOOLING_REFACTORING_ASTSELECTION_H
 
-#include "clang/AST/ASTTypeTraits.h"
-#include "clang/AST/Stmt.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/Support/raw_ostream.h"
 #include <cassert>
 #include <cstddef>
 #include <functional>
 #include <optional>
 #include <vector>
 
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
+
 namespace clang {
 
 class ASTContext;
+class Decl;
+class Stmt;
 
 namespace tooling {
 

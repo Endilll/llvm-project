@@ -13,18 +13,22 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SIMPLECONSTRAINTMANAGER_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SIMPLECONSTRAINTMANAGER_H
 
-#include "clang/StaticAnalyzer/Core/PathSensitive/BasicValueFactory.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ConstraintManager.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
+
+namespace llvm {
+class APSInt;
+}  // namespace llvm
 
 namespace clang {
 
 namespace ento {
+class BasicValueFactory;
+class ExprEngine;
+class NonLoc;
+class SymbolManager;
 
 class SimpleConstraintManager : public ConstraintManager {
   ExprEngine *EE;

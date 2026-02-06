@@ -14,26 +14,29 @@
 #ifndef LLVM_CLANG_CODEGEN_SWIFTCALLINGCONV_H
 #define LLVM_CLANG_CODEGEN_SWIFTCALLINGCONV_H
 
-#include "clang/AST/CanonicalType.h"
-#include "clang/AST/CharUnits.h"
-#include "clang/AST/Type.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
-#include "llvm/ADT/SmallVector.h"
 #include <cassert>
 #include <cstdint>
 #include <utility>
+#include <iterator>
+
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace llvm {
   class IntegerType;
   class Type;
   class StructType;
   class VectorType;
+template <typename T> class ArrayRef;
 }
 
 namespace clang {
 class FieldDecl;
 class ASTRecordLayout;
+class QualType;
+class RecordDecl;
 
 namespace CodeGen {
 class ABIArgInfo;

@@ -8,11 +8,13 @@
 #ifndef LLVM_CLANG_FRONTEND_TESTMODULEFILEEXTENSION_H
 #define LLVM_CLANG_FRONTEND_TESTMODULEFILEEXTENSION_H
 
+#include <string>
+
 #include "clang/Serialization/ModuleFileExtension.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Bitstream/BitstreamReader.h"
-#include <string>
+#include "llvm/Support/ExtensibleRTTI.h"
 
 namespace clang {
 

@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "PPCLinux.h"
+
+#include <string>
+#include <system_error>
+
 #include "ToolChains/Linux.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
@@ -20,7 +24,10 @@
 #include "llvm/Option/Option.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
-#include <string>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

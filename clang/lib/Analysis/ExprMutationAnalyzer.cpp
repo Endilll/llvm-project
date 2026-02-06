@@ -6,6 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Analysis/Analyses/ExprMutationAnalyzer.h"
+
+#include <algorithm>
+#include <cstddef>
+#include <utility>
+#include <string>
+
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -22,11 +28,17 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/STLExtras.h"
-#include <algorithm>
-#include <cstddef>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/ExprObjC.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
+class ASTContext;
+
 using namespace ast_matchers;
 
 // Check if result of Source expression could be a Target expression.
@@ -255,6 +267,7 @@ const auto isMoveOnly = [] {
 };
 
 template <class T> struct NodeID;
+
 template <> struct NodeID<Expr> {
   static constexpr StringRef value = "expr";
 };

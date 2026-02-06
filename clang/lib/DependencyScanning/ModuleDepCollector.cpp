@@ -8,6 +8,19 @@
 
 #include "clang/DependencyScanning/ModuleDepCollector.h"
 
+#include <array>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
+#include <vector>
+#include <map>
+
 #include "clang/AST/DependenceFlags.h"
 #include "clang/Basic/CodeGenOptions.h"
 #include "clang/Basic/DiagnosticOptions.h"
@@ -28,7 +41,6 @@
 #include "clang/Lex/ModuleLoader.h"
 #include "clang/Lex/ModuleMap.h"
 #include "clang/Lex/Preprocessor.h"
-#include "clang/Lex/Token.h"
 #include "clang/Serialization/ASTBitCodes.h"
 #include "clang/Serialization/ModuleFile.h"
 #include "llvm/ADT/APInt.h"
@@ -45,18 +57,18 @@
 #include "llvm/Support/HashBuilder.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <array>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <variant>
-#include <vector>
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/FileSystemOptions.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Lex/HeaderSearch.h"
+#include "clang/Lex/PreprocessorOptions.h"
+#include "clang/Serialization/ASTReader.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
 
 using namespace clang;
 using namespace dependencies;

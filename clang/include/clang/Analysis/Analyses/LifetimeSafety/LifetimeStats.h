@@ -14,9 +14,14 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_LIFETIMESTATS_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_LIFETIMESTATS_H
 
-#include "clang/AST/TypeBase.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace clang {
+class Type;
+}  // namespace clang
 
 namespace clang::lifetimes {
 /// A structure to hold the statistics related to LifetimeAnalysis.

@@ -11,9 +11,22 @@
 
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
+#include "clang/Driver/Action.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+template <unsigned int InternalLen> class SmallString;
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace tools {
 
 /// Directly call system default assembler and linker.

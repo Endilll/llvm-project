@@ -25,11 +25,13 @@
 
 #include "clang/Analysis/CodeInjector.h"
 #include "llvm/ADT/StringMap.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 
 class CompilerInstance;
 class NamedDecl;
+class Stmt;
 
 namespace ento {
 class ModelInjector : public CodeInjector {

@@ -13,14 +13,22 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_M68K_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_M68K_H
 
-#include "OSTargets.h"
+#include <string>
+#include <string_view>
+#include <utility>
+
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/TargetParser/Triple.h"
-#include <optional>
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Specifiers.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 
 class LLVM_LIBRARY_VISIBILITY M68kTargetInfo : public TargetInfo {

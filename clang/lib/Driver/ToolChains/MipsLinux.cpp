@@ -7,21 +7,33 @@
 //===----------------------------------------------------------------------===//
 
 #include "MipsLinux.h"
+
+#include <cassert>
+#include <string>
+#include <vector>
+
 #include "Arch/Mips.h"
 #include "ToolChains/Gnu.h"
 #include "ToolChains/Linux.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Driver.h"
-#include "clang/Driver/Tool.h"
 #include "clang/Options/Options.h"
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
-#include <cassert>
-#include <string>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Driver/Multilib.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

@@ -9,18 +9,33 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_CLANG_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_CLANG_H
 
-#include "MSVC.h"
-#include "clang/Driver/Driver.h"
+#include <memory>
+
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/Types.h"
-#include "llvm/Frontend/Debug/Options.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/TargetParser/Triple.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class StringRef;
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 class ObjCRuntime;
+
 namespace driver {
+class Compilation;
+class Driver;
+class InputInfo;
+class JobAction;
+class ToolChain;
 
 namespace tools {
 

@@ -23,16 +23,16 @@
 #ifndef LLVM_CLANG_CODEGEN_CODEGENABITYPES_H
 #define LLVM_CLANG_CODEGEN_CODEGENABITYPES_H
 
+#include <cstdint>
+
 #include "clang/AST/CanonicalType.h"
-#include "clang/AST/CharUnits.h"
-#include "clang/AST/Decl.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/ABI.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Value.h"
-#include <cstdint>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace llvm {
 class AttrBuilder;
@@ -51,9 +51,12 @@ class CXXMethodDecl;
 class GlobalDecl;
 class ObjCMethodDecl;
 class ObjCProtocolDecl;
+class CharUnits;
+class FieldDecl;
+class FunctionDecl;
+class RecordDecl;
 
 namespace CodeGen {
-class CGFunctionInfo;
 class CodeGenModule;
 
 /// Additional implicit arguments to add to a constructor argument list.

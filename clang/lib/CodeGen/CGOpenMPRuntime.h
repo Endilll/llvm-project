@@ -13,6 +13,14 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGOPENMPRUNTIME_H
 #define LLVM_CLANG_LIB_CODEGEN_CGOPENMPRUNTIME_H
 
+#include <stdint.h>
+#include <iterator>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <variant>
+
 #include "CGValue.h"
 #include "clang/AST/DeclOpenMP.h"
 #include "clang/AST/GlobalDecl.h"
@@ -21,35 +29,54 @@
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/PointerIntPair.h"
-#include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringSet.h"
-#include "llvm/Frontend/OpenMP/OMPConstants.h"
 #include "llvm/Frontend/OpenMP/OMPIRBuilder.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/ValueHandle.h"
 #include "llvm/Support/AtomicOrdering.h"
+#include "Address.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/OpenMPClause.h"
+#include "clang/AST/Redeclarable.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorHandling.h"
 
 namespace llvm {
-class ArrayType;
 class Constant;
-class FunctionType;
 class GlobalVariable;
 class Type;
-class Value;
-class OpenMPIRBuilder;
+class GlobalValue;
+class StringRef;
+namespace omp {
+enum class ProcBindKind;
+}  // namespace omp
+template <typename Fn> class function_ref;
 } // namespace llvm
 
 namespace clang {
-class Expr;
-class OMPDependClause;
 class OMPExecutableDirective;
 class OMPLoopDirective;
-class VarDecl;
-class OMPDeclareReductionDecl;
+class ASTContext;
+class CXXRecordDecl;
+class Stmt;
+enum class LangAS : unsigned int;
 
 namespace CodeGen {
-class Address;
 class CodeGenFunction;
 class CodeGenModule;
 

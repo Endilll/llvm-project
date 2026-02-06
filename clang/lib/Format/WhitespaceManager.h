@@ -15,10 +15,27 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_WHITESPACEMANAGER_H
 #define LLVM_CLANG_LIB_FORMAT_WHITESPACEMANAGER_H
 
-#include "TokenAnnotator.h"
-#include "clang/Basic/SourceManager.h"
+#include <assert.h>
+#include <algorithm>
+#include <iterator>
+#include <string>
+#include <tuple>
+
+#include "FormatToken.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Format/Format.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Error.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
+class SourceManager;
+
 namespace format {
 
 /// Manages the whitespaces around tokens and their replacements.

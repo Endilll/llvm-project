@@ -12,8 +12,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <map>
+#include <set>
+#include <string>
+#include <system_error>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeOrdering.h"
@@ -21,10 +26,9 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/GraphWriter.h"
 #include "llvm/Support/raw_ostream.h"
-#include <map>
-#include <set>
-#include <string>
-#include <system_error>
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/Casting.h"
+
 using namespace clang;
 
 namespace {

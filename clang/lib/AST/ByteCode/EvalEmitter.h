@@ -13,19 +13,36 @@
 #ifndef LLVM_CLANG_AST_INTERP_EVALEMITTER_H
 #define LLVM_CLANG_AST_INTERP_EVALEMITTER_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <memory>
+#include <optional>
+
 #include "EvaluationResult.h"
 #include "InterpState.h"
-#include "PrimType.h"
-#include "Record.h"
 #include "Source.h"
+#include "Context.h"
+#include "Function.h"
+#include "Pointer.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace clang {
+class CallExpr;
+class Expr;
+class FunctionDecl;
+class ParmVarDecl;
+class ValueDecl;
+class VarDecl;
+
 namespace interp {
-class Context;
-class Function;
 class InterpStack;
 class Program;
-enum Opcode : uint32_t;
+class Block;
+class State;
+struct Descriptor;
 
 /// An emitter which evaluates opcodes as they are emitted.
 class EvalEmitter : public SourceMapper {
@@ -143,6 +160,7 @@ private:
 protected:
 #define GET_EVAL_PROTO
 #include "Opcodes.inc"
+
 #undef GET_EVAL_PROTO
 };
 

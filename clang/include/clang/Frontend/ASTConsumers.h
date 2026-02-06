@@ -13,9 +13,15 @@
 #ifndef LLVM_CLANG_FRONTEND_ASTCONSUMERS_H
 #define LLVM_CLANG_FRONTEND_ASTCONSUMERS_H
 
+#include <memory>
+
 #include "clang/AST/ASTDumperUtils.h"
 #include "clang/Basic/LLVM.h"
-#include <memory>
+
+namespace llvm {
+class StringRef;
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 

@@ -10,6 +10,17 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <initializer_list>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "ABIInfoImpl.h"
 #include "Address.h"
 #include "CGCXXABI.h"
@@ -34,8 +45,6 @@
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/StmtVisitor.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -54,15 +63,32 @@
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <initializer_list>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "CodeGenTypes.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+
+namespace clang {
+class Stmt;
+enum class LangAS : unsigned int;
+}  // namespace clang
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
+
 using namespace clang;
 using namespace CodeGen;
 
@@ -71,7 +97,6 @@ using namespace CodeGen;
 //===----------------------------------------------------------------------===//
 
 namespace {
-class ConstExprEmitter;
 
 llvm::Constant *getPadding(const CodeGenModule &CGM, CharUnits PadSize) {
   llvm::Type *Ty = CGM.CharTy;

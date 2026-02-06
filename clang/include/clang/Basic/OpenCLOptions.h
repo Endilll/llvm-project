@@ -14,10 +14,13 @@
 #ifndef LLVM_CLANG_BASIC_OPENCLOPTIONS_H
 #define LLVM_CLANG_BASIC_OPENCLOPTIONS_H
 
+#include <utility>
+
 #include "clang/Basic/LangOptions.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 

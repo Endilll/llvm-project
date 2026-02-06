@@ -11,6 +11,7 @@
 #include <cassert>
 #include <string>
 #include <utility>
+#include <functional>
 
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -18,11 +19,9 @@
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchersInternal.h"
-#include "clang/Analysis/CFG.h"
 #include "clang/Analysis/FlowSensitive/CFGMatchSwitch.h"
 #include "clang/Analysis/FlowSensitive/DataflowAnalysis.h"
 #include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
@@ -34,6 +33,24 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/StringMap.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/Analysis/FlowSensitive/Arena.h"
+#include "clang/Analysis/FlowSensitive/DataflowAnalysisContext.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class CFGElement;
+}  // namespace clang
 
 namespace clang::dataflow::statusor_model {
 namespace {

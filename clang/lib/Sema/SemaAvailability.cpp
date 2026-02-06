@@ -10,6 +10,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <memory>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -47,13 +57,15 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <cstddef>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/NSAPI.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
 
 using namespace clang;
 using namespace sema;

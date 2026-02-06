@@ -9,14 +9,6 @@
 #ifndef LLVM_CLANG_FRONTEND_FRONTENDOPTIONS_H
 #define LLVM_CLANG_FRONTEND_FRONTENDOPTIONS_H
 
-#include "clang/AST/ASTDumperUtils.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangStandard.h"
-#include "clang/Frontend/CommandLineSourceLoc.h"
-#include "clang/Sema/CodeCompleteOptions.h"
-#include "clang/Serialization/ModuleFileExtension.h"
-#include "llvm/Support/Compiler.h"
-#include "llvm/Support/MemoryBufferRef.h"
 #include <cassert>
 #include <map>
 #include <memory>
@@ -24,13 +16,18 @@
 #include <string>
 #include <vector>
 
-namespace llvm {
-
-class MemoryBuffer;
-
-} // namespace llvm
+#include "clang/AST/ASTDumperUtils.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangStandard.h"
+#include "clang/Frontend/CommandLineSourceLoc.h"
+#include "clang/Sema/CodeCompleteOptions.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/MemoryBufferRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
+class ModuleFileExtension;
 
 namespace frontend {
 

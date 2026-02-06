@@ -10,13 +10,15 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/AST/Attr.h"
+#include <cassert>
+#include <cstdint>
+#include <string>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/TypeBase.h"
-#include "clang/Basic/AttributeCommonInfo.h"
 #include "clang/Basic/AttributeScopeInfo.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -34,9 +36,14 @@
 #include "clang/Sema/SemaHLSL.h"
 #include "llvm/ADT/APInt.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <string>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/Sema/Scope.h"
+#include "clang/Sema/Sema.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

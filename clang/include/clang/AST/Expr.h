@@ -13,13 +13,25 @@
 #ifndef LLVM_CLANG_AST_EXPR_H
 #define LLVM_CLANG_AST_EXPR_H
 
+#include <cassert>
+#include <climits>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <functional>
+#include <new>
+
 #include "clang/AST/APNumericStorage.h"
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTVector.h"
 #include "clang/AST/ComputeDependence.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclAccessPair.h"
-#include "clang/AST/DeclID.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/DependenceFlags.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
@@ -52,37 +64,30 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <climits>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <type_traits>
-#include <utility>
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
   class AllocSizeAttr;
-  class APValue;
   class ASTContext;
-  class BlockDecl;
   class CXXBaseSpecifier;
-  class CXXMemberCallExpr;
-  class CXXOperatorCallExpr;
   class CastExpr;
   class Decl;
   class IdentifierInfo;
-  class MaterializeTemporaryExpr;
-  class NamedDecl;
   class ObjCPropertyRefExpr;
-  class OpaqueValueExpr;
-  class ParmVarDecl;
-  class StringLiteral;
   class TargetInfo;
-  class ValueDecl;
   class WarnUnusedResultAttr;
+class CXXRecordDecl;
+class DeclContext;
+class DesignatedInitExpr;
+class Expr;
+class SourceManager;
 
 /// A simple array of base specifiers.
 typedef SmallVector<CXXBaseSpecifier*, 4> CXXCastPath;
@@ -6272,7 +6277,6 @@ class GenericSelectionExpr final
     return getNumAssocs() + (int)isTypePredicate();
   }
 
-  template <bool Const> class AssociationIteratorTy;
   /// Bundle together an association expression and its TypeSourceInfo.
   /// The Const template parameter is for the const and non-const versions
   /// of AssociationTy.

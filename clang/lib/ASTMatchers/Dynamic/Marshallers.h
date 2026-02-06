@@ -19,21 +19,6 @@
 #ifndef LLVM_CLANG_LIB_ASTMATCHERS_DYNAMIC_MARSHALLERS_H
 #define LLVM_CLANG_LIB_ASTMATCHERS_DYNAMIC_MARSHALLERS_H
 
-#include "clang/AST/ASTTypeTraits.h"
-#include "clang/AST/OperationKinds.h"
-#include "clang/ASTMatchers/ASTMatchersInternal.h"
-#include "clang/ASTMatchers/Dynamic/Diagnostics.h"
-#include "clang/ASTMatchers/Dynamic/VariantValue.h"
-#include "clang/Basic/AttrKinds.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/OpenMPKinds.h"
-#include "clang/Basic/TypeTraits.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/StringSwitch.h"
-#include "llvm/ADT/Twine.h"
-#include "llvm/Support/Regex.h"
 #include <cassert>
 #include <cstddef>
 #include <iterator>
@@ -44,6 +29,23 @@
 #include <utility>
 #include <vector>
 
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/AST/OperationKinds.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "clang/ASTMatchers/Dynamic/Diagnostics.h"
+#include "clang/ASTMatchers/Dynamic/VariantValue.h"
+#include "clang/Basic/AttrKinds.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OpenMPKinds.h"
+#include "clang/Basic/TypeTraits.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/StringSwitch.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Regex.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Frontend/OpenMP/OMP.h.inc"
+
 namespace clang {
 namespace ast_matchers {
 namespace dynamic {
@@ -53,6 +55,7 @@ namespace internal {
 ///   functions in VariantValue.
 /// Used to verify and extract the matcher arguments below.
 template <class T> struct ArgTypeTraits;
+
 template <class T> struct ArgTypeTraits<const T &> : public ArgTypeTraits<T> {
 };
 
@@ -165,6 +168,7 @@ private:
     return llvm::StringSwitch<std::optional<attr::Kind>>(AttrKind)
 #define ATTR(X) .Case(#X, attr::X)
 #include "clang/Basic/AttrList.inc"
+
         .Default(std::nullopt);
   }
 
@@ -195,6 +199,7 @@ private:
     return llvm::StringSwitch<std::optional<CastKind>>(AttrKind)
 #define CAST_OPERATION(Name) .Case(#Name, CK_##Name)
 #include "clang/AST/OperationKinds.def"
+
         .Default(std::nullopt);
   }
 
@@ -246,6 +251,7 @@ private:
 #define GEN_CLANG_CLAUSE_CLASS
 #define CLAUSE_CLASS(Enum, Str, Class) .Case(#Enum, llvm::omp::Clause::Enum)
 #include "llvm/Frontend/OpenMP/OMP.inc"
+
         .Default(std::nullopt);
   }
 
@@ -277,6 +283,7 @@ private:
 #define CXX11_UNARY_EXPR_OR_TYPE_TRAIT(Spelling, Name, Key)                    \
   .Case(#Name, UETT_##Name)
 #include "clang/Basic/TokenKinds.def"
+
         .Default(std::nullopt);
   }
 

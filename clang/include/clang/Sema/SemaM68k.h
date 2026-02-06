@@ -13,11 +13,12 @@
 #ifndef LLVM_CLANG_SEMA_SEMAM68K_H
 #define LLVM_CLANG_SEMA_SEMAM68K_H
 
-#include "clang/AST/ASTFwd.h"
 #include "clang/Sema/SemaBase.h"
 
 namespace clang {
 class ParsedAttr;
+class Decl;
+class Sema;
 
 class SemaM68k : public SemaBase {
 public:

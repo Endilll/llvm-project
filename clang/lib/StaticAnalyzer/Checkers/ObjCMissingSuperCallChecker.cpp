@@ -12,9 +12,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <string>
+
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DynamicRecursiveASTVisitor.h"
-#include "clang/AST/Expr.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/IdentifierTable.h"
@@ -27,7 +29,13 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
+#include "clang/AST/ASTContext.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

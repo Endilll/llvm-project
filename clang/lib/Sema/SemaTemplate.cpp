@@ -8,13 +8,24 @@
 //  This file implements semantic analysis for C++ templates.
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <iterator>
+#include <type_traits>
+
 #include "TreeTransform.h"
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclFriend.h"
@@ -77,16 +88,27 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/TypeOrdering.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Sema/IdentifierResolver.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/TargetParser/Triple.h"
 
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
 using namespace clang;
 using namespace sema;
 

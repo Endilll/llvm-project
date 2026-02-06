@@ -11,6 +11,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/DeclBase.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <new>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/ASTMutationListener.h"
@@ -50,13 +60,11 @@
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 

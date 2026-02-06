@@ -19,12 +19,14 @@
 #ifndef LLVM_CLANG_TOOLING_FIXIT_H
 #define LLVM_CLANG_TOOLING_FIXIT_H
 
-#include "clang/AST/ASTContext.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
+class ASTContext;
+
 namespace tooling {
 namespace fixit {
 

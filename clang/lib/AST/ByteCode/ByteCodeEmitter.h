@@ -13,14 +13,30 @@
 #ifndef LLVM_CLANG_AST_INTERP_LINKEMITTER_H
 #define LLVM_CLANG_AST_INTERP_LINKEMITTER_H
 
+#include <stdint.h>
+#include <cstddef>
+#include <optional>
+
 #include "Context.h"
-#include "PrimType.h"
-#include "Program.h"
+#include "Function.h"
 #include "Source.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
+class CallExpr;
+class Expr;
+class FunctionDecl;
+class ParmVarDecl;
+class ValueDecl;
+class VarDecl;
+
 namespace interp {
 enum Opcode : uint32_t;
+class Program;
+struct Descriptor;
 
 /// An emitter which links the program to bytecode for later use.
 class ByteCodeEmitter {
@@ -104,6 +120,7 @@ private:
 protected:
 #define GET_LINK_PROTO
 #include "Opcodes.inc"
+
 #undef GET_LINK_PROTO
 };
 

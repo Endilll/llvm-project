@@ -12,16 +12,19 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "Move.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/ExprCXX.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
@@ -41,10 +44,28 @@
 #include "llvm/ADT/StringSet.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Expr.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/ImmutableMap.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

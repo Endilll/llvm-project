@@ -16,14 +16,15 @@
 #ifndef LLVM_CLANG_UNDERLYING_TYPE_RESOLVER_H
 #define LLVM_CLANG_UNDERLYING_TYPE_RESOLVER_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/ExtractAPI/API.h"
-
 #include <string>
 
+#include "clang/ExtractAPI/API.h"
+
 namespace clang {
+class ASTContext;
+class NamedDecl;
+class QualType;
+
 namespace extractapi {
 
 struct TypedefUnderlyingTypeResolver {

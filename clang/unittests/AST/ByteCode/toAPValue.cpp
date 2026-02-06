@@ -1,5 +1,6 @@
 #include "../../../lib/AST/ByteCode/Context.h"
 #include "../../../lib/AST/ByteCode/Descriptor.h"
+#include "../../../lib/AST/ByteCode/MemberPointer.h"
 #include "../../../lib/AST/ByteCode/Program.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
@@ -11,6 +12,8 @@
 using namespace clang;
 using namespace clang::interp;
 using namespace clang::ast_matchers;
+
+using APSInt = llvm::APSInt;
 
 /// Test the various toAPValue implementations.
 TEST(ToAPValue, Pointers) {

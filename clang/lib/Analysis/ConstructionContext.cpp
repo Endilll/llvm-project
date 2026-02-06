@@ -14,6 +14,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/ConstructionContext.h"
+
+#include <cassert>
+
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
@@ -22,7 +25,8 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Specifiers.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
+#include "clang/AST/Type.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 

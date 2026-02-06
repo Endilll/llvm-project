@@ -13,14 +13,23 @@
 #ifndef LLVM_CLANG_SEMA_SEMAX86_H
 #define LLVM_CLANG_SEMA_SEMAX86_H
 
-#include "clang/AST/ASTFwd.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/SemaBase.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class ArrayRef;
+template <typename T> class SmallVectorImpl;
+template <unsigned int InternalLen> class SmallString;
+}  // namespace llvm
 
 namespace clang {
 class ParsedAttr;
 class TargetInfo;
+class CallExpr;
+class Decl;
+class Sema;
+class SourceLocation;
 
 class SemaX86 : public SemaBase {
 public:

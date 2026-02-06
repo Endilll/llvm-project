@@ -14,11 +14,14 @@
 #ifndef LLVM_CLANG_REWRITE_CORE_REWRITER_H
 #define LLVM_CLANG_REWRITE_CORE_REWRITER_H
 
+#include <map>
+#include <string>
+#include <utility>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/RewriteBuffer.h"
-#include <map>
-#include <string>
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

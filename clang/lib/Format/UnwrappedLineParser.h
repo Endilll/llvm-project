@@ -15,10 +15,33 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_UNWRAPPEDLINEPARSER_H
 #define LLVM_CLANG_LIB_FORMAT_UNWRAPPEDLINEPARSER_H
 
-#include "Macros.h"
+#include <stddef.h>
 #include <stack>
+#include <iosfwd>
+#include <list>
+#include <memory>
+#include <optional>
+
+#include "Macros.h"
+#include "FormatToken.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Format/Format.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitVector.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Regex.h"
+
+namespace llvm {
+template <typename T> class SpecificBumpPtrAllocator;
+}  // namespace llvm
 
 namespace clang {
+class IdentifierTable;
+class SourceManager;
+
 namespace format {
 
 struct UnwrappedLineNode;

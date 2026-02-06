@@ -12,6 +12,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ASTImporter.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
@@ -72,20 +86,19 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/MemoryBufferRef.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <tuple>
-#include <type_traits>
-#include <utility>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/FileEntry.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang {
+template <typename decl_type> class Redeclarable;
 
   using llvm::make_error;
   using llvm::Error;

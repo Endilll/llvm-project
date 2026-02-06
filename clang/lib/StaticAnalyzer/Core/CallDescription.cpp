@@ -13,6 +13,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallDescription.h"
+
+#include <cassert>
+#include <cstddef>
+#include <initializer_list>
+#include <iterator>
+#include <optional>
+#include <utility>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -22,11 +30,10 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
 #include "llvm/ADT/STLExtras.h"
-#include <cassert>
-#include <cstddef>
-#include <initializer_list>
-#include <iterator>
-#include <optional>
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace llvm;
 using namespace clang;

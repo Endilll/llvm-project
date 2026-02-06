@@ -10,6 +10,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <stack>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -62,13 +72,22 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/OpenCLOptions.h"
+#include "clang/Lex/Preprocessor.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
 
 using namespace clang;
 

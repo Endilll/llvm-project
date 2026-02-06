@@ -14,17 +14,25 @@
 //===----------------------------------------------------------------------===//
 
 #include "DefinitionBlockSeparator.h"
+
+#include <cassert>
+#include <cstddef>
+#include <utility>
+#include <map>
+
 #include "FormatToken.h"
 #include "FormatTokenLexer.h"
 #include "TokenAnnotator.h"
 #include "WhitespaceManager.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Format/Format.h"
 #include "clang/Tooling/Core/Replacement.h"
-#include <cassert>
-#include <cstddef>
-#include <utility>
+#include "AffectedRangeManager.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Error.h"
+
 #define DEBUG_TYPE "definition-block-separator"
 
 namespace clang {

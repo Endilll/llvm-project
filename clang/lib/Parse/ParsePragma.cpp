@@ -10,6 +10,17 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/DependenceFlags.h"
@@ -52,15 +63,18 @@
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/Basic/CharInfo.h"
+#include "clang/Basic/OpenCLOptions.h"
+#include "clang/Lex/PPCallbacks.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
 using namespace clang;
 
 namespace {

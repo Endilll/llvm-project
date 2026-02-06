@@ -7,11 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "NoOwnershipChangeVisitor.h"
+
+#include <string>
+#include <optional>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/Analysis/ProgramPoint.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
@@ -24,7 +26,16 @@
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <string>
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Analysis/PathDiagnostic.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/bit.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

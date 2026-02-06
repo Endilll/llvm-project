@@ -14,9 +14,20 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <array>
+#include <cstddef>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
+#include <functional>
+#include <type_traits>
+
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
-#include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Analysis/ProgramPoint.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
@@ -43,16 +54,18 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/raw_ostream.h"
-
-#include <algorithm>
-#include <array>
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <variant>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

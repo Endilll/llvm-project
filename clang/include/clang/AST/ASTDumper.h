@@ -9,14 +9,20 @@
 #ifndef LLVM_CLANG_AST_ASTDUMPER_H
 #define LLVM_CLANG_AST_ASTDUMPER_H
 
-#include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTNodeTraverser.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclTemplate.h"
 #include "clang/AST/TextNodeDumper.h"
 #include "clang/Basic/LLVM.h"
 
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
+
 namespace clang {
+class ASTContext;
+class ClassTemplateDecl;
+class DeclContext;
+class FunctionTemplateDecl;
+class VarTemplateDecl;
 
 class ASTDumper : public ASTNodeTraverser<ASTDumper, TextNodeDumper> {
 

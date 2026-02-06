@@ -10,13 +10,24 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <numeric>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <iterator>
+#include <memory>
+#include <variant>
+
 #include "ABIInfoImpl.h"
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGCUDARuntime.h"
 #include "CGCXXABI.h"
 #include "CGCall.h"
-#include "CGCleanup.h"
 #include "CGDebugInfo.h"
 #include "CGHLSLRuntime.h"
 #include "CGObjCRuntime.h"
@@ -39,7 +50,6 @@
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
@@ -50,13 +60,11 @@
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/StmtVisitor.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/CodeGenOptions.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/Module.h"
 #include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/Sanitizers.h"
 #include "clang/Basic/SourceLocation.h"
@@ -87,7 +95,6 @@
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/CodeGen.h"
 #include "llvm/Support/CommandLine.h"
-#include "llvm/Support/ConvertUTF.h"
 #include "llvm/Support/Endian.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
@@ -95,15 +102,55 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/xxhash.h"
 #include "llvm/Transforms/Utils/SanitizerStats.h"
+#include "ABIInfo.h"
+#include "CodeGenTypes.h"
+#include "SanitizerMetadata.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Mangle.h"
+#include "clang/AST/RecordLayout.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/NoSanitizeList.h"
+#include "clang/Basic/PointerAuthOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DebugLoc.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/IR/ValueHandle.h"
+#include "llvm/Support/AllocToken.h"
+#include "llvm/Support/TypeSize.h"
+#include "llvm/TargetParser/Triple.h"
 
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <numeric>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+namespace clang {
+class ObjCInterfaceDecl;
+class ObjCIvarDecl;
+class Stmt;
+namespace CodeGen {
+class CGFunctionInfo;
+}  // namespace CodeGen
+}  // namespace clang
 
 using namespace clang;
 using namespace CodeGen;

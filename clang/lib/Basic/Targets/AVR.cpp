@@ -11,15 +11,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "AVR.h"
+
+#include <iterator>
+#include <optional>
+#include <string>
+
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/MacroBuilder.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/Compiler.h"
-#include <iterator>
-#include <optional>
-#include <string>
 
 using namespace clang;
 using namespace clang::targets;

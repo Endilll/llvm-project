@@ -13,26 +13,24 @@
 #ifndef LLVM_CLANG_INTERPRETER_UTILS_H
 #define LLVM_CLANG_INTERPRETER_UTILS_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Mangle.h"
-#include "clang/AST/TypeVisitor.h"
-#include "clang/Basic/TargetInfo.h"
-#include "clang/CodeGen/ModuleBuilder.h"
-#include "clang/Driver/Compilation.h"
-#include "clang/Driver/Driver.h"
-#include "clang/Driver/Job.h"
-#include "clang/Driver/Tool.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/TextDiagnosticBuffer.h"
-#include "clang/Lex/PreprocessorOptions.h"
-#include "clang/Options/Options.h"
 
-#include "clang/Sema/Lookup.h"
-#include "llvm/IR/Module.h"
-#include "llvm/Support/Errc.h"
-#include "llvm/TargetParser/Host.h"
+
+#include <stdint.h>
+#include <string>
+
+#include "clang/Sema/Sema.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
+class ASTContext;
+class Decl;
+class DeclContext;
+class Expr;
+class IntegerLiteral;
+class NamedDecl;
+class NamespaceDecl;
+class QualType;
+
 IntegerLiteral *IntegerLiteralExpr(ASTContext &C, uint64_t Val);
 
 Expr *CStyleCastPtrExpr(Sema &S, QualType Ty, Expr *E);

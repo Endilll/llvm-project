@@ -14,57 +14,6 @@
 #ifndef LLVM_CLANG_AST_ASTCONTEXT_H
 #define LLVM_CLANG_AST_ASTCONTEXT_H
 
-#include "clang/AST/ASTFwd.h"
-#include "clang/AST/AttrIterator.h"
-#include "clang/AST/CanonicalType.h"
-#include "clang/AST/CommentCommandTraits.h"
-#include "clang/AST/ComparisonCategories.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclID.h"
-#include "clang/AST/DeclarationName.h"
-#include "clang/AST/ExternalASTSource.h"
-#include "clang/AST/NestedNameSpecifierBase.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/RawCommentList.h"
-#include "clang/AST/Redeclarable.h"
-#include "clang/AST/SYCLKernelInfo.h"
-#include "clang/AST/TemplateBase.h"
-#include "clang/AST/TemplateName.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/AST/TypeOrdering.h"
-#include "clang/Basic/AddressSpaces.h"
-#include "clang/Basic/AttrKinds.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/IdentifierTable.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/Linkage.h"
-#include "clang/Basic/PartialDiagnostic.h"
-#include "clang/Basic/Sanitizers.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/Specifiers.h"
-#include "clang/Basic/TargetCXXABI.h"
-#include "clang/Basic/UnsignedOrNone.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/DenseMapInfo.h"
-#include "llvm/ADT/DenseSet.h"
-#include "llvm/ADT/FoldingSet.h"
-#include "llvm/ADT/Hashing.h"
-#include "llvm/ADT/MapVector.h"
-#include "llvm/ADT/PointerIntPair.h"
-#include "llvm/ADT/PointerUnion.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/STLForwardCompat.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
-#include "llvm/ADT/SetVector.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/StringSet.h"
-#include "llvm/ADT/TinyPtrVector.h"
-#include "llvm/Support/Allocator.h"
-#include "llvm/Support/TypeSize.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -80,12 +29,84 @@
 #include <utility>
 #include <vector>
 
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CommentCommandTraits.h"
+#include "clang/AST/ComparisonCategories.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclID.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/ExternalASTSource.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/RawCommentList.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/AST/TypeOrdering.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/AttrKinds.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Linkage.h"
+#include "clang/Basic/PartialDiagnostic.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/Hashing.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/StringSet.h"
+#include "llvm/ADT/TinyPtrVector.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/TypeSize.h"
+#include "clang/AST/ASTContextAllocate.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/Basic/NoSanitizeList.h"
+#include "clang/Basic/ProfileList.h"
+#include "clang/Basic/XRayLists.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class ArrayInitLoopExpr;
+class Attr;
+class BTFTypeTagAttr;
+class SYCLKernelInfo;
+class SanitizerMask;
+class SourceManager;
+class StreamingDiagnostic;
+class StringLiteral;
+class TemplateParamObjectDecl;
+}  // namespace clang
+
 namespace llvm {
 
 class APFixedPoint;
 class FixedPointSemantics;
 struct fltSemantics;
 template <typename T, unsigned N> class SmallPtrSet;
+class raw_ostream;
+template <typename Fn> class function_ref;
 
 struct ScalableVecTyKey {
   clang::QualType EltTy;
@@ -128,26 +149,16 @@ class AtomicExpr;
 class BlockExpr;
 struct BlockVarCopyInit;
 class BuiltinTemplateDecl;
-class CharUnits;
-class ConceptDecl;
 class CXXABI;
-class CXXConstructorDecl;
-class CXXMethodDecl;
-class CXXRecordDecl;
 class DiagnosticsEngine;
 class DynTypedNodeList;
 class Expr;
 enum class FloatModeKind;
 class GlobalDecl;
-class IdentifierTable;
-class LangOptions;
 class MangleContext;
 class MangleNumberingContext;
 class MemberSpecializationInfo;
 class Module;
-struct MSGuidDeclParts;
-class NestedNameSpecifier;
-class NoSanitizeList;
 class ObjCCategoryDecl;
 class ObjCCategoryImplDecl;
 class ObjCContainerDecl;
@@ -164,7 +175,6 @@ class OMPTraitInfo;
 class ParentMapContext;
 struct ParsedTargetAttr;
 class Preprocessor;
-class ProfileList;
 class StoredDeclsMap;
 class TargetAttr;
 class TargetInfo;
@@ -174,10 +184,8 @@ class TemplateTemplateParmDecl;
 class TemplateTypeParmDecl;
 class TypeConstraint;
 class UnresolvedSetIterator;
-class UsingShadowDecl;
 class VarTemplateDecl;
 class VTableContextBase;
-class XRayFunctionFilter;
 
 /// A simple array of base specifiers.
 typedef SmallVector<CXXBaseSpecifier *, 4> CXXCastPath;
@@ -202,10 +210,6 @@ namespace interp {
 class Context;
 
 } // namespace interp
-
-namespace serialization {
-template <class> class AbstractTypeReader;
-} // namespace serialization
 
 enum class AlignRequirementKind {
   /// The alignment was not explicit in code.

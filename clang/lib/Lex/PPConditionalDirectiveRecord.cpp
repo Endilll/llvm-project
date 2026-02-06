@@ -11,14 +11,15 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Lex/PPConditionalDirectiveRecord.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Lex/PPCallbacks.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/Support/Capacity.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/Capacity.h"
 
 using namespace clang;
 

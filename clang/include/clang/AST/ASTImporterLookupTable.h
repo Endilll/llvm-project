@@ -18,11 +18,10 @@
 #include "clang/AST/DeclarationName.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SetVector.h"
+#include "clang/AST/Decl.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
-
-class NamedDecl;
-class DeclContext;
 
 // There are certain cases when normal C/C++ lookup (localUncachedLookup)
 // does not find AST nodes. E.g.:

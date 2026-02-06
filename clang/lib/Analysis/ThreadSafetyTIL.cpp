@@ -7,9 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/ThreadSafetyTIL.h"
+
+#include <cassert>
+
 #include "clang/Analysis/Analyses/ThreadSafetyUtil.h"
 #include "clang/Basic/LLVM.h"
-#include <cassert>
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 using namespace threadSafety;

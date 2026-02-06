@@ -13,8 +13,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Rewrite/Frontend/FixItRewriter.h"
+
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+#include <map>
+
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -26,11 +33,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
 
 using namespace clang;
 using llvm::RewriteBuffer;

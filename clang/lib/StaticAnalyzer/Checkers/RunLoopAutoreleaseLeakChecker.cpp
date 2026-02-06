@@ -22,6 +22,9 @@
 //===----------------------------------------------------------------------===//
 //
 
+#include <cassert>
+#include <string>
+
 #include "clang/AST/StmtObjC.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Analysis/AnalysisDeclContext.h"
@@ -30,14 +33,21 @@
 #include "clang/Basic/SourceLocation.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclObjC.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
-#include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ExprEngine.h"
-#include <cassert>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

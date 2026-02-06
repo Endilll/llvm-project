@@ -7,6 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "DiagnosticBuilderWrappers.h"
+
+#include <string>
+#include <utility>
+#include <iterator>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/InstallAPI/DylibVerifier.h"
 #include "llvm/ADT/STLExtras.h"
@@ -19,8 +24,7 @@
 #include "llvm/TextAPI/FileTypes.h"
 #include "llvm/TextAPI/PackedVersion.h"
 #include "llvm/TextAPI/Platform.h"
-#include <string>
-#include <utility>
+#include "llvm/ADT/StringRef.h"
 
 using clang::DiagnosticBuilder;
 

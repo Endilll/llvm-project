@@ -7,15 +7,26 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/CompilerInstance.h"
+
+#include <algorithm>
+#include <cassert>
+#include <chrono>
+#include <functional>
+#include <limits>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticOptions.h"
-#include "clang/Basic/DiagnosticSerialization.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/IdentifierTable.h"
@@ -26,8 +37,6 @@
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/Stack.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/Version.h"
-#include "clang/Config/config.h"
 #include "clang/Frontend/ChainedDiagnosticConsumer.h"
 #include "clang/Frontend/CommandLineSourceLoc.h"
 #include "clang/Frontend/CompilerInvocation.h"
@@ -49,15 +58,12 @@
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include "clang/Sema/CodeCompleteConsumer.h"
-#include "clang/Sema/CodeCompleteOptions.h"
-#include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Serialization/ASTReader.h"
 #include "clang/Serialization/GlobalModuleIndex.h"
 #include "clang/Serialization/InMemoryModuleCache.h"
 #include "clang/Serialization/ModuleCache.h"
 #include "clang/Serialization/ModuleFile.h"
-#include "clang/Serialization/ModuleFileExtension.h"
 #include "llvm/ADT/CachedHashString.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/STLExtras.h"
@@ -86,17 +92,34 @@
 #include "llvm/Support/VirtualOutputFile.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Host.h"
-#include <algorithm>
-#include <cassert>
-#include <chrono>
-#include <functional>
-#include <limits>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
+#include "clang/APINotes/APINotesManager.h"
+#include "clang/APINotes/APINotesOptions.h"
+#include "clang/AST/ExternalASTSource.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/CustomizableOptional.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Basic/DiagnosticSerializationInterface.inc"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/TargetOptions.h"
+#include "clang/Basic/Version.inc"
+#include "clang/Frontend/PreprocessorOutputOptions.h"
+#include "clang/Sema/ExternalSemaSource.h"
+#include "llvm/ADT/FunctionExtras.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace clang {
+class ASTDeserializationListener;
+class CodeCompleteOptions;
+class ModuleFileExtension;
+}  // namespace clang
 
 using namespace clang;
 

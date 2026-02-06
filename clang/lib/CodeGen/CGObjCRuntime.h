@@ -14,21 +14,21 @@
 
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGOBJCRUNTIME_H
 #define LLVM_CLANG_LIB_CODEGEN_CGOBJCRUNTIME_H
-#include "CGBuilder.h"
-#include "CGCall.h"
+#include <stdint.h>
+#include <string>
+#include <vector>
+
 #include "CGCleanup.h"
 #include "CGValue.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/Basic/IdentifierTable.h" // Selector
-#include "llvm/ADT/UniqueVector.h"
+#include "Address.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/Support/ErrorHandling.h"
 
 namespace llvm {
 class Constant;
 class Function;
-class Module;
-class StructLayout;
-class StructType;
-class Type;
 class Value;
 } // namespace llvm
 
@@ -38,25 +38,18 @@ class CGFunctionInfo;
 class CodeGenFunction;
 } // namespace CodeGen
 
-class FieldDecl;
 class ObjCAtTryStmt;
 class ObjCAtThrowStmt;
 class ObjCAtSynchronizedStmt;
-class ObjCContainerDecl;
-class ObjCCategoryImplDecl;
-class ObjCImplementationDecl;
-class ObjCInterfaceDecl;
-class ObjCMessageExpr;
-class ObjCMethodDecl;
-class ObjCProtocolDecl;
-class Selector;
-class ObjCIvarDecl;
-class ObjCStringLiteral;
-class BlockDeclRefExpr;
+class QualType;
+class StringLiteral;
+class VarDecl;
 
 namespace CodeGen {
 class CodeGenModule;
 class CGBlockInfo;
+class CallArgList;
+class ReturnValueSlot;
 
 // FIXME: Several methods should be pure virtual but aren't to avoid the
 // partially-implemented subclass breaking.

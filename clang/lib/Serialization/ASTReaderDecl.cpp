@@ -11,9 +11,19 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <deque>
+#include <string>
+#include <utility>
+#include <iterator>
+#include <new>
+#include <optional>
+
 #include "ASTCommon.h"
 #include "ASTReaderInternals.h"
-#include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTStructuralEquivalence.h"
 #include "clang/AST/Attr.h"
@@ -33,7 +43,6 @@
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/LambdaCapture.h"
-#include "clang/AST/OpenMPClause.h"
 #include "clang/AST/Redeclarable.h"
 #include "clang/AST/SYCLKernelInfo.h"
 #include "clang/AST/SelectorLocationsKind.h"
@@ -52,7 +61,6 @@
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/Linkage.h"
 #include "clang/Basic/Module.h"
-#include "clang/Basic/OpenACCKinds.h"
 #include "clang/Basic/PragmaKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
@@ -64,6 +72,7 @@
 #include "clang/Serialization/ASTRecordReader.h"
 #include "clang/Serialization/ContinuousRangeMap.h"
 #include "clang/Serialization/ModuleFile.h"
+#include "clang/Serialization/ModuleFileExtension.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/SmallPtrSet.h"
@@ -73,13 +82,32 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <deque>
-#include <string>
-#include <utility>
+#include "MultiOnDiskHashTable.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTUnresolvedSet.h"
+#include "clang/AST/DeclOpenACC.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/PagedVector.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/TinyPtrVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
+
+namespace clang {
+class ConceptReference;
+class OMPTraitInfo;
+enum class OpenACCDirectiveKind : uint8_t;
+}  // namespace clang
 
 using namespace clang;
 using namespace serialization;

@@ -21,6 +21,11 @@
 #ifndef LLVM_CLANG_SEMA_DELAYEDDIAGNOSTIC_H
 #define LLVM_CLANG_SEMA_DELAYEDDIAGNOSTIC_H
 
+#include <cassert>
+#include <cstddef>
+#include <utility>
+#include <new>
+
 #include "clang/AST/DeclAccessPair.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -28,19 +33,19 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/PartialDiagnostic.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/Specifiers.h"
 #include "clang/Sema/Sema.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
-#include <cstddef>
-#include <utility>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 
 class ObjCInterfaceDecl;
 class ObjCPropertyDecl;
+class NamedDecl;
+enum AccessSpecifier : uint8_t;
 
 namespace sema {
 

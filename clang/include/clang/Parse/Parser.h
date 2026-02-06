@@ -13,13 +13,16 @@
 #ifndef LLVM_CLANG_PARSE_PARSER_H
 #define LLVM_CLANG_PARSE_PARSER_H
 
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclObjC.h"
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <stack>
+#include <utility>
+#include <variant>
+
 #include "clang/AST/DeclTemplate.h"
-#include "clang/AST/DeclarationName.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/AttrSubjectMatchRules.h"
@@ -56,17 +59,23 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
-#include "llvm/Frontend/OpenMP/OMPContext.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
-#include <cassert>
-#include <cstddef>
-#include <memory>
-#include <optional>
-#include <stack>
-#include <utility>
-#include <variant>
+#include "clang/AST/TemplateName.h"
+#include "clang/Lex/ModuleLoader.h"
+#include "clang/Lex/Token.h"
+#include "clang/Sema/ParsedTemplate.h"
+#include "llvm/ADT/ArrayRef.h"
+
+namespace llvm {
+class VersionTuple;
+namespace omp {
+enum class TraitSelector;
+enum class TraitSet;
+}  // namespace omp
+template <typename Fn> class function_ref;
+}  // namespace llvm
 
 namespace clang {
 class PragmaHandler;
@@ -74,16 +83,12 @@ class Scope;
 class BalancedDelimiterTracker;
 class CorrectionCandidateCallback;
 class DeclGroupRef;
-class DiagnosticBuilder;
 struct LoopHint;
-class Parser;
 class ParsingDeclRAIIObject;
 class ParsingDeclSpec;
 class ParsingDeclarator;
 class ParsingFieldDeclarator;
 class ColonProtectionRAIIObject;
-class InMessageExpressionRAIIObject;
-class PoisonSEHIdentifiersRAIIObject;
 class OMPClause;
 class OpenACCClause;
 class ObjCTypeParamList;
@@ -91,6 +96,16 @@ struct OMPTraitProperty;
 struct OMPTraitSelector;
 struct OMPTraitSet;
 class OMPTraitInfo;
+class Decl;
+class DeclarationName;
+class LabelDecl;
+class MaterializeTemporaryExpr;
+class NamedDecl;
+class ObjCContainerDecl;
+class RecordDecl;
+class TargetInfo;
+class VarDecl;
+struct DeclarationNameInfo;
 
 enum class AnnotatedNameKind {
   /// Annotation has failed and emitted an error.

@@ -12,8 +12,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
-#include "clang/AST/ASTTypeTraits.h"
-#include "clang/AST/Attr.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <queue>
+#include <set>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <list>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclObjC.h"
@@ -60,18 +73,16 @@
 #include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <queue>
-#include <set>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

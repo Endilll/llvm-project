@@ -15,10 +15,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <tuple>
+#include <utility>
+
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
-#include "clang/AST/ParentMap.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
@@ -31,9 +34,21 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
-#include <memory>
-#include <tuple>
-#include <utility>
+#include "clang/AST/Expr.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
+
+namespace clang {
+namespace ento {
+class CallEvent;
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

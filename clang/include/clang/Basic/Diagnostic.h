@@ -14,22 +14,6 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTIC_H
 #define LLVM_CLANG_BASIC_DIAGNOSTIC_H
 
-#include "clang/Basic/DiagnosticIDs.h"
-#include "clang/Basic/DiagnosticOptions.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/Specifiers.h"
-#include "llvm/ADT/APInt.h"
-#include "llvm/ADT/APSInt.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/FunctionExtras.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringExtras.h"
-#include "llvm/ADT/iterator_range.h"
-#include "llvm/Support/Compiler.h"
-#include "llvm/Support/ErrorHandling.h"
 #include <cassert>
 #include <cstdint>
 #include <limits>
@@ -41,11 +25,34 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <iterator>
+
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/FunctionExtras.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringExtras.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Format.h"
 
 namespace llvm {
 class Error;
 class raw_ostream;
 class MemoryBuffer;
+class APInt;
+
 namespace vfs {
 class FileSystem;
 } // namespace vfs
@@ -57,11 +64,13 @@ class DeclContext;
 class Diagnostic;
 class DiagnosticBuilder;
 class DiagnosticConsumer;
-class IdentifierInfo;
 class LangOptions;
 class Preprocessor;
 class SourceManager;
 class StoredDiagnostic;
+namespace diag {
+enum class Group;
+}  // namespace diag
 
 namespace tok {
 

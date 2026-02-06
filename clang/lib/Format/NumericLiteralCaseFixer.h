@@ -15,10 +15,15 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_NUMERICLITERALCASEFIXER_H
 #define LLVM_CLANG_LIB_FORMAT_NUMERICLITERALCASEFIXER_H
 
-#include "TokenAnalyzer.h"
+#include <iterator>
+#include <utility>
+
+#include "clang/Tooling/Core/Replacement.h"
 
 namespace clang {
 namespace format {
+class Environment;
+struct FormatStyle;
 
 class NumericLiteralCaseFixer {
 public:

@@ -7,12 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/CommentBriefParser.h"
+
+#include <string>
+
 #include "clang/AST/CommentCommandTraits.h"
 #include "clang/AST/CommentLexer.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/STLExtras.h"
-#include <string>
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 namespace comments {

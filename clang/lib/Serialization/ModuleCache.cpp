@@ -8,6 +8,12 @@
 
 #include "clang/Serialization/ModuleCache.h"
 
+#include <ctime>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <chrono>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Serialization/InMemoryModuleCache.h"
 #include "clang/Serialization/ModuleFile.h"
@@ -18,10 +24,8 @@
 #include "llvm/Support/LockFileManager.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <ctime>
-#include <memory>
-#include <string>
-#include <system_error>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
 
 using namespace clang;
 

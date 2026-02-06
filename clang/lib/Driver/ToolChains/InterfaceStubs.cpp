@@ -7,8 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "InterfaceStubs.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Driver/Action.h"
+
+#include <memory>
+#include <string>
+
 #include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/InputInfo.h"
@@ -18,8 +20,9 @@
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/Path.h"
-#include <memory>
-#include <string>
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 namespace driver {

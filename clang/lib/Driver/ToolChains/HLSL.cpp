@@ -7,6 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "HLSL.h"
+
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <regex>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangStandard.h"
@@ -24,13 +33,12 @@
 #include "llvm/Option/Option.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <regex>
-#include <string>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Driver/InputInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/VersionTuple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

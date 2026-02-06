@@ -9,12 +9,12 @@
 #ifndef LLVM_CLANG_LIB_INDEX_INDEXINGCONTEXT_H
 #define LLVM_CLANG_LIB_INDEX_INDEXINGCONTEXT_H
 
-#include "clang/Basic/IdentifierTable.h"
-#include "clang/Basic/LLVM.h"
+#include <memory>
+
 #include "clang/Index/IndexSymbol.h"
-#include "clang/Index/IndexingAction.h"
 #include "clang/Lex/MacroInfo.h"
 #include "llvm/ADT/ArrayRef.h"
+#include "clang/Index/IndexingOptions.h"
 
 namespace clang {
   class ASTContext;
@@ -25,13 +25,14 @@ namespace clang {
   class TagDecl;
   class TypeSourceInfo;
   class NamedDecl;
-  class ObjCMethodDecl;
   class DeclContext;
   class NestedNameSpecifierLoc;
   class Stmt;
   class Expr;
   class TypeLoc;
   class SourceLocation;
+class IdentifierInfo;
+class LangOptions;
 
 namespace index {
   class IndexDataConsumer;

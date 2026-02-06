@@ -13,22 +13,28 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_STORE_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_STORE_H
 
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <optional>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Type.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/StoreRef.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/SmallVector.h"
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <optional>
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+class raw_ostream;
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 
@@ -37,7 +43,6 @@ class CastExpr;
 class CompoundLiteralExpr;
 class CXXBasePath;
 class Decl;
-class Expr;
 class LocationContext;
 class ObjCIvarDecl;
 class StackFrameContext;

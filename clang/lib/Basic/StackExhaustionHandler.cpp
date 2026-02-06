@@ -13,10 +13,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/StackExhaustionHandler.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Stack.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
+#include "clang/Basic/Diagnostic.h"
 
 void clang::StackExhaustionHandler::runWithSufficientStackSpace(
     SourceLocation Loc, llvm::function_ref<void()> Fn) {

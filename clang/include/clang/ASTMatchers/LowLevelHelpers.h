@@ -13,12 +13,16 @@
 #ifndef LLVM_CLANG_ASTMATCHERS_LOWLEVELHELPERS_H
 #define LLVM_CLANG_ASTMATCHERS_LOWLEVELHELPERS_H
 
-#include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
-#include "clang/AST/Type.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
+namespace llvm {
+template <typename Fn> class function_ref;
+}  // namespace llvm
 
 namespace clang {
+class CXXConstructExpr;
+class CallExpr;
+class Expr;
+class QualType;
+
 namespace ast_matchers {
 
 void matchEachArgumentWithParamType(

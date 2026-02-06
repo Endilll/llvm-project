@@ -6,6 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Frontend/LayoutOverrideSource.h"
+
+#include <cstdint>
+#include <cstring>
+#include <fstream>
+#include <string>
+
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -16,10 +22,10 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cstdint>
-#include <cstring>
-#include <fstream>
-#include <string>
+#include "clang/AST/DeclBase.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

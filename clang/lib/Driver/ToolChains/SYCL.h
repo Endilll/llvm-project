@@ -10,11 +10,24 @@
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_SYCL_H
 
 #include "clang/Driver/SyclInstallationDetector.h"
-#include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
+#include "llvm/Frontend/Debug/Options.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace toolchains {
 
 class LLVM_LIBRARY_VISIBILITY SYCLToolChain : public ToolChain {

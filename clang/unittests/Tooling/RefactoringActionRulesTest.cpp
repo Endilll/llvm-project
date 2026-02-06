@@ -11,6 +11,8 @@
 #include "clang/Tooling/Refactoring.h"
 #include "clang/Tooling/Refactoring/Extract/Extract.h"
 #include "clang/Tooling/Refactoring/RefactoringAction.h"
+#include "clang/Tooling/Refactoring/RefactoringActionRuleRequirements.h"
+#include "clang/Tooling/Refactoring/RefactoringActionRulesInternal.h"
 #include "clang/Tooling/Refactoring/RefactoringDiagnostic.h"
 #include "clang/Tooling/Refactoring/Rename/SymbolName.h"
 #include "clang/Tooling/Tooling.h"

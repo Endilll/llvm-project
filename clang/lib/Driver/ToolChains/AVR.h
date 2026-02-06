@@ -9,13 +9,29 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_AVR_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_AVR_H
 
+#include <optional>
+#include <string>
+
 #include "Gnu.h"
-#include "clang/Driver/InputInfo.h"
 #include "clang/Driver/Tool.h"
-#include "clang/Driver/ToolChain.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+class ToolChain;
+
 namespace toolchains {
 
 class LLVM_LIBRARY_VISIBILITY AVRToolChain : public Generic_ELF {

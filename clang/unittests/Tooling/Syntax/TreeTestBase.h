@@ -13,6 +13,10 @@
 #ifndef LLVM_CLANG_UNITTESTS_TOOLING_SYNTAX_TREETESTBASE_H
 #define LLVM_CLANG_UNITTESTS_TOOLING_SYNTAX_TREETESTBASE_H
 
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/SourceManager.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Frontend/CompilerInvocation.h"
 #include "clang/Testing/TestClangConfig.h"
@@ -22,6 +26,7 @@
 #include "clang/Tooling/Syntax/Tree.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ScopedPrinter.h"
+#include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Testing/Annotations/Annotations.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

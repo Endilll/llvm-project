@@ -14,11 +14,9 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_ORIGINS_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_ORIGINS_H
 
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/LifetimeStats.h"
+#include <cstddef>
+#include <optional>
+
 #include "clang/Analysis/Analyses/LifetimeSafety/Utils.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
@@ -26,8 +24,21 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cstddef>
-#include <optional>
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace clang {
+class ASTContext;
+class Decl;
+class Expr;
+class QualType;
+class Stmt;
+class Type;
+class ValueDecl;
+namespace lifetimes {
+struct LifetimeSafetyStats;
+}  // namespace lifetimes
+}  // namespace clang
 
 namespace clang::lifetimes::internal {
 

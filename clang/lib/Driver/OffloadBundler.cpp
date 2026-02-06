@@ -15,7 +15,24 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Driver/OffloadBundler.h"
-#include "clang/Basic/Cuda.h"
+
+#include <llvm/Support/Process.h>
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <forward_list>
+#include <functional>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/OffloadArch.h"
 #include "clang/Basic/TargetID.h"
 #include "llvm/ADT/ArrayRef.h"
@@ -51,29 +68,17 @@
 #include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Program.h"
-#include "llvm/Support/Signals.h"
 #include "llvm/Support/StringSaver.h"
 #include "llvm/Support/Timer.h"
-#include "llvm/Support/WithColor.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Host.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <forward_list>
-#include <functional>
-#include <limits>
-#include <llvm/Support/Process.h>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/fallible_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Object/SymbolicFile.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace llvm;
 using namespace llvm::object;

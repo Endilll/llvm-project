@@ -12,6 +12,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/NestedNameSpecifier.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <optional>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -19,7 +26,6 @@
 #include "clang/AST/DependenceFlags.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/LLVM.h"
@@ -30,11 +36,8 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MemAlloc.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdlib>
-#include <cstring>
-#include <optional>
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

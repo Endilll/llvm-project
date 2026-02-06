@@ -7,6 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Refactoring/ASTSelection.h"
+
+#include <cassert>
+#include <functional>
+#include <optional>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -25,11 +33,14 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <functional>
-#include <optional>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class LangOptions;
+}  // namespace clang
 
 using namespace clang;
 using namespace tooling;

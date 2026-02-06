@@ -10,9 +10,19 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include <bitset>
+#include <cassert>
+#include <cstdint>
+#include <functional>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <initializer_list>
+#include <iterator>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/Expr.h"
@@ -29,7 +39,6 @@
 #include "clang/Basic/OperatorPrecedence.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
-#include "clang/Basic/TargetInfo.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Token.h"
 #include "clang/Parse/Parser.h"
@@ -56,17 +65,29 @@
 #include "llvm/Frontend/OpenMP/DirectiveNameParser.h"
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
 #include "llvm/Frontend/OpenMP/OMPAssume.h"
-#include "llvm/Frontend/OpenMP/OMPConstants.h"
 #include "llvm/Frontend/OpenMP/OMPContext.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <bitset>
-#include <cassert>
-#include <cstdint>
-#include <functional>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Lex/Preprocessor.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Frontend/Directive/Spelling.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Attr;
+}  // namespace clang
+namespace llvm {
+namespace omp {
+enum class DefaultKind;
+}  // namespace omp
+}  // namespace llvm
 
 using namespace clang;
 using namespace llvm::omp;

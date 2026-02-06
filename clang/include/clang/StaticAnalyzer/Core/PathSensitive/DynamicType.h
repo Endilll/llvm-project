@@ -15,17 +15,22 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_DYNAMICTYPE_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_DYNAMICTYPE_H
 
-#include "clang/AST/Type.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/DynamicCastInfo.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/DynamicTypeInfo.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
+class QualType;
+
 namespace ento {
+class DynamicCastInfo;
+class MemRegion;
+class SymbolReaper;
 
 /// Get dynamic type information for the region \p MR.
 DynamicTypeInfo getDynamicTypeInfo(ProgramStateRef State, const MemRegion *MR);

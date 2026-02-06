@@ -13,6 +13,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "UnwrappedLineParser.h"
+
+#include <cassert>
+#include <cstddef>
+#include <functional>
+#include <iterator>
+#include <list>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <string>
+
 #include "FormatToken.h"
 #include "FormatTokenSource.h"
 #include "Macros.h"
@@ -26,21 +37,19 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/Support/Allocator.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/Regex.h"
 #include "llvm/Support/raw_os_ostream.h"
 #include "llvm/Support/raw_ostream.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/Twine.h"
 
-#include <cassert>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <list>
-#include <memory>
-#include <optional>
-#include <ostream>
-#include <utility>
+namespace clang {
+class SourceManager;
+}  // namespace clang
+namespace llvm {
+template <typename T> class SpecificBumpPtrAllocator;
+}  // namespace llvm
 
 #define DEBUG_TYPE "format-parser"
 

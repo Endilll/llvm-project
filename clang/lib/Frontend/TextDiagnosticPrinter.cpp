@@ -11,17 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/TextDiagnosticPrinter.h"
+
+#include <cassert>
+#include <cstdint>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Frontend/TextDiagnostic.h"
-#include "clang/Lex/Lexer.h"
-#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+
 using namespace clang;
 
 TextDiagnosticPrinter::TextDiagnosticPrinter(raw_ostream &os,

@@ -13,6 +13,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "BreakableToken.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <string>
+#include <initializer_list>
+
 #include "ContinuationIndenter.h"
 #include "Encoding.h"
 #include "FormatToken.h"
@@ -24,10 +31,9 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Regex.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <string>
+#include "WhitespaceManager.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/AllocatorBase.h"
 
 #define DEBUG_TYPE "format-token-breaker"
 

@@ -13,10 +13,12 @@
 #ifndef LLVM_CLANG_SEMA_SEMASWIFT_H
 #define LLVM_CLANG_SEMA_SEMASWIFT_H
 
-#include "clang/AST/ASTFwd.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/SemaBase.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
 class AttributeCommonInfo;
@@ -24,6 +26,8 @@ class Decl;
 enum class ParameterABI;
 class ParsedAttr;
 class SwiftNameAttr;
+class Sema;
+class SourceLocation;
 
 class SemaSwift : public SemaBase {
 public:

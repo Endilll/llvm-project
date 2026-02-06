@@ -18,17 +18,25 @@
 #ifndef LLVM_CLANG_AST_FORMATSTRING_H
 #define LLVM_CLANG_AST_FORMATSTRING_H
 
-#include "clang/AST/CanonicalType.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
 #include <cassert>
 #include <optional>
 #include <string>
 
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
+
 namespace clang {
 
 class TargetInfo;
+class ASTContext;
+class LangOptions;
 
 //===----------------------------------------------------------------------===//
 /// Common components of both fprintf and fscanf format strings.

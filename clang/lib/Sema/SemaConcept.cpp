@@ -11,6 +11,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaConcept.h"
+
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <algorithm>
+#include <new>
+#include <string>
+#include <tuple>
+
 #include "TreeTransform.h"
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTConcept.h"
@@ -40,8 +53,6 @@
 #include "clang/Basic/UnsignedOrNone.h"
 #include "clang/Sema/DeclSpec.h"
 #include "clang/Sema/EnterExpressionEvaluationContext.h"
-#include "clang/Sema/Initialization.h"
-#include "clang/Sema/Overload.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/ScopeInfo.h"
 #include "clang/Sema/Sema.h"
@@ -59,13 +70,15 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/TimeProfiler.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/Lex/Token.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 using namespace sema;

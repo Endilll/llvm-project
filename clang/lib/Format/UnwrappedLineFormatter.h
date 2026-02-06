@@ -15,13 +15,26 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_UNWRAPPEDLINEFORMATTER_H
 #define LLVM_CLANG_LIB_FORMAT_UNWRAPPEDLINEFORMATTER_H
 
-#include "ContinuationIndenter.h"
+#include <iterator>
+#include <map>
+#include <utility>
+
+#include "FormatToken.h"
+#include "TokenAnnotator.h"
+
+namespace llvm {
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
+class SourceManager;
+
 namespace format {
 
 class ContinuationIndenter;
 class WhitespaceManager;
+struct FormatStyle;
+struct FormattingAttemptStatus;
 
 class UnwrappedLineFormatter {
 public:

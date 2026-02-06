@@ -14,8 +14,14 @@
 #ifndef LLVM_CLANG_TOOLING_FILEMATCHTRIE_H
 #define LLVM_CLANG_TOOLING_FILEMATCHTRIE_H
 
-#include "clang/Basic/LLVM.h"
 #include <memory>
+
+#include "clang/Basic/LLVM.h"
+
+namespace llvm {
+class StringRef;
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 namespace tooling {

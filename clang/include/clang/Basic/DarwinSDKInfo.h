@@ -9,20 +9,27 @@
 #ifndef LLVM_CLANG_BASIC_DARWINSDKINFO_H
 #define LLVM_CLANG_BASIC_DARWINSDKINFO_H
 
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/Support/VersionTuple.h"
-#include "llvm/Support/VirtualFileSystem.h"
-#include "llvm/TargetParser/Triple.h"
 #include <cassert>
 #include <cstdint>
 #include <optional>
 #include <string>
 #include <utility>
 
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Error.h"
+
 namespace llvm {
+namespace vfs {
+class FileSystem;
+}  // namespace vfs
+
 namespace json {
 class Object;
 } // end namespace json

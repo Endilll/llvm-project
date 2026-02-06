@@ -14,16 +14,16 @@
 #ifndef LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_TRANSFER_H
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_TRANSFER_H
 
-#include "clang/AST/Stmt.h"
-#include "clang/Analysis/FlowSensitive/AdornedCFG.h"
-#include "clang/Analysis/FlowSensitive/DataflowAnalysisContext.h"
-#include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
-#include "clang/Analysis/FlowSensitive/TypeErasedDataflowAnalysis.h"
-#include "llvm/ADT/ArrayRef.h"
 #include <optional>
+
+#include "clang/AST/Stmt.h"
+#include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
+#include "llvm/ADT/ArrayRef.h"
 
 namespace clang {
 namespace dataflow {
+class AdornedCFG;
+struct TypeErasedDataflowAnalysisState;
 
 /// Maps statements to the environments of basic blocks that contain them.
 class StmtToEnvMap {

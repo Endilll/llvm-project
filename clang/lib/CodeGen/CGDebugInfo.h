@@ -13,30 +13,57 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGDEBUGINFO_H
 #define LLVM_CLANG_LIB_CODEGEN_CGDEBUGINFO_H
 
-#include "CGBuilder.h"
+#include <stdint.h>
+#include <optional>
+#include <string>
+#include <cstring>
+#include <iterator>
+#include <utility>
+#include <vector>
+
 #include "SanitizerHandler.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/Type.h"
 #include "clang/AST/TypeOrdering.h"
 #include "clang/Basic/ASTSourceDescriptor.h"
-#include "clang/Basic/CodeGenOptions.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/IR/DIBuilder.h"
-#include "llvm/IR/DebugInfo.h"
-#include "llvm/IR/ValueHandle.h"
 #include "llvm/Support/Allocator.h"
-#include <map>
-#include <optional>
-#include <string>
+#include "clang/AST/Decl.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Sanitizers.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Frontend/Debug/Options.h"
+#include "llvm/IR/DebugInfoMetadata.h"
+#include "llvm/IR/DebugLoc.h"
+#include "llvm/IR/Metadata.h"
+#include "llvm/IR/TrackingMDRef.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace llvm {
-class MDNode;
-}
+class AllocaInst;
+class CallBase;
+class Function;
+class GlobalValue;
+class GlobalVariable;
+class Instruction;
+class StructLayout;
+class Value;
+namespace dwarf {
+enum Tag : uint16_t;
+}  // namespace dwarf
+template <unsigned int InternalLen> class SmallString;
+}  // namespace llvm
 
 namespace clang {
 class ClassTemplateSpecializationDecl;
@@ -44,14 +71,25 @@ class GlobalDecl;
 class Module;
 class ModuleMap;
 class ObjCInterfaceDecl;
-class UsingDecl;
-class VarDecl;
 enum class DynamicInitKind : unsigned;
+class APValue;
+class ASTContext;
+class Decl;
+class Expr;
+class LambdaCapture;
+class ObjCMethodDecl;
+class SourceManager;
+class StringLiteral;
+class TemplateArgument;
+class TemplateParameterList;
+enum AccessSpecifier : uint8_t;
+template <typename decl_type> class CanonicalDeclPtr;
 
 namespace CodeGen {
 class CodeGenModule;
 class CodeGenFunction;
 class CGBlockInfo;
+class CGBuilderTy;
 
 /// This class gathers all debug information during compilation and is
 /// responsible for emitting to llvm globals or pass directly to the

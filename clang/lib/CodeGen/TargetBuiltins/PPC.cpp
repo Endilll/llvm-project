@@ -10,6 +10,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <utility>
+#include <iterator>
+#include <variant>
+
 #include "Address.h"
 #include "CGBuiltin.h"
 #include "CGValue.h"
@@ -42,13 +52,17 @@
 #include "llvm/Support/ScopedPrinter.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <string>
-#include <string_view>
-#include <tuple>
-#include <utility>
+#include "CGBuilder.h"
+#include "CodeGenModule.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
 
 using namespace clang;
 using namespace CodeGen;

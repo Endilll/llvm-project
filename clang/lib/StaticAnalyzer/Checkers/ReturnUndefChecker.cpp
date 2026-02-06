@@ -12,6 +12,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <tuple>
+#include <utility>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/Stmt.h"
@@ -27,9 +31,17 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
-#include <memory>
-#include <tuple>
-#include <utility>
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace ento {
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

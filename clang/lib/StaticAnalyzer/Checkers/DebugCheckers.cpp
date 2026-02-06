@@ -10,11 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <utility>
+#include <string>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/PrettyPrinter.h"
 #include "clang/Analysis/AnalysisDeclContext.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/Analysis/Analyses/Dominators.h"
 #include "clang/Analysis/Analyses/LiveVariables.h"
 #include "clang/Analysis/CallGraph.h"
@@ -23,13 +25,29 @@
 #include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ExprEngine.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Process.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/Analysis/CFG.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Stmt;
+namespace ento {
+class ExplodedGraph;
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

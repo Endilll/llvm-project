@@ -6,6 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <string>
+
 #include "ABIInfoImpl.h"
 #include "Address.h"
 #include "CGCXXABI.h"
@@ -14,13 +20,11 @@
 #include "CodeGenTypes.h"
 #include "TargetInfo.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/RecordLayout.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/TargetInfo.h"
@@ -33,14 +37,26 @@
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Function.h"
-#include "llvm/IR/LLVMContext.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <memory>
+#include "ABIInfo.h"
+#include "CodeGenFunction.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
 
 using namespace clang;
 using namespace clang::CodeGen;

@@ -13,10 +13,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "NumericLiteralCaseFixer.h"
+
+#include <array>
+#include <cassert>
+#include <string>
+#include <utility>
+
 #include "AffectedRangeManager.h"
 #include "NumericLiteralInfo.h"
 #include "TokenAnalyzer.h"
-
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TokenKinds.h"
@@ -26,11 +31,8 @@
 #include "clang/Tooling/Core/Replacement.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Error.h"
-
-#include <array>
-#include <cassert>
-#include <string>
-#include <utility>
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 namespace format {

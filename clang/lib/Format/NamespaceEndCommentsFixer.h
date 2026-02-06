@@ -17,8 +17,15 @@
 
 #include "TokenAnalyzer.h"
 
+namespace llvm {
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
+
 namespace clang {
 namespace format {
+class AnnotatedLine;
+struct FormatStyle;
+struct FormatToken;
 
 // Finds the namespace token corresponding to a closing namespace `}`, if that
 // is to be formatted.

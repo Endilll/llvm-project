@@ -16,12 +16,31 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_TOKENANALYZER_H
 #define LLVM_CLANG_LIB_FORMAT_TOKENANALYZER_H
 
+#include <iterator>
+#include <memory>
+#include <utility>
+
 #include "AffectedRangeManager.h"
-#include "FormatTokenLexer.h"
-#include "TokenAnnotator.h"
+#include "Encoding.h"
+#include "UnwrappedLineParser.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Format/Format.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
 namespace format {
+class AnnotatedLine;
+class FormatTokenLexer;
+class TokenAnnotator;
 
 class Environment {
 public:

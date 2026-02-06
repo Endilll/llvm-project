@@ -13,9 +13,14 @@
 #ifndef LLVM_CLANG_LEX_TOKENLEXER_H
 #define LLVM_CLANG_LEX_TOKENLEXER_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
 #include <optional>
+
+#include "clang/Basic/SourceLocation.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 

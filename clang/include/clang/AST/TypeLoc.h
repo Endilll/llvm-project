@@ -14,6 +14,11 @@
 #ifndef LLVM_CLANG_AST_TYPELOC_H
 #define LLVM_CLANG_AST_TYPELOC_H
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
@@ -26,17 +31,18 @@
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/MathExtras.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstring>
+#include "clang/AST/TemplateName.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 
 class Attr;
 class ASTContext;
 class CXXRecordDecl;
-class ConceptDecl;
 class Expr;
 class ObjCInterfaceDecl;
 class ObjCProtocolDecl;
@@ -44,7 +50,14 @@ class ObjCTypeParamDecl;
 class ParmVarDecl;
 class TemplateTypeParmDecl;
 class UnqualTypeLoc;
-class UnresolvedUsingTypenameDecl;
+class AutoTypeLoc;
+class BTFTypeTagAttr;
+class EnumDecl;
+class IdentifierInfo;
+class NamedDecl;
+class RecordDecl;
+class TagDecl;
+class TemplateDecl;
 
 // Predeclare all the type nodes.
 #define ABSTRACT_TYPELOC(Class, Base)

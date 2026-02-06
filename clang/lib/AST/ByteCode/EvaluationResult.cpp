@@ -7,13 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "EvaluationResult.h"
+
+#include <cstddef>
+#include <iterator>
+
 #include "ByteCode/Descriptor.h"
 #include "ByteCode/PrimType.h"
 #include "InterpState.h"
 #include "Pointer.h"
 #include "Record.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/TypeBase.h"
@@ -22,9 +25,11 @@
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SetVector.h"
-#include <cassert>
-#include <cstddef>
-#include <iterator>
+#include "ByteCode/Context.h"
+#include "ByteCode/InterpBlock.h"
+#include "ByteCode/Source.h"
+#include "clang/AST/OptionalDiagnostic.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 namespace interp {

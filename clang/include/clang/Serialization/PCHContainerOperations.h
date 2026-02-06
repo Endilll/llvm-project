@@ -9,15 +9,18 @@
 #ifndef LLVM_CLANG_SERIALIZATION_PCHCONTAINEROPERATIONS_H
 #define LLVM_CLANG_SERIALIZATION_PCHCONTAINEROPERATIONS_H
 
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "clang/Basic/Module.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/MemoryBufferRef.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace llvm {
 class raw_pwrite_stream;

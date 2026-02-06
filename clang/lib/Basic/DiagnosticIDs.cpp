@@ -21,6 +21,11 @@
 #include "llvm/ADT/StringTable.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>

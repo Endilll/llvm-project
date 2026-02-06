@@ -13,14 +13,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ExtractAPI/API.h"
+
+#include <cassert>
+#include <cstring>
+#include <memory>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Casting.h"
-#include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstring>
-#include <memory>
 
 using namespace clang::extractapi;
 using namespace llvm;
@@ -34,6 +35,7 @@ APIRecord *APIRecord::castFromRecordContext(const RecordContext *Ctx) {
   case KIND:                                                                   \
     return static_cast<CLASS *>(const_cast<RecordContext *>(Ctx));
 #include "clang/ExtractAPI/APIRecords.inc"
+
   default:
     return nullptr;
     // llvm_unreachable("RecordContext derived class isn't propertly
@@ -48,7 +50,6 @@ RecordContext *APIRecord::castToRecordContext(const APIRecord *Record) {
 #define RECORD_CONTEXT(CLASS, KIND)                                            \
   case KIND:                                                                   \
     return static_cast<CLASS *>(const_cast<APIRecord *>(Record));
-#include "clang/ExtractAPI/APIRecords.inc"
   default:
     return nullptr;
     // llvm_unreachable("RecordContext derived class isn't propertly

@@ -10,6 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <tuple>
+#include <utility>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
@@ -17,7 +24,6 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/APSIntType.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ExprEngine.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
@@ -29,12 +35,19 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <tuple>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/BasicValueFactory.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ConstraintManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaWasm.h"
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -27,6 +28,11 @@
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaBase.h"
+#include "clang/AST/Attr.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 

@@ -14,6 +14,12 @@
 #ifndef LLVM_CLANG_BASIC_FILEENTRY_H
 #define LLVM_CLANG_BASIC_FILEENTRY_H
 
+#include <sys/types.h>
+#include <cassert>
+#include <memory>
+#include <string>
+#include <type_traits>
+
 #include "clang/Basic/CustomizableOptional.h"
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/LLVM.h"
@@ -24,13 +30,8 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/FileSystem/UniqueID.h"
-
-#include <cassert>
-#include <ctime>
-#include <memory>
-#include <string>
-#include <sys/types.h>
-#include <type_traits>
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/Support/Casting.h"
 
 namespace llvm {
 
@@ -46,15 +47,10 @@ class File;
 namespace clang {
 
 class FileEntryRef;
-
-namespace optional_detail {
-
-/// Forward declare a template specialization for OptionalStorage.
-template <> class OptionalStorage<clang::FileEntryRef>;
-
-} // namespace optional_detail
-
 class FileEntry;
+namespace optional_detail {
+template <typename> class OptionalStorage;
+}  // namespace optional_detail
 
 /// A reference to a \c FileEntry that includes the name of the file as it was
 /// accessed by the FileManager's client.

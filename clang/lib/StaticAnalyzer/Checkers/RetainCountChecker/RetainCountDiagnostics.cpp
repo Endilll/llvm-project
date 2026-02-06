@@ -12,8 +12,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "RetainCountDiagnostics.h"
+
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <iterator>
+
 #include "RetainCountChecker.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -22,7 +29,6 @@
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/Stmt.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Analysis/PathDiagnostic.h"
@@ -31,7 +37,6 @@
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceManager.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
@@ -49,11 +54,19 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/Type.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ConstraintManager.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class SourceManager;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

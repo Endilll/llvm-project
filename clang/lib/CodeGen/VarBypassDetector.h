@@ -14,11 +14,13 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_VARBYPASSDETECTOR_H
 #define LLVM_CLANG_LIB_CODEGEN_VARBYPASSDETECTOR_H
 
-#include "CodeGenModule.h"
-#include "clang/AST/Decl.h"
+#include <iterator>
+#include <utility>
+
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 
@@ -27,6 +29,7 @@ class Stmt;
 class VarDecl;
 
 namespace CodeGen {
+class CodeGenModule;
 
 /// The class detects jumps which bypass local variables declaration:
 ///    goto L;

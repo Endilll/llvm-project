@@ -14,22 +14,22 @@
 #ifndef LLVM_CLANG_LEX_MACROINFO_H
 #define LLVM_CLANG_LEX_MACROINFO_H
 
+#include <algorithm>
+#include <cassert>
+
 #include "clang/Lex/Token.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/PointerIntPair.h"
-#include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
-#include <algorithm>
-#include <cassert>
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 
 class DefMacroDirective;
-class IdentifierInfo;
 class Module;
 class Preprocessor;
 class SourceManager;

@@ -9,10 +9,25 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaHLSL.h"
+
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <initializer_list>
+#include <iterator>
+#include <limits>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
+#include <tuple>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclAccessPair.h"
 #include "clang/AST/DeclBase.h"
@@ -24,7 +39,6 @@
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Type.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/AttrKinds.h"
 #include "clang/Basic/AttributeScopeInfo.h"
@@ -46,7 +60,6 @@
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaBase.h"
-#include "clang/Sema/Template.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
@@ -69,19 +82,19 @@
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <cmath>
-#include <cstddef>
-#include <cstdint>
-#include <initializer_list>
-#include <iterator>
-#include <limits>
-#include <optional>
-#include <string>
-#include <utility>
-#include <variant>
+#include "clang/AST/APValue.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/Hashing.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/FormatVariadicDetails.h"
+#include "llvm/Support/VersionTuple.h"
 
 using namespace clang;
 using namespace clang::hlsl;

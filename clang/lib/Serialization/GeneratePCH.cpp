@@ -11,6 +11,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+#include <system_error>
+#include <utility>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/LLVM.h"
@@ -18,17 +24,24 @@
 #include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/HeaderSearchOptions.h"
 #include "clang/Lex/Preprocessor.h"
-#include "clang/Sema/SemaConsumer.h"
-#include "clang/Serialization/ASTDeserializationListener.h"
 #include "clang/Serialization/ASTWriter.h"
+#include "clang/Serialization/ModuleFileExtension.h"
 #include "clang/Serialization/PCHContainerOperations.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/Bitstream/BitstreamWriter.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <system_error>
-#include <utility>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Module.h"
+#include "clang/Lex/ModuleLoader.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/SmallVector.h"
+
+namespace clang {
+class CodeGenOptions;
+class ModuleCache;
+class ModuleFileExtension;
+}  // namespace clang
 
 using namespace clang;
 

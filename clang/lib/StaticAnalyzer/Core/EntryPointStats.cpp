@@ -7,16 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/EntryPointStats.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/Analysis/AnalysisDeclContext.h"
-#include "clang/Index/USRGeneration.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringExtras.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/FileSystem.h"
-#include "llvm/Support/ManagedStatic.h"
-#include "llvm/Support/raw_ostream.h"
+
 #include <array>
 #include <cassert>
 #include <cctype>
@@ -26,6 +17,18 @@
 #include <system_error>
 #include <utility>
 #include <vector>
+
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Index/USRGeneration.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Support/ManagedStatic.h"
+#include "llvm/Support/raw_ostream.h"
+#include "clang/AST/ASTContext.h"
+#include "llvm/ADT/ArrayRef.h"
 
 using namespace clang;
 using namespace ento;

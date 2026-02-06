@@ -11,6 +11,28 @@
 
 #include "ABIInfo.h"
 #include "CGCXXABI.h"
+#include "Address.h"
+#include "CGValue.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/CodeGen/CGFunctionInfo.h"
+#include "llvm/ADT/Twine.h"
+
+namespace clang {
+class ASTContext;
+class CharUnits;
+class FieldDecl;
+namespace CodeGen {
+class CGBuilderTy;
+class CodeGenFunction;
+class CodeGenTypes;
+}  // namespace CodeGen
+struct TypeInfoChars;
+}  // namespace clang
+namespace llvm {
+class BasicBlock;
+class Type;
+class Value;
+}  // namespace llvm
 
 namespace clang::CodeGen {
 

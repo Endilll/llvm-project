@@ -10,6 +10,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <climits>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/TypeBase.h"
@@ -32,8 +35,22 @@
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <climits>
+#include "clang/AST/Decl.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Lex/Token.h"
+#include "clang/Sema/Sema.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
+
 using namespace clang;
 
 bool Parser::MayBeDesignationStart() {

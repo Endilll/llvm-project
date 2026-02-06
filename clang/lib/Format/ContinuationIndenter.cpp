@@ -12,6 +12,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "ContinuationIndenter.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <map>
+#include <vector>
+
 #include "BreakableToken.h"
 #include "Encoding.h"
 #include "FormatInternal.h"
@@ -30,16 +44,12 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
 
 #define DEBUG_TYPE "format-indenter"
 

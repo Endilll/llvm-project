@@ -9,14 +9,15 @@
 #ifndef LLVM_CLANG_DEPENDENCYSCANNING_INPROCESSMODULECACHE_H
 #define LLVM_CLANG_DEPENDENCYSCANNING_INPROCESSMODULECACHE_H
 
-#include "clang/Serialization/ModuleCache.h"
-#include "llvm/ADT/StringMap.h"
-
 #include <atomic>
 #include <ctime>
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
+
+#include "clang/Serialization/ModuleCache.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 namespace dependencies {

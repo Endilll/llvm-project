@@ -12,6 +12,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <string>
+
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/Analysis/PathDiagnostic.h"
@@ -24,7 +26,15 @@
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/raw_ostream.h"
-#include <string>
+#include "clang/AST/Decl.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace ento {
+class AnalysisManager;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

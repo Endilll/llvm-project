@@ -10,15 +10,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cctype>
+#include <climits>
+#include <cstddef>
+#include <cstdint>
+#include <initializer_list>
+#include <iterator>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
-#include "clang/AST/ASTMutationListener.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/AttrIterator.h"
-#include "clang/AST/Attrs.inc"
-#include "clang/AST/CXXInheritance.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -61,7 +74,6 @@
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Scope.h"
-#include "clang/Sema/ScopeInfo.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaAMDGPU.h"
 #include "clang/Sema/SemaARM.h"
@@ -88,7 +100,6 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Demangle/Demangle.h"
-#include "llvm/IR/DerivedTypes.h"
 #include "llvm/MC/MCSectionMachO.h"
 #include "llvm/Support/CodeGen.h"
 #include "llvm/Support/Error.h"
@@ -96,21 +107,31 @@
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cctype>
-#include <climits>
-#include <cstddef>
-#include <cstdint>
-#include <initializer_list>
-#include <iterator>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/TargetOptions.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
 
 using namespace clang;
 using namespace sema;

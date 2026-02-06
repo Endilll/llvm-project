@@ -11,6 +11,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/TemplateName.h"
+
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -29,12 +37,10 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

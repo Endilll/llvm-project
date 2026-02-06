@@ -13,9 +13,15 @@
 #ifndef LLVM_CLANG_AST_TEMPLATENAME_H
 #define LLVM_CLANG_AST_TEMPLATENAME_H
 
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <tuple>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/DependenceFlags.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/UnsignedOrNone.h"
@@ -23,12 +29,12 @@
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/Support/PointerLikeTypeTraits.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <tuple>
-#include <utility>
+#include "llvm/ADT/ArrayRef.h"
+
+namespace llvm {
+class raw_ostream;
+template <typename T> struct PointerLikeTypeTraits;
+}  // namespace llvm
 
 namespace clang {
 
@@ -37,8 +43,6 @@ class Decl;
 class DependentTemplateName;
 class IdentifierInfo;
 class NamedDecl;
-class NestedNameSpecifier;
-enum OverloadedOperatorKind : int;
 class OverloadedTemplateStorage;
 class AssumedTemplateStorage;
 class DeducedTemplateStorage;
@@ -50,6 +54,7 @@ class TemplateArgument;
 class TemplateDecl;
 class TemplateTemplateParmDecl;
 class UsingShadowDecl;
+class StreamingDiagnostic;
 
 /// Implementation class used to describe either a set of overloaded
 /// template names or an already-substituted template template parameter pack.

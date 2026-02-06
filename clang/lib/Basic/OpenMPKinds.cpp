@@ -11,7 +11,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/OpenMPKinds.h"
-#include "clang/Basic/IdentifierTable.h"
+
+#include <cassert>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
@@ -21,7 +23,8 @@
 #include "llvm/Frontend/OpenMP/OMPConstants.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
 
 using namespace clang;
 using namespace llvm::omp;

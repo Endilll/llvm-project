@@ -13,6 +13,21 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CODEGENFUNCTION_H
 #define LLVM_CLANG_LIB_CODEGEN_CODEGENFUNCTION_H
 
+#include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <optional>
+#include <algorithm>
+#include <array>
+#include <initializer_list>
+#include <iterator>
+#include <memory>
+#include <new>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <variant>
+
 #include "CGBuilder.h"
 #include "CGLoopInfo.h"
 #include "CGValue.h"
@@ -23,11 +38,9 @@
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/CurrentSourceLocExprScope.h"
 #include "clang/AST/ExprCXX.h"
-#include "clang/AST/ExprObjC.h"
-#include "clang/AST/ExprOpenMP.h"
+#include "clang/AST/Mangle.h"
 #include "clang/AST/StmtOpenACC.h"
 #include "clang/AST/StmtOpenMP.h"
-#include "clang/AST/StmtSYCL.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/CapturedStmt.h"
@@ -41,39 +54,73 @@
 #include "llvm/Frontend/OpenMP/OMPIRBuilder.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/ValueHandle.h"
-#include "llvm/Support/Debug.h"
 #include "llvm/Transforms/Utils/SanitizerStats.h"
-#include <optional>
+#include "Address.h"
+#include "CGCall.h"
+#include "CGPointerAuthInfo.h"
+#include "CodeGenTBAA.h"
+#include "CodeGenTypeCache.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/BaseSubobject.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/OperationKinds.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/StmtCXX.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Sanitizers.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Attributes.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/DebugLoc.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/AtomicOrdering.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/TypeSize.h"
+#include "llvm/TargetParser/Triple.h"
 
 namespace llvm {
-class BasicBlock;
 class ConvergenceControlInst;
-class LLVMContext;
 class MDNode;
-class SwitchInst;
-class Twine;
-class Value;
-class CanonicalLoopInfo;
+class APSInt;
+class BlockAddress;
+class ConstantInt;
+class DILocation;
+class GlobalVariable;
+class VersionTuple;
+enum class RoundingMode : int8_t;
+template <typename Fn> class function_ref;
 } // namespace llvm
 
 namespace clang {
-class ASTContext;
-class CXXDestructorDecl;
-class CXXForRangeStmt;
-class CXXTryStmt;
 class Decl;
-class LabelDecl;
-class FunctionDecl;
-class FunctionProtoType;
-class LabelStmt;
-class ObjCContainerDecl;
-class ObjCInterfaceDecl;
-class ObjCIvarDecl;
-class ObjCMethodDecl;
-class ObjCImplementationDecl;
-class ObjCPropertyImplDecl;
-class TargetInfo;
-class VarDecl;
 class ObjCForCollectionStmt;
 class ObjCAtTryStmt;
 class ObjCAtThrowStmt;
@@ -82,7 +129,20 @@ class ObjCAutoreleasePoolStmt;
 class OMPUseDevicePtrClause;
 class OMPUseDeviceAddrClause;
 class SVETypeFlags;
-class OMPExecutableDirective;
+class APValue;
+class Attr;
+class ObjCArrayLiteral;
+class ObjCBoxedExpr;
+class ObjCDictionaryLiteral;
+class ObjCEncodeExpr;
+class ObjCIsaExpr;
+class ObjCIvarRefExpr;
+class ObjCMessageExpr;
+class ObjCProtocolExpr;
+class ObjCSelectorExpr;
+class ObjCStringLiteral;
+class PointerAuthSchema;
+struct ThunkInfo;
 
 namespace analyze_os_log {
 class OSLogBufferLayout;
@@ -91,17 +151,19 @@ class OSLogBufferLayout;
 namespace CodeGen {
 class CodeGenTypes;
 class CodeGenPGO;
-class CGCallee;
 class CGFunctionInfo;
 class CGBlockInfo;
 class CGCXXABI;
-class BlockByrefHelpers;
 class BlockByrefInfo;
 class BlockFieldFlags;
 class RegionCodeGenTy;
 class TargetCodeGenInfo;
 struct OMPTaskDataTy;
 struct CGCoroData;
+class CGDebugInfo;
+class CodeGenFunction;
+class TrapReason;
+struct CGBitFieldInfo;
 
 // clang-format off
 /// The kind of evaluation to perform on values of a particular

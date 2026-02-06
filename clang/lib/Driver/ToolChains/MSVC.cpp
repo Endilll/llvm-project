@@ -7,11 +7,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "MSVC.h"
+
+#include <cassert>
+#include <cctype>
+#include <cstdio>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "Darwin.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Sanitizers.h"
-#include "clang/Config/config.h"
 #include "clang/Driver/Action.h"
 #include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Compilation.h"
@@ -28,23 +37,16 @@
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/OptTable.h"
 #include "llvm/Option/Option.h"
-#include "llvm/Support/ConvertUTF.h"
-#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Process.h"
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include "llvm/TargetParser/Host.h"
 #include "llvm/WindowsDriver/MSVCPaths.h"
-#include <cassert>
-#include <cctype>
-#include <cstdio>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/ErrorOr.h"
 
 #ifdef _WIN32
   #define WIN32_LEAN_AND_MEAN

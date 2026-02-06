@@ -7,6 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Inclusions/StandardLibrary.h"
+
+#include <cassert>
+#include <optional>
+#include <string>
+#include <type_traits>
+#include <vector>
+#include <iterator>
+#include <utility>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/Basic/LLVM.h"
@@ -19,11 +28,8 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Casting.h"
-#include <cassert>
-#include <optional>
-#include <string>
-#include <type_traits>
-#include <vector>
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/IdentifierTable.h"
 
 namespace clang {
 namespace tooling {

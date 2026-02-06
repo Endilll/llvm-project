@@ -10,9 +10,20 @@
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_PPC_FREEBSD_H
 
 #include "FreeBSD.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace toolchains {
 
 class LLVM_LIBRARY_VISIBILITY PPCFreeBSDToolChain : public FreeBSD {

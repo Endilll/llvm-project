@@ -11,6 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/Sanitizers.h"
+
+#include <algorithm>
+#include <cmath>
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/Hashing.h"
 #include "llvm/ADT/StringSwitch.h"
@@ -18,11 +25,8 @@
 #include "llvm/Support/Format.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Transforms/Instrumentation/AddressSanitizerOptions.h"
-#include <algorithm>
-#include <cmath>
-#include <optional>
-#include <string>
-#include <vector>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 

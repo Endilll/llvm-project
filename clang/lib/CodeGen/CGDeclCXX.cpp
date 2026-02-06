@@ -10,11 +10,20 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <variant>
+#include <vector>
+
 #include "Address.h"
 #include "CGCXXABI.h"
 #include "CGCall.h"
 #include "CGDebugInfo.h"
-#include "CGHLSLRuntime.h"
 #include "CGObjCRuntime.h"
 #include "CGOpenMPRuntime.h"
 #include "CGValue.h"
@@ -25,7 +34,6 @@
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Mangle.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/LLVM.h"
@@ -40,23 +48,54 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/CallingConv.h"
-#include "llvm/IR/Comdat.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/InstrTypes.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/MDBuilder.h"
-#include "llvm/IR/ValueHandle.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "CGBuilder.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace llvm {
+class BasicBlock;
+class Comdat;
+class MDNode;
+class WeakTrackingVH;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

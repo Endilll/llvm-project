@@ -15,9 +15,9 @@
 #ifndef LLVM_CLANG_BASIC_VERSION_H
 #define LLVM_CLANG_BASIC_VERSION_H
 
-#include "clang/Basic/Version.inc"
-#include "llvm/ADT/StringRef.h"
 #include <string>
+
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
   /// Retrieves the repository path (e.g., Subversion path) that

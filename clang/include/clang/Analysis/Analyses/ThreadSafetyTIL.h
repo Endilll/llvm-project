@@ -46,6 +46,15 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_THREADSAFETYTIL_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_THREADSAFETYTIL_H
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
+#include <version>
+
 #include "clang/AST/Decl.h"
 #include "clang/Analysis/Analyses/ThreadSafetyUtil.h"
 #include "clang/Basic/LLVM.h"
@@ -54,18 +63,13 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/DeclarationName.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 
 class CallExpr;
-class Expr;
 class Stmt;
 
 namespace threadSafety {
@@ -77,6 +81,7 @@ class BasicBlock;
 enum TIL_Opcode : unsigned char {
 #define TIL_OPCODE_DEF(X) COP_##X,
 #include "ThreadSafetyOps.def"
+
 #undef TIL_OPCODE_DEF
 };
 

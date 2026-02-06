@@ -9,8 +9,6 @@
 #ifndef LLVM_CLANG_BASIC_CUDA_H
 #define LLVM_CLANG_BASIC_CUDA_H
 
-#include "clang/Basic/OffloadArch.h"
-
 namespace llvm {
 class StringRef;
 class Twine;
@@ -18,6 +16,7 @@ class VersionTuple;
 } // namespace llvm
 
 namespace clang {
+enum class OffloadArch;
 
 enum class CudaVersion {
   UNKNOWN,

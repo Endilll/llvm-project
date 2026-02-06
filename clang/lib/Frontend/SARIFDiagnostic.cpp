@@ -7,6 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/SARIFDiagnostic.h"
+
+#include <cassert>
+#include <string>
+#include <utility>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileEntry.h"
@@ -20,12 +25,11 @@
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/Support/ConvertUTF.h"
-#include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/Locale.h"
-#include <cassert>
-#include <string>
-#include <utility>
+#include "clang/Basic/LangOptions.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 

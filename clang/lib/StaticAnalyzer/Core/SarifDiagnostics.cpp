@@ -11,13 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "SarifDiagnostics.h"
+
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+#include <list>
+#include <tuple>
+
 #include "HTMLDiagnostics.h"
-#include "clang/Analysis/IssueHash.h"
-#include "clang/Analysis/MacroExpansionContext.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/Sarif.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
 #include "clang/Basic/Version.h"
 #include "clang/Lex/Lexer.h"
 #include "clang/Lex/Preprocessor.h"
@@ -27,19 +35,25 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringSet.h"
 #include "llvm/ADT/StringSwitch.h"
-#include "llvm/Support/ConvertUTF.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/JSON.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/FormatVariadicDetails.h"
+
+namespace clang {
+class LangOptions;
+class MacroExpansionContext;
+class SourceManager;
+namespace cross_tu {
+class CrossTranslationUnitContext;
+}  // namespace cross_tu
+}  // namespace clang
 
 using namespace llvm;
 using namespace clang;
@@ -105,6 +119,7 @@ static StringRef getRuleDescription(StringRef CheckName) {
 #define CHECKER(FULLNAME, CLASS, HELPTEXT, DOC_URI, IS_HIDDEN)                 \
   .Case(FULLNAME, HELPTEXT)
 #include "clang/StaticAnalyzer/Checkers/Checkers.inc"
+
 #undef CHECKER
 #undef GET_CHECKERS
       ;
@@ -116,6 +131,7 @@ static StringRef getRuleHelpURIStr(StringRef CheckName) {
 #define CHECKER(FULLNAME, CLASS, HELPTEXT, DOC_URI, IS_HIDDEN)                 \
   .Case(FULLNAME, DOC_URI)
 #include "clang/StaticAnalyzer/Checkers/Checkers.inc"
+
 #undef CHECKER
 #undef GET_CHECKERS
       ;

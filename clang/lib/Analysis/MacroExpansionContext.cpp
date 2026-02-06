@@ -7,14 +7,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/MacroExpansionContext.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Format/Format.h"
 #include "clang/Lex/Lexer.h"
-#include "clang/Lex/MacroInfo.h"
 #include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Lex/Token.h"
@@ -23,13 +31,14 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/FunctionExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class LangOptions;
+}  // namespace clang
 
 #define DEBUG_TYPE "macro-expansion-context"
 

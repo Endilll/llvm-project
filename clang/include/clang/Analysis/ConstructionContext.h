@@ -16,22 +16,26 @@
 #ifndef LLVM_CLANG_ANALYSIS_CONSTRUCTIONCONTEXT_H
 #define LLVM_CLANG_ANALYSIS_CONSTRUCTIONCONTEXT_H
 
+#include <cassert>
+#include <iterator>
+#include <tuple>
+#include <new>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/Stmt.h"
 #include "clang/Analysis/Support/BumpVector.h"
 #include "clang/AST/ExprCXX.h"
-#include "clang/AST/ExprObjC.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <iterator>
-#include <tuple>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
+class ObjCMessageExpr;
 
 /// Represents a single point (AST node) in the program that requires attention
 /// during construction of an object. ConstructionContext would be represented

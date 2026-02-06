@@ -11,11 +11,18 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+#include <iterator>
+
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
-#include "clang/AST/CXXInheritance.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -23,14 +30,12 @@
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/DeclarationName.h"
-#include "clang/AST/DynamicRecursiveASTVisitor.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprConcepts.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/Redeclarable.h"
 #include "clang/AST/Type.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/AddressSpaces.h"
@@ -55,7 +60,6 @@
 #include "clang/Lex/Lexer.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Sema/DeclSpec.h"
-#include "clang/Sema/EnterExpressionEvaluationContext.h"
 #include "clang/Sema/Initialization.h"
 #include "clang/Sema/Lookup.h"
 #include "clang/Sema/Overload.h"
@@ -67,7 +71,6 @@
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaBase.h"
 #include "clang/Sema/SemaCUDA.h"
-#include "clang/Sema/SemaHLSL.h"
 #include "clang/Sema/SemaLambda.h"
 #include "clang/Sema/SemaObjC.h"
 #include "clang/Sema/SemaPPC.h"
@@ -83,12 +86,40 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TypeSize.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/Attr.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/LambdaCapture.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/ObjCRuntime.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Sema/CleanupInfo.h"
+#include "clang/Sema/IdentifierResolver.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
+
+namespace clang {
+class Attr;
+template <typename decl_type> class CanonicalDeclPtr;
+}  // namespace clang
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
+
 using namespace clang;
 using namespace sema;
 

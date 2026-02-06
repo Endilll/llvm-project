@@ -7,14 +7,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
+
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/Analysis/PathDiagnostic.h"
-#include "clang/Lex/Preprocessor.h"
 #include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
 #include "clang/StaticAnalyzer/Core/PathDiagnosticConsumers.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
-#include <memory>
-#include <utility>
+
+namespace clang {
+class Preprocessor;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

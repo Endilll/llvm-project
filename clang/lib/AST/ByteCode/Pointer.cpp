@@ -7,6 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "Pointer.h"
+
+#include <algorithm>
+#include <cstddef>
+#include <functional>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "Boolean.h"
 #include "ByteCode/Descriptor.h"
 #include "Context.h"
@@ -29,14 +37,17 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <optional>
-#include <string>
-#include <utility>
+#include "ByteCode/FixedPoint.h"
+#include "ByteCode/FunctionPointer.h"
+#include "ByteCode/IntegralAP.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Type.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace clang::interp;

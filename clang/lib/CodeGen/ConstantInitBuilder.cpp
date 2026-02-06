@@ -13,6 +13,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/CodeGen/ConstantInitBuilder.h"
+
+#include <cassert>
+#include <cstddef>
+#include <optional>
+
 #include "CodeGenModule.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/CodeGen/ConstantInitFuture.h"
@@ -22,9 +27,16 @@
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/GlobalVariable.h"
-#include "llvm/IR/Type.h"
-#include <cassert>
-#include <cstddef>
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/PointerAuthOptions.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+
+namespace llvm {
+class Type;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

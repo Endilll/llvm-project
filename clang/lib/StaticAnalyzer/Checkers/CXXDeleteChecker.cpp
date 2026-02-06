@@ -28,9 +28,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <utility>
+#include <string>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
@@ -44,8 +47,19 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Type.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

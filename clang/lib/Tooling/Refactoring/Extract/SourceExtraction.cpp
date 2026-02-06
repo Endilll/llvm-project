@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Refactoring/Extract/SourceExtraction.h"
+
+#include <optional>
+
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/StmtObjC.h"
@@ -15,7 +18,10 @@
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Lexer.h"
-#include <optional>
+#include "clang/AST/Expr.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

@@ -15,13 +15,25 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_FORMATTOKEN_H
 #define LLVM_CLANG_LIB_FORMAT_FORMATTOKEN_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <unordered_set>
+#include <memory>
+#include <optional>
+
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/OperatorPrecedence.h"
 #include "clang/Format/Format.h"
-#include "clang/Lex/Lexer.h"
-#include <unordered_set>
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
+class LangOptions;
+
 namespace format {
 
 #define LIST_TOKEN_TYPES                                                       \
@@ -819,6 +831,7 @@ public:
                    tok::kw__Atomic,
 #define TRANSFORM_TYPE_TRAIT_DEF(_, Trait) tok::kw___##Trait,
 #include "clang/Basic/TransformTypeTraits.def"
+
                    tok::kw_requires);
   }
 
@@ -1809,6 +1822,7 @@ struct AdditionalKeywords {
       // Handle C++ keywords not included above: these are all JS identifiers.
 #define KEYWORD(X, Y) case tok::kw_##X:
 #include "clang/Basic/TokenKinds.def"
+
       // #undef KEYWORD is not needed -- it's #undef-ed at the end of
       // TokenKinds.def
       return true;

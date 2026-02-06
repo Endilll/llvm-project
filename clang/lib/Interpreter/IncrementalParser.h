@@ -13,15 +13,12 @@
 #ifndef LLVM_CLANG_LIB_INTERPRETER_INCREMENTALPARSER_H
 #define LLVM_CLANG_LIB_INTERPRETER_INCREMENTALPARSER_H
 
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/Error.h"
-
 #include <list>
 #include <memory>
 
-namespace llvm {
-class Module;
-}
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Error.h"
+#include "llvm/IR/Module.h"
 
 namespace clang {
 class ASTConsumer;

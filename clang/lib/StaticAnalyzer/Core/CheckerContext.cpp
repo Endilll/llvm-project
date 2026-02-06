@@ -12,6 +12,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
+
+#include <cstddef>
+#include <string>
+#include <tuple>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -28,9 +33,8 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "llvm/ADT/StringExtras.h"
-#include <cstddef>
-#include <string>
-#include <tuple>
+#include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

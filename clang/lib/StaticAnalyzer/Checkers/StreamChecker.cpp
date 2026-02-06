@@ -10,6 +10,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <functional>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+
 #include "NoOwnershipChangeVisitor.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
@@ -19,7 +29,6 @@
 #include "clang/Analysis/CFG.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
@@ -47,15 +56,30 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <functional>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/BasicValueFactory.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+class Preprocessor;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;
@@ -221,6 +245,7 @@ REGISTER_MAP_WITH_PROGRAMSTATE(StreamMap, SymbolRef, StreamState)
 namespace {
 
 class StreamChecker;
+
 using FnCheck = std::function<void(const StreamChecker *, const FnDescription *,
                                    const CallEvent &, CheckerContext &)>;
 

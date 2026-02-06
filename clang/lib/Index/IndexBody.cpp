@@ -6,6 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <vector>
+#include <iterator>
+
 #include "IndexingContext.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTLambda.h"
@@ -26,8 +30,20 @@
 #include "clang/Index/IndexSymbol.h"
 #include "clang/Sema/HeuristicResolver.h"
 #include "llvm/ADT/STLExtras.h"
-#include <cassert>
-#include <vector>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace clang::index;

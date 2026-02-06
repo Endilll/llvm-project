@@ -7,6 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Transformer/RangeSelector.h"
+
+#include <string>
+#include <utility>
+#include <map>
+
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
@@ -24,8 +29,17 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Errc.h"
 #include "llvm/Support/Error.h"
-#include <string>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+class LangOptions;
+}  // namespace clang
 
 using namespace clang;
 using namespace transformer;

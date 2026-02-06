@@ -9,11 +9,14 @@
 #ifndef LLVM_CLANG_ANALYZER_WEBKIT_PTRTYPESEMANTICS_H
 #define LLVM_CLANG_ANALYZER_WEBKIT_PTRTYPESEMANTICS_H
 
-#include "llvm/ADT/APInt.h"
+#include <optional>
+#include <string>
+
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/PointerUnion.h"
-#include <optional>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 class CXXBaseSpecifier;

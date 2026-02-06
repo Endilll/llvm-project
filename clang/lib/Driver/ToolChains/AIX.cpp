@@ -7,6 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "AIX.h"
+
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Action.h"
@@ -15,8 +25,6 @@
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/InputInfo.h"
 #include "clang/Driver/Job.h"
-#include "clang/Driver/SanitizerArgs.h"
-#include "clang/Driver/Tool.h"
 #include "clang/Options/Options.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringRef.h"
@@ -28,14 +36,12 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Path.h"
 #include "llvm/TargetParser/Triple.h"
-
-#include <cassert>
-#include <cstddef>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <utility>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/VersionTuple.h"
 
 using AIX = clang::driver::toolchains::AIX;
 using namespace clang;

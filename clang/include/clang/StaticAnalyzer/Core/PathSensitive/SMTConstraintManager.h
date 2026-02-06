@@ -14,6 +14,13 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SMTCONSTRAINTMANAGER_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SMTCONSTRAINTMANAGER_H
 
+#include <cassert>
+#include <iterator>
+#include <optional>
+#include <tuple>
+#include <utility>
+#include <memory>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/TypeBase.h"
@@ -38,11 +45,18 @@
 #include "llvm/ADT/ImmutableSet.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SMTAPI.h"
-#include <cassert>
-#include <iterator>
-#include <optional>
-#include <tuple>
-#include <utility>
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
+
+namespace clang {
+namespace ento {
+class ExprEngine;
+}  // namespace ento
+}  // namespace clang
 
 typedef llvm::ImmutableSet<
     std::pair<clang::ento::SymbolRef, const llvm::SMTExpr *>>

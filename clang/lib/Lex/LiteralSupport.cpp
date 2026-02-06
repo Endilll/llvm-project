@@ -12,6 +12,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/LiteralSupport.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <iterator>
+#include <limits>
+#include <optional>
+#include <string>
+
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -26,7 +37,6 @@
 #include "clang/Lex/Token.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APInt.h"
-#include "llvm/ADT/FloatingPointMode.h"
 #include "llvm/ADT/ScopeExit.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringExtras.h"
@@ -35,15 +45,12 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Unicode.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <iterator>
-#include <limits>
-#include <optional>
-#include <string>
+#include "clang/Basic/SourceManager.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace llvm {
+enum class RoundingMode : int8_t;
+}  // namespace llvm
 
 using namespace clang;
 

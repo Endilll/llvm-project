@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
+
+#include <cassert>
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/Stmt.h"
 #include "clang/Analysis/ProgramPoint.h"
@@ -29,10 +35,15 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <optional>
-#include <string>
-#include <vector>
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

@@ -9,10 +9,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaSPIRV.h"
+
+#include <cassert>
+#include <optional>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/DiagnosticSema.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/PartialDiagnostic.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TargetBuiltins.h"
@@ -23,8 +26,11 @@
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <optional>
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/SmallVector.h"
 
 // SPIR-V enumerants. Enums have only the required entries, see SPIR-V specs for
 // values.

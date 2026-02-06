@@ -11,6 +11,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaMIPS.h"
+
+#include <string>
+
 #include "clang/AST/Expr.h"
 #include "clang/Basic/DiagnosticSema.h"
 #include "clang/Basic/LLVM.h"
@@ -21,7 +24,12 @@
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaBase.h"
-#include <string>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

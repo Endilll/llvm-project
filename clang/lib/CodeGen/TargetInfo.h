@@ -14,34 +14,57 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_TARGETINFO_H
 #define LLVM_CLANG_LIB_CODEGEN_TARGETINFO_H
 
-#include "CGBuilder.h"
+#include <assert.h>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "CGValue.h"
 #include "CodeGenModule.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/SyncScope.h"
 #include "clang/Basic/TargetInfo.h"
-#include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringRef.h"
+#include "ABIInfo.h"
+#include "Address.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/LLVMContext.h"
 
 namespace llvm {
 class Constant;
 class GlobalValue;
 class Type;
 class Value;
+class AttrBuilder;
+class Function;
+class Instruction;
+class PointerType;
+enum class AtomicOrdering : unsigned int;
+template <unsigned int InternalLen> class SmallString;
 }
 
 namespace clang {
 class Decl;
+class AtomicExpr;
+class FunctionDecl;
+class GlobalDecl;
+class LangOptions;
+class VarDecl;
+enum class SyncScope;
+struct PointerAuthOptions;
 
 namespace CodeGen {
-class ABIInfo;
 class CallArgList;
 class CodeGenFunction;
 class CGHLSLOffsetInfo;
 class CGBlockInfo;
-class CGHLSLOffsetInfo;
-class SwiftABIInfo;
+class CGBuilderTy;
 
 /// TargetCodeGenInfo - This class organizes various target-specific
 /// codegeneration issues, like target-specific attributes, builtins and so

@@ -9,12 +9,26 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_WEBASSEMBLY_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_WEBASSEMBLY_H
 
-#include "Gnu.h"
+#include <string>
+
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace tools {
 namespace wasm {
 

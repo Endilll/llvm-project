@@ -9,6 +9,22 @@
 //  This file defines the code-completion semantic actions.
 //
 //===----------------------------------------------------------------------===//
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <limits>
+#include <list>
+#include <map>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <memory>
+
 #include "clang-c/Index.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/Decl.h"
@@ -53,7 +69,6 @@
 #include "clang/Sema/ObjCMethodList.h"
 #include "clang/Sema/Overload.h"
 #include "clang/Sema/Ownership.h"
-#include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/ParsedTemplate.h"
 #include "clang/Sema/Scope.h"
 #include "clang/Sema/ScopeInfo.h"
@@ -82,21 +97,31 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <limits>
-#include <list>
-#include <map>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/RawCommentList.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/ModuleLoader.h"
+#include "clang/Lex/PreprocessorLexer.h"
+#include "clang/Sema/ExternalSemaSource.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/ErrorOr.h"
 
 using namespace clang;
 using namespace sema;
@@ -181,6 +206,7 @@ private:
 
     // Iteration.
     class iterator;
+
     iterator begin() const;
     iterator end() const;
   };

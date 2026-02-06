@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/DependencyScanning/DependencyScanningWorker.h"
+#include "clang/DependencyScanning/DependencyScanningService.h"
 #include "clang/DependencyScanning/DependencyScanningUtils.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "gtest/gtest.h"

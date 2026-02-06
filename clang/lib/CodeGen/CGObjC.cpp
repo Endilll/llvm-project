@@ -10,6 +10,17 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <memory>
+#include <new>
+#include <tuple>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGCall.h"
@@ -35,8 +46,6 @@
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtObjC.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -61,20 +70,45 @@
 #include "llvm/IR/FPEnv.h"
 #include "llvm/IR/InlineAsm.h"
 #include "llvm/IR/InstrTypes.h"
-#include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/Metadata.h"
 #include "llvm/Support/AtomicOrdering.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "CodeGenTypes.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/ObjCRuntime.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/IR/ValueHandle.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace llvm {
+class Instruction;
+}  // namespace llvm
+
 using namespace clang;
 using namespace CodeGen;
 

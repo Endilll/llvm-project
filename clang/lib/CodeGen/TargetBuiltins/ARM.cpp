@@ -10,6 +10,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <numeric>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "ABIInfo.h"
 #include "CGBuilder.h"
 #include "CGBuiltin.h"
@@ -52,16 +62,27 @@
 #include "llvm/Support/TypeSize.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/AArch64TargetParser.h"
-
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <numeric>
-#include <optional>
-#include <string>
-#include <utility>
+#include "Address.h"
+#include "CGValue.h"
+#include "CodeGenFunction.h"
+#include "CodeGenModule.h"
+#include "CodeGenTBAA.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 using namespace CodeGen;

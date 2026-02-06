@@ -16,6 +16,7 @@
 #include "clang/Frontend/CompilerInvocation.h"
 #include "clang/Frontend/PCHContainerOperations.h"
 #include "clang/Lex/HeaderSearch.h"
+#include "clang/Lex/Preprocessor.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/ToolOutputFile.h"

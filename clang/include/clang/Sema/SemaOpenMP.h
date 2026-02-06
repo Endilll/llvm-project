@@ -14,13 +14,16 @@
 #ifndef LLVM_CLANG_SEMA_SEMAOPENMP_H
 #define LLVM_CLANG_SEMA_SEMAOPENMP_H
 
-#include "clang/AST/ASTFwd.h"
+#include <optional>
+#include <string>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/ExprOpenMP.h"
 #include "clang/AST/OpenMPClause.h"
 #include "clang/AST/StmtOpenMP.h"
-#include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OpenMPKinds.h"
 #include "clang/Basic/SourceLocation.h"
@@ -29,11 +32,23 @@
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/SemaBase.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/Frontend/OpenMP/OMP.h.inc"
-#include "llvm/Frontend/OpenMP/OMPConstants.h"
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/Decl.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/StmtCXX.h"
+#include "clang/AST/TypeBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+namespace omp {
+enum class DefaultKind;
+enum class ProcBindKind;
+}  // namespace omp
+}  // namespace llvm
 
 namespace clang {
 namespace sema {
@@ -44,6 +59,13 @@ class DeclContext;
 class DeclGroupRef;
 class ParsedAttr;
 class Scope;
+class ASTContext;
+class Decl;
+class IdentifierInfo;
+class OMPGroupPrivateDecl;
+class OMPRequiresDecl;
+class OMPThreadPrivateDecl;
+class Sema;
 
 class SemaOpenMP : public SemaBase {
 public:

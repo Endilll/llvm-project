@@ -7,6 +7,26 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Driver/Driver.h"
+
+#include <sysexits.h>
+#include <algorithm>
+#include <cassert>
+#include <cstdlib> // ::getenv
+#include <cstring>
+#include <iterator>
+#include <map>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <system_error>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <chrono>
+#include <functional>
+#include <initializer_list>
+
 #include "ToolChains/AIX.h"
 #include "ToolChains/AMDGPU.h"
 #include "ToolChains/AMDGPUOpenMP.h"
@@ -68,7 +88,6 @@
 #include "clang/Driver/Job.h"
 #include "clang/Driver/Multilib.h"
 #include "clang/Driver/Phases.h"
-#include "clang/Driver/SanitizerArgs.h"
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
 #include "clang/Driver/Types.h"
@@ -115,21 +134,15 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Host.h"
 #include "llvm/TargetParser/RISCVISAInfo.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdlib> // ::getenv
-#include <cstring>
-#include <iterator>
-#include <map>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <sysexits.h>
-#include <system_error>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/Basic/Version.inc"
+#include "clang/Driver/CudaInstallationDetector.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FormatVariadicDetails.h"
+#include "llvm/TargetParser/Triple.h"
 #if LLVM_ON_UNIX
 #include <unistd.h> // getpid
 #endif

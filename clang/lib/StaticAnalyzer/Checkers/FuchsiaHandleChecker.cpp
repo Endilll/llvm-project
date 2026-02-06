@@ -87,6 +87,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <type_traits>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Type.h"
@@ -114,13 +123,21 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/DeclarationName.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/ImmutableMap.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

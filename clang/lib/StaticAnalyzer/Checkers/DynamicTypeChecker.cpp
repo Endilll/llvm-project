@@ -16,6 +16,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/Expr.h"
@@ -23,7 +26,6 @@
 #include "clang/AST/TypeBase.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
@@ -37,8 +39,20 @@
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/Twine.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <utility>
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/Stmt.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class LangOptions;
+namespace ento {
+class MemRegion;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

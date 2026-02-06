@@ -13,22 +13,33 @@
 #ifndef LLVM_CLANG_AST_APVALUE_H
 #define LLVM_CLANG_AST_APVALUE_H
 
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/APFixedPoint.h"
-#include "llvm/ADT/APFloat.h"
-#include "llvm/ADT/APSInt.h"
-#include "llvm/ADT/FoldingSet.h"
-#include "llvm/ADT/Hashing.h"
-#include "llvm/ADT/PointerIntPair.h"
-#include "llvm/ADT/PointerUnion.h"
-#include "llvm/Support/AlignOf.h"
-#include "llvm/Support/PointerLikeTypeTraits.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <string>
 #include <utility>
+#include <new>
+
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/APFixedPoint.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/Hashing.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/Support/AlignOf.h"
+#include "clang/AST/DeclBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Error.h"
+
+namespace llvm {
+class FoldingSetNodeID;
+class raw_ostream;
+template <typename T> struct PointerLikeTypeTraits;
+}  // namespace llvm
 
 namespace clang {
 namespace serialization {
@@ -39,8 +50,6 @@ template <typename T> class BasicReaderBase;
   class ASTContext;
   class CharUnits;
   class CXXRecordDecl;
-  class Decl;
-  class DiagnosticBuilder;
   class Expr;
   class FieldDecl;
   struct PrintingPolicy;

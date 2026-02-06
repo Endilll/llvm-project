@@ -30,6 +30,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaPseudoObject.h"
+
+#include <cassert>
+
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclObjCCommon.h"
@@ -37,7 +40,6 @@
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/DiagnosticSema.h"
 #include "clang/Basic/IdentifierTable.h"
@@ -47,7 +49,6 @@
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Sema/DeclSpec.h"
-#include "clang/Sema/Initialization.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/ScopeInfo.h"
 #include "clang/Sema/Sema.h"
@@ -56,7 +57,18 @@
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace sema;

@@ -64,13 +64,15 @@
 // making an assumption e.g. `S1 + n == S2 + m` we store `S1 - S2 == m - n` as
 // a constraint which we later retrieve when doing an actual comparison.
 
+#include <cassert>
+#include <utility>
+#include <optional>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclTemplate.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/Stmt.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Analysis/ProgramPoint.h"
@@ -90,11 +92,26 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/STLExtras.h"
-
 #include "Iterator.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/BasicValueFactory.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/ImmutableMap.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
 
-#include <cassert>
-#include <utility>
+namespace clang {
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

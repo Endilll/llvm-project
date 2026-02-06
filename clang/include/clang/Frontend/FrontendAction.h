@@ -17,6 +17,12 @@
 #ifndef LLVM_CLANG_FRONTEND_FRONTENDACTION_H
 #define LLVM_CLANG_FRONTEND_FRONTENDACTION_H
 
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -24,15 +30,13 @@
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendOptions.h"
 #include "llvm/Support/Error.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/Lex/Preprocessor.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/MemoryBufferRef.h"
 
 namespace clang {
-class ASTMergeAction;
-class CompilerInstance;
+class Module;
 
 /// Abstract base class for actions which can be performed by the frontend.
 class FrontendAction {

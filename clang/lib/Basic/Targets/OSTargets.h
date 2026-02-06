@@ -12,9 +12,28 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_OSTARGETS_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_OSTARGETS_H
 
-#include "Targets.h"
+#include <optional>
+#include <string>
+
+#include "TargetDefines.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/MacroBuilder.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 
 template <typename TgtInfo>

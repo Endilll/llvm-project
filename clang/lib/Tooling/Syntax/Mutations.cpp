@@ -6,12 +6,20 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Tooling/Syntax/Mutations.h"
+
+#include <cassert>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Syntax/BuildTree.h"
 #include "clang/Tooling/Syntax/Nodes.h"
-#include "clang/Tooling/Syntax/TokenBufferTokenManager.h"
 #include "clang/Tooling/Syntax/Tree.h"
-#include <cassert>
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace syntax {
+class TokenBufferTokenManager;
+}  // namespace syntax
+}  // namespace clang
 
 using namespace clang;
 

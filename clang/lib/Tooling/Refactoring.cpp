@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Refactoring.h"
+
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileEntry.h"
@@ -20,20 +26,20 @@
 #include "clang/Basic/SourceManager.h"
 #include "clang/Format/Format.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
-#include "clang/Lex/Lexer.h"
 #include "clang/Rewrite/Core/Rewriter.h"
-#include "clang/Serialization/PCHContainerOperations.h"
 #include "clang/Tooling/Core/Replacement.h"
 #include "clang/Tooling/Tooling.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
-#include <map>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
 
 namespace clang {
+class PCHContainerOperations;
+
 namespace tooling {
+class CompilationDatabase;
 
 RefactoringTool::RefactoringTool(
     const CompilationDatabase &Compilations, ArrayRef<std::string> SourcePaths,

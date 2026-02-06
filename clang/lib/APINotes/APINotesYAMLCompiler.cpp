@@ -14,6 +14,15 @@
 //
 
 #include "clang/APINotes/APINotesYAMLCompiler.h"
+
+#include <optional>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <system_error>
+
 #include "clang/APINotes/APINotesWriter.h"
 #include "clang/APINotes/Types.h"
 #include "clang/Basic/LLVM.h"
@@ -25,11 +34,10 @@
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/YAMLTraits.h"
 #include "llvm/Support/raw_ostream.h"
-#include <optional>
-#include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 using namespace api_notes;
@@ -481,6 +489,7 @@ template <> struct MappingTraits<Field> {
 
 namespace {
 struct Tag;
+
 typedef std::vector<Tag> TagsSeq;
 
 struct Tag {
@@ -600,6 +609,7 @@ template <> struct MappingTraits<Typedef> {
 
 namespace {
 struct Namespace;
+
 typedef std::vector<Namespace> NamespacesSeq;
 
 struct TopLevelItems {

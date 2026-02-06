@@ -6,16 +6,21 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cinttypes>
+#include <iterator>
+#include <utility>
+#include <new>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
-#include "clang/AST/Expr.h"
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/RecordLayout.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/VTableBuilder.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Diagnostic.h"
@@ -38,12 +43,15 @@
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cinttypes>
-#include <cstdint>
-#include <iterator>
-#include <utility>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Type.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

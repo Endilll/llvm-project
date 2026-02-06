@@ -15,6 +15,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticLex.h"
@@ -38,12 +45,10 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/SmallString.h"
 
 using namespace clang;
 

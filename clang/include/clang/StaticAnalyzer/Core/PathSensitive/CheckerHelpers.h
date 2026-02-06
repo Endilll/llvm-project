@@ -13,15 +13,22 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CHECKERHELPERS_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CHECKERHELPERS_H
 
+#include <cassert>
+#include <optional>
+#include <utility>
+#include <iterator>
+
 #include "ProgramState_Fwd.h"
 #include "SVals.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Stmt.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/OperatorKinds.h"
-#include <cassert>
-#include <optional>
-#include <utility>
+#include "clang/AST/StmtIterator.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
 
@@ -29,6 +36,8 @@ class Expr;
 class VarDecl;
 class QualType;
 class Preprocessor;
+class Decl;
+enum OverloadedOperatorKind : int;
 
 namespace ento {
 

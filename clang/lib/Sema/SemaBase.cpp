@@ -1,6 +1,7 @@
 #include "clang/Sema/SemaBase.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
+
+#include <vector>
+
 #include "clang/AST/Redeclarable.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -9,9 +10,12 @@
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaCUDA.h"
 #include "llvm/ADT/DenseMap.h"
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 
 namespace clang {
+class DeclContext;
 
 SemaBase::SemaBase(Sema &S) : SemaRef(S) {}
 

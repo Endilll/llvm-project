@@ -11,6 +11,29 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Serialization/ASTReader.h"
+
+#include <sys/types.h>
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <functional>
+#include <iterator>
+#include <limits>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <initializer_list>
+#include <list>
+#include <new>
+
 #include "ASTCommon.h"
 #include "ASTReaderInternals.h"
 #include "TemplateArgumentHasher.h"
@@ -22,11 +45,10 @@
 #include "clang/AST/ASTUnresolvedSet.h"
 #include "clang/AST/AbstractTypeReader.h"
 #include "clang/AST/AttrIterator.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclFriend.h"
 #include "clang/AST/DeclGroup.h"
 #include "clang/AST/DeclID.h"
 #include "clang/AST/DeclObjC.h"
@@ -40,13 +62,11 @@
 #include "clang/AST/OpenACCClause.h"
 #include "clang/AST/OpenMPClause.h"
 #include "clang/AST/RawCommentList.h"
-#include "clang/AST/Stmt.h"
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/AST/TypeLocVisitor.h"
-#include "clang/AST/UnresolvedSet.h"
 #include "clang/Basic/ASTSourceDescriptor.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/CommentOptions.h"
@@ -65,7 +85,6 @@
 #include "clang/Basic/ObjCRuntime.h"
 #include "clang/Basic/OpenACCKinds.h"
 #include "clang/Basic/OpenMPKinds.h"
-#include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/PragmaKinds.h"
 #include "clang/Basic/Sanitizers.h"
 #include "clang/Basic/SourceLocation.h"
@@ -128,8 +147,6 @@
 #include "llvm/Bitstream/BitCodeEnums.h"
 #include "llvm/Bitstream/BitstreamReader.h"
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
-#include "llvm/Frontend/OpenMP/OMPConstants.h"
-#include "llvm/Frontend/OpenMP/OMPContext.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/Compression.h"
 #include "llvm/Support/DJB.h"
@@ -147,25 +164,21 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/xxhash.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-#include <cstring>
-#include <ctime>
-#include <functional>
-#include <iterator>
-#include <limits>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <sys/types.h>
-#include <system_error>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "MultiOnDiskHashTable.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/CustomizableOptional.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Sema/SemaRISCV.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/MemoryBufferRef.h"
+#include "llvm/Support/OnDiskHashTable.h"
+#include "llvm/Support/VirtualFileSystem.h"
 
 using namespace clang;
 using namespace clang::serialization;

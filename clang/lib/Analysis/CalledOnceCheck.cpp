@@ -7,7 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/CalledOnceCheck.h"
-#include "clang/AST/ASTContext.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <iterator>
+#include <tuple>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -17,7 +23,6 @@
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/ParentMap.h"
 #include "clang/AST/Stmt.h"
-#include "clang/AST/StmtObjC.h"
 #include "clang/AST/StmtVisitor.h"
 #include "clang/AST/Type.h"
 #include "clang/Analysis/AnalysisDeclContext.h"
@@ -33,9 +38,17 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <memory>
-#include <optional>
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class ObjCAtThrowStmt;
+}  // namespace clang
 
 using namespace clang;
 

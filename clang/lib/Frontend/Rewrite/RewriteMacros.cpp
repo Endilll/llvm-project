@@ -11,6 +11,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdio>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -23,10 +28,8 @@
 #include "clang/Rewrite/Frontend/Rewriters.h"
 #include "llvm/ADT/RewriteBuffer.h"
 #include "llvm/Support/MemoryBufferRef.h"
-#include <cassert>
-#include <cstdio>
-#include <string>
-#include <vector>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/raw_ostream.h"
 
 using namespace clang;
 using llvm::RewriteBuffer;

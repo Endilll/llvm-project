@@ -12,12 +12,17 @@
 
 #ifndef LLVM_CLANG_SEMA_SEMACONCEPT_H
 #define LLVM_CLANG_SEMA_SEMACONCEPT_H
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <utility>
+#include <vector>
+#include <initializer_list>
+#include <iterator>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclTemplate.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/ExprConcepts.h"
 #include "clang/AST/TemplateBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -33,15 +38,15 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 class Sema;
-class MultiLevelTemplateArgumentList;
+class ConceptSpecializationExpr;
+class NamedDecl;
+class TemplateParameterList;
+struct AssociatedConstraint;
 
 /// \brief A normalized constraint, as defined in C++ [temp.constr.normal], is
 /// either an atomic constraint, a conjunction of normalized constraints or a

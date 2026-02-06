@@ -11,9 +11,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <optional>
+#include <tuple>
+#include <utility>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/Stmt.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Analysis/ProgramPoint.h"
 #include "clang/Basic/LLVM.h"
@@ -22,7 +26,6 @@
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ConstraintManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
@@ -31,10 +34,21 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
 #include "llvm/ADT/FoldingSet.h"
-#include <memory>
-#include <optional>
-#include <tuple>
-#include <utility>
+#include "clang/Basic/SourceLocation.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class ReturnStmt;
+class StackFrameContext;
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

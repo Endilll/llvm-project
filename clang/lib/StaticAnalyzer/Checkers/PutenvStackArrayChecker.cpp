@@ -12,8 +12,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <utility>
+
 #include "clang/AST/Decl.h"
-#include "clang/AST/Expr.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
@@ -26,8 +28,18 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
-#include <memory>
-#include <utility>
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Expr;
+namespace ento {
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

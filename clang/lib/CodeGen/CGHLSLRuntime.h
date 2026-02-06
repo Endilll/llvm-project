@@ -15,22 +15,42 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGHLSLRUNTIME_H
 #define LLVM_CLANG_LIB_CODEGEN_CGHLSLRUNTIME_H
 
+#include <stddef.h>
+#include <stdint.h>
+#include <optional>
+#include <iterator>
+#include <utility>
+
 #include "Address.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Decl.h"
-#include "clang/Basic/Builtins.h"
-#include "clang/Basic/HLSLRuntime.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Frontend/HLSL/HLSLResource.h"
 #include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/IntrinsicsDirectX.h"
 #include "llvm/IR/IntrinsicsSPIRV.h"
+#include "clang/AST/AttrIterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/DXILABI.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/TargetParser/Triple.h"
 
-#include <optional>
-#include <vector>
+namespace clang {
+class DeclaratorDecl;
+class Expr;
+class MemberExpr;
+class QualType;
+namespace CodeGen {
+class CGHLSLRuntime;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class BasicBlock;
+class Instruction;
+class Type;
+template <typename Fn> class function_ref;
+}  // namespace llvm
 
 // A function generator macro for picking the right intrinsic
 // for the target backend
@@ -54,24 +74,16 @@ namespace llvm {
 class GlobalVariable;
 class Function;
 class StructType;
-class Metadata;
 } // namespace llvm
 
 namespace clang {
-class NamedDecl;
 class VarDecl;
-class ParmVarDecl;
 class InitListExpr;
 class HLSLBufferDecl;
 class HLSLRootSignatureDecl;
-class HLSLVkBindingAttr;
-class HLSLResourceBindingAttr;
 class Type;
 class RecordType;
-class DeclContext;
-class HLSLPackOffsetAttr;
 class ArraySubscriptExpr;
-
 class FunctionDecl;
 
 namespace CodeGen {

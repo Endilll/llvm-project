@@ -14,12 +14,6 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTICIDS_H
 #define LLVM_CLANG_BASIC_DIAGNOSTICIDS_H
 
-#include "clang/Basic/DiagnosticCategories.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/Compiler.h"
-#include "llvm/Support/ErrorHandling.h"
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -30,15 +24,24 @@
 #include <utility>
 #include <vector>
 
+#include "clang/Basic/DiagnosticCategories.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
+
+namespace llvm {
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
+
 namespace clang {
 class DiagnosticsEngine;
-class DiagnosticBuilder;
 class LangOptions;
 class SourceLocation;
 
 // Import the diagnostic enums themselves.
 namespace diag {
-enum class Group;
 
 // Size of each of the diagnostic categories.
 enum {

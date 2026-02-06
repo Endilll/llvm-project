@@ -10,6 +10,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/CodeGenOptions.h"
@@ -24,13 +33,11 @@
 #include "clang/Basic/OpenCLOptions.h"
 #include "clang/Basic/Sanitizers.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
 #include "clang/Basic/SyncScope.h"
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Basic/Version.h"
 #include "clang/Frontend/FrontendOptions.h"
 #include "clang/Frontend/Utils.h"
-#include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include "clang/Serialization/ASTReader.h"
@@ -40,17 +47,16 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/Twine.h"
-#include "llvm/IR/DataLayout.h"
-#include "llvm/IR/DerivedTypes.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/Version.inc"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
+
 using namespace clang;
 
 static bool MacroBodyEndsInBackslash(StringRef MacroBody) {

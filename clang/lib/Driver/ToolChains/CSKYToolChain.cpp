@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "CSKYToolChain.h"
+
+#include <cassert>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "ToolChains/Gnu.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Action.h"
@@ -23,9 +29,13 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <memory>
-#include <string>
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Option/OptSpecifier.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

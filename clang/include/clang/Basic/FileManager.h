@@ -14,6 +14,14 @@
 #ifndef LLVM_CLANG_BASIC_FILEMANAGER_H
 #define LLVM_CLANG_BASIC_FILEMANAGER_H
 
+#include <sys/types.h>
+#include <cstdint>
+#include <ctime>
+#include <memory>
+#include <optional>
+#include <system_error>
+#include <utility>
+
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileSystemOptions.h"
@@ -25,21 +33,18 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorOr.h"
-#include "llvm/Support/FileSystem/UniqueID.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <cstdint>
-#include <ctime>
-#include <memory>
-#include <optional>
-#include <sys/types.h>
-#include <system_error>
-#include <utility>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/MemoryBuffer.h"
 
 namespace llvm {
-
-class MemoryBuffer;
-
-} // end namespace llvm
+namespace sys {
+namespace fs {
+class UniqueID;
+}  // namespace fs
+}  // namespace sys
+}  // namespace llvm
 
 namespace clang {
 

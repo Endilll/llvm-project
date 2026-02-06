@@ -12,6 +12,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/FormatString.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "FormatStringParsing.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/TypeBase.h"
@@ -20,12 +28,12 @@
 #include "clang/Basic/TargetInfo.h"
 #include "llvm/Support/ConvertUTF.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/TargetParser/Triple.h"
 
 using clang::analyze_format_string::ArgType;
 using clang::analyze_format_string::FormatStringHandler;

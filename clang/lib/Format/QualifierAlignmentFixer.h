@@ -15,10 +15,26 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_QUALIFIERALIGNMENTFIXER_H
 #define LLVM_CLANG_LIB_FORMAT_QUALIFIERALIGNMENTFIXER_H
 
+#include <functional>
+#include <iterator>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "TokenAnalyzer.h"
+#include "FormatToken.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace clang {
+class LangOptions;
+class SourceManager;
+
 namespace format {
+class AnnotatedLine;
+class FormatTokenLexer;
+struct FormatStyle;
 
 typedef std::function<std::pair<tooling::Replacements, unsigned>(
     const Environment &)>

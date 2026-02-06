@@ -13,10 +13,16 @@
 #ifndef LLVM_CLANG_AST_DECLOBJC_H
 #define LLVM_CLANG_AST_DECLOBJC_H
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <string>
+#include <utility>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclID.h"
 #include "clang/AST/DeclObjCCommon.h"
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/Redeclarable.h"
@@ -35,18 +41,19 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <string>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Stmt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 
-class ASTContext;
-class CompoundStmt;
-class CXXCtorInitializer;
 class Expr;
 class ObjCCategoryDecl;
 class ObjCCategoryImplDecl;
@@ -56,7 +63,7 @@ class ObjCIvarDecl;
 class ObjCPropertyDecl;
 class ObjCPropertyImplDecl;
 class ObjCProtocolDecl;
-class Stmt;
+class GlobalDeclID;
 
 class ObjCListBase {
 protected:

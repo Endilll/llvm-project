@@ -9,7 +9,9 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_MSVC_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_MSVC_H
 
-#include "clang/Driver/Compilation.h"
+#include <optional>
+#include <string>
+
 #include "clang/Driver/CudaInstallationDetector.h"
 #include "clang/Driver/LazyDetector.h"
 #include "clang/Driver/RocmInstallationDetector.h"
@@ -18,9 +20,26 @@
 #include "clang/Driver/ToolChain.h"
 #include "llvm/Frontend/Debug/Options.h"
 #include "llvm/WindowsDriver/MSVCPaths.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
+#include "clang/Driver/Types.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Target/TargetOptions.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace llvm {
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace tools {
 
 /// Visual studio tools.

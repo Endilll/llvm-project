@@ -11,14 +11,23 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaRISCV.h"
+
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+#include <functional>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/TypeBase.h"
-#include "clang/Basic/Builtins.h"
 #include "clang/Basic/DiagnosticSema.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -45,13 +54,14 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/RISCVISAInfo.h"
 #include "llvm/TargetParser/RISCVTargetParser.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <vector>
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/TypeSize.h"
 
 using namespace llvm;
 using namespace clang;

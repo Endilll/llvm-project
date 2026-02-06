@@ -11,6 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/Attributes.h"
+
+#include <cassert>
+#include <optional>
+#include <string>
+#include <list>
+#include <memory>
+
 #include "clang/Basic/AttrSubjectMatchRules.h"
 #include "clang/Basic/AttributeCommonInfo.h"
 #include "clang/Basic/IdentifierTable.h"
@@ -23,9 +30,9 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
-#include <string>
+#include "clang/Basic/AttributeScopeInfo.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/SmallString.h"
 
 using namespace clang;
 
@@ -211,6 +218,7 @@ AttributeCommonInfo::getCXX11AttrArgsInfo(const IdentifierInfo *Name) {
 #define CXX11_ATTR_ARGS_INFO
   return llvm::StringSwitch<AttributeCommonInfo::AttrArgsInfo>(AttrName)
 #include "clang/Basic/CXX11AttributeInfo.inc"
+
       .Default(AttributeCommonInfo::AttrArgsInfo::None);
 #undef CXX11_ATTR_ARGS_INFO
 }

@@ -11,10 +11,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/Basic/DiagnosticFrontend.h"
+#include <memory>
+#include <string>
+#include <system_error>
+
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/Module.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Frontend/Utils.h"
@@ -25,9 +27,11 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/GraphWriter.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <string>
-#include <system_error>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 namespace DOT = llvm::DOT;

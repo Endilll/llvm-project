@@ -18,10 +18,14 @@
 #ifndef LLVM_CLANG_STATICANALYZER_FRONTEND_CHECKERREGISTRY_H
 #define LLVM_CLANG_STATICANALYZER_FRONTEND_CHECKERREGISTRY_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Core/CheckerRegistryData.h"
 #include <functional>
 #include <string>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/StaticAnalyzer/Core/CheckerRegistryData.h"
+#include "clang/Basic/Version.inc"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
 
 // FIXME: move this information to an HTML file in docs/.
 // At the very least, a checker plugin is a dynamic library that exports

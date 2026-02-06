@@ -9,9 +9,12 @@
 #ifndef LLVM_CLANG_AST_NSAPI_H
 #define LLVM_CLANG_AST_NSAPI_H
 
+#include <optional>
+
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
-#include <optional>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
   class ASTContext;

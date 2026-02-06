@@ -8,6 +8,12 @@
 #ifndef LLVM_CLANG_ANALYSIS_FLOWSENSITIVE__ARENA_H
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE__ARENA_H
 
+#include <memory>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/Analysis/FlowSensitive/Formula.h"
 #include "clang/Analysis/FlowSensitive/StorageLocation.h"
 #include "clang/Analysis/FlowSensitive/Value.h"
@@ -16,10 +22,10 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Error.h"
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang::dataflow {
 

@@ -12,9 +12,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/IdentifierTable.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdio>
+#include <cstring>
+#include <string>
+
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/DiagnosticIDs.h"
-#include "clang/Basic/DiagnosticLex.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/OperatorKinds.h"
@@ -30,11 +36,10 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdio>
-#include <cstring>
-#include <string>
+#include "clang/Basic/DiagnosticLexInterface.inc"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
 
 using namespace clang;
 
@@ -320,6 +325,7 @@ static KeywordStatus getTokenKwStatus(const LangOptions &LangOpts,
 #define KEYWORD(NAME, FLAGS) \
   case tok::kw_##NAME: return getKeywordStatus(LangOpts, FLAGS);
 #include "clang/Basic/TokenKinds.def"
+
   default: return KS_Disabled;
   }
 }
@@ -841,6 +847,7 @@ IdentifierTable::getFutureCompatDiagKind(const IdentifierInfo &II,
   unsigned Flags = llvm::StringSwitch<unsigned>(II.getName())
 #define KEYWORD(NAME, FLAGS) .Case(#NAME, FLAGS)
 #include "clang/Basic/TokenKinds.def"
+
 #undef KEYWORD
       ;
 

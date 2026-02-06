@@ -11,6 +11,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <optional>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -46,7 +50,6 @@
 #include "clang/Basic/Lambda.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/OpenACCKinds.h"
-#include "clang/Basic/OpenMPKinds.h"
 #include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TypeTraits.h"
@@ -60,9 +63,16 @@
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <optional>
-#include <string>
+#include "clang/AST/ASTConcept.h"
+#include "clang/AST/LambdaCapture.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/StmtOpenACC.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

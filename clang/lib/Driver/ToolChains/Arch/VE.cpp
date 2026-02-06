@@ -7,11 +7,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "VE.h"
+
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
-#include "clang/Driver/Driver.h"
 #include "clang/Options/Options.h"
 #include "llvm/Option/ArgList.h"
-#include <vector>
+#include "llvm/ADT/StringRef.h"
+
+namespace clang {
+namespace driver {
+class Driver;
+}  // namespace driver
+}  // namespace clang
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

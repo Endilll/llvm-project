@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "ASTUtils.h"
+
+#include <cassert>
+#include <functional>
+#include <optional>
+#include <utility>
+
 #include "PtrTypesSemantics.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -16,13 +22,16 @@
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtVisitor.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
-#include <cassert>
-#include <functional>
-#include <optional>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

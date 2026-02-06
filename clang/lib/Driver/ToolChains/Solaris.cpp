@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "Solaris.h"
+
+#include <cassert>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "Gnu.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
@@ -26,9 +32,16 @@
 #include "llvm/Option/Option.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
-#include <cassert>
-#include <memory>
-#include <string>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Driver/InputInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Option/Arg.h"
+#include "llvm/Option/OptSpecifier.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

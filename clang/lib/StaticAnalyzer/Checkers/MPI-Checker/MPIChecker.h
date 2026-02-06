@@ -17,14 +17,20 @@
 #ifndef LLVM_CLANG_LIB_STATICANALYZER_CHECKERS_MPICHECKER_MPICHECKER_H
 #define LLVM_CLANG_LIB_STATICANALYZER_CHECKERS_MPICHECKER_MPICHECKER_H
 
+#include <memory>
+
 #include "MPIBugReporter.h"
-#include "MPITypes.h"
 #include "clang/StaticAnalyzer/Checkers/MPIFunctionClassifier.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/StaticAnalyzer/Core/Checker.h"
 
 namespace clang {
 namespace ento {
+class CallEvent;
+class MemRegion;
+class SymbolReaper;
+
 namespace mpi {
 
 class MPIChecker : public Checker<check::PreCall, check::DeadSymbols> {

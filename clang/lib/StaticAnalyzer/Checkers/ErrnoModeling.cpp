@@ -19,6 +19,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "ErrnoModeling.h"
+
+#include <cassert>
+#include <optional>
+#include <string>
+#include <functional>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/TypeBase.h"
@@ -37,10 +43,23 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
 #include "llvm/ADT/STLExtras.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+class LocationContext;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

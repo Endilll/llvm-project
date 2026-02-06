@@ -13,16 +13,6 @@
 #ifndef LLVM_CLANG_ANALYSIS_PATHDIAGNOSTIC_H
 #define LLVM_CLANG_ANALYSIS_PATHDIAGNOSTIC_H
 
-#include "clang/AST/Stmt.h"
-#include "clang/Analysis/AnalysisDeclContext.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/FoldingSet.h"
-#include "llvm/ADT/PointerUnion.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/Allocator.h"
 #include <cassert>
 #include <deque>
 #include <list>
@@ -33,19 +23,33 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <iterator>
+
+#include "clang/AST/Stmt.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 
-class AnalysisDeclContext;
 class BinaryOperator;
 class CallEnter;
 class CallExitEnd;
 class ConditionalOperator;
 class Decl;
-class LocationContext;
 class MemberExpr;
 class ProgramPoint;
 class SourceManager;
+class LangOptions;
 
 namespace ento {
 

@@ -14,12 +14,14 @@
 #ifndef LLVM_CLANG_AST_COMMENTBRIEFPARSER_H
 #define LLVM_CLANG_AST_COMMENTBRIEFPARSER_H
 
+#include <string>
+
 #include "clang/AST/CommentLexer.h"
 #include "clang/Basic/SourceLocation.h"
-#include <string>
 
 namespace clang {
 namespace comments {
+class CommandTraits;
 
 /// A very simple comment parser that extracts "a brief description".
 ///

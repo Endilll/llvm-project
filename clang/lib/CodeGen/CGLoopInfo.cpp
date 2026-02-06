@@ -7,7 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGLoopInfo.h"
-#include "clang/AST/ASTContext.h"
+
+#include <cassert>
+#include <optional>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/AttrIterator.h"
 #include "clang/AST/Expr.h"
@@ -21,12 +24,13 @@
 #include "llvm/IR/CFG.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DebugLoc.h"
-#include "llvm/IR/InstrTypes.h"
-#include "llvm/IR/Instructions.h"
 #include "llvm/IR/Metadata.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/Casting.h"
+
 using namespace clang::CodeGen;
 using namespace llvm;
 

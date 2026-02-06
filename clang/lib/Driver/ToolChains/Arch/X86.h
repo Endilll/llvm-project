@@ -9,15 +9,21 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_ARCH_X86_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_ARCH_X86_H
 
-#include "clang/Driver/Driver.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Option/Option.h"
-#include "llvm/TargetParser/Triple.h"
 #include <string>
 #include <vector>
 
+namespace llvm {
+class StringRef;
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
+
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace tools {
 namespace x86 {
 

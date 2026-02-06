@@ -12,6 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ComparisonCategories.h"
+
+#include <cassert>
+#include <optional>
+#include <vector>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -21,9 +27,10 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
-#include <vector>
+#include "clang/AST/APValue.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

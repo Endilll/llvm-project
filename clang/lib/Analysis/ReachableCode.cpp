@@ -12,6 +12,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/ReachableCode.h"
+
+#include <cassert>
+#include <optional>
+#include <utility>
+#include <iterator>
+#include <vector>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/AttrIterator.h"
 #include "clang/AST/Decl.h"
@@ -34,9 +41,15 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
-#include <utility>
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class ASTContext;
+}  // namespace clang
 
 using namespace clang;
 

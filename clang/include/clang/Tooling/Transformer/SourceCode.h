@@ -13,15 +13,22 @@
 #ifndef LLVM_CLANG_TOOLING_TRANSFORMER_SOURCECODE_H
 #define LLVM_CLANG_TOOLING_TRANSFORMER_SOURCECODE_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/TokenKinds.h"
-#include "llvm/Support/Error.h"
 #include <optional>
 
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/Support/Error.h"
+#include "llvm/ADT/StringRef.h"
+
 namespace clang {
+class Decl;
+class LangOptions;
+class SourceManager;
+namespace tok {
+enum TokenKind : unsigned short;
+}  // namespace tok
+
 namespace tooling {
 
 /// Extends \p Range to include the token \p Terminator, if it immediately

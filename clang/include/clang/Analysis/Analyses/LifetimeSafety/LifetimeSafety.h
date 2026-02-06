@@ -20,18 +20,28 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_H
 
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/Expr.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/Facts.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/LifetimeStats.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/LiveOrigins.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/LoanPropagation.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/Origins.h"
-#include "clang/Analysis/AnalysisDeclContext.h"
-#include "clang/Basic/SourceLocation.h"
 #include <cstdint>
 #include <memory>
+
+#include "clang/Analysis/Analyses/LifetimeSafety/Facts.h"
+#include "clang/Analysis/Analyses/LifetimeSafety/LiveOrigins.h"
+#include "clang/Analysis/Analyses/LifetimeSafety/LoanPropagation.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class AnalysisDeclContext;
+class CXXMethodDecl;
+class Expr;
+class FieldDecl;
+class ParmVarDecl;
+namespace lifetimes {
+namespace internal {
+class OriginManager;
+}  // namespace internal
+struct LifetimeSafetyStats;
+}  // namespace lifetimes
+}  // namespace clang
 
 namespace clang::lifetimes {
 

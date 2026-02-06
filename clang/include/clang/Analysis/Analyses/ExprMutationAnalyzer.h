@@ -8,20 +8,27 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_EXPRMUTATIONANALYZER_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_EXPRMUTATIONANALYZER_H
 
-#include "clang/AST/ASTContext.h"
+#include <memory>
+#include <utility>
+
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/Stmt.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
-#include <memory>
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 
 class FunctionParmMutationAnalyzer;
+class ASTContext;
+class Decl;
+namespace ast_matchers {
+class BoundNodes;
+}  // namespace ast_matchers
 
 /// Analyzes whether any mutative operations are applied to an expression within
 /// a given statement.

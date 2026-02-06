@@ -17,13 +17,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGCleanup.h"
+
+#include <cstring>
+#include <initializer_list>
+#include <iterator>
+#include <memory>
+#include <new>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGValue.h"
 #include "CodeGenFunction.h"
 #include "EHScopeStack.h"
 #include "clang/AST/CharUnits.h"
-#include "clang/AST/ExprCXX.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/SmallPtrSet.h"
@@ -37,12 +43,18 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/SaveAndRestore.h"
-#include <cassert>
-#include <cstddef>
-#include <cstring>
-#include <initializer_list>
-#include <iterator>
-#include <memory>
+#include "CodeGenModule.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/IR/Value.h"
+
+namespace clang {
+class CXXTemporary;
+}  // namespace clang
 
 using namespace clang;
 using namespace CodeGen;

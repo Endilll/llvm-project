@@ -11,16 +11,37 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/AST/Decl.h"
-#include "clang/AST/Stmt.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
-#include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+class DeclStmt;
+class FunctionDecl;
+class LocationContext;
+class ReturnStmt;
+class Stmt;
+class TranslationUnitDecl;
+namespace ento {
+class AnalysisManager;
+class BugReporter;
+class CXXAllocatorCall;
+class CallEvent;
+class CheckerContext;
+class ExplodedGraph;
+class ExprEngine;
+class MemRegion;
+class ObjCMethodCall;
+class SymbolReaper;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

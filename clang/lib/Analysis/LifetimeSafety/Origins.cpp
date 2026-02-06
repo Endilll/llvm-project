@@ -7,11 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/LifetimeSafety/Origins.h"
+
+#include <cassert>
+#include <string>
+#include <new>
+
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclTemplate.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/RecursiveASTVisitor.h"
@@ -23,8 +26,11 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <string>
+
+namespace clang {
+class Decl;
+class Stmt;
+}  // namespace clang
 
 namespace clang::lifetimes::internal {
 namespace {

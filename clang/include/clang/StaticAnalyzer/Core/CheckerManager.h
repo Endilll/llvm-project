@@ -13,29 +13,38 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_CHECKERMANAGER_H
 #define LLVM_CLANG_STATICANALYZER_CORE_CHECKERMANAGER_H
 
+#include <cassert>
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
+#include <utility>
+
 #include "clang/AST/Stmt.h"
 #include "clang/Analysis/ProgramPoint.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallVector.h"
-#include <cassert>
-#include <functional>
-#include <memory>
-#include <string>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 
 class AnalyzerOptions;
-class CallExpr;
 class Decl;
 class LocationContext;
-class Stmt;
 class TranslationUnitDecl;
+class ASTContext;
+class DiagnosticsEngine;
+class Preprocessor;
 
 namespace ento {
 

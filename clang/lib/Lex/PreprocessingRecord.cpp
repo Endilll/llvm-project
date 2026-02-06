@@ -12,20 +12,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/PreprocessingRecord.h"
-#include "clang/Basic/FileEntry.h"
-#include "clang/Basic/IdentifierTable.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TokenKinds.h"
-#include "clang/Lex/MacroInfo.h"
-#include "clang/Lex/PPCallbacks.h"
-#include "clang/Lex/Token.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/iterator_range.h"
-#include "llvm/Support/Capacity.h"
-#include "llvm/Support/ErrorHandling.h"
+
 #include <cassert>
 #include <cstddef>
 #include <cstring>
@@ -33,6 +20,20 @@
 #include <optional>
 #include <utility>
 #include <vector>
+
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Lex/MacroInfo.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Capacity.h"
+#include "llvm/Support/ErrorHandling.h"
 
 using namespace clang;
 

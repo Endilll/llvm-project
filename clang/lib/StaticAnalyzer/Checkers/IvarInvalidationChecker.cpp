@@ -27,6 +27,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/Expr.h"
@@ -46,7 +48,19 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class ASTContext;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

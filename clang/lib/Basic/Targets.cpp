@@ -13,6 +13,13 @@
 
 #include "Targets.h"
 
+#include <cassert>
+#include <memory>
+#include <string>
+#include <optional>
+#include <utility>
+#include <vector>
+
 #include "Targets/AArch64.h"
 #include "Targets/AMDGPU.h"
 #include "Targets/ARC.h"
@@ -53,9 +60,13 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <memory>
-#include <string>
+#include "TargetDefines.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/VersionTuple.h"
 
 using namespace clang;
 

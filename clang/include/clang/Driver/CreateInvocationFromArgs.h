@@ -14,17 +14,21 @@
 #ifndef LLVM_CLANG_DRIVER_CREATEINVOCATIONFROMARGS_H
 #define LLVM_CLANG_DRIVER_CREATEINVOCATIONFROMARGS_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/Support/VirtualFileSystem.h"
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
+
 namespace clang {
 
 class CompilerInvocation;
-class DiagnosticsEngine;
 
 /// Optional inputs to createInvocation.
 struct CreateInvocationOptions {

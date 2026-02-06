@@ -10,6 +10,22 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <deque>
+#include <initializer_list>
+#include <type_traits>
+
 #include "CheckExprLifetime.h"
 #include "TreeTransform.h"
 #include "TypeLocBuilder.h"
@@ -19,8 +35,7 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTDiagnostic.h"
 #include "clang/AST/ASTLambda.h"
-#include "clang/AST/ASTMutationListener.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/ComparisonCategories.h"
 #include "clang/AST/Decl.h"
@@ -29,7 +44,6 @@
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/DynamicRecursiveASTVisitor.h"
-#include "clang/AST/EvaluatedExprVisitor.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprObjC.h"
@@ -70,8 +84,6 @@
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Sema/AnalysisBasedWarnings.h"
 #include "clang/Sema/DeclSpec.h"
-#include "clang/Sema/DelayedDiagnostic.h"
-#include "clang/Sema/Designator.h"
 #include "clang/Sema/EnterExpressionEvaluationContext.h"
 #include "clang/Sema/Initialization.h"
 #include "clang/Sema/Lookup.h"
@@ -109,18 +121,37 @@
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/TypeSize.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/APValue.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclOpenMP.h"
+#include "clang/AST/NSAPI.h"
+#include "clang/Basic/Cuda.h"
+#include "clang/Basic/ObjCRuntime.h"
+#include "clang/Basic/OpenCLOptions.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Lex/Token.h"
+#include "clang/Sema/CleanupInfo.h"
+#include "clang/Sema/SemaOpenACC.h"
+#include "llvm/ADT/APFixedPoint.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 using namespace sema;

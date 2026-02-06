@@ -6,6 +6,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <functional>
+
 #include "IndexingContext.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/Attr.h"
@@ -18,10 +21,25 @@
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Index/IndexDataConsumer.h"
 #include "clang/Index/IndexSymbol.h"
 #include "llvm/ADT/PointerUnion.h"
-#include <cassert>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Index/IndexingOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Stmt;
+}  // namespace clang
+namespace { class IndexingDeclVisitor; }
 
 using namespace clang;
 using namespace index;

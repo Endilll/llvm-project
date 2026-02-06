@@ -13,11 +13,15 @@
 
 #include "clang/Analysis/AnnexKDetection.h"
 
+#include <cassert>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Lex/Token.h"
-#include <cassert>
+#include "clang/Lex/MacroInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang::analysis {
 

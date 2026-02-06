@@ -13,15 +13,25 @@
 #ifndef LLVM_CLANG_AST_INTERP_INTERPFRAME_H
 #define LLVM_CLANG_AST_INTERP_INTERPFRAME_H
 
+#include <assert.h>
+#include <stddef.h>
+#include <memory>
+
 #include "Frame.h"
 #include "InterpBlock.h"
 #include "Pointer.h"
+#include "Descriptor.h"
+#include "Function.h"
+#include "Source.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang {
+class Expr;
+
 namespace interp {
-class Function;
 class InterpState;
-class Pointer;
 
 /// Frame storing local variables.
 class InterpFrame final : public Frame {

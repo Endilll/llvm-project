@@ -15,8 +15,26 @@
 #define LLVM_CLANG_SEMA_HLSLBUILTINTYPEDECLBUILDER_H
 
 #include "clang/AST/Type.h"
-#include "clang/Sema/Sema.h"
 #include "llvm/ADT/StringMap.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/AST/HLSLResource.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace clang {
+class Attr;
+class ConceptDecl;
+class DeclarationName;
+class Expr;
+class Sema;
+}  // namespace clang
+namespace llvm {
+class StringRef;
+namespace dxil {
+enum class ResourceClass : uint8_t;
+}  // namespace dxil
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 using llvm::hlsl::ResourceClass;
 using llvm::hlsl::ResourceDimension;

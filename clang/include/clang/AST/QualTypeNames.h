@@ -60,13 +60,16 @@
 #ifndef LLVM_CLANG_AST_QUALTYPENAMES_H
 #define LLVM_CLANG_AST_QUALTYPENAMES_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/TypeBase.h"
 #include <string>
 
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+
 namespace clang {
+class ASTContext;
+class Decl;
+
 namespace TypeName {
 /// Get the fully qualified name for a type. This includes full
 /// qualification of all template parameters etc.

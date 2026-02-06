@@ -9,17 +9,26 @@
 #ifndef LLVM_CLANG_ANALYSIS_MACROEXPANSIONCONTEXT_H
 #define LLVM_CLANG_ANALYSIS_MACROEXPANSIONCONTEXT_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Lex/Preprocessor.h"
-#include "clang/Lex/Token.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/Support/Compiler.h"
 #include <optional>
 #include <string>
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+class StringRef;
+class raw_ostream;
+}  // namespace llvm
+
 namespace clang {
+class LangOptions;
+class Preprocessor;
+class SourceManager;
+class Token;
 
 namespace detail {
 class MacroExpansionRangeRecorder;

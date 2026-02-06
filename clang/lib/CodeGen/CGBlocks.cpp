@@ -11,6 +11,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGBlocks.h"
+
+#include <algorithm>
+#include <cstdio>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <iterator>
+#include <memory>
+#include <new>
+
 #include "Address.h"
 #include "CGCXXABI.h"
 #include "CGCall.h"
@@ -28,11 +38,9 @@
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclObjC.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -45,7 +53,6 @@
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/InstrTypes.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Module.h"
@@ -53,13 +60,42 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/ScopedPrinter.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstdio>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "CGBuilder.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Mangle.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/PointerAuthOptions.h"
+#include "clang/Basic/Sanitizers.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Alignment.h"
+#include "llvm/Support/TypeSize.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace clang {
+namespace CodeGen {
+class CGFunctionInfo;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class CallBase;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

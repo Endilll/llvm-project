@@ -17,18 +17,31 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_BREAKABLETOKEN_H
 #define LLVM_CLANG_LIB_FORMAT_BREAKABLETOKEN_H
 
+#include <iterator>
+#include <string>
+#include <utility>
+
 #include "Encoding.h"
-#include "WhitespaceManager.h"
 #include "llvm/ADT/StringSet.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Format/Format.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class Regex;
+}  // namespace llvm
 
 namespace clang {
 namespace format {
+class WhitespaceManager;
+struct FormatToken;
+struct LineState;
 
 /// Checks if \p Token switches formatting, like /* clang-format off */.
 /// \p Token must be a comment.
 bool switchesFormatting(const FormatToken &Token);
 
-struct FormatStyle;
 
 /// Base class for tokens / ranges of tokens that can allow breaking
 /// within the tokens - for example, to avoid whitespace beyond the column

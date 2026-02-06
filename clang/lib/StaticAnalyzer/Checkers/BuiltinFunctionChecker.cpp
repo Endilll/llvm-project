@@ -14,6 +14,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <utility>
+#include <functional>
+#include <iterator>
+#include <optional>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
@@ -28,14 +34,24 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallDescription.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/CheckerHelpers.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/APSIntType.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace clang {
+class LocationContext;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

@@ -10,6 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <iterator>
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include "ASTCommon.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/Attr.h"
@@ -23,9 +30,7 @@
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/DeclVisitor.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/OpenMPClause.h"
 #include "clang/AST/PrettyDeclStackTrace.h"
-#include "clang/AST/Redeclarable.h"
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
@@ -39,6 +44,7 @@
 #include "clang/Serialization/ASTRecordWriter.h"
 #include "clang/Serialization/ASTWriter.h"
 #include "clang/Serialization/SourceLocationEncoding.h"
+#include "clang/Serialization/ModuleFileExtension.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/ADT/STLForwardCompat.h"
@@ -47,11 +53,25 @@
 #include "llvm/Bitstream/BitstreamWriter.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <iterator>
-#include <memory>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+template <typename decl_type> class Redeclarable;
+}  // namespace clang
+
 using namespace clang;
 using namespace serialization;
 

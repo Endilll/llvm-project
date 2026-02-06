@@ -15,31 +15,43 @@
 #ifndef LLVM_CLANG_AST_ASTTYPETRAITS_H
 #define LLVM_CLANG_AST_ASTTYPETRAITS_H
 
-#include "clang/AST/ASTFwd.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/LambdaCapture.h"
-#include "clang/AST/NestedNameSpecifierBase.h"
-#include "clang/AST/TemplateBase.h"
-#include "clang/AST/TemplateName.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/AST/TypeLoc.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/DenseMapInfo.h"
-#include "llvm/ADT/Hashing.h"
-#include "llvm/Support/AlignOf.h"
 #include <cassert>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
+#include <new>
+
+#include "clang/AST/ASTFwd.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/Hashing.h"
+#include "llvm/Support/AlignOf.h"
+#include "clang/AST/Stmt.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace llvm {
-class raw_ostream;
-} // namespace llvm
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
 
 struct PrintingPolicy;
+class ASTContext;
+class Attr;
+class CXXBaseSpecifier;
+class CXXCtorInitializer;
+class ConceptReference;
+class Decl;
+class LambdaCapture;
+class OMPClause;
+class TemplateArgument;
+class TemplateArgumentLoc;
+class TemplateName;
 
 /// Defines how we descend a level in the AST when we pass
 /// through expressions.

@@ -9,28 +9,23 @@
 #ifndef LLVM_CLANG_FRONTEND_COMPILERINVOCATION_H
 #define LLVM_CLANG_FRONTEND_COMPILERINVOCATION_H
 
-#include "clang/APINotes/APINotesOptions.h"
-#include "clang/Basic/CodeGenOptions.h"
-#include "clang/Basic/DiagnosticOptions.h"
-#include "clang/Basic/FileSystemOptions.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/LangStandard.h"
-#include "clang/Basic/PointerAuthOptions.h"
-#include "clang/Frontend/DependencyOutputOptions.h"
-#include "clang/Frontend/FrontendOptions.h"
-#include "clang/Frontend/MigratorOptions.h"
-#include "clang/Frontend/PreprocessorOutputOptions.h"
-#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+
 namespace llvm {
 
 class Triple;
+template <typename T> class ArrayRef;
 
 namespace opt {
 
@@ -52,6 +47,17 @@ class DiagnosticsEngine;
 class HeaderSearchOptions;
 class PreprocessorOptions;
 class TargetOptions;
+class APINotesOptions;
+class AnalyzerOptions;
+class CodeGenOptions;
+class DependencyOutputOptions;
+class FileSystemOptions;
+class FrontendOptions;
+class InputKind;
+class LangOptions;
+class MigratorOptions;
+class PreprocessorOutputOptions;
+struct PointerAuthOptions;
 
 // This lets us create the DiagnosticsEngine with a properly-filled-out
 // DiagnosticOptions instance.

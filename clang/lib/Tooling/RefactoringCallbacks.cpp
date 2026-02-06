@@ -9,11 +9,19 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Tooling/RefactoringCallbacks.h"
+
+#include <cassert>
+#include <cstddef>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Stmt.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/ASTMatchers/ASTMatchersInternal.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/Lexer.h"
@@ -22,13 +30,19 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <map>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/ASTMatchers/ASTMatchers.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/Twine.h"
+
+namespace clang {
+class SourceManager;
+namespace ast_matchers {
+namespace internal {
+class DynTypedMatcher;
+}  // namespace internal
+}  // namespace ast_matchers
+}  // namespace clang
 
 using llvm::StringError;
 using llvm::make_error;

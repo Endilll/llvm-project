@@ -9,10 +9,18 @@
 #ifndef LLVM_CLANG_LIB_STATICANALYZER_CORE_PLISTDIAGNOSTICS_H
 #define LLVM_CLANG_LIB_STATICANALYZER_CORE_PLISTDIAGNOSTICS_H
 
-#include "clang/CrossTU/CrossTranslationUnit.h"
-#include "clang/Lex/Preprocessor.h"
-#include "clang/StaticAnalyzer/Core/PathDiagnosticConsumers.h"
 #include <string>
+
+#include "clang/CrossTU/CrossTranslationUnit.h"
+#include "clang/StaticAnalyzer/Core/PathDiagnosticConsumers.h"
+
+namespace clang {
+class MacroExpansionContext;
+class Preprocessor;
+namespace ento {
+struct PathDiagnosticConsumerOptions;
+}  // namespace ento
+}  // namespace clang
 
 namespace clang::ento {
 

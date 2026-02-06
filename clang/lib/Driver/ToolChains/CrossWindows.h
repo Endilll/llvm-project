@@ -9,14 +9,24 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_CROSSWINDOWS_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_CROSSWINDOWS_H
 
-#include "Cuda.h"
 #include "Gnu.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Driver/Tool.h"
-#include "clang/Driver/ToolChain.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+class ToolChain;
+
 namespace tools {
 
 namespace CrossWindows {

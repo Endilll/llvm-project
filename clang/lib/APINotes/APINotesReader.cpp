@@ -13,9 +13,20 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/APINotes/APINotesReader.h"
+
+#include <sys/types.h>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #include "APINotesFormat.h"
 #include "clang/APINotes/Types.h"
-#include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/Hashing.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
@@ -28,18 +39,13 @@
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/OnDiskHashTable.h"
 #include "llvm/Support/VersionTuple.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <ctime>
-#include <memory>
-#include <optional>
-#include <string>
-#include <sys/types.h>
-#include <tuple>
-#include <utility>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/PointerEmbeddedInt.h"
+#include "llvm/Support/MemoryBufferRef.h"
 
 namespace clang {
+enum class NullabilityKind : uint8_t;
+
 namespace api_notes {
 using namespace llvm::support;
 

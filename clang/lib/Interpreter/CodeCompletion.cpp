@@ -14,6 +14,7 @@
 #include "clang/AST/ASTImporter.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclarationName.h"
+#include "clang/AST/DeclLookups.h"
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/Diagnostic.h"

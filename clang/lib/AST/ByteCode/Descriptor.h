@@ -13,18 +13,34 @@
 #ifndef LLVM_CLANG_AST_INTERP_DESCRIPTOR_H
 #define LLVM_CLANG_AST_INTERP_DESCRIPTOR_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <algorithm>
+#include <cstddef>
+#include <limits>
+#include <optional>
+
 #include "InitMap.h"
 #include "PrimType.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang {
+class ASTContext;
+
 namespace interp {
 class Block;
 class Record;
 class SourceInfo;
 struct Descriptor;
-enum PrimType : uint8_t;
 
 using DeclTy = llvm::PointerUnion<const Decl *, const Expr *>;
 

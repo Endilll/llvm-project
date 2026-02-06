@@ -13,21 +13,22 @@
 #ifndef LLVM_CLANG_LEX_LEXER_H
 #define LLVM_CLANG_LEX_LEXER_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/TokenKinds.h"
-#include "clang/Lex/DependencyDirectivesScanner.h"
-#include "clang/Lex/PreprocessorLexer.h"
-#include "clang/Lex/Token.h"
 #include <cassert>
 #include <cstdint>
 #include <optional>
 #include <string>
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Lex/PreprocessorLexer.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+
 namespace llvm {
 
 class MemoryBufferRef;
+template <typename T> class SmallVectorImpl;
 
 } // namespace llvm
 
@@ -37,6 +38,14 @@ class DiagnosticBuilder;
 class Preprocessor;
 class SourceManager;
 class LangOptions;
+class DiagnosticsEngine;
+namespace dependency_directives_scan {
+struct Directive;
+struct Token;
+}  // namespace dependency_directives_scan
+namespace tok {
+enum TokenKind : unsigned short;
+}  // namespace tok
 
 /// ConflictMarkerKind - Kinds of conflict marker which the lexer might be
 /// recovering from.

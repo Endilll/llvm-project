@@ -11,6 +11,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Frontend/AnalysisConsumer.h"
+
+#include <cassert>
+#include <cmath>
+#include <functional>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <optional>
+
 #include "ModelInjector.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -22,7 +33,6 @@
 #include "clang/Analysis/CallGraph.h"
 #include "clang/Analysis/CodeInjector.h"
 #include "clang/Analysis/MacroExpansionContext.h"
-#include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -32,7 +42,6 @@
 #include "clang/Frontend/CompilerInvocation.h"
 #include "clang/Frontend/FrontendOptions.h"
 #include "clang/Lex/Preprocessor.h"
-#include "clang/Rewrite/Core/Rewriter.h"
 #include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
@@ -52,13 +61,22 @@
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/Timer.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cmath>
-#include <functional>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/MemoryBufferRef.h"
 
 using namespace clang;
 using namespace ento;
@@ -205,6 +223,7 @@ public:
              MacroExpansions);                                                 \
     break;
 #include "clang/StaticAnalyzer/Core/Analyses.def"
+
     default:
       llvm_unreachable("Unknown analyzer output type!");
     }

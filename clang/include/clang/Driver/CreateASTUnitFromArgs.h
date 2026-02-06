@@ -13,15 +13,21 @@
 #ifndef LLVM_CLANG_DRIVER_CREATEASTUNITFROMARGS_H
 #define LLVM_CLANG_DRIVER_CREATEASTUNITFROMARGS_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticOptions.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Frontend/ASTUnit.h"
 #include <memory>
 #include <optional>
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Frontend/ASTUnit.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/VirtualFileSystem.h"
+
 namespace clang {
+class DiagnosticOptions;
+class DiagnosticsEngine;
+class PCHContainerOperations;
 
 /// Create an ASTUnit from a vector of command line arguments, which must
 /// specify exactly one source file.

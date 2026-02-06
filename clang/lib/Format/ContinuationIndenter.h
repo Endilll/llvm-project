@@ -15,8 +15,23 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_CONTINUATIONINDENTER_H
 #define LLVM_CLANG_LIB_FORMAT_CONTINUATIONINDENTER_H
 
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <utility>
+
 #include "Encoding.h"
 #include "FormatToken.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Format/Format.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Regex.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
 class SourceManager;
@@ -25,10 +40,7 @@ namespace format {
 
 class AnnotatedLine;
 class BreakableToken;
-struct FormatToken;
 struct LineState;
-struct ParenState;
-struct RawStringFormatStyleManager;
 class WhitespaceManager;
 
 struct RawStringFormatStyleManager {

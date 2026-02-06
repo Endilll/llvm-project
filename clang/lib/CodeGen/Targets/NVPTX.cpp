@@ -6,18 +6,21 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cstdint>
+#include <memory>
+#include <string>
+
 #include "ABIInfoImpl.h"
 #include "Address.h"
 #include "CGValue.h"
 #include "CodeGenModule.h"
-#include "CodeGenTypes.h"
 #include "TargetInfo.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -32,14 +35,36 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/IntrinsicsNVPTX.h"
-#include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Metadata.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Operator.h"
 #include "llvm/Support/Casting.h"
-#include <algorithm>
-#include <cstdint>
-#include <memory>
+#include "ABIInfo.h"
+#include "CGCXXABI.h"
+#include "CodeGenFunction.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Type.h"
+
+namespace clang {
+namespace CodeGen {
+class CodeGenTypes;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class LLVMContext;
+class Value;
+}  // namespace llvm
 
 using namespace clang;
 using namespace clang::CodeGen;

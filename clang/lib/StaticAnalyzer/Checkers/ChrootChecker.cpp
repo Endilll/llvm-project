@@ -13,6 +13,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <utility>
+#include <optional>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Analysis/PathDiagnostic.h"
@@ -32,10 +36,19 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramStateTrait.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
 #include "llvm/ADT/FoldingSet.h"
-#include <memory>
-#include <utility>
+#include "clang/AST/Expr.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/BasicValueFactory.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class LocationContext;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

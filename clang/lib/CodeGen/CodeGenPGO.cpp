@@ -11,12 +11,23 @@
 //===----------------------------------------------------------------------===//
 
 #include "CodeGenPGO.h"
+
+#include <algorithm>
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <tuple>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGDebugInfo.h"
 #include "CodeGenFunction.h"
 #include "CoverageMappingGen.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
@@ -28,7 +39,6 @@
 #include "clang/AST/StmtVisitor.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
@@ -39,7 +49,6 @@
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/GlobalValue.h"
 #include "llvm/IR/GlobalVariable.h"
-#include "llvm/IR/Instruction.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/MDBuilder.h"
 #include "llvm/ProfileData/InstrProf.h"
@@ -49,16 +58,36 @@
 #include "llvm/Support/MD5.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/StmtObjC.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Error.h"
 
 namespace llvm {
+class Instruction;
+class MDNode;
+class Value;
+
 extern cl::opt<bool> EnableSingleByteCoverage;
 } // namespace llvm
 

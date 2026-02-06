@@ -9,12 +9,20 @@
 #ifndef LLVM_CLANG_AST_INTERP_FUNCTION_POINTER_H
 #define LLVM_CLANG_AST_INTERP_FUNCTION_POINTER_H
 
+#include <stdint.h>
+#include <string>
+
 #include "Function.h"
-#include "Primitives.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/Decl.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 class ASTContext;
-class APValue;
+
 namespace interp {
 
 class FunctionPointer final {

@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "SystemZ.h"
+
+#include <iterator>
+#include <string>
+#include <array>
+#include <optional>
+
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -24,9 +30,7 @@
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/ADT/StringTable.h"
 #include "llvm/Support/VersionTuple.h"
-#include <cstdint>
-#include <iterator>
-#include <string>
+#include "llvm/ADT/Twine.h"
 
 using namespace clang;
 using namespace clang::targets;

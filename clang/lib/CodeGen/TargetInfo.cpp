@@ -12,18 +12,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "TargetInfo.h"
+
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "ABIInfo.h"
 #include "ABIInfoImpl.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/CodeGenOptions.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/PointerAuthOptions.h"
 #include "clang/Basic/Specifiers.h"
-#include "clang/Basic/SyncScope.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/SmallVector.h"
@@ -38,14 +41,28 @@
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Type.h"
-#include "llvm/Support/AtomicOrdering.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
+#include "CGBuilder.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+enum class SyncScope;
+}  // namespace clang
+namespace llvm {
+enum class AtomicOrdering : unsigned int;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

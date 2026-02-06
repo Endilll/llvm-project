@@ -7,9 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "FileIndexRecord.h"
+
+#include <cassert>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclTemplate.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
@@ -19,7 +21,10 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace clang::index;

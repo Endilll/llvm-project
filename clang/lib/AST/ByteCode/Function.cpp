@@ -7,16 +7,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "Function.h"
+
+#include <utility>
+#include <iterator>
+#include <vector>
+
 #include "ByteCode/Source.h"
-#include "Program.h"
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
-#include <cassert>
-#include <utility>
 
 using namespace clang;
 using namespace clang::interp;

@@ -13,6 +13,16 @@
 #ifndef LLVM_CLANG_LEX_HEADERSEARCH_H
 #define LLVM_CLANG_LEX_HEADERSEARCH_H
 
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <version>
+
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
@@ -31,27 +41,19 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "clang/Basic/CustomizableOptional.h"
+#include "llvm/ADT/ArrayRef.h"
 
 namespace llvm {
 
 class Triple;
+template <typename T> class SmallVectorImpl;
 
 } // namespace llvm
 
 namespace clang {
 
 class DiagnosticsEngine;
-class DirectoryEntry;
-class ExternalPreprocessorSource;
-class FileEntry;
 class FileManager;
 class HeaderSearch;
 class HeaderSearchOptions;

@@ -11,13 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "CodeGenFunction.h"
+
+#include <algorithm>
+#include <climits>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "Address.h"
 #include "CGBlocks.h"
 #include "CGBuilder.h"
 #include "CGCUDARuntime.h"
 #include "CGCXXABI.h"
 #include "CGCall.h"
-#include "CGCleanup.h"
 #include "CGDebugInfo.h"
 #include "CGHLSLRuntime.h"
 #include "CGOpenMPRuntime.h"
@@ -31,7 +39,6 @@
 #include "TargetInfo.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
-#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
@@ -42,7 +49,6 @@
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/StmtObjC.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/CodeGenOptions.h"
 #include "clang/Basic/DiagnosticFrontend.h"
@@ -74,7 +80,6 @@
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/ConstantFolder.h"
 #include "llvm/IR/Constants.h"
-#include "llvm/IR/DataLayout.h"
 #include "llvm/IR/DebugLoc.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Dominators.h"
@@ -83,7 +88,6 @@
 #include "llvm/IR/InstrTypes.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
-#include "llvm/IR/IntrinsicInst.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/MDBuilder.h"
 #include "llvm/Support/CRC.h"
@@ -91,18 +95,27 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/xxhash.h"
-#include "llvm/Transforms/Scalar/LowerExpectIntrinsic.h"
 #include "llvm/Transforms/Utils/PromoteMemToReg.h"
 #include "llvm/Transforms/Utils/SanitizerStats.h"
-#include <algorithm>
-#include <cassert>
-#include <climits>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "CodeGenTypes.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Mangle.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/ProfileList.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/IR/DebugInfoMetadata.h"
+#include "llvm/IR/FMF.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Metadata.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/User.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 using namespace CodeGen;

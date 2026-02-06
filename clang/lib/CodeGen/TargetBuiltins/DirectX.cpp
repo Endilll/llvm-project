@@ -10,13 +10,16 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "CGHLSLRuntime.h"
 #include "CodeGenFunction.h"
 #include "clang/AST/Expr.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetBuiltins.h"
-#include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/IntrinsicsDirectX.h"
+#include "CGBuilder.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Value.h"
 
 using namespace clang;
 using namespace CodeGen;

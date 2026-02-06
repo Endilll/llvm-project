@@ -11,6 +11,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+#include <utility>
+#include <iterator>
+#include <map>
+#include <vector>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTImporter.h"
 #include "clang/AST/ASTImporterSharedState.h"
@@ -29,10 +36,14 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <utility>
 #include "clang/AST/ExternalASTMerger.h"
+#include "clang/AST/ExternalASTSource.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class FileManager;
+}  // namespace clang
 
 using namespace clang;
 

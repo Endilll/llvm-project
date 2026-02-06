@@ -10,6 +10,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <iterator>
+#include <tuple>
+#include <utility>
+
 #include "Address.h"
 #include "CodeGenFunction.h"
 #include "clang/AST/Expr.h"
@@ -20,10 +24,14 @@
 #include "llvm/IR/FPEnv.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/IntrinsicsHexagon.h"
-#include "llvm/IR/Type.h"
-#include <iterator>
-#include <tuple>
-#include <utility>
+#include "CGBuilder.h"
+#include "CodeGenModule.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace CodeGen;

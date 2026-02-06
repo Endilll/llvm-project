@@ -13,6 +13,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cctype>
+#include <cstdint>
+#include <functional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGCXXABI.h"
@@ -23,7 +32,6 @@
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
 #include "CodeGenTypes.h"
-#include "SanitizerMetadata.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -52,7 +60,6 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/InstrTypes.h"
 #include "llvm/IR/Instructions.h"
-#include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/MDBuilder.h"
 #include "llvm/IR/Metadata.h"
@@ -61,13 +68,32 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/ModRef.h"
-#include <cassert>
-#include <cctype>
-#include <cstdint>
-#include <functional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 using namespace CodeGen;

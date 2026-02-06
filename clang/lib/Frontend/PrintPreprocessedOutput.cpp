@@ -11,8 +11,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstring>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <utility>
+#include <optional>
+
 #include "clang/Basic/CharInfo.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
@@ -31,12 +38,17 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstring>
-#include <iterator>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Module.h"
+#include "clang/Lex/PPEmbedParameters.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+
 using namespace clang;
 
 /// PrintMacroDefinition - Print a macro definition in a form that will be

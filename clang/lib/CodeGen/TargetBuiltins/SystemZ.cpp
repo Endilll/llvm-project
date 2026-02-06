@@ -10,6 +10,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <optional>
+
 #include "Address.h"
 #include "CodeGenFunction.h"
 #include "clang/AST/Expr.h"
@@ -24,6 +26,16 @@
 #include "llvm/IR/IntrinsicsS390.h"
 #include "llvm/IR/Type.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "CGBuilder.h"
+#include "CodeGenModule.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class Value;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

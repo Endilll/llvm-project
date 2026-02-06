@@ -13,12 +13,22 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_LANAI_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_LANAI_H
 
+#include <string>
+#include <string_view>
+
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/TargetParser/Triple.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallVector.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 
 class LLVM_LIBRARY_VISIBILITY LanaiTargetInfo : public TargetInfo {

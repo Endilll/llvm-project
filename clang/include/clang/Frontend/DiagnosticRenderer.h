@@ -16,15 +16,21 @@
 #define LLVM_CLANG_FRONTEND_DIAGNOSTICRENDERER_H
 
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/PointerUnion.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class ArrayRef;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 
 class LangOptions;
 class SourceManager;
+class DiagnosticOptions;
 
 using DiagOrStoredDiag =
     llvm::PointerUnion<const Diagnostic *, const StoredDiagnostic *>;

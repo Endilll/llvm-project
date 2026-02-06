@@ -14,14 +14,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "TokenAnalyzer.h"
-#include "AffectedRangeManager.h"
+
+#include <cassert>
+#include <memory>
+#include <utility>
+#include <map>
+#include <string>
+
 #include "Encoding.h"
 #include "FormatToken.h"
 #include "FormatTokenLexer.h"
 #include "TokenAnnotator.h"
 #include "UnwrappedLineParser.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -33,9 +38,7 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <utility>
+#include "llvm/ADT/StringRef.h"
 
 #define DEBUG_TYPE "format-formatter"
 

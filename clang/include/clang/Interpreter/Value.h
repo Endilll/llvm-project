@@ -33,7 +33,6 @@
 #ifndef LLVM_CLANG_INTERPRETER_VALUE_H
 #define LLVM_CLANG_INTERPRETER_VALUE_H
 
-#include <cassert>
 #include <cstdint>
 
 // NOTE: Since the REPL itself could also include this runtime, extreme caution

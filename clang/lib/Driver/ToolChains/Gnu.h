@@ -9,16 +9,41 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_GNU_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_GNU_H
 
+#include <set>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
+
 #include "clang/Driver/CudaInstallationDetector.h"
 #include "clang/Driver/LazyDetector.h"
 #include "clang/Driver/RocmInstallationDetector.h"
 #include "clang/Driver/SyclInstallationDetector.h"
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
-#include <set>
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
+#include "clang/Driver/Multilib.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace llvm {
+class Twine;
+class raw_ostream;
+namespace opt {
+class ArgList;
+}  // namespace opt
+namespace vfs {
+class FileSystem;
+}  // namespace vfs
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
 
 struct DetectedMultilibs {
   /// The set of multilibs that the detected installation supports.

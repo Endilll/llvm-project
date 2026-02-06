@@ -16,6 +16,16 @@
 #ifndef LLVM_CLANG_AST_OPENMPCLAUSE_H
 #define LLVM_CLANG_AST_OPENMPCLAUSE_H
 
+#include <cassert>
+#include <cstddef>
+#include <functional>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+
 #include "clang/AST/ASTFwd.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclarationName.h"
@@ -38,24 +48,27 @@
 #include "llvm/ADT/iterator.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
-#include "llvm/Frontend/OpenMP/OMPConstants.h"
 #include "llvm/Frontend/OpenMP/OMPContext.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <utility>
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/TemplateBase.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+namespace omp {
+enum class DefaultKind;
+}  // namespace omp
+}  // namespace llvm
 
 namespace clang {
 
 class ASTContext;
+class Attr;
 
 //===----------------------------------------------------------------------===//
 // AST classes for clauses.

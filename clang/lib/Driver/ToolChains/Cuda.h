@@ -9,20 +9,30 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_CUDA_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_CUDA_H
 
-#include "clang/Basic/Cuda.h"
+#include <vector>
+#include <string>
+
 #include "clang/Driver/Action.h"
 #include "clang/Driver/CudaInstallationDetector.h"
-#include "clang/Driver/Multilib.h"
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/Support/VersionTuple.h"
-#include <bitset>
-#include <set>
-#include <vector>
+#include "clang/Basic/LLVM.h"
+#include "llvm/Frontend/Debug/Options.h"
+#include "llvm/Option/Option.h"
+
+namespace llvm {
+class StringRef;
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace tools {
 namespace NVPTX {
 

@@ -12,7 +12,11 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "clang/AST/ASTContext.h"
+#include <algorithm>
+#include <cassert>
+#include <optional>
+#include <string>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -26,7 +30,6 @@
 #include "clang/ASTMatchers/ASTMatchersMacros.h"
 #include "clang/Analysis/ProgramPoint.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramStateTrait.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
@@ -35,10 +38,21 @@
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/LoopUnrolling.h"
-#include <algorithm>
-#include <cassert>
-#include <optional>
-#include <string>
+#include "clang/AST/APValue.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Analysis/CFG.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class ASTContext;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

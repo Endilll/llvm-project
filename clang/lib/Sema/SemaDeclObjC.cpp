@@ -10,10 +10,19 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <new>
+
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTMutationListener.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclObjC.h"
@@ -22,7 +31,6 @@
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/NSAPI.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Diagnostic.h"
@@ -58,14 +66,27 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdlib>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/Attr.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/ObjCRuntime.h"
+#include "clang/Basic/PartialDiagnostic.h"
+#include "clang/Sema/ExternalSemaSource.h"
+#include "clang/Sema/IdentifierResolver.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
 
 using namespace clang;
 

@@ -12,10 +12,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGCall.h"
+
+#include <algorithm>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <new>
+
 #include "ABIInfo.h"
 #include "ABIInfoImpl.h"
 #include "Address.h"
-#include "CGBlocks.h"
 #include "CGBuilder.h"
 #include "CGCXXABI.h"
 #include "CGCleanup.h"
@@ -39,11 +50,9 @@
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/GlobalDecl.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/CodeGenOptions.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/ExceptionSpecificationType.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
@@ -73,7 +82,6 @@
 #include "llvm/IR/DebugLoc.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/InlineAsm.h"
 #include "llvm/IR/InstrTypes.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/IntrinsicInst.h"
@@ -90,16 +98,44 @@
 #include "llvm/Support/ModRef.h"
 #include "llvm/Support/TypeSize.h"
 #include "llvm/Transforms/Utils/Local.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/RecordLayout.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/Analysis/SimplifyQuery.h"
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Value.h"
+#include "llvm/IR/ValueHandle.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
+
 using namespace clang;
 using namespace CodeGen;
 

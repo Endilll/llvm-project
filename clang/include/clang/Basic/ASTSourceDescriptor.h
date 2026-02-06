@@ -15,10 +15,12 @@
 #ifndef LLVM_CLANG_BASIC_ASTSOURCEDESCRIPTOR_H
 #define LLVM_CLANG_BASIC_ASTSOURCEDESCRIPTOR_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/Module.h"
 #include <string>
 #include <utility>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Module.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

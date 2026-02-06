@@ -13,29 +13,45 @@
 #ifndef LLVM_CLANG_INSTALLAPI_VISITOR_H
 #define LLVM_CLANG_INSTALLAPI_VISITOR_H
 
-#include "clang/AST/ASTConsumer.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclObjC.h"
-#include "clang/AST/GlobalDecl.h"
-#include "clang/AST/Mangle.h"
-#include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TargetInfo.h"
-#include "clang/InstallAPI/Context.h"
-#include "clang/InstallAPI/HeaderFile.h"
-#include "clang/Lex/Preprocessor.h"
-#include "llvm/ADT/Twine.h"
-#include "llvm/ADT/iterator_range.h"
-#include "llvm/TextAPI/Record.h"
 #include <memory>
 #include <optional>
 #include <string>
 
+#include "clang/AST/ASTConsumer.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Mangle.h"
+#include "clang/AST/RecursiveASTVisitor.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/InstallAPI/HeaderFile.h"
+#include "llvm/ADT/Twine.h"
+#include "clang/AST/ASTContext.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+namespace MachO {
+class ObjCContainerRecord;
+}  // namespace MachO
+template <typename IteratorT> class iterator_range;
+}  // namespace llvm
+
 namespace clang {
 struct AvailabilityInfo;
+class CXXMethodDecl;
+class CXXRecordDecl;
+class FunctionDecl;
+class NamedDecl;
+class ObjCCategoryDecl;
+class ObjCInterfaceDecl;
+class ObjCIvarDecl;
+class Preprocessor;
+class SourceManager;
+class VarDecl;
+struct ThunkInfo;
+
 namespace installapi {
+struct InstallAPIContext;
 
 /// ASTVisitor for collecting declarations that represent global symbols.
 class InstallAPIVisitor final : public ASTConsumer,

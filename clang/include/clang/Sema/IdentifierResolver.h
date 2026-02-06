@@ -14,12 +14,14 @@
 #ifndef LLVM_CLANG_SEMA_IDENTIFIERRESOLVER_H
 #define LLVM_CLANG_SEMA_IDENTIFIERRESOLVER_H
 
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/SmallVector.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 

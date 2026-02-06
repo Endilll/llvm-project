@@ -9,27 +9,41 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_COMMONARGS_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_COMMONARGS_H
 
+#include <string>
+#include <tuple>
+#include <vector>
+
 #include "clang/Basic/CodeGenOptions.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
-#include "clang/Driver/Driver.h"
-#include "clang/Driver/InputInfo.h"
 #include "clang/Driver/Multilib.h"
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Frontend/Debug/Options.h"
-#include "llvm/Option/Arg.h"
-#include "llvm/Option/ArgList.h"
 #include "llvm/Option/OptSpecifier.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/CodeGen.h"
-#include <string>
-#include <tuple>
-#include <vector>
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+
+namespace llvm {
+class Triple;
+class Twine;
+namespace opt {
+class Arg;
+class ArgList;
+}  // namespace opt
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Compilation;
+class Driver;
+class InputInfo;
+class JobAction;
+
 namespace tools {
 
 void addPathIfExists(const Driver &D, const Twine &Path,

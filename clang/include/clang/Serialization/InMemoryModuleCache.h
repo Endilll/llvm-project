@@ -9,12 +9,14 @@
 #ifndef LLVM_CLANG_SERIALIZATION_INMEMORYMODULECACHE_H
 #define LLVM_CLANG_SERIALIZATION_INMEMORYMODULECACHE_H
 
+#include <memory>
+#include <utility>
+
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include <memory>
-#include <utility>
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 

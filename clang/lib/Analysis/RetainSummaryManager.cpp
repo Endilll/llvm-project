@@ -13,6 +13,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/RetainSummaryManager.h"
+
+#include <cassert>
+#include <optional>
+#include <string>
+#include <new>
+#include <type_traits>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -31,9 +38,18 @@
 #include "clang/Basic/OperatorKinds.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
-#include <string>
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/Type.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
+
+namespace { struct GeneralizedConsumedAttr; }
+namespace { struct GeneralizedReturnsNotRetainedAttr; }
+namespace { struct GeneralizedReturnsRetainedAttr; }
 
 using namespace clang;
 using namespace ento;

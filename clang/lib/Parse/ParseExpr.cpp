@@ -20,11 +20,19 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <vector>
+#include <functional>
+#include <iterator>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Availability.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
 #include "clang/AST/LocInfoType.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/TypeBase.h"
@@ -65,11 +73,20 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <utility>
-#include <vector>
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/OpenCLOptions.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/Token.h"
+#include "clang/Sema/ParsedAttr.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
+
 using namespace clang;
 
 ExprResult

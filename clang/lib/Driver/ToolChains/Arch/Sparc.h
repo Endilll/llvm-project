@@ -9,14 +9,22 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_ARCH_SPARC_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_ARCH_SPARC_H
 
-#include "clang/Driver/Driver.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Option/Option.h"
 #include <string>
 #include <vector>
 
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
+
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace tools {
 namespace sparc {
 

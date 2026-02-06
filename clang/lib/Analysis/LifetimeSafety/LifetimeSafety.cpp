@@ -12,22 +12,27 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Analysis/Analyses/LifetimeSafety/LifetimeSafety.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/Type.h"
+
+#include <memory>
+
 #include "clang/Analysis/Analyses/LifetimeSafety/Checker.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Facts.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/FactsGenerator.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/LifetimeStats.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/LiveOrigins.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/LoanPropagation.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Origins.h"
 #include "clang/Analysis/AnalysisDeclContext.h"
-#include "clang/Analysis/CFG.h"
-#include "llvm/ADT/FoldingSet.h"
 #include "llvm/Support/Debug.h"
-#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TimeProfiler.h"
-#include <memory>
+#include "llvm/ADT/StringRef.h"
+
+namespace clang {
+class CFG;
+class Stmt;
+namespace lifetimes {
+struct LifetimeSafetyStats;
+}  // namespace lifetimes
+}  // namespace clang
 
 namespace clang::lifetimes {
 namespace internal {

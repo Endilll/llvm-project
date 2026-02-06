@@ -7,6 +7,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "Gnu.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <initializer_list>
+#include <iterator>
+
 #include "Arch/ARM.h"
 #include "Arch/CSKY.h"
 #include "Arch/LoongArch.h"
@@ -15,8 +29,6 @@
 #include "Arch/RISCV.h"
 #include "Arch/Sparc.h"
 #include "Arch/SystemZ.h"
-#include "clang/Basic/DiagnosticDriver.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Config/config.h" // for GCC_INSTALL_PREFIX
 #include "clang/Driver/Action.h"
@@ -48,17 +60,17 @@
 #include "llvm/TargetParser/ARMTargetParser.h"
 #include "llvm/TargetParser/ARMTargetParserCommon.h"
 #include "llvm/TargetParser/RISCVISAInfo.h"
-#include "llvm/TargetParser/TargetParser.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Driver/InputInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Option/Arg.h"
+#include "llvm/Option/OptSpecifier.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/raw_ostream.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

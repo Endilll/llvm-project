@@ -12,13 +12,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtVisitor.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
-#include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
@@ -32,8 +35,17 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/Support/raw_ostream.h"
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/StmtIterator.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class AnalysisDeclContext;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

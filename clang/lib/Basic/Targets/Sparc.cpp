@@ -11,9 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "Sparc.h"
+
+#include <iterator>
+
 #include "TargetDefines.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/MacroBuilder.h"
 #include "clang/Basic/TargetInfo.h"
 #include "llvm/ADT/ArrayRef.h"
@@ -21,7 +23,6 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <iterator>
 
 using namespace clang;
 using namespace clang::targets;

@@ -11,6 +11,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <array>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
+
 #include "Address.h"
 #include "CGCall.h"
 #include "CGDebugInfo.h"
@@ -20,7 +27,6 @@
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/NonTrivialTypeVisitor.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/CodeGen/CodeGenABITypes.h"
@@ -29,16 +35,39 @@
 #include "llvm/IR/Argument.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/Instructions.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/ScopedPrinter.h"
-#include <array>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <string>
-#include <utility>
+#include "CGBuilder.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/RecordLayout.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace CodeGen {
+class CGFunctionInfo;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class BasicBlock;
+class PHINode;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

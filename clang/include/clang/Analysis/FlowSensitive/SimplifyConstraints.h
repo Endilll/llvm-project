@@ -9,13 +9,15 @@
 #ifndef LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_SIMPLIFYCONSTRAINTS_H
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_SIMPLIFYCONSTRAINTS_H
 
-#include "clang/Analysis/FlowSensitive/Arena.h"
-#include "clang/Analysis/FlowSensitive/Formula.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallVector.h"
+#include "clang/Basic/LLVM.h"
 
 namespace clang {
 namespace dataflow {
+class Arena;
+class Formula;
+enum class Atom : unsigned int;
 
 /// Information on the way a set of constraints was simplified.
 struct SimplifyConstraintsInfo {

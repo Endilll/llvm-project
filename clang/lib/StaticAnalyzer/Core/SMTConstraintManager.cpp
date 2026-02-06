@@ -7,9 +7,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/SMTConstraintManager.h"
+
+#include <memory>
+
 #include "clang/StaticAnalyzer/Core/PathSensitive/ConstraintManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
-#include <memory>
+
+namespace clang {
+namespace ento {
+class ExprEngine;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

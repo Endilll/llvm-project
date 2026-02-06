@@ -13,6 +13,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/AnalysisBasedWarnings.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <deque>
+#include <iterator>
+#include <list>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <tuple>
+
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/AttrIterator.h"
 #include "clang/AST/Decl.h"
@@ -22,7 +37,6 @@
 #include "clang/AST/EvaluatedExprVisitor.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
-#include "clang/AST/ExprObjC.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/ParentMap.h"
@@ -70,22 +84,25 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/iterator_range.h"
-#include "llvm/Support/Debug.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <deque>
-#include <iterator>
-#include <list>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Module;
+}  // namespace clang
 
 using namespace clang;
 

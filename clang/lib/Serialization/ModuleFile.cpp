@@ -12,12 +12,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Serialization/ModuleFile.h"
+
 #include "ASTReaderInternals.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Serialization/ContinuousRangeMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
+#include "clang/Serialization/ModuleFileExtension.h"
 
 using namespace clang;
 using namespace serialization;

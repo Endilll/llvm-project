@@ -9,13 +9,20 @@
 #ifndef LLVM_CLANG_AST_INTERP_EVALUATION_RESULT_H
 #define LLVM_CLANG_AST_INTERP_EVALUATION_RESULT_H
 
+#include <assert.h>
+#include <utility>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 namespace interp {
-class EvalEmitter;
 class Context;
 class Pointer;
 class SourceInfo;

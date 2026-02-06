@@ -12,6 +12,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/AnalysisDeclContext.h"
+
+#include <cassert>
+#include <functional>
+#include <memory>
+#include <string>
+#include <utility>
+#include <new>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -43,11 +51,14 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <functional>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

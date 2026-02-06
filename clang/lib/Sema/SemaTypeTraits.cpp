@@ -10,6 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclAccessPair.h"
 #include "clang/AST/DeclCXX.h"
@@ -48,11 +55,24 @@
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Sema/SemaBase.h"
+#include "clang/Sema/TemplateDeduction.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

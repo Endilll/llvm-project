@@ -11,13 +11,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <utility>
+#include <string>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/Stmt.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/CommonBugCategories.h"
@@ -29,8 +31,28 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <utility>
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class ReturnStmt;
+namespace ento {
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

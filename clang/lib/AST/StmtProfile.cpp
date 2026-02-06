@@ -10,6 +10,9 @@
 // representation that identifies a statement/expression.
 //
 //===----------------------------------------------------------------------===//
+#include <cassert>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -35,7 +38,30 @@
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTConcept.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/LambdaCapture.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/StmtCXX.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/StmtObjC.h"
+#include "clang/AST/StmtOpenACC.h"
+#include "clang/AST/StmtOpenMP.h"
+#include "clang/AST/StmtSYCL.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class IdentifierInfo;
+}  // namespace clang
+
 using namespace clang;
 
 namespace {
@@ -456,6 +482,7 @@ public:
 #define GEN_CLANG_CLAUSE_CLASS
 #define CLAUSE_CLASS(Enum, Str, Class) void Visit##Class(const Class *C);
 #include "llvm/Frontend/OpenMP/OMP.inc"
+
   void VisitOMPClauseWithPreInit(const OMPClauseWithPreInit *C);
   void VisitOMPClauseWithPostUpdate(const OMPClauseWithPostUpdate *C);
 };

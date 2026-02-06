@@ -12,13 +12,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/Sema.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "UsedDeclVisitor.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTDiagnostic.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/ComparisonCategories.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -30,22 +39,16 @@
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/NSAPI.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/PrettyDeclStackTrace.h"
 #include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/RawCommentList.h"
 #include "clang/AST/Redeclarable.h"
 #include "clang/AST/Stmt.h"
-#include "clang/AST/StmtCXX.h"
-#include "clang/AST/StmtOpenMP.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/UnresolvedSet.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/CapturedStmt.h"
 #include "clang/Basic/DarwinSDKInfo.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
-#include "clang/Basic/DiagnosticOptions.h"
-#include "clang/Basic/DiagnosticSema.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
@@ -61,7 +64,6 @@
 #include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/HeaderSearchOptions.h"
 #include "clang/Lex/Lexer.h"
-#include "clang/Lex/ModuleLoader.h"
 #include "clang/Lex/ModuleMap.h"
 #include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
@@ -69,16 +71,13 @@
 #include "clang/Sema/AnalysisBasedWarnings.h"
 #include "clang/Sema/CXXFieldCollector.h"
 #include "clang/Sema/CleanupInfo.h"
-#include "clang/Sema/CodeCompleteConsumer.h"
 #include "clang/Sema/DeclSpec.h"
 #include "clang/Sema/EnterExpressionEvaluationContext.h"
 #include "clang/Sema/ExternalSemaSource.h"
 #include "clang/Sema/Initialization.h"
 #include "clang/Sema/MultiplexExternalSemaSource.h"
-#include "clang/Sema/ObjCMethodList.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/ParsedAttr.h"
-#include "clang/Sema/RISCVIntrinsicManager.h"
 #include "clang/Sema/Scope.h"
 #include "clang/Sema/ScopeInfo.h"
 #include "clang/Sema/SemaAMDGPU.h"
@@ -112,7 +111,6 @@
 #include "clang/Sema/SemaX86.h"
 #include "clang/Sema/TemplateDeduction.h"
 #include "clang/Sema/TemplateInstCallback.h"
-#include "clang/Sema/TypoCorrection.h"
 #include "clang/Sema/Weak.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APInt.h"
@@ -129,14 +127,16 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/OpenMPClause.h"
+#include "clang/AST/TypeOrdering.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Lex/MacroInfo.h"
+#include "clang/Sema/Lookup.h"
+#include "clang/Sema/SemaConcept.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 using namespace sema;

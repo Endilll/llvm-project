@@ -10,6 +10,16 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
+#include <tuple>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -17,7 +27,6 @@
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/OpenACCClause.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/DiagnosticSema.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OpenACCKinds.h"
@@ -31,14 +40,15 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <utility>
-#include <variant>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 

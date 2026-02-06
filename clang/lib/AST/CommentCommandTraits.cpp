@@ -7,13 +7,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/CommentCommandTraits.h"
-#include "clang/Basic/CommentOptions.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/Support/Allocator.h"
+
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <iterator>
+#include <vector>
+
+#include "clang/Basic/CommentOptions.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 namespace comments {

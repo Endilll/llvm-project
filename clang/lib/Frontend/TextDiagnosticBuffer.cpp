@@ -11,10 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/TextDiagnosticBuffer.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/Support/ErrorHandling.h"
+
 #include <string>
+
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/ADT/SmallString.h"
 
 using namespace clang;
 

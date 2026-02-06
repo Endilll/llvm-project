@@ -11,6 +11,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/Builtins.h"
+
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
+#include <initializer_list>
+#include <vector>
+
 #include "BuiltinTargetFeatures.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
@@ -21,13 +32,8 @@
 #include "llvm/ADT/StringTable.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <cstdlib>
-#include <cstring>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <utility>
+#include "llvm/ADT/Twine.h"
+
 using namespace clang;
 
 const char *HeaderDesc::getName() const {
@@ -36,6 +42,7 @@ const char *HeaderDesc::getName() const {
   case ID:                                                                     \
     return NAME;
 #include "clang/Basic/BuiltinHeaders.def"
+
 #undef HEADER
   };
   llvm_unreachable("Unknown HeaderDesc::HeaderID enum");
@@ -45,6 +52,7 @@ static constexpr unsigned NumBuiltins = Builtin::FirstTSBuiltin;
 
 #define GET_BUILTIN_STR_TABLE
 #include "clang/Basic/Builtins.inc"
+
 #undef GET_BUILTIN_STR_TABLE
 
 static constexpr Builtin::Info BuiltinInfos[] = {

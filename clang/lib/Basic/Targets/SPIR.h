@@ -13,14 +13,27 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_SPIR_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_SPIR_H
 
-#include "Targets.h"
+#include <assert.h>
+#include <optional>
+#include <algorithm>
+#include <memory>
+#include <string>
+#include <string_view>
+
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Basic/TargetOptions.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/Support/VersionTuple.h"
 #include "llvm/TargetParser/Triple.h"
-#include <optional>
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Frontend/OpenMP/OMPGridValues.h"
 
 namespace clang {
 namespace targets {

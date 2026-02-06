@@ -13,20 +13,23 @@
 #ifndef LLVM_CLANG_AST_COMMENTPARSER_H
 #define LLVM_CLANG_AST_COMMENTPARSER_H
 
+#include <iterator>
+
 #include "clang/AST/Comment.h"
 #include "clang/AST/CommentLexer.h"
-#include "clang/AST/CommentSema.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/Support/Allocator.h"
-#include <iterator>
+#include "clang/AST/CommentCommandTraits.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace clang {
 class SourceManager;
 
 namespace comments {
-class CommandTraits;
+class Sema;
+class TextTokenRetokenizer;
 
 /// Doxygen comment parser.
 class Parser {

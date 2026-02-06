@@ -7,6 +7,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "Compiler.h"
+#include "IntegralAP.h"
+
+#include <sys/types.h>
+#include <algorithm>
+#include <cstddef>
+#include <functional>
+#include <optional>
+#include <string>
+#include <utility>
+#include <initializer_list>
+#include <iterator>
+
 #include "ByteCode/Descriptor.h"
 #include "ByteCode/EvalEmitter.h"
 #include "ByteCode/InterpBlock.h"
@@ -25,7 +37,6 @@
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/ComparisonCategories.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/Expr.h"
@@ -48,15 +59,19 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <optional>
-#include <string>
-#include <sys/types.h>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Type.h"
+#include "llvm/ADT/APFixedPoint.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/PointerUnion.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::interp;

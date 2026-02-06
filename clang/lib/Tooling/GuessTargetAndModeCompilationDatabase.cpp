@@ -6,14 +6,16 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Tooling/CompilationDatabase.h"
-#include "clang/Tooling/Tooling.h"
 #include <cassert>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/Tooling/CompilationDatabase.h"
+#include "clang/Tooling/Tooling.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 namespace tooling {

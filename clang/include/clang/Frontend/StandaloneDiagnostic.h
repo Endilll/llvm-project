@@ -14,17 +14,18 @@
 #ifndef LLVM_CLANG_FRONTEND_STANDALONEDIAGNOSTICS_H
 #define LLVM_CLANG_FRONTEND_STANDALONEDIAGNOSTICS_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
-#include "clang/Basic/DiagnosticOptions.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "llvm/ADT/StringMap.h"
-#include <cassert>
 #include <string>
 #include <vector>
 
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/StringMap.h"
+
 namespace clang {
+class CharSourceRange;
+class FileManager;
+class LangOptions;
+class SourceLocation;
 
 /// Represents a StoredDiagnostic in a form that can be retained until after its
 /// SourceManager has been destroyed.

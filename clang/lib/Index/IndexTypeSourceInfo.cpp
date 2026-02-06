@@ -6,11 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <vector>
+
 #include "IndexingContext.h"
-#include "clang/AST/ASTConcept.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
-#include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/AST/TemplateName.h"
 #include "clang/AST/TypeLoc.h"
@@ -18,8 +19,19 @@
 #include "clang/Index/IndexSymbol.h"
 #include "clang/Sema/HeuristicResolver.h"
 #include "llvm/ADT/ScopeExit.h"
-#include <cassert>
-#include <vector>
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class DeclContext;
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 using namespace index;

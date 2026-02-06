@@ -11,14 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/CodeGen/ModuleBuilder.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <tuple>
+#include <vector>
+
 #include "CGDebugInfo.h"
 #include "CodeGenModule.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclGroup.h"
-#include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclOpenMP.h"
-#include "clang/AST/Expr.h"
 #include "clang/Basic/CodeGenOptions.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
@@ -26,17 +33,20 @@
 #include "clang/Frontend/CompilerInstance.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/IR/DataLayout.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/Regex.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FormatVariadicDetails.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 using namespace CodeGen;

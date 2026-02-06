@@ -9,13 +9,15 @@
 // This file implements the Expression parsing implementation for C++.
 //
 //===----------------------------------------------------------------------===//
+#include <cassert>
+#include <iterator>
+#include <numeric>
+#include <string>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclTemplate.h"
-#include "clang/AST/ExprCXX.h"
-#include "clang/AST/ExprConcepts.h"
-#include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/AttributeScopeInfo.h"
 #include "clang/Basic/Diagnostic.h"
@@ -47,11 +49,18 @@
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <iterator>
-#include <numeric>
-#include <string>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/Token.h"
+#include "clang/Sema/Sema.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

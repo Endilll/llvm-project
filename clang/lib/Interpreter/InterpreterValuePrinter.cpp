@@ -10,10 +10,23 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <stdlib.h>
+#include <cassert>
+#include <cmath>
+#include <cstdarg>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+#include <array>
+#include <memory>
+#include <new>
+
 #include "IncrementalAction.h"
 #include "InterpreterUtils.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
@@ -28,14 +41,11 @@
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Interpreter/Interpreter.h"
 #include "clang/Interpreter/Value.h"
-#include "clang/Lex/Preprocessor.h"
 #include "clang/Sema/DeclSpec.h"
 #include "clang/Sema/Lookup.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/Redeclaration.h"
-#include "clang/Sema/Scope.h"
 #include "clang/Sema/Sema.h"
-
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
@@ -44,15 +54,23 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
+#include "clang/AST/ASTConsumer.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/CodeGen/ModuleBuilder.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Format.h"
 
-#include <cassert>
-#include <cmath>
-#include <cstdarg>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
+namespace clang {
+class Scope;
+}  // namespace clang
 
 #define DEBUG_TYPE "interp-value"
 

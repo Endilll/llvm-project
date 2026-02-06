@@ -13,16 +13,19 @@
 #ifndef LLVM_CLANG_AST_INTERP_BLOCK_H
 #define LLVM_CLANG_AST_INTERP_BLOCK_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <cstddef>
+#include <cstring>
+#include <optional>
+
 #include "Descriptor.h"
 #include "llvm/Support/raw_ostream.h"
+#include "clang/Basic/UnsignedOrNone.h"
 
 namespace clang {
 namespace interp {
-class Block;
-class DeadBlock;
-class InterpState;
 class Pointer;
-enum PrimType : uint8_t;
 
 /// A memory block, either on the stack or in the heap.
 ///

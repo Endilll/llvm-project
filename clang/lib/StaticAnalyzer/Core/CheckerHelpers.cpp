@@ -11,6 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerHelpers.h"
+
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/Expr.h"
@@ -19,7 +26,6 @@
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/AttrKinds.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/MacroInfo.h"
 #include "clang/Lex/Preprocessor.h"
@@ -27,16 +33,22 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
-#include "llvm/ADT/APInt.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <optional>
-#include <utility>
-#include <vector>
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+class APInt;
+}  // namespace llvm
 
 namespace clang {
+enum OverloadedOperatorKind : int;
 
 namespace ento {
 
@@ -211,6 +223,7 @@ OperatorKind operationKindFromOverloadedOperator(OverloadedOperatorKind OOK,
     }                                                                          \
     break;
 #include "clang/Basic/OperatorKinds.def"
+
   default:
     llvm_unreachable("unexpected operator kind");
   }

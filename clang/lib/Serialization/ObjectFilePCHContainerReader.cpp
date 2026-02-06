@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Serialization/ObjectFilePCHContainerReader.h"
+
+#include <memory>
+#include <system_error>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/Object/COFF.h"
 #include "llvm/Object/Error.h"
@@ -14,6 +18,10 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Object/SymbolicFile.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

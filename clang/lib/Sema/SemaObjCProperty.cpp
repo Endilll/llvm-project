@@ -11,7 +11,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/AST/ASTMutationListener.h"
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <memory>
+#include <string>
+#include <utility>
+#include <optional>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclObjC.h"
@@ -20,7 +27,6 @@
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticSema.h"
@@ -43,12 +49,27 @@
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <cstring>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/ObjCRuntime.h"
+#include "clang/Sema/Sema.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Scope;
+}  // namespace clang
 
 using namespace clang;
 

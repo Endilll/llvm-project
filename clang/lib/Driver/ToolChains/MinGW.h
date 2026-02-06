@@ -9,17 +9,31 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_MINGW_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_MINGW_H
 
-#include "Cuda.h"
+#include <memory>
+#include <string>
+
 #include "Gnu.h"
 #include "clang/Driver/CudaInstallationDetector.h"
 #include "clang/Driver/LazyDetector.h"
 #include "clang/Driver/RocmInstallationDetector.h"
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
-#include "llvm/Support/ErrorOr.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace tools {
 
 /// Directly call GNU Binutils assembler and linker

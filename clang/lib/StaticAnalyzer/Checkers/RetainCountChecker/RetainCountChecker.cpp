@@ -12,11 +12,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "RetainCountChecker.h"
+
+#include <memory>
+#include <optional>
+#include <utility>
+
 #include "RetainCountChecker/RetainCountDiagnostics.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/Expr.h"
@@ -49,10 +53,22 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "clang/AST/ParentMap.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/Type.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/ImmutableMap.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

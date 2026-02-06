@@ -10,11 +10,21 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <list>
+#include <string>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Rewrite/Core/TokenRewriter.h"
 #include "clang/Rewrite/Frontend/Rewriters.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/Token.h"
+#include "llvm/Support/raw_ostream.h"
+
+namespace clang {
+class LangOptions;
+}  // namespace clang
 
 void clang::DoRewriteTest(Preprocessor &PP, raw_ostream *OS) {
   SourceManager &SM = PP.getSourceManager();

@@ -11,10 +11,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/TokenLexer.h"
+
+#include <cassert>
+#include <cstring>
+#include <optional>
+#include <vector>
+
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticLex.h"
 #include "clang/Basic/IdentifierTable.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
@@ -29,9 +33,9 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/iterator_range.h"
-#include <cassert>
-#include <cstring>
-#include <optional>
+#include "clang/Basic/DiagnosticLexInterface.inc"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 

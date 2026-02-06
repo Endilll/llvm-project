@@ -15,15 +15,20 @@
 #ifndef LLVM_CLANG_REWRITE_FRONTEND_FIXITREWRITER_H
 #define LLVM_CLANG_REWRITE_FRONTEND_FIXITREWRITER_H
 
+#include <memory>
+#include <string>
+#include <vector>
+#include <iterator>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Edit/EditedSource.h"
 #include "clang/Rewrite/Core/Rewriter.h"
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 

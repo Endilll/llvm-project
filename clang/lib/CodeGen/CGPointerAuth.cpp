@@ -11,13 +11,18 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <utility>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGPointerAuthInfo.h"
 #include "CGValue.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/TypeBase.h"
@@ -25,17 +30,34 @@
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/CodeGen/CodeGenABITypes.h"
-#include "clang/CodeGen/ConstantInitBuilder.h"
 #include "llvm/Analysis/ValueTracking.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SipHash.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/PointerAuthOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Analysis/SimplifyQuery.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class BasicBlock;
+class Type;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

@@ -11,6 +11,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <functional>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "ErrnoModeling.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
@@ -20,9 +26,13 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
-#include <cassert>
-#include <functional>
-#include <optional>
+#include "clang/AST/Expr.h"
+#include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 using namespace ento;

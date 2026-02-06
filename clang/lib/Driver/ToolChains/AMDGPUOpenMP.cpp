@@ -7,20 +7,31 @@
 //===----------------------------------------------------------------------===//
 
 #include "AMDGPUOpenMP.h"
+
+#include <cassert>
+#include <string>
+
 #include "AMDGPU.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Sanitizers.h"
 #include "clang/Basic/TargetID.h"
 #include "clang/Driver/Action.h"
-#include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
-#include "clang/Driver/Tool.h"
 #include "clang/Options/Options.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/Option/Arg.h"
 #include "llvm/Option/OptTable.h"
 #include "llvm/Option/Option.h"
-#include <cassert>
+#include "ToolChains/Gnu.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/Support/VersionTuple.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class Arg;
+}  // namespace opt
+}  // namespace llvm
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

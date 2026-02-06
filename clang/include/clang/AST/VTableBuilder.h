@@ -13,27 +13,35 @@
 #ifndef LLVM_CLANG_AST_VTABLEBUILDER_H
 #define LLVM_CLANG_AST_VTABLEBUILDER_H
 
-#include "clang/AST/BaseSubobject.h"
-#include "clang/AST/CXXInheritance.h"
-#include "clang/AST/CharUnits.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/GlobalDecl.h"
-#include "clang/AST/RecordLayout.h"
-#include "clang/Basic/ABI.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/Thunk.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/Support/ErrorHandling.h"
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <tuple>
 #include <utility>
+#include <iterator>
+
+#include "clang/AST/BaseSubobject.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/Basic/ABI.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Thunk.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "clang/AST/DeclBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
-  class CXXRecordDecl;
+class ASTContext;
 
 /// Represents a single component in a vtable.
 class VTableComponent {

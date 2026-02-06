@@ -13,9 +13,6 @@
 #ifndef LLVM_CLANG_SEMA_SEMASYCL_H
 #define LLVM_CLANG_SEMA_SEMASYCL_H
 
-#include "clang/AST/ASTFwd.h"
-#include "clang/AST/Type.h"
-#include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/SemaBase.h"
 #include "llvm/ADT/DenseSet.h"
@@ -23,6 +20,13 @@
 namespace clang {
 class Decl;
 class ParsedAttr;
+class CompoundStmt;
+class FunctionDecl;
+class QualType;
+class Sema;
+class SourceLocation;
+class TypeSourceInfo;
+class ValueDecl;
 
 class SemaSYCL : public SemaBase {
 public:

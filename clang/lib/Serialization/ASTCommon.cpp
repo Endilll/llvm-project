@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "ASTCommon.h"
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -22,6 +23,7 @@
 #include "clang/Serialization/ASTDeserializationListener.h"
 #include "llvm/Support/DJB.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "clang/AST/DeclarationName.h"
 
 using namespace clang;
 
@@ -224,11 +226,13 @@ serialization::TypeIdxFromBuiltin(const BuiltinType *BT) {
     ID = PREDEF_TYPE_##Id##_ID; \
     break;
 #include "clang/Basic/OpenCLImageTypes.def"
+
 #define EXT_OPAQUE_TYPE(ExtType, Id, Ext) \
   case BuiltinType::Id: \
     ID = PREDEF_TYPE_##Id##_ID; \
     break;
 #include "clang/Basic/OpenCLExtensionTypes.def"
+
   case BuiltinType::OCLSampler:
     ID = PREDEF_TYPE_SAMPLER_ID;
     break;
@@ -249,31 +253,37 @@ serialization::TypeIdxFromBuiltin(const BuiltinType *BT) {
     ID = PREDEF_TYPE_##Id##_ID; \
     break;
 #include "clang/Basic/AArch64ACLETypes.def"
+
 #define PPC_VECTOR_TYPE(Name, Id, Size) \
   case BuiltinType::Id: \
     ID = PREDEF_TYPE_##Id##_ID; \
     break;
 #include "clang/Basic/PPCTypes.def"
+
 #define RVV_TYPE(Name, Id, SingletonId)                                        \
   case BuiltinType::Id:                                                        \
     ID = PREDEF_TYPE_##Id##_ID;                                                \
     break;
 #include "clang/Basic/RISCVVTypes.def"
+
 #define WASM_TYPE(Name, Id, SingletonId)                                       \
   case BuiltinType::Id:                                                        \
     ID = PREDEF_TYPE_##Id##_ID;                                                \
     break;
 #include "clang/Basic/WebAssemblyReferenceTypes.def"
+
 #define AMDGPU_TYPE(Name, Id, SingletonId, Width, Align)                       \
   case BuiltinType::Id:                                                        \
     ID = PREDEF_TYPE_##Id##_ID;                                                \
     break;
 #include "clang/Basic/AMDGPUTypes.def"
+
 #define HLSL_INTANGIBLE_TYPE(Name, Id, SingletonId)                            \
   case BuiltinType::Id:                                                        \
     ID = PREDEF_TYPE_##Id##_ID;                                                \
     break;
 #include "clang/Basic/HLSLIntangibleTypes.def"
+
   case BuiltinType::BuiltinFn:
     ID = PREDEF_TYPE_BUILTIN_FN;
     break;

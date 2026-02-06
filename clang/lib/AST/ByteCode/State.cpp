@@ -7,10 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "State.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <utility>
+
 #include "Frame.h"
-#include "Program.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/CXXInheritance.h"
 #include "clang/AST/OptionalDiagnostic.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticAST.h"
@@ -21,10 +25,14 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <utility>
+#include "ByteCode/Source.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace clang::interp;

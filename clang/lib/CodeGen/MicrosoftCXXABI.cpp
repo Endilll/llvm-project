@@ -13,6 +13,20 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <new>
+#include <string>
+#include <variant>
+
 #include "ABIInfo.h"
 #include "Address.h"
 #include "CGBuilder.h"
@@ -25,7 +39,6 @@
 #include "CodeGenModule.h"
 #include "CodeGenTypes.h"
 #include "EHScopeStack.h"
-#include "TargetInfo.h"
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
@@ -39,11 +52,9 @@
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/StmtCXX.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/VTableBuilder.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/AddressSpaces.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Linkage.h"
 #include "clang/Basic/SourceLocation.h"
@@ -71,20 +82,46 @@
 #include "llvm/IR/InstrTypes.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
-#include "llvm/IR/Intrinsics.h"
 #include "llvm/Support/AtomicOrdering.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "CodeGenFunction.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/TypeOrdering.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/CodeGen/CGFunctionInfo.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Stmt;
+}  // namespace clang
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

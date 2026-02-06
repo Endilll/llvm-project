@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "InterpStack.h"
+
+#include <cstdlib>
+#include <iterator>
+
 #include "Boolean.h"
 #include "ByteCode/PrimType.h"
 #include "FixedPoint.h"
@@ -17,8 +21,8 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdlib>
+#include "ByteCode/IntegralAP.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 using namespace clang::interp;

@@ -14,20 +14,23 @@
 #ifndef LLVM_CLANG_FRONTEND_SARIFDIAGNOSTICPRINTER_H
 #define LLVM_CLANG_FRONTEND_SARIFDIAGNOSTICPRINTER_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/Sarif.h"
-#include "llvm/ADT/StringRef.h"
 #include <cassert>
 #include <memory>
 #include <string>
 #include <utility>
 
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Sarif.h"
+#include "llvm/ADT/StringRef.h"
+#include "clang/Frontend/SARIFDiagnostic.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
+
 namespace clang {
 class DiagnosticOptions;
-class LangOptions;
-class SARIFDiagnostic;
-class SarifDocumentWriter;
 
 class SARIFDiagnosticPrinter : public DiagnosticConsumer {
 public:

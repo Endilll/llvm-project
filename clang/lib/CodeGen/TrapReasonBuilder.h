@@ -13,6 +13,13 @@
 #ifndef LLVM_CLANG_CODEGEN_TRAP_REASON_BUILDER_H
 #define LLVM_CLANG_CODEGEN_TRAP_REASON_BUILDER_H
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 namespace CodeGen {

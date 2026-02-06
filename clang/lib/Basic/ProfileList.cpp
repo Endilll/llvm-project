@@ -12,6 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/ProfileList.h"
+
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -20,11 +26,14 @@
 #include "llvm/Frontend/Driver/CodeGenOptions.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SpecialCaseList.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
 
-#include <memory>
-#include <optional>
-#include <string>
-#include <vector>
+namespace llvm {
+namespace vfs {
+class FileSystem;
+}  // namespace vfs
+}  // namespace llvm
 
 using namespace clang;
 

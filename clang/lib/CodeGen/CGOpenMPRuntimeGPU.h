@@ -14,12 +14,37 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGOPENMPRUNTIMEGPU_H
 #define LLVM_CLANG_LIB_CODEGEN_CGOPENMPRUNTIMEGPU_H
 
+#include <iterator>
+#include <memory>
+#include <utility>
+
 #include "CGOpenMPRuntime.h"
 #include "CodeGenFunction.h"
-#include "clang/AST/StmtOpenMP.h"
+#include "Address.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/OpenMPKinds.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Value.h"
+
+namespace llvm {
+class Constant;
+class Function;
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
+class OMPExecutableDirective;
+
 namespace CodeGen {
+class CodeGenModule;
 
 class CGOpenMPRuntimeGPU : public CGOpenMPRuntime {
 public:

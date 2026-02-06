@@ -15,11 +15,17 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_CHECKER_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_CHECKER_H
 
-#include "clang/Analysis/Analyses/LifetimeSafety/Facts.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/LifetimeSafety.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/LiveOrigins.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/LoanPropagation.h"
-#include "clang/Analysis/AnalysisDeclContext.h"
+namespace clang {
+class AnalysisDeclContext;
+namespace lifetimes {
+class LifetimeSafetySemaHelper;
+namespace internal {
+class FactManager;
+class LiveOriginsAnalysis;
+class LoanPropagationAnalysis;
+}  // namespace internal
+}  // namespace lifetimes
+}  // namespace clang
 
 namespace clang::lifetimes::internal {
 

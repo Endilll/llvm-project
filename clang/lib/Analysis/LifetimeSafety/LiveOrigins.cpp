@@ -7,20 +7,33 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/LifetimeSafety/LiveOrigins.h"
+
+#include <cassert>
+#include <memory>
+#include <utility>
+
 #include "Dataflow.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Facts.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Origins.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Utils.h"
-#include "clang/Analysis/AnalysisDeclContext.h"
-#include "clang/Analysis/CFG.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
+#include "clang/AST/Decl.h"
+#include "clang/AST/Expr.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class AnalysisDeclContext;
+class CFG;
+}  // namespace clang
 
 namespace clang::lifetimes::internal {
 namespace {

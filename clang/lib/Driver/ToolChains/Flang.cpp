@@ -7,6 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "Flang.h"
+
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <tuple>
+#include <initializer_list>
+#include <optional>
+#include <vector>
+
 #include "Arch/RISCV.h"
 
 #include "clang/Basic/CodeGenOptions.h"
@@ -38,12 +48,16 @@
 #include "llvm/TargetParser/Host.h"
 #include "llvm/TargetParser/RISCVISAInfo.h"
 #include "llvm/TargetParser/RISCVTargetParser.h"
-
-#include <cassert>
-#include <cstddef>
-#include <memory>
-#include <string>
-#include <tuple>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/Option/OptSpecifier.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

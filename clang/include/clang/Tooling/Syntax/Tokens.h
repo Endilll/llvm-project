@@ -27,24 +27,32 @@
 #ifndef LLVM_CLANG_TOOLING_SYNTAX_TOKENS_H
 #define LLVM_CLANG_TOOLING_SYNTAX_TOKENS_H
 
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TokenKinds.h"
-#include "clang/Lex/Token.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/raw_ostream.h"
 #include <optional>
 #include <string>
 #include <tuple>
 #include <utility>
 #include <vector>
 
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
+
 namespace clang {
 class Preprocessor;
+class LangOptions;
+class SourceManager;
+class Token;
+namespace tok {
+enum TokenKind : unsigned short;
+}  // namespace tok
 
 namespace syntax {
 

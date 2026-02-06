@@ -11,10 +11,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/Lexer.h"
+
+#include <sys/types.h>
+#include <smmintrin.h>
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <optional>
+#include <string>
+#include <iterator>
+
 #include "UnicodeCharSets.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticLex.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -40,19 +52,9 @@
 #include "llvm/Support/Unicode.h"
 #include "llvm/Support/UnicodeCharRanges.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <limits>
-#include <optional>
-#include <string>
-#include <sys/types.h>
-
-#ifdef __SSE4_2__
-#include <nmmintrin.h>
-#endif
+#include "clang/Basic/DiagnosticLexInterface.inc"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
 
 using namespace clang;
 
@@ -120,6 +122,7 @@ bool Token::isSimpleTypeSpecifier(const LangOptions &LangOpts) const {
   case tok::kw__Sat:
 #define TRANSFORM_TYPE_TRAIT_DEF(_, Trait) case tok::kw___##Trait:
 #include "clang/Basic/TransformTypeTraits.def"
+
   case tok::kw___auto_type:
   case tok::kw_char16_t:
   case tok::kw_char32_t:
@@ -2866,6 +2869,7 @@ static bool isEndOfBlockCommentWithEscapedNewLine(const char *CurPtr, Lexer *L,
 #include <emmintrin.h>
 #elif __ALTIVEC__
 #include <altivec.h>
+
 #undef bool
 #endif
 

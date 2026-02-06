@@ -18,13 +18,14 @@
 #include <system_error>
 #include <utility>
 #include <vector>
+#include <functional>
+#include <iterator>
 
 #include "clang/AST/ASTDumper.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/Stmt.h"
-#include "clang/AST/StmtCXX.h"
 #include "clang/AST/StmtVisitor.h"
 #include "clang/Analysis/Analyses/PostOrderCFGView.h"
 #include "clang/Analysis/CFG.h"
@@ -45,6 +46,17 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/PrettyStackTrace.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Analysis/FlowSensitive/DataflowAnalysisContext.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
+
+namespace clang {
+class CXXForRangeStmt;
+}  // namespace clang
 
 #define DEBUG_TYPE "clang-dataflow"
 

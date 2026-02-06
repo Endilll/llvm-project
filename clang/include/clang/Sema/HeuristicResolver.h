@@ -9,25 +9,27 @@
 #ifndef LLVM_CLANG_SEMA_HEURISTICRESOLVER_H
 #define LLVM_CLANG_SEMA_HEURISTICRESOLVER_H
 
-#include "clang/AST/APValue.h"
+#include <vector>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/TypeBase.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
-#include <vector>
+
+namespace llvm {
+template <typename Fn> class function_ref;
+}  // namespace llvm
 
 namespace clang {
 
 class ASTContext;
 class CallExpr;
-class CXXBasePath;
 class CXXDependentScopeMemberExpr;
 class DeclarationName;
 class DependentScopeDeclRefExpr;
 class FunctionProtoTypeLoc;
-class NamedDecl;
-class Type;
 class UnresolvedUsingValueDecl;
+class CXXRecordDecl;
+class Expr;
 
 // This class handles heuristic resolution of declarations and types in template
 // code.

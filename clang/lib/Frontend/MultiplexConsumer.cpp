@@ -13,9 +13,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/MultiplexConsumer.h"
+
+#include <cstddef>
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTMutationListener.h"
-#include "clang/AST/Decl.h"
 #include "clang/AST/DeclGroup.h"
 #include "clang/AST/DeclID.h"
 #include "clang/Basic/IdentifierTable.h"
@@ -24,17 +29,13 @@
 #include "clang/Sema/SemaConsumer.h"
 #include "clang/Serialization/ASTBitCodes.h"
 #include "clang/Serialization/ASTDeserializationListener.h"
-#include <cstddef>
-#include <memory>
-#include <utility>
-#include <vector>
+#include "clang/AST/TypeBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 
 namespace clang {
-
-class NamespaceDecl;
-class TranslationUnitDecl;
 
 MultiplexASTDeserializationListener::MultiplexASTDeserializationListener(
       const std::vector<ASTDeserializationListener*>& L)

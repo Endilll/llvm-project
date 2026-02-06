@@ -10,12 +10,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <vector>
+
 #include "CodeGenFunction.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetBuiltins.h"
-#include "llvm/ADT/APInt.h"
 #include "llvm/IR/Constant.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
@@ -25,10 +29,14 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Value.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <optional>
-#include <vector>
+#include "Address.h"
+#include "CGBuilder.h"
+#include "CodeGenModule.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace CodeGen;

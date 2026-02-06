@@ -15,15 +15,15 @@
 #include "clang/AST/Type.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Sanitizers.h"
-#include "clang/Basic/SourceLocation.h"
 
 namespace llvm {
 class GlobalVariable;
-class Instruction;
+class StringRef;
 } // namespace llvm
 
 namespace clang {
 class VarDecl;
+class SourceLocation;
 
 namespace CodeGen {
 

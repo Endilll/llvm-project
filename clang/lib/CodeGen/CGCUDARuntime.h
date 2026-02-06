@@ -15,10 +15,11 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGCUDARUNTIME_H
 #define LLVM_CLANG_LIB_CODEGEN_CGCUDARUNTIME_H
 
+#include <string>
+
 #include "clang/AST/GlobalDecl.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Frontend/Offloading/Utility.h"
 #include "llvm/IR/GlobalValue.h"
+#include "llvm/Support/Compiler.h"
 
 namespace llvm {
 class CallBase;

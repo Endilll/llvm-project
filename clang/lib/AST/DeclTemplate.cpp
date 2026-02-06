@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/DeclTemplate.h"
+
+#include <cassert>
+#include <optional>
+#include <tuple>
+#include <utility>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTMutationListener.h"
@@ -20,13 +26,10 @@
 #include "clang/AST/DeclID.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExternalASTSource.h"
-#include "clang/AST/ODRHash.h"
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
-#include "clang/AST/TypeLoc.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -39,10 +42,8 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
-#include <tuple>
-#include <utility>
+#include "clang/Basic/LangOptions.h"
+#include "llvm/Support/raw_ostream.h"
 
 using namespace clang;
 

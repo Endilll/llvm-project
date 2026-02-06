@@ -7,6 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Rewrite/Frontend/FrontendActions.h"
+
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/Diagnostic.h"
@@ -17,15 +25,12 @@
 #include "clang/Frontend/FrontendAction.h"
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Frontend/FrontendOptions.h"
-#include "clang/Frontend/Utils.h"
-#include "clang/Lex/Preprocessor.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include "clang/Rewrite/Frontend/ASTConsumers.h"
 #include "clang/Rewrite/Frontend/FixItRewriter.h"
 #include "clang/Rewrite/Frontend/Rewriters.h"
 #include "clang/Serialization/ASTReader.h"
 #include "clang/Serialization/ModuleFile.h"
-#include "clang/Serialization/ModuleManager.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/Support/CrashRecoveryContext.h"
 #include "llvm/Support/Error.h"
@@ -33,11 +38,19 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Frontend/CompilerInvocation.h"
+#include "clang/Frontend/PreprocessorOutputOptions.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 

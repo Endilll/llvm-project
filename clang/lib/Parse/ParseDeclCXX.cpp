@@ -10,6 +10,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <optional>
+#include <string>
+#include <utility>
+#include <memory>
+#include <stack>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -17,7 +25,6 @@
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/PrettyDeclStackTrace.h"
-#include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/AttributeCommonInfo.h"
 #include "clang/Basic/AttributeScopeInfo.h"
@@ -32,7 +39,6 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
-#include "clang/Basic/TargetInfo.h"
 #include "clang/Basic/TemplateKinds.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/LiteralSupport.h"
@@ -47,15 +53,23 @@
 #include "clang/Sema/Scope.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaCodeCompletion.h"
-#include "clang/Sema/SemaHLSL.h"
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TimeProfiler.h"
-#include <algorithm>
-#include <cassert>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

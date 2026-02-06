@@ -8,14 +8,20 @@
 #ifndef LLVM_CLANG_DRIVER_XRAYARGS_H
 #define LLVM_CLANG_DRIVER_XRAYARGS_H
 
+#include <string>
+#include <vector>
+
 #include "clang/Basic/XRayInstr.h"
 #include "clang/Driver/Types.h"
 #include "llvm/ADT/ArrayRef.h"
-#include "llvm/Option/Arg.h"
-#include "llvm/Option/ArgList.h"
 #include "llvm/Option/Option.h"
-#include <string>
-#include <vector>
+
+namespace llvm {
+namespace opt {
+class Arg;
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {

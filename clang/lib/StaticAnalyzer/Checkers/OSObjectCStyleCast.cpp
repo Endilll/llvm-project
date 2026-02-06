@@ -11,6 +11,9 @@
 // as an explicit static or dynamic cast should be used instead.
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <string>
+
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -23,14 +26,20 @@
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
-#include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/CommonBugCategories.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
-#include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <string>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

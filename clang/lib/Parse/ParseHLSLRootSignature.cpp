@@ -7,6 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Parse/ParseHLSLRootSignature.h"
+
+#include <cassert>
+#include <cstdint>
+#include <limits>
+#include <memory>
+#include <optional>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
@@ -27,11 +34,16 @@
 #include "llvm/BinaryFormat/DXContainer.h"
 #include "llvm/Frontend/HLSL/HLSLRootSignature.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <limits>
-#include <memory>
-#include <optional>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/DXILABI.h"
+
+namespace clang {
+class IdentifierInfo;
+}  // namespace clang
 
 using namespace llvm::hlsl::rootsig;
 

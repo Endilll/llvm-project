@@ -11,6 +11,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ASTDiagnostic.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <iterator>
+#include <optional>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/Attr.h"
@@ -24,7 +34,6 @@
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
-#include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/APSInt.h"
@@ -34,11 +43,16 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Format.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <string>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

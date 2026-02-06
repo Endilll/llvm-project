@@ -12,6 +12,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/ModuleMapFile.h"
+
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticLex.h"
@@ -24,17 +32,12 @@
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Lexer.h"
-#include "clang/Lex/ModuleMap.h"
 #include "clang/Lex/Token.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
-#include <variant>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/MemoryBufferRef.h"
 
 using namespace clang;
 using namespace modulemap;

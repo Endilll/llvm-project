@@ -7,6 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/InstallAPI/Frontend.h"
+
+#include <limits.h>
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <algorithm>
+#include <vector>
+
 #include "clang/AST/Availability.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/Basic/FileEntry.h"
@@ -18,6 +28,7 @@
 #include "clang/InstallAPI/HeaderFile.h"
 #include "clang/InstallAPI/MachO.h"
 #include "clang/Lex/Preprocessor.h"
+#include "clang/Serialization/ModuleFileExtension.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MemoryBuffer.h"
@@ -25,12 +36,16 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TextAPI/RecordsSlice.h"
 #include "llvm/TextAPI/Utils.h"
-#include <cassert>
-#include <linux/limits.h>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/Lex/HeaderSearch.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/TargetParser/Triple.h"
+#include "llvm/TextAPI/Record.h"
+#include "llvm/TextAPI/Symbol.h"
 
 using namespace llvm;
 using namespace llvm::MachO;

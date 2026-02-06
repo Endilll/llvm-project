@@ -7,6 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "ByteCodeEmitter.h"
+
+#include <cassert>
+#include <cstddef>
+#include <limits>
+#include <type_traits>
+#include <utility>
+#include <new>
+
 #include "ByteCode/Descriptor.h"
 #include "ByteCode/FixedPoint.h"
 #include "ByteCode/Function.h"
@@ -29,12 +37,6 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/bit.h"
 #include "llvm/Support/Endian.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <limits>
-#include <type_traits>
-#include <utility>
 
 using namespace clang;
 using namespace clang::interp;
@@ -278,4 +280,13 @@ bool ByteCodeEmitter::speculate(const CallExpr *E, const LabelTy &EndLabel) {
 
 #define GET_LINK_IMPL
 #include "Opcodes.inc"
+
+namespace clang {
+class ComparisonCategoryInfo;
+}  // namespace clang
+namespace llvm {
+enum class RoundingMode : int8_t;
+struct fltSemantics;
+}  // namespace llvm
+
 #undef GET_LINK_IMPL

@@ -6,20 +6,34 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+
 #include "ABIInfoImpl.h"
 #include "CodeGenModule.h"
-#include "CodeGenTypes.h"
 #include "TargetInfo.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Support/MathExtras.h"
-#include <memory>
+#include "ABIInfo.h"
+#include "CGCXXABI.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace CodeGen {
+class CodeGenTypes;
+}  // namespace CodeGen
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::CodeGen;

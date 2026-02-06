@@ -16,6 +16,7 @@
 #include "clang/Index/IndexDataConsumer.h"
 #include "clang/Index/IndexSymbol.h"
 #include "clang/Index/IndexingAction.h"
+#include "clang/Index/IndexingOptions.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Tooling/Tooling.h"
 #include "llvm/ADT/StringRef.h"

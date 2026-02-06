@@ -13,13 +13,21 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_HEXAGON_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_HEXAGON_H
 
+#include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
+
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/TargetParser/Triple.h"
-#include <optional>
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 
 // Hexagon abstract base class

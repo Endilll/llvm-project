@@ -13,6 +13,8 @@
 
 #include <utility>
 #include <vector>
+#include <iterator>
+#include <optional>
 
 #include "clang/Analysis/FlowSensitive/DebugSupport.h"
 #include "clang/Analysis/FlowSensitive/Formula.h"
@@ -22,6 +24,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/DenseMap.h"
 
 namespace clang {
 namespace dataflow {

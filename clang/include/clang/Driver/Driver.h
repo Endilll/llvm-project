@@ -9,6 +9,14 @@
 #ifndef LLVM_CLANG_DRIVER_DRIVER_H
 #define LLVM_CLANG_DRIVER_DRIVER_H
 
+#include <cstdlib>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/HeaderInclude.h"
@@ -31,19 +39,18 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/StringSaver.h"
-
-#include <cstdlib>
-#include <map>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/VirtualFileSystem.h"
 
 namespace llvm {
 class Triple;
-namespace vfs {
-class FileSystem;
-}
+class raw_ostream;
+template <unsigned int InternalLen> class SmallString;
+
 namespace cl {
 class ExpansionContext;
 }
@@ -52,13 +59,12 @@ class ExpansionContext;
 namespace clang {
 
 namespace driver {
+class Driver;
 
 typedef SmallVector<InputInfo, 4> InputInfoList;
 
 class Command;
 class Compilation;
-class JobAction;
-class ToolChain;
 
 /// Describes the kind of LTO mode selected via -f(no-)?lto(=.*)? options.
 enum LTOKind {

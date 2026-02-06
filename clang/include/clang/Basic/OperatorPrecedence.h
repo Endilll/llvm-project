@@ -14,9 +14,10 @@
 #ifndef LLVM_CLANG_BASIC_OPERATORPRECEDENCE_H
 #define LLVM_CLANG_BASIC_OPERATORPRECEDENCE_H
 
-#include "clang/Basic/TokenKinds.h"
-
 namespace clang {
+namespace tok {
+enum TokenKind : unsigned short;
+}  // namespace tok
 
 /// PrecedenceLevels - These are precedences for the binary/ternary
 /// operators in the C99 grammar.  These have been named to relate

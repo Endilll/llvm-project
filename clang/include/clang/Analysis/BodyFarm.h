@@ -14,9 +14,11 @@
 #ifndef LLVM_CLANG_ANALYSIS_BODYFARM_H
 #define LLVM_CLANG_ANALYSIS_BODYFARM_H
 
+#include <optional>
+
 #include "clang/AST/DeclBase.h"
 #include "llvm/ADT/DenseMap.h"
-#include <optional>
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 

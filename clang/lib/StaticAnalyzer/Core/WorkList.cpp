@@ -11,20 +11,26 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/WorkList.h"
+
+#include <cassert>
+#include <deque>
+#include <memory>
+#include <utility>
+#include <vector>
+#include <optional>
+
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/ProgramPoint.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/EntryPointStats.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/PriorityQueue.h"
 #include "llvm/ADT/STLExtras.h"
-#include <cassert>
-#include <deque>
-#include <memory>
-#include <utility>
-#include <vector>
+#include "clang/Analysis/CFG.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 using namespace ento;

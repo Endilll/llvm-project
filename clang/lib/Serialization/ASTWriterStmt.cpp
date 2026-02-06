@@ -11,6 +11,12 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <iterator>
+#include <optional>
+#include <utility>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
@@ -26,7 +32,6 @@
 #include "clang/AST/ExprOpenMP.h"
 #include "clang/AST/StmtVisitor.h"
 #include "clang/AST/TemplateBase.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
@@ -38,10 +43,30 @@
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Bitstream/BitstreamWriter.h"
-#include <cassert>
-#include <cstdint>
-#include <iterator>
-#include <optional>
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/StmtCXX.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/StmtObjC.h"
+#include "clang/AST/StmtOpenACC.h"
+#include "clang/AST/StmtOpenMP.h"
+#include "clang/AST/StmtSYCL.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+class TypeSourceInfo;
+}  // namespace clang
+
 using namespace clang;
 
 //===----------------------------------------------------------------------===//

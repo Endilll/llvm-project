@@ -12,13 +12,21 @@
 #ifndef LLVM_CLANG_INSTALLAPI_DIRECTORYSCANNER_H
 #define LLVM_CLANG_INSTALLAPI_DIRECTORYSCANNER_H
 
-#include "clang/Basic/FileManager.h"
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/InstallAPI/HeaderFile.h"
 #include "clang/InstallAPI/Library.h"
 #include "llvm/Support/Error.h"
-#include <utility>
-#include <vector>
+#include "llvm/ADT/StringRef.h"
+
+namespace clang {
+class FileManager;
+}  // namespace clang
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang::installapi {
 

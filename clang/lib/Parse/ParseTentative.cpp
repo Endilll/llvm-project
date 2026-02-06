@@ -11,6 +11,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+
 #include "clang/AST/Decl.h"
 #include "clang/Basic/AttributeCommonInfo.h"
 #include "clang/Basic/IdentifierTable.h"
@@ -25,8 +28,11 @@
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/TypoCorrection.h"
 #include "llvm/ADT/STLExtras.h"
-#include <cassert>
-#include <memory>
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+
 using namespace clang;
 
 bool Parser::isCXXDeclarationStatement(
@@ -172,6 +178,7 @@ Parser::TPResult Parser::TryConsumeDeclarationSpecifier() {
   case tok::kw___attribute:
 #define TRANSFORM_TYPE_TRAIT_DEF(_, Trait) case tok::kw___##Trait:
 #include "clang/Basic/TransformTypeTraits.def"
+
   {
     ConsumeToken();
     if (Tok.isNot(tok::l_paren))
@@ -819,6 +826,7 @@ Parser::TPResult Parser::TryParseOperatorId() {
   case tok::Token:
 #define OVERLOADED_OPERATOR_MULTI(Name, Spelling, Unary, Binary, MemOnly)
 #include "clang/Basic/OperatorKinds.def"
+
     ConsumeToken();
     return TPResult::True;
 
@@ -1490,8 +1498,10 @@ Parser::isCXXDeclarationSpecifier(ImplicitTypenameContext AllowImplicitTypename,
   case tok::annot_pack_indexing_type:
 #define GENERIC_IMAGE_TYPE(ImgType, Id) case tok::kw_##ImgType##_t:
 #include "clang/Basic/OpenCLImageTypes.def"
+
 #define HLSL_INTANGIBLE_TYPE(Name, Id, SingletonId) case tok::kw_##Name:
 #include "clang/Basic/HLSLIntangibleTypes.def"
+
     if (NextToken().is(tok::l_paren))
       return TPResult::Ambiguous;
 
@@ -1533,7 +1543,6 @@ Parser::isCXXDeclarationSpecifier(ImplicitTypenameContext AllowImplicitTypename,
   }
 
 #define TRANSFORM_TYPE_TRAIT_DEF(_, Trait) case tok::kw___##Trait:
-#include "clang/Basic/TransformTypeTraits.def"
     return TPResult::True;
 
   // C11 _Alignas
@@ -1576,7 +1585,6 @@ bool Parser::isCXXDeclarationSpecifierAType() {
   case tok::annot_typename:
   case tok::kw_typeof:
 #define TRANSFORM_TYPE_TRAIT_DEF(_, Trait) case tok::kw___##Trait:
-#include "clang/Basic/TransformTypeTraits.def"
     return true;
 
     // elaborated-type-specifier
@@ -1617,9 +1625,7 @@ bool Parser::isCXXDeclarationSpecifierAType() {
   case tok::kw__Fract:
   case tok::kw__Sat:
 #define GENERIC_IMAGE_TYPE(ImgType, Id) case tok::kw_##ImgType##_t:
-#include "clang/Basic/OpenCLImageTypes.def"
 #define HLSL_INTANGIBLE_TYPE(Name, Id, SingletonId) case tok::kw_##Name:
-#include "clang/Basic/HLSLIntangibleTypes.def"
     return true;
 
   case tok::kw_auto:

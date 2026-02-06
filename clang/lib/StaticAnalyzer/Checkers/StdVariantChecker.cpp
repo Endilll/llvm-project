@@ -6,6 +6,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/LLVM.h"
@@ -21,16 +26,29 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
-#include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-
 #include "TaggedUnionModeling.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+class LocationContext;
+namespace ento {
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

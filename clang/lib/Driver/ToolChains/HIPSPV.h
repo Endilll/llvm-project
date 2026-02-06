@@ -9,12 +9,27 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_HIPSPV_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_HIPSPV_H
 
-#include "SPIRV.h"
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
+#include "llvm/Frontend/Debug/Options.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Compilation;
+class Driver;
+class InputInfo;
+
 namespace tools {
 namespace HIPSPV {
 

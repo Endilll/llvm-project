@@ -14,18 +14,25 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_ANALYZEROPTIONS_H
 #define LLVM_CLANG_STATICANALYZER_CORE_ANALYZEROPTIONS_H
 
-#include "clang/Analysis/PathDiagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/Compiler.h"
 #include <cassert>
 #include <cstddef>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
+#include <iterator>
+
+#include "clang/Analysis/PathDiagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 

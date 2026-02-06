@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Index/CommentToXML.h"
+
+#include <cassert>
+#include <climits>
+#include <cstddef>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/AttrIterator.h"
@@ -24,14 +30,22 @@
 #include "clang/Index/USRGeneration.h"
 #include "clang/Tooling/Core/Replacement.h"
 #include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/TinyPtrVector.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <climits>
-#include <cstddef>
-#include <string>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/VersionTuple.h"
+
+namespace clang {
+class LangOptions;
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::comments;

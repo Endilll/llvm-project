@@ -6,6 +6,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+
 #include "ABIInfoImpl.h"
 #include "CodeGenModule.h"
 #include "CodeGenTypes.h"
@@ -15,11 +18,17 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/Type.h"
 #include "llvm/Support/DXILABI.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <memory>
+#include "ABIInfo.h"
+#include "clang/AST/CharUnits.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
 
 using namespace clang;
 using namespace clang::CodeGen;

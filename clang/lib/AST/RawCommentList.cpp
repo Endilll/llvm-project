@@ -7,8 +7,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/RawCommentList.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <map>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Comment.h"
 #include "clang/AST/CommentBriefParser.h"
 #include "clang/AST/CommentCommandTraits.h"
 #include "clang/AST/CommentLexer.h"
@@ -20,15 +31,9 @@
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstring>
-#include <map>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 

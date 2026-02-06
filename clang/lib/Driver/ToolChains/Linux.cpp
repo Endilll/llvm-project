@@ -7,6 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "Linux.h"
+
+#include <cassert>
+#include <optional>
+#include <string>
+#include <utility>
+#include <functional>
+#include <iterator>
+
 #include "Arch/ARM.h"
 #include "Arch/LoongArch.h"
 #include "Arch/Mips.h"
@@ -23,7 +31,6 @@
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/Multilib.h"
 #include "clang/Driver/SanitizerArgs.h"
-#include "clang/Driver/Tool.h"
 #include "clang/Driver/Types.h"
 #include "clang/Options/Options.h"
 #include "llvm/ADT/SmallVector.h"
@@ -35,10 +42,17 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/ScopedPrinter.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <cassert>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Driver/CudaInstallationDetector.h"
+#include "clang/Driver/LazyDetector.h"
+#include "clang/Driver/RocmInstallationDetector.h"
+#include "clang/Driver/SyclInstallationDetector.h"
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

@@ -17,6 +17,13 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSISDECLCONTEXT_H
 #define LLVM_CLANG_ANALYSIS_ANALYSISDECLCONTEXT_H
 
+#include <cassert>
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
+
 #include "clang/AST/DeclBase.h"
 #include "clang/Analysis/BodyFarm.h"
 #include "clang/Analysis/CFG.h"
@@ -28,12 +35,11 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 

@@ -12,6 +12,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ASTMatchers/Dynamic/Registry.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "Marshallers.h"
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/DeclBase.h"
@@ -27,13 +36,27 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/Attr.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/LambdaCapture.h"
+#include "clang/AST/OpenMPClause.h"
+#include "clang/AST/StmtCXX.h"
+#include "clang/AST/StmtObjC.h"
+#include "clang/AST/StmtOpenMP.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Regex.h"
 
 namespace clang {
 namespace ast_matchers {

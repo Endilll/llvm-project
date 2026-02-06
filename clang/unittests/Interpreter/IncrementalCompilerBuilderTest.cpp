@@ -8,6 +8,7 @@
 
 #include "clang/Basic/TargetOptions.h"
 #include "clang/Frontend/CompilerInstance.h"
+#include "clang/Frontend/FrontendOptions.h"
 #include "clang/Interpreter/Interpreter.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include "llvm/Support/Error.h"

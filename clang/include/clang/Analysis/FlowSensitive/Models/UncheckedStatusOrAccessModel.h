@@ -11,18 +11,29 @@
 
 #include "clang/AST/Type.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/Analysis/CFG.h"
 #include "clang/Analysis/FlowSensitive/CFGMatchSwitch.h"
 #include "clang/Analysis/FlowSensitive/CachedConstAccessorsLattice.h"
 #include "clang/Analysis/FlowSensitive/DataflowAnalysis.h"
-#include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
 #include "clang/Analysis/FlowSensitive/MatchSwitch.h"
 #include "clang/Analysis/FlowSensitive/NoopLattice.h"
-#include "clang/Analysis/FlowSensitive/StorageLocation.h"
-#include "clang/Analysis/FlowSensitive/Value.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/Any.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class ASTContext;
+class CFGElement;
+class CXXRecordDecl;
+namespace dataflow {
+class BoolValue;
+class Environment;
+class RecordStorageLocation;
+class StorageLocation;
+}  // namespace dataflow
+}  // namespace clang
 
 namespace clang::dataflow::statusor_model {
 

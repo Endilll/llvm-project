@@ -13,6 +13,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "FormatTokenLexer.h"
+
+#include <cassert>
+#include <cctype>
+#include <string>
+#include <tuple>
+#include <deque>
+#include <iterator>
+#include <new>
+#include <utility>
+#include <vector>
+
 #include "Encoding.h"
 #include "FormatToken.h"
 #include "clang/Basic/CharInfo.h"
@@ -29,11 +40,10 @@
 #include "llvm/ADT/StringSet.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Regex.h"
-#include <cassert>
-#include <cctype>
-#include <cstddef>
-#include <string>
-#include <tuple>
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/MemoryBufferRef.h"
 
 namespace clang {
 namespace format {

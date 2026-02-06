@@ -18,7 +18,6 @@
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTUnresolvedSet.h"
 #include "clang/AST/AbstractBasicWriter.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"

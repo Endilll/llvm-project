@@ -10,10 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <optional>
+#include <iterator>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclTemplate.h"
-#include "clang/AST/ExprCXX.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -38,8 +41,22 @@
 #include "clang/Sema/Sema.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Sema/SemaCodeCompletion.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Expr;
+class IdentifierInfo;
+}  // namespace clang
+
 using namespace clang;
 
 unsigned Parser::ReenterTemplateScopes(MultiParseScope &S, Decl *D) {

@@ -11,14 +11,18 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Basic/SanitizerSpecialCaseList.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/Sanitizers.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/Support/ErrorHandling.h"
+
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Sanitizers.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 

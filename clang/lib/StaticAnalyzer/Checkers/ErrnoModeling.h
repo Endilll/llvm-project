@@ -13,13 +13,22 @@
 #ifndef LLVM_CLANG_LIB_STATICANALYZER_CHECKERS_ERRNOMODELING_H
 #define LLVM_CLANG_LIB_STATICANALYZER_CHECKERS_ERRNOMODELING_H
 
-#include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include <stdint.h>
 #include <optional>
+#include <string>
+
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "clang/Analysis/CFG.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 
 namespace clang {
+class LocationContext;
+
 namespace ento {
+class CallEvent;
+class CheckerContext;
+class NoteTag;
+
 namespace errno_modeling {
 
 /// Describe how reads and writes of \c errno are handled by the checker.

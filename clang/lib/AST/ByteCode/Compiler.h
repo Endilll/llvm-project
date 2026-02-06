@@ -13,17 +13,86 @@
 #ifndef LLVM_CLANG_AST_INTERP_BYTECODEEXPRGEN_H
 #define LLVM_CLANG_AST_INTERP_BYTECODEEXPRGEN_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <optional>
+#include <utility>
+
 #include "ByteCodeEmitter.h"
 #include "EvalEmitter.h"
-#include "Pointer.h"
 #include "PrimType.h"
-#include "Record.h"
-#include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/StmtVisitor.h"
+#include "Context.h"
+#include "Descriptor.h"
+#include "Floating.h"
+#include "Function.h"
+#include "Source.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/FloatingPointMode.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorHandling.h"
+
+namespace llvm {
+class APInt;
+class APSInt;
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
-class QualType;
+class APValue;
+class ArrayTypeTraitExpr;
+class BuiltinBitCastExpr;
+class CXXBindTemporaryExpr;
+class CXXBoolLiteralExpr;
+class CXXConstructExpr;
+class CXXConstructorDecl;
+class CXXDefaultArgExpr;
+class CXXDefaultInitExpr;
+class CXXDeleteExpr;
+class CXXDestructorDecl;
+class CXXDynamicCastExpr;
+class CXXForRangeStmt;
+class CXXInheritedCtorInitExpr;
+class CXXMethodDecl;
+class CXXNewExpr;
+class CXXNoexceptExpr;
+class CXXNullPtrLiteralExpr;
+class CXXParenListInitExpr;
+class CXXReinterpretCastExpr;
+class CXXRewrittenBinaryOperator;
+class CXXScalarValueInitExpr;
+class CXXStdInitializerListExpr;
+class CXXThisExpr;
+class CXXThrowExpr;
+class CXXTryStmt;
+class CXXTypeidExpr;
+class CXXUuidofExpr;
+class ConceptSpecializationExpr;
+class ExprWithCleanups;
+class ExpressionTraitExpr;
+class FunctionDecl;
+class LambdaExpr;
+class MaterializeTemporaryExpr;
+class ObjCBoolLiteralExpr;
+class ObjCBoxedExpr;
+class ObjCEncodeExpr;
+class ObjCStringLiteral;
+class PackIndexingExpr;
+class RecordDecl;
+class RequiresExpr;
+class SizeOfPackExpr;
+class SubstNonTypeTemplateParmExpr;
+class TypeTraitExpr;
+class ValueDecl;
+class VarDecl;
 
 namespace interp {
 
@@ -41,8 +110,10 @@ template <class Emitter> class LabelScope;
 template <class Emitter> class SwitchScope;
 template <class Emitter> class StmtExprScope;
 template <class Emitter> class LocOverrideScope;
-
 template <class Emitter> class Compiler;
+class Program;
+class Record;
+
 struct InitLink {
 public:
   enum {

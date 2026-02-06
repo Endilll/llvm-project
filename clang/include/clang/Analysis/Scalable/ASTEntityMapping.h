@@ -9,10 +9,14 @@
 #ifndef LLVM_CLANG_ANALYSIS_SCALABLE_ASTENTITYMAPPING_H
 #define LLVM_CLANG_ANALYSIS_SCALABLE_ASTENTITYMAPPING_H
 
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/Analysis/Scalable/Model/EntityName.h"
 #include <optional>
+
+#include "clang/Analysis/Scalable/Model/EntityName.h"
+
+namespace clang {
+class Decl;
+class FunctionDecl;
+}  // namespace clang
 
 namespace clang::ssaf {
 

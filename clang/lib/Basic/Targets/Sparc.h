@@ -12,11 +12,23 @@
 
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_SPARC_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_SPARC_H
+#include <string>
+#include <string_view>
+#include <utility>
+
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/TargetParser/Triple.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 // Shared base class for SPARC v8 (32-bit) and SPARC v9 (64-bit).
 class LLVM_LIBRARY_VISIBILITY SparcTargetInfo : public TargetInfo {

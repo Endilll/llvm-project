@@ -11,6 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/OpenMPClause.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <functional>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
+#include <new>
+#include <vector>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -35,14 +47,7 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/Basic/LangOptions.h"
 
 using namespace clang;
 using namespace llvm;

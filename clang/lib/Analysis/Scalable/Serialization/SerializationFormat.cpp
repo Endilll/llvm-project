@@ -7,13 +7,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Scalable/Serialization/SerializationFormat.h"
+
+#include <vector>
+
 #include "clang/Analysis/Scalable/Model/BuildNamespace.h"
-#include "clang/Analysis/Scalable/Model/EntityId.h"
 #include "clang/Analysis/Scalable/Model/EntityName.h"
 #include "clang/Analysis/Scalable/TUSummary/TUSummary.h"
-#include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringRef.h"
-#include <vector>
+
+namespace llvm {
+template <unsigned int InternalLen> class SmallString;
+}  // namespace llvm
 
 using namespace clang::ssaf;
 

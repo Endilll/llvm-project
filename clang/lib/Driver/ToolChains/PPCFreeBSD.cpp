@@ -7,13 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "PPCFreeBSD.h"
+
 #include "ToolChains/FreeBSD.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Options/Options.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/Path.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang::driver::toolchains;
 using namespace llvm::opt;

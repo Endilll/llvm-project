@@ -11,8 +11,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <optional>
+
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTFwd.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DynamicRecursiveASTVisitor.h"
@@ -31,7 +33,6 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/Lexer.h"
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/CommonBugCategories.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
@@ -42,7 +43,25 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Analysis/CFG.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/Token.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+class LangOptions;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

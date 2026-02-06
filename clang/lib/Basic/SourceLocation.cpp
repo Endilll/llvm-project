@@ -11,6 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/SourceLocation.h"
+
+#include <cassert>
+#include <cstring>
+#include <string>
+#include <type_traits>
+#include <utility>
+
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/PrettyStackTrace.h"
@@ -19,11 +26,7 @@
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstring>
-#include <string>
-#include <type_traits>
-#include <utility>
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 

@@ -11,6 +11,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cctype>
+#include <memory>
+#include <string>
+#include <utility>
+#include <tuple>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/TypeBase.h"
@@ -34,10 +40,22 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cctype>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FormatVariadicDetails.h"
+
+namespace clang {
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

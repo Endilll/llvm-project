@@ -13,18 +13,21 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CONSTRAINTMANAGER_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CONSTRAINTMANAGER_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
-#include "llvm/ADT/STLExtras.h"
 #include <memory>
 #include <optional>
 #include <utility>
+#include <iterator>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace llvm {
 
 class APSInt;
+class raw_ostream;
 
 } // namespace llvm
 
@@ -34,6 +37,10 @@ namespace ento {
 class ProgramStateManager;
 class ExprEngine;
 class SymbolReaper;
+class DefinedSVal;
+class NonLoc;
+class ProgramState;
+class SVal;
 
 class ConditionTruthVal {
   std::optional<bool> Val;

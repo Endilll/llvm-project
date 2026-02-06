@@ -9,14 +9,30 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_BAREMETAL_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_BAREMETAL_H
 
+#include <string>
+
 #include "ToolChains/Gnu.h"
 #include "clang/Driver/Tool.h"
-#include "clang/Driver/ToolChain.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
+#include "clang/Driver/Multilib.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
 
-#include <string>
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+class ToolChain;
 
 namespace toolchains {
 

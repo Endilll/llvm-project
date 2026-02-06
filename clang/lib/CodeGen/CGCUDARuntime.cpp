@@ -13,6 +13,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGCUDARuntime.h"
+
+#include <cassert>
+
 #include "Address.h"
 #include "CGCall.h"
 #include "CodeGenFunction.h"
@@ -24,7 +27,29 @@
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/Specifiers.h"
 #include "llvm/IR/Constant.h"
-#include <cassert>
+#include "CGBuilder.h"
+#include "CGValue.h"
+#include "CodeGenModule.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Value.h"
+
+namespace clang {
+namespace CodeGen {
+class CGFunctionInfo;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class BasicBlock;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

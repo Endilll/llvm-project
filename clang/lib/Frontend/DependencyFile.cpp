@@ -10,7 +10,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/Basic/DiagnosticFrontend.h"
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/LLVM.h"
@@ -18,21 +25,25 @@
 #include "clang/Basic/SourceManager.h"
 #include "clang/Frontend/DependencyOutputOptions.h"
 #include "clang/Frontend/Utils.h"
-#include "clang/Lex/DirectoryLookup.h"
 #include "clang/Lex/ModuleMap.h"
 #include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Serialization/ASTReader.h"
 #include "clang/Serialization/ModuleFile.h"
+#include "clang/Serialization/ModuleFileExtension.h"
 #include "llvm/ADT/StringSet.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Lex/HeaderSearch.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 

@@ -7,10 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "InterpShared.h"
-#include "clang/AST/Attr.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/BitVector.h"
+
 #include <cassert>
+
+#include "clang/AST/Attr.h"
+#include "llvm/ADT/BitVector.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/Decl.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 namespace interp {

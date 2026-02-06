@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Index/IndexSymbol.h"
+
+#include <cassert>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -17,10 +20,14 @@
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Linkage.h"
-#include "clang/Lex/MacroInfo.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
 
 using namespace clang;
 using namespace clang::index;

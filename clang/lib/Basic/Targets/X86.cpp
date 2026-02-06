@@ -11,10 +11,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "X86.h"
+
+#include <algorithm>
+#include <cassert>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "TargetDefines.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/MacroBuilder.h"
 #include "clang/Basic/TargetBuiltins.h"
@@ -28,12 +35,10 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/Triple.h"
 #include "llvm/TargetParser/X86TargetParser.h"
-#include <algorithm>
-#include <cassert>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <vector>
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 namespace targets {

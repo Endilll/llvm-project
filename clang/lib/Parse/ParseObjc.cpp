@@ -10,8 +10,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <string>
+#include <iterator>
+#include <memory>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclObjCCommon.h"
 #include "clang/AST/ExprObjC.h"
@@ -44,10 +51,23 @@
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <optional>
-#include <string>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Sema/Sema.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace clang {
+class Expr;
+class ParmVarDecl;
+}  // namespace clang
 
 using namespace clang;
 

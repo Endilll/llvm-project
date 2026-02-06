@@ -11,6 +11,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+#include <new>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/AttrIterator.h"
@@ -28,7 +36,6 @@
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/ExprOpenMP.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
-#include "clang/AST/OpenMPClause.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
@@ -43,7 +50,6 @@
 #include "clang/Basic/ExpressionTraits.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
-#include "clang/Basic/OpenACCKinds.h"
 #include "clang/Basic/OpenMPKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
@@ -52,6 +58,7 @@
 #include "clang/Serialization/ASTBitCodes.h"
 #include "clang/Serialization/ASTReader.h"
 #include "clang/Serialization/ASTRecordReader.h"
+#include "clang/Serialization/ModuleFileExtension.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/PointerUnion.h"
@@ -60,12 +67,22 @@
 #include "llvm/Bitstream/BitstreamReader.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/StmtOpenACC.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
+
+namespace clang {
+class IdentifierInfo;
+enum class OpenACCAtomicKind : uint8_t;
+}  // namespace clang
 
 using namespace clang;
 using namespace serialization;

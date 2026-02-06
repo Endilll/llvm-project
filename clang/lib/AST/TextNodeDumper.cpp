@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/TextNodeDumper.h"
+
+#include <algorithm>
+#include <cstring>
+#include <string>
+#include <utility>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTDumperUtils.h"
@@ -36,7 +42,6 @@
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OpenACCClause.h"
 #include "clang/AST/OpenMPClause.h"
-#include "clang/AST/Redeclarable.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/StmtObjC.h"
@@ -71,11 +76,23 @@
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-
-#include <algorithm>
-#include <cstring>
-#include <string>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclOpenACC.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/AttrKinds.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/APFixedPoint.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/FloatingPointMode.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

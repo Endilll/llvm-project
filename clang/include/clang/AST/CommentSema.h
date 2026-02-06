@@ -19,11 +19,20 @@
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Allocator.h"
+#include "clang/AST/Decl.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
 class Decl;
-class SourceMgr;
 class Preprocessor;
+class SourceManager;
+class TemplateParameterList;
 
 namespace comments {
 class CommandTraits;

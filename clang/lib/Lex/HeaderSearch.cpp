@@ -11,6 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/HeaderSearch.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+#include <functional>
+#include <map>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticLex.h"
@@ -46,18 +61,10 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/xxhash.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdio>
-#include <cstring>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

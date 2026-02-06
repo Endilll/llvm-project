@@ -14,9 +14,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <optional>
+
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/TypeBase.h"
-#include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
@@ -36,8 +38,23 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
 #include "llvm/ADT/ImmutableMap.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <optional>
+#include "clang/AST/ASTContext.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class StackFrameContext;
+class Stmt;
+namespace ento {
+class AnalysisManager;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

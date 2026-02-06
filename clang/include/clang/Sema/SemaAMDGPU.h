@@ -13,12 +13,18 @@
 #ifndef LLVM_CLANG_SEMA_SEMAAMDGPU_H
 #define LLVM_CLANG_SEMA_SEMAAMDGPU_H
 
-#include "clang/AST/ASTFwd.h"
 #include "clang/Sema/SemaBase.h"
 
 namespace clang {
 class AttributeCommonInfo;
 class ParsedAttr;
+class AMDGPUFlatWorkGroupSizeAttr;
+class AMDGPUMaxNumWorkGroupsAttr;
+class AMDGPUWavesPerEUAttr;
+class CallExpr;
+class Decl;
+class Expr;
+class Sema;
 
 class SemaAMDGPU : public SemaBase {
 public:

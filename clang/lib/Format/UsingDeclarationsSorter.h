@@ -19,6 +19,7 @@
 
 namespace clang {
 namespace format {
+struct FormatStyle;
 
 class UsingDeclarationsSorter : public TokenAnalyzer {
 public:

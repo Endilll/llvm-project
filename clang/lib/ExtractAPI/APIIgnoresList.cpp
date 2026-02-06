@@ -13,13 +13,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ExtractAPI/APIIgnoresList.h"
+
+#include <system_error>
+#include <utility>
+
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
-#include <system_error>
-#include <utility>
+#include "llvm/Support/ErrorOr.h"
 
 using namespace clang;
 using namespace clang::extractapi;

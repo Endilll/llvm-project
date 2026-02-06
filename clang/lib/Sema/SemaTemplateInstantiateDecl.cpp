@@ -9,6 +9,16 @@
 //
 //===----------------------------------------------------------------------===/
 
+#include <cassert>
+#include <deque>
+#include <optional>
+#include <string>
+#include <utility>
+#include <iterator>
+#include <memory>
+#include <tuple>
+#include <vector>
+
 #include "TreeTransform.h"
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTConsumer.h"
@@ -16,13 +26,11 @@
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/ASTMutationListener.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclFriend.h"
-#include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclOpenACC.h"
 #include "clang/AST/DeclOpenMP.h"
 #include "clang/AST/DeclTemplate.h"
@@ -37,7 +45,6 @@
 #include "clang/AST/PrettyDeclStackTrace.h"
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TemplateName.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/AttrKinds.h"
 #include "clang/Basic/Builtins.h"
@@ -58,7 +65,6 @@
 #include "clang/Sema/Attr.h"
 #include "clang/Sema/DeclSpec.h"
 #include "clang/Sema/EnterExpressionEvaluationContext.h"
-#include "clang/Sema/Initialization.h"
 #include "clang/Sema/Lookup.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/Redeclaration.h"
@@ -84,11 +90,26 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <deque>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/ASTConcept.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/Redeclarable.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Sema/AnalysisBasedWarnings.h"
+#include "clang/Sema/ExternalSemaSource.h"
+#include "clang/Sema/ParsedAttr.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

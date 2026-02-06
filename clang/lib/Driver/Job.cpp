@@ -7,6 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Driver/Job.h"
+
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/InputInfo.h"
@@ -30,13 +39,8 @@
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/Program.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 using namespace driver;

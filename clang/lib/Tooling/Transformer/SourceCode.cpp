@@ -10,13 +10,18 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Tooling/Transformer/SourceCode.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <set>
+#include <initializer_list>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Comment.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"
-#include "clang/AST/Expr.h"
 #include "clang/AST/RawCommentList.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/LLVM.h"
@@ -30,10 +35,11 @@
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/Errc.h"
 #include "llvm/Support/Error.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <set>
+#include "clang/AST/DeclBase.h"
+
+namespace clang {
+class LangOptions;
+}  // namespace clang
 
 using namespace clang;
 

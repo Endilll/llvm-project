@@ -1,4 +1,9 @@
 #include "clang/AST/JSONNodeDumper.h"
+
+#include <cstdint>
+#include <string>
+#include <utility>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/Comment.h"
 #include "clang/AST/CommentCommandTraits.h"
@@ -11,8 +16,6 @@
 #include "clang/AST/ExprConcepts.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
-#include "clang/AST/OpenACCClause.h"
-#include "clang/AST/OpenMPClause.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtObjC.h"
 #include "clang/AST/Type.h"
@@ -32,9 +35,23 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/JSON.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cstdint>
-#include <string>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclOpenACC.h"
+#include "clang/AST/DeclOpenMP.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/AttrKinds.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 

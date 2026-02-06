@@ -9,11 +9,25 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_MIPS_LINUX_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_MIPS_LINUX_H
 
+#include <string>
+
 #include "Linux.h"
 #include "clang/Driver/ToolChain.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace toolchains {
 
 class LLVM_LIBRARY_VISIBILITY MipsLLVMToolChain : public Linux {

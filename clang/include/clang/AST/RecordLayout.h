@@ -13,19 +13,23 @@
 #ifndef LLVM_CLANG_AST_RECORDLAYOUT_H
 #define LLVM_CLANG_AST_RECORDLAYOUT_H
 
+#include <cassert>
+#include <cstdint>
+
 #include "clang/AST/ASTVector.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/PointerIntPair.h"
-#include <cassert>
-#include <cstdint>
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 
 class ASTContext;
-class CXXRecordDecl;
 
 /// ASTRecordLayout -
 /// This class contains layout information for one RecordDecl,

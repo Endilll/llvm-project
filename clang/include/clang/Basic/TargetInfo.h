@@ -14,32 +14,6 @@
 #ifndef LLVM_CLANG_BASIC_TARGETINFO_H
 #define LLVM_CLANG_BASIC_TARGETINFO_H
 
-#include "clang/Basic/AddressSpaces.h"
-#include "clang/Basic/BitmaskEnum.h"
-#include "clang/Basic/Builtins.h"
-#include "clang/Basic/CFProtectionOptions.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/Specifiers.h"
-#include "clang/Basic/TargetCXXABI.h"
-#include "clang/Basic/TargetOptions.h"
-#include "llvm/ADT/APFloat.h"
-#include "llvm/ADT/APInt.h"
-#include "llvm/ADT/APSInt.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
-#include "llvm/ADT/BitmaskEnum.h"
-#include "llvm/ADT/SmallSet.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/StringSet.h"
-#include "llvm/Frontend/OpenMP/OMPGridValues.h"
-#include "llvm/IR/DerivedTypes.h"
-#include "llvm/Support/Compiler.h"
-#include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/MathExtras.h"
-#include "llvm/Support/VersionTuple.h"
-#include "llvm/TargetParser/Triple.h"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -50,15 +24,44 @@
 #include <string_view>
 #include <utility>
 #include <vector>
+#include <iterator>
+
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/BitmaskEnum.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/CFProtectionOptions.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/SmallSet.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/StringSet.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MathExtras.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace llvm {
 struct fltSemantics;
+class APSInt;
+namespace omp {
+struct GV;
+}  // namespace omp
 }
 
 namespace clang {
 class DiagnosticsEngine;
-class LangOptions;
-class CodeGenOptions;
 class MacroBuilder;
 
 /// Contains information gathered from parsing the contents of TargetAttr.
@@ -75,7 +78,6 @@ struct ParsedTargetAttr {
   }
 };
 
-namespace Builtin { struct Info; }
 
 enum class FloatModeKind {
   NoFloat = 0,

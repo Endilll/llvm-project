@@ -13,18 +13,23 @@
 #ifndef LLVM_CLANG_AST_STMTOPENACC_H
 #define LLVM_CLANG_AST_STMTOPENACC_H
 
-#include "clang/AST/OpenACCClause.h"
-#include "clang/AST/Stmt.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/OpenACCKinds.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/Support/TrailingObjects.h"
 #include <cassert>
 #include <cstddef>
 #include <memory>
 
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/OpenACCKinds.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/Support/TrailingObjects.h"
+#include "clang/AST/StmtIterator.h"
+#include "llvm/ADT/ArrayRef.h"
+
 namespace clang {
+class ASTContext;
+class Expr;
+class OpenACCClause;
+
 /// This is the base class for an OpenACC statement-level construct, other
 /// construct types are expected to inherit from this.
 class OpenACCConstructStmt : public Stmt {

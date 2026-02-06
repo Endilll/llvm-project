@@ -9,12 +9,12 @@
 #ifndef LLVM_CLANG_FRONTEND_CHAINEDDIAGNOSTICCONSUMER_H
 #define LLVM_CLANG_FRONTEND_CHAINEDDIAGNOSTICCONSUMER_H
 
-#include "clang/Basic/Diagnostic.h"
 #include <memory>
 #include <utility>
 
+#include "clang/Basic/Diagnostic.h"
+
 namespace clang {
-class LangOptions;
 
 /// ChainedDiagnosticConsumer - Chain two diagnostic clients so that diagnostics
 /// go to the first client and then the second. The first diagnostic client

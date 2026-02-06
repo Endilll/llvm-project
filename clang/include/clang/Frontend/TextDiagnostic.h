@@ -16,14 +16,23 @@
 #define LLVM_CLANG_FRONTEND_TEXTDIAGNOSTIC_H
 
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Frontend/DiagnosticRenderer.h"
 #include "llvm/Support/FormattedStream.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/ArrayRef.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
+class DiagnosticOptions;
+class LangOptions;
+class Preprocessor;
+class SourceManager;
 
 using llvm::formatted_raw_ostream;
 

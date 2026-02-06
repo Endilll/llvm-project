@@ -11,6 +11,20 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <map>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <new>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/TypeBase.h"
@@ -39,18 +53,14 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <map>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/AST/CanonicalType.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ImmutableMap.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;
@@ -2038,6 +2048,12 @@ public:
   case SymExpr::Id##Kind:                                                      \
     DISPATCH(Id);
 #include "clang/StaticAnalyzer/Core/PathSensitive/Symbols.def"
+
+namespace clang {
+namespace ento {
+class ExprEngine;
+}  // namespace ento
+}  // namespace clang
     }
     llvm_unreachable("Unknown SymExpr kind!");
   }
@@ -2072,7 +2088,6 @@ public:
   }                                                                            \
   DEFAULT_ASSIGN(Id)
 #define ABSTRACT_SYMBOL(Id, Parent) SYMBOL(Id, Parent)
-#include "clang/StaticAnalyzer/Core/PathSensitive/Symbols.def"
 
   // Default implementations for the top class that doesn't have parents.
   bool assignSymExprImpl(const SymExpr *Sym, RangeSet Constraint) {

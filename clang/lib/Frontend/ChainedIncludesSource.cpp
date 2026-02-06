@@ -11,6 +11,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -18,7 +24,6 @@
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Frontend/ASTUnit.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendOptions.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
@@ -34,11 +39,19 @@
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTConsumer.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Frontend/CompilerInvocation.h"
+#include "clang/Frontend/Utils.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace clang {
+class ASTDeserializationListener;
+class ModuleFileExtension;
+}  // namespace clang
 
 using namespace clang;
 

@@ -14,22 +14,24 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGLOOPINFO_H
 #define LLVM_CLANG_LIB_CODEGEN_CGLOOPINFO_H
 
-#include "llvm/ADT/ArrayRef.h"
+#include <memory>
+#include <optional>
+
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/IR/DebugLoc.h"
-#include "llvm/IR/Value.h"
-#include "llvm/Support/Compiler.h"
+#include "llvm/IR/Metadata.h"
 
 namespace llvm {
 class BasicBlock;
 class Instruction;
-class MDNode;
+template <typename T> class ArrayRef;
 } // end namespace llvm
 
 namespace clang {
 class Attr;
 class ASTContext;
 class CodeGenOptions;
+
 namespace CodeGen {
 
 /// Attributes that may be specified on loops.

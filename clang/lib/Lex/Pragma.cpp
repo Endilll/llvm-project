@@ -12,6 +12,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/Pragma.h"
+
+#include <algorithm>
+#include <cassert>
+#include <climits>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/CLWarnings.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -44,16 +56,10 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Timer.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <climits>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/Lex/ModuleMap.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 

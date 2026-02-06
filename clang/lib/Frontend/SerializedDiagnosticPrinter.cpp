@@ -7,13 +7,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/SerializedDiagnosticPrinter.h"
+
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <iterator>
+
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
 #include "clang/Frontend/DiagnosticRenderer.h"
 #include "clang/Frontend/SerializedDiagnosticReader.h"
 #include "clang/Frontend/SerializedDiagnostics.h"
@@ -28,12 +35,19 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <system_error>
-#include <utility>
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class LangOptions;
+class SourceManager;
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::serialized_diags;

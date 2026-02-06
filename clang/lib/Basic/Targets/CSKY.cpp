@@ -11,17 +11,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "CSKY.h"
+
+#include <string>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/MacroBuilder.h"
-#include "clang/Basic/OpenCLOptions.h"
 #include "clang/Basic/TargetInfo.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/TargetParser/CSKYTargetParser.h"
-#include <cstdint>
-#include <string>
-#include <vector>
 
 using namespace clang;
 using namespace clang::targets;

@@ -6,6 +6,14 @@
 //
 //===----------------------------------------------------------------------===//
 #include "InterpBuiltinBitCast.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <memory>
+#include <variant>
+
 #include "BitcastBuffer.h"
 #include "Boolean.h"
 #include "ByteCode/Descriptor.h"
@@ -22,7 +30,6 @@
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/RecordLayout.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/DiagnosticAST.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -32,13 +39,17 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SwapByteOrder.h"
-
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstring>
-#include <memory>
-#include <variant>
+#include "ByteCode/FunctionPointer.h"
+#include "ByteCode/IntegralAP.h"
+#include "ByteCode/InterpFrame.h"
+#include "ByteCode/Source.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/OptionalDiagnostic.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace clang::interp;

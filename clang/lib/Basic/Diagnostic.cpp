@@ -11,6 +11,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/Diagnostic.h"
+
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include <new>
+
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/DiagnosticError.h"
@@ -36,18 +49,17 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/SpecialCaseList.h"
 #include "llvm/Support/Unicode.h"
-#include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/MemoryBufferRef.h"
+
+namespace clang {
+namespace diag {
+enum class Group;
+}  // namespace diag
+}  // namespace clang
 
 using namespace clang;
 

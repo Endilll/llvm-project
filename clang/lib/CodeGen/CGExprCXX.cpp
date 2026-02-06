@@ -10,12 +10,22 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <new>
+
 #include "Address.h"
 #include "CGCUDARuntime.h"
 #include "CGCXXABI.h"
 #include "CGCleanup.h"
 #include "CGDebugInfo.h"
-#include "CGObjCRuntime.h"
 #include "CGValue.h"
 #include "CodeGenFunction.h"
 #include "CodeGenTBAA.h"
@@ -33,7 +43,6 @@
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/RecordLayout.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/CodeGenOptions.h"
@@ -53,14 +62,33 @@
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "CGBuilder.h"
+#include "CGCall.h"
+#include "CodeGenModule.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class BasicBlock;
+class Type;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

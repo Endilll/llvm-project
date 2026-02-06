@@ -11,9 +11,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "M68k.h"
+
+#include <cstdint>
+#include <limits>
+#include <optional>
+#include <string>
+#include <string_view>
+
 #include "TargetDefines.h"
 #include "clang/Basic/Builtins.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/MacroBuilder.h"
 #include "clang/Basic/Specifiers.h"
@@ -23,13 +29,13 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
-#include "llvm/ADT/Twine.h"
-#include "llvm/TargetParser/TargetParser.h"
-#include <cstdint>
-#include <limits>
-#include <optional>
-#include <string>
-#include <string_view>
+#include "llvm/ADT/StringMap.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+class Triple;
+class Twine;
+}  // namespace llvm
 
 namespace clang {
 namespace targets {

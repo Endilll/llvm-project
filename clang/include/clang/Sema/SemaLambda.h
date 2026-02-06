@@ -15,7 +15,6 @@
 #ifndef LLVM_CLANG_SEMA_SEMALAMBDA_H
 #define LLVM_CLANG_SEMA_SEMALAMBDA_H
 
-#include "clang/AST/Decl.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/UnsignedOrNone.h"
 
@@ -24,6 +23,7 @@ namespace sema {
 class FunctionScopeInfo;
 }
 class Sema;
+class ValueDecl;
 
 /// Examines the FunctionScopeInfo stack to determine the nearest
 /// enclosing lambda (to the current lambda) that is 'capture-capable' for

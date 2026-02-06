@@ -9,24 +9,26 @@
 #ifndef LLVM_CLANG_AST_RAWCOMMENTLIST_H
 #define LLVM_CLANG_AST_RAWCOMMENTLIST_H
 
-#include "clang/Basic/CommentOptions.h"
+#include <map>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
-#include <map>
-#include <string>
-#include <vector>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 
 class ASTContext;
-class ASTReader;
 class Decl;
 class DiagnosticsEngine;
 class Preprocessor;
 class SourceManager;
+struct CommentOptions;
 
 namespace comments {
   class FullComment;

@@ -11,10 +11,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "RISCV.h"
+
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <map>
+
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/CFProtectionOptions.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/MacroBuilder.h"
 #include "clang/Basic/Specifiers.h"
@@ -31,14 +41,12 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/RISCVISAInfo.h"
 #include "llvm/TargetParser/RISCVTargetParser.h"
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/StringTable.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/RISCVISAUtils.h"
 
 using namespace clang;
 using namespace clang::targets;

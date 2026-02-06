@@ -10,6 +10,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <iterator>
+#include <utility>
+#include <functional>
+#include <optional>
+#include <tuple>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGCXXABI.h"
@@ -31,32 +39,53 @@
 #include "clang/AST/ComparisonCategories.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclTemplate.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/StmtVisitor.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/Function.h"
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/InstrTypes.h"
-#include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/IntrinsicInst.h"
-#include "llvm/IR/Intrinsics.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TypeSize.h"
-#include <cassert>
-#include <cstdint>
-#include <iterator>
-#include <utility>
+#include "CodeGenTypes.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/RecordLayout.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Stmt;
+}  // namespace clang
+namespace llvm {
+class BasicBlock;
+class Instruction;
+class MDNode;
+}  // namespace llvm
+
 using namespace clang;
 using namespace CodeGen;
 

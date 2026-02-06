@@ -11,12 +11,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/XRayLists.h"
+
+#include <string>
+
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "llvm/Support/SpecialCaseList.h"
-#include <string>
+#include "llvm/ADT/ArrayRef.h"
 
 using namespace clang;
 

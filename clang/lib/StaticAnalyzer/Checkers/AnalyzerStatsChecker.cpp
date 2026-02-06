@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 // This file reports various statistics about analyzer visitation.
 //===----------------------------------------------------------------------===//
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/Analysis/CFG.h"
@@ -25,8 +29,14 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/raw_ostream.h"
-#include <optional>
-#include <string>
+#include "clang/AST/DeclBase.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/CoreEngine.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

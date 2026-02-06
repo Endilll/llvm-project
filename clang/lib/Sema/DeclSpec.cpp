@@ -11,6 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/DeclSpec.h"
+
+#include <cassert>
+#include <cstring>
+#include <iterator>
+#include <memory>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -26,7 +33,6 @@
 #include "clang/Basic/ExceptionSpecificationType.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
-#include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/Specifiers.h"
@@ -37,11 +43,13 @@
 #include "clang/Sema/Sema.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstring>
-#include <iterator>
-#include <memory>
-#include <utility>
+#include "clang/Basic/OpenCLOptions.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
+
 using namespace clang;
 
 

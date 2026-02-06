@@ -11,6 +11,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/CXXInheritance.h"
+
+#include <cassert>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -21,14 +25,14 @@
 #include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/iterator_range.h"
-#include <algorithm>
-#include <cassert>
-#include <utility>
+#include "clang/AST/CanonicalType.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

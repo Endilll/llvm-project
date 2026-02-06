@@ -10,6 +10,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <utility>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGBuiltin.h"
@@ -27,7 +33,6 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Analysis/ValueTracking.h"
-#include "llvm/CodeGen/MachineFunction.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
@@ -47,9 +52,22 @@
 #include "llvm/Support/AtomicOrdering.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Target/TargetOptions.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 using namespace CodeGen;

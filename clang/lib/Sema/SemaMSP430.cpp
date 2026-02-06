@@ -11,6 +11,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaMSP430.h"
+
+#include <optional>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/DeclBase.h"
@@ -19,9 +22,12 @@
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/SemaBase.h"
 #include "llvm/ADT/APSInt.h"
-#include <optional>
+#include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/AttributeCommonInfo.h"
 
 namespace clang {
+class Sema;
 
 SemaMSP430::SemaMSP430(Sema &S) : SemaBase(S) {}
 

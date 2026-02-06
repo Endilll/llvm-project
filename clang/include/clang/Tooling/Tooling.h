@@ -29,8 +29,12 @@
 #ifndef LLVM_CLANG_TOOLING_TOOLING_H
 #define LLVM_CLANG_TOOLING_TOOLING_H
 
-#include "clang/AST/ASTConsumer.h"
-#include "clang/Basic/DiagnosticOptions.h"
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Frontend/ASTUnit.h"
@@ -43,10 +47,10 @@
 #include "llvm/Option/Option.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/Serialization/PCHContainerOperations.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Error.h"
 
 namespace clang {
 
@@ -54,6 +58,7 @@ class CompilerInstance;
 class CompilerInvocation;
 class DiagnosticConsumer;
 class DiagnosticsEngine;
+class DiagnosticOptions;
 
 namespace driver {
 

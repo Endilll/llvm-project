@@ -12,9 +12,12 @@
 #ifndef LLVM_CLANG_SEMA_CHECK_EXPR_LIFETIME_H
 #define LLVM_CLANG_SEMA_CHECK_EXPR_LIFETIME_H
 
-#include "clang/AST/Expr.h"
-#include "clang/Sema/Initialization.h"
-#include "clang/Sema/Sema.h"
+namespace clang {
+class CXXMethodDecl;
+class Expr;
+class InitializedEntity;
+class Sema;
+}  // namespace clang
 
 namespace clang::sema {
 

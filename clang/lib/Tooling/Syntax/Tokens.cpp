@@ -7,10 +7,17 @@
 //===----------------------------------------------------------------------===//
 #include "clang/Tooling/Syntax/Tokens.h"
 
-#include "clang/Basic/Diagnostic.h"
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TokenKinds.h"
@@ -26,14 +33,14 @@
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/Basic/FileEntry.h"
+#include "llvm/ADT/FunctionExtras.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FormatVariadicDetails.h"
+
+namespace clang {
+class LangOptions;
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::syntax;

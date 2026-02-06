@@ -9,13 +9,13 @@
 #ifndef CLANG_INCLUDE_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_ENTRYPOINTSTATS_H
 #define CLANG_INCLUDE_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_ENTRYPOINTSTATS_H
 
-#include "clang/AST/ASTContext.h"
-#include "llvm/ADT/Statistic.h"
-#include "llvm/ADT/StringRef.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <optional>
+
+#include "llvm/ADT/Statistic.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace llvm {
 class raw_ostream;
@@ -23,6 +23,7 @@ class raw_ostream;
 
 namespace clang {
 class Decl;
+class ASTContext;
 
 namespace ento {
 

@@ -13,13 +13,25 @@
 #ifndef LLVM_CLANG_AST_INTERP_INTERP_H
 #define LLVM_CLANG_AST_INTERP_INTERP_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <type_traits>
+#include <algorithm>
+#include <cstddef>
+#include <cstring>
+#include <functional>
+#include <initializer_list>
+#include <new>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "../ExprConstShared.h"
 #include "BitcastBuffer.h"
 #include "Boolean.h"
 #include "DynamicAllocator.h"
 #include "FixedPoint.h"
 #include "Floating.h"
-#include "Function.h"
 #include "InterpBuiltinBitCast.h"
 #include "InterpFrame.h"
 #include "InterpHelpers.h"
@@ -33,10 +45,46 @@
 #include "clang/AST/Expr.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APSInt.h"
-#include <type_traits>
+#include "ByteCode/Context.h"
+#include "ByteCode/Descriptor.h"
+#include "ByteCode/FunctionPointer.h"
+#include "ByteCode/Integral.h"
+#include "ByteCode/IntegralAP.h"
+#include "ByteCode/InterpBlock.h"
+#include "ByteCode/Pointer.h"
+#include "ByteCode/Primitives.h"
+#include "ByteCode/Record.h"
+#include "ByteCode/Source.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/ComparisonCategories.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/OptionalDiagnostic.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticAST.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/ADT/APFixedPoint.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+enum class RoundingMode : int8_t;
+}  // namespace llvm
 
 namespace clang {
 namespace interp {
+class Function;
 
 using APSInt = llvm::APSInt;
 using FixedPointSemantics = llvm::FixedPointSemantics;

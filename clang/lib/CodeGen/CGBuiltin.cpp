@@ -11,7 +11,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGBuiltin.h"
-#include "ABIInfo.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <memory>
+
 #include "Address.h"
 #include "CGCUDARuntime.h"
 #include "CGCXXABI.h"
@@ -28,7 +40,7 @@
 #include "PatternInit.h"
 #include "SanitizerHandler.h"
 #include "TargetInfo.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
@@ -36,10 +48,8 @@
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/StmtVisitor.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Builtins.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/Sanitizers.h"
@@ -59,7 +69,6 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/Constants.h"
-#include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/FPEnv.h"
 #include "llvm/IR/InlineAsm.h"
@@ -81,15 +90,40 @@
 #include "llvm/Support/TypeSize.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "CGBuilder.h"
+#include "CGCall.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/DebugLoc.h"
+#include "llvm/IR/FMF.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+
+namespace llvm {
+class DILocation;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

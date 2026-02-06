@@ -7,6 +7,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/DependencyScanning/DependencyScanningFilesystem.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+#include <new>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Lex/DependencyDirectivesScanner.h"
 #include "llvm/ADT/Hashing.h"
@@ -21,16 +34,8 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Threading.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <mutex>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
 
 using namespace clang;
 using namespace dependencies;

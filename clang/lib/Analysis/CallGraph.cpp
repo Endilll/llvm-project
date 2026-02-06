@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/CallGraph.h"
+
+#include <cassert>
+#include <memory>
+#include <string>
+#include <iterator>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -29,9 +35,8 @@
 #include "llvm/Support/DOTGraphTraits.h"
 #include "llvm/Support/GraphWriter.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <string>
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/StmtIterator.h"
 
 using namespace clang;
 

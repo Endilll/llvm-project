@@ -14,24 +14,32 @@
 //===----------------------------------------------------------------------===//
 
 #include "ObjCPropertyAttributeOrderFixer.h"
+
+#include <cassert>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "FormatToken.h"
 #include "FormatTokenLexer.h"
 #include "TokenAnalyzer.h"
 #include "TokenAnnotator.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Format/Format.h"
 #include "clang/Tooling/Core/Replacement.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <set>
-#include <string>
-#include <utility>
+#include "AffectedRangeManager.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
+class SourceManager;
+
 namespace format {
 
 ObjCPropertyAttributeOrderFixer::ObjCPropertyAttributeOrderFixer(

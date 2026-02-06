@@ -13,12 +13,14 @@
 #ifndef LLVM_CLANG_FRONTEND_TEXTDIAGNOSTICBUFFER_H
 #define LLVM_CLANG_FRONTEND_TEXTDIAGNOSTICBUFFER_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/SourceLocation.h"
 #include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>
+#include <iterator>
+
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/SourceLocation.h"
 
 namespace clang {
 

@@ -11,6 +11,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/HeaderMap.h"
+
+#include <string.h>
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <utility>
+
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
@@ -21,12 +29,10 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string.h>
-#include <utility>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/raw_ostream.h"
+
 using namespace clang;
 
 /// HashHMapKey - This is the 'well known' hash function required by the file

@@ -10,6 +10,9 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <optional>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/OperationKinds.h"
@@ -25,9 +28,11 @@
 #include "clang/Sema/SemaOpenACC.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/Support/ErrorHandling.h"
-
-#include <cassert>
-#include <optional>
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

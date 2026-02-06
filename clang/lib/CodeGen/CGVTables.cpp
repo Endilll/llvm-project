@@ -10,6 +10,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdio>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <functional>
+
 #include "Address.h"
 #include "CGVTables.h"
 #include "CGCXXABI.h"
@@ -20,13 +30,10 @@
 #include "CodeGenModule.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/BaseSubobject.h"
-#include "clang/AST/CXXInheritance.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/Mangle.h"
-#include "clang/AST/RecordLayout.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/VTableBuilder.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/CodeGenOptions.h"
@@ -63,14 +70,32 @@
 #include "llvm/TargetParser/Triple.h"
 #include "llvm/Transforms/Utils/Cloning.h"
 #include "llvm/Transforms/Utils/ValueMapper.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdio>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "CGBuilder.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/PointerAuthOptions.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/TrackingMDRef.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
 
 using namespace clang;
 using namespace CodeGen;

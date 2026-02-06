@@ -11,16 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/Availability.h"
+
+#include <algorithm>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Decl.h"
 #include "clang/Basic/TargetInfo.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Casting.h"
-#include <algorithm>
-#include <utility>
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace {
 

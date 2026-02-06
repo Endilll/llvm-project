@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/InstallAPI/FileList.h"
+#include "clang/Basic/LangStandard.h"
 #include "clang/InstallAPI/HeaderFile.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/MemoryBuffer.h"

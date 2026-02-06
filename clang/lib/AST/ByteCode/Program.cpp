@@ -7,27 +7,33 @@
 //===----------------------------------------------------------------------===//
 
 #include "Program.h"
-#include "ByteCode/Descriptor.h"
-#include "ByteCode/InterpBlock.h"
-#include "ByteCode/Record.h"
-#include "Context.h"
-#include "Function.h"
-#include "Integral.h"
-#include "PrimType.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclTemplate.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/UnsignedOrNone.h"
-#include <cassert>
+
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <limits>
 #include <optional>
 #include <utility>
+#include <new>
+
+#include "ByteCode/Descriptor.h"
+#include "ByteCode/InterpBlock.h"
+#include "ByteCode/Record.h"
+#include "Context.h"
+#include "Integral.h"
+#include "PrimType.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "ByteCode/IntegralAP.h"
+#include "ByteCode/Pointer.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/Type.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace clang::interp;

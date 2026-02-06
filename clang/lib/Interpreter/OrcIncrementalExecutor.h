@@ -13,24 +13,16 @@
 #ifndef LLVM_CLANG_LIB_INTERPRETER_ORCINCREMENTALEXECUTOR_H
 #define LLVM_CLANG_LIB_INTERPRETER_ORCINCREMENTALEXECUTOR_H
 
-#include "clang/Interpreter/IncrementalExecutor.h"
-
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ExecutionEngine/Orc/Core.h"
-#include "llvm/ExecutionEngine/Orc/ExecutionUtils.h"
-#include "llvm/ExecutionEngine/Orc/Layer.h"
-#include "llvm/ExecutionEngine/Orc/Shared/ExecutorAddress.h"
-#include "llvm/ExecutionEngine/Orc/SimpleRemoteEPC.h"
-#include "llvm/Support/Error.h"
-
-#include <cstdint>
 #include <memory>
+
+#include "clang/Interpreter/IncrementalExecutor.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ExecutionEngine/Orc/Core.h"
 
 namespace llvm {
 class Error;
+
 namespace orc {
-class JITTargetMachineBuilder;
 class LLJIT;
 class LLJITBuilder;
 class ThreadSafeContext;

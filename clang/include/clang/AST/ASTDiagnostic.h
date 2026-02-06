@@ -9,13 +9,22 @@
 #ifndef LLVM_CLANG_AST_ASTDIAGNOSTIC_H
 #define LLVM_CLANG_AST_ASTDIAGNOSTIC_H
 
-#include "clang/AST/Type.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
 #include <cstdint>
 #include <string>
 
+#include "clang/AST/Type.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class ArrayRef;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
+
 namespace clang {
+class ASTContext;
+
   /// DiagnosticsEngine argument formatting function for diagnostics that
   /// involve AST nodes.
   ///

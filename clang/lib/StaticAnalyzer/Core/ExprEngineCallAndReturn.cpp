@@ -10,6 +10,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <tuple>
+#include <utility>
+
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -39,11 +45,24 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/WorkList.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/SaveAndRestore.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <tuple>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/FunctionSummary.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 using namespace ento;

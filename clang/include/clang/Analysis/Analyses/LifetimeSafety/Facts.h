@@ -14,7 +14,10 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_FACTS_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_FACTS_H
 
-#include "clang/AST/Expr.h"
+#include <cstdint>
+#include <new>
+#include <utility>
+
 #include "clang/Analysis/Analyses/LifetimeSafety/Loans.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Origins.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Utils.h"
@@ -25,8 +28,16 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Allocator.h"
-#include "llvm/Support/Debug.h"
-#include <cstdint>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace clang {
+class Expr;
+class FieldDecl;
+}  // namespace clang
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang::lifetimes::internal {
 

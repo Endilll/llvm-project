@@ -7,6 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "InterpFrame.h"
+
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <iterator>
+#include <new>
+#include <type_traits>
+
 #include "Boolean.h"
 #include "Integral.h"
 #include "ByteCode/Descriptor.h"
@@ -17,7 +26,6 @@
 #include "MemberPointer.h"
 #include "Pointer.h"
 #include "PrimType.h"
-#include "Program.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -29,12 +37,17 @@
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "ByteCode/Context.h"
+#include "ByteCode/FixedPoint.h"
+#include "ByteCode/Floating.h"
+#include "ByteCode/IntegralAP.h"
+#include "ByteCode/InterpBlock.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Expr.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace clang::interp;

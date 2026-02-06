@@ -10,6 +10,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Availability.h"
 #include "clang/AST/Decl.h"
@@ -22,7 +30,6 @@
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/StmtVisitor.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Analysis/DomainSpecific/CocoaConventions.h"
 #include "clang/Basic/Builtins.h"
@@ -58,13 +65,24 @@
 #include "llvm/Support/ConvertUTF.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <cstdint>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/NSAPI.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/PartialDiagnostic.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Sema/CleanupInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
 
 using namespace clang;
 using namespace sema;

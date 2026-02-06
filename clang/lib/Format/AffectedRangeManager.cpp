@@ -13,13 +13,15 @@
 
 #include "AffectedRangeManager.h"
 
+#include <cassert>
+
 #include "FormatToken.h"
 #include "TokenAnnotator.h"
 #include "UnwrappedLineParser.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TokenKinds.h"
-#include <cassert>
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 namespace format {

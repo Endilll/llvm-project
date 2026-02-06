@@ -7,15 +7,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Transformer/Transformer.h"
+
+#include <map>
+#include <utility>
+
 #include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/ASTMatchers/ASTMatchersInternal.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Tooling/Refactoring/AtomicChange.h"
 #include "clang/Tooling/Transformer/RewriteRule.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Error.h"
-#include <map>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/Any.h"
 
 namespace clang {
 namespace tooling {

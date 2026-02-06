@@ -13,21 +13,29 @@
 #ifndef LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_ASTOPS_H
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_ASTOPS_H
 
+#include <optional>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DynamicRecursiveASTVisitor.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
-#include "clang/AST/Type.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Analysis/FlowSensitive/StorageLocation.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/SetVector.h"
-#include <optional>
-#include <utility>
-#include <vector>
+#include "clang/AST/Stmt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
+class QualType;
+
 namespace dataflow {
 
 /// Skip past nodes that the CFG does not emit. These nodes are invisible to

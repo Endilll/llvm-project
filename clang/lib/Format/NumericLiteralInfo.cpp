@@ -15,8 +15,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "NumericLiteralInfo.h"
+
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
 
 namespace clang {
 namespace format {

@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/Environment.h"
+
+#include <cassert>
+#include <utility>
+#include <functional>
+#include <optional>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/PrettyPrinter.h"
@@ -28,8 +34,10 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

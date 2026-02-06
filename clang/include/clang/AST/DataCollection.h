@@ -26,16 +26,18 @@
 #ifndef LLVM_CLANG_AST_DATACOLLECTION_H
 #define LLVM_CLANG_AST_DATACOLLECTION_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/StringRef.h"
 #include <cstddef>
 #include <string>
 #include <type_traits>
 
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringRef.h"
+
 namespace clang {
+class ASTContext;
+class SourceLocation;
+
 namespace data_collection {
 
 /// Returns a string that represents all macro expansions that expanded into the

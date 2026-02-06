@@ -11,15 +11,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/DeclOpenACC.h"
-#include "clang/AST/ASTContext.h"
+
 #include "clang/AST/Attr.h"
-#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclID.h"
 #include "clang/AST/OpenACCClause.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/SmallVector.h"
+
+namespace clang {
+class ASTContext;
+class Expr;
+struct PrintingPolicy;
+}  // namespace clang
 
 using namespace clang;
 

@@ -11,23 +11,26 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ExprConcepts.h"
+
+#include <cassert>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ComputeDependence.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"
-#include "clang/AST/DeclarationName.h"
 #include "clang/AST/DependenceFlags.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/Stmt.h"
-#include "clang/AST/TemplateBase.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/STLExtras.h"
-#include <cassert>
+#include "llvm/ADT/BitmaskEnum.h"
+
+namespace clang {
+class RequiresExprBodyDecl;
+}  // namespace clang
 
 using namespace clang;
 

@@ -9,11 +9,10 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_ABIINFO_H
 #define LLVM_CLANG_LIB_CODEGEN_ABIINFO_H
 
-#include "clang/AST/Attr.h"
-#include "clang/AST/CharUnits.h"
-#include "clang/AST/Type.h"
+#include <stdint.h>
+
 #include "llvm/IR/CallingConv.h"
-#include "llvm/IR/Type.h"
+#include "clang/Basic/LLVM.h"
 
 namespace llvm {
 class Value;
@@ -21,12 +20,22 @@ class LLVMContext;
 class DataLayout;
 class Type;
 class FixedVectorType;
+class StringRef;
+class raw_ostream;
+template <typename T> class ArrayRef;
 } // namespace llvm
 
 namespace clang {
 class ASTContext;
 class CodeGenOptions;
 class TargetInfo;
+class CharUnits;
+class LangOptions;
+class QualType;
+class TargetAttr;
+class TargetClonesAttr;
+class TargetVersionAttr;
+class Type;
 
 namespace CodeGen {
 class ABIArgInfo;

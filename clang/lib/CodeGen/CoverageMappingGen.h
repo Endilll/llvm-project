@@ -13,14 +13,25 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_COVERAGEMAPPINGGEN_H
 #define LLVM_CLANG_LIB_CODEGEN_COVERAGEMAPPINGGEN_H
 
+#include <stdint.h>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/IR/GlobalValue.h"
 #include "llvm/Support/CommandLine.h"
-#include "llvm/Support/raw_ostream.h"
+#include "clang/Basic/FileEntry.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+class Constant;
+class GlobalVariable;
+class StringRef;
+class raw_ostream;
+}  // namespace llvm
 
 namespace llvm::coverage {
 extern cl::opt<bool> SystemHeadersCoverage;
@@ -30,8 +41,6 @@ namespace clang {
 
 class LangOptions;
 class SourceManager;
-class FileEntry;
-class Preprocessor;
 class Decl;
 class Stmt;
 

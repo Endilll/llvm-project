@@ -7,17 +7,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Driver/Distro.h"
+
+#include <memory>
+#include <utility>
+#include <string>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/Threading.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/TargetParser/Host.h"
 #include "llvm/TargetParser/Triple.h"
-#include <memory>
-#include <utility>
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
 
 using namespace clang::driver;
 using namespace clang;

@@ -14,18 +14,22 @@
 #ifndef LLVM_CLANG_BASIC_SOURCELOCATION_H
 #define LLVM_CLANG_BASIC_SOURCELOCATION_H
 
-#include "clang/Basic/FileEntry.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/DenseMapInfo.h"
 #include <cassert>
 #include <cstdint>
 #include <string>
 #include <utility>
 
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/PointerIntPair.h"
+
 namespace llvm {
 
 class FoldingSetNodeID;
 template <typename T, typename Enable> struct FoldingSetTrait;
+class StringRef;
+class raw_ostream;
 
 } // namespace llvm
 

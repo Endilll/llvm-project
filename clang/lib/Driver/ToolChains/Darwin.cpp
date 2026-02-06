@@ -7,6 +7,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "Darwin.h"
+
+#include <cstdlib> // ::getenv
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <initializer_list>
+#include <vector>
+
 #include "Arch/ARM.h"
 #include "clang/Basic/AlignedAllocation.h"
 #include "clang/Basic/DarwinSDKInfo.h"
@@ -50,16 +61,11 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/ARMTargetParser.h"
 #include "llvm/TargetParser/Host.h"
-#include "llvm/TargetParser/TargetParser.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <cstdlib> // ::getenv
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Option/OptSpecifier.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

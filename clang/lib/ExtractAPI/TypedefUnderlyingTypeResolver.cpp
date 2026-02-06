@@ -12,13 +12,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ExtractAPI/TypedefUnderlyingTypeResolver.h"
+
+#include <string>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Module.h"
 #include "clang/ExtractAPI/API.h"
 #include "clang/Index/USRGeneration.h"
-#include <string>
+#include "clang/AST/DeclObjC.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 using namespace extractapi;

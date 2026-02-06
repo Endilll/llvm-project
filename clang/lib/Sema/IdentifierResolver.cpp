@@ -12,6 +12,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/IdentifierResolver.h"
+
+#include <cassert>
+#include <cstdint>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclarationName.h"
@@ -23,8 +27,7 @@
 #include "clang/Sema/Scope.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

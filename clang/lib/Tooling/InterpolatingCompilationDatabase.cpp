@@ -42,6 +42,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangStandard.h"
 #include "clang/Driver/Driver.h"
@@ -59,14 +69,11 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/StringSaver.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Option/Arg.h"
+#include "llvm/Option/Option.h"
 
 namespace clang {
 namespace tooling {

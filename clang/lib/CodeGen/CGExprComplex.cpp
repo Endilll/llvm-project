@@ -10,6 +10,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <tuple>
+#include <utility>
+
 #include "CGBuilder.h"
 #include "CGCall.h"
 #include "CGDebugInfo.h"
@@ -38,11 +42,34 @@
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/MDBuilder.h"
-#include "llvm/IR/Metadata.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <tuple>
+#include "Address.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace CodeGen {
+class CGFunctionInfo;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class BasicBlock;
+class MDNode;
+}  // namespace llvm
+
 using namespace clang;
 using namespace CodeGen;
 

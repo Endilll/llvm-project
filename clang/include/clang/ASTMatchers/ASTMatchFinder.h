@@ -40,22 +40,29 @@
 #ifndef LLVM_CLANG_ASTMATCHERS_ASTMATCHFINDER_H
 #define LLVM_CLANG_ASTMATCHERS_ASTMATCHFINDER_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTTypeTraits.h"
-#include "clang/AST/ExternalASTSource.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/ASTMatchers/ASTMatchersInternal.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceManager.h"
-#include "llvm/ADT/SmallPtrSet.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/Support/Timer.h"
 #include <memory>
 #include <optional>
 #include <utility>
 #include <vector>
+#include <iterator>
+
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/ASTMatchers/ASTMatchers.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/StringMap.h"
+#include "clang/AST/ASTConsumer.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class TimeRecord;
+}  // namespace llvm
 
 namespace clang {
+class ASTContext;
+class SourceManager;
 
 namespace ast_matchers {
 

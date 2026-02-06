@@ -10,6 +10,17 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <iterator>
+#include <optional>
+#include <set>
+#include <string>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/CXXInheritance.h"
@@ -22,17 +33,14 @@
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
 #include "clang/AST/GlobalDecl.h"
 #include "clang/AST/Mangle.h"
 #include "clang/AST/TemplateBase.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/VTableBuilder.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Linkage.h"
@@ -56,16 +64,20 @@
 #include "llvm/Support/StringSaver.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/xxhash.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <iterator>
-#include <optional>
-#include <set>
-#include <string>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/RecordLayout.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Thunk.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 
@@ -480,6 +492,7 @@ private:
                                             Qualifiers Quals, \
                                             SourceRange Range);
 #include "clang/AST/TypeNodes.inc"
+
 #undef ABSTRACT_TYPE
 #undef NON_CANONICAL_TYPE
 #undef TYPE
@@ -2668,6 +2681,7 @@ void MicrosoftCXXNameMangler::mangleType(QualType T, SourceRange Range,
     mangleType(cast<CLASS##Type>(ty), Quals, Range); \
     break;
 #include "clang/AST/TypeNodes.inc"
+
 #undef ABSTRACT_TYPE
 #undef NON_CANONICAL_TYPE
 #undef TYPE
@@ -2778,6 +2792,7 @@ void MicrosoftCXXNameMangler::mangleType(const BuiltinType *T, Qualifiers,
 #define PLACEHOLDER_TYPE(Id, SingletonId) \
   case BuiltinType::Id:
 #include "clang/AST/BuiltinTypes.def"
+
   case BuiltinType::Dependent:
     llvm_unreachable("placeholder types shouldn't get to name mangling");
 
@@ -2796,6 +2811,7 @@ void MicrosoftCXXNameMangler::mangleType(const BuiltinType *T, Qualifiers,
     Out << "PAUocl_" #ImgType "_" #Suffix "@@"; \
     break;
 #include "clang/Basic/OpenCLImageTypes.def"
+
   case BuiltinType::OCLSampler:
     Out << "PA";
     mangleArtificialTagType(TagTypeKind::Struct, "ocl_sampler");

@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/TypeLoc.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
@@ -28,10 +34,7 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstring>
+#include "clang/AST/Decl.h"
 
 using namespace clang;
 
@@ -402,9 +405,11 @@ TypeSpecifierType BuiltinTypeLoc::getWrittenTypeSpec() const {
 #define IMAGE_TYPE(ImgType, Id, SingletonId, Access, Suffix) \
   case BuiltinType::Id:
 #include "clang/Basic/OpenCLImageTypes.def"
+
 #define EXT_OPAQUE_TYPE(ExtType, Id, Ext) \
   case BuiltinType::Id:
 #include "clang/Basic/OpenCLExtensionTypes.def"
+
   case BuiltinType::OCLSampler:
   case BuiltinType::OCLEvent:
   case BuiltinType::OCLClkEvent:
@@ -413,17 +418,23 @@ TypeSpecifierType BuiltinTypeLoc::getWrittenTypeSpec() const {
 #define SVE_TYPE(Name, Id, SingletonId) \
   case BuiltinType::Id:
 #include "clang/Basic/AArch64ACLETypes.def"
+
 #define PPC_VECTOR_TYPE(Name, Id, Size) \
   case BuiltinType::Id:
 #include "clang/Basic/PPCTypes.def"
+
 #define RVV_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/RISCVVTypes.def"
+
 #define WASM_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/WebAssemblyReferenceTypes.def"
+
 #define AMDGPU_TYPE(Name, Id, SingletonId, Width, Align) case BuiltinType::Id:
 #include "clang/Basic/AMDGPUTypes.def"
+
 #define HLSL_INTANGIBLE_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/HLSLIntangibleTypes.def"
+
   case BuiltinType::BuiltinFn:
   case BuiltinType::IncompleteMatrixIdx:
   case BuiltinType::ArraySection:

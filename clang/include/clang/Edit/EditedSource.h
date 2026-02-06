@@ -9,15 +9,24 @@
 #ifndef LLVM_CLANG_EDIT_EDITEDSOURCE_H
 #define LLVM_CLANG_EDIT_EDITEDSOURCE_H
 
+#include <map>
+#include <tuple>
+#include <utility>
+
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Edit/FileOffset.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/Allocator.h"
-#include <map>
-#include <tuple>
-#include <utility>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+class Twine;
+}  // namespace llvm
 
 namespace clang {
 

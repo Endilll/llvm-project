@@ -12,6 +12,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/TemplateBase.h"
+
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <new>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -36,10 +44,9 @@
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
+#include "clang/AST/APValue.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/SmallString.h"
 
 using namespace clang;
 

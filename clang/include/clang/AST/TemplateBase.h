@@ -14,11 +14,15 @@
 #ifndef LLVM_CLANG_AST_TEMPLATEBASE_H
 #define LLVM_CLANG_AST_TEMPLATEBASE_H
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+
 #include "clang/AST/DependenceFlags.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/TemplateName.h"
 #include "clang/AST/TypeBase.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/UnsignedOrNone.h"
@@ -29,14 +33,18 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Expr;
+class StreamingDiagnostic;
+}  // namespace clang
 
 namespace llvm {
 
 class FoldingSetNodeID;
+class raw_ostream;
+template <typename T> struct PointerLikeTypeTraits;
 
 // Provide PointerLikeTypeTraits for clang::Expr*, this default one requires a
 // full definition of Expr, but this file only sees a forward del because of
@@ -57,7 +65,6 @@ class APValue;
 class ASTContext;
 class Expr;
 struct PrintingPolicy;
-class TypeSourceInfo;
 class ValueDecl;
 
 /// Represents a template argument.

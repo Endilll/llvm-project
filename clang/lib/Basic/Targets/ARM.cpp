@@ -11,11 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "ARM.h"
+
+#include <array>
+#include <cassert>
+#include <cstring>
+#include <string>
+#include <string_view>
+#include <vector>
+
 #include "TargetDefines.h"
 #include "Targets/OSTargets.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/MacroBuilder.h"
 #include "clang/Basic/Specifiers.h"
@@ -34,13 +41,9 @@
 #include "llvm/Support/CodeGen.h"
 #include "llvm/TargetParser/ARMTargetParser.h"
 #include "llvm/TargetParser/ARMTargetParserCommon.h"
-#include <array>
-#include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <string>
-#include <string_view>
-#include <vector>
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 using namespace clang::targets;

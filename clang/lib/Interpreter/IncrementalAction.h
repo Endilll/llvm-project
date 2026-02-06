@@ -9,17 +9,25 @@
 #ifndef LLVM_CLANG_INTERPRETER_INCREMENTALACTION_H
 #define LLVM_CLANG_INTERPRETER_INCREMENTALACTION_H
 
-#include "clang/Frontend/FrontendActions.h"
+#include <memory>
+
 #include "clang/Frontend/MultiplexConsumer.h"
+#include "clang/AST/ASTConsumer.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Frontend/FrontendAction.h"
+#include "llvm/IR/Module.h"
 
 namespace llvm {
-class Module;
-}
+class Error;
+class LLVMContext;
+}  // namespace llvm
 
 namespace clang {
 
 class Interpreter;
 class CodeGenerator;
+class CompilerInstance;
 
 /// A custom action enabling the incremental processing functionality.
 ///

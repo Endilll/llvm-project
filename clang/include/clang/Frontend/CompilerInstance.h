@@ -9,38 +9,6 @@
 #ifndef LLVM_CLANG_FRONTEND_COMPILERINSTANCE_H_
 #define LLVM_CLANG_FRONTEND_COMPILERINSTANCE_H_
 
-#include "clang/APINotes/APINotesOptions.h"
-#include "clang/AST/ASTConsumer.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
-#include "clang/Basic/DiagnosticOptions.h"
-#include "clang/Basic/FileSystemOptions.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TargetInfo.h"
-#include "clang/Frontend/CompilerInvocation.h"
-#include "clang/Frontend/DependencyOutputOptions.h"
-#include "clang/Frontend/FrontendOptions.h"
-#include "clang/Frontend/Utils.h"
-#include "clang/Lex/DependencyDirectivesScanner.h"
-#include "clang/Lex/HeaderSearchOptions.h"
-#include "clang/Lex/ModuleLoader.h"
-#include "clang/Sema/CodeCompleteOptions.h"
-#include "clang/Serialization/ModuleFileExtension.h"
-#include "clang/Serialization/PCHContainerOperations.h"
-#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/StringSet.h"
-#include "llvm/Support/BuryPointer.h"
-#include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/VirtualFileSystem.h"
-#include "llvm/Support/VirtualOutputBackend.h"
-#include "llvm/Support/VirtualOutputFile.h"
-#include "llvm/Support/raw_ostream.h"
 #include <cassert>
 #include <functional>
 #include <list>
@@ -51,33 +19,69 @@
 #include <utility>
 #include <vector>
 
+#include "clang/AST/ASTConsumer.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/Frontend/CompilerInvocation.h"
+#include "clang/Frontend/Utils.h"
+#include "clang/Lex/DependencyDirectivesScanner.h"
+#include "clang/Lex/HeaderSearchOptions.h"
+#include "clang/Lex/ModuleLoader.h"
+#include "clang/Serialization/PCHContainerOperations.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/StringSet.h"
+#include "llvm/Support/BuryPointer.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/Support/raw_ostream.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/Module.h"
+#include "clang/Sema/CodeCompleteConsumer.h"
+#include "clang/Sema/Sema.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/Timer.h"
+
 namespace llvm {
-class raw_fd_ostream;
 class PassPlugin;
-class Timer;
-class TimerGroup;
+namespace vfs {
+class OutputBackend;
+class OutputFile;
+}  // namespace vfs
 }
 
 namespace clang {
-class ASTContext;
 class ASTReader;
 
 namespace serialization {
 class ModuleFile;
 }
 
-class CodeCompleteConsumer;
-class DiagnosticsEngine;
-class DiagnosticConsumer;
-class FileManager;
 class FrontendAction;
-class Module;
 class ModuleCache;
 class Preprocessor;
-class Sema;
-class SourceManager;
-class TargetInfo;
 enum class DisableValidationForModuleKind;
+class APINotesOptions;
+class AnalyzerOptions;
+class CodeCompleteOptions;
+class CodeGenOptions;
+class DependencyOutputOptions;
+class DiagnosticOptions;
+class ExternalSemaSource;
+class FileSystemOptions;
+class FrontendInputFile;
+class FrontendOptions;
+class ModuleFileExtension;
+class PreprocessorOptions;
+class PreprocessorOutputOptions;
+class TargetOptions;
 
 /// CompilerInstance - Helper class for managing a single instance of the Clang
 /// compiler.

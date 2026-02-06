@@ -14,6 +14,14 @@
 #ifndef LLVM_CLANG_BASIC_LANGOPTIONS_H
 #define LLVM_CLANG_BASIC_LANGOPTIONS_H
 
+#include <cassert>
+#include <cstdint>
+#include <functional>
+#include <map>
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/CFProtectionOptions.h"
 #include "clang/Basic/CommentOptions.h"
 #include "clang/Basic/LLVM.h"
@@ -23,19 +31,20 @@
 #include "clang/Basic/TargetCXXABI.h"
 #include "clang/Basic/Visibility.h"
 #include "llvm/ADT/FloatingPointMode.h"
-#include "llvm/BinaryFormat/DXContainer.h"
-#include "llvm/Support/AllocToken.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <cstdint>
-#include <functional>
-#include <map>
-#include <optional>
-#include <string>
-#include <vector>
+
+namespace llvm {
+class StringRef;
+class VersionTuple;
+enum class AllocTokenMode;
+namespace dxbc {
+enum class RootSignatureVersion;
+}  // namespace dxbc
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 

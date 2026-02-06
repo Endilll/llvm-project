@@ -13,13 +13,23 @@
 #ifndef LLVM_CLANG_AST_INTERP_RECORD_H
 #define LLVM_CLANG_AST_INTERP_RECORD_H
 
-#include "Descriptor.h"
+#include <assert.h>
+#include <string>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang {
+class QualType;
+
 namespace interp {
-class Program;
+struct Descriptor;
 
 /// Structure/Class descriptor.
 class Record final {

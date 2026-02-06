@@ -10,6 +10,21 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <functional>
+#include <memory>
+#include <new>
+#include <type_traits>
+
 #include "CGBuilder.h"
 #include "CGCall.h"
 #include "CGDebugInfo.h"
@@ -25,7 +40,6 @@
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/Stmt.h"
-#include "clang/AST/StmtVisitor.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/AttrKinds.h"
 #include "clang/Basic/Builtins.h"
@@ -35,7 +49,6 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/PrettyStackTrace.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
 #include "clang/Basic/Specifiers.h"
 #include "clang/Basic/TargetInfo.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
@@ -46,7 +59,6 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallSet.h"
 #include "llvm/ADT/StringExtras.h"
-#include "llvm/IR/Assumptions.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DataLayout.h"
@@ -62,16 +74,41 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/SaveAndRestore.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "Address.h"
+#include "CGLoopInfo.h"
+#include "CodeGenTypes.h"
+#include "SanitizerMetadata.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/StmtCXX.h"
+#include "clang/AST/StmtObjC.h"
+#include "clang/AST/StmtOpenACC.h"
+#include "clang/AST/StmtOpenMP.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/IntrinsicInst.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Metadata.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
 
 using namespace clang;
 using namespace CodeGen;

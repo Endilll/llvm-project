@@ -13,15 +13,31 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_ARM_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_ARM_H
 
+#include <stdint.h>
+#include <string>
+#include <string_view>
+#include <utility>
+
 #include "OSTargets.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/TargetParser/ARMTargetParser.h"
-#include "llvm/TargetParser/ARMTargetParserCommon.h"
 #include "llvm/TargetParser/Triple.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+namespace ARM {
+enum class ISAKind;
+}  // namespace ARM
+}  // namespace llvm
 
 namespace clang {
+class LangOptions;
+class MacroBuilder;
+class TargetOptions;
+
 namespace targets {
 
 class LLVM_LIBRARY_VISIBILITY ARMTargetInfo : public TargetInfo {

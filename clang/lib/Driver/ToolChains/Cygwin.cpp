@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "Cygwin.h"
+
+#include <string>
+
 #include "ToolChains/Gnu.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Config/config.h"
@@ -18,7 +21,12 @@
 #include "llvm/Support/CodeGen.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <string>
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

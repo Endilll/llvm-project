@@ -14,13 +14,6 @@
 #ifndef LLVM_CLANG_FORMAT_FORMAT_H
 #define LLVM_CLANG_FORMAT_FORMAT_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Tooling/Core/Replacement.h"
-#include "clang/Tooling/Inclusions/IncludeStyle.h"
-#include "llvm/Support/MemoryBufferRef.h"
-#include "llvm/Support/Regex.h"
-#include "llvm/Support/SourceMgr.h"
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -30,7 +23,18 @@
 #include <type_traits>
 #include <vector>
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "clang/Tooling/Inclusions/IncludeStyle.h"
+#include "llvm/Support/MemoryBufferRef.h"
+#include "llvm/Support/SourceMgr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Error.h"
+
 namespace llvm {
+template <typename T> class ArrayRef;
+
 namespace vfs {
 class FileSystem;
 }

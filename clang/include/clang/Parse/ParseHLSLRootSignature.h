@@ -13,23 +13,29 @@
 #ifndef LLVM_CLANG_PARSE_PARSEHLSLROOTSIGNATURE_H
 #define LLVM_CLANG_PARSE_PARSEHLSLROOTSIGNATURE_H
 
-#include "clang/AST/ComparisonCategories.h"
-#include "clang/AST/Expr.h"
+#include <cstdint>
+#include <optional>
+
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/LexHLSLRootSignature.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Sema/SemaHLSL.h"
-
-
 #include "llvm/BinaryFormat/DXContainer.h"
 #include "llvm/Frontend/HLSL/HLSLRootSignature.h"
-#include <cstdint>
-#include <optional>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
+class IdentifierInfo;
+class Sema;
+class StringLiteral;
+
 namespace hlsl {
 
 class RootSignatureParser {

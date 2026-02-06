@@ -11,6 +11,23 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/ASTUnit.h"
+
+#include <algorithm>
+#include <atomic>
+#include <cassert>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <functional>
+#include <map>
+#include <system_error>
+
 #include "clang-c/Index.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
@@ -27,7 +44,6 @@
 #include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
@@ -48,7 +64,6 @@
 #include "clang/Frontend/MultiplexConsumer.h"
 #include "clang/Frontend/PrecompiledPreamble.h"
 #include "clang/Frontend/StandaloneDiagnostic.h"
-#include "clang/Frontend/Utils.h"
 #include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/HeaderSearchOptions.h"
 #include "clang/Lex/Lexer.h"
@@ -89,19 +104,18 @@
 #include "llvm/Support/Timer.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <atomic>
-#include <cassert>
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/TypeOrdering.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Frontend/CommandLineSourceLoc.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/MemoryBufferRef.h"
+
+namespace clang {
+class ModuleFileExtension;
+}  // namespace clang
 
 using namespace clang;
 

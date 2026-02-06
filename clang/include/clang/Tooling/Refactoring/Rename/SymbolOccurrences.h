@@ -9,11 +9,11 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_RENAME_SYMBOLOCCURRENCES_H
 #define LLVM_CLANG_TOOLING_REFACTORING_RENAME_SYMBOLOCCURRENCES_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/ArrayRef.h"
 #include <memory>
 #include <vector>
+
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/ArrayRef.h"
 
 namespace clang {
 namespace tooling {

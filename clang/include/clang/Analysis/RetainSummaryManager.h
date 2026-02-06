@@ -15,11 +15,12 @@
 #ifndef LLVM_CLANG_ANALYSIS_RETAINSUMMARYMANAGER_H
 #define LLVM_CLANG_ANALYSIS_RETAINSUMMARYMANAGER_H
 
+#include <optional>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/ExprObjC.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
@@ -27,14 +28,24 @@
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/ImmutableMap.h"
-#include "clang/AST/Attr.h"
-#include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/Analysis/AnyCall.h"
 #include "clang/Analysis/SelectorExtras.h"
 #include "llvm/Support/Allocator.h"
-#include <optional>
-#include <utility>
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace clang {
+class CallExpr;
+class Decl;
+class ObjCMessageExpr;
+}  // namespace clang
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 using namespace clang;
 

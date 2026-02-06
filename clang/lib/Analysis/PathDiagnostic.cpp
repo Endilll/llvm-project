@@ -11,6 +11,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/PathDiagnostic.h"
+
+#include <cassert>
+#include <cstring>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <vector>
+#include <new>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -21,7 +30,6 @@
 #include "clang/AST/ParentMap.h"
 #include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/Stmt.h"
-#include "clang/AST/Type.h"
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Analysis/IssueHash.h"
@@ -33,17 +41,16 @@
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstring>
-#include <memory>
-#include <optional>
-#include <utility>
-#include <vector>
+#include "clang/AST/TemplateBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class LangOptions;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

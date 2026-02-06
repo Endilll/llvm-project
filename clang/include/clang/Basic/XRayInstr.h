@@ -14,9 +14,15 @@
 #ifndef LLVM_CLANG_BASIC_XRAYINSTR_H
 #define LLVM_CLANG_BASIC_XRAYINSTR_H
 
-#include "clang/Basic/LLVM.h"
 #include <cassert>
 #include <cstdint>
+
+#include "clang/Basic/LLVM.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 

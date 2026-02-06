@@ -12,16 +12,20 @@
 
 #include "clang/AST/StmtCXX.h"
 
+#include <cassert>
+#include <cstddef>
+#include <memory>
+
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/DeclBase.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/STLExtras.h"
-#include <cassert>
-#include <cstddef>
-#include <memory>
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 using namespace clang;
 

@@ -16,24 +16,46 @@
 #ifndef LLVM_CLANG_AST_DYNAMIC_RECURSIVE_AST_VISITOR_H
 #define LLVM_CLANG_AST_DYNAMIC_RECURSIVE_AST_VISITOR_H
 
-#include "clang/AST/ASTConcept.h"
-#include "clang/AST/Attr.h"
+#include <type_traits>
+
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclarationName.h"
-#include "clang/AST/ExprConcepts.h"
-#include "clang/AST/LambdaCapture.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclOpenACC.h"
+#include "clang/AST/DeclOpenMP.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/Stmt.h"
-#include "clang/AST/TemplateBase.h"
-#include "clang/AST/TemplateName.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
-#include "clang/Basic/LLVM.h"
-#include <type_traits>
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 class ASTContext;
+class Attr;
+class CXXBaseSpecifier;
+class CXXCtorInitializer;
+class ClassTemplateDecl;
+class ConceptReference;
+class Expr;
+class FunctionTemplateDecl;
+class LambdaCapture;
+class LambdaExpr;
+class QualType;
+class TemplateArgument;
+class TemplateArgumentLoc;
+class TemplateName;
+class Type;
+class TypeConstraint;
+class VarTemplateDecl;
+namespace concepts {
+class ExprRequirement;
+class NestedRequirement;
+class Requirement;
+class TypeRequirement;
+}  // namespace concepts
+struct DeclarationNameInfo;
 
 /// Recursive AST visitor that supports extension via dynamic dispatch.
 ///

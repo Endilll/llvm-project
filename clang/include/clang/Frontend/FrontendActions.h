@@ -9,16 +9,23 @@
 #ifndef LLVM_CLANG_FRONTEND_FRONTENDACTIONS_H
 #define LLVM_CLANG_FRONTEND_FRONTENDACTIONS_H
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Frontend/FrontendAction.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <string>
-#include <vector>
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
+class CompilerInstance;
 
 //===----------------------------------------------------------------------===//
 // Custom Consumer Actions

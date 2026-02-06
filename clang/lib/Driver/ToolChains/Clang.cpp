@@ -7,6 +7,26 @@
 //===----------------------------------------------------------------------===//
 
 #include "Clang.h"
+
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cctype>
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <initializer_list>
+#include <iterator>
+#include <memory>
+#include <set>
+#include <string>
+#include <system_error>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <optional>
+
 #include "Arch/ARM.h"
 #include "Arch/LoongArch.h"
 #include "Arch/Mips.h"
@@ -82,28 +102,18 @@
 #include "llvm/TargetParser/ARMTargetParser.h"
 #include "llvm/TargetParser/ARMTargetParserCommon.h"
 #include "llvm/TargetParser/Host.h"
-#include "llvm/TargetParser/LoongArchTargetParser.h"
 #include "llvm/TargetParser/PPCTargetParser.h"
 #include "llvm/TargetParser/RISCVISAInfo.h"
 #include "llvm/TargetParser/RISCVTargetParser.h"
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <cctype>
-#include <chrono>
-#include <cstddef>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
-#include <initializer_list>
-#include <iterator>
-#include <memory>
-#include <set>
-#include <string>
-#include <system_error>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/Driver/CudaInstallationDetector.h"
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Option/Arg.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

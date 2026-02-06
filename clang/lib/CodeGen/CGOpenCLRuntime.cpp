@@ -13,19 +13,32 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGOpenCLRuntime.h"
+
+#include <assert.h>
+#include <cstdint>
+
 #include "CodeGenFunction.h"
 #include "TargetInfo.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/CodeGen/ConstantInitBuilder.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/Function.h"
 #include "llvm/IR/GlobalValue.h"
-#include <assert.h>
-#include <cstdint>
+#include "CodeGenModule.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Decl.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class Function;
+class Type;
+class Value;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

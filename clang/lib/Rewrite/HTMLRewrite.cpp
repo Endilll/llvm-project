@@ -12,6 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Rewrite/Core/HTMLRewrite.h"
+
+#include <cassert>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -27,10 +33,13 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <vector>
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 using namespace llvm;

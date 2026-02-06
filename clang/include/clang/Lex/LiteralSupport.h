@@ -14,15 +14,22 @@
 #ifndef LLVM_CLANG_LEX_LITERALSUPPORT_H
 #define LLVM_CLANG_LEX_LITERALSUPPORT_H
 
+#include <cassert>
+#include <cstdint>
+
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/TokenKinds.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/SmallString.h"
-#include "llvm/ADT/FloatingPointMode.h"
 #include "llvm/ADT/StringRef.h"
-#include <cassert>
-#include <cstdint>
+#include "llvm/ADT/ArrayRef.h"
+
+namespace llvm {
+class APInt;
+enum class RoundingMode : int8_t;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 

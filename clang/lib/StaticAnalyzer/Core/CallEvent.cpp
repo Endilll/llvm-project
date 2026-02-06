@@ -13,6 +13,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
+
+#include <cassert>
+#include <optional>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -28,16 +33,12 @@
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Analysis/CFGStmtMap.h"
-#include "clang/Analysis/ConstructionContext.h"
-#include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Analysis/ProgramPoint.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/Specifiers.h"
 #include "clang/CrossTU/CrossTranslationUnit.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/BasicValueFactory.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/CallDescription.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerHelpers.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/DynamicType.h"
@@ -58,7 +59,6 @@
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/SmallSet.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
@@ -66,9 +66,10 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <optional>
-#include <utility>
+#include "clang/AST/CanonicalType.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
+#include "llvm/ADT/iterator.h"
 
 #define DEBUG_TYPE "static-analyzer-call-event"
 

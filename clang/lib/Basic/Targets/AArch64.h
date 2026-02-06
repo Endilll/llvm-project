@@ -13,12 +13,26 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_AARCH64_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_AARCH64_H
 
+#include <stdint.h>
+#include <string>
+#include <string_view>
+#include <utility>
+
 #include "OSTargets.h"
-#include "clang/Basic/TargetBuiltins.h"
 #include "llvm/TargetParser/AArch64TargetParser.h"
-#include <optional>
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/TargetParser/Triple.h"
 
 namespace clang {
+class LangOptions;
+class MacroBuilder;
+class TargetOptions;
+
 namespace targets {
 
 enum AArch64AddrSpace { ptr32_sptr = 270, ptr32_uptr = 271, ptr64 = 272 };

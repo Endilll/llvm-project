@@ -11,7 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Driver/CreateInvocationFromArgs.h"
-#include "clang/Basic/DiagnosticFrontend.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <utility>
+
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Action.h"
@@ -20,7 +25,6 @@
 #include "clang/Driver/Job.h"
 #include "clang/Driver/Tool.h"
 #include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/Utils.h"
 #include "clang/Options/Options.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
@@ -29,10 +33,13 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Host.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Frontend/CompilerInvocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
 
 using namespace llvm::opt;
 

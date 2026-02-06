@@ -6,6 +6,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <utility>
+
 #include "DiagOutputUtils.h"
 #include "PtrTypesSemantics.h"
 #include "clang/AST/Decl.h"
@@ -24,10 +29,17 @@
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+namespace ento {
+class AnalysisManager;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

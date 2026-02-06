@@ -9,15 +9,22 @@
 #ifndef LLVM_CLANG_LIB_INDEX_FILEINDEXRECORD_H
 #define LLVM_CLANG_LIB_INDEX_FILEINDEXRECORD_H
 
+#include <vector>
+
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Index/DeclOccurrence.h"
 #include "clang/Index/IndexSymbol.h"
 #include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/SmallVector.h"
-#include <vector>
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 class IdentifierInfo;
+class Decl;
+class MacroInfo;
+class SourceManager;
 
 namespace index {
 

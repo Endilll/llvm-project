@@ -17,6 +17,19 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+#include <initializer_list>
+#include <iterator>
+#include <list>
+#include <map>
+#include <new>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGCXXABI.h"
@@ -24,7 +37,6 @@
 #include "CGCleanup.h"
 #include "CGDebugInfo.h"
 #include "CGPointerAuthInfo.h"
-#include "CGRecordLayout.h"
 #include "CGVTables.h"
 #include "CGValue.h"
 #include "CodeGenFunction.h"
@@ -83,14 +95,42 @@
 #include "llvm/Support/ModRef.h"
 #include "llvm/Support/ScopedPrinter.h"
 #include "llvm/Support/raw_ostream.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/PointerAuthOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/ConstantRange.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalAlias.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/User.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+#include "llvm/TargetParser/Triple.h"
 
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
+namespace llvm {
+class Comdat;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;
@@ -3769,9 +3809,11 @@ static bool TypeInfoIsInStandardLibrary(const BuiltinType *Ty) {
 #define IMAGE_TYPE(ImgType, Id, SingletonId, Access, Suffix) \
     case BuiltinType::Id:
 #include "clang/Basic/OpenCLImageTypes.def"
+
 #define EXT_OPAQUE_TYPE(ExtType, Id, Ext) \
     case BuiltinType::Id:
 #include "clang/Basic/OpenCLExtensionTypes.def"
+
     case BuiltinType::OCLSampler:
     case BuiltinType::OCLEvent:
     case BuiltinType::OCLClkEvent:
@@ -3780,17 +3822,23 @@ static bool TypeInfoIsInStandardLibrary(const BuiltinType *Ty) {
 #define SVE_TYPE(Name, Id, SingletonId) \
     case BuiltinType::Id:
 #include "clang/Basic/AArch64ACLETypes.def"
+
 #define PPC_VECTOR_TYPE(Name, Id, Size) \
     case BuiltinType::Id:
 #include "clang/Basic/PPCTypes.def"
+
 #define RVV_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/RISCVVTypes.def"
+
 #define WASM_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/WebAssemblyReferenceTypes.def"
+
 #define AMDGPU_TYPE(Name, Id, SingletonId, Width, Align) case BuiltinType::Id:
 #include "clang/Basic/AMDGPUTypes.def"
+
 #define HLSL_INTANGIBLE_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/HLSLIntangibleTypes.def"
+
     case BuiltinType::ShortAccum:
     case BuiltinType::Accum:
     case BuiltinType::LongAccum:
@@ -3823,6 +3871,7 @@ static bool TypeInfoIsInStandardLibrary(const BuiltinType *Ty) {
 #define PLACEHOLDER_TYPE(Id, SingletonId) \
     case BuiltinType::Id:
 #include "clang/AST/BuiltinTypes.def"
+
       llvm_unreachable("asking for RRTI for a placeholder type!");
 
     case BuiltinType::ObjCId:
@@ -3997,6 +4046,7 @@ void ItaniumRTTIBuilder::BuildVTablePointer(const Type *Ty,
 #define NON_CANONICAL_TYPE(Class, Base) case Type::Class:
 #define DEPENDENT_TYPE(Class, Base) case Type::Class:
 #include "clang/AST/TypeNodes.inc"
+
     llvm_unreachable("Non-canonical and dependent types shouldn't get here");
 
   case Type::LValueReference:
@@ -4286,6 +4336,7 @@ llvm::Constant *ItaniumRTTIBuilder::BuildTypeInfo(
 #define NON_CANONICAL_TYPE(Class, Base) case Type::Class:
 #define DEPENDENT_TYPE(Class, Base) case Type::Class:
 #include "clang/AST/TypeNodes.inc"
+
     llvm_unreachable("Non-canonical and dependent types shouldn't get here");
 
   // GCC treats vector types as fundamental types.

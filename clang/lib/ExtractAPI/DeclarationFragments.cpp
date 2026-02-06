@@ -12,7 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ExtractAPI/DeclarationFragments.h"
-#include "clang/AST/ASTFwd.h"
+
+#include <cassert>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjCCommon.h"
@@ -30,10 +35,18 @@
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTConcept.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Expr.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
 
 using namespace clang::extractapi;
 using namespace llvm;

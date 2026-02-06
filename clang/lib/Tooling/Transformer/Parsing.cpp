@@ -7,6 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Transformer/Parsing.h"
+
+#include <cstddef>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <functional>
+
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Transformer/RangeSelector.h"
@@ -15,11 +23,8 @@
 #include "llvm/ADT/Twine.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cstddef>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 using namespace transformer;

@@ -13,6 +13,8 @@
 #ifndef LLVM_CLANG_AST_CXXINHERITANCE_H
 #define LLVM_CLANG_AST_CXXINHERITANCE_H
 
+#include <list>
+
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclarationName.h"
@@ -25,7 +27,7 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Compiler.h"
-#include <list>
+#include "clang/AST/TypeOrdering.h"
 
 namespace clang {
 

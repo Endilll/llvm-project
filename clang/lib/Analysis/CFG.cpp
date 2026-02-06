@@ -12,6 +12,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/CFG.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/AttrIterator.h"
@@ -59,16 +71,11 @@
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "clang/AST/APValue.h"
+#include "clang/AST/StmtIterator.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

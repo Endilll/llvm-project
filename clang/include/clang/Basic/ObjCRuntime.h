@@ -14,15 +14,20 @@
 #ifndef LLVM_CLANG_BASIC_OBJCRUNTIME_H
 #define LLVM_CLANG_BASIC_OBJCRUNTIME_H
 
+#include <string>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/Hashing.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/bit.h"
 #include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/HashBuilder.h"
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/TargetParser/Triple.h"
-#include <string>
+
+namespace llvm {
+class StringRef;
+class raw_ostream;
+enum class endianness;
+template <typename HasherT, llvm::endianness Endianness> class HashBuilder;
+}  // namespace llvm
 
 namespace clang {
 

@@ -7,6 +7,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Transformer/RewriteRule.h"
+
+#include <cassert>
+#include <cstddef>
+#include <initializer_list>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/TypeLoc.h"
@@ -23,15 +35,9 @@
 #include "llvm/Support/Errc.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <initializer_list>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace transformer;

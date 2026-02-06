@@ -7,11 +7,25 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/FrontendAction.h"
+
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <system_error>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <initializer_list>
+#include <iterator>
+#include <map>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclGroup.h"
 #include "clang/AST/DeclID.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/DiagnosticFrontend.h"
@@ -62,19 +76,34 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Registry.h"
-#include "llvm/Support/Timer.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <system_error>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/ExternalASTSource.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/CustomizableOptional.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/Module.h"
+#include "clang/Frontend/CommandLineSourceLoc.h"
+#include "clang/Lex/HeaderSearchOptions.h"
+#include "clang/Lex/Token.h"
+#include "clang/Sema/ExternalSemaSource.h"
+#include "clang/Serialization/ModuleFile.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/MemoryBuffer.h"
+
+namespace clang {
+class CodeCompleteConsumer;
+}  // namespace clang
+
 using namespace clang;
 
 LLVM_INSTANTIATE_REGISTRY(FrontendPluginRegistry)

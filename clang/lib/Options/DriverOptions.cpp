@@ -8,7 +8,7 @@
 
 #include "clang/Options/Options.h"
 #include "llvm/Option/OptTable.h"
-#include <cassert>
+#include "llvm/ADT/ArrayRef.h"
 
 using namespace clang::options;
 using namespace llvm::opt;

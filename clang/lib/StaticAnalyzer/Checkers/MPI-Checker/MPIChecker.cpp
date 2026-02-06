@@ -15,6 +15,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "MPIChecker.h"
+
+#include <cstddef>
+#include <utility>
+
 #include "MPI-Checker/MPITypes.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
@@ -28,7 +32,18 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/SmallVector.h"
-#include <cstddef>
+#include "MPI-Checker/MPIBugReporter.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+#include "llvm/ADT/ImmutableMap.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 namespace ento {

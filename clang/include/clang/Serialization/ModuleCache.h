@@ -9,13 +9,14 @@
 #ifndef LLVM_CLANG_SERIALIZATION_MODULECACHE_H
 #define LLVM_CLANG_SERIALIZATION_MODULECACHE_H
 
-#include "clang/Basic/LLVM.h"
-
 #include <ctime>
 #include <memory>
 
+#include "clang/Basic/LLVM.h"
+
 namespace llvm {
 class AdvisoryLock;
+class StringRef;
 } // namespace llvm
 
 namespace clang {

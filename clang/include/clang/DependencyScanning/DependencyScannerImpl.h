@@ -9,19 +9,6 @@
 #ifndef LLVM_CLANG_DEPENDENCYSCANNING_DEPENDENCYSCANNERIMPL_H
 #define LLVM_CLANG_DEPENDENCYSCANNING_DEPENDENCYSCANNERIMPL_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/DependencyScanning/DependencyScanningFilesystem.h"
-#include "clang/DependencyScanning/ModuleDepCollector.h"
-#include "clang/Driver/Driver.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/CompilerInvocation.h"
-#include "clang/Frontend/DependencyOutputOptions.h"
-#include "clang/Frontend/TextDiagnosticPrinter.h"
-#include "clang/Serialization/PCHContainerOperations.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/VirtualFileSystem.h"
-#include "llvm/Support/raw_ostream.h"
 #include <cstdint>
 #include <memory>
 #include <optional>
@@ -29,16 +16,37 @@
 #include <utility>
 #include <vector>
 
+#include "clang/Basic/LLVM.h"
+#include "clang/DependencyScanning/DependencyScanningFilesystem.h"
+#include "clang/DependencyScanning/ModuleDepCollector.h"
+#include "clang/Frontend/CompilerInstance.h"
+#include "clang/Frontend/CompilerInvocation.h"
+#include "clang/Frontend/DependencyOutputOptions.h"
+#include "clang/Frontend/TextDiagnosticPrinter.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/raw_ostream.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+namespace vfs {
+class FileSystem;
+class OverlayFileSystem;
+}  // namespace vfs
+}  // namespace llvm
+
 namespace clang {
-class DiagnosticConsumer;
+class PCHContainerOperations;
 
 namespace dependencies {
 class DependencyScanningService;
 class DependencyScanningWorker;
-
 class DependencyConsumer;
 class DependencyActionController;
-class DependencyScanningWorkerFilesystem;
 
 class DependencyScanningAction {
 public:

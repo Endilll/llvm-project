@@ -14,7 +14,12 @@
 #ifndef LLVM_CLANG_SEMA_SEMAOPENACC_H
 #define LLVM_CLANG_SEMA_SEMAOPENACC_H
 
-#include "clang/AST/ASTFwd.h"
+#include <cassert>
+#include <optional>
+#include <utility>
+#include <variant>
+#include <iterator>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclGroup.h"
 #include "clang/AST/Expr.h"
@@ -30,15 +35,17 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
-#include <optional>
-#include <utility>
-#include <variant>
+#include "clang/AST/DeclOpenACC.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
-class IdentifierInfo;
-class OpenACCClause;
-class Scope;
+class CXXForRangeStmt;
+class Decl;
+class OpenACCRoutineDeclAttr;
+class QualType;
+class Sema;
+class Stmt;
 
 class SemaOpenACC : public SemaBase {
 public:

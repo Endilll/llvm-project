@@ -13,16 +13,33 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_X86_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_X86_H
 
+#include <ctype.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string>
+#include <string_view>
+
 #include "OSTargets.h"
-#include "clang/Basic/BitmaskEnum.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/TargetParser/Triple.h"
 #include "llvm/TargetParser/X86TargetParser.h"
-#include <optional>
+#include "TargetDefines.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/MacroBuilder.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/DerivedTypes.h"
 
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 
 static const unsigned X86AddrSpaceMap[] = {

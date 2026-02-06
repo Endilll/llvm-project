@@ -10,6 +10,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <list>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/CanonicalType.h"
@@ -22,7 +27,6 @@
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/DependentDiagnostic.h"
 #include "clang/AST/ExprCXX.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/DiagnosticSema.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/PartialDiagnostic.h"
@@ -36,8 +40,22 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class MultiLevelTemplateArgumentList;
+}  // namespace clang
 
 using namespace clang;
 using namespace sema;

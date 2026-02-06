@@ -16,17 +16,22 @@
 #ifndef LLVM_CLANG_TOOLING_CORE_DIAGNOSTIC_H
 #define LLVM_CLANG_TOOLING_CORE_DIAGNOSTIC_H
 
-#include "Replacement.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
 #include <string>
 #include <vector>
 
+#include "Replacement.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+
 namespace clang {
+class CharSourceRange;
+class SourceLocation;
+class SourceManager;
+
 namespace tooling {
 
 /// Represents a range within a specific source file.

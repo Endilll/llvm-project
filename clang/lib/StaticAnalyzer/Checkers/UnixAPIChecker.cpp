@@ -11,6 +11,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <tuple>
+#include <utility>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -37,12 +45,22 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <tuple>
-#include <utility>
+#include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Preprocessor;
+namespace ento {
+class AnalysisManager;
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

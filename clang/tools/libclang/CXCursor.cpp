@@ -26,6 +26,7 @@
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/Frontend/ASTUnit.h"
+#include "clang/Lex/Preprocessor.h"
 #include "llvm/Support/ErrorHandling.h"
 
 using namespace clang;

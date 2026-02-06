@@ -7,6 +7,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Inclusions/HeaderIncludes.h"
+
+#include <algorithm>
+#include <cassert>
+#include <climits>
+#include <functional>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <tuple>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TokenKinds.h"
@@ -21,15 +34,8 @@
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Regex.h"
-#include <algorithm>
-#include <cassert>
-#include <climits>
-#include <functional>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <type_traits>
-#include <utility>
+#include "clang/Basic/LangOptions.h"
+#include "llvm/Support/FormatVariadicDetails.h"
 
 namespace clang {
 namespace tooling {

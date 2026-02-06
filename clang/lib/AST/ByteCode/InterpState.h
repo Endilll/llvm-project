@@ -13,18 +13,43 @@
 #ifndef LLVM_CLANG_AST_INTERP_INTERPSTATE_H
 #define LLVM_CLANG_AST_INTERP_INTERPSTATE_H
 
-#include "Context.h"
+#include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <utility>
+
 #include "DynamicAllocator.h"
 #include "Floating.h"
 #include "Function.h"
 #include "InterpFrame.h"
-#include "InterpStack.h"
 #include "State.h"
+#include "ByteCode/Source.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/PartialDiagnostic.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Allocator.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
+class Expr;
+class LifetimeExtendedTemporaryDecl;
+class VarDecl;
+
 namespace interp {
 class Context;
-class SourceMapper;
+class Block;
+class DeadBlock;
+class InterpStack;
+class Program;
 
 struct StdAllocatorCaller {
   const Expr *Call = nullptr;

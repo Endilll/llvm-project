@@ -11,14 +11,19 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/FormatString.h"
 #include "FormatStringParsing.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetInfo.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
+#include "clang/AST/Decl.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/TargetParser/Triple.h"
 
 using clang::analyze_format_string::ArgType;
 using clang::analyze_format_string::FormatStringHandler;

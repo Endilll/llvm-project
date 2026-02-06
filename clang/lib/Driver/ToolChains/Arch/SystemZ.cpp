@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "SystemZ.h"
+
+#include <string>
+#include <vector>
+
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Config/config.h"
 #include "clang/Driver/Driver.h"
@@ -15,8 +19,9 @@
 #include "llvm/Option/ArgList.h"
 #include "llvm/TargetParser/Host.h"
 #include "llvm/TargetParser/Triple.h"
-#include <string>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/Option.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

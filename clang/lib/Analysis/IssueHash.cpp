@@ -7,7 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/IssueHash.h"
-#include "clang/AST/ASTContext.h"
+
+#include <cstddef>
+#include <optional>
+#include <sstream>
+#include <string>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/TypeBase.h"
@@ -21,11 +26,8 @@
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/LineIterator.h"
 #include "llvm/Support/MD5.h"
-
-#include <cstddef>
-#include <optional>
-#include <sstream>
-#include <string>
+#include "clang/AST/DeclBase.h"
+#include "llvm/Support/MemoryBufferRef.h"
 
 using namespace clang;
 

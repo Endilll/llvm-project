@@ -9,12 +9,15 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTICOPTIONS_H
 #define LLVM_CLANG_BASIC_DIAGNOSTICOPTIONS_H
 
-#include "clang/Basic/LLVM.h"
 #include <string>
 #include <type_traits>
 #include <vector>
 
+#include "clang/Basic/LLVM.h"
+
 namespace llvm {
+class raw_ostream;
+
 namespace opt {
 class ArgList;
 } // namespace opt

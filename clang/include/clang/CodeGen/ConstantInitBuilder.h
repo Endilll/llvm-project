@@ -15,6 +15,12 @@
 #ifndef LLVM_CLANG_CODEGEN_CONSTANTINITBUILDER_H
 #define LLVM_CLANG_CODEGEN_CONSTANTINITBUILDER_H
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <vector>
+#include <utility>
+
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/Twine.h"
@@ -24,13 +30,11 @@
 #include "llvm/IR/GlobalValue.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/CodeGen/ConstantInitFuture.h"
-#include "llvm/IR/SymbolTableListTraits.h"
-#include "llvm/IR/Type.h"
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <vector>
+namespace llvm {
+class GlobalVariable;
+class Type;
+}  // namespace llvm
 
 namespace clang {
 class GlobalDecl;

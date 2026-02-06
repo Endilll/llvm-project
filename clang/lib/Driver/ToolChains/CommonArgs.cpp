@@ -7,6 +7,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Driver/CommonArgs.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <initializer_list>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <tuple>
+#include <vector>
+#include <system_error>
+#include <utility>
+
 #include "Arch/AArch64.h"
 #include "Arch/ARM.h"
 #include "Arch/CSKY.h"
@@ -39,7 +54,6 @@
 #include "clang/Driver/SanitizerArgs.h"
 #include "clang/Driver/ToolChain.h"
 #include "clang/Driver/Types.h"
-#include "clang/Driver/Util.h"
 #include "clang/Driver/XRayArgs.h"
 #include "clang/Frontend/CompilerInvocation.h"
 #include "clang/Frontend/FrontendOptions.h"
@@ -60,7 +74,6 @@
 #include "llvm/Option/OptTable.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/CodeGen.h"
-#include "llvm/Support/Compression.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/MathExtras.h"
@@ -69,21 +82,13 @@
 #include "llvm/Support/Program.h"
 #include "llvm/Support/Threading.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include "llvm/Support/YAMLParser.h"
-#include "llvm/TargetParser/Host.h"
 #include "llvm/TargetParser/PPCTargetParser.h"
 #include "llvm/TargetParser/TargetParser.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdlib>
-#include <initializer_list>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <tuple>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

@@ -6,15 +6,19 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/AST/TypeBase.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/IR/DerivedTypes.h"
+namespace llvm {
+class StructType;
+class Type;
+}  // namespace llvm
 
 namespace clang {
+class ConstantArrayType;
+class QualType;
+class RecordType;
+
 namespace CodeGen {
 class CGHLSLOffsetInfo;
 class CodeGenModule;
-class CGHLSLOffsetInfo;
 
 //===----------------------------------------------------------------------===//
 // Implementation of constant buffer layout common between DirectX and

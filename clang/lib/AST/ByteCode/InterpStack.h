@@ -13,13 +13,27 @@
 #ifndef LLVM_CLANG_AST_INTERP_INTERPSTACK_H
 #define LLVM_CLANG_AST_INTERP_INTERPSTACK_H
 
-#include "FixedPoint.h"
-#include "IntegralAP.h"
-#include "MemberPointer.h"
+#include <assert.h>
+#include <stdint.h>
+#include <cstdlib>
+#include <new>
+#include <type_traits>
+#include <utility>
+
 #include "PrimType.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
 
 namespace clang {
 namespace interp {
+class Boolean;
+class FixedPoint;
+class Floating;
+class MemberPointer;
+class Pointer;
+template <bool Signed> class IntegralAP;
+template <unsigned int Bits, bool Signed> class Integral;
 
 /// Stack frame storing temporaries and parameters.
 class InterpStack final {

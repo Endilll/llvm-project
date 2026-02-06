@@ -11,6 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
+
+#include <cassert>
+#include <cstdint>
+#include <optional>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/CharUnits.h"
@@ -31,9 +36,8 @@
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
+#include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

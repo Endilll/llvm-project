@@ -7,8 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "ARM.h"
-#include "clang/Basic/DiagnosticDriver.h"
-#include "clang/Basic/DiagnosticIDs.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/Types.h"
@@ -20,14 +28,15 @@
 #include "llvm/Option/Option.h"
 #include "llvm/TargetParser/ARMTargetParser.h"
 #include "llvm/TargetParser/Host.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

@@ -11,6 +11,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaBPF.h"
+
+#include <cassert>
+#include <optional>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
@@ -25,8 +29,11 @@
 #include "clang/Sema/SemaBase.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/STLExtras.h"
-#include <cassert>
-#include <optional>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 

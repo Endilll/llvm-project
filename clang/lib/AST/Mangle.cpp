@@ -10,30 +10,7 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/AST/Mangle.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Attr.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclObjC.h"
-#include "clang/AST/DeclTemplate.h"
-#include "clang/AST/ExprCXX.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/AST/VTableBuilder.h"
-#include "clang/Basic/ABI.h"
-#include "clang/Basic/AddressSpaces.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/Specifiers.h"
-#include "clang/Basic/TargetCXXABI.h"
-#include "clang/Basic/TargetInfo.h"
-#include "llvm/ADT/StringExtras.h"
-#include "llvm/IR/DataLayout.h"
-#include "llvm/IR/Mangler.h"
-#include "llvm/Support/Casting.h"
-#include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/Format.h"
-#include "llvm/Support/MathExtras.h"
-#include "llvm/Support/raw_ostream.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cinttypes>
@@ -42,6 +19,36 @@
 #include <optional>
 #include <string>
 #include <vector>
+
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/AST/VTableBuilder.h"
+#include "clang/Basic/ABI.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Specifiers.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Mangler.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/Format.h"
+#include "llvm/Support/MathExtras.h"
+#include "llvm/Support/raw_ostream.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/ObjCRuntime.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 

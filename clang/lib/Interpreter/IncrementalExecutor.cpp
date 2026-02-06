@@ -11,35 +11,50 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Interpreter/IncrementalExecutor.h"
-#include "OrcIncrementalExecutor.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/StringExtras.h"
-#include "llvm/Config/llvm-config.h"
-#include "llvm/ExecutionEngine/Orc/MemoryMapper.h"
-#include "llvm/ExecutionEngine/Orc/TaskDispatch.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <system_error>
 #include <tuple>
+#include <iterator>
+#include <new>
+
+#include "OrcIncrementalExecutor.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringExtras.h"
+#include "llvm/Config/llvm-config.h"
+#include "llvm/ExecutionEngine/Orc/MemoryMapper.h"
+#include "llvm/ExecutionEngine/Orc/TaskDispatch.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/FunctionExtras.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/ExecutionEngine/Orc/Core.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FormatVariadicDetails.h"
+#include "llvm/TargetParser/Triple.h"
 #ifdef __EMSCRIPTEN__
 #include "Wasm.h"
 #endif // __EMSCRIPTEN__
+
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
 
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/ToolChain.h"
-
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/Twine.h"
-
 #include "llvm/ExecutionEngine/JITLink/JITLinkMemoryManager.h"
 #include "llvm/ExecutionEngine/Orc/Debugging/DebuggerSupport.h"
-#include "llvm/ExecutionEngine/Orc/EPCDynamicLibrarySearchGenerator.h"
 #include "llvm/ExecutionEngine/Orc/ExecutorProcessControl.h"
 #include "llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h"
 #include "llvm/ExecutionEngine/Orc/LLJIT.h"
@@ -47,20 +62,12 @@
 #include "llvm/ExecutionEngine/Orc/Shared/OrcRTBridge.h"
 #include "llvm/ExecutionEngine/Orc/Shared/SimpleRemoteEPCUtils.h"
 #include "llvm/ExecutionEngine/Orc/SimpleRemoteEPC.h"
-
 #include "llvm/Support/Error.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-
 #include "llvm/TargetParser/Host.h"
-
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
 
 #ifdef LLVM_ON_UNIX
 #include <netdb.h>

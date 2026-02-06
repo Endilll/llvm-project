@@ -14,16 +14,20 @@
 #ifndef LLVM_CLANG_FRONTEND_TEXTDIAGNOSTICPRINTER_H
 #define LLVM_CLANG_FRONTEND_TEXTDIAGNOSTICPRINTER_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/Support/Compiler.h"
 #include <memory>
 #include <string>
 #include <utility>
 
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
+
 namespace clang {
 class DiagnosticOptions;
-class LangOptions;
 class TextDiagnostic;
 
 class TextDiagnosticPrinter : public DiagnosticConsumer {

@@ -12,6 +12,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/SourceMgrAdapter.h"
+
+#include <memory>
+#include <optional>
+#include <utility>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
@@ -20,9 +25,11 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SMLoc.h"
 #include "llvm/Support/SourceMgr.h"
-#include <memory>
-#include <optional>
-#include <utility>
+#include "clang/Basic/CustomizableOptional.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/MemoryBuffer.h"
 
 using namespace clang;
 

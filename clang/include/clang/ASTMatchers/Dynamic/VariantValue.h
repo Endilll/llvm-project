@@ -17,15 +17,21 @@
 #ifndef LLVM_CLANG_ASTMATCHERS_DYNAMIC_VARIANTVALUE_H
 #define LLVM_CLANG_ASTMATCHERS_DYNAMIC_VARIANTVALUE_H
 
-#include "clang/AST/ASTTypeTraits.h"
-#include "clang/ASTMatchers/ASTMatchersInternal.h"
-#include "clang/Basic/LLVM.h"
 #include <cassert>
 #include <memory>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "clang/Basic/LLVM.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 namespace ast_matchers {

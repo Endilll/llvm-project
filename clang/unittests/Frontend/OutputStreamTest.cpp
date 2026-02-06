@@ -9,6 +9,7 @@
 #include "clang/Basic/LangStandard.h"
 #include "clang/CodeGen/BackendUtil.h"
 #include "clang/Frontend/CompilerInstance.h"
+#include "clang/Frontend/FrontendOptions.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
 #include "clang/FrontendTool/Utils.h"
 #include "clang/Lex/PreprocessorOptions.h"

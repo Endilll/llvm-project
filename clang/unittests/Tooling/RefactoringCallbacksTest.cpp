@@ -9,6 +9,7 @@
 #include "RewriterTestContext.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
+#include "clang/Tooling/Tooling.h"
 #include "clang/Tooling/RefactoringCallbacks.h"
 #include "gtest/gtest.h"
 

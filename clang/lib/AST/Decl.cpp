@@ -11,6 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/Decl.h"
+
+#include <algorithm>
+#include <cassert>
+#include <climits>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <new>
+
 #include "Linkage.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
@@ -30,7 +42,6 @@
 #include "clang/AST/ODRHash.h"
 #include "clang/AST/PrettyDeclStackTrace.h"
 #include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/Randstruct.h"
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/Redeclarable.h"
 #include "clang/AST/Stmt.h"
@@ -72,16 +83,13 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <climits>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <type_traits>
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
 
 using namespace clang;
 

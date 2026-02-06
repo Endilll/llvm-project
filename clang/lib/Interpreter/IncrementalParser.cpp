@@ -11,8 +11,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "IncrementalParser.h"
-#include "IncrementalAction.h"
 
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <list>
+#include <memory>
+#include <sstream>
+#include <system_error>
+#include <utility>
+#include <vector>
+#include <string>
+
+#include "IncrementalAction.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclContextInternals.h"
@@ -32,16 +43,19 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/MemoryBuffer.h"
-
-#include <cassert>
-#include <cstddef>
-#include <cstring>
-#include <list>
-#include <memory>
-#include <sstream>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTConsumer.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/Token.h"
+#include "clang/Sema/IdentifierResolver.h"
+#include "clang/Sema/Scope.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
 
 #define DEBUG_TYPE "clang-repl"
 

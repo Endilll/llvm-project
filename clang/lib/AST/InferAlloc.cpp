@@ -11,6 +11,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/InferAlloc.h"
+
+#include <optional>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -23,7 +27,9 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/AllocToken.h"
 #include "llvm/Support/raw_ostream.h"
-#include <optional>
+#include "clang/AST/PrettyPrinter.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace infer_alloc;

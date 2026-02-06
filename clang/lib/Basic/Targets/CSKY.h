@@ -13,11 +13,25 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_CSKY_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_CSKY_H
 
-#include "clang/Basic/MacroBuilder.h"
+#include <stdint.h>
+#include <string>
+#include <string_view>
+
 #include "clang/Basic/TargetInfo.h"
 #include "llvm/TargetParser/CSKYTargetParser.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 
 class LLVM_LIBRARY_VISIBILITY CSKYTargetInfo : public TargetInfo {

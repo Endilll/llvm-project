@@ -8,6 +8,14 @@
 #include "clang/ASTMatchers/ASTMatchersMacros.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/Stmt.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang::dataflow {
 

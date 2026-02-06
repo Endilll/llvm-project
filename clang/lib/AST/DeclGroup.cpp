@@ -11,9 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/DeclGroup.h"
-#include "clang/AST/ASTContext.h"
+
 #include <cassert>
 #include <memory>
+#include <new>
+
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
 
 using namespace clang;
 

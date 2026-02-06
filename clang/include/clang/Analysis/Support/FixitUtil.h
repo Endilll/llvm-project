@@ -9,16 +9,23 @@
 #ifndef LLVM_CLANG_ANALYSIS_SUPPORT_FIXITUTIL_H
 #define LLVM_CLANG_ANALYSIS_SUPPORT_FIXITUTIL_H
 
-#include "clang/AST/Decl.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Lex/Lexer.h"
 #include <optional>
 #include <string>
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Lex/Lexer.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
+
 namespace clang {
+class DeclaratorDecl;
+class Expr;
+class LangOptions;
+class Qualifiers;
+class SourceManager;
 
 // Returns the text of the pointee type of `T` from a `VarDecl` of a pointer
 // type. The text is obtained through from `TypeLoc`s.  Since `TypeLoc` does not

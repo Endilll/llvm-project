@@ -7,6 +7,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/APINotes/APINotesWriter.h"
+
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <algorithm>
+#include <iterator>
+#include <new>
+#include <vector>
+
 #include "APINotesFormat.h"
 #include "clang/APINotes/Types.h"
 #include "clang/Basic/FileEntry.h"
@@ -27,14 +40,11 @@
 #include "llvm/Support/OnDiskHashTable.h"
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "llvm/ADT/PointerEmbeddedInt.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/MemAlloc.h"
 
 namespace clang {
 namespace api_notes {

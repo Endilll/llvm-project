@@ -11,9 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/XRayInstr.h"
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

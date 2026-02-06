@@ -6,6 +6,11 @@
 //
 //===----------------------------------------------------------------------===//
 #include "SPIRV.h"
+
+#include <cassert>
+#include <memory>
+#include <string>
+
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Driver/Action.h"
 #include "clang/Driver/CommonArgs.h"
@@ -21,10 +26,12 @@
 #include "llvm/Option/Option.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/FileSystem.h"
-#include <bits/basic_string.h>
-#include <cassert>
-#include <memory>
-#include <string>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/SmallVector.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

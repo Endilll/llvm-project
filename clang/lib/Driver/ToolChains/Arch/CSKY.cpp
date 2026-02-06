@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "CSKY.h"
+
+#include <cstdint>
+#include <optional>
+#include <vector>
+#include <string>
+
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Driver.h"
@@ -17,11 +23,12 @@
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/Option.h"
 #include "llvm/TargetParser/CSKYTargetParser.h"
-#include "llvm/TargetParser/Host.h"
-#include "llvm/TargetParser/TargetParser.h"
-#include <cstdint>
-#include <optional>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/ArrayRef.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

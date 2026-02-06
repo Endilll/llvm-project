@@ -7,11 +7,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/DependencyScanning/DependencyScannerImpl.h"
+
+#include <algorithm>
+#include <cassert>
+#include <ctime>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <functional>
+#include <iterator>
+
 #include "clang/AST/DependenceFlags.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/DiagnosticOptions.h"
-#include "clang/Basic/DiagnosticSerialization.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/IdentifierTable.h"
@@ -24,7 +34,6 @@
 #include "clang/DependencyScanning/DependencyScanningWorker.h"
 #include "clang/DependencyScanning/InProcessModuleCache.h"
 #include "clang/DependencyScanning/ModuleDepCollector.h"
-#include "clang/Driver/Driver.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/CompilerInvocation.h"
 #include "clang/Frontend/FrontendAction.h"
@@ -38,9 +47,7 @@
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include "clang/Serialization/ASTReader.h"
-#include "clang/Serialization/ModuleCache.h"
 #include "clang/Serialization/ModuleFile.h"
-#include "clang/Serialization/PCHContainerOperations.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/ADT/ScopeExit.h"
@@ -53,16 +60,17 @@
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include "llvm/TargetParser/Host.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <ctime>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Basic/DiagnosticSerializationInterface.inc"
+#include "clang/Lex/ModuleLoader.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class ModuleCache;
+class PCHContainerOperations;
+}  // namespace clang
 
 using namespace clang;
 using namespace dependencies;

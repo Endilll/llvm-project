@@ -9,11 +9,15 @@
 #ifndef LLVM_CLANG_FRONTEND_LOGDIAGNOSTICPRINTER_H
 #define LLVM_CLANG_FRONTEND_LOGDIAGNOSTICPRINTER_H
 
+#include <memory>
+#include <string>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include <memory>
-#include <string>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang {
 class DiagnosticOptions;

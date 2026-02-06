@@ -11,6 +11,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cinttypes>
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <optional>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGCUDARuntime.h"
@@ -18,7 +28,7 @@
 #include "CGCall.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -26,9 +36,7 @@
 #include "clang/AST/GlobalDecl.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Cuda.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/CodeGen/CodeGenABITypes.h"
 #include "clang/CodeGen/ConstantInitBuilder.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallVector.h"
@@ -42,7 +50,6 @@
 #include "llvm/IR/GlobalAlias.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
-#include "llvm/IR/ReplaceConstant.h"
 #include "llvm/IR/User.h"
 #include "llvm/Object/OffloadBinary.h"
 #include "llvm/Support/Alignment.h"
@@ -51,15 +58,50 @@
 #include "llvm/Support/Format.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cinttypes>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <system_error>
-#include <utility>
+#include "CGValue.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Mangle.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Use.h"
+#include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/TypeSize.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace clang {
+namespace CodeGen {
+class CGFunctionInfo;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class LLVMContext;
+class Type;
+class Value;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

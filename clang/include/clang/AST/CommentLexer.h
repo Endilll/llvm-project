@@ -13,20 +13,23 @@
 #ifndef LLVM_CLANG_AST_COMMENTLEXER_H
 #define LLVM_CLANG_AST_COMMENTLEXER_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "llvm/Support/Allocator.h"
-#include "llvm/Support/Compiler.h"
 #include <cassert>
 #include <cstdint>
 
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+
 namespace clang {
+class SourceManager;
+
 namespace comments {
 
 class Lexer;
-class TextTokenRetokenizer;
 struct CommandInfo;
 class CommandTraits;
 

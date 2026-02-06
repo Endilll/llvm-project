@@ -9,15 +9,28 @@
 #ifndef LLVM_CLANG_AST_INTERP_MEMBER_POINTER_H
 #define LLVM_CLANG_AST_INTERP_MEMBER_POINTER_H
 
-#include "Pointer.h"
+#include <assert.h>
+#include <stdint.h>
 #include <optional>
+#include <string>
+
+#include "Pointer.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/ComparisonCategories.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang {
 class ASTContext;
+
 namespace interp {
 
 class Context;
 class FunctionPointer;
+struct Descriptor;
 
 class MemberPointer final {
 private:

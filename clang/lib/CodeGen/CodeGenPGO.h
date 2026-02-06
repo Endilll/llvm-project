@@ -13,17 +13,41 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CODEGENPGO_H
 #define LLVM_CLANG_LIB_CODEGEN_CODEGENPGO_H
 
-#include "CGBuilder.h"
-#include "CodeGenModule.h"
-#include "CodeGenTypes.h"
-#include "MCDCState.h"
-#include "llvm/ProfileData/InstrProfReader.h"
+#include <stdint.h>
 #include <array>
 #include <memory>
 #include <optional>
+#include <string>
+#include <vector>
+
+#include "CodeGenModule.h"
+#include "MCDCState.h"
+#include "Address.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/ProfileData/InstrProf.h"
+
+namespace llvm {
+class Function;
+class GlobalVariable;
+class IndexedInstrProfReader;
+class Instruction;
+class Module;
+class StringRef;
+class Value;
+}  // namespace llvm
 
 namespace clang {
+class Decl;
+class Stmt;
+
 namespace CodeGen {
+class CGBuilderTy;
+class CodeGenFunction;
 
 /// Per-function PGO state.
 class CodeGenPGO {

@@ -13,6 +13,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "FormatToken.h"
+
+#include <algorithm>
+#include <array>
+#include <climits>
+#include <iterator>
+
 #include "ContinuationIndenter.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -21,10 +27,7 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <climits>
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 namespace format {

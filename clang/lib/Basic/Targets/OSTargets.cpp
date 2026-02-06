@@ -10,6 +10,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "OSTargets.h"
+
+#include <algorithm>
+#include <cassert>
+
 #include "TargetDefines.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -17,8 +21,7 @@
 #include "clang/Basic/Sanitizers.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
+#include "llvm/ADT/FloatingPointMode.h"
 
 using namespace clang;
 using namespace clang::targets;

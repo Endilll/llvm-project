@@ -14,22 +14,25 @@
 #ifndef LLVM_CLANG_AST_ASTSTRUCTURALEQUIVALENCE_H
 #define LLVM_CLANG_AST_ASTSTRUCTURALEQUIVALENCE_H
 
-#include "clang/AST/DeclBase.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/UnsignedOrNone.h"
-#include "llvm/ADT/DenseSet.h"
 #include <queue>
 #include <tuple>
 #include <utility>
 
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/iterator_range.h"
+
 namespace clang {
 
 class ASTContext;
-class Decl;
 class DiagnosticBuilder;
 class QualType;
 class RecordDecl;
 class SourceLocation;
+class IdentifierInfo;
+class LangOptions;
+class Stmt;
 
 /// \brief Whether to perform a normal or minimal equivalence check.
 /// In case of `Minimal`, we do not perform a recursive check of decls with

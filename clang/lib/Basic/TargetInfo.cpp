@@ -11,6 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/TargetInfo.h"
+
+#include <cassert>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/CFProtectionOptions.h"
 #include "clang/Basic/CharInfo.h"
@@ -25,10 +30,12 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/ErrorHandling.h"
-#include "llvm/TargetParser/TargetParser.h"
-#include <cassert>
-#include <string>
-#include <vector>
+#include "llvm/ADT/Twine.h"
+
+namespace llvm {
+class APSInt;
+}  // namespace llvm
+
 using namespace clang;
 
 static const LangASMap DefaultAddrSpaceMap = {0};

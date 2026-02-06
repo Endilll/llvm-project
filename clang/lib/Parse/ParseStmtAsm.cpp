@@ -10,6 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+#include <iterator>
+#include <vector>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
@@ -43,10 +50,20 @@
 #include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SourceMgr.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Sema/Sema.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/SMLoc.h"
+#include "llvm/TargetParser/Triple.h"
+
 using namespace clang;
 
 namespace {

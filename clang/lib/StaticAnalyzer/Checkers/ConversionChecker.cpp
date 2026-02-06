@@ -23,6 +23,10 @@
 // is an alternative to those checks.
 //
 //===----------------------------------------------------------------------===//
+#include <climits>
+#include <memory>
+#include <utility>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Stmt.h"
@@ -37,10 +41,17 @@
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
 #include "llvm/ADT/APFloat.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
-#include <climits>
-#include <memory>
-#include <utility>
+namespace clang {
+namespace ento {
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

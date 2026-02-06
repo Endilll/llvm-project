@@ -13,10 +13,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGHLSLRuntime.h"
+
+#include <cassert>
+#include <optional>
+#include <string>
+#include <utility>
+#include <algorithm>
+#include <tuple>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGCall.h"
-#include "CGDebugInfo.h"
 #include "CGRecordLayout.h"
 #include "CGValue.h"
 #include "CodeGenFunction.h"
@@ -27,7 +34,6 @@
 #include "TargetInfo.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/AttrIterator.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/HLSLResource.h"
@@ -45,7 +51,6 @@
 #include "llvm/ADT/ScopeExit.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/BinaryFormat/DXContainer.h"
 #include "llvm/Frontend/HLSL/HLSLResource.h"
 #include "llvm/Frontend/HLSL/HLSLRootSignature.h"
 #include "llvm/Frontend/HLSL/RootSignatureMetadata.h"
@@ -60,21 +65,50 @@
 #include "llvm/IR/IntrinsicInst.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/IntrinsicsDirectX.h"
-#include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Metadata.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Value.h"
-#include "llvm/Support/Alignment.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
+#include "CodeGenTypes.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FormatVariadicDetails.h"
+#include "llvm/Support/TypeSize.h"
+#include "llvm/Support/VersionTuple.h"
+
+namespace clang {
+class Decl;
+namespace CodeGen {
+class CGFunctionInfo;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class LLVMContext;
+namespace dxbc {
+enum class RootSignatureVersion;
+}  // namespace dxbc
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

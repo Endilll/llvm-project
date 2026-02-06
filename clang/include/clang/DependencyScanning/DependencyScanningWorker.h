@@ -9,28 +9,36 @@
 #ifndef LLVM_CLANG_DEPENDENCYSCANNING_DEPENDENCYSCANNINGWORKER_H
 #define LLVM_CLANG_DEPENDENCYSCANNING_DEPENDENCYSCANNINGWORKER_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/DependencyScanning/DependencyScannerImpl.h"
-#include "clang/DependencyScanning/DependencyScanningService.h"
-#include "clang/DependencyScanning/ModuleDepCollector.h"
-#include "clang/Serialization/PCHContainerOperations.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
-#include "llvm/Support/MemoryBufferRef.h"
-#include "llvm/Support/VirtualFileSystem.h"
 #include <memory>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
+#include <iterator>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/DependencyScanning/ModuleDepCollector.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/Support/MemoryBufferRef.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include "clang/DependencyScanning/DependencyScanningFilesystem.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 
 class DependencyOutputOptions;
+class DiagnosticConsumer;
+class PCHContainerOperations;
 
 namespace dependencies {
 
-class DependencyScanningWorkerFilesystem;
 class CompilerInstanceWithContext;
+class DependencyScanningService;
+struct DiagnosticsEngineWithDiagOpts;
 
 /// A command-line tool invocation that is part of building a TU.
 ///

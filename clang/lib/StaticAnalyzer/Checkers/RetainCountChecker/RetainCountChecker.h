@@ -14,36 +14,53 @@
 #ifndef LLVM_CLANG_LIB_STATICANALYZER_CHECKERS_RETAINCOUNTCHECKER_H
 #define LLVM_CLANG_LIB_STATICANALYZER_CHECKERS_RETAINCOUNTCHECKER_H
 
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
+#include <assert.h>
+#include <stddef.h>
+#include <memory>
+
 #include "RetainCountDiagnostics.h"
-#include "clang/AST/Attr.h"
-#include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
-#include "clang/AST/ParentMap.h"
-#include "clang/Analysis/DomainSpecific/CocoaConventions.h"
-#include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Analysis/RetainSummaryManager.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Analysis/SelectorExtras.h"
-#include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
-#include "clang/StaticAnalyzer/Core/CheckerManager.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramStateTrait.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
-#include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/FoldingSet.h"
-#include "llvm/ADT/ImmutableList.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/SmallString.h"
-#include "llvm/ADT/StringExtras.h"
-#include <cstdarg>
-#include <utility>
+#include "clang/AST/TypeBase.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+template <typename T> class ArrayRef;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
+class ASTContext;
+class BlockExpr;
+class CastExpr;
+class Expr;
+class ObjCArrayLiteral;
+class ObjCBoxedExpr;
+class ObjCDictionaryLiteral;
+class ObjCIvarRefExpr;
+class ReturnStmt;
+class SimpleProgramPointTag;
+class Stmt;
+
 namespace ento {
+class CallEvent;
+class ExplodedNode;
+class MemRegion;
+class SVal;
+class SymbolReaper;
+
 namespace retaincountchecker {
 
 /// Metadata on reference.

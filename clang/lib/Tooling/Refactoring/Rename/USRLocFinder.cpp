@@ -14,6 +14,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Refactoring/Rename/USRLocFinder.h"
+
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Decl.h"
@@ -23,7 +32,6 @@
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/ParentMapContext.h"
 #include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -41,13 +49,12 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <optional>
-#include <set>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/Type.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
 
 using namespace llvm;
 

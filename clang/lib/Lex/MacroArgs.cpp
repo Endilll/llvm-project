@@ -11,15 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/MacroArgs.h"
-#include "clang/Basic/DiagnosticLex.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/TokenKinds.h"
-#include "clang/Lex/Lexer.h"
-#include "clang/Lex/MacroInfo.h"
-#include "clang/Lex/Preprocessor.h"
-#include "clang/Lex/Token.h"
-#include "llvm/Support/MemAlloc.h"
-#include "llvm/Support/SaveAndRestore.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>
@@ -27,6 +19,21 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <new>
+
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Lex/Lexer.h"
+#include "clang/Lex/MacroInfo.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/Token.h"
+#include "llvm/Support/MemAlloc.h"
+#include "llvm/Support/SaveAndRestore.h"
+#include "clang/Basic/DiagnosticLexInterface.inc"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
 
 using namespace clang;
 

@@ -16,13 +16,11 @@
 #define LLVM_CLANG_AST_ODRHASH_H
 
 #include "clang/AST/DeclarationName.h"
-#include "clang/AST/TemplateName.h"
-#include "clang/AST/Type.h"
-#include "clang/AST/TemplateBase.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 
@@ -32,6 +30,18 @@ class IdentifierInfo;
 class NestedNameSpecifier;
 class Stmt;
 class TemplateParameterList;
+class CXXRecordDecl;
+class DeclContext;
+class DependentTemplateStorage;
+class EnumDecl;
+class FunctionDecl;
+class ObjCInterfaceDecl;
+class ObjCProtocolDecl;
+class QualType;
+class RecordDecl;
+class TemplateArgument;
+class TemplateName;
+class Type;
 
 // ODRHash is used to calculate a hash based on AST node contents that
 // does not rely on pointer addresses.  This allows the hash to not vary

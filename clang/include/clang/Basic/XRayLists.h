@@ -12,18 +12,21 @@
 #ifndef LLVM_CLANG_BASIC_XRAYLISTS_H
 #define LLVM_CLANG_BASIC_XRAYLISTS_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
 #include <memory>
 #include <string>
 
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringRef.h"
+
 namespace llvm {
 class SpecialCaseList;
+template <typename T> class ArrayRef;
 }
 
 namespace clang {
 
 class SourceManager;
+class SourceLocation;
 
 class XRayFunctionFilter {
   std::unique_ptr<llvm::SpecialCaseList> AlwaysInstrument;

@@ -14,20 +14,26 @@
 #ifndef CLANG_ANALYSIS_FLOWSENSITIVE_MODELS_UNCHECKEDOPTIONALACCESSMODEL_H
 #define CLANG_ANALYSIS_FLOWSENSITIVE_MODELS_UNCHECKEDOPTIONALACCESSMODEL_H
 
-#include "clang/AST/ASTContext.h"
+#include <functional>
+
 #include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/Analysis/CFG.h"
 #include "clang/Analysis/FlowSensitive/CFGMatchSwitch.h"
 #include "clang/Analysis/FlowSensitive/CachedConstAccessorsLattice.h"
 #include "clang/Analysis/FlowSensitive/DataflowAnalysis.h"
-#include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
 #include "clang/Analysis/FlowSensitive/MatchSwitch.h"
 #include "clang/Analysis/FlowSensitive/NoopLattice.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/SmallVector.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/Any.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
+class ASTContext;
+class CFGElement;
+
 namespace dataflow {
+class Environment;
 
 // FIXME: Explore using an allowlist-approach, where constructs supported by the
 // analysis are always enabled and additional constructs are enabled through the

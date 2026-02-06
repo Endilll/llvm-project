@@ -7,7 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "CheckExprLifetime.h"
-#include "clang/AST/Attrs.inc"
+
+#include <algorithm>
+#include <cassert>
+#include <iterator>
+
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"
@@ -30,8 +35,20 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 namespace clang::sema {
 using lifetimes::isGslOwnerType;

@@ -7,12 +7,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/InstallAPI/DylibVerifier.h"
+
+#include <cassert>
+#include <cstdlib>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <functional>
+#include <map>
+
 #include "DiagnosticBuilderWrappers.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/Basic/DiagnosticInstallAPI.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceManager.h"
 #include "clang/Basic/Specifiers.h"
 #include "clang/InstallAPI/FrontendRecords.h"
 #include "clang/InstallAPI/MachO.h"
@@ -25,12 +32,26 @@
 #include "llvm/TextAPI/DylibReader.h"
 #include "llvm/TextAPI/Symbol.h"
 #include "llvm/TextAPI/Target.h"
-#include <cassert>
-#include <cstdlib>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/Availability.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticInstallAPIInterface.inc"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/SmallSet.h"
+#include "llvm/BinaryFormat/MachO.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TextAPI/ArchitectureSet.h"
+#include "llvm/TextAPI/FileTypes.h"
+#include "llvm/TextAPI/PackedVersion.h"
+#include "llvm/TextAPI/Record.h"
+#include "llvm/TextAPI/SymbolSet.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 using namespace llvm::MachO;
 

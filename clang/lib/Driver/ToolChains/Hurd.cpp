@@ -7,19 +7,28 @@
 //===----------------------------------------------------------------------===//
 
 #include "Hurd.h"
+
+#include <string>
+#include <functional>
+
 #include "ToolChains/Gnu.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Config/config.h"
 #include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Driver.h"
-#include "clang/Driver/Tool.h"
 #include "clang/Options/Options.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <string>
+#include "clang/Driver/Multilib.h"
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

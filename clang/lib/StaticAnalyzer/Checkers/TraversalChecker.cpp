@@ -10,14 +10,20 @@
 // as it builds the ExplodedGraph.
 //
 //===----------------------------------------------------------------------===//
-#include "clang/AST/Stmt.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
-#include "clang/AST/ParentMap.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CheckerContext.h"
 #include "llvm/Support/raw_ostream.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+
+namespace clang {
+class ReturnStmt;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

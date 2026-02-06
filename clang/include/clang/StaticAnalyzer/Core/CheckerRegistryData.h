@@ -20,18 +20,26 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_CHECKERREGISTRYDATA_H
 #define LLVM_CLANG_STATICANALYZER_CORE_CHECKERREGISTRYDATA_H
 
+#include <cassert>
+#include <cstddef>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 

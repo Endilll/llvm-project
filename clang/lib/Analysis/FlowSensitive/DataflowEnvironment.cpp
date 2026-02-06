@@ -13,6 +13,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
+
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
@@ -23,7 +29,6 @@
 #include "clang/Analysis/FlowSensitive/ASTOps.h"
 #include "clang/Analysis/FlowSensitive/DataflowAnalysisContext.h"
 #include "clang/Analysis/FlowSensitive/DataflowLattice.h"
-#include "clang/Analysis/FlowSensitive/Formula.h"
 #include "clang/Analysis/FlowSensitive/StorageLocation.h"
 #include "clang/Analysis/FlowSensitive/Value.h"
 #include "clang/Basic/LLVM.h"
@@ -36,10 +41,23 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/LambdaCapture.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/TypeOrdering.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace clang {
+namespace dataflow {
+class Formula;
+}  // namespace dataflow
+}  // namespace clang
 
 #define DEBUG_TYPE "dataflow"
 

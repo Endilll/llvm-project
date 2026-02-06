@@ -11,10 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/RecordLayout.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/Basic/LLVM.h"
-#include <cassert>
+
 #include <cstdint>
+
+#include "clang/AST/ASTContext.h"
+#include "llvm/ADT/ArrayRef.h"
 
 using namespace clang;
 

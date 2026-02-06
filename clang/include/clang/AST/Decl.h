@@ -13,12 +13,18 @@
 #ifndef LLVM_CLANG_AST_DECL_H
 #define LLVM_CLANG_AST_DECL_H
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <optional>
+#include <string>
+
 #include "clang/AST/APNumericStorage.h"
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTContextAllocate.h"
 #include "clang/AST/DeclAccessPair.h"
 #include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclID.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
@@ -45,16 +51,22 @@
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/iterator_range.h"
-#include "llvm/BinaryFormat/DXContainer.h"
 #include "llvm/Frontend/HLSL/HLSLRootSignature.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <optional>
-#include <string>
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/Stmt.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class APInt;
+class raw_ostream;
+namespace dxbc {
+enum class RootSignatureVersion;
+}  // namespace dxbc
+}  // namespace llvm
 
 namespace clang {
 
@@ -73,7 +85,6 @@ class Module;
 class NamespaceDecl;
 class ParmVarDecl;
 class RecordDecl;
-class Stmt;
 class StringLiteral;
 class TagDecl;
 class TemplateArgumentList;
@@ -84,6 +95,10 @@ class UnresolvedSetImpl;
 class VarTemplateDecl;
 enum class ImplicitParamKind;
 struct UsualDeleteParams;
+class CXXRecordDecl;
+class DeclAccessPair;
+class GlobalDeclID;
+class LangOptions;
 
 // Holds a constraint expression along with a pack expansion index, if
 // expanded.

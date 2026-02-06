@@ -12,6 +12,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Serialization/ModuleManager.h"
+
+#include <sys/types.h>
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <array>
+#include <iterator>
+
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/LLVM.h"
@@ -34,15 +45,7 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/VirtualFileSystem.h"
-#include <cassert>
-#include <cstdint>
-#include <ctime>
-#include <memory>
-#include <string>
-#include <sys/types.h>
-#include <system_error>
-#include <utility>
+#include "clang/Basic/CustomizableOptional.h"
 
 using namespace clang;
 using namespace serialization;

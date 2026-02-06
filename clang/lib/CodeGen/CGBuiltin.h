@@ -10,6 +10,24 @@
 #define LLVM_CLANG_LIB_CODEGEN_CGBUILTIN_H
 
 #include "CodeGenFunction.h"
+#include "Address.h"
+#include "CodeGenModule.h"
+#include "clang/AST/Expr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/Support/AtomicOrdering.h"
+
+namespace clang {
+class QualType;
+}  // namespace clang
+namespace llvm {
+class Function;
+class IntegerType;
+class Type;
+class Value;
+}  // namespace llvm
 
 // Many of MSVC builtins are on x64, ARM and AArch64; to avoid repeating code,
 // we handle them here.

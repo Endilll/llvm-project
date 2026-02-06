@@ -6,6 +6,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstddef>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "ABIInfoImpl.h"
 #include "Address.h"
 #include "CGBuilder.h"
@@ -26,16 +33,29 @@
 #include "llvm/ADT/SmallString.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Metadata.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <map>
-#include <memory>
-#include <string>
-#include <utility>
+#include "ABIInfo.h"
+#include "CodeGenFunction.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
 
 using namespace clang;
 using namespace clang::CodeGen;

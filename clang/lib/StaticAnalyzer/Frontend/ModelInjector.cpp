@@ -7,6 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "ModelInjector.h"
+
+#include <memory>
+#include <utility>
+#include <string>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/Basic/Diagnostic.h"
@@ -14,19 +19,24 @@
 #include "clang/Basic/LangStandard.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Stack.h"
-#include "clang/Frontend/ASTUnit.h"
 #include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendAction.h"
 #include "clang/Frontend/FrontendOptions.h"
 #include "clang/Lex/Preprocessor.h"
-#include "clang/Serialization/ASTReader.h"
 #include "clang/StaticAnalyzer/Frontend/FrontendActions.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/CrashRecoveryContext.h"
 #include "llvm/Support/FileSystem.h"
-#include <memory>
-#include <utility>
+#include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Frontend/CompilerInvocation.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/VirtualFileSystem.h"
 
 using namespace clang;
 using namespace ento;

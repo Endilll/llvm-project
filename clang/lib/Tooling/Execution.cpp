@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Execution.h"
+
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
 #include "clang/Tooling/CommonOptionsParser.h"
@@ -18,10 +24,8 @@
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/Registry.h"
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 LLVM_INSTANTIATE_REGISTRY(clang::tooling::ToolExecutorPluginRegistry)
 

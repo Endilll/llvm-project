@@ -12,16 +12,23 @@
 #ifndef LLVM_CLANG_AST_STMTOBJC_H
 #define LLVM_CLANG_AST_STMTOBJC_H
 
+#include <cassert>
+#include <cstddef>
+
 #include "clang/AST/Stmt.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <cstddef>
+#include "clang/AST/StmtIterator.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
+class ASTContext;
+class Expr;
+class VarDecl;
 
 /// Represents Objective-C's collection statement.
 ///

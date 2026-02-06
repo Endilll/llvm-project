@@ -9,10 +9,24 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_LFI_LINUX_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_LFI_LINUX_H
 
+#include <string>
+#include <vector>
+
 #include "Linux.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace toolchains {
 
 class LLVM_LIBRARY_VISIBILITY LFILinux : public Linux {

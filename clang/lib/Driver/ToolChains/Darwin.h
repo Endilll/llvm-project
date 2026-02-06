@@ -9,6 +9,11 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_DARWIN_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_DARWIN_H
 
+#include <assert.h>
+#include <memory>
+#include <optional>
+#include <string>
+
 #include "clang/Basic/DarwinSDKInfo.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Driver/CudaInstallationDetector.h"
@@ -17,10 +22,30 @@
 #include "clang/Driver/SyclInstallationDetector.h"
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
-#include "clang/Driver/XRayArgs.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
+#include "clang/Driver/Types.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/CodeGen.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/Target/TargetOptions.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace llvm {
+namespace opt {
+class ArgList;
+class DerivedArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Compilation;
+class Driver;
 
 namespace toolchains {
 class MachO;

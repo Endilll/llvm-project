@@ -8,15 +8,20 @@
 #ifndef LLVM_CLANG_DRIVER_SANITIZERARGS_H
 #define LLVM_CLANG_DRIVER_SANITIZERARGS_H
 
-#include "clang/Basic/Sanitizers.h"
-#include "clang/Driver/Types.h"
-#include "llvm/Option/Arg.h"
-#include "llvm/Option/ArgList.h"
-#include "llvm/Option/Option.h"
-#include "llvm/Transforms/Instrumentation/AddressSanitizerOptions.h"
 #include <cassert>
 #include <string>
 #include <vector>
+
+#include "clang/Basic/Sanitizers.h"
+#include "clang/Driver/Types.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Transforms/Instrumentation/AddressSanitizerOptions.h"
+
+namespace llvm {
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {

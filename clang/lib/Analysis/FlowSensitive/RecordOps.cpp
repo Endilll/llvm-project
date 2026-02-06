@@ -11,17 +11,30 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/FlowSensitive/RecordOps.h"
+
+#include <cassert>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Type.h"
 #include "clang/Analysis/FlowSensitive/ASTOps.h"
 #include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
 #include "clang/Analysis/FlowSensitive/StorageLocation.h"
-#include "clang/Analysis/FlowSensitive/Value.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Debug.h"
-#include <cassert>
+#include "clang/Analysis/FlowSensitive/DataflowAnalysisContext.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace dataflow {
+class Value;
+}  // namespace dataflow
+}  // namespace clang
 
 #define DEBUG_TYPE "dataflow"
 

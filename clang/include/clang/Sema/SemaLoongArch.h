@@ -13,11 +13,12 @@
 #ifndef LLVM_CLANG_SEMA_SEMALOONGARCH_H
 #define LLVM_CLANG_SEMA_SEMALOONGARCH_H
 
-#include "clang/AST/ASTFwd.h"
 #include "clang/Sema/SemaBase.h"
 
 namespace clang {
 class TargetInfo;
+class CallExpr;
+class Sema;
 
 class SemaLoongArch : public SemaBase {
 public:

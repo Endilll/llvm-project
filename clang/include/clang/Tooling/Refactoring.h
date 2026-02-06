@@ -18,19 +18,26 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_H
 #define LLVM_CLANG_TOOLING_REFACTORING_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Serialization/PCHContainerOperations.h"
-#include "clang/Tooling/Core/Replacement.h"
-#include "clang/Tooling/Tooling.h"
 #include <map>
 #include <memory>
 #include <string>
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "clang/Tooling/Tooling.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
+
 namespace clang {
 
 class Rewriter;
+class PCHContainerOperations;
 
 namespace tooling {
+class CompilationDatabase;
 
 /// A tool to run refactorings.
 ///

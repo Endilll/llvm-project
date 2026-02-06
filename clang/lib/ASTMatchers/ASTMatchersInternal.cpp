@@ -11,9 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ASTMatchers/ASTMatchersInternal.h"
+
+#include <cassert>
+#include <cstddef>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTTypeTraits.h"
-#include "clang/AST/Attr.h"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -24,8 +33,6 @@
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/ExprConcepts.h"
 #include "clang/AST/ExprObjC.h"
-#include "clang/AST/LambdaCapture.h"
-#include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OpenMPClause.h"
 #include "clang/AST/ParentMapContext.h"
 #include "clang/AST/PrettyPrinter.h"
@@ -33,9 +40,6 @@
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/StmtObjC.h"
 #include "clang/AST/StmtOpenMP.h"
-#include "clang/AST/TemplateBase.h"
-#include "clang/AST/TemplateName.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchersMacros.h"
@@ -55,16 +59,12 @@
 #include "llvm/Support/Regex.h"
 #include "llvm/Support/WithColor.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
+class LambdaCapture;
+class LangOptions;
+
 namespace ast_matchers {
 
 AST_MATCHER_P(ObjCMessageExpr, hasAnySelectorMatcher, std::vector<std::string>,

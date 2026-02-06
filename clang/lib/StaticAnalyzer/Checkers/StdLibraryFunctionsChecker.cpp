@@ -40,6 +40,22 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cctype>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <tuple>
+#include <type_traits>
+
 #include "ErrnoModeling.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
@@ -49,7 +65,6 @@
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
@@ -74,19 +89,22 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/raw_ostream.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FormatVariadicDetails.h"
 
-#include <algorithm>
-#include <cassert>
-#include <cctype>
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+namespace clang {
+class Decl;
+class LocationContext;
+class Preprocessor;
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::ento;
@@ -2199,7 +2217,6 @@ void StdLibraryFunctionsChecker::initFunctionSummaries(
 
     auto ValidFileDescriptorOrAtFdcwd = [&](ArgNo ArgN) {
       return std::make_shared<RangeConstraint>(
-          ArgN, WithinRange, Range({AT_FDCWDv, AT_FDCWDv}, {0, IntMax}),
           "a valid file descriptor or AT_FDCWD");
     };
 

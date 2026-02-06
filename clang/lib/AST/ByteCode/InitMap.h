@@ -9,6 +9,7 @@
 #ifndef LLVM_CLANG_AST_INTERP_INIT_MAP_H
 #define LLVM_CLANG_AST_INTERP_INIT_MAP_H
 
+#include <stddef.h>
 #include <cassert>
 #include <climits>
 #include <cstdint>

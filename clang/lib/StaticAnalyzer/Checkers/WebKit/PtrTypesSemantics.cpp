@@ -7,6 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "PtrTypesSemantics.h"
+
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "ASTUtils.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/CXXInheritance.h"
@@ -18,14 +25,19 @@
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/StmtVisitor.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Analysis/DomainSpecific/CocoaConventions.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Specifiers.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

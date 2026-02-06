@@ -12,8 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/LifetimeSafety/LifetimeStats.h"
+
+#include <string>
+
 #include "clang/AST/TypeBase.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang::lifetimes {
 void printStats(const LifetimeSafetyStats &Stats) {

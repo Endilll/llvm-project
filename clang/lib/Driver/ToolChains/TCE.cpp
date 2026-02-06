@@ -7,11 +7,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "TCE.h"
+
+#include <string>
+
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/ToolChain.h"
-#include "llvm/Option/ArgList.h"
-#include "llvm/TargetParser/Triple.h"
-#include <string>
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

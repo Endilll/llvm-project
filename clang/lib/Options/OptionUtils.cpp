@@ -7,10 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Options/OptionUtils.h"
+
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/Version.h"
 #include "clang/Config/config.h"
 #include "clang/Options/Options.h"
 #include "llvm/ADT/StringMap.h"
@@ -20,10 +25,12 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
-#include <cstddef>
-#include <cstdint>
-#include <string>
-#include <utility>
+#include "clang/Basic/Version.inc"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 using namespace llvm::opt;

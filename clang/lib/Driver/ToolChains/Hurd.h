@@ -9,11 +9,25 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_Hurd_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_Hurd_H
 
+#include <string>
+#include <vector>
+
 #include "Gnu.h"
-#include "clang/Driver/ToolChain.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace toolchains {
 
 class LLVM_LIBRARY_VISIBILITY Hurd : public Generic_ELF {

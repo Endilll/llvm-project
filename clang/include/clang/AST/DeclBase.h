@@ -13,12 +13,19 @@
 #ifndef LLVM_CLANG_AST_DECLBASE_H
 #define LLVM_CLANG_AST_DECLBASE_H
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <string>
+#include <type_traits>
+#include <utility>
+
 #include "clang/AST/ASTDumperUtils.h"
 #include "clang/AST/AttrIterator.h"
 #include "clang/AST/DeclID.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/SelectorLocationsKind.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -31,16 +38,18 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/Support/PointerLikeTypeTraits.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/VersionTuple.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <string>
-#include <type_traits>
-#include <utility>
+#include "clang/Basic/Linkage.h"
+#include "llvm/ADT/STLExtras.h"
+
+namespace llvm {
+class StringRef;
+class raw_ostream;
+template <typename T> class ArrayRef;
+template <typename T> class SmallVectorImpl;
+template <typename T> struct PointerLikeTypeTraits;
+}  // namespace llvm
 
 namespace clang {
 
@@ -52,13 +61,9 @@ class DeclContext;
 class ExternalSourceSymbolAttr;
 class FunctionDecl;
 class FunctionType;
-class IdentifierInfo;
-enum class Linkage : unsigned char;
 class LinkageSpecDecl;
 class Module;
 class NamedDecl;
-class ObjCContainerDecl;
-class ObjCMethodDecl;
 struct PrintingPolicy;
 class RecordDecl;
 class SourceManager;
@@ -68,6 +73,8 @@ class TemplateDecl;
 class TemplateParameterList;
 class TranslationUnitDecl;
 class UsingDirectiveDecl;
+class QualType;
+enum class TagTypeKind;
 
 /// Captures the result of checking the availability of a
 /// declaration.

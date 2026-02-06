@@ -10,6 +10,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <array>
+#include <cassert>
+#include <optional>
+#include <string>
+
 #include "Address.h"
 #include "CGBuiltin.h"
 #include "CodeGenFunction.h"
@@ -17,7 +22,6 @@
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/TypeBase.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetBuiltins.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/IR/Constants.h"
@@ -28,13 +32,20 @@
 #include "llvm/IR/IntrinsicsNVPTX.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Metadata.h"
-#include "llvm/IR/Type.h"
 #include "llvm/IR/Value.h"
 #include "llvm/Support/AtomicOrdering.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <array>
-#include <cassert>
-#include <optional>
+#include "CGBuilder.h"
+#include "CodeGenModule.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+
+namespace llvm {
+class Type;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

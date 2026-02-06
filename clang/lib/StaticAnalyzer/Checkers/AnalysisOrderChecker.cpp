@@ -13,14 +13,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <optional>
+#include <string>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
 #include "clang/AST/Stmt.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Analysis/CFGStmtMap.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
@@ -28,6 +29,28 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
 #include "llvm/Support/raw_ostream.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExprEngine.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class CXXConstructExpr;
+class CXXDeleteExpr;
+class CXXNewExpr;
+namespace ento {
+class ExplodedGraph;
+class MemRegion;
+class SymbolReaper;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

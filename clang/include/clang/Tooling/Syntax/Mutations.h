@@ -12,12 +12,13 @@
 #define LLVM_CLANG_TOOLING_SYNTAX_MUTATIONS_H
 
 #include "clang/Tooling/Core/Replacement.h"
-#include "clang/Tooling/Syntax/Nodes.h"
-#include "clang/Tooling/Syntax/TokenBufferTokenManager.h"
-#include "clang/Tooling/Syntax/Tree.h"
 
 namespace clang {
 namespace syntax {
+class Arena;
+class Statement;
+class TokenBufferTokenManager;
+class TranslationUnit;
 
 /// Computes textual replacements required to mimic the tree modifications made
 /// to the syntax tree.

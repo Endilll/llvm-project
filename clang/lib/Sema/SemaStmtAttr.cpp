@@ -10,6 +10,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <tuple>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/DependenceFlags.h"
@@ -26,7 +34,6 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/ParsedAttrInfo.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/TargetInfo.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/ScopeInfo.h"
@@ -35,11 +42,13 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <vector>
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace sema;
@@ -465,6 +474,11 @@ static Attr *handleMSConstexprAttr(Sema &S, Stmt *St, const ParsedAttr &A,
 
 #define WANT_STMT_MERGE_LOGIC
 #include "clang/Sema/AttrParsedAttrImpl.inc"
+
+namespace clang {
+class TargetInfo;
+}  // namespace clang
+
 #undef WANT_STMT_MERGE_LOGIC
 
 static void

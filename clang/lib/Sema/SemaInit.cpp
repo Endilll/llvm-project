@@ -10,9 +10,19 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <iterator>
+#include <tuple>
+
 #include "CheckExprLifetime.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -24,7 +34,6 @@
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/IgnoreExpr.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/AttrKinds.h"
@@ -52,7 +61,6 @@
 #include "clang/Sema/TypoCorrection.h"
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallString.h"
@@ -63,13 +71,29 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
+#include "clang/AST/APValue.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/OpenCLOptions.h"
+#include "clang/Sema/CleanupInfo.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class IdentifierInfo;
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 

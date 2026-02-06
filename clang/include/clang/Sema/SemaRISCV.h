@@ -13,22 +13,27 @@
 #ifndef LLVM_CLANG_SEMA_SEMARISCV_H
 #define LLVM_CLANG_SEMA_SEMARISCV_H
 
-#include "clang/AST/ASTFwd.h"
-#include "clang/AST/Type.h"
+#include <memory>
+
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/SemaBase.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
-#include <memory>
+#include "clang/Sema/RISCVIntrinsicManager.h"
+
+namespace llvm {
+template <typename T> class SmallVectorImpl;
+template <unsigned int InternalLen> class SmallString;
+}  // namespace llvm
 
 namespace clang {
-namespace sema {
-class RISCVIntrinsicManager;
-} // namespace sema
-
 class ParsedAttr;
 class TargetInfo;
+class CallExpr;
+class Decl;
+class QualType;
+class Sema;
+class SourceLocation;
 
 class SemaRISCV : public SemaBase {
 public:

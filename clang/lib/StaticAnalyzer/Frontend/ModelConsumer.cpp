@@ -19,11 +19,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Frontend/ModelConsumer.h"
+
+#include <utility>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclGroup.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Casting.h"
-#include <utility>
+#include "llvm/Support/AllocatorBase.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

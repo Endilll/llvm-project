@@ -14,12 +14,17 @@
 #ifndef LLVM_CLANG_BASIC_FILESYSTEMSTATCACHE_H
 #define LLVM_CLANG_BASIC_FILESYSTEMSTATCACHE_H
 
+#include <memory>
+#include <system_error>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <memory>
-#include <system_error>
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
 

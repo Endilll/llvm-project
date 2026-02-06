@@ -13,10 +13,14 @@
 #ifndef LLVM_CLANG_AST_EXPROBJC_H
 #define LLVM_CLANG_AST_EXPROBJC_H
 
-#include "clang/AST/Attr.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <utility>
+
 #include "clang/AST/ComputeDependence.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclID.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DependenceFlags.h"
 #include "clang/AST/Expr.h"
@@ -35,16 +39,21 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/StmtIterator.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 
 class ASTContext;
 class CXXBaseSpecifier;
+class WarnUnusedResultAttr;
 
 /// ObjCStringLiteral, used for Objective-C string literals
 /// i.e. @"foo".

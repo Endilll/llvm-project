@@ -14,13 +14,21 @@
 #ifndef LLVM_CLANG_SERIALIZATION_ASTWRITER_H
 #define LLVM_CLANG_SERIALIZATION_ASTWRITER_H
 
+#include <cassert>
+#include <cstdint>
+#include <ctime>
+#include <memory>
+#include <queue>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/ASTMutationListener.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclID.h"
 #include "clang/AST/Type.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Module.h"
@@ -42,14 +50,13 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Bitstream/BitstreamWriter.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <ctime>
-#include <memory>
-#include <queue>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/Serialization/ModuleFile.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+class VersionTuple;
+}  // namespace llvm
 
 namespace clang {
 
@@ -60,31 +67,24 @@ class CodeGenOptions;
 class CXXRecordDecl;
 class FileEntry;
 class FPOptionsOverride;
-class FunctionDecl;
 class HeaderSearch;
-class HeaderSearchOptions;
 class IdentifierResolver;
 class LangOptions;
 class MacroDefinitionRecord;
 class MacroInfo;
-class Module;
 class ModuleCache;
 class ModuleFileExtension;
 class ModuleFileExtensionWriter;
-class NamedDecl;
 class ObjCInterfaceDecl;
 class PreprocessingRecord;
 class Preprocessor;
-class RecordDecl;
-class Sema;
 class SourceManager;
 class Stmt;
-class StoredDeclsList;
 class SwitchCase;
 class Token;
-
 struct VisibleLookupBlockOffsets;
 struct LookupBlockOffsets;
+class DiagnosticsEngine;
 
 namespace serialization {
 enum class DeclUpdateKind;

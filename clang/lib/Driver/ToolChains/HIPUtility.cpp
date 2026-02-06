@@ -7,8 +7,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "HIPUtility.h"
+
+#include <deque>
+#include <functional>
+#include <memory>
+#include <set>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Action.h"
 #include "clang/Driver/CommonArgs.h"
@@ -36,14 +45,14 @@
 #include "llvm/Support/Program.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <deque>
-#include <functional>
-#include <memory>
-#include <set>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/fallible_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Option/Arg.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorOr.h"
 
 using namespace clang;
 using namespace clang::driver;

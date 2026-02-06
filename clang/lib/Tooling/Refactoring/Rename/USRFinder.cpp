@@ -12,16 +12,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Refactoring/Rename/USRFinder.h"
+
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Index/USRGeneration.h"
-#include "clang/Lex/Lexer.h"
 #include "clang/Tooling/Refactoring/RecursiveSymbolVisitor.h"
 #include "llvm/ADT/SmallString.h"
-#include <string>
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace llvm;
 

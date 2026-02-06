@@ -15,16 +15,38 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_FORMATTOKENLEXER_H
 #define LLVM_CLANG_LIB_FORMAT_FORMATTOKENLEXER_H
 
+#include <stddef.h>
+#include <stack>
+#include <memory>
+
 #include "Encoding.h"
 #include "FormatToken.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/StringSet.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Lex/Lexer.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Regex.h"
 
-#include <stack>
+namespace llvm {
+template <typename T> class SpecificBumpPtrAllocator;
+}  // namespace llvm
 
 namespace clang {
+class IdentifierInfo;
+class IdentifierTable;
+class SourceManager;
+class Token;
+namespace tok {
+enum TokenKind : unsigned short;
+}  // namespace tok
+
 namespace format {
+struct FormatStyle;
 
 enum LexerState {
   NORMAL,

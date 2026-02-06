@@ -9,16 +9,17 @@
 #ifndef LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_FORMULA_H
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_FORMULA_H
 
-#include "clang/Basic/LLVM.h"
+#include <cassert>
+#include <string>
+#include <type_traits>
+
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <string>
-#include <type_traits>
+#include "llvm/ADT/Hashing.h"
 
 namespace clang::dataflow {
 
@@ -48,6 +49,7 @@ enum class Atom : unsigned {};
 /// trailing objects.
 /// For this reason, Formulas are Arena-allocated and over-aligned.
 class Formula;
+
 class alignas(const Formula *) Formula {
 public:
   enum Kind : unsigned {

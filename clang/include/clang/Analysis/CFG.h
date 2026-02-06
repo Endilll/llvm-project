@@ -14,23 +14,6 @@
 #ifndef LLVM_CLANG_ANALYSIS_CFG_H
 #define LLVM_CLANG_ANALYSIS_CFG_H
 
-#include "clang/AST/Attr.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
-#include "clang/AST/ExprObjC.h"
-#include "clang/AST/Stmt.h"
-#include "clang/Analysis/ConstructionContext.h"
-#include "clang/Analysis/Support/BumpVector.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/FoldingSet.h"
-#include "llvm/ADT/GraphTraits.h"
-#include "llvm/ADT/PointerIntPair.h"
-#include "llvm/ADT/iterator_range.h"
-#include "llvm/Support/Allocator.h"
-#include "llvm/Support/Casting.h"
-#include "llvm/Support/Compiler.h"
-#include "llvm/Support/raw_ostream.h"
 #include <bitset>
 #include <cassert>
 #include <cstddef>
@@ -39,23 +22,40 @@
 #include <optional>
 #include <type_traits>
 #include <vector>
+#include <utility>
+
+#include "clang/AST/Attr.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Analysis/Support/BumpVector.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/GraphTraits.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/raw_ostream.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/Type.h"
+
+namespace llvm {
+template <typename From> struct simplify_type;
+}  // namespace llvm
 
 namespace clang {
 
 class ASTContext;
-class BinaryOperator;
 class CFG;
 class CXXBaseSpecifier;
-class CXXBindTemporaryExpr;
 class CXXCtorInitializer;
-class CXXDeleteExpr;
 class CXXDestructorDecl;
-class CXXNewExpr;
 class CXXRecordDecl;
 class Decl;
-class FieldDecl;
 class LangOptions;
-class VarDecl;
+class ConstructionContext;
 
 /// Represents a top-level expression in a basic block.
 class CFGElement {

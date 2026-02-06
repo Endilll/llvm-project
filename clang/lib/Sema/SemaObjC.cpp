@@ -11,8 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaObjC.h"
+
+#include <cassert>
+#include <optional>
+#include <string>
+
 #include "clang/AST/ASTMutationListener.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
@@ -25,7 +30,6 @@
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtObjC.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/Diagnostic.h"
@@ -39,7 +43,6 @@
 #include "clang/Sema/Lookup.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/ParsedAttr.h"
-#include "clang/Sema/Redeclaration.h"
 #include "clang/Sema/ScopeInfo.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaBase.h"
@@ -47,8 +50,16 @@
 #include "llvm/ADT/APSInt.h"
 #include "llvm/Support/ConvertUTF.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/ObjCRuntime.h"
+#include "clang/Sema/Scope.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

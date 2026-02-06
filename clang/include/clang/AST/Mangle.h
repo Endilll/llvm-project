@@ -13,16 +13,6 @@
 #ifndef LLVM_CLANG_AST_MANGLE_H
 #define LLVM_CLANG_AST_MANGLE_H
 
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/GlobalDecl.h"
-#include "clang/AST/Type.h"
-#include "clang/Basic/ABI.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/UnsignedOrNone.h"
-#include "llvm/ADT/DenseMap.h"
 #include <cstdint>
 #include <memory>
 #include <optional>
@@ -30,24 +20,36 @@
 #include <utility>
 #include <vector>
 
+#include "clang/AST/Decl.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/Basic/ABI.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/iterator_range.h"
+
 namespace llvm {
 class raw_ostream;
+class StringRef;
+template <typename T> class ArrayRef;
 }
 
 namespace clang {
 class ASTContext;
-class BlockDecl;
 class CXXConstructorDecl;
 class CXXDestructorDecl;
 class CXXMethodDecl;
-class FunctionDecl;
 struct MethodVFTableLocation;
-class NamedDecl;
 class ObjCMethodDecl;
 class StringLiteral;
-struct ThisAdjustment;
 struct ThunkInfo;
-class VarDecl;
+class CXXRecordDecl;
+class Decl;
+class DeclContext;
+class DiagnosticsEngine;
+class MSGuidDecl;
+class Module;
+class QualType;
 
 /// Extract mangling function name from MangleContext such that swift can call
 /// it to prepare for ObjCDirect in swift.

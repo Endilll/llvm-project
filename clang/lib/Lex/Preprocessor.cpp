@@ -25,11 +25,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/Preprocessor.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticLex.h"
 #include "clang/Basic/FileEntry.h"
-#include "clang/Basic/FileManager.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -63,22 +74,13 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Capacity.h"
-#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/Registry.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/SmallString.h"
 
 using namespace clang;
 

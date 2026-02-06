@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "AVR.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+
 #include "ToolChains/Gnu.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
@@ -18,16 +24,21 @@
 #include "clang/Driver/Job.h"
 #include "clang/Driver/Tool.h"
 #include "clang/Options/Options.h"
-#include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
-#include "llvm/TargetParser/SubtargetFeature.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <string>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class Arg;
+}  // namespace opt
+}  // namespace llvm
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

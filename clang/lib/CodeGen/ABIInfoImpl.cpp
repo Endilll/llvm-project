@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "ABIInfoImpl.h"
+
+#include <algorithm>
+#include <cassert>
+
 #include "ABIInfo.h"
 #include "Address.h"
 #include "CGBuilder.h"
@@ -14,7 +18,7 @@
 #include "CGValue.h"
 #include "CodeGenFunction.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -22,15 +26,24 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
 #include "llvm/ADT/Twine.h"
-#include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Value.h"
-#include <algorithm>
-#include <cassert>
+#include "CodeGenModule.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class BasicBlock;
+}  // namespace llvm
 
 using namespace clang;
 using namespace clang::CodeGen;

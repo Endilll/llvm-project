@@ -7,13 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Refactoring/Rename/SymbolOccurrences.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Tooling/Refactoring/Rename/SymbolName.h"
-#include "llvm/ADT/STLExtras.h"
+
 #include <cassert>
 #include <memory>
 #include <string>
+#include <new>
+
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Tooling/Refactoring/Rename/SymbolName.h"
+#include "llvm/ADT/STLExtras.h"
 
 using namespace clang;
 using namespace tooling;

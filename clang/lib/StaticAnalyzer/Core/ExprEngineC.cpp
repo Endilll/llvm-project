@@ -10,6 +10,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <optional>
+
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
@@ -32,8 +35,23 @@
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Stmt.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/BasicValueFactory.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class LocationContext;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

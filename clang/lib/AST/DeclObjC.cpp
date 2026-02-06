@@ -11,6 +11,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/DeclObjC.h"
+
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <queue>
+#include <utility>
+#include <new>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTMutationListener.h"
 #include "clang/AST/Attr.h"
@@ -32,11 +40,8 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <queue>
-#include <utility>
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/iterator.h"
 
 using namespace clang;
 

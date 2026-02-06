@@ -10,6 +10,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <utility>
+#include <variant>
+#include <type_traits>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/OpenACCClause.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -31,9 +36,18 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <utility>
-#include <variant>
+#include "clang/AST/DeclGroup.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Sema/Scope.h"
+#include "clang/Sema/Sema.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 using namespace clang;
 using namespace llvm;

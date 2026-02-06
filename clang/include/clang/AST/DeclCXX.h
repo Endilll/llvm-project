@@ -15,9 +15,15 @@
 #ifndef LLVM_CLANG_AST_DECLCXX_H
 #define LLVM_CLANG_AST_DECLCXX_H
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <iterator>
+#include <utility>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTUnresolvedSet.h"
-#include "clang/AST/ComputeDependence.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclID.h"
@@ -31,7 +37,6 @@
 #include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/AST/UnresolvedSet.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Lambda.h"
 #include "clang/Basic/LangOptions.h"
@@ -49,12 +54,15 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <iterator>
-#include <utility>
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/TemplateBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+template <typename Fn> class function_ref;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 
@@ -68,7 +76,6 @@ class CXXDestructorDecl;
 class CXXFinalOverriderMap;
 class CXXIndirectPrimaryBaseSet;
 class CXXMethodDecl;
-class DecompositionDecl;
 class FriendDecl;
 class FunctionTemplateDecl;
 class IdentifierInfo;
@@ -76,7 +83,7 @@ class MemberSpecializationInfo;
 class BaseUsingDecl;
 class TemplateDecl;
 class TemplateParameterList;
-class UsingDecl;
+class StreamingDiagnostic;
 
 /// Represents an access specifier followed by colon ':'.
 ///

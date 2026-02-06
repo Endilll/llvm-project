@@ -12,6 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/FlowSensitive/AdornedCFG.h"
+
+#include <system_error>
+#include <utility>
+#include <iterator>
+#include <optional>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Stmt.h"
@@ -22,8 +28,11 @@
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Error.h"
-#include <system_error>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 namespace dataflow {

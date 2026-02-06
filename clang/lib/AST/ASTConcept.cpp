@@ -12,6 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ASTConcept.h"
+
+#include <cassert>
+#include <cstddef>
+#include <string>
+#include <new>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/ExprConcepts.h"
@@ -26,9 +32,10 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <string>
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/PointerIntPair.h"
 
 using namespace clang;
 

@@ -14,19 +14,22 @@
 #ifndef LLVM_CLANG_AST_VTTBUILDER_H
 #define LLVM_CLANG_AST_VTTBUILDER_H
 
+#include <cstdint>
+
 #include "clang/AST/BaseSubobject.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/SmallPtrSet.h"
-#include <cstdint>
+#include "clang/AST/DeclCXX.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 
 class ASTContext;
 class ASTRecordLayout;
-class CXXRecordDecl;
 
 class VTTVTable {
   llvm::PointerIntPair<const CXXRecordDecl *, 1, bool> BaseAndIsVirtual;

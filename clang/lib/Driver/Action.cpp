@@ -7,13 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Driver/Action.h"
+
+#include <cassert>
+#include <string>
+#include <initializer_list>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Types.h"
 #include "clang/Driver/Util.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <string>
 
 using namespace clang;
 using namespace driver;

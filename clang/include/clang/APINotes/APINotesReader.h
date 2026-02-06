@@ -15,14 +15,19 @@
 #ifndef LLVM_CLANG_APINOTES_READER_H
 #define LLVM_CLANG_APINOTES_READER_H
 
-#include "clang/APINotes/Types.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/VersionTuple.h"
 #include <cassert>
 #include <memory>
 #include <optional>
-#include <utility>
+#include <iterator>
+
+#include "clang/APINotes/Types.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class MemoryBuffer;
+class VersionTuple;
+}  // namespace llvm
 
 namespace clang {
 namespace api_notes {
@@ -31,6 +36,7 @@ namespace api_notes {
 /// the \c APINotesWriter.
 class APINotesReader {
   class Implementation;
+
   std::unique_ptr<Implementation> Implementation;
 
   APINotesReader(llvm::MemoryBuffer *InputBuffer,

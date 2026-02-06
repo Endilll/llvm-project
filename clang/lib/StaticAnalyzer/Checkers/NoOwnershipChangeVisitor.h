@@ -6,12 +6,23 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <string>
+
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
-#include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/Support/Compiler.h"
 
 namespace clang {
+class ASTContext;
+class Decl;
+
 namespace ento {
+class CheckerBackend;
+class ExplodedNode;
 
 class NoOwnershipChangeVisitor : public NoStateChangeFuncVisitor {
 protected:

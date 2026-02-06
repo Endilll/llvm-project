@@ -9,6 +9,12 @@
 #ifndef LLVM_CLANG_LEX_MODULEMAPFILE_H
 #define LLVM_CLANG_LEX_MODULEMAPFILE_H
 
+#include <cstdint>
+#include <optional>
+#include <variant>
+#include <vector>
+#include <string>
+
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/LLVM.h"
 // TODO: Consider moving ModuleId to another header, parsing a modulemap file is
@@ -16,11 +22,12 @@
 #include "clang/Basic/Module.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/Support/Compiler.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 
-#include <cstdint>
-#include <optional>
-#include <variant>
-#include <vector>
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 

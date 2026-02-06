@@ -9,12 +9,13 @@
 #ifndef LLVM_CLANG_FRONTEND_SERIALIZEDDIAGNOSTICPRINTER_H
 #define LLVM_CLANG_FRONTEND_SERIALIZEDDIAGNOSTICPRINTER_H
 
-#include "clang/Basic/LLVM.h"
 #include <memory>
 
+#include "clang/Basic/LLVM.h"
+
 namespace llvm {
-class raw_ostream;
-}
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
 class DiagnosticConsumer;

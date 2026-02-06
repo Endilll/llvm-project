@@ -11,6 +11,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstddef>
+#include <map>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <string>
+
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Module.h"
@@ -21,17 +29,13 @@
 #include "clang/Rewrite/Frontend/Rewriters.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Frontend/PreprocessorOutputOptions.h"
-#include "clang/Lex/Pragma.h"
 #include "clang/Lex/Preprocessor.h"
 #include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <map>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 using namespace llvm;

@@ -17,6 +17,7 @@
 
 #include "llvm/ADT/BitVector.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 

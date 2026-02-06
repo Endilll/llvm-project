@@ -12,15 +12,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "TypeLocBuilder.h"
-#include "clang/AST/ASTContext.h"
+
+#include <cassert>
+#include <iterator>
+
 #include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/STLExtras.h"
-#include <cassert>
-#include <cstddef>
-#include <cstring>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 

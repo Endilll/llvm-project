@@ -7,11 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "ABIInfo.h"
+
+#include <algorithm>
+#include <cassert>
+#include <vector>
+
 #include "ABIInfoImpl.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -19,9 +23,21 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
+#include "Address.h"
+#include "CGCXXABI.h"
+#include "CGValue.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/Type.h"
+#include "clang/CodeGen/CGFunctionInfo.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 using namespace clang::CodeGen;

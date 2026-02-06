@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaPPC.h"
+
+#include <cassert>
+#include <cstdlib>
+#include <optional>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/CharUnits.h"
@@ -29,8 +35,8 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdlib>
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
 
 namespace clang {
 

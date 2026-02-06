@@ -14,7 +14,13 @@
 #ifndef LLVM_CLANG_AST_EXPRCXX_H
 #define LLVM_CLANG_AST_EXPRCXX_H
 
-#include "clang/AST/ASTConcept.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <utility>
+#include <variant>
+
 #include "clang/AST/ComputeDependence.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -48,21 +54,20 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <utility>
-#include <variant>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/StmtIterator.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 
-class ASTContext;
-class DeclAccessPair;
 class IdentifierInfo;
 class LambdaCapture;
-class NonTypeTemplateParmDecl;
-class TemplateParameterList;
+class APValue;
+class WarnUnusedResultAttr;
 
 //===--------------------------------------------------------------------===//
 // C++ Expressions.

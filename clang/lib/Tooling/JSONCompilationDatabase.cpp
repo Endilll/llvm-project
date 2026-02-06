@@ -11,10 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/JSONCompilationDatabase.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Tooling/CompilationDatabase.h"
 #include "clang/Tooling/CompilationDatabasePluginRegistry.h"
-#include "clang/Tooling/Tooling.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
@@ -26,14 +34,12 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/YAMLParser.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/TargetParser/Host.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace tooling;

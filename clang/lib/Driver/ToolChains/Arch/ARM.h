@@ -9,17 +9,27 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_ARCH_ARM_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_ARCH_ARM_H
 
-#include "clang/Driver/ToolChain.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Option/ArgList.h"
-#include "llvm/Option/Option.h"
-#include "llvm/TargetParser/ARMTargetParser.h"
-#include "llvm/TargetParser/Triple.h"
 #include <string>
 #include <vector>
 
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/Option.h"
+#include "llvm/TargetParser/ARMTargetParser.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Types.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
+
 namespace clang {
 namespace driver {
+class Driver;
+class ToolChain;
+
 namespace tools {
 namespace arm {
 

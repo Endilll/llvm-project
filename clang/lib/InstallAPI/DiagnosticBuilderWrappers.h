@@ -13,15 +13,20 @@
 #ifndef LLVM_CLANG_INSTALLAPI_DIAGNOSTICBUILDER_WRAPPER_H
 #define LLVM_CLANG_INSTALLAPI_DIAGNOSTICBUILDER_WRAPPER_H
 
-#include "clang/Basic/Diagnostic.h"
 #include "clang/InstallAPI/DylibVerifier.h"
-#include "llvm/TextAPI/Architecture.h"
 #include "llvm/TextAPI/ArchitectureSet.h"
-#include "llvm/TextAPI/InterfaceFile.h"
 #include "llvm/TextAPI/Platform.h"
+#include "llvm/BinaryFormat/MachO.h"
+#include "llvm/TextAPI/PackedVersion.h"
+
+namespace clang {
+class DiagnosticBuilder;
+}  // namespace clang
 
 namespace llvm {
 namespace MachO {
+enum Architecture : uint8_t;
+enum FileType : unsigned int;
 
 const clang::DiagnosticBuilder &operator<<(const clang::DiagnosticBuilder &DB,
                                            const PlatformType &Platform);

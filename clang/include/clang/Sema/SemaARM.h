@@ -13,24 +13,32 @@
 #ifndef LLVM_CLANG_SEMA_SEMAARM_H
 #define LLVM_CLANG_SEMA_SEMAARM_H
 
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Sema/SemaBase.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
-#include <tuple>
+#include <variant>
 
 namespace llvm {
-template <typename T, unsigned N> class SmallVector;
-} // namespace llvm
+template <typename T> class SmallVectorImpl;
+template <unsigned int InternalLen> class SmallString;
+}  // namespace llvm
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 class ParsedAttr;
-class TargetInfo;
+class CallExpr;
+class Decl;
+class Expr;
+class FunctionDecl;
+class QualType;
+class Sema;
+class SourceLocation;
 
 class SemaARM : public SemaBase {
 public:

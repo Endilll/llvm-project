@@ -14,17 +14,19 @@
 #ifndef LLVM_CLANG_BASIC_NOSANITIZELIST_H
 #define LLVM_CLANG_BASIC_NOSANITIZELIST_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 
 class SanitizerMask;
 class SourceManager;
 class SanitizerSpecialCaseList;
+class SourceLocation;
 
 class NoSanitizeList {
   std::unique_ptr<SanitizerSpecialCaseList> SSCL;

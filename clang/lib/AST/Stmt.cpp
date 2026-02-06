@@ -11,6 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/Stmt.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <new>
+#include <type_traits>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -25,7 +37,6 @@
 #include "clang/AST/StmtOpenACC.h"
 #include "clang/AST/StmtOpenMP.h"
 #include "clang/AST/StmtSYCL.h"
-#include "clang/AST/Type.h"
 #include "clang/Basic/CapturedStmt.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/DiagnosticAST.h"
@@ -43,14 +54,9 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 

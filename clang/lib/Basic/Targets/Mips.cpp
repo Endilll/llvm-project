@@ -11,19 +11,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "Mips.h"
+
+#include <iterator>
+#include <string>
+#include <array>
+
 #include "TargetDefines.h"
 #include "Targets/OSTargets.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/MacroBuilder.h"
 #include "clang/Basic/Specifiers.h"
 #include "clang/Basic/TargetBuiltins.h"
 #include "clang/Basic/TargetCXXABI.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
@@ -31,8 +34,8 @@
 #include "llvm/ADT/StringTable.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/Triple.h"
-#include <iterator>
-#include <string>
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/Twine.h"
 
 using namespace clang;
 using namespace clang::targets;

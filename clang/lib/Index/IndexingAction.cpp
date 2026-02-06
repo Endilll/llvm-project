@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Index/IndexingAction.h"
+
+#include <cassert>
+#include <functional>
+#include <memory>
+#include <utility>
+
 #include "IndexingContext.h"
 #include "clang/AST/DeclGroup.h"
 #include "clang/Basic/LLVM.h"
@@ -19,10 +25,23 @@
 #include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Serialization/ASTReader.h"
-#include <cassert>
-#include <functional>
-#include <memory>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/Basic/CustomizableOptional.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/Module.h"
+#include "clang/Frontend/ASTUnit.h"
+#include "clang/Lex/MacroInfo.h"
+#include "clang/Lex/Token.h"
+#include "clang/Serialization/ModuleFile.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class IdentifierInfo;
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::index;

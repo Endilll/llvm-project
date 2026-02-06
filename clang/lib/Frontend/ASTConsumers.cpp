@@ -11,21 +11,29 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/ASTConsumers.h"
+
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTDumperUtils.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/RecordLayout.h"
 #include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
-#include "llvm/Support/Timer.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TypeBase.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
 using namespace clang;
 
 //===----------------------------------------------------------------------===//

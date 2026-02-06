@@ -18,13 +18,13 @@
 #include <cstdint>
 #include <vector>
 
-#include "clang/Analysis/FlowSensitive/Formula.h"
-#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
 
 namespace clang {
 namespace dataflow {
+class Formula;
+enum class Atom : unsigned int;
 
 /// Boolean variables are represented as positive integers.
 using Variable = uint32_t;

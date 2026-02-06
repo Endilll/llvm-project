@@ -8,6 +8,14 @@
 
 #include "BareMetal.h"
 
+#include <memory>
+#include <optional>
+#include <sstream>
+#include <string>
+#include <system_error>
+#include <iterator>
+#include <vector>
+
 #include "Gnu.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -39,12 +47,13 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
-
-#include <memory>
-#include <optional>
-#include <sstream>
-#include <string>
-#include <system_error>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Option/OptSpecifier.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace llvm::opt;
 using namespace clang;

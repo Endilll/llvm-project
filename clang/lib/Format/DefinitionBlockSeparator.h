@@ -17,10 +17,21 @@
 #define LLVM_CLANG_LIB_FORMAT_DEFINITIONBLOCKSEPARATOR_H
 
 #include "TokenAnalyzer.h"
-#include "WhitespaceManager.h"
+
+namespace llvm {
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
+namespace tooling {
+class Replacements;
+}  // namespace tooling
+
 namespace format {
+class AnnotatedLine;
+class FormatTokenLexer;
+struct FormatStyle;
+
 class DefinitionBlockSeparator : public TokenAnalyzer {
 public:
   DefinitionBlockSeparator(const Environment &Env, const FormatStyle &Style)

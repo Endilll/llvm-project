@@ -7,9 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "CrossWindows.h"
+
+#include <memory>
+#include <string>
+#include <initializer_list>
+#include <vector>
+
 #include "ToolChains/Gnu.h"
-#include "clang/Basic/DiagnosticIDs.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/Sanitizers.h"
 #include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Compilation.h"
@@ -23,8 +27,11 @@
 #include "llvm/Option/Option.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Path.h"
-#include <memory>
-#include <string>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

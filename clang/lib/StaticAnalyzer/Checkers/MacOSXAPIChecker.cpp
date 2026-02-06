@@ -14,6 +14,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <utility>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/Basic/LLVM.h"
@@ -27,8 +30,19 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <utility>
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace ento {
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

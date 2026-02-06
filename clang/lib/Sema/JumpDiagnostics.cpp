@@ -11,8 +11,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
@@ -32,8 +35,20 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/Basic/DiagnosticSema.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Attr;
+}  // namespace clang
+
 using namespace clang;
 
 namespace {

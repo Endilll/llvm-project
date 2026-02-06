@@ -13,9 +13,15 @@
 #ifndef LLVM_CLANG_LIB_INTERPRETER_DEVICE_OFFLOAD_H
 #define LLVM_CLANG_LIB_INTERPRETER_DEVICE_OFFLOAD_H
 
+#include <list>
+
 #include "IncrementalParser.h"
-#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Error.h"
 
 namespace clang {
 struct PartialTranslationUnit;

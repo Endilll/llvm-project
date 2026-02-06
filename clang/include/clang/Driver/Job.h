@@ -9,6 +9,12 @@
 #ifndef LLVM_CLANG_DRIVER_JOB_H
 #define LLVM_CLANG_DRIVER_JOB_H
 
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/InputInfo.h"
 #include "llvm/ADT/ArrayRef.h"
@@ -17,17 +23,15 @@
 #include "llvm/ADT/iterator.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/Program.h"
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
 
 class Action;
-class InputInfo;
 class Tool;
 
 struct CrashReportInfo {

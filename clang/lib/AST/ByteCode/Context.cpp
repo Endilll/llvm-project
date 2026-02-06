@@ -7,6 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "Context.h"
+
+#include <string.h>
+#include <cstddef>
+#include <optional>
+#include <string>
+#include <utility>
+#include <type_traits>
+
 #include "Boolean.h"
 #include "ByteCode/Record.h"
 #include "ByteCode/State.h"
@@ -14,7 +22,6 @@
 #include "Compiler.h"
 #include "EvalEmitter.h"
 #include "Integral.h"
-#include "InterpFrame.h"
 #include "InterpHelpers.h"
 #include "InterpStack.h"
 #include "Pointer.h"
@@ -33,13 +40,21 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <string.h>
-#include <string>
-#include <utility>
+#include "Descriptor.h"
+#include "EvaluationResult.h"
+#include "Function.h"
+#include "IntegralAP.h"
+#include "InterpState.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/OptionalDiagnostic.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+struct fltSemantics;
+}  // namespace llvm
 
 using namespace clang;
 using namespace clang::interp;

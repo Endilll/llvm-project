@@ -13,14 +13,24 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_PPC_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_PPC_H
 
+#include <string>
+#include <string_view>
+#include <utility>
+
 #include "OSTargets.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/TargetParser/Triple.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 
 // PPC abstract base class

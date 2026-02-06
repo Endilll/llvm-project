@@ -6,6 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <set>
+#include <utility>
+
 #include "ABIInfoImpl.h"
 #include "Address.h"
 #include "CGBuilder.h"
@@ -15,25 +21,34 @@
 #include "CodeGenTypes.h"
 #include "TargetInfo.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
-#include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/IntrinsicsS390.h"
 #include "llvm/IR/Module.h"
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <set>
+#include "ABIInfo.h"
+#include "CodeGenFunction.h"
+#include "clang/AST/Type.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class BasicBlock;
+}  // namespace llvm
 
 using namespace clang;
 using namespace clang::CodeGen;

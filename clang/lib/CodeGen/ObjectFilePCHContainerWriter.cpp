@@ -7,16 +7,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/CodeGen/ObjectFilePCHContainerWriter.h"
+
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "CGDebugInfo.h"
 #include "CodeGenModule.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclGroup.h"
 #include "clang/AST/DeclObjC.h"
-#include "clang/AST/Expr.h"
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/CodeGenOptions.h"
@@ -34,24 +40,35 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Frontend/Debug/Options.h"
 #include "llvm/IR/Constants.h"
-#include "llvm/IR/DataLayout.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Metadata.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Type.h"
 #include "llvm/MC/TargetRegistry.h"
-#include "llvm/Object/COFF.h"
 #include "llvm/Support/Alignment.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/Basic/ASTSourceDescriptor.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Frontend/CompilerInvocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace clang {
+class HeaderSearchOptions;
+class ModuleMap;
+class PreprocessorOptions;
+}  // namespace clang
 
 using namespace clang;
 

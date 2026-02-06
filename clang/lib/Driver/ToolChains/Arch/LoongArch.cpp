@@ -7,6 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "LoongArch.h"
+
+#include <cassert>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/CommonArgs.h"
@@ -17,9 +22,14 @@
 #include "llvm/Option/ArgList.h"
 #include "llvm/TargetParser/Host.h"
 #include "llvm/TargetParser/LoongArchTargetParser.h"
-#include <cassert>
-#include <string>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

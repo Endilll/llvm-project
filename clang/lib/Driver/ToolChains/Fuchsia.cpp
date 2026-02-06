@@ -7,6 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "Fuchsia.h"
+
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <vector>
+
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Sanitizers.h"
@@ -31,11 +38,14 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Option/OptSpecifier.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

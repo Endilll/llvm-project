@@ -10,11 +10,21 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <iterator>
+
 #include "TreeTransform.h"
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclAccessPair.h"
 #include "clang/AST/DeclBase.h"
@@ -62,14 +72,13 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <utility>
+#include "clang/AST/ASTConcept.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 

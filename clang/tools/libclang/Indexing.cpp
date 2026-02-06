@@ -23,6 +23,7 @@
 #include "clang/Frontend/MultiplexConsumer.h"
 #include "clang/Frontend/Utils.h"
 #include "clang/Index/IndexingAction.h"
+#include "clang/Index/IndexingOptions.h"
 #include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/PPConditionalDirectiveRecord.h"

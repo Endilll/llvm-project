@@ -13,23 +13,36 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGCLEANUP_H
 #define LLVM_CLANG_LIB_CODEGEN_CGCLEANUP_H
 
-#include "EHScopeStack.h"
+#include <assert.h>
+#include <stddef.h>
+#include <iterator>
+#include <utility>
 
+#include "EHScopeStack.h"
 #include "Address.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/IR/Instruction.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/MathExtras.h"
 
 namespace llvm {
-class BasicBlock;
 class Value;
 class ConstantInt;
+class Constant;
 }
 
 namespace clang {
 class FunctionDecl;
+
 namespace CodeGen {
 class CodeGenModule;
 class CodeGenFunction;

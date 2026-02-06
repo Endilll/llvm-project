@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 #include <cassert>
 #include <memory>
+#include <utility>
 
 #include "Dataflow.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Facts.h"
@@ -14,13 +15,22 @@
 #include "clang/Analysis/Analyses/LifetimeSafety/Loans.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Origins.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Utils.h"
-#include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/BitVector.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/ImmutableMap.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class AnalysisDeclContext;
+}  // namespace clang
 
 namespace clang::lifetimes::internal {
 

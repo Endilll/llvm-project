@@ -12,10 +12,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/ModuleMap.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <variant>
+#include <vector>
+#include <iterator>
+#include <new>
+
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
-#include "clang/Basic/DiagnosticLex.h"
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
@@ -24,7 +35,6 @@
 #include "clang/Basic/Module.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TargetInfo.h"
 #include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/HeaderSearchOptions.h"
 #include "clang/Lex/ModuleMapFile.h"
@@ -41,14 +51,14 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <variant>
-#include <vector>
+#include "clang/Basic/CustomizableOptional.h"
+#include "clang/Basic/DiagnosticLexInterface.inc"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/TinyPtrVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/MemoryBufferRef.h"
 
 using namespace clang;
 
@@ -397,6 +407,7 @@ static StringRef sanitizeFilenameAsIdentifier(StringRef Name,
 #define KEYWORD(Keyword,Conditions) .Case(#Keyword, true)
 #define ALIAS(Keyword, AliasOf, Conditions) .Case(Keyword, true)
 #include "clang/Basic/TokenKinds.def"
+
            .Default(false)) {
     if (Name.data() != Buffer.data())
       Buffer.append(Name.begin(), Name.end());

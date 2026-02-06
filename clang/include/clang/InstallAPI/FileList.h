@@ -13,14 +13,18 @@
 #ifndef LLVM_CLANG_INSTALLAPI_FILELIST_H
 #define LLVM_CLANG_INSTALLAPI_FILELIST_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/FileManager.h"
-#include "clang/InstallAPI/HeaderFile.h"
-#include "llvm/Support/Error.h"
-#include "llvm/Support/MemoryBuffer.h"
 #include <memory>
 
+#include "clang/InstallAPI/HeaderFile.h"
+#include "llvm/Support/Error.h"
+
+namespace llvm {
+class MemoryBuffer;
+}  // namespace llvm
+
 namespace clang {
+class FileManager;
+
 namespace installapi {
 
 class FileListReader {

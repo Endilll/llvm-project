@@ -20,13 +20,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprObjC.h"
-#include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/StmtVisitor.h"
@@ -35,7 +35,20 @@
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
 #include "llvm/ADT/DenseMap.h"
-#include <cassert>
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class ASTContext;
+class AnalysisDeclContext;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

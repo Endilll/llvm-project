@@ -10,6 +10,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
@@ -26,7 +28,10 @@
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 
@@ -124,6 +129,7 @@ static Cl::Kinds ClassifyInternal(ASTContext &Ctx, const Expr *E) {
 #define STMT(Kind, Base) case Expr::Kind##Class:
 #define EXPR(Kind, Base)
 #include "clang/AST/StmtNodes.inc"
+
     llvm_unreachable("cannot classify a statement");
 
     // First come the expressions that are always lvalues, unconditionally.

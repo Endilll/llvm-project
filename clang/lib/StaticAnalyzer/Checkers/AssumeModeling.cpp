@@ -13,7 +13,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/AttrIterator.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Stmt.h"
 #include "clang/Basic/Builtins.h"

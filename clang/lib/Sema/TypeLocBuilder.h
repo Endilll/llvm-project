@@ -14,8 +14,12 @@
 #ifndef LLVM_CLANG_LIB_SEMA_TYPELOCBUILDER_H
 #define LLVM_CLANG_LIB_SEMA_TYPELOCBUILDER_H
 
+#include <string.h>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/TypeLoc.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/SourceLocation.h"
 
 namespace clang {
 

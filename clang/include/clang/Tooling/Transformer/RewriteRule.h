@@ -15,10 +15,17 @@
 #ifndef LLVM_CLANG_TOOLING_TRANSFORMER_REWRITERULE_H
 #define LLVM_CLANG_TOOLING_TRANSFORMER_REWRITERULE_H
 
-#include "clang/AST/ASTTypeTraits.h"
-#include "clang/AST/DeclBase.h"
+#include <cassert>
+#include <cstddef>
+#include <initializer_list>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <functional>
+
 #include "clang/AST/Stmt.h"
-#include "clang/AST/TypeLoc.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchersInternal.h"
 #include "clang/Basic/LLVM.h"
@@ -29,16 +36,13 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
-#include <cassert>
-#include <cstddef>
-#include <initializer_list>
-#include <memory>
-#include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
 
 namespace clang {
+class Decl;
+class DynTypedNode;
+class TypeLoc;
+
 namespace transformer {
 // Specifies how to interpret an edit.
 enum class EditKind {

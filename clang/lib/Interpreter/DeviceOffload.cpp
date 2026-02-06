@@ -11,14 +11,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "DeviceOffload.h"
-#include "IncrementalParser.h"
 
+#include <cstdint>
+#include <list>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <memory>
+#include <optional>
+
+#include "IncrementalParser.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetOptions.h"
-#include "clang/CodeGen/ModuleBuilder.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Interpreter/PartialTranslationUnit.h"
-
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Module.h"
@@ -28,11 +34,10 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Target/TargetMachine.h"
-#include <cstdint>
-#include <list>
-#include <string>
-#include <system_error>
-#include <utility>
+#include "clang/Basic/CodeGenOptions.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Target/TargetOptions.h"
 
 namespace clang {
 

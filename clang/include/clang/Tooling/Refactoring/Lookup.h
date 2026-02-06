@@ -13,15 +13,20 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORING_LOOKUP_H
 #define LLVM_CLANG_TOOLING_REFACTORING_LOOKUP_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
 #include <string>
+
+#include "clang/Basic/LLVM.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
 
 class DeclContext;
 class NamedDecl;
 class NestedNameSpecifier;
+class SourceLocation;
 
 namespace tooling {
 

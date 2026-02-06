@@ -13,22 +13,28 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <memory>
+#include <utility>
+#include <list>
+#include <optional>
+
 #include "FormatToken.h"
 #include "Macros.h"
-
 #include "UnwrappedLineParser.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TokenKinds.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/Support/Debug.h"
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <utility>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/raw_ostream.h"
 
 #define DEBUG_TYPE "format-reconstruct"
 

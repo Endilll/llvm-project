@@ -14,12 +14,19 @@
 #define LLVM_CLANG_AST_INTERP_STATE_H
 
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTDiagnostic.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/OptionalDiagnostic.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "clang/Basic/PartialDiagnostic.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
-class OptionalDiagnostic;
+class LangOptions;
+class SourceLocation;
 
 /// Kinds of access we can perform on an object, for diagnostics. Note that
 /// we consider a member function call to be a kind of access, even though

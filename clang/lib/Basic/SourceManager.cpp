@@ -11,6 +11,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/SourceManager.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <vector>
+#include <system_error>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticOptions.h"
@@ -43,17 +56,9 @@
 #include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/Basic/CustomizableOptional.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/Twine.h"
 
 using namespace clang;
 using namespace SrcMgr;

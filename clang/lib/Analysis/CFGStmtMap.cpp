@@ -11,10 +11,18 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <optional>
+#include <iterator>
+
 #include "clang/AST/ParentMap.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Analysis/CFGStmtMap.h"
-#include <optional>
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 

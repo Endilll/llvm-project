@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "TemplateArgumentHasher.h"
+
+#include <cassert>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -22,7 +25,15 @@
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/Support/TimeProfiler.h"
-#include <cassert>
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 using namespace clang;
 

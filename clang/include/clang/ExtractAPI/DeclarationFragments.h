@@ -18,28 +18,61 @@
 #ifndef LLVM_CLANG_EXTRACTAPI_DECLARATION_FRAGMENTS_H
 #define LLVM_CLANG_EXTRACTAPI_DECLARATION_FRAGMENTS_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclObjC.h"
-#include "clang/AST/DeclTemplate.h"
-#include "clang/AST/ExprCXX.h"
-#include "clang/AST/TemplateBase.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/AST/TypeLoc.h"
-#include "clang/Basic/ExceptionSpecificationType.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/Specifiers.h"
-#include "clang/Lex/MacroInfo.h"
-#include "llvm/Support/ErrorHandling.h"
 #include <iterator>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/ExceptionSpecificationType.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
+
 namespace clang {
+class ASTContext;
+class CXXConversionDecl;
+class CXXMethodDecl;
+class CXXRecordDecl;
+class ClassTemplatePartialSpecializationDecl;
+class ClassTemplateSpecializationDecl;
+class ConceptDecl;
+class EnumConstantDecl;
+class EnumDecl;
+class FieldDecl;
+class FunctionDecl;
+class FunctionProtoTypeLoc;
+class FunctionTemplateDecl;
+class FunctionTypeLoc;
+class MacroInfo;
+class NamedDecl;
+class NamespaceDecl;
+class ObjCCategoryDecl;
+class ObjCInterfaceDecl;
+class ObjCMethodDecl;
+class ObjCPropertyDecl;
+class ObjCProtocolDecl;
+class ParmVarDecl;
+class QualType;
+class Qualifiers;
+class RecordDecl;
+class RedeclarableTemplateDecl;
+class TemplateArgument;
+class TemplateArgumentLoc;
+class Type;
+class TypedefNameDecl;
+class VarDecl;
+class VarTemplatePartialSpecializationDecl;
+class VarTemplateSpecializationDecl;
+
 namespace extractapi {
 
 /// DeclarationFragments is a vector of tagged important parts of a symbol's

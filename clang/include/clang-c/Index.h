@@ -23,7 +23,7 @@
 #include "clang-c/CXString.h"
 #include "clang-c/ExternC.h"
 #include "clang-c/Platform.h"
-#include <cstddef>
+#include <stddef.h>
 
 /**
  * The version constants for the libclang API.

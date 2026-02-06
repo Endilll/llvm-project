@@ -9,6 +9,8 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_NUMERICLITERALINFO_H
 #define LLVM_CLANG_LIB_FORMAT_NUMERICLITERALINFO_H
 
+#include <stddef.h>
+
 #include "llvm/ADT/StringRef.h"
 
 namespace clang {

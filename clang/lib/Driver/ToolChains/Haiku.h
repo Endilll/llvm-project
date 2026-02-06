@@ -10,11 +10,22 @@
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_HAIKU_H
 
 #include "Gnu.h"
-#include "clang/Driver/Driver.h"
-#include "clang/Driver/ToolChain.h"
+#include "clang/Driver/Tool.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+class ToolChain;
+
 namespace tools {
 
 /// Directly call GNU Binutils assembler and linker

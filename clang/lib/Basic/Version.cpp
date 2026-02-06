@@ -11,12 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/Version.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Config/config.h"
-#include "llvm/Support/raw_ostream.h"
+
 #include <string>
 
-#include "VCSVersion.inc"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/raw_ostream.h"
+#include "clang/Basic/Version.inc"
 
 namespace clang {
 

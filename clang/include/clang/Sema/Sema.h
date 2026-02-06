@@ -14,8 +14,22 @@
 #ifndef LLVM_CLANG_SEMA_SEMA_H
 #define LLVM_CLANG_SEMA_SEMA_H
 
+#include <cassert>
+#include <climits>
+#include <cstddef>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 #include "clang/APINotes/APINotesManager.h"
-#include "clang/AST/ASTFwd.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/AttrIterator.h"
 #include "clang/AST/CharUnits.h"
@@ -39,7 +53,6 @@
 #include "clang/Basic/CapturedStmt.h"
 #include "clang/Basic/Cuda.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticSema.h"
 #include "clang/Basic/ExceptionSpecificationType.h"
 #include "clang/Basic/ExpressionTraits.h"
 #include "clang/Basic/IdentifierTable.h"
@@ -48,7 +61,6 @@
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/Module.h"
 #include "clang/Basic/OpenCLOptions.h"
-#include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/PartialDiagnostic.h"
 #include "clang/Basic/PragmaKinds.h"
 #include "clang/Basic/SourceLocation.h"
@@ -69,8 +81,6 @@
 #include "clang/Sema/Redeclaration.h"
 #include "clang/Sema/Scope.h"
 #include "clang/Sema/SemaBase.h"
-#include "clang/Sema/SemaConcept.h"
-#include "clang/Sema/SemaRISCV.h"
 #include "clang/Sema/TypoCorrection.h"
 #include "clang/Sema/Weak.h"
 #include "llvm/ADT/APInt.h"
@@ -78,7 +88,6 @@
 #include "llvm/ADT/BitmaskEnum.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
-#include "llvm/ADT/FloatingPointMode.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/PointerIntPair.h"
@@ -98,23 +107,27 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <climits>
-#include <cstddef>
-#include <cstdint>
-#include <deque>
-#include <functional>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DependenceFlags.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace llvm {
 struct InlineAsmIdentifierInfo;
+class VersionTuple;
+enum class RoundingMode : int8_t;
+template <typename Fn> class function_ref;
 } // namespace llvm
 
 namespace clang {
@@ -122,11 +135,7 @@ class ADLResult;
 class APValue;
 struct ASTConstraintSatisfaction;
 class ASTConsumer;
-class ASTContext;
-class ASTDeclReader;
 class ASTMutationListener;
-class ASTReader;
-class ASTWriter;
 class CXXBasePath;
 class CXXBasePaths;
 class CXXFieldCollector;
@@ -139,11 +148,20 @@ class DeducedTemplateArgument;
 struct DeductionFailureInfo;
 class DependentDiagnostic;
 class Designation;
-class IdentifierInfo;
 class ImplicitConversionSequence;
+class AttributeCommonInfo;
+class ConceptReference;
+class ParsedTemplateArgument;
+class Sema;
+class SourceManager;
+class Stmt;
+enum OverloadedOperatorKind : int;
+struct LateParsedTemplate;
+struct TemplateIdAnnotation;
+struct UnsubstitutedConstraintSatisfactionCacheResult;
+
 typedef MutableArrayRef<ImplicitConversionSequence> ConversionSequenceList;
 class InitializationKind;
-class InitializationSequence;
 class InitializedEntity;
 enum class LangAS : unsigned int;
 class LocalInstantiationScope;
@@ -155,7 +173,6 @@ class MultiLevelTemplateArgumentList;
 struct NormalizedConstraint;
 class ObjCInterfaceDecl;
 class ObjCMethodDecl;
-struct OverloadCandidate;
 enum class OverloadCandidateParamOrder : char;
 enum OverloadCandidateRewriteKind : unsigned;
 class OverloadCandidateSet;
@@ -188,12 +205,9 @@ class SemaSystemZ;
 class SemaWasm;
 class SemaX86;
 class StandardConversionSequence;
-class TemplateArgument;
-class TemplateArgumentLoc;
 class TemplateInstantiationCallback;
 class TemplatePartialOrderingContext;
 class TemplateSpecCandidateSet;
-class Token;
 class TypeConstraint;
 class TypoCorrectionConsumer;
 class UnresolvedSetImpl;

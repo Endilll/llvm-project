@@ -18,11 +18,6 @@
 #ifndef LLVM_CLANG_TOOLING_CORE_REPLACEMENT_H
 #define LLVM_CLANG_TOOLING_CORE_REPLACEMENT_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/Support/Error.h"
-#include "llvm/Support/raw_ostream.h"
 #include <map>
 #include <optional>
 #include <set>
@@ -30,6 +25,13 @@
 #include <system_error>
 #include <utility>
 #include <vector>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/Support/Error.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "IndexingContext.h"
+
+#include <cassert>
+#include <memory>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -23,8 +27,17 @@
 #include "clang/Sema/HeuristicResolver.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <memory>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/Module.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class IdentifierInfo;
+class LangOptions;
+}  // namespace clang
 
 using namespace clang;
 using namespace index;

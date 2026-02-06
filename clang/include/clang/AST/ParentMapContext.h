@@ -14,16 +14,19 @@
 #ifndef LLVM_CLANG_AST_PARENTMAPCONTEXT_H
 #define LLVM_CLANG_AST_PARENTMAPCONTEXT_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTTypeTraits.h"
-#include "clang/Basic/LLVM.h"
 #include <cassert>
 #include <cstddef>
 #include <memory>
 #include <optional>
+#include <new>
+
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/ASTTypeTraits.h"
+#include "llvm/ADT/ArrayRef.h"
 
 namespace clang {
 class DynTypedNodeList;
+class Expr;
 
 class ParentMapContext {
 public:

@@ -12,6 +12,11 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringRef.h"
 
+namespace llvm {
+class raw_ostream;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
+
 namespace clang {
 class ASTContext;
 class Decl;

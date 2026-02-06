@@ -6,11 +6,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/DirectoryWatcher/DirectoryWatcher.h"
-#include "llvm/Support/FileSystem.h"
 #include <optional>
 #include <string>
 #include <vector>
+
+#include "clang/DirectoryWatcher/DirectoryWatcher.h"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

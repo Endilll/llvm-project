@@ -13,6 +13,9 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_DOMINATORS_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_DOMINATORS_H
 
+#include <cassert>
+#include <utility>
+
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Basic/LLVM.h"
@@ -27,7 +30,8 @@
 #include "llvm/Support/GenericIteratedDominanceFrontier.h"
 #include "llvm/Support/GenericDomTree.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
+#include "llvm/ADT/bit.h"
+#include "llvm/ADT/iterator_range.h"
 
 // FIXME: There is no good reason for the domtree to require a print method
 // which accepts an LLVM Module, so remove this (and the method's argument that

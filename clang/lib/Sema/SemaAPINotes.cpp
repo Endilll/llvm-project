@@ -10,6 +10,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstring>
+#include <optional>
+#include <stack>
+#include <string>
+#include <functional>
+#include <tuple>
+#include <vector>
+
 #include "TypeLocBuilder.h"
 #include "clang/APINotes/APINotesManager.h"
 #include "clang/APINotes/APINotesReader.h"
@@ -40,11 +49,20 @@
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstring>
-#include <optional>
-#include <stack>
-#include <string>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Sema/Ownership.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/VersionTuple.h"
+
+namespace clang {
+class Attr;
+}  // namespace clang
 
 using namespace clang;
 

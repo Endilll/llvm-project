@@ -7,6 +7,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/FrontendActions.h"
+
+#include <cassert>
+#include <ctime>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclTemplate.h"
@@ -47,7 +59,6 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringExtras.h"
-#include "llvm/BinaryFormat/DXContainer.h"
 #include "llvm/Config/llvm-config.h" // for LLVM_HOST_TRIPLE
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/FileSystem.h"
@@ -55,15 +66,39 @@
 #include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/YAMLTraits.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <ctime>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TargetOptions.h"
+#include "clang/Frontend/ASTUnit.h"
+#include "clang/Frontend/CommandLineSourceLoc.h"
+#include "clang/Lex/HeaderSearchOptions.h"
+#include "clang/Lex/Token.h"
+#include "clang/Sema/Sema.h"
+#include "clang/Sema/SemaHLSL.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorOr.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace clang {
+class CodeCompleteConsumer;
+}  // namespace clang
+namespace llvm {
+namespace dxbc {
+enum class RootSignatureVersion;
+}  // namespace dxbc
+}  // namespace llvm
 
 using namespace clang;
 

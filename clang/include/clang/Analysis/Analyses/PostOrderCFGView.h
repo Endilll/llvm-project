@@ -13,15 +13,17 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_POSTORDERCFGVIEW_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_POSTORDERCFGVIEW_H
 
+#include <memory>
+#include <optional>
+#include <utility>
+#include <vector>
+
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/CFG.h"
 #include "llvm/ADT/BitVector.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/PostOrderIterator.h"
-#include <memory>
-#include <optional>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 

@@ -15,14 +15,16 @@
 #ifndef LLVM_CLANG_AST_COMMENTCOMMANDTRAITS_H
 #define LLVM_CLANG_AST_COMMENTCOMMANDTRAITS_H
 
-#include "clang/Basic/CommentOptions.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace clang {
+struct CommentOptions;
+
 namespace comments {
 
 /// Information about a single command.

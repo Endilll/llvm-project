@@ -15,20 +15,35 @@
 #ifndef LLVM_CLANG_AST_INTERP_FUNCTION_H
 #define LLVM_CLANG_AST_INTERP_FUNCTION_H
 
-#include "Descriptor.h"
+#include <assert.h>
+#include <stdint.h>
+#include <cstddef>
+#include <string>
+#include <utility>
+
+#include "PrimType.h"
 #include "Source.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "llvm/ADT/PointerUnion.h"
-#include "llvm/Support/raw_ostream.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 namespace interp {
 class Program;
-class ByteCodeEmitter;
-class Pointer;
-enum PrimType : uint8_t;
+struct Descriptor;
 
 /// Describes a scope block.
 ///

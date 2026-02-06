@@ -13,25 +13,30 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CODEGENMODULE_H
 #define LLVM_CLANG_LIB_CODEGEN_CODEGENMODULE_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <string.h>
+#include <optional>
+#include <iterator>
+#include <map>
+#include <memory>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <variant>
+#include <vector>
+
 #include "CGVTables.h"
 #include "CodeGenTypeCache.h"
-#include "CodeGenTypes.h"
-#include "SanitizerMetadata.h"
 #include "TrapReasonBuilder.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
-#include "clang/AST/DeclOpenMP.h"
 #include "clang/AST/GlobalDecl.h"
-#include "clang/AST/Mangle.h"
-#include "clang/Basic/ABI.h"
 #include "clang/Basic/CodeGenOptions.h"
 #include "clang/Basic/LangOptions.h"
-#include "clang/Basic/NoSanitizeList.h"
 #include "clang/Basic/ProfileList.h"
 #include "clang/Basic/StackExhaustionHandler.h"
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/XRayLists.h"
-#include "clang/Lex/PreprocessorOptions.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/SetVector.h"
@@ -39,19 +44,62 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/ValueHandle.h"
-#include "llvm/Transforms/Utils/SanitizerStats.h"
-#include <optional>
+#include "Address.h"
+#include "CGCall.h"
+#include "CGPointerAuthInfo.h"
+#include "CGValue.h"
+#include "CodeGenTBAA.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/TypeOrdering.h"
+#include "clang/AST/VTableBuilder.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Linkage.h"
+#include "clang/Basic/ObjCRuntime.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Visibility.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/StringSet.h"
+#include "llvm/ADT/TinyPtrVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Attributes.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalObject.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Metadata.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/TargetParser/Triple.h"
 
 namespace llvm {
-class Module;
-class Constant;
 class ConstantInt;
-class Function;
-class GlobalValue;
 class DataLayout;
-class FunctionType;
 class LLVMContext;
 class IndexedInstrProfReader;
+class CallBase;
+class InlineAsm;
+class Instruction;
+class Twine;
+class Type;
+class Value;
+class raw_ostream;
+struct Align;
+struct SanitizerStatReport;
+template <typename Fn> class function_ref;
 
 namespace vfs {
 class FileSystem;
@@ -59,36 +107,37 @@ class FileSystem;
 }
 
 namespace clang {
-class ASTContext;
-class AtomicType;
-class FunctionDecl;
 class IdentifierInfo;
-class ObjCImplementationDecl;
 class ObjCEncodeExpr;
-class BlockExpr;
-class CharUnits;
 class Decl;
-class Expr;
 class Stmt;
-class StringLiteral;
-class NamedDecl;
 class PointerAuthSchema;
-class ValueDecl;
-class VarDecl;
-class LangOptions;
-class CodeGenOptions;
 class HeaderSearchOptions;
 class DiagnosticsEngine;
 class AnnotateAttr;
-class CXXDestructorDecl;
 class Module;
 class CoverageSourceInfo;
 class InitSegAttr;
+class AMDGPUFlatWorkGroupSizeAttr;
+class AMDGPUWavesPerEUAttr;
+class CUDALaunchBoundsAttr;
+class DeclContext;
+class MaterializeTemporaryExpr;
+class OMPAllocateDecl;
+class OMPDeclareMapperDecl;
+class OMPDeclareReductionDecl;
+class OMPRequiresDecl;
+class OMPThreadPrivateDecl;
+class OpenACCDeclareDecl;
+class OpenACCRoutineDecl;
+class PreprocessorOptions;
+class ReqdWorkGroupSizeAttr;
+class SanitizerMask;
+class TemplateParamObjectDecl;
 
 namespace CodeGen {
 
 class CodeGenFunction;
-class CodeGenTBAA;
 class CGCXXABI;
 class CGDebugInfo;
 class CGObjCRuntime;
@@ -98,6 +147,10 @@ class CGCUDARuntime;
 class CGHLSLRuntime;
 class CoverageMappingModuleGen;
 class TargetCodeGenInfo;
+class ABIInfo;
+class CGFunctionInfo;
+class CodeGenTypes;
+class SanitizerMetadata;
 
 enum ForDefinition_t : bool {
   NotForDefinition = false,

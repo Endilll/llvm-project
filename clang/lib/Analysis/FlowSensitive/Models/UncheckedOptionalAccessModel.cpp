@@ -12,6 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/FlowSensitive/Models/UncheckedOptionalAccessModel.h"
+
+#include <cassert>
+#include <optional>
+#include <utility>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -25,12 +31,10 @@
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchersInternal.h"
 #include "clang/ASTMatchers/ASTMatchersMacros.h"
-#include "clang/Analysis/CFG.h"
 #include "clang/Analysis/FlowSensitive/Arena.h"
 #include "clang/Analysis/FlowSensitive/CFGMatchSwitch.h"
 #include "clang/Analysis/FlowSensitive/DataflowAnalysis.h"
 #include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
-#include "clang/Analysis/FlowSensitive/Formula.h"
 #include "clang/Analysis/FlowSensitive/MatchSwitch.h"
 #include "clang/Analysis/FlowSensitive/RecordOps.h"
 #include "clang/Analysis/FlowSensitive/SmartPointerAccessorCaching.h"
@@ -43,13 +47,23 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/Analysis/FlowSensitive/DataflowAnalysisContext.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
+class CFGElement;
+
 namespace dataflow {
+class Formula;
 
 // Note: the Names appear in reverse order. E.g., to check
 // if NS is foo::bar::, call isFullyQualifiedNamespaceEqualTo(NS, "bar", "foo")

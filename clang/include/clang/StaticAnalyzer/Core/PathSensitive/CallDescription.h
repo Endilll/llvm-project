@@ -15,25 +15,33 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CALLDESCRIPTION_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CALLDESCRIPTION_H
 
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/Expr.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
 #include <cstddef>
 #include <initializer_list>
 #include <iterator>
 #include <optional>
 #include <string>
-#include <utility>
 #include <vector>
+
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 class IdentifierInfo;
 } // namespace clang
 
 namespace clang {
+class CallExpr;
+class Decl;
+class FunctionDecl;
+class NamedDecl;
+
 namespace ento {
+class CallEvent;
+
 /// A `CallDescription` is a pattern that can be used to _match_ calls
 /// based on the qualified name and the argument/parameter counts.
 class CallDescription {

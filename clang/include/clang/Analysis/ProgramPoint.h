@@ -14,7 +14,11 @@
 #ifndef LLVM_CLANG_ANALYSIS_PROGRAMPOINT_H
 #define LLVM_CLANG_ANALYSIS_PROGRAMPOINT_H
 
-#include "clang/AST/Stmt.h"
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Basic/LLVM.h"
@@ -23,16 +27,18 @@
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class StringRef;
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
-
-class AnalysisDeclContext;
-class LocationContext;
+class CXXCtorInitializer;
+class Decl;
+class ReturnStmt;
+class Stmt;
 
 /// ProgramPoints can be "tagged" as representing points specific to a given
 /// analysis entity.  Tags are abstract annotations, with an associated

@@ -11,6 +11,29 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Serialization/ASTWriter.h"
+
+#include <string.h>
+#include <sys/types.h>
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstdlib>
+#include <ctime>
+#include <functional>
+#include <iterator>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <queue>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <deque>
+#include <initializer_list>
+#include <map>
+#include <new>
+
 #include "ASTCommon.h"
 #include "ASTReaderInternals.h"
 #include "MultiOnDiskHashTable.h"
@@ -37,7 +60,6 @@
 #include "clang/AST/OpenMPClause.h"
 #include "clang/AST/RawCommentList.h"
 #include "clang/AST/TemplateBase.h"
-#include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/AST/TypeLocVisitor.h"
@@ -92,7 +114,6 @@
 #include "clang/Serialization/ModuleFile.h"
 #include "clang/Serialization/ModuleFileExtension.h"
 #include "llvm/ADT/APFloat.h"
-#include "llvm/ADT/APInt.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
@@ -127,24 +148,28 @@
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/xxhash.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <functional>
-#include <iterator>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <queue>
-#include <string.h>
-#include <string>
-#include <sys/types.h>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/APValue.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/CommentOptions.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/Linkage.h"
+#include "clang/Basic/Version.inc"
+#include "clang/Lex/ExternalPreprocessorSource.h"
+#include "clang/Sema/SemaRISCV.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/TinyPtrVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/MemAlloc.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 using namespace clang::serialization;

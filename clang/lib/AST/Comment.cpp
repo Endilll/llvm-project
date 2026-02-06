@@ -7,19 +7,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/Comment.h"
-#include "clang/AST/ASTContext.h"
+
+#include <cassert>
+#include <type_traits>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/TemplateBase.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <type_traits>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 namespace comments {
@@ -31,6 +34,7 @@ namespace comments {
   static_assert(std::is_trivially_destructible<CLASS>::value,                  \
                 #CLASS " should be trivially destructible!");
 #include "clang/AST/CommentNodes.inc"
+
 #undef COMMENT
 #undef ABSTRACT_COMMENT
 
@@ -47,6 +51,7 @@ const char *Comment::getCommentKindName() const {
   case CommentKind::CLASS:                                                     \
     return #CLASS;
 #include "clang/AST/CommentNodes.inc"
+
 #undef COMMENT
 #undef ABSTRACT_COMMENT
   }
@@ -78,6 +83,7 @@ static inline void CheckCommentASTNodes() {
   ASSERT_IMPLEMENTS_child_begin(&CLASS::child_begin); \
   ASSERT_IMPLEMENTS_child_begin(&CLASS::child_end);
 #include "clang/AST/CommentNodes.inc"
+
 #undef COMMENT
 #undef ABSTRACT_COMMENT
 }
@@ -95,6 +101,7 @@ Comment::child_iterator Comment::child_begin() const {
   case CommentKind::CLASS:                                                     \
     return static_cast<const CLASS *>(this)->child_begin();
 #include "clang/AST/CommentNodes.inc"
+
 #undef COMMENT
 #undef ABSTRACT_COMMENT
   }
@@ -110,6 +117,7 @@ Comment::child_iterator Comment::child_end() const {
   case CommentKind::CLASS:                                                     \
     return static_cast<const CLASS *>(this)->child_end();
 #include "clang/AST/CommentNodes.inc"
+
 #undef COMMENT
 #undef ABSTRACT_COMMENT
   }

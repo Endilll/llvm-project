@@ -12,6 +12,7 @@
 #include "clang/Basic/SourceManager.h"
 #include "clang/Format/Format.h"
 #include "clang/Tooling/Core/Replacement.h"
+#include "clang/Tooling/ReplacementsYaml.h"
 #include "llvm/ADT/Any.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/SmallVector.h"

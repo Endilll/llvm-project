@@ -13,13 +13,16 @@
 #ifndef LLVM_CLANG_AST_INFERALLOC_H
 #define LLVM_CLANG_AST_INFERALLOC_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/TypeBase.h"
-#include "llvm/Support/AllocToken.h"
 #include <optional>
 
+#include "clang/AST/TypeBase.h"
+#include "llvm/Support/AllocToken.h"
+
 namespace clang {
+class ASTContext;
+class CallExpr;
+class CastExpr;
+
 namespace infer_alloc {
 
 /// Infer the possible allocated type from an allocation call expression.

@@ -9,8 +9,8 @@
 #ifndef LLVM_CLANG_AST_INTERP_BUILTIN_BIT_CAST_H
 #define LLVM_CLANG_AST_INTERP_BUILTIN_BIT_CAST_H
 
-#include "BitcastBuffer.h"
 #include <cstddef>
+#include <utility>
 
 namespace clang {
 namespace interp {
@@ -18,6 +18,8 @@ class Pointer;
 class InterpState;
 class CodePtr;
 class Context;
+struct BitcastBuffer;
+struct Bits;
 
 inline static void swapBytes(std::byte *M, size_t N) {
   for (size_t I = 0; I != (N / 2); ++I)

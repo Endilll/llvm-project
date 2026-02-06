@@ -11,6 +11,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/ConstraintManager.h"
+
+#include <cassert>
+
 #include "clang/AST/Type.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
@@ -19,7 +22,7 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
 #include "llvm/ADT/ScopeExit.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 
 using namespace clang;
 using namespace ento;

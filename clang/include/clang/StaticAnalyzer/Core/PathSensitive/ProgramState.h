@@ -13,12 +13,17 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_PROGRAMSTATE_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_PROGRAMSTATE_H
 
-#include "clang/AST/Decl.h"
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/BasicValueFactory.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ConstraintManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/Environment.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
@@ -27,8 +32,6 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/StoreRef.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/FoldingSet.h"
@@ -36,25 +39,39 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <utility>
-#include <vector>
+#include "clang/AST/Expr.h"
+#include "clang/AST/Type.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/Support/Casting.h"
 
 namespace llvm {
 class APSInt;
+class raw_ostream;
+template <typename T> class ArrayRef;
 }
 
 namespace clang {
 class ASTContext;
+class FieldDecl;
+class IndirectFieldDecl;
+class LocationContext;
+class ObjCIvarDecl;
+class StackFrameContext;
+class Stmt;
+class VarDecl;
 
 namespace ento {
 
 class AnalysisManager;
 class CallEvent;
 class CallEventManager;
+class BasicValueFactory;
+class ExprEngine;
+class ProgramStateManager;
+class SymExpr;
+class SymbolManager;
+class SymbolReaper;
+class SymbolVisitor;
 
 typedef std::unique_ptr<ConstraintManager>(*ConstraintManagerCreator)(
     ProgramStateManager &, ExprEngine *);

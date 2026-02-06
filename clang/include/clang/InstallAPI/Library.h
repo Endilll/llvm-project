@@ -13,10 +13,12 @@
 #ifndef LLVM_CLANG_INSTALLAPI_LIBRARY_H
 #define LLVM_CLANG_INSTALLAPI_LIBRARY_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/InstallAPI/HeaderFile.h"
 #include <string>
 #include <vector>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/InstallAPI/HeaderFile.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang::installapi {
 

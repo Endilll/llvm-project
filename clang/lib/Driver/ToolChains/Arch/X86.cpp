@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "X86.h"
+
+#include <cassert>
+#include <string>
+#include <vector>
+#include <utility>
+
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Driver.h"
@@ -17,9 +23,16 @@
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/TargetParser/Host.h"
-#include <cassert>
-#include <string>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Option/OptTable.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

@@ -9,6 +9,7 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Expr.h"
 #include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticParse.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/LangOptions.h"

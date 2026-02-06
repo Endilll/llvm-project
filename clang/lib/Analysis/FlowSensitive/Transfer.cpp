@@ -12,6 +12,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/FlowSensitive/Transfer.h"
+
+#include <assert.h>
+#include <utility>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -35,8 +39,15 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
 #include "llvm/Support/Casting.h"
-#include <assert.h>
-#include <cassert>
+#include "clang/Analysis/FlowSensitive/Arena.h"
+#include "clang/Analysis/FlowSensitive/DataflowAnalysis.h"
+#include "clang/Analysis/FlowSensitive/NoopLattice.h"
+#include "llvm/ADT/Any.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
 
 #define DEBUG_TYPE "dataflow"
 

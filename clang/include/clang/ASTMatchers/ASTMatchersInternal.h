@@ -34,6 +34,23 @@
 #ifndef LLVM_CLANG_ASTMATCHERS_ASTMATCHERSINTERNAL_H
 #define LLVM_CLANG_ASTMATCHERS_ASTMATCHERSINTERNAL_H
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <limits>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <new>
+
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -52,7 +69,6 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
@@ -62,24 +78,18 @@
 #include "llvm/ADT/iterator.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/Regex.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <limits>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 
 class ASTContext;
+enum AccessSpecifier : uint8_t;
 
 namespace ast_matchers {
 

@@ -14,6 +14,11 @@
 #ifndef LLVM_CLANG_SEMA_SEMABASE_H
 #define LLVM_CLANG_SEMA_SEMABASE_H
 
+#include <optional>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Redeclarable.h"
 #include "clang/Basic/Diagnostic.h"
@@ -21,17 +26,14 @@
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/Ownership.h"
 #include "llvm/ADT/DenseMap.h"
-#include <optional>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 
 class ASTContext;
-class DiagnosticsEngine;
 class LangOptions;
 class Sema;
+class DeclContext;
 
 class SemaBase {
 public:

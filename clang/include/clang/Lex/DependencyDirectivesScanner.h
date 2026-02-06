@@ -17,13 +17,20 @@
 #ifndef LLVM_CLANG_LEX_DEPENDENCYDIRECTIVESSCANNER_H
 #define LLVM_CLANG_LEX_DEPENDENCYDIRECTIVESSCANNER_H
 
+#include <cstdint>
+#include <memory>
+#include <optional>
+
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/ArrayRef.h"
-#include <cstdint>
-#include <memory>
-#include <optional>
+
+namespace llvm {
+class StringRef;
+class raw_ostream;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 class FileManager;

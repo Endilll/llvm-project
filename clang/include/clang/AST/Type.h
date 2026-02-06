@@ -21,6 +21,7 @@
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/TypeBase.h" // IWYU pragma: export
 #include "clang/Basic/LLVM.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 

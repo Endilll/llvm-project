@@ -27,24 +27,29 @@
 #ifndef LLVM_CLANG_TOOLING_EXECUTION_H
 #define LLVM_CLANG_TOOLING_EXECUTION_H
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Tooling.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/StringSaver.h"
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+
+namespace llvm {
+template <typename Fn> class function_ref;
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 namespace tooling {
+class CommonOptionsParser;
+class FrontendActionFactory;
 
 extern llvm::cl::opt<std::string> ExecutorName;
 

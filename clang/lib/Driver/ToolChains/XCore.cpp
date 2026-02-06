@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "XCore.h"
+
+#include <cassert>
+#include <cstdlib> // ::getenv
+#include <memory>
+#include <string>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Action.h"
 #include "clang/Driver/CommonArgs.h"
@@ -14,15 +20,18 @@
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/InputInfo.h"
 #include "clang/Driver/Job.h"
-#include "clang/Driver/Tool.h"
 #include "clang/Options/Options.h"
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/Program.h"
-#include <cassert>
-#include <cstdlib> // ::getenv
-#include <memory>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

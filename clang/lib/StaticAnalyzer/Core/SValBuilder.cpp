@@ -12,6 +12,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+
+#include <cassert>
+#include <optional>
+#include <tuple>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -41,9 +46,11 @@
 #include "llvm/ADT/APSInt.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
-#include <tuple>
+#include "clang/AST/APValue.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ConstraintManager.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

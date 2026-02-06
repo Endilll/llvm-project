@@ -14,14 +14,21 @@
 #define LLVM_CLANG_LIB_CODEGEN_MACROPPCALLBACKS_H
 
 #include "clang/Lex/PPCallbacks.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace llvm {
 class DIMacroFile;
+class raw_ostream;
 }
 namespace clang {
 class Preprocessor;
 class MacroInfo;
 class CodeGenerator;
+class IdentifierInfo;
 
 class MacroPPCallbacks : public PPCallbacks {
   /// A pointer to code generator, where debug info generator can be found.

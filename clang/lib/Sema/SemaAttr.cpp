@@ -11,6 +11,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -18,8 +27,6 @@
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/Stmt.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/LifetimeAnnotations.h"
 #include "clang/Basic/AttrSubjectMatchRules.h"
 #include "clang/Basic/Builtins.h"
@@ -40,11 +47,9 @@
 #include "clang/Lex/Token.h"
 #include "clang/Sema/Lookup.h"
 #include "clang/Sema/ParsedAttr.h"
-#include "clang/Sema/Scope.h"
 #include "clang/Sema/Sema.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/FloatingPointMode.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
@@ -53,14 +58,25 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
 using namespace clang;
 
 //===----------------------------------------------------------------------===//

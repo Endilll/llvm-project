@@ -22,7 +22,13 @@
 #ifndef LLVM_CLANG_SEMA_DECLSPEC_H
 #define LLVM_CLANG_SEMA_DECLSPEC_H
 
-#include "clang/AST/Decl.h"
+#include <array>
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <new>
+
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjCCommon.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
@@ -30,26 +36,25 @@
 #include "clang/Basic/ExceptionSpecificationType.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Lambda.h"
-#include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
 #include "clang/Lex/Token.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/ParsedAttr.h"
 #include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <array>
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "clang/AST/Expr.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+class StringRef;
+template <typename Fn> class function_ref;
+}  // namespace llvm
 
 namespace clang {
   class ASTContext;
-  class CXXRecordDecl;
   class TypeLoc;
   class LangOptions;
   class IdentifierInfo;
@@ -58,6 +63,10 @@ namespace clang {
   class Sema;
   class Declarator;
   struct TemplateIdAnnotation;
+class Decl;
+class NamedDecl;
+class TemplateParameterList;
+enum OverloadedOperatorKind : int;
 
 /// Represents a C++ nested-name-specifier or a global scope specifier.
 ///

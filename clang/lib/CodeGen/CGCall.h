@@ -14,28 +14,44 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGCALL_H
 #define LLVM_CLANG_LIB_CODEGEN_CGCALL_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <algorithm>
+
 #include "CGPointerAuthInfo.h"
 #include "CGValue.h"
 #include "EHScopeStack.h"
-#include "clang/AST/ASTFwd.h"
-#include "clang/AST/CanonicalType.h"
 #include "clang/AST/GlobalDecl.h"
 #include "clang/AST/Type.h"
 #include "llvm/ADT/STLForwardCompat.h"
-#include "llvm/IR/Value.h"
+#include "Address.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/Support/Compiler.h"
 
 namespace llvm {
-class Type;
 class Value;
+class Function;
+class Instruction;
 } // namespace llvm
 
 namespace clang {
-class Decl;
 class FunctionDecl;
 class TargetOptions;
 class VarDecl;
+class CXXPseudoDestructorExpr;
+class CallExpr;
+class CodeGenOptions;
+class Expr;
+class LangOptions;
 
 namespace CodeGen {
+class CodeGenFunction;
 
 /// Abstract information about a function or function prototype.
 class CGCalleeInfo {

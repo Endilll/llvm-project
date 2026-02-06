@@ -11,14 +11,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <utility>
+
 #include "CGBuilder.h"
 #include "CGCall.h"
 #include "CGValue.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
 #include "clang/AST/Expr.h"
-#include "clang/Basic/Builtins.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetOptions.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
@@ -28,13 +30,23 @@
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/Instruction.h"
 #include "llvm/IR/Type.h"
 #include "llvm/Support/TypeSize.h"
 #include "llvm/Transforms/Utils/AMDGPUEmitPrintf.h"
-#include <cassert>
-#include <cstdint>
-#include <utility>
+#include "clang/AST/Decl.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Value.h"
+
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

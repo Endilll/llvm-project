@@ -11,6 +11,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+#include <tuple>
+#include <utility>
+
 #include "CXXABI.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
@@ -18,7 +23,6 @@
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Mangle.h"
 #include "clang/AST/MangleNumberingContext.h"
-#include "clang/AST/RecordLayout.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/LLVM.h"
@@ -29,10 +33,10 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <memory>
-#include <tuple>
-#include <utility>
+#include "clang/AST/Decl.h"
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

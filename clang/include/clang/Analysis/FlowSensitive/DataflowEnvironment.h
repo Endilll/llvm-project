@@ -15,16 +15,20 @@
 #ifndef LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_DATAFLOWENVIRONMENT_H
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_DATAFLOWENVIRONMENT_H
 
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
 #include "clang/AST/Type.h"
-#include "clang/Analysis/FlowSensitive/ASTOps.h"
 #include "clang/Analysis/FlowSensitive/Arena.h"
 #include "clang/Analysis/FlowSensitive/DataflowAnalysisContext.h"
 #include "clang/Analysis/FlowSensitive/DataflowLattice.h"
-#include "clang/Analysis/FlowSensitive/Formula.h"
 #include "clang/Analysis/FlowSensitive/StorageLocation.h"
 #include "clang/Analysis/FlowSensitive/Value.h"
 #include "clang/Basic/LLVM.h"
@@ -34,16 +38,23 @@
 #include "llvm/ADT/MapVector.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <memory>
-#include <optional>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
+class CXXConstructExpr;
+class CXXMemberCallExpr;
+class Stmt;
+
 namespace dataflow {
+class Formula;
+enum class Atom : unsigned int;
+struct ReferencedDecls;
 
 /// Indicates the result of a tentative comparison.
 enum class ComparisonResult {

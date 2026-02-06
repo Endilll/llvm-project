@@ -14,16 +14,18 @@
 #ifndef LLVM_CLANG_AST_COMPARISONCATEGORIES_H
 #define LLVM_CLANG_AST_COMPARISONCATEGORIES_H
 
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/APSInt.h"
-#include "llvm/ADT/DenseMap.h"
 #include <cassert>
 #include <optional>
 #include <vector>
 
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+
 namespace llvm {
   class StringRef;
-  class APSInt;
 }
 
 namespace clang {
@@ -31,7 +33,6 @@ namespace clang {
 class ASTContext;
 class VarDecl;
 class CXXRecordDecl;
-class Sema;
 class QualType;
 class NamespaceDecl;
 

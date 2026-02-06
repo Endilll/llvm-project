@@ -7,6 +7,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "UnwrappedLineFormatter.h"
+
+#include <algorithm>
+#include <cassert>
+#include <climits>
+#include <cstddef>
+#include <functional>
+#include <iterator>
+#include <queue>
+#include <set>
+#include <utility>
+#include <new>
+#include <optional>
+
 #include "ContinuationIndenter.h"
 #include "FormatToken.h"
 #include "NamespaceEndCommentsFixer.h"
@@ -20,15 +33,11 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Debug.h"
-#include <algorithm>
-#include <cassert>
-#include <climits>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <queue>
-#include <set>
-#include <utility>
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 #define DEBUG_TYPE "format-formatter"
 

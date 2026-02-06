@@ -14,6 +14,12 @@
 #ifndef LLVM_CLANG_TOOLING_JSONCOMPILATIONDATABASE_H
 #define LLVM_CLANG_TOOLING_JSONCOMPILATIONDATABASE_H
 
+#include <memory>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Tooling/CompilationDatabase.h"
 #include "clang/Tooling/FileMatchTrie.h"
@@ -21,11 +27,11 @@
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/YAMLParser.h"
-#include <memory>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+
+namespace llvm {
+class StringRef;
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 namespace tooling {

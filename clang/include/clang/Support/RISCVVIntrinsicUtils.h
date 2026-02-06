@@ -9,12 +9,6 @@
 #ifndef CLANG_SUPPORT_RISCVVINTRINSICUTILS_H
 #define CLANG_SUPPORT_RISCVVINTRINSICUTILS_H
 
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/BitmaskEnum.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/Compiler.h"
-#include "llvm/Support/ErrorHandling.h"
 #include <cassert>
 #include <cstdint>
 #include <optional>
@@ -24,8 +18,15 @@
 #include <unordered_map>
 #include <vector>
 
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
+
 namespace llvm {
 class raw_ostream;
+template <typename T> class ArrayRef;
 } // end namespace llvm
 
 namespace clang {
@@ -253,7 +254,6 @@ struct LMULType {
 class RVVType;
 using RVVTypePtr = RVVType *;
 using RVVTypes = std::vector<RVVTypePtr>;
-class RVVTypeCache;
 
 // This class is compact representation of a valid and invalid RVVType.
 class RVVType {

@@ -13,24 +13,37 @@
 #ifndef LLVM_CLANG_AST_INTERP_POINTER_H
 #define LLVM_CLANG_AST_INTERP_POINTER_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <cstddef>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "Descriptor.h"
 #include "FunctionPointer.h"
 #include "InitMap.h"
 #include "InterpBlock.h"
 #include "clang/AST/ComparisonCategories.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/Expr.h"
 #include "llvm/Support/raw_ostream.h"
+#include "Function.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/Support/ErrorHandling.h"
 
 namespace clang {
+class ASTContext;
+
 namespace interp {
-class Block;
-class DeadBlock;
 class Pointer;
 class Context;
+class Record;
+enum PrimType : uint8_t;
 
-class Pointer;
 inline llvm::raw_ostream &operator<<(llvm::raw_ostream &OS, const Pointer &P);
 
 struct BlockPointer {

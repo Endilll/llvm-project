@@ -13,10 +13,12 @@
 #ifndef LLVM_CLANG_SEMA_SEMASYSTEMZ_H
 #define LLVM_CLANG_SEMA_SEMASYSTEMZ_H
 
-#include "clang/AST/ASTFwd.h"
 #include "clang/Sema/SemaBase.h"
 
 namespace clang {
+class CallExpr;
+class Sema;
+
 class SemaSystemZ : public SemaBase {
 public:
   SemaSystemZ(Sema &S);

@@ -11,7 +11,6 @@
 
 #include "clang/Basic/LLVM.h"
 #include "clang/Serialization/PCHContainerOperations.h"
-#include "llvm/Support/MemoryBufferRef.h"
 
 namespace clang {
 /// A PCHContainerReader implementation that uses LLVM to

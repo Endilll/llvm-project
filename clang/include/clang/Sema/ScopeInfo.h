@@ -14,8 +14,12 @@
 #ifndef LLVM_CLANG_SEMA_SCOPEINFO_H
 #define LLVM_CLANG_SEMA_SCOPEINFO_H
 
+#include <cassert>
+#include <cstdint>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/CapturedStmt.h"
 #include "clang/Basic/Diagnostic.h"
@@ -32,7 +36,6 @@
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/STLForwardCompat.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
@@ -40,30 +43,26 @@
 #include "llvm/ADT/TinyPtrVector.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <utility>
+#include "clang/AST/Decl.h"
+#include "clang/AST/Stmt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+template <typename Fn> class function_ref;
+}  // namespace llvm
 
 namespace clang {
 
-class BlockDecl;
-class CapturedDecl;
 class CXXMethodDecl;
 class CXXRecordDecl;
-class ImplicitParamDecl;
-class NamedDecl;
 class ObjCIvarRefExpr;
 class ObjCMessageExpr;
 class ObjCPropertyDecl;
 class ObjCPropertyRefExpr;
-class ParmVarDecl;
-class RecordDecl;
-class ReturnStmt;
 class Scope;
-class Stmt;
-class SwitchStmt;
 class TemplateParameterList;
-class VarDecl;
 
 namespace sema {
 

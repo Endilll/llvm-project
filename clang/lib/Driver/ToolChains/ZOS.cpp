@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "ZOS.h"
+
+#include <cassert>
+#include <cstdlib>
+#include <memory>
+#include <string>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Action.h"
 #include "clang/Driver/CommonArgs.h"
@@ -14,7 +20,6 @@
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/InputInfo.h"
 #include "clang/Driver/Job.h"
-#include "clang/Driver/Tool.h"
 #include "clang/Options/Options.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/Option/Arg.h"
@@ -25,12 +30,15 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/WithColor.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdlib>
-#include <memory>
-#include <string>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Option/OptSpecifier.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 using namespace clang;
 using namespace clang::driver;

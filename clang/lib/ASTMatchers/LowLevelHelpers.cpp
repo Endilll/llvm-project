@@ -7,15 +7,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ASTMatchers/LowLevelHelpers.h"
+
+#include <algorithm>
+#include <cassert>
+#include <type_traits>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/TypeBase.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
-#include <algorithm>
-#include <cassert>
-#include <type_traits>
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 namespace ast_matchers {

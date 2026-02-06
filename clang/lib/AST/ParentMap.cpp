@@ -11,15 +11,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ParentMap.h"
-#include "clang/AST/Decl.h"
+
+#include <cassert>
+#include <utility>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtObjC.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
-#include <cassert>
-#include <utility>
+#include "clang/AST/StmtIterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

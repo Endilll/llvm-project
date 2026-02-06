@@ -13,12 +13,17 @@
 #ifndef LLVM_CLANG_LIB_SERIALIZATION_ASTCOMMON_H
 #define LLVM_CLANG_LIB_SERIALIZATION_ASTCOMMON_H
 
-#include "clang/AST/ASTContext.h"
 #include "clang/AST/DeclFriend.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Serialization/ASTBitCodes.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/Specifiers.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
+class BuiltinType;
 
 namespace serialization {
 

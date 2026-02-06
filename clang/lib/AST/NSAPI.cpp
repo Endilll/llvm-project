@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/NSAPI.h"
+
+#include <optional>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclObjC.h"
@@ -15,7 +18,10 @@
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringSwitch.h"
-#include <optional>
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 
@@ -439,9 +445,11 @@ NSAPI::getNSNumberFactoryMethodKind(QualType T) const {
 #define IMAGE_TYPE(ImgType, Id, SingletonId, Access, Suffix) \
   case BuiltinType::Id:
 #include "clang/Basic/OpenCLImageTypes.def"
+
 #define EXT_OPAQUE_TYPE(ExtType, Id, Ext) \
   case BuiltinType::Id:
 #include "clang/Basic/OpenCLExtensionTypes.def"
+
   case BuiltinType::OCLSampler:
   case BuiltinType::OCLEvent:
   case BuiltinType::OCLClkEvent:
@@ -450,17 +458,23 @@ NSAPI::getNSNumberFactoryMethodKind(QualType T) const {
 #define SVE_TYPE(Name, Id, SingletonId) \
   case BuiltinType::Id:
 #include "clang/Basic/AArch64ACLETypes.def"
+
 #define PPC_VECTOR_TYPE(Name, Id, Size) \
   case BuiltinType::Id:
 #include "clang/Basic/PPCTypes.def"
+
 #define RVV_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/RISCVVTypes.def"
+
 #define WASM_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/WebAssemblyReferenceTypes.def"
+
 #define AMDGPU_TYPE(Name, Id, SingletonId, Width, Align) case BuiltinType::Id:
 #include "clang/Basic/AMDGPUTypes.def"
+
 #define HLSL_INTANGIBLE_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/HLSLIntangibleTypes.def"
+
   case BuiltinType::BoundMember:
   case BuiltinType::UnresolvedTemplate:
   case BuiltinType::Dependent:

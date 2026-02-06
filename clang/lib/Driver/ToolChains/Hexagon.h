@@ -9,12 +9,31 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_HEXAGON_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_HEXAGON_H
 
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "Linux.h"
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Driver/Action.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace llvm {
+namespace opt {
+class ArgList;
+}  // namespace opt
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace tools {
 namespace hexagon {
 // For Hexagon, we do not need to instantiate tools for PreProcess, PreCompile

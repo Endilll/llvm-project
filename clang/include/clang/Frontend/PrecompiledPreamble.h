@@ -13,29 +13,30 @@
 #ifndef LLVM_CLANG_FRONTEND_PRECOMPILEDPREAMBLE_H
 #define LLVM_CLANG_FRONTEND_PRECOMPILEDPREAMBLE_H
 
-#include "clang/Basic/Diagnostic.h"
+#include <sys/types.h>
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <type_traits>
+#include <vector>
+#include <array>
+
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
 #include "clang/Lex/Lexer.h"
 #include "clang/Lex/PPCallbacks.h"
-#include "clang/Lex/Preprocessor.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSet.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/MD5.h"
-#include <cstddef>
-#include <ctime>
-#include <memory>
-#include <string>
-#include <sys/types.h>
-#include <system_error>
-#include <type_traits>
-#include <vector>
+#include "llvm/Support/AllocatorBase.h"
 
 namespace llvm {
 class MemoryBuffer;
 class MemoryBufferRef;
+template <typename T> class IntrusiveRefCntPtr;
+
 namespace vfs {
 class FileSystem;
 }
@@ -47,6 +48,11 @@ class CompilerInvocation;
 class Decl;
 class DeclGroupRef;
 class PCHContainerOperations;
+class ASTWriter;
+class CommentHandler;
+class DiagnosticsEngine;
+class LangOptions;
+class PreprocessorOptions;
 
 /// Runs lexer to compute suggested preamble bounds.
 PreambleBounds ComputePreambleBounds(const LangOptions &LangOpts,

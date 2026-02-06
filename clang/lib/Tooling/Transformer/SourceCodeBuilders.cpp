@@ -7,7 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Transformer/SourceCodeBuilders.h"
-#include "clang/AST/ASTContext.h"
+
+#include <optional>
+#include <string>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/OperationKinds.h"
@@ -20,8 +23,16 @@
 #include "llvm/ADT/Twine.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <optional>
-#include <string>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace clang {
+class ASTContext;
+}  // namespace clang
 
 using namespace clang;
 using namespace tooling;

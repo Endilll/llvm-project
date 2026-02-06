@@ -13,10 +13,12 @@
 #ifndef LLVM_CLANG_SEMA_SEMADIRECTX_H
 #define LLVM_CLANG_SEMA_SEMADIRECTX_H
 
-#include "clang/AST/ASTFwd.h"
 #include "clang/Sema/SemaBase.h"
 
 namespace clang {
+class CallExpr;
+class Sema;
+
 class SemaDirectX : public SemaBase {
 public:
   SemaDirectX(Sema &S);

@@ -15,6 +15,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/ThreadSafety.h"
+
+#include <cassert>
+#include <functional>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <new>
+#include <tuple>
+#include <type_traits>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -37,7 +50,6 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/ImmutableMap.h"
 #include "llvm/ADT/STLExtras.h"
@@ -48,14 +60,18 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TrailingObjects.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <functional>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/AttrIterator.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace { class LockableFactEntry; }
+namespace { class ScopedLockableFactEntry; }
 
 using namespace clang;
 using namespace threadSafety;

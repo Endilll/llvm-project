@@ -11,6 +11,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/APValue.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <string>
+#include <utility>
+#include <optional>
+
 #include "Linkage.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/CharUnits.h"
@@ -33,13 +43,12 @@
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <string>
-#include <utility>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
 using namespace clang;
 
 /// The identity of a type_info object depends on the canonical unqualified

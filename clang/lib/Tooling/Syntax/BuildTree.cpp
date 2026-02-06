@@ -14,6 +14,7 @@
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/IgnoreExpr.h"
+#include "clang/AST/NestedNameSpecifier.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/RecursiveASTVisitor.h"

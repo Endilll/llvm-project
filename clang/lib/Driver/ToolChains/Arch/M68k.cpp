@@ -7,16 +7,27 @@
 //===----------------------------------------------------------------------===//
 
 #include "M68k.h"
+
+#include <string>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
-#include "clang/Driver/Driver.h"
 #include "clang/Options/Options.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
-#include "llvm/Support/Regex.h"
 #include "llvm/TargetParser/Host.h"
-#include <string>
-#include <vector>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/Option.h"
+
+namespace clang {
+namespace driver {
+class Driver;
+}  // namespace driver
+}  // namespace clang
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

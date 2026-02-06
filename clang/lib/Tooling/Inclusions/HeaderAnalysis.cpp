@@ -7,15 +7,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Inclusions/HeaderAnalysis.h"
-#include "clang/Basic/FileEntry.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Lex/HeaderSearch.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/MemoryBufferRef.h"
+
 #include <cstring>
 #include <optional>
 #include <tuple>
+#include <utility>
+
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Lex/HeaderSearch.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/MemoryBufferRef.h"
+#include "clang/Basic/SourceManager.h"
 
 namespace clang::tooling {
 namespace {

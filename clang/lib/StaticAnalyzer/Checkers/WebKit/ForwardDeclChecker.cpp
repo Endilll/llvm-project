@@ -6,6 +6,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "ASTUtils.h"
 #include "DiagOutputUtils.h"
 #include "PtrTypesSemantics.h"
@@ -18,8 +23,6 @@
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/Analysis/DomainSpecific/CocoaConventions.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/OperatorKinds.h"
@@ -33,10 +36,18 @@
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/AST/Type.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class Decl;
+namespace ento {
+class AnalysisManager;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

@@ -10,11 +10,20 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #include "CheckExprLifetime.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/AttrIterator.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/CharUnits.h"
@@ -36,7 +45,6 @@
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/StmtObjC.h"
 #include "clang/AST/StmtOpenACC.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/AST/TypeOrdering.h"
 #include "clang/Basic/AttrKinds.h"
@@ -56,7 +64,6 @@
 #include "clang/Basic/TypeTraits.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Sema/DeclSpec.h"
-#include "clang/Sema/EnterExpressionEvaluationContext.h"
 #include "clang/Sema/Initialization.h"
 #include "clang/Sema/Lookup.h"
 #include "clang/Sema/Overload.h"
@@ -82,15 +89,19 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/APValue.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace sema;

@@ -10,6 +10,11 @@
 // AST back out to C/Objective-C/C++/Objective-C++ code.
 //
 //===----------------------------------------------------------------------===//
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/AttrIterator.h"
@@ -28,7 +33,6 @@
 #include "clang/AST/OpenMPClause.h"
 #include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/TemplateBase.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/ExceptionSpecificationType.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Module.h"
@@ -40,10 +44,22 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
-#include <optional>
-#include <string>
+#include "clang/AST/ASTConcept.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/AttrKinds.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
 using namespace clang;
 
 namespace {
@@ -293,6 +309,7 @@ DeclPrinter::prettyPrintAttributes(const Decl *D,
 #define ATTR(X)
 #define PRAGMA_SPELLING_ATTR(X) case attr::X:
 #include "clang/Basic/AttrList.inc"
+
       break;
     default:
       AttrPosAsWritten APos = getPosAsWritten(A, D);
@@ -345,6 +362,7 @@ void DeclPrinter::prettyPrintPragmas(Decl *D) {
 #define ATTR(X)
 #define PRAGMA_SPELLING_ATTR(X) case attr::X:
 #include "clang/Basic/AttrList.inc"
+
         A->printPretty(Out, Policy);
         Indent();
         break;

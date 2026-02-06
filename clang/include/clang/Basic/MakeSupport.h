@@ -10,7 +10,11 @@
 #define LLVM_CLANG_BASIC_MAKESUPPORT_H
 
 #include "clang/Basic/LLVM.h"
-#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 

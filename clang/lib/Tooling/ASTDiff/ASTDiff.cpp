@@ -11,6 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/ASTDiff/ASTDiff.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <functional>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <unordered_set>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Decl.h"
@@ -31,20 +46,13 @@
 #include "llvm/ADT/PriorityQueue.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <functional>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <unordered_set>
-#include <utility>
-#include <vector>
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace llvm;
 using namespace clang;

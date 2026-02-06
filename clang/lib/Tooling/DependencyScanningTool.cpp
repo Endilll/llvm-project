@@ -15,6 +15,7 @@
 #include "clang/DependencyScanning/DependencyScanningUtils.h"
 #include "clang/DependencyScanning/DependencyScanningWorker.h"
 #include "clang/DependencyScanning/ModuleDepCollector.h"
+#include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/Job.h"
 #include "clang/Driver/Tool.h"

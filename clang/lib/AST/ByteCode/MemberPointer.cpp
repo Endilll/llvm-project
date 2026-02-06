@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "MemberPointer.h"
+
+#include <optional>
+
 #include "ByteCode/InterpBlock.h"
 #include "ByteCode/Pointer.h"
 #include "Context.h"
@@ -15,8 +18,8 @@
 #include "Record.h"
 #include "clang/AST/Decl.h"
 #include "clang/Basic/LLVM.h"
-#include <cassert>
-#include <optional>
+#include "ByteCode/Descriptor.h"
+#include "llvm/ADT/ArrayRef.h"
 
 namespace clang {
 namespace interp {

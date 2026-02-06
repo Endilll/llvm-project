@@ -11,6 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "CoverageMappingGen.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <functional>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
+#include <vector>
+#include <array>
+#include <iterator>
+
 #include "CodeGenFunction.h"
 #include "MCDCState.h"
 #include "clang/AST/DeclCXX.h"
@@ -21,7 +36,6 @@
 #include "clang/AST/StmtVisitor.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -54,18 +68,28 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <variant>
-#include <vector>
+#include "CodeGenModule.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/StmtObjC.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/FunctionExtras.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/Module.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Error.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
 
 // This selects the coverage mapping format defined when `InstrProfData.inc`
 // is textually included.

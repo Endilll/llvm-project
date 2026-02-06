@@ -15,7 +15,19 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_TOKENANNOTATOR_H
 #define LLVM_CLANG_LIB_FORMAT_TOKENANNOTATOR_H
 
+#include <assert.h>
+#include <stddef.h>
+#include <list>
+#include <memory>
+
 #include "UnwrappedLineParser.h"
+#include "FormatToken.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Format/Format.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 namespace format {

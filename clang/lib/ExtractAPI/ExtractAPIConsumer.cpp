@@ -12,11 +12,17 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "clang/AST/ASTConcept.h"
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/DeclObjC.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -29,7 +35,6 @@
 #include "clang/ExtractAPI/ExtractAPIVisitor.h"
 #include "clang/ExtractAPI/FrontendActions.h"
 #include "clang/ExtractAPI/Serialization/SymbolGraphSerializer.h"
-#include "clang/Frontend/ASTConsumers.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendAction.h"
 #include "clang/Frontend/FrontendOptions.h"
@@ -41,7 +46,6 @@
 #include "clang/Lex/MacroInfo.h"
 #include "clang/Lex/PPCallbacks.h"
 #include "clang/Lex/Preprocessor.h"
-#include "clang/Lex/PreprocessorOptions.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallString.h"
@@ -53,12 +57,21 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Regex.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/Module.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/VirtualFileSystem.h"
 
 using namespace clang;
 using namespace extractapi;

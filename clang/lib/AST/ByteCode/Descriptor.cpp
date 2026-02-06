@@ -7,7 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "Descriptor.h"
-#include "Boolean.h"
+
+#include <algorithm>
+#include <cstddef>
+#include <new>
+#include <type_traits>
+
 #include "ByteCode/InitMap.h"
 #include "FixedPoint.h"
 #include "Floating.h"
@@ -23,10 +28,17 @@
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclCXX.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+namespace interp {
+class Boolean;
+template <unsigned int Bits, bool Signed> class Integral;
+}  // namespace interp
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::interp;

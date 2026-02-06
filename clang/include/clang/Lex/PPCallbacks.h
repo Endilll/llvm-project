@@ -14,17 +14,17 @@
 #ifndef LLVM_CLANG_LEX_PPCALLBACKS_H
 #define LLVM_CLANG_LEX_PPCALLBACKS_H
 
-#include "clang/Basic/DiagnosticIDs.h"
+#include <memory>
+#include <utility>
+
 #include "clang/Basic/FileEntry.h"
-#include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/Module.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Lex/ModuleLoader.h"
 #include "clang/Lex/Pragma.h"
-#include <memory>
-#include <utility>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 class Token;
@@ -33,6 +33,10 @@ class MacroDefinition;
 class MacroDirective;
 class MacroArgs;
 struct LexEmbedParametersResult;
+class Module;
+namespace diag {
+enum class Severity : uint8_t;
+}  // namespace diag
 
 /// This interface provides a way to observe the actions of the
 /// preprocessor as it does its thing.

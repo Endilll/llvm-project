@@ -11,6 +11,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/CodeCompleteConsumer.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <iterator>
+#include <string>
+#include <vector>
+#include <new>
+
 #include "clang-c/Index.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -32,12 +41,10 @@
 #include "llvm/ADT/Twine.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <iterator>
-#include <string>
-#include <vector>
+#include "clang/AST/DeclCXX.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

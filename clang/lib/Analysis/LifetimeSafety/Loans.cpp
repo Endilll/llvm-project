@@ -7,10 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/LifetimeSafety/Loans.h"
+
+#include <string>
+
 #include "clang/AST/Decl.h"
-#include "clang/AST/ExprCXX.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
+
+namespace clang {
+class MaterializeTemporaryExpr;
+}  // namespace clang
 
 namespace clang::lifetimes::internal {
 

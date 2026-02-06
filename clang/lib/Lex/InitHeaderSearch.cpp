@@ -10,31 +10,42 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/Basic/DiagnosticIDs.h"
-#include "clang/Basic/FileManager.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Config/config.h" // C_INCLUDE_DIRS
-#include "clang/Lex/DirectoryLookup.h"
-#include "clang/Lex/HeaderMap.h"
-#include "clang/Lex/HeaderSearch.h"
-#include "clang/Lex/HeaderSearchOptions.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/SmallPtrSet.h"
-#include "llvm/ADT/StringExtras.h"
-#include "llvm/ADT/Twine.h"
-#include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/Path.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/TargetParser/Triple.h"
 #include <cassert>
 #include <iterator>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Config/config.h" // C_INCLUDE_DIRS
+#include "clang/Lex/DirectoryLookup.h"
+#include "clang/Lex/HeaderSearch.h"
+#include "clang/Lex/HeaderSearchOptions.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/Path.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/TargetParser/Triple.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Lex/ModuleMap.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class HeaderMap;
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::frontend;

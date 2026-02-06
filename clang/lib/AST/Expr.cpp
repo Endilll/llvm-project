@@ -11,6 +11,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/Expr.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "clang/AST/APNumericStorage.h"
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTContext.h"
@@ -32,7 +41,6 @@
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/RecordLayout.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtIterator.h"
 #include "clang/AST/TemplateBase.h"
@@ -61,14 +69,15 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Format.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/ExprConcepts.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/SmallString.h"
+
 using namespace clang;
 
 const Expr *Expr::getBestDynamicClassTypeExpr() const {

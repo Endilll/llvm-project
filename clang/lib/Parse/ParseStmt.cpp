@@ -11,13 +11,18 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <utility>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/PrettyDeclStackTrace.h"
 #include "clang/AST/Stmt.h"
 #include "clang/Basic/AttributeScopeInfo.h"
-#include "clang/Basic/Attributes.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticParse.h"
@@ -47,11 +52,21 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/ScopeExit.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/StackExhaustionHandler.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Sema/Sema.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

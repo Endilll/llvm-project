@@ -11,22 +11,27 @@
 //===----------------------------------------------------------------------===//
 
 #include "OrcIncrementalExecutor.h"
-#include "clang/Interpreter/PartialTranslationUnit.h"
 
+#include <utility>
+
+#include "clang/Interpreter/PartialTranslationUnit.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ExecutionEngine/Orc/Core.h"
 #include "llvm/ExecutionEngine/Orc/EPCDynamicLibrarySearchGenerator.h"
-#include "llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h"
 #include "llvm/ExecutionEngine/Orc/LLJIT.h"
 #include "llvm/ExecutionEngine/Orc/Shared/ExecutorAddress.h"
 #include "llvm/ExecutionEngine/Orc/TargetProcess/JITLoaderGDB.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
-#include <utility>
-
-#ifdef LLVM_ON_UNIX
-#endif // LLVM_ON_UNIX
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Config/llvm-config.h"
+#include "llvm/ExecutionEngine/Orc/Shared/ExecutorSymbolDef.h"
+#include "llvm/ExecutionEngine/Orc/ThreadSafeModule.h"
+#include "llvm/IR/Module.h"
+#include "llvm/Support/Casting.h"
 
 // Force linking some of the runtimes that helps attaching to a debugger.
 LLVM_ATTRIBUTE_USED void linkComponents() {

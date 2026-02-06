@@ -14,6 +14,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "UninitializedObject.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
@@ -23,8 +28,10 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <optional>
+#include "clang/AST/Decl.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace clang::ento;

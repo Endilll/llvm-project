@@ -12,15 +12,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/VTTBuilder.h"
+
+#include <cassert>
+#include <cstdint>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/BaseSubobject.h"
 #include "clang/AST/CharUnits.h"
-#include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/Type.h"
-#include <cassert>
-#include <cstdint>
 
 using namespace clang;
 

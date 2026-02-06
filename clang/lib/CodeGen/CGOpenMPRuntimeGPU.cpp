@@ -12,6 +12,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGOpenMPRuntimeGPU.h"
+
+#include <cassert>
+#include <cstdint>
+#include <iterator>
+#include <memory>
+#include <utility>
+#include <new>
+#include <optional>
+#include <string>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGCall.h"
@@ -36,11 +46,8 @@
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtOpenMP.h"
 #include "clang/AST/StmtVisitor.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/CapturedStmt.h"
-#include "clang/Basic/Cuda.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Lambda.h"
 #include "clang/Basic/OffloadArch.h"
@@ -55,7 +62,6 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
-#include "llvm/Frontend/OpenMP/OMPConstants.h"
 #include "llvm/Frontend/OpenMP/OMPDeviceConstants.h"
 #include "llvm/Frontend/OpenMP/OMPGridValues.h"
 #include "llvm/Frontend/OpenMP/OMPIRBuilder.h"
@@ -72,11 +78,39 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <iterator>
-#include <memory>
-#include <utility>
+#include "CodeGenModule.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/ValueHandle.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+
+namespace clang {
+namespace CodeGen {
+class CGFunctionInfo;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class BasicBlock;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

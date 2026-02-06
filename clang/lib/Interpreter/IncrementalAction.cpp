@@ -8,6 +8,13 @@
 
 #include "IncrementalAction.h"
 
+#include <cassert>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
@@ -24,16 +31,18 @@
 #include "llvm/IR/Module.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/Error.h"
-#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "clang/AST/DeclGroup.h"
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
 
 namespace clang {
+class Decl;
+
 IncrementalAction::IncrementalAction(CompilerInstance &Instance,
                                      llvm::LLVMContext &LLVMCtx,
                                      llvm::Error &Err, Interpreter &I,

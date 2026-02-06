@@ -13,15 +13,16 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_DYNAMICEXTENT_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_DYNAMICEXTENT_H
 
-#include "clang/AST/TypeBase.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
 
 namespace clang {
+class QualType;
+
 namespace ento {
+class MemRegion;
+class SValBuilder;
+class SymbolReaper;
 
 /// \returns The stored dynamic extent for the region \p MR.
 DefinedOrUnknownSVal getDynamicExtent(ProgramStateRef State,

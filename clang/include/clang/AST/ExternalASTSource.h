@@ -14,18 +14,6 @@
 #ifndef LLVM_CLANG_AST_EXTERNALASTSOURCE_H
 #define LLVM_CLANG_AST_EXTERNALASTSOURCE_H
 
-#include "clang/AST/CharUnits.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclID.h"
-#include "clang/AST/TemplateName.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/PointerUnion.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
-#include "llvm/ADT/iterator.h"
-#include "llvm/Support/PointerLikeTypeTraits.h"
-#include "llvm/Support/SwapByteOrder.h"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -33,6 +21,25 @@
 #include <iterator>
 #include <new>
 #include <optional>
+
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclID.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/SwapByteOrder.h"
+#include "clang/AST/TypeBase.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+template <typename T> struct PointerLikeTypeTraits;
+}  // namespace llvm
 
 namespace clang {
 
@@ -51,7 +58,10 @@ class RecordDecl;
 class Selector;
 class Stmt;
 class TagDecl;
-class VarDecl;
+class CharUnits;
+class FunctionDecl;
+class Module;
+class TemplateArgument;
 
 /// Abstract interface for external sources of AST nodes.
 ///

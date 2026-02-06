@@ -9,18 +9,41 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_AMDGPU_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_AMDGPU_H
 
-#include "Gnu.h"
-#include "clang/Basic/TargetID.h"
-#include "clang/Driver/Tool.h"
-#include "clang/Driver/ToolChain.h"
-#include "clang/Options/Options.h"
-#include "llvm/ADT/SmallString.h"
-#include "llvm/TargetParser/TargetParser.h"
-
+#include <assert.h>
 #include <map>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "Gnu.h"
+#include "clang/Driver/Tool.h"
+#include "clang/Options/Options.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticDriver.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Sanitizers.h"
+#include "clang/Driver/Action.h"
+#include "clang/Driver/Driver.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringExtras.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/Arg.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace llvm {
+namespace AMDGPU {
+enum GPUKind : uint32_t;
+}  // namespace AMDGPU
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class ToolChain;
 
 namespace tools {
 namespace amdgpu {

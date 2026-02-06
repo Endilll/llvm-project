@@ -13,16 +13,27 @@
 #ifndef LLVM_CLANG_AST_INTERP_SOURCE_H
 #define LLVM_CLANG_AST_INTERP_SOURCE_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <cstddef>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 #include "PrimType.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/Stmt.h"
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/Support/Endian.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 class Expr;
 class SourceLocation;
 class SourceRange;
+class Decl;
+class Stmt;
+
 namespace interp {
 class Function;
 

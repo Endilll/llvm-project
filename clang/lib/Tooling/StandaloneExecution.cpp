@@ -7,11 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/StandaloneExecution.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Serialization/PCHContainerOperations.h"
+
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Tooling/ArgumentsAdjusters.h"
 #include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/CompilationDatabase.h"
 #include "clang/Tooling/Execution.h"
 #include "clang/Tooling/ToolExecutorPluginRegistry.h"
 #include "clang/Tooling/Tooling.h"
@@ -19,12 +22,12 @@
 #include "llvm/ADT/Twine.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <memory>
-#include <string>
-#include <utility>
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 namespace tooling {
+class CompilationDatabase;
 
 static llvm::Error make_string_error(const llvm::Twine &Message) {
   return llvm::make_error<llvm::StringError>(Message,

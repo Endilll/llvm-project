@@ -11,6 +11,20 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <iterator>
+#include <list>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+#include <map>
+#include <new>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/CanonicalType.h"
@@ -25,7 +39,6 @@
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/TemplateName.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticSema.h"
@@ -73,19 +86,30 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdlib>
-#include <iterator>
-#include <list>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <utility>
-#include <vector>
-
 #include "OpenCLBuiltins.inc"
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/TypeOrdering.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Sema/ExternalSemaSource.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallSet.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 using namespace sema;
@@ -4029,7 +4053,6 @@ bool VisibleDeclConsumer::includeHiddenDecls() const { return false; }
 
 namespace {
 
-class ShadowContextRAII;
 
 class VisibleDeclsRecord {
 public:

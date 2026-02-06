@@ -11,16 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/LangOptions.h"
+
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <vector>
+#include <utility>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangStandard.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <vector>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/VersionTuple.h"
 
 using namespace clang;
 
@@ -38,7 +43,6 @@ void LangOptions::resetNonModularOptions() {
 #define ENUM_LANGOPT(Name, Type, Bits, Default, Compatibility, Description)    \
   if constexpr (CompatibilityKind::Compatibility == CompatibilityKind::Benign) \
     Name = static_cast<unsigned>(Default);
-#include "clang/Basic/LangOptions.def"
 
   // Reset "benign" options with implied values (Options.td ImpliedBy relations)
   // rather than their defaults. This avoids unexpected combinations and

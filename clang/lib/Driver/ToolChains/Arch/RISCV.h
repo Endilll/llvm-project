@@ -9,14 +9,23 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_ARCH_RISCV_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_ARCH_RISCV_H
 
-#include "clang/Driver/Driver.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Option/Option.h"
 #include <string>
 #include <vector>
 
+#include "clang/Basic/LLVM.h"
+
+namespace llvm {
+class StringRef;
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
+
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace tools {
 namespace riscv {
 void getRISCVTargetFeatures(const Driver &D, const llvm::Triple &Triple,

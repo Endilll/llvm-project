@@ -13,11 +13,13 @@
 #ifndef LLVM_CLANG_SEMA_SEMASPIRV_H
 #define LLVM_CLANG_SEMA_SEMASPIRV_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTFwd.h"
 #include "clang/Sema/SemaBase.h"
+#include "clang/Basic/TargetInfo.h"
 
 namespace clang {
+class CallExpr;
+class Sema;
+
 class SemaSPIRV : public SemaBase {
 public:
   SemaSPIRV(Sema &S);

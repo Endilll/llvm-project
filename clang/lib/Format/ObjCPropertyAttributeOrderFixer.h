@@ -18,9 +18,18 @@
 #define LLVM_CLANG_LIB_FORMAT_OBJCPROPERTYATTRIBUTEORDERFIXER_H
 
 #include "TokenAnalyzer.h"
+#include "FormatToken.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
+class SourceManager;
+namespace tooling {
+class Replacements;
+}  // namespace tooling
+
 namespace format {
+struct FormatStyle;
 
 class ObjCPropertyAttributeOrderFixer : public TokenAnalyzer {
   llvm::StringMap<unsigned> SortOrderMap;

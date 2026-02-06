@@ -9,10 +9,16 @@
 #ifndef LLVM_CLANG_INDEX_INDEXSYMBOL_H
 #define LLVM_CLANG_INDEX_INDEXSYMBOL_H
 
+#include <cstdint>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Lex/MacroInfo.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
-#include <cstdint>
+
+namespace llvm {
+class StringRef;
+class raw_ostream;
+template <typename Fn> class function_ref;
+}  // namespace llvm
 
 namespace clang {
   class Decl;

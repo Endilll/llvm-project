@@ -13,10 +13,13 @@
 #ifndef LLVM_CLANG_AST_INTERP_TYPE_H
 #define LLVM_CLANG_AST_INTERP_TYPE_H
 
-#include "llvm/Support/raw_ostream.h"
-#include <climits>
+#include <assert.h>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
+#include <type_traits>
+
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang {
 namespace interp {
@@ -24,7 +27,6 @@ namespace interp {
 class Pointer;
 class Boolean;
 class Floating;
-class FunctionPointer;
 class MemberPointer;
 class FixedPoint;
 template <bool Signed> class IntegralAP;
@@ -136,6 +138,7 @@ constexpr bool needsAlloc(PrimType T) {
 
 /// Mapping from primitive types to their representation.
 template <PrimType T> struct PrimConv;
+
 template <> struct PrimConv<PT_Sint8> {
   using T = Integral<8, true>;
 };

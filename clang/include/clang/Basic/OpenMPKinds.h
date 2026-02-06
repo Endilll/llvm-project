@@ -15,13 +15,16 @@
 #define LLVM_CLANG_BASIC_OPENMPKINDS_H
 
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "llvm/ADT/Sequence.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
 
+namespace llvm {
+template <typename EnumT> struct enum_iteration_traits;
+}  // namespace llvm
+
 namespace clang {
+class LangOptions;
 
 /// OpenMP directives.
 using OpenMPDirectiveKind = llvm::omp::Directive;

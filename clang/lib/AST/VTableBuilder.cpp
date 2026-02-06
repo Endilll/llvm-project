@@ -11,6 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/VTableBuilder.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cinttypes>
+#include <cstdint>
+#include <functional>
+#include <list>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/BaseSubobject.h"
 #include "clang/AST/CXXInheritance.h"
@@ -19,7 +34,6 @@
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/RecordLayout.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/DiagnosticAST.h"
@@ -38,20 +52,10 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Format.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cinttypes>
-#include <cstdint>
-#include <cstdio>
-#include <functional>
-#include <list>
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/Decl.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
 
 using namespace clang;
 

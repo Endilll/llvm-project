@@ -15,12 +15,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/DelayedDiagnostic.h"
-#include "clang/AST/Decl.h"
+
+#include <cassert>
+#include <cstring>
+
 #include "clang/AST/DeclBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include <cassert>
-#include <cstring>
+
+namespace clang {
+class NamedDecl;
+}  // namespace clang
 
 using namespace clang;
 using namespace sema;

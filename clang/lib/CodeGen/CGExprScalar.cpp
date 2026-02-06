@@ -10,13 +10,19 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <iterator>
+
 #include "Address.h"
 #include "CGBuilder.h"
 #include "CGCXXABI.h"
-#include "CGCleanup.h"
 #include "CGDebugInfo.h"
 #include "CGHLSLRuntime.h"
-#include "CGObjCRuntime.h"
 #include "CGOpenMPRuntime.h"
 #include "CGRecordLayout.h"
 #include "CGValue.h"
@@ -40,9 +46,7 @@
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtVisitor.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/CodeGenOptions.h"
-#include "clang/Basic/DiagnosticTrap.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/Sanitizers.h"
@@ -70,7 +74,6 @@
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/IntrinsicsPowerPC.h"
 #include "llvm/IR/MatrixBuilder.h"
-#include "llvm/IR/Module.h"
 #include "llvm/IR/Operator.h"
 #include "llvm/Support/AtomicOrdering.h"
 #include "llvm/Support/CommandLine.h"
@@ -78,12 +81,35 @@
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/TypeSize.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "CodeGenTypes.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/CurrentSourceLocExprScope.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticTrapInterface.inc"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/User.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/VersionTuple.h"
+
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

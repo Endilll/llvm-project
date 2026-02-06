@@ -5,6 +5,11 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
+#include <cassert>
+#include <cstddef>
+#include <string>
+#include <optional>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Core/Replacement.h"
 #include "clang/Tooling/Syntax/Mutations.h"
@@ -15,9 +20,10 @@
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/Error.h"
-#include <cassert>
-#include <cstddef>
-#include <string>
+#include "clang/Basic/SourceManager.h"
+#include "clang/Tooling/Syntax/Nodes.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

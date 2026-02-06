@@ -16,6 +16,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <utility>
+
 #include "CXXABI.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
@@ -37,12 +44,16 @@
 #include "llvm/ADT/iterator.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "clang/AST/CharUnits.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class IdentifierInfo;
+}  // namespace clang
 
 using namespace clang;
 

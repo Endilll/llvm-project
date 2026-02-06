@@ -12,7 +12,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/LifetimeSafety/Checker.h"
-#include "clang/AST/Attrs.inc"
+
+#include <vector>
+
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
@@ -25,7 +28,6 @@
 #include "clang/Analysis/Analyses/LifetimeSafety/Origins.h"
 #include "clang/Analysis/Analyses/PostOrderCFGView.h"
 #include "clang/Analysis/AnalysisDeclContext.h"
-#include "clang/Analysis/CFG.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
@@ -33,6 +35,18 @@
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TimeProfiler.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/Analysis/Analyses/LifetimeSafety/Utils.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class CFGBlock;
+}  // namespace clang
 
 namespace clang::lifetimes::internal {
 

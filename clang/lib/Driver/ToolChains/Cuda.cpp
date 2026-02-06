@@ -7,6 +7,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "Cuda.h"
+
+#include <cassert>
+#include <cstdint>
+#include <initializer_list>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+#include <bitset>
+
 #include "clang/Basic/Cuda.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
@@ -39,20 +51,21 @@
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
-#include "llvm/Support/Process.h"
 #include "llvm/Support/Program.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/TargetParser/Host.h"
-#include "llvm/TargetParser/TargetParser.h"
-#include <cassert>
-#include <cstdint>
-#include <initializer_list>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

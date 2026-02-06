@@ -7,18 +7,25 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/StandaloneDiagnostic.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/FileManager.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Lex/Lexer.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/StringMap.h"
+
 #include <cassert>
 #include <iterator>
 #include <utility>
 
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Lex/Lexer.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/StringMap.h"
+#include "clang/Basic/FileEntry.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+
 namespace clang {
+class LangOptions;
 
 StandaloneDiagnostic::SourceOffsetRange::SourceOffsetRange(
     CharSourceRange Range, const SourceManager &SrcMgr,

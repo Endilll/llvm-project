@@ -13,9 +13,11 @@
 #ifndef LLVM_CLANG_AST_DECLGROUP_H
 #define LLVM_CLANG_AST_DECLGROUP_H
 
-#include "llvm/Support/TrailingObjects.h"
 #include <cassert>
 #include <cstdint>
+
+#include "llvm/Support/TrailingObjects.h"
+#include "llvm/ADT/ArrayRef.h"
 
 namespace clang {
 

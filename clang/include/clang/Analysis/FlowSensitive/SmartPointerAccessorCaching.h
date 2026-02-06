@@ -26,14 +26,22 @@
 
 #include <cassert>
 
-#include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/Analysis/FlowSensitive/MatchSwitch.h"
-#include "clang/Analysis/FlowSensitive/StorageLocation.h"
-#include "clang/Analysis/FlowSensitive/Value.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace clang {
+class FunctionDecl;
+namespace dataflow {
+class PointerValue;
+class RecordStorageLocation;
+class StorageLocation;
+class Value;
+template <typename LatticeT> struct TransferState;
+}  // namespace dataflow
+}  // namespace clang
 
 namespace clang::dataflow {
 

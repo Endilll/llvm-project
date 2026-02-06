@@ -7,14 +7,23 @@
 //===----------------------------------------------------------------------===//
 
 #include "DynamicAllocator.h"
-#include "ByteCode/Descriptor.h"
-#include "InterpBlock.h"
-#include "InterpState.h"
-#include "llvm/ADT/STLExtras.h"
+
 #include <cassert>
 #include <cstddef>
 #include <memory>
 #include <utility>
+#include <new>
+
+#include "ByteCode/Descriptor.h"
+#include "InterpBlock.h"
+#include "llvm/ADT/STLExtras.h"
+#include "ByteCode/Pointer.h"
+
+namespace clang {
+namespace interp {
+enum PrimType : uint8_t;
+}  // namespace interp
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::interp;

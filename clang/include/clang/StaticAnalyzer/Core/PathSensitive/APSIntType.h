@@ -9,10 +9,12 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_APSINTTYPE_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_APSINTTYPE_H
 
-#include "llvm/ADT/APSInt.h"
-#include "llvm/Support/Compiler.h"
 #include <cstdint>
 #include <tuple>
+
+#include "llvm/ADT/APSInt.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/ADT/APInt.h"
 
 namespace clang {
 namespace ento {

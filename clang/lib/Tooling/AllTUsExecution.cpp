@@ -7,6 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/AllTUsExecution.h"
+
+#include <memory>
+#include <mutex>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Serialization/PCHContainerOperations.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
@@ -24,11 +31,10 @@
 #include "llvm/Support/Threading.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <mutex>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 namespace tooling {

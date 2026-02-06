@@ -12,16 +12,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Rewrite/Core/TokenRewriter.h"
+
+#include <cassert>
+#include <cstring>
+#include <map>
+#include <utility>
+
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Lexer.h"
 #include "clang/Lex/ScratchBuffer.h"
 #include "clang/Lex/Token.h"
-#include <cassert>
-#include <cstring>
-#include <map>
-#include <utility>
+#include "llvm/Support/MemoryBufferRef.h"
 
 using namespace clang;
 

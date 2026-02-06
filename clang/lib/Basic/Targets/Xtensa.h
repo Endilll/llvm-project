@@ -15,17 +15,25 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_XTENSA_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_XTENSA_H
 
+#include <string>
+#include <string_view>
+
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/TargetParser/Triple.h"
-
 #include "clang/Basic/Builtins.h"
-#include "clang/Basic/MacroBuilder.h"
-#include "clang/Basic/TargetBuiltins.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 
 class LLVM_LIBRARY_VISIBILITY XtensaTargetInfo : public TargetInfo {

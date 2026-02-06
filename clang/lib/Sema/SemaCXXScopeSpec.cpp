@@ -10,6 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstring>
+#include <memory>
+#include <optional>
+#include <new>
+#include <string>
+
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/CanonicalType.h"
@@ -17,10 +24,8 @@
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/DeclarationName.h"
-#include "clang/AST/ExprCXX.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/TemplateBase.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -38,10 +43,16 @@
 #include "clang/Sema/TypoCorrection.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstring>
-#include <memory>
-#include <optional>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
+
 using namespace clang;
 
 /// Find the current instantiation that associated with the given type.

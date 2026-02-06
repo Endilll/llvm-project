@@ -12,26 +12,28 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Rewrite/Core/Rewriter.h"
+
+#include <cassert>
+#include <iterator>
+#include <map>
+#include <string>
+#include <utility>
+#include <functional>
+
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Lex/Lexer.h"
 #include "llvm/ADT/RewriteBuffer.h"
-#include "llvm/ADT/RewriteRope.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/IOSandbox.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <iterator>
-#include <map>
-#include <string>
-#include <utility>
+#include "clang/Basic/FileManager.h"
 
 using namespace clang;
 using llvm::RewriteBuffer;

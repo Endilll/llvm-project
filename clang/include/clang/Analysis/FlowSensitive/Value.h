@@ -14,16 +14,21 @@
 #ifndef LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_VALUE_H
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_VALUE_H
 
+#include <cassert>
+
 #include "clang/Analysis/FlowSensitive/Formula.h"
-#include "clang/Analysis/FlowSensitive/StorageLocation.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/iterator_range.h"
-#include <cassert>
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 namespace dataflow {
+class StorageLocation;
 
 /// Base class for all values computed by abstract interpretation.
 ///

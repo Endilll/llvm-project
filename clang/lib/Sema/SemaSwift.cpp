@@ -11,12 +11,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaSwift.h"
+
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <tuple>
+
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclObjC.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/AttributeCommonInfo.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/DiagnosticSema.h"
@@ -31,12 +35,17 @@
 #include "clang/Sema/SemaObjC.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <tuple>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
+class Expr;
+
 SemaSwift::SemaSwift(Sema &S) : SemaBase(S) {}
 
 SwiftNameAttr *SemaSwift::mergeNameAttr(Decl *D, const SwiftNameAttr &SNA,

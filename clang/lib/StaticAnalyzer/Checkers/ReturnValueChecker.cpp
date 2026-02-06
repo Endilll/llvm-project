@@ -16,6 +16,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <optional>
+#include <string>
+#include <tuple>
+
 #include "clang/AST/DeclCXX.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
@@ -27,8 +31,14 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "llvm/Support/FormatVariadic.h"
-#include <optional>
-#include <string>
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FormatVariadicDetails.h"
 
 using namespace clang;
 using namespace ento;

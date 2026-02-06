@@ -13,26 +13,29 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGBLOCKS_H
 #define LLVM_CLANG_LIB_CODEGEN_CGBLOCKS_H
 
-#include "CGBuilder.h"
-#include "CGCall.h"
-#include "CGValue.h"
-#include "CodeGenFunction.h"
-#include "CodeGenTypes.h"
+#include <assert.h>
+#include <stdint.h>
+
 #include "clang/AST/CharUnits.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
-#include "clang/AST/ExprObjC.h"
 #include "clang/AST/Type.h"
-#include "clang/Basic/TargetInfo.h"
+#include "Address.h"
+#include "EHScopeStack.h"
+#include "clang/AST/Decl.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace llvm {
 class Value;
+class StructType;
 }
 
 namespace clang {
-namespace CodeGen {
+class BlockExpr;
 
-class CGBlockInfo;
+namespace CodeGen {
 
 // Flags stored in __block variables.
 enum BlockByrefFlags {

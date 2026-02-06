@@ -14,13 +14,19 @@
 #ifndef LLVM_CLANG_AST_OSLOG_H
 #define LLVM_CLANG_AST_OSLOG_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Expr.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/STLExtras.h"
 #include <cassert>
 
+#include "clang/AST/ASTContext.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/STLExtras.h"
+#include "clang/AST/CharUnits.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
 namespace clang {
+class CallExpr;
+class Expr;
+
 namespace analyze_os_log {
 
 /// An OSLogBufferItem represents a single item in the data written by a call

@@ -7,17 +7,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/FlowSensitive/FormulaSerialization.h"
+
+#include <cstddef>
+#include <stack>
+#include <vector>
+#include <string>
+
 #include "clang/Analysis/FlowSensitive/Arena.h"
 #include "clang/Analysis/FlowSensitive/Formula.h"
-#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <stack>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang::dataflow {
 

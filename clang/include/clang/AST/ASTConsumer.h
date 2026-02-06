@@ -15,13 +15,11 @@
 
 namespace clang {
   class ASTContext;
-  class CXXMethodDecl;
   class CXXRecordDecl;
   class Decl;
   class DeclGroupRef;
   class ASTMutationListener;
   class ASTDeserializationListener; // layering violation because void* is ugly
-  class SemaConsumer; // layering violation required for safe SemaConsumer
   class TagDecl;
   class DeclaratorDecl;
   class VarDecl;

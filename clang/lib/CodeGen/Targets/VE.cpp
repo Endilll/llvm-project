@@ -6,14 +6,23 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cstdint>
+#include <memory>
+
 #include "ABIInfoImpl.h"
 #include "CodeGenModule.h"
-#include "CodeGenTypes.h"
 #include "TargetInfo.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
-#include <cstdint>
-#include <memory>
+#include "ABIInfo.h"
+#include "clang/AST/ASTContext.h"
+#include "llvm/ADT/ArrayRef.h"
+
+namespace clang {
+namespace CodeGen {
+class CodeGenTypes;
+}  // namespace CodeGen
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::CodeGen;

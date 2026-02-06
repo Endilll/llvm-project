@@ -7,7 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/MakeSupport.h"
+
 #include "clang/Basic/LLVM.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 
 void clang::quoteMakeTarget(StringRef Target, SmallVectorImpl<char> &Res) {
   for (unsigned i = 0, e = Target.size(); i != e; ++i) {

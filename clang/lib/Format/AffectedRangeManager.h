@@ -14,9 +14,13 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_AFFECTEDRANGEMANAGER_H
 #define LLVM_CLANG_LIB_FORMAT_AFFECTEDRANGEMANAGER_H
 
-#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
 
 namespace clang {
+class SourceManager;
+
 namespace format {
 
 struct FormatToken;

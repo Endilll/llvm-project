@@ -19,12 +19,14 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_INTERVALPARTITION_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_INTERVALPARTITION_H
 
-#include "clang/Analysis/CFG.h"
-#include "llvm/ADT/DenseSet.h"
 #include <deque>
 #include <optional>
 #include <utility>
 #include <vector>
+
+#include "clang/Analysis/CFG.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 /// A _weak topological ordering_ (WTO) of CFG nodes provides a total order over

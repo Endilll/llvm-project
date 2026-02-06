@@ -11,10 +11,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+
 #include "CGCall.h"
 #include "CodeGenFunction.h"
 #include "CodeGenModule.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/GlobalDecl.h"
@@ -23,7 +25,20 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/IR/Attributes.h"
-#include <cassert>
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "llvm/IR/Function.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+namespace CodeGen {
+class CGFunctionInfo;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class FunctionType;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

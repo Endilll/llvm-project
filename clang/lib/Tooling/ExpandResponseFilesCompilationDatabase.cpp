@@ -6,20 +6,21 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Tooling/CompilationDatabase.h"
 #include "clang/Tooling/Tooling.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/CommandLine.h"
-#include "llvm/Support/ConvertUTF.h"
 #include "llvm/TargetParser/Host.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/Support/VirtualFileSystem.h"
 
 namespace clang {
 namespace tooling {

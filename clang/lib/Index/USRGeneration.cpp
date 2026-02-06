@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Index/USRGeneration.h"
+
+#include <cassert>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -28,7 +31,19 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace clang::index;
@@ -761,10 +776,12 @@ void USRGenerator::VisitType(QualType T) {
         case BuiltinType::Id: \
           Out << "@BT@" << #Suffix << "_" << #ImgType; break;
 #include "clang/Basic/OpenCLImageTypes.def"
+
 #define EXT_OPAQUE_TYPE(ExtType, Id, Ext) \
         case BuiltinType::Id: \
           Out << "@BT@" << #ExtType; break;
 #include "clang/Basic/OpenCLExtensionTypes.def"
+
         case BuiltinType::OCLEvent:
           Out << "@BT@OCLEvent"; break;
         case BuiltinType::OCLClkEvent:
@@ -780,26 +797,32 @@ void USRGenerator::VisitType(QualType T) {
     Out << "@BT@" << #Name;                                                    \
     break;
 #include "clang/Basic/AArch64ACLETypes.def"
+
 #define PPC_VECTOR_TYPE(Name, Id, Size) \
         case BuiltinType::Id: \
           Out << "@BT@" << #Name; break;
 #include "clang/Basic/PPCTypes.def"
+
 #define RVV_TYPE(Name, Id, SingletonId) \
         case BuiltinType::Id: \
           Out << "@BT@" << Name; break;
 #include "clang/Basic/RISCVVTypes.def"
+
 #define WASM_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/WebAssemblyReferenceTypes.def"
+
 #define AMDGPU_TYPE(Name, Id, SingletonId, Width, Align)                       \
   case BuiltinType::Id:                                                        \
     Out << "@BT@" << #Name;                                                    \
     break;
 #include "clang/Basic/AMDGPUTypes.def"
+
 #define HLSL_INTANGIBLE_TYPE(Name, Id, SingletonId)                            \
   case BuiltinType::Id:                                                        \
     Out << "@BT@" << #Name;                                                    \
     break;
 #include "clang/Basic/HLSLIntangibleTypes.def"
+
         case BuiltinType::ShortAccum:
           Out << "@BT@ShortAccum"; break;
         case BuiltinType::Accum:
@@ -861,6 +884,7 @@ void USRGenerator::VisitType(QualType T) {
 #define BUILTIN_TYPE(Id, SingletonId)
 #define PLACEHOLDER_TYPE(Id, SingletonId) case BuiltinType::Id:
 #include "clang/AST/BuiltinTypes.def"
+
         case BuiltinType::Dependent:
           // If you're adding a new builtin type, please add its name prefixed
           // with "@BT@" to `Out` (see cases above).

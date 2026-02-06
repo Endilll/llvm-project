@@ -14,6 +14,16 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <optional>
+#include <string>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
@@ -34,8 +44,6 @@
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TemplateName.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/AST/TypeLoc.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/ExceptionSpecificationType.h"
@@ -62,14 +70,22 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/RISCVTargetParser.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/ASTConcept.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 
@@ -628,6 +644,7 @@ private:
   void mangleCXXDtorType(CXXDtorType T);
 
   struct TemplateArgManglingInfo;
+
   void mangleTemplateArgs(TemplateName TN,
                           const TemplateArgumentLoc *TemplateArgs,
                           unsigned NumTemplateArgs);
@@ -3407,6 +3424,7 @@ void CXXNameMangler::mangleType(const BuiltinType *T) {
 #define PLACEHOLDER_TYPE(Id, SingletonId) \
   case BuiltinType::Id:
 #include "clang/AST/BuiltinTypes.def"
+
   case BuiltinType::Dependent:
     if (!NullOut)
       llvm_unreachable("mangling a placeholder type");
@@ -3426,6 +3444,7 @@ void CXXNameMangler::mangleType(const BuiltinType *T) {
     Out << type_name.size() << type_name; \
     break;
 #include "clang/Basic/OpenCLImageTypes.def"
+
   case BuiltinType::OCLSampler:
     Out << "11ocl_sampler";
     break;
@@ -3447,6 +3466,7 @@ void CXXNameMangler::mangleType(const BuiltinType *T) {
     Out << type_name.size() << type_name; \
     break;
 #include "clang/Basic/OpenCLExtensionTypes.def"
+
   // The SVE types are effectively target-specific.  The mangling scheme
   // is defined in the appendices to the Procedure Call Standard for the
   // Arm Architecture.
@@ -3477,27 +3497,32 @@ void CXXNameMangler::mangleType(const BuiltinType *T) {
     Out << (type_name == #Name ? "u" : "") << type_name.size() << type_name;   \
     break;
 #include "clang/Basic/AArch64ACLETypes.def"
+
 #define PPC_VECTOR_TYPE(Name, Id, Size)                                        \
   case BuiltinType::Id:                                                        \
     mangleVendorType(#Name);                                                   \
     break;
 #include "clang/Basic/PPCTypes.def"
+
     // TODO: Check the mangling scheme for RISC-V V.
 #define RVV_TYPE(Name, Id, SingletonId)                                        \
   case BuiltinType::Id:                                                        \
     mangleVendorType(Name);                                                    \
     break;
 #include "clang/Basic/RISCVVTypes.def"
+
 #define WASM_REF_TYPE(InternalName, MangledName, Id, SingletonId, AS)          \
   case BuiltinType::Id:                                                        \
     mangleVendorType(MangledName);                                             \
     break;
 #include "clang/Basic/WebAssemblyReferenceTypes.def"
+
 #define AMDGPU_TYPE(Name, Id, SingletonId, Width, Align)                       \
   case BuiltinType::Id:                                                        \
     mangleVendorType(Name);                                                    \
     break;
 #include "clang/Basic/AMDGPUTypes.def"
+
 #define HLSL_INTANGIBLE_TYPE(Name, Id, SingletonId)                            \
   case BuiltinType::Id:                                                        \
     mangleVendorType(#Name);                                                   \

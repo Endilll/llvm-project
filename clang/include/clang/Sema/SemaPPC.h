@@ -13,13 +13,15 @@
 #ifndef LLVM_CLANG_SEMA_SEMAPPC_H
 #define LLVM_CLANG_SEMA_SEMAPPC_H
 
-#include "clang/AST/ASTFwd.h"
-#include "clang/AST/Type.h"
-#include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/SemaBase.h"
 
 namespace clang {
 class TargetInfo;
+class CallExpr;
+class Expr;
+class QualType;
+class Sema;
+class SourceLocation;
 
 class SemaPPC : public SemaBase {
 public:

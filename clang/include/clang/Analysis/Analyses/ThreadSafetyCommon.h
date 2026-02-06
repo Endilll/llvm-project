@@ -21,10 +21,14 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_THREADSAFETYCOMMON_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_THREADSAFETYCOMMON_H
 
+#include <functional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/ExprObjC.h"
-#include "clang/AST/Type.h"
 #include "clang/Analysis/Analyses/PostOrderCFGView.h"
 #include "clang/Analysis/Analyses/ThreadSafetyTIL.h"
 #include "clang/Analysis/Analyses/ThreadSafetyTraverse.h"
@@ -37,28 +41,21 @@
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/Support/raw_ostream.h"
-#include <functional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 
-class AbstractConditionalOperator;
-class ArraySubscriptExpr;
-class BinaryOperator;
-class CallExpr;
-class CastExpr;
 class CXXDestructorDecl;
 class CXXMemberCallExpr;
 class CXXOperatorCallExpr;
 class CXXThisExpr;
-class DeclRefExpr;
 class DeclStmt;
-class Expr;
-class MemberExpr;
 class Stmt;
-class UnaryOperator;
+class ObjCIvarRefExpr;
+class QualType;
 
 namespace threadSafety {
 

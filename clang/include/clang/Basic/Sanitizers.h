@@ -14,23 +14,21 @@
 #ifndef LLVM_CLANG_BASIC_SANITIZERS_H
 #define LLVM_CLANG_BASIC_SANITIZERS_H
 
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/bit.h"
-#include "llvm/Support/HashBuilder.h"
-#include "llvm/Transforms/Instrumentation/AddressSanitizerOptions.h"
 #include <cassert>
 #include <cstdint>
 #include <optional>
 #include <string>
 #include <vector>
 
+#include "clang/Basic/LLVM.h"
+#include "llvm/Transforms/Instrumentation/AddressSanitizerOptions.h"
+
 namespace llvm {
 class hash_code;
-class Triple;
-namespace opt {
-class ArgList;
-}
+class StringRef;
+enum class endianness;
+template <typename HasherT, llvm::endianness Endianness> class HashBuilder;
+template <typename T> class SmallVectorImpl;
 } // namespace llvm
 
 namespace clang {

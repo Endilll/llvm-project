@@ -14,8 +14,20 @@
 #ifndef LLVM_CLANG_LEX_PREPROCESSOR_H
 #define LLVM_CLANG_LEX_PREPROCESSOR_H
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <new>
+
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/IdentifierTable.h"
@@ -25,7 +37,6 @@
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TokenKinds.h"
-#include "clang/Lex/DependencyDirectivesScanner.h"
 #include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/Lexer.h"
 #include "clang/Lex/MacroInfo.h"
@@ -53,42 +64,26 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Registry.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
-
-namespace llvm {
-
-template<unsigned InternalLen> class SmallString;
-
-} // namespace llvm
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 
 class CodeCompletionHandler;
 class CommentHandler;
-class DirectoryEntry;
 class EmptylineHandler;
 class ExternalPreprocessorSource;
-class FileEntry;
 class FileManager;
-class HeaderSearch;
 class MacroArgs;
-class PragmaHandler;
-class PragmaNamespace;
 class PreprocessingRecord;
 class PreprocessorLexer;
 class PreprocessorOptions;
 class ScratchBuffer;
 class TargetInfo;
 class NoTrivialPPDirectiveTracer;
+class DependencyDirectivesGetter;
+class Preprocessor;
 
 namespace Builtin {
 class Context;

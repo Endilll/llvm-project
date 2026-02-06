@@ -13,12 +13,23 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_MSP430_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_MSP430_H
 
+#include <string_view>
+
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/TargetParser/Triple.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 
 class LLVM_LIBRARY_VISIBILITY MSP430TargetInfo : public TargetInfo {

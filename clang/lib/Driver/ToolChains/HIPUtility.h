@@ -10,9 +10,21 @@
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_HIPUTILITY_H
 
 #include "clang/Driver/Tool.h"
+#include "clang/Basic/LLVM.h"
+
+namespace llvm {
+class StringRef;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Compilation;
+class InputInfo;
+class JobAction;
+
 namespace tools {
 namespace HIP {
 

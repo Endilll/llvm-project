@@ -11,9 +11,24 @@
 //===----------------------------------------------------------------------===//
 
 #include "CodeGenModule.h"
+
+#include <algorithm>
+#include <climits>
+#include <ctime>
+#include <functional>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+#include <array>
+#include <initializer_list>
+#include <system_error>
+
 #include "ABIInfo.h"
 #include "Address.h"
-#include "CGBlocks.h"
 #include "CGCUDARuntime.h"
 #include "CGCXXABI.h"
 #include "CGCall.h"
@@ -34,7 +49,6 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
@@ -49,10 +63,8 @@
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/GlobalDecl.h"
 #include "clang/AST/Mangle.h"
-#include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/AST/StmtVisitor.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Builtins.h"
@@ -94,7 +106,6 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringSwitch.h"
-#include "llvm/Analysis/TargetLibraryInfo.h"
 #include "llvm/BinaryFormat/ELF.h"
 #include "llvm/Frontend/Debug/Options.h"
 #include "llvm/Frontend/Driver/CodeGenOptions.h"
@@ -143,20 +154,41 @@
 #include "llvm/TargetParser/X86TargetParser.h"
 #include "llvm/Transforms/Utils/BuildLibCalls.h"
 #include "llvm/Transforms/Utils/SanitizerStats.h"
-#include <algorithm>
-#include <cassert>
-#include <climits>
-#include <cstddef>
-#include <cstdint>
-#include <ctime>
-#include <functional>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <utility>
-#include <vector>
+#include "CGBuilder.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/Redeclarable.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/NoSanitizeList.h"
+#include "clang/Basic/PointerAuthOptions.h"
+#include "clang/Basic/TargetOptions.h"
+#include "clang/Basic/Version.inc"
+#include "clang/Basic/XRayLists.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/IR/DebugLoc.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Use.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/TypeSize.h"
+#include "llvm/Support/VirtualFileSystem.h"
+
+namespace clang {
+namespace CodeGen {
+class CGFunctionInfo;
+}  // namespace CodeGen
+struct PrintingPolicy;
+}  // namespace clang
 
 using namespace clang;
 using namespace CodeGen;

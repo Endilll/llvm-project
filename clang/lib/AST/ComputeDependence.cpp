@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ComputeDependence.h"
+
+#include <cassert>
+#include <utility>
+#include <initializer_list>
+#include <optional>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -29,8 +35,18 @@
 #include "clang/Basic/TypeTraits.h"
 #include "clang/Basic/UnsignedOrNone.h"
 #include "llvm/ADT/ArrayRef.h"
-#include <cassert>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTConcept.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

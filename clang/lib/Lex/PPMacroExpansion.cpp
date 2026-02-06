@@ -11,6 +11,22 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <ctime>
+#include <iomanip>
+#include <limits>
+#include <locale>
+#include <memory>
+#include <optional>
+#include <sstream>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/AttributeCommonInfo.h"
 #include "clang/Basic/Attributes.h"
 #include "clang/Basic/Builtins.h"
@@ -25,7 +41,6 @@
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Lex/CodeCompletionHandler.h"
-#include "clang/Lex/DirectoryLookup.h"
 #include "clang/Lex/ExternalPreprocessorSource.h"
 #include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/Lexer.h"
@@ -53,21 +68,17 @@
 #include "llvm/Support/Format.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <ctime>
-#include <iomanip>
-#include <limits>
-#include <locale>
-#include <memory>
-#include <optional>
-#include <sstream>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/Basic/Module.h"
+#include "clang/Basic/TargetOptions.h"
+#include "clang/Basic/TokenKinds.h"
+#include "clang/Lex/MultipleIncludeOpt.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/TinyPtrVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 

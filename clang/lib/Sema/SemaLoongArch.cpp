@@ -11,13 +11,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaLoongArch.h"
-#include "clang/AST/Expr.h"
+
 #include "clang/Basic/TargetBuiltins.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaBase.h"
 #include "llvm/Support/MathExtras.h"
 
 namespace clang {
+class CallExpr;
 
 SemaLoongArch::SemaLoongArch(Sema &S) : SemaBase(S) {}
 

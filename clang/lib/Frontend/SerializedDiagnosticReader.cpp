@@ -7,6 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/SerializedDiagnosticReader.h"
+
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <initializer_list>
+#include <memory>
+
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/FileSystemOptions.h"
 #include "clang/Basic/LLVM.h"
@@ -18,11 +27,8 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/ManagedStatic.h"
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/MemoryBufferRef.h"
 
 using namespace clang;
 using namespace serialized_diags;

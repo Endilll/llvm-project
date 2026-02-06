@@ -6,9 +6,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/AST/TemplateBase.h"
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
+class TemplateArgument;
+
 namespace serialization {
 
 /// Calculate a stable hash value for template arguments. We guarantee that

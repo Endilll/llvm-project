@@ -13,16 +13,23 @@
 #ifndef LLVM_CLANG_BASIC_PROFILELIST_H
 #define LLVM_CLANG_BASIC_PROFILELIST_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/Frontend/Driver/CodeGenOptions.h"
 #include <memory>
 #include <optional>
 #include <string>
 
+#include "clang/Basic/LLVM.h"
+#include "llvm/Frontend/Driver/CodeGenOptions.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class ArrayRef;
+}  // namespace llvm
+
 namespace clang {
 
 class ProfileSpecialCaseList;
+class SourceLocation;
+class SourceManager;
 
 class ProfileList {
 public:

@@ -11,21 +11,37 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ASTContext.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <initializer_list>
+#include <new>
+
 #include "ByteCode/Context.h"
 #include "CXXABI.h"
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTMutationListener.h"
 #include "clang/AST/ASTStructuralEquivalence.h"
-#include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/AttrIterator.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Comment.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclContextInternals.h"
+#include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclID.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclObjCCommon.h"
@@ -43,7 +59,6 @@
 #include "clang/AST/RawCommentList.h"
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/SYCLKernelInfo.h"
-#include "clang/AST/Stmt.h"
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
@@ -100,19 +115,16 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/AArch64TargetParser.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstdlib>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/OpenMPClause.h"
+#include "clang/Basic/Sanitizers.h"
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
 
 using namespace clang;
 

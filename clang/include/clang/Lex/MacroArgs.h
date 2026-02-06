@@ -13,10 +13,14 @@
 #ifndef LLVM_CLANG_LEX_MACROARGS_H
 #define LLVM_CLANG_LEX_MACROARGS_H
 
-#include "clang/Basic/LLVM.h"
+#include <vector>
+
 #include "clang/Lex/Token.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <vector>
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
   class MacroInfo;

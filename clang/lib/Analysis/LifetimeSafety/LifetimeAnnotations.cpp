@@ -6,6 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Analysis/Analyses/LifetimeSafety/LifetimeAnnotations.h"
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -20,6 +21,12 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringSet.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Redeclarable.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang::lifetimes {
 

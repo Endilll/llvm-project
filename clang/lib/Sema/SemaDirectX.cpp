@@ -9,11 +9,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaDirectX.h"
-#include "clang/AST/Expr.h"
-#include "clang/Sema/Sema.h"
+
 #include "clang/Sema/SemaBase.h"
 
 namespace clang {
+class CallExpr;
+class Sema;
 
 SemaDirectX::SemaDirectX(Sema &S) : SemaBase(S) {}
 

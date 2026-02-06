@@ -11,13 +11,18 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Lex/Preprocessor.h"
-#include "clang/Lex/Token.h"
 #include <cassert>
 #include <cstddef>
 #include <utility>
+#include <vector>
+
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/Token.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+
 using namespace clang;
 
 std::pair<Preprocessor::CachedTokensTy::size_type, bool>

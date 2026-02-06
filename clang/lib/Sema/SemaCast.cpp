@@ -13,8 +13,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <optional>
+#include <set>
+#include <string>
+#include <iterator>
+#include <list>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTStructuralEquivalence.h"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
@@ -23,7 +30,6 @@
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/RecordLayout.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/AttrKinds.h"
 #include "clang/Basic/Diagnostic.h"
@@ -52,10 +58,27 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <optional>
-#include <set>
-#include <string>
+#include "clang/AST/APValue.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/OpenCLOptions.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
+
 using namespace clang;
 
 

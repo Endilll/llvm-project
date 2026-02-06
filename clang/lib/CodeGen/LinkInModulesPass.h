@@ -15,13 +15,15 @@
 #ifndef LLVM_BITCODE_LINKINMODULESPASS_H
 #define LLVM_BITCODE_LINKINMODULESPASS_H
 
-#include "BackendConsumer.h"
 #include "llvm/IR/PassManager.h"
+#include "llvm/IR/Analysis.h"
+
+namespace clang {
+class BackendConsumer;
+}  // namespace clang
 
 namespace llvm {
 class Module;
-class ModulePass;
-class Pass;
 
 /// Create and return a pass that links in Moduels from a provided
 /// BackendConsumer to a given primary Module. Note that this pass is designed

@@ -11,8 +11,18 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <map>
+#include <vector>
+
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticLex.h"
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
@@ -38,14 +48,23 @@
 #include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
+#include "clang/Basic/DiagnosticLexInterface.inc"
+#include "clang/Basic/Module.h"
+#include "clang/Lex/DependencyDirectivesScanner.h"
+#include "clang/Lex/MultipleIncludeOpt.h"
+#include "clang/Lex/PreprocessorLexer.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class MacroArgs;
+}  // namespace clang
 
 using namespace clang;
 

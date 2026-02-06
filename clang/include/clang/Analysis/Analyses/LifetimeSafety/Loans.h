@@ -14,17 +14,26 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_LOANS_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_LOANS_H
 
-#include "clang/AST/Decl.h"
+#include <cassert>
+#include <cstdint>
+#include <new>
+#include <type_traits>
+#include <utility>
+
+#include "clang/Analysis/Analyses/LifetimeSafety/Utils.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/ExprCXX.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/Utils.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
+
+namespace clang {
+class Expr;
+class ParmVarDecl;
+class ValueDecl;
+}  // namespace clang
 
 namespace clang::lifetimes::internal {
 

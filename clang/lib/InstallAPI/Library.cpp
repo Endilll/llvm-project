@@ -7,10 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/InstallAPI/Library.h"
+
+#include <cassert>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Regex.h"
-#include <cassert>
+#include "llvm/ADT/SmallVector.h"
 
 using namespace llvm;
 namespace clang::installapi {

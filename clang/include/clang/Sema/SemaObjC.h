@@ -13,7 +13,10 @@
 #ifndef LLVM_CLANG_SEMA_SEMAOBJC_H
 #define LLVM_CLANG_SEMA_SEMAOBJC_H
 
-#include "clang/AST/ASTFwd.h"
+#include <memory>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/NSAPI.h"
 #include "clang/AST/OperationKinds.h"
@@ -32,21 +35,40 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
-#include <memory>
-#include <utility>
+#include "clang/AST/DeclarationName.h"
+#include "clang/Sema/ParsedAttr.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 
 class AttributeCommonInfo;
 class AvailabilitySpec;
-enum class CheckedConversionKind;
 class DeclGroupRef;
 class LookupResult;
 struct ObjCDictionaryElement;
-class ParsedAttr;
-class ParsedAttributesView;
 class Scope;
-struct SkipBodyInfo;
+class Decl;
+class DeclContext;
+class Expr;
+class FormatAttr;
+class NamedDecl;
+class ObjCArrayLiteral;
+class ObjCDictionaryLiteral;
+class ObjCMessageExpr;
+class ParmVarDecl;
+class RecordDecl;
+class Stmt;
+class StringLiteral;
+class TypedefNameDecl;
+class ValueDecl;
+class VarDecl;
 
 class SemaObjC : public SemaBase {
 public:

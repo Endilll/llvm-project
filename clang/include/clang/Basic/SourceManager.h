@@ -34,6 +34,17 @@
 #ifndef LLVM_CLANG_BASIC_SOURCEMANAGER_H
 #define LLVM_CLANG_BASIC_SOURCEMANAGER_H
 
+#include <cassert>
+#include <cstddef>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <new>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileEntry.h"
@@ -52,20 +63,14 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/MemoryBufferRef.h"
-#include <cassert>
-#include <cstddef>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 
 class ASTReader;
 class ASTWriter;
-class FileManager;
 class LineTableInfo;
 class SourceManager;
 

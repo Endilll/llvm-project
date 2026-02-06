@@ -7,20 +7,27 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/CommentParser.h"
+
+#include <cassert>
+#include <cstring>
+#include <new>
+
 #include "clang/AST/Comment.h"
 #include "clang/AST/CommentCommandTraits.h"
 #include "clang/AST/CommentLexer.h"
 #include "clang/AST/CommentSema.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticComment.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstring>
+#include "clang/Basic/DiagnosticCommentInterface.inc"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 

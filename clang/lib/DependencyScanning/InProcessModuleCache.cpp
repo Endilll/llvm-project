@@ -8,12 +8,6 @@
 
 #include "clang/DependencyScanning/InProcessModuleCache.h"
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Serialization/InMemoryModuleCache.h"
-#include "clang/Serialization/ModuleCache.h"
-#include "llvm/Support/AdvisoryLock.h"
-#include "llvm/Support/Chrono.h"
-
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -22,6 +16,14 @@
 #include <mutex>
 #include <shared_mutex>
 #include <system_error>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/Serialization/InMemoryModuleCache.h"
+#include "clang/Serialization/ModuleCache.h"
+#include "llvm/Support/AdvisoryLock.h"
+#include "llvm/Support/Chrono.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Error.h"
 
 using namespace clang;
 using namespace dependencies;

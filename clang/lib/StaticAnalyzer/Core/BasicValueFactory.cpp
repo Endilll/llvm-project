@@ -13,15 +13,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/BasicValueFactory.h"
-#include "clang/AST/Decl.h"
+
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <utility>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/APSIntType.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/StoreRef.h"
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/APSInt.h"
@@ -31,10 +34,16 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <utility>
+#include "clang/AST/DeclCXX.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class NamedDecl;
+namespace ento {
+class TypedValueRegion;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

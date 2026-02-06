@@ -7,6 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ODRDiagsEmitter.h"
+
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <string>
+#include <utility>
+#include <tuple>
+#include <type_traits>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -29,11 +38,18 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/iterator.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <string>
-#include <utility>
+#include "clang/AST/Expr.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 

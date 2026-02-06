@@ -16,6 +16,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ASTMatchers/ASTMatchFinder.h"
+
+#include <cassert>
+#include <climits>
+#include <deque>
+#include <map>
+#include <memory>
+#include <optional>
+#include <set>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <new>
+#include <string>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTTypeTraits.h"
@@ -33,7 +48,6 @@
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/TemplateBase.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchersInternal.h"
@@ -50,17 +64,15 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/Timer.h"
-#include <cassert>
-#include <climits>
-#include <deque>
-#include <map>
-#include <memory>
-#include <optional>
-#include <set>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "clang/AST/Expr.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/TemplateName.h"
+#include "clang/AST/Type.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang {
 namespace ast_matchers {

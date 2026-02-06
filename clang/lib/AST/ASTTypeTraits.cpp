@@ -13,8 +13,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ASTTypeTraits.h"
+
 #include "clang/AST/ASTConcept.h"
-#include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -29,6 +29,8 @@
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
 #include "llvm/Support/ErrorHandling.h"
+#include "clang/Basic/AttrKinds.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 

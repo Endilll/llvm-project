@@ -13,9 +13,29 @@
 #ifndef LLVM_CLANG_AST_INTERP_FLOATING_H
 #define LLVM_CLANG_AST_INTERP_FLOATING_H
 
-#include "Primitives.h"
+#include <assert.h>
+#include <stdint.h>
+#include <cstddef>
+#include <cstring>
+#include <string>
+
 #include "clang/AST/APValue.h"
 #include "llvm/ADT/APFloat.h"
+#include "clang/AST/ComparisonCategories.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/raw_ostream.h"
+
+namespace clang {
+class ASTContext;
+}  // namespace clang
+namespace llvm {
+enum FPClassTest : unsigned int;
+enum class RoundingMode : int8_t;
+}  // namespace llvm
 
 // XXX This is just a debugging help. Setting this to 1 will heap-allocate ALL
 // floating values.

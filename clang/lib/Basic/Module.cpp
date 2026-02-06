@@ -12,6 +12,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/Module.h"
+
+#include <cassert>
+#include <functional>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
+#include <vector>
+#include <initializer_list>
+#include <iterator>
+
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/FileEntry.h"
@@ -29,13 +40,8 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <functional>
-#include <optional>
-#include <string>
-#include <utility>
-#include <variant>
-#include <vector>
+#include "llvm/ADT/SmallString.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 

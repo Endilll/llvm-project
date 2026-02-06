@@ -10,13 +10,17 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <utility>
+#include <optional>
+
 #include "CGVTables.h"
 #include "CodeGenModule.h"
 #include "CGCXXABI.h"
 #include "clang/AST/BaseSubobject.h"
 #include "clang/AST/GlobalDecl.h"
 #include "clang/AST/Mangle.h"
-#include "clang/AST/RecordLayout.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/AST/VTTBuilder.h"
 #include "clang/AST/VTableBuilder.h"
@@ -29,9 +33,26 @@
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/Support/Alignment.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <utility>
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/PointerAuthOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Module.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+
+namespace llvm {
+class Constant;
+class Value;
+}  // namespace llvm
+
 using namespace clang;
 using namespace CodeGen;
 

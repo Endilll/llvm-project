@@ -13,25 +13,30 @@
 #ifndef LLVM_CLANG_TOOLING_STANDALONEEXECUTION_H
 #define LLVM_CLANG_TOOLING_STANDALONEEXECUTION_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/FileManager.h"
+#include <memory>
+#include <optional>
+#include <string>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Serialization/PCHContainerOperations.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
 #include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/CompilationDatabase.h"
 #include "clang/Tooling/Execution.h"
 #include "clang/Tooling/Tooling.h"
 #include "llvm/ADT/ArrayRef.h"
-#include "llvm/Support/Error.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+template <typename T> class IntrusiveRefCntPtr;
+}  // namespace llvm
 
 namespace clang {
+class DiagnosticConsumer;
+class FileManager;
+
 namespace tooling {
+class CompilationDatabase;
 
 /// A standalone executor that runs FrontendActions on a given set of
 /// TUs in sequence.

@@ -14,11 +14,12 @@
 #ifndef LLVM_CLANG_AST_DECLFRIEND_H
 #define LLVM_CLANG_AST_DECLFRIEND_H
 
-#include "clang/AST/APValue.h"
+#include <cassert>
+#include <iterator>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclID.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/TypeBase.h"
@@ -30,12 +31,12 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <iterator>
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 
 class ASTContext;
+class GlobalDeclID;
 
 /// FriendDecl - Represents the declaration of a friend entity,
 /// which can be a function, a type, or a templated function or type.

@@ -7,8 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "DragonFly.h"
+
+#include <cassert>
+#include <memory>
+#include <string>
+
 #include "ToolChains/Gnu.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Driver/CommonArgs.h"
 #include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
@@ -19,8 +23,11 @@
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/Path.h"
-#include <cassert>
-#include <memory>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/OptSpecifier.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

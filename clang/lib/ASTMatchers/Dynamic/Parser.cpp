@@ -12,6 +12,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/ASTMatchers/Dynamic/Parser.h"
+
+#include <cassert>
+#include <cerrno>
+#include <cstddef>
+#include <cstdlib>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/ASTMatchers/ASTMatchersInternal.h"
 #include "clang/ASTMatchers/Dynamic/Diagnostics.h"
@@ -24,14 +34,10 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/ManagedStatic.h"
-#include <cassert>
-#include <cerrno>
-#include <cstddef>
-#include <cstdlib>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 namespace ast_matchers {

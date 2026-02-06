@@ -10,8 +10,22 @@
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_SPIRV_OPENMP_H
 
 #include "SPIRV.h"
-#include "clang/Driver/Tool.h"
-#include "clang/Driver/ToolChain.h"
+#include "clang/Driver/Action.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace clang {
+namespace driver {
+class Driver;
+class ToolChain;
+}  // namespace driver
+}  // namespace clang
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang::driver::toolchains {
 class LLVM_LIBRARY_VISIBILITY SPIRVOpenMPToolChain : public SPIRVToolChain {

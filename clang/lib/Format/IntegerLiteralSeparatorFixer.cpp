@@ -13,6 +13,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "IntegerLiteralSeparatorFixer.h"
+
+#include <algorithm>
+#include <cassert>
+#include <string>
+#include <utility>
+
 #include "AffectedRangeManager.h"
 #include "TokenAnalyzer.h"
 #include "clang/Basic/LLVM.h"
@@ -24,10 +30,9 @@
 #include "clang/Tooling/Core/Replacement.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Error.h"
-#include <algorithm>
-#include <cassert>
-#include <string>
-#include <utility>
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 namespace format {

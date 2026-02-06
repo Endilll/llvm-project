@@ -12,6 +12,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cctype>
+#include <memory>
+#include <optional>
+#include <stack>
+#include <string>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -57,14 +68,17 @@
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cctype>
-#include <memory>
-#include <optional>
-#include <stack>
-#include <string>
-#include <utility>
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/ASTMatchers/ASTMatchersInternal.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ConstraintManager.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/Twine.h"
+
+namespace clang {
+class LangOptions;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

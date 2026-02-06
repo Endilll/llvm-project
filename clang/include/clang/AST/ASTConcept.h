@@ -14,10 +14,13 @@
 #ifndef LLVM_CLANG_AST_ASTCONCEPT_H
 #define LLVM_CLANG_AST_ASTCONCEPT_H
 
+#include <cstddef>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/TemplateBase.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/UnsignedOrNone.h"
@@ -26,18 +29,22 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include "llvm/Support/raw_ostream.h"
-#include <cstddef>
-#include <utility>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 
-class ConceptDecl;
 class TemplateDecl;
 class ConceptReference;
 class Expr;
 class NamedDecl;
 struct PrintingPolicy;
+class ASTContext;
+class StreamingDiagnostic;
 
 /// Unsatisfied constraint expressions if the template arguments could be
 /// substituted into them, or a diagnostic if substitution resulted in

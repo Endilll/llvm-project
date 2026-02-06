@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/HeuristicResolver.h"
+
+#include <cstddef>
+#include <vector>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/Decl.h"
@@ -25,8 +29,10 @@
 #include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
-#include <cstddef>
-#include <vector>
+#include "clang/AST/DeclarationName.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 

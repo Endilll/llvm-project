@@ -7,6 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Transformer/Stencil.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <map>
+#include <system_error>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/Expr.h"
@@ -28,12 +38,11 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/Decl.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/TypeBase.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace transformer;

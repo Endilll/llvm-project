@@ -11,6 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Refactoring/Lookup.h"
+
+#include <cassert>
+#include <string>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -20,8 +25,12 @@
 #include "clang/Basic/SourceManager.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
-#include <cassert>
-#include <string>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/Casting.h"
+
 using namespace clang;
 using namespace clang::tooling;
 

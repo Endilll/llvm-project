@@ -11,8 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ExprObjC.h"
+
+#include <cassert>
+#include <cstdint>
+
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attr.h"
 #include "clang/AST/ComputeDependence.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/SelectorLocationsKind.h"
@@ -24,8 +27,8 @@
 #include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 

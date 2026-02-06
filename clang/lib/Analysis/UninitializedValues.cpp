@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/UninitializedValues.h"
+
+#include <algorithm>
+#include <cassert>
+#include <optional>
+#include <iterator>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -31,9 +37,15 @@
 #include "llvm/ADT/PackedVector.h"
 #include "llvm/ADT/SmallBitVector.h"
 #include "llvm/ADT/SmallVector.h"
-#include <algorithm>
-#include <cassert>
-#include <optional>
+#include "clang/AST/DeclTemplate.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class ASTContext;
+class ObjCMessageExpr;
+}  // namespace clang
 
 using namespace clang;
 

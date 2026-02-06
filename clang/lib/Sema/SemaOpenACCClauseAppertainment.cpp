@@ -11,8 +11,12 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstdint>
+#include <initializer_list>
+#include <string>
+
 #include "clang/Basic/DiagnosticSema.h"
-#include "clang/Basic/LLVM.h"
 #include "clang/Basic/OpenACCKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/SemaOpenACC.h"
@@ -20,10 +24,9 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/bit.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <initializer_list>
-#include <string>
+#include "clang/AST/OpenACCClause.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
 
 using namespace clang;
 

@@ -11,16 +11,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Frontend/AnalyzerHelpFlags.h"
+
+#include <memory>
+#include <string>
+#include <utility>
+#include <iterator>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
-#include "clang/StaticAnalyzer/Frontend/CheckerRegistry.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/Twine.h"
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/Frontend/FrontendOptions.h"
+#include "clang/StaticAnalyzer/Core/CheckerRegistryData.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/raw_ostream.h"
 
 using namespace clang;
 using namespace ento;
@@ -97,6 +103,7 @@ OPTIONS:
                   " in deep mode)").str()                                      \
     },
 #include "clang/StaticAnalyzer/Core/AnalyzerOptions.def"
+
 #undef ANALYZER_OPTION
 #undef ANALYZER_OPTION_DEPENDS_ON_USER_MODE
   };

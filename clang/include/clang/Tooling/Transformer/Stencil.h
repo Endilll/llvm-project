@@ -20,13 +20,15 @@
 #ifndef LLVM_CLANG_TOOLING_TRANSFORMER_STENCIL_H_
 #define LLVM_CLANG_TOOLING_TRANSFORMER_STENCIL_H_
 
-#include "clang/Tooling/Transformer/MatchConsumer.h"
-#include "clang/Tooling/Transformer/RangeSelector.h"
-#include "llvm/ADT/StringRef.h"
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+#include <iterator>
+
+#include "clang/Tooling/Transformer/MatchConsumer.h"
+#include "clang/Tooling/Transformer/RangeSelector.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 namespace transformer {

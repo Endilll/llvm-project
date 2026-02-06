@@ -13,14 +13,16 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_FUNCTIONSUMMARY_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_FUNCTIONSUMMARY_H
 
-#include "clang/AST/DeclBase.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/DenseSet.h"
-#include "llvm/ADT/SmallBitVector.h"
 #include <cassert>
 #include <deque>
 #include <optional>
 #include <utility>
+
+#include "clang/AST/DeclBase.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/SmallBitVector.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 namespace ento {

@@ -15,9 +15,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/DependencyDirectivesScanner.h"
+
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <utility>
+
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticLex.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/TokenKinds.h"
@@ -29,9 +34,12 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
-#include <cstddef>
-#include <optional>
+#include "clang/Basic/DiagnosticLexInterface.inc"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/raw_ostream.h"
 
 using namespace clang;
 using namespace clang::dependency_directives_scan;

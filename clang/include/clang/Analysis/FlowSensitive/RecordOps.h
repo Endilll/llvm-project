@@ -14,11 +14,11 @@
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_RECORDOPS_H
 
 #include "clang/AST/Type.h"
-#include "clang/Analysis/FlowSensitive/DataflowEnvironment.h"
-#include "clang/Analysis/FlowSensitive/StorageLocation.h"
 
 namespace clang {
 namespace dataflow {
+class Environment;
+class RecordStorageLocation;
 
 /// Copies a record (struct, class, or union) from `Src` to `Dst`.
 ///

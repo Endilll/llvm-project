@@ -12,9 +12,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Tooling.h"
+
+#include <cassert>
+#include <cstring>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+#include <functional>
+
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticFrontend.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/FileSystemOptions.h"
@@ -33,7 +41,6 @@
 #include "clang/Frontend/FrontendOptions.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
 #include "clang/Lex/HeaderSearchOptions.h"
-#include "clang/Lex/PreprocessorOptions.h"
 #include "clang/Options/OptionUtils.h"
 #include "clang/Options/Options.h"
 #include "clang/Tooling/ArgumentsAdjusters.h"
@@ -43,12 +50,10 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/Twine.h"
-#include "llvm/Option/ArgList.h"
 #include "llvm/Option/OptTable.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/CommandLine.h"
-#include "llvm/Support/Debug.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MemoryBuffer.h"
@@ -56,13 +61,16 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Host.h"
-#include <cassert>
-#include <cstring>
-#include <memory>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Driver/InputInfo.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorOr.h"
 
 #define DEBUG_TYPE "clang-tooling"
 

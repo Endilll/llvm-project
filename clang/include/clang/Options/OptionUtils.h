@@ -13,13 +13,14 @@
 #ifndef LLVM_CLANG_OPTIONS_OPTIONUTILS_H
 #define LLVM_CLANG_OPTIONS_OPTIONUTILS_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/Option/OptSpecifier.h"
 #include <cstdint>
 #include <string>
 
+#include "clang/Basic/LLVM.h"
+#include "llvm/Option/OptSpecifier.h"
+
 namespace llvm {
+class StringRef;
 
 namespace opt {
 
@@ -30,6 +31,7 @@ class ArgList;
 } // namespace llvm
 
 namespace clang {
+class DiagnosticsEngine;
 
 /// Return the value of the last argument as an integer, or a default. If Diags
 /// is non-null, emits an error if the argument is given, but non-integral.

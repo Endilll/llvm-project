@@ -11,14 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Parse/Parser.h"
+
+#include <cassert>
+#include <optional>
+#include <functional>
+#include <string>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/Stmt.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -27,7 +31,6 @@
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
-#include "clang/Basic/StackExhaustionHandler.h"
 #include "clang/Basic/TemplateKinds.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/ModuleLoader.h"
@@ -47,8 +50,22 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/TimeProfiler.h"
-#include <cassert>
-#include <optional>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/Pragma.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+struct PrintingPolicy;
+}  // namespace clang
+
 using namespace clang;
 
 

@@ -7,6 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/DiagnosticRenderer.h"
+
+#include <algorithm>
+#include <cassert>
+#include <iterator>
+#include <utility>
+#include <string>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/LLVM.h"
@@ -22,10 +29,8 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <iterator>
-#include <utility>
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 

@@ -14,20 +14,27 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_UNSAFEBUFFERUSAGE_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_UNSAFEBUFFERUSAGE_H
 
-#include "clang/AST/ASTTypeTraits.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/Stmt.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/SmallVector.h"
 #include <set>
 #include <string>
 #include <vector>
 
+#include "clang/AST/Decl.h"
+#include "clang/AST/Expr.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
 namespace clang {
+class ASTContext;
+class Decl;
+class DynTypedNode;
+class SourceLocation;
+class SourceManager;
+class Stmt;
 
 using VarGrpTy = std::vector<const VarDecl *>;
 using VarGrpRef = ArrayRef<const VarDecl *>;

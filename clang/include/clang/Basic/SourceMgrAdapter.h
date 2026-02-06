@@ -14,19 +14,23 @@
 #ifndef LLVM_CLANG_SOURCEMGRADAPTER_H
 #define LLVM_CLANG_SOURCEMGRADAPTER_H
 
-#include "clang/Basic/FileEntry.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/Support/SMLoc.h"
-#include "llvm/Support/SourceMgr.h"
 #include <optional>
 #include <utility>
+
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/Support/SourceMgr.h"
+
+namespace llvm {
+class SMLoc;
+class SMRange;
+}  // namespace llvm
 
 namespace clang {
 
 class DiagnosticsEngine;
-class FileEntry;
+class SourceManager;
 
 /// An adapter that can be used to translate diagnostics from one or more
 /// llvm::SourceMgr instances to a ,

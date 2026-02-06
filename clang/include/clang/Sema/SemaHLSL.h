@@ -13,7 +13,13 @@
 #ifndef LLVM_CLANG_SEMA_SEMAHLSL_H
 #define LLVM_CLANG_SEMA_SEMAHLSL_H
 
-#include "clang/AST/ASTFwd.h"
+#include <cassert>
+#include <cstdint>
+#include <initializer_list>
+#include <optional>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Type.h"
@@ -26,22 +32,36 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringSet.h"
 #include "llvm/Frontend/HLSL/HLSLRootSignature.h"
-#include "llvm/Support/DXILABI.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <cstdint>
-#include <initializer_list>
-#include <optional>
-#include <utility>
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+class StringRef;
+namespace dxil {
+enum class ResourceClass : uint8_t;
+}  // namespace dxil
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
-class AttributeCommonInfo;
-class IdentifierInfo;
 class InitializedEntity;
-class InitializationKind;
 class ParsedAttr;
 class Scope;
 class VarDecl;
+class CallExpr;
+class Decl;
+class DeclContext;
+class DeclaratorDecl;
+class Expr;
+class FunctionDecl;
+class HLSLRootSignatureDecl;
+class InitListExpr;
+class ParmVarDecl;
+class Sema;
+class TranslationUnitDecl;
 
 namespace hlsl {
 

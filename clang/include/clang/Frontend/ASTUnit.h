@@ -13,19 +13,26 @@
 #ifndef LLVM_CLANG_FRONTEND_ASTUNIT_H
 #define LLVM_CLANG_FRONTEND_ASTUNIT_H
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang-c/Index.h"
-#include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/DeclID.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileSystemOptions.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TargetOptions.h"
 #include "clang/Frontend/PrecompiledPreamble.h"
 #include "clang/Frontend/StandaloneDiagnostic.h"
 #include "clang/Lex/HeaderSearchOptions.h"
@@ -40,38 +47,29 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Bitstream/BitstreamWriter.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Sema/Sema.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/VirtualFileSystem.h"
 
 namespace llvm {
 
 class MemoryBuffer;
-
-namespace vfs {
-
-class FileSystem;
-
-} // namespace vfs
+class raw_ostream;
 } // namespace llvm
 
 namespace clang {
 
-class ASTContext;
 class ASTDeserializationListener;
 class ASTMutationListener;
 class ASTReader;
-class CodeGenOptions;
 class CompilerInstance;
 class CompilerInvocation;
-class Decl;
-class FileEntry;
-class FileManager;
 class FrontendAction;
 class HeaderSearch;
 class InputKind;
@@ -80,9 +78,11 @@ class PCHContainerOperations;
 class PCHContainerReader;
 class Preprocessor;
 class PreprocessorOptions;
-class Sema;
 class TargetInfo;
 class SyntaxOnlyAction;
+class ASTConsumer;
+class DiagnosticOptions;
+class TargetOptions;
 
 /// \brief Enumerates the available scopes for skipping function bodies.
 enum class SkipFunctionBodiesScope { None, Preamble, PreambleAndMainFile };

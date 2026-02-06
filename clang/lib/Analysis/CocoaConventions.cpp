@@ -11,12 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/DomainSpecific/CocoaConventions.h"
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/LLVM.h"
-#include "llvm/Support/ErrorHandling.h"
+#include "clang/Basic/IdentifierTable.h"
 
 using namespace clang;
 using namespace ento;

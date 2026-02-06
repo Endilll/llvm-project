@@ -7,12 +7,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Frontend/CheckerRegistry.h"
+
+#include <cassert>
+#include <cstring>
+#include <functional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <iterator>
+#include <vector>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "clang/StaticAnalyzer/Core/CheckerRegistryData.h"
@@ -21,12 +30,11 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/DynamicLibrary.h"
 #include "llvm/Support/Path.h"
-#include <cassert>
-#include <cstring>
-#include <functional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 using namespace ento;

@@ -13,6 +13,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/DynamicType.h"
+
+#include <cassert>
+#include <iterator>
+
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/JsonSupport.h"
 #include "clang/Basic/LLVM.h"
@@ -25,8 +29,11 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <utility>
+#include "llvm/ADT/ImmutableMap.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 /// The GDM component containing the dynamic type info. This is a map from a
 /// symbol to its most likely type.

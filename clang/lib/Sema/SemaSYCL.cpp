@@ -9,17 +9,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaSYCL.h"
+
+#include <cassert>
+#include <cstdint>
+#include <utility>
+
 #include "TreeTransform.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/Expr.h"
-#include "clang/AST/Mangle.h"
 #include "clang/AST/SYCLKernelInfo.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtSYCL.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticSema.h"
@@ -33,8 +35,16 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/STLExtras.h"
-#include <cassert>
-#include <cstdint>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/Type.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

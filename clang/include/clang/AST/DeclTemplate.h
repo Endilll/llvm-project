@@ -14,17 +14,22 @@
 #ifndef LLVM_CLANG_AST_DECLTEMPLATE_H
 #define LLVM_CLANG_AST_DECLTEMPLATE_H
 
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <optional>
+#include <tuple>
+#include <utility>
+#include <new>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/ComparisonCategories.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclID.h"
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/Redeclarable.h"
 #include "clang/AST/TemplateBase.h"
-#include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -38,29 +43,35 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <optional>
-#include <tuple>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/TypeLoc.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 
 enum BuiltinTemplateKind : int;
 class ClassTemplateDecl;
 class ClassTemplatePartialSpecializationDecl;
-class Expr;
 class FunctionTemplateDecl;
 class IdentifierInfo;
 class NonTypeTemplateParmDecl;
-class TemplateDecl;
 class TemplateTemplateParmDecl;
 class TemplateTypeParmDecl;
-class ConceptDecl;
 class UnresolvedSetImpl;
 class VarTemplateDecl;
 class VarTemplatePartialSpecializationDecl;
+class GlobalDeclID;
+class MemberSpecializationInfo;
+class TemplateName;
 
 /// Stores a template parameter of any kind.
 using TemplateParameter =

@@ -10,6 +10,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <string>
+#include <optional>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -39,8 +43,15 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <string>
+#include "clang/AST/ASTConcept.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 
@@ -1960,6 +1971,7 @@ void TypePrinter::printAttributedAfter(const AttributedType *T,
 #define DECL_OR_TYPE_ATTR(NAME)
 #define ATTR(NAME) case attr::NAME:
 #include "clang/Basic/AttrList.inc"
+
     llvm_unreachable("non-type attribute attached to type");
 
   case attr::BTFTypeTag:

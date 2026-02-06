@@ -12,7 +12,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/FileEntry.h"
+
 #include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/Support/MemoryBuffer.h"
 
 using namespace clang;
 

@@ -10,6 +10,17 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <new>
+
 #include "ABIInfoImpl.h"
 #include "Address.h"
 #include "CGBlocks.h"
@@ -26,7 +37,6 @@
 #include "TargetInfo.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/BaseSubobject.h"
-#include "clang/AST/CXXInheritance.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
@@ -39,9 +49,7 @@
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/ABI.h"
-#include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/CodeGenOptions.h"
 #include "clang/Basic/LLVM.h"
@@ -54,7 +62,6 @@
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/InstrTypes.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Intrinsics.h"
@@ -62,15 +69,43 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Transforms/Utils/SanitizerStats.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "CGBuilder.h"
+#include "CGVTables.h"
+#include "CodeGenModule.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/VTableBuilder.h"
+#include "clang/Basic/NoSanitizeList.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/Argument.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/DebugInfoMetadata.h"
+#include "llvm/IR/DebugLoc.h"
+#include "llvm/IR/FPEnv.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+enum class LangAS : unsigned int;
+}  // namespace clang
+namespace llvm {
+class BasicBlock;
+class CallBase;
+class Type;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

@@ -11,6 +11,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/DeclCXX.h"
+
+#include <cassert>
+#include <cinttypes>
+#include <cstddef>
+#include <cstdint>
+#include <initializer_list>
+#include <memory>
+#include <new>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/ASTMutationListener.h"
@@ -52,12 +61,15 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Format.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cinttypes>
-#include <cstddef>
-#include <cstdint>
-#include <initializer_list>
-#include <memory>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace clang {
+class Module;
+}  // namespace clang
 
 using namespace clang;
 

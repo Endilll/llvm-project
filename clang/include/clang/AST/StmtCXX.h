@@ -13,7 +13,8 @@
 #ifndef LLVM_CLANG_AST_STMTCXX_H
 #define LLVM_CLANG_AST_STMTCXX_H
 
-#include "clang/AST/DeclID.h"
+#include <cstddef>
+
 #include "clang/AST/DeclarationName.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/NestedNameSpecifierBase.h"
@@ -23,11 +24,13 @@
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <cstddef>
+#include "clang/AST/Decl.h"
+#include "clang/AST/StmtIterator.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
-
-class VarDecl;
+class ASTContext;
 
 /// CXXCatchStmt - This represents a C++ catch block.
 ///

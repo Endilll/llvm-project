@@ -11,6 +11,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <functional>
+#include <string>
+#include <utility>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTMutationListener.h"
 #include "clang/AST/Decl.h"
@@ -35,8 +40,6 @@
 #include "clang/Lex/ModuleMap.h"
 #include "clang/Lex/Preprocessor.h"
 #include "clang/Sema/Ownership.h"
-#include "clang/Sema/ParsedAttr.h"
-#include "clang/Sema/Scope.h"
 #include "clang/Sema/Sema.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/STLExtras.h"
@@ -45,10 +48,26 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <functional>
-#include <string>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/FileManager.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Sema/ScopeInfo.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Scope;
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 using namespace sema;

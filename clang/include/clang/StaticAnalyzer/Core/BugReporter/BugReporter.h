@@ -14,19 +14,23 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_BUGREPORTER_BUGREPORTER_H
 #define LLVM_CLANG_STATICANALYZER_CORE_BUGREPORTER_BUGREPORTER_H
 
+#include <cassert>
+#include <functional>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Analysis/ProgramPoint.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include "clang/Lex/Preprocessor.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugSuppression.h"
-#include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
-#include "clang/StaticAnalyzer/Core/CheckerManager.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
@@ -36,14 +40,8 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/iterator_range.h"
-#include <cassert>
-#include <functional>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 
@@ -53,15 +51,21 @@ class Decl;
 class LocationContext;
 class SourceManager;
 class Stmt;
+class CallExpr;
+class Expr;
+class Preprocessor;
 
 namespace ento {
 
 class BugType;
-class CheckerBase;
 class ExplodedGraph;
 class ExplodedNode;
 class ExprEngine;
 class MemRegion;
+class CheckerFrontend;
+class CheckerNameRef;
+class ProgramStateManager;
+class SVal;
 
 //===----------------------------------------------------------------------===//
 // Interface for individual bug reports.

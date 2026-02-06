@@ -10,10 +10,12 @@
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_IFS_H
 
 #include "clang/Driver/Tool.h"
-#include "clang/Driver/ToolChain.h"
+#include "llvm/Support/Compiler.h"
 
 namespace clang {
 namespace driver {
+class ToolChain;
+
 namespace tools {
 namespace ifstool {
 class LLVM_LIBRARY_VISIBILITY Merger : public Tool {

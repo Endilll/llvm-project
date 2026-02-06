@@ -27,12 +27,22 @@
 #ifndef LLVM_CLANG_TOOLING_COMPILATIONDATABASE_H
 #define LLVM_CLANG_TOOLING_COMPILATIONDATABASE_H
 
-#include "clang/Basic/LLVM.h"
-#include "llvm/Support/VirtualFileSystem.h"
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/Twine.h"
+
+namespace llvm {
+class StringRef;
+namespace vfs {
+class FileSystem;
+}  // namespace vfs
+template <typename T> class ArrayRef;
+template <typename T> class IntrusiveRefCntPtr;
+}  // namespace llvm
 
 namespace clang {
 namespace tooling {

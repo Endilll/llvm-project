@@ -9,8 +9,13 @@
 #ifndef LLVM_CLANG_DEPENDENCYSCANNING_DEPENDENCYSCANNINGUTILS_H
 #define LLVM_CLANG_DEPENDENCYSCANNING_DEPENDENCYSCANNINGUTILS_H
 
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
-#include "clang/DependencyScanning/DependencyScannerImpl.h"
 #include "clang/DependencyScanning/DependencyScanningWorker.h"
 #include "clang/DependencyScanning/ModuleDepCollector.h"
 #include "llvm/ADT/DenseSet.h"
@@ -18,11 +23,8 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <iterator>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 namespace dependencies {

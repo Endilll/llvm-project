@@ -10,6 +10,18 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <sys/types.h>
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <memory>
+#include <string>
+#include <utility>
+#include <type_traits>
+#include <vector>
+
 #include "Boolean.h"
 #include "ByteCode/Descriptor.h"
 #include "ByteCode/InitMap.h"
@@ -21,7 +33,6 @@
 #include "FixedPoint.h"
 #include "Floating.h"
 #include "Function.h"
-#include "FunctionPointer.h"
 #include "Integral.h"
 #include "IntegralAP.h"
 #include "InterpFrame.h"
@@ -40,15 +51,13 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <limits>
-#include <memory>
-#include <string>
-#include <sys/types.h>
-#include <utility>
+#include "ByteCode/Pointer.h"
+#include "clang/AST/APValue.h"
+#include "clang/Basic/UnsignedOrNone.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace clang::interp;

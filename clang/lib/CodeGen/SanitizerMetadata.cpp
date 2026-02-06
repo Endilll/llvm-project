@@ -10,6 +10,9 @@
 //
 //===----------------------------------------------------------------------===//
 #include "SanitizerMetadata.h"
+
+#include <string>
+
 #include "CodeGenModule.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Type.h"
@@ -18,7 +21,15 @@
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/IR/Metadata.h"
 #include "llvm/Support/raw_ostream.h"
-#include <string>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/Decl.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Module.h"
 
 using namespace clang;
 using namespace CodeGen;

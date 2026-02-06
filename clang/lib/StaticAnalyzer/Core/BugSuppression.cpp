@@ -7,8 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/BugReporter/BugSuppression.h"
+
+#include <cassert>
+#include <string>
+#include <utility>
+#include <tuple>
+
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/DynamicRecursiveASTVisitor.h"
@@ -20,9 +25,18 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/FormatVariadic.h"
 #include "llvm/Support/TimeProfiler.h"
-#include <cassert>
-#include <string>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Analysis/PathDiagnostic.h"
+#include "clang/Basic/SourceManager.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FormatVariadicDetails.h"
+
+namespace clang {
+class Attr;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

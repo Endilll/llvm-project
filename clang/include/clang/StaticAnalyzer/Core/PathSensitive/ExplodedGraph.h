@@ -18,27 +18,31 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_EXPLODEDGRAPH_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_EXPLODEDGRAPH_H
 
-#include "clang/Analysis/AnalysisDeclContext.h"
-#include "clang/Analysis/CFG.h"
-#include "clang/Analysis/ProgramPoint.h"
-#include "clang/Analysis/Support/BumpVector.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/DepthFirstIterator.h"
-#include "llvm/ADT/FoldingSet.h"
-#include "llvm/ADT/GraphTraits.h"
-#include "llvm/ADT/SetVector.h"
-#include "llvm/ADT/iterator_range.h"
-#include "llvm/Support/Allocator.h"
 #include <cassert>
 #include <cstdint>
 #include <memory>
 #include <optional>
 #include <utility>
 #include <vector>
+
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Analysis/ProgramPoint.h"
+#include "clang/Analysis/Support/BumpVector.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DepthFirstIterator.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/ADT/bit.h"
+
+namespace llvm {
+template <class GraphType> struct GraphTraits;
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 
@@ -47,6 +51,7 @@ class Decl;
 class Expr;
 class ParentMap;
 class Stmt;
+class CFGBlock;
 
 namespace ento {
 

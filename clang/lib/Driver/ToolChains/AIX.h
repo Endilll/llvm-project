@@ -9,11 +9,27 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_AIX_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_AIX_H
 
+#include <string>
+
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
+#include "clang/Driver/Action.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Target/TargetOptions.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace tools {
 
 /// Directly call system default assembler and linker.

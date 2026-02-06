@@ -13,10 +13,12 @@
 #ifndef LLVM_CLANG_SEMA_SEMAHEXAGON_H
 #define LLVM_CLANG_SEMA_SEMAHEXAGON_H
 
-#include "clang/AST/ASTFwd.h"
 #include "clang/Sema/SemaBase.h"
 
 namespace clang {
+class CallExpr;
+class Sema;
+
 class SemaHexagon : public SemaBase {
 public:
   SemaHexagon(Sema &S);

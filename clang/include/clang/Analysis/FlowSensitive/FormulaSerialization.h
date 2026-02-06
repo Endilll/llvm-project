@@ -9,12 +9,19 @@
 #ifndef LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_FORMULA_SERIALIZATION_H
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_FORMULA_SERIALIZATION_H
 
-#include "clang/Analysis/FlowSensitive/Arena.h"
 #include "clang/Analysis/FlowSensitive/Formula.h"
-#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/Support/raw_ostream.h"
-#include <cassert>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Error.h"
+
+namespace clang {
+namespace dataflow {
+class Arena;
+}  // namespace dataflow
+}  // namespace clang
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang::dataflow {
 

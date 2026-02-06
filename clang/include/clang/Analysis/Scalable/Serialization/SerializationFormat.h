@@ -14,18 +14,20 @@
 #ifndef CLANG_ANALYSIS_SCALABLE_SERIALIZATION_SERIALIZATION_FORMAT_H
 #define CLANG_ANALYSIS_SCALABLE_SERIALIZATION_SERIALIZATION_FORMAT_H
 
-#include "clang/Analysis/Scalable/Model/BuildNamespace.h"
-#include "llvm/ADT/SmallString.h"
-#include "llvm/ADT/StringRef.h"
 #include <vector>
+
+#include "clang/Analysis/Scalable/Model/BuildNamespace.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+template <unsigned int InternalLen> class SmallString;
+}  // namespace llvm
 
 namespace clang::ssaf {
 
-class EntityId;
 class EntityIdTable;
 class EntityName;
 class TUSummary;
-class TUSummaryData;
 
 /// Abstract base class for serialization formats.
 class SerializationFormat {

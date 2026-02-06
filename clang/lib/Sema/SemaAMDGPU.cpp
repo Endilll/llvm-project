@@ -11,6 +11,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaAMDGPU.h"
+
+#include <cassert>
+#include <cstdint>
+
 #include "clang/AST/Expr.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/DiagnosticFrontend.h"
@@ -25,8 +29,18 @@
 #include "llvm/Support/AMDGPUAddrSpace.h"
 #include "llvm/Support/AtomicOrdering.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Sema/ParsedAttr.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 

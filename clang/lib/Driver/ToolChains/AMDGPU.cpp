@@ -7,8 +7,16 @@
 //===----------------------------------------------------------------------===//
 
 #include "AMDGPU.h"
+
+#include <cstring>
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+
 #include "ToolChains/Gnu.h"
-#include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetID.h"
 #include "clang/Config/config.h"
@@ -35,22 +43,19 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/FileSystem.h"
-#include "llvm/Support/LineIterator.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Process.h"
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/TargetParser/Host.h"
 #include "llvm/TargetParser/TargetParser.h"
-#include <cassert>
-#include <cstring>
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "clang/Driver/LazyDetector.h"
+#include "clang/Driver/ToolChain.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/MemoryBuffer.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

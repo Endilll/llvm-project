@@ -12,6 +12,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/BodyFarm.h"
+
+#include <cassert>
+#include <cstdint>
+#include <optional>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/Decl.h"
@@ -24,7 +29,6 @@
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Stmt.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Analysis/CodeInjector.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/LLVM.h"
@@ -36,9 +40,16 @@
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
 
 #define DEBUG_TYPE "body-farm"
 

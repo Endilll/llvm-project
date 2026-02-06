@@ -5,6 +5,12 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/DeclGroup.h"
 #include "clang/Basic/DiagnosticIDs.h"
@@ -18,12 +24,20 @@
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendActions.h"
+#include "clang/Serialization/ModuleFileExtension.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/Support/Error.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/AST/Decl.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Frontend/FrontendAction.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 using namespace clang;
 

@@ -6,7 +6,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/Basic/DiagnosticFrontend.h"
+#include <cassert>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/HeaderInclude.h"
 #include "clang/Basic/LLVM.h"
@@ -27,10 +33,19 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/JSON.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <system_error>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Basic/FileManager.h"
+#include "clang/Lex/HeaderSearch.h"
+#include "clang/Lex/ModuleMap.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Error.h"
+
 using namespace clang;
 
 namespace {

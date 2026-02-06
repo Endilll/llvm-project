@@ -14,33 +14,36 @@
 #ifndef LLVM_CLANG_SERIALIZATION_MODULEMANAGER_H
 #define LLVM_CLANG_SERIALIZATION_MODULEMANAGER_H
 
+#include <sys/types.h>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Module.h"
-#include "clang/Basic/SourceLocation.h"
 #include "clang/Serialization/ModuleFile.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
-#include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/iterator.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include <cstdint>
-#include <ctime>
-#include <memory>
-#include <string>
-#include <sys/types.h>
-#include <utility>
+
+namespace llvm {
+class StringRef;
+template <typename Fn> class function_ref;
+template <typename PtrType> class SmallPtrSetImpl;
+}  // namespace llvm
 
 namespace clang {
 
-class FileEntry;
 class FileManager;
 class GlobalModuleIndex;
 class HeaderSearch;
 class ModuleCache;
 class PCHContainerReader;
+class SourceLocation;
 
 namespace serialization {
 

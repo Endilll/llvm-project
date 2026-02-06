@@ -8,10 +8,11 @@
 
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangStandard.h"
-#include "clang/Config/config.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/Triple.h"
+#include "llvm/ADT/StringRef.h"
+
 using namespace clang;
 
 StringRef clang::languageToString(Language L) {

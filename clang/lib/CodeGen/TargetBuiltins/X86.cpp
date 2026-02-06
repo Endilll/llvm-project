@@ -10,6 +10,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <utility>
+#include <iterator>
+
 #include "Address.h"
 #include "CGBuiltin.h"
 #include "CodeGenFunction.h"
@@ -21,7 +29,6 @@
 #include "clang/Basic/TargetBuiltins.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/IR/Attributes.h"
-#include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Constant.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
@@ -44,12 +51,16 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/Triple.h"
 #include "llvm/TargetParser/X86TargetParser.h"
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <utility>
+#include "CGBuilder.h"
+#include "CodeGenModule.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/FMF.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
 
 using namespace clang;
 using namespace CodeGen;

@@ -12,11 +12,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGCXXABI.h"
+
+#include <cassert>
+#include <optional>
+#include <vector>
+
 #include "Address.h"
 #include "CGCall.h"
 #include "CGCleanup.h"
 #include "CGValue.h"
-#include "clang/AST/APValue.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
@@ -27,16 +31,31 @@
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Linkage.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/GlobalValue.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <optional>
-#include <vector>
+#include "CodeGenTypes.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Mangle.h"
+#include "clang/AST/RecordLayout.h"
+#include "clang/Basic/DiagnosticFrontendInterface.inc"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/Instructions.h"
+
+namespace clang {
+class APValue;
+}  // namespace clang
+namespace llvm {
+class BasicBlock;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

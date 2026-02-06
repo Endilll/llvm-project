@@ -7,6 +7,23 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/UnsafeBufferUsage.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <map>
+#include <memory>
+#include <optional>
+#include <queue>
+#include <set>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+#include <initializer_list>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTTypeTraits.h"
@@ -33,7 +50,6 @@
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Basic/TypeTraits.h"
 #include "clang/Lex/Lexer.h"
-#include "clang/Lex/Preprocessor.h"
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/DenseMap.h"
@@ -48,20 +64,22 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <map>
-#include <memory>
-#include <optional>
-#include <queue>
-#include <set>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 
@@ -2896,6 +2914,7 @@ public:
     return true;                                                               \
   }
 #include "clang/Analysis/Analyses/UnsafeBufferUsageGadgets.def"
+
     return false;
   }
 
@@ -2928,6 +2947,7 @@ public:
     Results = {};                                                              \
   }
 #include "clang/Analysis/Analyses/UnsafeBufferUsageGadgets.def"
+
     // In parallel, match all DeclRefExprs so that to find out
     // whether there are any uncovered by gadgets.
     if (auto *DRE = findDeclRefExpr(S); DRE) {

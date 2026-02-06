@@ -11,8 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "LoongArch.h"
+
+#include <string>
+#include <utility>
+#include <vector>
+#include <array>
+
 #include "clang/Basic/Builtins.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/MacroBuilder.h"
 #include "clang/Basic/TargetBuiltins.h"
@@ -24,9 +29,9 @@
 #include "llvm/ADT/StringTable.h"
 #include "llvm/TargetParser/LoongArchTargetParser.h"
 #include "llvm/TargetParser/Triple.h"
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/Basic/TargetOptions.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
 
 using namespace clang;
 using namespace clang::targets;

@@ -14,14 +14,16 @@
 #ifndef LLVM_CLANG_SEMA_SEMAPSEUDOOBJECT_H
 #define LLVM_CLANG_SEMA_SEMAPSEUDOOBJECT_H
 
-#include "clang/AST/ASTFwd.h"
 #include "clang/AST/OperationKinds.h"
-#include "clang/Basic/SourceLocation.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/SemaBase.h"
 
 namespace clang {
 class Scope;
+class Expr;
+class PseudoObjectExpr;
+class Sema;
+class SourceLocation;
 
 class SemaPseudoObject : public SemaBase {
 public:

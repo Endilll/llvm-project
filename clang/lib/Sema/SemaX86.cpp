@@ -11,6 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaX86.h"
+
+#include <bitset>
+#include <cassert>
+#include <tuple>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
@@ -26,9 +31,17 @@
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/TargetParser/Triple.h"
-#include <bitset>
-#include <cassert>
-#include <tuple>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 

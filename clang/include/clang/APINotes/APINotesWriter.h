@@ -15,13 +15,16 @@
 #ifndef LLVM_CLANG_APINOTES_WRITER_H
 #define LLVM_CLANG_APINOTES_WRITER_H
 
-#include "clang/APINotes/Types.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/VersionTuple.h"
-#include "llvm/Support/raw_ostream.h"
-
 #include <memory>
 #include <optional>
+
+#include "clang/APINotes/Types.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class VersionTuple;
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 class FileEntry;
@@ -32,6 +35,7 @@ namespace api_notes {
 /// read by the \c APINotesReader.
 class APINotesWriter {
   class Implementation;
+
   std::unique_ptr<Implementation> Implementation;
 
 public:

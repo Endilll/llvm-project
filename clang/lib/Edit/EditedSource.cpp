@@ -7,6 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Edit/EditedSource.h"
+
+#include <cassert>
+#include <tuple>
+#include <utility>
+
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
@@ -18,9 +23,7 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/Twine.h"
-#include <cassert>
-#include <tuple>
-#include <utility>
+#include "llvm/ADT/SmallString.h"
 
 using namespace clang;
 using namespace edit;

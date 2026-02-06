@@ -16,21 +16,36 @@
 #ifndef LLVM_CLANG_AST_INTERP_CONTEXT_H
 #define LLVM_CLANG_AST_INTERP_CONTEXT_H
 
+#include <assert.h>
+#include <stdint.h>
+#include <memory>
+#include <optional>
+#include <string>
+
 #include "InterpStack.h"
+#include "PrimType.h"
+#include "Program.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+struct fltSemantics;
+}  // namespace llvm
 
 namespace clang {
 class LangOptions;
-class FunctionDecl;
-class VarDecl;
 class APValue;
-class BlockExpr;
+class CXXMethodDecl;
+class CXXRecordDecl;
 
 namespace interp {
 class Function;
-class Program;
 class State;
-enum PrimType : uint8_t;
+class Record;
 
 struct ParamOffset {
   unsigned Offset;

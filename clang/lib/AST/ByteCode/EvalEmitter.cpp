@@ -7,6 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "EvalEmitter.h"
+
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <new>
+
 #include "ByteCode/Descriptor.h"
 #include "ByteCode/EvaluationResult.h"
 #include "ByteCode/Function.h"
@@ -24,12 +31,18 @@
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/UnsignedOrNone.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "ByteCode/Boolean.h"
+#include "ByteCode/FixedPoint.h"
+#include "ByteCode/Floating.h"
+#include "ByteCode/Integral.h"
+#include "ByteCode/InterpStack.h"
+#include "ByteCode/InterpState.h"
+#include "ByteCode/MemberPointer.h"
+#include "ByteCode/Program.h"
+#include "clang/AST/APValue.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace clang::interp;
@@ -398,4 +411,11 @@ void EvalEmitter::updateGlobalTemporaries() {
 
 #define GET_EVAL_IMPL
 #include "Opcodes.inc"
+
+namespace clang {
+namespace interp {
+class State;
+}  // namespace interp
+}  // namespace clang
+
 #undef GET_EVAL_IMPL

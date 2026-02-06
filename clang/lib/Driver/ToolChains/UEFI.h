@@ -11,6 +11,21 @@
 
 #include "clang/Driver/Tool.h"
 #include "clang/Driver/ToolChain.h"
+#include "llvm/Frontend/Debug/Options.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Support/Compiler.h"
+
+namespace clang {
+namespace driver {
+class Driver;
+}  // namespace driver
+}  // namespace clang
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang::driver {
 namespace tools {

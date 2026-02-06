@@ -13,12 +13,19 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_XCORE_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_XCORE_H
 
+#include <string_view>
+
 #include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
 #include "llvm/Support/Compiler.h"
-#include "llvm/TargetParser/Triple.h"
+#include "llvm/ADT/ArrayRef.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 namespace clang {
+class TargetOptions;
+
 namespace targets {
 
 class LLVM_LIBRARY_VISIBILITY XCoreTargetInfo : public TargetInfo {

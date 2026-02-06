@@ -14,18 +14,20 @@
 #ifndef LLVM_CLANG_ANALYSIS_CLONEDETECTION_H
 #define LLVM_CLANG_ANALYSIS_CLONEDETECTION_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/Support/Regex.h"
 #include <cassert>
 #include <cstddef>
 #include <memory>
 #include <string>
 #include <tuple>
 #include <vector>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Regex.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 

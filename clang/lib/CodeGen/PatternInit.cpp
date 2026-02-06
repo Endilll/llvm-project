@@ -7,6 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "PatternInit.h"
+
+#include <cstdint>
+
 #include "CodeGenModule.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetInfo.h"
@@ -17,7 +20,11 @@
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Type.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cstdint>
+#include "clang/AST/ASTContext.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/Support/Casting.h"
 
 llvm::Constant *clang::CodeGen::initializationPatternFor(CodeGenModule &CGM,
                                                          llvm::Type *Ty) {

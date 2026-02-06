@@ -11,10 +11,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "AArch64.h"
+
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cctype>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+
 #include "Targets/OSTargets.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/Specifiers.h"
@@ -33,16 +43,10 @@
 #include "llvm/Support/CodeGen.h"
 #include "llvm/TargetParser/AArch64TargetParser.h"
 #include "llvm/TargetParser/ARMTargetParserCommon.h"
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <cctype>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <utility>
-#include <vector>
+#include "clang/Basic/MacroBuilder.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/VersionTuple.h"
 
 using namespace clang;
 using namespace clang::targets;

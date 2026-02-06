@@ -7,6 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "Interp.h"
+
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <iterator>
+
 #include "ByteCode/Descriptor.h"
 #include "ByteCode/DynamicAllocator.h"
 #include "ByteCode/FixedPoint.h"
@@ -27,15 +34,13 @@
 #include "Program.h"
 #include "State.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attrs.inc"
-#include "clang/AST/CXXInheritance.h"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/DiagnosticAST.h"
@@ -52,12 +57,14 @@
 #include "llvm/ADT/Sequence.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "ByteCode/Boolean.h"
+#include "ByteCode/ByteCodeEmitter.h"
+#include "ByteCode/MemberPointer.h"
+#include "clang/AST/APValue.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/BitVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 using namespace clang::interp;

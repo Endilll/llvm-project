@@ -6,6 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <stdint.h>
+#include <algorithm>
+#include <cassert>
+#include <memory>
+#include <utility>
+
 #include "ABIInfoImpl.h"
 #include "Address.h"
 #include "CGCXXABI.h"
@@ -13,10 +19,9 @@
 #include "CodeGenTypes.h"
 #include "HLSLBufferLayoutBuilder.h"
 #include "TargetInfo.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -31,17 +36,25 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Metadata.h"
-#include "llvm/Support/AtomicOrdering.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/DXILABI.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/Triple.h"
-
-#include <algorithm>
-#include <cassert>
-#include <memory>
-#include <stdint.h>
-#include <utility>
+#include "ABIInfo.h"
+#include "CodeGenModule.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/TypeSize.h"
 
 using namespace clang;
 using namespace clang::CodeGen;

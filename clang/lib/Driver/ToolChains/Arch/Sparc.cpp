@@ -7,6 +7,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "Sparc.h"
+
+#include <string>
+#include <vector>
+
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Driver/Driver.h"
@@ -15,8 +19,9 @@
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/TargetParser/Host.h"
-#include <string>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/Option/Option.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

@@ -13,20 +13,24 @@
 #ifndef LLVM_CLANG_LEX_HEADERMAP_H
 #define LLVM_CLANG_LEX_HEADERMAP_H
 
-#include "clang/Basic/FileEntry.h"
-#include "clang/Basic/FileManager.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Lex/HeaderMapTypes.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/Support/MemoryBuffer.h"
 #include <memory>
 #include <optional>
 #include <utility>
 
-namespace clang {
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Lex/HeaderMapTypes.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
 
-struct HMapBucket;
-struct HMapHeader;
+namespace llvm {
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
+
+namespace clang {
+class FileManager;
 
 /// Implementation for \a HeaderMap that doesn't depend on \a FileManager.
 class HeaderMapImpl {

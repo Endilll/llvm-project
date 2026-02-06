@@ -13,15 +13,25 @@
 #ifndef LLVM_CLANG_SERIALIZATION_ASTREADER_H
 #define LLVM_CLANG_SERIALIZATION_ASTREADER_H
 
+#include <sys/types.h>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <deque>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclID.h"
 #include "clang/AST/DeclObjC.h"
-#include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/Type.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticOptions.h"
-#include "clang/Basic/FileEntry.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -39,11 +49,9 @@
 #include "clang/Sema/ExternalSemaSource.h"
 #include "clang/Sema/IdentifierResolver.h"
 #include "clang/Sema/Sema.h"
-#include "clang/Sema/Weak.h"
 #include "clang/Serialization/ASTBitCodes.h"
 #include "clang/Serialization/ContinuousRangeMap.h"
 #include "clang/Serialization/ModuleFile.h"
-#include "clang/Serialization/ModuleFileExtension.h"
 #include "clang/Serialization/ModuleManager.h"
 #include "clang/Serialization/SourceLocationEncoding.h"
 #include "llvm/ADT/BitVector.h"
@@ -51,7 +59,6 @@
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/PagedVector.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
@@ -65,63 +72,49 @@
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/Timer.h"
-#include "llvm/Support/VersionTuple.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <ctime>
-#include <deque>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <sys/types.h>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Endian.h"
+
+namespace llvm {
+class VersionTuple;
+template <typename Fn> class function_ref;
+}  // namespace llvm
 
 namespace clang {
 
 class ASTConsumer;
-class ASTContext;
 class ASTDeserializationListener;
 class ASTReader;
-class ASTRecordReader;
 class CodeGenOptions;
 class CXXTemporary;
-class Decl;
 class DeclarationName;
-class DeclaratorDecl;
-class DeclContext;
 class EnumDecl;
 class Expr;
-class FieldDecl;
-class FileEntry;
 class FileManager;
 class FileSystemOptions;
 class FunctionDecl;
 class GlobalModuleIndex;
-struct HeaderFileInfo;
 class HeaderSearchOptions;
-class LangOptions;
 class MacroInfo;
 class ModuleCache;
 class NamedDecl;
-class NamespaceDecl;
-class ObjCCategoryDecl;
-class ObjCInterfaceDecl;
 class PCHContainerReader;
 class Preprocessor;
-class PreprocessorOptions;
-class Sema;
-class SourceManager;
 class Stmt;
 class SwitchCase;
 class TargetOptions;
 class Token;
-class TypedefNameDecl;
-class ValueDecl;
 class VarDecl;
+class DiagnosticOptions;
+class FileEntryRef;
+class ModuleFileExtension;
+class RecordDecl;
+class TemplateArgument;
+struct ModuleFileExtensionMetadata;
 
 /// Abstract interface for callback invocations by the ASTReader.
 ///

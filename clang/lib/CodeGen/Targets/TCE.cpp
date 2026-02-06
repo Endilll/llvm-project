@@ -6,20 +6,38 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+
 #include "ABIInfoImpl.h"
 #include "CodeGenModule.h"
-#include "CodeGenTypes.h"
 #include "TargetInfo.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Function.h"
-#include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Metadata.h"
-#include <memory>
+#include "ABIInfo.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Module.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace CodeGen {
+class CodeGenTypes;
+}  // namespace CodeGen
+}  // namespace clang
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
 
 using namespace clang;
 using namespace clang::CodeGen;

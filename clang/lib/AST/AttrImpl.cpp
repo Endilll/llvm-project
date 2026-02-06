@@ -10,6 +10,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <optional>
+#include <string>
+#include <type_traits>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTStructuralEquivalence.h"
 #include "clang/AST/Attr.h"
@@ -20,10 +25,17 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <optional>
-#include <string>
-#include <type_traits>
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/CodeGen.h"
+
 using namespace clang;
 
 void LoopHintAttr::printPrettyPragma(raw_ostream &OS,
@@ -369,3 +381,16 @@ bool areAlignedAttrsEqual(const AlignedAttr &A1, const AlignedAttr &A2,
 } // namespace
 
 #include "clang/AST/AttrImpl.inc"
+
+namespace clang {
+class IdentifierInfo;
+class MSGuidDecl;
+class OMPTraitInfo;
+struct PrintingPolicy;
+}  // namespace clang
+namespace llvm {
+class VersionTuple;
+namespace dxil {
+enum class ResourceClass : uint8_t;
+}  // namespace dxil
+}  // namespace llvm

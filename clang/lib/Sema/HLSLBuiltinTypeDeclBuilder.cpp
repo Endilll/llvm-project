@@ -12,6 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "HLSLBuiltinTypeDeclBuilder.h"
+
+#include <array>
+#include <cassert>
+#include <cstdint>
+#include <utility>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
@@ -43,9 +49,16 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/DXILABI.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <array>
-#include <cassert>
-#include <cstdint>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Sema/Scope.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Frontend/HLSL/HLSLRootSignature.h"
+#include "llvm/Support/Casting.h"
 
 using namespace llvm::hlsl;
 

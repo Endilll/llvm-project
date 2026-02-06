@@ -7,12 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/FlowSensitive/Formula.h"
-#include "clang/Basic/LLVM.h"
+
+#include <cassert>
+#include <new>
+
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang::dataflow {
 

@@ -12,6 +12,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/Consumed.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <iterator>
+#include <string>
+
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
@@ -29,10 +37,8 @@
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <utility>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
 
 // TODO: Adjust states of args to constructors in the same way that arguments to
 //       function calls are handled.

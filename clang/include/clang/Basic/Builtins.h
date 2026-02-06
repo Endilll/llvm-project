@@ -15,19 +15,22 @@
 #ifndef LLVM_CLANG_BASIC_BUILTINS_H
 #define LLVM_CLANG_BASIC_BUILTINS_H
 
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/StringTable.h"
-#include "llvm/TargetParser/Triple.h"
-#include <alloca.h>
 #include <array>
 #include <cstdint>
 #include <cstring>
 #include <optional>
 #include <string>
 #include <utility>
+
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/StringTable.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 // VC++ defines 'alloca' as an object-like macro, which interferes with our
 // builtins.

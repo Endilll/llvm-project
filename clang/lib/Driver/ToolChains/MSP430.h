@@ -9,20 +9,28 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_MSP430_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_MSP430_H
 
-#include "Gnu.h"
-#include "clang/Driver/Driver.h"
-#include "clang/Driver/DriverDiagnostic.h"
-#include "clang/Driver/InputInfo.h"
-#include "clang/Driver/Tool.h"
-#include "clang/Driver/ToolChain.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Option/Option.h"
-
 #include <string>
 #include <vector>
 
+#include "Gnu.h"
+#include "clang/Driver/Tool.h"
+#include "llvm/Option/Option.h"
+#include "clang/Driver/Action.h"
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class StringRef;
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
+
 namespace clang {
 namespace driver {
+class Driver;
+class ToolChain;
+
 namespace toolchains {
 
 class LLVM_LIBRARY_VISIBILITY MSP430ToolChain : public Generic_ELF {

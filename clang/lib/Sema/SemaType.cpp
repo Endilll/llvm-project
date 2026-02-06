@@ -10,15 +10,30 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <array>
+#include <bitset>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <algorithm>
+#include <initializer_list>
+#include <iterator>
+#include <memory>
+#include <new>
+#include <vector>
+
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTMutationListener.h"
 #include "clang/AST/ASTStructuralEquivalence.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
-#include "clang/AST/CXXInheritance.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclTemplate.h"
@@ -72,21 +87,30 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/iterator.h"
-#include "llvm/IR/DerivedTypes.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/TargetParser/Triple.h"
-#include <array>
-#include <bitset>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <limits>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/ExternalASTSource.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/Cuda.h"
+#include "clang/Basic/OpenCLOptions.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Sema/ExternalSemaSource.h"
+#include "clang/Sema/Scope.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
 
 using namespace clang;
 

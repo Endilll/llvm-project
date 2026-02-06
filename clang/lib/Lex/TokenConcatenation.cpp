@@ -11,6 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Lex/TokenConcatenation.h"
+
+#include <cassert>
+#include <cstring>
+#include <string>
+
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
@@ -20,8 +25,9 @@
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/Preprocessor.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstring>
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/StringRef.h"
+
 using namespace clang;
 
 

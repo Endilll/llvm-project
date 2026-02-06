@@ -15,11 +15,14 @@
 #ifndef LLVM_CLANG_BASIC_STACK_EXHAUSTION_HANDLER_H
 #define LLVM_CLANG_BASIC_STACK_EXHAUSTION_HANDLER_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/SourceLocation.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
+namespace llvm {
+template <typename Fn> class function_ref;
+}  // namespace llvm
 
 namespace clang {
+class DiagnosticsEngine;
+class SourceLocation;
+
 class StackExhaustionHandler {
 public:
   StackExhaustionHandler(DiagnosticsEngine &diags) : DiagsRef(diags) {}

@@ -7,21 +7,29 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/DependencyScanning/DependencyScanningWorker.h"
+
+#include <cassert>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/DependencyScanning/DependencyScannerImpl.h"
-#include "clang/Driver/Driver.h"
 #include "clang/Serialization/ObjectFilePCHContainerReader.h"
 #include "clang/Serialization/PCHContainerOperations.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <cassert>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "clang/DependencyScanning/DependencyScanningService.h"
+#include "clang/Frontend/CompilerInvocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/MemoryBuffer.h"
 
 using namespace clang;
 using namespace dependencies;

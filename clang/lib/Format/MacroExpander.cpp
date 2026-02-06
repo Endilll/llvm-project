@@ -12,32 +12,39 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "Macros.h"
-
-#include "Encoding.h"
-#include "FormatToken.h"
-#include "FormatTokenLexer.h"
-#include "clang/Basic/IdentifierTable.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TokenKinds.h"
-#include "clang/Format/Format.h"
-#include "clang/Lex/Lexer.h"
-#include "clang/Lex/PreprocessorOptions.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringSet.h"
-#include "llvm/Support/Allocator.h"
-#include "llvm/Support/ErrorHandling.h"
 #include <cassert>
 #include <cstddef>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
+#include <memory>
+#include <new>
+
+#include "Macros.h"
+#include "Encoding.h"
+#include "FormatToken.h"
+#include "FormatTokenLexer.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/TokenKinds.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringSet.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/MemoryBuffer.h"
 
 namespace clang {
+class IdentifierTable;
+
 namespace format {
+struct FormatStyle;
 
 struct MacroExpander::Definition {
   StringRef Name;

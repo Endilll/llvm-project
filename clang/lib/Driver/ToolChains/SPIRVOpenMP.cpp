@@ -6,15 +6,23 @@
 //
 //==------------------------------------------------------------------------==//
 #include "SPIRVOpenMP.h"
+
 #include "ToolChains/SPIRV.h"
 #include "clang/Driver/Action.h"
 #include "clang/Driver/CommonArgs.h"
-#include "clang/Driver/Driver.h"
-#include "clang/Driver/ToolChain.h"
 #include "clang/Options/Options.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/Option.h"
-#include "llvm/TargetParser/Triple.h"
+
+namespace clang {
+namespace driver {
+class Driver;
+class ToolChain;
+}  // namespace driver
+}  // namespace clang
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

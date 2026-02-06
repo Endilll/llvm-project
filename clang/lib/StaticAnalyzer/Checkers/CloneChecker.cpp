@@ -12,20 +12,32 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "clang/Analysis/AnalysisDeclContext.h"
+#include <memory>
+#include <utility>
+#include <vector>
+#include <string>
+
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
 #include "clang/Analysis/CloneDetection.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
-#include <memory>
-#include <utility>
-#include <vector>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/Stmt.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace clang {
+class AnalysisDeclContext;
+class Decl;
+class SourceManager;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

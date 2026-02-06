@@ -11,13 +11,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/FileMatchTrie.h"
+
+#include <string>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
-#include <string>
-#include <vector>
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/raw_ostream.h"
 
 using namespace clang;
 using namespace tooling;

@@ -11,8 +11,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "CodeGenTypes.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <utility>
+
 #include "CGCXXABI.h"
-#include "CGCall.h"
 #include "CGDebugInfo.h"
 #include "CGHLSLRuntime.h"
 #include "CGOpenCLRuntime.h"
@@ -21,10 +27,7 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclObjC.h"
-#include "clang/AST/Expr.h"
 #include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/RecordLayout.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/CodeGen/CGFunctionInfo.h"
 #include "llvm/ADT/APFloat.h"
@@ -34,14 +37,19 @@
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/DerivedTypes.h"
-#include "llvm/IR/Module.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <utility>
+#include "CodeGenModule.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
 
 using namespace clang;
 using namespace CodeGen;
@@ -424,6 +432,7 @@ llvm::Type *CodeGenTypes::ConvertType(QualType T) {
 #define DEPENDENT_TYPE(Class, Base) case Type::Class:
 #define NON_CANONICAL_UNLESS_DEPENDENT_TYPE(Class, Base) case Type::Class:
 #include "clang/AST/TypeNodes.inc"
+
     llvm_unreachable("Non-canonical or dependent types aren't possible.");
 
   case Type::Builtin: {
@@ -526,9 +535,11 @@ llvm::Type *CodeGenTypes::ConvertType(QualType T) {
 #define IMAGE_TYPE(ImgType, Id, SingletonId, Access, Suffix) \
     case BuiltinType::Id:
 #include "clang/Basic/OpenCLImageTypes.def"
+
 #define EXT_OPAQUE_TYPE(ExtType, Id, Ext) \
     case BuiltinType::Id:
 #include "clang/Basic/OpenCLExtensionTypes.def"
+
     case BuiltinType::OCLSampler:
     case BuiltinType::OCLEvent:
     case BuiltinType::OCLClkEvent:
@@ -541,6 +552,7 @@ llvm::Type *CodeGenTypes::ConvertType(QualType T) {
 #define SVE_PREDICATE_TYPE(Name, MangledName, Id, SingletonId)                 \
   case BuiltinType::Id:
 #include "clang/Basic/AArch64ACLETypes.def"
+
       {
         ASTContext::BuiltinVectorTypeInfo Info =
             Context.getBuiltinVectorTypeInfo(cast<BuiltinType>(Ty));
@@ -575,8 +587,10 @@ llvm::Type *CodeGenTypes::ConvertType(QualType T) {
         llvm::FixedVectorType::get(ConvertType(Context.BoolTy), Size); \
       break;
 #include "clang/Basic/PPCTypes.def"
+
 #define RVV_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/RISCVVTypes.def"
+
       {
         ASTContext::BuiltinVectorTypeInfo Info =
             Context.getBuiltinVectorTypeInfo(cast<BuiltinType>(Ty));
@@ -601,6 +615,7 @@ llvm::Type *CodeGenTypes::ConvertType(QualType T) {
       llvm_unreachable("Unexpected wasm reference builtin type!");             \
   } break;
 #include "clang/Basic/WebAssemblyReferenceTypes.def"
+
 #define AMDGPU_OPAQUE_PTR_TYPE(Name, Id, SingletonId, Width, Align, AS)        \
   case BuiltinType::Id:                                                        \
     return llvm::PointerType::get(getLLVMContext(), AS);
@@ -609,8 +624,10 @@ llvm::Type *CodeGenTypes::ConvertType(QualType T) {
     return llvm::TargetExtType::get(getLLVMContext(), "amdgcn.named.barrier",  \
                                     {}, {Scope});
 #include "clang/Basic/AMDGPUTypes.def"
+
 #define HLSL_INTANGIBLE_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/HLSLIntangibleTypes.def"
+
       ResultType = CGM.getHLSLRuntime().convertHLSLSpecificType(Ty);
       break;
     case BuiltinType::Dependent:
@@ -618,6 +635,7 @@ llvm::Type *CodeGenTypes::ConvertType(QualType T) {
 #define PLACEHOLDER_TYPE(Id, SingletonId) \
     case BuiltinType::Id:
 #include "clang/AST/BuiltinTypes.def"
+
       llvm_unreachable("Unexpected placeholder builtin type!");
     }
     break;

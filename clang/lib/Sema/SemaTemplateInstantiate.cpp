@@ -9,6 +9,16 @@
 //
 //===----------------------------------------------------------------------===/
 
+#include <cassert>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <deque>
+#include <iterator>
+#include <memory>
+
 #include "TreeTransform.h"
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTConcept.h"
@@ -16,7 +26,7 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/ASTMutationListener.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclAccessPair.h"
 #include "clang/AST/DeclBase.h"
@@ -51,7 +61,6 @@
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/Sema.h"
-#include "clang/Sema/SemaConcept.h"
 #include "clang/Sema/SemaInternal.h"
 #include "clang/Sema/Template.h"
 #include "clang/Sema/TemplateDeduction.h"
@@ -67,12 +76,31 @@
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Basic/StackExhaustionHandler.h"
+#include "clang/Sema/ScopeInfo.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/TinyPtrVector.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace clang {
+class Attr;
+class IdentifierInfo;
+class Module;
+}  // namespace clang
 
 using namespace clang;
 using namespace sema;

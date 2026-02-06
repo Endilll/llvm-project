@@ -10,6 +10,19 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+#include <iterator>
+#include <vector>
+
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTConsumer.h"
@@ -17,7 +30,6 @@
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/AttrIterator.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
@@ -69,7 +81,6 @@
 #include "clang/Basic/Visibility.h"
 #include "clang/Lex/HeaderSearch.h" // TODO: Sema shouldn't depend on Lex
 #include "clang/Lex/Lexer.h" // TODO: Extract static functions to fix layering.
-#include "clang/Lex/ModuleLoader.h" // TODO: Sema shouldn't depend on Lex
 #include "clang/Lex/Preprocessor.h" // Included for isCodeCompletionEnabled()
 #include "clang/Lex/Token.h"
 #include "clang/Sema/AnalysisBasedWarnings.h"
@@ -121,16 +132,35 @@
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <unordered_map>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DeclFriend.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/LambdaCapture.h"
+#include "clang/AST/OpenMPClause.h"
+#include "clang/AST/Redeclarable.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/AST/UnresolvedSet.h"
+#include "clang/Basic/AttributeCommonInfo.h"
+#include "clang/Basic/Cuda.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/ObjCRuntime.h"
+#include "clang/Basic/OpenCLOptions.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace sema;

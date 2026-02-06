@@ -9,15 +9,6 @@
 #ifndef LLVM_CLANG_DEPENDENCYSCANNING_DEPENDENCYSCANNINGFILESYSTEM_H
 #define LLVM_CLANG_DEPENDENCYSCANNING_DEPENDENCYSCANNINGFILESYSTEM_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Lex/DependencyDirectivesScanner.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/Support/Allocator.h"
-#include "llvm/Support/ErrorOr.h"
-#include "llvm/Support/ExtensibleRTTI.h"
-#include "llvm/Support/FileSystem/UniqueID.h"
-#include "llvm/Support/VirtualFileSystem.h"
 #include <atomic>
 #include <cassert>
 #include <cstdint>
@@ -29,6 +20,28 @@
 #include <utility>
 #include <variant>
 #include <vector>
+#include <iterator>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/Lex/DependencyDirectivesScanner.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/ExtensibleRTTI.h"
+#include "llvm/Support/FileSystem/UniqueID.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/raw_ostream.h"
+
+namespace llvm {
+template <typename T> class IntrusiveRefCntPtr;
+}  // namespace llvm
 
 namespace clang {
 namespace dependencies {

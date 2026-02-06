@@ -13,6 +13,12 @@
 #ifndef LLVM_CLANG_AST_DECLARATIONNAME_H
 #define LLVM_CLANG_AST_DECLARATIONNAME_H
 
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <string>
+#include <type_traits>
+
 #include "clang/AST/TemplateName.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/Diagnostic.h"
@@ -24,11 +30,14 @@
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <string>
-#include <type_traits>
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/PointerUnion.h"
+
+namespace llvm {
+class raw_ostream;
+template <typename T> struct PointerLikeTypeTraits;
+}  // namespace llvm
 
 namespace clang {
 
@@ -38,7 +47,6 @@ class DeclarationName;
 class DeclarationNameTable;
 struct PrintingPolicy;
 class TemplateDecl;
-class TypeSourceInfo;
 
 using CanQualType = CanQual<Type>;
 

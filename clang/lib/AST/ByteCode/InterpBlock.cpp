@@ -11,9 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "InterpBlock.h"
-#include "Pointer.h"
-#include <cassert>
+
 #include <cstdlib>
+
+#include "Pointer.h"
+#include "ByteCode/Descriptor.h"
 
 using namespace clang;
 using namespace clang::interp;

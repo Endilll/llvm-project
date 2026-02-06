@@ -11,10 +11,18 @@
 ///
 //===----------------------------------------------------------------------===//
 #include "TrapReasonBuilder.h"
+
+#include <cassert>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
-#include <cassert>
+#include "clang/Basic/DiagnosticIDs.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+
+namespace llvm {
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 namespace CodeGen {

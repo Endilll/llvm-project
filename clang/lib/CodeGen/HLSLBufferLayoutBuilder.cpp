@@ -7,20 +7,36 @@
 //===----------------------------------------------------------------------===//
 
 #include "HLSLBufferLayoutBuilder.h"
+
+#include <cassert>
+#include <cstdint>
+#include <string>
+#include <utility>
+#include <iterator>
+
 #include "CGHLSLRuntime.h"
 #include "CodeGenModule.h"
 #include "TargetInfo.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Type.h"
-#include "clang/Basic/LLVM.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Frontend/HLSL/HLSLResource.h"
 #include "llvm/IR/DerivedTypes.h"
-#include <cassert>
-#include <cstdint>
-#include <string>
-#include <utility>
+#include "CodeGenTypes.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclCXX.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Support/TypeSize.h"
+
+namespace llvm {
+class LLVMContext;
+}  // namespace llvm
 
 //===----------------------------------------------------------------------===//
 // Implementation of constant buffer layout common between DirectX and

@@ -11,6 +11,20 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <functional>
+#include <initializer_list>
+#include <iterator>
+#include <limits>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <memory>
+
 #include "CheckExprLifetime.h"
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTContext.h"
@@ -38,7 +52,6 @@
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TemplateName.h"
 #include "clang/AST/Type.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/AST/UnresolvedSet.h"
 #include "clang/Basic/AddressSpaces.h"
@@ -48,7 +61,6 @@
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
-#include "clang/Basic/OpenCLOptions.h"
 #include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/PartialDiagnostic.h"
 #include "clang/Basic/SourceLocation.h"
@@ -113,21 +125,22 @@
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/SaveAndRestore.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/TargetParser/RISCVTargetParser.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <functional>
-#include <initializer_list>
-#include <iterator>
-#include <limits>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/Basic/Builtins.h"
+#include "clang/Basic/Linkage.h"
+#include "clang/Sema/CleanupInfo.h"
+#include "llvm/ADT/APFixedPoint.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace sema;

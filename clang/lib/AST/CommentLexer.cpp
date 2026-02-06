@@ -7,10 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/CommentLexer.h"
+
+#include <cassert>
+#include <cstddef>
+
 #include "clang/AST/CommentCommandTraits.h"
 #include "clang/Basic/CharInfo.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticComment.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
@@ -20,8 +23,8 @@
 #include "llvm/Support/ConvertUTF.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
+#include "clang/Basic/DiagnosticCommentInterface.inc"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 namespace comments {

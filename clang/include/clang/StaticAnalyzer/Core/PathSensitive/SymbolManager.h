@@ -14,6 +14,10 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SYMBOLMANAGER_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SYMBOLMANAGER_H
 
+#include <cassert>
+#include <memory>
+#include <utility>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/Type.h"
 #include "clang/Analysis/AnalysisDeclContext.h"
@@ -23,7 +27,6 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/StoreRef.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
-#include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/FoldingSet.h"
@@ -31,8 +34,12 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
-#include <memory>
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class APSInt;
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 

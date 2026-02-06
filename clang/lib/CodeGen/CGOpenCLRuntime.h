@@ -15,18 +15,25 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGOPENCLRUNTIME_H
 #define LLVM_CLANG_LIB_CODEGEN_CGOPENCLRUNTIME_H
 
-#include "clang/AST/Expr.h"
-#include "clang/AST/Type.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/IR/Type.h"
-#include "llvm/IR/Value.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+class Function;
+class PointerType;
+class StringRef;
+class Type;
+class Value;
+}  // namespace llvm
 
 namespace clang {
 
 class BlockExpr;
 class Expr;
 class VarDecl;
+class PipeType;
+class Type;
 
 namespace CodeGen {
 

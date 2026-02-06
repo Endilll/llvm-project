@@ -11,10 +11,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "AMDGPU.h"
+
+#include <iterator>
+#include <string>
+#include <initializer_list>
+
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/MacroBuilder.h"
@@ -31,10 +35,8 @@
 #include "llvm/Support/AMDGPUAddrSpace.h"
 #include "llvm/TargetParser/TargetParser.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <iterator>
-#include <string>
-#include <vector>
+#include "llvm/ADT/Twine.h"
+
 using namespace clang;
 using namespace clang::targets;
 

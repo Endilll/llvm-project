@@ -13,14 +13,16 @@
 #ifndef LLVM_CLANG_SEMA_SCOPE_H
 #define LLVM_CLANG_SEMA_SCOPE_H
 
+#include <cassert>
+#include <optional>
+
 #include "clang/AST/Decl.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/iterator_range.h"
-#include <cassert>
-#include <optional>
+#include "llvm/Support/Casting.h"
 
 namespace llvm {
 
@@ -33,7 +35,6 @@ namespace clang {
 class Decl;
 class DeclContext;
 class UsingDirectiveDecl;
-class VarDecl;
 
 /// Scope - A scope is a transient data structure that is used while parsing the
 /// program.  It assists with resolving identifiers to the appropriate

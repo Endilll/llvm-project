@@ -13,11 +13,12 @@
 #ifndef LLVM_CLANG_AST_NESTEDNAMESPECIFIER_H
 #define LLVM_CLANG_AST_NESTEDNAMESPECIFIER_H
 
+#include <optional>
+
 #include "clang/AST/NestedNameSpecifierBase.h"
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/Hashing.h"
-#include <cassert>
-#include <optional>
+#include "llvm/ADT/APInt.h"
 
 namespace llvm {
 

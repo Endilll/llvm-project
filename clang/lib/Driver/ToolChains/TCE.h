@@ -9,12 +9,20 @@
 #ifndef LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_TCE_H
 #define LLVM_CLANG_LIB_DRIVER_TOOLCHAINS_TCE_H
 
-#include "clang/Driver/Driver.h"
 #include "clang/Driver/ToolChain.h"
-#include <set>
+#include "llvm/Support/Compiler.h"
+
+namespace llvm {
+class Triple;
+namespace opt {
+class ArgList;
+}  // namespace opt
+}  // namespace llvm
 
 namespace clang {
 namespace driver {
+class Driver;
+
 namespace toolchains {
 
 /// TCEToolChain - A tool chain using the llvm bitcode tools to perform

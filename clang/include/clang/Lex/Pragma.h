@@ -13,11 +13,18 @@
 #ifndef LLVM_CLANG_LEX_PRAGMA_H
 #define LLVM_CLANG_LEX_PRAGMA_H
 
+#include <memory>
+#include <string>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/StringMap.h"
-#include <memory>
-#include <string>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+template <typename T> class SmallVectorImpl;
+}  // namespace llvm
 
 namespace clang {
 

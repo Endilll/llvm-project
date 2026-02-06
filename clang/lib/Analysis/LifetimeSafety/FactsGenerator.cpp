@@ -9,9 +9,11 @@
 #include <cassert>
 #include <optional>
 #include <string>
+#include <new>
+#include <utility>
+#include <vector>
 
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
@@ -28,8 +30,18 @@
 #include "clang/Basic/OperatorKinds.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Casting.h"
-#include "llvm/Support/Signals.h"
 #include "llvm/Support/TimeProfiler.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 namespace clang::lifetimes::internal {
 using llvm::isa_and_present;

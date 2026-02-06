@@ -11,6 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "CGDebugInfo.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cctype>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <array>
+#include <type_traits>
+
 #include "CGBlocks.h"
 #include "CGBuilder.h"
 #include "CGCXXABI.h"
@@ -27,7 +39,6 @@
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclFriend.h"
 #include "clang/AST/DeclGroup.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclTemplate.h"
@@ -43,7 +54,6 @@
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TemplateName.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/VTableBuilder.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/ASTSourceDescriptor.h"
@@ -61,7 +71,6 @@
 #include "clang/CodeGen/ModuleBuilder.h"
 #include "clang/Frontend/FrontendOptions.h"
 #include "clang/Lex/HeaderSearchOptions.h"
-#include "clang/Lex/ModuleMap.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/DenseSet.h"
@@ -78,11 +87,9 @@
 #include "llvm/IR/DebugInfo.h"
 #include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/IR/DebugLoc.h"
-#include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/InstrTypes.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Instructions.h"
-#include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/Metadata.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/Casting.h"
@@ -96,16 +103,36 @@
 #include "llvm/Support/TypeSize.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Target/TargetOptions.h"
-#include <algorithm>
-#include <cassert>
-#include <cctype>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "Address.h"
+#include "CodeGenTypes.h"
+#include "clang/AST/APValue.h"
+#include "clang/AST/AttrIterator.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/Mangle.h"
+#include "clang/AST/TypeOrdering.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/ObjCRuntime.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/TinyPtrVector.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/DebugProgramInstruction.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Type.h"
+#include "llvm/TargetParser/Triple.h"
+
 using namespace clang;
 using namespace clang::CodeGen;
 

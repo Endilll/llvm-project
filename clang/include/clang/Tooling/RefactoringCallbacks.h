@@ -28,19 +28,25 @@
 #ifndef LLVM_CLANG_TOOLING_REFACTORINGCALLBACKS_H
 #define LLVM_CLANG_TOOLING_REFACTORINGCALLBACKS_H
 
-#include "clang/AST/ASTConsumer.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/ASTMatchers/ASTMatchersInternal.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Tooling/Core/Replacement.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/Error.h"
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "clang/AST/ASTConsumer.h"
+#include "clang/ASTMatchers/ASTMatchFinder.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Tooling/Core/Replacement.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Error.h"
+
 namespace clang {
+namespace ast_matchers {
+namespace internal {
+class DynTypedMatcher;
+}  // namespace internal
+}  // namespace ast_matchers
+
 namespace tooling {
 
 /// Base class for RefactoringCallbacks.

@@ -7,6 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/InstallAPI/HeaderFile.h"
+
+#include <memory>
+#include <optional>
+#include <string>
+#include <system_error>
+#include <utility>
+
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/InstallAPI/MachO.h"
@@ -16,11 +23,9 @@
 #include "llvm/Support/Regex.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/TextAPI/Utils.h"
-#include <memory>
-#include <optional>
-#include <string>
-#include <system_error>
-#include <utility>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/ErrorOr.h"
 
 using namespace llvm;
 namespace clang::installapi {

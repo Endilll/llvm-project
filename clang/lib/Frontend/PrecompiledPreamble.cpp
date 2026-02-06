@@ -11,7 +11,22 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/PrecompiledPreamble.h"
-#include "clang/AST/ASTConsumer.h"
+
+#include <sys/types.h>
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+#include <chrono>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/FileEntry.h"
@@ -53,20 +68,22 @@
 #include "llvm/Support/Process.h"
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstdlib>
-#include <ctime>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <string>
-#include <sys/types.h>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "clang/AST/DeclGroup.h"
+#include "clang/Basic/CustomizableOptional.h"
+#include "clang/Lex/DirectoryLookup.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/MemoryBufferRef.h"
+
+namespace clang {
+class CodeGenOptions;
+class ModuleCache;
+class ModuleFileExtension;
+}  // namespace clang
 
 using namespace clang;
 

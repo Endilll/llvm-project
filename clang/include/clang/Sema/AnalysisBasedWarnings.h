@@ -13,27 +13,23 @@
 #ifndef LLVM_CLANG_SEMA_ANALYSISBASEDWARNINGS_H
 #define LLVM_CLANG_SEMA_ANALYSISBASEDWARNINGS_H
 
-#include "clang/AST/Decl.h"
-#include "clang/Analysis/Analyses/LifetimeSafety/LifetimeStats.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Sema/ScopeInfo.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/Support/Compiler.h"
 #include <map>
 #include <memory>
 
+#include "clang/Analysis/Analyses/LifetimeSafety/LifetimeStats.h"
+#include "clang/Sema/ScopeInfo.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/Support/Compiler.h"
+
 namespace clang {
 
-class AnalysisDeclContext;
 class Decl;
 class FunctionDecl;
 class QualType;
 class Sema;
 class VarDecl;
-namespace sema {
-  class FunctionScopeInfo;
-  class SemaPPCallbacks;
-}
+class SourceLocation;
+class TranslationUnitDecl;
 
 namespace sema {
 

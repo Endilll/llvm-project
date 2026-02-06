@@ -14,14 +14,27 @@
 #ifndef LLVM_CLANG_LIB_STATICANALYZER_CHECKERS_RETAINCOUNTCHECKER_DIAGNOSTICS_H
 #define LLVM_CLANG_LIB_STATICANALYZER_CHECKERS_RETAINCOUNTCHECKER_DIAGNOSTICS_H
 
+#include <assert.h>
+
 #include "clang/Analysis/PathDiagnostic.h"
-#include "clang/Analysis/RetainSummaryManager.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
-#include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
+#include "clang/StaticAnalyzer/Core/BugReporter/CommonBugCategories.h"
+#include "clang/StaticAnalyzer/Core/Checker.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
+class LangOptions;
+class Stmt;
+
 namespace ento {
+class CheckerContext;
+class ExplodedNode;
+class MemRegion;
+
 namespace retaincountchecker {
 
 class RefCountBug : public BugType {

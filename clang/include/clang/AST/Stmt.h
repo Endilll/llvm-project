@@ -13,19 +13,26 @@
 #ifndef LLVM_CLANG_AST_STMT_H
 #define LLVM_CLANG_AST_STMT_H
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <tuple>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/DeclGroup.h"
 #include "clang/AST/DependenceFlags.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/StmtIterator.h"
-#include "clang/Basic/Builtins.h"
 #include "clang/Basic/CapturedStmt.h"
 #include "clang/Basic/ExpressionTraits.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Lambda.h"
 #include "clang/Basic/LangOptions.h"
-#include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/Specifiers.h"
 #include "clang/Basic/TypeTraits.h"
@@ -40,18 +47,16 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TrailingObjects.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <tuple>
+#include "clang/AST/Decl.h"
+#include "clang/Basic/TargetInfo.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 namespace llvm {
 
 class FoldingSetNodeID;
+class raw_ostream;
+template <typename T> class SmallVectorImpl;
 
 } // namespace llvm
 
@@ -67,9 +72,6 @@ class LabelDecl;
 class ODRHash;
 class PrinterHelper;
 struct PrintingPolicy;
-class RecordDecl;
-class SourceManager;
-class StringLiteral;
 class Token;
 class VarDecl;
 enum class CharacterLiteralKind;
@@ -79,6 +81,7 @@ enum class CXXNewInitializationStyle;
 enum class PredefinedIdentKind;
 enum class SourceLocIdentKind;
 enum class StringLiteralKind;
+enum OverloadedOperatorKind : int;
 
 //===----------------------------------------------------------------------===//
 // AST classes for statements.

@@ -11,6 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/Type.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <vector>
+#include <new>
+#include <type_traits>
+
 #include "Linkage.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
@@ -18,7 +30,6 @@
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclFriend.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/DependenceFlags.h"
@@ -51,14 +62,14 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <vector>
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/Redeclarable.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/APFixedPoint.h"
+#include "llvm/ADT/BitmaskEnum.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/raw_ostream.h"
 
 using namespace clang;
 

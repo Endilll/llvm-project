@@ -9,29 +9,6 @@
 #ifndef LLVM_CLANG_DEPENDENCYSCANNING_MODULEDEPCOLLECTOR_H
 #define LLVM_CLANG_DEPENDENCYSCANNING_MODULEDEPCOLLECTOR_H
 
-#include "clang/Basic/FileEntry.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/Module.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/DependencyScanning/DependencyScanningService.h"
-#include "clang/Frontend/CompilerInvocation.h"
-#include "clang/Frontend/DependencyOutputOptions.h"
-#include "clang/Frontend/FrontendOptions.h"
-#include "clang/Frontend/Utils.h"
-#include "clang/Lex/HeaderSearch.h"
-#include "clang/Lex/ModuleLoader.h"
-#include "clang/Lex/PPCallbacks.h"
-#include "clang/Serialization/ASTReader.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/DenseSet.h"
-#include "llvm/ADT/Hashing.h"
-#include "llvm/ADT/MapVector.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
-#include "llvm/ADT/SetVector.h"
-#include "llvm/ADT/SmallPtrSet.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringSet.h"
 #include <memory>
 #include <optional>
 #include <set>
@@ -41,12 +18,48 @@
 #include <variant>
 #include <vector>
 
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/Module.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Frontend/CompilerInvocation.h"
+#include "clang/Frontend/DependencyOutputOptions.h"
+#include "clang/Frontend/FrontendOptions.h"
+#include "clang/Frontend/Utils.h"
+#include "clang/Lex/ModuleLoader.h"
+#include "clang/Lex/PPCallbacks.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/Hashing.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringSet.h"
+#include "clang/Lex/HeaderSearchOptions.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+template <typename Fn> class function_ref;
+}  // namespace llvm
+
 namespace clang {
+class CodeGenOptions;
+class CompilerInstance;
+class LangOptions;
+
 namespace dependencies {
 
 class DependencyActionController;
 class DependencyConsumer;
 class PrebuiltModuleASTAttrs;
+class DependencyScanningService;
 
 /// Modular dependency that has already been built prior to the dependency scan.
 struct PrebuiltModuleDep {

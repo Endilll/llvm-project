@@ -11,6 +11,20 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstring>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <functional>
+#include <iterator>
+
 #include "clang/Basic/AttributeCommonInfo.h"
 #include "clang/Basic/Attributes.h"
 #include "clang/Basic/CharInfo.h"
@@ -26,7 +40,6 @@
 #include "clang/Basic/Module.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TargetInfo.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/CodeCompletionHandler.h"
 #include "clang/Lex/HeaderSearch.h"
@@ -54,17 +67,22 @@
 #include "llvm/Support/MemoryBufferRef.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/SaveAndRestore.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstring>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "clang/Basic/CustomizableOptional.h"
+#include "clang/Lex/Lexer.h"
+#include "clang/Lex/MultipleIncludeOpt.h"
+#include "clang/Lex/PreprocessorLexer.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace clang {
+class TargetInfo;
+}  // namespace clang
 
 using namespace clang;
 

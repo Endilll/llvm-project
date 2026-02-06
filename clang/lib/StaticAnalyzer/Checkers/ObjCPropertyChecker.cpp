@@ -14,6 +14,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <string>
+
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Analysis/PathDiagnostic.h"
@@ -23,7 +25,16 @@
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/CheckerManager.h"
 #include "llvm/Support/raw_ostream.h"
-#include <string>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace ento {
+class AnalysisManager;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

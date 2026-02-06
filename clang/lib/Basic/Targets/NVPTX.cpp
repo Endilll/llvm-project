@@ -11,6 +11,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "NVPTX.h"
+
+#include <cassert>
+#include <iterator>
+#include <vector>
+
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/Cuda.h"
@@ -27,8 +32,7 @@
 #include "llvm/ADT/Twine.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/TargetParser/Triple.h"
-#include <cassert>
-#include <iterator>
+#include "clang/Basic/LangOptions.h"
 
 using namespace clang;
 using namespace clang::targets;

@@ -7,8 +7,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/LifetimeSafety/Facts.h"
+
+#include <cassert>
+#include <cstddef>
+#include <string>
+#include <vector>
+
 #include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Loans.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Origins.h"
 #include "clang/Analysis/Analyses/PostOrderCFGView.h"
@@ -19,8 +24,12 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstddef>
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Decl;
+}  // namespace clang
 
 namespace clang::lifetimes::internal {
 

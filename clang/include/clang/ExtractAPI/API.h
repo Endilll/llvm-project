@@ -18,20 +18,6 @@
 #ifndef LLVM_CLANG_EXTRACTAPI_API_H
 #define LLVM_CLANG_EXTRACTAPI_API_H
 
-#include "clang/AST/Availability.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclTemplate.h"
-#include "clang/AST/RawCommentList.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangStandard.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/Visibility.h"
-#include "clang/ExtractAPI/DeclarationFragments.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/Support/Allocator.h"
-#include "llvm/Support/Casting.h"
-#include "llvm/TargetParser/Triple.h"
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -41,7 +27,27 @@
 #include <utility>
 #include <vector>
 
+#include "clang/AST/Availability.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/RawCommentList.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/Visibility.h"
+#include "clang/ExtractAPI/DeclarationFragments.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Allocator.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
+#include "clang/AST/ASTConcept.h"
+#include "clang/AST/Decl.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
 namespace clang {
+enum class Language : uint8_t;
+
 namespace extractapi {
 
 class Template {

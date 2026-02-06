@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "Marshallers.h"
+
+#include <cassert>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "clang/AST/OperationKinds.h"
 #include "clang/ASTMatchers/Dynamic/VariantValue.h"
 #include "clang/Basic/AttrKinds.h"
@@ -17,10 +23,7 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Regex.h"
-#include <cassert>
-#include <optional>
-#include <string>
-#include <utility>
+#include "llvm/ADT/BitmaskEnum.h"
 
 static std::optional<std::string>
 getBestGuess(llvm::StringRef Search, llvm::ArrayRef<llvm::StringRef> Allowed,

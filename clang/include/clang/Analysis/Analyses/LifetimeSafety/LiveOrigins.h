@@ -21,17 +21,25 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_LIVE_ORIGINS_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_LIFETIMESAFETY_LIVE_ORIGINS_H
 
+#include <cstdint>
+#include <memory>
+
 #include "clang/Analysis/Analyses/LifetimeSafety/Facts.h"
 #include "clang/Analysis/Analyses/LifetimeSafety/Origins.h"
-#include "clang/Analysis/AnalysisDeclContext.h"
-#include "clang/Analysis/CFG.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/ImmutableMap.h"
 #include "llvm/ADT/PointerUnion.h"
 #include "llvm/ADT/StringMap.h"
-#include "llvm/Support/Debug.h"
-#include <cstdint>
-#include <memory>
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace clang {
+class AnalysisDeclContext;
+class CFG;
+}  // namespace clang
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang::lifetimes::internal {
 
@@ -95,6 +103,7 @@ public:
 
 private:
   class Impl;
+
   std::unique_ptr<Impl> PImpl;
 };
 

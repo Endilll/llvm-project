@@ -11,14 +11,19 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaAVR.h"
+
 #include "clang/AST/DeclBase.h"
 #include "clang/Basic/DiagnosticSema.h"
 #include "clang/Sema/Attr.h"
 #include "clang/Sema/ParsedAttr.h"
-#include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaBase.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/TypeBase.h"
+#include "clang/Basic/AttributeCommonInfo.h"
 
 namespace clang {
+class Sema;
+
 SemaAVR::SemaAVR(Sema &S) : SemaBase(S) {}
 
 void SemaAVR::handleInterruptAttr(Decl *D, const ParsedAttr &AL) {

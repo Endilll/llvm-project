@@ -9,11 +9,15 @@
 #ifndef LLVM_CLANG_ANALYSIS_SCALABLE_MODEL_ENTITY_ID_TABLE_H
 #define LLVM_CLANG_ANALYSIS_SCALABLE_MODEL_ENTITY_ID_TABLE_H
 
-#include "clang/Analysis/Scalable/Model/EntityId.h"
-#include "clang/Analysis/Scalable/Model/EntityName.h"
-#include "llvm/ADT/STLFunctionalExtras.h"
 #include <cstddef>
 #include <map>
+
+#include "clang/Analysis/Scalable/Model/EntityId.h"
+#include "clang/Analysis/Scalable/Model/EntityName.h"
+
+namespace llvm {
+template <typename Fn> class function_ref;
+}  // namespace llvm
 
 namespace clang::ssaf {
 

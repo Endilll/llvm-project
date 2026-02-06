@@ -15,6 +15,12 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CALLEVENT_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CALLEVENT_H
 
+#include <cassert>
+#include <optional>
+#include <utility>
+#include <iterator>
+#include <new>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -27,7 +33,6 @@
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ExprEngine.h"
@@ -44,16 +49,22 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/Analysis/CFG.h"
+#include "clang/Analysis/ConstructionContext.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+class raw_ostream;
+}  // namespace llvm
 
 namespace clang {
 
-class LocationContext;
 class ProgramPoint;
 class ProgramPointTag;
-class StackFrameContext;
+enum OverloadedOperatorKind : int;
 
 namespace ento {
 

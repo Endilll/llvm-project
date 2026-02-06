@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/Basic/CodeGenOptions.h"
 #include "clang/Basic/DiagnosticFrontend.h"
 #include "clang/Basic/Stack.h"
 #include "clang/Basic/TargetOptions.h"
@@ -21,6 +22,7 @@
 #include "clang/Driver/DriverDiagnostic.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/CompilerInvocation.h"
+#include "clang/Frontend/FrontendOptions.h"
 #include "clang/Frontend/TextDiagnosticBuffer.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
 #include "clang/Frontend/Utils.h"

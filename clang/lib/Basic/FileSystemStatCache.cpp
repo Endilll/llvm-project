@@ -11,13 +11,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/FileSystemStatCache.h"
+
+#include <memory>
+#include <system_error>
+#include <utility>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <memory>
-#include <system_error>
-#include <utility>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
 
 using namespace clang;
 

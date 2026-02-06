@@ -15,7 +15,4 @@
 #ifndef LLVM_CLANG_LIB_BASIC_TARGETS_H
 #define LLVM_CLANG_LIB_BASIC_TARGETS_H
 
-#include "TargetDefines.h"
-#include "clang/Basic/TargetInfo.h"
-
 #endif // LLVM_CLANG_LIB_BASIC_TARGETS_H

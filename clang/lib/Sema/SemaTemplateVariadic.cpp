@@ -8,6 +8,15 @@
 //  This file implements semantic analysis for C++0x variadic templates.
 //===----------------------------------------------------------------------===/
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <tuple>
+#include <utility>
+
 #include "TypeLocBuilder.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -37,7 +46,6 @@
 #include "clang/Sema/DeclSpec.h"
 #include "clang/Sema/Lookup.h"
 #include "clang/Sema/Ownership.h"
-#include "clang/Sema/ParsedAttr.h"
 #include "clang/Sema/ParsedTemplate.h"
 #include "clang/Sema/ScopeInfo.h"
 #include "clang/Sema/Sema.h"
@@ -52,13 +60,20 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <tuple>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/PartialDiagnostic.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Scope;
+}  // namespace clang
 
 using namespace clang;
 

@@ -14,6 +14,14 @@
 #ifndef LLVM_CLANG_AST_ASTIMPORTER_H
 #define LLVM_CLANG_AST_ASTIMPORTER_H
 
+#include <algorithm>
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <tuple>
+#include <iterator>
+#include <variant>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTImportError.h"
 #include "clang/AST/DeclBase.h"
@@ -31,28 +39,26 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/SmallVector.h"
-#include <algorithm>
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <tuple>
+#include "clang/AST/TemplateBase.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Error.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 
 class ASTContext;
 class ASTImporterSharedState;
 class Attr;
-class CXXBaseSpecifier;
-class CXXCtorInitializer;
-class Decl;
-class DeclContext;
 class Expr;
 class FileManager;
 class NamedDecl;
 class Stmt;
-class TagDecl;
 class TranslationUnitDecl;
-class TypeSourceInfo;
+class FunctionDecl;
 
   // \brief Returns with a list of declarations started from the canonical decl
   // then followed by subsequent decls in the translation unit.

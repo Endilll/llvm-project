@@ -9,17 +9,20 @@
 #ifndef LLVM_CLANG_TOOLING_INCLUSIONS_HEADERINCLUDES_H
 #define LLVM_CLANG_TOOLING_INCLUSIONS_HEADERINCLUDES_H
 
+#include <list>
+#include <optional>
+#include <set>
+#include <string>
+#include <unordered_map>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Tooling/Core/Replacement.h"
 #include "clang/Tooling/Inclusions/IncludeStyle.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/Regex.h"
-#include <list>
-#include <optional>
-#include <set>
-#include <string>
-#include <unordered_map>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 namespace tooling {

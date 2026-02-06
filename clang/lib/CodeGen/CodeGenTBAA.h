@@ -14,11 +14,22 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CODEGENTBAA_H
 #define LLVM_CLANG_LIB_CODEGEN_CODEGENTBAA_H
 
-#include "clang/AST/Type.h"
+#include <stdint.h>
+#include <memory>
+
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/IR/MDBuilder.h"
-#include "llvm/IR/Metadata.h"
+#include "llvm/ADT/DenseMapInfo.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/SmallVector.h"
+
+namespace llvm {
+class MDNode;
+class Module;
+class StringRef;
+class Type;
+}  // namespace llvm
 
 namespace clang {
   class ASTContext;

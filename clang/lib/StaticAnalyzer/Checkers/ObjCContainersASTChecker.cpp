@@ -10,6 +10,9 @@
 // 'CFDictionary', 'CFSet' APIs.
 //
 //===----------------------------------------------------------------------===//
+#include <cassert>
+#include <cstdint>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/TypeBase.h"
@@ -26,8 +29,14 @@
 #include "clang/StaticAnalyzer/Core/Checker.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 using namespace ento;

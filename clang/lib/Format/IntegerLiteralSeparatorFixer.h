@@ -15,10 +15,21 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_INTEGERLITERALSEPARATORFIXER_H
 #define LLVM_CLANG_LIB_FORMAT_INTEGERLITERALSEPARATORFIXER_H
 
-#include "TokenAnalyzer.h"
+#include <iterator>
+#include <string>
+#include <utility>
+
+#include "clang/Basic/LLVM.h"
+#include "clang/Tooling/Core/Replacement.h"
+
+namespace llvm {
+class StringRef;
+}  // namespace llvm
 
 namespace clang {
 namespace format {
+class Environment;
+struct FormatStyle;
 
 class IntegerLiteralSeparatorFixer {
 public:

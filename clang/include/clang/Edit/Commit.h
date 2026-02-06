@@ -14,6 +14,8 @@
 #include "clang/Edit/FileOffset.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Allocator.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 

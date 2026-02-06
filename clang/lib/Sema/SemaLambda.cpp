@@ -10,11 +10,18 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Sema/SemaLambda.h"
+
+#include <cassert>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+
 #include "TypeLocBuilder.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTLambda.h"
 #include "clang/AST/Attr.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
@@ -27,7 +34,6 @@
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Stmt.h"
 #include "clang/AST/StmtCXX.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/AddressSpaces.h"
 #include "clang/Basic/Diagnostic.h"
@@ -63,12 +69,22 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/LambdaCapture.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Sema/ParsedAttr.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/TargetParser/Triple.h"
+
+namespace clang {
+class Attr;
+}  // namespace clang
+
 using namespace clang;
 using namespace sema;
 

@@ -12,6 +12,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <climits>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <tuple>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclObjC.h"
@@ -50,13 +58,24 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <climits>
-#include <cstdint>
-#include <memory>
-#include <optional>
-#include <tuple>
-#include <utility>
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Analysis/CFG.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ConstraintManager.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class LocationContext;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

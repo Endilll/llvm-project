@@ -6,6 +6,12 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Tooling/Syntax/Tree.h"
+
+#include <cassert>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Tooling/Syntax/Nodes.h"
@@ -14,10 +20,7 @@
 #include "llvm/ADT/STLFunctionalExtras.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

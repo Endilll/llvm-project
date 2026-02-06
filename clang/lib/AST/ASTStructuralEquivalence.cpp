@@ -59,6 +59,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ASTStructuralEquivalence.h"
+
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <optional>
+#include <tuple>
+#include <utility>
+#include <string>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
@@ -92,12 +101,21 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <optional>
-#include <tuple>
-#include <utility>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclAccessPair.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/Expr.h"
+#include "clang/AST/ExternalASTSource.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/Stmt.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

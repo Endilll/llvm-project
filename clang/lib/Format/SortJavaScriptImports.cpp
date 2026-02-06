@@ -12,10 +12,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "SortJavaScriptImports.h"
+
+#include <cassert>
+#include <iterator>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <memory>
+
 #include "FormatToken.h"
 #include "TokenAnalyzer.h"
 #include "TokenAnnotator.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
@@ -27,18 +34,17 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/Error.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <iterator>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "AffectedRangeManager.h"
+#include "FormatTokenLexer.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 #define DEBUG_TYPE "format-formatter"
 
 namespace clang {
 namespace format {
-
-class FormatTokenLexer;
 
 // An imported symbol in a JavaScript ES6 import/export, possibly aliased.
 struct JsImportedSymbol {

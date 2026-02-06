@@ -5,6 +5,18 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 //===----------------------------------------------------------------------===//
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+#include <iterator>
+#include <memory>
+#include <new>
+#include <type_traits>
+
 #include "../ExprConstShared.h"
 #include "Boolean.h"
 #include "ByteCode/BitcastBuffer.h"
@@ -16,7 +28,6 @@
 #include "ByteCode/Record.h"
 #include "ByteCode/Source.h"
 #include "ByteCode/State.h"
-#include "EvalEmitter.h"
 #include "InterpBuiltinBitCast.h"
 #include "InterpHelpers.h"
 #include "PrimType.h"
@@ -30,10 +41,7 @@
 #include "clang/AST/OSLog.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/RecordLayout.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/Builtins.h"
-#include "clang/Basic/DiagnosticAST.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
@@ -51,13 +59,26 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/SipHash.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
+#include "ByteCode/Context.h"
+#include "ByteCode/Integral.h"
+#include "ByteCode/IntegralAP.h"
+#include "ByteCode/InterpBlock.h"
+#include "ByteCode/InterpStack.h"
+#include "ByteCode/InterpState.h"
+#include "ByteCode/MemberPointer.h"
+#include "ByteCode/Pointer.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/OptionalDiagnostic.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 namespace interp {

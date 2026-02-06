@@ -12,6 +12,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+
+#include <cassert>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <new>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/OperationKinds.h"
@@ -27,10 +34,13 @@
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/FoldingSet.h"
 #include "llvm/ADT/PointerUnion.h"
-#include <cassert>
-#include <cstdint>
-#include <memory>
-#include <optional>
+#include "clang/AST/DeclCXX.h"
+#include "clang/Analysis/CFGStmtMap.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace ento;

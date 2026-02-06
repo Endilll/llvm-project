@@ -13,7 +13,8 @@
 #ifndef LLVM_CLANG_INSTALLAPI_FRONTEND_H
 #define LLVM_CLANG_INSTALLAPI_FRONTEND_H
 
-#include "clang/AST/ASTConsumer.h"
+#include <memory>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/FrontendAction.h"
@@ -21,7 +22,8 @@
 #include "clang/InstallAPI/DylibVerifier.h"
 #include "clang/InstallAPI/Visitor.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include <memory>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace clang {
 namespace installapi {

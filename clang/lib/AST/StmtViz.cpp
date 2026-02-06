@@ -11,12 +11,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/AST/Decl.h"
+#include <string>
+
 #include "clang/AST/Stmt.h"
 #include "llvm/Support/DOTGraphTraits.h"
-#include "llvm/Support/GraphWriter.h"
 #include "llvm/Support/raw_ostream.h"
-#include <string>
 
 using namespace clang;
 

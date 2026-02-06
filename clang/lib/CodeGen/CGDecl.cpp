@@ -10,10 +10,20 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <utility>
+#include <iterator>
+#include <memory>
+#include <new>
+#include <tuple>
+
 #include "Address.h"
 #include "CGBlocks.h"
 #include "CGBuilder.h"
-#include "CGCXXABI.h"
 #include "CGCall.h"
 #include "CGCleanup.h"
 #include "CGDebugInfo.h"
@@ -41,10 +51,8 @@
 #include "clang/AST/ExprCXX.h"
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/Stmt.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/ABI.h"
 #include "clang/Basic/CodeGenOptions.h"
-#include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Sanitizers.h"
 #include "clang/Basic/SourceLocation.h"
@@ -65,14 +73,40 @@
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/Metadata.h"
 #include "llvm/IR/Type.h"
-#include "llvm/IR/Use.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <utility>
+#include "CodeGenTypes.h"
+#include "SanitizerMetadata.h"
+#include "VarBypassDetector.h"
+#include "clang/AST/GlobalDecl.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/AddressSpaces.h"
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetCXXABI.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/IR/Constant.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Value.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/TypeSize.h"
+
+namespace llvm {
+class BasicBlock;
+class Instruction;
+class LLVMContext;
+class Use;
+}  // namespace llvm
 
 using namespace clang;
 using namespace CodeGen;

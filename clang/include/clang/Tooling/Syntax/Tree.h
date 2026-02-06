@@ -21,15 +21,17 @@
 #ifndef LLVM_CLANG_TOOLING_SYNTAX_TREE_H
 #define LLVM_CLANG_TOOLING_SYNTAX_TREE_H
 
+#include <cstdint>
+#include <iterator>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Tooling/Syntax/TokenManager.h"
 #include "llvm/ADT/iterator.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
-#include <cstdint>
-#include <iterator>
-#include <string>
-#include <vector>
+#include "llvm/Support/AllocatorBase.h"
 
 namespace clang {
 namespace syntax {
@@ -45,10 +47,6 @@ private:
 };
 
 class Tree;
-class TreeBuilder;
-class FactoryImpl;
-class MutationsImpl;
-
 enum class NodeKind : uint16_t;
 enum class NodeRole : uint8_t;
 

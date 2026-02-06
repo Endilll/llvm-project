@@ -11,6 +11,20 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ExprCXX.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <variant>
+#include <new>
+#include <tuple>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
 #include "clang/AST/ComputeDependence.h"
@@ -43,16 +57,9 @@
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <utility>
-#include <variant>
+#include "clang/AST/APValue.h"
+#include "clang/AST/CanonicalType.h"
+#include "llvm/ADT/BitmaskEnum.h"
 
 using namespace clang;
 

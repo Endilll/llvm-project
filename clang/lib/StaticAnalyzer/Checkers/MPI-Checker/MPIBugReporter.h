@@ -15,12 +15,22 @@
 #ifndef LLVM_CLANG_LIB_STATICANALYZER_CHECKERS_MPICHECKER_MPIBUGREPORTER_H
 #define LLVM_CLANG_LIB_STATICANALYZER_CHECKERS_MPICHECKER_MPIBUGREPORTER_H
 
+#include <string>
+
 #include "MPITypes.h"
 #include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
 #include "llvm/ADT/StringRef.h"
+#include "clang/StaticAnalyzer/Core/BugReporter/BugReporterVisitors.h"
+#include "clang/StaticAnalyzer/Core/Checker.h"
+#include "llvm/ADT/FoldingSet.h"
 
 namespace clang {
 namespace ento {
+class BugReporter;
+class CallEvent;
+class ExplodedNode;
+class MemRegion;
+
 namespace mpi {
 
 class MPIBugReporter {

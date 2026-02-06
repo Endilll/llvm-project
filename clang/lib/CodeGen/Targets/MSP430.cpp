@@ -6,13 +6,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <string>
+
 #include "ABIInfoImpl.h"
 #include "Address.h"
 #include "CGValue.h"
 #include "CodeGenModule.h"
-#include "CodeGenTypes.h"
 #include "TargetInfo.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
@@ -21,7 +23,18 @@
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/CallingConv.h"
 #include "llvm/IR/Function.h"
-#include <memory>
+#include "ABIInfo.h"
+#include "CGCXXABI.h"
+#include "CodeGenFunction.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/IR/GlobalValue.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace CodeGen {
+class CodeGenTypes;
+}  // namespace CodeGen
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::CodeGen;

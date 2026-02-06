@@ -14,10 +14,16 @@
 #ifndef LLVM_CLANG_LEX_PREPROCESSINGRECORD_H
 #define LLVM_CLANG_LEX_PREPROCESSINGRECORD_H
 
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <optional>
+#include <utility>
+#include <vector>
+
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/Module.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Lex/PPCallbacks.h"
@@ -27,12 +33,9 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <optional>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 
@@ -50,9 +53,7 @@ void operator delete(void *ptr, clang::PreprocessingRecord &PR,
 
 namespace clang {
 
-class IdentifierInfo;
 class MacroInfo;
-class SourceManager;
 class Token;
 
   /// Base class that describes a preprocessed entity, which may be a

@@ -7,8 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/LogDiagnosticPrinter.h"
+
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/PlistSupport.h"
@@ -16,9 +20,10 @@
 #include "clang/Basic/SourceManager.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/Basic/DiagnosticIDs.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+
 using namespace clang;
 using namespace markup;
 

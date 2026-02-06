@@ -11,6 +11,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Serialization/GlobalModuleIndex.h"
+
+#include <sys/types.h>
+#include <cassert>
+#include <cstdint>
+#include <cstdio>
+#include <map>
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <array>
+#include <functional>
+#include <initializer_list>
+#include <new>
+
 #include "ASTReaderInternals.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/FileManager.h"
@@ -44,16 +59,13 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdint>
-#include <cstdio>
-#include <ctime>
-#include <map>
-#include <memory>
-#include <string>
-#include <sys/types.h>
-#include <system_error>
-#include <utility>
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/MemAlloc.h"
+#include "llvm/Support/MemoryBufferRef.h"
+
 using namespace clang;
 using namespace serialization;
 

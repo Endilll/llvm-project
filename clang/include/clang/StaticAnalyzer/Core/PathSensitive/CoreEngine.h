@@ -14,6 +14,13 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_COREENGINE_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_COREENGINE_H
 
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/AST/Stmt.h"
 #include "clang/Analysis/AnalysisDeclContext.h"
 #include "clang/Analysis/CFG.h"
@@ -26,11 +33,9 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/WorkList.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/iterator_range.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <utility>
-#include <vector>
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 

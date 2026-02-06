@@ -9,16 +9,19 @@
 #ifndef LLVM_CLANG_ANALYZER_WEBKIT_ASTUTILS_H
 #define LLVM_CLANG_ANALYZER_WEBKIT_ASTUTILS_H
 
-#include "clang/AST/Decl.h"
-#include "llvm/ADT/APInt.h"
-#include "llvm/Support/Casting.h"
-
 #include <functional>
 #include <string>
-#include <utility>
+
+#include "clang/AST/Decl.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 class Expr;
+class CXXRecordDecl;
+class Decl;
+class QualType;
 
 /// This function de-facto defines a set of transformations that we consider
 /// safe (in heuristical sense). These transformation if passed a safe value as

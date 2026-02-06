@@ -9,21 +9,23 @@
 #ifndef LLVM_CLANG_INDEX_INDEXINGACTION_H
 #define LLVM_CLANG_INDEX_INDEXINGACTION_H
 
-#include "clang/AST/ASTConsumer.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Index/IndexingOptions.h"
-#include "clang/Lex/PPCallbacks.h"
-#include "clang/Lex/Preprocessor.h"
 #include <functional>
 #include <memory>
 
+#include "clang/AST/ASTConsumer.h"
+#include "clang/Lex/PPCallbacks.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
+
 namespace clang {
   class ASTContext;
-  class ASTConsumer;
   class ASTReader;
   class ASTUnit;
   class Decl;
   class FrontendAction;
+class Preprocessor;
 
 namespace serialization {
   class ModuleFile;
@@ -31,6 +33,7 @@ namespace serialization {
 
 namespace index {
 class IndexDataConsumer;
+struct IndexingOptions;
 
 /// Creates an ASTConsumer that indexes all symbols (macros and AST decls).
 std::unique_ptr<ASTConsumer>

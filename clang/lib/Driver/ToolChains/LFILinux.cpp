@@ -7,9 +7,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "LFILinux.h"
-#include "clang/Driver/Driver.h"
-#include "llvm/Option/ArgList.h"
+
 #include "llvm/Option/Option.h"
+#include "clang/Driver/ToolChain.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

@@ -9,22 +9,6 @@
 #ifndef LLVM_CLANG_DRIVER_TOOLCHAIN_H
 #define LLVM_CLANG_DRIVER_TOOLCHAIN_H
 
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/Sanitizers.h"
-#include "clang/Driver/Action.h"
-#include "clang/Driver/Multilib.h"
-#include "clang/Driver/Types.h"
-#include "llvm/ADT/APFloat.h"
-#include "llvm/ADT/FloatingPointMode.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Frontend/Debug/Options.h"
-#include "llvm/MC/MCTargetOptions.h"
-#include "llvm/Option/Option.h"
-#include "llvm/Support/VersionTuple.h"
-#include "llvm/Target/TargetOptions.h"
-#include "llvm/TargetParser/Triple.h"
 #include <cassert>
 #include <climits>
 #include <memory>
@@ -32,7 +16,29 @@
 #include <string>
 #include <utility>
 
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/Sanitizers.h"
+#include "clang/Driver/Action.h"
+#include "clang/Driver/Multilib.h"
+#include "clang/Driver/Types.h"
+#include "llvm/ADT/FloatingPointMode.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Frontend/Debug/Options.h"
+#include "llvm/Option/Option.h"
+#include "llvm/Target/TargetOptions.h"
+#include "llvm/TargetParser/Triple.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/CodeGen.h"
+#include "llvm/Support/Error.h"
+
 namespace llvm {
+class VersionTuple;
+class raw_ostream;
+struct fltSemantics;
+template <typename T> class ArrayRef;
+
 namespace opt {
 
 class Arg;

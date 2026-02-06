@@ -12,6 +12,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Core/PathSensitive/SimpleConstraintManager.h"
+
+#include <cassert>
+#include <optional>
+
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ExprEngine.h"
@@ -22,8 +26,11 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <optional>
+#include "clang/AST/ASTContext.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/Support/Casting.h"
 
 namespace clang {
 

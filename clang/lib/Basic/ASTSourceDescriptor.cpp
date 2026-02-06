@@ -12,8 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/ASTSourceDescriptor.h"
-#include "clang/Basic/Module.h"
+
 #include <string>
+
+#include "clang/Basic/Module.h"
+#include "clang/Basic/DirectoryEntry.h"
+#include "clang/Basic/FileEntry.h"
 
 namespace clang {
 

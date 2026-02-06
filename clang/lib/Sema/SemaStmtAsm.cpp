@@ -10,6 +10,15 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <utility>
+
 #include "clang/AST/APValue.h"
 #include "clang/AST/CharUnits.h"
 #include "clang/AST/Decl.h"
@@ -21,8 +30,6 @@
 #include "clang/AST/OperationKinds.h"
 #include "clang/AST/RecordLayout.h"
 #include "clang/AST/Stmt.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/AST/TypeLoc.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticIDs.h"
 #include "clang/Basic/DiagnosticSema.h"
@@ -31,13 +38,9 @@
 #include "clang/Basic/Specifiers.h"
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Lex/Preprocessor.h"
-#include "clang/Lex/Token.h"
 #include "clang/Sema/DeclSpec.h"
-#include "clang/Sema/Initialization.h"
 #include "clang/Sema/Lookup.h"
 #include "clang/Sema/Ownership.h"
-#include "clang/Sema/Scope.h"
-#include "clang/Sema/ScopeInfo.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaBase.h"
 #include "llvm/ADT/APSInt.h"
@@ -48,14 +51,23 @@
 #include "llvm/ADT/StringSet.h"
 #include "llvm/MC/MCParser/MCAsmParser.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <optional>
-#include <string>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Sema/TemplateDeduction.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class Token;
+}  // namespace clang
+
 using namespace clang;
 using namespace sema;
 

@@ -17,26 +17,32 @@
 #ifndef LLVM_CLANG_ANALYSIS_CALLGRAPH_H
 #define LLVM_CLANG_ANALYSIS_CALLGRAPH_H
 
+#include <memory>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclObjC.h"
 #include "clang/AST/DynamicRecursiveASTVisitor.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseMapInfo.h"
-#include "llvm/ADT/GraphTraits.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/TimeProfiler.h"
-#include <memory>
+#include "clang/AST/DeclBase.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class raw_ostream;
+template <class GraphType> struct GraphTraits;
+}  // namespace llvm
 
 namespace clang {
 
 class CallGraphNode;
-class Decl;
-class DeclContext;
-class Stmt;
+class Expr;
 
 /// The AST-based call graph.
 ///

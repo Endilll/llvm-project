@@ -32,6 +32,24 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <algorithm>
+#include <cassert>
+#include <climits>
+#include <cstdint>
+#include <cstring>
+#include <functional>
+#include <iterator>
+#include <limits>
+#include <map>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <initializer_list>
+#include <list>
+#include <type_traits>
+#include <variant>
+
 #include "ByteCode/Context.h"
 #include "ByteCode/Frame.h"
 #include "ByteCode/State.h"
@@ -59,7 +77,6 @@
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/StmtVisitor.h"
 #include "clang/AST/Type.h"
-#include "clang/AST/TypeLoc.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticAST.h"
@@ -78,7 +95,6 @@
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/FloatingPointMode.h"
 #include "llvm/ADT/Hashing.h"
 #include "llvm/ADT/PointerIntPair.h"
@@ -99,19 +115,18 @@
 #include "llvm/Support/SwapByteOrder.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <climits>
-#include <cstdint>
-#include <cstring>
-#include <functional>
-#include <iterator>
-#include <limits>
-#include <map>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/ExprConcepts.h"
+#include "clang/AST/ExprObjC.h"
+#include "clang/AST/Stmt.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 #define DEBUG_TYPE "exprconstant"
 
@@ -124,7 +139,6 @@ using llvm::FixedPointSemantics;
 
 namespace {
   struct LValue;
-  class CallStackFrame;
   class EvalInfo;
 
   using SourceLocExprScopeGuard =

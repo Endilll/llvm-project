@@ -14,10 +14,17 @@
 #ifndef LLVM_CLANG_LIB_FORMAT_SORTJAVASCRIPTIMPORTS_H
 #define LLVM_CLANG_LIB_FORMAT_SORTJAVASCRIPTIMPORTS_H
 
-#include "clang/Format/Format.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Tooling/Core/Replacement.h"
+
+namespace llvm {
+class StringRef;
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 namespace format {
+struct FormatStyle;
 
 // Sort JavaScript ES6 imports/exports in ``Code``. The generated replacements
 // only monotonically increase the length of the given code.

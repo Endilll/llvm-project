@@ -11,8 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/StaticAnalyzer/Checkers/Taint.h"
+
+#include <cassert>
+#include <optional>
+#include <vector>
+#include <utility>
+
 #include "clang/Basic/LLVM.h"
-#include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramStateTrait.h"
@@ -23,9 +28,17 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <optional>
-#include <vector>
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState.h"
+#include "llvm/ADT/ImmutableSet.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class LocationContext;
+class Stmt;
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

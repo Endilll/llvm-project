@@ -10,9 +10,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/HLSLExternalSemaSource.h"
+
+#include <utility>
+
 #include "HLSLBuiltinTypeDeclBuilder.h"
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/Attr.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"
@@ -34,7 +36,14 @@
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/SmallVector.h"
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/TemplateBase.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Frontend/HLSL/HLSLRootSignature.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/DXILABI.h"
 
 using namespace clang;
 using namespace llvm::hlsl;

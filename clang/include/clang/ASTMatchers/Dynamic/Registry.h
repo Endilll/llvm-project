@@ -16,19 +16,26 @@
 #ifndef LLVM_CLANG_ASTMATCHERS_DYNAMIC_REGISTRY_H
 #define LLVM_CLANG_ASTMATCHERS_DYNAMIC_REGISTRY_H
 
-#include "clang/AST/ASTTypeTraits.h"
-#include "clang/ASTMatchers/Dynamic/Diagnostics.h"
-#include "clang/ASTMatchers/Dynamic/VariantValue.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/ArrayRef.h"
 #include <optional>
 #include <string>
-#include <utility>
 #include <vector>
+#include <iterator>
+
+#include "clang/AST/ASTTypeTraits.h"
+#include "clang/ASTMatchers/Dynamic/VariantValue.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+template <typename T> class ArrayRef;
+}  // namespace llvm
 
 namespace clang {
 namespace ast_matchers {
 namespace dynamic {
+class Diagnostics;
+struct ParserValue;
+struct SourceRange;
 
 namespace internal {
 

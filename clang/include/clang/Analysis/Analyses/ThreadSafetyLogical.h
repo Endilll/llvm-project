@@ -12,10 +12,12 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_THREADSAFETYLOGICAL_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_THREADSAFETYLOGICAL_H
 
-#include "clang/Analysis/Analyses/ThreadSafetyTIL.h"
-
 namespace clang {
 namespace threadSafety {
+namespace til {
+class SExpr;
+}  // namespace til
+
 namespace lexpr {
 
 class LExpr {

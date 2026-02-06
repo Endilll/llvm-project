@@ -14,27 +14,6 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CHECKERCONTEXT_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_CHECKERCONTEXT_H
 
-#include "clang/AST/Decl.h"
-#include "clang/AST/Expr.h"
-#include "clang/Analysis/AnalysisDeclContext.h"
-#include "clang/Analysis/CFG.h"
-#include "clang/Analysis/ProgramPoint.h"
-#include "clang/Basic/IdentifierTable.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Lex/Preprocessor.h"
-#include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/CoreEngine.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ExprEngine.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/Store.h"
-#include "llvm/ADT/SmallString.h"
-#include "llvm/Support/Compiler.h"
-#include "llvm/Support/raw_ostream.h"
 #include <cassert>
 #include <functional>
 #include <memory>
@@ -42,8 +21,43 @@
 #include <string>
 #include <utility>
 
+#include "clang/AST/Decl.h"
+#include "clang/Analysis/AnalysisDeclContext.h"
+#include "clang/Analysis/CFG.h"
+#include "clang/Analysis/ProgramPoint.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/CoreEngine.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExprEngine.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SValBuilder.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/raw_ostream.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/ExplodedGraph.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+
 namespace clang {
+class CallExpr;
+class Decl;
+class Expr;
+class IdentifierInfo;
+class LangOptions;
+class Preprocessor;
+class SourceLocation;
+class SourceManager;
+class Stmt;
+
 namespace ento {
+class AnalysisManager;
+class ConstraintManager;
+class MemRegion;
+class ProgramStateManager;
+class StoreManager;
+class SymbolManager;
 
 class CheckerContext {
   ExprEngine &Eng;

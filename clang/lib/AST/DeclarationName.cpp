@@ -12,6 +12,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/DeclarationName.h"
+
+#include <algorithm>
+#include <cassert>
+#include <string>
+#include <utility>
+
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -19,7 +25,6 @@
 #include "clang/AST/DeclTemplate.h"
 #include "clang/AST/OpenMPClause.h"
 #include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/Type.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/AST/TypeOrdering.h"
 #include "clang/Basic/IdentifierTable.h"
@@ -31,10 +36,9 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <string>
-#include <utility>
+#include "clang/AST/CanonicalType.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

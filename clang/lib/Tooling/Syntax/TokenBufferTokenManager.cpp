@@ -7,13 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Tooling/Syntax/TokenBufferTokenManager.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Tooling/Syntax/Tokens.h"
-#include "llvm/Support/MemoryBuffer.h"
+
 #include <cassert>
 #include <memory>
 #include <utility>
+
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Tooling/Syntax/Tokens.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "clang/Basic/SourceManager.h"
 
 namespace clang {
 namespace syntax {

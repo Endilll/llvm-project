@@ -9,21 +9,23 @@
 #ifndef LLVM_CLANG_FRONTEND_VERIFYDIAGNOSTICCONSUMER_H
 #define LLVM_CLANG_FRONTEND_VERIFYDIAGNOSTICCONSUMER_H
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/FileEntry.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Lex/Preprocessor.h"
-#include "llvm/ADT/DenseMap.h"
 #include <cassert>
 #include <limits>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Lex/Preprocessor.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+
 namespace clang {
 
-class FileEntry;
 class LangOptions;
 class SourceManager;
 class TextDiagnosticBuffer;

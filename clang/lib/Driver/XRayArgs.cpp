@@ -6,8 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 #include "clang/Driver/XRayArgs.h"
-#include "clang/Basic/DiagnosticDriver.h"
-#include "clang/Basic/DiagnosticIDs.h"
+
+#include <string>
+#include <tuple>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/XRayInstr.h"
 #include "clang/Driver/CommonArgs.h"
@@ -20,9 +22,16 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Option/Option.h"
-#include "llvm/Support/SpecialCaseList.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <string>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Basic/DiagnosticDriver.h"
+#include "clang/Basic/DiagnosticIDs.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Option/Arg.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang;
 using namespace clang::driver;

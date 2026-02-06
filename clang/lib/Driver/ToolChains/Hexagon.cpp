@@ -7,6 +7,15 @@
 //===----------------------------------------------------------------------===//
 
 #include "Hexagon.h"
+
+#include <algorithm>
+#include <cassert>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "ToolChains/Linux.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/LLVM.h"
@@ -27,13 +36,14 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <algorithm>
-#include <cassert>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <vector>
+#include "clang/Basic/Diagnostic.h"
+#include "clang/Driver/Multilib.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Option/OptSpecifier.h"
 
 using namespace clang::driver;
 using namespace clang::driver::tools;

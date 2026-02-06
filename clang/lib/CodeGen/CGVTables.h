@@ -13,16 +13,29 @@
 #ifndef LLVM_CLANG_LIB_CODEGEN_CGVTABLES_H
 #define LLVM_CLANG_LIB_CODEGEN_CGVTABLES_H
 
+#include <stdint.h>
+#include <iterator>
+#include <utility>
+
 #include "clang/AST/BaseSubobject.h"
-#include "clang/AST/CharUnits.h"
 #include "clang/AST/GlobalDecl.h"
 #include "clang/AST/VTableBuilder.h"
-#include "clang/Basic/ABI.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/IR/GlobalVariable.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace llvm {
+class Constant;
+class GlobalValue;
+class Type;
+}  // namespace llvm
 
 namespace clang {
   class CXXRecordDecl;
+struct ThunkInfo;
 
 namespace CodeGen {
   class CodeGenModule;

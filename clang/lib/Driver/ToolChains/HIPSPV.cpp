@@ -7,6 +7,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "HIPSPV.h"
+
+#include <cassert>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "HIPUtility.h"
 #include "ToolChains/SPIRV.h"
 #include "clang/Basic/DiagnosticDriver.h"
@@ -18,7 +24,6 @@
 #include "clang/Driver/Driver.h"
 #include "clang/Driver/InputInfo.h"
 #include "clang/Driver/Job.h"
-#include "clang/Driver/Tool.h"
 #include "clang/Driver/Types.h"
 #include "clang/Options/Options.h"
 #include "llvm/ADT/SmallVector.h"
@@ -27,9 +32,11 @@
 #include "llvm/Option/Option.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
-#include <cassert>
-#include <memory>
-#include <string>
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/VersionTuple.h"
+#include "llvm/TargetParser/Triple.h"
 
 using namespace clang::driver;
 using namespace clang::driver::toolchains;

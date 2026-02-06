@@ -14,8 +14,14 @@
 #ifndef LLVM_CLANG_SERIALIZATION_MODULEFILE_H
 #define LLVM_CLANG_SERIALIZATION_MODULEFILE_H
 
+#include <sys/types.h>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "clang/Basic/FileEntry.h"
-#include "clang/Basic/FileManager.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/Module.h"
 #include "clang/Basic/SourceLocation.h"
@@ -29,14 +35,12 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Bitstream/BitstreamReader.h"
 #include "llvm/Support/Endian.h"
-#include <cassert>
-#include <cstdint>
-#include <ctime>
-#include <memory>
-#include <optional>
-#include <string>
-#include <sys/types.h>
-#include <vector>
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+
+namespace llvm {
+class MemoryBuffer;
+}  // namespace llvm
 
 namespace clang {
 

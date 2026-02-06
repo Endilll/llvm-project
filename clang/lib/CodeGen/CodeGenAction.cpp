@@ -7,15 +7,24 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/CodeGen/CodeGenAction.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <functional>
+#include <iterator>
+#include <system_error>
+
 #include "BackendConsumer.h"
 #include "CGCall.h"
-#include "CodeGenModule.h"
 #include "CoverageMappingGen.h"
 #include "MacroPPCallbacks.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclGroup.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticDriver.h"
@@ -44,7 +53,6 @@
 #include "llvm/Demangle/Demangle.h"
 #include "llvm/Frontend/Debug/Options.h"
 #include "llvm/Frontend/Driver/CodeGenOptions.h"
-#include "llvm/IR/DebugInfo.h"
 #include "llvm/IR/DiagnosticHandler.h"
 #include "llvm/IR/DiagnosticInfo.h"
 #include "llvm/IR/DiagnosticPrinter.h"
@@ -69,21 +77,30 @@
 #include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Transforms/IPO/Internalize.h"
-#include "llvm/Transforms/Utils/Cloning.h"
+#include "clang/AST/Decl.h"
+#include "clang/Basic/CodeGenOptions.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetOptions.h"
+#include "clang/Frontend/FrontendOptions.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/ilist_iterator.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/IR/Function.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/VirtualFileSystem.h"
+#include "llvm/TargetParser/Triple.h"
 
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
 using namespace clang;
 using namespace llvm;
 
 #define DEBUG_TYPE "codegenaction"
 
 namespace clang {
-class BackendConsumer;
 class ClangDiagnosticHandler final : public DiagnosticHandler {
 public:
   ClangDiagnosticHandler(const CodeGenOptions &CGOpts, BackendConsumer *BCon)

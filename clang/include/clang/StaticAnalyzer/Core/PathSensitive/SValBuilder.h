@@ -14,40 +14,40 @@
 #ifndef LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SVALBUILDER_H
 #define LLVM_CLANG_STATICANALYZER_CORE_PATHSENSITIVE_SVALBUILDER_H
 
+#include <cassert>
+#include <cstdint>
+#include <optional>
+
 #include "clang/AST/ASTContext.h"
-#include "clang/AST/DeclarationName.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprObjC.h"
 #include "clang/AST/Type.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Basic/LangOptions.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/APSIntPtr.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/BasicValueFactory.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/ProgramState_Fwd.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymExpr.h"
 #include "clang/StaticAnalyzer/Core/PathSensitive/SymbolManager.h"
-#include "llvm/ADT/APInt.h"
-#include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/ImmutableList.h"
 #include "llvm/Support/Allocator.h"
-#include <cassert>
-#include <cstdint>
-#include <optional>
+#include "clang/AST/CanonicalType.h"
+#include "clang/AST/Decl.h"
+
+namespace llvm {
+class APInt;
+class APSInt;
+}  // namespace llvm
 
 namespace clang {
 
 class AnalyzerOptions;
-class BlockDecl;
 class CXXBoolLiteralExpr;
 class CXXMethodDecl;
 class CXXRecordDecl;
-class DeclaratorDecl;
-class FunctionDecl;
 class LocationContext;
 class StackFrameContext;
-class Stmt;
 
 namespace ento {
 
@@ -55,6 +55,8 @@ class CallEvent;
 class ConditionTruthVal;
 class ProgramStateManager;
 class StoreRef;
+class APSIntPtr;
+
 class SValBuilder {
   virtual void anchor();
 

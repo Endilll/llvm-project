@@ -9,17 +9,25 @@
 #ifndef LLVM_CLANG_AST_INTERP_DYNAMIC_ALLOCATOR_H
 #define LLVM_CLANG_AST_INTERP_DYNAMIC_ALLOCATOR_H
 
+#include <stdint.h>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <utility>
+
 #include "Descriptor.h"
-#include "InterpBlock.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Allocator.h"
+#include "llvm/ADT/DenseMap.h"
 
 namespace clang {
 class Expr;
+
 namespace interp {
 class Block;
 class InterpState;
+enum PrimType : uint8_t;
 
 /// Manages dynamic memory allocations done during bytecode interpretation.
 ///

@@ -7,11 +7,14 @@
 //===----------------------------------------------------------------------===//
 
 #include "InterpState.h"
+
+#include <cstdlib>
+#include <cstring>
+#include <new>
+
 #include "ByteCode/InterpBlock.h"
 #include "ByteCode/Source.h"
 #include "InterpFrame.h"
-#include "InterpStack.h"
-#include "Program.h"
 #include "State.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/DeclTemplate.h"
@@ -20,10 +23,24 @@
 #include "clang/AST/TypeBase.h"
 #include "clang/Basic/DiagnosticAST.h"
 #include "clang/Basic/LLVM.h"
-#include <cassert>
-#include <cstddef>
-#include <cstdlib>
-#include <cstring>
+#include "ByteCode/Context.h"
+#include "ByteCode/DynamicAllocator.h"
+#include "ByteCode/Function.h"
+#include "ByteCode/Pointer.h"
+#include "clang/AST/OptionalDiagnostic.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace interp {
+class InterpStack;
+class Program;
+}  // namespace interp
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::interp;

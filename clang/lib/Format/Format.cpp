@@ -13,6 +13,24 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Format/Format.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <iterator>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <set>
+#include <string>
+#include <system_error>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <initializer_list>
+
 #include "DefinitionBlockSeparator.h"
 #include "FormatToken.h"
 #include "FormatTokenLexer.h"
@@ -56,21 +74,13 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/YAMLTraits.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <iterator>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <system_error>
-#include <tuple>
-#include <utility>
-#include <vector>
+#include "AffectedRangeManager.h"
+#include "ContinuationIndenter.h"
+#include "WhitespaceManager.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/iterator_range.h"
 
 #define DEBUG_TYPE "format-formatter"
 

@@ -12,10 +12,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Basic/ParsedAttrInfo.h"
-#include "llvm/Support/ManagedStatic.h"
-#include "llvm/Support/Registry.h"
+
 #include <list>
 #include <memory>
+
+#include "llvm/Support/ManagedStatic.h"
+#include "llvm/Support/Registry.h"
+#include "llvm/ADT/iterator_range.h"
 
 using namespace clang;
 

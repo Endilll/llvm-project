@@ -13,6 +13,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "TokenAnnotator.h"
+
+#include <algorithm>
+#include <iterator>
+#include <string>
+#include <vector>
+
 #include "FormatToken.h"
 #include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/LLVM.h"
@@ -25,9 +31,9 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <iterator>
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/StringRef.h"
 
 #define DEBUG_TYPE "format-token-annotator"
 
@@ -454,6 +460,7 @@ private:
                                          tok::kw_typeof,
 #define TRANSFORM_TYPE_TRAIT_DEF(_, Trait) tok::kw___##Trait,
 #include "clang/Basic/TransformTypeTraits.def"
+
                                          tok::kw__Atomic)) {
         OpeningParen.setType(TT_TypeDeclarationParen);
         // decltype() and typeof() usually contain expressions.

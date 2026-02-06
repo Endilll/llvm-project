@@ -11,13 +11,23 @@
 //===----------------------------------------------------------------------===//
 
 #include "HTMLDiagnostics.h"
+
+#include <cassert>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+#include <deque>
+#include <list>
+
 #include "PlistDiagnostics.h"
 #include "SarifDiagnostics.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/Stmt.h"
-#include "clang/Analysis/IssueHash.h"
-#include "clang/Analysis/MacroExpansionContext.h"
 #include "clang/Analysis/PathDiagnostic.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
@@ -42,14 +52,20 @@
 #include "llvm/Support/IOSandbox.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
-#include <system_error>
-#include <utility>
-#include <vector>
+#include "clang/AST/DeclarationName.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/RewriteRope.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/MemoryBufferRef.h"
+
+namespace clang {
+class LangOptions;
+class MacroExpansionContext;
+namespace cross_tu {
+class CrossTranslationUnitContext;
+}  // namespace cross_tu
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

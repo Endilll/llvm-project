@@ -9,14 +9,18 @@
 #ifndef LLVM_CLANG_BASIC_TARGETID_H
 #define LLVM_CLANG_BASIC_TARGETID_H
 
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringMap.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/TargetParser/Triple.h"
 #include <optional>
 #include <set>
 #include <string>
 #include <utility>
+
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringRef.h"
+
+namespace llvm {
+class Triple;
+}  // namespace llvm
 
 namespace clang {
 

@@ -7,6 +7,27 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Frontend/CompilerInvocation.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <ctime>
+#include <fstream>
+#include <functional>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#include <iterator>
+#include <map>
+#include <set>
+
 #include "TestModuleFileExtension.h"
 #include "clang/APINotes/APINotesOptions.h"
 #include "clang/AST/ASTDumperUtils.h"
@@ -40,7 +61,6 @@
 #include "clang/Frontend/MigratorOptions.h"
 #include "clang/Frontend/PreprocessorOutputOptions.h"
 #include "clang/Frontend/TextDiagnosticBuffer.h"
-#include "clang/Frontend/Utils.h"
 #include "clang/Lex/HeaderSearchOptions.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include "clang/Options/OptionUtils.h"
@@ -64,13 +84,11 @@
 #include "llvm/Frontend/Driver/CodeGenOptions.h"
 #include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/Linker/Linker.h"
-#include "llvm/MC/MCTargetOptions.h"
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Option/OptSpecifier.h"
 #include "llvm/Option/OptTable.h"
 #include "llvm/Option/Option.h"
-#include "llvm/ProfileData/InstrProfReader.h"
 #include "llvm/Remarks/HotnessThresholdParser.h"
 #include "llvm/Support/AllocToken.h"
 #include "llvm/Support/Allocator.h"
@@ -78,6 +96,7 @@
 #include "llvm/Support/Error.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/Hash.h"
 #include "llvm/Support/HashBuilder.h"
 #include "llvm/Support/MD5.h"
 #include "llvm/Support/MathExtras.h"
@@ -91,25 +110,18 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/type_traits.h"
-#include "llvm/Target/TargetOptions.h"
 #include "llvm/TargetParser/Host.h"
 #include "llvm/TargetParser/Triple.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <ctime>
-#include <fstream>
-#include <functional>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "clang/Basic/Version.inc"
+#include "llvm/ADT/ADL.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMap.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/StringTable.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/AllocatorBase.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace options;

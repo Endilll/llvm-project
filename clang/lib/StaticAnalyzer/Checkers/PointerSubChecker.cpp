@@ -12,6 +12,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <tuple>
+
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/OperationKinds.h"
@@ -25,9 +30,17 @@
 #include "clang/StaticAnalyzer/Core/PathSensitive/MemRegion.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/FormatVariadic.h"
-#include <memory>
-#include <string>
-#include <utility>
+#include "clang/AST/TypeBase.h"
+#include "clang/Analysis/PathDiagnostic.h"
+#include "clang/StaticAnalyzer/Core/PathSensitive/SVals.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/FormatVariadicDetails.h"
+
+namespace clang {
+namespace ento {
+class ExplodedNode;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

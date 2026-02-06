@@ -9,8 +9,12 @@
 #ifndef LLVM_CLANG_DRIVER_DISTRO_H
 #define LLVM_CLANG_DRIVER_DISTRO_H
 
-#include "llvm/Support/VirtualFileSystem.h"
-#include "llvm/TargetParser/Triple.h"
+namespace llvm {
+class Triple;
+namespace vfs {
+class FileSystem;
+}  // namespace vfs
+}  // namespace llvm
 
 namespace clang {
 namespace driver {

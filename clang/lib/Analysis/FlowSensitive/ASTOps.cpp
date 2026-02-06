@@ -11,8 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/FlowSensitive/ASTOps.h"
+
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <vector>
+
 #include "clang/AST/ASTLambda.h"
-#include "clang/AST/ComputeDependence.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/DeclCXX.h"
@@ -24,10 +29,7 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SetVector.h"
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <vector>
+#include "clang/AST/LambdaCapture.h"
 
 #define DEBUG_TYPE "dataflow"
 

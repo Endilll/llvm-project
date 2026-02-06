@@ -15,17 +15,18 @@
 #ifndef LLVM_CLANG_SERIALIZATION_GLOBALMODULEINDEX_H
 #define LLVM_CLANG_SERIALIZATION_GLOBALMODULEINDEX_H
 
+#include <sys/types.h>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Error.h"
-#include <ctime>
-#include <memory>
-#include <string>
-#include <sys/types.h>
-#include <utility>
+#include "llvm/Support/AllocatorBase.h"
 
 namespace llvm {
 class BitstreamCursor;
@@ -36,7 +37,6 @@ namespace clang {
 
 class FileManager;
 class IdentifierIterator;
-class PCHContainerOperations;
 class PCHContainerReader;
 
 namespace serialization {

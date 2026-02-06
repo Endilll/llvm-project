@@ -13,9 +13,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstddef>
+#include <utility>
+
 #include "CoroutineStmtBuilder.h"
 #include "clang/AST/ASTLambda.h"
-#include "clang/AST/Attrs.inc"
+#include "clang/AST/Attr.h"
 #include "clang/AST/CanonicalType.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -31,7 +35,6 @@
 #include "clang/AST/StmtCXX.h"
 #include "clang/AST/TemplateBase.h"
 #include "clang/AST/TemplateName.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/AST/UnresolvedSet.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/DiagnosticSema.h"
@@ -46,7 +49,6 @@
 #include "clang/Sema/EnterExpressionEvaluationContext.h"
 #include "clang/Sema/Initialization.h"
 #include "clang/Sema/Lookup.h"
-#include "clang/Sema/Overload.h"
 #include "clang/Sema/Ownership.h"
 #include "clang/Sema/ScopeInfo.h"
 #include "clang/Sema/Sema.h"
@@ -54,9 +56,17 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/Casting.h"
-#include <cassert>
-#include <cstddef>
-#include <utility>
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclObjC.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Sema/CleanupInfo.h"
+#include "clang/Sema/Scope.h"
+#include "clang/Sema/SemaBase.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 using namespace sema;

@@ -13,18 +13,20 @@
 #ifndef LLVM_CLANG_CODEGEN_MODULEBUILDER_H
 #define LLVM_CLANG_CODEGEN_MODULEBUILDER_H
 
-#include "clang/AST/ASTConsumer.h"
-#include "clang/Basic/LLVM.h"
-#include "llvm/ADT/StringRef.h"
 #include <memory>
 #include <optional>
 #include <utility>
+#include <iterator>
+
+#include "clang/AST/ASTConsumer.h"
+#include "clang/Basic/LLVM.h"
+#include "llvm/ADT/StringRef.h"
 
 namespace llvm {
   class Constant;
   class LLVMContext;
   class Module;
-  class StringRef;
+template <typename T> class IntrusiveRefCntPtr;
 
   namespace vfs {
   class FileSystem;
@@ -41,7 +43,6 @@ namespace clang {
   class DiagnosticsEngine;
   class GlobalDecl;
   class HeaderSearchOptions;
-  class LangOptions;
   class PreprocessorOptions;
   class CompilerInstance;
 

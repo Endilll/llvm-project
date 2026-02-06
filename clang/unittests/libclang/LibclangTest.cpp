@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "TestUtils.h"
+#include "clang-c/BuildSystem.h"
 #include "clang-c/Index.h"
 #include "clang-c/Rewrite.h"
 #include "llvm/ADT/StringRef.h"

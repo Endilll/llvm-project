@@ -14,8 +14,13 @@
 #ifndef LLVM_CLANG_AST_OPENACCCLAUSE_H
 #define LLVM_CLANG_AST_OPENACCCLAUSE_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
+#include <cassert>
+#include <cstddef>
+#include <optional>
+#include <utility>
+#include <variant>
+#include <new>
+
 #include "clang/AST/Expr.h"
 #include "clang/AST/PrettyPrinter.h"
 #include "clang/AST/StmtIterator.h"
@@ -29,14 +34,14 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TrailingObjects.h"
-
-#include <cassert>
-#include <cstddef>
-#include <optional>
-#include <utility>
-#include <variant>
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace clang {
+class ASTContext;
+class Stmt;
+class VarDecl;
+
 /// This is the base type for all OpenACC Clauses.
 class OpenACCClause {
   OpenACCClauseKind Kind;

@@ -11,25 +11,6 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/AST/CharUnits.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclTemplate.h"
-#include "clang/AST/DynamicRecursiveASTVisitor.h"
-#include "clang/AST/RecordLayout.h"
-#include "clang/AST/TypeBase.h"
-#include "clang/Analysis/PathDiagnostic.h"
-#include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/StaticAnalyzer/Checkers/BuiltinCheckerRegistration.h"
-#include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
-#include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
-#include "clang/StaticAnalyzer/Core/Checker.h"
-#include "clang/StaticAnalyzer/Core/PathSensitive/AnalysisManager.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/ADT/bit.h"
-#include "llvm/Support/raw_ostream.h"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
@@ -37,6 +18,41 @@
 #include <memory>
 #include <tuple>
 #include <utility>
+#include <string>
+
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclTemplate.h"
+#include "clang/AST/DynamicRecursiveASTVisitor.h"
+#include "clang/AST/RecordLayout.h"
+#include "clang/Analysis/PathDiagnostic.h"
+#include "clang/Basic/LLVM.h"
+#include "clang/Basic/LangOptions.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/StaticAnalyzer/Core/BugReporter/BugReporter.h"
+#include "clang/StaticAnalyzer/Core/BugReporter/BugType.h"
+#include "clang/StaticAnalyzer/Core/Checker.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/bit.h"
+#include "llvm/Support/raw_ostream.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclCXX.h"
+#include "clang/AST/PrettyPrinter.h"
+#include "clang/AST/Type.h"
+#include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
+#include "clang/StaticAnalyzer/Core/CheckerManager.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+namespace ento {
+class AnalysisManager;
+}  // namespace ento
+}  // namespace clang
 
 using namespace clang;
 using namespace ento;

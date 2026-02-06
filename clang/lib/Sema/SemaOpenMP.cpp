@@ -12,13 +12,25 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaOpenMP.h"
+
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+
 #include "clang/AST/ASTConsumer.h"
 
 #include "TreeTransform.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTMutationListener.h"
 #include "clang/AST/AttrIterator.h"
-#include "clang/AST/Attrs.inc"
 #include "clang/AST/CXXInheritance.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclAccessPair.h"
@@ -91,22 +103,34 @@
 #include "llvm/Frontend/OpenMP/OMP.h"
 #include "llvm/Frontend/OpenMP/OMP.h.inc"
 #include "llvm/Frontend/OpenMP/OMPAssume.h"
-#include "llvm/Frontend/OpenMP/OMPConstants.h"
 #include "llvm/Frontend/OpenMP/OMPContext.h"
 #include "llvm/IR/Assumptions.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/AST/ExprCXX.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/AST/Type.h"
+#include "clang/AST/TypeLoc.h"
+#include "clang/AST/TypeOrdering.h"
+#include "clang/Basic/IdentifierTable.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Sema/Overload.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringMapEntry.h"
+#include "llvm/ADT/StringSet.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator.h"
+#include "llvm/Support/AllocatorBase.h"
+
+namespace llvm {
+namespace omp {
+enum class DefaultKind;
+}  // namespace omp
+}  // namespace llvm
 
 using namespace clang;
 using namespace llvm::omp;

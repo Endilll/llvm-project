@@ -11,15 +11,17 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Sema/SemaHexagon.h"
-#include "clang/AST/Expr.h"
+
+#include <cstdint>
+#include <iterator>
+
 #include "clang/Basic/TargetBuiltins.h"
 #include "clang/Sema/Sema.h"
 #include "clang/Sema/SemaBase.h"
 #include "llvm/ADT/STLExtras.h"
-#include <cstdint>
-#include <iterator>
 
 namespace clang {
+class CallExpr;
 
 SemaHexagon::SemaHexagon(Sema &S) : SemaBase(S) {}
 

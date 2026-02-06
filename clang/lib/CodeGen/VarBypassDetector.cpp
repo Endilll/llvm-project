@@ -8,13 +8,17 @@
 
 #include "VarBypassDetector.h"
 
+#include <cassert>
+
 #include "CodeGenModule.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/Stmt.h"
 #include "clang/Basic/LLVM.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
+#include "clang/AST/StmtIterator.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 using namespace CodeGen;

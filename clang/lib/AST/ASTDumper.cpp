@@ -12,6 +12,10 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/AST/ASTDumper.h"
+
+#include <functional>
+#include <utility>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ASTDumperUtils.h"
@@ -29,11 +33,17 @@
 #include "clang/AST/TypeBase.h"
 #include "clang/AST/TypeLoc.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceManager.h"
 #include "clang/Basic/Specifiers.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <functional>
+#include "clang/AST/APValue.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/Basic/Diagnostic.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class SourceManager;
+}  // namespace clang
 
 using namespace clang;
 using namespace clang::comments;

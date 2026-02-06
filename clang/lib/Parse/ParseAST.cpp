@@ -11,6 +11,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Parse/ParseAST.h"
+
+#include <memory>
+#include <utility>
+#include <string>
+#include <vector>
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ExternalASTSource.h"
@@ -19,17 +25,23 @@
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Parse/Parser.h"
-#include "clang/Sema/CodeCompleteConsumer.h"
 #include "clang/Sema/EnterExpressionEvaluationContext.h"
 #include "clang/Sema/Sema.h"
-#include "clang/Sema/SemaConsumer.h"
 #include "clang/Sema/TemplateInstCallback.h"
 #include "llvm/Support/CrashRecoveryContext.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/TimeProfiler.h"
 #include "llvm/Support/raw_ostream.h"
-#include <memory>
-#include <utility>
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclGroup.h"
+#include "clang/Basic/FileEntry.h"
+#include "clang/Basic/SourceLocation.h"
+#include "clang/Basic/SourceManager.h"
+#include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/Token.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
 
 using namespace clang;
 

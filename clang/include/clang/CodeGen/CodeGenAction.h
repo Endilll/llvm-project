@@ -9,20 +9,22 @@
 #ifndef LLVM_CLANG_CODEGEN_CODEGENACTION_H
 #define LLVM_CLANG_CODEGEN_CODEGENACTION_H
 
-#include "clang/AST/ASTConsumer.h"
+#include <memory>
+
 #include "clang/Basic/LLVM.h"
 #include "clang/Frontend/FrontendAction.h"
 #include "llvm/Support/MemoryBufferRef.h"
-#include <memory>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/IR/Module.h"
 
 namespace llvm {
   class LLVMContext;
-  class Module;
 }
 
 namespace clang {
 class BackendConsumer;
 class CodeGenerator;
+class CompilerInstance;
 
 class CodeGenAction : public ASTFrontendAction {
 private:

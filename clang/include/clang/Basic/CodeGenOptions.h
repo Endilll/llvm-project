@@ -13,9 +13,17 @@
 #ifndef LLVM_CLANG_BASIC_CODEGENOPTIONS_H
 #define LLVM_CLANG_BASIC_CODEGENOPTIONS_H
 
+#include <cstdint>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+#include <iterator>
+
 #include "clang/Basic/CFProtectionOptions.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/LangOptions.h"
 #include "clang/Basic/PointerAuthOptions.h"
 #include "clang/Basic/Sanitizers.h"
 #include "clang/Basic/XRayInstr.h"
@@ -28,20 +36,14 @@
 #include "llvm/Support/CodeGen.h"
 #include "llvm/Support/Compression.h"
 #include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/Hash.h"
 #include "llvm/Support/Regex.h"
 #include "llvm/Target/TargetOptions.h"
 #include "llvm/Transforms/Instrumentation/AddressSanitizerOptions.h"
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/StringRef.h"
 
 namespace llvm {
 class PassBuilder;
+enum class KCFIHashAlgorithm;
 }
 namespace clang {
 

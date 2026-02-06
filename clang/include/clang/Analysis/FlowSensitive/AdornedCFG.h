@@ -14,8 +14,9 @@
 #ifndef LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_ADORNEDCFG_H
 #define LLVM_CLANG_ANALYSIS_FLOWSENSITIVE_ADORNEDCFG_H
 
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
+#include <memory>
+#include <utility>
+
 #include "clang/AST/Stmt.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Analysis/FlowSensitive/ASTOps.h"
@@ -23,10 +24,13 @@
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/Support/Error.h"
-#include <memory>
-#include <utility>
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
+class ASTContext;
+class Decl;
+class FunctionDecl;
+
 namespace dataflow {
 
 namespace internal {

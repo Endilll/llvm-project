@@ -14,6 +14,11 @@
 
 #include "clang/AST/ODRHash.h"
 
+#include <cassert>
+#include <climits>
+#include <utility>
+#include <iterator>
+
 #include "clang/AST/ASTConcept.h"
 #include "clang/AST/Decl.h"
 #include "clang/AST/DeclBase.h"
@@ -34,9 +39,15 @@
 #include "llvm/ADT/STLForwardCompat.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Support/ErrorHandling.h"
-#include <cassert>
-#include <climits>
-#include <utility>
+#include "clang/AST/APValue.h"
+#include "clang/AST/ASTContext.h"
+#include "clang/AST/CharUnits.h"
+#include "clang/AST/NestedNameSpecifierBase.h"
+#include "clang/AST/Stmt.h"
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
 
 using namespace clang;
 

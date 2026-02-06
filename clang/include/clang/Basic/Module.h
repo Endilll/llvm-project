@@ -15,6 +15,18 @@
 #ifndef LLVM_CLANG_BASIC_MODULE_H
 #define LLVM_CLANG_BASIC_MODULE_H
 
+#include <sys/types.h>
+#include <array>
+#include <cassert>
+#include <cstdint>
+#include <ctime>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
+#include <vector>
+#include <algorithm>
+
 #include "clang/Basic/DirectoryEntry.h"
 #include "clang/Basic/FileEntry.h"
 #include "clang/Basic/LLVM.h"
@@ -27,16 +39,9 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Compiler.h"
-#include <array>
-#include <cassert>
-#include <cstdint>
-#include <ctime>
-#include <optional>
-#include <string>
-#include <sys/types.h>
-#include <utility>
-#include <variant>
-#include <vector>
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/AllocatorBase.h"
 
 namespace llvm {
 

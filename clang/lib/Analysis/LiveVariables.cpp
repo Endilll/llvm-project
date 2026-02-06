@@ -11,6 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 #include "clang/Analysis/Analyses/LiveVariables.h"
+
+#include <cassert>
+#include <memory>
+#include <optional>
+#include <vector>
+#include <string>
+
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
@@ -24,7 +31,6 @@
 #include "clang/Analysis/CFG.h"
 #include "clang/Analysis/FlowSensitive/DataflowWorklist.h"
 #include "clang/Basic/LLVM.h"
-#include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TypeTraits.h"
 #include "llvm/ADT/BitVector.h"
 #include "llvm/ADT/DenseMap.h"
@@ -32,10 +38,17 @@
 #include "llvm/ADT/ImmutableSet.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <memory>
-#include <optional>
-#include <vector>
+#include "clang/AST/Decl.h"
+#include "clang/AST/DeclBase.h"
+#include "clang/AST/DeclarationName.h"
+#include "clang/AST/StmtIterator.h"
+#include "clang/Basic/SourceLocation.h"
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/Support/Casting.h"
+
+namespace clang {
+class ASTContext;
+}  // namespace clang
 
 using namespace clang;
 

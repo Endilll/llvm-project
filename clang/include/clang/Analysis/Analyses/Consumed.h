@@ -14,23 +14,26 @@
 #ifndef LLVM_CLANG_ANALYSIS_ANALYSES_CONSUMED_H
 #define LLVM_CLANG_ANALYSIS_ANALYSES_CONSUMED_H
 
+#include <list>
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include "clang/Analysis/Analyses/PostOrderCFGView.h"
 #include "clang/Analysis/CFG.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/PartialDiagnostic.h"
 #include "clang/Basic/SourceLocation.h"
 #include "llvm/ADT/DenseMap.h"
-#include <list>
-#include <memory>
-#include <utility>
-#include <vector>
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 namespace clang {
 
 class AnalysisDeclContext;
 class CXXBindTemporaryExpr;
 class FunctionDecl;
-class PostOrderCFGView;
 class Stmt;
 class VarDecl;
 

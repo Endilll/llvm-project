@@ -21,6 +21,10 @@
 //
 // Remark options are also handled here, analogously, except that they are much
 // simpler because a remark can't be promoted to an error.
+#include <string>
+#include <memory>
+#include <vector>
+
 #include "clang/Basic/Diagnostic.h"
 #include "clang/Basic/DiagnosticDriver.h"
 #include "clang/Basic/DiagnosticFrontend.h"
@@ -29,7 +33,12 @@
 #include "clang/Basic/LLVM.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/VirtualFileSystem.h"
-#include <string>
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/MemoryBuffer.h"
+
 using namespace clang;
 
 // EmitUnknownDiagWarning - Emit a warning and typo hint for unknown warning

@@ -11,18 +11,26 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cassert>
+#include <cstddef>
+#include <string>
+
 #include "FormatStringParsing.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/FormatString.h"
 #include "clang/AST/OSLog.h"
-#include "clang/AST/TypeBase.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/TargetInfo.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/Regex.h"
-#include <cassert>
-#include <cstddef>
-#include <string>
+#include "clang/AST/Decl.h"
+#include "clang/AST/Type.h"
+#include "clang/Basic/LangOptions.h"
+#include "llvm/ADT/STLFunctionalExtras.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/TargetParser/Triple.h"
 
 using clang::analyze_format_string::ArgType;
 using clang::analyze_format_string::FormatStringHandler;
@@ -862,29 +870,38 @@ bool PrintfSpecifier::fixType(QualType QT, const LangOptions &LangOpt,
 #define IMAGE_TYPE(ImgType, Id, SingletonId, Access, Suffix) \
   case BuiltinType::Id:
 #include "clang/Basic/OpenCLImageTypes.def"
+
 #define EXT_OPAQUE_TYPE(ExtType, Id, Ext) \
   case BuiltinType::Id:
 #include "clang/Basic/OpenCLExtensionTypes.def"
+
 #define SVE_TYPE(Name, Id, SingletonId) \
   case BuiltinType::Id:
 #include "clang/Basic/AArch64ACLETypes.def"
+
 #define PPC_VECTOR_TYPE(Name, Id, Size) \
   case BuiltinType::Id:
 #include "clang/Basic/PPCTypes.def"
+
 #define RVV_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/RISCVVTypes.def"
+
 #define WASM_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/WebAssemblyReferenceTypes.def"
+
 #define AMDGPU_TYPE(Name, Id, SingletonId, Width, Align) case BuiltinType::Id:
 #include "clang/Basic/AMDGPUTypes.def"
+
 #define HLSL_INTANGIBLE_TYPE(Name, Id, SingletonId) case BuiltinType::Id:
 #include "clang/Basic/HLSLIntangibleTypes.def"
+
 #define SIGNED_TYPE(Id, SingletonId)
 #define UNSIGNED_TYPE(Id, SingletonId)
 #define FLOATING_TYPE(Id, SingletonId)
 #define BUILTIN_TYPE(Id, SingletonId) \
   case BuiltinType::Id:
 #include "clang/AST/BuiltinTypes.def"
+
     // Misc other stuff which doesn't make sense here.
     return false;
 
